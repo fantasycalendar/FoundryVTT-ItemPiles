@@ -1,3 +1,21 @@
 {
-    "MODULE.hello": "hello"
+    "ITEM-PILES": {
+        "AddToPile": {
+            "Title": "Add to pile?",
+            "Content": "There's already an item pile at this location, do you want to add the item to pile?",
+            "AddToPile": "Add to pile",
+            "NewPile": "Create new pile",
+            "Cancel": "Don't drop item"
+        },
+        "Setting": {
+            "Debug": {
+                "Title": "Enable debugging",
+                "Label": "Prints debug messages to the console"
+            },
+            "Quantity": {
+                "Title": "Item quantity attribute",
+                "Label": "Here you can configure what the attribute path is for an item's quantity. For example, in the 5e system, each item's quantity is in each item's 'item.data.data.quantity', so you'd put `data.quantity' in this setting."
+            }
+        }
+    }
 }
