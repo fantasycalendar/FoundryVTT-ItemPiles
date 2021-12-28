@@ -218,7 +218,6 @@ class ItemPile {
     }
 
     remove(){
-        this._disableEvents();
         pileManager.piles.delete(this.tokenDocument.uuid);
         lib.debug(`Removed pile: ${this.tokenDocument.uuid}`);
     }
@@ -322,9 +321,9 @@ class ItemPile {
 
         if(!controlledToken || controlledToken.document === this.tokenDocument) return;
 
-        const distance = lib.distance_between_rect(this.tokenDocument.object, controlledToken) / canvas.grid.size;
+        const distance = Math.floor(lib.distance_between_rect(this.tokenDocument.object, controlledToken) / canvas.grid.size)+1;
 
-        if((this._data.distance - 1) < distance) return;
+        if(this._data.distance < distance) return;
 
         if(this.isLocked){
             return this.rattle();
