@@ -28,10 +28,6 @@
             "Cancel": "Don't drop item"
         },
         "Setting": {
-            "Debug": {
-                "Title": "Enable debugging",
-                "Label": "Prints debug messages to the console"
-            },
             "Quantity": {
                 "Title": "Item quantity attribute",
                 "Label": "Here you can configure what the attribute path is for an item's quantity. For example, in the 5e system, each item's quantity is in each item's 'item.data.data.quantity', so you'd put `data.quantity' in this setting."
@@ -39,6 +35,14 @@
             "DeleteEmptyPiles": {
                 "Title": "Auto-delete empty piles",
                 "Label": "This causes item piles to delete themselves once they run out of items."
+            },
+            "PreloadFiles": {
+                "Title": "Preload Files",
+                "Label": "Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience."
+            },
+            "Debug": {
+                "Title": "Enable debugging",
+                "Label": "Prints debug messages to the console"
             }
         }
     }

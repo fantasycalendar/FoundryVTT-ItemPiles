@@ -2,7 +2,7 @@ import CONSTANTS from "./constants.js";
 import * as lib from "./lib/lib.js"
 import registerSettings from "./settings.js";
 import { itemPileSocket, registerSocket, SOCKET_HANDLERS } from "./socket.js";
-import ItemPilesAPI from "./api.js";
+import API from "./api.js";
 
 const pileManager = {
 
@@ -14,6 +14,7 @@ const pileManager = {
         Hooks.once("socketlib.ready", registerSocket);
         Hooks.on("dropCanvasData", this._dropCanvasData.bind(this));
         Hooks.on("canvasReady", this._canvasReady.bind(this));
+        Hooks.on("createToken", this._createPile.bind(this));
         Hooks.on("updateToken", this._updatePile.bind(this));
         Hooks.on("deleteToken", this._deletePile.bind(this));
         Hooks.on("getActorSheetHeaderButtons", this._insertItemPileHeaderButtons.bind(this));
@@ -24,10 +25,6 @@ const pileManager = {
         let obj = actorSheet.object;
 
         if(!obj.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)) return;
-
-        if(obj.token){
-            obj = pileManager.piles.get(obj.token.uuid)
-        }
 
         buttons.unshift({
             label: "ITEM-PILES.Defaults.Configure",
@@ -113,19 +110,24 @@ const pileManager = {
             dropData.position = { x, y };
         }
 
-        return ItemPilesAPI.handleDrop(dropData);
+        return API.handleDrop(dropData);
     },
 
     _canvasReady(){
         pileManager.piles.forEach((pile) => pile._disableEvents());
         pileManager.piles = new Map();
-        const tokens = canvas.tokens.placeables.filter((token) => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME));
-        tokens.forEach(token => ItemPile.make(token));
+        const tokens = canvas.tokens.placeables.filter((token) => token.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME));
+        tokens.forEach(token => ItemPile.make(token.document));
+    },
+
+    _createPile(doc){
+        if(!doc.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)) return;
+        ItemPile.make(doc);
     },
 
     _updatePile(doc, changes){
         const pile = pileManager.piles.get(doc.uuid);
-        if(!pile || !changes?.actorData?.flags) return;
+        if(!pile) return;
         pile.updated();
     },
 
@@ -143,46 +145,53 @@ class ItemPile {
     /**
      * Sets up a managed item pile
      *
-     * @param {Token} token
+     * @param {TokenDocument} tokenDocument
      */
-    static make(token){
-        const pile = new ItemPile(token);
-        pileManager.piles.set(token.document.uuid, pile);
+    static make(tokenDocument){
+        const pile = new ItemPile(tokenDocument);
+        pileManager.piles.set(tokenDocument.uuid, pile);
         return pile;
     }
 
-    constructor(token) {
-        this.token = token;
+    constructor(tokenDocument) {
+        this.tokenDocument = tokenDocument;
         this._clicked = false;
-        this._data = this.token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
-        this.setup();
+        this._data = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        this._preloaded = new Set();
+        this._setup();
     }
 
-    async setup(){
-        lib.debug(`Initialized pile: ${this.token.document.uuid}`);
+    async _setup(){
         await this.update();
+        await lib.wait(50);
         this._enableEvents();
+        this._preloadTextures();
+        lib.debug(`Initialized pile: ${this.tokenDocument.uuid}`);
     }
 
-    remove(){
-        lib.debug(`Removed pile: ${this.token.document.uuid}`);
-        this._disableEvents();
-        pileManager.piles.delete(this.token.document.uuid);
+    _preloadTextures(){
+        if(!game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")) return;
+        for(let [key, value] of Object.entries(this._data)){
+            if(this._preloaded.has(value) || !value) continue;
+            if(key.toLowerCase().includes("image")){
+                loadTexture(value);
+                lib.debug(`Preloaded image: ${value}`);
+            }else if(key.toLowerCase().includes("sound")){
+                AudioHelper.preloadSound(value);
+                lib.debug(`Preloaded sound: ${value}`);
+            }
+            this._preloaded.add(value);
+        }
     }
 
     _enableEvents(){
-        this.token.on('pointerdown', this.clicked.bind(this));
+        if(!lib.object_has_event(this.tokenDocument.object, "pointerdown", this.clicked.bind(this))){
+            this.tokenDocument.object.on('pointerdown', this.clicked.bind(this));
+        }
     }
 
     _disableEvents(){
-        this.token.off('pointerdown', this.clicked.bind(this));
-    }
-
-    async updated(){
-        lib.debug(`Updated pile: ${this.token.document.uuid}`);
-        this._data = this.token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
-        await lib.wait(50);
-        this._enableEvents();
+        this.tokenDocument.object.off('pointerdown', this.clicked.bind(this));
     }
 
     _getImage(data){
@@ -201,21 +210,36 @@ class ItemPile {
         }
 
         if(!img) {
-            img = this.token.actor.data.img;
+            img = this.tokenDocument.actor.data.img;
         }
 
         return img;
 
     }
 
+    remove(){
+        this._disableEvents();
+        pileManager.piles.delete(this.tokenDocument.uuid);
+        lib.debug(`Removed pile: ${this.tokenDocument.uuid}`);
+    }
+
+    async updated(){
+        lib.debug(`Updated pile: ${this.tokenDocument.uuid}`);
+        this._data = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        await lib.wait(50);
+        this._enableEvents();
+        this._preloadTextures();
+    }
+
     get items(){
-        return this.token.actor.items;
+        return this.tokenDocument.actor.items;
     }
 
     async update(inData = false){
         if(!inData) inData = this._data;
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, this.token.document.uuid, {
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, this.tokenDocument.uuid, {
             "img": this._getImage(inData),
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: inData,
             [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: inData
         });
     }
@@ -292,15 +316,15 @@ class ItemPile {
 
     async doubleClicked(){
 
-        lib.debug(`Clicked: ${this.token.document.uuid}`);
+        lib.debug(`Clicked: ${this.tokenDocument.uuid}`);
 
         let controlledToken = canvas.tokens.controlled?.[0] ?? false;
 
-        if(!controlledToken || controlledToken === this.token) return;
+        if(!controlledToken || controlledToken.document === this.tokenDocument) return;
 
-        const distance = lib.distance_between(this.token, controlledToken) / canvas.grid.size;
+        const distance = lib.distance_between_rect(this.tokenDocument.object, controlledToken) / canvas.grid.size;
 
-        if(distance > this._data.distance) return;
+        if((this._data.distance - 1) < distance) return;
 
         if(this.isLocked){
             return this.rattle();
@@ -315,11 +339,10 @@ class ItemPile {
 }
 
 class ItemPileConfig extends FormApplication {
-    constructor(object) {
+
+    constructor(actor) {
         super();
-        this.actor = object?.token?.actor ?? object;
-        this.pile = object;
-        this.isPile = object instanceof ItemPile;
+        this.document = actor?.token ?? actor;
     }
 
     /* -------------------------------------------- */
@@ -337,17 +360,23 @@ class ItemPileConfig extends FormApplication {
 
     async getData(options) {
         const data = super.getData(options);
-        data.pile_data = this.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        data.pile_data = this.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
         return data;
     }
 
     async _updateObject(event, formData) {
         const data = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, formData);
-        if(this.isPile){
-            await this.pile.update(data);
-        }else{
-            await this.actor.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME, data);
+
+        if (this.document instanceof TokenDocument) {
+            const pile = pileManager.piles.get(this.document.uuid);
+            return pile.update(data);
         }
+
+        return this.document.update({
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
+            [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
+        });
+
     }
 
 }

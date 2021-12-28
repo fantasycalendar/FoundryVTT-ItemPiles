@@ -6,15 +6,6 @@ const debouncedReload = debounce(() => {
 
 export default function registerSettings(){
 
-    game.settings.register(CONSTANTS.MODULE_NAME, "debug", {
-        name: "ITEM-PILES.Setting.Debug.Title",
-        hint: "ITEM-PILES.Setting.Debug.Label",
-        scope: "world",
-        config: true,
-        default: false,
-        type: Boolean
-    });
-
     game.settings.register(CONSTANTS.MODULE_NAME, "quantityAttribute", {
         name: "ITEM-PILES.Setting.Quantity.Title",
         hint: "ITEM-PILES.Setting.Quantity.Label",
@@ -31,6 +22,24 @@ export default function registerSettings(){
         scope: "world",
         config: true,
         default: true,
+        type: Boolean
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "preloadFiles", {
+        name: "ITEM-PILES.Setting.PreloadFiles.Title",
+        hint: "ITEM-PILES.Setting.PreloadFiles.Label",
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "debug", {
+        name: "ITEM-PILES.Setting.Debug.Title",
+        hint: "ITEM-PILES.Setting.Debug.Label",
+        scope: "world",
+        config: true,
+        default: false,
         type: Boolean
     });
 

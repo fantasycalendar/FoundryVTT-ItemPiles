@@ -1,7 +1,7 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 
-export default class ItemPilesAPI {
+export default class API {
 
     /**
      * The attribute used to track the quantity of items in this system
@@ -35,14 +35,14 @@ export default class ItemPilesAPI {
     }={}) {
 
         if(!target) {
-            const pile = await ItemPilesAPI.createPile(position);
+            const pile = await API.createPile(position);
             target = pile.actor;
         }
 
         if(actor){
-            await ItemPilesAPI.transferItem(actor, target, itemData._id, quantity)
+            await API.transferItem(actor, target, itemData._id, quantity)
         }else{
-            await ItemPilesAPI.addItem(target, itemData, quantity);
+            await API.addItem(target, itemData, quantity);
         }
 
         return target;
@@ -57,19 +57,23 @@ export default class ItemPilesAPI {
 
             lib.custom_notify("The primary item pile has been added to your Actors list.<br>You can configure the default look and behavior on it.")
 
+            const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS)
+
             pileActor = await Actor.create({
                 name: "Item Pile",
                 type: "character",
                 img: "icons/svg/mystery-man.svg",
-                "flags.item-piles.data": foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS)
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
             });
 
             await pileActor.update({ "token": {
-                    actorLink: false,
-                    bar1: { attribute: "" },
-                    vision: false,
-                    displayName: 50
-                }})
+                actorLink: false,
+                bar1: { attribute: "" },
+                vision: false,
+                displayName: 50,
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
+            }});
+
         }
 
         const tokenData = await pileActor.getTokenData();
@@ -81,9 +85,9 @@ export default class ItemPilesAPI {
 
         const [ tokenDocument ] = await canvas.scene.createEmbeddedDocuments("Token", [ tokenData ])
 
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await lib.wait(50)
 
-        ItemPile.make(tokenDocument.object)
+        ItemPile.make(tokenDocument)
 
         return tokenDocument;
 
@@ -110,9 +114,9 @@ export default class ItemPilesAPI {
 
         const itemData = actorItem.toObject();
 
-        const quantityRemoved = await ItemPilesAPI.removeItem(fromActor, itemId);
+        const quantityRemoved = await API.removeItem(fromActor, itemId);
 
-        return ItemPilesAPI.addItem(toActor, itemData, quantityRemoved);
+        return API.addItem(toActor, itemData, quantityRemoved);
 
     }
 
@@ -228,7 +232,7 @@ export default class ItemPilesAPI {
      *
      * @param documentUuid
      * @param updates
-     * @returns {Promise<*>}
+     * @returns {Promise}
      */
     static async updatePile(documentUuid, updates){
         const document = await fromUuid(documentUuid);
