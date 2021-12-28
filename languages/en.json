@@ -20,13 +20,23 @@
             "OpenSoundPath": "Opening Sound Path",
             "LockedSoundPath": "Locked Sound Path"
         },
-        "AddToPile": {
-            "Title": "Add to pile?",
-            "Content": "There's already an item pile at this location, do you want to add the item to pile?",
+        "HUD": {
+            "ToggleLocked": "Toggle Locked",
+            "ToggleClosed": "Toggle Closed",
+            "Configure": "Configure Pile"
+        },
+
+        "DropItem": {
+            "Title": "Dropping Item",
+            "Dropping": "You're dropping",
+            "ExistingPiles": "There's already an item pile at this location, you will add your item(s) to this pile.",
+            "QuantityToDrop": "You have {quantity} of this item, how many do you want to drop?",
             "AddToPile": "Add to pile",
             "NewPile": "Create new pile",
-            "Cancel": "Don't drop item"
+            "Cancel": "Cancel",
+            "LockedWarning": "This item pile is locked and cannot be opened - you can't drop items in it."
         },
+
         "Setting": {
             "Quantity": {
                 "Title": "Item quantity attribute",

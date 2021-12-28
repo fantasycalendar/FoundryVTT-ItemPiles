@@ -30,7 +30,7 @@ export function getTokensAtLocation(position){
     return canvas.tokens.placeables.filter(token => {
         return position.x >= token.x && position.x < (token.x + (token.data.width * canvas.grid.size))
             && position.y >= token.y && position.y < (token.y + (token.data.height * canvas.grid.size));
-    }).map(token => token.actor);
+    });
 }
 
 export function distance_between_rect(p1, p2){

@@ -1,5 +1,7 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
+import ItemPile from "./itemPile.js";
+import { managedPiles } from "./module.js";
 
 export default class API {
 
@@ -13,18 +15,18 @@ export default class API {
     }
 
     /**
-     * If not given a pile, this method creates an item pile at a location, then adds an item to it.
+     * If not given an actor, this method creates an item pile at a location, then adds an item to it.
      *
-     * If a target was provided, it will just add the item to that target.
+     * If a target was provided, it will just add the item to that target actor.
      *
-     * If an actor was provided, it will transfer the item from the actor to the target.
+     * If an actor was provided, it will transfer the item from the actor to the target actor.
      *
-     * @param {Actor|ItemPile|Boolean} actor
-     * @param {Actor|ItemPile|Boolean} target
+     * @param {Actor|Boolean} actor
+     * @param {Actor|Boolean} target
      * @param {Object|Boolean} position
      * @param {Object} itemData
      * @param {Number} quantity
-     * @returns {Promise<ItemPile>}
+     * @returns {Promise<Actor>}
      */
     static async handleDrop({
         actor = false,
@@ -35,8 +37,8 @@ export default class API {
     }={}) {
 
         if(!target) {
-            const pile = await API.createPile(position);
-            target = pile.actor;
+            const token = await API.createPile(position);
+            target = token.actor;
         }
 
         if(actor){
@@ -49,6 +51,12 @@ export default class API {
 
     }
 
+    /**
+     * Creates an empty tile at a location
+     *
+     * @param position
+     * @returns {Promise<TokenDocument>}
+     */
     static async createPile(position){
 
         let pileActor = game.actors.getName("Item Pile")
@@ -100,10 +108,10 @@ export default class API {
      * @param {Actor|ItemPile} fromActor        The actor or pile to transfer the item from
      * @param {Actor|ItemPile} toActor          The actor or pile to transfer the item to
      * @param {String} itemId                   The ID of the item to transfer
-     * @param {Number} quantityToTransfer       How many of the item to transfer
-     * @returns {Promise<Item>}                 The item that was transferred
+     * @param {Number} quantity                 How many of the item to transfer
+     * @returns {Promise<Number>}               The number of items that were transferred
      */
-    static async transferItem(fromActor, toActor, itemId, quantityToTransfer = 1) {
+    static async transferItem(fromActor, toActor, itemId, quantity = 1) {
 
         const actorItem = fromActor.items.get(itemId);
 
@@ -114,7 +122,7 @@ export default class API {
 
         const itemData = actorItem.toObject();
 
-        const quantityRemoved = await API.removeItem(fromActor, itemId);
+        const quantityRemoved = await API.removeItem(fromActor, itemId, quantity);
 
         return API.addItem(toActor, itemData, quantityRemoved);
 
@@ -124,10 +132,10 @@ export default class API {
      * Subtracts the quantity of an item on an actor. If its quantity reaches 0, the item is removed from the actor.
      * @param {Actor} actor                     The actor to remove an item from
      * @param {String} itemId                   The itemId to remove from the actor
-     * @param {Number} quantityToRemove         How many of the items to remove
+     * @param {Number} quantity         How many of the items to remove
      * @returns {Promise<Number>}               Returns how many items were removed from the actor
      */
-    static async removeItem(actor, itemId, quantityToRemove = 1){
+    static async removeItem(actor, itemId, quantity = 1){
 
         const item = actor.items.get(itemId);
 
@@ -138,22 +146,22 @@ export default class API {
 
         const currentQuantity = item ? (getProperty(item.data, this.quantity_attribute) ?? 1) : 1;
 
-        const newQuantity = Math.max(0, currentQuantity - quantityToRemove);
+        const newQuantity = Math.max(0, currentQuantity - quantity);
 
         if(newQuantity >= 1){
 
-            await actorItem.update({ [this.quantity_attribute]: newQuantity });
+            await item.update({ [this.quantity_attribute]: newQuantity });
             lib.debug(`Removed 1 "${item.name}" from actor ${actor.id}`)
 
         }else{
 
-            quantityToRemove = currentQuantity;
+            quantity = currentQuantity;
 
             await item.delete();
             lib.debug(`Removed the last "${item.name}" from actor ${actor.id}`)
 
             if(actor.token) {
-                const pile = pileManager.piles.get(actor.token.uuid);
+                const pile = managedPiles.get(actor.token.uuid);
                 if (game.settings.get(CONSTANTS.MODULE_NAME, "deleteEmptyPiles") && pile && pile.items.size === 0) {
                     await actor.sheet.close();
                     await pile.document.delete();
@@ -162,65 +170,39 @@ export default class API {
 
         }
 
-        return quantityToRemove;
+        return quantity;
 
     }
 
     /**
      * Adds an item to an actor
      *
-     * @param {Actor} actor
-     * @param {Object} itemData
-     * @param {Number} [quantityToAdd=1] quantityToAdd
+     * @param {Actor} actor             The actor to add an item to
+     * @param {Object} itemData         The item's data to add to this actor
+     * @param {Number} quantity    Number of them items to add
      * @returns {Promise<Number>}
      */
-    static async addItem(actor, itemData, quantityToAdd = 1){
-
-        itemData = foundry.utils.duplicate(itemData);
-        delete itemData._id;
+    static async addItem(actor, itemData, quantity = 1){
 
         let item;
-        for(const actorItem of Array.from(actor.items)){
-            const diff = foundry.utils.diffObject(actorItem.toObject(), itemData);
-
-            if(diff.data){
-                delete diff.data.equipped;
-                if(foundry.utils.isObjectEmpty(diff.data)){
-                    delete diff.data;
-                }
-            }
-
-            let target = diff;
-            let justQuantityDiff = true;
-            const keys = this.quantity_attribute.split('.');
-            for(let key of keys){
-                if(target[key] !== undefined){
-                    if(Object.keys(target).length !== 1){
-                        justQuantityDiff = false;
-                        break;
-                    }
-                    target = target[key];
-                }else{
-                    break;
-                }
-            }
-
-            if(foundry.utils.isObjectEmpty(diff) || justQuantityDiff){
-                item = actorItem;
-                break;
+        for(const _item of Array.from(actor.items)){
+            if(_item.name === itemData.name && _item.type === itemData.type){
+                item = _item;
+                break
             }
         }
 
         const currentQuantity = item ? (getProperty(item.data, this.quantity_attribute) ?? 0) : 0;
 
-        const newQuantity = currentQuantity + quantityToAdd;
+        const newQuantity = currentQuantity + quantity;
 
-        if(newQuantity > 1){
+        if(item){
             await item.update({ [this.quantity_attribute]: newQuantity });
-            lib.debug(`Added 1 "${item.name}" to pile ${actor.uuid} (now has ${newQuantity})`)
+            lib.debug(`Added ${newQuantity} "${item.name}" to pile ${actor.uuid} (now has ${newQuantity})`)
         }else{
+            setProperty(itemData, this.quantity_attribute, newQuantity);
             await actor.createEmbeddedDocuments('Item', [ itemData ])
-            lib.debug(`Added "${itemData.name}" to pile ${actor.uuid}`)
+            lib.debug(`Added ${newQuantity} "${itemData.name}" to pile ${actor.uuid}`)
         }
 
         return newQuantity;

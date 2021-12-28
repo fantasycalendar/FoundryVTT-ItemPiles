@@ -1,0 +1,34 @@
+<form class="flexcol {{cssClasses}}" style="padding:0.5rem;" autocomplete="off">
+
+    <h3 style="text-align: center;">{{localize "ITEM-PILES.DropItem.Dropping"}}: {{droppedItem.name}}</h3>
+
+    {{#if itemsAtLocation}}
+
+    <p>{{localize "ITEM-PILES.DropItem.ExistingPiles"}}</p>
+
+    {{/if}}
+
+    {{#if itemQuantityMoreThanOne}}
+
+        <div class="form-group">
+            <label>{{localize "ITEM-PILES.DropItem.QuantityToDrop" quantity=itemQuantity itemName=droppedItem.name}}</label>
+        </div>
+        <div class="form-group">
+            <input style="flex: 6;" type="range" name="quantity" min="1" max="{{itemQuantity}}" id="rangeSlider" value="1"/>
+            <input style="flex: 1; margin-left:1rem;" type="number" id="rangeValue" value="1">
+        </div>
+
+    {{else}}
+        <input type="hidden" name="quantity" value="1"/>
+    {{/if}}
+
+    <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+        {{#if itemsAtLocation}}
+        <button type="submit" name="submit" value="addToPile"><i class="fas fa-download"></i> {{localize "ITEM-PILES.DropItem.AddToPile"}}</button>
+        {{else}}
+        <button type="submit" name="submit" value="newPile"><i class="fas fa-box"></i> {{localize "ITEM-PILES.DropItem.NewPile"}}</button>
+        {{/if}}
+        <button type="cancel" name="cancel" value="cancel"><i class="fas fa-times"></i> {{localize "ITEM-PILES.DropItem.Cancel"}}</button>
+    </footer>
+
+</form>
