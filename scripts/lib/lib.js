@@ -1,7 +1,17 @@
 import CONSTANTS from "../constants.js";
 
+export function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export function debug(msg, args = "") {
     if (game.settings.get(CONSTANTS.MODULE_NAME, "debug")) console.log(`DEBUG | Item Piles | ${msg}`, args)
+}
+
+export function custom_notify(message, notify = true) {
+    message = `Item Piles | ${message}`;
+    if (notify) ui.notifications.notify(message);
+    console.log(message.replace("<br>", "\n"));
 }
 
 export function custom_warning(warning, notify = false) {
@@ -21,4 +31,8 @@ export function getTokensAtLocation(position){
         return position.x >= token.x && position.x < (token.x + (token.data.width * canvas.grid.size))
             && position.y >= token.y && position.y < (token.y + (token.data.height * canvas.grid.size));
     }).map(token => token.actor);
+}
+
+export function distance_between(a, b){
+    return new Ray(a, b).distance;
 }

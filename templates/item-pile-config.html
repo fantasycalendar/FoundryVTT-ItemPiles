@@ -1,0 +1,90 @@
+<form class="flexcol {{cssClasses}}" autocomplete="off">
+
+    <h2>{{localize "ITEM-PILES.Defaults.MainSettings"}}</h2>
+
+    <div class="form-group">
+        <label>
+            {{localize "ITEM-PILES.Defaults.Distance"}}<br>
+            <span class="units">{{localize "ITEM-PILES.Defaults.GridUnits"}}</span>
+        </label>
+        <input type="number" name="distance" value="{{pile_data.distance}}"/>
+    </div>
+
+    <div class="form-group">
+        <label>
+            {{localize "ITEM-PILES.Defaults.DisplayOne"}}<br>
+            <span class="units">{{localize "ITEM-PILES.Defaults.DisplayOneExplanation"}}</span>
+        </label>
+        <input type="checkbox" name="displayOne" {{checked pile_data.displayOne}}/>
+    </div>
+
+    <h2 style="margin-top: 1rem;">{{localize "ITEM-PILES.Defaults.ContainerSettings"}}</h2>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.IsContainer"}}</label>
+        <input type="checkbox" name="isContainer" {{checked pile_data.isContainer}}/>
+    </div>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.Closed"}}</label>
+        <input type="checkbox" name="closed" {{checked pile_data.closed}}/>
+    </div>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.Locked"}}</label>
+        <input type="checkbox" name="locked" {{checked pile_data.locked}}/>
+    </div>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.ClosedImagePath"}}</label>
+        <div class="form-fields">
+            {{filePicker target="closedImage" type="imagevideo"}}
+            <input class="image" type="text" name="closedImage" placeholder="path/image.png" value="{{pile_data.closedImage}}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.OpenedImagePath"}}</label>
+        <div class="form-fields">
+            {{filePicker target="openedImage" type="imagevideo"}}
+            <input class="image" type="text" name="openedImage" placeholder="path/image.png" value="{{pile_data.openedImage}}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.LockedImagePath"}}</label>
+        <div class="form-fields">
+            {{filePicker target="lockedImage" type="imagevideo"}}
+            <input class="image" type="text" name="lockedImage" placeholder="path/image.png" value="{{pile_data.lockedImage}}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.CloseSoundPath"}}</label>
+        <div class="form-fields">
+            {{filePicker target="closeSound" type="audio"}}
+            <input class="sound" type="text" name="closeSound" placeholder="path/sound.png" value="{{pile_data.closeSound}}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.OpenSoundPath"}}</label>
+        <div class="form-fields">
+            {{filePicker target="openSound" type="audio"}}
+            <input class="sound" type="text" name="openSound" placeholder="path/sound.png" value="{{pile_data.openSound}}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.LockedSoundPath"}}</label>
+        <div class="form-fields">
+            {{filePicker target="lockedSound" type="audio"}}
+            <input class="sound" type="text" name="lockedSound" placeholder="path/sound.png" value="{{pile_data.lockedSound}}"/>
+        </div>
+    </div>
+
+    <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+        <button type="submit" name="submit" value="1"><i class="far fa-save"></i> {{localize "ITEM-PILES.Defaults.Update"}}</button>
+    </footer>
+
+</form>

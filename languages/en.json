@@ -1,5 +1,25 @@
 {
     "ITEM-PILES": {
+        "Defaults": {
+            "Title": "Item Pile Configuration",
+            "Configure": "Configure Item Pile",
+            "Update": "Update Item Pile",
+            "Distance": "Interaction Distance",
+            "GridUnits": "Grid Units",
+            "DisplayOne": "Display Single Item Image",
+            "DisplayOneExplanation": "If the pile is a single item, this sets the pile token's image to be the image of the item.",
+            "MainSettings": "Main Settings",
+            "ContainerSettings": "Container Settings",
+            "IsContainer": "Is Container",
+            "Locked": "Locked",
+            "Closed": "Closed",
+            "ClosedImagePath": "Closed Image Path",
+            "OpenedImagePath": "Opened Image Path",
+            "LockedImagePath": "Locked Image Path",
+            "CloseSoundPath": "Closing Sound Path",
+            "OpenSoundPath": "Opening Sound Path",
+            "LockedSoundPath": "Locked Sound Path"
+        },
         "AddToPile": {
             "Title": "Add to pile?",
             "Content": "There's already an item pile at this location, do you want to add the item to pile?",
@@ -15,6 +35,10 @@
             "Quantity": {
                 "Title": "Item quantity attribute",
                 "Label": "Here you can configure what the attribute path is for an item's quantity. For example, in the 5e system, each item's quantity is in each item's 'item.data.data.quantity', so you'd put `data.quantity' in this setting."
+            },
+            "DeleteEmptyPiles": {
+                "Title": "Auto-delete empty piles",
+                "Label": "This causes item piles to delete themselves once they run out of items."
             }
         }
     }
