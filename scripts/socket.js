@@ -3,7 +3,8 @@ import CONSTANTS from "./constants.js";
 import API from "./api.js";
 
 export const SOCKET_HANDLERS = {
-    UPDATE_PILE: "updatePile"
+    UPDATE_DOCUMENT: "updateDocument",
+    DROP: "drop",
 };
 
 export let itemPileSocket;
@@ -11,5 +12,6 @@ export let itemPileSocket;
 export function registerSocket() {
     lib.debug("Registered itemPileSocket");
     itemPileSocket = socketlib.registerModule(CONSTANTS.MODULE_NAME);
-    itemPileSocket.register(SOCKET_HANDLERS.UPDATE_PILE, (...args) => API.updatePile(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.UPDATE_DOCUMENT, (...args) => API.updateDocument(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.DROP, (args) => API.handleDrop(args))
 }

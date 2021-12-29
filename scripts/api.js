@@ -2,6 +2,7 @@ import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 import ItemPile from "./itemPile.js";
 import { managedPiles } from "./module.js";
+import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 
 export default class API {
 
@@ -21,17 +22,16 @@ export default class API {
      *
      * If an actor was provided, it will transfer the item from the actor to the target actor.
      *
-     * @param {Actor|Boolean} actor
-     * @param {Actor|Boolean} target
+     * @param {String|Boolean} source
+     * @param {String|Boolean} target
      * @param {Object|Boolean} position
      * @param {Object} itemData
      * @param {Number} quantity
-     * @returns {Promise<Actor>}
      */
     static async handleDrop({
-        actor = false,
+        source = false,
         target = false,
-        position = { x: 0, y: 0},
+        position = { x: 0, y: 0 },
         itemData = false,
         quantity = 1
     }={}) {
@@ -39,15 +39,20 @@ export default class API {
         if(!target) {
             const token = await API.createPile(position);
             target = token.actor;
+        }else{
+            target = target ? (await fromUuid(target)) : false;
+            target = target?.actor ?? target;
         }
 
-        if(actor){
-            await API.transferItem(actor, target, itemData._id, quantity)
+        source = source ? (await fromUuid(source)) : false;
+        source = source?.actor ?? source;
+
+        debugger;
+        if(source){
+            await API.transferItem(source, target, itemData._id, quantity)
         }else{
             await API.addItem(target, itemData, quantity);
         }
-
-        return target;
 
     }
 
@@ -73,6 +78,7 @@ export default class API {
                 img: "icons/svg/mystery-man.svg",
                 [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
             });
+
 
             await pileActor.update({ "token": {
                 actorLink: false,
@@ -198,10 +204,10 @@ export default class API {
 
         if(item){
             await item.update({ [this.quantity_attribute]: newQuantity });
-            lib.debug(`Added ${newQuantity} "${item.name}" to pile ${actor.uuid} (now has ${newQuantity})`)
-        }else{
+            lib.debug(`Added ${newQuantity} "${item.name}" to pile ${actor.uuid} (now has ${newQuantity})`);
+        }else {
             setProperty(itemData, this.quantity_attribute, newQuantity);
-            await actor.createEmbeddedDocuments('Item', [ itemData ])
+            await actor.createEmbeddedDocuments("Item", [itemData]);
             lib.debug(`Added ${newQuantity} "${itemData.name}" to pile ${actor.uuid}`)
         }
 
@@ -216,7 +222,7 @@ export default class API {
      * @param updates
      * @returns {Promise}
      */
-    static async updatePile(documentUuid, updates){
+    static async updateDocument(documentUuid, updates){
         const document = await fromUuid(documentUuid);
         return document.update(updates);
     }

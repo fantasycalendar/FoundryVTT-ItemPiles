@@ -83,6 +83,14 @@ export default class ItemPile {
 
     }
 
+    _getScale(data){
+        let scale = this.tokenDocument.actor.data.token.scale;
+        if(data.overrideSingleItemScale && this.items.size === 1){
+            scale = data.singleItemScale;
+        }
+        return scale;
+    }
+
     remove(){
         managedPiles.delete(this.tokenDocument.uuid);
         lib.debug(`Removed pile: ${this.tokenDocument.uuid}`);
@@ -102,8 +110,9 @@ export default class ItemPile {
 
     async update(inData = false){
         if(!inData) inData = this._data;
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, this.tokenDocument.uuid, {
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_DOCUMENT, this.tokenDocument.uuid, {
             "img": this._getImage(inData),
+            "scale": this._getScale(inData),
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: inData,
             [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: inData
         });

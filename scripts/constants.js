@@ -5,6 +5,8 @@ const CONSTANTS = {
     PILE_DEFAULTS: {
         distance: 1,
         displayOne: true,
+        overrideSingleItemScale: false,
+        singleItemScale: 1.0,
         isContainer: false,
         closed: false,
         locked: false,

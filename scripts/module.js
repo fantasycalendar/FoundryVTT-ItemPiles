@@ -1,7 +1,7 @@
 import CONSTANTS from "./constants.js";
 import * as lib from "./lib/lib.js"
 import registerSettings from "./settings.js";
-import { registerSocket } from "./socket.js";
+import { itemPileSocket, registerSocket, SOCKET_HANDLERS } from "./socket.js";
 import API from "./api.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import ItemPile from "./itemPile.js";
@@ -20,6 +20,8 @@ Hooks.once("init", () => {
     Hooks.on("createToken", module._createPile);
     Hooks.on("updateToken", module._updatePile);
     Hooks.on("deleteToken", module._deletePile);
+    Hooks.on("createItem", module._pileInventoryChanged);
+    Hooks.on("deleteItem", module._pileInventoryChanged);
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
@@ -27,7 +29,18 @@ Hooks.once("init", () => {
 
 const module = {
 
-    _renderPileHUD(app, html, data){
+    _pileInventoryChanged(item) {
+
+        if (!item.parent?.token) return;
+
+        const pile = managedPiles.get(item.parent?.token.uuid);
+        if (!pile) return;
+
+        pile.update();
+
+    },
+
+    _renderPileHUD(app, html, data) {
 
         const document = app?.object?.document;
         const flagData = document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
@@ -37,31 +50,34 @@ const module = {
 
         const container = $(`<div class="col right" style="right:-130px;"></div>`);
 
-        const locked = pile.isLocked ? "" : "-open";
+        if (pile.isContainer) {
 
-        const lock_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${locked}"></i></div>`);
+            const locked = pile.isLocked ? "" : "-open";
 
-        lock_button.click(async function(){
-            $(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
-            await pile.toggleLocked();
-        });
+            const lock_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${locked}"></i></div>`);
 
-        container.append(lock_button);
+            lock_button.click(async function () {
+                $(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
+                await pile.toggleLocked();
+            });
 
-        const closed = pile.isClosed ? "" : "-open";
+            container.append(lock_button);
 
-        const open_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${closed}"></i></div>`);
+            const closed = pile.isClosed ? "" : "-open";
 
-        open_button.click(async function(){
-            $(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
-            await pile.toggleClosed();
-        });
+            const open_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${closed}"></i></div>`);
 
-        container.append(open_button);
+            open_button.click(async function () {
+                $(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
+                await pile.toggleClosed();
+            });
+
+            container.append(open_button);
+        }
 
         const configure_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i class="fas fa-toolbox"></i></div>`);
 
-        configure_button.click(async function(){
+        configure_button.click(async function () {
             new ItemPileConfig(document).render(true);
         });
 
@@ -71,11 +87,11 @@ const module = {
 
     },
 
-    _insertItemPileHeaderButtons(actorSheet, buttons){
+    _insertItemPileHeaderButtons(actorSheet, buttons) {
 
         let obj = actorSheet.object;
 
-        if(!obj.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)) return;
+        if (!obj.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)) return;
 
         buttons.unshift({
             label: "ITEM-PILES.Defaults.Configure",
@@ -87,12 +103,12 @@ const module = {
         })
     },
 
-    async _dropCanvasData(canvas, data){
+    async _dropCanvasData(canvas, data) {
 
-        if(data.type !== "Item") return;
+        if (data.type !== "Item") return;
 
         const itemData = data.id ? game.items.get(data.id)?.toObject() : data.data;
-        if(!itemData){
+        if (!itemData) {
             throw lib.custom_error("Something went wrong when dropping this item!")
         }
 
@@ -100,48 +116,46 @@ const module = {
 
         const dropData = {
             itemData: itemData,
-            actor: false,
+            source: false,
             target: false,
             location: false,
             quantity: 1
         }
 
-        if(data.tokenId){
-            dropData.actor = canvas.tokens.get(data.tokenId).actor;
-        } else if(data.actorId){
-            dropData.actor = game.actors.get(data.actorId);
+        if (data.tokenId) {
+            dropData.source = canvas.tokens.get(data.tokenId).actor.uuid;
+        } else if (data.actorId) {
+            dropData.source = game.actors.get(data.actorId).uuid;
         }
 
-        const [ x, y ] = canvas.grid.getTopLeft(data.x, data.y);
+        const [x, y] = canvas.grid.getTopLeft(data.x, data.y);
 
         let droppableDocuments = lib.getTokensAtLocation({ x, y })
             .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME))
             .map(token => managedPiles.get(token.document.uuid));
 
         let action;
-        if(droppableDocuments.length > 0){
+        if (droppableDocuments.length > 0) {
             droppableDocuments = droppableDocuments.filter(pile => !pile.isLocked);
-            if(!droppableDocuments.length){
+            if (!droppableDocuments.length) {
                 return Dialog.prompt({
                     title: game.i18n.localize("ITEM-PILES.DropItem.Title"),
                     content: `<p>${game.i18n.localize("ITEM-PILES.DropItem.LockedWarning")}</p>`,
                     label: "OK",
-                    callback: () => {},
+                    callback: () => {
+                    },
                     rejectClose: false
                 });
             }
         }
 
-        const itemQuantity = getProperty(itemData, API.quantity_attribute) ?? 1;
+        if (altDown) {
 
-        if(altDown){
-
-            if(droppableDocuments.length){
+            if (droppableDocuments.length) {
                 action = "addToPile";
             }
 
-        }else if(itemQuantity > 1){
-
+        } else {
             const result = await DropDialog.query(itemData, droppableDocuments);
 
             if (!result) return;
@@ -150,37 +164,37 @@ const module = {
 
         }
 
-        if(action === "addToPile"){
-            dropData.target = droppableDocuments[0].actor;
-        }else{
+        if (action === "addToPile") {
+            dropData.target = droppableDocuments[0].actor.uuid;
+        } else {
             dropData.position = { x, y };
         }
 
-        return API.handleDrop(dropData);
-        
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP, dropData);
+
     },
 
-    _canvasReady(){
+    _canvasReady() {
         managedPiles.forEach((pile) => pile._disableEvents());
         managedPiles.clear();
         const tokens = canvas.tokens.placeables.filter((token) => token.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME));
         tokens.forEach(token => ItemPile.make(token.document));
     },
 
-    _createPile(doc){
-        if(!doc.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)) return;
+    _createPile(doc) {
+        if (!doc.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)) return;
         ItemPile.make(doc);
     },
 
-    _updatePile(doc, changes){
+    _updatePile(doc, changes) {
         const pile = managedPiles.get(doc.uuid);
-        if(!pile) return;
+        if (!pile) return;
         pile.updated();
     },
 
-    _deletePile(doc){
+    _deletePile(doc) {
         const pile = managedPiles.get(doc.uuid);
-        if(!pile) return;
+        if (!pile) return;
         pile.remove();
     }
 }
