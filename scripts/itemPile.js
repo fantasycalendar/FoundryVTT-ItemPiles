@@ -67,7 +67,7 @@ export default class ItemPile {
             if(data.locked && data.lockedImage){
                 img = data.lockedImage;
             }else if(!data.closed && data.openedImage){
-                img = data.openedImage;
+                img = this.items.size === 0 ? data.emptyImage : data.openedImage;
             }else if(data.closedImage) {
                 img = data.closedImage;
             }

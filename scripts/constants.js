@@ -11,6 +11,7 @@ const CONSTANTS = {
         closed: false,
         locked: false,
         closedImage: "",
+        emptyImage: "",
         openedImage: "",
         lockedImage: "",
         closeSound: "",

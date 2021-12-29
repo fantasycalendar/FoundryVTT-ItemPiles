@@ -47,7 +47,6 @@ export default class API {
         source = source ? (await fromUuid(source)) : false;
         source = source?.actor ?? source;
 
-        debugger;
         if(source){
             await API.transferItem(source, target, itemData._id, quantity)
         }else{

@@ -75,6 +75,14 @@
     </div>
 
     <div class="form-group">
+        <label>{{localize "ITEM-PILES.Defaults.EmptyImagePath"}}</label>
+        <div class="form-fields">
+            {{filePicker target="emptyImage" type="imagevideo"}}
+            <input class="image container-input" type="text" name="emptyImage" placeholder="path/image.png" value="{{emptyImage}}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
         <label>{{localize "ITEM-PILES.Defaults.LockedImagePath"}}</label>
         <div class="form-fields">
             {{filePicker target="lockedImage" type="imagevideo"}}

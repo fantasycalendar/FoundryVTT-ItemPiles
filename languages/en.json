@@ -17,6 +17,7 @@
             "Locked": "Locked",
             "Closed": "Closed",
             "ClosedImagePath": "Closed Image Path",
+            "EmptyImagePath": "Empty Image Path",
             "OpenedImagePath": "Opened Image Path",
             "LockedImagePath": "Locked Image Path",
             "CloseSoundPath": "Closing Sound Path",
