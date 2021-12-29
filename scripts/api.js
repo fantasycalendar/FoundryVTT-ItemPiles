@@ -3,6 +3,7 @@ import CONSTANTS from "./constants.js";
 import ItemPile from "./itemPile.js";
 import { managedPiles } from "./module.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
+import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 
 export default class API {
 
@@ -37,8 +38,8 @@ export default class API {
     }={}) {
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP, {
-            source: source?.uuid,
-            target: target?.uuid,
+            sourceUuid: API.getUuid(source),
+            targetUuid: API.getUuid(target),
             position,
             itemData,
             quantity
@@ -47,28 +48,22 @@ export default class API {
     }
 
     static async _handleDrop({
-        source = false,
-        target = false,
+        sourceUuid = false,
+        targetUuid = false,
         position = { x: 0, y: 0 },
         itemData = false,
         quantity = 1
     }={}) {
 
-        if(!target) {
-            const token = await API.createPile(position);
-            target = token.actor;
-        }else{
-            target = target ? (await fromUuid(target)) : false;
-            target = target?.actor ?? target;
+        if(!targetUuid) {
+            const pile = await API.createPile(position);
+            targetUuid = pile.uuid;
         }
 
-        source = source ? (await fromUuid(source)) : false;
-        source = source?.actor ?? source;
-
-        if(source){
-            await API.transferItem(source, target, itemData._id, quantity)
+        if(sourceUuid){
+            await API._transferItem(sourceUuid, targetUuid, itemData._id, quantity)
         }else{
-            await API.addItem(target, itemData, quantity);
+            await API._addItem(sourceUuid, itemData, quantity);
         }
 
     }
@@ -122,9 +117,7 @@ export default class API {
 
         await lib.wait(50)
 
-        ItemPile.make(tokenDocument)
-
-        return tokenDocument;
+        return ItemPile.make(tokenDocument);
 
     }
 
@@ -139,10 +132,13 @@ export default class API {
      * @returns {Promise}              The number of items that were transferred
      */
     static async transferItem(fromActor, toActor, itemId, quantity = 1) {
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, fromActor, toActor, itemId, quantity);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ITEM, API.getUuid(fromActor), API.getUuid(toActor), itemId, quantity);
     }
 
-    static async _transferItem(fromActor, toActor, itemId, quantity = 1) {
+    static async _transferItem(fromActorUuid, toActorUuid, itemId, quantity = 1) {
+
+        const fromActor = await API.getActor(fromActorUuid);
+        const toActor = await API.getActor(toActorUuid);
 
         const actorItem = fromActor.items.get(itemId);
 
@@ -167,12 +163,12 @@ export default class API {
      * @returns {Promise}               Returns how many items were removed from the actor
      */
     static async removeItem(actor, itemId, quantity = 1){
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEM, actor.uuid, itemId, quantity);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEM, API.getUuid(actor), itemId, quantity);
     }
 
     static async _removeItem(actorUuid, itemId, quantity = 1){
 
-        const actor = await fromUuid(actorUuid);
+        const actor = await API.getActor(actorUuid);
 
         const item = actor.items.get(itemId);
 
@@ -207,6 +203,8 @@ export default class API {
 
         }
 
+        await API.rerenderPileInventoryApplication(actor);
+
         return quantity;
 
     }
@@ -220,12 +218,12 @@ export default class API {
      * @returns {Promise<Number>}
      */
     static async addItem(actor, itemData, quantity = 1){
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEM, actor.uuid, itemData, quantity);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEM, API.getUuid(actor), itemData, quantity);
     }
 
     static async _addItem(actorUuid, itemData, quantity = 1){
 
-        const actor = await fromUuid(actorUuid);
+        const actor = await API.getActor(actorUuid);
 
         const item = this.getSimilarItem(actor, itemData);
 
@@ -241,6 +239,8 @@ export default class API {
             await actor.createEmbeddedDocuments("Item", [itemData]);
             lib.debug(`Added ${newQuantity} "${itemData.name}" to pile ${actor.uuid}`)
         }
+
+        await API.rerenderPileInventoryApplication(actor);
 
         return newQuantity;
 
@@ -266,16 +266,13 @@ export default class API {
      * @returns {Promise}
      */
     static async transferAllItems(source, target){
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, source.uuid, target.uuid);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, this.getUuid(source), this.getUuid(target));
     }
 
     static async _transferAllItems(sourceUuid, targetUuid) {
 
-        let source = await fromUuid(sourceUuid);
-        let target = await fromUuid(targetUuid);
-
-        source = source?.actor ?? source;
-        target = target?.actor ?? target;
+        const source = await API.getActor(sourceUuid);
+        const target = await API.getActor(targetUuid);
 
         const itemsToCreate = [];
         const itemsToUpdate = [];
@@ -309,6 +306,7 @@ export default class API {
         await target.updateEmbeddedDocuments("Item", itemsToUpdate);
         await source.update({ items: [] });
         await API.updatePile(source)
+        await API.rerenderPileInventoryApplication(source);
     }
 
     /**
@@ -320,12 +318,20 @@ export default class API {
     static async updatePile(document){
         let pileToken = document?.token ?? document;
         if(pileToken){
-            const pile = managedPiles.get(pileToken.uuid);
+            const pile = managedPiles.get(API.getUuid(pileToken));
             if(pile){
                 return pile.update();
             }
         }
+    }
 
+    static async getActor(documentUuid){
+        const document = await fromUuid(documentUuid);
+        return document?.actor ?? document;
+    }
+
+    static getUuid(document){
+        return document?.token?.uuid ?? document?.uuid ?? false;
     }
 
     /**
@@ -338,6 +344,18 @@ export default class API {
     static async updateDocument(documentUuid, updates){
         const document = await fromUuid(documentUuid);
         return document.update(updates);
+    }
+
+    static async rerenderPileInventoryApplication(inPile) {
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, API.getUuid(inPile));
+    }
+
+    static async _rerenderPileInventoryApplication(inPileUuid){
+        const pile = await API.getActor(inPileUuid);
+        const app = ItemPileInventory.getActiveApplicationForPile(pile)
+        if(app){
+            app.render(true);
+        }
     }
 
 }

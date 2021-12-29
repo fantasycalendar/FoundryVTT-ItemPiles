@@ -73,37 +73,3 @@ export default class DropDialog extends FormApplication {
     }
 
 }
-/*
-dropType = await new Promise(resolve => {
-    new Dialog({
-        title: game.i18n.localize("ITEM-PILES.AddToPile.Title"),
-        content: `<p>${game.i18n.localize("ITEM-PILES.AddToPile.Content")}</p>`,
-        buttons: {
-            addToPile: {
-                icon: '<i class="fas fa-check"></i>',
-                label: game.i18n.localize("ITEM-PILES.AddToPile.AddToPile"),
-                callback: () => {
-                    resolve("addToPile")
-                }
-            },
-            newPile: {
-                icon: '<i class="fas fa-times"></i>',
-                label: game.i18n.localize("ITEM-PILES.AddToPile.NewPile"),
-                callback: () => {
-                    resolve("newPile")
-                }
-            },
-            cancel: {
-                icon: '<i class="fas fa-times"></i>',
-                label: game.i18n.localize("ITEM-PILES.AddToPile.Cancel"),
-                callback: () => {
-                    resolve(false)
-                }
-            },
-        },
-        default: "cancel",
-        close: html => {
-            resolve(false);
-        }
-    }).render(true);
-});*/

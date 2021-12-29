@@ -117,9 +117,9 @@ const module = {
         }
 
         if (data.tokenId) {
-            dropData.source = canvas.tokens.get(data.tokenId).actor.uuid;
+            dropData.source = canvas.tokens.get(data.tokenId).actor;
         } else if (data.actorId) {
-            dropData.source = game.actors.get(data.actorId).uuid;
+            dropData.source = game.actors.get(data.actorId);
         }
 
         const [x, y] = canvas.grid.getTopLeft(data.x, data.y);
@@ -150,6 +150,7 @@ const module = {
             }
 
         } else {
+
             const result = await DropDialog.query(itemData, droppableDocuments);
 
             if (!result) return;
@@ -159,7 +160,7 @@ const module = {
         }
 
         if (action === "addToPile") {
-            dropData.target = droppableDocuments[0].actor.uuid;
+            dropData.target = droppableDocuments[0].actor;
         } else {
             dropData.position = { x, y };
         }
@@ -172,7 +173,10 @@ const module = {
         managedPiles.forEach((pile) => pile._disableEvents());
         managedPiles.clear();
         const tokens = canvas.tokens.placeables.filter((token) => token.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME));
-        tokens.forEach(token => ItemPile.make(token.document));
+        const piles = tokens.map(token => ItemPile.make(token.document));
+        if(game.user.isGM){
+            piles.forEach(pile => pile.update());
+        }
     },
 
     _createPile(doc) {

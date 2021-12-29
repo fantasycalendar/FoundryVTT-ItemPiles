@@ -1,12 +1,103 @@
 <form class="flexcol {{cssClasses}}" style="padding:0.5rem;" autocomplete="off">
 
-    <h3 style="text-align: center;">{{localize "ITEM-PILES.Inspect.Title"}}: {{item.name}}</h3>
+    <style>
 
-    
+        .item-piles-items {
+            max-height: 500px;
+            overflow-y: scroll;
+        }
+
+        .item-piles-item-row {
+            padding: 0;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-piles-item-row:hover {
+            background-color: var(--color-text-light-highlight);
+        }
+
+        .item-piles-item-row .item-piles-img{
+            min-height: 26px;
+            max-width: 26px;
+        }
+
+        .item-piles-item-row .item-piles-img img{
+        }
+
+        .item-piles-item-row .item-piles-text {
+            line-height: 1.6rem;
+            font-size: 1rem;
+            text-wrap: normal;
+            flex: 0 1 auto;
+        }
+
+        .item-piles-item-row .item-piles-name{
+            padding: 0 0.5rem;
+            flex: 4;
+        }
+
+        .item-piles-item-row .item-piles-quantity{
+            flex: 0.75;
+            margin-left: 0.5rem;
+            text-align:right;
+        }
+
+        .item-piles-item-row .item-piles-input-divider{
+            flex: 0.75;
+            margin: 0 0.5rem 0 0.25rem;
+            font-size: 0.8rem;
+            line-height: 1.5rem;
+        }
+
+        .item-piles-item-row .item-piles-take-button{
+            flex: 1;
+            height: 26px;
+            padding: 1px 3px;
+            line-height: inherit;
+        }
+
+        #item-piles-preview-container{
+            position: absolute;
+            display: none;
+            border-radius: 2rem;
+            overflow: hidden;
+        }
+
+        #item-piles-preview-image{
+            width: 300px;
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        }
+
+    </style>
+
+    <div id="item-piles-preview-container">
+        <img id="item-piles-preview-image">
+    </div>
+
+    <h3 style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Title"}}: {{item.name}}</h3>
+
+    {{#unless hasItems}}
+    <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Empty"}}</p>
+    {{/unless}}
+
+    <div class="item-piles-items">
+        {{#each items as |item id|}}
+        <div class="flexrow item-piles-item-row" data-item-id="{{item.id}}">
+            <img class="item-piles-img" src="{{item.img}}"/>
+            <div class="item-piles-name item-piles-text">{{item.name}}</div>
+            <input class="item-piles-quantity" type="number" min="1" value="1" max="{{item.quantity}}"/>
+            <span class="item-piles-text item-piles-input-divider">/ {{item.quantity}}</span>
+            <!--<input class="item-piles-quantity-max" type="number" value="{{item.quantity}}" disabled/>-->
+            <button class="item-piles-take-button" type="button">{{localize "ITEM-PILES.Inspect.Take"}}</button>
+        </div>
+        {{/each}}
+    </div>
 
     <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+        {{#if hasItems}}
         <button type="submit" name="takeAll" value="takeAll"><i class="fas fa-download"></i> {{localize "ITEM-PILES.Inspect.TakeAll"}}</button>
-        <button type="submit" name="close" value="close"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Cancel"}}</button>
+        {{/if}}
+        <button type="submit" name="cancel" value="cancel"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Cancel"}}</button>
     </footer>
 
 </form>

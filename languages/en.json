@@ -4,6 +4,8 @@
         "Inspect": {
             "Title": "Inspecting Pile Contents",
             "TakeAll": "Take All Items",
+            "Empty": "This pile is empty.",
+            "Take": "Take",
             "Cancel": "Cancel"
         },
 

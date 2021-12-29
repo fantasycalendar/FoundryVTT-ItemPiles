@@ -10,6 +10,7 @@ export const SOCKET_HANDLERS = {
     REMOVE_ITEM: "removeItem",
     ADD_ITEM: "addItem",
     TRANSFER_ALL_ITEMS: "transferAllItems",
+    RERENDER_PILE_INVENTORY: "rerenderPileInventory",
 };
 
 export let itemPileSocket;
@@ -24,4 +25,5 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.REMOVE_ITEM, (...args) => API._removeItem(...args))
     itemPileSocket.register(SOCKET_HANDLERS.ADD_ITEM, (...args) => API._addItem(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, (...args) => API._transferAllItems(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, (...args) => API._rerenderPileInventoryApplication(...args))
 }

@@ -29,8 +29,6 @@ export default class ItemPile {
     }
 
     async _setup(){
-        await this.update();
-        await lib.wait(50);
         this._enableEvents();
         this._preloadTextures();
         lib.debug(`Initialized pile: ${this.tokenDocument.uuid}`);
