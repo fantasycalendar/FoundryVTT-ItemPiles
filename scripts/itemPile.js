@@ -2,6 +2,7 @@ import CONSTANTS from "./constants.js";
 import * as lib from "./lib/lib.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { managedPiles, preloadedImages } from "./module.js";
+import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 
 export default class ItemPile {
 
@@ -221,6 +222,8 @@ export default class ItemPile {
         if(this.isClosed){
             await this.open();
         }
+
+        new ItemPileInventory(this.actor, controlledToken.actor).render(true);
 
     }
 

@@ -1,5 +1,12 @@
 {
     "ITEM-PILES": {
+
+        "Inspect": {
+            "Title": "Inspecting Pile Contents",
+            "TakeAll": "Take All Items",
+            "Cancel": "Cancel"
+        },
+
         "Defaults": {
             "Title": "Item Pile Configuration",
             "Configure": "Configure Item Pile",

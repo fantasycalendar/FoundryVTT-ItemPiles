@@ -22,13 +22,31 @@ export default class API {
      *
      * If an actor was provided, it will transfer the item from the actor to the target actor.
      *
-     * @param {String|Boolean} source
-     * @param {String|Boolean} target
+     * @param {Actor|Boolean} source
+     * @param {Actor|Boolean} target
      * @param {Object|Boolean} position
      * @param {Object} itemData
      * @param {Number} quantity
      */
     static async handleDrop({
+        source = false,
+        target = false,
+        position = { x: 0, y: 0 },
+        itemData = false,
+        quantity = 1
+    }={}) {
+
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP, {
+            source: source?.uuid,
+            target: target?.uuid,
+            position,
+            itemData,
+            quantity
+        });
+
+    }
+
+    static async _handleDrop({
         source = false,
         target = false,
         position = { x: 0, y: 0 },
@@ -59,9 +77,13 @@ export default class API {
      * Creates an empty tile at a location
      *
      * @param position
-     * @returns {Promise<TokenDocument>}
+     * @returns {Promise}
      */
-    static async createPile(position){
+    static async createPile(position) {
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position);
+    }
+
+    static async _createPile(position){
 
         let pileActor = game.actors.getName("Item Pile")
 
@@ -110,13 +132,17 @@ export default class API {
      * Transfers an item from one actor to another, removing it or subtracting a number of quantity from the first
      * to the second one, deleting the item if its quantity reaches 0
      *
-     * @param {Actor|ItemPile} fromActor        The actor or pile to transfer the item from
-     * @param {Actor|ItemPile} toActor          The actor or pile to transfer the item to
-     * @param {String} itemId                   The ID of the item to transfer
-     * @param {Number} quantity                 How many of the item to transfer
-     * @returns {Promise<Number>}               The number of items that were transferred
+     * @param {Actor} fromActor        The actor or pile to transfer the item from
+     * @param {Actor} toActor          The actor or pile to transfer the item to
+     * @param {String} itemId          The ID of the item to transfer
+     * @param {Number} quantity        How many of the item to transfer
+     * @returns {Promise}              The number of items that were transferred
      */
     static async transferItem(fromActor, toActor, itemId, quantity = 1) {
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, fromActor, toActor, itemId, quantity);
+    }
+
+    static async _transferItem(fromActor, toActor, itemId, quantity = 1) {
 
         const actorItem = fromActor.items.get(itemId);
 
@@ -135,12 +161,18 @@ export default class API {
 
     /**
      * Subtracts the quantity of an item on an actor. If its quantity reaches 0, the item is removed from the actor.
-     * @param {Actor} actor                     The actor to remove an item from
-     * @param {String} itemId                   The itemId to remove from the actor
+     * @param {Actor} actor             The actor to remove an item from
+     * @param {String} itemId           The itemId to remove from the actor
      * @param {Number} quantity         How many of the items to remove
-     * @returns {Promise<Number>}               Returns how many items were removed from the actor
+     * @returns {Promise}               Returns how many items were removed from the actor
      */
     static async removeItem(actor, itemId, quantity = 1){
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEM, actor.uuid, itemId, quantity);
+    }
+
+    static async _removeItem(actorUuid, itemId, quantity = 1){
+
+        const actor = await fromUuid(actorUuid);
 
         const item = actor.items.get(itemId);
 
@@ -184,18 +216,18 @@ export default class API {
      *
      * @param {Actor} actor             The actor to add an item to
      * @param {Object} itemData         The item's data to add to this actor
-     * @param {Number} quantity    Number of them items to add
+     * @param {Number} quantity         Number of them items to add
      * @returns {Promise<Number>}
      */
     static async addItem(actor, itemData, quantity = 1){
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEM, actor.uuid, itemData, quantity);
+    }
 
-        let item;
-        for(const _item of Array.from(actor.items)){
-            if(_item.name === itemData.name && _item.type === itemData.type){
-                item = _item;
-                break
-            }
-        }
+    static async _addItem(actorUuid, itemData, quantity = 1){
+
+        const actor = await fromUuid(actorUuid);
+
+        const item = this.getSimilarItem(actor, itemData);
 
         const currentQuantity = item ? (getProperty(item.data, this.quantity_attribute) ?? 0) : 0;
 
@@ -211,6 +243,88 @@ export default class API {
         }
 
         return newQuantity;
+
+    }
+
+    static getSimilarItem(actor, itemData){
+
+        for(const item of Array.from(actor.items)){
+            if(item.name === itemData.name && item.type === itemData.type){
+                return item;
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Adds an item to an actor
+     *
+     * @param {Actor} source         The actor to transfer all items from
+     * @param {Actor} target         The actor to receive all the items
+     * @returns {Promise}
+     */
+    static async transferAllItems(source, target){
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, source.uuid, target.uuid);
+    }
+
+    static async _transferAllItems(sourceUuid, targetUuid) {
+
+        let source = await fromUuid(sourceUuid);
+        let target = await fromUuid(targetUuid);
+
+        source = source?.actor ?? source;
+        target = target?.actor ?? target;
+
+        const itemsToCreate = [];
+        const itemsToUpdate = [];
+
+        const items = Array.from(source.items);
+
+        for(let item of items){
+
+            const incomingQuantity = getProperty(item.data, this.quantity_attribute) ?? 1;
+
+            const similarItem = this.getSimilarItem(target, item);
+
+            if(similarItem){
+
+                const currentQuantity = getProperty(similarItem.data, this.quantity_attribute) ?? 1;
+
+                itemsToUpdate.push({
+                    _id: similarItem.id,
+                    [this.quantity_attribute]: currentQuantity + incomingQuantity
+                })
+
+            }else {
+
+                itemsToCreate.push(item.toObject());
+
+            }
+
+        }
+
+        await target.createEmbeddedDocuments("Item", itemsToCreate);
+        await target.updateEmbeddedDocuments("Item", itemsToUpdate);
+        await source.update({ items: [] });
+        await API.updatePile(source)
+    }
+
+    /**
+     * Updates a pile if it exists
+     *
+     * @param {Actor|Token|TokenDocument} document
+     * @return <Promise>
+     */
+    static async updatePile(document){
+        let pileToken = document?.token ?? document;
+        if(pileToken){
+            const pile = managedPiles.get(pileToken.uuid);
+            if(pile){
+                return pile.update();
+            }
+        }
 
     }
 

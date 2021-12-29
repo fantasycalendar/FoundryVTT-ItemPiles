@@ -30,14 +30,8 @@ Hooks.once("init", () => {
 const module = {
 
     _pileInventoryChanged(item) {
-
         if (!item.parent?.token) return;
-
-        const pile = managedPiles.get(item.parent?.token.uuid);
-        if (!pile) return;
-
-        pile.update();
-
+        API.updatePile(item.parent);
     },
 
     _renderPileHUD(app, html, data) {
@@ -170,7 +164,7 @@ const module = {
             dropData.position = { x, y };
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP, dropData);
+        return API.handleDrop(dropData);
 
     },
 
@@ -186,7 +180,7 @@ const module = {
         ItemPile.make(doc);
     },
 
-    _updatePile(doc, changes) {
+    _updatePile(doc) {
         const pile = managedPiles.get(doc.uuid);
         if (!pile) return;
         pile.updated();
