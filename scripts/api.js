@@ -18,6 +18,100 @@ export default class API {
     }
 
     /**
+     * This handles any dropped data onto the canvas or a set item pile
+     *
+     * @param canvas
+     * @param data
+     * @param itemPile
+     * @return {Promise}
+     */
+    static async dropData(canvas, data, itemPile = false) {
+
+        if (data.type !== "Item") return;
+
+        const itemData = data.id ? game.items.get(data.id)?.toObject() : data.data;
+        if (!itemData) {
+            throw lib.custom_error("Something went wrong when dropping this item!")
+        }
+
+        const altDown = game.keyboard.downKeys.has("AltLeft");
+
+        const dropData = {
+            itemData: itemData,
+            source: false,
+            target: false,
+            location: false,
+            quantity: 1
+        }
+
+        if (data.tokenId) {
+            dropData.source = canvas.tokens.get(data.tokenId).actor;
+        } else if (data.actorId) {
+            dropData.source = game.actors.get(data.actorId);
+        }
+
+        let action = "addToPile";
+        let droppableDocuments = [];
+        let x;
+        let y;
+
+        if(!itemPile){
+
+            const position = canvas.grid.getTopLeft(data.x, data.y);
+            x = position[0];
+            y = position[1];
+
+            droppableDocuments = lib.getTokensAtLocation({ x, y })
+                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME))
+                .map(token => managedPiles.get(token.document.uuid));
+
+        }else{
+
+            droppableDocuments.push(itemPile);
+
+        }
+
+        if (droppableDocuments.length > 0) {
+            droppableDocuments = droppableDocuments.filter(pile => !pile.isLocked);
+            if (!droppableDocuments.length) {
+                return Dialog.prompt({
+                    title: game.i18n.localize("ITEM-PILES.DropItem.Title"),
+                    content: `<p>${game.i18n.localize("ITEM-PILES.DropItem.LockedWarning")}</p>`,
+                    label: "OK",
+                    callback: () => {
+                    },
+                    rejectClose: false
+                });
+            }
+        }
+
+        if (altDown) {
+
+            if (droppableDocuments.length) {
+                action = "addToPile";
+            }
+
+        } else {
+
+            const result = await DropDialog.query(itemData, droppableDocuments);
+
+            if (!result) return;
+            action = result.action;
+            dropData.quantity = result.quantity;
+
+        }
+
+        if (action === "addToPile") {
+            dropData.target = droppableDocuments[0].actor;
+        } else {
+            dropData.position = { x, y };
+        }
+
+        return API.handleDrop(dropData);
+
+    }
+
+    /**
      * If not given an actor, this method creates an item pile at a location, then adds an item to it.
      *
      * If a target was provided, it will just add the item to that target actor.
@@ -320,14 +414,24 @@ export default class API {
      * @param {Actor|Token|TokenDocument} document
      * @return <Promise>
      */
-    static async updatePile(document){
-        let pileToken = document?.token ?? document;
+    static async updatePile(object){
+        let pileToken = object?.token ?? object?.document ?? object;
         if(pileToken){
             const pile = managedPiles.get(API.getUuid(pileToken));
             if(pile){
                 return pile.update();
             }
         }
+    }
+
+    /**
+     * Causes all connected users to re-render a specific pile's inventory UI
+     *
+     * @param inPile
+     * @return {Promise<*>}
+     */
+    static async rerenderPileInventoryApplication(inPile) {
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, API.getUuid(inPile));
     }
 
     static async getActor(documentUuid){
@@ -339,20 +443,9 @@ export default class API {
         return document?.token?.uuid ?? document?.uuid ?? false;
     }
 
-    /**
-     * Updates a pile with certain updates
-     *
-     * @param documentUuid
-     * @param updates
-     * @returns {Promise}
-     */
     static async updateDocument(documentUuid, updates){
         const document = await fromUuid(documentUuid);
         return document.update(updates);
-    }
-
-    static async rerenderPileInventoryApplication(inPile) {
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, API.getUuid(inPile));
     }
 
     static async _rerenderPileInventoryApplication(inPileUuid){
@@ -360,89 +453,4 @@ export default class API {
         ItemPileInventory.rerenderActiveApp(pile);
     }
 
-    static async dropCanvasData(canvas, data, itemPile = false) {
-
-        if (data.type !== "Item") return;
-
-        const itemData = data.id ? game.items.get(data.id)?.toObject() : data.data;
-        if (!itemData) {
-            throw lib.custom_error("Something went wrong when dropping this item!")
-        }
-
-        const altDown = game.keyboard.downKeys.has("AltLeft");
-
-        const dropData = {
-            itemData: itemData,
-            source: false,
-            target: false,
-            location: false,
-            quantity: 1
-        }
-
-        if (data.tokenId) {
-            dropData.source = canvas.tokens.get(data.tokenId).actor;
-        } else if (data.actorId) {
-            dropData.source = game.actors.get(data.actorId);
-        }
-
-        let action = "addToPile";
-        let droppableDocuments = [];
-        let x;
-        let y;
-
-        if(!itemPile){
-
-            const position = canvas.grid.getTopLeft(data.x, data.y);
-            x = position[0];
-            y = position[1];
-
-            droppableDocuments = lib.getTokensAtLocation({ x, y })
-                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME))
-                .map(token => managedPiles.get(token.document.uuid));
-
-        }else{
-
-            droppableDocuments.push(itemPile);
-
-        }
-
-        if (droppableDocuments.length > 0) {
-            droppableDocuments = droppableDocuments.filter(pile => !pile.isLocked);
-            if (!droppableDocuments.length) {
-                return Dialog.prompt({
-                    title: game.i18n.localize("ITEM-PILES.DropItem.Title"),
-                    content: `<p>${game.i18n.localize("ITEM-PILES.DropItem.LockedWarning")}</p>`,
-                    label: "OK",
-                    callback: () => {
-                    },
-                    rejectClose: false
-                });
-            }
-        }
-
-        if (altDown) {
-
-            if (droppableDocuments.length) {
-                action = "addToPile";
-            }
-
-        } else {
-
-            const result = await DropDialog.query(itemData, droppableDocuments);
-
-            if (!result) return;
-            action = result.action;
-            dropData.quantity = result.quantity;
-
-        }
-
-        if (action === "addToPile") {
-            dropData.target = droppableDocuments[0].actor;
-        } else {
-            dropData.position = { x, y };
-        }
-
-        return API.handleDrop(dropData);
-
-    }
 }

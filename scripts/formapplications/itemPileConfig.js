@@ -14,10 +14,11 @@ export class ItemPileConfig extends FormApplication {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["sheet", "token-sheet"],
+            classes: ["sheet", "item-pile-config"],
             template: `${CONSTANTS.PATH}templates/item-pile-config.html`,
             width: 430,
-            height: "auto"
+            height: "auto",
+            resizable: false
         });
     }
 
@@ -37,7 +38,27 @@ export class ItemPileConfig extends FormApplication {
 
     activateListeners(html){
         super.activateListeners(html);
+        const self = this;
+
+        const enabledCheckbox = html.find('input[name="enabled"]');
         const scaleCheckbox = html.find('input[name="overrideSingleItemScale"]');
+        const displayOneCheckbox = html.find('input[name="displayOne"]');
+        const containerCheckbox = html.find('input[name="isContainer"]');
+
+        const settingsContainer = html.find('.item-pile-config-all-settings');
+        enabledCheckbox.change(function(){
+            let isEnabled = $(this).is(":checked");
+            if(isEnabled){
+                settingsContainer.show();
+            }else{
+                settingsContainer.hide();
+            }
+            settingsContainer.find("input").each(function(){
+                $(this).prop('disabled', !isEnabled);
+            });
+            self.setPosition();
+        }).change();
+
         const slider = html.find("#scaleRange");
         const input = html.find("#scaleInput");
         scaleCheckbox.change(function(){
@@ -46,29 +67,38 @@ export class ItemPileConfig extends FormApplication {
             input.prop('disabled', isDisabled);
             slider.parent().toggleClass("item-pile-disabled", isDisabled);
         }).change();
+
+        displayOneCheckbox.change(function(){
+            let isDisabled = !$(this).is(":checked");
+            html.find('.item-pile-display-one-settings').children().each(function(){
+                $(this).toggleClass("item-pile-disabled", isDisabled);
+                $(this).find('input, button').prop("disabled", isDisabled);
+            });
+        }).change();
+
+        containerCheckbox.change(function(){
+            let isDisabled = !$(this).is(":checked");
+            html.find('.item-pile-container-settings').children().each(function(){
+                $(this).toggleClass("item-pile-disabled", isDisabled);
+                $(this).find('input, button').prop("disabled", isDisabled);
+            });
+        }).change();
+
         slider.on("input", function(){
             input.val($(this).val());
         })
         input.change(function(){
             slider.slider('value', $(this).val());
         })
-
-        const containerCheckbox = html.find('input[name="isContainer"]');
-        containerCheckbox.change(function(){
-            let isDisabled = !$(this).is(":checked");
-            html.find('.container-input').each(function(){
-                $(this).prop('disabled', isDisabled);
-                if($(this).prev().length) {
-                    $(this).prev().prop('disabled', isDisabled);
-                }
-                $(this).closest('.form-group').toggleClass("item-pile-disabled", isDisabled);
-            });
-        }).change();
     }
 
     async _updateObject(event, formData) {
 
         const data = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, formData);
+
+        if(!formData.enabled){
+            setTimeout(canvas.tokens.hud.render(true), 100);
+        }
 
         if (this.document instanceof TokenDocument) {
             const pile = managedPiles.get(this.document.uuid);

@@ -40,7 +40,7 @@ const module = {
         const flagData = document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
         const pile = managedPiles.get(document?.uuid);
 
-        if (!document || !flagData || !pile) return;
+        if (!document || !flagData?.enabled || !pile) return;
 
         const container = $(`<div class="col right" style="right:-130px;"></div>`);
 
@@ -85,11 +85,9 @@ const module = {
 
         let obj = actorSheet.object;
 
-        if (!obj.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)) return;
-
         buttons.unshift({
             label: "ITEM-PILES.Defaults.Configure",
-            icon: "fas fa-clock",
+            icon: "fas fa-box-open",
             class: "item-piles-config",
             onclick: () => {
                 new ItemPileConfig(obj).render(true);
@@ -99,7 +97,7 @@ const module = {
 
     async _dropCanvasData(canvas, data) {
 
-        return API.dropCanvasData(canvas, data);
+        return API.dropData(canvas, data);
 
     },
 

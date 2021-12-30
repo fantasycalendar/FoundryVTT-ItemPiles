@@ -87,7 +87,7 @@ export class ItemPileInventory extends FormApplication {
             return false;
         }
 
-        return API.dropCanvasData(canvas, data, this.itemPile);
+        return API.dropData(canvas, data, this.itemPile);
 
     }
 

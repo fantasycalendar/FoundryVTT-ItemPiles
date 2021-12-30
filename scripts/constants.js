@@ -3,8 +3,9 @@ const CONSTANTS = {
     FLAG_NAME: "data",
     PATH: "modules/item-piles/",
     PILE_DEFAULTS: {
+        enabled: true,
         distance: 1,
-        displayOne: true,
+        displayOne: false,
         overrideSingleItemScale: false,
         singleItemScale: 1.0,
         isContainer: false,
