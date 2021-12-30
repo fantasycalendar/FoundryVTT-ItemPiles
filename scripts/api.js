@@ -225,7 +225,9 @@ export default class API {
 
         const actor = await API.getActor(actorUuid);
 
-        const item = this.getSimilarItem(actor, itemData);
+        const actorItems = Array.from(actor.items);
+
+        const item = this.getSimilarItem(actorItems, itemData.name, itemData.type);
 
         const currentQuantity = item ? (getProperty(item.data, this.quantity_attribute) ?? 0) : 0;
 
@@ -246,10 +248,10 @@ export default class API {
 
     }
 
-    static getSimilarItem(actor, itemData){
+    static getSimilarItem(items, itemName, itemType){
 
-        for(const item of Array.from(actor.items)){
-            if(item.name === itemData.name && item.type === itemData.type){
+        for(const item of items){
+            if(item.name === itemName && item.type === itemType){
                 return item;
             }
         }
@@ -279,11 +281,13 @@ export default class API {
 
         const items = Array.from(source.items);
 
+        const targetItems = Array.from(target.items);
+
         for(let item of items){
 
             const incomingQuantity = getProperty(item.data, this.quantity_attribute) ?? 1;
 
-            const similarItem = this.getSimilarItem(target, item);
+            const similarItem = this.getSimilarItem(targetItems, item.name, item.type);
 
             if(similarItem){
 
@@ -352,10 +356,7 @@ export default class API {
 
     static async _rerenderPileInventoryApplication(inPileUuid){
         const pile = await API.getActor(inPileUuid);
-        const app = ItemPileInventory.getActiveApplicationForPile(pile)
-        if(app){
-            app.render(true);
-        }
+        ItemPileInventory.rerenderActiveApp(pile);
     }
 
 }

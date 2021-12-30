@@ -6,7 +6,8 @@
             "TakeAll": "Take All Items",
             "Empty": "This pile is empty.",
             "Take": "Take",
-            "Cancel": "Cancel"
+            "Close": "Close",
+            "Leave": "Leave"
         },
 
         "Defaults": {

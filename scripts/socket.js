@@ -1,6 +1,7 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 import API from "./api.js";
+import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 
 export const SOCKET_HANDLERS = {
     UPDATE_DOCUMENT: "updateDocument",
@@ -11,6 +12,8 @@ export const SOCKET_HANDLERS = {
     ADD_ITEM: "addItem",
     TRANSFER_ALL_ITEMS: "transferAllItems",
     RERENDER_PILE_INVENTORY: "rerenderPileInventory",
+    QUERY_PILE_INVENTORY_OPEN: "queryPileInventoryOpen",
+    RESPOND_PILE_INVENTORY_OPEN: "responsePileInventoryOpen",
 };
 
 export let itemPileSocket;
@@ -26,4 +29,43 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.ADD_ITEM, (...args) => API._addItem(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, (...args) => API._transferAllItems(...args))
     itemPileSocket.register(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, (...args) => API._rerenderPileInventoryApplication(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.QUERY_PILE_INVENTORY_OPEN, (...args) => isPileInventoryOpenForOthers.respond(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.RESPOND_PILE_INVENTORY_OPEN, (...args) => isPileInventoryOpenForOthers.handleResponse(...args))
+}
+
+export const isPileInventoryOpenForOthers = {
+
+    query(inPile) {
+        const promise = new Promise(resolve => {
+            this.resolve = resolve;
+        });
+
+        this.usersToRespond = new Set(game.users
+            .filter(user => user.active && user !== game.user)
+            .map(user => user.id));
+        this.isOpen = false;
+
+        itemPileSocket.executeForOthers(SOCKET_HANDLERS.QUERY_PILE_INVENTORY_OPEN, game.user.id, API.getUuid(inPile));
+
+        setTimeout(this.resolve, 200);
+
+        return promise;
+    },
+
+    async respond(inUserId, inPileUuid) {
+        const pile = await API.getActor(inPileUuid);
+        const app = ItemPileInventory.getActiveAppFromPile(pile);
+        return itemPileSocket.executeAsUser(SOCKET_HANDLERS.RESPOND_PILE_INVENTORY_OPEN, inUserId, game.user.id, !!app);
+    },
+
+    handleResponse(inUserId, appOpen) {
+        this.usersToRespond.delete(inUserId);
+        this.isOpen = this.isOpen || appOpen;
+        if(this.usersToRespond.size > 0) return;
+        this.resolve(this.isOpen);
+        this.usersToRespond = new Set();
+        this.isOpen = false;
+        this.resolve = () => {};
+    }
+
 }

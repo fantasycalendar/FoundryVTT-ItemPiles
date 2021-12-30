@@ -16,6 +16,10 @@
             background-color: var(--color-text-light-highlight);
         }
 
+        .item-pile-item-disabled, .item-pile-item-disabled:hover {
+            background-color: var(--color-text-dark-inactive);
+        }
+
         .item-piles-item-row .item-piles-img{
             min-height: 26px;
             max-width: 26px;
@@ -44,7 +48,7 @@
 
         .item-piles-item-row .item-piles-input-divider{
             flex: 0.75;
-            margin: 0 0.5rem 0 0.25rem;
+            margin: 0.1rem 0.5rem 0 0.25rem;
             font-size: 0.8rem;
             line-height: 1.5rem;
         }
@@ -82,13 +86,12 @@
 
     <div class="item-piles-items">
         {{#each items as |item id|}}
-        <div class="flexrow item-piles-item-row" data-item-id="{{item.id}}">
+        <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
             <img class="item-piles-img" src="{{item.img}}"/>
             <div class="item-piles-name item-piles-text">{{item.name}}</div>
-            <input class="item-piles-quantity" type="number" min="1" value="1" max="{{item.quantity}}"/>
-            <span class="item-piles-text item-piles-input-divider">/ {{item.quantity}}</span>
-            <!--<input class="item-piles-quantity-max" type="number" value="{{item.quantity}}" disabled/>-->
-            <button class="item-piles-take-button" type="button">{{localize "ITEM-PILES.Inspect.Take"}}</button>
+            <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.maxQuantity}}disabled{{/unless}}/>
+            <span class="item-piles-text item-piles-input-divider">/ {{item.maxQuantity}}</span>
+            <button class="item-piles-take-button" type="button" {{#unless item.maxQuantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
         </div>
         {{/each}}
     </div>
@@ -97,7 +100,8 @@
         {{#if hasItems}}
         <button type="submit" name="takeAll" value="takeAll"><i class="fas fa-download"></i> {{localize "ITEM-PILES.Inspect.TakeAll"}}</button>
         {{/if}}
-        <button type="submit" name="cancel" value="cancel"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Cancel"}}</button>
+        <button type="submit" name="close" value="close"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Close"}}</button>
+        <button type="submit" name="leave" value="leave"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Leave"}}</button>
     </footer>
 
 </form>

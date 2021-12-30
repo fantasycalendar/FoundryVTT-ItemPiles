@@ -63,15 +63,23 @@ export default class ItemPile {
 
         let img;
         if(data.isContainer){
+
+            img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage;
+
             if(data.locked && data.lockedImage){
                 img = data.lockedImage;
-            }else if(!data.closed && data.openedImage){
-                img = this.items.size === 0 ? data.emptyImage : data.openedImage;
-            }else if(data.closedImage) {
+            }else if(data.closed && data.closedImage){
                 img = data.closedImage;
+            }else if(data.openedImage && this.items.size > 0) {
+                img = data.openedImage;
+            }else if(data.emptyImage){
+                img = data.emptyImage;
             }
+
         }else if(data.displayOne && this.items.size === 1){
+
             img = Array.from(this.items)[0].data.img;
+
         }
 
         if(!img) {
