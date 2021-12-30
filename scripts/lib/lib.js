@@ -8,9 +8,9 @@ export function debug(msg, args = "") {
     if (game.settings.get(CONSTANTS.MODULE_NAME, "debug")) console.log(`DEBUG | Item Piles | ${msg}`, args)
 }
 
-export function custom_notify(message, notify = true) {
+export function custom_notify(message) {
     message = `Item Piles | ${message}`;
-    if (notify) ui.notifications.notify(message);
+    ui.notifications.notify(message);
     console.log(message.replace("<br>", "\n"));
 }
 

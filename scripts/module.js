@@ -37,18 +37,15 @@ const module = {
     _renderPileHUD(app, html, data) {
 
         const document = app?.object?.document;
-        const flagData = document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
         const pile = managedPiles.get(document?.uuid);
 
-        if (!document || !flagData?.enabled || !pile) return;
+        if (!document || !pile || !document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled) return;
 
         const container = $(`<div class="col right" style="right:-130px;"></div>`);
 
         if (pile.isContainer) {
 
-            const locked = pile.isLocked ? "" : "-open";
-
-            const lock_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${locked}"></i></div>`);
+            const lock_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pile.isLocked ? "" : "-open"}"></i></div>`);
 
             lock_button.click(async function () {
                 $(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
@@ -57,9 +54,7 @@ const module = {
 
             container.append(lock_button);
 
-            const closed = pile.isClosed ? "" : "-open";
-
-            const open_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${closed}"></i></div>`);
+            const open_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${pile.isClosed ? "" : "-open"}"></i></div>`);
 
             open_button.click(async function () {
                 $(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
@@ -104,7 +99,7 @@ const module = {
     _canvasReady() {
         managedPiles.forEach((pile) => pile._disableEvents());
         managedPiles.clear();
-        const tokens = canvas.tokens.placeables.filter((token) => token.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME));
+        const tokens = canvas.tokens.placeables.filter((token) => token.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled);
         const piles = tokens.map(token => ItemPile.make(token.document));
         if(game.user.isGM){
             piles.forEach(pile => pile.update());
@@ -112,7 +107,7 @@ const module = {
     },
 
     _createPile(doc) {
-        if (!doc.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)) return;
+        if (!doc.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled) return;
         ItemPile.make(doc);
     },
 

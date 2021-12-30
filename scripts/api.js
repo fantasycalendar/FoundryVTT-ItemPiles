@@ -62,7 +62,7 @@ export default class API {
             y = position[1];
 
             droppableDocuments = lib.getTokensAtLocation({ x, y })
-                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME))
+                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled)
                 .map(token => managedPiles.get(token.document.uuid));
 
         }else{
@@ -152,7 +152,7 @@ export default class API {
 
         if(!targetUuid) {
             const pile = await API.createPile(position);
-            targetUuid = pile.uuid;
+            targetUuid = pile.tokenDocument.uuid;
         }
 
         if(sourceUuid){
@@ -175,21 +175,20 @@ export default class API {
 
     static async _createPile(position){
 
-        let pileActor = game.actors.getName("Item Pile")
+        let pileActor = game.actors.getName("Default Item Pile (do not rename)")
 
         if (!pileActor) {
 
-            lib.custom_notify("The primary item pile has been added to your Actors list.<br>You can configure the default look and behavior on it.")
+            lib.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
             const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS)
 
             pileActor = await Actor.create({
-                name: "Item Pile",
+                name: "Default Item Pile (do not rename)",
                 type: "character",
                 img: "icons/svg/mystery-man.svg",
                 [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
             });
-
 
             await pileActor.update({ "token": {
                 actorLink: false,
