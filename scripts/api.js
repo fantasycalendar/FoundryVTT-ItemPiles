@@ -411,7 +411,7 @@ export default class API {
     /**
      * Updates a pile if it exists
      *
-     * @param {Actor|Token|TokenDocument} document
+     * @param {Actor|Token|TokenDocument} object
      * @return <Promise>
      */
     static async updatePile(object){
