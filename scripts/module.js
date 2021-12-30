@@ -99,73 +99,7 @@ const module = {
 
     async _dropCanvasData(canvas, data) {
 
-        if (data.type !== "Item") return;
-
-        const itemData = data.id ? game.items.get(data.id)?.toObject() : data.data;
-        if (!itemData) {
-            throw lib.custom_error("Something went wrong when dropping this item!")
-        }
-
-        const altDown = game.keyboard.downKeys.has("AltLeft");
-
-        const dropData = {
-            itemData: itemData,
-            source: false,
-            target: false,
-            location: false,
-            quantity: 1
-        }
-
-        if (data.tokenId) {
-            dropData.source = canvas.tokens.get(data.tokenId).actor;
-        } else if (data.actorId) {
-            dropData.source = game.actors.get(data.actorId);
-        }
-
-        const [x, y] = canvas.grid.getTopLeft(data.x, data.y);
-
-        let droppableDocuments = lib.getTokensAtLocation({ x, y })
-            .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME))
-            .map(token => managedPiles.get(token.document.uuid));
-
-        let action;
-        if (droppableDocuments.length > 0) {
-            droppableDocuments = droppableDocuments.filter(pile => !pile.isLocked);
-            if (!droppableDocuments.length) {
-                return Dialog.prompt({
-                    title: game.i18n.localize("ITEM-PILES.DropItem.Title"),
-                    content: `<p>${game.i18n.localize("ITEM-PILES.DropItem.LockedWarning")}</p>`,
-                    label: "OK",
-                    callback: () => {
-                    },
-                    rejectClose: false
-                });
-            }
-        }
-
-        if (altDown) {
-
-            if (droppableDocuments.length) {
-                action = "addToPile";
-            }
-
-        } else {
-
-            const result = await DropDialog.query(itemData, droppableDocuments);
-
-            if (!result) return;
-            action = result.action;
-            dropData.quantity = result.quantity;
-
-        }
-
-        if (action === "addToPile") {
-            dropData.target = droppableDocuments[0].actor;
-        } else {
-            dropData.position = { x, y };
-        }
-
-        return API.handleDrop(dropData);
+        return API.dropCanvasData(canvas, data);
 
     },
 

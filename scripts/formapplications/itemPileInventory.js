@@ -24,6 +24,7 @@ export class ItemPileInventory extends FormApplication {
     constructor(pile, actor) {
         super();
         this.pile = pile;
+        this.itemPile = managedPiles.get(pile.uuid);
         this.actor = actor;
         this.items = [];
     }
@@ -33,10 +34,11 @@ export class ItemPileInventory extends FormApplication {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["sheet", "token-sheet"],
+            classes: ["sheet", "item-pile-inventory-sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
             width: 450,
-            height: "auto"
+            height: "auto",
+            dragDrop: [{dragSelector: null, dropSelector: ".item-piles-item-drop-container"}],
         });
     }
 
@@ -69,6 +71,23 @@ export class ItemPileInventory extends FormApplication {
         const newItems = this.getPileItemData();
         newItems.filter(newItem => !this.items.find(item => item.id === newItem.id) && !API.getSimilarItem(this.items, newItem.name, newItem.type))
             .forEach(newItem => this.items.push(newItem));
+
+    }
+
+    _onDrop(event){
+
+        super._onDrop(event);
+
+        // Try to extract the data
+        let data;
+        try {
+            data = JSON.parse(event.dataTransfer.getData('text/plain'));
+        }
+        catch (err) {
+            return false;
+        }
+
+        return API.dropCanvasData(canvas, data, this.itemPile);
 
     }
 
@@ -157,10 +176,9 @@ export class ItemPileInventory extends FormApplication {
         if(event.submitter.value === "close"){
             return isPileInventoryOpenForOthers.query(this.pile).then((result) => {
                 if(!result){
-                    this.pile.close();
+                    this.itemPile.close();
                 }
             });
-
         }
 
     }

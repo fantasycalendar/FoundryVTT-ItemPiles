@@ -4,6 +4,7 @@ import ItemPile from "./itemPile.js";
 import { managedPiles } from "./module.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
+import DropDialog from "./formapplications/dropDialog.js";
 
 export default class API {
 
@@ -359,4 +360,89 @@ export default class API {
         ItemPileInventory.rerenderActiveApp(pile);
     }
 
+    static async dropCanvasData(canvas, data, itemPile = false) {
+
+        if (data.type !== "Item") return;
+
+        const itemData = data.id ? game.items.get(data.id)?.toObject() : data.data;
+        if (!itemData) {
+            throw lib.custom_error("Something went wrong when dropping this item!")
+        }
+
+        const altDown = game.keyboard.downKeys.has("AltLeft");
+
+        const dropData = {
+            itemData: itemData,
+            source: false,
+            target: false,
+            location: false,
+            quantity: 1
+        }
+
+        if (data.tokenId) {
+            dropData.source = canvas.tokens.get(data.tokenId).actor;
+        } else if (data.actorId) {
+            dropData.source = game.actors.get(data.actorId);
+        }
+
+        let action = "addToPile";
+        let droppableDocuments = [];
+        let x;
+        let y;
+
+        if(!itemPile){
+
+            const position = canvas.grid.getTopLeft(data.x, data.y);
+            x = position[0];
+            y = position[1];
+
+            droppableDocuments = lib.getTokensAtLocation({ x, y })
+                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME))
+                .map(token => managedPiles.get(token.document.uuid));
+
+        }else{
+
+            droppableDocuments.push(itemPile);
+
+        }
+
+        if (droppableDocuments.length > 0) {
+            droppableDocuments = droppableDocuments.filter(pile => !pile.isLocked);
+            if (!droppableDocuments.length) {
+                return Dialog.prompt({
+                    title: game.i18n.localize("ITEM-PILES.DropItem.Title"),
+                    content: `<p>${game.i18n.localize("ITEM-PILES.DropItem.LockedWarning")}</p>`,
+                    label: "OK",
+                    callback: () => {
+                    },
+                    rejectClose: false
+                });
+            }
+        }
+
+        if (altDown) {
+
+            if (droppableDocuments.length) {
+                action = "addToPile";
+            }
+
+        } else {
+
+            const result = await DropDialog.query(itemData, droppableDocuments);
+
+            if (!result) return;
+            action = result.action;
+            dropData.quantity = result.quantity;
+
+        }
+
+        if (action === "addToPile") {
+            dropData.target = droppableDocuments[0].actor;
+        } else {
+            dropData.position = { x, y };
+        }
+
+        return API.handleDrop(dropData);
+
+    }
 }

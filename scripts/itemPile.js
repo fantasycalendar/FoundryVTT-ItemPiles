@@ -21,17 +21,13 @@ export default class ItemPile {
         this.tokenDocument = tokenDocument;
         this._clicked = false;
         this._data = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
-        this._setup();
+        this._enableEvents();
+        this._preloadTextures();
+        lib.debug(`Initialized pile: ${this.tokenDocument.uuid}`);
     }
 
     get actor(){
         return this.tokenDocument.actor;
-    }
-
-    async _setup(){
-        this._enableEvents();
-        this._preloadTextures();
-        lib.debug(`Initialized pile: ${this.tokenDocument.uuid}`);
     }
 
     _preloadTextures(){
@@ -101,14 +97,44 @@ export default class ItemPile {
     remove(){
         managedPiles.delete(this.tokenDocument.uuid);
         lib.debug(`Removed pile: ${this.tokenDocument.uuid}`);
+        Hooks.callAll('itemPileDeleted', this.tokenDocument, this.tokenDocument.uuid)
     }
 
     async updated(){
         lib.debug(`Updated pile: ${this.tokenDocument.uuid}`);
-        this._data = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
-        await lib.wait(650);
+        const newData = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        this._fireHooks(newData);
+        this._data = newData;
+        await lib.wait(50);
         this._enableEvents();
         this._preloadTextures();
+    }
+
+    _fireHooks(newData){
+
+        const diff = foundry.utils.diffObject(this._data, newData);
+
+        if(foundry.utils.isObjectEmpty(diff)) return;
+
+        Hooks.callAll('updateItemPile', this.tokenDocument, diff, this.tokenDocument.uuid)
+
+        if(newData.isContainer) {
+
+            if (!this._data.closed && newData.closed) {
+                Hooks.callAll("closedItemPile", this.tokenDocument, this.tokenDocument.uuid)
+            }
+            if (!this._data.locked && newData.locked) {
+                Hooks.callAll("lockedItemPile", this.tokenDocument, this.tokenDocument.uuid)
+            }
+            if (this._data.locked && !newData.locked) {
+                Hooks.callAll("unlockedItemPile", this.tokenDocument, this.tokenDocument.uuid)
+            }
+            if (this._data.closed && !newData.closed) {
+                Hooks.callAll("openedItemPile", this.tokenDocument, this.tokenDocument.uuid)
+            }
+
+        }
+
     }
 
     get items(){
@@ -138,20 +164,22 @@ export default class ItemPile {
     }
 
     async lock(){
-        this._data.closed = true;
-        this._data.locked = true;
-        return this.update();
+        const data = foundry.utils.duplicate(this._data);
+        data.closed = true;
+        data.locked = true;
+        return this.update(data);
     }
 
     async unlock(){
-        this._data.locked = false;
-        if(this._data.unlockedSound){
+        const data = foundry.utils.duplicate(this._data);
+        data.locked = false;
+        if(data.unlockedSound){
             AudioHelper.play({
-                src: this._data.unlockedSound,
+                src: data.unlockedSound,
                 volume: 0.6
             }, true)
         }
-        return this.update();
+        return this.update(data);
     }
 
     async toggleLocked(){
@@ -162,26 +190,28 @@ export default class ItemPile {
     }
 
     async open(){
-        this._data.closed = false;
-        this._data.locked = false;
-        if(this._data.openSound){
+        const data = foundry.utils.duplicate(this._data);
+        data.closed = false;
+        data.locked = false;
+        if(data.openSound){
             AudioHelper.play({
-                src: this._data.openSound,
+                src: data.openSound,
                 volume: 0.6
             }, true)
         }
-        return this.update();
+        return this.update(data);
     }
 
     async close(){
-        this._data.closed = true;
-        if(this._data.closeSound){
+        const data = foundry.utils.duplicate(this._data);
+        data.closed = true;
+        if(data.closeSound){
             AudioHelper.play({
-                src: this._data.closeSound,
+                src: data.closeSound,
                 volume: 0.6
             }, true)
         }
-        return this.update();
+        return this.update(data);
     }
 
     async toggleClosed(){
