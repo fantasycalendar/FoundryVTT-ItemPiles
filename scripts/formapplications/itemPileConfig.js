@@ -48,14 +48,10 @@ export class ItemPileConfig extends FormApplication {
         const settingsContainer = html.find('.item-pile-config-all-settings');
         enabledCheckbox.change(function(){
             let isEnabled = $(this).is(":checked");
-            if(isEnabled){
-                settingsContainer.show();
-            }else{
-                settingsContainer.hide();
-            }
             settingsContainer.find("input").each(function(){
                 $(this).prop('disabled', !isEnabled);
             });
+            settingsContainer.css('display', isEnabled ? "block" : "none");
             self.setPosition();
         }).change();
 
@@ -76,12 +72,15 @@ export class ItemPileConfig extends FormApplication {
             });
         }).change();
 
+        const containerSettings = html.find('.item-pile-container-settings');
         containerCheckbox.change(function(){
             let isDisabled = !$(this).is(":checked");
-            html.find('.item-pile-container-settings').children().each(function(){
+            containerSettings.children().each(function(){
                 $(this).toggleClass("item-pile-disabled", isDisabled);
                 $(this).find('input, button').prop("disabled", isDisabled);
             });
+            containerSettings.css('display', isDisabled ? "none" : "block");
+            self.setPosition();
         }).change();
 
         slider.on("input", function(){

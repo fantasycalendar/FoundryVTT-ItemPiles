@@ -12,8 +12,34 @@ export default function registerSettings(){
         scope: "world",
         config: true,
         default: "data.quantity",
-        type: String,
-        onChange: debouncedReload
+        type: String
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "currencyAttributes", {
+        name: "ITEM-PILES.Setting.Currency.Title",
+        hint: "ITEM-PILES.Setting.Currency.Label",
+        scope: "world",
+        config: true,
+        default: "data.currency.pp,data.currency.gp,data.currency.ep,data.currency.sp,data.currency.cp",
+        type: String
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "itemTypeAttribute", {
+        name: "ITEM-PILES.Setting.ItemType.Title",
+        hint: "ITEM-PILES.Setting.ItemType.Label",
+        scope: "world",
+        config: true,
+        default: "type",
+        type: String
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "itemTypeFilters", {
+        name: "ITEM-PILES.Setting.ItemTypeFilters.Title",
+        hint: "ITEM-PILES.Setting.ItemTypeFilters.Label",
+        scope: "world",
+        config: true,
+        default: "spell,feat,class",
+        type: String
     });
 
     game.settings.register(CONSTANTS.MODULE_NAME, "deleteEmptyPiles", {

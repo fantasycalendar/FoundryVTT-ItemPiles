@@ -10,17 +10,18 @@ export default class ItemPile {
      * Sets up a managed item pile
      *
      * @param {TokenDocument} tokenDocument
+     * @param {object} settings
      */
-    static make(tokenDocument){
-        const pile = new ItemPile(tokenDocument);
+    static make(tokenDocument, settings = {}){
+        const pile = new ItemPile(tokenDocument, settings);
         managedPiles.set(tokenDocument.uuid, pile);
         return pile;
     }
 
-    constructor(tokenDocument) {
+    constructor(tokenDocument, settings = {}) {
         this.tokenDocument = tokenDocument;
         this._clicked = false;
-        this._data = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        this._data = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? settings;
         this._enableEvents();
         this._preloadTextures();
         lib.debug(`Initialized pile: ${this.tokenDocument.uuid}`);
@@ -101,7 +102,6 @@ export default class ItemPile {
     }
 
     async updated(){
-        lib.debug(`Updated pile: ${this.tokenDocument.uuid}`);
         const newData = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
         this._fireHooks(newData);
         this._data = newData;

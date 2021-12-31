@@ -1,12 +1,22 @@
 <form class="flex {{cssClasses}}" autocomplete="off">
 
     <style>
-        div.item-pile-disabled{
+
+        .form-group.item-pile-disabled{
             opacity: 0.75;
         }
 
         .item-pile-config {
             min-width: 430px;
+            max-width: 430px;
+        }
+
+        .item-pile-config p{
+            flex: 0;
+            line-height: 14px;
+            font-size: var(--font-size-12);
+            color: var(--color-text-dark-secondary);
+            padding-right: 1rem;
         }
     </style>
 
@@ -23,11 +33,19 @@
     <div class="item-pile-config-all-settings" {{#unless enabled}} style="display:none;" {{/unless}}>
 
         <div class="form-group">
-            <label>
+            <label style="flex:4;">
                 {{localize "ITEM-PILES.Defaults.Distance"}}<br>
-                <span class="units">{{localize "ITEM-PILES.Defaults.GridUnits"}}</span>
+                <span class="units">{{localize "ITEM-PILES.Defaults.GridUnits"}}</span class="units">
             </label>
-            <input type="number" name="distance" value="{{distance}}"/>
+            <input style="flex:2;" type="number" name="distance" value="{{distance}}"/>
+        </div>
+
+        <div class="form-group">
+            <label style="flex:4;">
+                {{localize "ITEM-PILES.Defaults.ItemTypeFilter"}}<br>
+                <p>{{localize "ITEM-PILES.Defaults.ItemTypeFilterExplanation"}}</p>
+            </label>
+            <input style="flex:2;" type="text" placeholder="class, feat, spell..." name="itemTypeFilter" value="{{itemTypeFilter}}"/>
         </div>
 
         <h2 style="margin-top: 1rem;">{{localize "ITEM-PILES.Defaults.SingleItemSettings"}}</h2>

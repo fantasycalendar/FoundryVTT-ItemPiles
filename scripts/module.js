@@ -1,11 +1,9 @@
 import CONSTANTS from "./constants.js";
-import * as lib from "./lib/lib.js"
 import registerSettings from "./settings.js";
-import { itemPileSocket, registerSocket, SOCKET_HANDLERS } from "./socket.js";
+import { registerSocket } from "./socket.js";
 import API from "./api.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import ItemPile from "./itemPile.js";
-import DropDialog from "./formapplications/dropDialog.js";
 
 export const managedPiles = new Map();
 export const preloadedImages = new Set();
@@ -19,11 +17,16 @@ Hooks.once("init", () => {
     Hooks.on("canvasReady", module._canvasReady);
     Hooks.on("createToken", module._createPile);
     Hooks.on("updateToken", module._updatePile);
+    Hooks.on("updateActor", module._updatePile);
     Hooks.on("deleteToken", module._deletePile);
     Hooks.on("createItem", module._pileInventoryChanged);
     Hooks.on("deleteItem", module._pileInventoryChanged);
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
+
+    window.ItemPiles = {
+        API
+    }
 
 });
 
@@ -108,10 +111,23 @@ const module = {
 
     _createPile(doc) {
         if (!doc.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled) return;
-        ItemPile.make(doc);
+        const pile = ItemPile.make(doc);
+        pile.update();
     },
 
-    _updatePile(doc) {
+    _updatePile(doc, changes) {
+        if(doc instanceof Actor){
+            doc = doc.token;
+            if(!doc) return;
+        }
+        const flagChanges = changes?.flags?.[CONSTANTS.MODULE_NAME]?.[CONSTANTS.FLAG_NAME];
+        if (flagChanges) {
+            if (flagChanges?.enabled) {
+                return module._createPile(doc);
+            } else if (flagChanges?.enabled) {
+                return module._deletePile(doc);
+            }
+        }
         const pile = managedPiles.get(doc.uuid);
         if (!pile) return;
         pile.updated();

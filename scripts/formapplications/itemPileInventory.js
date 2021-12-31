@@ -60,7 +60,7 @@ export class ItemPileInventory extends FormApplication {
             const foundItem = self.pile.items.get(id) ?? API.getSimilarItem(pileItems, name, type);
 
             const itemQuantity = foundItem ? $(this).find('input').val() : 1;
-            const maxQuantity = foundItem ? (getProperty(foundItem.data, API.quantity_attribute) ?? 1) : 0;
+            const maxQuantity = foundItem ? (getProperty(foundItem.data, API.QUANTITY_ATTRIBUTE) ?? 1) : 0;
 
             const currentQuantity = Math.min(maxQuantity, Math.max(itemQuantity, 1));
 
@@ -87,7 +87,7 @@ export class ItemPileInventory extends FormApplication {
             return false;
         }
 
-        return API.dropData(canvas, data, this.itemPile);
+        return API.dropData(canvas, data, { itemPile: this.itemPile });
 
     }
 
@@ -99,7 +99,7 @@ export class ItemPileInventory extends FormApplication {
                 type: item.type,
                 img: item.data?.img ?? "",
                 currentQuantity: 1,
-                maxQuantity: getProperty(item.data, API.quantity_attribute) ?? 1
+                maxQuantity: getProperty(item.data, API.QUANTITY_ATTRIBUTE) ?? 1
             };
         });
     }
@@ -163,7 +163,7 @@ export class ItemPileInventory extends FormApplication {
         const itemId = element.attr('data-item-id');
         const inputQuantity = element.find(".item-piles-quantity").val();
         const item = this.pile.items.get(itemId);
-        const maxQuantity = getProperty(item.data, API.quantity_attribute) ?? 1;
+        const maxQuantity = getProperty(item.data, API.QUANTITY_ATTRIBUTE) ?? 1;
         await API.transferItem(this.pile, this.actor, itemId, Math.min(inputQuantity, maxQuantity));
     }
 
