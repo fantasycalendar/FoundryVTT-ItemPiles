@@ -1,25 +1,5 @@
 <form class="flex {{cssClasses}}" autocomplete="off">
 
-    <style>
-
-        .form-group.item-pile-disabled{
-            opacity: 0.75;
-        }
-
-        .item-pile-config {
-            min-width: 430px;
-            max-width: 430px;
-        }
-
-        .item-pile-config p{
-            flex: 0;
-            line-height: 14px;
-            font-size: var(--font-size-12);
-            color: var(--color-text-dark-secondary);
-            padding-right: 1rem;
-        }
-    </style>
-
     <nav class="sheet-navigation tabs" data-group="primary">
         <a class="item active" data-tab="mainsettings">{{localize "ITEM-PILES.Defaults.MainSettings"}}</a>
         <a class="item" data-tab="singleitem">{{localize "ITEM-PILES.Defaults.SingleItemSettings"}}</a>
@@ -56,8 +36,8 @@
                 <select style="flex:4;" name="deleteWhenEmpty">
                     {{#select deleteWhenEmpty}}
                     <option value="default">{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyDefault"}}</option>
-                    <option value="1">{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyYes"}}</option>
-                    <option value="0">{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyNo"}}</option>
+                    <option value="true">{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyYes"}}</option>
+                    <option value="false">{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyNo"}}</option>
                     {{/select}}
                 </select>
             </div>

@@ -5,18 +5,18 @@ import { isPileInventoryOpenForOthers } from "../socket.js";
 
 export class ItemPileInventory extends FormApplication {
 
-    static getActiveAppFromPile(inPile) {
+    static getActiveAppFromPile(inPileUuid) {
         for(let app of Object.values(ui.windows)){
-            if(app instanceof this && app.pile === inPile){
+            if(app instanceof this && app.pileUuid === inPileUuid){
                 return app;
             }
         }
         return false;
     }
 
-    static async rerenderActiveApp(inPile){
-        const app = ItemPileInventory.getActiveAppFromPile(inPile);
-        if(!app) return
+    static async rerenderActiveApp(inPileUuid){
+        const app = ItemPileInventory.getActiveAppFromPile(inPileUuid);
+        if(!app) return;
         app.saveItems();
         app.render(true);
     }
@@ -24,6 +24,7 @@ export class ItemPileInventory extends FormApplication {
     constructor(pile, actor) {
         super();
         this.pile = pile;
+        this.pileUuid = pile.uuid;
         this.itemPile = managedPiles.get(pile.uuid);
         this.actor = actor;
         this.items = [];
@@ -34,6 +35,7 @@ export class ItemPileInventory extends FormApplication {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
+            title: game.i18n.localize("ITEM-PILES.Inspect.Title"),
             classes: ["sheet", "item-pile-inventory-sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
             width: 450,
@@ -104,16 +106,17 @@ export class ItemPileInventory extends FormApplication {
         });
     }
 
-    get title() {
-        return `${game.i18n.localize("ITEM-PILES.Inspect.Title")}: ${this.pile.name}`
-    }
-
     getData(options){
         const data = super.getData(options);
 
-        data.pile = this.pile;
-        data.hasItems = Array.from(this.pile.items).length > 0;
-        data.items = this.items.length ? this.items : this.getPileItemData();
+        data.isDestroyed = this.itemPile.isDestroyed;
+
+        data.name = !data.isDestroyed ? this.pile.name : "Nonexistent pile";
+
+        if(!data.isDestroyed) {
+            data.hasItems = Array.from(this.pile.items).length > 0;
+            data.items = this.items.length ? this.items : this.getPileItemData();
+        }
 
         return data;
     }

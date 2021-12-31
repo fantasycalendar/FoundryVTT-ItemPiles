@@ -3,7 +3,6 @@ import * as lib from "./lib/lib.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { managedPiles, preloadedImages } from "./module.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
-import API from "./api.js";
 
 export default class ItemPile {
 
@@ -22,9 +21,8 @@ export default class ItemPile {
     constructor(tokenDocument, settings = {}) {
         this.tokenDocument = tokenDocument;
         this._clicked = false;
-        this._data = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? settings;
-        this._enableEvents();
-        this._preloadTextures();
+        this._data = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        this.updated();
         lib.debug(`Initialized pile: ${this.tokenDocument.uuid}`);
     }
 
@@ -33,11 +31,11 @@ export default class ItemPile {
     }
 
     get shouldBeDeleted(){
-        return this.items.size === 0 && {
-            "default": game.settings.get(CONSTANTS.MODULE_NAME, "deleteEmptyPiles"),
-            "1": true,
-            "0": false
-        }[this._data?.deleteWhenEmpty ?? "default"]
+        const deleteSetting = this._data?.deleteWhenEmpty === "default"
+            ? game.settings.get(CONSTANTS.MODULE_NAME, "deleteEmptyPiles")
+            : this._data?.deleteWhenEmpty;
+
+        return this.items.size === 0 && deleteSetting;
     }
 
     _preloadTextures(){
@@ -56,6 +54,7 @@ export default class ItemPile {
     }
 
     _enableEvents(){
+        if(this.isDestroyed) return;
         if(!lib.object_has_event(this.tokenDocument.object, "pointerdown", this.clicked.bind(this))){
             this.tokenDocument.object.on('pointerdown', this.clicked.bind(this));
         }
@@ -104,18 +103,18 @@ export default class ItemPile {
         return scale;
     }
 
-    checkShouldBeDeleted(){
-        if(!this.shouldBeDeleted) return;
-        debounceSelfDelete(this);
-    }
-
     remove(){
         managedPiles.delete(this.tokenDocument.uuid);
         lib.debug(`Removed pile: ${this.tokenDocument.uuid}`);
         Hooks.callAll('itemPileDeleted', this.tokenDocument, this.tokenDocument.uuid)
     }
 
+    get isDestroyed(){
+        return !this.tokenDocument?.object || this.tokenDocument?.object?.destroyed;
+    }
+
     async updated(){
+        if(this.isDestroyed) return;
         const newData = this.tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
         this._fireHooks(newData);
         this._data = newData;
@@ -156,6 +155,11 @@ export default class ItemPile {
     }
 
     async update(inData = false){
+        debounceUpdate(this, inData);
+    }
+
+    async _update(inData = false){
+        if(this.isDestroyed) return;
         if(!inData) inData = this._data;
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_DOCUMENT, this.tokenDocument.uuid, {
             "img": this._getImage(inData),
@@ -279,8 +283,6 @@ export default class ItemPile {
 
 }
 
-const debounceSelfDelete = foundry.utils.debounce(async (pile) => {
-    if(pile.tokenDocument._destroyed) return;
-    await API.closePileInventoryApplication(pile.tokenDocument);
-    await pile.tokenDocument.delete();
-}, 1500)
+const debounceUpdate = foundry.utils.debounce((pile, updates) => {
+    pile._update(updates);
+}, 50);

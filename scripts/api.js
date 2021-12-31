@@ -402,14 +402,12 @@ export default class API {
             await item.delete();
             lib.debug(`Removed the last "${item.name}" from target ${target.id}`);
 
-            if (target.token) {
-                const pile = managedPiles.get(targetUuid);
-                pile.checkShouldBeDeleted();
-            }
+
+            await API.checkPileShouldBeDeleted(targetUuid);
 
         }
 
-        await API.rerenderPileInventoryApplication(target);
+        await API.rerenderPileInventoryApplication(targetUuid);
 
         return quantity;
 
@@ -459,14 +457,14 @@ export default class API {
 
         if (item) {
             await item.update({ [this.QUANTITY_ATTRIBUTE]: newQuantity });
-            lib.debug(`Added ${newQuantity} "${item.name}" to pile ${target.uuid} (now has ${newQuantity})`);
+            lib.debug(`Added ${newQuantity} "${item.name}" to pile ${targetUuid} (now has ${newQuantity})`);
         } else {
             setProperty(itemData, this.QUANTITY_ATTRIBUTE, newQuantity);
             await target.createEmbeddedDocuments("Item", [itemData]);
-            lib.debug(`Added ${newQuantity} "${itemData.name}" to pile ${target.uuid}`)
+            lib.debug(`Added ${newQuantity} "${itemData.name}" to pile ${targetUuid}`)
         }
 
-        await API.rerenderPileInventoryApplication(target);
+        await API.rerenderPileInventoryApplication(targetUuid);
 
         return newQuantity;
 
@@ -552,16 +550,13 @@ export default class API {
 
         await source.deleteEmbeddedDocuments("Item", itemsToDelete);
 
-        // Refresh potential piles and any relevant open UIs
-        await API.updatePile(source);
-        await API.updatePile(target);
-        await API.rerenderPileInventoryApplication(source);
-        await API.rerenderPileInventoryApplication(target);
+        // Check if potential piles should be deleted
+        await API.checkPileShouldBeDeleted(sourceUuid);
+        await API.checkPileShouldBeDeleted(targetUuid);
 
-        if (target.token) {
-            const pile = managedPiles.get(targetUuid);
-            pile.checkShouldBeDeleted();
-        }
+        // Refresh potential piles and any relevant open UIs
+        await API.rerenderPileInventoryApplication(sourceUuid);
+        await API.rerenderPileInventoryApplication(targetUuid);
 
         return {
             itemsUpdated: itemsToUpdate,
@@ -625,9 +620,11 @@ export default class API {
 
         pileSettings.enabled = false;
 
-        await API._updateTargetPileSettings(target, pileSettings);
+        await API._updateTargetPileSettings(target, pileSettings, tokenSettings);
 
         await API.rerenderTokenHud();
+
+        await API.rerenderPileInventoryApplication(targetUuid);
 
         return targetUuid;
 
@@ -669,33 +666,15 @@ export default class API {
     /**
      * Causes all connected users to re-render a specific pile's inventory UI
      *
-     * @param inPile
+     * @param inPileUuid
      * @return {Promise<*>}
      */
-    static async rerenderPileInventoryApplication(inPile) {
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, API.getUuid(inPile));
+    static async rerenderPileInventoryApplication(inPileUuid) {
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, inPileUuid);
     }
 
     static async _rerenderPileInventoryApplication(inPileUuid){
-        const pile = await API.getActor(inPileUuid);
-        ItemPileInventory.rerenderActiveApp(pile);
-    }
-
-    /**
-     * Causes all connected users to re-render a specific pile's inventory UI
-     *
-     * @param inPile
-     * @return {Promise<*>}
-     */
-    static async closePileInventoryApplication(inPile) {
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CLOSE_PILE_INVENTORY, API.getUuid(inPile));
-    }
-
-    static async _closePileInventoryApplication(inPileUuid){
-        const pile = await API.getActor(inPileUuid);
-        const app = ItemPileInventory.getActiveAppFromPile(pile);
-        if(!app) return;
-        await app.close(true);
+        ItemPileInventory.rerenderActiveApp(inPileUuid);
     }
 
     /**
@@ -711,16 +690,29 @@ export default class API {
         }
     }
 
+    static async checkPileShouldBeDeleted(targetUuid){
+        const pile = await API.getItemPile(targetUuid);
+        if(!pile?.shouldBeDeleted) return;
+        await API.removePile(targetUuid);
+        await pile.tokenDocument.delete();
+        //await lib.wait(25);
+    }
+
     /* -------- UTILITY METHODS -------- */
+
+    static async removePile(pileUuid){
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.REMOVE_PILE, pileUuid);
+    }
+
+    static async _removePile(pileUuid) {
+        const pile = await API.getItemPile(pileUuid);
+        if(pile) pile.remove();
+        return pileUuid;
+    }
 
     static async getItemPile(target){
         const uuid = typeof target === "string" ? target : (await API.getUuid(target));
         return managedPiles.get(uuid);
-    }
-
-    static async isItemPile(target){
-        const uuid = typeof target === "string" ? target : (await API.getUuid(target));
-        return managedPiles.has(uuid);
     }
 
     static getSimilarItem(items, itemName, itemType){

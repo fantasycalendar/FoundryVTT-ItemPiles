@@ -97,6 +97,12 @@ export class ItemPileConfig extends FormApplication {
             setTimeout(canvas.tokens.hud.render(true), 100);
         }
 
+        formData.deleteWhenEmpty = {
+            "default": "default",
+            "true": true,
+            "false": false
+        }[formData.deleteWhenEmpty];
+
         if (this.document instanceof TokenDocument) {
             const pile = managedPiles.get(this.document.uuid);
             return pile.update(data);

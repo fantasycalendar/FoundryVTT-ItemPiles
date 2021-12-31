@@ -1,6 +1,6 @@
 import CONSTANTS from "./constants.js";
 import registerSettings from "./settings.js";
-import { registerSocket } from "./socket.js";
+import { itemPileSocket, registerSocket } from "./socket.js";
 import API from "./api.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import ItemPile from "./itemPile.js";
@@ -18,7 +18,7 @@ Hooks.once("init", () => {
     Hooks.on("createToken", module._createPile);
     Hooks.on("updateToken", module._updatePile);
     Hooks.on("updateActor", module._updatePile);
-    Hooks.on("deleteToken", module._deletePile);
+    Hooks.on("preDeleteToken", module._deletePile);
     Hooks.on("createItem", module._pileInventoryChanged);
     Hooks.on("deleteItem", module._pileInventoryChanged);
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
@@ -94,9 +94,7 @@ const module = {
     },
 
     async _dropCanvasData(canvas, data) {
-
         return API.dropData(canvas, data);
-
     },
 
     _canvasReady() {
