@@ -1,6 +1,6 @@
 name: Release Creation
 
-on: 
+on:
   release:
     types: [published]
 
@@ -26,6 +26,7 @@ jobs:
         url: https://github.com/${{github.repository}}
         manifest: https://github.com/${{github.repository}}/releases/latest/download/module.json
         download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.zip
+        bugs: https://github.com/${{github.repository}}/issues
 
     # Create a zip file with all files required by the module to add to the release
     - run: zip -r ./module.zip module.json LICENSE styles/ scripts/ templates/ languages/
