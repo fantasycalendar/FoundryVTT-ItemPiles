@@ -164,7 +164,7 @@ export class ItemPileInventory extends FormApplication {
         const inputQuantity = element.find(".item-piles-quantity").val();
         const item = this.pile.items.get(itemId);
         const maxQuantity = getProperty(item.data, API.QUANTITY_ATTRIBUTE) ?? 1;
-        await API.transferItem(this.pile, this.actor, itemId, Math.min(inputQuantity, maxQuantity));
+        await API.transferItem(this.pile, this.actor, itemId, { quantity: Math.min(inputQuantity, maxQuantity) });
     }
 
     async _updateObject(event, formData) {

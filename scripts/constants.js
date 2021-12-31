@@ -7,6 +7,7 @@ const CONSTANTS = {
         distance: 1,
         itemTypeFilter: "",
         displayOne: false,
+        deleteWhenEmpty: "default",
         overrideSingleItemScale: false,
         singleItemScale: 1.0,
         isContainer: false,

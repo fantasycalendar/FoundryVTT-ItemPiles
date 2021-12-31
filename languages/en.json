@@ -31,9 +31,14 @@
             "EnabledPile": "Enabled",
             "EnabledPileExplanation": "Causes this actor to act as an item pile.",
             "Distance": "Interaction Distance",
-            "GridUnits": "Grid Units",
+            "GridUnits": "Grid Units (leave empty for infinite)",
             "ItemTypeFilter": "Item Type Filter",
             "ItemTypeFilterExplanation": "Items of these types will not be shown in any item pile UI, each type separated by a comma. Leave blank to use module defaults.",
+            "DeleteWhenEmpty": "Delete when empty",
+            "DeleteWhenEmptyExplanation": "Causes the item pile to auto-delete itself once it's empty.",
+            "DeleteWhenEmptyDefault": "Default module setting",
+            "DeleteWhenEmptyYes": "Yes, delete when empty",
+            "DeleteWhenEmptyNo": "No, don't delete when empty",
             "DisplayOne": "Display Single Item Image",
             "DisplayOneExplanation": "If the pile is a single item, this sets the pile token's image to be the image of the item.",
             "OverrideSingleItemScale": "Override single item token scale",
@@ -84,7 +89,7 @@
             },
             "DeleteEmptyPiles": {
                 "Title": "Auto-delete empty piles",
-                "Label": "This causes item piles to delete themselves once they run out of items."
+                "Label": "This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles."
             },
             "PreloadFiles": {
                 "Title": "Preload Files",

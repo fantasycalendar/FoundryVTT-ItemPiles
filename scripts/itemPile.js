@@ -3,6 +3,7 @@ import * as lib from "./lib/lib.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { managedPiles, preloadedImages } from "./module.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
+import API from "./api.js";
 
 export default class ItemPile {
 
@@ -29,6 +30,14 @@ export default class ItemPile {
 
     get actor(){
         return this.tokenDocument.actor;
+    }
+
+    get shouldBeDeleted(){
+        return this.items.size === 0 && {
+            "default": game.settings.get(CONSTANTS.MODULE_NAME, "deleteEmptyPiles"),
+            "1": true,
+            "0": false
+        }[this._data?.deleteWhenEmpty ?? "default"]
     }
 
     _preloadTextures(){
@@ -93,6 +102,11 @@ export default class ItemPile {
             scale = data.singleItemScale;
         }
         return scale;
+    }
+
+    checkShouldBeDeleted(){
+        if(!this.shouldBeDeleted) return;
+        debounceSelfDelete(this);
     }
 
     remove(){
@@ -264,3 +278,9 @@ export default class ItemPile {
     }
 
 }
+
+const debounceSelfDelete = foundry.utils.debounce(async (pile) => {
+    if(pile.tokenDocument._destroyed) return;
+    await API.closePileInventoryApplication(pile.tokenDocument);
+    await pile.tokenDocument.delete();
+}, 500)

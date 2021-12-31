@@ -32,11 +32,17 @@ This module uses the [socketlib](https://github.com/manuelVo/foundryvtt-socketli
 
 ## Item Pile Settings
 
-- **Item quantity attribute:** Here you can configure what the attribute path is for an item's quantity. For example, in the 5e system, each item's quantity is in each item's 'item.data.data.quantity', so you'd put `data.quantity' in this setting.
+- **Item quantity attribute:** Here you can configure what the attribute path is for an item's quantity. For example, in the 5e system, each item's quantity is in each item's `item.data.data.quantity`, so you'd put `data.quantity` in this setting.
 
-- **Auto-delete empty piles:** This causes item piles to delete themselves once they run out of items."
+- **Currency attribute:** This setting defines the attribute path for determining where currencies exist on characters. In D&D5e, all currencies exist in `actor.data.data.currency`, so you'd put each currency separated by a comma, like `data.currency.pp, data.currency.gp` and so on.
 
-- **Preload Files:** Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience."
+- **Item type attribute:** This setting defines the attribute path for determining where the item types live. In D&D5e, it's just `type` because the type is defined directly in `item.data.type`, because each item distinguishes its type with that attribute.
+
+- **Item type filters:** Here you can configure what item types are ignored and not listed in the item pile dialogs. For example, in D&D5e we probably don't want to show spells, feats, and classes, so you'd put `spell, feat, class`.
+
+- **Auto-delete empty piles:** This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles.
+
+- **Preload Files:** Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience.
 
 - **Enable debugging:** Prints debug messages to the console"
 ## [Changelog](./changelog.md)

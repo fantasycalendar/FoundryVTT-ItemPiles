@@ -18,7 +18,8 @@ export class ItemPileConfig extends FormApplication {
             template: `${CONSTANTS.PATH}templates/item-pile-config.html`,
             width: 430,
             height: "auto",
-            resizable: false
+            resizable: false,
+            tabs: [{navSelector: ".tabs", contentSelector: ".tab-body", initial: "mainsettings"}]
         });
     }
 
@@ -48,11 +49,10 @@ export class ItemPileConfig extends FormApplication {
         const settingsContainer = html.find('.item-pile-config-all-settings');
         enabledCheckbox.change(function(){
             let isEnabled = $(this).is(":checked");
-            settingsContainer.find("input").each(function(){
+            html.find('input, button, select').not($(this)).each(function(){
                 $(this).prop('disabled', !isEnabled);
+                $(this).closest('.form-group').toggleClass("item-pile-disabled", !isEnabled);
             });
-            settingsContainer.css('display', isEnabled ? "block" : "none");
-            self.setPosition();
         }).change();
 
         const slider = html.find("#scaleRange");
@@ -77,10 +77,8 @@ export class ItemPileConfig extends FormApplication {
             let isDisabled = !$(this).is(":checked");
             containerSettings.children().each(function(){
                 $(this).toggleClass("item-pile-disabled", isDisabled);
-                $(this).find('input, button').prop("disabled", isDisabled);
+                $(this).find('input, button, select').prop("disabled", isDisabled);
             });
-            containerSettings.css('display', isDisabled ? "none" : "block");
-            self.setPosition();
         }).change();
 
         slider.on("input", function(){

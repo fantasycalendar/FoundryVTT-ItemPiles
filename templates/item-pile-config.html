@@ -20,140 +20,169 @@
         }
     </style>
 
-    <h2>{{localize "ITEM-PILES.Defaults.MainSettings"}}</h2>
+    <nav class="sheet-navigation tabs" data-group="primary">
+        <a class="item active" data-tab="mainsettings">{{localize "ITEM-PILES.Defaults.MainSettings"}}</a>
+        <a class="item" data-tab="singleitem">{{localize "ITEM-PILES.Defaults.SingleItemSettings"}}</a>
+        <a class="item" data-tab="container">{{localize "ITEM-PILES.Defaults.ContainerSettings"}}</a>
+    </nav>
 
-    <div class="form-group">
-        <label>
-            {{localize "ITEM-PILES.Defaults.EnabledPile"}}<br>
-            <span class="units">{{localize "ITEM-PILES.Defaults.EnabledPileExplanation"}}</span>
-        </label>
-        <input type="checkbox" name="enabled" {{checked enabled}}/>
-    </div>
+    <hr/>
 
-    <div class="item-pile-config-all-settings" {{#unless enabled}} style="display:none;" {{/unless}}>
+    <section class="tab-body">
 
-        <div class="form-group">
-            <label style="flex:4;">
-                {{localize "ITEM-PILES.Defaults.Distance"}}<br>
-                <span class="units">{{localize "ITEM-PILES.Defaults.GridUnits"}}</span class="units">
-            </label>
-            <input style="flex:2;" type="number" name="distance" value="{{distance}}"/>
-        </div>
-
-        <div class="form-group">
-            <label style="flex:4;">
-                {{localize "ITEM-PILES.Defaults.ItemTypeFilter"}}<br>
-                <p>{{localize "ITEM-PILES.Defaults.ItemTypeFilterExplanation"}}</p>
-            </label>
-            <input style="flex:2;" type="text" placeholder="class, feat, spell..." name="itemTypeFilter" value="{{itemTypeFilter}}"/>
-        </div>
-
-        <h2 style="margin-top: 1rem;">{{localize "ITEM-PILES.Defaults.SingleItemSettings"}}</h2>
-
-        <div class="form-group">
-            <label>
-                {{localize "ITEM-PILES.Defaults.DisplayOne"}}<br>
-                <span class="units">{{localize "ITEM-PILES.Defaults.DisplayOneExplanation"}}</span>
-            </label>
-            <input type="checkbox" name="displayOne" {{checked displayOne}}/>
-        </div>
-
-        <div class="item-pile-display-one-settings">
+        <div class="tab mainsettings flex" data-group="primary" data-tab="mainsettings">
 
             <div class="form-group">
                 <label>
-                    {{localize "ITEM-PILES.Defaults.OverrideSingleItemScale"}}<br>
+                    {{localize "ITEM-PILES.Defaults.EnabledPile"}}<br>
+                    <p>{{localize "ITEM-PILES.Defaults.EnabledPileExplanation"}}</p>
                 </label>
-                <input type="checkbox" name="overrideSingleItemScale" {{checked overrideSingleItemScale}}/>
+                <input type="checkbox" name="enabled" {{checked enabled}}/>
             </div>
 
             <div class="form-group">
-                <label style="flex:3;">
-                    {{localize "ITEM-PILES.Defaults.SingleItemScale"}}<br>
+                <label style="flex:4;">
+                    {{localize "ITEM-PILES.Defaults.Distance"}}<br>
+                    <p>{{localize "ITEM-PILES.Defaults.GridUnits"}}</p>
                 </label>
-                <input style="flex:3;" type="range" min="0.2" step="0.1" max="3" id="scaleRange" name="singleItemScale" value="{{singleItemScale}}"/>
-                <input style="flex:0.5; margin-left:1rem;" type="number" step="0.1" id="scaleInput" value="{{singleItemScale}}"/>
+                <input style="flex:4;" type="number" name="distance" value="{{distance}}"/>
+            </div>
+
+            <div class="form-group">
+                <label style="flex:4;">
+                    {{localize "ITEM-PILES.Defaults.DeleteWhenEmpty"}}<br>
+                    <p >{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyExplanation"}}</p>
+                </label>
+                <select style="flex:4;" name="deleteWhenEmpty">
+                    {{#select deleteWhenEmpty}}
+                    <option value="default">{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyDefault"}}</option>
+                    <option value="1">{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyYes"}}</option>
+                    <option value="0">{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyNo"}}</option>
+                    {{/select}}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label style="flex:4;">
+                    {{localize "ITEM-PILES.Defaults.ItemTypeFilter"}}<br>
+                    <p>{{localize "ITEM-PILES.Defaults.ItemTypeFilterExplanation"}}</p>
+                </label>
+                <input style="flex:2;" type="text" placeholder="class, feat, spell..." name="itemTypeFilter" value="{{itemTypeFilter}}"/>
             </div>
 
         </div>
 
-        <h2 style="margin-top: 1rem;">{{localize "ITEM-PILES.Defaults.ContainerSettings"}}</h2>
+        <div class="tab singleitem flex" data-group="primary" data-tab="singleitem">
 
-        <div class="form-group">
-            <label>{{localize "ITEM-PILES.Defaults.IsContainer"}}</label>
-            <input type="checkbox" name="isContainer" {{checked isContainer}}/>
+            <div class="form-group">
+                <label>
+                    {{localize "ITEM-PILES.Defaults.DisplayOne"}}<br>
+                    <p>{{localize "ITEM-PILES.Defaults.DisplayOneExplanation"}}</p>
+                </label>
+                <input type="checkbox" name="displayOne" {{checked displayOne}}/>
+            </div>
+
+            <div class="item-pile-display-one-settings">
+
+                <div class="form-group">
+                    <label>
+                        {{localize "ITEM-PILES.Defaults.OverrideSingleItemScale"}}<br>
+                    </label>
+                    <input type="checkbox" name="overrideSingleItemScale" {{checked overrideSingleItemScale}}/>
+                </div>
+
+                <div class="form-group">
+                    <label style="flex:3;">
+                        {{localize "ITEM-PILES.Defaults.SingleItemScale"}}<br>
+                    </label>
+                    <input style="flex:3;" type="range" min="0.2" step="0.1" max="3" id="scaleRange" name="singleItemScale" value="{{singleItemScale}}"/>
+                    <input style="flex:0.5; margin-left:1rem;" type="number" step="0.1" id="scaleInput" value="{{singleItemScale}}"/>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="item-pile-container-settings">
-
-            <div class="form-group item-pile-container-setting">
-                <label>{{localize "ITEM-PILES.Defaults.Closed"}}</label>
-                <input type="checkbox" class="container-input" name="closed" {{checked closed}}/>
-            </div>
+        <div class="tab container flex" data-group="primary" data-tab="container">
 
             <div class="form-group">
-                <label>{{localize "ITEM-PILES.Defaults.Locked"}}</label>
-                <input type="checkbox" class="container-input" name="locked" {{checked locked}}/>
+                <label>{{localize "ITEM-PILES.Defaults.IsContainer"}}</label>
+                <input type="checkbox" name="isContainer" {{checked isContainer}}/>
             </div>
 
-            <div class="form-group">
-                <label>{{localize "ITEM-PILES.Defaults.ClosedImagePath"}}</label>
-                <div class="form-fields">
-                    {{filePicker target="closedImage" type="imagevideo"}}
-                    <input class="image container-input" type="text" name="closedImage" placeholder="path/image.png" value="{{closedImage}}"/>
+            <div class="item-pile-container-settings">
+
+                <div class="form-group item-pile-container-setting">
+                    <label>{{localize "ITEM-PILES.Defaults.Closed"}}</label>
+                    <input type="checkbox" class="container-input" name="closed" {{checked closed}}/>
+                </div>
+
+                <div class="form-group">
+                    <label>{{localize "ITEM-PILES.Defaults.Locked"}}</label>
+                    <input type="checkbox" class="container-input" name="locked" {{checked locked}}/>
+                </div>
+
+                <div class="form-group">
+                    <label>{{localize "ITEM-PILES.Defaults.ClosedImagePath"}}</label>
+                    <div class="form-fields">
+                        {{filePicker target="closedImage" type="imagevideo"}}
+                        <input class="image container-input" type="text" name="closedImage" placeholder="path/image.png" value="{{closedImage}}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{localize "ITEM-PILES.Defaults.OpenedImagePath"}}</label>
+                    <div class="form-fields">
+                        {{filePicker target="openedImage" type="imagevideo"}}
+                        <input class="image container-input" type="text" name="openedImage" placeholder="path/image.png" value="{{openedImage}}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{localize "ITEM-PILES.Defaults.EmptyImagePath"}}</label>
+                    <div class="form-fields">
+                        {{filePicker target="emptyImage" type="imagevideo"}}
+                        <input class="image container-input" type="text" name="emptyImage" placeholder="path/image.png" value="{{emptyImage}}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{localize "ITEM-PILES.Defaults.LockedImagePath"}}</label>
+                    <div class="form-fields">
+                        {{filePicker target="lockedImage" type="imagevideo"}}
+                        <input class="image container-input" type="text" name="lockedImage" placeholder="path/image.png" value="{{lockedImage}}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{localize "ITEM-PILES.Defaults.CloseSoundPath"}}</label>
+                    <div class="form-fields">
+                        {{filePicker target="closeSound" type="audio"}}
+                        <input class="sound container-input" type="text" name="closeSound" placeholder="path/sound.wav" value="{{closeSound}}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{localize "ITEM-PILES.Defaults.OpenSoundPath"}}</label>
+                    <div class="form-fields">
+                        {{filePicker target="openSound" type="audio"}}
+                        <input class="sound container-input" type="text" name="openSound" placeholder="path/sound.wav" value="{{openSound}}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{localize "ITEM-PILES.Defaults.LockedSoundPath"}}</label>
+                    <div class="form-fields">
+                        {{filePicker target="lockedSound" type="audio"}}
+                        <input class="sound container-input" type="text" name="lockedSound" placeholder="path/sound.wav" value="{{lockedSound}}"/>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>{{localize "ITEM-PILES.Defaults.OpenedImagePath"}}</label>
-                <div class="form-fields">
-                    {{filePicker target="openedImage" type="imagevideo"}}
-                    <input class="image container-input" type="text" name="openedImage" placeholder="path/image.png" value="{{openedImage}}"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>{{localize "ITEM-PILES.Defaults.EmptyImagePath"}}</label>
-                <div class="form-fields">
-                    {{filePicker target="emptyImage" type="imagevideo"}}
-                    <input class="image container-input" type="text" name="emptyImage" placeholder="path/image.png" value="{{emptyImage}}"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>{{localize "ITEM-PILES.Defaults.LockedImagePath"}}</label>
-                <div class="form-fields">
-                    {{filePicker target="lockedImage" type="imagevideo"}}
-                    <input class="image container-input" type="text" name="lockedImage" placeholder="path/image.png" value="{{lockedImage}}"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>{{localize "ITEM-PILES.Defaults.CloseSoundPath"}}</label>
-                <div class="form-fields">
-                    {{filePicker target="closeSound" type="audio"}}
-                    <input class="sound container-input" type="text" name="closeSound" placeholder="path/sound.wav" value="{{closeSound}}"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>{{localize "ITEM-PILES.Defaults.OpenSoundPath"}}</label>
-                <div class="form-fields">
-                    {{filePicker target="openSound" type="audio"}}
-                    <input class="sound container-input" type="text" name="openSound" placeholder="path/sound.wav" value="{{openSound}}"/>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>{{localize "ITEM-PILES.Defaults.LockedSoundPath"}}</label>
-                <div class="form-fields">
-                    {{filePicker target="lockedSound" type="audio"}}
-                    <input class="sound container-input" type="text" name="lockedSound" placeholder="path/sound.wav" value="{{lockedSound}}"/>
-                </div>
-            </div>
         </div>
 
-    </div>
+
+    </section>
 
     <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
         <button type="submit" name="submit" value="1"><i class="far fa-save"></i> {{localize "ITEM-PILES.Defaults.Update"}}</button>

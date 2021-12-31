@@ -136,6 +136,10 @@ export default class API {
                 action = "addToPile";
             }
 
+            if(game.keyboard.downKeys.has("ControlLeft")){
+                dropData.quantity = getProperty(itemData, API.QUANTITY_ATTRIBUTE) ?? 1;
+            }
+
         } else {
 
             const result = await DropDialog.query(itemData, droppableDocuments);
@@ -238,7 +242,7 @@ export default class API {
      * @param position
      * @returns {Promise}
      */
-    static async createPile(position) {
+    static async createPile(position) {itemTypeFilters
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position);
     }
 
@@ -315,7 +319,7 @@ export default class API {
             throw lib.custom_error(`transferItem | Could not drop item of type ${disallowedType}`, true)
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ITEM, sourceUuid, targetUuid, itemId, quantity);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ITEM, sourceUuid, targetUuid, itemId, { quantity, force });
 
     }
 
@@ -396,14 +400,11 @@ export default class API {
             quantity = currentQuantity;
 
             await item.delete();
-            lib.debug(`Removed the last "${item.name}" from target ${target.id}`)
+            lib.debug(`Removed the last "${item.name}" from target ${target.id}`);
 
             if (target.token) {
-                const pile = managedPiles.get(target.token.uuid);
-                if (game.settings.get(CONSTANTS.MODULE_NAME, "deleteEmptyPiles") && pile && pile.items.size === 0) {
-                    await target.sheet.close();
-                    await pile.document.delete();
-                }
+                const pile = managedPiles.get(targetUuid);
+                pile.checkShouldBeDeleted();
             }
 
         }
@@ -479,7 +480,7 @@ export default class API {
      * @param {Array|Boolean} itemTypeFilters           Item types to filter
      * @returns {Promise}
      */
-    static async transferAllItems(source, target, { itemTypeFilters = false }){
+    static async transferAllItems(source, target, { itemTypeFilters = false }={}){
 
         const sourceUuid = API.getUuid(source);
         if(!sourceUuid) throw lib.custom_error(`revertFromItemPile | Could not determine the UUID, please provide a valid source`, true)
@@ -497,7 +498,7 @@ export default class API {
         );
     }
 
-    static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false }) {
+    static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false }={}) {
 
         const source = await API.getActor(sourceUuid);
         if(!source){
@@ -556,6 +557,11 @@ export default class API {
         await API.updatePile(target);
         await API.rerenderPileInventoryApplication(source);
         await API.rerenderPileInventoryApplication(target);
+
+        if (target.token) {
+            const pile = managedPiles.get(targetUuid);
+            pile.checkShouldBeDeleted();
+        }
 
         return {
             itemsUpdated: itemsToUpdate,
@@ -673,6 +679,23 @@ export default class API {
     static async _rerenderPileInventoryApplication(inPileUuid){
         const pile = await API.getActor(inPileUuid);
         ItemPileInventory.rerenderActiveApp(pile);
+    }
+
+    /**
+     * Causes all connected users to re-render a specific pile's inventory UI
+     *
+     * @param inPile
+     * @return {Promise<*>}
+     */
+    static async closePileInventoryApplication(inPile) {
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CLOSE_PILE_INVENTORY, API.getUuid(inPile));
+    }
+
+    static async _closePileInventoryApplication(inPileUuid){
+        const pile = await API.getActor(inPileUuid);
+        const app = ItemPileInventory.getActiveAppFromPile(pile);
+        if(!app) return;
+        await app.close(true);
     }
 
     /**
