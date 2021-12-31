@@ -5,7 +5,7 @@ const CONSTANTS = {
     PILE_DEFAULTS: {
         enabled: true,
         distance: 1,
-        itemTypeFilter: "",
+        itemTypeFilters: "",
         displayOne: false,
         deleteWhenEmpty: "default",
         overrideSingleItemScale: false,

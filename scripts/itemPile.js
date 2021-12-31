@@ -283,4 +283,4 @@ const debounceSelfDelete = foundry.utils.debounce(async (pile) => {
     if(pile.tokenDocument._destroyed) return;
     await API.closePileInventoryApplication(pile.tokenDocument);
     await pile.tokenDocument.delete();
-}, 500)
+}, 1500)
