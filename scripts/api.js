@@ -1126,7 +1126,7 @@ export default class API {
 
         }
 
-        return new ItemPileInventory(tokenDocument.actor, closestTokens[0]?.actor).render(true);
+        return new ItemPileInventory(tokenDocument, closestTokens[0]).render(true);
 
     }
 

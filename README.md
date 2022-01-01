@@ -40,7 +40,17 @@ This module uses the [libwrapper](https://github.com/ruipin/fvtt-lib-wrapper) li
 
 Installing this module allows anyone to drag & drop items to the canvas, which creates piles of items on the ground. The default pile is normally relatively unstyled and you can change it all you want, but you **shouldn't delete it** or the module will create a new default item pile actor. This is the actor that is used by everyone in your game to create item piles when they drag & drop items.
 
-You can duplicate this item pile to create new versions of the same type, or configure new item piles through the `Item Pile` button on actor sheets, which can turn them into item piles.
+You can duplicate this item pile to create new versions of the same type, or configure new item piles through the `Item Pile` button on actor sheets, which can turn them into item piles. This UI has a wide range of customization, which allows you to control exactly how your players interact with the item pile.
+
+![Item Pile Token Configuration](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/configs.gif)
+
+When players double click on the item pile (or Left Control + Double Click for GMs to inspect), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
+
+![Item Pile Inventory UI](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/inventory-ui.png)
+
+In addition, item piles have a few extra buttons on the right click Token HUD to open, close, lock, and unlock containers, and a quick way to access the configuration of that token.
+
+![Item Pile Token HUD buttons](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/token-buttons.png)
 
 In the module settings, you can configure all sorts of things, such as whether empty piles auto-delete once they're empty, and which item types are allowed to be picked up. These are by default configured to the D&D5e system, so adjust them accordingly for your own system.
 

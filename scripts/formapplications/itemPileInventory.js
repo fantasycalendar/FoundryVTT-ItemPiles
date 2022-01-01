@@ -23,12 +23,12 @@ export class ItemPileInventory extends FormApplication {
         return true;
     }
 
-    constructor(pile, actor = false) {
+    constructor(pile, recipient = false) {
         super();
-        this.pileActor = pile;
-        this.pileToken = pile.token;
+        this.pileActor = pile.actor;
+        this.pileToken = pile;
         this.pileUuid = pile.uuid;
-        this.actor = actor;
+        this.recipient = recipient?.actor ?? recipient;
         this.items = [];
         this.deleted = false;
     }
@@ -116,7 +116,8 @@ export class ItemPileInventory extends FormApplication {
 
         data.name = !data.isDeleted ? this.pileToken.name : "Nonexistent pile";
 
-        data.actor = this.actor;
+        data.hasRecipient = !!this.recipient;
+        data.recipient = this.recipient;
 
         if(!data.isDeleted) {
             data.hasItems = Array.from(this.pileActor.items).length > 0;
@@ -172,13 +173,13 @@ export class ItemPileInventory extends FormApplication {
         const inputQuantity = element.find(".item-piles-quantity").val();
         const item = this.pileActor.items.get(itemId);
         const maxQuantity = getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
-        await API.transferItem(this.pileActor, this.actor, itemId, { quantity: Math.min(inputQuantity, maxQuantity) });
+        await API.transferItem(this.pileActor, this.recipient, itemId, { quantity: Math.min(inputQuantity, maxQuantity) });
     }
 
     async _updateObject(event, formData) {
 
         if(event.submitter.value === "takeAll"){
-            return await API.transferAllItems(this.pileActor, this.actor);
+            return await API.transferAllItems(this.pileActor, this.recipient);
         }
 
         if(event.submitter.value === "close"){

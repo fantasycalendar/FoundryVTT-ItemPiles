@@ -6,8 +6,8 @@
             <img id="item-piles-preview-image">
         </div>
 
-        {{#if actor}}
-        <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.AsActor" actorName=actor.name }}</p>
+        {{#if hasRecipient}}
+        <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}</p>
         {{else}}
         <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.NoActor"}}</p>
         {{/if}}
@@ -25,25 +25,31 @@
             {{/unless}}
 
             <div class="item-piles-items">
-                {{#each items as |item id|}}
-                <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
-                    <img class="item-piles-img" src="{{item.img}}"/>
-                    <div class="item-piles-name item-piles-text">{{item.name}}</div>
-                    {{#if actor}}
-                    <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.maxQuantity}}disabled{{/unless}}/>
-                    <span class="item-piles-text item-piles-input-divider">/ {{item.maxQuantity}}</span>
-                    <button class="item-piles-take-button" type="button" {{#unless item.maxQuantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
-                    {{else}}
-                    <span class="item-piles-text item-piles-input-divider item-piles-text-right">x{{item.maxQuantity}}</span>
-                    {{/if}}
-                </div>
-                {{/each}}
+                {{#if hasRecipient}}
+                    {{#each items as |item id|}}
+                    <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
+                        <img class="item-piles-img" src="{{item.img}}"/>
+                        <div class="item-piles-name item-piles-text">{{item.name}}</div>
+                        <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.maxQuantity}}disabled{{/unless}}/>
+                        <span class="item-piles-text item-piles-input-divider">/ {{item.maxQuantity}}</span>
+                        <button class="item-piles-take-button" type="button" {{#unless item.maxQuantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                    </div>
+                    {{/each}}
+                {{else}}
+                    {{#each items as |item id|}}
+                    <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
+                        <img class="item-piles-img" src="{{item.img}}"/>
+                        <div class="item-piles-name item-piles-text">{{item.name}}</div>
+                        <span class="item-piles-text item-piles-input-divider item-piles-text-right">x{{item.maxQuantity}}</span>
+                    </div>
+                    {{/each}}
+                {{/if}}
             </div>
 
         {{/if}}
 
         <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
-            {{#if actor}}
+            {{#if hasRecipient}}
                 {{#if hasItems}}
                 <button type="submit" name="takeAll" value="takeAll"><i class="fas fa-download"></i> {{localize "ITEM-PILES.Inspect.TakeAll"}}</button>
                 {{/if}}
