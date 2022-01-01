@@ -8,7 +8,7 @@
 
         <h3 style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Title"}}: {{name}}</h3>
 
-        {{#if isDestroyed}}
+        {{#if isDeleted}}
 
             <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Destroyed"}}</p>
 
@@ -36,7 +36,7 @@
             {{#if hasItems}}
             <button type="submit" name="takeAll" value="takeAll"><i class="fas fa-download"></i> {{localize "ITEM-PILES.Inspect.TakeAll"}}</button>
             {{/if}}
-            {{#unless isDestroyed}}
+            {{#unless isDeleted}}
             <button type="submit" name="close" value="close"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Close"}}</button>
             {{/unless}}
             <button type="submit" name="leave" value="leave"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Leave"}}</button>

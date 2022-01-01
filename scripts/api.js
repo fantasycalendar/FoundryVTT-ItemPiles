@@ -1,7 +1,5 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
-import ItemPile from "./itemPile.js";
-import { managedPiles } from "./module.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropDialog from "./formapplications/dropDialog.js";
@@ -49,11 +47,11 @@ export default class API {
      *
      * @param canvas
      * @param data
-     * @param itemPile
+     * @param target
      * @param force
      * @return {Promise}
      */
-    static async dropData(canvas, data, { itemPile = false, force = false }={}) {
+    static async dropData(canvas, data, { target = false, force = false }={}) {
 
         if (data.type !== "Item") return;
 
@@ -100,31 +98,28 @@ export default class API {
         let x;
         let y;
 
-        if(!itemPile){
+        if(!target){
 
             const position = canvas.grid.getTopLeft(data.x, data.y);
             x = position[0];
             y = position[1];
 
             droppableDocuments = lib.getTokensAtLocation({ x, y })
-                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled)
-                .map(token => managedPiles.get(token.document.uuid));
+                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled);
 
         }else{
 
-            droppableDocuments.push(itemPile);
+            droppableDocuments.push(target);
 
         }
 
         if (droppableDocuments.length > 0 && !game.user.isGM) {
-            droppableDocuments = droppableDocuments.filter(pile => !pile.isLocked);
+            droppableDocuments = droppableDocuments.filter(token => API.isPileLocked(token));
             if (!droppableDocuments.length) {
                 return Dialog.prompt({
                     title: game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title"),
                     content: `<p>${game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title")}</p>`,
                     label: "OK",
-                    callback: () => {
-                    },
                     rejectClose: false
                 });
             }
@@ -151,7 +146,7 @@ export default class API {
         }
 
         if (action === "addToPile") {
-            dropData.target = droppableDocuments[0].actor;
+            dropData.target = droppableDocuments[0];
         } else {
             dropData.position = { x, y };
         }
@@ -183,18 +178,18 @@ export default class API {
         force = false
     }={}) {
 
-        const sourceUuid = API.getUuid(source);
+        const sourceUuid = lib.getUuid(source);
         if(!sourceUuid) throw lib.custom_error(`handleDrop | Could not determine the UUID, please provide a valid source`, true)
 
-        const targetUuid = API.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`handleDrop | Could not determine the UUID, please provide a valid target`, true)
+        const targetUuid = lib.getUuid(target) ?? target;
+        if(target && !targetUuid) throw lib.custom_error(`handleDrop | Could not determine the UUID, please provide a valid target`, true)
 
         const disallowedType = API.isItemTypeDisallowed(itemData);
         if(disallowedType && !force){
             throw lib.custom_error(`handleDrop | Could not drop item of type ${disallowedType}`, true)
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP, {
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEM, {
             sourceUuid,
             targetUuid,
             position,
@@ -215,8 +210,7 @@ export default class API {
     }={}) {
 
         if(!targetUuid) {
-            const pile = await API.createPile(position);
-            targetUuid = pile.tokenDocument.uuid;
+            targetUuid = await API.createPile(position);
         }
 
         if(sourceUuid){
@@ -242,7 +236,7 @@ export default class API {
      * @param position
      * @returns {Promise}
      */
-    static async createPile(position) {itemTypeFilters
+    static async createPile(position) {
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position);
     }
 
@@ -264,6 +258,7 @@ export default class API {
             });
 
             await pileActor.update({ "token": {
+                name: "Item Pile",
                 actorLink: false,
                 bar1: { attribute: "" },
                 vision: false,
@@ -280,13 +275,11 @@ export default class API {
             actorData: { items: {} }
         });
 
-        const [ tokenDocument ] = await canvas.scene.createEmbeddedDocuments("Token", [ tokenData ])
+        Hooks.call("preCreateItemPile", tokenData);
 
-        await lib.wait(50)
+        const [ tokenDocument ] = await canvas.scene.createEmbeddedDocuments("Token", [ tokenData ]);
 
-        ItemPile.make(tokenDocument)
-
-        return API.getUuid(tokenDocument);
+        return lib.getUuid(tokenDocument);
 
     }
 
@@ -303,10 +296,10 @@ export default class API {
      */
     static async transferItem(source, target, itemId, { quantity = 1, force = false }={}) {
 
-        const sourceUuid = API.getUuid(source);
+        const sourceUuid = lib.getUuid(source);
         if(!sourceUuid) throw lib.custom_error(`transferItem | Could not determine the UUID, please provide a valid source`, true)
 
-        const targetUuid = API.getUuid(target);
+        const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`transferItem | Could not determine the UUID, please provide a valid target`, true)
 
         const actorItem = source.items.get(itemId);
@@ -325,12 +318,12 @@ export default class API {
 
     static async _transferItem(sourceUuid, targetUuid, itemId, { quantity = 1, force = false }={}) {
 
-        const source = await API.getActor(sourceUuid);
+        const source = await lib.getActor(sourceUuid);
         if(!source){
             throw lib.custom_error(`TransferItem | Could not find actor with UUID ${sourceUuid}`, true)
         }
 
-        const target = await API.getActor(targetUuid);
+        const target = await lib.getActor(targetUuid);
         if(!target){
             throw lib.custom_error(`TransferItem | Could not find actor with UUID ${targetUuid}`, true)
         }
@@ -363,7 +356,7 @@ export default class API {
      */
     static async removeItem(target, itemId, { quantity = 1, force = false }={}){
 
-        const targetUuid = API.getUuid(target);
+        const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`removeItem | Could not determine the UUID, please provide a valid target`, true)
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEM, targetUuid, itemId, { quantity, force });
@@ -371,7 +364,7 @@ export default class API {
 
     static async _removeItem(targetUuid, itemId, { quantity = 1, force = false }={}) {
 
-        const target = await API.getActor(targetUuid);
+        const target = await lib.getActor(targetUuid);
         if (!target) {
             throw lib.custom_error(`RemoveItem | Could not find target with UUID ${targetUuid}`, true)
         }
@@ -403,7 +396,7 @@ export default class API {
             lib.debug(`Removed the last "${item.name}" from target ${target.id}`);
 
 
-            await API.checkPileShouldBeDeleted(targetUuid);
+            await API._checkPileShouldBeDeleted(target);
 
         }
 
@@ -424,7 +417,7 @@ export default class API {
      */
     static async addItem(target, itemData, { quantity = 1, force = false }){
 
-        const targetUuid = API.getUuid(target);
+        const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`addItem | Could not determine the UUID, please provide a valid target`, true)
 
         const disallowedType = API.isItemTypeDisallowed(itemData);
@@ -437,7 +430,7 @@ export default class API {
 
     static async _addItem(targetUuid, itemData, { quantity = 1, force = false }){
 
-        const target = await API.getActor(targetUuid);
+        const target = await lib.getActor(targetUuid);
         if (!target) {
             throw lib.custom_error(`AddItem | Could not find target with UUID ${targetUuid}`, true)
         }
@@ -449,7 +442,7 @@ export default class API {
 
         const targetItems = Array.from(target.items);
 
-        const item = this.getSimilarItem(targetItems, itemData.name, itemData.type);
+        const item = lib.getSimilarItem(targetItems, itemData.name, itemData.type);
 
         const currentQuantity = item ? (getProperty(item.data, this.QUANTITY_ATTRIBUTE) ?? 0) : 0;
 
@@ -480,10 +473,10 @@ export default class API {
      */
     static async transferAllItems(source, target, { itemTypeFilters = false }={}){
 
-        const sourceUuid = API.getUuid(source);
+        const sourceUuid = lib.getUuid(source);
         if(!sourceUuid) throw lib.custom_error(`revertFromItemPile | Could not determine the UUID, please provide a valid source`, true)
 
-        const targetUuid = API.getUuid(target);
+        const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`revertFromItemPile | Could not determine the UUID, please provide a valid target`, true)
 
         return itemPileSocket.executeAsGM(
@@ -498,12 +491,12 @@ export default class API {
 
     static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false }={}) {
 
-        const source = await API.getActor(sourceUuid);
+        const source = await lib.getActor(sourceUuid);
         if(!source){
             throw lib.custom_error(`TransferAllItems | Could not find source with UUID ${sourceUuid}`, true)
         }
 
-        const target = await API.getActor(targetUuid);
+        const target = await lib.getActor(targetUuid);
         if(!target){
             throw lib.custom_error(`TransferAllItems | Could not find target with UUID ${targetUuid}`, true)
         }
@@ -524,7 +517,7 @@ export default class API {
 
             const incomingQuantity = getProperty(item.data, this.QUANTITY_ATTRIBUTE) ?? 1;
 
-            const similarItem = this.getSimilarItem(targetItems, item.name, item.type);
+            const similarItem = lib.getSimilarItem(targetItems, item.name, item.type);
 
             if(similarItem){
 
@@ -551,8 +544,8 @@ export default class API {
         await source.deleteEmbeddedDocuments("Item", itemsToDelete);
 
         // Check if potential piles should be deleted
-        await API.checkPileShouldBeDeleted(sourceUuid);
-        await API.checkPileShouldBeDeleted(targetUuid);
+        await API._checkPileShouldBeDeleted(target);
+        await API._checkPileShouldBeDeleted(target);
 
         // Refresh potential piles and any relevant open UIs
         await API.rerenderPileInventoryApplication(sourceUuid);
@@ -573,7 +566,7 @@ export default class API {
      * @return {Promise}
      */
     static async turnTokenIntoItemPile(target, { pileSettings = {}, tokenSettings = {} }={}) {
-        const targetUuid = API.getUuid(target);
+        const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`revertFromItemPile | Could not determine the UUID, please provide a valid target`, true)
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TURN_INTO_PILE, targetUuid, pileSettings, tokenSettings);
     }
@@ -589,7 +582,7 @@ export default class API {
         const newPileSettings = foundry.utils.mergeObject(existingPileSettings, pileSettings);
         newPileSettings.enabled = true;
 
-        await API._updateTargetPileSettings(target, pileSettings);
+        await API._updateTargetPileSettings(target, pileSettings, tokenSettings);
 
         await API.rerenderTokenHud();
 
@@ -605,7 +598,7 @@ export default class API {
      * @return {Promise}
      */
     static async revertTokenFromItemPile(target, { tokenSettings={} }={}) {
-        const targetUuid = API.getUuid(target);
+        const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`revertFromItemPile | Could not determine the UUID, please provide a valid target`, true)
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REVERT_FROM_PILE, targetUuid, tokenSettings);
     }
@@ -630,7 +623,7 @@ export default class API {
 
     }
 
-    static async _updateTargetPileSettings(target, pileSettings){
+    static async _updateTargetPileSettings(target, pileSettings, tokenSettings){
         if(target instanceof Actor){
             return target.update({
                 [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings,
@@ -641,11 +634,9 @@ export default class API {
             });
         }
 
-        return target.update({
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings,
-            [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings,
-            ...tokenSettings
-        });
+        await target.update(tokenSettings);
+
+        return API._updatePile(target.uuid, pileSettings);
     }
 
     /**
@@ -667,73 +658,318 @@ export default class API {
      * Causes all connected users to re-render a specific pile's inventory UI
      *
      * @param inPileUuid
+     * @param deleted
      * @return {Promise<*>}
      */
-    static async rerenderPileInventoryApplication(inPileUuid) {
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, inPileUuid);
+    static async rerenderPileInventoryApplication(inPileUuid, deleted = false) {
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, inPileUuid, deleted);
     }
 
-    static async _rerenderPileInventoryApplication(inPileUuid){
-        ItemPileInventory.rerenderActiveApp(inPileUuid);
+    static async _rerenderPileInventoryApplication(inPileUuid, deleted = false){
+        ItemPileInventory.rerenderActiveApp(inPileUuid, deleted);
     }
 
     /**
-     * Updates a pile if it exists
+     * Opens a pile if it is enabled and a container
      *
-     * @param {Actor|Token|TokenDocument} target
-     * @return <Promise>
+     * @param token
+     * @return {Promise}
      */
-    static async updatePile(target){
-        const pile = await API.getItemPile(target)
-        if(pile){
-            return pile.update();
+    static async openPile(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        data.closed = false;
+        data.locked = false;
+        if(data.openSound){
+            AudioHelper.play({ src: data.openSound })
+        }
+        return API.updatePile(token, data);
+    }
+
+    /**
+     * Closes a pile if it is enabled and a container
+     *
+     * @param token
+     * @return {Promise}
+     */
+    static async closePile(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        data.closed = true;
+        if(data.closeSound){
+            AudioHelper.play({ src: data.closeSound })
+        }
+        return API.updatePile(token, data);
+    }
+
+    /**
+     * Toggles a pile's closed state if it is enabled and a container
+     *
+     * @param token
+     * @return {Promise}
+     */
+    static async togglePileClosed(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        if(data.closed){
+            return API.openPile(token);
+        }
+        return API.closePile(token);
+    }
+
+    /**
+     * Locks a pile if it is enabled and a container
+     *
+     * @param token
+     * @return {Promise}
+     */
+    static async lockPile(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        data.closed = true;
+        data.locked = true;
+        return API.updatePile(token, data);
+    }
+
+    /**
+     * Unlocks a pile if it is enabled and a container
+     *
+     * @param token
+     * @return {Promise}
+     */
+    static async unlockPile(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        data.locked = false;
+        return API.updatePile(token, data);
+    }
+
+    /**
+     * Toggles a pile's locked state if it is enabled and a container
+     *
+     * @param token
+     * @return {Promise}
+     */
+    static async togglePileLocked(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        if(data.locked){
+            return API.unlockPile(token);
+        }
+        return API.lockPile(token);
+    }
+
+    /**
+     * Causes the item pile to play a sound as it was attempted to be opened, but was locked
+     * @param token
+     * @return {Promise<boolean>}
+     */
+    static async rattleItemPile(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        if(data.locked && data.lockedSound){
+            AudioHelper.play({ src: data.lockedSound })
+        }
+        return true;
+    }
+
+    /**
+     * Whether an item pile is locked. If it is not enabled or not a container, it is always false.
+     *
+     * @param token
+     * @return {boolean}
+     */
+    static isPileLocked(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        return data.locked;
+    }
+
+    /**
+     * Whether an item pile is closed. If it is not enabled or not a container, it is always false.
+     *
+     * @param token
+     * @return {boolean}
+     */
+    static isPileClosed(token){
+        const data = API._getFreshFlags(token);
+        if(!data?.enabled || !data?.isContainer) return false;
+        return data.closed;
+    }
+
+    /**
+     * Whether an item pile is a container. If it is not enabled, it is always false.
+     *
+     * @param token
+     * @return {boolean}
+     */
+    static isPileContainer(token){
+        const data = API._getFreshFlags(token);
+        return data?.enabled && data?.isContainer;
+    }
+
+    /**
+     * Updates a pile with new data.
+     *
+     * @param token
+     * @param newData
+     * @return {Promise}
+     */
+    static async updatePile(token, newData){
+        const tokenUuid = lib.getUuid(token);
+        if(!tokenUuid) throw lib.custom_error(`updatePile | Could not determine the UUID, please provide a valid token`, true);
+
+        const diff = foundry.utils.diffObject(API._getFreshFlags(token), newData);
+
+        Hooks.call('preUpdateItemPile', token, newData, diff)
+
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, tokenUuid, newData)
+    }
+
+    static async _updatePile(tokenUuid, newData){
+
+        const token = await fromUuid(tokenUuid);
+        const oldData = API._getFreshFlags(token);
+
+        token.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME, newData);
+
+        const diff = foundry.utils.diffObject(oldData, newData);
+
+        await token.update({
+            "img": API._getItemPileTokenImage(token, newData),
+            "scale": API._getItemPileTokenScale(token, newData),
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: newData,
+            [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: newData
+        });
+
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.UPDATED_PILE, tokenUuid, diff);
+    }
+
+    static async _updatedPile(tokenUuid, diffData){
+        const token = await fromUuid(tokenUuid);
+
+        if(foundry.utils.isObjectEmpty(diffData)) return;
+
+        const data = API._getFreshFlags(token);
+
+        Hooks.callAll('updateItemPile', token, diffData)
+
+        if(data.isContainer) {
+            if (diffData?.closed === true) {
+                Hooks.callAll("closeItemPile", token)
+            }
+            if (diffData?.locked === true) {
+                Hooks.callAll("lockItemPile", token)
+            }
+            if (diffData?.locked === false) {
+                Hooks.callAll("unlockItemPile", token)
+            }
+            if (diffData?.closed === false) {
+                Hooks.callAll("openItemPile", token)
+            }
         }
     }
 
-    static async checkPileShouldBeDeleted(targetUuid){
-        const pile = await API.getItemPile(targetUuid);
-        if(!pile?.shouldBeDeleted) return;
-        await API.removePile(targetUuid);
-        await pile.tokenDocument.delete();
-        //await lib.wait(25);
+    /**
+     * Refreshes the token image of an item pile, ensuring it remains in sync
+     *
+     * @param token
+     * @return {Promise}
+     */
+    static async refreshPile(token) {
+        if (!API.isValidPile(token)) return;
+        const tokenUuid = lib.getUuid(token);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REFRESH_PILE, tokenUuid)
+    }
+
+    static async _refreshPile(tokenUuid){
+        const token = await fromUuid(tokenUuid);
+        if (!API.isValidPile(token)) return;
+        return token.update({
+            "img": API._getItemPileTokenImage(token),
+            "scale": API._getItemPileTokenScale(token),
+        });
+    }
+
+    /**
+     * Deletes a pile, calling the relevant hooks.
+     *
+     * @param token
+     * @return {Promise}
+     */
+    static async deletePile(token){
+        if(!API.isValidPile(token)) {
+            if(!tokenUuid) throw lib.custom_error(`deletePile | This is not an item pile, please provide a valid token`, true);
+        }
+        const tokenUuid = lib.getUuid(token);
+        if(!tokenUuid) throw lib.custom_error(`deletePile | Could not determine the UUID, please provide a valid token`, true);
+        Hooks.call('preDeleteItemPile', token);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DELETE_PILE, tokenUuid);
+    }
+
+    static async _deletePile(tokenUuid){
+        const token = await fromUuid(tokenUuid);
+        return token.delete();
+    }
+
+    /**
+     * Initializes a pile on the client-side.
+     *
+     * @param token
+     * @return {Promise<boolean>}
+     */
+    static async initializePile(token){
+
+        const data = token.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        if(!data?.enabled) return false;
+
+        const method = () => {
+            return doubleClickHandler.clicked(token.document);
+        }
+        if(!lib.object_has_event(token, "pointerdown", method)){
+            lib.debug(`Registered pointerdown method for token with uuid ${token.document.uuid}`)
+            token.on('pointerdown', method);
+        }
+
+        if(game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")){
+            for(let [key, value] of Object.entries(data)){
+                if(preloadedImages.has(value) || !value) continue;
+                if(key.toLowerCase().includes("image")){
+                    loadTexture(value);
+                    lib.debug(`Preloaded image: ${value}`);
+                }else if(key.toLowerCase().includes("sound")){
+                    AudioHelper.preloadSound(value);
+                    lib.debug(`Preloaded sound: ${value}`);
+                }
+                preloadedImages.add(value);
+            }
+        }
+
+        lib.debug(`Initialized item pile with uuid ${token.document.uuid}`);
+
+        return true;
+    }
+
+    /**
+     * Whether a given document is a valid pile or not
+     *
+     * @param document
+     * @return {boolean}
+     */
+    static isValidPile(document) {
+        return !!document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled;
     }
 
     /* -------- UTILITY METHODS -------- */
 
-    static async removePile(pileUuid){
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.REMOVE_PILE, pileUuid);
-    }
-
-    static async _removePile(pileUuid) {
-        const pile = await API.getItemPile(pileUuid);
-        if(pile) pile.remove();
-        return pileUuid;
-    }
-
-    static async getItemPile(target){
-        const uuid = typeof target === "string" ? target : (await API.getUuid(target));
-        return managedPiles.get(uuid);
-    }
-
-    static getSimilarItem(items, itemName, itemType){
-        for(const item of items){
-            if(item.name === itemName && item.type === itemType){
-                return item;
-            }
-        }
-        return false;
-    }
-
-    static async getActor(documentUuid){
-        const document = await fromUuid(documentUuid);
-        return document?.actor ?? document;
-    }
-
-    static getUuid(target){
-        const document = target?.token ?? target?.document ?? target;
-        return document?.uuid ?? false;
-    }
-
+    /**
+     * Checks whether an item (or item data) is of a type that is not allowed. If an array whether that type is allowed
+     * or not, returning the type if it is NOT allowed.
+     *
+     * @param {Item|Object} item
+     * @param {Array|Boolean} itemTypeFilter
+     * @return {boolean|string}
+     */
     static isItemTypeDisallowed(item, itemTypeFilter = false){
         if(!API.ITEM_TYPE_ATTRIBUTE) return false;
         if(!Array.isArray(itemTypeFilter)) itemTypeFilter = API.ITEM_TYPE_FILTERS;
@@ -744,9 +980,131 @@ export default class API {
         return false;
     }
 
-    static async updateDocument(documentUuid, updates){
-        const document = await fromUuid(documentUuid);
-        return document.update(updates);
+    /* -------- PRIVATE ITEM PILE METHODS -------- */
+
+    static _getFreshFlags(document){
+        return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
     }
 
+    static async _itemPileClicked(token){
+
+        if(!API.isValidPile(token)) return;
+
+        const data = API._getFreshFlags(token);
+
+        lib.debug(`Clicked: ${token.uuid}`);
+
+        let controlledToken = canvas.tokens.controlled?.[0] ?? false;
+
+        if(!controlledToken || controlledToken.document === token) return;
+
+        const distance = Math.floor(lib.distance_between_rect(token.object, controlledToken) / canvas.grid.size) + 1;
+
+        if(data.distance < distance) return;
+
+        if(data.isContainer) {
+
+            if (data.locked) {
+                return API.rattleItemPile(token);
+            }
+
+            if (data.closed) {
+                await API.openPile(token);
+            }
+
+        }
+
+        return new ItemPileInventory(token.actor, controlledToken.actor).render(true);
+
+    }
+
+    static _getItemPileTokenImage(tokenDocument, data = false){
+
+        if(!data){
+            data = API._getFreshFlags(tokenDocument);
+        }
+
+        const items = Array.from(tokenDocument.actor.items);
+
+        let img;
+        if(data.isContainer){
+
+            img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage;
+
+            if(data.locked && data.lockedImage){
+                img = data.lockedImage;
+            }else if(data.closed && data.closedImage){
+                img = data.closedImage;
+            }else if(data.openedImage && items.length > 0) {
+                img = data.openedImage;
+            }else if(data.emptyImage){
+                img = data.emptyImage;
+            }
+
+        }else if(data.displayOne && items.length === 1){
+
+            img = items[0].data.img;
+
+        }
+
+        if(!img) {
+            img = tokenDocument.actor.data.img;
+        }
+
+        return img;
+
+    }
+
+    static _getItemPileTokenScale(tokenDocument, data){
+
+        if(!data){
+            data = API._getFreshFlags(tokenDocument);
+        }
+
+        const items = Array.from(tokenDocument.actor.items);
+
+        return data.overrideSingleItemScale && items.length === 1
+            ? data.singleItemScale
+            : tokenDocument.actor.data.token.scale;
+
+    }
+
+    static async _checkPileShouldBeDeleted(target){
+
+        if(!(target instanceof TokenDocument)) return false;
+
+        const data = target.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+
+        const shouldDelete = {
+            "default": game.settings.get(CONSTANTS.MODULE_NAME, "deleteEmptyPiles"),
+            "true": true,
+            "false": false
+        }[data?.deleteWhenEmpty ?? "default"]
+
+        const hasItems = Array.from(target.actor.item).length > 0;
+
+        if(!data?.enabled || !shouldDelete || hasItems) return false;
+
+        return API.deletePile(target);
+    }
+
+}
+
+const preloadedImages = new Set();
+
+const doubleClickHandler = {
+    _clicked: false,
+    clicked(target){
+        if(target !== doubleClickHandler._target) {
+            doubleClickHandler._clicked = false
+        }
+        if(doubleClickHandler._clicked){
+            doubleClickHandler._target = false;
+            doubleClickHandler._clicked = false;
+            return API._itemPileClicked(target);
+        }
+        doubleClickHandler._target = target;
+        doubleClickHandler._clicked = true;
+        setTimeout(() => { doubleClickHandler._clicked = false }, 500);
+    }
 }

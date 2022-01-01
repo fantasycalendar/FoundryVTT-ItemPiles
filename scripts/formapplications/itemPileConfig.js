@@ -1,6 +1,6 @@
 import CONSTANTS from "../constants.js";
-import { managedPiles } from "../module.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
+import API from "../api.js";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -104,11 +104,10 @@ export class ItemPileConfig extends FormApplication {
         }[formData.deleteWhenEmpty];
 
         if (this.document instanceof TokenDocument) {
-            const pile = managedPiles.get(this.document.uuid);
-            return pile.update(data);
+            return API.updatePile(this.document, data);
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_DOCUMENT, this.document.uuid, {
+        return this.document.update({
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
             [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
         });

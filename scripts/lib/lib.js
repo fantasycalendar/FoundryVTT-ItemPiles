@@ -90,3 +90,27 @@ export function object_has_event(object, eventName, func){
 
     return false;
 }
+
+export function getSimilarItem(items, itemName, itemType){
+    for(const item of items){
+        if(item.name === itemName && item.type === itemType){
+            return item;
+        }
+    }
+    return false;
+}
+
+
+export async function getActor(documentUuid){
+    const document = await fromUuid(documentUuid);
+    return document?.actor ?? document;
+}
+
+export function getUuid(target){
+    // If it's an actor, get its TokenDocument
+    // If it's a token, get its Document
+    // If it's a TokenDocument, just use it
+    // Otherwise fail
+    const document = target?.token ?? target?.document ?? target;
+    return document?.uuid ?? false;
+}
