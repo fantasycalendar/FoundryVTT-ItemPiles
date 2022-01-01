@@ -75,7 +75,7 @@ In the module settings, you can configure all sorts of things, such as whether e
 ### ItemPiles.API.openPile(target)
 *(async)*
 
-Opens a pile if it is enabled and a container
+Visually opens a pile if it is enabled and a container (does not open a UI)
 
 | Param    | Type                                   | Description         |
 |----------|----------------------------------------|---------------------|
@@ -84,7 +84,7 @@ Opens a pile if it is enabled and a container
 ### ItemPiles.API.closePile(target)
 *(async)*
 
-Closes a pile if it is enabled and a container
+Visually closes a pile if it is enabled and a container (does not close a UI)
 
 | Param    | Type                                   | Description          |
 |----------|----------------------------------------|----------------------|
@@ -93,7 +93,7 @@ Closes a pile if it is enabled and a container
 ### ItemPiles.API.togglePileClosed(target)
 *(async)*
 
-Toggles a pile's closed state if it is enabled and a container
+Visually toggles a pile's closed state if it is enabled and a container (does not show a UI)
 
 | Param    | Type                                   | Description          |
 |----------|----------------------------------------|----------------------|
