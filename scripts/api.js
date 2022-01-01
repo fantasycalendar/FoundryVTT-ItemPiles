@@ -310,9 +310,7 @@ export default class API {
      */
     static async createPile(position, pileName = false) {
 
-        if(!pileName){
-            pileName = "Default Item Pile (do not rename)"
-        }else{
+        if(pileName){
             const pileActor = game.actors.getName(pileName);
             if(!pileActor){
                 throw lib.custom_error(`There is no actor of the name "${pileName}"`, true);
@@ -326,30 +324,39 @@ export default class API {
 
     static async _createPile(position, pileName){
 
-        let pileActor = game.actors.getName(pileName)
+        let pileActor;
 
-        if (!pileActor) {
+        if (!pileName) {
 
-            lib.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
+            pileActor = game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID") ? game.actors.get(game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID")) : false;
 
-            const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS)
+            if(!pileActor) {
 
-            pileActor = await Actor.create({
-                name: "Default Item Pile (do not rename)",
-                type: "character",
-                img: "icons/svg/mystery-man.svg",
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
-            });
+                lib.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
-            await pileActor.update({ "token": {
-                name: "Item Pile",
-                actorLink: false,
-                bar1: { attribute: "" },
-                vision: false,
-                displayName: 50,
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
-            }});
+                const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS)
 
+                pileActor = await Actor.create({
+                    name: "Default Item Pile",
+                    type: "character",
+                    img: "icons/svg/item-bag.svg",
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults,
+                    "token": {
+                        name: "Item Pile",
+                        actorLink: false,
+                        bar1: { attribute: "" },
+                        vision: false,
+                        displayName: 50,
+                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
+                    }
+                });
+
+                await game.settings.set(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", pileActor.id);
+
+            }
+
+        }else{
+            pileActor = game.actors.getName(pileName);
         }
 
         const tokenData = await pileActor.getTokenData();

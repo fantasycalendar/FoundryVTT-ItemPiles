@@ -69,4 +69,11 @@ export default function registerSettings(){
         type: Boolean
     });
 
+    game.settings.register(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", {
+        scope: "world",
+        config: false,
+        default: "",
+        type: String
+    });
+
 }

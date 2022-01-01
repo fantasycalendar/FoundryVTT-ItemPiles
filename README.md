@@ -34,7 +34,15 @@ This module uses the [socketlib](https://github.com/manuelVo/foundryvtt-socketli
 
 ### libwrapper
 
-This module uses the [libwrapper](https://github.com/manuelVo/foundryvtt-libwrapper/) library for wrapping core methods. It is a hard dependency and it is recommended for the best experience and compatibility with other modules.
+This module uses the [libwrapper](https://github.com/ruipin/fvtt-lib-wrapper) library for wrapping core methods. It is a hard dependency, and it is recommended for the best experience and compatibility with other modules.
+
+## Usage
+
+Installing this module allows anyone to drag & drop items to the canvas, which creates piles of items on the ground. The default pile is normally relatively unstyled and you can change it all you want, but you **shouldn't delete it** or the module will create a new default item pile actor. This is the actor that is used by everyone in your game to create item piles when they drag & drop items.
+
+You can duplicate this item pile to create new versions of the same type, or configure new item piles through the `Item Pile` button on actor sheets, which can turn them into item piles.
+
+In the module settings, you can configure all sorts of things, such as whether empty piles auto-delete once they're empty, and which item types are allowed to be picked up. These are by default configured to the D&D5e system, so adjust them accordingly for your own system.
 
 ## Item Piles Settings
 
@@ -44,7 +52,7 @@ This module uses the [libwrapper](https://github.com/manuelVo/foundryvtt-libwrap
 
 - **Item type attribute:** This setting defines the attribute path for determining where the item types live. In D&D5e, it's just `type` because the type is defined directly in `item.data.type`, because each item distinguishes its type with that attribute.
 
-- **Item type filters:** Here you can configure what item types are ignored and not listed in the item pile dialogs. For example, in D&D5e we probably don't want to show spells, feats, and classes, so you'd put `spell, feat, class`.
+- **Item type filters:** Here you can configure what item types are ignored and not listed in the item pile dialogs. For example, in D&D5e you probably don't want to show spells, feats, and classes, so you'd put `spell, feat, class`.
 
 - **Auto-delete empty piles:** This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles.
 
