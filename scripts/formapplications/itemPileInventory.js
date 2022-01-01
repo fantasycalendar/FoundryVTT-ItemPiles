@@ -23,7 +23,7 @@ export class ItemPileInventory extends FormApplication {
         return true;
     }
 
-    constructor(pile, actor) {
+    constructor(pile, actor = false) {
         super();
         this.pileActor = pile;
         this.pileToken = pile.token;
@@ -65,7 +65,7 @@ export class ItemPileInventory extends FormApplication {
             const foundItem = self.pileActor.items.get(id) ?? lib.getSimilarItem(pileItems, name, type);
 
             const itemQuantity = foundItem ? $(this).find('input').val() : 1;
-            const maxQuantity = foundItem ? (getProperty(foundItem.data, API.QUANTITY_ATTRIBUTE) ?? 1) : 0;
+            const maxQuantity = foundItem ? (getProperty(foundItem.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1) : 0;
 
             const currentQuantity = Math.min(maxQuantity, Math.max(itemQuantity, 1));
 
@@ -104,7 +104,7 @@ export class ItemPileInventory extends FormApplication {
                 type: item.type,
                 img: item.data?.img ?? "",
                 currentQuantity: 1,
-                maxQuantity: getProperty(item.data, API.QUANTITY_ATTRIBUTE) ?? 1
+                maxQuantity: getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1
             };
         });
     }
@@ -115,6 +115,8 @@ export class ItemPileInventory extends FormApplication {
         data.isDeleted = this.deleted;
 
         data.name = !data.isDeleted ? this.pileToken.name : "Nonexistent pile";
+
+        data.actor = this.actor;
 
         if(!data.isDeleted) {
             data.hasItems = Array.from(this.pileActor.items).length > 0;
@@ -169,7 +171,7 @@ export class ItemPileInventory extends FormApplication {
         const itemId = element.attr('data-item-id');
         const inputQuantity = element.find(".item-piles-quantity").val();
         const item = this.pileActor.items.get(itemId);
-        const maxQuantity = getProperty(item.data, API.QUANTITY_ATTRIBUTE) ?? 1;
+        const maxQuantity = getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
         await API.transferItem(this.pileActor, this.actor, itemId, { quantity: Math.min(inputQuantity, maxQuantity) });
     }
 

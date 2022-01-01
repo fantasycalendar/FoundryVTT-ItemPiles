@@ -3,6 +3,8 @@
 
         "Inspect": {
             "Title": "Inspecting Pile Contents",
+            "AsActor": "You're inspecting this pile as {actorName}",
+            "NoActor": "You are inspecting the contents of this pile without controlling a token, which means you can't take items from it.",
             "TakeAll": "Take All Items",
             "Empty": "This pile is empty.",
             "Destroyed": "This pile no longer exists and lies barren.",

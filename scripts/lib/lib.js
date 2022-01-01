@@ -106,6 +106,11 @@ export async function getActor(documentUuid){
     return document?.actor ?? document;
 }
 
+export async function getToken(documentUuid){
+    const document = await fromUuid(documentUuid);
+    return document?.token ?? document;
+}
+
 export function getUuid(target){
     // If it's an actor, get its TokenDocument
     // If it's a token, get its Document

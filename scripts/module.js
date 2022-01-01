@@ -2,11 +2,14 @@ import CONSTANTS from "./constants.js";
 import registerSettings from "./settings.js";
 import { registerSocket } from "./socket.js";
 import API from "./api.js";
+import * as lib from "./lib/lib.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
+import { registerLibwrappers } from "./libwrapper.js";
 
 Hooks.once("init", () => {
 
     registerSettings();
+    registerLibwrappers();
 
     Hooks.once("socketlib.ready", registerSocket);
     Hooks.on("canvasReady", module._canvasReady);
@@ -38,6 +41,13 @@ Hooks.once("init", () => {
 
 });
 
+Hooks.once("ready", () => {
+    if(!game.modules.get('lib-wrapper')?.active && game.user.isGM){
+        throw lib.custom_error("Item Piles requires the 'libWrapper' module. Please install and activate it.")
+    }
+    Hooks.callAll("itemPilesReady");
+})
+
 const module = {
 
     async _pileInventoryChanged(item) {
@@ -47,14 +57,14 @@ const module = {
 
     async _canvasReady(canvas) {
         for(const token of canvas.tokens.placeables){
-            await API.initializePile(token);
+            await API._initializePile(token.document);
         }
     },
 
     async _createPile(doc) {
-        if(!API.isValidPile(doc) || !doc?.object) return;
-        Hooks.callAll("createItemPile", doc);
-        return API.initializePile(doc.object);
+        if(!API.isValidPile(doc)) return;
+        Hooks.callAll("createItemPile", doc, API._getFreshFlags(doc));
+        return API._initializePile(doc);
     },
 
     async _deletePile(doc){

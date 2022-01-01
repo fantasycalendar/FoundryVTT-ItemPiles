@@ -6,21 +6,21 @@ const debouncedReload = debounce(() => {
 
 export default function registerSettings(){
 
-    game.settings.register(CONSTANTS.MODULE_NAME, "quantityAttribute", {
-        name: "ITEM-PILES.Setting.Quantity.Title",
-        hint: "ITEM-PILES.Setting.Quantity.Label",
-        scope: "world",
-        config: true,
-        default: "data.quantity",
-        type: String
-    });
-
     game.settings.register(CONSTANTS.MODULE_NAME, "currencyAttributes", {
         name: "ITEM-PILES.Setting.Currency.Title",
         hint: "ITEM-PILES.Setting.Currency.Label",
         scope: "world",
         config: true,
         default: "data.currency.pp,data.currency.gp,data.currency.ep,data.currency.sp,data.currency.cp",
+        type: String
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "itemQuantityAttribute", {
+        name: "ITEM-PILES.Setting.Quantity.Title",
+        hint: "ITEM-PILES.Setting.Quantity.Label",
+        scope: "world",
+        config: true,
+        default: "data.quantity",
         type: String
     });
 
@@ -54,7 +54,7 @@ export default function registerSettings(){
     game.settings.register(CONSTANTS.MODULE_NAME, "preloadFiles", {
         name: "ITEM-PILES.Setting.PreloadFiles.Title",
         hint: "ITEM-PILES.Setting.PreloadFiles.Label",
-        scope: "world",
+        scope: "client",
         config: true,
         default: true,
         type: Boolean
@@ -63,7 +63,7 @@ export default function registerSettings(){
     game.settings.register(CONSTANTS.MODULE_NAME, "debug", {
         name: "ITEM-PILES.Setting.Debug.Title",
         hint: "ITEM-PILES.Setting.Debug.Label",
-        scope: "world",
+        scope: "client",
         config: true,
         default: false,
         type: Boolean

@@ -37,7 +37,7 @@ export default class DropDialog extends FormApplication {
         data.dropObjects = this.dropObjects;
         data.itemsAtLocation = this.dropObjects.length > 0;
         data.droppedItem = this.droppedItem;
-        data.itemQuantity = getProperty(this.droppedItem, API.QUANTITY_ATTRIBUTE) ?? 1;
+        data.itemQuantity = getProperty(this.droppedItem, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
         data.itemQuantityMoreThanOne = data.itemQuantity > 1;
 
         return data;

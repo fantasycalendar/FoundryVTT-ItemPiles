@@ -46,6 +46,10 @@
     line-height: 1.5rem;
 }
 
+.item-piles-item-row .item-piles-text-right{
+    text-align: right;
+}
+
 .item-piles-item-row .item-piles-take-button{
     flex: 1;
     height: 26px;
