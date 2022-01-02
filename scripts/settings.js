@@ -1,18 +1,48 @@
 import CONSTANTS from "./constants.js";
-
-const debouncedReload = debounce(() => {
-    window.location.reload()
-}, 100)
+import { ItemPileAttributeEditor } from "./formapplications/itemPileAttributeEditor.js";
 
 export default function registerSettings(){
 
-    game.settings.register(CONSTANTS.MODULE_NAME, "currencyAttributes", {
-        name: "ITEM-PILES.Setting.Currency.Title",
-        hint: "ITEM-PILES.Setting.Currency.Label",
+    game.settings.registerMenu(CONSTANTS.MODULE_NAME, "openExtractableAttributesEditor", {
+        name: "ITEM-PILES.Setting.Attributes.Title",
+        label: "ITEM-PILES.Setting.Attributes.Label",
+        hint: "ITEM-PILES.Setting.Attributes.Hint",
+        icon: "fas fa-coins",
+        type: ItemPileAttributeEditor,
+        restricted: true
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "extractableAttributes", {
         scope: "world",
-        config: true,
-        default: "data.currency.pp,data.currency.gp,data.currency.ep,data.currency.sp,data.currency.cp",
-        type: String
+        config: false,
+        default: [
+            {
+                name: "Platinum Coins",
+                path: "data.currency.pp",
+                img: "icons/commodities/currency/coin-inset-snail-silver.webp"
+            },
+            {
+                name: "Gold Coins",
+                path: "data.currency.gp",
+                img: "icons/commodities/currency/coin-embossed-crown-gold.webp"
+            },
+            {
+                name: "Electrum Coins",
+                path: "data.currency.ep",
+                img: "icons/commodities/currency/coin-inset-copper-axe.webp"
+            },
+            {
+                name: "Silver Coins",
+                path: "data.currency.sp",
+                img: "icons/commodities/currency/coin-engraved-moon-silver.webp"
+            },
+            {
+                name: "Copper Coins",
+                path: "data.currency.cp",
+                img: "icons/commodities/currency/coin-engraved-waves-copper.webp"
+            }
+        ],
+        type: Array
     });
 
     game.settings.register(CONSTANTS.MODULE_NAME, "itemQuantityAttribute", {

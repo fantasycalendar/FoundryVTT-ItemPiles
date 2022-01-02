@@ -5,6 +5,7 @@ import API from "./api.js";
 import * as lib from "./lib/lib.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import { registerLibwrappers } from "./libwrapper.js";
+import { ItemPileAttributeEditor } from "./formapplications/itemPileAttributeEditor.js";
 
 Hooks.once("init", () => {
 
@@ -16,6 +17,7 @@ Hooks.once("init", () => {
     Hooks.on("createToken", module._createPile);
     Hooks.on("deleteToken", module._deletePile);
     Hooks.on("dropCanvasData", module._dropCanvasData);
+    Hooks.on("updateActor", module._pileAttributeChanged);
     Hooks.on("createItem", module._pileInventoryChanged);
     Hooks.on("deleteItem", module._pileInventoryChanged);
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
@@ -46,13 +48,25 @@ Hooks.once("ready", () => {
         throw lib.custom_error("Item Piles requires the 'libWrapper' module. Please install and activate it.")
     }
     Hooks.callAll("itemPilesReady");
+    //new ItemPileAttributeEditor().render(true)
 })
 
 const module = {
 
+    async _pileAttributeChanged(actor, changes){
+        const validProperty = API.EXTRACTABLE_ATTRIBUTES.find(attribute => {
+            return hasProperty(changes, attribute.path);
+        });
+        if(!validProperty) return;
+        const target = actor?.token ?? actor;
+        await API._rerenderPileInventoryApplication(target.uuid);
+        return API.refreshPile(target);
+    },
+
     async _pileInventoryChanged(item) {
-        if (!item?.parent?.token) return;
-        return API.refreshPile(item.parent.token);
+        if (!item?.parent) return;
+        await API._rerenderPileInventoryApplication(item.parent.uuid);
+        return API.refreshPile(item.parent);
     },
 
     async _canvasReady(canvas) {

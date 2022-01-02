@@ -16,6 +16,13 @@ export const SOCKET_HANDLERS = {
     REFRESH_PILE: "refreshPile",
 
     /**
+     * Item pile attribute sockets
+     */
+    TRANSFER_ATTRIBUTE: "transferAttribute",
+    REMOVE_ATTRIBUTE: "removeAttribute",
+    ADD_ATTRIBUTE: "addAttribute",
+
+    /**
      * UI sockets
      */
     RERENDER_TOKEN_HUD: "rerenderTokenHud",
@@ -66,6 +73,13 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.REMOVE_ITEM, (...args) => API._removeItem(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ITEM, (...args) => API._transferItem(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, (...args) => API._transferAllItems(...args))
+
+    /**
+     * Attribute transfer sockets
+     */
+    itemPileSocket.register(SOCKET_HANDLERS.ADD_ATTRIBUTE, (...args) => API._addAttribute(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.REMOVE_ATTRIBUTE, (...args) => API._removeAttribute(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ATTRIBUTE, (...args) => API._transferAttribute(...args))
 }
 
 export const isPileInventoryOpenForOthers = {
@@ -88,8 +102,7 @@ export const isPileInventoryOpenForOthers = {
     },
 
     async respond(inUserId, inPileUuid) {
-        const pile = await lib.getActor(inPileUuid);
-        const app = ItemPileInventory.getActiveAppFromPile(pile);
+        const app = ItemPileInventory.getActiveAppFromPile(inPileUuid);
         return itemPileSocket.executeAsUser(SOCKET_HANDLERS.RESPOND_PILE_INVENTORY_OPEN, inUserId, game.user.id, !!app);
     },
 

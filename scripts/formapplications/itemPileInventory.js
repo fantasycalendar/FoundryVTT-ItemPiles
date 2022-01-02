@@ -7,7 +7,7 @@ export class ItemPileInventory extends FormApplication {
 
     static getActiveAppFromPile(inPileUuid) {
         for(let app of Object.values(ui.windows)){
-            if(app instanceof this && app.pileUuid === inPileUuid){
+            if(app instanceof this && (app.pile.uuid === inPileUuid || app.pile.actor.uuid === inPileUuid)){
                 return app;
             }
         }
@@ -18,18 +18,29 @@ export class ItemPileInventory extends FormApplication {
         const app = ItemPileInventory.getActiveAppFromPile(inPileUuid);
         if(!app) return false;
         app.saveItems();
+        app.saveAttributes();
         app.deleted = deleted;
         app.render(true);
         return true;
     }
 
-    constructor(pile, recipient = false) {
+    static async show(){
+
+    }
+
+    /**
+     *
+     * @param pile
+     * @param recipient
+     */
+    constructor(pile, recipient) {
         super();
-        this.pileActor = pile.actor;
-        this.pileToken = pile;
-        this.pileUuid = pile.uuid;
-        this.recipient = recipient?.actor ?? recipient;
+        this.pile = pile;
+        console.log(this.pile)
+        this.recipient = recipient;
+        this.recipientActor = this.recipient?.actor ?? this.recipient;
         this.items = [];
+        this.attributes = [];
         this.deleted = false;
     }
 
@@ -51,25 +62,29 @@ export class ItemPileInventory extends FormApplication {
         let self = this;
         this.items = [];
 
-        let pileItems = Array.from(this.pileActor.items);
+        let pileItems = Array.from(this.pile.actor.items);
 
         if(!pileItems.length) return;
 
-        this.element.find(".item-piles-item-row").each(function(){
+        this.element.find(".item-piles-item-row:not(.item-piles-attribute-row)").each(function() {
 
             const id = $(this).attr("data-item-id");
             const type = $(this).attr("data-item-type");
             const name = $(this).find('.item-piles-name').text();
             const img = $(this).find('.item-piles-img').attr('src');
 
-            const foundItem = self.pileActor.items.get(id) ?? lib.getSimilarItem(pileItems, name, type);
+            const foundItem = self.pile.actor.items.get(id) ?? lib.getSimilarItem(pileItems, name, type);
 
             const itemQuantity = foundItem ? $(this).find('input').val() : 1;
             const maxQuantity = foundItem ? (getProperty(foundItem.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1) : 0;
 
             const currentQuantity = Math.min(maxQuantity, Math.max(itemQuantity, 1));
 
-            self.items.push({ id, name, type, img, currentQuantity, maxQuantity });
+            const hasRecipient = !!self.recipient;
+
+            if (hasRecipient){
+                self.items.push({ id, name, type, img, currentQuantity, maxQuantity, hasRecipient });
+            }
 
         });
 
@@ -77,6 +92,69 @@ export class ItemPileInventory extends FormApplication {
         newItems.filter(newItem => !this.items.find(item => item.id === newItem.id) && !lib.getSimilarItem(this.items, newItem.name, newItem.type))
             .forEach(newItem => this.items.push(newItem));
 
+    }
+
+    getPileItemData() {
+        return Array.from(this.pile.actor.items).map(item => {
+            return {
+                id: item.id,
+                name: item.name,
+                type: item.type,
+                img: item.data?.img ?? "",
+                currentQuantity: 1,
+                maxQuantity: getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1,
+                hasRecipient: !!this.recipient
+            };
+        })
+    }
+
+    saveAttributes(){
+
+        let self = this;
+        this.attributes = [];
+
+        this.element.find(".item-piles-attribute-row").each(function(){
+
+            const path = $(this).attr("data-attribute-path");
+            const name = $(this).find('.item-piles-name').text();
+            const img = $(this).find('.item-piles-img').attr('src');
+
+            const itemQuantity = $(this).find('input').val();
+            const maxQuantity = getProperty(self.pile.actor.data, path) ?? 0;
+
+            const currentQuantity = Math.min(maxQuantity, Math.max(itemQuantity, 0));
+
+            const hasRecipient = !!self.recipient;
+
+            if(hasRecipient) {
+                self.attributes.push({ name, path, img, currentQuantity, maxQuantity, hasRecipient });
+            }
+
+        });
+
+        const newAttributes = this.getPileAttributeData();
+        newAttributes.filter(newAttribute => !this.attributes.find(attribute => attribute.path === newAttribute.path))
+            .forEach(newAttribute => this.attributes.push(newAttribute));
+
+    }
+
+    validAttribute(attribute){
+        return getProperty(this.pile.actor.data, attribute)
+            && (!this.recipientActor || hasProperty(this.recipientActor.data, attribute));
+    }
+
+    getPileAttributeData() {
+        return API.EXTRACTABLE_ATTRIBUTES.map(attribute => {
+            if(!this.validAttribute(attribute.path)) return false;
+            return {
+                name: attribute.name,
+                path: attribute.path,
+                img: attribute.img,
+                currentQuantity: 1,
+                maxQuantity: getProperty(this.pile.actor.data, attribute.path) ?? 1,
+                hasRecipient: !!this.recipient
+            }
+        }).filter(Boolean);
     }
 
     _onDrop(event){
@@ -92,21 +170,8 @@ export class ItemPileInventory extends FormApplication {
             return false;
         }
 
-        return API.dropData(canvas, data, { target: this.pileToken });
+        return API.dropData(canvas, data, { target: this.pile });
 
-    }
-
-    getPileItemData(){
-        return Array.from(this.pileActor.items).map(item => {
-            return {
-                id: item.id,
-                name: item.name,
-                type: item.type,
-                img: item.data?.img ?? "",
-                currentQuantity: 1,
-                maxQuantity: getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1
-            };
-        });
     }
 
     getData(options){
@@ -114,15 +179,18 @@ export class ItemPileInventory extends FormApplication {
 
         data.isDeleted = this.deleted;
 
-        data.name = !data.isDeleted ? this.pileToken.name : "Nonexistent pile";
+        data.name = !data.isDeleted ? this.pile.name : "Nonexistent pile";
 
         data.hasRecipient = !!this.recipient;
         data.recipient = this.recipient;
 
         if(!data.isDeleted) {
-            data.hasItems = Array.from(this.pileActor.items).length > 0;
             data.items = this.items.length ? this.items : this.getPileItemData();
+            data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
+            data.hasItems = Array.from(this.pile.actor.items).length > 0;
+            data.hasAttributes = data?.attributes?.length;
         }
+        data.isEmpty = !data.hasItems && !data.hasAttributes;
 
         return data;
     }
@@ -144,6 +212,10 @@ export class ItemPileInventory extends FormApplication {
 
         html.find(".item-piles-take-button").click(function(){
             self.takeItem($(this).parent());
+        })
+
+        html.find(".item-piles-attribute-take-button").click(function(){
+            self.takeAttribute($(this).parent());
         })
     }
 
@@ -169,22 +241,32 @@ export class ItemPileInventory extends FormApplication {
 
     async takeItem(element){
         this.saveItems();
+        this.saveAttributes();
         const itemId = element.attr('data-item-id');
         const inputQuantity = element.find(".item-piles-quantity").val();
-        const item = this.pileActor.items.get(itemId);
+        const item = this.pile.actor.items.get(itemId);
         const maxQuantity = getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
-        await API.transferItem(this.pileActor, this.recipient, itemId, { quantity: Math.min(inputQuantity, maxQuantity) });
+        await API.transferItem(this.pile, this.recipient, itemId, { quantity: Math.min(inputQuantity, maxQuantity) });
+    }
+
+    async takeAttribute(element){
+        this.saveItems();
+        this.saveAttributes();
+        const attribute = element.attr('data-attribute-path');
+        const inputQuantity = element.find(".item-piles-quantity").val();
+        const maxQuantity = getProperty(this.pile.actor.data, attribute) ?? 0;
+        await API.transferAttribute(this.pile, this.recipient, attribute, { quantity: Math.min(inputQuantity, maxQuantity) })
     }
 
     async _updateObject(event, formData) {
 
         if(event.submitter.value === "takeAll"){
-            return await API.transferAllItems(this.pileActor, this.recipient);
+            return await API.transferAllItems(this.pile.actor, this.recipient);
         }
 
         if(event.submitter.value === "close"){
-            return isPileInventoryOpenForOthers.query(this.pileActor).then((result) => {
-                if(!result) API.closePile(this.pileToken);
+            return isPileInventoryOpenForOthers.query(this.pile).then((result) => {
+                if(!result) API.closePile(this.pile);
             });
         }
 

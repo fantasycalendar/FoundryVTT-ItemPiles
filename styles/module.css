@@ -19,6 +19,7 @@
 .item-piles-item-row .item-piles-img{
     min-height: 26px;
     max-width: 26px;
+    max-height: 26px;
 }
 
 .item-piles-item-row .item-piles-text {
@@ -50,7 +51,7 @@
     text-align: right;
 }
 
-.item-piles-item-row .item-piles-take-button{
+.item-piles-item-row .item-piles-take-button, .item-piles-item-row .item-piles-attribute-take-button{
     flex: 1;
     height: 26px;
     padding: 1px 3px;

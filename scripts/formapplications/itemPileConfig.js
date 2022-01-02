@@ -1,5 +1,4 @@
 import CONSTANTS from "../constants.js";
-import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
 import API from "../api.js";
 
 export class ItemPileConfig extends FormApplication {
@@ -103,14 +102,7 @@ export class ItemPileConfig extends FormApplication {
             "false": false
         }[formData.deleteWhenEmpty];
 
-        if (this.document instanceof TokenDocument) {
-            return API.updatePile(this.document, data);
-        }
-
-        return this.document.update({
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
-            [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
-        });
+        API._updatePile(this.document.uuid, data)
 
     }
 

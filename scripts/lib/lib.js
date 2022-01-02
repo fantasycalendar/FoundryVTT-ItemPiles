@@ -100,12 +100,6 @@ export function getSimilarItem(items, itemName, itemType){
     return false;
 }
 
-
-export async function getActor(documentUuid){
-    const document = await fromUuid(documentUuid);
-    return document?.actor ?? document;
-}
-
 export async function getToken(documentUuid){
     const document = await fromUuid(documentUuid);
     return document?.token ?? document;
@@ -116,6 +110,6 @@ export function getUuid(target){
     // If it's a token, get its Document
     // If it's a TokenDocument, just use it
     // Otherwise fail
-    const document = target?.token ?? target?.document ?? target;
+    const document = target?.document ?? target;
     return document?.uuid ?? false;
 }

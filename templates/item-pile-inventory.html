@@ -20,30 +20,46 @@
 
         {{else}}
 
-            {{#unless hasItems}}
+            {{#if isEmpty}}
             <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Empty"}}</p>
-            {{/unless}}
+            {{/if}}
 
             <div class="item-piles-items">
-                {{#if hasRecipient}}
-                    {{#each items as |item id|}}
-                    <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
-                        <img class="item-piles-img" src="{{item.img}}"/>
-                        <div class="item-piles-name item-piles-text">{{item.name}}</div>
+                {{#each items as |item id|}}
+                <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
+                    <img class="item-piles-img" src="{{item.img}}"/>
+                    <div class="item-piles-name item-piles-text">{{item.name}}</div>
+                    {{#if item.hasRecipient}}
                         <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.maxQuantity}}disabled{{/unless}}/>
-                        <span class="item-piles-text item-piles-input-divider">/ {{item.maxQuantity}}</span>
+                    {{/if}}
+                    <span class="item-piles-text item-piles-input-divider {{#unless item.hasRecipient}}item-piles-text-right{{/unless}}">
+                        {{#if item.hasRecipient}}/ {{else}}x{{/if}}{{item.maxQuantity}}
+                    </span>
+                    {{#if item.hasRecipient}}
                         <button class="item-piles-take-button" type="button" {{#unless item.maxQuantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
-                    </div>
-                    {{/each}}
-                {{else}}
-                    {{#each items as |item id|}}
-                    <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
-                        <img class="item-piles-img" src="{{item.img}}"/>
-                        <div class="item-piles-name item-piles-text">{{item.name}}</div>
-                        <span class="item-piles-text item-piles-input-divider item-piles-text-right">x{{item.maxQuantity}}</span>
-                    </div>
-                    {{/each}}
+                    {{/if}}
+                </div>
+                {{/each}}
+                {{#if hasAttributes}}
+                {{#if hasItems}}
+                <hr>
                 {{/if}}
+                {{/if}}
+                {{#each attributes as |attribute id|}}
+                <div class="flexrow item-piles-item-row item-piles-attribute-row" data-attribute-name="{{attribute.name}}" data-attribute-path="{{attribute.path}}">
+                    <img class="item-piles-img" src="{{attribute.img}}"/>
+                    <div class="item-piles-name item-piles-text">{{attribute.name}}</div>
+                    {{#if attribute.hasRecipient}}
+                        <input class="item-piles-quantity" type="number" min="1" value="{{attribute.currentQuantity}}" max="{{attribute.quantity}}" {{#unless attribute.maxQuantity}}disabled{{/unless}}/>
+                    {{/if}}
+                    <span class="item-piles-text item-piles-input-divider {{#unless attribute.hasRecipient}}item-piles-text-right{{/unless}}">
+                        {{#if attribute.hasRecipient}}/ {{else}}x{{/if}}{{attribute.maxQuantity}}
+                    </span>
+                    {{#if attribute.hasRecipient}}
+                        <button class="item-piles-attribute-take-button" type="button" {{#unless attribute.maxQuantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                    {{/if}}
+                </div>
+                {{/each}}
             </div>
 
         {{/if}}
