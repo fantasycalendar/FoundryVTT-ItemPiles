@@ -1136,13 +1136,17 @@ export default class API {
     static async _updatePile(targetUuid, newData){
 
         const target = await fromUuid(targetUuid);
+
         const oldData = API._getFreshFlags(target);
 
-        const data = foundry.utils.mergeObject(oldData, newData);
+        const data = foundry.utils.mergeObject(
+            foundry.utils.duplicate(oldData),
+            foundry.utils.duplicate(newData)
+        );
 
-        target.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME, data);
+        await target.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME, data);
 
-        const diff = foundry.utils.diffObject(data, newData);
+        const diff = foundry.utils.diffObject(oldData, data);
 
         if(target instanceof TokenDocument){
             await target.update({
@@ -1167,6 +1171,7 @@ export default class API {
     }
 
     static async _updatedPile(targetUuid, diffData){
+
         const target = await lib.getToken(targetUuid);
 
         if(foundry.utils.isObjectEmpty(diffData)) return;
