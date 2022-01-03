@@ -54,6 +54,15 @@ In addition, item piles have a few extra buttons on the right click Token HUD to
 
 In the module settings, you can configure all sorts of things, such as whether empty piles auto-delete once they're empty, and which item types are allowed to be picked up. These are by default configured to the D&D5e system, so adjust them accordingly for your own system.
 
+### Currencies and attributes
+
+For most systems, currencies or other physical things aren't considered "items" in Foundry, but rather just numbers on the sheet, so dragging and dropping them is hard. However, Item Piles still allow you to pick up such items from piles using its flexible "Dynamic Attributes" feature. With this feature, you can configure what types of these "numbers only" things that can still be picked from piles up by players.
+
+![Item Pile Dynamic Attribute Settings](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/attributes.png)
+
+Each row represents a field on a character sheet that may be picked up. As you can see, the D&D5e system denotes the number of gold coins a character has with the `actor.data.data.currency.gp` field, so by putting `data.currency.gp` as a valid field in this UI, Item Piles figures out that if an actor has more than 0 in this field, it can be "picked up" and transferred to the character who picked it up.
+
+
 ## Item Piles Settings
 
 - **Currency attribute:** This setting defines the attribute path for determining where currencies exist on characters. In D&D5e, all currencies exist in `actor.data.data.currency`, so you'd put each currency separated by a comma, like `data.currency.pp, data.currency.gp` and so on.
