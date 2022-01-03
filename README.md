@@ -30,15 +30,23 @@ This module uses the [libwrapper](https://github.com/ruipin/fvtt-lib-wrapper) li
 
 ## Usage
 
+### Initial Setup
+
 Installing this module allows anyone to drag & drop items to the canvas, which creates piles of items on the ground. The default pile is normally relatively unstyled and you can change it all you want, but you **shouldn't delete it** or the module will create a new default item pile actor. This is the actor that is used by everyone in your game to create item piles when they drag & drop items.
 
-You can duplicate this item pile to create new versions of the same type, or configure new item piles through the `Item Pile` button on actor sheets, which can turn them into item piles. This UI has a wide range of customization, which allows you to control exactly how your players interact with the item pile.
+As a GM, you can duplicate the default item pile to create new versions of that pile, or turn existing actors into new item piles through the `Item Pile` button on the actor sheets' header bar. This UI has a wide range of customization, which allows you to control exactly how your players interact with the item pile.
 
 ![Item Pile Token Configuration](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/configs.gif)
+
+### Interaction
+
+Any player or GM can drag & drop items - if you drag & drop an item from an actor's inventory, you will be prompted how many of that item that you wish to drop (if they have more than 1 of the item). Holding ALT before dragging & dropping an item, you will automatically drop 1 of the items into a new pile without a prompt. **You can also drag and drop items onto an existing pile**.
 
 When players double click on the item pile (or Left Control + Double Click for GMs to inspect), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
 
 ![Item Pile Inventory UI](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/inventory-ui.png)
+
+### Extra UI and settings
 
 In addition, item piles have a few extra buttons on the right click Token HUD to open, close, lock, and unlock containers, and a quick way to access the configuration of that token.
 
