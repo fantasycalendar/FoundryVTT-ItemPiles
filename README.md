@@ -22,7 +22,7 @@ To install this module manually:
 
 ### socketlib
 
-This module uses the [socketlib](https://github.com/manuelVo/foundryvtt-socketlib/) library so that players can modify the contents and the look of item piles.
+This module uses the [socketlib](https://github.com/manuelVo/foundryvtt-socketlib/) library so that players can modify the contents and the look of item piles without having to have full ownership of the item piles. Without it, they could only drop items and create item piles using pile actors they own.
 
 ### libwrapper
 
