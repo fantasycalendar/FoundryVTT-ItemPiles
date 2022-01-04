@@ -21,15 +21,21 @@
             "LockedWarning": {
                 "Title": "Locked Item Pile",
                 "Content": "This item pile is locked and cannot be opened - you can't drop items in it."
+            },
+            "ResetSettings": {
+                "Title": "Reset Item Piles Module Settings",
+                "Content": "Are you sure you want to reset all of the Item Piles module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
+                "Confirm": "Reset Module Settings",
+                "Cancel": "Cancel"
             }
         },
 
         "AttributeEditor": {
-            "Title": "Attributes Editor",
+            "Title": "Dynamic Attributes Editor",
             "Explanation": "Here you can define which attributes on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
-            "Name": "Attributes name",
-            "AttributePath": "Attributes attribute path",
-            "Icon": "Attributes icon",
+            "Name": "Attribute name",
+            "AttributePath": "Attribute path",
+            "Icon": "Attribute icon",
             "AddNew": "Add new attribute",
             "Submit": "Submit Attributes"
         },
@@ -42,11 +48,17 @@
             "ContainerSettings": "Container Settings",
             "Update": "Update Item Pile",
             "EnabledPile": "Enabled",
-            "EnabledPileExplanation": "Causes this actor to act as an item pile.",
+            "EnabledPileExplanation": "Whether this should act as an item pile.",
             "Distance": "Interaction Distance",
             "GridUnits": "Grid Units (leave empty for infinite)",
             "ItemTypeFilter": "Item Type Filter",
             "ItemTypeFilterExplanation": "Items of these types will not be shown in any item pile UI, each type separated by a comma. Leave blank to use module defaults.",
+            "Macro": "On Interact Macro",
+            "MacroExplanation": "Name of macro to execute when this pile is interacted with.",
+            "MacroPlaceholder": "Insert macro name",
+            "OverrideAttributes": "Override Dynamic Attributes",
+            "OverrideAttributesExplanation": "Configure if this pile should be able to transfer other attributes than the default.",
+            "ConfigureOverrideAttributes": "Configure Override Dynamic Attributes",
             "DeleteWhenEmpty": "Delete when empty",
             "DeleteWhenEmptyExplanation": "Causes the item pile to auto-delete itself once it's empty.",
             "DeleteWhenEmptyDefault": "Default module setting",
@@ -84,12 +96,21 @@
         },
 
         "Setting": {
+            "Reset": {
+                "Title": "Reset settings to default",
+                "Label": "Reset Item Piles Settings To Default",
+                "Hint": "This will reset all of the settings of Item Piles back to the active game system's default."
+            },
+            "ActorClass": {
+                "Title": "Actor class type",
+                "Label": "This setting defines the type of actor that will be used for the default item pile actor that is created on first item drop. In the case of D&D5e, this is \"character\", as it does not have a dedicated loot actor type."
+            },
             "Quantity": {
                 "Title": "Item quantity attribute",
                 "Label": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.quantity\" attribute, so you'd put \"data.quantity\" in this setting."
             },
             "Attributes": {
-                "Title": "Extractable Attributes",
+                "Title": "Dynamic Attributes",
                 "Label": "Configure Attributes",
                 "Hint": "This setting define the attributes that are eligible for pickup in item paths, such as currencies or power, which may not be actual items."
             },

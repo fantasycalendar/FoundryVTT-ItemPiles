@@ -24,8 +24,13 @@ export class ItemPileInventory extends FormApplication {
         return true;
     }
 
-    static async show(){
-
+    static async show(pile, recipient){
+        const uuid = await lib.getUuid(pile);
+        const app = ItemPileInventory.getActiveAppFromPile(uuid);
+        if(app){
+            return app.render(true, { focus: true });
+        }
+        return new ItemPileInventory(pile, recipient).render(true);
     }
 
     /**
@@ -36,7 +41,6 @@ export class ItemPileInventory extends FormApplication {
     constructor(pile, recipient) {
         super();
         this.pile = pile;
-        console.log(this.pile)
         this.recipient = recipient;
         this.recipientActor = this.recipient?.actor ?? this.recipient;
         this.items = [];
@@ -144,7 +148,7 @@ export class ItemPileInventory extends FormApplication {
     }
 
     getPileAttributeData() {
-        return API.EXTRACTABLE_ATTRIBUTES.map(attribute => {
+        return API.DYNAMIC_ATTRIBUTES.map(attribute => {
             if(!this.validAttribute(attribute.path)) return false;
             return {
                 name: attribute.name,
@@ -161,7 +165,6 @@ export class ItemPileInventory extends FormApplication {
 
         super._onDrop(event);
 
-        // Try to extract the data
         let data;
         try {
             data = JSON.parse(event.dataTransfer.getData('text/plain'));
@@ -170,7 +173,7 @@ export class ItemPileInventory extends FormApplication {
             return false;
         }
 
-        return API.dropData(canvas, data, { target: this.pile });
+        return API._dropDataOnCanvas(canvas, data, { target: this.pile });
 
     }
 
@@ -235,8 +238,7 @@ export class ItemPileInventory extends FormApplication {
     }
 
     clearImage(html){
-        html.find("#item-piles-preview-container")
-            .fadeOut(150);
+        html.find("#item-piles-preview-container").fadeOut(150);
     }
 
     async takeItem(element){
@@ -261,12 +263,13 @@ export class ItemPileInventory extends FormApplication {
     async _updateObject(event, formData) {
 
         if(event.submitter.value === "takeAll"){
-            return await API.transferAllItems(this.pile.actor, this.recipient);
+            debugger;
+            return await API.transferEverything(this.pile, this.recipient);
         }
 
         if(event.submitter.value === "close"){
             return isPileInventoryOpenForOthers.query(this.pile).then((result) => {
-                if(!result) API.closePile(this.pile);
+                if(!result) API.closeItemPile(this.pile);
             });
         }
 

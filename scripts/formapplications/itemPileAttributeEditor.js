@@ -1,12 +1,21 @@
 import CONSTANTS from "../constants.js";
+import API from "../api.js";
 
 export class ItemPileAttributeEditor extends FormApplication {
 
-    constructor(...args) {
-        super(...args);
-        this.attributes = game.settings.get(CONSTANTS.MODULE_NAME, "extractableAttributes");
+    static showForPile(document){
+        let resolve;
+        const promise = new Promise(_resolve => {
+            resolve = _resolve;
+        });
+        return [ promise, new ItemPileAttributeEditor(pileAttributes, resolve).render(true) ]
     }
 
+    constructor(pileAttributes = false, resolve = false) {
+        super();
+        this.resolve = resolve;
+        this.attributes = pileAttributes || game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
+    }
 
     /* -------------------------------------------- */
 
@@ -21,7 +30,6 @@ export class ItemPileAttributeEditor extends FormApplication {
             resizable: false
         });
     }
-
 
     async getData(options) {
         const data = super.getData(options);
@@ -54,7 +62,11 @@ export class ItemPileAttributeEditor extends FormApplication {
             setProperty(newSettings, path, value)
         }
 
-        game.settings.set(CONSTANTS.MODULE_NAME, "extractableAttributes", newSettings);
+        if(!this.resolve){
+            game.settings.set(CONSTANTS.MODULE_NAME, "dynamicAttributes", newSettings);
+        }else{
+            this.resolve(newSettings);
+        }
 
     }
 

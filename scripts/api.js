@@ -3,49 +3,72 @@ import CONSTANTS from "./constants.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropDialog from "./formapplications/dropDialog.js";
+import { HOOKS } from "./hooks.js";
 
 export default class API {
 
     /**
-     * The attributes used to track each currency in this system
+     * The actor class type used for the original item pile actor in this system
      *
-     * @returns {Array}
+     * @returns {string}
      */
-    static get EXTRACTABLE_ATTRIBUTES(){
-        return game.settings.get(CONSTANTS.MODULE_NAME, "extractableAttributes");
+    static get ACTOR_CLASS_TYPE(){
+        return game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType");
     }
 
     /**
-     * Sets the attributes used to track each currency in this system
+     * Sets the actor class type used for the original item pile actor in this system
+     *
+     * @param {string} inClassType
+     * @returns {Promise}
+     */
+    static async setActorClassType(inClassType) {
+        if(typeof inAttribute !== "string"){
+            throw lib.custom_error("setActorTypeClass | inClassType must be of type string");
+        }
+        return game.settings.set(CONSTANTS.MODULE_NAME, "actorClassType", inClassType);
+    }
+
+    /**
+     * The attributes used to track dynamic attributes in this system
+     *
+     * @returns {array}
+     */
+    static get DYNAMIC_ATTRIBUTES(){
+        return game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
+    }
+
+    /**
+     * Sets the attributes used to track dynamic attributes in this system
      *
      * @param {array} inAttributes
      * @returns {Promise}
      */
-    static async setExtractableAttributes(inAttributes) {
+    static async setDynamicAttributes(inAttributes) {
         if(!Array.isArray(inAttributes)) {
-            throw lib.custom_error("setExtractableAttributes | inAttributes must be of type array");
+            throw lib.custom_error("setDynamicAttributes | inAttributes must be of type array");
         }
         inAttributes.forEach(attribute => {
             if (typeof attribute !== "object") {
-                throw lib.custom_error("setExtractableAttributes | each entry in the inAttributes array must be of type object");
+                throw lib.custom_error("setDynamicAttributes | each entry in the inAttributes array must be of type object");
             }
             if (typeof attribute.name !== "string") {
-                throw lib.custom_error("setExtractableAttributes | attribute.name must be of type string");
+                throw lib.custom_error("setDynamicAttributes | attribute.name must be of type string");
             }
             if (typeof attribute.attribute !== "string") {
-                throw lib.custom_error("setExtractableAttributes | attribute.path must be of type string");
+                throw lib.custom_error("setDynamicAttributes | attribute.path must be of type string");
             }
             if (attribute.img && typeof attribute.img !== "string") {
-                throw lib.custom_error("setExtractableAttributes | attribute.img must be of type string");
+                throw lib.custom_error("setDynamicAttributes | attribute.img must be of type string");
             }
         })
-        return game.settings.set(CONSTANTS.MODULE_NAME, "extractableAttributes", inAttributes);
+        return game.settings.set(CONSTANTS.MODULE_NAME, "dynamicAttributes", inAttributes);
     }
 
     /**
      * The attribute used to track the quantity of items in this system
      *
-     * @returns {String}
+     * @returns {string}
      */
     static get ITEM_QUANTITY_ATTRIBUTE(){
         return game.settings.get(CONSTANTS.MODULE_NAME, "itemQuantityAttribute");
@@ -67,7 +90,7 @@ export default class API {
     /**
      * The attribute used to track the item type in this system
      *
-     * @returns {String}
+     * @returns {string}
      */
     static get ITEM_TYPE_ATTRIBUTE(){
         return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeAttribute");
@@ -77,7 +100,7 @@ export default class API {
      * Sets the attribute used to track the item type in this system
      *
      * @param {string} inAttribute
-     * @returns {String}
+     * @returns {string}
      */
     static async setItemTypeAttribute(inAttribute) {
         if(typeof inAttribute !== "string"){
@@ -89,7 +112,7 @@ export default class API {
     /**
      * The filters for item types eligible for interaction within this system
      *
-     * @returns {Array}
+     * @returns {array}
      */
     static get ITEM_TYPE_FILTERS(){
         return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeFilters").split(',').map(str => str.trim());
@@ -126,7 +149,7 @@ export default class API {
      * @param force
      * @return {Promise}
      */
-    static async dropData(canvas, data, { target = false, force = false }={}) {
+    static async _dropDataOnCanvas(canvas, data, { target = false, force = false }={}) {
 
         if (data.type !== "Item") return;
 
@@ -138,10 +161,10 @@ export default class API {
         const disallowedType = API.isItemTypeDisallowed(itemData);
 
         const dropData = {
-            itemData: itemData,
             source: false,
             target: false,
-            location: false,
+            itemData: itemData,
+            position: false,
             quantity: 1,
             force: false
         }
@@ -189,7 +212,7 @@ export default class API {
         }
 
         if (droppableDocuments.length > 0 && !game.user.isGM) {
-            droppableDocuments = droppableDocuments.filter(token => API.isPileLocked(token));
+            droppableDocuments = droppableDocuments.filter(token => API.isItemPileLocked(token));
             if (!droppableDocuments.length) {
                 return Dialog.prompt({
                     title: game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title"),
@@ -226,7 +249,10 @@ export default class API {
             dropData.position = { x, y };
         }
 
-        return API.handleDrop(dropData);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.itemData, dropData.position, dropData.quantity);
+        if(hookResult === false) return;
+
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEM, dropData);
 
     }
 
@@ -238,54 +264,24 @@ export default class API {
      * If an actor was provided, it will transfer the item from the actor to the target actor.
      *
      * @param {Actor|Boolean} source
-     * @param {Actor|Boolean} target
+     * @param {TokenDocument|Boolean} target
      * @param {Object|Boolean} position
      * @param {Object} itemData
      * @param {Number} quantity
      * @param {Boolean} force
      */
-    static async handleDrop({
-        source = false,
-        target = false,
-        position = { x: 0, y: 0 },
-        itemData = false,
-        quantity = 1,
-        force = false
-    }={}) {
-
-        const sourceUuid = lib.getUuid(source) ?? source;
-        if(source && !sourceUuid) throw lib.custom_error(`handleDrop | Could not determine the UUID, please provide a valid source`, true)
-
-        const disallowedType = API.isItemTypeDisallowed(itemData);
-        if(disallowedType && !force){
-            throw lib.custom_error(`handleDrop | Could not drop item of type ${disallowedType}`, true)
-        }
-
-        const targetUuid = lib.getUuid(target) ?? target;
-        if(target && !targetUuid) throw lib.custom_error(`handleDrop | Could not determine the UUID, please provide a valid target`, true)
-
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEM, {
-            sourceUuid,
-            targetUuid,
-            position,
-            itemData,
-            quantity,
-            force
-        });
-
-    }
-
-    static async _handleDrop({
+    static async _dropItem({
         sourceUuid = false,
         targetUuid = false,
-        position = { x: 0, y: 0 },
         itemData = false,
+        position = false,
         quantity = 1,
         force = false
     }={}) {
 
-        if(!targetUuid) {
+        if(!targetUuid && position) {
             targetUuid = await API.createPile(position);
+            await lib.wait(150);
         }
 
         if(sourceUuid){
@@ -294,14 +290,9 @@ export default class API {
             await API._addItem(targetUuid, itemData, { quantity, force });
         }
 
-        return {
-            sourceUuid,
-            targetUuid,
-            position,
-            itemData,
-            quantity,
-            force
-        }
+        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemData, position, quantity);
+
+        return { sourceUuid, targetUuid, position, itemData, quantity, force };
 
     }
 
@@ -309,29 +300,33 @@ export default class API {
      * Creates the default item pile at a location. If provided an actor's name, an item
      * pile will be created of that actor, if it is a valid item pile.
      *
-     * @param position
-     * @param pileName
+     * @param {object} position
+     * @param {string|boolean} pileActorName
+     *
      * @returns {Promise}
      */
-    static async createPile(position, pileName = false) {
+    static async createPile(position, pileActorName = false) {
 
-        if(pileName){
-            const pileActor = game.actors.getName(pileName);
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_CREATE, position, pileActorName);
+        if(hookResult === false) return;
+
+        if(pileActorName){
+            const pileActor = game.actors.getName(pileActorName);
             if(!pileActor){
-                throw lib.custom_error(`There is no actor of the name "${pileName}"`, true);
-            }else if(!API.isValidPile(pileActor)){
-                throw lib.custom_error(`The actor of name "${pileName}" is not a valid item pile actor.`, true);
+                throw lib.custom_error(`There is no actor of the name "${pileActorName}"`, true);
+            }else if(!API.isValidItemPile(pileActor)){
+                throw lib.custom_error(`The actor of name "${pileActorName}" is not a valid item pile actor.`, true);
             }
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position, pileName);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position, pileActorName);
     }
 
-    static async _createPile(position, pileName){
+    static async _createPile(position, pileActorName){
 
         let pileActor;
 
-        if (!pileName) {
+        if (!pileActorName) {
 
             pileActor = game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID") ? game.actors.get(game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID")) : false;
 
@@ -343,7 +338,7 @@ export default class API {
 
                 pileActor = await Actor.create({
                     name: "Default Item Pile",
-                    type: "character",
+                    type: game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType"),
                     img: "icons/svg/item-bag.svg",
                     [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
                 });
@@ -364,7 +359,7 @@ export default class API {
             }
 
         }else{
-            pileActor = game.actors.getName(pileName);
+            pileActor = game.actors.getName(pileActorName);
         }
 
         const tokenData = await pileActor.getTokenData();
@@ -373,8 +368,6 @@ export default class API {
             ...position,
             actorData: { items: {} }
         });
-
-        Hooks.call("preCreateItemPile", tokenData);
 
         const [ tokenDocument ] = await canvas.scene.createEmbeddedDocuments("Token", [ tokenData ]);
 
@@ -391,9 +384,14 @@ export default class API {
      * @param {String} itemId                       The ID of the item to transfer
      * @param {Number} quantity                     How many of the item to transfer
      * @param {Boolean} force                       Whether to ignore item type restrictions
-     * @returns {Promise}                           The number of items that were transferred
+     *
+     * @returns {Promise<Object>}                   An object containing the quantity transferred, the item ID that was
+     *                                              removed from the target, and the item ID that was added to the target
      */
     static async transferItem(source, target, itemId, { quantity = 1, force = false }={}) {
+
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, itemId, quantity);
+        if(hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
         if(!sourceUuid) throw lib.custom_error(`transferItem | Could not determine the UUID, please provide a valid source`, true)
@@ -419,12 +417,10 @@ export default class API {
 
     }
 
-    static async _transferItem(sourceUuid, targetUuid, itemId, { quantity = 1, force = false }={}) {
+    static async _transferItem(sourceUuid, targetUuid, itemId, { quantity = 1, force = false, isEverything = false }={}) {
 
         const source = await fromUuid(sourceUuid);
-        if(!source){
-            throw lib.custom_error(`TransferItem | Could not find actor with UUID ${sourceUuid}`, true)
-        }
+        if(!source) throw lib.custom_error(`TransferItem | Could not find actor with UUID ${sourceUuid}`, true)
 
         const sourceItems = source instanceof TokenDocument
             ? source.actor.items
@@ -441,15 +437,43 @@ export default class API {
         }
 
         const target = await fromUuid(targetUuid);
-        if(!target){
-            throw lib.custom_error(`TransferItem | Could not find actor with UUID ${targetUuid}`, true)
-        }
+        if(!target) throw lib.custom_error(`TransferItem | Could not find actor with UUID ${targetUuid}`, true)
 
         const itemData = actorItem.toObject();
 
-        const quantityRemoved = await API._removeItem(sourceUuid, itemId, { quantity, force });
+        const { quantityRemoved, itemIdRemoved } = await API._removeItem(sourceUuid, itemId, { quantity, force, isTransfer: true });
 
-        return API._addItem(targetUuid, itemData, { quantity: quantityRemoved, force });
+        const { quantityAdded, itemIdAdded } = await API._addItem(targetUuid, itemData, { quantity: quantityRemoved, force, isTransfer: true });
+
+        if(!isEverything){
+
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemId, quantity);
+
+            const macroData = {
+                action: "transferItem",
+                source: sourceUuid,
+                target: targetUuid,
+                item: itemIdAdded,
+                quantity: quantityRemoved
+            };
+            await API._executeItemPileMacro(source, macroData);
+            await API._executeItemPileMacro(target, macroData);
+
+            // Check if piles should be deleted
+            await API._checkItemPileShouldBeDeleted(target);
+            await API._checkItemPileShouldBeDeleted(source);
+
+            // Refresh open inventory UIs of piles
+            await API.rerenderItemPileInventoryApplication(targetUuid);
+            await API.rerenderItemPileInventoryApplication(sourceUuid);
+
+        }
+
+        return {
+            quantity: quantityAdded,
+            itemIdRemoved,
+            itemIdAdded
+        };
 
     }
 
@@ -460,9 +484,13 @@ export default class API {
      * @param {String} itemId                       The itemId to remove from the target
      * @param {Number} quantity                     How many of the items to remove
      * @param {Boolean} force                       Whether to ignore item type restrictions
-     * @returns {Promise}                           Returns how many items were removed from the target
+     *
+     * @returns {Promise<Object>}                   An object containing the quantity removed and the item ID that was removed
      */
     static async removeItem(target, itemId, { quantity = 1, force = false }={}){
+
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, itemId, quantity);
+        if(hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`removeItem | Could not determine the UUID, please provide a valid target`, true)
@@ -470,7 +498,7 @@ export default class API {
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEM, targetUuid, itemId, { quantity, force });
     }
 
-    static async _removeItem(targetUuid, itemId, { quantity = 1, force = false }={}) {
+    static async _removeItem(targetUuid, itemId, { quantity = 1, force = false, isTransfer = false }={}) {
 
         const target = await fromUuid(targetUuid);
         if (!target) {
@@ -509,12 +537,28 @@ export default class API {
 
         }
 
-        if(target instanceof TokenDocument) {
-            await API._checkPileShouldBeDeleted(target);
-            await API.rerenderPileInventoryApplication(targetUuid);
+        if(!isTransfer){
+
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.REMOVE, targetUuid, itemId, quantity);
+
+            const macroData = {
+                action: "removeItem",
+                target: targetUuid,
+                item: itemId,
+                quantity
+            };
+
+            await API._executeItemPileMacro(target, macroData);
+
+            await API._checkItemPileShouldBeDeleted(target);
+            await API.rerenderItemPileInventoryApplication(targetUuid);
+
         }
 
-        return quantity;
+        return {
+            quantityRemoved: quantity,
+            itemIdRemoved: itemId
+        };
 
     }
 
@@ -525,9 +569,13 @@ export default class API {
      * @param {Object} itemData                     The item's data to add to this target
      * @param {Number} quantity                     Number of them items to add
      * @param {Boolean} force                       Whether to ignore item type restrictions
-     * @returns {Promise<Number>}
+     *
+     * @returns {Promise<Object>}                   An object containing the quantity added and the item ID that was added
      */
     static async addItem(target, itemData, { quantity = 1, force = false }){
+
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, itemData, quantity);
+        if(hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`addItem | Could not determine the UUID, please provide a valid target`, true)
@@ -540,7 +588,7 @@ export default class API {
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEM, targetUuid, itemData, { quantity, force });
     }
 
-    static async _addItem(targetUuid, itemData, { quantity = 1, force = false }){
+    static async _addItem(targetUuid, itemData, { quantity = 1, force = false, isTransfer = false }){
 
         const target = await fromUuid(targetUuid);
         if (!target) {
@@ -558,7 +606,7 @@ export default class API {
 
         const targetItems = Array.from(actor.items);
 
-        const item = lib.getSimilarItem(targetItems, itemData.name, itemData.type);
+        let item = lib.getSimilarItem(targetItems, itemData.name, itemData.type);
 
         const currentQuantity = item ? (getProperty(item.data, this.ITEM_QUANTITY_ATTRIBUTE) ?? 0) : 0;
 
@@ -569,27 +617,47 @@ export default class API {
             lib.debug(`Added ${newQuantity} "${item.name}" to pile ${targetUuid} (now has ${newQuantity})`);
         } else {
             setProperty(itemData, this.ITEM_QUANTITY_ATTRIBUTE, newQuantity);
-            await actor.createEmbeddedDocuments("Item", [itemData]);
+            [ item ] = await actor.createEmbeddedDocuments("Item", [itemData]);
             lib.debug(`Added ${newQuantity} "${itemData.name}" to pile ${targetUuid}`)
         }
 
-        if(target instanceof TokenDocument) {
-            await API.rerenderPileInventoryApplication(targetUuid);
+        if(!isTransfer){
+
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.ADD, targetUuid, item.id, quantity);
+
+            const macroData = {
+                action: "addItem",
+                target: targetUuid,
+                item: item.id,
+                quantity
+            };
+            await API._executeItemPileMacro(target, macroData);
+
+            await API.rerenderItemPileInventoryApplication(targetUuid);
+
         }
 
-        return newQuantity;
+        return {
+            quantityAdded: quantity,
+            itemIdAdded: item.id
+        };
 
     }
 
     /**
      * Transfers all items between the source and the target.
      *
-     * @param {Actor|Token|TokenDocument} source        The actor to transfer all items from
-     * @param {Actor|Token|TokenDocument} target        The actor to receive all the items
-     * @param {Array|Boolean} itemTypeFilters           Item types to filter
-     * @returns {Promise}
+     * @param {Actor|Token|TokenDocument} source    The actor to transfer all items from
+     * @param {Actor|Token|TokenDocument} target    The actor to receive all the items
+     * @param {Array|Boolean} itemTypeFilters       Array of item types to filter - will default to module settings if none provided
+     *
+     * @returns {Promise<Object>}                   An object containing an array of the IDs of every item that was removed
+     *                                              from the source, and the IDs of every item that was added to the target
      */
     static async transferAllItems(source, target, { itemTypeFilters = false }={}){
+
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, source, target, itemTypeFilters);
+        if(hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
         if(!sourceUuid) throw lib.custom_error(`revertFromItemPile | Could not determine the UUID, please provide a valid source`, true)
@@ -607,17 +675,13 @@ export default class API {
         );
     }
 
-    static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false }={}) {
+    static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false, isEverything = false }={}) {
 
         const source = await fromUuid(sourceUuid);
-        if(!source){
-            throw lib.custom_error(`TransferAllItems | Could not find source with UUID ${sourceUuid}`, true)
-        }
+        if(!source) throw lib.custom_error(`TransferAllItems | Could not find source with UUID ${sourceUuid}`, true)
 
         const target = await fromUuid(targetUuid);
-        if(!target){
-            throw lib.custom_error(`TransferAllItems | Could not find target with UUID ${targetUuid}`, true)
-        }
+        if(!target) throw lib.custom_error(`TransferAllItems | Could not find target with UUID ${targetUuid}`, true)
 
         if(!Array.isArray(itemTypeFilters)){
             itemTypeFilters = API.ITEM_TYPE_FILTERS;
@@ -669,15 +733,29 @@ export default class API {
 
         await sourceActor.deleteEmbeddedDocuments("Item", itemsToDelete);
 
-        // Check if potential piles should be deleted and refresh potential piles and any relevant open UIs
-        if(source instanceof TokenDocument) {
-            await API._checkPileShouldBeDeleted(source);
-            await API.rerenderPileInventoryApplication(sourceUuid);
-        }
+        if(!isEverything) {
 
-        if(target instanceof TokenDocument) {
-            await API._checkPileShouldBeDeleted(target);
-            await API.rerenderPileInventoryApplication(targetUuid);
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, HOOKS.ITEM.TRANSFER_ALL, sourceUuid, targetUuid, itemsToCreate, itemsToUpdate, itemsToDelete);
+
+            const macroData = {
+                action: "transferAllItems",
+                source: sourceUuid,
+                target: targetUuid,
+                itemsUpdated: itemsToUpdate,
+                itemsCreated: itemsToCreate
+            };
+
+            await API._executeItemPileMacro(source, macroData);
+            await API._executeItemPileMacro(target, macroData);
+
+            // Check if piles should be deleted
+            await API._checkItemPileShouldBeDeleted(source);
+            await API._checkItemPileShouldBeDeleted(target);
+
+            // Refresh open inventory UIs of piles
+            await API.rerenderItemPileInventoryApplication(sourceUuid);
+            await API.rerenderItemPileInventoryApplication(targetUuid);
+
         }
 
         return {
@@ -693,9 +771,13 @@ export default class API {
      * @param {Actor|Token|TokenDocument} target    The target to transfer the attribute to
      * @param {String} attribute                    The path to the attribute to transfer
      * @param {Number} quantity                     How many of the attribute to transfer
+     *
      * @returns {Promise}                           The number of the attribute that were transferred
      */
     static async transferAttribute(source, target, attribute, { quantity = 1 }){
+
+        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, source, target, attribute, quantity);
+        if(hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
         if(!sourceUuid) throw lib.custom_error(`TransferAttribute | Could not determine the UUID, please provide a valid source`, true)
@@ -723,12 +805,10 @@ export default class API {
 
     }
 
-    static async _transferAttribute(sourceUuid, targetUuid, attribute, { quantity = 1 }={}) {
+    static async _transferAttribute(sourceUuid, targetUuid, attribute, { quantity = 1, isEverything = false }={}) {
 
         const source = await fromUuid(sourceUuid);
-        if(!source){
-            throw lib.custom_error(`TransferAttribute | Could not find actor with UUID ${sourceUuid}`, true)
-        }
+        if(!source) throw lib.custom_error(`TransferAttribute | Could not find actor with UUID ${sourceUuid}`, true)
 
         const sourceActor = source instanceof TokenDocument
             ? source.actor
@@ -739,9 +819,7 @@ export default class API {
         }
 
         const target = await fromUuid(targetUuid);
-        if(!target){
-            throw lib.custom_error(`TransferAttribute | Could not find actor with UUID ${targetUuid}`, true)
-        }
+        if(!target) throw lib.custom_error(`TransferAttribute | Could not find actor with UUID ${targetUuid}`, true)
 
         const targetActor = target instanceof TokenDocument
             ? target.actor
@@ -751,9 +829,36 @@ export default class API {
             throw lib.custom_error(`TransferAttribute | Could not find attribute ${attribute} on target actor of UUID ${targetUuid}`, true)
         }
 
-        const quantityRemoved = await API._removeAttribute(sourceUuid, attribute, { quantity });
+        const { quantityRemoved } = await API._removeAttribute(sourceUuid, attribute, { quantity, isTransfer: true });
 
-        return API._addAttribute(targetUuid, attribute, { quantity: quantityRemoved });
+        const { quantityAdded } = await API._addAttribute(targetUuid, attribute, { quantity: quantityRemoved, isTransfer: true });
+
+        if(!isEverything) {
+
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attribute, quantityRemoved);
+
+            const macroData = {
+                action: "transferAttribute",
+                source: sourceUuid,
+                target: targetUuid,
+                attribute: attribute,
+                quantity: quantityAdded
+            };
+            await API._executeItemPileMacro(source, macroData);
+            await API._executeItemPileMacro(target, macroData);
+
+            await API._checkItemPileShouldBeDeleted(source);
+            await API._checkItemPileShouldBeDeleted(target);
+
+            await API.rerenderItemPileInventoryApplication(sourceUuid);
+            await API.rerenderItemPileInventoryApplication(targetUuid);
+
+        }
+
+        return {
+            quantity: quantityAdded,
+            attribute: attribute
+        }
 
     }
 
@@ -766,6 +871,9 @@ export default class API {
      * @returns {Promise}                           Returns how much quantity of the attribute were removed from the target
      */
     static async removeAttribute(target, attribute, { quantity = 1 }={}){
+
+        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, target, attribute, quantity);
+        if(hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`RemoveAttribute | Could not determine the UUID, please provide a valid target`, true)
@@ -782,7 +890,7 @@ export default class API {
 
     }
 
-    static async _removeAttribute(targetUuid, attribute, { quantity = 1 }={}){
+    static async _removeAttribute(targetUuid, attribute, { quantity = 1, isTransfer = false }={}){
 
         const target = await fromUuid(targetUuid);
         if (!target) {
@@ -809,24 +917,40 @@ export default class API {
             quantity = currentQuantity;
         }
 
-        if(target instanceof TokenDocument){
-            await API._checkPileShouldBeDeleted(target);
-            await API.rerenderPileInventoryApplication(targetUuid);
+        if(!isTransfer) {
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.REMOVE, targetUuid, attribute, quantity);
+
+            const macroData = {
+                action: "removeAttribute",
+                target: targetUuid,
+                attribute: attribute,
+                quantity: quantity
+            };
+            await API._executeItemPileMacro(target, macroData);
+
+            await API._checkItemPileShouldBeDeleted(target);
+            await API.rerenderItemPileInventoryApplication(targetUuid);
         }
 
-        return quantity;
+        return {
+            quantityRemoved: quantity,
+            attributeRemoved: attribute
+        };
 
     }
 
     /**
      * Adds a set quantity of an attribute on an actor
      *
-     * @param {Token|TokenDocument} target          The target whose attribute will have a set quantity added to it
+     * @param {Actor|Token|TokenDocument} target    The target whose attribute will have a set quantity added to it
      * @param {String} attribute                    The path of the attribute to add to
      * @param {Number} quantity                     How many of the attribute's quantity to add
      * @returns {Promise}                           Returns how much quantity of the attribute were added to the target
      */
     static async addAttribute(target, attribute, { quantity = 1 }={}){
+
+        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, target, attribute, quantity);
+        if(hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`AddAttribute | Could not determine the UUID, please provide a valid target`, true)
@@ -843,7 +967,7 @@ export default class API {
 
     }
 
-    static async _addAttribute(targetUuid, attribute, { quantity = 1 }={}){
+    static async _addAttribute(targetUuid, attribute, { quantity = 1, isTransfer = false }={}){
 
         const target = await fromUuid(targetUuid);
         if (!target) {
@@ -866,11 +990,175 @@ export default class API {
             [attribute]: newQuantity
         });
 
-        if(target instanceof TokenDocument){
-            await API.rerenderPileInventoryApplication(targetUuid);
+        if(isTransfer) {
+
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.ADD, targetUuid, attribute, quantity);
+
+            const macroData = {
+                action: "addAttribute",
+                target: targetUuid,
+                attribute: attribute,
+                quantity: quantity
+            };
+            await API._executeItemPileMacro(target, macroData);
+
+            await API.rerenderItemPileInventoryApplication(targetUuid);
         }
 
-        return quantity;
+        return {
+            quantityAdded: quantity,
+            attributeAdded: attribute
+        };
+
+    }
+
+
+    /**
+     * Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target
+     *
+     * @param {Actor|Token|TokenDocument} source    The source to transfer the attributes from
+     * @param {Actor|Token|TokenDocument} target    The target to transfer the attributes to
+     *
+     * @returns {Promise<Object>}                   An object containing attributes that were transferred as keys with
+     *                                              the values being the quantity of that attribute that was transferred
+     */
+    static async transferAllAttributes(source, target){
+
+        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, source, target);
+        if(hookResult === false) return;
+
+        const sourceUuid = lib.getUuid(source);
+        if(!sourceUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
+
+        const targetUuid = lib.getUuid(target);
+        if(!targetUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
+
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ATTRIBUTES, sourceUuid, targetUuid);
+
+    }
+
+    static async _transferAllAttributes(sourceUuid, targetUuid, { isEverything = false }={}) {
+
+        const source = await fromUuid(sourceUuid);
+        if(!source) throw lib.custom_error(`TransferAllAttributes | Could not find actor with UUID ${sourceUuid}`, true)
+
+        const sourceActor = source instanceof TokenDocument
+            ? source.actor
+            : source;
+
+        const target = await fromUuid(targetUuid);
+        if(!target) throw lib.custom_error(`TransferAllAttributes | Could not find actor with UUID ${targetUuid}`, true)
+
+        const targetActor = target instanceof TokenDocument
+            ? target.actor
+            : target;
+
+        const validAttributes = API.DYNAMIC_ATTRIBUTES.filter(attribute => {
+            return hasProperty(sourceActor.data, attribute.path)
+                && getProperty(sourceActor.data, attribute.path) > 0
+                && hasProperty(targetActor.data, attribute.path);
+        });
+
+        if(!validAttributes.length) return;
+
+        const attributesToChange = {};
+        const attributesToZero = {};
+        for(const attribute of validAttributes) {
+
+            const incomingQuantity = getProperty(sourceActor.data, attribute.path) ?? 0;
+            const currentQuantity = getProperty(targetActor.data, attribute.path) ?? 0;
+
+            attributesToChange[attribute.path] = currentQuantity + incomingQuantity;
+            attributesToZero[attribute.path] = 0;
+
+        }
+
+        sourceActor.update(attributesToZero);
+        targetActor.update(attributesToChange);
+
+        if(!isEverything) {
+
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER_ALL, sourceUuid, targetUuid, attributesToChange);
+
+            const macroData = {
+                action: "transferAllAttributes",
+                source: sourceUuid,
+                target: targetUuid,
+                attributes: attributesToChange
+            };
+            await API._executeItemPileMacro(source, macroData);
+            await API._executeItemPileMacro(target, macroData);
+
+            await API._checkItemPileShouldBeDeleted(source);
+            await API._checkItemPileShouldBeDeleted(target);
+
+            await API.rerenderItemPileInventoryApplication(sourceUuid);
+            await API.rerenderItemPileInventoryApplication(targetUuid);
+
+        }
+
+        return attributesToChange;
+
+    }
+
+    /**
+     * Transfers all items and attributes between the source and the target.
+     *
+     * @param {Actor|Token|TokenDocument} source    The actor to transfer all items and attributes from
+     * @param {Actor|Token|TokenDocument} target    The actor to receive all the items and attributes
+     * @param {Array|Boolean} itemTypeFilters       Item types to filter
+     *
+     * @returns {Promise<Object>}                   An object containing an array of the IDs of every item that was removed
+     *                                              from the source, and the IDs of every item that was added to the target
+     */
+    static async transferEverything(source, target, { itemTypeFilters = false }={}){
+
+        const hookResult = Hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, source, target, itemTypeFilters);
+        if(hookResult === false) return;
+
+        const sourceUuid = lib.getUuid(source);
+        if(!sourceUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid source`, true)
+
+        const targetUuid = lib.getUuid(target);
+        if(!targetUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid target`, true)
+
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, { itemTypeFilters })
+
+    }
+
+    static async _transferEverything(sourceUuid, targetUuid, { itemTypeFilters = false }={}){
+
+        const source = await fromUuid(sourceUuid);
+        if(!source) throw lib.custom_error(`TransferEverything | Could not find actor with UUID ${sourceUuid}`, true)
+
+        const target = await fromUuid(targetUuid);
+        if(!target) throw lib.custom_error(`TransferEverything | Could not find actor with UUID ${targetUuid}`, true)
+
+        const itemResults = await API._transferAllItems(sourceUuid, targetUuid, { itemTypeFilters, isEverything: true });
+        const attributesChanged = await API._transferAllAttributes(sourceUuid, targetUuid, { isEverything: true });
+
+        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemResults.itemsCreated, itemResults.itemsUpdated, attributesChanged);
+
+        const macroData = {
+            action: "transferEverything",
+            source: sourceUuid,
+            target: targetUuid,
+            ...itemResults,
+            attributesChanged
+        };
+        await API._executeItemPileMacro(source, macroData);
+        await API._executeItemPileMacro(target, macroData);
+
+        await API._checkItemPileShouldBeDeleted(source);
+        await API._checkItemPileShouldBeDeleted(target);
+
+        await API.rerenderItemPileInventoryApplication(sourceUuid);
+        await API.rerenderItemPileInventoryApplication(targetUuid);
+
+        return {
+            ...itemResults,
+            attributesChanged
+        };
 
     }
 
@@ -883,6 +1171,8 @@ export default class API {
      * @return {Promise}
      */
     static async turnTokenIntoItemPile(target, { pileSettings = {}, tokenSettings = {} }={}) {
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_TURN_INTO, target, pileSettings, tokenSettings);
+        if(hookResult === false) return;
         const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`revertFromItemPile | Could not determine the UUID, please provide a valid target`, true)
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TURN_INTO_PILE, targetUuid, pileSettings, tokenSettings);
@@ -899,9 +1189,11 @@ export default class API {
         const newPileSettings = foundry.utils.mergeObject(existingPileSettings, pileSettings);
         newPileSettings.enabled = true;
 
-        await API._updateTargetPileSettings(target, pileSettings, tokenSettings);
+        await API._updateTargetItemPileSettings(target, pileSettings, tokenSettings);
 
         await API.rerenderTokenHud();
+
+        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.PILE.TURN_INTO, targetUuid, newPileSettings);
 
         return targetUuid;
 
@@ -915,6 +1207,8 @@ export default class API {
      * @return {Promise}
      */
     static async revertTokenFromItemPile(target, { tokenSettings={} }={}) {
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_REVERT_FROM, target, tokenSettings);
+        if(hookResult === false) return;
         const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`revertFromItemPile | Could not determine the UUID, please provide a valid target`, true)
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REVERT_FROM_PILE, targetUuid, tokenSettings);
@@ -930,19 +1224,21 @@ export default class API {
 
         pileSettings.enabled = false;
 
-        await API._updateTargetPileSettings(target, pileSettings, tokenSettings);
+        await API._updateTargetItemPileSettings(target, pileSettings, tokenSettings);
 
         await API.rerenderTokenHud();
 
         if(target instanceof TokenDocument){
-            await API.rerenderPileInventoryApplication(targetUuid);
+            await API.rerenderItemPileInventoryApplication(targetUuid);
         }
+
+        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.PILE.REVERT_FROM, targetUuid);
 
         return targetUuid;
 
     }
 
-    static async _updateTargetPileSettings(target, pileSettings, tokenSettings){
+    static async _updateTargetItemPileSettings(target, pileSettings, tokenSettings){
         if(target instanceof Actor){
             return target.update({
                 [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings,
@@ -955,7 +1251,7 @@ export default class API {
 
         await target.update(tokenSettings);
 
-        return API._updatePile(target.uuid, pileSettings);
+        return API._updateItemPile(target.uuid, pileSettings);
     }
 
     /**
@@ -977,48 +1273,60 @@ export default class API {
      * Opens a pile if it is enabled and a container
      *
      * @param {Token|TokenDocument} target
+     * @param {Token|TokenDocument|Boolean} interactingToken
      * @return {Promise}
      */
-    static async openPile(target){
+    static async openItemPile(target, interactingToken = false){
         const data = API._getFreshFlags(target);
         if(!data?.enabled || !data?.isContainer) return false;
+        const wasLocked = data.locked;
         data.closed = false;
         data.locked = false;
+        if(wasLocked){
+            const hookResult = Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
+            if(hookResult === false) return;
+        }
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_OPEN, target, data, interactingToken);
+        if(hookResult === false) return;
         if(data.openSound){
             AudioHelper.play({ src: data.openSound })
         }
-        return API.updatePile(target, data);
+        return API.updateItemPile(target, data, interactingToken);
     }
 
     /**
      * Closes a pile if it is enabled and a container
      *
      * @param {Token|TokenDocument} target          Target pile to close
+     * @param {Token|TokenDocument|Boolean} interactingToken
      * @return {Promise}
      */
-    static async closePile(target){
+    static async closeItemPile(target, interactingToken = false){
         const data = API._getFreshFlags(target);
         if(!data?.enabled || !data?.isContainer) return false;
         data.closed = true;
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, target, data, interactingToken);
+        if(hookResult === false) return;
         if(data.closeSound){
             AudioHelper.play({ src: data.closeSound })
         }
-        return API.updatePile(target, data);
+        return API.updateItemPile(target, data, interactingToken);
     }
 
     /**
      * Toggles a pile's closed state if it is enabled and a container
      *
      * @param {Token|TokenDocument} target          Target pile to open or close
+     * @param {Token|TokenDocument|Boolean} interactingToken
      * @return {Promise}
      */
-    static async togglePileClosed(target){
+    static async toggleItemPileClosed(target, interactingToken = false){
         const data = API._getFreshFlags(target);
         if(!data?.enabled || !data?.isContainer) return false;
         if(data.closed){
-            await API.openPile(target);
+            await API.openItemPile(target, interactingToken);
         }else{
-            await API.closePile(target);
+            await API.closeItemPile(target, interactingToken);
         }
         return !data.closed;
     }
@@ -1027,42 +1335,56 @@ export default class API {
      * Locks a pile if it is enabled and a container
      *
      * @param {Token|TokenDocument} target          Target pile to lock
+     * @param {Token|TokenDocument|Boolean} interactingToken
      * @return {Promise}
      */
-    static async lockPile(target){
+    static async lockItemPile(target, interactingToken = false){
         const data = API._getFreshFlags(target);
         if(!data?.enabled || !data?.isContainer) return false;
+        const wasClosed = data.closed;
         data.closed = true;
         data.locked = true;
-        return API.updatePile(target, data);
+        if(!wasClosed){
+            const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, target, data, interactingToken);
+            if(hookResult === false) return;
+        }
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_LOCK, target, data, interactingToken);
+        if(hookResult === false) return;
+        if(data.closeSound && !wasClosed){
+            AudioHelper.play({ src: data.closeSound })
+        }
+        return API.updateItemPile(target, data, interactingToken);
     }
 
     /**
      * Unlocks a pile if it is enabled and a container
      *
      * @param {Token|TokenDocument} target          Target pile to unlock
+     * @param {Token|TokenDocument|Boolean} interactingToken
      * @return {Promise}
      */
-    static async unlockPile(target){
+    static async unlockItemPile(target, interactingToken = false){
         const data = API._getFreshFlags(target);
         if(!data?.enabled || !data?.isContainer) return false;
         data.locked = false;
-        return API.updatePile(target, data);
+        Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
+        return API.updateItemPile(target, data, interactingToken);
     }
 
     /**
      * Toggles a pile's locked state if it is enabled and a container
      *
      * @param {Token|TokenDocument} target          Target pile to lock or unlock
+     * @param {Token|TokenDocument|Boolean} interactingToken
      * @return {Promise}
      */
-    static async togglePileLocked(target){
+    static async toggleItemPileLocked(target, interactingToken = false){
         const data = API._getFreshFlags(target);
         if(!data?.enabled || !data?.isContainer) return false;
         if(data.locked){
-            return API.unlockPile(target);
+            return API.unlockItemPile(target, interactingToken);
         }
-        return API.lockPile(target);
+        return API.lockItemPile(target, interactingToken);
     }
 
     /**
@@ -1086,7 +1408,7 @@ export default class API {
      * @param {Token|TokenDocument} target
      * @return {boolean}
      */
-    static isPileLocked(target){
+    static isItemPileLocked(target){
         const data = API._getFreshFlags(target);
         if(!data?.enabled || !data?.isContainer) return false;
         return data.locked;
@@ -1098,7 +1420,7 @@ export default class API {
      * @param {Token|TokenDocument} target
      * @return {boolean}
      */
-    static isPileClosed(target){
+    static isItemPileClosed(target){
         const data = API._getFreshFlags(target);
         if(!data?.enabled || !data?.isContainer) return false;
         return data.closed;
@@ -1110,7 +1432,7 @@ export default class API {
      * @param {Token|TokenDocument} target
      * @return {boolean}
      */
-    static isPileContainer(target){
+    static isItemPileContainer(target){
         const data = API._getFreshFlags(target);
         return data?.enabled && data?.isContainer;
     }
@@ -1120,20 +1442,24 @@ export default class API {
      *
      * @param {Token|TokenDocument} target
      * @param newData
+     * @param {Token|TokenDocument|Boolean} interactingToken
      * @return {Promise}
      */
-    static async updatePile(target, newData){
+    static async updateItemPile(target, newData, interactingToken = false){
+
         const targetUuid = lib.getUuid(target);
         if(!targetUuid) throw lib.custom_error(`updatePile | Could not determine the UUID, please provide a valid target`, true);
 
-        const diff = foundry.utils.diffObject(API._getFreshFlags(target), newData);
+        const interactingTokenUuid = interactingToken ? lib.getUuid(interactingToken) : false;
+        if(interactingToken && !interactingTokenUuid) throw lib.custom_error(`updatePile | Could not determine the UUID, please provide a valid target`, true);
 
-        Hooks.call('preUpdateItemPile', target, newData, diff)
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_UPDATE, target, newData, interactingToken);
+        if(hookResult === false) return;
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, targetUuid, newData)
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, targetUuid, newData, interactingTokenUuid)
     }
 
-    static async _updatePile(targetUuid, newData){
+    static async _updateItemPile(targetUuid, newData, interactingTokenUuid){
 
         const target = await fromUuid(targetUuid);
 
@@ -1164,34 +1490,68 @@ export default class API {
                     [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
                 }
             });
-            await API.refreshPile(target);
+            await API._refreshItemPile(target);
         }
 
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.UPDATED_PILE, targetUuid, diff);
+
+        if(data.isContainer) {
+            if (diff?.closed === true) {
+                await API._executeItemPileMacro(target, {
+                    action: "closeItemPile",
+                    source: interactingTokenUuid,
+                    target: targetUuid
+                });
+            }
+            if (diff?.locked === true) {
+                await API._executeItemPileMacro(target, {
+                    action: "lockItemPile",
+                    source: interactingTokenUuid,
+                    target: targetUuid
+                });
+            }
+            if (diff?.locked === false) {
+                await API._executeItemPileMacro(target, {
+                    action: "unlockItemPile",
+                    source: interactingTokenUuid,
+                    target: targetUuid
+                });
+            }
+            if (diff?.closed === false) {
+                await API._executeItemPileMacro(target, {
+                    action: "openItemPile",
+                    source: interactingTokenUuid,
+                    target: targetUuid
+                });
+            }
+        }
+
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.UPDATED_PILE, targetUuid, diff, interactingTokenUuid);
     }
 
-    static async _updatedPile(targetUuid, diffData){
+    static async _updatedItemPile(targetUuid, diffData, interactingTokenUuid){
 
         const target = await lib.getToken(targetUuid);
+
+        const interactingToken = interactingTokenUuid ? await fromUuid(interactingTokenUuid) : false;
 
         if(foundry.utils.isObjectEmpty(diffData)) return;
 
         const data = API._getFreshFlags(target);
 
-        Hooks.callAll('updateItemPile', target, diffData)
+        Hooks.callAll(HOOKS.PILE.UPDATE, target, diffData, interactingToken)
 
         if(data.isContainer) {
             if (diffData?.closed === true) {
-                Hooks.callAll("closeItemPile", target)
+                Hooks.callAll(HOOKS.PILE.CLOSE, target, interactingToken)
             }
             if (diffData?.locked === true) {
-                Hooks.callAll("lockItemPile", target)
+                Hooks.callAll(HOOKS.PILE.LOCK, target, interactingToken)
             }
             if (diffData?.locked === false) {
-                Hooks.callAll("unlockItemPile", target)
+                Hooks.callAll(HOOKS.PILE.UNLOCK, target, interactingToken)
             }
             if (diffData?.closed === false) {
-                Hooks.callAll("openItemPile", target)
+                Hooks.callAll(HOOKS.PILE.OPEN, target, interactingToken)
             }
         }
     }
@@ -1202,8 +1562,8 @@ export default class API {
      * @param {Token|TokenDocument} target
      * @return {Promise}
      */
-    static async deletePile(target){
-        if(!API.isValidPile(target)) {
+    static async deleteItemPile(target){
+        if(!API.isValidItemPile(target)) {
             if(!targetUuid) throw lib.custom_error(`deletePile | This is not an item pile, please provide a valid target`, true);
         }
         const targetUuid = lib.getUuid(target);
@@ -1211,11 +1571,12 @@ export default class API {
         if(!targetUuid.includes("Token")){
             throw lib.custom_error(`deletePile | Please provide a Token or TokenDocument`, true);
         }
-        Hooks.call('preDeleteItemPile', target);
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_DELETE, target);
+        if(hookResult === false) return;
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DELETE_PILE, targetUuid);
     }
 
-    static async _deletePile(targetUuid){
+    static async _deleteItemPile(targetUuid){
         const target = await lib.getToken(targetUuid);
         return target.delete();
     }
@@ -1226,7 +1587,7 @@ export default class API {
      * @param tokenDocument
      * @return {Promise<boolean>}
      */
-    static async _initializePile(tokenDocument){
+    static async _initializeItemPile(tokenDocument){
 
         const data = tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
         if(!data?.enabled) return false;
@@ -1265,7 +1626,7 @@ export default class API {
      * @param document
      * @return {boolean}
      */
-    static isValidPile(document) {
+    static isValidItemPile(document) {
         return !!document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled;
     }
 
@@ -1275,16 +1636,16 @@ export default class API {
      * @param target
      * @return {Promise}
      */
-    static async refreshPile(target) {
-        if (!API.isValidPile(target)) return;
+    static async refreshItemPile(target) {
+        if (!API.isValidItemPile(target)) return;
         const targetUuid = lib.getUuid(target);
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REFRESH_PILE, targetUuid)
     }
 
-    static async _refreshPile(targetUuid){
+    static async _refreshItemPile(targetUuid){
         const targetDocument = await fromUuid(targetUuid);
 
-        if (!API.isValidPile(targetDocument)) return;
+        if (!API.isValidItemPile(targetDocument)) return;
 
         let targets = [targetDocument]
         if(targetDocument instanceof Actor){
@@ -1302,14 +1663,65 @@ export default class API {
      *
      * @param inPileUuid
      * @param deleted
-     * @return {Promise<*>}
+     * @return {Promise}
      */
-    static async rerenderPileInventoryApplication(inPileUuid, deleted = false) {
+    static async rerenderItemPileInventoryApplication(inPileUuid, deleted = false) {
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, inPileUuid, deleted);
     }
 
-    static async _rerenderPileInventoryApplication(inPileUuid, deleted = false){
+    static async _rerenderItemPileInventoryApplication(inPileUuid, deleted = false){
         return ItemPileInventory.rerenderActiveApp(inPileUuid, deleted);
+    }
+
+    /**
+     * This executes any macro that is configured on the item pile, providing the macro with extra data relating to the
+     * action that prompted the execution (if the advanced-macros module is installed)
+     *
+     * @param {Actor|TokenDocument} target
+     * @param {Object} macroData
+     * @return {Promise}
+     */
+    static async _executeItemPileMacro(target, macroData){
+
+        if (!API.isValidItemPile(target)) return;
+
+        const pileData = API._getFreshFlags(target);
+
+        if (!pileData.macro) return;
+
+        const macro = game.macros.getName(pileData.macro);
+
+        if(!macro){
+            throw lib.custom_error(`Could not find macro with name "${pileData.macro}" on target with UUID ${target.uuid}`);
+        }
+
+        // Reformat macro data to contain useful information
+        if(macroData.source){
+            macroData.source = await fromUuid(macroData.source);
+        }
+
+        if(macroData.target){
+            macroData.target = await fromUuid(macroData.target);
+        }
+
+        const targetActor = macroData.target instanceof TokenDocument
+            ? macroData.target.actor
+            : macroData.target;
+
+        if(macroData.item){
+            macroData.item = targetActor.items.get(macroData.item)
+        }
+
+        if(macroData.itemsCreated){
+            macroData.itemsCreated = macroData.itemsCreated.map(item => targetActor.items.get(item.id));
+        }
+
+        if(macroData.itemsUpdated){
+            macroData.itemsUpdated = macroData.itemsUpdated.map(item => targetActor.items.get(item.id));
+        }
+
+        return macro.execute([macroData]);
+
     }
 
     /* -------- UTILITY METHODS -------- */
@@ -1337,7 +1749,6 @@ export default class API {
     static _getFreshFlags(document){
         return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
     }
-
 
     static async _itemPileClicked(pileDocument){
 
@@ -1371,16 +1782,18 @@ export default class API {
         if(data.isContainer && closestTokens.length) {
 
             if (data.locked) {
+                lib.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
                 return API.rattleItemPile(pileDocument);
             }
 
             if (data.closed) {
-                await API.openPile(pileDocument);
+                lib.debug(`Opened item pile with UUID ${pileDocument.uuid}`);
+                await API.openItemPile(pileDocument);
             }
 
         }
 
-        return new ItemPileInventory(pileDocument, closestTokens[0]).render(true);
+        return ItemPileInventory.show(pileDocument, closestTokens[0]);
 
     }
 
@@ -1405,10 +1818,10 @@ export default class API {
                 img = data.lockedImage;
             }else if(data.closed && data.closedImage){
                 img = data.closedImage;
-            }else if(data.openedImage && items.length > 0) {
-                img = data.openedImage;
-            }else if(data.emptyImage){
+            }else if(data.emptyImage && items.length === 0){
                 img = data.emptyImage;
+            }else if(data.openedImage) {
+                img = data.openedImage;
             }
 
         }else if(data.displayOne && items.length === 1){
@@ -1445,7 +1858,9 @@ export default class API {
 
     }
 
-    static async _checkPileShouldBeDeleted(pileDocument){
+    static async _checkItemPileShouldBeDeleted(pileDocument){
+
+        if(!(pileDocument instanceof TokenDocument)) return;
 
         const data = pileDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
 
@@ -1456,10 +1871,14 @@ export default class API {
         }[data?.deleteWhenEmpty ?? "default"]
 
         const hasItems = Array.from(pileDocument.actor.items).length > 0;
+        const hasNonZeroAttributes = API.DYNAMIC_ATTRIBUTES.find(attribute => {
+            return !!getProperty(pileDocument.actor.data, attribute.path);
+        })
 
-        if(!data?.enabled || !shouldDelete || hasItems) return false;
+        if(!data?.enabled || !shouldDelete || hasItems || hasNonZeroAttributes) return false;
 
-        return API.deletePile(pileDocument);
+        return API.deleteItemPile(pileDocument);
+
     }
 
 }

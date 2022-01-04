@@ -6,6 +6,7 @@ import * as lib from "./lib/lib.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { ItemPileAttributeEditor } from "./formapplications/itemPileAttributeEditor.js";
+import { HOOKS } from "./hooks.js";
 
 Hooks.once("init", () => {
 
@@ -23,19 +24,19 @@ Hooks.once("init", () => {
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
-    Hooks.on("preCreateItemPile", (...args) => console.log("preCreateItemPile", ...args));
-    Hooks.on("createItemPile", (...args) => console.log("createItemPile", ...args));
-
-    Hooks.on("preUpdateItemPile", (...args) => console.log("preUpdateItemPile", ...args));
-    Hooks.on("updateItemPile", (...args) => console.log("updateItemPile", ...args));
-
-    Hooks.on("preDeleteItemPile", (...args) => console.log("preDeleteItemPile", ...args));
-    Hooks.on("deleteItemPile", (...args) => console.log("deleteItemPile", ...args));
-
-    Hooks.on("closeItemPile", (...args) => console.log("closeItemPile", ...args));
-    Hooks.on("lockItemPile", (...args) => console.log("lockItemPile", ...args));
-    Hooks.on("unlockItemPile", (...args) => console.log("unlockItemPile", ...args));
-    Hooks.on("openItemPile", (...args) => console.log("openItemPile", ...args));
+    if(game.settings.get(CONSTANTS.MODULE_NAME, "debug")){
+        for(let hook of Object.values(HOOKS)){
+            if(typeof hook === "string"){
+                Hooks.on(hook, (...args) => lib.debug(hook, ...args));
+                lib.debug(hook)
+            }else{
+                for(let innerHook of Object.values(hook)){
+                    Hooks.on(innerHook, (...args) => lib.debug(innerHook, ...args));
+                    lib.debug(innerHook)
+                }
+            }
+        }
+    }
 
     window.ItemPiles = {
         API
@@ -47,44 +48,44 @@ Hooks.once("ready", () => {
     if(!game.modules.get('lib-wrapper')?.active && game.user.isGM){
         throw lib.custom_error("Item Piles requires the 'libWrapper' module. Please install and activate it.")
     }
-    Hooks.callAll("itemPilesReady");
+    Hooks.callAll(HOOKS.READY);
     //new ItemPileAttributeEditor().render(true)
 })
 
 const module = {
 
     async _pileAttributeChanged(actor, changes){
-        const validProperty = API.EXTRACTABLE_ATTRIBUTES.find(attribute => {
+        const validProperty = API.DYNAMIC_ATTRIBUTES.find(attribute => {
             return hasProperty(changes, attribute.path);
         });
         if(!validProperty) return;
         const target = actor?.token ?? actor;
-        await API._rerenderPileInventoryApplication(target.uuid);
-        return API.refreshPile(target);
+        await API._rerenderItemPileInventoryApplication(target.uuid);
+        return API.refreshItemPile(target);
     },
 
     async _pileInventoryChanged(item) {
         if (!item?.parent) return;
-        await API._rerenderPileInventoryApplication(item.parent.uuid);
-        return API.refreshPile(item.parent);
+        await API._rerenderItemPileInventoryApplication(item.parent.uuid);
+        return API.refreshItemPile(item.parent);
     },
 
     async _canvasReady(canvas) {
         for(const token of canvas.tokens.placeables){
-            await API._initializePile(token.document);
+            await API._initializeItemPile(token.document);
         }
     },
 
     async _createPile(doc) {
-        if(!API.isValidPile(doc)) return;
-        Hooks.callAll("createItemPile", doc, API._getFreshFlags(doc));
-        return API._initializePile(doc);
+        if(!API.isValidItemPile(doc)) return;
+        Hooks.callAll(HOOKS.PILE.CREATE, doc, API._getFreshFlags(doc));
+        return API._initializeItemPile(doc);
     },
 
     async _deletePile(doc){
-        if(!API.isValidPile(doc)) return;
-        Hooks.callAll("deleteItemPile", doc);
-        return API._rerenderPileInventoryApplication(doc.uuid, true);
+        if(!API.isValidItemPile(doc)) return;
+        Hooks.callAll(HOOKS.PILE.DELETE, doc);
+        return API._rerenderItemPileInventoryApplication(doc.uuid, true);
     },
 
     _renderPileHUD(app, html) {
@@ -103,7 +104,7 @@ const module = {
 
             lock_button.click(async function () {
                 $(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
-                await API.togglePileLocked(document);
+                await API.toggleItemPileLocked(document);
             });
 
             container.append(lock_button);
@@ -112,7 +113,7 @@ const module = {
 
             open_button.click(async function () {
                 $(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
-                await API.togglePileClosed(document);
+                await API.toggleItemPileClosed(document);
             });
 
             container.append(open_button);
@@ -121,7 +122,7 @@ const module = {
         const configure_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i class="fas fa-toolbox"></i></div>`);
 
         configure_button.click(async function () {
-            new ItemPileConfig(document).render(true);
+            ItemPileConfig.show(document);
         });
 
         container.append(configure_button);
@@ -139,12 +140,12 @@ const module = {
             icon: "fas fa-box-open",
             class: "item-piles-config",
             onclick: () => {
-                new ItemPileConfig(obj).render(true);
+                ItemPileConfig.show(obj);
             }
         })
     },
 
     async _dropCanvasData(canvas, data) {
-        return API.dropData(canvas, data);
+        return API._dropDataOnCanvas(canvas, data);
     },
 }
