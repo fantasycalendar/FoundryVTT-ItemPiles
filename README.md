@@ -41,7 +41,10 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 ## Natively Supported Systems
 
 - [Dungeons & Dragons 5e](https://foundryvtt.com/packages/dnd5e)
-- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e)
+
+## Not Supported Systems
+
+- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - This system already has a robust loot actor & token system, and feature rich systems. After speaking to the devs, they expressed interest in developing a similar system as the Drag & Drop system from Item Piles.
 
 ## Usage
 

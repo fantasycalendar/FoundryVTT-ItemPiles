@@ -1,7 +1,7 @@
 import dnd5e from "./systems/dnd5e.js";
 
 // ↓ IMPORT SYSTEMS HERE ↓
-import pf2e from "./systems/pf2e.js";
+
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -13,7 +13,7 @@ export const SYSTEMS = {
         return {
             dnd5e,
             // ↓ ONLY ADD SYSTEMS HERE ↓
-            pf2e,
+
             // ↑ AND ONLY HERE ↑
         }?.[game.system.id] ?? dnd5e;
     }

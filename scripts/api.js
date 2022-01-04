@@ -1491,8 +1491,7 @@ export default class API {
             });
             await API._refreshItemPile(target);
         }
-
-
+        
         if(data.isContainer) {
             if (diff?.closed === true) {
                 await API._executeItemPileMacro(target, {
