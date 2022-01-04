@@ -281,7 +281,6 @@ export default class API {
 
         if(!targetUuid && position) {
             targetUuid = await API.createPile(position);
-            await lib.wait(150);
         }
 
         if(sourceUuid){
