@@ -28,6 +28,7 @@ export const HOOKS = {
         REVERT_FROM: module`revertFromItemPile`
     },
     ITEM: {
+        PRE_DROP_DETERMINED: module`preDropItemDetermined`,
         PRE_DROP: module`preDropItem`,
         DROP: module`dropItem`,
         PRE_TRANSFER: module`preTransferItem`,

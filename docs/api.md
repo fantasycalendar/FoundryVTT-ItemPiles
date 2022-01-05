@@ -37,7 +37,7 @@
 <dt><a href="#setItemTypeFilters">setItemTypeFilters(inFilters)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Sets the filters for item types eligible for interaction within this system</p>
 </dd>
-<dt><a href="#createPile">createPile(position, pileActorName)</a> ⇒ <code>Promise</code></dt>
+<dt><a href="#createPile">createItemPile(position, pileActorName)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Creates the default item pile at a location. If provided an actor&#39;s name, an item
 pile will be created of that actor, if it is a valid item pile.</p>
 </dd>
@@ -198,9 +198,9 @@ Sets the filters for item types eligible for interaction within this system
 |-----------|---------------------------|
 | inFilters | <code>string/array</code> |
 
-<a name="createPile"></a>
+<a name="createItemPile"></a>
 
-## ItemPiles.API.createPile(position, pileActorName) ⇒ <code>Promise</code>
+## ItemPiles.API.createItemPile(position, pileActorName) ⇒ <code>Promise</code>
 Creates the default item pile at a location. If provided an actor's name, an item
 pile will be created of that actor, if it is a valid item pile.
 

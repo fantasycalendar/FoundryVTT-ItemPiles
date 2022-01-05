@@ -24,7 +24,7 @@ export default class API {
      * @returns {Promise}
      */
     static async setActorClassType(inClassType) {
-        if(typeof inAttribute !== "string"){
+        if(typeof inClassType !== "string"){
             throw lib.custom_error("setActorTypeClass | inClassType must be of type string");
         }
         return game.settings.set(CONSTANTS.MODULE_NAME, "actorClassType", inClassType);
@@ -142,161 +142,6 @@ export default class API {
     }
 
     /**
-     * This handles any dropped data onto the canvas or a set item pile
-     *
-     * @param canvas
-     * @param data
-     * @param target
-     * @param force
-     * @return {Promise}
-     */
-    static async _dropDataOnCanvas(canvas, data, { target = false, force = false }={}) {
-
-        if (data.type !== "Item") return;
-
-        const itemData = data.id ? game.items.get(data.id)?.toObject() : data.data;
-        if (!itemData) {
-            throw lib.custom_error("Something went wrong when dropping this item!")
-        }
-
-        const disallowedType = API.isItemTypeDisallowed(itemData);
-
-        const dropData = {
-            source: false,
-            target: false,
-            itemData: itemData,
-            position: false,
-            quantity: 1,
-            force: false
-        }
-
-        if (disallowedType) {
-            if(!game.user.isGM){
-                return lib.custom_warning(`Could not drag & drop item of type ""${disallowedType}"`, true)
-            }
-            if(!game.keyboard.downKeys.has("AltLeft")) {
-                dropData.force = await Dialog.confirm({
-                    title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
-                    content: `<p>${game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Content")}</p>`,
-                    defaultYes: false
-                });
-                if (!dropData.force) {
-                    return;
-                }
-            }
-        }
-
-        if (data.tokenId) {
-            dropData.source = canvas.tokens.get(data.tokenId).actor;
-        } else if (data.actorId) {
-            dropData.source = game.actors.get(data.actorId);
-        }
-
-        let action = "addToPile";
-        let droppableDocuments = [];
-        let x;
-        let y;
-
-        if(!target){
-
-            const position = canvas.grid.getTopLeft(data.x, data.y);
-            x = position[0];
-            y = position[1];
-
-            droppableDocuments = lib.getTokensAtLocation({ x, y })
-                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled);
-
-        }else{
-
-            droppableDocuments.push(target);
-
-        }
-
-        if (droppableDocuments.length > 0 && !game.user.isGM) {
-            droppableDocuments = droppableDocuments.filter(token => API.isItemPileLocked(token));
-            if (!droppableDocuments.length) {
-                return Dialog.prompt({
-                    title: game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title"),
-                    content: `<p>${game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title")}</p>`,
-                    label: "OK",
-                    rejectClose: false
-                });
-            }
-        }
-
-        if (game.keyboard.downKeys.has("AltLeft")) {
-
-            if (droppableDocuments.length) {
-                action = "addToPile";
-            }
-
-            if(game.keyboard.downKeys.has("ControlLeft")){
-                dropData.quantity = getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
-            }
-
-        } else {
-
-            const result = await DropDialog.query(itemData, droppableDocuments);
-
-            if (!result) return;
-            action = result.action;
-            dropData.quantity = Number(result.quantity);
-
-        }
-
-        if (action === "addToPile") {
-            dropData.target = droppableDocuments[0];
-        } else {
-            dropData.position = { x, y };
-        }
-
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.itemData, dropData.position, dropData.quantity);
-        if(hookResult === false) return;
-
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEMS, dropData);
-
-    }
-
-    /**
-     * If not given an actor, this method creates an item pile at a location, then adds an item to it.
-     *
-     * If a target was provided, it will just add the item to that target actor.
-     *
-     * If an actor was provided, it will transfer the item from the actor to the target actor.
-     *
-     * @param {Actor|Boolean} source
-     * @param {TokenDocument|Boolean} target
-     * @param {Object|Boolean} position
-     * @param {Object} itemData
-     * @param {Number} quantity
-     * @param {Boolean} force
-     */
-    static async _dropItems({
-        sourceUuid = false,
-        targetUuid = false,
-        itemData = false,
-        position = false,
-        quantity = 1,
-        force = false
-    }={}) {
-
-        if(!targetUuid && position) {
-            targetUuid = await API.createPile(position);
-        }
-
-        if(sourceUuid){
-            await API._transferItems(sourceUuid, targetUuid, itemData._id, { quantity, force })
-        }else{
-            await API._addItems(targetUuid, itemData, { quantity, force });
-        }
-
-        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemData, position, quantity);
-
-        return { sourceUuid, targetUuid, position, itemData, quantity, force };
-
-    }
-
-    /**
      * Creates the default item pile at a location. If provided an actor's name, an item
      * pile will be created of that actor, if it is a valid item pile.
      *
@@ -305,7 +150,7 @@ export default class API {
      *
      * @returns {Promise}
      */
-    static async createPile(position, pileActorName = false) {
+    static async createItemPile(position, { pileActorName = false }={}) {
 
         const hookResult = Hooks.call(HOOKS.PILE.PRE_CREATE, position, pileActorName);
         if(hookResult === false) return;
@@ -319,10 +164,13 @@ export default class API {
             }
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position, pileActorName);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position, { pileActorName });
     }
 
-    static async _createPile(position, pileActorName){
+    /**
+     * @private
+     */
+    static async _createItemPile(position, { pileActorName = false }={}){
 
         let pileActor;
 
@@ -334,18 +182,18 @@ export default class API {
 
                 lib.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
-                const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS)
+                const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
-                pileActor = await Actor.create({
+                const pileActor = await Actor.create({
                     name: "Default Item Pile",
                     type: game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType"),
                     img: "icons/svg/item-bag.svg",
                     [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
                 });
 
-                pileActor.update({
+                await pileActor.update({
                     "token": {
-                        name: "Item Pile",
+                        name: "ItemPile",
                         actorLink: false,
                         bar1: { attribute: "" },
                         vision: false,
@@ -359,7 +207,9 @@ export default class API {
             }
 
         }else{
+
             pileActor = game.actors.getName(pileActorName);
+
         }
 
         const tokenData = await pileActor.getTokenData();
@@ -514,6 +364,9 @@ export default class API {
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEMS, targetUuid, items, { itemTypeFilters });
     }
 
+    /**
+     * @private
+     */
     static async _removeItems(targetUuid, items, { itemTypeFilters = false, isTransfer = false }={}) {
 
         const target = await fromUuid(targetUuid);
@@ -630,6 +483,9 @@ export default class API {
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEMS, targetUuid, items, { itemTypeFilters });
     }
 
+    /**
+     * @private
+     */
     static async _addItems(targetUuid, items, { itemTypeFilters = false, isTransfer = false }){
 
         const target = await fromUuid(targetUuid);
@@ -739,6 +595,9 @@ export default class API {
         );
     }
 
+    /**
+     * @private
+     */
     static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false, isEverything = false }={}) {
 
         const source = await fromUuid(sourceUuid);
@@ -1092,6 +951,9 @@ export default class API {
 
     }
 
+    /**
+     * @private
+     */
     static async _transferAllAttributes(sourceUuid, targetUuid, { isEverything = false }={}) {
 
         const source = await fromUuid(sourceUuid);
@@ -1514,6 +1376,9 @@ export default class API {
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, targetUuid, newData, { interactingTokenUuid, tokenSettings })
     }
 
+    /**
+     * @private
+     */
     static async _updateItemPile(targetUuid, newData, { interactingTokenUuid = false, tokenSettings = false}={}){
 
         const target = await fromUuid(targetUuid);
@@ -1647,44 +1512,24 @@ export default class API {
         return target.delete();
     }
 
+    /* -------- UTILITY METHODS -------- */
+
     /**
-     * Initializes a pile on the client-side.
+     * Checks whether an item (or item data) is of a type that is not allowed. If an array whether that type is allowed
+     * or not, returning the type if it is NOT allowed.
      *
-     * @param tokenDocument
-     * @return {Promise<boolean>}
-     * @private
+     * @param {Item|Object} item
+     * @param {Array|Boolean} itemTypeFilters
+     * @return {boolean|string}
      */
-    static async _initializeItemPile(tokenDocument){
-
-        const data = tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
-        if(!data?.enabled) return false;
-
-        const method = () => {
-            return doubleClickHandler.clicked(tokenDocument);
+    static isItemTypeDisallowed(item, itemTypeFilters = false){
+        if(!API.ITEM_TYPE_ATTRIBUTE) return false;
+        if(!Array.isArray(itemTypeFilters)) itemTypeFilters = API.ITEM_TYPE_FILTERS;
+        const itemType = getProperty(item, API.ITEM_TYPE_ATTRIBUTE);
+        if(itemTypeFilters.includes(itemType)){
+            return itemType;
         }
-
-        if(!(tokenDocument.owner || game.user.isGM) && !lib.object_has_event(tokenDocument.object, "pointerdown", method)){
-            lib.debug(`Registered pointerdown method for target with uuid ${tokenDocument.uuid}`)
-            tokenDocument.object.on('pointerdown', method);
-        }
-
-        if(game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")){
-            for(let [key, value] of Object.entries(data)){
-                if(preloadedImages.has(value) || !value) continue;
-                if(key.toLowerCase().includes("image")){
-                    loadTexture(value);
-                    lib.debug(`Preloaded image: ${value}`);
-                }else if(key.toLowerCase().includes("sound")){
-                    AudioHelper.preloadSound(value);
-                    lib.debug(`Preloaded sound: ${value}`);
-                }
-                preloadedImages.add(value);
-            }
-        }
-
-        lib.debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
-
-        return true;
+        return false;
     }
 
     /**
@@ -1746,6 +1591,48 @@ export default class API {
         return ItemPileInventory.rerenderActiveApp(inPileUuid, deleted);
     }
 
+    /* -------- PRIVATE ITEM PILE METHODS -------- */
+
+    /**
+     * Initializes a pile on the client-side.
+     *
+     * @param tokenDocument
+     * @return {Promise<boolean>}
+     * @private
+     */
+    static async _initializeItemPile(tokenDocument){
+
+        const data = tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        if(!data?.enabled) return false;
+
+        const method = () => {
+            return doubleClickHandler.clicked(tokenDocument);
+        }
+
+        if(!(tokenDocument.owner || game.user.isGM) && !lib.object_has_event(tokenDocument.object, "pointerdown", method)){
+            lib.debug(`Registered pointerdown method for target with uuid ${tokenDocument.uuid}`)
+            tokenDocument.object.on('pointerdown', method);
+        }
+
+        if(game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")){
+            for(let [key, value] of Object.entries(data)){
+                if(preloadedImages.has(value) || !value) continue;
+                if(key.toLowerCase().includes("image")){
+                    loadTexture(value);
+                    lib.debug(`Preloaded image: ${value}`);
+                }else if(key.toLowerCase().includes("sound")){
+                    AudioHelper.preloadSound(value);
+                    lib.debug(`Preloaded sound: ${value}`);
+                }
+                preloadedImages.add(value);
+            }
+        }
+
+        lib.debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
+
+        return true;
+    }
+
     /**
      * This executes any macro that is configured on the item pile, providing the macro with extra data relating to the
      * action that prompted the execution (if the advanced-macros module is installed)
@@ -1792,32 +1679,179 @@ export default class API {
 
     }
 
-    /* -------- UTILITY METHODS -------- */
-
     /**
-     * Checks whether an item (or item data) is of a type that is not allowed. If an array whether that type is allowed
-     * or not, returning the type if it is NOT allowed.
+     * This handles any dropped data onto the canvas or a set item pile
      *
-     * @param {Item|Object} item
-     * @param {Array|Boolean} itemTypeFilters
-     * @return {boolean|string}
+     * @param canvas
+     * @param data
+     * @param target
+     * @param force
+     * @return {Promise}
+     * @private
      */
-    static isItemTypeDisallowed(item, itemTypeFilters = false){
-        if(!API.ITEM_TYPE_ATTRIBUTE) return false;
-        if(!Array.isArray(itemTypeFilters)) itemTypeFilters = API.ITEM_TYPE_FILTERS;
-        const itemType = getProperty(item, API.ITEM_TYPE_ATTRIBUTE);
-        if(itemTypeFilters.includes(itemType)){
-            return itemType;
+    static async _dropDataOnCanvas(canvas, data, { target = false, force = false }={}) {
+
+        if (data.type !== "Item") return;
+
+        const itemData = data.id ? game.items.get(data.id)?.toObject() : data.data;
+        if (!itemData) {
+            throw lib.custom_error("Something went wrong when dropping this item!")
         }
-        return false;
+
+        const dropData = {
+            source: false,
+            target: target,
+            itemData: itemData,
+            position: false,
+            force: false
+        }
+
+        const disallowedType = API.isItemTypeDisallowed(itemData);
+        if (disallowedType) {
+            if(!game.user.isGM){
+                return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
+            }
+            if(!game.keyboard.downKeys.has("ShiftLeft")) {
+                dropData.force = await Dialog.confirm({
+                    title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
+                    content: `<p>${game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
+                    defaultYes: false
+                });
+                if (!dropData.force) {
+                    return;
+                }
+            }
+        }
+
+        if (data.tokenId) {
+            dropData.source = canvas.tokens.get(data.tokenId).actor;
+        } else if (data.actorId) {
+            dropData.source = game.actors.get(data.actorId);
+        }
+
+        if(!dropData.source && !game.user.isGM){
+            return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
+        }
+
+        const pre_drop_determined_hook = Hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.position, dropData.itemData, dropData.force);
+        if(pre_drop_determined_hook === false) return;
+
+        let action = "addToPile";
+        let droppableDocuments = [];
+        let x;
+        let y;
+
+        if(!data.target){
+
+            const position = canvas.grid.getTopLeft(data.x, data.y);
+            x = position[0];
+            y = position[1];
+
+            droppableDocuments = lib.getTokensAtLocation({ x, y })
+                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled);
+
+        }else{
+
+            droppableDocuments.push(data.target);
+
+        }
+
+        if (droppableDocuments.length > 0 && !game.user.isGM) {
+            droppableDocuments = droppableDocuments.filter(token => API.isItemPileLocked(token));
+            if (!droppableDocuments.length) {
+                return Dialog.prompt({
+                    title: game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title"),
+                    content: `<p>${game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title")}</p>`,
+                    label: "OK",
+                    rejectClose: false
+                });
+            }
+        }
+
+        if (game.keyboard.downKeys.has("AltLeft")) {
+
+            if (droppableDocuments.length) {
+                action = "addToPile";
+            }
+
+            if(game.keyboard.downKeys.has("ControlLeft")){
+                setProperty(dropData.itemData, API.ITEM_QUANTITY_ATTRIBUTE, 1)
+            }
+
+        } else {
+
+            const result = await DropDialog.query(itemData, droppableDocuments);
+
+            if (!result) return;
+            action = result.action;
+            setProperty(dropData.itemData, API.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
+
+        }
+
+        if (action === "addToPile") {
+            dropData.target = droppableDocuments[0];
+        } else {
+            dropData.position = { x, y };
+        }
+
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData, dropData.force);
+        if(hookResult === false) return;
+
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEMS, dropData);
+
     }
 
-    /* -------- PRIVATE ITEM PILE METHODS -------- */
+    /**
+     * If not given an actor, this method creates an item pile at a location, then adds an item to it.
+     *
+     * If a target was provided, it will just add the item to that target actor.
+     *
+     * If an actor was provided, it will transfer the item from the actor to the target actor.
+     *
+     * @param {String|Boolean} sourceUuid
+     * @param {String|Boolean} targetUuid
+     * @param {Object|Boolean} position
+     * @param {Object} itemData
+     * @param {Boolean} force
+     *
+     * @returns {Promise<{sourceUuid: string|boolean, targetUuid: string|boolean, position: object|boolean, itemData: object }>}
+     * @private
+     */
+    static async _dropItems({
+        sourceUuid = false,
+        targetUuid = false,
+        itemData = false,
+        position = false,
+        force = false
+    }={}) {
 
+        if(!targetUuid && position) {
+            targetUuid = await API.createItemPile(position);
+        }
+
+        const itemTypeFilters = force ? [] : API.ITEM_TYPE_FILTERS;
+
+        if(sourceUuid){
+            await API._transferItems(sourceUuid, targetUuid, itemData, { itemTypeFilters })
+        }else{
+            await API._addItems(targetUuid, itemData, { itemTypeFilters });
+        }
+
+        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemData, position);
+
+        return { sourceUuid, targetUuid, position, itemData };
+
+    }
+
+    /**
+     */
     static _getFreshFlags(document){
         return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
     }
 
+    /**
+     * @private
+     */
     static async _itemPileClicked(pileDocument){
 
         lib.debug(`Clicked: ${pileDocument.uuid}`);
@@ -1865,6 +1899,9 @@ export default class API {
 
     }
 
+    /**
+     * @private
+     */
     static _getItemPileTokenImage(pileDocument, data = false){
 
         if(!data){
@@ -1908,6 +1945,9 @@ export default class API {
 
     }
 
+    /**
+     * @private
+     */
     static _getItemPileTokenScale(pileDocument, data){
 
         if(!data){
@@ -1926,6 +1966,9 @@ export default class API {
 
     }
 
+    /**
+     * @private
+     */
     static async _checkItemPileShouldBeDeleted(pileDocument){
 
         if(!(pileDocument instanceof TokenDocument)) return;

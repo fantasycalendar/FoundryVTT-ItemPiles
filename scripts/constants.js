@@ -1,7 +1,7 @@
 const CONSTANTS = {
     MODULE_NAME: "item-piles",
     FLAG_NAME: "data",
-    PATH: "modules/item-piles/",
+    PATH: `modules/${this.MODULE_NAME}/`,
     PILE_DEFAULTS: {
         enabled: true,
         distance: 1,
@@ -25,5 +25,7 @@ const CONSTANTS = {
         unlockedSound: "",
     }
 }
+
+Object.freeze(CONSTANTS);
 
 export default CONSTANTS;

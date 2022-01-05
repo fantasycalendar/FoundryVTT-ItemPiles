@@ -12,7 +12,7 @@ export const SOCKET_HANDLERS = {
     /**
      * Item pile sockets
      */
-    CREATE_PILE: "createPile",
+    CREATE_PILE: "createItemPile",
     UPDATE_PILE: "updateItemPile",
     UPDATED_PILE: "updatedPile",
     DELETE_PILE: "deleteItemPile",
@@ -57,7 +57,7 @@ export function registerSocket() {
     /**
      * Item pile sockets
      */
-    itemPileSocket.register(SOCKET_HANDLERS.CREATE_PILE, (...args) => API._createPile(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.CREATE_PILE, (...args) => API._createItemPile(...args))
     itemPileSocket.register(SOCKET_HANDLERS.UPDATE_PILE, (...args) => API._updateItemPile(...args))
     itemPileSocket.register(SOCKET_HANDLERS.UPDATED_PILE, (...args) => API._updatedItemPile(...args))
     itemPileSocket.register(SOCKET_HANDLERS.DELETE_PILE, (...args) => API._deleteItemPile(...args))

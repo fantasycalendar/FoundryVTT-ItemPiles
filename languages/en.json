@@ -13,10 +13,15 @@
             "Leave": "Leave"
         },
 
+        "Errors": {
+            "DisallowedItemDrop": "You cannot an drop \"{type}\" items",
+            "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM."
+        },
+
         "Dialogs": {
             "DropTypeWarning": {
                 "Title": "Item Type Warning",
-                "Content": "You're dropping an item that is of a type that is normally not allowed to be dropped. Are you sure you want to do this?"
+                "Content": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?"
             },
             "LockedWarning": {
                 "Title": "Locked Item Pile",
