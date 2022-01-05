@@ -187,8 +187,12 @@ export class ItemPileInventory extends FormApplication {
 
         data.hasRecipient = !!this.recipient;
         data.recipient = this.recipient;
+        data.isContainer = false;
 
         if (!data.isDeleted) {
+
+            const pileData = lib.getItemPileData(this.pile);
+            data.isContainer = pileData.isContainer;
             data.items = this.items.length ? this.items : this.getPileItemData();
             data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
             data.hasItems = Array.from(this.pile.actor.items).length > 0;

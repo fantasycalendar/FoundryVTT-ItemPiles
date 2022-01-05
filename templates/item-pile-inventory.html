@@ -70,7 +70,9 @@
                 <button type="submit" name="takeAll" value="takeAll"><i class="fas fa-download"></i> {{localize "ITEM-PILES.Inspect.TakeAll"}}</button>
                 {{/unless}}
                 {{#unless isDeleted}}
+                {{#if isContainer}}
                 <button type="submit" name="close" value="close"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Close"}}</button>
+                {{/if}}
                 {{/unless}}
             {{/if}}
             <button type="submit" name="leave" value="leave"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Leave"}}</button>
