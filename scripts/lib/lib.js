@@ -113,3 +113,9 @@ export function getUuid(target){
     const document = target?.document ?? target;
     return document?.uuid ?? false;
 }
+
+export function is_real_number(inNumber) {
+    return !isNaN(inNumber)
+        && typeof inNumber === "number"
+        && isFinite(inNumber);
+}
