@@ -3,6 +3,12 @@
     overflow-y: scroll;
 }
 
+.item-piles-dialog {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom:1rem;
+}
+
 .item-piles-item-row {
     padding: 0;
     margin-bottom: 0.25rem;

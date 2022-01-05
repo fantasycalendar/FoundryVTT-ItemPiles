@@ -15,17 +15,16 @@
 
         "Errors": {
             "DisallowedItemDrop": "You cannot an drop \"{type}\" items",
-            "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM."
+            "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM.",
+            "PileTooFar": "You're too far away to interact with this pile.",
+            "PileLocked": "This item pile is locked and cannot be opened - you can't drop items in it.",
+            "DropNoToken": "You don't have a token on this scene, so you can't drop any items here."
         },
 
         "Dialogs": {
             "DropTypeWarning": {
                 "Title": "Item Type Warning",
                 "Content": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?"
-            },
-            "LockedWarning": {
-                "Title": "Locked Item Pile",
-                "Content": "This item pile is locked and cannot be opened - you can't drop items in it."
             },
             "ResetSettings": {
                 "Title": "Reset Item Piles Module Settings",

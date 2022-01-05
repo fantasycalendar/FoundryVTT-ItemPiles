@@ -1711,7 +1711,7 @@ export default class API {
             if (!game.keyboard.downKeys.has("ShiftLeft")) {
                 dropData.force = await Dialog.confirm({
                     title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
-                    content: `<p>${game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
+                    content: `<p class="item-piles-dialog">${game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
                     defaultYes: false
                 });
                 if (!dropData.force) {
@@ -1745,7 +1745,8 @@ export default class API {
             y = position[1];
 
             droppableDocuments = lib.getTokensAtLocation({ x, y })
-                .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled);
+                .map(token => token.document)
+                .filter(token => API.isValidItemPile(token));
 
         } else {
 
@@ -1754,14 +1755,28 @@ export default class API {
         }
 
         if (droppableDocuments.length > 0 && !game.user.isGM) {
-            droppableDocuments = droppableDocuments.filter(token => API.isItemPileLocked(token));
+
+            const sourceToken = canvas.tokens.placeables.find(token => token.actor === dropData.source);
+
+            if(sourceToken){
+
+                const targetToken = droppableDocuments[0];
+
+                const distance = Math.floor(lib.distance_between_rect(sourceToken, targetToken.object) / canvas.grid.size) + 1
+
+                const maxDistance = lib.getFreshFlags(targetToken).distance;
+
+                if(distance > maxDistance) {
+                    lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
+                    return;
+                }
+            }
+
+            droppableDocuments = droppableDocuments.filter(token => !API.isItemPileLocked(token));
+
             if (!droppableDocuments.length) {
-                return Dialog.prompt({
-                    title: game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title"),
-                    content: `<p>${game.i18n.localize("ITEM-PILES.Dialogs.LockedWarning.Title")}</p>`,
-                    label: "OK",
-                    rejectClose: false
-                });
+                lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
+                return;
             }
         }
 
@@ -1819,12 +1834,12 @@ export default class API {
      * @private
      */
     static async _dropItems({
-                                sourceUuid = false,
-                                targetUuid = false,
-                                itemData = false,
-                                position = false,
-                                force = false
-                            } = {}) {
+        sourceUuid = false,
+        targetUuid = false,
+        itemData = false,
+        position = false,
+        force = false
+    } = {}) {
 
         const itemTypeFilters = force ? [] : API.ITEM_TYPE_FILTERS;
 
@@ -1885,7 +1900,7 @@ export default class API {
         })
 
         if (!closestTokens.length && !game.user.isGM) {
-            lib.custom_warning("You're too far away to interact with this pile!", true);
+            lib.custom_warning(game.i18n.localize("ITEM-PILES.Dialogs.TooFar.Content"), true);
             return;
         }
 
