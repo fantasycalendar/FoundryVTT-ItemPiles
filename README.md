@@ -55,13 +55,13 @@ Installing this module allows anyone to drag & drop items to the canvas, which c
 
 As a GM, you can duplicate the default item pile to create new versions of that pile, or turn existing actors into new item piles through the `Item Pile` button on the actor sheets' header bar. This UI has a wide range of customization, which allows you to control exactly how your players interact with the item pile.
 
-![Item Pile Token Configuration](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/configs.gif)
+![Item Pile Token Configuration](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/configs.png)
 
 ### Interaction
 
 Any player or GM can drag & drop items - if you drag & drop an item from an actor's inventory, you will be prompted how many of that item that you wish to drop (if they have more than 1 of the item). Holding ALT before dragging & dropping an item, you will automatically drop 1 of the items into a new pile without a prompt. **You can also drag and drop items onto an existing pile**.
 
-When players double click on the item pile (or Left Control + Double Click for GMs to inspect), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
+When players double-click on the item pile (or Left Control + Double Click for GMs to inspect, or to "inspect as" select two tokens, and repeat), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
 
 ![Item Pile Inventory UI](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/inventory-ui.png)
 
@@ -102,14 +102,13 @@ Each row represents a field on a character sheet that may be picked up. As you c
 
 ## API, Hooks, & Documentation
 
-You can find the documentation here:
-
-
-## [Changelog](./changelog.md)
+### [You can find the documentation here](https://github.com/Haxxer/FoundryVTT-ItemPiles/wiki)
 
 ## Issues
 
-Any issues, bugs, or feature requests are always welcome to be reported directly to the [Issue Tracker](https://github.com/Haxxer/FoundryVTT-ItemPiles/issues ), or using the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
+Any issues, bugs, or feature requests are always welcome to be reported directly to the [Issue Tracker](https://github.com/Haxxer/FoundryVTT-ItemPiles/issues), or using the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
+
+## [Changelog](./changelog.md)
 
 ## License
 
