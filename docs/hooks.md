@@ -2,8 +2,10 @@
 
 - [Generic](#Generic)
   - [item-piles-ready](#item-piles-ready)
-  - [item-piles-preTransferEverything](#item-piles-preTransferEverything)
-  - [item-piles-transferEverything](#item-piles-transferEverything)
+
+- [Specific](#Specific)
+    - [item-piles-preTransferEverything](#item-piles-preTransferEverything)
+    - [item-piles-transferEverything](#item-piles-transferEverything)
 
 - [Item Piles](#Item-Piles)
   - [item-piles-preCreateItemPile](#item-piles-preCreateItemPile)
@@ -58,6 +60,8 @@ Called when the module is ready.
 | Param | Type                   | Description              |
 |-------|------------------------|--------------------------|
 | api   | <code>Class API</code> | The item piles API class |
+
+### Specific
 
 #### item-piles-preTransferEverything
 
@@ -267,7 +271,7 @@ Called after a token has been reverted from an item pile into a normal token.
 
 ### Items
 
-#### item-piles-preDropItems
+#### item-piles-preDropItem
 
 Called before an item is dropped on the canvas.
 
@@ -281,7 +285,7 @@ Called before an item is dropped on the canvas.
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-dropItems
+#### item-piles-dropItem
 
 Called after an item has been dropped on the canvas.
 
@@ -295,14 +299,13 @@ Called after an item has been dropped on the canvas.
 
 #### item-piles-preTransferItems
 
-Called before an item is transferred from the source to the target.
+Called before items are transferred from the source to the target.
 
 | Param    | Type                                   | Description                                              |
 |----------|----------------------------------------|----------------------------------------------------------|
 | source   | <code>Actor,Token,TokenDocument</code> | The source that is going to transfer the item            |
 | target   | <code>Actor,Token,TokenDocument</code> | The target that is going to receive the item             |
-| itemId   | <code>string</code>                    | The ID of the item that is going to be transferred       |
-| quantity | <code>number</code>                    | The quantity of the item that is going to be transferred |
+| items    | <code>array</code>                     | An array of objects each containing the item id (key "_id") and the quantity that it is going to be transferred (key "quantity") |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -314,8 +317,7 @@ Called after an item has been transferred from the source to the target.
 |------------|---------------------|------------------------------------------|
 | sourceUuid | <code>string</code> | The source that transferred the item     |
 | targetUuid | <code>string</code> | The target that received the item        |
-| itemId     | <code>string</code> | The ID of the item that was transferred  |
-| quantity   | <code>number</code> | The quantity of the item was transferred |
+| items      | <code>array</code>  | An array containing the objects of each item that were transferred |
 
 #### item-piles-preAddItems
 
@@ -324,8 +326,7 @@ Called before an item is added to the target. This is not called in any transfer
 | Param    | Type                                   | Description                                        |
 |----------|----------------------------------------|----------------------------------------------------|
 | target   | <code>Actor,Token,TokenDocument</code> | The target that is going to receive the item       |
-| itemData | <code>object</code>                    | The data of the item that is going to be added     |
-| quantity | <code>number</code>                    | The quantity of the item that is going to be added |
+| items    | <code>array</code>                     | An array of objects each containing the item id (key "_id") and the quantity that it is going to be added (key "quantity") |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -336,8 +337,7 @@ Called after an item has been added to the target. This is not called in any tra
 | Param      | Type                | Description                                       |
 |------------|---------------------|---------------------------------------------------|
 | targetUuid | <code>string</code> | The UUID of the target that has received the item |
-| itemId     | <code>string</code> | The ID of the item that was added                 |
-| quantity   | <code>number</code> | The quantity of the item that was added           |
+| items      | <code>array</code>  | An array containing the objects of each item that were added |
 
 #### item-piles-preRemoveItems
 
@@ -346,8 +346,7 @@ Called before an item is removed from the target. This is not called in any tran
 | Param    | Type                                   | Description                                          |
 |----------|----------------------------------------|------------------------------------------------------|
 | target   | <code>Actor,Token,TokenDocument</code> | The target that is going to have its item removed    |
-| itemId   | <code>string</code>                    | The id of the item that is going to be removed       |
-| quantity | <code>number</code>                    | The quantity of the item that is going to be removed |
+| items    | <code>array</code>                     | An array of objects each containing the item id (key "_id") and the quantity that it is going to be removed (key "quantity") |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -358,8 +357,7 @@ Called after an item has been removed from the target. This is not called in any
 | Param      | Type                | Description                               |
 |------------|---------------------|-------------------------------------------|
 | targetUuid | <code>string</code> | The UUID of the target that lost the item |
-| itemId     | <code>string</code> | The ID of the item that was removed       |
-| quantity   | <code>number</code> | The quantity of the item that was removed |
+| items      | <code>array</code>  | An array containing the objects of each item that were removed |
 
 #### item-piles-preTransferAllItems
 
@@ -381,8 +379,7 @@ Called after all items has been transferred from the source to the target.
 |-------------------|---------------------|-----------------------------------------------------------------------------|
 | sourceUuid        | <code>string</code> | The UUID of the source that had all of its items and attributes transferred |
 | targetUuid        | <code>string</code> | The UUID of the target that received all of the items and attributes        |
-| itemsCreated      | <code>array</code>  | A list of raw item objects that were created on the target                  |
-| itemsUpdated      | <code>array</code>  | A list of item ids and quantities that were updated on the target           |
+| items             | <code>array</code>  | An array containing the objects of each item that were transferred          |
 
 ### Attributes
 
@@ -394,8 +391,7 @@ Called before an attribute's value is transferred from the source to the target.
 |-----------|----------------------------------------|-------------------------------------------------------------------|
 | source    | <code>Actor,Token,TokenDocument</code> | The source that is going to transfer its attribute's value        |
 | target    | <code>Actor,Token,TokenDocument</code> | The target that is going to receive the attribute's value         |
-| attribute | <code>string</code>                    | The path to the attribute that is going to be transferred         |
-| quantity  | <code>number</code>                    | How much of the attribute's value that is going to be transferred |
+| attributes | <code>array,object</code> | An array of strings for each attribute to transfer, or an object containing key-value pairs where the keys are the attribute path, and the values the amount to transfer |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -407,8 +403,7 @@ Called after an attribute's value has been transferred from the source to the ta
 |------------|---------------------|---------------------------------------------------------------|
 | sourceUuid | <code>string</code> | The UUID of the source that transferred its attribute's value |
 | targetUuid | <code>string</code> | The UUID of the target that received the attribute's value    |
-| attribute  | <code>string</code> | The path to the attribute has been transferred                |
-| quantity   | <code>number</code> | How much of the attribute's value that was transferred        |
+| attributes | <code>object</code> | An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred |
 
 #### item-piles-preAddAttributes
 
@@ -417,8 +412,7 @@ Called before the value of the attribute on the target is added to. Not called i
 | Param     | Type                                   | Description                                            |
 |-----------|----------------------------------------|--------------------------------------------------------|
 | target    | <code>Actor,Token,TokenDocument</code> | The target whose attribute's value will be added to    |
-| attribute | <code>string</code>                    | The path to the attribute that is going to be added to |
-| quantity  | <code>number</code>                    | How much of the attribute's value that will be added   |
+| attributes | <code>array,object</code> | An array of strings for each attribute to add, or an object containing key-value pairs where the keys are the attribute path, and the values the amount to add |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -429,8 +423,7 @@ Called after the value of the attribute on the target has been added to. Not cal
 | Param      | Type                | Description                                          |
 |------------|---------------------|------------------------------------------------------|
 | targetUuid | <code>string</code> | The target whose attribute's value has been added to |
-| attribute  | <code>string</code> | The path to the attribute that has been added to     |
-| quantity   | <code>number</code> | How much of the attribute's value was added to       |
+| attributes | <code>object</code> | An object containing a key value pair of each attribute added, the key being the attribute path and its value being the quantity that was added |
 
 #### item-piles-preRemoveAttributes
 
@@ -439,8 +432,7 @@ Called before the value of the attribute on the target is removed from. Not call
 | Param     | Type                                   | Description                                                |
 |-----------|----------------------------------------|------------------------------------------------------------|
 | target    | <code>Actor,Token,TokenDocument</code> | The target whose attribute's value will be removed from    |
-| attribute | <code>string</code>                    | The path to the attribute that is going to be removed from |
-| quantity  | <code>number</code>                    | How much of the attribute's value that will be removed     |
+| attributes | <code>array,object</code> | An array of strings for each attribute to subtracted, or an object containing key-value pairs where the keys are the attribute path, and the values the amount to subtracted |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -451,8 +443,7 @@ Called after the value of the attribute on the target has been removed from. Not
 | Param      | Type                | Description                                              |
 |------------|---------------------|----------------------------------------------------------|
 | targetUuid | <code>string</code> | The target whose attribute's value has been removed from |
-| attribute  | <code>string</code> | The path to the attribute that has been removed from     |
-| quantity   | <code>number</code> | How much of the attribute's value was removed from       |
+| attributes | <code>object</code> | An object containing a key value pair of each attribute subtracted, the key being the attribute path and its value being the quantity that was subtracted |
 
 #### item-piles-preTransferAllAttributes
 
@@ -473,4 +464,6 @@ Called after all attributes' values was transferred from the source to the targe
 |------------|---------------------|-----------------------------------------------------------------------|
 | sourceUuid | <code>string</code> | The UUID of the source that transferred all of its attributes' values |
 | targetUuid | <code>string</code> | The UUID of the target that received all of the attributes' values    |
+| itemsTransferred | <code>array</code> | An array of objects containing the item data transferred to the target   |
+| itemsTransferred | <code>object</code> | An object containing a key-value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred |
 

@@ -142,12 +142,11 @@ export default class API {
     }
 
     /**
-     * Creates the default item pile at a location. If provided an actor's name, an item
-     * pile will be created of that actor, if it is a valid item pile.
+     * Creates the default item pile token at a location.
      *
-     * @param {object} position
-     * @param {array/boolean} items
-     * @param {string/boolean} pileActorName
+     * @param {object} position                         The position to create the item pile at
+     * @param {array/boolean} [items=false]             Any items to create on the item pile
+     * @param {string/boolean} [pileActorName=false]    Whether to use an existing item pile actor as the basis of this new token
      *
      * @returns {Promise}
      */
@@ -177,11 +176,10 @@ export default class API {
     }
 
     /**
-     *
-     * @param {Object} position
-     * @param {String/Boolean} pileActorName
-     * @param {Array/Boolean} items
-     * @returns {Promise<*>}
+     * @param {object} position
+     * @param {string/boolean} [pileActorName=false]
+     * @param {array/boolean} [items=false]
+     * @returns {Promise<string>}
      * @private
      */
     static async _createItemPile(position, { pileActorName = false, items= false }={}){
@@ -255,26 +253,14 @@ export default class API {
     }
 
     /**
-     *
-     * @param {Actor/Token/TokenDocument} target    The target whose inventory to populate
-     * @param {string} tableName
-     * @param {number} timesToRoll
-     * @param {boolean} unique
-     * @returns {Promise<void>}
-     */
-    static async populateItemPileFromTable(target, tableName, { timesToRoll = 1, unique = true }={}){
-
-    }
-
-    /**
      * Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0
      *
-     * @param {Actor/Token/TokenDocument} source    The source to transfer the items from
-     * @param {Actor/Token/TokenDocument} target    The target to transfer the items to
-     * @param {Array} items                         An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity")
-     * @param {Boolean} itemTypeFilters             Whether to ignore item type restrictions
+     * @param {Actor/Token/TokenDocument} source        The source to transfer the items from
+     * @param {Actor/Token/TokenDocument} target        The target to transfer the items to
+     * @param {array} items                             An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity")
+     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to module settings if none provided
      *
-     * @returns {Promise<Object>}                   An object containing a key value pair for each item added to the target, key being item ID, value being quantities added
+     * @returns {Promise<object>}                       An object containing a key value pair for each item added to the target, key being item ID, value being quantities added
      */
     static async transferItems(source, target, items, { itemTypeFilters = false }={}) {
 
@@ -352,11 +338,11 @@ export default class API {
     /**
      * Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
      *
-     * @param {Actor/Token/TokenDocument} target    The target to remove a items from
-     * @param {Array} items                         An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or an array of IDs to remove all quantities of
-     * @param {Array/Boolean} itemTypeFilters       Array of item types disallowed - will default to module settings if none provided
+     * @param {Actor/Token/TokenDocument} target        The target to remove a items from
+     * @param {array} items                             An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or an array of IDs to remove all quantities of
+     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to module settings if none provided
      *
-     * @returns {Promise<Array>}                    An array containing the objects of each item that was removed, with their quantities set to the number removed
+     * @returns {Promise<array>}                        An array containing the objects of each item that was removed, with their quantities set to the number removed
      */
     static async removeItems(target, items, { itemTypeFilters = false }={}){
 
@@ -461,11 +447,11 @@ export default class API {
     /**
      * Adds item to an actor, increasing item quantities if matches were found
      *
-     * @param {Actor/TokenDocument/Token} target    The target to add an item to
-     * @param {Array} items                         An array of item objects
-     * @param {Array/Boolean} itemTypeFilters       Array of item types disallowed - will default to module settings if none provided
+     * @param {Actor/TokenDocument/Token} target        The target to add an item to
+     * @param {array} items                             An array of item objects
+     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to module settings if none provided
      *
-     * @returns {Promise<Array>}                    An array containing each item added as an object, with their quantities updated to match the new amounts
+     * @returns {Promise<array>}                        An array containing each item added as an object, with their quantities updated to match the new amounts
      */
     static async addItems(target, items, { itemTypeFilters = false }={}){
 
@@ -564,12 +550,11 @@ export default class API {
     /**
      * Transfers all items between the source and the target.
      *
-     * @param {Actor/Token/TokenDocument} source    The actor to transfer all items from
-     * @param {Actor/Token/TokenDocument} target    The actor to receive all the items
-     * @param {Array/Boolean} itemTypeFilters       Array of item types to filter out - will default to module settings if none provided
+     * @param {Actor/Token/TokenDocument} source        The actor to transfer all items from
+     * @param {Actor/Token/TokenDocument} target        The actor to receive all the items
+     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to module settings if none provided
      *
-     * @returns {Promise<Object>}                   An object containing an array of the IDs of every item that was removed
-     *                                              from the source, and the IDs of every item that was added to the target
+     * @returns {Promise<array>}                        An array containing all of the items that were transferred to the target
      */
     static async transferAllItems(source, target, { itemTypeFilters = false }={}){
 
@@ -658,9 +643,9 @@ export default class API {
      *
      * @param {Actor/Token/TokenDocument} source    The source to transfer the attribute from
      * @param {Actor/Token/TokenDocument} target    The target to transfer the attribute to
-     * @param {Array/Object} attributes             This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer
+     * @param {array/object} attributes             This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer
      *
-     * @returns {Promise}                           The number of the attribute that were transferred
+     * @returns {Promise<object>}                   An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
     static async transferAttributes(source, target, attributes){
 
@@ -684,20 +669,26 @@ export default class API {
         if(Array.isArray(attributes)) {
             attributes.forEach(attribute => {
                 if(typeof attribute !== "string"){
-                    throw lib.custom_error(`RemoveAttributes | Each attribute in the array must be of type string`, true)
+                    throw lib.custom_error(`TransferAttributes | Each attribute in the array must be of type string`, true)
+                }
+                if(!hasProperty(sourceActor.data, attribute)){
+                    throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
                 }
                 if(!hasProperty(targetActor.data, attribute)){
-                    throw lib.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+                    throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
             });
         }else{
             Object.entries(attributes).forEach(entry => {
                 const [attribute, quantity] = entry;
+                if(!hasProperty(sourceActor.data, attribute)){
+                    throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
+                }
                 if(!hasProperty(targetActor.data, attribute)){
-                    throw lib.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+                    throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
                 if(!lib.is_real_number(quantity) && quantity > 0){
-                    throw lib.custom_error(`RemoveAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+                    throw lib.custom_error(`TransferAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
                 }
             });
         }
@@ -745,10 +736,10 @@ export default class API {
     /**
      * Subtracts attributes on the target
      *
-     * @param {Token/TokenDocument} target  The target whose attribute will have a set quantity from it
-     * @param {Array/Object} attributes     This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
+     * @param {Token/TokenDocument} target  The target whose attributes will be subtracted from
+     * @param {array/object} attributes     This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
      *
-     * @returns {Promise}                   Returns how much quantity of the attribute were removed from the target
+     * @returns {Promise<object>}           Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      */
     static async removeAttributes(target, attributes){
 
@@ -846,9 +837,9 @@ export default class API {
      * Adds to attributes on an actor
      *
      * @param {Actor/Token/TokenDocument} target    The target whose attribute will have a set quantity added to it
-     * @param {Object} attributes                   An object with each key being an attribute path, and its value being the quantity to add
+     * @param {object} attributes                   An object with each key being an attribute path, and its value being the quantity to add
      *
-     * @returns {Promise}                           Returns how much quantity of the attribute were added to the target
+     * @returns {Promise<object>}                   Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      *
      */
     static async addAttributes(target, attributes){
@@ -857,7 +848,7 @@ export default class API {
         if(hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`AddAttribute | Could not determine the UUID, please provide a valid target`, true)
+        if(!targetUuid) throw lib.custom_error(`AddAttributes | Could not determine the UUID, please provide a valid target`, true)
 
         const targetActor = target instanceof TokenDocument
             ? target.actor
@@ -866,10 +857,10 @@ export default class API {
         Object.entries(attributes).forEach(entry => {
             const [attribute, quantity] = entry;
             if(!hasProperty(targetActor.data, attribute)){
-                throw lib.custom_error(`AddAttribute | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+                throw lib.custom_error(`AddAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
             }
             if(!lib.is_real_number(quantity) && quantity > 0){
-                throw lib.custom_error(`AddAttribute | Attribute "${attribute}" must be of type number and greater than 0`, true)
+                throw lib.custom_error(`AddAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
             }
         });
 
@@ -926,8 +917,7 @@ export default class API {
      * @param {Actor/Token/TokenDocument} source    The source to transfer the attributes from
      * @param {Actor/Token/TokenDocument} target    The target to transfer the attributes to
      *
-     * @returns {Promise<Object>}                   An object containing attributes that were transferred as keys with
-     *                                              the values being the quantity of that attribute that was transferred
+     * @returns {Promise<object>}                   An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
     static async transferAllAttributes(source, target){
 
@@ -999,12 +989,11 @@ export default class API {
     /**
      * Transfers all items and attributes between the source and the target.
      *
-     * @param {Actor/Token/TokenDocument} source    The actor to transfer all items and attributes from
-     * @param {Actor/Token/TokenDocument} target    The actor to receive all the items and attributes
-     * @param {Array/Boolean} itemTypeFilters       Array of item types disallowed - will default to module settings if none provided
+     * @param {Actor/Token/TokenDocument} source        The actor to transfer all items and attributes from
+     * @param {Actor/Token/TokenDocument} target        The actor to receive all the items and attributes
+     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to module settings if none provided
      *
-     * @returns {Promise<Object>}                   An object containing an array of the IDs of every item that was removed
-     *                                              from the source, and the IDs of every item that was added to the target
+     * @returns {Promise<object>}                       An object containing all items and attributes transferred to the target
      */
     static async transferEverything(source, target, { itemTypeFilters = false }={}){
 
@@ -1065,10 +1054,11 @@ export default class API {
     /**
      * Turns a token and its actor into an item pile
      *
-     * @param {Token/TokenDocument} target
-     * @param {object} settings
-     * @param {object} tokenSettings
-     * @return {Promise}
+     * @param {Token/TokenDocument} target      The target to be turned into an item pile
+     * @param {object} pileSettings             Overriding settings to be put on the item pile's settings
+     * @param {object} tokenSettings            Overriding settings that will update the token
+     *
+     * @return {Promise<string>}                The uuid of the target after it was turned into an item pile
      */
     static async turnTokenIntoItemPile(target, { pileSettings = {}, tokenSettings = {} }={}) {
         const hookResult = Hooks.call(HOOKS.PILE.PRE_TURN_INTO, target, pileSettings, tokenSettings);
@@ -1102,9 +1092,10 @@ export default class API {
     /**
      * Reverts a token from an item pile into a normal token and actor
      *
-     * @param {Token/TokenDocument} target
-     * @param {object} tokenSettings
-     * @return {Promise}
+     * @param {Token/TokenDocument} target      The target to be reverted from an item pile
+     * @param {object} tokenSettings            Overriding settings that will update the token
+     *
+     * @return {Promise<string>}                The uuid of the target after it was reverted from an item pile
      */
     static async revertTokenFromItemPile(target, { tokenSettings={} }={}) {
         const hookResult = Hooks.call(HOOKS.PILE.PRE_REVERT_FROM, target, tokenSettings);
@@ -1161,7 +1152,7 @@ export default class API {
      * Opens a pile if it is enabled and a container
      *
      * @param {Token/TokenDocument} target
-     * @param {Token/TokenDocument/Boolean} interactingToken
+     * @param {Token/TokenDocument/boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -1187,7 +1178,7 @@ export default class API {
      * Closes a pile if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to close
-     * @param {Token/TokenDocument/Boolean} interactingToken
+     * @param {Token/TokenDocument/boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -1207,7 +1198,7 @@ export default class API {
      * Toggles a pile's closed state if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to open or close
-     * @param {Token/TokenDocument/Boolean} interactingToken
+     * @param {Token/TokenDocument/boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -1226,7 +1217,7 @@ export default class API {
      * Locks a pile if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to lock
-     * @param {Token/TokenDocument/Boolean} interactingToken
+     * @param {Token/TokenDocument/boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -1252,7 +1243,7 @@ export default class API {
      * Unlocks a pile if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to unlock
-     * @param {Token/TokenDocument/Boolean} interactingToken
+     * @param {Token/TokenDocument/boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -1268,7 +1259,7 @@ export default class API {
      * Toggles a pile's locked state if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to lock or unlock
-     * @param {Token/TokenDocument/Boolean} interactingToken
+     * @param {Token/TokenDocument/boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -1340,8 +1331,8 @@ export default class API {
      *
      * @param {Token/TokenDocument} target
      * @param {object} newData
-     * @param {Token/TokenDocument/boolean} interactingToken
-     * @param {object/boolean} tokenSettings
+     * @param {Token/TokenDocument/boolean} [interactingToken=false]
+     * @param {object/boolean} [tokenSettings=false]
      *
      * @return {Promise}
      */
@@ -1506,7 +1497,7 @@ export default class API {
      * or not, returning the type if it is NOT allowed.
      *
      * @param {Item/Object} item
-     * @param {Array/Boolean} itemTypeFilters
+     * @param {array/boolean} [itemTypeFilters=false]
      * @return {boolean/string}
      */
     static isItemTypeDisallowed(item, itemTypeFilters = false){
@@ -1571,8 +1562,8 @@ export default class API {
     /**
      * Causes all connected users to re-render a specific pile's inventory UI
      *
-     * @param inPileUuid
-     * @param deleted
+     * @param {string} inPileUuid           The uuid of the pile to be re-rendered
+     * @param {boolean} [deleted=false]     Whether the pile was deleted as a part of this re-render
      * @return {Promise}
      */
     static async rerenderItemPileInventoryApplication(inPileUuid, deleted = false) {
@@ -1591,7 +1582,7 @@ export default class API {
     /**
      * Initializes a pile on the client-side.
      *
-     * @param tokenDocument
+     * @param {TokenDocument} tokenDocument
      * @return {Promise<boolean>}
      * @private
      */
@@ -1677,9 +1668,9 @@ export default class API {
     /**
      * This handles any dropped data onto the canvas or a set item pile
      *
-     * @param canvas
-     * @param data
-     * @param target
+     * @param {canvas} canvas
+     * @param {object} data
+     * @param {Actor/Token/TokenDocument}[target=false]
      * @return {Promise}
      * @private
      */
@@ -1806,11 +1797,11 @@ export default class API {
      *
      * If an actor was provided, it will transfer the item from the actor to the target actor.
      *
-     * @param {String/Boolean} sourceUuid
-     * @param {String/Boolean} targetUuid
-     * @param {Object/Boolean} position
-     * @param {Object} itemData
-     * @param {Boolean} force
+     * @param {string/boolean} [sourceUuid=false]
+     * @param {string/boolean} [targetUuid=false]
+     * @param {object/boolean} [position=false]
+     * @param {object} [itemData=false]
+     * @param {boolean} [force=false]
      *
      * @returns {Promise<{sourceUuid: string/boolean, targetUuid: string/boolean, position: object/boolean, itemsDropped: array }>}
      * @private
