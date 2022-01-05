@@ -41,25 +41,25 @@
 <dd><p>Creates the default item pile at a location. If provided an actor&#39;s name, an item
 pile will be created of that actor, if it is a valid item pile.</p>
 </dd>
-<dt><a href="#transferItem">transferItem(source, target, itemId, quantity, force)</a> ⇒ <code>Promise.&lt;Object&gt;</code></dt>
+<dt><a href="#transferItems">transferItems(source, target, itemId, quantity, force)</a> ⇒ <code>Promise.&lt;Object&gt;</code></dt>
 <dd><p>Transfers an item from a source to a target, removing it or subtracting a number of quantity from the first to the second one, deleting the item if its quantity reaches 0</p>
 </dd>
-<dt><a href="#removeItem">removeItem(target, itemId, quantity, force)</a> ⇒ <code>Promise.&lt;Object&gt;</code></dt>
+<dt><a href="#removeItems">removeItems(target, itemId, quantity, force)</a> ⇒ <code>Promise.&lt;Object&gt;</code></dt>
 <dd><p>Subtracts the quantity of an item on an actor. If its quantity reaches 0, the item is removed from the actor.</p>
 </dd>
-<dt><a href="#addItem">addItem(target, itemData, quantity, force)</a> ⇒ <code>Promise.&lt;Object&gt;</code></dt>
+<dt><a href="#addItems">addItems(target, itemData, quantity, force)</a> ⇒ <code>Promise.&lt;Object&gt;</code></dt>
 <dd><p>Adds an item to an actor.</p>
 </dd>
 <dt><a href="#transferAllItems">transferAllItems(source, target, itemTypeFilters)</a> ⇒ <code>Promise.&lt;Object&gt;</code></dt>
 <dd><p>Transfers all items between the source and the target.</p>
 </dd>
-<dt><a href="#transferAttribute">transferAttribute(source, target, attribute, quantity)</a> ⇒ <code>Promise</code></dt>
+<dt><a href="#transferAttributes">transferAttributes(source, target, attribute, quantity)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target</p>
 </dd>
-<dt><a href="#removeAttribute">removeAttribute(target, attribute, quantity)</a> ⇒ <code>Promise</code></dt>
+<dt><a href="#removeAttributes">removeAttributes(target, attribute, quantity)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Subtracts a set quantity of an attribute on an actor</p>
 </dd>
-<dt><a href="#addAttribute">addAttribute(target, attribute, quantity)</a> ⇒ <code>Promise</code></dt>
+<dt><a href="#addAttributes">addAttributes(target, attribute, quantity)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Adds a set quantity of an attribute on an actor</p>
 </dd>
 <dt><a href="#transferAllAttributes">transferAllAttributes(source, target)</a> ⇒ <code>Promise.&lt;Object&gt;</code></dt>
@@ -209,9 +209,9 @@ pile will be created of that actor, if it is a valid item pile.
 | position      | <code>object</code>         |                    | 
 | pileActorName | <code>string/boolean</code> | <code>false</code> | 
 
-<a name="transferItem"></a>
+<a name="transferItems"></a>
 
-## ItemPiles.API.transferItem(source, target, itemId, quantity, force) ⇒ <code>Promise.&lt;Object&gt;</code>
+## ItemPiles.API.transferItems(source, target, itemId, quantity, force) ⇒ <code>Promise.&lt;Object&gt;</code>
 Transfers an item from a source to a target, removing it or subtracting a number of quantity from the first to the second one, deleting the item if its quantity reaches 0
 
 **Returns**: <code>Promise.&lt;Object&gt;</code> - An object containing the quantity transferred, the item ID that was removed from the target, and the item ID that was added to the target.
@@ -224,9 +224,9 @@ Transfers an item from a source to a target, removing it or subtracting a number
 | quantity | <code>Number</code>              | How many of the item to transfer         |
 | force    | <code>Boolean</code>             | Whether to ignore item type restrictions |
 
-<a name="removeItem"></a>
+<a name="removeItems"></a>
 
-## ItemPiles.API.removeItem(target, itemId, quantity, force) ⇒ <code>Promise.&lt;Object&gt;</code>
+## ItemPiles.API.removeItems(target, itemId, quantity, force) ⇒ <code>Promise.&lt;Object&gt;</code>
 Subtracts the quantity of an item on an actor. If its quantity reaches 0, the item is removed from the actor.
 
 **Returns**: <code>Promise.&lt;Object&gt;</code> - An object containing the quantity removed and the item ID that was removed  
@@ -238,9 +238,9 @@ Subtracts the quantity of an item on an actor. If its quantity reaches 0, the it
 | quantity | <code>Number</code>              | How many of the items to remove          |
 | force    | <code>Boolean</code>             | Whether to ignore item type restrictions |
 
-<a name="addItem"></a>
+<a name="addItems"></a>
 
-## ItemPiles.API.addItem(target, itemData, quantity, force) ⇒ <code>Promise.&lt;Object&gt;</code>
+## ItemPiles.API.addItems(target, itemData, quantity, force) ⇒ <code>Promise.&lt;Object&gt;</code>
 Adds an item to an actor.
 
 **Returns**: <code>Promise.&lt;Object&gt;</code> - An object containing the quantity added and the item ID that was added  
@@ -265,9 +265,9 @@ Transfers all items between the source and the target.
 | target          | <code>Actor/TokenDocument</code> | The actor to receive all the items                                               |
 | itemTypeFilters | <code>Array/Boolean</code>       | Array of item types to filter - will default to module settings if none provided |
 
-<a name="transferAttribute"></a>
+<a name="transferAttributes"></a>
 
-## ItemPiles.API.transferAttribute(source, target, attribute, quantity) ⇒ <code>Promise</code>
+## ItemPiles.API.transferAttributes(source, target, attribute, quantity) ⇒ <code>Promise</code>
 Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target
 
 **Returns**: <code>Promise</code> - The number of the attribute that were transferred  
@@ -279,9 +279,9 @@ Transfers a set quantity of an attribute from a source to a target, removing it 
 | attribute | <code>String</code>              | The path to the attribute to transfer     |
 | quantity  | <code>Number</code>              | How many of the attribute to transfer     |
 
-<a name="removeAttribute"></a>
+<a name="removeAttributes"></a>
 
-## ItemPiles.API.removeAttribute(target, attribute, quantity) ⇒ <code>Promise</code>
+## ItemPiles.API.removeAttributes(target, attribute, quantity) ⇒ <code>Promise</code>
 Subtracts a set quantity of an attribute on an actor
 
 **Returns**: <code>Promise</code> - Returns how much quantity of the attribute were removed from the target  
@@ -292,9 +292,9 @@ Subtracts a set quantity of an attribute on an actor
 | attribute | <code>String</code>              | The path of the attribute to remove from the target         |
 | quantity  | <code>Number</code>              | How many of the attribute's quantity to remove              |
 
-<a name="addAttribute"></a>
+<a name="addAttributes"></a>
 
-## ItemPiles.API.addAttribute(target, attribute, quantity) ⇒ <code>Promise</code>
+## ItemPiles.API.addAttributes(target, attribute, quantity) ⇒ <code>Promise</code>
 Adds a set quantity of an attribute on an actor
 
 **Returns**: <code>Promise</code> - Returns how much quantity of the attribute were added to the target  

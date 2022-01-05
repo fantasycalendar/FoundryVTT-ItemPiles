@@ -31,14 +31,14 @@ export const SOCKET_HANDLERS = {
     /**
      * Item & attribute sockets
      */
-    DROP_ITEM: "dropItem",
-    ADD_ITEM: "addItem",
-    REMOVE_ITEM: "removeItem",
-    TRANSFER_ITEM: "transferItem",
+    DROP_ITEMS: "dropItems",
+    ADD_ITEMS: "addItems",
+    REMOVE_ITEMS: "removeItems",
+    TRANSFER_ITEMS: "transferItems",
     TRANSFER_ALL_ITEMS: "transferAllItems",
-    ADD_ATTRIBUTE: "addAttribute",
-    REMOVE_ATTRIBUTE: "removeAttribute",
-    TRANSFER_ATTRIBUTE: "transferAttribute",
+    ADD_ATTRIBUTE: "addAttributes",
+    REMOVE_ATTRIBUTES: "removeAttributes",
+    TRANSFER_ATTRIBUTES: "transferAttributes",
     TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes",
     TRANSFER_EVERYTHING: "transferEverything",
 };
@@ -76,14 +76,14 @@ export function registerSocket() {
     /**
      * Item & attribute sockets
      */
-    itemPileSocket.register(SOCKET_HANDLERS.DROP_ITEM, (args) => API._dropItem(args))
-    itemPileSocket.register(SOCKET_HANDLERS.ADD_ITEM, (...args) => API._addItem(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.REMOVE_ITEM, (...args) => API._removeItem(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ITEM, (...args) => API._transferItem(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.DROP_ITEMS, (args) => API._dropItems(args))
+    itemPileSocket.register(SOCKET_HANDLERS.ADD_ITEMS, (...args) => API._addItems(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.REMOVE_ITEMS, (...args) => API._removeItems(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ITEMS, (...args) => API._transferItems(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, (...args) => API._transferAllItems(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.ADD_ATTRIBUTE, (...args) => API._addAttribute(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.REMOVE_ATTRIBUTE, (...args) => API._removeAttribute(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ATTRIBUTE, (...args) => API._transferAttribute(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.ADD_ATTRIBUTE, (...args) => API._addAttributes(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.REMOVE_ATTRIBUTES, (...args) => API._removeAttributes(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ATTRIBUTES, (...args) => API._transferAttributes(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ALL_ATTRIBUTES, (...args) => API._transferAllAttributes(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_EVERYTHING, (...args) => API._transferEverything(...args))
 }

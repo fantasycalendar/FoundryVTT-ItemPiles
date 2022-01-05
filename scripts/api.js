@@ -252,7 +252,7 @@ export default class API {
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.itemData, dropData.position, dropData.quantity);
         if(hookResult === false) return;
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEM, dropData);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEMS, dropData);
 
     }
 
@@ -270,7 +270,7 @@ export default class API {
      * @param {Number} quantity
      * @param {Boolean} force
      */
-    static async _dropItem({
+    static async _dropItems({
         sourceUuid = false,
         targetUuid = false,
         itemData = false,
@@ -284,9 +284,9 @@ export default class API {
         }
 
         if(sourceUuid){
-            await API._transferItem(sourceUuid, targetUuid, itemData._id, { quantity, force })
+            await API._transferItems(sourceUuid, targetUuid, itemData._id, { quantity, force })
         }else{
-            await API._addItem(targetUuid, itemData, { quantity, force });
+            await API._addItems(targetUuid, itemData, { quantity, force });
         }
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemData, position, quantity);
@@ -375,85 +375,84 @@ export default class API {
     }
 
     /**
-     * Transfers an item from a source to a target, removing it or subtracting a number of quantity from the first
-     * to the second one, deleting the item if its quantity reaches 0
+     * Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0
      *
-     * @param {Actor|Token|TokenDocument} source    The source to transfer the item from
-     * @param {Actor|Token|TokenDocument} target    The target to transfer the item to
-     * @param {String} itemId                       The ID of the item to transfer
-     * @param {Number} quantity                     How many of the item to transfer
+     * @param {Actor|Token|TokenDocument} source    The source to transfer the items from
+     * @param {Actor|Token|TokenDocument} target    The target to transfer the items to
+     * @param {Object} items                        An object with a key value for each item, key being item ID, value being quantity to transfer
      * @param {Boolean} force                       Whether to ignore item type restrictions
      *
-     * @returns {Promise<Object>}                   An object containing the quantity transferred, the item ID that was
-     *                                              removed from the target, and the item ID that was added to the target
+     * @returns {Promise<Object>}                   An object containing a key value pair for each item added to the target, key being item ID, value being quantities added
      */
-    static async transferItem(source, target, itemId, { quantity = 1, force = false }={}) {
+    static async transferItems(source, target, items, { force = false }={}) {
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, itemId, quantity);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, items);
         if(hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
-        if(!sourceUuid) throw lib.custom_error(`transferItem | Could not determine the UUID, please provide a valid source`, true)
+        if(!sourceUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid source`, true)
 
         const sourceItems = source instanceof TokenDocument
             ? source.actor.items
             : source.items;
 
-        const actorItem = sourceItems.get(itemId);
-        if(!actorItem){
-            throw lib.custom_error(`transferItem | Could not find item with id ${itemId} on actor ${sourceUuid}`, true)
-        }
-
-        const disallowedType = API.isItemTypeDisallowed(actorItem);
-        if(disallowedType && !force){
-            throw lib.custom_error(`transferItem | Could not drop item of type ${disallowedType}`, true)
-        }
+        Object.keys(items).forEach(itemId => {
+            const actorItem = sourceItems.get(itemId);
+            if(!actorItem){
+                throw lib.custom_error(`TransferItems | Could not find item with id ${itemId} on source ${sourceUuid}`, true)
+            }
+            const disallowedType = API.isItemTypeDisallowed(actorItem);
+            if(disallowedType && !force){
+                throw lib.custom_error(`TransferItems | Could not transfer item of type ${disallowedType}`, true)
+            }
+        });
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`transferItem | Could not determine the UUID, please provide a valid target`, true)
+        if(!targetUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid target`, true)
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ITEM, sourceUuid, targetUuid, itemId, { quantity, force });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ITEMS, sourceUuid, targetUuid, items, { force });
 
     }
 
-    static async _transferItem(sourceUuid, targetUuid, itemId, { quantity = 1, force = false, isEverything = false }={}) {
+    static async _transferItems(sourceUuid, targetUuid, items, { force = false, isEverything = false }={}) {
 
         const source = await fromUuid(sourceUuid);
-        if(!source) throw lib.custom_error(`TransferItem | Could not find actor with UUID ${sourceUuid}`, true)
+        if(!source) throw lib.custom_error(`TransferItems | Could not find actor with UUID ${sourceUuid}`, true)
 
         const sourceItems = source instanceof TokenDocument
             ? source.actor.items
             : source.items;
 
-        const actorItem = sourceItems.get(itemId);
-        if(!actorItem){
-            throw lib.custom_error(`TransferItem | Could not find item with id ${itemId} on source ${sourceUuid}`, true)
-        }
-
-        const disallowedType = API.isItemTypeDisallowed(actorItem);
-        if(disallowedType && !force){
-            throw lib.custom_error(`transferItem | Could not transfer item of type ${disallowedType}`, true)
-        }
+        const sourceActorItems = items.map(item => {
+            const actorItem = sourceItems.get(item.id);
+            if(!actorItem){
+                throw lib.custom_error(`TransferItems | Could not find item with id ${item.id} on source ${sourceUuid}`, true)
+            }
+            const disallowedType = API.isItemTypeDisallowed(actorItem);
+            if(disallowedType && !force){
+                throw lib.custom_error(`TransferItems | Could not transfer item of type ${disallowedType}`, true)
+            }
+            return actorItem;
+        });
 
         const target = await fromUuid(targetUuid);
-        if(!target) throw lib.custom_error(`TransferItem | Could not find actor with UUID ${targetUuid}`, true)
+        if(!target) throw lib.custom_error(`TransferItems | Could not find actor with UUID ${targetUuid}`, true)
 
-        const itemData = actorItem.toObject();
+        let itemData = sourceActorItems.map(item => item.toObject());
 
-        const { quantityRemoved, itemIdRemoved } = await API._removeItem(sourceUuid, itemId, { quantity, force, isTransfer: true });
+        const itemsRemoved = await API._removeItems(sourceUuid, items, { force, isTransfer: true });
 
-        const { quantityAdded, itemIdAdded } = await API._addItem(targetUuid, itemData, { quantity: quantityRemoved, force, isTransfer: true });
+        const itemsAdded = await API._addItems(targetUuid, itemsRemoved, { force, isTransfer: true });
 
         if(!isEverything){
 
-            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemId, quantity);
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemsAdded);
 
             const macroData = {
-                action: "transferItem",
+                action: "transferItems",
                 source: sourceUuid,
                 target: targetUuid,
-                item: itemIdAdded,
-                quantity: quantityRemoved
+                itemsAdded: itemsAdded
             };
             await API._executeItemPileMacro(source, macroData);
             await API._executeItemPileMacro(target, macroData);
@@ -468,83 +467,105 @@ export default class API {
 
         }
 
-        return {
-            quantity: quantityAdded,
-            itemIdRemoved,
-            itemIdAdded
-        };
+        return itemsAdded;
 
     }
 
     /**
-     * Subtracts the quantity of an item on an actor. If its quantity reaches 0, the item is removed from the actor.
+     * Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
      *
-     * @param {Actor|Token|TokenDocument} target    The target to remove an item from
-     * @param {String} itemId                       The itemId to remove from the target
-     * @param {Number} quantity                     How many of the items to remove
+     * @param {Actor|Token|TokenDocument} target    The target to remove a items from
+     * @param {Array} items                         An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity")
      * @param {Boolean} force                       Whether to ignore item type restrictions
      *
-     * @returns {Promise<Object>}                   An object containing the quantity removed and the item ID that was removed
+     * @returns {Promise<Array>}                    An array containing the objects of each item that was removed, with their quantities set to the number removed
      */
-    static async removeItem(target, itemId, { quantity = 1, force = false }={}){
+    static async removeItems(target, items, { force = false }={}){
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, itemId, quantity);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, items);
         if(hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`removeItem | Could not determine the UUID, please provide a valid target`, true)
+        if(!targetUuid) throw lib.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEM, targetUuid, itemId, { quantity, force });
+        const targetItems = target instanceof TokenDocument
+            ? target.actor.items
+            : target.items;
+
+        items.forEach(item => {
+            const actorItem = targetItems.get(item._id);
+            if(!actorItem){
+                throw lib.custom_error(`RemoveItems | Could not find item with id ${item._id} on target ${targetUuid}`, true)
+            }
+            const disallowedType = API.isItemTypeDisallowed(actorItem);
+            if(disallowedType && !force){
+                throw lib.custom_error(`RemoveItems | Could not transfer item of type ${disallowedType}`, true)
+            }
+        });
+
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEMS, targetUuid, items, { force });
     }
 
-    static async _removeItem(targetUuid, itemId, { quantity = 1, force = false, isTransfer = false }={}) {
+    static async _removeItems(targetUuid, items, { force = false, isTransfer = false }={}) {
 
         const target = await fromUuid(targetUuid);
         if (!target) {
             throw lib.custom_error(`RemoveItem | Could not find target with UUID ${targetUuid}`, true)
         }
 
-        const targetItems = target instanceof TokenDocument
-            ? target.actor.items
-            : target.items;
+        const targetActor = target instanceof TokenDocument
+            ? target.actor
+            : target;
 
-        const item = targetItems.get(itemId);
-        if (!item) {
-            throw lib.custom_error(`RemoveItem | Could not delete find item with id ${itemId} on target ${targetUuid}`, true);
+        items.forEach(item => {
+            const actorItem = targetActor.items.get(item._id);
+            if(!actorItem){
+                throw lib.custom_error(`RemoveItem | Could not find item with id ${item._id} on target ${targetUuid}`, true)
+            }
+            const disallowedType = API.isItemTypeDisallowed(actorItem);
+            if(disallowedType && !force){
+                throw lib.custom_error(`RemoveItem | Could not transfer item of type ${disallowedType}`, true)
+            }
+        });
+
+        const itemsRemoved = [];
+        const itemsToUpdate = [];
+        const itemsToDelete = [];
+        for(const item of items) {
+
+            const actorItem = targetActor.items.get(item.id);
+
+            const currentQuantity = getProperty(actorItem.data, this.ITEM_QUANTITY_ATTRIBUTE);
+
+            const quantityToRemove = item.quantity ?? currentQuantity;
+
+            const newQuantity = Math.max(0, currentQuantity - quantityToRemove);
+
+            const removedItem = actorItem.toObject();
+
+            if (newQuantity >= 1) {
+                setProperty(removedItem, API.ITEM_QUANTITY_ATTRIBUTE, quantityToRemove);
+                itemsToUpdate.push({ [this.ITEM_QUANTITY_ATTRIBUTE]: newQuantity });
+            } else {
+                setProperty(removedItem, API.ITEM_QUANTITY_ATTRIBUTE, currentQuantity);
+                itemsToDelete.push(actorItem.id);
+            }
+
+            itemsRemoved.push(removedItem);
+
         }
 
-        const disallowedType = API.isItemTypeDisallowed(item);
-        if(disallowedType && !force){
-            throw lib.custom_error(`removeItem | Could not remove item of type ${disallowedType}`, true)
-        }
-
-        const currentQuantity = item ? (getProperty(item.data, this.ITEM_QUANTITY_ATTRIBUTE) ?? 1) : 1;
-
-        const newQuantity = Math.max(0, currentQuantity - quantity);
-
-        if (newQuantity >= 1) {
-
-            await item.update({ [this.ITEM_QUANTITY_ATTRIBUTE]: newQuantity });
-            lib.debug(`Removed 1 "${item.name}" from target ${targetUuid}`)
-
-        } else {
-
-            quantity = currentQuantity;
-
-            await item.delete();
-            lib.debug(`Removed the last "${item.name}" from target ${targetUuid}`);
-
-        }
+        await targetActor.updateEmbeddedDocuments("Item", itemsToUpdate);
+        await targetActor.deleteEmbeddedDocuments("Item", itemsToDelete);
 
         if(!isTransfer){
 
-            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.REMOVE, targetUuid, itemId, quantity);
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.REMOVE, targetUuid, itemsRemoved);
 
             const macroData = {
-                action: "removeItem",
+                action: "removeItems",
                 target: targetUuid,
-                item: itemId,
-                quantity
+                items: itemsRemoved
             };
 
             await API._executeItemPileMacro(target, macroData);
@@ -554,10 +575,7 @@ export default class API {
 
         }
 
-        return {
-            quantityRemoved: quantity,
-            itemIdRemoved: itemId
-        };
+        return itemsRemoved;
 
     }
 
@@ -565,70 +583,92 @@ export default class API {
      * Adds an item to an actor.
      *
      * @param {Actor|TokenDocument|Token} target    The target to add an item to
-     * @param {Object} itemData                     The item's data to add to this target
-     * @param {Number} quantity                     Number of them items to add
+     * @param {Array} items                         An array of item objects to add
      * @param {Boolean} force                       Whether to ignore item type restrictions
      *
-     * @returns {Promise<Object>}                   An object containing the quantity added and the item ID that was added
+     * @returns {Promise<Array>}                    An array containing the objects of each items added, with their quantities updated to match the new amounts
      */
-    static async addItem(target, itemData, { quantity = 1, force = false }){
+    static async addItems(target, items, { force = false }){
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, itemData, quantity);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, items);
         if(hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`addItem | Could not determine the UUID, please provide a valid target`, true)
+        if(!targetUuid) throw lib.custom_error(`AddItem | Could not determine the UUID, please provide a valid target`, true)
 
-        const disallowedType = API.isItemTypeDisallowed(itemData);
-        if(disallowedType && !force){
-            throw lib.custom_error(`addItem | Could not add item of type ${disallowedType}`, true)
+        for(const itemData of items) {
+            const disallowedType = API.isItemTypeDisallowed(itemData);
+            if (disallowedType && !force) {
+                throw lib.custom_error(`AddItem | Could not add item of type ${disallowedType}`, true)
+            }
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEM, targetUuid, itemData, { quantity, force });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEMS, targetUuid, items, { force });
     }
 
-    static async _addItem(targetUuid, itemData, { quantity = 1, force = false, isTransfer = false }){
+    static async _addItems(targetUuid, items, { force = false, isTransfer = false }){
 
         const target = await fromUuid(targetUuid);
         if (!target) {
             throw lib.custom_error(`AddItem | Could not find target with UUID ${targetUuid}`, true)
         }
 
-        const disallowedType = API.isItemTypeDisallowed(itemData);
-        if(disallowedType && !force){
-            throw lib.custom_error(`addItem | Could not add item of type ${disallowedType}`, true)
-        }
-
-        const actor = target instanceof TokenDocument
+        const targetActor = target instanceof TokenDocument
             ? target.actor
             : target;
 
-        const targetItems = Array.from(actor.items);
+        const targetItems = Array.from(targetActor.items);
 
-        let item = lib.getSimilarItem(targetItems, itemData.name, itemData.type);
+        const itemsAdded = [];
+        const itemsToCreate = [];
+        const itemsToUpdate = [];
+        for(const itemData of items){
 
-        const currentQuantity = item ? (getProperty(item.data, this.ITEM_QUANTITY_ATTRIBUTE) ?? 0) : 0;
+            const disallowedType = API.isItemTypeDisallowed(itemData);
+            if (disallowedType && !force) {
+                throw lib.custom_error(`AddItem | Could not add item of type ${disallowedType}`, true);
+            }
 
-        const newQuantity = currentQuantity + quantity;
+            const item = lib.getSimilarItem(targetItems, itemData._id, itemData.name, itemData.type);
 
-        if (item) {
-            await item.update({ [this.ITEM_QUANTITY_ATTRIBUTE]: newQuantity });
-            lib.debug(`Added ${newQuantity} "${item.name}" to pile ${targetUuid} (now has ${newQuantity})`);
-        } else {
-            setProperty(itemData, this.ITEM_QUANTITY_ATTRIBUTE, newQuantity);
-            [ item ] = await actor.createEmbeddedDocuments("Item", [itemData]);
-            lib.debug(`Added ${newQuantity} "${itemData.name}" to pile ${targetUuid}`)
+            const incomingQuantity = getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
+
+            const itemAdded = item ? item.toObject() : foundry.utils.duplicate(itemData);
+
+            if(item){
+                const currentQuantity = getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE);
+                const newQuantity = currentQuantity + incomingQuantity;
+                setProperty(itemAdded, API.ITEM_QUANTITY_ATTRIBUTE, newQuantity)
+                itemsToUpdate.push({
+                    "_id": item.id,
+                    [API.ITEM_QUANTITY_ATTRIBUTE]: newQuantity
+                });
+                itemsAdded[item.id] = newQuantity;
+            }else{
+                setProperty(itemAdded, API.ITEM_QUANTITY_ATTRIBUTE, incomingQuantity)
+                itemsToCreate.push(itemData);
+            }
+
+            itemsAdded.push(itemAdded)
+
+        }
+
+        const itemsCreated = await targetActor.createEmbeddedDocuments("Item", itemsToCreate);
+        await targetActor.updateEmbeddedDocuments("Item", itemsToUpdate);
+
+        for(const item of itemsCreated){
+            itemsAdded.find(item )
+            itemsAdded[item.id] = getProperty(item.data, API.ITEM_TYPE_ATTRIBUTE);
         }
 
         if(!isTransfer){
 
-            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.ADD, targetUuid, item.id, quantity);
+            await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.ADD, targetUuid, itemsAdded);
 
             const macroData = {
-                action: "addItem",
+                action: "addItems",
                 target: targetUuid,
-                item: item.id,
-                quantity
+                items: itemsAdded
             };
             await API._executeItemPileMacro(target, macroData);
 
@@ -636,10 +676,7 @@ export default class API {
 
         }
 
-        return {
-            quantityAdded: quantity,
-            itemIdAdded: item.id
-        };
+        return itemsAdded;
 
     }
 
@@ -685,11 +722,6 @@ export default class API {
         if(!Array.isArray(itemTypeFilters)){
             itemTypeFilters = API.ITEM_TYPE_FILTERS;
         }
-
-        const itemsToCreate = [];
-        const itemsToUpdate = [];
-        const itemsToDelete = [];
-
         const sourceActor = source instanceof TokenDocument
             ? source.actor
             : source;
@@ -701,6 +733,13 @@ export default class API {
         // Filter disallowed items by type
         const sourceItems = Array.from(sourceActor.items).filter(item => !API.isItemTypeDisallowed(item, itemTypeFilters))
         const targetItems = Array.from(targetActor.items);
+
+        const itemsRemoved =
+
+        const itemsToCreate = [];
+        const itemsToUpdate = [];
+        const itemsToDelete = [];
+
 
         for(let item of sourceItems){
 
@@ -773,7 +812,7 @@ export default class API {
      *
      * @returns {Promise}                           The number of the attribute that were transferred
      */
-    static async transferAttribute(source, target, attribute, { quantity = 1 }){
+    static async transferAttributes(source, target, attribute, { quantity = 1 }){
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, source, target, attribute, quantity);
         if(hookResult === false) return;
@@ -800,11 +839,11 @@ export default class API {
             throw lib.custom_error(`TransferAttribute | Could not find currency with attribute ${attribute} on target's actor with UUID ${targetUuid}`, true)
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ATTRIBUTE, sourceUuid, targetUuid, attribute, { quantity });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ATTRIBUTES, sourceUuid, targetUuid, attribute, { quantity });
 
     }
 
-    static async _transferAttribute(sourceUuid, targetUuid, attribute, { quantity = 1, isEverything = false }={}) {
+    static async _transferAttributes(sourceUuid, targetUuid, attribute, { quantity = 1, isEverything = false }={}) {
 
         const source = await fromUuid(sourceUuid);
         if(!source) throw lib.custom_error(`TransferAttribute | Could not find actor with UUID ${sourceUuid}`, true)
@@ -828,16 +867,16 @@ export default class API {
             throw lib.custom_error(`TransferAttribute | Could not find attribute ${attribute} on target actor of UUID ${targetUuid}`, true)
         }
 
-        const { quantityRemoved } = await API._removeAttribute(sourceUuid, attribute, { quantity, isTransfer: true });
+        const { quantityRemoved } = await API._removeAttributes(sourceUuid, attribute, { quantity, isTransfer: true });
 
-        const { quantityAdded } = await API._addAttribute(targetUuid, attribute, { quantity: quantityRemoved, isTransfer: true });
+        const { quantityAdded } = await API._addAttributes(targetUuid, attribute, { quantity: quantityRemoved, isTransfer: true });
 
         if(!isEverything) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attribute, quantityRemoved);
 
             const macroData = {
-                action: "transferAttribute",
+                action: "transferAttributes",
                 source: sourceUuid,
                 target: targetUuid,
                 attribute: attribute,
@@ -869,7 +908,7 @@ export default class API {
      * @param {Number} quantity                     How many of the attribute's quantity to remove
      * @returns {Promise}                           Returns how much quantity of the attribute were removed from the target
      */
-    static async removeAttribute(target, attribute, { quantity = 1 }={}){
+    static async removeAttributes(target, attribute, { quantity = 1 }={}){
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, target, attribute, quantity);
         if(hookResult === false) return;
@@ -885,11 +924,11 @@ export default class API {
             throw lib.custom_error(`RemoveAttribute | Could not find currency with attribute ${attribute} on target actor of UUID ${targetUuid}`, true)
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ATTRIBUTE, targetUuid, attribute, { quantity });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ATTRIBUTES, targetUuid, attribute, { quantity });
 
     }
 
-    static async _removeAttribute(targetUuid, attribute, { quantity = 1, isTransfer = false }={}){
+    static async _removeAttributes(targetUuid, attribute, { quantity = 1, isTransfer = false }={}){
 
         const target = await fromUuid(targetUuid);
         if (!target) {
@@ -920,7 +959,7 @@ export default class API {
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.REMOVE, targetUuid, attribute, quantity);
 
             const macroData = {
-                action: "removeAttribute",
+                action: "removeAttributes",
                 target: targetUuid,
                 attribute: attribute,
                 quantity: quantity
@@ -946,7 +985,7 @@ export default class API {
      * @param {Number} quantity                     How many of the attribute's quantity to add
      * @returns {Promise}                           Returns how much quantity of the attribute were added to the target
      */
-    static async addAttribute(target, attribute, { quantity = 1 }={}){
+    static async addAttributes(target, attribute, { quantity = 1 }={}){
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, target, attribute, quantity);
         if(hookResult === false) return;
@@ -966,7 +1005,7 @@ export default class API {
 
     }
 
-    static async _addAttribute(targetUuid, attribute, { quantity = 1, isTransfer = false }={}){
+    static async _addAttributes(targetUuid, attribute, { quantity = 1, isTransfer = false }={}){
 
         const target = await fromUuid(targetUuid);
         if (!target) {
@@ -994,7 +1033,7 @@ export default class API {
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.ADD, targetUuid, attribute, quantity);
 
             const macroData = {
-                action: "addAttribute",
+                action: "addAttributes",
                 target: targetUuid,
                 attribute: attribute,
                 quantity: quantity

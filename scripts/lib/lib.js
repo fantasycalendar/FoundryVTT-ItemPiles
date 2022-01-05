@@ -91,9 +91,9 @@ export function object_has_event(object, eventName, func){
     return false;
 }
 
-export function getSimilarItem(items, itemName, itemType){
+export function getSimilarItem(items, itemId, itemName, itemType){
     for(const item of items){
-        if(item.name === itemName && item.type === itemType){
+        if(item.id === itemId || (item.name === itemName && item.type === itemType)){
             return item;
         }
     }

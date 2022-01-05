@@ -26,24 +26,24 @@
   - [item-piles-revertFromItemPile](#item-piles-revertFromItemPile)
 
 - [Items](#Items)
-  - [item-piles-preDropItem](#item-piles-preDropItem)
-  - [item-piles-dropItem](#item-piles-dropItem)
-  - [item-piles-preTransferItem](#item-piles-preTransferItem)
-  - [item-piles-transferItem](#item-piles-transferItem)
-  - [item-piles-preAddItem](#item-piles-preAddItem)
-  - [item-piles-addItem](#item-piles-addItem)
-  - [item-piles-preRemoveItem](#item-piles-preRemoveItem)
-  - [item-piles-removeItem](#item-piles-removeItem)
+  - [item-piles-preDropItems](#item-piles-preDropItems)
+  - [item-piles-dropItems](#item-piles-dropItems)
+  - [item-piles-preTransferItems](#item-piles-preTransferItems)
+  - [item-piles-transferItemss](#item-piles-transferItems)
+  - [item-piles-preAddItems](#item-piles-preAddItems)
+  - [item-piles-addItems](#item-piles-addItems)
+  - [item-piles-preRemoveItems](#item-piles-preRemoveItems)
+  - [item-piles-removeItems](#item-piles-removeItems)
   - [item-piles-preTransferAllItems](#item-piles-preTransferAllItems)
   - [item-piles-transferAllItems](#item-piles-transferAllItems)
 
 - [Attributes](#Attributes)
-  - [item-piles-preTransferAttribute](#item-piles-preTransferAttribute)
-  - [item-piles-transferAttribute](#item-piles-transferAttribute)
-  - [item-piles-preAddAttribute](#item-piles-preAddAttribute)
-  - [item-piles-addAttribute](#item-piles-addAttribute)
-  - [item-piles-preRemoveAttribute](#item-piles-preRemoveAttribute)
-  - [item-piles-removeAttribute](#item-piles-removeAttribute)
+  - [item-piles-preTransferAttributes](#item-piles-preTransferAttributes)
+  - [item-piles-transferAttributes](#item-piles-transferAttributess)
+  - [item-piles-preAddAttributes](#item-piles-preAddAttributes)
+  - [item-piles-addAttributes](#item-piles-addAttributes)
+  - [item-piles-preRemoveAttributes](#item-piles-preRemoveAttributes)
+  - [item-piles-removeAttributes](#item-piles-removeAttributes)
   - [item-piles-preTransferAllAttributes](#item-piles-preTransferAllAttributes)
   - [item-piles-transferAllAttributes](#item-piles-transferAllAttributes)
 
@@ -267,7 +267,7 @@ Called after a token has been reverted from an item pile into a normal token.
 
 ### Items
 
-#### item-piles-preDropItem
+#### item-piles-preDropItems
 
 Called before an item is dropped on the canvas.
 
@@ -281,7 +281,7 @@ Called before an item is dropped on the canvas.
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-dropItem
+#### item-piles-dropItems
 
 Called after an item has been dropped on the canvas.
 
@@ -293,7 +293,7 @@ Called after an item has been dropped on the canvas.
 | position   | <code>object,boolean</code> | The position on the canvas where the item was dropped                                                                           |
 | quantity   | <code>number</code>         | The quantity of the item that was dropped                                                                                       |
 
-#### item-piles-preTransferItem
+#### item-piles-preTransferItems
 
 Called before an item is transferred from the source to the target.
 
@@ -306,7 +306,7 @@ Called before an item is transferred from the source to the target.
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-transferItem
+#### item-piles-transferItems
 
 Called after an item has been transferred from the source to the target.
 
@@ -317,7 +317,7 @@ Called after an item has been transferred from the source to the target.
 | itemId     | <code>string</code> | The ID of the item that was transferred  |
 | quantity   | <code>number</code> | The quantity of the item was transferred |
 
-#### item-piles-preAddItem
+#### item-piles-preAddItems
 
 Called before an item is added to the target. This is not called in any transfers.
 
@@ -329,7 +329,7 @@ Called before an item is added to the target. This is not called in any transfer
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-addItem
+#### item-piles-addItems
 
 Called after an item has been added to the target. This is not called in any transfers.
 
@@ -339,7 +339,7 @@ Called after an item has been added to the target. This is not called in any tra
 | itemId     | <code>string</code> | The ID of the item that was added                 |
 | quantity   | <code>number</code> | The quantity of the item that was added           |
 
-#### item-piles-preRemoveItem
+#### item-piles-preRemoveItems
 
 Called before an item is removed from the target. This is not called in any transfers.
 
@@ -351,7 +351,7 @@ Called before an item is removed from the target. This is not called in any tran
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-removeItem
+#### item-piles-removeItems
 
 Called after an item has been removed from the target. This is not called in any transfers.
 
@@ -386,7 +386,7 @@ Called after all items has been transferred from the source to the target.
 
 ### Attributes
 
-#### item-piles-preTransferAttribute
+#### item-piles-preTransferAttributes
 
 Called before an attribute's value is transferred from the source to the target.
 
@@ -399,7 +399,7 @@ Called before an attribute's value is transferred from the source to the target.
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-transferAttribute
+#### item-piles-transferAttributes
 
 Called after an attribute's value has been transferred from the source to the target.
 
@@ -410,7 +410,7 @@ Called after an attribute's value has been transferred from the source to the ta
 | attribute  | <code>string</code> | The path to the attribute has been transferred                |
 | quantity   | <code>number</code> | How much of the attribute's value that was transferred        |
 
-#### item-piles-preAddAttribute
+#### item-piles-preAddAttributes
 
 Called before the value of the attribute on the target is added to. Not called in the case of a transfer.
 
@@ -422,7 +422,7 @@ Called before the value of the attribute on the target is added to. Not called i
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-addAttribute
+#### item-piles-addAttributes
 
 Called after the value of the attribute on the target has been added to. Not called in the case of a transfer.
 
@@ -432,7 +432,7 @@ Called after the value of the attribute on the target has been added to. Not cal
 | attribute  | <code>string</code> | The path to the attribute that has been added to     |
 | quantity   | <code>number</code> | How much of the attribute's value was added to       |
 
-#### item-piles-preRemoveAttribute
+#### item-piles-preRemoveAttributes
 
 Called before the value of the attribute on the target is removed from. Not called in the case of a transfer.
 
@@ -444,7 +444,7 @@ Called before the value of the attribute on the target is removed from. Not call
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-removeAttribute
+#### item-piles-removeAttributes
 
 Called after the value of the attribute on the target has been removed from. Not called in the case of a transfer.
 
