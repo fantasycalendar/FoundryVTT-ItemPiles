@@ -192,6 +192,7 @@ export class ItemPileInventory extends FormApplication {
             data.hasItems = Array.from(this.pile.actor.items).length > 0;
             data.hasAttributes = data?.attributes?.length;
         }
+
         data.isEmpty = !data.hasItems && !data.hasAttributes;
 
         return data;
@@ -258,7 +259,7 @@ export class ItemPileInventory extends FormApplication {
         const inputQuantity = element.find(".item-piles-quantity").val();
         const maxQuantity = getProperty(this.pile.actor.data, attribute) ?? 0;
         const quantity = Math.min(inputQuantity, maxQuantity);
-        await API.transferAttributes(this.pile, this.recipient, [{ [attribute]: quantity }]);
+        await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity });
     }
 
     async _updateObject(event, formData) {

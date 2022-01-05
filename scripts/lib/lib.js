@@ -33,6 +33,10 @@ export function getTokensAtLocation(position) {
     });
 }
 
+export function getFreshFlags(document){
+    return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
+}
+
 export function distance_between_rect(p1, p2) {
 
     const x1 = p1.x;

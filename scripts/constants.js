@@ -27,6 +27,4 @@ const CONSTANTS = {
 
 CONSTANTS.PATH = `modules/${CONSTANTS.MODULE_NAME}/`;
 
-Object.freeze(CONSTANTS);
-
 export default CONSTANTS;

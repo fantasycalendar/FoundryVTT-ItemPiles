@@ -20,7 +20,7 @@ export class ItemPileAttributeEditor extends FormApplication {
         });
     }
 
-    static showForPile(document) {
+    static showForPile(pileAttributes) {
         let resolve;
         const promise = new Promise(_resolve => {
             resolve = _resolve;

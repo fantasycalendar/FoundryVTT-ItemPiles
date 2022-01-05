@@ -229,7 +229,7 @@ export default class API {
 
             overrideData['actorData'] = { "items": items || {} };
 
-            const pileConfig = API._getFreshFlags(pileActor);
+            const pileConfig = lib.getFreshFlags(pileActor);
 
             if (items.length === 1 && pileConfig.displayOne) {
                 overrideData["img"] = items[0].img
@@ -319,12 +319,11 @@ export default class API {
             await API._executeItemPileMacro(sourceUuid, macroData);
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            // Check if piles should be deleted
-            const deleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
+            const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
+            await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
             await API.rerenderItemPileInventoryApplication(targetUuid);
 
-            if (deleted) {
+            if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
             }
 
@@ -429,11 +428,11 @@ export default class API {
 
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            const deleted = await API._checkItemPileShouldBeDeleted(targetUuid);
+            const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(targetUuid);
 
-            await API.rerenderItemPileInventoryApplication(targetUuid, deleted);
+            await API.rerenderItemPileInventoryApplication(targetUuid, shouldBeDeleted);
 
-            if (deleted) {
+            if (shouldBeDeleted) {
                 await API._deleteItemPile(targetUuid);
             }
 
@@ -623,12 +622,11 @@ export default class API {
             await API._executeItemPileMacro(sourceUuid, macroData);
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            // Check if piles should be deleted and refresh UIs
-            const deleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
+            const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
+            await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
             await API.rerenderItemPileInventoryApplication(targetUuid);
 
-            if (deleted) {
+            if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
             }
 
@@ -701,9 +699,9 @@ export default class API {
      */
     static async _transferAttributes(sourceUuid, targetUuid, attributes, { isEverything = false } = {}) {
 
-        const { attributesRemoved } = await API._removeAttributes(sourceUuid, attributes, { isTransfer: true });
+        const attributesRemoved = await API._removeAttributes(sourceUuid, attributes, { isTransfer: true });
 
-        const { attributesAdded } = await API._addAttributes(targetUuid, attributesRemoved, { isTransfer: true });
+        const attributesAdded = await API._addAttributes(targetUuid, attributesRemoved, { isTransfer: true });
 
         if (!isEverything) {
 
@@ -718,11 +716,11 @@ export default class API {
             await API._executeItemPileMacro(sourceUuid, macroData);
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            const deleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
+            const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
+            await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
             await API.rerenderItemPileInventoryApplication(targetUuid);
 
-            if (deleted) {
+            if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
             }
 
@@ -820,10 +818,10 @@ export default class API {
             };
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            const deleted = await API._checkItemPileShouldBeDeleted(targetUuid);
-            await API.rerenderItemPileInventoryApplication(targetUuid, deleted);
+            const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(targetUuid);
+            await API.rerenderItemPileInventoryApplication(targetUuid, shouldBeDeleted);
 
-            if (deleted) {
+            if (shouldBeDeleted) {
                 await API._deleteItemPile(targetUuid);
             }
         }
@@ -972,10 +970,10 @@ export default class API {
             await API._executeItemPileMacro(sourceUuid, macroData);
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            const deleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
+            const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
+            await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
 
-            if (deleted) {
+            if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
             }
 
@@ -1038,11 +1036,11 @@ export default class API {
         await API._executeItemPileMacro(sourceUuid, macroData);
         await API._executeItemPileMacro(targetUuid, macroData);
 
-        const deleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-        await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
+        const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
+        await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
         await API.rerenderItemPileInventoryApplication(targetUuid);
 
-        if (deleted) {
+        if (shouldBeDeleted) {
             await API._deleteItemPile(sourceUuid);
         }
 
@@ -1077,7 +1075,7 @@ export default class API {
 
         const target = await fromUuid(targetUuid);
 
-        const existingPileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, API._getFreshFlags(target));
+        const existingPileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getFreshFlags(target));
         const newPileSettings = foundry.utils.mergeObject(existingPileSettings, pileSettings);
         newPileSettings.enabled = true;
 
@@ -1114,7 +1112,7 @@ export default class API {
 
         const target = await fromUuid(targetUuid);
 
-        const pileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, API._getFreshFlags(target));
+        const pileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getFreshFlags(target));
 
         pileSettings.enabled = false;
 
@@ -1159,7 +1157,7 @@ export default class API {
      * @return {Promise}
      */
     static async openItemPile(target, interactingToken = false) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         const wasLocked = data.locked;
         data.closed = false;
@@ -1185,7 +1183,7 @@ export default class API {
      * @return {Promise}
      */
     static async closeItemPile(target, interactingToken = false) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         data.closed = true;
         const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, target, data, interactingToken);
@@ -1205,7 +1203,7 @@ export default class API {
      * @return {Promise}
      */
     static async toggleItemPileClosed(target, interactingToken = false) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         if (data.closed) {
             await API.openItemPile(target, interactingToken);
@@ -1224,7 +1222,7 @@ export default class API {
      * @return {Promise}
      */
     static async lockItemPile(target, interactingToken = false) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         const wasClosed = data.closed;
         data.closed = true;
@@ -1250,7 +1248,7 @@ export default class API {
      * @return {Promise}
      */
     static async unlockItemPile(target, interactingToken = false) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         data.locked = false;
         Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
@@ -1266,7 +1264,7 @@ export default class API {
      * @return {Promise}
      */
     static async toggleItemPileLocked(target, interactingToken = false) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         if (data.locked) {
             return API.unlockItemPile(target, interactingToken);
@@ -1282,7 +1280,7 @@ export default class API {
      * @return {Promise<boolean>}
      */
     static async rattleItemPile(target) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         if (data.locked && data.lockedSound) {
             AudioHelper.play({ src: data.lockedSound })
@@ -1298,7 +1296,7 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileLocked(target) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         return data.locked;
     }
@@ -1311,7 +1309,7 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileClosed(target) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         if (!data?.enabled || !data?.isContainer) return false;
         return data.closed;
     }
@@ -1324,7 +1322,7 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileContainer(target) {
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
         return data?.enabled && data?.isContainer;
     }
 
@@ -1360,13 +1358,9 @@ export default class API {
      */
     static async _updateItemPile(targetUuid, newData, { interactingTokenUuid = false, tokenSettings = false } = {}) {
 
-        const deleted = await API._checkItemPileShouldBeDeleted(targetUuid);
-
-        if (deleted) return false;
-
         const target = await fromUuid(targetUuid);
 
-        const oldData = API._getFreshFlags(target);
+        const oldData = lib.getFreshFlags(target);
 
         const data = foundry.utils.mergeObject(
             foundry.utils.duplicate(oldData),
@@ -1381,8 +1375,6 @@ export default class API {
 
         if (target instanceof TokenDocument) {
             let updates = {
-                "img": API._getItemPileTokenImage(target, data),
-                "scale": API._getItemPileTokenScale(target, data),
                 [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
                 [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
             };
@@ -1394,8 +1386,6 @@ export default class API {
             let updates = {
                 [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
                 "token": {
-                    "img": API._getItemPileTokenImage(target, data),
-                    "scale": API._getItemPileTokenScale(target, data),
                     [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
                 }
             };
@@ -1403,8 +1393,9 @@ export default class API {
                 updates["token"] = foundry.utils.mergeObject(updates["token"], tokenSettings);
             }
             await target.update(updates);
-            await API._refreshItemPile(targetUuid);
         }
+
+        await API._refreshItemPile(targetUuid);
 
         if (data.isEnabled && data.isContainer) {
             if (diff?.closed === true) {
@@ -1451,7 +1442,7 @@ export default class API {
 
         if (foundry.utils.isObjectEmpty(diffData)) return;
 
-        const data = API._getFreshFlags(target);
+        const data = lib.getFreshFlags(target);
 
         Hooks.callAll(HOOKS.PILE.UPDATE, target, diffData, interactingToken)
 
@@ -1545,7 +1536,7 @@ export default class API {
     static async _refreshItemPile(targetUuid) {
         const targetDocument = await fromUuid(targetUuid);
 
-        if (targetDocument.destroyed || !API.isValidItemPile(targetDocument)) return;
+        if (!targetDocument || targetDocument.destroyed || !API.isValidItemPile(targetDocument)) return;
 
         let targets = [targetDocument]
         if (targetDocument instanceof Actor) {
@@ -1554,8 +1545,8 @@ export default class API {
 
         return Promise.allSettled(targets.map(_target => {
             return new Promise(async (resolve) => {
-                const deleted = await API._checkItemPileShouldBeDeleted(lib.getUuid(_target));
-                if (!deleted) {
+                const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(lib.getUuid(_target));
+                if (!shouldBeDeleted) {
                     await _target.update({
                         "img": API._getItemPileTokenImage(targetDocument),
                         "scale": API._getItemPileTokenScale(targetDocument),
@@ -1641,7 +1632,7 @@ export default class API {
 
         if (!API.isValidItemPile(target)) return;
 
-        const pileData = API._getFreshFlags(target);
+        const pileData = lib.getFreshFlags(target);
 
         if (!pileData.macro) return;
 
@@ -1861,18 +1852,11 @@ export default class API {
     /**
      * @private
      */
-    static _getFreshFlags(document) {
-        return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
-    }
-
-    /**
-     * @private
-     */
     static async _itemPileClicked(pileDocument) {
 
         lib.debug(`Clicked: ${pileDocument.uuid}`);
 
-        const data = API._getFreshFlags(pileDocument);
+        const data = lib.getFreshFlags(pileDocument);
 
         let validTokens = (canvas.tokens.controlled.length > 0 ? canvas.tokens.controlled : canvas.tokens.placeables).filter(token => token.owner && token.document !== pileDocument);
 
@@ -1921,7 +1905,7 @@ export default class API {
     static _getItemPileTokenImage(pileDocument, data = false) {
 
         if (!data) {
-            data = API._getFreshFlags(pileDocument);
+            data = lib.getFreshFlags(pileDocument);
         }
 
         const pileActor = pileDocument instanceof TokenDocument
@@ -1957,8 +1941,6 @@ export default class API {
                 : pileDocument.data.img;
         }
 
-        console.log(img)
-
         return img;
 
     }
@@ -1969,7 +1951,7 @@ export default class API {
     static _getItemPileTokenScale(pileDocument, data) {
 
         if (!data) {
-            data = API._getFreshFlags(pileDocument);
+            data = lib.getFreshFlags(pileDocument);
         }
 
         const pileActor = pileDocument instanceof TokenDocument

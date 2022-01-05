@@ -66,9 +66,9 @@
 
         <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
             {{#if hasRecipient}}
-                {{#if hasItems}}
+                {{#unless isEmpty}}
                 <button type="submit" name="takeAll" value="takeAll"><i class="fas fa-download"></i> {{localize "ITEM-PILES.Inspect.TakeAll"}}</button>
-                {{/if}}
+                {{/unless}}
                 {{#unless isDeleted}}
                 <button type="submit" name="close" value="close"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Close"}}</button>
                 {{/unless}}

@@ -1,13 +1,15 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import { ItemPileAttributeEditor } from "./itemPileAttributeEditor.js";
+import * as lib from "../lib/lib.js";
 
 export class ItemPileConfig extends FormApplication {
 
     constructor(actor) {
         super();
         this.document = actor?.token ?? actor;
-        this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, this.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME));
+        const flags = lib.getFreshFlags(this.document);
+        this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, flags);
         this.attributeEditor = false;
     }
 

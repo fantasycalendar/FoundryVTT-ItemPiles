@@ -19,6 +19,7 @@ Hooks.once("init", () => {
     Hooks.on("dropCanvasData", module._dropCanvasData);
     Hooks.on("updateActor", module._pileAttributeChanged);
     Hooks.on("createItem", module._pileInventoryChanged);
+    Hooks.on("updateItem", module._pileInventoryChanged);
     Hooks.on("deleteItem", module._pileInventoryChanged);
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
@@ -60,21 +61,22 @@ const module = {
             return hasProperty(changes, attribute.path);
         });
         if (!validProperty) return;
-        await API._rerenderItemPileInventoryApplication(target.uuid);
+        const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
+        await API._rerenderItemPileInventoryApplication(target.uuid, deleted);
+        if (deleted) return;
         return API.refreshItemPile(target);
     },
 
-    _pileInventoryChanged: debounce(async (item) => {
-        const target = item?.parent;
+    async _pileInventoryChanged(item) {
+        let target = item?.parent;
         if (!target) return;
+        target = target?.token ?? target;
         if (!API.isValidItemPile(target)) return;
         const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
-        if (deleted) {
-            return API.deleteItemPile(target);
-        }
-        await API._rerenderItemPileInventoryApplication(target.uuid);
+        await API._rerenderItemPileInventoryApplication(target.uuid, deleted);
+        if (deleted) return;
         return API.refreshItemPile(target);
-    }, 100),
+    },
 
     async _canvasReady(canvas) {
         for (const token of canvas.tokens.placeables) {
@@ -84,7 +86,7 @@ const module = {
 
     async _createPile(doc) {
         if (!API.isValidItemPile(doc)) return;
-        Hooks.callAll(HOOKS.PILE.CREATE, doc, API._getFreshFlags(doc));
+        Hooks.callAll(HOOKS.PILE.CREATE, doc, lib.getFreshFlags(doc));
         return API._initializeItemPile(doc);
     },
 
