@@ -55,20 +55,27 @@ Hooks.once("ready", () => {
 const module = {
 
     async _pileAttributeChanged(actor, changes){
+        const target = actor?.token ?? actor;
+        if(!API.isValidItemPile(target)) return;
         const validProperty = API.DYNAMIC_ATTRIBUTES.find(attribute => {
             return hasProperty(changes, attribute.path);
         });
         if(!validProperty) return;
-        const target = actor?.token ?? actor;
         await API._rerenderItemPileInventoryApplication(target.uuid);
         return API.refreshItemPile(target);
     },
 
-    async _pileInventoryChanged(item) {
-        if (!item?.parent) return;
-        await API._rerenderItemPileInventoryApplication(item.parent.uuid);
-        return API.refreshItemPile(item.parent);
-    },
+    _pileInventoryChanged: debounce(async (item) => {
+        const target = item?.parent;
+        if (!target) return;
+        if(!API.isValidItemPile(target)) return;
+        const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
+        if(deleted){
+            return API.deleteItemPile(target);
+        }
+        await API._rerenderItemPileInventoryApplication(target.uuid);
+        return API.refreshItemPile(target);
+    }, 100),
 
     async _canvasReady(canvas) {
         for(const token of canvas.tokens.placeables){

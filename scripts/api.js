@@ -1372,6 +1372,8 @@ export default class API {
 
         const diff = foundry.utils.diffObject(oldData, data);
 
+        await lib.wait(25);
+
         if(target instanceof TokenDocument){
             let updates = {
                 "img": API._getItemPileTokenImage(target, data),
@@ -1949,6 +1951,8 @@ export default class API {
                 ? pileDocument.actor.data.img
                 : pileDocument.data.img;
         }
+
+        console.log(img)
 
         return img;
 
