@@ -133,7 +133,7 @@ export async function updateItemPile(inDocument, flagData, tokenData){
 
     if(inDocument instanceof TokenDocument && inDocument.data.actorLink){
         inDocument = inDocument.actor;
-    }else if(inDocument instanceof Actor){
+    }else if(inDocument instanceof Actor && inDocument.token){
         inDocument = inDocument.token;
     }
 
