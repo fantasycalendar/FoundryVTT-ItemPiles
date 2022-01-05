@@ -47,7 +47,7 @@ function defaultSettings() {
             hint: "ITEM-PILES.Setting.DeleteEmptyPiles.Label",
             scope: "world",
             config: true,
-            default: true,
+            default: false,
             type: Boolean
         },
         "preloadFiles": {

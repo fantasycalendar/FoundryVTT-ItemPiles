@@ -195,6 +195,8 @@ export default class API {
 
                 const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
+                pileDataDefaults.deleteWhenEmpty = true;
+
                 pileActor = await Actor.create({
                     name: "Default Item Pile",
                     type: game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType"),
