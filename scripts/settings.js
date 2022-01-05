@@ -57,14 +57,6 @@ function defaultSettings() {
             config: true,
             default: true,
             type: Boolean
-        },
-        "debug": {
-            name: "ITEM-PILES.Setting.Debug.Title",
-            hint: "ITEM-PILES.Setting.Debug.Label",
-            scope: "client",
-            config: true,
-            default: false,
-            type: Boolean
         }
     }
 }
@@ -99,6 +91,22 @@ export default function registerSettings() {
         config: false,
         default: "",
         type: String
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "debug", {
+        name: "ITEM-PILES.Setting.Debug.Title",
+        hint: "ITEM-PILES.Setting.Debug.Label",
+        scope: "client",
+        config: true,
+        default: false,
+        type: Boolean
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "debugHooks", {
+        scope: "world",
+        config: false,
+        default: false,
+        type: Boolean
     });
 
 }

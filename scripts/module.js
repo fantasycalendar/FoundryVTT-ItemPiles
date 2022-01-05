@@ -24,15 +24,15 @@ Hooks.once("init", () => {
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
-    if (game.settings.get(CONSTANTS.MODULE_NAME, "debug")) {
+    if (game.settings.get(CONSTANTS.MODULE_NAME, "debugHooks")) {
         for (let hook of Object.values(HOOKS)) {
             if (typeof hook === "string") {
-                Hooks.on(hook, (...args) => lib.debug(hook, ...args));
-                lib.debug(hook)
+                Hooks.on(hook, (...args) => lib.debug(`Hook called: ${hook}`, ...args));
+                lib.debug(`Registered hook: ${hook}`)
             } else {
                 for (let innerHook of Object.values(hook)) {
-                    Hooks.on(innerHook, (...args) => lib.debug(innerHook, ...args));
-                    lib.debug(innerHook)
+                    Hooks.on(innerHook, (...args) => lib.debug(`Hook called: ${innerHook}`, ...args));
+                    lib.debug(`Registered hook: ${innerHook}`)
                 }
             }
         }
@@ -46,10 +46,16 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
     if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
-        throw lib.custom_error("Item Piles requires the 'libWrapper' module. Please install and activate it.")
+        let word = "install and activate";
+        if(game.modules.get('lib-wrapper')) word = "activate";
+        throw lib.custom_error(`Item Piles requires the 'libWrapper' module. Please ${word} it.`)
+    }
+    if (!game.modules.get('socketlib')?.active && game.user.isGM) {
+        let word = "install and activate";
+        if(game.modules.get('socketlib')) word = "activate";
+        throw lib.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
     }
     Hooks.callAll(HOOKS.READY);
-    //new ItemPileAttributeEditor().render(true)
 })
 
 const module = {
