@@ -1,6 +1,6 @@
 # Item Piles
 
-![Latest Release Download Count](https://img.shields.io/github/downloads/Haxxer/FoundryVTT-ItemPiles/latest/module.zip?color=2b82fc&label=DOWNLOADS&style=for-the-badge) [![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fitem-piles&colorB=006400&style=for-the-badge)](https://forge-vtt.com/bazaar#package=item-piles) ![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fgithub.com%2FHaxxer%2FFoundryVTT-ItemPiles%2Freleases%2Flatest%2Fdownload%2Fmodule.json&label=Foundry%20Version&query=$.compatibleCoreVersion&colorB=orange&style=for-the-badge) ![Latest Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fgithub.com%2FHaxxer%2FFoundryVTT-ItemPiles%2Freleases%2Flatest%2Fdownload%2Fmodule.json&label=Latest%20Release&prefix=v&query=$.version&colorB=red&style=for-the-badge)
+![Latest Release Download Count](https://img.shields.io/github/downloads/fantasycalendar/FoundryVTT-ItemPiles/latest/module.zip?color=2b82fc&label=DOWNLOADS&style=for-the-badge) [![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fitem-piles&colorB=006400&style=for-the-badge)](https://forge-vtt.com/bazaar#package=item-piles) ![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fgithub.com%2Ffantasycalendar%2FFoundryVTT-ItemPiles%2Freleases%2Flatest%2Fdownload%2Fmodule.json&label=Foundry%20Version&query=$.compatibleCoreVersion&colorB=orange&style=for-the-badge) ![Latest Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fgithub.com%2Ffantasycalendar%2FFoundryVTT-ItemPiles%2Freleases%2Flatest%2Fdownload%2Fmodule.json&label=Latest%20Release&prefix=v&query=$.version&colorB=red&style=for-the-badge)
 
 This module enables dropping items onto the canvas, which then get represented as a pile of items. In order to work in all systems without breaking or messing too much with the core functionality of Foundry, this **creates an unlinked token & actor** to hold these items. When a player double-clicks on an item pile token, it opens a custom UI to show what the pile contains and players can then take items from it.
 
@@ -18,7 +18,7 @@ To install this module manually:
 1.  Inside the Foundry "Configuration and Setup" screen, click "Add-on Modules"
 2.  Click "Install Module"
 3.  In the "Manifest URL" field, paste the following url:
-`https://github.com/Haxxer/FoundryVTT-ItemPiles/releases/latest/download/module.json`
+`https://github.com/fantasycalendar/FoundryVTT-ItemPiles/releases/latest/download/module.json`
 4.  Click 'Install' and wait for installation to complete
 5.  Don't forget to enable the module in game using the "Manage Module" button
 
@@ -49,7 +49,7 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 
 ## Requesting New Systems
 
-If you wish to request a new system, please create a new [system request here](https://github.com/Haxxer/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here).
+If you wish to request a new system, please create a new [system request here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here).
 
 Fill in _all_ of the information, and ask in the system's discord channel if you don't know what they are.
 
@@ -63,7 +63,7 @@ Installing this module allows anyone to drag & drop items to the canvas, which c
 
 As a GM, you can duplicate the default item pile to create new versions of that pile, or turn existing actors into new item piles through the `Item Pile` button on the actor sheets' header bar. This UI has a wide range of customization, which allows you to control exactly how your players interact with the item pile.
 
-![Item Pile Token Configuration](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/configs.png)
+![Item Pile Token Configuration](https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/configs.png)
 
 ### Interaction
 
@@ -71,13 +71,13 @@ Any player or GM can drag & drop items - if you drag & drop an item from an acto
 
 When players double-click on the item pile (or Left Control + double-click for GMs to inspect, or to inspect as someone else select two tokens, and repeat), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
 
-![Item Pile Inventory UI](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/inventory-ui.png)
+![Item Pile Inventory UI](https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/inventory-ui.png)
 
 ### Extra UI and settings
 
 In addition, item piles have a few extra buttons on the right click Token HUD to open, close, lock, and unlock containers, and a quick way to access the configuration of that token.
 
-![Item Pile Token HUD buttons](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/token-buttons.png)
+![Item Pile Token HUD buttons](https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/token-buttons.png)
 
 In the module settings, you can configure all sorts of things, such as whether empty piles auto-delete once they're empty, and which item types are allowed to be picked up. These are by default configured to the D&D5e system, so adjust them accordingly for your own system.
 
@@ -85,7 +85,7 @@ In the module settings, you can configure all sorts of things, such as whether e
 
 For most systems, currencies or other physical things aren't considered "items" in Foundry, but rather just numbers on the sheet, so dragging and dropping them is hard. However, Item Piles still allow you to pick up such items from piles using its flexible "Dynamic Attributes" feature. With this feature, you can configure what types of these "numbers only" things that can still be picked from piles up by players.
 
-![Item Pile Dynamic Attribute Settings](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/attributes.png)
+![Item Pile Dynamic Attribute Settings](https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/attributes.png)
 
 Each row represents a field on a character sheet that may be picked up. As you can see, the D&D5e system denotes the number of gold coins a character has with the `actor.data.data.currency.gp` field, so by putting `data.currency.gp` as a valid field in this UI, Item Piles figures out that if an actor has more than 0 in this field, it can be "picked up" and transferred to the character who picked it up.
 
@@ -110,11 +110,11 @@ Each row represents a field on a character sheet that may be picked up. As you c
 
 ## API, Hooks, & Documentation
 
-### [You can find the documentation here](https://github.com/Haxxer/FoundryVTT-ItemPiles/wiki)
+### [You can find the documentation here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/wiki)
 
 ## Issues
 
-Any issues, bugs, or feature requests are always welcome to be reported directly to the [Issue Tracker](https://github.com/Haxxer/FoundryVTT-ItemPiles/issues), or using the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
+Any issues, bugs, or feature requests are always welcome to be reported directly to the [Issue Tracker](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues), or using the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
 
 ## [Changelog](./changelog.md)
 
