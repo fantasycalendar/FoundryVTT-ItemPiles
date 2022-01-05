@@ -2,7 +2,7 @@
 
     <h3 style="text-align: center;">{{localize "ITEM-PILES.DropItem.Dropping"}}: {{droppedItem.name}}</h3>
 
-    {{#if itemsAtLocation}}
+    {{#if itemPileAtLocation}}
 
     <p>{{localize "ITEM-PILES.DropItem.ExistingPiles"}}</p>
 
@@ -23,7 +23,7 @@
     {{/if}}
 
     <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
-        {{#if itemsAtLocation}}
+        {{#if itemPileAtLocation}}
         <button type="submit" name="submit" value="addToPile"><i class="fas fa-download"></i> {{localize "ITEM-PILES.DropItem.AddToPile"}}</button>
         {{else}}
         <button type="submit" name="submit" value="newPile"><i class="fas fa-box"></i> {{localize "ITEM-PILES.DropItem.NewPile"}}</button>

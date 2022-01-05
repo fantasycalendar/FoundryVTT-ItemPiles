@@ -33,10 +33,6 @@ export function getTokensAtLocation(position) {
     });
 }
 
-export function getFreshFlags(document){
-    return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
-}
-
 export function distance_between_rect(p1, p2) {
 
     const x1 = p1.x;
@@ -95,7 +91,7 @@ export function object_has_event(object, eventName, func) {
     return false;
 }
 
-export function getSimilarItem(items, itemId, itemName, itemType) {
+export function getSimilarItem(items, { itemId, itemName, itemType }={}) {
     for (const item of items) {
         if (item.id === itemId || (item.name === itemName && item.type === itemType)) {
             return item;
@@ -122,4 +118,39 @@ export function is_real_number(inNumber) {
     return !isNaN(inNumber)
         && typeof inNumber === "number"
         && isFinite(inNumber);
+}
+
+export function getItemPileData(document){
+    if(document instanceof TokenDocument && document.data.actorLink){
+        document = document.actor;
+    }
+    return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
+}
+
+export async function updateItemPile(inDocument, flagData, tokenData){
+
+    if(!tokenData) tokenData = {};
+
+    if(inDocument instanceof TokenDocument && inDocument.data.actorLink){
+        inDocument = inDocument.actor;
+    }else if(inDocument instanceof Actor){
+        inDocument = inDocument.token;
+    }
+
+    if (inDocument instanceof TokenDocument) {
+        return inDocument.update({
+            ...tokenData,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
+            [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData
+        });
+    }
+
+    return inDocument.update({
+        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
+        "token": {
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
+            ...tokenData
+        }
+    });
+
 }

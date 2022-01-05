@@ -33,7 +33,7 @@ export default class DropDialog extends FormApplication {
         const data = super.getData(options);
 
         data.dropObjects = this.dropObjects;
-        data.itemsAtLocation = this.dropObjects.length > 0;
+        data.itemPileAtLocation = this.dropObjects.length > 0;
         data.droppedItem = this.droppedItem;
         data.itemQuantity = getProperty(this.droppedItem, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
         data.itemQuantityMoreThanOne = data.itemQuantity > 1;
@@ -50,8 +50,8 @@ export default class DropDialog extends FormApplication {
         slider.on("input", function () {
             input.val($(this).val());
         })
-        input.change(function () {
-            slider.slider('value', $(this).val());
+        input.keyup(function () {
+            slider.val($(this).val());
         })
     }
 

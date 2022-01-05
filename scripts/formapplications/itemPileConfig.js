@@ -8,7 +8,7 @@ export class ItemPileConfig extends FormApplication {
     constructor(actor) {
         super();
         this.document = actor?.token ?? actor;
-        const flags = lib.getFreshFlags(this.document);
+        const flags = lib.getItemPileData(this.document);
         this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, flags);
         this.attributeEditor = false;
     }

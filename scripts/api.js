@@ -231,7 +231,7 @@ export default class API {
 
             overrideData['actorData'] = { "items": items || {} };
 
-            const pileConfig = lib.getFreshFlags(pileActor);
+            const pileConfig = lib.getItemPileData(pileActor);
 
             if (items.length === 1 && pileConfig.displayOne) {
                 overrideData["img"] = items[0].img
@@ -501,7 +501,7 @@ export default class API {
         const itemsToUpdate = [];
         for (const itemData of items) {
 
-            const item = lib.getSimilarItem(targetActorItems, itemData._id, itemData.name, itemData.type);
+            const item = lib.getSimilarItem(targetActorItems, { itemId: itemData._id, itemName: itemData.name, itemType: itemData.type });
 
             const incomingQuantity = getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
 
@@ -953,7 +953,9 @@ export default class API {
             ? target.actor
             : target;
 
-        const attributesToTransfer = API.DYNAMIC_ATTRIBUTES.filter(attribute => {
+        const sourceAttributes = API.getPileAttributes(sourceActor);
+
+        const attributesToTransfer = sourceAttributes.filter(attribute => {
             return hasProperty(sourceActor.data, attribute.path)
                 && getProperty(sourceActor.data, attribute.path) > 0
                 && hasProperty(targetActor.data, attribute.path);
@@ -1080,7 +1082,7 @@ export default class API {
 
         const target = await fromUuid(targetUuid);
 
-        const existingPileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getFreshFlags(target));
+        const existingPileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(target));
         const newPileSettings = foundry.utils.mergeObject(existingPileSettings, pileSettings);
         newPileSettings.enabled = true;
 
@@ -1117,7 +1119,7 @@ export default class API {
 
         const target = await fromUuid(targetUuid);
 
-        const pileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getFreshFlags(target));
+        const pileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(target));
 
         pileSettings.enabled = false;
 
@@ -1162,7 +1164,7 @@ export default class API {
      * @return {Promise}
      */
     static async openItemPile(target, interactingToken = false) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         const wasLocked = data.locked;
         data.closed = false;
@@ -1188,7 +1190,7 @@ export default class API {
      * @return {Promise}
      */
     static async closeItemPile(target, interactingToken = false) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         data.closed = true;
         const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, target, data, interactingToken);
@@ -1208,7 +1210,7 @@ export default class API {
      * @return {Promise}
      */
     static async toggleItemPileClosed(target, interactingToken = false) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         if (data.closed) {
             await API.openItemPile(target, interactingToken);
@@ -1227,7 +1229,7 @@ export default class API {
      * @return {Promise}
      */
     static async lockItemPile(target, interactingToken = false) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         const wasClosed = data.closed;
         data.closed = true;
@@ -1253,7 +1255,7 @@ export default class API {
      * @return {Promise}
      */
     static async unlockItemPile(target, interactingToken = false) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         data.locked = false;
         Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
@@ -1269,7 +1271,7 @@ export default class API {
      * @return {Promise}
      */
     static async toggleItemPileLocked(target, interactingToken = false) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         if (data.locked) {
             return API.unlockItemPile(target, interactingToken);
@@ -1285,7 +1287,7 @@ export default class API {
      * @return {Promise<boolean>}
      */
     static async rattleItemPile(target) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         if (data.locked && data.lockedSound) {
             AudioHelper.play({ src: data.lockedSound })
@@ -1301,7 +1303,7 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileLocked(target) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         return data.locked;
     }
@@ -1314,7 +1316,7 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileClosed(target) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         if (!data?.enabled || !data?.isContainer) return false;
         return data.closed;
     }
@@ -1327,7 +1329,7 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileContainer(target) {
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
         return data?.enabled && data?.isContainer;
     }
 
@@ -1365,40 +1367,18 @@ export default class API {
 
         const target = await fromUuid(targetUuid);
 
-        const oldData = lib.getFreshFlags(target);
+        const oldData = lib.getItemPileData(target);
 
         const data = foundry.utils.mergeObject(
             foundry.utils.duplicate(oldData),
             foundry.utils.duplicate(newData)
         );
 
-        await target.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME, data);
-
         const diff = foundry.utils.diffObject(oldData, data);
 
         await lib.wait(25);
 
-        if (target instanceof TokenDocument) {
-            let updates = {
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
-                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
-            };
-            if (tokenSettings) {
-                updates = foundry.utils.mergeObject(updates, tokenSettings);
-            }
-            await target.update(updates);
-        } else {
-            let updates = {
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
-                "token": {
-                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
-                }
-            };
-            if (tokenSettings) {
-                updates["token"] = foundry.utils.mergeObject(updates["token"], tokenSettings);
-            }
-            await target.update(updates);
-        }
+        await lib.updateItemPile(target, data, tokenSettings);
 
         await API._refreshItemPile(targetUuid);
 
@@ -1447,7 +1427,7 @@ export default class API {
 
         if (foundry.utils.isObjectEmpty(diffData)) return;
 
-        const data = lib.getFreshFlags(target);
+        const data = lib.getItemPileData(target);
 
         Hooks.callAll(HOOKS.PILE.UPDATE, target, diffData, interactingToken)
 
@@ -1516,11 +1496,44 @@ export default class API {
     /**
      * Whether a given document is a valid pile or not
      *
-     * @param document
+     * @param {TokenDocument|Actor} document
      * @return {boolean}
      */
     static isValidItemPile(document) {
-        return !!document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled;
+        return lib.getItemPileData(document)?.enabled;
+    }
+
+    /**
+     * Whether the item pile is empty
+     *
+     * @param {TokenDocument|Actor} target
+     * @returns {boolean}
+     */
+    static isItemPileEmpty(target){
+        const targetActor = target instanceof TokenDocument
+            ? target.actor
+            : target;
+
+        const pileData = lib.getItemPileData(target);
+
+        const hasNoItems = Array.from(targetActor.items).length === 0;
+
+        const attributes = API.getPileAttributes(target);
+        const hasEmptyAttributes = attributes.find(attribute => {
+            return hasProperty(targetActor.data, attribute.path) && getProperty(targetActor.data, attribute.path) === 0;
+        })
+        return hasNoItems && hasEmptyAttributes;
+    }
+
+    /**
+     * Returns the attributes this item pile can transfer
+     *
+     * @param {TokenDocument|Actor} target
+     * @returns {array}
+     */
+    static getPileAttributes(target){
+        const pileData = lib.getItemPileData(target);
+        return pileData.overrideAttributes || API.DYNAMIC_ATTRIBUTES;
     }
 
     /**
@@ -1591,8 +1604,9 @@ export default class API {
      */
     static async _initializeItemPile(tokenDocument) {
 
-        const data = tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
-        if (!data?.enabled) return false;
+        if (!API.isValidItemPile(tokenDocument)) return false;
+
+        const pileData = lib.getItemPileData(tokenDocument);
 
         const method = () => {
             return doubleClickHandler.clicked(tokenDocument);
@@ -1604,23 +1618,25 @@ export default class API {
         }
 
         if (game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")) {
-            await Promise.allSettled(Object.entries(data).map(entry => {
-                return new Promise(resolve => {
+            Promise.allSettled(Object.entries(pileData).map(entry => {
+                return new Promise(async (resolve) => {
                     const [key, value] = entry;
                     if (preloadedFiles.has(value) || !value){
                         return resolve();
                     }
-                    preloadedFiles.add(value);
                     if (key.toLowerCase().includes("image")) {
+                        preloadedFiles.add(value);
                         lib.debug(`Preloaded image: ${value}`);
-                        return loadTexture(value);
+                        await loadTexture(value);
                     } else if (key.toLowerCase().includes("sound")) {
+                        preloadedFiles.add(value);
                         lib.debug(`Preloaded sound: ${value}`);
-                        return AudioHelper.preloadSound(value);
+                        await AudioHelper.preloadSound(value);
                     }
+                    return resolve();
                 });
             })).then(() => {
-                if(game.user.isGm){
+                if(game.user.isGM){
                     API._refreshItemPile(tokenDocument.uuid)
                 }
             });
@@ -1646,7 +1662,7 @@ export default class API {
 
         if (!API.isValidItemPile(target)) return;
 
-        const pileData = lib.getFreshFlags(target);
+        const pileData = lib.getItemPileData(target);
 
         if (!pileData.macro) return;
 
@@ -1738,7 +1754,11 @@ export default class API {
         let x;
         let y;
 
-        if (!data.target) {
+        if (dropData.target) {
+
+            droppableDocuments.push(dropData.target);
+
+        } else {
 
             const position = canvas.grid.getTopLeft(data.x, data.y);
             x = position[0];
@@ -1747,10 +1767,6 @@ export default class API {
             droppableDocuments = lib.getTokensAtLocation({ x, y })
                 .map(token => token.document)
                 .filter(token => API.isValidItemPile(token));
-
-        } else {
-
-            droppableDocuments.push(data.target);
 
         }
 
@@ -1764,7 +1780,7 @@ export default class API {
 
                 const distance = Math.floor(lib.distance_between_rect(sourceToken, targetToken.object) / canvas.grid.size) + 1
 
-                const maxDistance = lib.getFreshFlags(targetToken).distance;
+                const maxDistance = lib.getItemPileData(targetToken).distance;
 
                 if(distance > maxDistance) {
                     lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
@@ -1885,7 +1901,7 @@ export default class API {
 
         lib.debug(`Clicked: ${pileDocument.uuid}`);
 
-        const data = lib.getFreshFlags(pileDocument);
+        const data = lib.getItemPileData(pileDocument);
 
         let validTokens = (canvas.tokens.controlled.length > 0 ? canvas.tokens.controlled : canvas.tokens.placeables).filter(token => token.owner && token.document !== pileDocument);
 
@@ -1912,7 +1928,7 @@ export default class API {
 
         if (data.isContainer && closestTokens.length) {
 
-            if (data.locked) {
+            if (data.locked && !game.user.isGM) {
                 lib.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
                 return API.rattleItemPile(pileDocument);
             }
@@ -1934,7 +1950,7 @@ export default class API {
     static _getItemPileTokenImage(pileDocument, data = false) {
 
         if (!data) {
-            data = lib.getFreshFlags(pileDocument);
+            data = lib.getItemPileData(pileDocument);
         }
 
         const pileActor = pileDocument instanceof TokenDocument
@@ -1952,7 +1968,7 @@ export default class API {
                 img = data.lockedImage;
             } else if (data.closed && data.closedImage) {
                 img = data.closedImage;
-            } else if (data.emptyImage && items.length === 0) {
+            } else if (data.emptyImage && API.isItemPileEmpty(pileDocument)) {
                 img = data.emptyImage;
             } else if (data.openedImage) {
                 img = data.openedImage;
@@ -1980,7 +1996,7 @@ export default class API {
     static _getItemPileTokenScale(pileDocument, data) {
 
         if (!data) {
-            data = lib.getFreshFlags(pileDocument);
+            data = lib.getItemPileData(pileDocument);
         }
 
         const pileActor = pileDocument instanceof TokenDocument
@@ -1989,7 +2005,7 @@ export default class API {
 
         const items = Array.from(pileActor.items);
 
-        return data.overrideSingleItemScale && items.length === 1
+        return data.displayOne && data.overrideSingleItemScale && items.length === 1
             ? data.singleItemScale
             : pileActor.data.token.scale;
 
@@ -2004,20 +2020,15 @@ export default class API {
 
         if (!(target instanceof TokenDocument)) return false;
 
-        const data = target.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        const pileData = lib.getItemPileData(target);
 
         const shouldDelete = {
             "default": game.settings.get(CONSTANTS.MODULE_NAME, "deleteEmptyPiles"),
             "true": true,
             "false": false
-        }[data?.deleteWhenEmpty ?? "default"]
+        }[pileData?.deleteWhenEmpty ?? "default"]
 
-        const hasItems = Array.from(target.actor.items).length > 0;
-        const hasNonZeroAttributes = API.DYNAMIC_ATTRIBUTES.find(attribute => {
-            return !!getProperty(target.actor.data, attribute.path);
-        })
-
-        return data?.enabled && shouldDelete && !hasItems && !hasNonZeroAttributes;
+        return pileData?.enabled && shouldDelete && API.isItemPileEmpty(target);
 
     }
 

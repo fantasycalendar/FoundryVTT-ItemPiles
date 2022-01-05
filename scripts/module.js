@@ -63,14 +63,15 @@ const module = {
     async _pileAttributeChanged(actor, changes) {
         const target = actor?.token ?? actor;
         if (!API.isValidItemPile(target)) return;
-        const validProperty = API.DYNAMIC_ATTRIBUTES.find(attribute => {
+        const sourceAttributes = API.getPileAttributes(target);
+        const validProperty = sourceAttributes.find(attribute => {
             return hasProperty(changes, attribute.path);
         });
         if (!validProperty) return;
         const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
         await API._rerenderItemPileInventoryApplication(target.uuid, deleted);
-        if (deleted) return;
-        return API.refreshItemPile(target);
+        if (deleted || !game.user.isGM) return;
+        return API._refreshItemPile(target.uuid);
     },
 
     async _pileInventoryChanged(item) {
@@ -80,8 +81,8 @@ const module = {
         if (!API.isValidItemPile(target)) return;
         const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
         await API._rerenderItemPileInventoryApplication(target.uuid, deleted);
-        if (deleted) return;
-        return API.refreshItemPile(target);
+        if (deleted || !game.user.isGM) return;
+        return API._refreshItemPile(target.uuid);
     },
 
     async _canvasReady(canvas) {
@@ -92,7 +93,7 @@ const module = {
 
     async _createPile(doc) {
         if (!API.isValidItemPile(doc)) return;
-        Hooks.callAll(HOOKS.PILE.CREATE, doc, lib.getFreshFlags(doc));
+        Hooks.callAll(HOOKS.PILE.CREATE, doc, lib.getItemPileData(doc));
         return API._initializeItemPile(doc);
     },
 
@@ -106,9 +107,11 @@ const module = {
 
         const document = app?.object?.document;
 
-        const pileData = document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        if (!document) return;
 
-        if (!document || !pileData?.enabled) return;
+        if(!API.isValidItemPile(document)) return;
+
+        const pileData = lib.getItemPileData(document);
 
         const container = $(`<div class="col right" style="right:-130px;"></div>`);
 

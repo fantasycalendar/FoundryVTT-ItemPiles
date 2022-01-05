@@ -72,13 +72,14 @@ export class ItemPileInventory extends FormApplication {
 
         this.element.find(".item-piles-item-row:not(.item-piles-attribute-row)").each(function () {
 
-            const id = $(this).attr("data-item-id");
+            let id = $(this).attr("data-item-id");
             const type = $(this).attr("data-item-type");
             const name = $(this).find('.item-piles-name').text();
             const img = $(this).find('.item-piles-img').attr('src');
 
-            const foundItem = self.pile.actor.items.get(id) ?? lib.getSimilarItem(pileItems, name, type);
+            const foundItem = self.pile.actor.items.get(id) ?? lib.getSimilarItem(pileItems, { itemName: name, itemType: type });
 
+            id = foundItem ? foundItem.id : id;
             const itemQuantity = foundItem ? $(this).find('input').val() : 1;
             const maxQuantity = foundItem ? (getProperty(foundItem.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1) : 0;
 
@@ -93,7 +94,7 @@ export class ItemPileInventory extends FormApplication {
         });
 
         const newItems = this.getPileItemData();
-        newItems.filter(newItem => !this.items.find(item => item.id === newItem.id) && !lib.getSimilarItem(this.items, newItem.name, newItem.type))
+        newItems.filter(newItem => !this.items.find(item => item.id === newItem.id) && !lib.getSimilarItem(this.items, { itemName: newItem.name, itemType: newItem.type }))
             .forEach(newItem => this.items.push(newItem));
 
     }
@@ -148,7 +149,8 @@ export class ItemPileInventory extends FormApplication {
     }
 
     getPileAttributeData() {
-        return API.DYNAMIC_ATTRIBUTES.map(attribute => {
+        const attributes = API.getPileAttributes(this.pile);
+        return attributes.map(attribute => {
             if (!this.validAttribute(attribute.path)) return false;
             return {
                 name: attribute.name,
@@ -193,7 +195,7 @@ export class ItemPileInventory extends FormApplication {
             data.hasAttributes = data?.attributes?.length;
         }
 
-        data.isEmpty = !data.hasItems && !data.hasAttributes;
+        data.isEmpty = API.isItemPileEmpty(this.pile);
 
         return data;
     }
