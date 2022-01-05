@@ -51,7 +51,9 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 
 If you wish to request a new system, please create a new [system request here](https://github.com/Haxxer/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here).
 
-Fill in _all_ of the information, and ask in the system's discord channel if you don't know what they are. Incomplete requests will be rejected.
+Fill in _all_ of the information, and ask in the system's discord channel if you don't know what they are.
+
+Incomplete requests will be rejected.
 
 ## Usage
 
