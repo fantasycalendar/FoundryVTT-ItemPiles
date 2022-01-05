@@ -47,6 +47,12 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 
 - [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - This system already has a robust loot actor & token system, and feature rich systems. After speaking to the devs, they expressed interest in developing a similar system as the Drag & Drop system from Item Piles.
 
+## Requesting New Systems
+
+If you wish to request a new system, please create a new [system request here](https://github.com/Haxxer/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here).
+
+Fill in _all_ of the information, and ask in the system's discord channel if you don't know what they are. Incomplete requests will be rejected.
+
 ## Usage
 
 ### Initial Setup
@@ -61,7 +67,7 @@ As a GM, you can duplicate the default item pile to create new versions of that 
 
 Any player or GM can drag & drop items - if you drag & drop an item from an actor's inventory, you will be prompted how many of that item that you wish to drop (if they have more than 1 of the item). Holding ALT before dragging & dropping an item, you will automatically drop 1 of the items into a new pile without a prompt. **You can also drag and drop items onto an existing pile**.
 
-When players double-click on the item pile (or Left Control + Double Click for GMs to inspect, or to "inspect as" select two tokens, and repeat), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
+When players double-click on the item pile (or Left Control + double-click for GMs to inspect, or to inspect as someone else select two tokens, and repeat), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
 
 ![Item Pile Inventory UI](https://raw.githubusercontent.com/Haxxer/FoundryVTT-ItemPiles/master/docs/images/inventory-ui.png)
 
