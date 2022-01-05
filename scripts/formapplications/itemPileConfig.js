@@ -70,7 +70,7 @@ export class ItemPileConfig extends FormApplication {
         const slider = html.find("#scaleRange");
         const input = html.find("#scaleInput");
         scaleCheckbox.change(function () {
-            let isDisabled = !$(this).is(":checked");
+            let isDisabled = !$(this).is(":checked") || !displayOneCheckbox.is(":checked");
             slider.prop('disabled', isDisabled);
             input.prop('disabled', isDisabled);
             slider.parent().toggleClass("item-pile-disabled", isDisabled);
