@@ -18,7 +18,7 @@
 </dd>
 </dl>
 
-## Functions
+## Setting Methods
 
 <dl>
 <dt><a href="#setActorClassType">setActorClassType(inClassType)</a> ⇒ <code>Promise</code></dt>
@@ -36,6 +36,10 @@
 <dt><a href="#setItemTypeFilters">setItemTypeFilters(inFilters)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Sets the filters for item types eligible for interaction within this system</p>
 </dd>
+
+
+## Item Pile Methods
+
 <dt><a href="#createItemPile">createItemPile(position, [items], [pileActorName])</a> ⇒ <code>Promise</code></dt>
 <dd><p>Creates the default item pile token at a location.</p>
 </dd>
@@ -118,6 +122,12 @@ or not, returning the type if it is NOT allowed.</p>
 <dt><a href="#isValidItemPile">isValidItemPile(document)</a> ⇒ <code>boolean</code></dt>
 <dd><p>Whether a given document is a valid pile or not</p>
 </dd>
+<dt><a href="#isItemPileEmpty">isItemPileEmpty(target)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Whether the item pile is empty</p>
+</dd>
+<dt><a href="#getPileAttributes">getPileAttributes(target)</a> ⇒ <code>array</code></dt>
+<dd><p>Returns the attributes this item pile can transfer</p>
+</dd>
 <dt><a href="#refreshItemPile">refreshItemPile(target)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Refreshes the target image of an item pile, ensuring it remains in sync</p>
 </dd>
@@ -128,40 +138,34 @@ or not, returning the type if it is NOT allowed.</p>
 
 <a name="ACTOR_CLASS_TYPE"></a>
 
-## ACTOR\_CLASS\_TYPE ⇒ <code>string</code>
+## ItemPiles.API.ACTOR\_CLASS\_TYPE ⇒ <code>string</code>
 The actor class type used for the original item pile actor in this system
 
-**Kind**: global variable  
 <a name="DYNAMIC_ATTRIBUTES"></a>
 
-## DYNAMIC\_ATTRIBUTES ⇒ <code>array</code>
+## ItemPiles.API.DYNAMIC\_ATTRIBUTES ⇒ <code>array</code>
 The attributes used to track dynamic attributes in this system
 
-**Kind**: global variable  
 <a name="ITEM_QUANTITY_ATTRIBUTE"></a>
 
-## ITEM\_QUANTITY\_ATTRIBUTE ⇒ <code>string</code>
+## ItemPiles.API.ITEM\_QUANTITY\_ATTRIBUTE ⇒ <code>string</code>
 The attribute used to track the quantity of items in this system
 
-**Kind**: global variable  
 <a name="ITEM_TYPE_ATTRIBUTE"></a>
 
-## ITEM\_TYPE\_ATTRIBUTE ⇒ <code>string</code>
+## ItemPiles.API.ITEM\_TYPE\_ATTRIBUTE ⇒ <code>string</code>
 The attribute used to track the item type in this system
 
-**Kind**: global variable  
 <a name="ITEM_TYPE_FILTERS"></a>
 
-## ITEM\_TYPE\_FILTERS ⇒ <code>array</code>
+## ItemPiles.API.ITEM\_TYPE\_FILTERS ⇒ <code>array</code>
 The filters for item types eligible for interaction within this system
 
-**Kind**: global variable  
 <a name="setActorClassType"></a>
 
-## setActorClassType(inClassType) ⇒ <code>Promise</code>
+## ItemPiles.API.setActorClassType(inClassType) ⇒ <code>Promise</code>
 Sets the actor class type used for the original item pile actor in this system
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -169,10 +173,9 @@ Sets the actor class type used for the original item pile actor in this system
 
 <a name="setDynamicAttributes"></a>
 
-## setDynamicAttributes(inAttributes) ⇒ <code>Promise</code>
+## ItemPiles.API.setDynamicAttributes(inAttributes) ⇒ <code>Promise</code>
 Sets the attributes used to track dynamic attributes in this system
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -180,10 +183,9 @@ Sets the attributes used to track dynamic attributes in this system
 
 <a name="setItemQuantityAttribute"></a>
 
-## setItemQuantityAttribute(inAttribute) ⇒ <code>Promise</code>
+## ItemPiles.API.setItemQuantityAttribute(inAttribute) ⇒ <code>Promise</code>
 Sets the inAttribute used to track the quantity of items in this system
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -191,10 +193,9 @@ Sets the inAttribute used to track the quantity of items in this system
 
 <a name="setItemTypeAttribute"></a>
 
-## setItemTypeAttribute(inAttribute) ⇒ <code>string</code>
+## ItemPiles.API.setItemTypeAttribute(inAttribute) ⇒ <code>string</code>
 Sets the attribute used to track the item type in this system
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -202,10 +203,9 @@ Sets the attribute used to track the item type in this system
 
 <a name="setItemTypeFilters"></a>
 
-## setItemTypeFilters(inFilters) ⇒ <code>Promise</code>
+## ItemPiles.API.setItemTypeFilters(inFilters) ⇒ <code>Promise</code>
 Sets the filters for item types eligible for interaction within this system
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -213,10 +213,9 @@ Sets the filters for item types eligible for interaction within this system
 
 <a name="createItemPile"></a>
 
-## createItemPile(position, [items], [pileActorName]) ⇒ <code>Promise</code>
+## ItemPiles.API.createItemPile(position, [items], [pileActorName]) ⇒ <code>Promise</code>
 Creates the default item pile token at a location.
 
-**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -226,10 +225,9 @@ Creates the default item pile token at a location.
 
 <a name="transferItems"></a>
 
-## transferItems(source, target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;object&gt;</code>
+## ItemPiles.API.transferItems(source, target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;object&gt;</code>
 Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair for each item added to the target, key being item ID, value being quantities added  
 
 | Param | Type | Default | Description |
@@ -241,10 +239,9 @@ Transfers items from the source to the target, subtracting a number of quantity 
 
 <a name="removeItems"></a>
 
-## removeItems(target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
+## ItemPiles.API.removeItems(target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
 Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;array&gt;</code> - An array containing the objects of each item that was removed, with their quantities set to the number removed  
 
 | Param | Type | Default | Description |
@@ -255,10 +252,9 @@ Subtracts the quantity of items on an actor. If the quantity of an item reaches 
 
 <a name="addItems"></a>
 
-## addItems(target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
+## ItemPiles.API.addItems(target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
 Adds item to an actor, increasing item quantities if matches were found
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;array&gt;</code> - An array containing each item added as an object, with their quantities updated to match the new amounts  
 
 | Param | Type | Default | Description |
@@ -269,10 +265,9 @@ Adds item to an actor, increasing item quantities if matches were found
 
 <a name="transferAllItems"></a>
 
-## transferAllItems(source, target, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
+## ItemPiles.API.transferAllItems(source, target, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
 Transfers all items between the source and the target.
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;array&gt;</code> - An array containing all of the items that were transferred to the target  
 
 | Param | Type | Default | Description |
@@ -283,10 +278,9 @@ Transfers all items between the source and the target.
 
 <a name="transferAttributes"></a>
 
-## transferAttributes(source, target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
+## ItemPiles.API.transferAttributes(source, target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
 Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred  
 
 | Param | Type | Description |
@@ -297,10 +291,9 @@ Transfers a set quantity of an attribute from a source to a target, removing it 
 
 <a name="removeAttributes"></a>
 
-## removeAttributes(target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
+## ItemPiles.API.removeAttributes(target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
 Subtracts attributes on the target
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;object&gt;</code> - Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed  
 
 | Param | Type | Description |
@@ -310,10 +303,9 @@ Subtracts attributes on the target
 
 <a name="addAttributes"></a>
 
-## addAttributes(target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
+## ItemPiles.API.addAttributes(target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
 Adds to attributes on an actor
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;object&gt;</code> - Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed  
 
 | Param | Type | Description |
@@ -323,10 +315,9 @@ Adds to attributes on an actor
 
 <a name="transferAllAttributes"></a>
 
-## transferAllAttributes(source, target) ⇒ <code>Promise.&lt;object&gt;</code>
+## ItemPiles.API.transferAllAttributes(source, target) ⇒ <code>Promise.&lt;object&gt;</code>
 Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred  
 
 | Param | Type | Description |
@@ -336,10 +327,9 @@ Transfers all dynamic attributes from a source to a target, removing it or subtr
 
 <a name="transferEverything"></a>
 
-## transferEverything(source, target, [itemTypeFilters]) ⇒ <code>Promise.&lt;object&gt;</code>
+## ItemPiles.API.transferEverything(source, target, [itemTypeFilters]) ⇒ <code>Promise.&lt;object&gt;</code>
 Transfers all items and attributes between the source and the target.
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;object&gt;</code> - An object containing all items and attributes transferred to the target  
 
 | Param | Type | Default | Description |
@@ -350,10 +340,9 @@ Transfers all items and attributes between the source and the target.
 
 <a name="turnTokenIntoItemPile"></a>
 
-## turnTokenIntoItemPile(target, pileSettings, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
+## ItemPiles.API.turnTokenIntoItemPile(target, pileSettings, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
 Turns a token and its actor into an item pile
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;string&gt;</code> - The uuid of the target after it was turned into an item pile  
 
 | Param | Type | Description |
@@ -364,10 +353,9 @@ Turns a token and its actor into an item pile
 
 <a name="revertTokenFromItemPile"></a>
 
-## revertTokenFromItemPile(target, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
+## ItemPiles.API.revertTokenFromItemPile(target, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
 Reverts a token from an item pile into a normal token and actor
 
-**Kind**: global function  
 **Returns**: <code>Promise.&lt;string&gt;</code> - The uuid of the target after it was reverted from an item pile  
 
 | Param | Type | Description |
@@ -377,16 +365,14 @@ Reverts a token from an item pile into a normal token and actor
 
 <a name="rerenderTokenHud"></a>
 
-## rerenderTokenHud() ⇒ <code>Promise</code>
+## ItemPiles.API.rerenderTokenHud() ⇒ <code>Promise</code>
 Causes every user's token HUD to rerender
 
-**Kind**: global function  
 <a name="openItemPile"></a>
 
-## openItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
+## ItemPiles.API.openItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
 Opens a pile if it is enabled and a container
 
-**Kind**: global function  
 
 | Param | Type | Default |
 | --- | --- | --- |
@@ -395,10 +381,9 @@ Opens a pile if it is enabled and a container
 
 <a name="closeItemPile"></a>
 
-## closeItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
+## ItemPiles.API.closeItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
 Closes a pile if it is enabled and a container
 
-**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -407,10 +392,9 @@ Closes a pile if it is enabled and a container
 
 <a name="toggleItemPileClosed"></a>
 
-## toggleItemPileClosed(target, [interactingToken]) ⇒ <code>Promise</code>
+## ItemPiles.API.toggleItemPileClosed(target, [interactingToken]) ⇒ <code>Promise</code>
 Toggles a pile's closed state if it is enabled and a container
 
-**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -419,10 +403,9 @@ Toggles a pile's closed state if it is enabled and a container
 
 <a name="lockItemPile"></a>
 
-## lockItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
+## ItemPiles.API.lockItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
 Locks a pile if it is enabled and a container
 
-**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -431,10 +414,9 @@ Locks a pile if it is enabled and a container
 
 <a name="unlockItemPile"></a>
 
-## unlockItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
+## ItemPiles.API.unlockItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
 Unlocks a pile if it is enabled and a container
 
-**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -443,10 +425,9 @@ Unlocks a pile if it is enabled and a container
 
 <a name="toggleItemPileLocked"></a>
 
-## toggleItemPileLocked(target, [interactingToken]) ⇒ <code>Promise</code>
+## ItemPiles.API.toggleItemPileLocked(target, [interactingToken]) ⇒ <code>Promise</code>
 Toggles a pile's locked state if it is enabled and a container
 
-**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -455,10 +436,9 @@ Toggles a pile's locked state if it is enabled and a container
 
 <a name="rattleItemPile"></a>
 
-## rattleItemPile(target) ⇒ <code>Promise.&lt;boolean&gt;</code>
+## ItemPiles.API.rattleItemPile(target) ⇒ <code>Promise.&lt;boolean&gt;</code>
 Causes the item pile to play a sound as it was attempted to be opened, but was locked
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -466,10 +446,9 @@ Causes the item pile to play a sound as it was attempted to be opened, but was l
 
 <a name="isItemPileLocked"></a>
 
-## isItemPileLocked(target) ⇒ <code>boolean</code>
+## ItemPiles.API.isItemPileLocked(target) ⇒ <code>boolean</code>
 Whether an item pile is locked. If it is not enabled or not a container, it is always false.
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -477,10 +456,9 @@ Whether an item pile is locked. If it is not enabled or not a container, it is a
 
 <a name="isItemPileClosed"></a>
 
-## isItemPileClosed(target) ⇒ <code>boolean</code>
+## ItemPiles.API.isItemPileClosed(target) ⇒ <code>boolean</code>
 Whether an item pile is closed. If it is not enabled or not a container, it is always false.
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -488,10 +466,9 @@ Whether an item pile is closed. If it is not enabled or not a container, it is a
 
 <a name="isItemPileContainer"></a>
 
-## isItemPileContainer(target) ⇒ <code>boolean</code>
+## ItemPiles.API.isItemPileContainer(target) ⇒ <code>boolean</code>
 Whether an item pile is a container. If it is not enabled, it is always false.
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -499,10 +476,9 @@ Whether an item pile is a container. If it is not enabled, it is always false.
 
 <a name="updateItemPile"></a>
 
-## updateItemPile(target, newData, [interactingToken], [tokenSettings]) ⇒ <code>Promise</code>
+## ItemPiles.API.updateItemPile(target, newData, [interactingToken], [tokenSettings]) ⇒ <code>Promise</code>
 Updates a pile with new data.
 
-**Kind**: global function  
 
 | Param | Type | Default |
 | --- | --- | --- |
@@ -513,10 +489,9 @@ Updates a pile with new data.
 
 <a name="deleteItemPile"></a>
 
-## deleteItemPile(target) ⇒ <code>Promise</code>
+## ItemPiles.API.deleteItemPile(target) ⇒ <code>Promise</code>
 Deletes a pile, calling the relevant hooks.
 
-**Kind**: global function  
 
 | Param | Type |
 | --- | --- |
@@ -524,11 +499,10 @@ Deletes a pile, calling the relevant hooks.
 
 <a name="isItemTypeDisallowed"></a>
 
-## isItemTypeDisallowed(item, [itemTypeFilters]) ⇒ <code>boolean/string</code>
+## ItemPiles.API.isItemTypeDisallowed(item, [itemTypeFilters]) ⇒ <code>boolean/string</code>
 Checks whether an item (or item data) is of a type that is not allowed. If an array whether that type is allowed
 or not, returning the type if it is NOT allowed.
 
-**Kind**: global function  
 
 | Param | Type | Default |
 | --- | --- | --- |
@@ -537,21 +511,39 @@ or not, returning the type if it is NOT allowed.
 
 <a name="isValidItemPile"></a>
 
-## isValidItemPile(document) ⇒ <code>boolean</code>
+## ItemPiles.API.isValidItemPile(document) ⇒ <code>boolean</code>
 Whether a given document is a valid pile or not
 
-**Kind**: global function  
 
-| Param |
-| --- |
-| document | 
+| Param | Type |
+| --- | --- |
+| document | <code>TokenDocument</code> \| <code>Actor</code> | 
+
+<a name="isItemPileEmpty"></a>
+
+## ItemPiles.API.isItemPileEmpty(target) ⇒ <code>boolean</code>
+Whether the item pile is empty
+
+
+| Param | Type |
+| --- | --- |
+| target | <code>TokenDocument</code> \| <code>Actor</code> | 
+
+<a name="getPileAttributes"></a>
+
+## ItemPiles.API.getPileAttributes(target) ⇒ <code>array</code>
+Returns the attributes this item pile can transfer
+
+
+| Param | Type |
+| --- | --- |
+| target | <code>TokenDocument</code> \| <code>Actor</code> | 
 
 <a name="refreshItemPile"></a>
 
-## refreshItemPile(target) ⇒ <code>Promise</code>
+## ItemPiles.API.refreshItemPile(target) ⇒ <code>Promise</code>
 Refreshes the target image of an item pile, ensuring it remains in sync
 
-**Kind**: global function  
 
 | Param |
 | --- |
@@ -559,10 +551,9 @@ Refreshes the target image of an item pile, ensuring it remains in sync
 
 <a name="rerenderItemPileInventoryApplication"></a>
 
-## rerenderItemPileInventoryApplication(inPileUuid, [deleted]) ⇒ <code>Promise</code>
+## ItemPiles.API.rerenderItemPileInventoryApplication(inPileUuid, [deleted]) ⇒ <code>Promise</code>
 Causes all connected users to re-render a specific pile's inventory UI
 
-**Kind**: global function  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
