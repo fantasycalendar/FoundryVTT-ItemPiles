@@ -248,7 +248,8 @@ export class ItemPileInventory extends FormApplication {
         const inputQuantity = element.find(".item-piles-quantity").val();
         const item = this.pile.actor.items.get(itemId);
         const maxQuantity = getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
-        await API.transferItems(this.pile, this.recipient, itemId, { quantity: Math.min(inputQuantity, maxQuantity) });
+        const quantity = Math.min(inputQuantity, maxQuantity);
+        await API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }]);
     }
 
     async takeAttribute(element){
@@ -257,13 +258,13 @@ export class ItemPileInventory extends FormApplication {
         const attribute = element.attr('data-attribute-path');
         const inputQuantity = element.find(".item-piles-quantity").val();
         const maxQuantity = getProperty(this.pile.actor.data, attribute) ?? 0;
-        await API.transferAttributes(this.pile, this.recipient, attribute, { quantity: Math.min(inputQuantity, maxQuantity) })
+        const quantity = Math.min(inputQuantity, maxQuantity);
+        await API.transferAttributes(this.pile, this.recipient, [{ [attribute]: quantity }]);
     }
 
     async _updateObject(event, formData) {
 
         if(event.submitter.value === "takeAll"){
-            debugger;
             return await API.transferEverything(this.pile, this.recipient);
         }
 

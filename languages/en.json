@@ -70,7 +70,7 @@
             "DeleteWhenEmptyYes": "Yes, delete when empty",
             "DeleteWhenEmptyNo": "No, don't delete when empty",
             "DisplayOne": "Display Single Item Image",
-            "DisplayOneExplanation": "If the pile is a single item, this sets the pile token's image to be the image of the item.",
+            "DisplayOneExplanation": "If the pile is made up of a single item, this sets the pile token's image to be the image of the item.",
             "OverrideSingleItemScale": "Override single item token scale",
             "SingleItemScale": "Single item token scale",
             "IsContainer": "Is Container",
