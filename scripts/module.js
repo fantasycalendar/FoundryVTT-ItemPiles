@@ -5,7 +5,6 @@ import API from "./api.js";
 import * as lib from "./lib/lib.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import { registerLibwrappers } from "./libwrapper.js";
-import { ItemPileAttributeEditor } from "./formapplications/itemPileAttributeEditor.js";
 import { HOOKS } from "./hooks.js";
 
 Hooks.once("init", () => {
@@ -24,13 +23,13 @@ Hooks.once("init", () => {
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
-    if(game.settings.get(CONSTANTS.MODULE_NAME, "debug")){
-        for(let hook of Object.values(HOOKS)){
-            if(typeof hook === "string"){
+    if (game.settings.get(CONSTANTS.MODULE_NAME, "debug")) {
+        for (let hook of Object.values(HOOKS)) {
+            if (typeof hook === "string") {
                 Hooks.on(hook, (...args) => lib.debug(hook, ...args));
                 lib.debug(hook)
-            }else{
-                for(let innerHook of Object.values(hook)){
+            } else {
+                for (let innerHook of Object.values(hook)) {
                     Hooks.on(innerHook, (...args) => lib.debug(innerHook, ...args));
                     lib.debug(innerHook)
                 }
@@ -45,7 +44,7 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("ready", () => {
-    if(!game.modules.get('lib-wrapper')?.active && game.user.isGM){
+    if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
         throw lib.custom_error("Item Piles requires the 'libWrapper' module. Please install and activate it.")
     }
     Hooks.callAll(HOOKS.READY);
@@ -54,13 +53,13 @@ Hooks.once("ready", () => {
 
 const module = {
 
-    async _pileAttributeChanged(actor, changes){
+    async _pileAttributeChanged(actor, changes) {
         const target = actor?.token ?? actor;
-        if(!API.isValidItemPile(target)) return;
+        if (!API.isValidItemPile(target)) return;
         const validProperty = API.DYNAMIC_ATTRIBUTES.find(attribute => {
             return hasProperty(changes, attribute.path);
         });
-        if(!validProperty) return;
+        if (!validProperty) return;
         await API._rerenderItemPileInventoryApplication(target.uuid);
         return API.refreshItemPile(target);
     },
@@ -68,9 +67,9 @@ const module = {
     _pileInventoryChanged: debounce(async (item) => {
         const target = item?.parent;
         if (!target) return;
-        if(!API.isValidItemPile(target)) return;
+        if (!API.isValidItemPile(target)) return;
         const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
-        if(deleted){
+        if (deleted) {
             return API.deleteItemPile(target);
         }
         await API._rerenderItemPileInventoryApplication(target.uuid);
@@ -78,19 +77,19 @@ const module = {
     }, 100),
 
     async _canvasReady(canvas) {
-        for(const token of canvas.tokens.placeables){
+        for (const token of canvas.tokens.placeables) {
             await API._initializeItemPile(token.document);
         }
     },
 
     async _createPile(doc) {
-        if(!API.isValidItemPile(doc)) return;
+        if (!API.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.CREATE, doc, API._getFreshFlags(doc));
         return API._initializeItemPile(doc);
     },
 
-    async _deletePile(doc){
-        if(!API.isValidItemPile(doc)) return;
+    async _deletePile(doc) {
+        if (!API.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.DELETE, doc);
         return API._rerenderItemPileInventoryApplication(doc.uuid, true);
     },

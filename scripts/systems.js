@@ -9,7 +9,7 @@ import dnd5e from "./systems/dnd5e.js";
  * FOLLOW THE CONVENTION IN THE D&D 5E SYSTEM FILE
  */
 export const SYSTEMS = {
-    get DATA(){
+    get DATA() {
         return {
             dnd5e,
             // ↓ ONLY ADD SYSTEMS HERE ↓

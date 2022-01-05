@@ -4,24 +4,12 @@ import { ItemPileAttributeEditor } from "./itemPileAttributeEditor.js";
 
 export class ItemPileConfig extends FormApplication {
 
-    static show(actor){
-        const document = actor?.token ?? actor;
-        for(let app of Object.values(ui.windows)){
-            if(app instanceof this && app.document === document){
-                return app.render(false, { focus: true });
-            }
-        }
-        return new ItemPileConfig(actor).render(true);
-    }
-
     constructor(actor) {
         super();
         this.document = actor?.token ?? actor;
         this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, this.document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME));
         this.attributeEditor = false;
     }
-
-    /* -------------------------------------------- */
 
     /** @inheritdoc */
     static get defaultOptions() {
@@ -31,13 +19,25 @@ export class ItemPileConfig extends FormApplication {
             width: 430,
             height: "auto",
             resizable: false,
-            tabs: [{navSelector: ".tabs", contentSelector: ".tab-body", initial: "mainsettings"}]
+            tabs: [{ navSelector: ".tabs", contentSelector: ".tab-body", initial: "mainsettings" }]
         });
     }
 
     get title() {
         return `${game.i18n.localize("ITEM-PILES.Defaults.Title")}: ${this.document.data.name}`
     }
+
+    static show(actor) {
+        const document = actor?.token ?? actor;
+        for (let app of Object.values(ui.windows)) {
+            if (app instanceof this && app.document === document) {
+                return app.render(false, { focus: true });
+            }
+        }
+        return new ItemPileConfig(actor).render(true);
+    }
+
+    /* -------------------------------------------- */
 
     async getData(options) {
         let data = super.getData(options);
@@ -48,7 +48,7 @@ export class ItemPileConfig extends FormApplication {
         return data;
     }
 
-    activateListeners(html){
+    activateListeners(html) {
         super.activateListeners(html);
         const self = this;
         const enabledCheckbox = html.find('input[name="enabled"]');
@@ -57,9 +57,9 @@ export class ItemPileConfig extends FormApplication {
         const containerCheckbox = html.find('input[name="isContainer"]');
         const overrideAttributesEnabledCheckbox = html.find('.item-pile-config-override-attributes-checkbox');
 
-        enabledCheckbox.change(function(){
+        enabledCheckbox.change(function () {
             let isEnabled = $(this).is(":checked");
-            html.find('input, button, select').not($(this)).each(function(){
+            html.find('input, button, select').not($(this)).each(function () {
                 $(this).prop('disabled', !isEnabled);
                 $(this).closest('.form-group').toggleClass("item-pile-disabled", !isEnabled);
             });
@@ -67,16 +67,16 @@ export class ItemPileConfig extends FormApplication {
 
         const slider = html.find("#scaleRange");
         const input = html.find("#scaleInput");
-        scaleCheckbox.change(function(){
+        scaleCheckbox.change(function () {
             let isDisabled = !$(this).is(":checked");
             slider.prop('disabled', isDisabled);
             input.prop('disabled', isDisabled);
             slider.parent().toggleClass("item-pile-disabled", isDisabled);
         }).change();
 
-        displayOneCheckbox.change(function(){
+        displayOneCheckbox.change(function () {
             let isDisabled = !$(this).is(":checked");
-            html.find('.item-pile-display-one-settings').children().each(function(){
+            html.find('.item-pile-display-one-settings').children().each(function () {
                 $(this).toggleClass("item-pile-disabled", isDisabled);
                 $(this).find('input, button').prop("disabled", isDisabled);
                 scaleCheckbox.change();
@@ -84,41 +84,41 @@ export class ItemPileConfig extends FormApplication {
         }).change();
 
         const containerSettings = html.find('.item-pile-container-settings');
-        containerCheckbox.change(function(){
+        containerCheckbox.change(function () {
             let isDisabled = !$(this).is(":checked");
-            containerSettings.children().each(function(){
+            containerSettings.children().each(function () {
                 $(this).toggleClass("item-pile-disabled", isDisabled);
                 $(this).find('input, button, select').prop("disabled", isDisabled);
             });
         }).change();
 
-        overrideAttributesEnabledCheckbox.change(function(){
+        overrideAttributesEnabledCheckbox.change(function () {
             let isChecked = $(this).is(":checked");
             html.find(".item-pile-config-configure-override-attributes")
                 .toggleClass("item-pile-disabled", !isChecked)
                 .prop("disabled", !isChecked);
-            if(isChecked){
+            if (isChecked) {
                 self.pileData.overrideAttributes = game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
             }
         }).change();
 
-        html.find(".item-pile-config-configure-override-attributes").click(function(){
+        html.find(".item-pile-config-configure-override-attributes").click(function () {
             self.showAttributeEditor();
         })
 
-        slider.on("input", function(){
+        slider.on("input", function () {
             input.val($(this).val());
         })
-        input.change(function(){
+        input.change(function () {
             slider.slider('value', $(this).val());
         })
     }
 
-    async showAttributeEditor(){
-        if(this.attributeEditor){
-            return this.attributeEditor.render(false, {focus: true});
+    async showAttributeEditor() {
+        if (this.attributeEditor) {
+            return this.attributeEditor.render(false, { focus: true });
         }
-        const [ promise, UI ] = ItemPileAttributeEditor.showForPile(this.pileData.overrideAttributes);
+        const [promise, UI] = ItemPileAttributeEditor.showForPile(this.pileData.overrideAttributes);
         this.attributeEditor = UI;
         promise.then(newSettings => {
             this.attributeEditor = false;
@@ -134,7 +134,7 @@ export class ItemPileConfig extends FormApplication {
 
         data.overrideAttributes = checked ? this.pileData.overrideAttributes : false;
 
-        if(!formData.enabled){
+        if (!formData.enabled) {
             setTimeout(canvas.tokens.hud.render(true), 100);
         }
 
@@ -148,9 +148,9 @@ export class ItemPileConfig extends FormApplication {
 
     }
 
-    async close(...args){
+    async close(...args) {
         super.close(...args);
-        if(this.attributeEditor){
+        if (this.attributeEditor) {
             this.attributeEditor.close();
         }
     }

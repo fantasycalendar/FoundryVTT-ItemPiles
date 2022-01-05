@@ -4,7 +4,6 @@ import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropDialog from "./formapplications/dropDialog.js";
 import { HOOKS } from "./hooks.js";
-import { is_real_number } from "./lib/lib.js";
 
 export default class API {
 
@@ -13,8 +12,44 @@ export default class API {
      *
      * @returns {string}
      */
-    static get ACTOR_CLASS_TYPE(){
+    static get ACTOR_CLASS_TYPE() {
         return game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType");
+    }
+
+    /**
+     * The attributes used to track dynamic attributes in this system
+     *
+     * @returns {array}
+     */
+    static get DYNAMIC_ATTRIBUTES() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
+    }
+
+    /**
+     * The attribute used to track the quantity of items in this system
+     *
+     * @returns {string}
+     */
+    static get ITEM_QUANTITY_ATTRIBUTE() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemQuantityAttribute");
+    }
+
+    /**
+     * The attribute used to track the item type in this system
+     *
+     * @returns {string}
+     */
+    static get ITEM_TYPE_ATTRIBUTE() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeAttribute");
+    }
+
+    /**
+     * The filters for item types eligible for interaction within this system
+     *
+     * @returns {array}
+     */
+    static get ITEM_TYPE_FILTERS() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeFilters").split(',').map(str => str.trim());
     }
 
     /**
@@ -24,19 +59,10 @@ export default class API {
      * @returns {Promise}
      */
     static async setActorClassType(inClassType) {
-        if(typeof inClassType !== "string"){
+        if (typeof inClassType !== "string") {
             throw lib.custom_error("setActorTypeClass | inClassType must be of type string");
         }
         return game.settings.set(CONSTANTS.MODULE_NAME, "actorClassType", inClassType);
-    }
-
-    /**
-     * The attributes used to track dynamic attributes in this system
-     *
-     * @returns {array}
-     */
-    static get DYNAMIC_ATTRIBUTES(){
-        return game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
     }
 
     /**
@@ -46,7 +72,7 @@ export default class API {
      * @returns {Promise}
      */
     static async setDynamicAttributes(inAttributes) {
-        if(!Array.isArray(inAttributes)) {
+        if (!Array.isArray(inAttributes)) {
             throw lib.custom_error("setDynamicAttributes | inAttributes must be of type array");
         }
         inAttributes.forEach(attribute => {
@@ -67,34 +93,16 @@ export default class API {
     }
 
     /**
-     * The attribute used to track the quantity of items in this system
-     *
-     * @returns {string}
-     */
-    static get ITEM_QUANTITY_ATTRIBUTE(){
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemQuantityAttribute");
-    }
-
-    /**
      * Sets the inAttribute used to track the quantity of items in this system
      *
      * @param {string} inAttribute
      * @returns {Promise}
      */
     static async setItemQuantityAttribute(inAttribute) {
-        if(typeof inAttribute !== "string"){
+        if (typeof inAttribute !== "string") {
             throw lib.custom_error("setItemQuantityAttribute | inAttribute must be of type string");
         }
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemQuantityAttribute", inAttribute);
-    }
-
-    /**
-     * The attribute used to track the item type in this system
-     *
-     * @returns {string}
-     */
-    static get ITEM_TYPE_ATTRIBUTE(){
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeAttribute");
     }
 
     /**
@@ -104,19 +112,10 @@ export default class API {
      * @returns {string}
      */
     static async setItemTypeAttribute(inAttribute) {
-        if(typeof inAttribute !== "string"){
+        if (typeof inAttribute !== "string") {
             throw lib.custom_error("setItemTypeAttribute | inAttribute must be of type string");
         }
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemTypeAttribute", inAttribute);
-    }
-
-    /**
-     * The filters for item types eligible for interaction within this system
-     *
-     * @returns {array}
-     */
-    static get ITEM_TYPE_FILTERS(){
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeFilters").split(',').map(str => str.trim());
     }
 
     /**
@@ -126,12 +125,12 @@ export default class API {
      * @returns {Promise}
      */
     static async setItemTypeFilters(inFilters) {
-        if(!Array.isArray(inFilters)){
-            if(typeof inFilters !== "string"){
+        if (!Array.isArray(inFilters)) {
+            if (typeof inFilters !== "string") {
                 throw lib.custom_error("setItemTypeFilters | inFilters must be of type string or array");
             }
             inFilters = inFilters.split(',')
-        }else{
+        } else {
             inFilters.forEach(filter => {
                 if (typeof filter !== "string") {
                     throw lib.custom_error("setItemTypeFilters | each entry in inFilters must be of type string");
@@ -150,21 +149,21 @@ export default class API {
      *
      * @returns {Promise}
      */
-    static async createItemPile(position, { items = false, pileActorName = false }={}) {
+    static async createItemPile(position, { items = false, pileActorName = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.PILE.PRE_CREATE, position, pileActorName);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
-        if(pileActorName){
+        if (pileActorName) {
             const pileActor = game.actors.getName(pileActorName);
-            if(!pileActor){
+            if (!pileActor) {
                 throw lib.custom_error(`There is no actor of the name "${pileActorName}"`, true);
-            }else if(!API.isValidItemPile(pileActor)){
+            } else if (!API.isValidItemPile(pileActor)) {
                 throw lib.custom_error(`The actor of name "${pileActorName}" is not a valid item pile actor.`, true);
             }
         }
 
-        if(items){
+        if (items) {
             items = items.map(item => {
                 return item instanceof Item
                     ? item.toObject()
@@ -182,7 +181,7 @@ export default class API {
      * @returns {Promise<string>}
      * @private
      */
-    static async _createItemPile(position, { pileActorName = false, items= false }={}){
+    static async _createItemPile(position, { pileActorName = false, items = false } = {}) {
 
         let pileActor;
 
@@ -190,7 +189,7 @@ export default class API {
 
             pileActor = game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID") ? game.actors.get(game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID")) : false;
 
-            if(!pileActor) {
+            if (!pileActor) {
 
                 lib.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
@@ -218,7 +217,7 @@ export default class API {
 
             }
 
-        }else{
+        } else {
 
             pileActor = game.actors.getName(pileActorName);
 
@@ -226,9 +225,9 @@ export default class API {
 
         const overrideData = { ...position };
 
-        if(!pileActor.data.token.actorLink){
+        if (!pileActor.data.token.actorLink) {
 
-            overrideData['actorData'] = {"items": items || {} };
+            overrideData['actorData'] = { "items": items || {} };
 
             const pileConfig = API._getFreshFlags(pileActor);
 
@@ -246,7 +245,7 @@ export default class API {
 
         const tokenData = await pileActor.getTokenData(overrideData);
 
-        const [ tokenDocument ] = await canvas.scene.createEmbeddedDocuments("Token", [ tokenData ]);
+        const [tokenDocument] = await canvas.scene.createEmbeddedDocuments("Token", [tokenData]);
 
         return lib.getUuid(tokenDocument);
 
@@ -262,17 +261,17 @@ export default class API {
      *
      * @returns {Promise<object>}                       An object containing a key value pair for each item added to the target, key being item ID, value being quantities added
      */
-    static async transferItems(source, target, items, { itemTypeFilters = false }={}) {
+    static async transferItems(source, target, items, { itemTypeFilters = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, items);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
-        if(!sourceUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid source`, true)
+        if (!sourceUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid source`, true)
 
-        if(itemTypeFilters){
+        if (itemTypeFilters) {
             itemTypeFilters.forEach(filter => {
-                if(typeof filter !== "string") throw lib.custom_error(`TransferItems | entries in the itemTypeFilters must be of type string`);
+                if (typeof filter !== "string") throw lib.custom_error(`TransferItems | entries in the itemTypeFilters must be of type string`);
             })
         }
 
@@ -282,17 +281,17 @@ export default class API {
 
         items.forEach(item => {
             const actorItem = sourceActorItems.get(item._id);
-            if(!actorItem){
+            if (!actorItem) {
                 throw lib.custom_error(`TransferItems | Could not find item with id "${item._id}" on source "${sourceUuid}"`, true)
             }
             const disallowedType = API.isItemTypeDisallowed(actorItem, itemTypeFilters);
-            if(disallowedType){
+            if (disallowedType) {
                 throw lib.custom_error(`TransferItems | Could not transfer item of type "${disallowedType}"`, true)
             }
         });
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid target`, true)
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ITEMS, sourceUuid, targetUuid, items, { itemTypeFilters });
 
@@ -301,13 +300,13 @@ export default class API {
     /**
      * @private
      */
-    static async _transferItems(sourceUuid, targetUuid, items, { itemTypeFilters = false, isEverything = false }={}) {
+    static async _transferItems(sourceUuid, targetUuid, items, { itemTypeFilters = false, isEverything = false } = {}) {
 
         const itemsRemoved = await API._removeItems(sourceUuid, items, { itemTypeFilters, isTransfer: true });
 
         const itemsAdded = await API._addItems(targetUuid, itemsRemoved, { itemTypeFilters, isTransfer: true });
 
-        if(!isEverything){
+        if (!isEverything) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemsAdded);
 
@@ -325,7 +324,7 @@ export default class API {
             await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
             await API.rerenderItemPileInventoryApplication(targetUuid);
 
-            if(deleted){
+            if (deleted) {
                 await API._deleteItemPile(sourceUuid);
             }
 
@@ -344,17 +343,17 @@ export default class API {
      *
      * @returns {Promise<array>}                        An array containing the objects of each item that was removed, with their quantities set to the number removed
      */
-    static async removeItems(target, items, { itemTypeFilters = false }={}){
+    static async removeItems(target, items, { itemTypeFilters = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, items);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
+        if (!targetUuid) throw lib.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
 
-        if(itemTypeFilters){
+        if (itemTypeFilters) {
             itemTypeFilters.forEach(filter => {
-                if(typeof filter !== "string") throw lib.custom_error(`RemoveItems | entries in the itemTypeFilters must be of type string`);
+                if (typeof filter !== "string") throw lib.custom_error(`RemoveItems | entries in the itemTypeFilters must be of type string`);
             })
         }
 
@@ -365,11 +364,11 @@ export default class API {
         items.forEach(item => {
             const itemId = typeof item === "string" ? item : item._id;
             const actorItem = targetActorItems.get(itemId);
-            if(!actorItem){
+            if (!actorItem) {
                 throw lib.custom_error(`RemoveItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
             }
             const disallowedType = API.isItemTypeDisallowed(actorItem, itemTypeFilters);
-            if(disallowedType){
+            if (disallowedType) {
                 throw lib.custom_error(`RemoveItems | Could not transfer item of type "${disallowedType}"`, true)
             }
         });
@@ -380,7 +379,7 @@ export default class API {
     /**
      * @private
      */
-    static async _removeItems(targetUuid, items, { isTransfer = false }={}) {
+    static async _removeItems(targetUuid, items, { isTransfer = false } = {}) {
 
         const target = await fromUuid(targetUuid);
         const targetActor = target instanceof TokenDocument
@@ -390,7 +389,7 @@ export default class API {
         const itemsRemoved = [];
         const itemsToUpdate = [];
         const itemsToDelete = [];
-        for(const item of items) {
+        for (const item of items) {
 
             const itemId = typeof item === "string" ? item : item._id;
 
@@ -420,7 +419,7 @@ export default class API {
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.REMOVE, targetUuid, itemsRemoved);
 
-        if(!isTransfer){
+        if (!isTransfer) {
 
             const macroData = {
                 action: "removeItems",
@@ -434,7 +433,7 @@ export default class API {
 
             await API.rerenderItemPileInventoryApplication(targetUuid, deleted);
 
-            if(deleted){
+            if (deleted) {
                 await API._deleteItemPile(targetUuid);
             }
 
@@ -453,23 +452,23 @@ export default class API {
      *
      * @returns {Promise<array>}                        An array containing each item added as an object, with their quantities updated to match the new amounts
      */
-    static async addItems(target, items, { itemTypeFilters = false }={}){
+    static async addItems(target, items, { itemTypeFilters = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, items);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
 
-        if(itemTypeFilters){
+        if (itemTypeFilters) {
             itemTypeFilters.forEach(filter => {
-                if(typeof filter !== "string") throw lib.custom_error(`AddItem | entries in the itemTypeFilters must be of type string`);
+                if (typeof filter !== "string") throw lib.custom_error(`AddItem | entries in the itemTypeFilters must be of type string`);
             })
         }
 
-        for(const index in items) {
+        for (const index in items) {
             const item = items[index];
-            if(item instanceof Item){
+            if (item instanceof Item) {
                 items[index] = item.toObject();
             }
             const disallowedType = API.isItemTypeDisallowed(item, itemTypeFilters);
@@ -484,7 +483,7 @@ export default class API {
     /**
      * @private
      */
-    static async _addItems(targetUuid, items, { isTransfer = false }={}){
+    static async _addItems(targetUuid, items, { isTransfer = false } = {}) {
 
         const target = await fromUuid(targetUuid);
         const targetActor = target instanceof TokenDocument
@@ -496,7 +495,7 @@ export default class API {
         const itemsAdded = [];
         const itemsToCreate = [];
         const itemsToUpdate = [];
-        for(const itemData of items){
+        for (const itemData of items) {
 
             const item = lib.getSimilarItem(targetActorItems, itemData._id, itemData.name, itemData.type);
 
@@ -504,7 +503,7 @@ export default class API {
 
             const itemAdded = item ? item.toObject() : foundry.utils.duplicate(itemData);
 
-            if(item){
+            if (item) {
                 const currentQuantity = getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE);
                 const newQuantity = currentQuantity + incomingQuantity;
                 itemsToUpdate.push({
@@ -515,7 +514,7 @@ export default class API {
                 const itemAdded = item.toObject();
                 setProperty(itemAdded, API.ITEM_QUANTITY_ATTRIBUTE, newQuantity)
                 itemsAdded.push(itemAdded);
-            }else{
+            } else {
                 setProperty(itemAdded, API.ITEM_QUANTITY_ATTRIBUTE, incomingQuantity)
                 itemsToCreate.push(itemData);
             }
@@ -529,7 +528,7 @@ export default class API {
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.ADD, targetUuid, itemsAdded);
 
-        if(!isTransfer){
+        if (!isTransfer) {
 
             const macroData = {
                 action: "addItems",
@@ -556,20 +555,20 @@ export default class API {
      *
      * @returns {Promise<array>}                        An array containing all of the items that were transferred to the target
      */
-    static async transferAllItems(source, target, { itemTypeFilters = false }={}){
+    static async transferAllItems(source, target, { itemTypeFilters = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, source, target, itemTypeFilters);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
-        if(!sourceUuid) throw lib.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid source`, true)
+        if (!sourceUuid) throw lib.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid source`, true)
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid target`, true)
 
-        if(itemTypeFilters){
+        if (itemTypeFilters) {
             itemTypeFilters.forEach(filter => {
-                if(typeof filter !== "string") throw lib.custom_error(`RevertFromItemPile | entries in the itemTypeFilters must be of type string`);
+                if (typeof filter !== "string") throw lib.custom_error(`RevertFromItemPile | entries in the itemTypeFilters must be of type string`);
             })
         }
 
@@ -586,19 +585,19 @@ export default class API {
     /**
      * @private
      */
-    static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false, isEverything = false }={}) {
+    static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false, isEverything = false } = {}) {
 
         const source = await fromUuid(sourceUuid);
-        if(!source) throw lib.custom_error(`TransferAllItems | Could not find source with UUID "${sourceUuid}"`, true)
+        if (!source) throw lib.custom_error(`TransferAllItems | Could not find source with UUID "${sourceUuid}"`, true)
 
         const target = await fromUuid(targetUuid);
-        if(!target) throw lib.custom_error(`TransferAllItems | Could not find target with UUID "${targetUuid}"`, true)
+        if (!target) throw lib.custom_error(`TransferAllItems | Could not find target with UUID "${targetUuid}"`, true)
 
-        if(!Array.isArray(itemTypeFilters)){
+        if (!Array.isArray(itemTypeFilters)) {
             itemTypeFilters = API.ITEM_TYPE_FILTERS;
-        }else{
+        } else {
             itemTypeFilters.forEach(filter => {
-                if(typeof filter !== "string") throw lib.custom_error(`TransferAllItems | entries in the itemTypeFilters must be of type string`);
+                if (typeof filter !== "string") throw lib.custom_error(`TransferAllItems | entries in the itemTypeFilters must be of type string`);
             })
         }
 
@@ -611,7 +610,7 @@ export default class API {
         const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, { itemTypeFilters, isTransfer: true });
         const itemsAdded = await API._addItems(targetUuid, itemsRemoved, { itemTypeFilters, isTransfer: true });
 
-        if(!isEverything) {
+        if (!isEverything) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, HOOKS.ITEM.TRANSFER_ALL, sourceUuid, targetUuid, itemsAdded);
 
@@ -629,7 +628,7 @@ export default class API {
             await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
             await API.rerenderItemPileInventoryApplication(targetUuid);
 
-            if(deleted){
+            if (deleted) {
                 await API._deleteItemPile(sourceUuid);
             }
 
@@ -647,16 +646,16 @@ export default class API {
      *
      * @returns {Promise<object>}                   An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
-    static async transferAttributes(source, target, attributes){
+    static async transferAttributes(source, target, attributes) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, source, target, attributes);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
-        if(!sourceUuid) throw lib.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid source`, true)
+        if (!sourceUuid) throw lib.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid source`, true)
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid target`, true)
 
         const sourceActor = source instanceof TokenDocument
             ? source.actor
@@ -666,28 +665,28 @@ export default class API {
             ? target.actor
             : target;
 
-        if(Array.isArray(attributes)) {
+        if (Array.isArray(attributes)) {
             attributes.forEach(attribute => {
-                if(typeof attribute !== "string"){
+                if (typeof attribute !== "string") {
                     throw lib.custom_error(`TransferAttributes | Each attribute in the array must be of type string`, true)
                 }
-                if(!hasProperty(sourceActor.data, attribute)){
+                if (!hasProperty(sourceActor.data, attribute)) {
                     throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
                 }
-                if(!hasProperty(targetActor.data, attribute)){
+                if (!hasProperty(targetActor.data, attribute)) {
                     throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
             });
-        }else{
+        } else {
             Object.entries(attributes).forEach(entry => {
                 const [attribute, quantity] = entry;
-                if(!hasProperty(sourceActor.data, attribute)){
+                if (!hasProperty(sourceActor.data, attribute)) {
                     throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
                 }
-                if(!hasProperty(targetActor.data, attribute)){
+                if (!hasProperty(targetActor.data, attribute)) {
                     throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
-                if(!lib.is_real_number(quantity) && quantity > 0){
+                if (!lib.is_real_number(quantity) && quantity > 0) {
                     throw lib.custom_error(`TransferAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
                 }
             });
@@ -700,13 +699,13 @@ export default class API {
     /**
      * @private
      */
-    static async _transferAttributes(sourceUuid, targetUuid, attributes, {  isEverything = false }={}) {
+    static async _transferAttributes(sourceUuid, targetUuid, attributes, { isEverything = false } = {}) {
 
         const { attributesRemoved } = await API._removeAttributes(sourceUuid, attributes, { isTransfer: true });
 
         const { attributesAdded } = await API._addAttributes(targetUuid, attributesRemoved, { isTransfer: true });
 
-        if(!isEverything) {
+        if (!isEverything) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributesAdded);
 
@@ -723,7 +722,7 @@ export default class API {
             await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
             await API.rerenderItemPileInventoryApplication(targetUuid);
 
-            if(deleted){
+            if (deleted) {
                 await API._deleteItemPile(sourceUuid);
             }
 
@@ -741,34 +740,34 @@ export default class API {
      *
      * @returns {Promise<object>}           Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      */
-    static async removeAttributes(target, attributes){
+    static async removeAttributes(target, attributes) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, target, attributes);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`RemoveAttributes | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`RemoveAttributes | Could not determine the UUID, please provide a valid target`, true)
 
         const targetActor = target instanceof TokenDocument
             ? target.actor
             : target;
 
-        if(Array.isArray(attributes)) {
+        if (Array.isArray(attributes)) {
             attributes.forEach(attribute => {
-                if(typeof attribute !== "string"){
+                if (typeof attribute !== "string") {
                     throw lib.custom_error(`RemoveAttributes | Each attribute in the array must be of type string`, true)
                 }
-                if(!hasProperty(targetActor.data, attribute)){
+                if (!hasProperty(targetActor.data, attribute)) {
                     throw lib.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
             });
-        }else{
+        } else {
             Object.entries(attributes).forEach(entry => {
                 const [attribute, quantity] = entry;
-                if(!hasProperty(targetActor.data, attribute)){
+                if (!hasProperty(targetActor.data, attribute)) {
                     throw lib.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
-                if(!lib.is_real_number(quantity) && quantity > 0){
+                if (!lib.is_real_number(quantity) && quantity > 0) {
                     throw lib.custom_error(`RemoveAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
                 }
             });
@@ -781,7 +780,7 @@ export default class API {
     /**
      * @private
      */
-    static async _removeAttributes(targetUuid, attributes, { isTransfer = false }={}){
+    static async _removeAttributes(targetUuid, attributes, { isTransfer = false } = {}) {
 
         const target = await fromUuid(targetUuid);
         const targetActor = target instanceof TokenDocument
@@ -791,13 +790,13 @@ export default class API {
         const updates = {};
         const attributesRemoved = {};
 
-        if(Array.isArray(attributes)) {
+        if (Array.isArray(attributes)) {
             attributes = Object.fromEntries(attributes.map(attribute => {
                 return [attribute, getProperty(targetActor.data, attribute)];
             }))
         }
 
-        for(const [attribute, quantityToRemove] of Object.entries(attributes)){
+        for (const [attribute, quantityToRemove] of Object.entries(attributes)) {
 
             const currentQuantity = getProperty(targetActor.data, attribute);
             const newQuantity = Math.max(0, currentQuantity - quantityToRemove);
@@ -812,7 +811,7 @@ export default class API {
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.REMOVE, targetUuid, attributesRemoved);
 
-        if(!isTransfer) {
+        if (!isTransfer) {
 
             const macroData = {
                 action: "removeAttributes",
@@ -824,7 +823,7 @@ export default class API {
             const deleted = await API._checkItemPileShouldBeDeleted(targetUuid);
             await API.rerenderItemPileInventoryApplication(targetUuid, deleted);
 
-            if(deleted){
+            if (deleted) {
                 await API._deleteItemPile(targetUuid);
             }
         }
@@ -842,13 +841,13 @@ export default class API {
      * @returns {Promise<object>}                   Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      *
      */
-    static async addAttributes(target, attributes){
+    static async addAttributes(target, attributes) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, target, attributes);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`AddAttributes | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`AddAttributes | Could not determine the UUID, please provide a valid target`, true)
 
         const targetActor = target instanceof TokenDocument
             ? target.actor
@@ -856,10 +855,10 @@ export default class API {
 
         Object.entries(attributes).forEach(entry => {
             const [attribute, quantity] = entry;
-            if(!hasProperty(targetActor.data, attribute)){
+            if (!hasProperty(targetActor.data, attribute)) {
                 throw lib.custom_error(`AddAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
             }
-            if(!lib.is_real_number(quantity) && quantity > 0){
+            if (!lib.is_real_number(quantity) && quantity > 0) {
                 throw lib.custom_error(`AddAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
             }
         });
@@ -871,7 +870,7 @@ export default class API {
     /**
      * @private
      */
-    static async _addAttributes(targetUuid, attributes, { isTransfer = false }={}){
+    static async _addAttributes(targetUuid, attributes, { isTransfer = false } = {}) {
 
         const target = await fromUuid(targetUuid);
         const targetActor = target instanceof TokenDocument
@@ -881,7 +880,7 @@ export default class API {
         const updates = {};
         const attributesAdded = {};
 
-        for(const [attribute, quantityToAdd] of Object.entries(attributes)){
+        for (const [attribute, quantityToAdd] of Object.entries(attributes)) {
 
             const currentQuantity = getProperty(targetActor.data, attribute);
 
@@ -894,7 +893,7 @@ export default class API {
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.ADD, targetUuid, attributesAdded);
 
-        if(isTransfer) {
+        if (isTransfer) {
 
             const macroData = {
                 action: "addAttributes",
@@ -919,16 +918,16 @@ export default class API {
      *
      * @returns {Promise<object>}                   An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
-    static async transferAllAttributes(source, target){
+    static async transferAllAttributes(source, target) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, source, target);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
-        if(!sourceUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
+        if (!sourceUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
+        if (!targetUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ATTRIBUTES, sourceUuid, targetUuid);
 
@@ -937,7 +936,7 @@ export default class API {
     /**
      * @private
      */
-    static async _transferAllAttributes(sourceUuid, targetUuid, { isEverything = false }={}) {
+    static async _transferAllAttributes(sourceUuid, targetUuid, { isEverything = false } = {}) {
 
         const source = await fromUuid(sourceUuid);
 
@@ -962,7 +961,7 @@ export default class API {
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER_ALL, sourceUuid, targetUuid, attributesAdded);
 
-        if(!isEverything) {
+        if (!isEverything) {
 
             const macroData = {
                 action: "transferAllAttributes",
@@ -976,7 +975,7 @@ export default class API {
             const deleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
             await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
 
-            if(deleted){
+            if (deleted) {
                 await API._deleteItemPile(sourceUuid);
             }
 
@@ -995,20 +994,20 @@ export default class API {
      *
      * @returns {Promise<object>}                       An object containing all items and attributes transferred to the target
      */
-    static async transferEverything(source, target, { itemTypeFilters = false }={}){
+    static async transferEverything(source, target, { itemTypeFilters = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, source, target, itemTypeFilters);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
-        if(!sourceUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid source`, true)
+        if (!sourceUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid source`, true)
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid target`, true)
 
-        if(itemTypeFilters){
+        if (itemTypeFilters) {
             itemTypeFilters.forEach(filter => {
-                if(typeof filter !== "string") throw lib.custom_error(`TransferEverything | entries in the itemTypeFilters must be of type string`);
+                if (typeof filter !== "string") throw lib.custom_error(`TransferEverything | entries in the itemTypeFilters must be of type string`);
             })
         }
 
@@ -1019,9 +1018,12 @@ export default class API {
     /**
      * @private
      */
-    static async _transferEverything(sourceUuid, targetUuid, { itemTypeFilters = false }={}){
+    static async _transferEverything(sourceUuid, targetUuid, { itemTypeFilters = false } = {}) {
 
-        const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, { itemTypeFilters, isEverything: true });
+        const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, {
+            itemTypeFilters,
+            isEverything: true
+        });
         const attributesTransferred = await API._transferAllAttributes(sourceUuid, targetUuid, { isEverything: true });
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemsTransferred, attributesTransferred);
@@ -1040,7 +1042,7 @@ export default class API {
         await API.rerenderItemPileInventoryApplication(sourceUuid, deleted);
         await API.rerenderItemPileInventoryApplication(targetUuid);
 
-        if(deleted){
+        if (deleted) {
             await API._deleteItemPile(sourceUuid);
         }
 
@@ -1060,18 +1062,18 @@ export default class API {
      *
      * @return {Promise<string>}                The uuid of the target after it was turned into an item pile
      */
-    static async turnTokenIntoItemPile(target, { pileSettings = {}, tokenSettings = {} }={}) {
+    static async turnTokenIntoItemPile(target, { pileSettings = {}, tokenSettings = {} } = {}) {
         const hookResult = Hooks.call(HOOKS.PILE.PRE_TURN_INTO, target, pileSettings, tokenSettings);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`TurnIntoItemPile | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`TurnIntoItemPile | Could not determine the UUID, please provide a valid target`, true)
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TURN_INTO_PILE, targetUuid, pileSettings, tokenSettings);
     }
 
     /**
      * @private
      */
-    static async _turnTokenIntoItemPile(targetUuid, pileSettings={}, tokenSettings={}) {
+    static async _turnTokenIntoItemPile(targetUuid, pileSettings = {}, tokenSettings = {}) {
 
         const target = await fromUuid(targetUuid);
 
@@ -1097,11 +1099,11 @@ export default class API {
      *
      * @return {Promise<string>}                The uuid of the target after it was reverted from an item pile
      */
-    static async revertTokenFromItemPile(target, { tokenSettings={} }={}) {
+    static async revertTokenFromItemPile(target, { tokenSettings = {} } = {}) {
         const hookResult = Hooks.call(HOOKS.PILE.PRE_REVERT_FROM, target, tokenSettings);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`RevertFromItemPile | Could not determine the UUID, please provide a valid target`, true)
+        if (!targetUuid) throw lib.custom_error(`RevertFromItemPile | Could not determine the UUID, please provide a valid target`, true)
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REVERT_FROM_PILE, targetUuid, tokenSettings);
     }
 
@@ -1120,7 +1122,7 @@ export default class API {
 
         setTimeout(API.rerenderTokenHud, 100);
 
-        if(target instanceof TokenDocument){
+        if (target instanceof TokenDocument) {
             await API.rerenderItemPileInventoryApplication(targetUuid);
         }
 
@@ -1135,15 +1137,15 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async rerenderTokenHud(){
+    static async rerenderTokenHud() {
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_TOKEN_HUD);
     }
 
     /**
      * @private
      */
-    static async _rerenderTokenHud(){
-        if(!canvas.tokens.hud.rendered) return;
+    static async _rerenderTokenHud() {
+        if (!canvas.tokens.hud.rendered) return;
         await canvas.tokens.hud.render(true)
         return true;
     }
@@ -1156,19 +1158,19 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async openItemPile(target, interactingToken = false){
+    static async openItemPile(target, interactingToken = false) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
+        if (!data?.enabled || !data?.isContainer) return false;
         const wasLocked = data.locked;
         data.closed = false;
         data.locked = false;
-        if(wasLocked){
+        if (wasLocked) {
             const hookResult = Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
-            if(hookResult === false) return;
+            if (hookResult === false) return;
         }
         const hookResult = Hooks.call(HOOKS.PILE.PRE_OPEN, target, data, interactingToken);
-        if(hookResult === false) return;
-        if(data.openSound){
+        if (hookResult === false) return;
+        if (data.openSound) {
             AudioHelper.play({ src: data.openSound })
         }
         return API.updateItemPile(target, data, { interactingToken });
@@ -1182,13 +1184,13 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async closeItemPile(target, interactingToken = false){
+    static async closeItemPile(target, interactingToken = false) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
+        if (!data?.enabled || !data?.isContainer) return false;
         data.closed = true;
         const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, target, data, interactingToken);
-        if(hookResult === false) return;
-        if(data.closeSound){
+        if (hookResult === false) return;
+        if (data.closeSound) {
             AudioHelper.play({ src: data.closeSound })
         }
         return API.updateItemPile(target, data, interactingToken);
@@ -1202,12 +1204,12 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async toggleItemPileClosed(target, interactingToken = false){
+    static async toggleItemPileClosed(target, interactingToken = false) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
-        if(data.closed){
+        if (!data?.enabled || !data?.isContainer) return false;
+        if (data.closed) {
             await API.openItemPile(target, interactingToken);
-        }else{
+        } else {
             await API.closeItemPile(target, interactingToken);
         }
         return !data.closed;
@@ -1221,19 +1223,19 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async lockItemPile(target, interactingToken = false){
+    static async lockItemPile(target, interactingToken = false) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
+        if (!data?.enabled || !data?.isContainer) return false;
         const wasClosed = data.closed;
         data.closed = true;
         data.locked = true;
-        if(!wasClosed){
+        if (!wasClosed) {
             const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, target, data, interactingToken);
-            if(hookResult === false) return;
+            if (hookResult === false) return;
         }
         const hookResult = Hooks.call(HOOKS.PILE.PRE_LOCK, target, data, interactingToken);
-        if(hookResult === false) return;
-        if(data.closeSound && !wasClosed){
+        if (hookResult === false) return;
+        if (data.closeSound && !wasClosed) {
             AudioHelper.play({ src: data.closeSound })
         }
         return API.updateItemPile(target, data, interactingToken);
@@ -1247,9 +1249,9 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async unlockItemPile(target, interactingToken = false){
+    static async unlockItemPile(target, interactingToken = false) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
+        if (!data?.enabled || !data?.isContainer) return false;
         data.locked = false;
         Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
         return API.updateItemPile(target, data, interactingToken);
@@ -1263,10 +1265,10 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async toggleItemPileLocked(target, interactingToken = false){
+    static async toggleItemPileLocked(target, interactingToken = false) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
-        if(data.locked){
+        if (!data?.enabled || !data?.isContainer) return false;
+        if (data.locked) {
             return API.unlockItemPile(target, interactingToken);
         }
         return API.lockItemPile(target, interactingToken);
@@ -1279,10 +1281,10 @@ export default class API {
      *
      * @return {Promise<boolean>}
      */
-    static async rattleItemPile(target){
+    static async rattleItemPile(target) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
-        if(data.locked && data.lockedSound){
+        if (!data?.enabled || !data?.isContainer) return false;
+        if (data.locked && data.lockedSound) {
             AudioHelper.play({ src: data.lockedSound })
         }
         return true;
@@ -1295,9 +1297,9 @@ export default class API {
      *
      * @return {boolean}
      */
-    static isItemPileLocked(target){
+    static isItemPileLocked(target) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
+        if (!data?.enabled || !data?.isContainer) return false;
         return data.locked;
     }
 
@@ -1308,9 +1310,9 @@ export default class API {
      *
      * @return {boolean}
      */
-    static isItemPileClosed(target){
+    static isItemPileClosed(target) {
         const data = API._getFreshFlags(target);
-        if(!data?.enabled || !data?.isContainer) return false;
+        if (!data?.enabled || !data?.isContainer) return false;
         return data.closed;
     }
 
@@ -1321,7 +1323,7 @@ export default class API {
      *
      * @return {boolean}
      */
-    static isItemPileContainer(target){
+    static isItemPileContainer(target) {
         const data = API._getFreshFlags(target);
         return data?.enabled && data?.isContainer;
     }
@@ -1336,28 +1338,31 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async updateItemPile(target, newData, { interactingToken = false, tokenSettings = false }={}){
+    static async updateItemPile(target, newData, { interactingToken = false, tokenSettings = false } = {}) {
 
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
+        if (!targetUuid) throw lib.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
 
         const interactingTokenUuid = interactingToken ? lib.getUuid(interactingToken) : false;
-        if(interactingToken && !interactingTokenUuid) throw lib.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
+        if (interactingToken && !interactingTokenUuid) throw lib.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
 
         const hookResult = Hooks.call(HOOKS.PILE.PRE_UPDATE, target, newData, interactingToken, tokenSettings);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, targetUuid, newData, { interactingTokenUuid, tokenSettings })
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.UPDATE_PILE, targetUuid, newData, {
+            interactingTokenUuid,
+            tokenSettings
+        })
     }
 
     /**
      * @private
      */
-    static async _updateItemPile(targetUuid, newData, { interactingTokenUuid = false, tokenSettings = false}={}){
+    static async _updateItemPile(targetUuid, newData, { interactingTokenUuid = false, tokenSettings = false } = {}) {
 
         const deleted = await API._checkItemPileShouldBeDeleted(targetUuid);
 
-        if(deleted) return false;
+        if (deleted) return false;
 
         const target = await fromUuid(targetUuid);
 
@@ -1374,18 +1379,18 @@ export default class API {
 
         await lib.wait(25);
 
-        if(target instanceof TokenDocument){
+        if (target instanceof TokenDocument) {
             let updates = {
                 "img": API._getItemPileTokenImage(target, data),
                 "scale": API._getItemPileTokenScale(target, data),
                 [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
                 [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
             };
-            if(tokenSettings){
+            if (tokenSettings) {
                 updates = foundry.utils.mergeObject(updates, tokenSettings);
             }
             await target.update(updates);
-        }else{
+        } else {
             let updates = {
                 [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data,
                 "token": {
@@ -1394,14 +1399,14 @@ export default class API {
                     [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: data
                 }
             };
-            if(tokenSettings){
+            if (tokenSettings) {
                 updates["token"] = foundry.utils.mergeObject(updates["token"], tokenSettings);
             }
             await target.update(updates);
             await API._refreshItemPile(targetUuid);
         }
-        
-        if(data.isEnabled && data.isContainer) {
+
+        if (data.isEnabled && data.isContainer) {
             if (diff?.closed === true) {
                 await API._executeItemPileMacro(targetUuid, {
                     action: "closeItemPile",
@@ -1438,19 +1443,19 @@ export default class API {
     /**
      * @private
      */
-    static async _updatedItemPile(targetUuid, diffData, interactingTokenUuid){
+    static async _updatedItemPile(targetUuid, diffData, interactingTokenUuid) {
 
         const target = await lib.getToken(targetUuid);
 
         const interactingToken = interactingTokenUuid ? await fromUuid(interactingTokenUuid) : false;
 
-        if(foundry.utils.isObjectEmpty(diffData)) return;
+        if (foundry.utils.isObjectEmpty(diffData)) return;
 
         const data = API._getFreshFlags(target);
 
         Hooks.callAll(HOOKS.PILE.UPDATE, target, diffData, interactingToken)
 
-        if(data.isEnabled && data.isContainer) {
+        if (data.isEnabled && data.isContainer) {
             if (diffData?.closed === true) {
                 Hooks.callAll(HOOKS.PILE.CLOSE, target, interactingToken)
             }
@@ -1473,21 +1478,21 @@ export default class API {
      *
      * @return {Promise}
      */
-    static async deleteItemPile(target){
-        if(!API.isValidItemPile(target)) {
-            if(!targetUuid) throw lib.custom_error(`deleteItemPile | This is not an item pile, please provide a valid target`, true);
+    static async deleteItemPile(target) {
+        if (!API.isValidItemPile(target)) {
+            if (!targetUuid) throw lib.custom_error(`deleteItemPile | This is not an item pile, please provide a valid target`, true);
         }
         const targetUuid = lib.getUuid(target);
-        if(!targetUuid) throw lib.custom_error(`deleteItemPile | Could not determine the UUID, please provide a valid target`, true);
-        if(!targetUuid.includes("Token")){
+        if (!targetUuid) throw lib.custom_error(`deleteItemPile | Could not determine the UUID, please provide a valid target`, true);
+        if (!targetUuid.includes("Token")) {
             throw lib.custom_error(`deleteItemPile | Please provide a Token or TokenDocument`, true);
         }
         const hookResult = Hooks.call(HOOKS.PILE.PRE_DELETE, target);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DELETE_PILE, targetUuid);
     }
 
-    static async _deleteItemPile(targetUuid){
+    static async _deleteItemPile(targetUuid) {
         const target = await lib.getToken(targetUuid);
         return target.delete();
     }
@@ -1502,11 +1507,11 @@ export default class API {
      * @param {array/boolean} [itemTypeFilters=false]
      * @return {boolean/string}
      */
-    static isItemTypeDisallowed(item, itemTypeFilters = false){
-        if(!API.ITEM_TYPE_ATTRIBUTE) return false;
-        if(!Array.isArray(itemTypeFilters)) itemTypeFilters = API.ITEM_TYPE_FILTERS;
+    static isItemTypeDisallowed(item, itemTypeFilters = false) {
+        if (!API.ITEM_TYPE_ATTRIBUTE) return false;
+        if (!Array.isArray(itemTypeFilters)) itemTypeFilters = API.ITEM_TYPE_FILTERS;
         const itemType = getProperty(item, API.ITEM_TYPE_ATTRIBUTE);
-        if(itemTypeFilters.includes(itemType)){
+        if (itemTypeFilters.includes(itemType)) {
             return itemType;
         }
         return false;
@@ -1537,20 +1542,20 @@ export default class API {
     /**
      * @private
      */
-    static async _refreshItemPile(targetUuid){
+    static async _refreshItemPile(targetUuid) {
         const targetDocument = await fromUuid(targetUuid);
 
         if (targetDocument.destroyed || !API.isValidItemPile(targetDocument)) return;
 
         let targets = [targetDocument]
-        if(targetDocument instanceof Actor){
+        if (targetDocument instanceof Actor) {
             targets = Array.from(canvas.tokens.getDocuments()).filter(token => token.actor === targetDocument);
         }
 
         return Promise.allSettled(targets.map(_target => {
             return new Promise(async (resolve) => {
                 const deleted = await API._checkItemPileShouldBeDeleted(lib.getUuid(_target));
-                if(!deleted) {
+                if (!deleted) {
                     await _target.update({
                         "img": API._getItemPileTokenImage(targetDocument),
                         "scale": API._getItemPileTokenScale(targetDocument),
@@ -1575,7 +1580,7 @@ export default class API {
     /**
      * @private
      */
-    static async _rerenderItemPileInventoryApplication(inPileUuid, deleted = false){
+    static async _rerenderItemPileInventoryApplication(inPileUuid, deleted = false) {
         return ItemPileInventory.rerenderActiveApp(inPileUuid, deleted);
     }
 
@@ -1588,27 +1593,27 @@ export default class API {
      * @return {Promise<boolean>}
      * @private
      */
-    static async _initializeItemPile(tokenDocument){
+    static async _initializeItemPile(tokenDocument) {
 
         const data = tokenDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
-        if(!data?.enabled) return false;
+        if (!data?.enabled) return false;
 
         const method = () => {
             return doubleClickHandler.clicked(tokenDocument);
         }
 
-        if(!(tokenDocument.owner || game.user.isGM) && !lib.object_has_event(tokenDocument.object, "pointerdown", method)){
+        if (!(tokenDocument.owner || game.user.isGM) && !lib.object_has_event(tokenDocument.object, "pointerdown", method)) {
             lib.debug(`Registered pointerdown method for target with uuid ${tokenDocument.uuid}`)
             tokenDocument.object.on('pointerdown', method);
         }
 
-        if(game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")){
-            for(let [key, value] of Object.entries(data)){
-                if(preloadedImages.has(value) || !value) continue;
-                if(key.toLowerCase().includes("image")){
+        if (game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")) {
+            for (let [key, value] of Object.entries(data)) {
+                if (preloadedImages.has(value) || !value) continue;
+                if (key.toLowerCase().includes("image")) {
                     loadTexture(value);
                     lib.debug(`Preloaded image: ${value}`);
-                }else if(key.toLowerCase().includes("sound")){
+                } else if (key.toLowerCase().includes("sound")) {
                     AudioHelper.preloadSound(value);
                     lib.debug(`Preloaded sound: ${value}`);
                 }
@@ -1630,7 +1635,7 @@ export default class API {
      * @return {Promise}
      * @private
      */
-    static async _executeItemPileMacro(targetUuid, macroData){
+    static async _executeItemPileMacro(targetUuid, macroData) {
 
         const target = await fromUuid(targetUuid);
 
@@ -1642,16 +1647,16 @@ export default class API {
 
         const macro = game.macros.getName(pileData.macro);
 
-        if(!macro){
+        if (!macro) {
             throw lib.custom_error(`Could not find macro with name "${pileData.macro}" on target with UUID ${target.uuid}`);
         }
 
         // Reformat macro data to contain useful information
-        if(macroData.source){
+        if (macroData.source) {
             macroData.source = await fromUuid(macroData.source);
         }
 
-        if(macroData.target){
+        if (macroData.target) {
             macroData.target = await fromUuid(macroData.target);
         }
 
@@ -1659,7 +1664,7 @@ export default class API {
             ? macroData.target.actor
             : macroData.target;
 
-        if(macroData.item){
+        if (macroData.item) {
             macroData.items = macroData.items.map(item => targetActor.items.get(item._id));
         }
 
@@ -1676,7 +1681,7 @@ export default class API {
      * @return {Promise}
      * @private
      */
-    static async _dropDataOnCanvas(canvas, data, { target = false }={}) {
+    static async _dropDataOnCanvas(canvas, data, { target = false } = {}) {
 
         if (data.type !== "Item") return;
 
@@ -1695,10 +1700,10 @@ export default class API {
 
         const disallowedType = API.isItemTypeDisallowed(itemData);
         if (disallowedType) {
-            if(!game.user.isGM){
+            if (!game.user.isGM) {
                 return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
             }
-            if(!game.keyboard.downKeys.has("ShiftLeft")) {
+            if (!game.keyboard.downKeys.has("ShiftLeft")) {
                 dropData.force = await Dialog.confirm({
                     title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
                     content: `<p>${game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
@@ -1716,19 +1721,19 @@ export default class API {
             dropData.source = game.actors.get(data.actorId);
         }
 
-        if(!dropData.source && !game.user.isGM){
+        if (!dropData.source && !game.user.isGM) {
             return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
         }
 
         const pre_drop_determined_hook = Hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.position, dropData.itemData, dropData.force);
-        if(pre_drop_determined_hook === false) return;
+        if (pre_drop_determined_hook === false) return;
 
         let action = "addToPile";
         let droppableDocuments = [];
         let x;
         let y;
 
-        if(!data.target){
+        if (!data.target) {
 
             const position = canvas.grid.getTopLeft(data.x, data.y);
             x = position[0];
@@ -1737,7 +1742,7 @@ export default class API {
             droppableDocuments = lib.getTokensAtLocation({ x, y })
                 .filter(token => token.actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME)?.enabled);
 
-        }else{
+        } else {
 
             droppableDocuments.push(data.target);
 
@@ -1780,7 +1785,7 @@ export default class API {
         }
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData, dropData.force);
-        if(hookResult === false) return;
+        if (hookResult === false) return;
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEMS, {
             sourceUuid: lib.getUuid(dropData.source),
@@ -1809,32 +1814,32 @@ export default class API {
      * @private
      */
     static async _dropItems({
-        sourceUuid = false,
-        targetUuid = false,
-        itemData = false,
-        position = false,
-        force = false
-    }={}) {
+                                sourceUuid = false,
+                                targetUuid = false,
+                                itemData = false,
+                                position = false,
+                                force = false
+                            } = {}) {
 
         const itemTypeFilters = force ? [] : API.ITEM_TYPE_FILTERS;
 
         let itemsDropped = [itemData];
 
         // If there's a source of the item (it wasn't dropped from the item bar)
-        if(sourceUuid){
+        if (sourceUuid) {
 
             // If there's a target token, add the item to it, otherwise create a new pile at the drop location
-            if(targetUuid) {
+            if (targetUuid) {
                 itemsDropped = await API._transferItems(sourceUuid, targetUuid, itemsDropped, { itemTypeFilters });
-            }else{
+            } else {
                 const itemsRemoved = await API._removeItems(sourceUuid, itemsDropped, { itemTypeFilters });
                 targetUuid = await API._createItemPile(position, { items: itemsRemoved });
                 const target = await fromUuid(targetUuid);
                 itemsDropped = Array.from(target.actor.items).map(item => item.toObject());
             }
 
-        // If there's no source (it was dropped from the item bar)
-        }else {
+            // If there's no source (it was dropped from the item bar)
+        } else {
 
             // If there's a target token, add the item to it, otherwise create a new pile at the drop location
             if (targetUuid) {
@@ -1856,14 +1861,14 @@ export default class API {
     /**
      * @private
      */
-    static _getFreshFlags(document){
+    static _getFreshFlags(document) {
         return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
     }
 
     /**
      * @private
      */
-    static async _itemPileClicked(pileDocument){
+    static async _itemPileClicked(pileDocument) {
 
         lib.debug(`Clicked: ${pileDocument.uuid}`);
 
@@ -1872,16 +1877,16 @@ export default class API {
         let validTokens = (canvas.tokens.controlled.length > 0 ? canvas.tokens.controlled : canvas.tokens.placeables).filter(token => token.owner && token.document !== pileDocument);
 
         let closestTokens = validTokens.map(token => {
-                const distance = Math.floor(lib.distance_between_rect(pileDocument.object, token) / canvas.grid.size) + 1;
-                return {
-                    token,
-                    distance
-                };
-            }).filter(potentialTarget => {
-                return data.distance >= potentialTarget?.distance;
-            })
+            const distance = Math.floor(lib.distance_between_rect(pileDocument.object, token) / canvas.grid.size) + 1;
+            return {
+                token,
+                distance
+            };
+        }).filter(potentialTarget => {
+            return data.distance >= potentialTarget?.distance;
+        })
 
-        if(!closestTokens.length && !game.user.isGM){
+        if (!closestTokens.length && !game.user.isGM) {
             lib.custom_warning("You're too far away to interact with this pile!", true);
             return;
         }
@@ -1892,7 +1897,7 @@ export default class API {
 
         closestTokens = closestTokens.map(potentialTarget => potentialTarget.token.document);
 
-        if(data.isContainer && closestTokens.length) {
+        if (data.isContainer && closestTokens.length) {
 
             if (data.locked) {
                 lib.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
@@ -1913,9 +1918,9 @@ export default class API {
     /**
      * @private
      */
-    static _getItemPileTokenImage(pileDocument, data = false){
+    static _getItemPileTokenImage(pileDocument, data = false) {
 
-        if(!data){
+        if (!data) {
             data = API._getFreshFlags(pileDocument);
         }
 
@@ -1926,27 +1931,27 @@ export default class API {
         const items = Array.from(pileActor.items);
 
         let img;
-        if(data.isContainer){
+        if (data.isContainer) {
 
             img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage;
 
-            if(data.locked && data.lockedImage){
+            if (data.locked && data.lockedImage) {
                 img = data.lockedImage;
-            }else if(data.closed && data.closedImage){
+            } else if (data.closed && data.closedImage) {
                 img = data.closedImage;
-            }else if(data.emptyImage && items.length === 0){
+            } else if (data.emptyImage && items.length === 0) {
                 img = data.emptyImage;
-            }else if(data.openedImage) {
+            } else if (data.openedImage) {
                 img = data.openedImage;
             }
 
-        }else if(data.displayOne && items.length === 1){
+        } else if (data.displayOne && items.length === 1) {
 
             img = items[0].data.img;
 
         }
 
-        if(!img) {
+        if (!img) {
             img = pileDocument instanceof TokenDocument
                 ? pileDocument.actor.data.img
                 : pileDocument.data.img;
@@ -1961,9 +1966,9 @@ export default class API {
     /**
      * @private
      */
-    static _getItemPileTokenScale(pileDocument, data){
+    static _getItemPileTokenScale(pileDocument, data) {
 
-        if(!data){
+        if (!data) {
             data = API._getFreshFlags(pileDocument);
         }
 
@@ -1982,11 +1987,11 @@ export default class API {
     /**
      * @private
      */
-    static async _checkItemPileShouldBeDeleted(targetUuid){
+    static async _checkItemPileShouldBeDeleted(targetUuid) {
 
         const target = await fromUuid(targetUuid);
 
-        if(!(target instanceof TokenDocument)) return false;
+        if (!(target instanceof TokenDocument)) return false;
 
         const data = target.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
 
@@ -2011,17 +2016,19 @@ const preloadedImages = new Set();
 
 const doubleClickHandler = {
     _clicked: false,
-    clicked(target){
-        if(target !== doubleClickHandler._target) {
+    clicked(target) {
+        if (target !== doubleClickHandler._target) {
             doubleClickHandler._clicked = false
         }
-        if(doubleClickHandler._clicked){
+        if (doubleClickHandler._clicked) {
             doubleClickHandler._target = false;
             doubleClickHandler._clicked = false;
             return API._itemPileClicked(target);
         }
         doubleClickHandler._target = target;
         doubleClickHandler._clicked = true;
-        setTimeout(() => { doubleClickHandler._clicked = false }, 500);
+        setTimeout(() => {
+            doubleClickHandler._clicked = false
+        }, 500);
     }
 }

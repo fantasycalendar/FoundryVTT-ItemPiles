@@ -1,9 +1,8 @@
 import CONSTANTS from "./constants.js";
 import { ItemPileAttributeEditor } from "./formapplications/itemPileAttributeEditor.js";
 import { SYSTEMS } from "./systems.js";
-import ResetDialog from "./formapplications/resetSettingsDialog.js";
 
-function defaultSettings(){
+function defaultSettings() {
     return {
         "dynamicAttributes": {
             scope: "world",
@@ -70,7 +69,7 @@ function defaultSettings(){
     }
 }
 
-export default function registerSettings(){
+export default function registerSettings() {
 
     game.settings.registerMenu(CONSTANTS.MODULE_NAME, "resetAllSettings", {
         name: "ITEM-PILES.Setting.Reset.Title",
@@ -91,7 +90,7 @@ export default function registerSettings(){
     });
 
     const settings = defaultSettings();
-    for(const [name, data] of Object.entries(settings)){
+    for (const [name, data] of Object.entries(settings)) {
         game.settings.register(CONSTANTS.MODULE_NAME, name, data);
     }
 
@@ -104,7 +103,7 @@ export default function registerSettings(){
 
 }
 
-class ResetSettingsDialog extends FormApplication{
+class ResetSettingsDialog extends FormApplication {
     constructor(...args) {
         super(...args);
         return new Dialog({
@@ -128,9 +127,9 @@ class ResetSettingsDialog extends FormApplication{
     }
 }
 
-async function resetSettings(){
+async function resetSettings() {
     const settings = defaultSettings();
-    for(const [name, data] of Object.entries(settings)){
+    for (const [name, data] of Object.entries(settings)) {
         await game.settings.set(CONSTANTS.MODULE_NAME, name, data.default);
     }
     window.location.reload();

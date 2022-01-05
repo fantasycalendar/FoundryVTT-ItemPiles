@@ -5,34 +5,6 @@ import { isPileInventoryOpenForOthers } from "../socket.js";
 
 export class ItemPileInventory extends FormApplication {
 
-    static getActiveAppFromPile(inPileUuid) {
-        for(let app of Object.values(ui.windows)){
-            if(app instanceof this && (app.pile.uuid === inPileUuid || app.pile.actor.uuid === inPileUuid)){
-                return app;
-            }
-        }
-        return false;
-    }
-
-    static async rerenderActiveApp(inPileUuid, deleted = false){
-        const app = ItemPileInventory.getActiveAppFromPile(inPileUuid);
-        if(!app) return false;
-        app.saveItems();
-        app.saveAttributes();
-        app.deleted = deleted;
-        app.render(true);
-        return true;
-    }
-
-    static async show(pile, recipient){
-        const uuid = await lib.getUuid(pile);
-        const app = ItemPileInventory.getActiveAppFromPile(uuid);
-        if(app){
-            return app.render(true, { focus: true });
-        }
-        return new ItemPileInventory(pile, recipient).render(true);
-    }
-
     /**
      *
      * @param pile
@@ -48,8 +20,6 @@ export class ItemPileInventory extends FormApplication {
         this.deleted = false;
     }
 
-    /* -------------------------------------------- */
-
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
@@ -58,19 +28,49 @@ export class ItemPileInventory extends FormApplication {
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
             width: 450,
             height: "auto",
-            dragDrop: [{dragSelector: null, dropSelector: ".item-piles-item-drop-container"}],
+            dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-item-drop-container" }],
         });
     }
 
-    saveItems(){
+    static getActiveAppFromPile(inPileUuid) {
+        for (let app of Object.values(ui.windows)) {
+            if (app instanceof this && (app.pile.uuid === inPileUuid || app.pile.actor.uuid === inPileUuid)) {
+                return app;
+            }
+        }
+        return false;
+    }
+
+    static async rerenderActiveApp(inPileUuid, deleted = false) {
+        const app = ItemPileInventory.getActiveAppFromPile(inPileUuid);
+        if (!app) return false;
+        app.saveItems();
+        app.saveAttributes();
+        app.deleted = deleted;
+        app.render(true);
+        return true;
+    }
+
+    static async show(pile, recipient) {
+        const uuid = await lib.getUuid(pile);
+        const app = ItemPileInventory.getActiveAppFromPile(uuid);
+        if (app) {
+            return app.render(true, { focus: true });
+        }
+        return new ItemPileInventory(pile, recipient).render(true);
+    }
+
+    /* -------------------------------------------- */
+
+    saveItems() {
         let self = this;
         this.items = [];
 
         let pileItems = Array.from(this.pile.actor.items);
 
-        if(!pileItems.length) return;
+        if (!pileItems.length) return;
 
-        this.element.find(".item-piles-item-row:not(.item-piles-attribute-row)").each(function() {
+        this.element.find(".item-piles-item-row:not(.item-piles-attribute-row)").each(function () {
 
             const id = $(this).attr("data-item-id");
             const type = $(this).attr("data-item-type");
@@ -86,7 +86,7 @@ export class ItemPileInventory extends FormApplication {
 
             const hasRecipient = !!self.recipient;
 
-            if (hasRecipient){
+            if (hasRecipient) {
                 self.items.push({ id, name, type, img, currentQuantity, maxQuantity, hasRecipient });
             }
 
@@ -112,12 +112,12 @@ export class ItemPileInventory extends FormApplication {
         })
     }
 
-    saveAttributes(){
+    saveAttributes() {
 
         let self = this;
         this.attributes = [];
 
-        this.element.find(".item-piles-attribute-row").each(function(){
+        this.element.find(".item-piles-attribute-row").each(function () {
 
             const path = $(this).attr("data-attribute-path");
             const name = $(this).find('.item-piles-name').text();
@@ -130,7 +130,7 @@ export class ItemPileInventory extends FormApplication {
 
             const hasRecipient = !!self.recipient;
 
-            if(hasRecipient) {
+            if (hasRecipient) {
                 self.attributes.push({ name, path, img, currentQuantity, maxQuantity, hasRecipient });
             }
 
@@ -142,14 +142,14 @@ export class ItemPileInventory extends FormApplication {
 
     }
 
-    validAttribute(attribute){
+    validAttribute(attribute) {
         return getProperty(this.pile.actor.data, attribute)
             && (!this.recipientActor || hasProperty(this.recipientActor.data, attribute));
     }
 
     getPileAttributeData() {
         return API.DYNAMIC_ATTRIBUTES.map(attribute => {
-            if(!this.validAttribute(attribute.path)) return false;
+            if (!this.validAttribute(attribute.path)) return false;
             return {
                 name: attribute.name,
                 path: attribute.path,
@@ -161,15 +161,14 @@ export class ItemPileInventory extends FormApplication {
         }).filter(Boolean);
     }
 
-    _onDrop(event){
+    _onDrop(event) {
 
         super._onDrop(event);
 
         let data;
         try {
             data = JSON.parse(event.dataTransfer.getData('text/plain'));
-        }
-        catch (err) {
+        } catch (err) {
             return false;
         }
 
@@ -177,7 +176,7 @@ export class ItemPileInventory extends FormApplication {
 
     }
 
-    getData(options){
+    getData(options) {
         const data = super.getData(options);
 
         data.isDeleted = this.deleted;
@@ -187,7 +186,7 @@ export class ItemPileInventory extends FormApplication {
         data.hasRecipient = !!this.recipient;
         data.recipient = this.recipient;
 
-        if(!data.isDeleted) {
+        if (!data.isDeleted) {
             data.items = this.items.length ? this.items : this.getPileItemData();
             data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
             data.hasItems = Array.from(this.pile.actor.items).length > 0;
@@ -202,27 +201,27 @@ export class ItemPileInventory extends FormApplication {
         super.activateListeners(html);
         let self = this;
         let timer;
-        html.find('img').mouseenter(function(){
+        html.find('img').mouseenter(function () {
             const element = $(this);
-            timer = setTimeout(function(){
+            timer = setTimeout(function () {
                 self.previewImage(html, element);
             }, 300);
         });
-        html.find('img').mouseleave(function(){
+        html.find('img').mouseleave(function () {
             self.clearImage(html);
             clearTimeout(timer);
         });
 
-        html.find(".item-piles-take-button").click(function(){
+        html.find(".item-piles-take-button").click(function () {
             self.takeItem($(this).parent());
         })
 
-        html.find(".item-piles-attribute-take-button").click(function(){
+        html.find(".item-piles-attribute-take-button").click(function () {
             self.takeAttribute($(this).parent());
         })
     }
 
-    previewImage(html, element){
+    previewImage(html, element) {
         const src = element.prop("src");
 
         const pos = element.position();
@@ -237,11 +236,11 @@ export class ItemPileInventory extends FormApplication {
         }).fadeIn(150);
     }
 
-    clearImage(html){
+    clearImage(html) {
         html.find("#item-piles-preview-container").fadeOut(150);
     }
 
-    async takeItem(element){
+    async takeItem(element) {
         this.saveItems();
         this.saveAttributes();
         const itemId = element.attr('data-item-id');
@@ -252,7 +251,7 @@ export class ItemPileInventory extends FormApplication {
         await API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }]);
     }
 
-    async takeAttribute(element){
+    async takeAttribute(element) {
         this.saveItems();
         this.saveAttributes();
         const attribute = element.attr('data-attribute-path');
@@ -264,13 +263,13 @@ export class ItemPileInventory extends FormApplication {
 
     async _updateObject(event, formData) {
 
-        if(event.submitter.value === "takeAll"){
+        if (event.submitter.value === "takeAll") {
             return await API.transferEverything(this.pile, this.recipient);
         }
 
-        if(event.submitter.value === "close"){
+        if (event.submitter.value === "close") {
             return isPileInventoryOpenForOthers.query(this.pile).then((result) => {
-                if(!result) API.closeItemPile(this.pile);
+                if (!result) API.closeItemPile(this.pile);
             });
         }
 

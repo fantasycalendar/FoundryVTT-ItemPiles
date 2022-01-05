@@ -88,7 +88,7 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_EVERYTHING, (...args) => API._transferEverything(...args))
 }
 
-async function callHook(inHookName, ...args){
+async function callHook(inHookName, ...args) {
     return Hooks.callAll(inHookName, ...args);
 }
 
@@ -119,11 +119,12 @@ export const isPileInventoryOpenForOthers = {
     handleResponse(inUserId, appOpen) {
         this.usersToRespond.delete(inUserId);
         this.isOpen = this.isOpen || appOpen;
-        if(this.usersToRespond.size > 0) return;
+        if (this.usersToRespond.size > 0) return;
         this.resolve(this.isOpen);
         this.usersToRespond = new Set();
         this.isOpen = false;
-        this.resolve = () => {};
+        this.resolve = () => {
+        };
     }
 
 }

@@ -3,22 +3,12 @@ import API from "../api.js";
 
 export default class DropDialog extends FormApplication {
 
-    static query(droppedItem, dropObjects){
-
-        return new Promise(resolve => {
-            new DropDialog(resolve, droppedItem, dropObjects).render(true);
-        });
-
-    }
-
     constructor(resolve, droppedItem, dropObjects) {
         super();
         this.resolve = resolve;
         this.droppedItem = droppedItem;
         this.dropObjects = dropObjects;
     }
-
-    /* -------------------------------------------- */
 
     /** @inheritdoc */
     static get defaultOptions() {
@@ -29,6 +19,14 @@ export default class DropDialog extends FormApplication {
             width: 430,
             height: "auto"
         });
+    }
+
+    static query(droppedItem, dropObjects) {
+
+        return new Promise(resolve => {
+            new DropDialog(resolve, droppedItem, dropObjects).render(true);
+        });
+
     }
 
     async getData(options) {
@@ -43,21 +41,23 @@ export default class DropDialog extends FormApplication {
         return data;
     }
 
-    activateListeners(html){
+    /* -------------------------------------------- */
+
+    activateListeners(html) {
         super.activateListeners(html);
         const slider = html.find("#rangeSlider");
         const input = html.find("#rangeValue")
-        slider.on("input", function(){
+        slider.on("input", function () {
             input.val($(this).val());
         })
-        input.change(function(){
+        input.change(function () {
             slider.slider('value', $(this).val());
         })
     }
 
     async _updateObject(event, formData) {
 
-        if(event.submitter.value === "cancel"){
+        if (event.submitter.value === "cancel") {
             return this.resolve(false);
         }
 
@@ -67,7 +67,7 @@ export default class DropDialog extends FormApplication {
 
     }
 
-    async close(options){
+    async close(options) {
         await super.close(options);
         this.resolve(false);
     }

@@ -26,14 +26,14 @@ export function custom_error(error, notify = true) {
     return new Error(error.replace("<br>", "\n"));
 }
 
-export function getTokensAtLocation(position){
+export function getTokensAtLocation(position) {
     return canvas.tokens.placeables.filter(token => {
         return position.x >= token.x && position.x < (token.x + (token.data.width * canvas.grid.size))
             && position.y >= token.y && position.y < (token.y + (token.data.height * canvas.grid.size));
     });
 }
 
-export function distance_between_rect(p1, p2){
+export function distance_between_rect(p1, p2) {
 
     const x1 = p1.x;
     const y1 = p1.y;
@@ -50,21 +50,21 @@ export function distance_between_rect(p1, p2){
     const bottom = y2b < y1;
     const top = y1b < y2;
 
-    if(top && left) {
+    if (top && left) {
         return distance_between({ x: x1, y: y1b }, { x: x2b, y: y2 });
-    } else if(left && bottom) {
+    } else if (left && bottom) {
         return distance_between({ x: x1, y: y1 }, { x: x2b, y: y2b });
-    } else if(bottom && right) {
+    } else if (bottom && right) {
         return distance_between({ x: x1b, y: y1 }, { x: x2, y: y2b });
-    } else if(right && top) {
+    } else if (right && top) {
         return distance_between({ x: x1b, y: y1b }, { x: x2, y: y2 });
-    } else if(left) {
+    } else if (left) {
         return x1 - x2b;
-    } else if(right) {
+    } else if (right) {
         return x2 - x1b;
-    } else if(bottom) {
+    } else if (bottom) {
         return y1 - y2b;
-    } else if(top) {
+    } else if (top) {
         return y2 - y1b;
     }
 
@@ -72,18 +72,18 @@ export function distance_between_rect(p1, p2){
 
 }
 
-export function distance_between(a, b){
+export function distance_between(a, b) {
     return new Ray(a, b).distance;
 }
 
-export function object_has_event(object, eventName, func){
+export function object_has_event(object, eventName, func) {
 
-    if(!object?._events?.[eventName]) return false;
+    if (!object?._events?.[eventName]) return false;
 
     let events = object?._events?.[eventName];
-    if(!Array.isArray(events)) events = [events];
-    for(let event of events){
-        if(event.context === object && event.fn.toString() === func.toString()){
+    if (!Array.isArray(events)) events = [events];
+    for (let event of events) {
+        if (event.context === object && event.fn.toString() === func.toString()) {
             return true;
         }
     }
@@ -91,21 +91,21 @@ export function object_has_event(object, eventName, func){
     return false;
 }
 
-export function getSimilarItem(items, itemId, itemName, itemType){
-    for(const item of items){
-        if(item.id === itemId || (item.name === itemName && item.type === itemType)){
+export function getSimilarItem(items, itemId, itemName, itemType) {
+    for (const item of items) {
+        if (item.id === itemId || (item.name === itemName && item.type === itemType)) {
             return item;
         }
     }
     return false;
 }
 
-export async function getToken(documentUuid){
+export async function getToken(documentUuid) {
     const document = await fromUuid(documentUuid);
     return document?.token ?? document;
 }
 
-export function getUuid(target){
+export function getUuid(target) {
     // If it's an actor, get its TokenDocument
     // If it's a token, get its Document
     // If it's a TokenDocument, just use it

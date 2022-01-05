@@ -1,23 +1,12 @@
 import CONSTANTS from "../constants.js";
-import API from "../api.js";
 
 export class ItemPileAttributeEditor extends FormApplication {
-
-    static showForPile(document){
-        let resolve;
-        const promise = new Promise(_resolve => {
-            resolve = _resolve;
-        });
-        return [ promise, new ItemPileAttributeEditor(pileAttributes, resolve).render(true) ]
-    }
 
     constructor(pileAttributes = false, resolve = false) {
         super();
         this.resolve = resolve;
         this.attributes = pileAttributes || game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
     }
-
-    /* -------------------------------------------- */
 
     /** @inheritdoc */
     static get defaultOptions() {
@@ -31,21 +20,31 @@ export class ItemPileAttributeEditor extends FormApplication {
         });
     }
 
+    static showForPile(document) {
+        let resolve;
+        const promise = new Promise(_resolve => {
+            resolve = _resolve;
+        });
+        return [promise, new ItemPileAttributeEditor(pileAttributes, resolve).render(true)]
+    }
+
     async getData(options) {
         const data = super.getData(options);
         data.attributes = this.attributes;
         return data;
     }
 
+    /* -------------------------------------------- */
+
     activateListeners(html) {
         super.activateListeners(html);
         const self = this;
-        html.find('.item-pile-attribute-remove').click(function(){
+        html.find('.item-pile-attribute-remove').click(function () {
             const index = Number($(this).closest('.item-pile-attribute-row').attr("data-attribute-index"));
             self.attributes.splice(index, 1);
             self.render(true);
         });
-        html.find('button[name="newAttribute"]').click(function(){
+        html.find('button[name="newAttribute"]').click(function () {
             self.attributes.push({
                 name: "",
                 path: "",
@@ -58,13 +57,13 @@ export class ItemPileAttributeEditor extends FormApplication {
     async _updateObject(event, formData) {
 
         const newSettings = [];
-        for(let [path, value] of Object.entries(formData)){
+        for (let [path, value] of Object.entries(formData)) {
             setProperty(newSettings, path, value)
         }
 
-        if(!this.resolve){
+        if (!this.resolve) {
             game.settings.set(CONSTANTS.MODULE_NAME, "dynamicAttributes", newSettings);
-        }else{
+        } else {
             this.resolve(newSettings);
         }
 
