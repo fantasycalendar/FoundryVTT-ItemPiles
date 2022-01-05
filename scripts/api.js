@@ -236,6 +236,9 @@ export default class API {
                 if (pileConfig.overrideSingleItemScale) {
                     overrideData["scale"] = pileConfig.singleItemScale;
                 }
+            }else{
+                overrideData["img"] = API._getItemPileTokenImage(pileActor);
+                overrideData["scale"] = API._getItemPileTokenScale(pileActor);
             }
 
         } else {
@@ -1599,17 +1602,26 @@ export default class API {
         }
 
         if (game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")) {
-            for (let [key, value] of Object.entries(data)) {
-                if (preloadedImages.has(value) || !value) continue;
-                if (key.toLowerCase().includes("image")) {
-                    loadTexture(value);
-                    lib.debug(`Preloaded image: ${value}`);
-                } else if (key.toLowerCase().includes("sound")) {
-                    AudioHelper.preloadSound(value);
-                    lib.debug(`Preloaded sound: ${value}`);
+            await Promise.allSettled(Object.entries(data).map(entry => {
+                return new Promise(resolve => {
+                    const [key, value] = entry;
+                    if (preloadedFiles.has(value) || !value){
+                        return resolve();
+                    }
+                    preloadedFiles.add(value);
+                    if (key.toLowerCase().includes("image")) {
+                        lib.debug(`Preloaded image: ${value}`);
+                        return loadTexture(value);
+                    } else if (key.toLowerCase().includes("sound")) {
+                        lib.debug(`Preloaded sound: ${value}`);
+                        return AudioHelper.preloadSound(value);
+                    }
+                });
+            })).then(() => {
+                if(game.user.isGm){
+                    API._refreshItemPile(tokenDocument.uuid)
                 }
-                preloadedImages.add(value);
-            }
+            });
         }
 
         lib.debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
@@ -1994,7 +2006,7 @@ export default class API {
 
 }
 
-const preloadedImages = new Set();
+const preloadedFiles = new Set();
 
 const doubleClickHandler = {
     _clicked: false,
