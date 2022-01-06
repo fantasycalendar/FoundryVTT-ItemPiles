@@ -9,7 +9,7 @@
             "Empty": "This pile is empty.",
             "Destroyed": "This pile no longer exists and lies barren.",
             "Take": "Take",
-            "Close": "Close",
+            "Close": "Close Lid",
             "Leave": "Leave"
         },
 
@@ -26,16 +26,25 @@
                 "Title": "Item Type Warning",
                 "Content": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?"
             },
+            "ResetSettings": {
+                "Title": "Reset Item Piles Module Settings",
+                "Content": "Are you sure you want to reset all of the Item Piles module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
+                "Confirm": "Reset Module Settings"
+            },
             "LinkedActorWarning": {
                 "Title": "Item Piles & Linked Actor",
                 "Content": "Are you sure you want to turn this <strong>linked actor</strong> into an item pile? This actor's token is linked and all tokens of this actor will share its inventory and attributes."
             },
-            "ResetSettings": {
-                "Title": "Reset Item Piles Module Settings",
-                "Content": "Are you sure you want to reset all of the Item Piles module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
-                "Confirm": "Reset Module Settings",
-                "Cancel": "Cancel"
-            }
+            "NoSystemFound": {
+                "Title": "System Not Recognized",
+                "Content": "This system is not currently fully supported. This means that the module does not know how to best handle this system's items, but can still operate in a limited fashion.<br><br>You can configure the module's settings yourself, but it requires a bit of technical know-how.<br><br>If you have any questions, ping <strong>Wasp#2005</strong> on the Foundry discord."
+            },
+            "SystemFound": {
+                "Title": "System Recognized",
+                "Content": "This system was previously not supported, but in an recent update it was added as a supported system!<br><br>Do you want to load this system's default Item Pile settings?",
+                "Confirm": "Apply System Defaults"
+            },
+            "Cancel": "Cancel"
         },
 
         "AttributeEditor": {
@@ -87,6 +96,7 @@
             "OpenSoundPath": "Opening Sound Path",
             "LockedSoundPath": "Locked Sound Path"
         },
+
         "HUD": {
             "ToggleLocked": "Toggle Locked",
             "ToggleClosed": "Toggle Closed",

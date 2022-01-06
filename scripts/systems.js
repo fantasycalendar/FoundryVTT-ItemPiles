@@ -13,10 +13,10 @@ export const SYSTEMS = {
     get DATA() {
         return {
             dnd5e,
-            // ↓ ONLY ADD SYSTEMS HERE ↓
+            // ↓ ADD SYSTEMS HERE ↓
             pf1,
             ds4,
-            // ↑ AND ONLY HERE ↑
-        }?.[game.system.id] ?? dnd5e;
+            // ↑ ADD SYSTEMS HERE ↑
+        }?.[game.system.id];
     }
 };

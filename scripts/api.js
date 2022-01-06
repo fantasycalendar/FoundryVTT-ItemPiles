@@ -1514,6 +1514,8 @@ export default class API {
             ? target.actor
             : target;
 
+        if(!targetActor) return false;
+
         const hasNoItems = Array.from(targetActor.items).length === 0;
 
         const attributes = API.getPileAttributes(target);
@@ -1960,6 +1962,8 @@ export default class API {
             ? pileDocument.actor
             : pileDocument;
 
+        if(!pileActor) return;
+
         const items = Array.from(pileActor.items);
 
         let img;
@@ -2005,6 +2009,8 @@ export default class API {
         const pileActor = pileDocument instanceof TokenDocument
             ? pileDocument.actor
             : pileDocument;
+
+        if(!pileActor) return;
 
         const items = Array.from(pileActor.items);
 

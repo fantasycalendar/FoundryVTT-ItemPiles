@@ -1,4 +1,4 @@
-// Pile Stack Definitions for Foundry VTT Game System Dungeonslayers 4
+// Item Piles Definitions for Foundry VTT Game System Dungeonslayers 4
 
 export default {
     // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
@@ -14,14 +14,14 @@ export default {
     // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
     "DYNAMIC_ATTRIBUTES": [
         {
-            name: "DS4.CharacterCurrencySilver",
-            path: "data.currency.silver",
-            img: "icons/commodities/currency/coin-inset-snail-silver.webp"
-        },
-        {
             name: "DS4.CharacterCurrencyGold",
             path: "data.currency.gold",
             img: "icons/commodities/currency/coin-embossed-crown-gold.webp"
+        },
+        {
+            name: "DS4.CharacterCurrencySilver",
+            path: "data.currency.silver",
+            img: "icons/commodities/currency/coin-inset-snail-silver.webp"
         },
         {
             name: "DS4.CharacterCurrencyCopper",

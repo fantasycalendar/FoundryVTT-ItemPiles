@@ -1,13 +1,14 @@
 import CONSTANTS from "./constants.js";
 import { ItemPileAttributeEditor } from "./formapplications/itemPileAttributeEditor.js";
 import { SYSTEMS } from "./systems.js";
+import * as lib from "./lib/lib.js";
 
-function defaultSettings() {
+function defaultSettings(apply = false) {
     return {
         "dynamicAttributes": {
             scope: "world",
             config: false,
-            default: SYSTEMS.DATA.DYNAMIC_ATTRIBUTES,
+            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.DYNAMIC_ATTRIBUTES : [],
             type: Array
         },
         "actorClassType": {
@@ -15,7 +16,7 @@ function defaultSettings() {
             hint: "ITEM-PILES.Setting.ActorClass.Label",
             scope: "world",
             config: true,
-            default: SYSTEMS.DATA.ACTOR_CLASS_TYPE,
+            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ACTOR_CLASS_TYPE : "character",
             type: String
         },
         "itemQuantityAttribute": {
@@ -23,7 +24,7 @@ function defaultSettings() {
             hint: "ITEM-PILES.Setting.Quantity.Label",
             scope: "world",
             config: true,
-            default: SYSTEMS.DATA.ITEM_QUANTITY_ATTRIBUTE,
+            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_QUANTITY_ATTRIBUTE : "",
             type: String
         },
         "itemTypeAttribute": {
@@ -31,7 +32,7 @@ function defaultSettings() {
             hint: "ITEM-PILES.Setting.ItemType.Label",
             scope: "world",
             config: true,
-            default: SYSTEMS.DATA.ITEM_TYPE_ATTRIBUTE,
+            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_TYPE_ATTRIBUTE : "",
             type: String
         },
         "itemTypeFilters": {
@@ -39,24 +40,8 @@ function defaultSettings() {
             hint: "ITEM-PILES.Setting.ItemTypeFilters.Label",
             scope: "world",
             config: true,
-            default: SYSTEMS.DATA.ITEM_TYPE_FILTERS,
+            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_TYPE_FILTERS : "",
             type: String
-        },
-        "deleteEmptyPiles": {
-            name: "ITEM-PILES.Setting.DeleteEmptyPiles.Title",
-            hint: "ITEM-PILES.Setting.DeleteEmptyPiles.Label",
-            scope: "world",
-            config: true,
-            default: false,
-            type: Boolean
-        },
-        "preloadFiles": {
-            name: "ITEM-PILES.Setting.PreloadFiles.Title",
-            hint: "ITEM-PILES.Setting.PreloadFiles.Label",
-            scope: "client",
-            config: true,
-            default: true,
-            type: Boolean
         }
     }
 }
@@ -86,6 +71,24 @@ export default function registerSettings() {
         game.settings.register(CONSTANTS.MODULE_NAME, name, data);
     }
 
+    game.settings.register(CONSTANTS.MODULE_NAME, "deleteEmptyPiles", {
+        name: "ITEM-PILES.Setting.DeleteEmptyPiles.Title",
+        hint: "ITEM-PILES.Setting.DeleteEmptyPiles.Label",
+        scope: "world",
+        config: true,
+        default: false,
+        type: Boolean
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "preloadFiles", {
+        name: "ITEM-PILES.Setting.PreloadFiles.Title",
+        hint: "ITEM-PILES.Setting.PreloadFiles.Label",
+        scope: "client",
+        config: true,
+        default: true,
+        type: Boolean
+    });
+
     game.settings.register(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", {
         scope: "world",
         config: false,
@@ -109,6 +112,20 @@ export default function registerSettings() {
         type: Boolean
     });
 
+    game.settings.register(CONSTANTS.MODULE_NAME, "systemFound", {
+        scope: "world",
+        config: false,
+        default: false,
+        type: Boolean
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown", {
+        scope: "world",
+        config: false,
+        default: false,
+        type: Boolean
+    });
+
 }
 
 class ResetSettingsDialog extends FormApplication {
@@ -122,12 +139,12 @@ class ResetSettingsDialog extends FormApplication {
                     icon: '<i class="fas fa-check"></i>',
                     label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Confirm"),
                     callback: () => {
-                        resetSettings();
+                        applyDefaultSettings();
                     }
                 },
                 cancel: {
                     icon: '<i class="fas fa-times"></i>',
-                    label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Cancel")
+                    label: game.i18n.localize("ITEM-PILES.Dialogs.Cancel")
                 }
             },
             default: "cancel"
@@ -135,10 +152,59 @@ class ResetSettingsDialog extends FormApplication {
     }
 }
 
-async function resetSettings() {
-    const settings = defaultSettings();
+async function applyDefaultSettings() {
+    const settings = defaultSettings(true);
     for (const [name, data] of Object.entries(settings)) {
         await game.settings.set(CONSTANTS.MODULE_NAME, name, data.default);
     }
-    window.location.reload();
+}
+
+export async function checkSystem(){
+
+    if(game.system.id === "dnd5e") return;
+
+    if(!SYSTEMS.DATA){
+
+        if(game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")) return;
+
+        await game.settings.set(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown", true);
+
+        return Dialog.prompt({
+            title: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Title"),
+            content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content")),
+            callback: () => {}
+        });
+
+    }
+
+    if(game.settings.get(CONSTANTS.MODULE_NAME, "systemFound")) return;
+
+    game.settings.set(CONSTANTS.MODULE_NAME, "systemFound", true);
+
+    if(game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")){
+
+        await new Dialog({
+            title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
+            content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"), "fas fa-search"),
+            buttons: {
+                confirm: {
+                    icon: '<i class="fas fa-check"></i>',
+                    label: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Confirm"),
+                    callback: () => {
+                        applyDefaultSettings();
+                    }
+                },
+                cancel: {
+                    icon: '<i class="fas fa-times"></i>',
+                    label: game.i18n.localize("No")
+                }
+            },
+            default: "cancel"
+        }).render(true);
+
+    }else if(!game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeAttribute")){
+
+        applyDefaultSettings();
+
+    }
 }

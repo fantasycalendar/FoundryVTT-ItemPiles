@@ -23,6 +23,11 @@
 				"Title": "Avertissement Type d'objet",
 				"Content": "Vous déposez un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être déposé. Êtes-vous sûr de vouloir faire cela ?"
 			},
+            "ResetSettings": {
+                "Title": "Réinitialiser les paramètres du module Item Piles",
+                "Content": "Êtes-vous sûr de vouloir réinitialiser tous les paramètres du module Item Piles aux valeurs par défaut du système actuel ? <strong>CECI NE PEUT PAS ÊTRE ANNULé !</strong>",
+                "Confirm": "Réinitialiser les paramètres du module"
+            },
 			"LinkedActorWarning": {
 				"Title": "Piles d'objets et acteur lié",
 				"Content": "Êtes-vous sûr de vouloir transformer ce <strong>acteur lié</strong> en pile d'objets ? Le jeton de cet acteur est lié et tous les jetons de cet acteur partageront son inventaire et ses attributs."
@@ -36,13 +41,8 @@
 				"Content": "Ce système n'était auparavant pas pris en charge, mais dans une mise à jour récente, il a été ajouté comme système pris en charge !<br><br>Voulez-vous charger les paramètres de pile d'objets par défaut de ce système ?",
 				"Confirm": "Appliquer les valeurs par défaut du système"
 			},
-			"ResetSettings": {
-				"Title": "Réinitialiser les paramètres du module Item Piles",
-				"Content": "Êtes-vous sûr de vouloir réinitialiser tous les paramètres du module Item Piles aux valeurs par défaut du système actuel ? <strong>CECI NE PEUT PAS ÊTRE ANNULé !</strong>",
-				"Confirm": "Réinitialiser les paramètres du module",
-				"Cancel": "Annuler"
-			}
-		},
+            "Cancel": "Annuler"
+        },
 		"AttributeEditor": {
 			"Title": "Éditeur d'attributs dynamiques",
 			"Explanation": "Ici, vous pouvez définir les attributs des personnages qui peuvent être récupérés dans les piles d'objets, comme les devises. Dans D&D5e, les monnaies existent sur les acteurs dans le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Gold Coins\" et le chemin d'attribut \"data.currency.gp\".",

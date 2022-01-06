@@ -42,7 +42,8 @@ export class ItemPileAttributeEditor extends FormApplication {
         html.find('.item-pile-attribute-remove').click(function () {
             const index = Number($(this).closest('.item-pile-attribute-row').attr("data-attribute-index"));
             self.attributes.splice(index, 1);
-            self.render(true);
+            $(this).closest('.item-pile-attribute-row').remove();
+            self.rerender();
         });
         html.find('button[name="newAttribute"]').click(function () {
             self.attributes.push({
@@ -50,8 +51,21 @@ export class ItemPileAttributeEditor extends FormApplication {
                 path: "",
                 img: ""
             })
-            self.render(true);
+            self.rerender();
         });
+    }
+
+    rerender(){
+        const self = this;
+        this.element.find('.item-pile-attribute-row').each(function(index){
+            if(index === 0) return;
+            self.attributes[index-1] = {
+                name: $(this).find('.item-pile-attribute-name-input').val(),
+                path: $(this).find('.item-pile-attribute-path-input').val(),
+                img: $(this).find('.item-pile-attribute-img-input').val()
+            }
+        });
+        return this.render(true);
     }
 
     async _updateObject(event, formData) {

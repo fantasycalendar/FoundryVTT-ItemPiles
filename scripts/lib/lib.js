@@ -107,10 +107,15 @@ export function is_real_number(inNumber) {
 }
 
 export function getItemPileData(document){
-    if(document instanceof TokenDocument && document.data.actorLink){
-        document = document.actor;
+    if(document instanceof TokenDocument && document?.data?.actorLink){
+        document = document?.actor;
     }
-    return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
+    try{
+        return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
+    }catch(err){
+        return {};
+    }
+
 }
 
 export async function updateItemPile(inDocument, flagData, tokenData){
@@ -139,4 +144,12 @@ export async function updateItemPile(inDocument, flagData, tokenData){
         }
     });
 
+}
+
+export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
+    return `<p class="item-piles-dialog">
+        <i style="font-size:3rem;" class="${icon}"></i><br><br>
+        <strong style="font-size:1.2rem;">Item Piles</strong>
+        <br><br>${message}
+    </p>`;
 }

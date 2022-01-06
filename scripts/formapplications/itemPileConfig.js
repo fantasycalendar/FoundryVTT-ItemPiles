@@ -2,6 +2,7 @@ import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import { ItemPileAttributeEditor } from "./itemPileAttributeEditor.js";
 import * as lib from "../lib/lib.js";
+import { dialogWarning } from "../lib/lib.js";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -89,7 +90,7 @@ export class ItemPileConfig extends FormApplication {
                     if(isLinked){
                         const doContinue = await Dialog.confirm({
                             title: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Title"),
-                            content: `<p class="item-piles-dialog"><i style="font-size:3rem;" class="fas fa-exclamation-triangle"></i><br><br>${game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content")}</p>`,
+                            content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content")),
                             defaultYes: false
                         });
                         if (!doContinue) {

@@ -29,9 +29,9 @@
             "ResetSettings": {
                 "Title": "Item Piles（お宝）設定初期化",
                 "Content": "設定を現在のシステムのデフォルトに初期化しますか？<strong>この操作を取り消すことはできません！</strong>",
-                "Confirm": "設定初期化",
-                "Cancel": "キャンセル"
-            }
+                "Confirm": "設定初期化"
+            },
+            "Cancel": "キャンセル"
         },
 
         "AttributeEditor": {

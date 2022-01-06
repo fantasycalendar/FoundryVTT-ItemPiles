@@ -26,16 +26,25 @@
                 "Title": "Gegenstand Typ Warnung",
                 "Content": "Du versuchst einen Gegenstand vom Typ (\"{type}\") hier abzulegen was normal nicht erlaubt ist. Bist du sicher das du das tun willst?"
             },
+            "ResetSettings": {
+                "Title": "Setze Einstellungen von Gegenstandsstapel zurück",
+                "Content": "Bist du sicher das du alle Einstellungen vom Gegenstandsstapelmodul auf die Standardwerte des Systems zurücksetzen willst ? <strong>DIES KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!</strong>",
+                "Confirm": "Moduleinstellungen zurücksetzen"
+            },
             "LinkedActorWarning": {
                 "Title": "Gegenstandsstapel & verlinkter Akteur",
                 "Content": "Bist du sicher das du diesen <strong>verlinkten Akteuer</strong> in einen Gegenstandstapel ändern willst ? Alle Akteur-Token bei verlinkten Akteueren teilen sich ein Inventar und Attribute"
             },
-            "ResetSettings": {
-                "Title": "Setze Einstellungen von Gegenstandsstapel zurück",
-                "Content": "Bist du sicher das du alle Einstellungen vom Gegenstandsstapelmodul auf die Standardwerte des Systems zurücksetzen willst ? <strong>DIES KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!</strong>",
-                "Confirm": "Moduleinstellungen zurücksetzen",
-                "Cancel": "Abbrechen"
-            }
+            "NoSystemFound": {
+                "Title": "System nicht erkannt",
+                "Content": "Dein Spielsystem wird im Moment nicht vollständig unterstützt. Das bedeutet das diesem Modul nicht bekannt ist wie es am besten mit den Gegenständen des Systems umgehen muss. Du kannst dieses Modul trotzdem verwenden, aber die Funktionalität könnte eingeschränkt sein.<br><br>Du kannst die Einstellung für dein Spielsystem selbst vornehmen, dies erfordert ein wenig technische Kenntnis.<br><br>Wenn du Fragen hast kontaktiere <strong>Wasp#2005</strong> auf dem Foundry Discord Server."
+            },
+            "SystemFound": {
+                "Title": "Spielsystem erfolgreich erkannt",
+                "Content": "Dein Spielsystem wurde in vorherigen Versionen dieses Modules nicht untersützt. Diese Unterstützung wurde nun mit dem Update hinzugefügt!<br><br>Möchtest du nun die Standardeinstellungen deines Spielsystems im Gegenstandsstapel-Modul laden?",
+                "Confirm": "Standardeinstellungen setzen"
+            },
+            "Cancel": "Abbrechen"
         },
 
         "AttributeEditor": {
