@@ -1688,7 +1688,7 @@ export default class API {
      *
      * @param {canvas} canvas
      * @param {object} data
-     * @param {Actor/Token/TokenDocument}[target=false]
+     * @param {Actor/Token/TokenDocument/boolean}[target=false]
      * @return {Promise}
      * @private
      */
@@ -1696,8 +1696,19 @@ export default class API {
 
         if (data.type !== "Item") return;
 
-        const itemData = data.id ? game.items.get(data.id)?.toObject() : data.data;
+        let itemData;
+        if(data.pack){
+            const uuid = `Compendium.${data.pack}.${data.id}`;
+            const item = await fromUuid(uuid);
+            itemData = item.toObject();
+        }else if(data.id){
+            itemData = game.items.get(data.id)?.toObject();
+        }else{
+            itemData = data.data;
+        }
+
         if (!itemData) {
+            console.error(data);
             throw lib.custom_error("Something went wrong when dropping this item!")
         }
 
