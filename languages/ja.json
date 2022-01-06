@@ -1,0 +1,143 @@
+{
+    "ITEM-PILES": {
+
+        "Inspect": {
+            "Title": "お宝の中身",
+            "AsActor": "{actorName}としてお宝を確認中",
+            "NoActor": "選択中のコマが居ない状態で中身を確認しています。アイテムを取得する先が存在ませんのでアイテムの取得ができません。",
+            "TakeAll": "すべてのアイテムを取得",
+            "Empty": "このお宝は空です",
+            "Destroyed": "このお宝はもはや存在せず……",
+            "Take": "取得",
+            "Close": "閉じる",
+            "Leave": "離れる"
+        },
+
+        "Errors": {
+            "DisallowedItemDrop": "\"{type}\"アイテムを置く事はできません",
+            "NoSourceDrop": "アイテム一覧からシーンにアイテムを置くにはGM権限が必要です。",
+            "PileTooFar": "距離が離れすぎているためお宝を確認できません。",
+            "PileLocked": "このお宝はロック中です。中身の確認とアイテムの追加ができません。",
+            "DropNoToken": "このシーンにコマを所持していませんのでシーンにアイテムを置くことができません。"
+        },
+
+        "Dialogs": {
+            "DropTypeWarning": {
+                "Title": "アイテム種別警告",
+                "Content": "種別が\"{type}\"のアイテムを置こうとしています。このアイテムはシーンに置くことが推薦されていません。本当に置きますか？"
+            },
+            "ResetSettings": {
+                "Title": "Item Piles（お宝）設定初期化",
+                "Content": "設定を現在のシステムのデフォルトに初期化しますか？<strong>この操作を取り消すことはできません！</strong>",
+                "Confirm": "設定初期化",
+                "Cancel": "キャンセル"
+            }
+        },
+
+        "AttributeEditor": {
+            "Title": "参照データ設定",
+            "Explanation": "お宝として指定されたコマから取得可能なリソースや内部データをここで定義できます。例えばD&D5版の場合、所持しているGPの数は\"actor.data.data.currency.gp\"に保存されています。\"金貨\"という名前とともに\"data.currency.gp\"のデータパスを設定してあげればお宝からGPを取得可能になります。",
+            "Name": "データ名",
+            "AttributePath": "データパス",
+            "Icon": "データアイコン",
+            "AddNew": "新規データ追加",
+            "Submit": "データ追加"
+        },
+
+        "Defaults": {
+            "Title": "Item Pile（お宝）設定",
+            "Configure": "Item Pile（お宝）",
+            "MainSettings": "全体設定",
+            "SingleItemSettings": "単体設定",
+            "ContainerSettings": "コンテナ設定",
+            "Update": "お宝更新",
+            "EnabledPile": "有効化",
+            "EnabledPileExplanation": "このキャラクターがお宝として振る舞うかどうかを設定します。",
+            "Distance": "操作可能範囲",
+            "GridUnits": "グリッド単位（空で無限）",
+            "ItemTypeFilter": "アイテム種別フィルタ",
+            "ItemTypeFilterExplanation": "この種別のアイテムは",
+            "Macro": "操作時のマクロ",
+            "MacroExplanation": "このお宝を誰かが操作したときにマクロを実行します（効果音やその他の挙動を自分で追加したい時）",
+            "MacroPlaceholder": "マクロ名",
+            "OverrideAttributes": "参照データ上書き",
+            "OverrideAttributesExplanation": "ここを設定すればデフォルト以外のデータを参照し、中身を取得できるようになります。",
+            "ConfigureOverrideAttributes": "参照データ設定",
+            "DeleteWhenEmpty": "空のお宝を自動削除",
+            "DeleteWhenEmptyExplanation": "中身が空になったら、お宝のコマがシーン上から消滅します。",
+            "DeleteWhenEmptyDefault": "デフォルト設定",
+            "DeleteWhenEmptyYes": "はい、空になったら削除してください",
+            "DeleteWhenEmptyNo": "いいえ、空になっても削除しないでください",
+            "DisplayOne": "単体時、アイテム画像を表示",
+            "DisplayOneExplanation": "お宝の中身が単体のアイテムの場合、そのアイテムの画像がお宝の画像そのものになります。",
+            "OverrideSingleItemScale": "単体アイテムのコマサイズ調整",
+            "SingleItemScale": "単体アイテムコマサイズ",
+            "IsContainer": "コンテナである",
+            "Locked": "ロックされている",
+            "Closed": "閉まっている",
+            "ClosedImagePath": "閉まっている時の画像",
+            "EmptyImagePath": "空の時の画像",
+            "OpenedImagePath": "開いている時の画像",
+            "LockedImagePath": "ロック中の画像",
+            "CloseSoundPath": "閉めた時の効果音",
+            "OpenSoundPath": "開いた時の効果音",
+            "LockedSoundPath": "ロック中の効果音"
+        },
+        "HUD": {
+            "ToggleLocked": "ロック切替",
+            "ToggleClosed": "開閉",
+            "Configure": "お宝設定"
+        },
+
+        "DropItem": {
+            "Title": "アイテムを置こうとしています",
+            "Dropping": "置こうとしているアイテム：",
+            "ExistingPiles": "置こうとした場所に既にお宝が存在していますので、そのお宝の中に追加されます。",
+            "QuantityToDrop": "このアイテムは現在{quantity}個所持してます。何個置きますか？",
+            "AddToPile": "お宝に追加",
+            "NewPile": "新たなお宝を作成",
+            "Cancel": "キャンセル"
+        },
+
+        "Setting": {
+            "Reset": {
+                "Title": "設定初期化",
+                "Label": "Item Piles（お宝）設定初期化",
+                "Hint": "設定を現在のシステムのデフォルトに初期化します。"
+            },
+            "ActorClass": {
+                "Title": "お宝キャラ種別",
+                "Label": "（上級設定）この設定では最初にお宝が作成されたときに使用される内部キャラデータの種別を定義できます。シーンに操作可能なオブジェクトを置くにはキャラ（actor）として設定しないと行けないので、この設定は必須です。D&D5版の場合、専用のコンテナとなる種別を持っていませんので\"character\"がデフォルトで使用されます。"
+            },
+            "Quantity": {
+                "Title": "アイテム個数データ",
+                "Label": "（上級設定）ここではアイテムの個数が格納されているデータバスを設定します。D&D5版の場合、アイテムの個数は\"item.data.data.quantity\"のデータパスに存在しているので\"data.quantity\"のみをここに記入します。"
+            },
+            "Attributes": {
+                "Title": "参照データ設定",
+                "Label": "データ設定",
+                "Hint": "（上級設定）ここでは所持金や能力の使用回数など、必ずしもアイテムではないものを設定し中から取得できるようにします。"
+            },
+            "ItemType": {
+                "Title": "アイテム種別設定",
+                "Label": "（上級設定）ここではデータ上アイテムとなるものがどんなパスを持つのかを設定します。D&D5版の場合、\"item.data.type\"という形で定義されているので、ここには\"type\"とだけ記入します。"
+            },
+            "ItemTypeFilters": {
+                "Title": "アイテム種別フィルタ",
+                "Label": "お宝として取得不可能なアイテムの種別をここで定義します。それらのアイテムは中に存在しても、ダイアログの中には出現しなくなります。D&D5版では、呪文、特徴、クラスをアイテムとして置きたくないかもしれないので\"spell, feat, class\"を記入します（英語名であることに注意）。"
+            },
+            "DeleteEmptyPiles": {
+                "Title": "空のお宝を自動削除",
+                "Label": "中身が空になったら、お宝のコマがシーン上から消滅するかどうかを設定できます。この設定は個別のお宝で上書き可能です。"
+            },
+            "PreloadFiles": {
+                "Title": "先読み",
+                "Label": "お宝関連の画像やファイルをシーンロード時に先読みすることで開閉のときのスムーズさを担保します。"
+            },
+            "Debug": {
+                "Title": "デバッグモード",
+                "Label": "コンソールにデバッグ用のメッセージを表示します。"
+            }
+        }
+    }
+}
