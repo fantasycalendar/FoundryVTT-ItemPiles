@@ -1,0 +1,136 @@
+{
+	"ITEM-PILES": {
+		"Inspect": {
+			"Title": "Inspecter le contenu des piles",
+			"AsActor": "Vous inspectez cette pile en tant que {actorName}",
+			"NoActor": "Vous inspectez le contenu de cette pile sans contrôler un token, ce qui signifie que vous ne pouvez pas y prendre d'objets.",
+			"TakeAll": "Prendre tous les articles",
+			"Empty": "Cette pile est vide.",
+			"Destroyed": "Cette pile n'existe plus.",
+			"Take": "Prendre",
+			"Close": "Fermer",
+			"Leave": "Partir"
+		},
+		"Errors": {
+			"DisallowedItemDrop": "Vous ne pouvez pas déposer des éléments de type \"{type}\"",
+			"NoSourceDrop": "Vous ne pouvez pas déposer d'objets de la barre d'objets, sauf si vous êtes un MJ.",
+			"PileTooFar": "Vous êtes trop loin pour interagir avec cette pile.",
+			"PileLocked": "Ce tas d'objets est verrouillé et ne peut pas être ouvert - vous ne pouvez pas y déposer d'objets.",
+			"DropNoToken": "Vous n'avez pas de Token sur cette scène, donc vous ne pouvez pas déposer d'objets ici."
+		},
+		"Dialogs": {
+			"DropTypeWarning": {
+				"Title": "Avertissement Type d'objet",
+				"Content": "Vous déposez un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être déposé. Êtes-vous sûr de vouloir faire cela ?"
+			},
+			"ResetSettings": {
+				"Title": "Réinitialiser les paramètres du module Item Piles",
+				"Content": "Êtes-vous sûr de vouloir réinitialiser tous les paramètres du module Item Piles aux valeurs par défaut du système actuel ? <strong>CECI NE PEUT PAS ÊTRE ANNULé !</strong>",
+				"Confirm": "Réinitialiser les paramètres du module",
+				"Cancel": "Annuler"
+			}
+		},
+		"AttributeEditor": {
+			"Title": "Éditeur d'attributs dynamiques",
+			"Explanation": "Ici, vous pouvez définir les attributs des personnages qui peuvent être récupérés dans les piles d'objets, comme les devises. Dans D&D5e, les monnaies existent sur les acteurs dans le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Gold Coins\" et le chemin d'attribut \"data.currency.gp\".",
+			"Name": "Nom de l'attribut",
+			"AttributePath": "Chemin de l'attribut",
+			"Icon": "Icône de l'attribut",
+			"AddNew": "Ajouter un nouvel attribut",
+			"Submit": "Soumettre les attributs"
+		},
+		"Defaults": {
+			"Title": "Configuration de la pile d'article",
+			"Configure": "Pile d'articles",
+			"MainSettings": "Paramètres principaux",
+			"SingleItemSettings": "Paramètres objet unique",
+			"ContainerSettings": "Paramètres du conteneur",
+			"Update": "Mise à jour de la pile d'articles",
+			"EnabledPile": "Activé",
+			"EnabledPileExplanation": "Si cela doit agir comme une pile d'articles.",
+			"Distance": "Distance d'interaction",
+			"GridUnits": "Unités de grille (laissez vide pour l'infini)",
+			"ItemTypeFilter": "Filtre du type d'article",
+			"ItemTypeFilterExplanation": "Les éléments de ces types ne seront pas affichés dans l'interface de la pile d'éléments, chaque type étant séparé par une virgule. Laissez vide pour utiliser les valeurs par défaut du module.",
+			"Macro": "Macro à l'interaction",
+			"MacroExplanation": "Nom de la macro à exécuter lors de l'interaction avec cette pile.",
+			"MacroPlaceholder": "Insérer le nom de la macro",
+			"OverrideAttributes": "Remplacer les attributs dynamiques",
+			"OverrideAttributesExplanation": "Configurez si cette pile doit être capable d'utiliser d'autres attributs que ceux par défaut.",
+			"ConfigureOverrideAttributes": "Configurer les attributs dynamiques de remplacement",
+			"DeleteWhenEmpty": "Supprimer lorsque vide",
+			"DeleteWhenEmptyExplanation": "Permet à la pile d'objets de s'effacer automatiquement lorsqu'elle est vide.",
+			"DeleteWhenEmptyDefault": "Réglage par défaut du module",
+			"DeleteWhenEmptyYes": "Oui, supprimer quand c'est vide",
+			"DeleteWhenEmptyNo": "Non, ne pas supprimer quand c'est vide",
+			"DisplayOne": "Afficher l'image d'un seul élément",
+			"DisplayOneExplanation": "Si la pile est composée d'un seul objet, l'image du token de la pile sera l'image de l'objet.",
+			"OverrideSingleItemScale": "Remplacer l'échelle du Token objet unique",
+			"SingleItemScale": "Échelle du Token",
+			"IsContainer": "Est un conteneur",
+			"Locked": "est verrouillé",
+			"Closed": "Est fermé",
+			"ClosedImagePath": "Chemin de l'image quand fermé",
+			"EmptyImagePath": "Chemin de l'image quand vide",
+			"OpenedImagePath": "Chemin de l'image quand ouvert",
+			"LockedImagePath": "Chemin de l'image quand verrouillé",
+			"CloseSoundPath": "Chemin du son quand fermé",
+			"OpenSoundPath": "Chemin du son quand ouvert",
+			"LockedSoundPath": "Chemin du son quand verrouillé"
+		},
+		"HUD": {
+			"ToggleLocked": "Verrouillé (Interrupteur)",
+			"ToggleClosed": "Fermé (Interrupteur)",
+			"Configure": "Configurer la pile"
+		},
+		"DropItem": {
+			"Title": "Objet lâché",
+			"Dropping": "Vous laissez tomber",
+			"ExistingPiles": "Il y a déjà une pile d'objets à cet endroit, vous allez ajouter votre ou vos objets à cette pile.",
+			"QuantityToDrop": "Vous avez {quantity} de cet article, combien voulez-vous en déposer ?",
+			"AddToPile": "Ajouter à la pile",
+			"NewPile": "Créer une nouvelle pile",
+			"Cancel": "Annuler"
+		},
+		"Setting": {
+			"Reset": {
+				"Title": "Réinitialiser les paramètres par défaut",
+				"Label": "Réinitialiser les paramètres par défaut des piles d'objets.",
+				"Hint": "Cela réinitialisera tous les paramètres d'Item Piles aux valeurs par défaut du système de jeu actif."
+			},
+			"ActorClass": {
+				"Title": "Type d'acteur",
+				"Label": "Ce paramètre définit le type d'acteur qui sera utilisé pour l'acteur de pile d'objets par défaut qui est créé lors du premier dépôt d'objet. Dans le cas de D&D5e, c'est \"personnage\", car il n'y a pas de type d'acteur de butin dédié."
+			},
+			"Quantity": {
+				"Title": "Attribut Quantité d'articles",
+				"Label": "Ici, vous pouvez configurer le chemin de l'attribut pour la quantité de chaque élément. Par exemple, dans le système de D&D5e, la quantité de chaque objet est stockée dans l'attribut \"item.data.data.quantity\" de l'objet, donc vous mettez \"data.quantity\" dans ce paramètre."
+			},
+			"Attributes": {
+				"Title": "Attributs dynamiques",
+				"Label": "Configurer les attributs",
+				"Hint": "Ce paramètre définit les attributs qui peuvent être ramassés dans les chemins d'accès aux articles, tels que les devises ou les pouvoirs, qui peuvent ne pas être des articles réels."
+			},
+			"ItemType": {
+				"Title": "Attribut Type d'article",
+				"Label": "Ce paramètre définit le chemin de l'attribut pour déterminer où se trouvent les types d'objets. Dans D&D5e, c'est juste \"type\" parce que le type est défini directement dans \"item.data.type\", parce que chaque objet distingue son type avec cet attribut."
+			},
+			"ItemTypeFilters": {
+				"Title": "Filtres de type d'article",
+				"Label": "Ici, vous pouvez configurer quels types d'objets sont ignorés et ne sont pas listés dans les dialogues de pile d'objets. Par exemple, dans D&D5e, nous ne voulons probablement pas montrer les sorts, les dons et les classes, donc vous mettrez \"sort, dons, classe\"."
+			},
+			"DeleteEmptyPiles": {
+				"Title": "Suppression automatique des piles vides",
+				"Label": "Les piles d'objets se suppriment d'elles-mêmes lorsqu'elles n'ont plus d'objets. Cette option peut être modifiée pour chaque pile d'objets."
+			},
+			"PreloadFiles": {
+				"Title": "Précharger les fichiers",
+				"Label": "Permet de précharger les fichiers (images et audio) des piles, ce qui se traduit par un chargement plus rapide."
+			},
+			"Debug": {
+				"Title": "Activer le débogage",
+				"Label": "Imprime les messages de débogage sur la console"
+			}
+		}
+	}
+}
