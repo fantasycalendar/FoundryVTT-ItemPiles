@@ -12,27 +12,27 @@ export default {
     // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
     "DYNAMIC_ATTRIBUTES": [
         {
-            name: "Platinum Coins",
+            name: "DND5E.CurrencyPP",
             path: "data.currency.pp",
             img: "icons/commodities/currency/coin-inset-snail-silver.webp"
         },
         {
-            name: "Gold Coins",
+            name: "DND5E.CurrencyGP",
             path: "data.currency.gp",
             img: "icons/commodities/currency/coin-embossed-crown-gold.webp"
         },
         {
-            name: "Electrum Coins",
+            name: "DND5E.CurrencyEP",
             path: "data.currency.ep",
             img: "icons/commodities/currency/coin-inset-copper-axe.webp"
         },
         {
-            name: "Silver Coins",
+            name: "DND5E.CurrencySP",
             path: "data.currency.sp",
             img: "icons/commodities/currency/coin-engraved-moon-silver.webp"
         },
         {
-            name: "Copper Coins",
+            name: "DND5E.CurrencyCP",
             path: "data.currency.cp",
             img: "icons/commodities/currency/coin-engraved-waves-copper.webp"
         }

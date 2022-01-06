@@ -1722,12 +1722,12 @@ export default class API {
         const disallowedType = API.isItemTypeDisallowed(itemData);
         if (disallowedType) {
             if (!game.user.isGM) {
-                return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
+                return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
             }
             if (!game.keyboard.downKeys.has("ShiftLeft")) {
                 dropData.force = await Dialog.confirm({
                     title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
-                    content: `<p class="item-piles-dialog">${game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
+                    content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
                     defaultYes: false
                 });
                 if (!dropData.force) {

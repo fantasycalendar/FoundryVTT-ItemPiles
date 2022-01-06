@@ -152,8 +152,9 @@ export class ItemPileInventory extends FormApplication {
         const attributes = API.getPileAttributes(this.pile);
         return attributes.map(attribute => {
             if (!this.validAttribute(attribute.path)) return false;
+            const localizedName = game.i18n.has(attribute.name) ? game.i18n.localize(attribute.name) : attribute.name;
             return {
-                name: attribute.name,
+                name: localizedName,
                 path: attribute.path,
                 img: attribute.img,
                 currentQuantity: 1,
