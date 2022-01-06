@@ -6,6 +6,7 @@ import * as lib from "./lib/lib.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { HOOKS } from "./hooks.js";
+import { registerHotkeys } from "./hotkeys.js";
 
 Hooks.once("init", () => {
 
@@ -56,6 +57,7 @@ Hooks.once("ready", () => {
         if(game.modules.get('socketlib')) word = "activate";
         throw lib.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
     }
+    registerHotkeys();
     Hooks.callAll(HOOKS.READY);
 })
 
@@ -90,19 +92,17 @@ const module = {
         const tokens = [...canvas.tokens.placeables].map(token => token.document);
         for (const doc of tokens) {
             await API._initializeItemPile(doc);
-            await API._registerClickEvents(doc);
         }
     },
 
     async _createPile(doc) {
         if (!API.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.CREATE, doc, lib.getItemPileData(doc));
-        await API._initializeItemPile(doc);
-        return API._registerClickEvents(doc);
+        return API._initializeItemPile(doc);
     },
 
     async _updatePile(doc){
-        return API._registerClickEvents(doc);
+        return API._initializeItemPile(doc);
     },
 
     async _deletePile(doc) {

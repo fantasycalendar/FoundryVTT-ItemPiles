@@ -1575,21 +1575,6 @@ export default class API {
     }
 
     /**
-     * @private
-     */
-    static async _registerClickEvents(targetDocument){
-        const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(targetDocument.uuid);
-        if (!targetDocument || targetDocument.destroyed || !(targetDocument instanceof TokenDocument) || !API.isValidItemPile(targetDocument) || shouldBeDeleted) return;
-        const method = () => {
-            return doubleClickHandler.clicked(targetDocument);
-        }
-        if (!(targetDocument.owner || game.user.isGM) && !lib.object_has_event(targetDocument.object, "pointerdown", method)) {
-            lib.debug(`Registered pointerdown method for target with uuid ${targetDocument.uuid}`)
-            targetDocument.object.on('pointerdown', method);
-        }
-    }
-
-    /**
      * Causes all connected users to re-render a specific pile's inventory UI
      *
      * @param {string} inPileUuid           The uuid of the pile to be re-rendered
@@ -1642,7 +1627,7 @@ export default class API {
                 });
             })).then(() => {
                 if(game.user.isGM){
-                    API._refreshItemPile(tokenDocument);
+                    API._refreshItemPile(tokenDocument.uuid);
                 }
             })
         }
@@ -1904,6 +1889,8 @@ export default class API {
      */
     static async _itemPileClicked(pileDocument) {
 
+        if(!pileDocument || pileDocument.destroyed || !API.isValidItemPile(pileDocument)) return;
+
         lib.debug(`Clicked: ${pileDocument.uuid}`);
 
         const data = lib.getItemPileData(pileDocument);
@@ -1921,7 +1908,7 @@ export default class API {
         })
 
         if (!closestTokens.length && !game.user.isGM) {
-            lib.custom_warning(game.i18n.localize("ITEM-PILES.Dialogs.TooFar.Content"), true);
+            lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
             return;
         }
 
@@ -2040,23 +2027,3 @@ export default class API {
 }
 
 const preloadedFiles = new Set();
-
-const doubleClickHandler = {
-    _clicked: false,
-    _target: false,
-    clicked(target) {
-        if (target !== doubleClickHandler._target) {
-            doubleClickHandler._clicked = false
-        }
-        if (doubleClickHandler._clicked) {
-            doubleClickHandler._target = false;
-            doubleClickHandler._clicked = false;
-            return API._itemPileClicked(target);
-        }
-        doubleClickHandler._target = target;
-        doubleClickHandler._clicked = true;
-        setTimeout(() => {
-            doubleClickHandler._clicked = false
-        }, 500);
-    }
-}

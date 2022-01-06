@@ -27,7 +27,8 @@ export function custom_error(error, notify = true) {
 }
 
 export function getTokensAtLocation(position) {
-    return canvas.tokens.placeables.filter(token => {
+    const tokens = [...canvas.tokens.placeables];
+    return tokens.filter(token => {
         return position.x >= token.x && position.x < (token.x + (token.data.width * canvas.grid.size))
             && position.y >= token.y && position.y < (token.y + (token.data.height * canvas.grid.size));
     });
@@ -74,21 +75,6 @@ export function distance_between_rect(p1, p2) {
 
 export function distance_between(a, b) {
     return new Ray(a, b).distance;
-}
-
-export function object_has_event(object, eventName, func) {
-
-    if (!object?._events?.[eventName]) return false;
-
-    let events = object?._events?.[eventName];
-    if (!Array.isArray(events)) events = [events];
-    for (let event of events) {
-        if (event.context === object && event.fn.toString() === func.toString()) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 export function getSimilarItem(items, { itemId, itemName, itemType }={}) {

@@ -1,5 +1,9 @@
 # Item Piles Changelog 
 
+## Version 1.0.2
+- Fixed issue where if an item pile was updated, it would break the ability for players to open the pile
+- Fixed localization issue when an item pile was too far away from a player
+
 ## Version 1.0.1
 - Added Pathfinder 1 system support
 - Added Japanese localization
