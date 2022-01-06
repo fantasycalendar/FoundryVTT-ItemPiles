@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG] - Descriptive bug title"
+title: "[BUG] - [!! WRITE SHORT DESCRIPTION HERE !!]"
 labels: bug
 assignees: Haxxer
 
