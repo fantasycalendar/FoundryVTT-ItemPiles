@@ -16,7 +16,7 @@ function defaultSettings(apply = false) {
             hint: "ITEM-PILES.Setting.ActorClass.Label",
             scope: "world",
             config: true,
-            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ACTOR_CLASS_TYPE : "character",
+            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ACTOR_CLASS_TYPE : game.system.template.Actor.types[0],
             type: String
         },
         "itemQuantityAttribute": {
