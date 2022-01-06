@@ -15,6 +15,7 @@ Hooks.once("init", () => {
     Hooks.once("socketlib.ready", registerSocket);
     Hooks.on("canvasReady", module._canvasReady);
     Hooks.on("createToken", module._createPile);
+    Hooks.on("updateToken", module._updatePile);
     Hooks.on("deleteToken", module._deletePile);
     Hooks.on("dropCanvasData", module._dropCanvasData);
     Hooks.on("updateActor", module._pileAttributeChanged);
@@ -86,15 +87,22 @@ const module = {
     },
 
     async _canvasReady(canvas) {
-        for (const token of canvas.tokens.placeables) {
-            await API._initializeItemPile(token.document);
+        const tokens = [...canvas.tokens.placeables].map(token => token.document);
+        for (const doc of tokens) {
+            await API._initializeItemPile(doc);
+            await API._registerClickEvents(doc);
         }
     },
 
     async _createPile(doc) {
         if (!API.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.CREATE, doc, lib.getItemPileData(doc));
-        return API._initializeItemPile(doc);
+        await API._initializeItemPile(doc);
+        return API._registerClickEvents(doc);
+    },
+
+    async _updatePile(doc){
+        return API._registerClickEvents(doc);
     },
 
     async _deletePile(doc) {

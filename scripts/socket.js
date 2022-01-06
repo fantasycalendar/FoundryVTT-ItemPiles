@@ -19,6 +19,7 @@ export const SOCKET_HANDLERS = {
     TURN_INTO_PILE: "turnIntoPile",
     REVERT_FROM_PILE: "revertFromPile",
     REFRESH_PILE: "refreshItemPile",
+    REGISTER_PILE_EVENTS: "registerPileClickEvents",
 
     /**
      * UI sockets
@@ -64,6 +65,7 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.TURN_INTO_PILE, (...args) => API._turnTokenIntoItemPile(...args))
     itemPileSocket.register(SOCKET_HANDLERS.REVERT_FROM_PILE, (...args) => API._revertTokenFromItemPile(...args))
     itemPileSocket.register(SOCKET_HANDLERS.REFRESH_PILE, (...args) => API._refreshItemPile(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.REGISTER_PILE_EVENTS, (...args) => API._registerClickEvents(...args))
 
     /**
      * UI sockets

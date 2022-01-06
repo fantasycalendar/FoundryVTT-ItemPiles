@@ -1514,8 +1514,6 @@ export default class API {
             ? target.actor
             : target;
 
-        const pileData = lib.getItemPileData(target);
-
         const hasNoItems = Array.from(targetActor.items).length === 0;
 
         const attributes = API.getPileAttributes(target);
@@ -1563,7 +1561,8 @@ export default class API {
 
         return Promise.allSettled(targets.map(_target => {
             return new Promise(async (resolve) => {
-                const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(lib.getUuid(_target));
+                const uuid = lib.getUuid(_target);
+                const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(uuid);
                 if (!shouldBeDeleted) {
                     await _target.update({
                         "img": API._getItemPileTokenImage(targetDocument),
@@ -1573,6 +1572,21 @@ export default class API {
                 resolve();
             })
         }));
+    }
+
+    /**
+     * @private
+     */
+    static async _registerClickEvents(targetDocument){
+        const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(targetDocument.uuid);
+        if (!targetDocument || targetDocument.destroyed || !(targetDocument instanceof TokenDocument) || !API.isValidItemPile(targetDocument) || shouldBeDeleted) return;
+        const method = () => {
+            return doubleClickHandler.clicked(targetDocument);
+        }
+        if (!(targetDocument.owner || game.user.isGM) && !lib.object_has_event(targetDocument.object, "pointerdown", method)) {
+            lib.debug(`Registered pointerdown method for target with uuid ${targetDocument.uuid}`)
+            targetDocument.object.on('pointerdown', method);
+        }
     }
 
     /**
@@ -1608,17 +1622,8 @@ export default class API {
 
         const pileData = lib.getItemPileData(tokenDocument);
 
-        const method = () => {
-            return doubleClickHandler.clicked(tokenDocument);
-        }
-
-        if (!(tokenDocument.owner || game.user.isGM) && !lib.object_has_event(tokenDocument.object, "pointerdown", method)) {
-            lib.debug(`Registered pointerdown method for target with uuid ${tokenDocument.uuid}`)
-            tokenDocument.object.on('pointerdown', method);
-        }
-
         if (game.settings.get(CONSTANTS.MODULE_NAME, "preloadFiles")) {
-            Promise.allSettled(Object.entries(pileData).map(entry => {
+            await Promise.allSettled(Object.entries(pileData).map(entry => {
                 return new Promise(async (resolve) => {
                     const [key, value] = entry;
                     if (preloadedFiles.has(value) || !value){
@@ -1637,9 +1642,9 @@ export default class API {
                 });
             })).then(() => {
                 if(game.user.isGM){
-                    API._refreshItemPile(tokenDocument.uuid)
+                    API._refreshItemPile(tokenDocument);
                 }
-            });
+            })
         }
 
         lib.debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
@@ -2038,6 +2043,7 @@ const preloadedFiles = new Set();
 
 const doubleClickHandler = {
     _clicked: false,
+    _target: false,
     clicked(target) {
         if (target !== doubleClickHandler._target) {
             doubleClickHandler._clicked = false
