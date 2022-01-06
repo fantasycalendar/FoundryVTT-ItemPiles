@@ -149,11 +149,6 @@ export class ItemPileConfig extends FormApplication {
         });
     }
 
-    async _onSubmit(...args){
-        console.log(...args);
-        return super._onSubmit(...args);
-    }
-
     async _updateObject(event, formData) {
 
         const data = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, formData);
