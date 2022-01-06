@@ -1,4 +1,4 @@
-# Canvas Hoard Changelog 
+# Item Piles Changelog 
 
 ## Version 1.0.1
 - Added Pathfinder 1 system support
