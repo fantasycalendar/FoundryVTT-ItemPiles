@@ -158,6 +158,8 @@ const module = {
 
     _insertItemPileHeaderButtons(actorSheet, buttons) {
 
+        if(!game.user.isGM) return;
+
         let obj = actorSheet.object;
 
         buttons.unshift({
