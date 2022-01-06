@@ -1,5 +1,10 @@
 # Item Piles Changelog 
 
+## Version 1.0.4
+- Fixed non-GMs being able to turn their characters into loot piles
+- Fixed disabling loot piles would also disable the save button
+- Added warning when turning a linked actor into an item pile 
+
 ## Version 1.0.3
 - Fixed dropping items from compendiums
 
