@@ -59,14 +59,6 @@ export class ItemPileConfig extends FormApplication {
         const containerCheckbox = html.find('input[name="isContainer"]');
         const overrideAttributesEnabledCheckbox = html.find('.item-pile-config-override-attributes-checkbox');
 
-        enabledCheckbox.change(function () {
-            let isEnabled = $(this).is(":checked");
-            html.find('input, button, select').not($(this)).each(function () {
-                $(this).prop('disabled', !isEnabled);
-                $(this).closest('.form-group').toggleClass("item-pile-disabled", !isEnabled);
-            });
-        }).change();
-
         const slider = html.find("#scaleRange");
         const input = html.find("#scaleInput");
         scaleCheckbox.change(function () {
@@ -82,6 +74,35 @@ export class ItemPileConfig extends FormApplication {
                 $(this).toggleClass("item-pile-disabled", isDisabled);
                 $(this).find('input, button').prop("disabled", isDisabled);
                 scaleCheckbox.change();
+            });
+        }).change();
+
+        let firstTime = true;
+        enabledCheckbox.change(async function () {
+            let isEnabled = $(this).is(":checked");
+            if(!firstTime){
+                const existingData = lib.getItemPileData(self.document);
+                if(isEnabled && !existingData?.enabled) {
+                    const isLinked = self.document instanceof Actor
+                        ? self.document.data.token.actorLink
+                        : self.document.isLinked;
+                    if(isLinked){
+                        const doContinue = await Dialog.confirm({
+                            title: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Title"),
+                            content: `<p class="item-piles-dialog"><i style="font-size:3rem;" class="fas fa-exclamation-triangle"></i><br><br>${game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content")}</p>`,
+                            defaultYes: false
+                        });
+                        if (!doContinue) {
+                            isEnabled = false;
+                            $(this).prop("checked", false);
+                        }
+                    }
+                }
+            }
+            firstTime = false;
+            html.find('.tab-body').find('input, button, select').not($(this)).each(function () {
+                $(this).prop('disabled', !isEnabled);
+                $(this).closest('.form-group').toggleClass("item-pile-disabled", !isEnabled);
             });
         }).change();
 
@@ -128,6 +149,11 @@ export class ItemPileConfig extends FormApplication {
         });
     }
 
+    async _onSubmit(...args){
+        console.log(...args);
+        return super._onSubmit(...args);
+    }
+
     async _updateObject(event, formData) {
 
         const data = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, formData);
@@ -137,7 +163,7 @@ export class ItemPileConfig extends FormApplication {
         data.overrideAttributes = checked ? this.pileData.overrideAttributes : false;
 
         if (!formData.enabled) {
-            setTimeout(canvas.tokens.hud.render(true), 100);
+            setTimeout(canvas.tokens.hud.render(true), 250);
         }
 
         formData.deleteWhenEmpty = {

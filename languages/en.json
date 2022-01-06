@@ -26,6 +26,10 @@
                 "Title": "Item Type Warning",
                 "Content": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?"
             },
+            "LinkedActorWarning": {
+                "Title": "Item Piles & Linked Actor",
+                "Content": "Are you sure you want to turn this <strong>linked actor</strong> into an item pile? This actor's token is linked and all tokens of this actor will share its inventory and attributes."
+            },
             "ResetSettings": {
                 "Title": "Reset Item Piles Module Settings",
                 "Content": "Are you sure you want to reset all of the Item Piles module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
