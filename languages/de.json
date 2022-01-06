@@ -1,0 +1,147 @@
+{
+    "ITEM-PILES": {
+
+        "Inspect": {
+            "Title": "Untersuche Gegenstandstapel",
+            "AsActor": "Du untersuchst diesen Stapel als {actorName}",
+            "NoActor": "Du untersuchst den Inhalt dieses Stapels ohne ein Token zu kontrollieren. Dies bedeutet du kannst keine Gegenstände vom Stapel nehmen.",
+            "TakeAll": "Alles nehmen",
+            "Empty": "Dieser Stapel ist leer.",
+            "Destroyed": "Dieser Stapel existiert nicht mehr und liegt brach.",
+            "Take": "Nehmen",
+            "Close": "Kiste schliessen",
+            "Leave": "Verlassen"
+        },
+
+        "Errors": {
+            "DisallowedItemDrop": "Du kannst keinen Gegenstand vom Typ \"{type}\" hier fallen lassen.",
+            "NoSourceDrop": "Du kannst keine Gegenstände aus der Gegenstandsleiste fallen lassen, es sei denn, du bist ein GM.",
+            "PileTooFar": "Du bist zu weit entfernt um mit dem Stapel zu interagieren",
+            "PileLocked": "Dieser Stapel ist gesperrt und verschlossen - du kannst keine Gegenstände hier fallen lassen.",
+            "DropNoToken": "Du hast kein Token in dieser Szene, daher kannst du hier keinen Gegenstand fallen lassen."
+        },
+
+        "Dialogs": {
+            "DropTypeWarning": {
+                "Title": "Gegenstand Typ Warnung",
+                "Content": "Du versuchst einen Gegenstand vom Typ (\"{type}\") hier abzulegen was normal nicht erlaubt ist. Bist du sicher das du das tun willst?"
+            },
+            "LinkedActorWarning": {
+                "Title": "Gegenstandsstapel & verlinkter Akteur",
+                "Content": "Bist du sicher das du diesen <strong>verlinkten Akteuer</strong> in einen Gegenstandstapel ändern willst ? Alle Akteur-Token bei verlinkten Akteueren teilen sich ein Inventar und Attribute"
+            },
+            "ResetSettings": {
+                "Title": "Setze Einstellungen von Gegenstandsstapel zurück",
+                "Content": "Bist du sicher das du alle Einstellungen vom Gegenstandsstapelmodul auf die Standardwerte des Systems zurücksetzen willst ? <strong>DIES KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!</strong>",
+                "Confirm": "Moduleinstellungen zurücksetzen",
+                "Cancel": "Abbrechen"
+            }
+        },
+
+        "AttributeEditor": {
+            "Title": "Dynamischer Attribute Editor",
+            "Explanation": "Hier kannst du festlegen, welche Attribute von Charakteren von Gegenstandsstapeln abgeholt werden können, z.B. Währungen. In D&D5e gibt es Währungen für Akteure mit dem Attributspfad \"actor.data.data.currency.gp\", also fügst du deine eigene mit dem Namen \"Goldmünzen\" und dem Attributspfad \"data.currency.gp\" hinzu.",
+            "Name": "Attributsname",
+            "AttributePath": "Attributspfad",
+            "Icon": "Attribut Icon",
+            "AddNew": "Neues Attribut zufügen",
+            "Submit": "Attribut übermitteln"
+        },
+
+        "Defaults": {
+            "Title": "Gegenstandsstapel Konfiguration",
+            "Configure": "Gegenstandsstapel",
+            "MainSettings": "Hauptmenü",
+            "SingleItemSettings": "Einstellungen einzelner Gegenstand",
+            "ContainerSettings": "Einstellungen Container",
+            "Update": "Gegenstandsstapel aktualisieren",
+            "EnabledPile": "Aktiviert",
+            "EnabledPileExplanation": "Bestimmt ob sich dies als Gegenstandsstapel verhalten soll.",
+            "Distance": "Interaktionsreichweite",
+            "GridUnits": "Gittereinheiten (leer lassen für unbegrenzt)",
+            "ItemTypeFilter": "Gegenstandstyp Filter",
+            "ItemTypeFilterExplanation": "Artikel dieser Typen werden in keiner Artikelstapel-Benutzeroberfläche angezeigt, wobei jeder Typ durch ein Komma getrennt wird. Leer lassen, um die Standardwerte des Moduls zu verwenden.",
+            "Macro": "Macro bei Interaktion",
+            "MacroExplanation": "Name des Makros, das ausgeführt werden soll, wenn mit diesem Stapel interagiert wird.",
+            "MacroPlaceholder": "Macro Name einfügen",
+            "OverrideAttributes": "Dynamische Attribute außer Kraft setzen",
+            "OverrideAttributesExplanation": "Legen Sie fest, ob dieser Stapel andere Attribute als die Standardattribute übertragen können soll.",
+            "ConfigureOverrideAttributes": "Konfiguriere: Dynamische Attribute außer Kraft setzen",
+            "DeleteWhenEmpty": "Löschen wenn leer",
+            "DeleteWhenEmptyExplanation": "Bewirkt, dass sich der Gegenstandsstapel selbst löscht, sobald er leer ist.",
+            "DeleteWhenEmptyDefault": "Standardeinstellung des Moduls",
+            "DeleteWhenEmptyYes": "Ja, löschen, wenn leer",
+            "DeleteWhenEmptyNo": "Nein, nicht löschen wenn leer",
+            "DisplayOne": "Einzelnes Artikelbild anzeigen",
+            "DisplayOneExplanation": "Besteht der Stapel aus einem einzigen Gegenstand, wird das Bild des Stapels auf das Bild des Gegenstandes gesetzt.",
+            "OverrideSingleItemScale": "Einzelne Gegenstands-Token-Skalierung außer Kraft setzen",
+            "SingleItemScale": "Gegenstands-Token-Skalierung",
+            "IsContainer": "Ist Container",
+            "Locked": "Ist verschlossen",
+            "Closed": "Ist geschlossen",
+            "ClosedImagePath": "Pfad Bild Geschlossener Container",
+            "EmptyImagePath": "Pfad Bild Leerer Container",
+            "OpenedImagePath": "Pfad Bild Geöffneter Container",
+            "LockedImagePath": "Pfad Bild Verschlossener Container",
+            "CloseSoundPath": "Pfad Geräusch Schliessen",
+            "OpenSoundPath": "Pfad Geräusch Öffnen",
+            "LockedSoundPath": "Pfad Geräusch Verschlossen"
+        },
+        "HUD": {
+            "ToggleLocked": "Setze verschlossen",
+            "ToggleClosed": "Setze geschlossen",
+            "Configure": "Stapel konfigurieren"
+        },
+
+        "DropItem": {
+            "Title": "Gegenstand fallenlassen",
+            "Dropping": "Du lässt Gegenstand fallen",
+            "ExistingPiles": "Es gibt bereits einen Gegenstandsstapel an dieser Stelle, Sie werden Ihre(n) Gegenstand(e) zu diesem Stapel hinzufügen.",
+            "QuantityToDrop": "Du hast {Menge} Stück dieses Gegenstandes, wie viele willst du abgeben?",
+            "AddToPile": "Zum Stapel zufügen",
+            "NewPile": "Neuen Stapel erzeugen",
+            "Cancel": "Abbrechen"
+        },
+
+        "Setting": {
+            "Reset": {
+                "Title": "Einstellungen zurücksetzen",
+                "Label": "Einstellungen auf Standard zurücksetzen",
+                "Hint": "Dadurch werden alle Einstellungen der Gegenstandsstapel auf die Standardeinstellungen des aktiven Spielsystems zurückgesetzt."
+            },
+            "ActorClass": {
+                "Title": "Akteur Klassentyp",
+                "Label": "Diese Einstellung definiert den Typ des Akteurs, der für den Standard-Gegenstandsstapel-Akteur verwendet wird, der beim ersten Erzeugen eines Stapels erstellt wird. Im Falle von D&D5e ist dies \"character\", da es keinen eigenen Beuteakteurstyp gibt."
+            },
+            "Quantity": {
+                "Title": "Gegenstand Attribut Artikelmenge",                
+                "Label": "Hier können Sie den Attributspfad für die Menge der einzelnen Gegenstände konfigurieren. Im D&D5e-System zum Beispiel wird die Menge jedes Gegenstands im Attribut \"item.data.data.quantity\" gespeichert, so dass Sie hier \"data.quantity\" eingeben müssen."
+            },
+            "Attributes": {
+                "Title": "Dynamische Attribute",
+                "Label": "Attribute konfigurieren",
+                "Hint": "Mit dieser Einstellung werden die Attribute festgelegt, die für die Abholung in Artikelpfaden in Frage kommen, z. B. Währungen oder Stärken, bei denen es sich nicht um tatsächliche Artikel handeln muss."
+            },
+            "ItemType": {
+                "Title": "Gegenstand Attribut Artikeltyp",                
+                "Label": "Diese Einstellung legt den Attributspfad fest, der bestimmt, wo sich die Gegenstandstypen befinden. In D&D5e heißt dieser einfach \"type\", weil der Typ direkt in \"item.data.type\" definiert ist, da jeder Gegenstand seinen Typ mit diesem Attribut kennzeichnet."
+            },
+            "ItemTypeFilters": {
+                "Title": "Gegenstand Typ Filter",                
+                "Label": "Hier kannst du konfigurieren, welche Gegenstandstypen ignoriert und nicht in den Gegenstandsstapeldialogen aufgeführt werden sollen. Zum Beispiel willst du in D&D5e wahrscheinlich keine Zauber, Feats und Klassen anzeigen, also würdest du \"spell, feat, class\" eintragen."
+            },
+            "DeleteEmptyPiles": {
+                "Title": "Leere Stapel automatisch löschen",
+                "Label": "Dies führt dazu, dass sich Gegenstandsstapel selbst löschen, sobald sie keine Gegenstände mehr enthalten. Dies kann bei einzelnen Gegenstandsstapeln außer Kraft gesetzt werden."
+            },
+            "PreloadFiles": {
+                "Title": "Dateien vorladen",
+                "Label": "Veranlasst, dass Dateien (Bilder und Audio) von Stapeln vorgeladen werden, was zu einem nahtlosen Erlebnis führt."
+            },
+            "Debug": {
+                "Title": "Debugging einschalten",
+                "Label": "Gibt Debug-Meldungen auf der Konsole aus"
+            }
+        }
+    }
+}

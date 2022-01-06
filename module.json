@@ -35,6 +35,11 @@
       "lang": "ja",
       "name": "日本語",
       "path": "languages/ja.json"
+    },
+    {
+        "lang": "de",
+        "name": "Deutsch (German)",
+        "path": "languages/de.json"
     }
   ],
   "dependencies": [
