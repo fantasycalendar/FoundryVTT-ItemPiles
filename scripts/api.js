@@ -46,10 +46,10 @@ export default class API {
     /**
      * The filters for item types eligible for interaction within this system
      *
-     * @returns {array}
+     * @returns {Array}
      */
     static get ITEM_TYPE_FILTERS() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeFilters").split(',').map(str => str.trim());
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeFilters").split(',').map(str => str.trim().toLowerCase());
     }
 
     /**
@@ -280,12 +280,10 @@ export default class API {
             })
         }
 
-        const sourceActorItems = source instanceof TokenDocument
-            ? source.actor.items
-            : source.items;
+        const sourceActorItems = API.getItemPileItems(source);
 
         items.forEach(item => {
-            const actorItem = sourceActorItems.get(item._id);
+            const actorItem = sourceActorItems.find(actorItem => actorItem.id === item._id);
             if (!actorItem) {
                 throw lib.custom_error(`TransferItems | Could not find item with id "${item._id}" on source "${sourceUuid}"`, true)
             }
@@ -361,13 +359,11 @@ export default class API {
             })
         }
 
-        const targetActorItems = target instanceof TokenDocument
-            ? target.actor.items
-            : target.items;
+        const targetActorItems = API.getItemPileItems(target);
 
         items.forEach(item => {
             const itemId = typeof item === "string" ? item : item._id;
-            const actorItem = targetActorItems.get(itemId);
+            const actorItem = targetActorItems.find(actorItem => actorItem.id === itemId);
             if (!actorItem) {
                 throw lib.custom_error(`RemoveItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
             }
@@ -605,11 +601,7 @@ export default class API {
             })
         }
 
-        const sourceActor = source instanceof TokenDocument
-            ? source.actor
-            : source;
-
-        const itemsToRemove = Array.from(sourceActor.items).filter(item => !API.isItemTypeDisallowed(item, itemTypeFilters)).map(item => item.toObject());
+        const itemsToRemove = API.getItemPileItems(target, itemTypeFilters).map(item => item.toObject());
 
         const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, { itemTypeFilters, isTransfer: true });
         const itemsAdded = await API._addItems(targetUuid, itemsRemoved, { itemTypeFilters, isTransfer: true });
@@ -953,7 +945,7 @@ export default class API {
             ? target.actor
             : target;
 
-        const sourceAttributes = API.getPileAttributes(sourceActor);
+        const sourceAttributes = API.getItemPileAttributes(sourceActor);
 
         const attributesToTransfer = sourceAttributes.filter(attribute => {
             return hasProperty(sourceActor.data, attribute.path)
@@ -1086,7 +1078,7 @@ export default class API {
         const newPileSettings = foundry.utils.mergeObject(existingPileSettings, pileSettings);
         newPileSettings.enabled = true;
 
-        await API._updateItemPile(targetUuid, pileSettings, { tokenSettings });
+        await API._updateItemPile(targetUuid, newPileSettings, { tokenSettings });
 
         setTimeout(API.rerenderTokenHud, 100);
 
@@ -1380,8 +1372,6 @@ export default class API {
 
         await lib.updateItemPile(target, data, tokenSettings);
 
-        await API._refreshItemPile(targetUuid);
-
         if (data.isEnabled && data.isContainer) {
             if (diff?.closed === true) {
                 await API._executeItemPileMacro(targetUuid, {
@@ -1500,7 +1490,8 @@ export default class API {
      * @return {boolean}
      */
     static isValidItemPile(document) {
-        return lib.getItemPileData(document)?.enabled;
+        const documentActor = document instanceof TokenDocument ? document.actor : document;
+        return document && !document.destroyed && documentActor && lib.getItemPileData(document)?.enabled;
     }
 
     /**
@@ -1516,13 +1507,53 @@ export default class API {
 
         if(!targetActor) return false;
 
-        const hasNoItems = Array.from(targetActor.items).length === 0;
+        const hasNoItems = API.getItemPileItems(target).length === 0;
 
-        const attributes = API.getPileAttributes(target);
+        const attributes = API.getItemPileAttributes(target);
         const hasEmptyAttributes = attributes.find(attribute => {
             return hasProperty(targetActor.data, attribute.path) && getProperty(targetActor.data, attribute.path) === 0;
         })
         return hasNoItems && hasEmptyAttributes;
+    }
+
+    /**
+     * Returns the item type filters for a given item pile
+     *
+     * @param target
+     * @returns {Array}
+     */
+    static getItemPileItemTypeFilters(target){
+        if(!API.isValidItemPile(target)) return [];
+        const pileData = lib.getItemPileData(target);
+        return pileData.itemTypeFilters
+            ? pileData.itemTypeFilters.split(',').map(str => str.trim().toLowerCase())
+            : API.ITEM_TYPE_FILTERS;
+    }
+
+    /**
+     * Returns the items this item pile can transfer
+     *
+     * @param {TokenDocument|Actor} target
+     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
+     * @returns {Array}
+     */
+    static getItemPileItems(target, itemTypeFilters = false){
+
+        if(!API.isValidItemPile(target)) return [];
+
+        const pileItemFilters = Array.isArray(itemTypeFilters)
+            ? new Set(itemTypeFilters)
+            : new Set(API.getItemPileItemTypeFilters(target));
+
+        const targetActor = target instanceof TokenDocument
+            ? target.actor
+            : target;
+
+        return Array.from(targetActor.items).filter(item => {
+            const itemType = getProperty(item.data, API.ITEM_TYPE_ATTRIBUTE);
+            return !pileItemFilters.has(itemType);
+        })
+
     }
 
     /**
@@ -1531,7 +1562,7 @@ export default class API {
      * @param {TokenDocument|Actor} target
      * @returns {array}
      */
-    static getPileAttributes(target){
+    static getItemPileAttributes(target){
         const pileData = lib.getItemPileData(target);
         return pileData.overrideAttributes || API.DYNAMIC_ATTRIBUTES;
     }
@@ -1554,7 +1585,7 @@ export default class API {
     static async _refreshItemPile(targetUuid) {
         const targetDocument = await fromUuid(targetUuid);
 
-        if (!targetDocument || targetDocument.destroyed || !API.isValidItemPile(targetDocument)) return;
+        if (!API.isValidItemPile(targetDocument)) return;
 
         let targets = [targetDocument]
         if (targetDocument instanceof Actor) {
@@ -1627,11 +1658,7 @@ export default class API {
                     }
                     return resolve();
                 });
-            })).then(() => {
-                if(game.user.isGM){
-                    API._refreshItemPile(tokenDocument.uuid);
-                }
-            })
+            }));
         }
 
         lib.debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
@@ -1902,7 +1929,7 @@ export default class API {
      */
     static async _itemPileClicked(pileDocument) {
 
-        if(!pileDocument || pileDocument.destroyed || !API.isValidItemPile(pileDocument)) return;
+        if(!API.isValidItemPile(pileDocument)) return;
 
         lib.debug(`Clicked: ${pileDocument.uuid}`);
 
@@ -1958,18 +1985,21 @@ export default class API {
             data = lib.getItemPileData(pileDocument);
         }
 
+        let img = pileDocument.data.img;
+
         const pileActor = pileDocument instanceof TokenDocument
             ? pileDocument.actor
             : pileDocument;
 
-        if(!pileActor) return;
+        if(!pileActor || !API.isValidItemPile(pileDocument)) return img;
 
-        const items = Array.from(pileActor.items);
+        img = pileActor.data.token.img;
 
-        let img;
+        const items = API.getItemPileItems(pileDocument);
+
         if (data.isContainer) {
 
-            img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage;
+            img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage || img;
 
             if (data.locked && data.lockedImage) {
                 img = data.lockedImage;
@@ -1985,12 +2015,6 @@ export default class API {
 
             img = items[0].data.img;
 
-        }
-
-        if (!img) {
-            img = pileDocument instanceof TokenDocument
-                ? pileDocument.actor.data.img
-                : pileDocument.data.img;
         }
 
         return img;
@@ -2010,13 +2034,19 @@ export default class API {
             ? pileDocument.actor
             : pileDocument;
 
-        if(!pileActor) return;
+        const baseScale = pileActor
+            ? pileActor.data.token.scale
+            : pileDocument.data.scale;
 
-        const items = Array.from(pileActor.items);
+        if(!pileActor){
+            return baseScale;
+        }
+
+        const items = API.getItemPileItems(pileDocument);
 
         return data.displayOne && data.overrideSingleItemScale && items.length === 1
             ? data.singleItemScale
-            : pileActor.data.token.scale;
+            : baseScale;
 
     }
 

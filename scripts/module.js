@@ -1,5 +1,5 @@
 import CONSTANTS from "./constants.js";
-import registerSettings, { checkSystem } from "./settings.js";
+import registerSettings, { checkIncompatibilities, checkSystem } from "./settings.js";
 import { registerSocket } from "./socket.js";
 import API from "./api.js";
 import * as lib from "./lib/lib.js";
@@ -58,6 +58,7 @@ Hooks.once("ready", () => {
         throw lib.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
     }
     checkSystem();
+    checkIncompatibilities();
     registerHotkeys();
     Hooks.callAll(HOOKS.READY);
 })
@@ -67,7 +68,7 @@ const module = {
     async _pileAttributeChanged(actor, changes) {
         const target = actor?.token ?? actor;
         if (!API.isValidItemPile(target)) return;
-        const sourceAttributes = API.getPileAttributes(target);
+        const sourceAttributes = API.getItemPileAttributes(target);
         const validProperty = sourceAttributes.find(attribute => {
             return hasProperty(changes, attribute.path);
         });
@@ -93,6 +94,9 @@ const module = {
         const tokens = [...canvas.tokens.placeables].map(token => token.document);
         for (const doc of tokens) {
             await API._initializeItemPile(doc);
+            if(game.user.isGM) {
+                await API._refreshItemPile(doc.uuid);
+            }
         }
     },
 
@@ -103,7 +107,10 @@ const module = {
     },
 
     async _updatePile(doc){
-        return API._initializeItemPile(doc);
+        await API._initializeItemPile(doc);
+        if(game.user.isGM) {
+            return API._refreshItemPile(doc.uuid);
+        }
     },
 
     async _deletePile(doc) {

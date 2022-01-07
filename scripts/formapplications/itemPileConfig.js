@@ -46,7 +46,7 @@ export class ItemPileConfig extends FormApplication {
         let data = super.getData(options);
         data = foundry.utils.mergeObject(data, this.pileData);
         data.defaultItemTypeFilters = API.ITEM_TYPE_FILTERS.length
-            ? "Defaults: " + API.ITEM_TYPE_FILTERS.join(', ')
+            ? "Defaults: " + Array.from(API.ITEM_TYPE_FILTERS).join(', ')
             : "Input item type filters...";
         return data;
     }

@@ -1,5 +1,15 @@
 # Item Piles Changelog 
 
+## Version 1.0.6
+- Added API endpoints:
+    - `ItemPiles.API.getItemPileItemTypeFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
+    - `ItemPiles.API.getItemPileItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
+- Added warning on startup for module incompatibilities
+- Updated japanese localization
+- Fixed item piles not respecting item type filters
+- Fixed issue with `ItemPiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile
+- Fixed issues with item pile tokens sometimes switching to their actors image when they were empty
+
 ## Version 1.0.5
 - Added french localization
 - Added german localization

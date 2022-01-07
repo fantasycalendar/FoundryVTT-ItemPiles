@@ -66,7 +66,7 @@ export class ItemPileInventory extends FormApplication {
         let self = this;
         this.items = [];
 
-        let pileItems = Array.from(this.pile.actor.items);
+        let pileItems = API.getItemPileItems(this.pile);
 
         if (!pileItems.length) return;
 
@@ -100,7 +100,8 @@ export class ItemPileInventory extends FormApplication {
     }
 
     getPileItemData() {
-        return Array.from(this.pile.actor.items).map(item => {
+        const pileItems = API.getItemPileItems(this.pile);
+        return pileItems.map(item => {
             return {
                 id: item.id,
                 name: item.name,
@@ -149,7 +150,7 @@ export class ItemPileInventory extends FormApplication {
     }
 
     getPileAttributeData() {
-        const attributes = API.getPileAttributes(this.pile);
+        const attributes = API.getItemPileAttributes(this.pile);
         return attributes.map(attribute => {
             if (!this.validAttribute(attribute.path)) return false;
             const localizedName = game.i18n.has(attribute.name) ? game.i18n.localize(attribute.name) : attribute.name;
@@ -196,7 +197,7 @@ export class ItemPileInventory extends FormApplication {
             data.isContainer = pileData.isContainer;
             data.items = this.items.length ? this.items : this.getPileItemData();
             data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
-            data.hasItems = Array.from(this.pile.actor.items).length > 0;
+            data.hasItems = API.getItemPileItems(this.pile).length > 0;
             data.hasAttributes = data?.attributes?.length;
         }
 
