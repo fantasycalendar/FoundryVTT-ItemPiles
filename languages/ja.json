@@ -59,7 +59,7 @@
 
         "Defaults": {
             "Title": "Item Pile（お宝）設定",
-            "Configure": "Item Pile（お宝）",
+            "Configure": "お宝",
             "MainSettings": "全体設定",
             "SingleItemSettings": "単体設定",
             "ContainerSettings": "コンテナ設定",
