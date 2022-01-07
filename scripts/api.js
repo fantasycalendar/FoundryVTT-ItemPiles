@@ -1924,6 +1924,8 @@ export default class API {
 
         let validTokens = (canvas.tokens.controlled.length > 0 ? canvas.tokens.controlled : canvas.tokens.placeables).filter(token => token.owner && token.document !== pileDocument);
 
+        const maxDistance = data.distance ? data.distance : Infinity;
+
         let closestTokens = validTokens.map(token => {
             const distance = Math.floor(lib.distance_between_rect(pileDocument.object, token) / canvas.grid.size) + 1;
             return {
@@ -1931,7 +1933,7 @@ export default class API {
                 distance
             };
         }).filter(potentialTarget => {
-            return data.distance >= potentialTarget?.distance;
+            return maxDistance >= potentialTarget?.distance || game.user.isGM;
         })
 
         if (!closestTokens.length && !game.user.isGM) {
