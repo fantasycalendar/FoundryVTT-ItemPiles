@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.0.7
+- Fixed module being broken
+
 ## Version 1.0.6
 - Added API endpoints:
     - `ItemPiles.API.getItemPileItemTypeFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
