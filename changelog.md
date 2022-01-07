@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.0.8
+- Fixed item pile token image not being updated when first creating a new item pile
+
 ## Version 1.0.7
 - Fixed module being broken
 

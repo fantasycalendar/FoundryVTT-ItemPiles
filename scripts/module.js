@@ -15,6 +15,7 @@ Hooks.once("init", () => {
 
     Hooks.once("socketlib.ready", registerSocket);
     Hooks.on("canvasReady", module._canvasReady);
+    Hooks.on("preCreateToken", module._preCreatePile);
     Hooks.on("createToken", module._createPile);
     Hooks.on("updateToken", module._updatePile);
     Hooks.on("deleteToken", module._deletePile);
@@ -99,13 +100,25 @@ const module = {
         }
     },
 
+    async _preCreatePile(token){
+        if (!API.isValidItemPile(token)) return;
+        token.data.update({
+            "img": API._getItemPileTokenImage(token),
+            "scale": API._getItemPileTokenScale(token)
+        });
+    },
+
     async _createPile(doc) {
         if (!API.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.CREATE, doc, lib.getItemPileData(doc));
-        return API._initializeItemPile(doc);
+        await API._initializeItemPile(doc);
+        if(game.user.isGM) {
+            return API._refreshItemPile(doc.uuid);
+        }
     },
 
     async _updatePile(doc){
+        if (!API.isValidItemPile(doc)) return;
         await API._initializeItemPile(doc);
         if(game.user.isGM) {
             return API._refreshItemPile(doc.uuid);
