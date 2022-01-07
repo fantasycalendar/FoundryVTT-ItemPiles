@@ -777,6 +777,70 @@ export default class API {
     }
 
     /**
+     * @private
+     */
+    static _getItemPileTokenImage(pileDocument, data = false) {
+
+        let img = pileDocument instanceof TokenDocument && pileDocument.data.actorLink
+            ? pileDocument.actor.data.token.scale
+            : pileDocument.data.scale;
+
+        if(!API.isValidItemPile(pileDocument)) return img;
+
+        if (!data) {
+            data = lib.getItemPileData(pileDocument);
+        }
+
+        const items = API.getItemPileItems(pileDocument);
+
+        if (data.isContainer) {
+
+            img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage || img;
+
+            if (data.locked && data.lockedImage) {
+                img = data.lockedImage;
+            } else if (data.closed && data.closedImage) {
+                img = data.closedImage;
+            } else if (data.emptyImage && API.isItemPileEmpty(pileDocument)) {
+                img = data.emptyImage;
+            } else if (data.openedImage) {
+                img = data.openedImage;
+            }
+
+        } else if (data.displayOne && items.length === 1) {
+
+            img = items[0].data.img;
+
+        }
+
+        return img;
+
+    }
+
+    /**
+     * @private
+     */
+    static _getItemPileTokenScale(pileDocument, data) {
+
+        if (!data) {
+            data = lib.getItemPileData(pileDocument);
+        }
+
+        const baseScale = pileDocument instanceof TokenDocument && pileDocument.data.actorLink
+                ? pileDocument.actor.data.token.scale
+                : pileDocument.data.scale;
+
+        if(!API.isValidItemPile(pileDocument)) return baseScale;
+
+        const items = API.getItemPileItems(pileDocument);
+
+        return data.displayOne && data.overrideSingleItemScale && items.length === 1
+            ? data.singleItemScale
+            : baseScale;
+
+    }
+
+    /**
      * Causes all connected users to re-render a specific pile's inventory UI
      *
      * @param {string} inPileUuid           The uuid of the pile to be re-rendered
@@ -1962,80 +2026,6 @@ export default class API {
         }
 
         return ItemPileInventory.show(pileDocument, closestTokens[0]);
-
-    }
-
-    /**
-     * @private
-     */
-    static _getItemPileTokenImage(pileDocument, data = false) {
-
-        if (!data) {
-            data = lib.getItemPileData(pileDocument);
-        }
-
-        let img = pileDocument.data.img;
-
-        const pileActor = pileDocument instanceof TokenDocument
-            ? pileDocument.actor
-            : pileDocument;
-
-        if(!pileActor || !API.isValidItemPile(pileDocument)) return img;
-
-        img = pileActor.data.token.img;
-
-        const items = API.getItemPileItems(pileDocument);
-
-        if (data.isContainer) {
-
-            img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage || img;
-
-            if (data.locked && data.lockedImage) {
-                img = data.lockedImage;
-            } else if (data.closed && data.closedImage) {
-                img = data.closedImage;
-            } else if (data.emptyImage && API.isItemPileEmpty(pileDocument)) {
-                img = data.emptyImage;
-            } else if (data.openedImage) {
-                img = data.openedImage;
-            }
-
-        } else if (data.displayOne && items.length === 1) {
-
-            img = items[0].data.img;
-
-        }
-
-        return img;
-
-    }
-
-    /**
-     * @private
-     */
-    static _getItemPileTokenScale(pileDocument, data) {
-
-        if (!data) {
-            data = lib.getItemPileData(pileDocument);
-        }
-
-        const pileActor = pileDocument instanceof TokenDocument
-            ? pileDocument.actor
-            : pileDocument;
-
-        const baseScale = pileActor
-            ? pileActor.data.token.scale
-            : pileDocument.data.scale;
-
-        if(!pileActor){
-            return baseScale;
-        }
-
-        const items = API.getItemPileItems(pileDocument);
-
-        return data.displayOne && data.overrideSingleItemScale && items.length === 1
-            ? data.singleItemScale
-            : baseScale;
 
     }
 

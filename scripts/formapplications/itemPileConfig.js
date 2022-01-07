@@ -62,21 +62,6 @@ export class ItemPileConfig extends FormApplication {
 
         const slider = html.find("#scaleRange");
         const input = html.find("#scaleInput");
-        scaleCheckbox.change(function () {
-            let isDisabled = !$(this).is(":checked") || !displayOneCheckbox.is(":checked");
-            slider.prop('disabled', isDisabled);
-            input.prop('disabled', isDisabled);
-            slider.parent().toggleClass("item-pile-disabled", isDisabled);
-        }).change();
-
-        displayOneCheckbox.change(function () {
-            let isDisabled = !$(this).is(":checked");
-            html.find('.item-pile-display-one-settings').children().each(function () {
-                $(this).toggleClass("item-pile-disabled", isDisabled);
-                $(this).find('input, button').prop("disabled", isDisabled);
-                scaleCheckbox.change();
-            });
-        }).change();
 
         let firstTime = true;
         enabledCheckbox.change(async function () {
@@ -104,6 +89,22 @@ export class ItemPileConfig extends FormApplication {
             html.find('.tab-body').find('input, button, select').not($(this)).each(function () {
                 $(this).prop('disabled', !isEnabled);
                 $(this).closest('.form-group').toggleClass("item-pile-disabled", !isEnabled);
+            });
+        }).change();
+        
+        scaleCheckbox.change(function () {
+            let isDisabled = !$(this).is(":checked") || !displayOneCheckbox.is(":checked");
+            slider.prop('disabled', isDisabled);
+            input.prop('disabled', isDisabled);
+            slider.parent().toggleClass("item-pile-disabled", isDisabled);
+        }).change();
+
+        displayOneCheckbox.change(function () {
+            let isDisabled = !$(this).is(":checked");
+            html.find('.item-pile-display-one-settings').children().each(function () {
+                $(this).toggleClass("item-pile-disabled", isDisabled);
+                $(this).find('input, button').prop("disabled", isDisabled);
+                scaleCheckbox.change();
             });
         }).change();
 
