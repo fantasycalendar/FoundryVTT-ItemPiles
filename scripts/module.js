@@ -58,7 +58,6 @@ Hooks.once("ready", () => {
         throw lib.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
     }
     checkSystem();
-    checkIncompatibilities();
     registerHotkeys();
     Hooks.callAll(HOOKS.READY);
 })

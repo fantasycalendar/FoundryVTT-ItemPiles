@@ -215,20 +215,3 @@ export async function checkSystem(){
 
     }
 }
-
-export async function checkIncompatibilities(){
-
-
-    if(game.settings.get('monks-active-tiles', 'drop-item') && !game.settings.get(CONSTANTS.MODULE_NAME, 'monksActiveTilesDropItemWarning')){
-        await Dialog.prompt({
-            title: "Module Incompatibility",
-            content: lib.dialogWarning(`The module "Monks Active Tile Triggers" has a setting called "Drop Item on Canvas", which when enabled creates a tile when an item is dropped on the canvas. This clashes with Item Piles, and it is recommended you turn this setting off.`),
-            label: "OK",
-            callback: () => {
-                game.settings.set(CONSTANTS.MODULE_NAME, 'monksActiveTilesDropItemWarning', true)
-            }
-        });
-    }
-
-
-}
