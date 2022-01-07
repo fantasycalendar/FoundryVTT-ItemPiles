@@ -1126,23 +1126,11 @@ export default class API {
     static async _transferAllItems(sourceUuid, targetUuid, { itemTypeFilters = false, isEverything = false } = {}) {
 
         const source = await fromUuid(sourceUuid);
-        if (!source) throw lib.custom_error(`TransferAllItems | Could not find source with UUID "${sourceUuid}"`, true)
 
-        const target = await fromUuid(targetUuid);
-        if (!target) throw lib.custom_error(`TransferAllItems | Could not find target with UUID "${targetUuid}"`, true)
+        const itemsToRemove = API.getItemPileItems(source, itemTypeFilters).map(item => item.toObject());
 
-        if (!Array.isArray(itemTypeFilters)) {
-            itemTypeFilters = API.ITEM_TYPE_FILTERS;
-        } else {
-            itemTypeFilters.forEach(filter => {
-                if (typeof filter !== "string") throw lib.custom_error(`TransferAllItems | entries in the itemTypeFilters must be of type string`);
-            })
-        }
-
-        const itemsToRemove = API.getItemPileItems(target, itemTypeFilters).map(item => item.toObject());
-
-        const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, { itemTypeFilters, isTransfer: true });
-        const itemsAdded = await API._addItems(targetUuid, itemsRemoved, { itemTypeFilters, isTransfer: true });
+        const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, { isTransfer: true });
+        const itemsAdded = await API._addItems(targetUuid, itemsRemoved, { isTransfer: true });
 
         if (!isEverything) {
 
@@ -1554,10 +1542,7 @@ export default class API {
      */
     static async _transferEverything(sourceUuid, targetUuid, { itemTypeFilters = false } = {}) {
 
-        const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, {
-            itemTypeFilters,
-            isEverything: true
-        });
+        const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, { itemTypeFilters, isEverything: true });
         const attributesTransferred = await API._transferAllAttributes(sourceUuid, targetUuid, { isEverything: true });
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemsTransferred, attributesTransferred);
