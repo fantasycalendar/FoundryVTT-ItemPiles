@@ -86,6 +86,27 @@
 <dt><a href="#deleteItemPile">deleteItemPile(target)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Deletes a pile, calling the relevant hooks.</p>
 </dd>
+<dt><a href="#isValidItemPile">isValidItemPile(document)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Whether a given document is a valid pile or not</p>
+</dd>
+<dt><a href="#isItemPileEmpty">isItemPileEmpty(target)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Whether the item pile is empty</p>
+</dd>
+<dt><a href="#getItemPileItemTypeFilters">getItemPileItemTypeFilters(target)</a> ⇒ <code>Array</code></dt>
+<dd><p>Returns the item type filters for a given item pile</p>
+</dd>
+<dt><a href="#getItemPileItems">getItemPileItems(target, [itemTypeFilters])</a> ⇒ <code>Array</code></dt>
+<dd><p>Returns the items this item pile can transfer</p>
+</dd>
+<dt><a href="#getItemPileAttributes">getItemPileAttributes(target)</a> ⇒ <code>array</code></dt>
+<dd><p>Returns the attributes this item pile can transfer</p>
+</dd>
+<dt><a href="#refreshItemPile">refreshItemPile(target)</a> ⇒ <code>Promise</code></dt>
+<dd><p>Refreshes the target image of an item pile, ensuring it remains in sync</p>
+</dd>
+<dt><a href="#rerenderItemPileInventoryApplication">rerenderItemPileInventoryApplication(inPileUuid, [deleted])</a> ⇒ <code>Promise</code></dt>
+<dd><p>Causes all connected users to re-render a specific pile&#39;s inventory UI</p>
+</dd>
 
 ### Items & Attributes
 
@@ -126,27 +147,6 @@
 <dd><p>Checks whether an item (or item data) is of a type that is not allowed. If an array whether that type is allowed
 or not, returning the type if it is NOT allowed.</p>
 </dd>
-<dt><a href="#isValidItemPile">isValidItemPile(document)</a> ⇒ <code>boolean</code></dt>
-<dd><p>Whether a given document is a valid pile or not</p>
-</dd>
-<dt><a href="#isItemPileEmpty">isItemPileEmpty(target)</a> ⇒ <code>boolean</code></dt>
-<dd><p>Whether the item pile is empty</p>
-</dd>
-<dt><a href="#getItemPileItemTypeFilters">getItemPileItemTypeFilters(target)</a> ⇒ <code>Array</code></dt>
-<dd><p>Returns the item type filters for a given item pile</p>
-</dd>
-<dt><a href="#getItemPileItems">getItemPileItems(target, [itemTypeFilters])</a> ⇒ <code>Array</code></dt>
-<dd><p>Returns the items this item pile can transfer</p>
-</dd>
-<dt><a href="#getItemPileAttributes">getItemPileAttributes(target)</a> ⇒ <code>array</code></dt>
-<dd><p>Returns the attributes this item pile can transfer</p>
-</dd>
-<dt><a href="#refreshItemPile">refreshItemPile(target)</a> ⇒ <code>Promise</code></dt>
-<dd><p>Refreshes the target image of an item pile, ensuring it remains in sync</p>
-</dd>
-<dt><a href="#rerenderItemPileInventoryApplication">rerenderItemPileInventoryApplication(inPileUuid, [deleted])</a> ⇒ <code>Promise</code></dt>
-<dd><p>Causes all connected users to re-render a specific pile&#39;s inventory UI</p>
-</dd>
 </dl>
 
 <a name="ACTOR_CLASS_TYPE"></a>
@@ -177,7 +177,7 @@ The filters for item types eligible for interaction within this system
 <a name="setActorClassType"></a>
 
 ## ItemPiles.API.setActorClassType(inClassType) ⇒ <code>Promise</code>
-Sets the actor class type used for the original item pile actor in this system 
+Sets the actor class type used for the original item pile actor in this system
 
 | Param | Type |
 | --- | --- |
@@ -186,7 +186,7 @@ Sets the actor class type used for the original item pile actor in this system
 <a name="setDynamicAttributes"></a>
 
 ## ItemPiles.API.setDynamicAttributes(inAttributes) ⇒ <code>Promise</code>
-Sets the attributes used to track dynamic attributes in this system 
+Sets the attributes used to track dynamic attributes in this system
 
 | Param | Type |
 | --- | --- |
@@ -195,7 +195,7 @@ Sets the attributes used to track dynamic attributes in this system
 <a name="setItemQuantityAttribute"></a>
 
 ## ItemPiles.API.setItemQuantityAttribute(inAttribute) ⇒ <code>Promise</code>
-Sets the inAttribute used to track the quantity of items in this system 
+Sets the inAttribute used to track the quantity of items in this system
 
 | Param | Type |
 | --- | --- |
@@ -204,7 +204,7 @@ Sets the inAttribute used to track the quantity of items in this system
 <a name="setItemTypeAttribute"></a>
 
 ## ItemPiles.API.setItemTypeAttribute(inAttribute) ⇒ <code>string</code>
-Sets the attribute used to track the item type in this system 
+Sets the attribute used to track the item type in this system
 
 | Param | Type |
 | --- | --- |
@@ -213,7 +213,7 @@ Sets the attribute used to track the item type in this system
 <a name="setItemTypeFilters"></a>
 
 ## ItemPiles.API.setItemTypeFilters(inFilters) ⇒ <code>Promise</code>
-Sets the filters for item types eligible for interaction within this system 
+Sets the filters for item types eligible for interaction within this system
 
 | Param | Type |
 | --- | --- |
@@ -222,7 +222,7 @@ Sets the filters for item types eligible for interaction within this system
 <a name="createItemPile"></a>
 
 ## ItemPiles.API.createItemPile(position, [items], [pileActorName]) ⇒ <code>Promise</code>
-Creates the default item pile token at a location. 
+Creates the default item pile token at a location.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -233,8 +233,8 @@ Creates the default item pile token at a location.
 <a name="transferItems"></a>
 
 ## ItemPiles.API.transferItems(source, target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;object&gt;</code>
-Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0 
-**Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair for each item added to the target, key being item ID, value being quantities added  
+Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0
+**Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair for each item added to the target, key being item ID, value being quantities added
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -246,8 +246,8 @@ Transfers items from the source to the target, subtracting a number of quantity 
 <a name="removeItems"></a>
 
 ## ItemPiles.API.removeItems(target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
-Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor. 
-**Returns**: <code>Promise.&lt;array&gt;</code> - An array containing the objects of each item that was removed, with their quantities set to the number removed  
+Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
+**Returns**: <code>Promise.&lt;array&gt;</code> - An array containing the objects of each item that was removed, with their quantities set to the number removed
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -258,8 +258,8 @@ Subtracts the quantity of items on an actor. If the quantity of an item reaches 
 <a name="addItems"></a>
 
 ## ItemPiles.API.addItems(target, items, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
-Adds item to an actor, increasing item quantities if matches were found 
-**Returns**: <code>Promise.&lt;array&gt;</code> - An array containing each item added as an object, with their quantities updated to match the new amounts  
+Adds item to an actor, increasing item quantities if matches were found
+**Returns**: <code>Promise.&lt;array&gt;</code> - An array containing each item added as an object, with their quantities updated to match the new amounts
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -270,8 +270,8 @@ Adds item to an actor, increasing item quantities if matches were found
 <a name="transferAllItems"></a>
 
 ## ItemPiles.API.transferAllItems(source, target, [itemTypeFilters]) ⇒ <code>Promise.&lt;array&gt;</code>
-Transfers all items between the source and the target. 
-**Returns**: <code>Promise.&lt;array&gt;</code> - An array containing all of the items that were transferred to the target  
+Transfers all items between the source and the target.
+**Returns**: <code>Promise.&lt;array&gt;</code> - An array containing all of the items that were transferred to the target
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -282,8 +282,8 @@ Transfers all items between the source and the target.
 <a name="transferAttributes"></a>
 
 ## ItemPiles.API.transferAttributes(source, target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
-Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target 
-**Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred  
+Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target
+**Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -294,8 +294,8 @@ Transfers a set quantity of an attribute from a source to a target, removing it 
 <a name="removeAttributes"></a>
 
 ## ItemPiles.API.removeAttributes(target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
-Subtracts attributes on the target 
-**Returns**: <code>Promise.&lt;object&gt;</code> - Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed  
+Subtracts attributes on the target
+**Returns**: <code>Promise.&lt;object&gt;</code> - Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -305,8 +305,8 @@ Subtracts attributes on the target
 <a name="addAttributes"></a>
 
 ## ItemPiles.API.addAttributes(target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
-Adds to attributes on an actor 
-**Returns**: <code>Promise.&lt;object&gt;</code> - Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed  
+Adds to attributes on an actor
+**Returns**: <code>Promise.&lt;object&gt;</code> - Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -316,8 +316,8 @@ Adds to attributes on an actor
 <a name="transferAllAttributes"></a>
 
 ## ItemPiles.API.transferAllAttributes(source, target) ⇒ <code>Promise.&lt;object&gt;</code>
-Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target 
-**Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred  
+Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target
+**Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -327,8 +327,8 @@ Transfers all dynamic attributes from a source to a target, removing it or subtr
 <a name="transferEverything"></a>
 
 ## ItemPiles.API.transferEverything(source, target, [itemTypeFilters]) ⇒ <code>Promise.&lt;object&gt;</code>
-Transfers all items and attributes between the source and the target. 
-**Returns**: <code>Promise.&lt;object&gt;</code> - An object containing all items and attributes transferred to the target  
+Transfers all items and attributes between the source and the target.
+**Returns**: <code>Promise.&lt;object&gt;</code> - An object containing all items and attributes transferred to the target
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -339,8 +339,8 @@ Transfers all items and attributes between the source and the target.
 <a name="turnTokenIntoItemPile"></a>
 
 ## ItemPiles.API.turnTokenIntoItemPile(target, pileSettings, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
-Turns a token and its actor into an item pile 
-**Returns**: <code>Promise.&lt;string&gt;</code> - The uuid of the target after it was turned into an item pile  
+Turns a token and its actor into an item pile
+**Returns**: <code>Promise.&lt;string&gt;</code> - The uuid of the target after it was turned into an item pile
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -351,8 +351,8 @@ Turns a token and its actor into an item pile
 <a name="revertTokenFromItemPile"></a>
 
 ## ItemPiles.API.revertTokenFromItemPile(target, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
-Reverts a token from an item pile into a normal token and actor 
-**Returns**: <code>Promise.&lt;string&gt;</code> - The uuid of the target after it was reverted from an item pile  
+Reverts a token from an item pile into a normal token and actor
+**Returns**: <code>Promise.&lt;string&gt;</code> - The uuid of the target after it was reverted from an item pile
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -362,11 +362,11 @@ Reverts a token from an item pile into a normal token and actor
 <a name="rerenderTokenHud"></a>
 
 ## ItemPiles.API.rerenderTokenHud() ⇒ <code>Promise</code>
-Causes every user's token HUD to rerender 
+Causes every user's token HUD to rerender
 <a name="openItemPile"></a>
 
 ## ItemPiles.API.openItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
-Opens a pile if it is enabled and a container 
+Opens a pile if it is enabled and a container
 
 | Param | Type | Default |
 | --- | --- | --- |
@@ -376,7 +376,7 @@ Opens a pile if it is enabled and a container
 <a name="closeItemPile"></a>
 
 ## ItemPiles.API.closeItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
-Closes a pile if it is enabled and a container 
+Closes a pile if it is enabled and a container
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -386,7 +386,7 @@ Closes a pile if it is enabled and a container
 <a name="toggleItemPileClosed"></a>
 
 ## ItemPiles.API.toggleItemPileClosed(target, [interactingToken]) ⇒ <code>Promise</code>
-Toggles a pile's closed state if it is enabled and a container 
+Toggles a pile's closed state if it is enabled and a container
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -396,7 +396,7 @@ Toggles a pile's closed state if it is enabled and a container
 <a name="lockItemPile"></a>
 
 ## ItemPiles.API.lockItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
-Locks a pile if it is enabled and a container 
+Locks a pile if it is enabled and a container
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -406,7 +406,7 @@ Locks a pile if it is enabled and a container
 <a name="unlockItemPile"></a>
 
 ## ItemPiles.API.unlockItemPile(target, [interactingToken]) ⇒ <code>Promise</code>
-Unlocks a pile if it is enabled and a container 
+Unlocks a pile if it is enabled and a container
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -416,7 +416,7 @@ Unlocks a pile if it is enabled and a container
 <a name="toggleItemPileLocked"></a>
 
 ## ItemPiles.API.toggleItemPileLocked(target, [interactingToken]) ⇒ <code>Promise</code>
-Toggles a pile's locked state if it is enabled and a container 
+Toggles a pile's locked state if it is enabled and a container
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -426,7 +426,7 @@ Toggles a pile's locked state if it is enabled and a container
 <a name="rattleItemPile"></a>
 
 ## ItemPiles.API.rattleItemPile(target) ⇒ <code>Promise.&lt;boolean&gt;</code>
-Causes the item pile to play a sound as it was attempted to be opened, but was locked 
+Causes the item pile to play a sound as it was attempted to be opened, but was locked
 
 | Param | Type |
 | --- | --- |
@@ -435,7 +435,7 @@ Causes the item pile to play a sound as it was attempted to be opened, but was l
 <a name="isItemPileLocked"></a>
 
 ## ItemPiles.API.isItemPileLocked(target) ⇒ <code>boolean</code>
-Whether an item pile is locked. If it is not enabled or not a container, it is always false. 
+Whether an item pile is locked. If it is not enabled or not a container, it is always false.
 
 | Param | Type |
 | --- | --- |
@@ -444,7 +444,7 @@ Whether an item pile is locked. If it is not enabled or not a container, it is a
 <a name="isItemPileClosed"></a>
 
 ## ItemPiles.API.isItemPileClosed(target) ⇒ <code>boolean</code>
-Whether an item pile is closed. If it is not enabled or not a container, it is always false. 
+Whether an item pile is closed. If it is not enabled or not a container, it is always false.
 
 | Param | Type |
 | --- | --- |
@@ -453,7 +453,7 @@ Whether an item pile is closed. If it is not enabled or not a container, it is a
 <a name="isItemPileContainer"></a>
 
 ## ItemPiles.API.isItemPileContainer(target) ⇒ <code>boolean</code>
-Whether an item pile is a container. If it is not enabled, it is always false. 
+Whether an item pile is a container. If it is not enabled, it is always false.
 
 | Param | Type |
 | --- | --- |
@@ -462,7 +462,7 @@ Whether an item pile is a container. If it is not enabled, it is always false.
 <a name="updateItemPile"></a>
 
 ## ItemPiles.API.updateItemPile(target, newData, [interactingToken], [tokenSettings]) ⇒ <code>Promise</code>
-Updates a pile with new data. 
+Updates a pile with new data.
 
 | Param | Type | Default |
 | --- | --- | --- |
@@ -474,7 +474,7 @@ Updates a pile with new data.
 <a name="deleteItemPile"></a>
 
 ## ItemPiles.API.deleteItemPile(target) ⇒ <code>Promise</code>
-Deletes a pile, calling the relevant hooks. 
+Deletes a pile, calling the relevant hooks.
 
 | Param | Type |
 | --- | --- |
@@ -484,7 +484,7 @@ Deletes a pile, calling the relevant hooks.
 
 ## ItemPiles.API.isItemTypeDisallowed(item, [itemTypeFilters]) ⇒ <code>boolean/string</code>
 Checks whether an item (or item data) is of a type that is not allowed. If an array whether that type is allowed
-or not, returning the type if it is NOT allowed. 
+or not, returning the type if it is NOT allowed.
 
 | Param | Type | Default |
 | --- | --- | --- |
@@ -494,7 +494,7 @@ or not, returning the type if it is NOT allowed.
 <a name="isValidItemPile"></a>
 
 ## ItemPiles.API.isValidItemPile(document) ⇒ <code>boolean</code>
-Whether a given document is a valid pile or not 
+Whether a given document is a valid pile or not
 
 | Param | Type |
 | --- | --- |
@@ -503,7 +503,7 @@ Whether a given document is a valid pile or not
 <a name="isItemPileEmpty"></a>
 
 ## ItemPiles.API.isItemPileEmpty(target) ⇒ <code>boolean</code>
-Whether the item pile is empty 
+Whether the item pile is empty
 
 | Param | Type |
 | --- | --- |
@@ -512,7 +512,7 @@ Whether the item pile is empty
 <a name="getItemPileItemTypeFilters"></a>
 
 ## ItemPiles.API.getItemPileItemTypeFilters(target) ⇒ <code>Array</code>
-Returns the item type filters for a given item pile 
+Returns the item type filters for a given item pile
 
 | Param |
 | --- |
@@ -521,7 +521,7 @@ Returns the item type filters for a given item pile
 <a name="getItemPileItems"></a>
 
 ## ItemPiles.API.getItemPileItems(target, [itemTypeFilters]) ⇒ <code>Array</code>
-Returns the items this item pile can transfer 
+Returns the items this item pile can transfer
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -531,7 +531,7 @@ Returns the items this item pile can transfer
 <a name="getItemPileAttributes"></a>
 
 ## ItemPiles.API.getItemPileAttributes(target) ⇒ <code>array</code>
-Returns the attributes this item pile can transfer 
+Returns the attributes this item pile can transfer
 
 | Param | Type |
 | --- | --- |
@@ -540,7 +540,7 @@ Returns the attributes this item pile can transfer
 <a name="refreshItemPile"></a>
 
 ## ItemPiles.API.refreshItemPile(target) ⇒ <code>Promise</code>
-Refreshes the target image of an item pile, ensuring it remains in sync 
+Refreshes the target image of an item pile, ensuring it remains in sync
 
 | Param |
 | --- |
@@ -549,7 +549,7 @@ Refreshes the target image of an item pile, ensuring it remains in sync
 <a name="rerenderItemPileInventoryApplication"></a>
 
 ## ItemPiles.API.rerenderItemPileInventoryApplication(inPileUuid, [deleted]) ⇒ <code>Promise</code>
-Causes all connected users to re-render a specific pile's inventory UI 
+Causes all connected users to re-render a specific pile's inventory UI
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
