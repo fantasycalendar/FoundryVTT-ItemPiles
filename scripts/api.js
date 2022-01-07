@@ -4,6 +4,7 @@ import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropDialog from "./formapplications/dropDialog.js";
 import { HOOKS } from "./hooks.js";
+import { hasNonzeroAttribute } from "./lib/lib.js";
 
 export default class API {
 
@@ -677,9 +678,10 @@ export default class API {
         const hasNoItems = API.getItemPileItems(target).length === 0;
 
         const attributes = API.getItemPileAttributes(target);
-        const hasEmptyAttributes = attributes.find(attribute => {
-            return hasProperty(targetActor.data, attribute.path) && getProperty(targetActor.data, attribute.path) === 0;
-        })
+        const hasEmptyAttributes = attributes.filter(attribute => {
+            return lib.hasNonzeroAttribute(targetActor, attribute.path)
+        }).length === 0;
+
         return hasNoItems && hasEmptyAttributes;
     }
 

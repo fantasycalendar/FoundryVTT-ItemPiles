@@ -145,8 +145,7 @@ export class ItemPileInventory extends FormApplication {
     }
 
     validAttribute(attribute) {
-        return getProperty(this.pile.actor.data, attribute)
-            && (!this.recipientActor || hasProperty(this.recipientActor.data, attribute));
+        return lib.hasNonzeroAttribute(this.pile.actor, attribute) && (!this.recipientActor || hasProperty(this.recipientActor.data, attribute));
     }
 
     getPileAttributeData() {

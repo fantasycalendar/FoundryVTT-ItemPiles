@@ -2,7 +2,8 @@
 
 ## Version 1.0.8
 - Fixed item pile token image not being updated when first creating a new item pile
-- Fixed `Take All Items` button not working on items
+- Fixed item piles acting as non-empty when attributes were incorrectly configured
+- Fixed the `Take All Items` button not taking items from item piles
 
 ## Version 1.0.7
 - Fixed module being broken

@@ -118,6 +118,14 @@ export function getItemPileData(document){
 
 }
 
+export function hasNonzeroAttribute(target, attribute){
+    const actor = target instanceof TokenDocument
+        ? target.actor
+        : target;
+    const attributeValue = getProperty(actor.data, attribute) ?? 0;
+    return hasProperty(actor.data, attribute) && attributeValue > 0;
+}
+
 export async function updateItemPile(inDocument, flagData, tokenData){
 
     if(!tokenData) tokenData = {};

@@ -145,8 +145,9 @@ class ResetSettingsDialog extends FormApplication {
                 confirm: {
                     icon: '<i class="fas fa-check"></i>',
                     label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Confirm"),
-                    callback: () => {
-                        applyDefaultSettings();
+                    callback: async () => {
+                        await applyDefaultSettings();
+                        window.location.reload();
                     }
                 },
                 cancel: {
