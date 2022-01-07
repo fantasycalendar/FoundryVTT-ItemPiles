@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.0.9
+- Fixed module settings would stay blank even on a recognized game system
+
 ## Version 1.0.8
 - Fixed item pile token image not being updated when first creating a new item pile
 - Fixed item piles acting as non-empty when attributes were incorrectly configured

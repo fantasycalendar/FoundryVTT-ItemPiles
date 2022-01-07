@@ -169,8 +169,6 @@ async function applyDefaultSettings() {
 
 export async function checkSystem(){
 
-    if(game.system.id === "dnd5e") return;
-
     if(!SYSTEMS.DATA){
 
         if(game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")) return;
@@ -191,7 +189,7 @@ export async function checkSystem(){
 
     if(game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")){
 
-        await new Dialog({
+        return new Dialog({
             title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
             content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"), "fas fa-search"),
             buttons: {
@@ -210,9 +208,7 @@ export async function checkSystem(){
             default: "cancel"
         }).render(true);
 
-    }else if(!game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeAttribute")){
-
-        applyDefaultSettings();
-
     }
+
+    return applyDefaultSettings();
 }
