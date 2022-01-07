@@ -42,6 +42,8 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 
 - [Dungeons & Dragons 5e](https://foundryvtt.com/packages/dnd5e)
 - [Pathfinder 1e](https://foundryvtt.com/packages/pf1)
+- [Dungeon Slayers 4](https://foundryvtt.com/packages/ds4)
+
 
 ## Not Supported Systems
 
