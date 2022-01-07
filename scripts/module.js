@@ -1,5 +1,5 @@
 import CONSTANTS from "./constants.js";
-import registerSettings, { checkIncompatibilities, checkSystem } from "./settings.js";
+import registerSettings, { checkSystem } from "./settings.js";
 import { registerSocket } from "./socket.js";
 import API from "./api.js";
 import * as lib from "./lib/lib.js";
