@@ -31,7 +31,9 @@ In addition, the module features a robust and well documented API, where module 
 
 ---
 
-# This is a Foundry v9+ only module
+## This is a Foundry v9+ only module
+
+---
 
 ## Installation
 
