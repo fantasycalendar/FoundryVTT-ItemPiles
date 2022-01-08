@@ -27,7 +27,9 @@ export const HOOKS = {
         PRE_TURN_INTO: module`preTurnIntoItemPiles`,
         TURN_INTO: module`turnIntoItemPiles`,
         PRE_REVERT_FROM: module`preRevertFromItemPiles`,
-        REVERT_FROM: module`revertFromItemPiles`
+        REVERT_FROM: module`revertFromItemPiles`,
+        PRE_OPEN_INVENTORY: module`preOpenItemPileInventory`,
+        OPEN_INVENTORY: module`openItemPileInventory`,
     },
     ITEM: {
         PRE_DROP_DETERMINED: module`preDropItemDetermined`,

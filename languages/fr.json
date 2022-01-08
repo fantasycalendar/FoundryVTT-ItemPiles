@@ -61,6 +61,8 @@
 			"Update": "Mise à jour de la pile d'articles",
 			"EnabledPile": "Activé",
 			"EnabledPileExplanation": "Si cela doit agir comme une pile d'articles.",
+            "InspectItems": "Activer l'inspection des éléments",
+            "InspectItemsExplanation": "En cliquant sur les noms des éléments, vous ouvrirez la fiche en question.",
 			"Distance": "Distance d'interaction",
 			"GridUnits": "Unités de grille (laissez vide pour l'infini)",
 			"ItemTypeFilter": "Filtre du type d'article",

@@ -66,6 +66,8 @@
             "Update": "Gegenstandsstapel aktualisieren",
             "EnabledPile": "Aktiviert",
             "EnabledPileExplanation": "Bestimmt ob sich dies als Gegenstandsstapel verhalten soll.",
+            "InspectItems": "Gegenstände prüfbar aktivieren",
+            "InspectItemsExplanation": "Durch Klick auf den Namen des Gegenständes wird das Gegenstandsfenster geöffnet.",
             "Distance": "Interaktionsreichweite",
             "GridUnits": "Gittereinheiten (leer lassen für unbegrenzt)",
             "ItemTypeFilter": "Gegenstandstyp Filter",

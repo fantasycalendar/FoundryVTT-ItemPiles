@@ -28,6 +28,8 @@
   - [item-piles-turnIntoItemPiles](#item-piles-turnIntoItemPiles)
   - [item-piles-preRevertFromItemPiles](#item-piles-preRevertFromItemPiles)
   - [item-piles-revertFromItemPiles](#item-piles-revertFromItemPiles)
+  - [item-piles-preOpenItemPileInventory](#item-piles-preOpenItemPileInventory)
+  - [item-piles-openItemPileInventory](#item-piles-openItemPileInventory)
 
 - [Items](#Items)
   - [item-piles-preDropItems](#item-piles-preDropItems)
@@ -290,6 +292,27 @@ Called after a token has been reverted from an item pile into a normal token.
 | Param           | Type                | Description                                               |
 |-----------------|---------------------|-----------------------------------------------------------|
 | target      | <code>Actor,TokenDocument</code> | The token that was reverted from an item pile |
+
+#### item-piles-preOpenItemPileInventory
+
+Called before an item pile's inventory is opened.
+
+| Param          | Type                              | Description                                              |
+|----------------|-----------------------------------|----------------------------------------------------------|
+| itemPileToken         | <code>TokenDocument</code>  | The item pile token whose inventory is going to be opened |
+| interactingToken  | <code>TokenDocument/boolean</code>               | The token that is going to be interacting with the item pile |
+
+If the hook returns `false`, the action is interrupted.
+
+#### item-piles-openItemPileInventory
+
+Called after an item pile's inventory has been opened.
+
+| Param            | Type                | Description                                               |
+|------------------|---------------------|-----------------------------------------------------------|
+| app    | <code>FormApplication</code>  | The item pile's inventory formapplication |
+| itemPileToken    | <code>TokenDocument</code>  | The item pile whose inventory was opened |
+| interactingToken | <code>TokenDocument/boolean</code>               | The token that interacted with the item pile |
 
 ### Items
 

@@ -2,6 +2,7 @@ import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import * as lib from "../lib/lib.js";
 import { isPileInventoryOpenForOthers } from "../socket.js";
+import { HOOKS } from "../hooks.js";
 
 export class ItemPileInventory extends FormApplication {
 
@@ -18,6 +19,7 @@ export class ItemPileInventory extends FormApplication {
         this.items = [];
         this.attributes = [];
         this.deleted = false;
+        Hooks.call(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient);
     }
 
     /** @inheritdoc */

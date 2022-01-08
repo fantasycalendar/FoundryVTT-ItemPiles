@@ -117,6 +117,8 @@ For most systems, currencies or other physical things aren't considered "items" 
 
 Each row represents a field on a character sheet that may be picked up. As you can see, the D&D5e system denotes the number of gold coins a character has with the `actor.data.data.currency.gp` field, so by putting `data.currency.gp` as a valid field in this UI, Item Piles figures out that if an actor has more than 0 in this field, it can be "picked up" and transferred to the character who picked it up.
 
+Keep in mind that the name field in here accepts localization strings, so for D&D5e's currencies, you could enter `DND5E.CurrencyGP` in the name field.
+
 
 ## Item Piles Settings
 
@@ -149,3 +151,9 @@ Any issues, bugs, or feature requests are always welcome to be reported directly
 ## License
 
 This package is under an [MIT](LICENSE) and the [Foundry Virtual Tabletop Limited License Agreement for module development](https://foundryvtt.com/article/license/).
+
+## Credits:
+
+- Padhiver#1916 for the French localization
+- STB#9841 for the German localization
+- Brother Sharp#6921 for the Japanese localization

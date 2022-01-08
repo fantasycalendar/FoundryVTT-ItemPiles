@@ -1,12 +1,14 @@
 # Item Piles Changelog 
 
 ## Version 1.1.0
-- System support added - D&D 3.5: <https://foundryvtt.com/packages/D35E>
+- Added support for the D&D 3.5 system: <https://foundryvtt.com/packages/D35E>
 - Added the ability to click on item names to inspect the items - this can be disabled in the item pile's settings
 - Hooks that previously only returned the UUID of a given document now actually provides the document itself 
 - Hooks added:
   - `item-piles-preRattleItemPile` - Called locally before a locked item pile is attempted to be opened 
   - `item-piles-rattleItemPile` - Called for everyone after a locked item pile was attempted to be opened
+  - `item-piles-preOpenItemPileInventory` - Called locally before an item pile's inventory is opened
+  - `item-piles-openItemPileInventory` - Called locally after an item pile's inventory has been opened
 - API changes:
     - Changed `ItemPiles.API.turnTokenIntoItemPile` to `ItemPiles.API.turnTokensIntoItemPiles`, now can take array of tokens to turn into piles
     - Changed `ItemPiles.API.revertTokenFromItemPile` to `ItemPiles.API.revertTokensFromItemPiles`, now can take array of tokens to revert
