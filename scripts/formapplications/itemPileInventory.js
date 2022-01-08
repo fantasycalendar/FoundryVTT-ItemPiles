@@ -19,7 +19,7 @@ export class ItemPileInventory extends FormApplication {
         this.items = [];
         this.attributes = [];
         this.deleted = false;
-        Hooks.call(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient);
+        Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient);
     }
 
     /** @inheritdoc */

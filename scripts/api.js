@@ -2014,7 +2014,8 @@ export default class API {
 
         }
 
-        Hooks.call(HOOKS.PILE.PRE_OPEN_INVENTORY, pileDocument, interactingToken);
+        const result = Hooks.call(HOOKS.PILE.PRE_OPEN_INVENTORY, pileDocument, interactingToken);
+        if(result === false) return;
 
         return ItemPileInventory.show(pileDocument, interactingToken);
 
