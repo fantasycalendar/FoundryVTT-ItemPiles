@@ -157,31 +157,41 @@ export async function updateItemPile(inDocument, flagData, tokenData){
 
     if(!tokenData) tokenData = {};
 
-    if(inDocument instanceof TokenDocument && inDocument.data.actorLink){
-        inDocument = inDocument?.actor;
-    }else if(inDocument instanceof Actor && inDocument.token){
-        inDocument = inDocument?.token;
+    let documentActor;
+    let documentTokens = [];
+
+    if(inDocument instanceof Actor){
+        documentActor = inDocument;
+        if(inDocument.token) {
+            documentToken.push(inDocument?.token);
+        }else{
+            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
+        }
+    }else{
+        documentActor = inDocument.actor;
+        if(inDocument.isLinked){
+            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
+        }else{
+            documentTokens.push(inDocument);
+        }
     }
 
-    tokenData = foundry.utils.mergeObject(tokenData, {
-        "img": getItemPileTokenImage(inDocument, flagData),
-        "scale": getItemPileTokenScale(inDocument, flagData),
+    const updates = documentTokens.map(tokenDocument => {
+        const newTokenData = foundry.utils.mergeObject(tokenData, {
+            "img": getItemPileTokenImage(tokenDocument, flagData),
+            "scale": getItemPileTokenScale(tokenDocument, flagData),
+        });
+        return {
+            "_id": tokenDocument.id,
+            ...newTokenData,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData
+        }
     });
 
-    if (inDocument instanceof TokenDocument) {
-        return inDocument.update({
-            ...tokenData,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
-            [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData
-        });
-    }
+    await canvas.scene.updateEmbeddedDocuments("Token", updates);
 
-    return inDocument.update({
-        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
-        "token": {
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
-            ...tokenData
-        }
+    return documentActor.update({
+        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData
     });
 
 }
