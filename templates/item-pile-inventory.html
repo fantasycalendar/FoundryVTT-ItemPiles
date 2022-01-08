@@ -28,7 +28,11 @@
                 {{#each items as |item id|}}
                 <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
                     <img class="item-piles-img" src="{{item.img}}"/>
-                    <div class="item-piles-name item-piles-text"><a class="item-piles-item-clickable">{{item.name}}</a></div>
+                    <div class="item-piles-name item-piles-text">
+                        {{#if @root.canInspectItems}}<a class="item-piles-item-clickable">{{/if}}
+                        {{item.name}}
+                        {{#if @root.canInspectItems}}</a>{{/if}}
+                    </div>
                     {{#if @root.hasRecipient}}
                         <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.maxQuantity}}disabled{{/unless}}/>
                     {{/if}}

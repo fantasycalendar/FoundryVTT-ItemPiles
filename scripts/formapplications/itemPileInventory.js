@@ -201,6 +201,8 @@ export class ItemPileInventory extends FormApplication {
             data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
             data.hasItems = API.getItemPileItems(this.pile).length > 0;
             data.hasAttributes = data?.attributes?.length;
+            data.canInspectItems = pileData.canInspectItems || game.user.isGM;
+            console.log(data.canInspectItems)
         }
 
         data.isEmpty = lib.isItemPileEmpty(this.pile);

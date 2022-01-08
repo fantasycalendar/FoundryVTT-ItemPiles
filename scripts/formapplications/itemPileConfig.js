@@ -2,6 +2,7 @@ import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import { ItemPileAttributeEditor } from "./itemPileAttributeEditor.js";
 import * as lib from "../lib/lib.js";
+import { itemPileSocket } from "../socket.js";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -152,7 +153,9 @@ export class ItemPileConfig extends FormApplication {
 
     async _updateObject(event, formData) {
 
-        const data = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, formData);
+        let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+
+        const data = foundry.utils.mergeObject(defaults, formData);
 
         const checked = this.element.find('.item-pile-config-override-attributes-checkbox').is(":checked");
 
@@ -168,7 +171,9 @@ export class ItemPileConfig extends FormApplication {
             "false": false
         }[formData.deleteWhenEmpty];
 
-        API.updateItemPile(this.document, data)
+        API.updateItemPile(this.document, data).then(() => {
+            API.rerenderItemPileInventoryApplication(this.document.uuid);
+        });
 
     }
 

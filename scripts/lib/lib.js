@@ -144,7 +144,10 @@ export function getItemPileData(inDocument){
         inDocument = inDocument?.token;
     }
     try{
-        return foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
+        let data = inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        if(!data) return {};
+        let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+        return foundry.utils.mergeObject(defaults, data);
     }catch(err){
         return {};
     }

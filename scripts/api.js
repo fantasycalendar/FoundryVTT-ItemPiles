@@ -291,12 +291,13 @@ export default class API {
     static async _turnTokensIntoItemPiles(targetUuids, pileSettings = {}, tokenSettings = {}) {
 
         const tokenUpdateGroups = {};
+        const defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
         for(const targetUuid of targetUuids) {
 
             let target = await fromUuid(targetUuid);
 
-            const existingPileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(target));
+            const existingPileSettings = foundry.utils.mergeObject(defaults, lib.getItemPileData(target));
             pileSettings = foundry.utils.mergeObject(existingPileSettings, pileSettings);
             pileSettings.enabled = true;
 
@@ -365,12 +366,13 @@ export default class API {
     static async _revertTokensFromItemPiles(targetUuids, tokenSettings) {
 
         const tokenUpdateGroups = {};
+        const defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
         for(const targetUuid of targetUuids) {
 
             let target = await fromUuid(targetUuid);
 
-            const pileSettings = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(target));
+            const pileSettings = foundry.utils.mergeObject(defaults, lib.getItemPileData(target));
             pileSettings.enabled = false;
 
             const [_, sceneId, __, tokenId] = targetUuid.split('.');
