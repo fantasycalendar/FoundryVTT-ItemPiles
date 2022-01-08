@@ -91,7 +91,7 @@ export class ItemPileInventory extends FormApplication {
                 name = foundItem.name;
                 img = foundItem.data.img;
                 type = getProperty(foundItem.data, API.ITEM_TYPE_ATTRIBUTE);
-                maxQuantity = getProperty(foundItem.data, API.ITEM_QUANTITY_ATTRIBUTE);
+                maxQuantity = Number(getProperty(foundItem.data, API.ITEM_QUANTITY_ATTRIBUTE));
             }else{
                 itemQuantity = 0;
                 maxQuantity = 0;
@@ -118,7 +118,7 @@ export class ItemPileInventory extends FormApplication {
                 type: item.type,
                 img: item.data?.img ?? "",
                 currentQuantity: 1,
-                maxQuantity: getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1
+                maxQuantity: Number(getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1)
             };
         })
     }
@@ -135,7 +135,7 @@ export class ItemPileInventory extends FormApplication {
             const img = $(this).find('.item-piles-img').attr('src');
 
             const itemQuantity = $(this).find('input').val();
-            const maxQuantity = getProperty(self.pile.actor.data, path) ?? 0;
+            const maxQuantity = Number(getProperty(self.pile.actor.data, path)) ?? 0;
 
             const currentQuantity = Math.min(maxQuantity, Math.max(itemQuantity, 0));
 
@@ -163,7 +163,7 @@ export class ItemPileInventory extends FormApplication {
                 path: attribute.path,
                 img: attribute.img,
                 currentQuantity: 1,
-                maxQuantity: getProperty(this.pile.actor.data, attribute.path) ?? 1
+                maxQuantity: Number(getProperty(this.pile.actor.data, attribute.path) ?? 1)
             }
         }).filter(Boolean);
     }
@@ -277,7 +277,7 @@ export class ItemPileInventory extends FormApplication {
         this.saveItems();
         this.saveAttributes();
         const item = this.pile.actor.items.get(itemId);
-        const maxQuantity = getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
+        const maxQuantity = Number(getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1);
         const quantity = Math.min(inputQuantity, maxQuantity);
         await API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }]);
     }
@@ -285,7 +285,7 @@ export class ItemPileInventory extends FormApplication {
     async takeAttribute(attribute, inputQuantity) {
         this.saveItems();
         this.saveAttributes();
-        const maxQuantity = getProperty(this.pile.actor.data, attribute) ?? 0;
+        const maxQuantity = Number(getProperty(this.pile.actor.data, attribute) ?? 0);
         const quantity = Math.min(inputQuantity, maxQuantity);
         await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity });
     }

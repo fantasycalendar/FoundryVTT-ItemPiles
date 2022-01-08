@@ -21,6 +21,8 @@ Like what we've done? Buy us a coffee!
 
 ---
 
+![Item Piles in a nutshell](./docs/images/intro.jpg)
+
 ## What is Item Piles?
 
 This module enables dropping items onto the canvas, which then get represented as a pile of items. In order to work in all systems without breaking or messing too much with the core functionality of Foundry, this **creates an unlinked token & actor** to hold these items. When a player double-clicks on an item pile token, it opens a custom UI to show what the pile contains and players can then take items from it.
@@ -69,6 +71,7 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 - [Pathfinder 1e](https://foundryvtt.com/packages/pf1)
 - [Dungeon Slayers 4](https://foundryvtt.com/packages/ds4)
 - [D&D 3.5e SRD](https://foundryvtt.com/packages/D35E)
+- [Savage Worlds Adventure Edition](https://foundryvtt.com/packages/swade)
 
 
 ## Not Supported Systems
@@ -91,7 +94,13 @@ Installing this module allows anyone to drag & drop items to the canvas, which c
 
 As a GM, you can duplicate the default item pile to create new versions of that pile, or turn existing actors into new item piles through the `Item Pile` button on the actor sheets' header bar. This UI has a wide range of customization, which allows you to control exactly how your players interact with the item pile.
 
-![Item Pile Token Configuration](https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/configs.png)
+![Item Pile Token Configuration](./docs/images/configs.png)
+
+### Warning!
+
+Be sure to set any new Item Piles as **unlinked from its actor data**! Unless you know what you're doing, keeping this enabled will be confusing as **all tokens of this pile will share the same images and inventory**.
+
+![Item Pile Token Linked](./docs/images/disable-link.jpg)
 
 ### Interaction
 
@@ -99,13 +108,13 @@ Any player or GM can drag & drop items - if you drag & drop an item from an acto
 
 When players double-click on the item pile (or Left Control + double-click for GMs to inspect, or to inspect as someone else select two tokens, and repeat), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
 
-![Item Pile Inventory UI](https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/inventory-ui.png)
+![Item Pile Inventory UI](./docs/images/inventory-ui.png)
 
 ### Extra UI and settings
 
 In addition, item piles have a few extra buttons on the right click Token HUD to open, close, lock, and unlock containers, and a quick way to access the configuration of that token.
 
-![Item Pile Token HUD buttons](https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/token-buttons.png)
+![Item Pile Token HUD buttons](./docs/images/token-buttons.png)
 
 In the module settings, you can configure all sorts of things, such as whether empty piles auto-delete once they're empty, and which item types are allowed to be picked up. These are by default configured to the D&D5e system, so adjust them accordingly for your own system.
 
@@ -113,7 +122,7 @@ In the module settings, you can configure all sorts of things, such as whether e
 
 For most systems, currencies or other physical things aren't considered "items" in Foundry, but rather just numbers on the sheet, so dragging and dropping them is hard. However, Item Piles still allow you to pick up such items from piles using its flexible "Dynamic Attributes" feature. With this feature, you can configure what types of these "numbers only" things that can still be picked from piles up by players.
 
-![Item Pile Dynamic Attribute Settings](https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/attributes.png)
+![Item Pile Dynamic Attribute Settings](./docs/images/attributes.png)
 
 Each row represents a field on a character sheet that may be picked up. As you can see, the D&D5e system denotes the number of gold coins a character has with the `actor.data.data.currency.gp` field, so by putting `data.currency.gp` as a valid field in this UI, Item Piles figures out that if an actor has more than 0 in this field, it can be "picked up" and transferred to the character who picked it up.
 

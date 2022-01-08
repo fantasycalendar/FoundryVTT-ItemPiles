@@ -1,5 +1,10 @@
 # Item Piles Changelog 
 
+## Version 1.1.1
+- Added support for the Savage Worlds Adventure Edition: <https://foundryvtt.com/packages/swade>
+- Fixed linked token actors not acting like they are linked - now all tokens on the canvas with the same linked actor share the same state and image
+- Fixed dynamic attributes not being treated as numbers, which caused problems in some systems (such as SWADE) if they were stored as strings
+
 ## Version 1.1.0
 - Added support for the D&D 3.5 system: <https://foundryvtt.com/packages/D35E>
 - Added the ability to click on item names to inspect the items - this can be disabled in the item pile's settings

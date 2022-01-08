@@ -891,12 +891,12 @@ export default class API {
 
             const item = lib.getSimilarItem(targetActorItems, { itemId: itemData._id, itemName: itemData.name, itemType: itemData.type });
 
-            const incomingQuantity = getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1;
+            const incomingQuantity = Number(getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1);
 
             const itemAdded = item ? item.toObject() : foundry.utils.duplicate(itemData);
 
             if (item) {
-                const currentQuantity = getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE);
+                const currentQuantity = Number(getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE));
                 const newQuantity = currentQuantity + incomingQuantity;
                 itemsToUpdate.push({
                     "_id": item.id,
@@ -998,9 +998,9 @@ export default class API {
             const actorItem = targetActor.items.get(itemId);
             const removedItem = actorItem.toObject();
 
-            const currentQuantity = getProperty(actorItem.data, API.ITEM_QUANTITY_ATTRIBUTE);
+            const currentQuantity = Number(getProperty(actorItem.data, API.ITEM_QUANTITY_ATTRIBUTE));
 
-            const quantityToRemove = getProperty(item, API.ITEM_QUANTITY_ATTRIBUTE) ?? item.quantity ?? currentQuantity;
+            const quantityToRemove = Number(getProperty(item, API.ITEM_QUANTITY_ATTRIBUTE) ?? item.quantity ?? currentQuantity);
 
             const newQuantity = Math.max(0, currentQuantity - quantityToRemove);
 
@@ -1249,7 +1249,7 @@ export default class API {
 
         for (const [attribute, quantityToAdd] of Object.entries(attributes)) {
 
-            const currentQuantity = getProperty(targetActor.data, attribute);
+            const currentQuantity = Number(getProperty(targetActor.data, attribute));
 
             updates[attribute] = currentQuantity + quantityToAdd;
             attributesAdded[attribute] = currentQuantity + quantityToAdd;
@@ -1336,13 +1336,13 @@ export default class API {
 
         if (Array.isArray(attributes)) {
             attributes = Object.fromEntries(attributes.map(attribute => {
-                return [attribute, getProperty(targetActor.data, attribute)];
+                return [attribute, Number(getProperty(targetActor.data, attribute))];
             }))
         }
 
         for (const [attribute, quantityToRemove] of Object.entries(attributes)) {
 
-            const currentQuantity = getProperty(targetActor.data, attribute);
+            const currentQuantity = Number(getProperty(targetActor.data, attribute));
             const newQuantity = Math.max(0, currentQuantity - quantityToRemove);
 
             updates[attribute] = newQuantity;
@@ -1515,7 +1515,7 @@ export default class API {
 
         const attributesToTransfer = sourceAttributes.filter(attribute => {
             return hasProperty(sourceActor.data, attribute.path)
-                && getProperty(sourceActor.data, attribute.path) > 0
+                && Number(getProperty(sourceActor.data, attribute.path)) > 0
                 && hasProperty(targetActor.data, attribute.path);
         }).map(attribute => attribute.path);
 
