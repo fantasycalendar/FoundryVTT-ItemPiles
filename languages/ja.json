@@ -66,6 +66,8 @@
             "Update": "お宝更新",
             "EnabledPile": "有効化",
             "EnabledPileExplanation": "このキャラクターがお宝として振る舞うかどうかを設定します。",
+            "InspectItems": "アイテム詳細表示",
+            "InspectItemsExplanation": "アイテム名をクリックすると、そのアイテムの詳細が表示されます。",
             "Distance": "操作可能範囲",
             "GridUnits": "グリッド単位（空で無限）",
             "ItemTypeFilter": "アイテム種別フィルタ",

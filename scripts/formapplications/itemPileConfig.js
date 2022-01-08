@@ -2,7 +2,6 @@ import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import { ItemPileAttributeEditor } from "./itemPileAttributeEditor.js";
 import * as lib from "../lib/lib.js";
-import { dialogWarning } from "../lib/lib.js";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -91,7 +90,7 @@ export class ItemPileConfig extends FormApplication {
                 $(this).closest('.form-group').toggleClass("item-pile-disabled", !isEnabled);
             });
         }).change();
-        
+
         scaleCheckbox.change(function () {
             let isDisabled = !$(this).is(":checked") || !displayOneCheckbox.is(":checked");
             slider.prop('disabled', isDisabled);
@@ -169,7 +168,7 @@ export class ItemPileConfig extends FormApplication {
             "false": false
         }[formData.deleteWhenEmpty];
 
-        API._updateItemPile(this.document.uuid, data)
+        API.updateItemPile(this.document, data)
 
     }
 

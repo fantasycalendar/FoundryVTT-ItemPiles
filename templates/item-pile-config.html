@@ -29,6 +29,14 @@
             </div>
 
             <div class="form-group">
+                <label>
+                    {{localize "ITEM-PILES.Defaults.InspectItems"}}<br>
+                    <p>{{localize "ITEM-PILES.Defaults.InspectItemsExplanation"}}</p>
+                </label>
+                <input type="checkbox" name="canInspectItems" {{checked canInspectItems}}/>
+            </div>
+
+            <div class="form-group">
                 <label style="flex:4;">
                     {{localize "ITEM-PILES.Defaults.DeleteWhenEmpty"}}<br>
                     <p >{{localize "ITEM-PILES.Defaults.DeleteWhenEmptyExplanation"}}</p>

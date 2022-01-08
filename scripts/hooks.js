@@ -22,10 +22,12 @@ export const HOOKS = {
         LOCK: module`lockItemPile`,
         PRE_UNLOCK: module`preUnlockItemPile`,
         UNLOCK: module`unlockItemPile`,
-        PRE_TURN_INTO: module`preTurnIntoItemPile`,
-        TURN_INTO: module`turnIntoItemPile`,
-        PRE_REVERT_FROM: module`preRevertFromItemPile`,
-        REVERT_FROM: module`revertFromItemPile`
+        PRE_RATTLE: module`preRattleItemPile`,
+        RATTLE: module`rattleItemPile`,
+        PRE_TURN_INTO: module`preTurnIntoItemPiles`,
+        TURN_INTO: module`turnIntoItemPiles`,
+        PRE_REVERT_FROM: module`preRevertFromItemPiles`,
+        REVERT_FROM: module`revertFromItemPiles`
     },
     ITEM: {
         PRE_DROP_DETERMINED: module`preDropItemDetermined`,

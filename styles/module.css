@@ -40,6 +40,14 @@
     flex: 4;
 }
 
+.item-piles-item-row .item-piles-name .item-piles-clickable{
+    cursor: pointer;
+}
+
+.item-piles-item-row .item-piles-name .item-piles-clickable:hover{
+    text-shadow: 0 0 8px var(--color-shadow-primary);
+}
+
 .item-piles-item-row .item-piles-quantity{
     flex: 0.75;
     margin-left: 0.5rem;

@@ -22,10 +22,12 @@
   - [item-piles-lockItemPile](#item-piles-lockItemPile)
   - [item-piles-preUnlockItemPile](#item-piles-preUnlockItemPile)
   - [item-piles-unlockItemPile](#item-piles-unlockItemPile)
-  - [item-piles-preTurnIntoItemPile](#item-piles-preTurnIntoItemPile)
-  - [item-piles-turnIntoItemPile](#item-piles-turnIntoItemPile)
-  - [item-piles-preRevertFromItemPile](#item-piles-preRevertFromItemPile)
-  - [item-piles-revertFromItemPile](#item-piles-revertFromItemPile)
+  - [item-piles-preRattleItemPile](#item-piles-preRattleItemPile)
+  - [item-piles-rattleItemPile](#item-piles-rattleItemPile)
+  - [item-piles-preTurnIntoItemPiles](#item-piles-preTurnIntoItemPiles)
+  - [item-piles-turnIntoItemPiles](#item-piles-turnIntoItemPiles)
+  - [item-piles-preRevertFromItemPiles](#item-piles-preRevertFromItemPiles)
+  - [item-piles-revertFromItemPiles](#item-piles-revertFromItemPiles)
 
 - [Items](#Items)
   - [item-piles-preDropItems](#item-piles-preDropItems)
@@ -81,8 +83,8 @@ Called after all items and attributes have been transferred from the source to t
 
 | Param             | Type                | Description                                                                 |
 |-------------------|---------------------|-----------------------------------------------------------------------------|
-| sourceUuid        | <code>string</code> | The UUID of the source that had all of its items and attributes transferred |
-| targetUuid        | <code>string</code> | The UUID of the target that received all of the items and attributes        |
+| source        | <code>Actor,TokenDocument</code> | The source that had all of its items and attributes transferred |
+| target        | <code>Actor,TokenDocument</code> | The target that received all of the items and attributes        |
 | itemsCreated      | <code>array</code>  | A list of raw item objects that were created on the target                  |
 | itemsUpdated      | <code>array</code>  | A list of item ids and quantities that were updated on the target           |
 | attributesChanged | <code>array</code>  | A list of attributes and their new values                                   |
@@ -229,7 +231,27 @@ Called after an item pile has been unlocked.
 | target           | <code>TokenDocument</code>         | The document of the item pile has been unlocked                                    |
 | interactingToken | <code>TokenDocument,boolean</code> | If the action was caused by a token, this will be a TokenDocument, otherwise false |
 
-#### item-piles-preTurnIntoItemPile
+#### item-piles-preUnlockItemPile
+
+Called before a locked item pile is going to be attempted to be opened.
+
+| Param            | Type                               | Description                                                                        |
+|------------------|------------------------------------|------------------------------------------------------------------------------------|
+| target           | <code>TokenDocument</code>         | The document of the locked item pile is going to be attempted to be opened                              |
+| interactingToken | <code>TokenDocument,boolean</code> | If the action was caused by a token, this will be a TokenDocument, otherwise false |
+
+If the hook returns `false`, the action is interrupted.
+
+#### item-piles-unlockItemPile
+
+Called after a locked item pile was attempted to be opened.
+
+| Param            | Type                               | Description                                                                        |
+|------------------|------------------------------------|------------------------------------------------------------------------------------|
+| target           | <code>TokenDocument</code>         | The document of the locked item pile that was attempted to be opened                                    |
+| interactingToken | <code>TokenDocument,boolean</code> | If the action was caused by a token, this will be a TokenDocument, otherwise false |
+
+#### item-piles-preTurnIntoItemPiles
 
 Called before a token is turned into an item pile.
 
@@ -241,16 +263,16 @@ Called before a token is turned into an item pile.
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-turnIntoItemPile
+#### item-piles-turnIntoItemPiles
 
 Called after a token has been turned into an item pile.
 
 | Param           | Type                | Description                                             |
 |-----------------|---------------------|---------------------------------------------------------|
-| targetUuid      | <code>string</code> | The UUID of the token that was turned into an item pile |
+| target      | <code>string</code> | The token that was turned into an item pile |
 | newPileSettings | <code>object</code> | The resulting item pile's settings                      |
 
-#### item-piles-preRevertFromItemPile
+#### item-piles-preRevertFromItemPiles
 
 Called before a token is reverted from an item pile into a normal token.
 
@@ -261,13 +283,13 @@ Called before a token is reverted from an item pile into a normal token.
 
 If the hook returns `false`, the action is interrupted.
 
-#### item-piles-revertFromItemPile
+#### item-piles-revertFromItemPiles
 
 Called after a token has been reverted from an item pile into a normal token.
 
 | Param           | Type                | Description                                               |
 |-----------------|---------------------|-----------------------------------------------------------|
-| targetUuid      | <code>string</code> | The UUID of the token that was reverted from an item pile |
+| target      | <code>Actor,TokenDocument</code> | The token that was reverted from an item pile |
 
 ### Items
 
@@ -291,8 +313,8 @@ Called after an item has been dropped on the canvas.
 
 | Param      | Type                        | Description                                                                                                                     |
 |------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| sourceUuid | <code>string</code>         | The UUID of the actor or token document that dropped the item                                                                   |
-| targetUuid | <code>string</code>         | The UUID of the token document of the item pile that the item was dropped on, which may have been created as a part of the drop |
+| source | <code>Actor,TokenDocument</code>         | The actor or token document that dropped the item                                                                   |
+| target | <code>Actor,TokenDocument</code>         | The token document of the item pile that the item was dropped on, which may have been created as a part of the drop |
 | itemData   | <code>object</code>         | The data of the item that was dropped                                                                                           |
 | position   | <code>object,boolean</code> | The position on the canvas where the item was dropped                                                                           |
 | quantity   | <code>number</code>         | The quantity of the item that was dropped                                                                                       |
@@ -315,8 +337,8 @@ Called after an item has been transferred from the source to the target.
 
 | Param      | Type                | Description                              |
 |------------|---------------------|------------------------------------------|
-| sourceUuid | <code>string</code> | The source that transferred the item     |
-| targetUuid | <code>string</code> | The target that received the item        |
+| source | <code>Actor,TokenDocument</code> | The source that transferred the item     |
+| target | <code>Actor,TokenDocument</code> | The target that received the item        |
 | items      | <code>array</code>  | An array containing the objects of each item that were transferred |
 
 #### item-piles-preAddItems
@@ -336,7 +358,7 @@ Called after an item has been added to the target. This is not called in any tra
 
 | Param      | Type                | Description                                       |
 |------------|---------------------|---------------------------------------------------|
-| targetUuid | <code>string</code> | The UUID of the target that has received the item |
+| target | <code>Actor,TokenDocument</code> | The target that has received the item |
 | items      | <code>array</code>  | An array containing the objects of each item that were added |
 
 #### item-piles-preRemoveItems
@@ -356,7 +378,7 @@ Called after an item has been removed from the target. This is not called in any
 
 | Param      | Type                | Description                               |
 |------------|---------------------|-------------------------------------------|
-| targetUuid | <code>string</code> | The UUID of the target that lost the item |
+| target | <code>Actor,TokenDocument</code> | The target that lost the item |
 | items      | <code>array</code>  | An array containing the objects of each item that were removed |
 
 #### item-piles-preTransferAllItems
@@ -377,8 +399,8 @@ Called after all items has been transferred from the source to the target.
 
 | Param             | Type                | Description                                                                 |
 |-------------------|---------------------|-----------------------------------------------------------------------------|
-| sourceUuid        | <code>string</code> | The UUID of the source that had all of its items and attributes transferred |
-| targetUuid        | <code>string</code> | The UUID of the target that received all of the items and attributes        |
+| source        | <code>Actor,TokenDocument</code> | The source that had all of its items and attributes transferred |
+| target        | <code>Actor,TokenDocument</code> | The target that received all of the items and attributes        |
 | items             | <code>array</code>  | An array containing the objects of each item that were transferred          |
 
 ### Attributes
@@ -401,8 +423,8 @@ Called after an attribute's value has been transferred from the source to the ta
 
 | Param      | Type                | Description                                                   |
 |------------|---------------------|---------------------------------------------------------------|
-| sourceUuid | <code>string</code> | The UUID of the source that transferred its attribute's value |
-| targetUuid | <code>string</code> | The UUID of the target that received the attribute's value    |
+| source | <code>Actor,TokenDocument</code> | The source that transferred its attribute's value |
+| target | <code>Actor,TokenDocument</code> | The target that received the attribute's value    |
 | attributes | <code>object</code> | An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred |
 
 #### item-piles-preAddAttributes
@@ -422,7 +444,7 @@ Called after the value of the attribute on the target has been added to. Not cal
 
 | Param      | Type                | Description                                          |
 |------------|---------------------|------------------------------------------------------|
-| targetUuid | <code>string</code> | The target whose attribute's value has been added to |
+| target | <code>Actor,TokenDocument</code> | The target whose attribute's value has been added to |
 | attributes | <code>object</code> | An object containing a key value pair of each attribute added, the key being the attribute path and its value being the quantity that was added |
 
 #### item-piles-preRemoveAttributes
@@ -442,7 +464,7 @@ Called after the value of the attribute on the target has been removed from. Not
 
 | Param      | Type                | Description                                              |
 |------------|---------------------|----------------------------------------------------------|
-| targetUuid | <code>string</code> | The target whose attribute's value has been removed from |
+| target | <code>Actor,TokenDocument</code> | The target whose attribute's value has been removed from |
 | attributes | <code>object</code> | An object containing a key value pair of each attribute subtracted, the key being the attribute path and its value being the quantity that was subtracted |
 
 #### item-piles-preTransferAllAttributes
@@ -462,8 +484,8 @@ Called after all attributes' values was transferred from the source to the targe
 
 | Param      | Type                | Description                                                           |
 |------------|---------------------|-----------------------------------------------------------------------|
-| sourceUuid | <code>string</code> | The UUID of the source that transferred all of its attributes' values |
-| targetUuid | <code>string</code> | The UUID of the target that received all of the attributes' values    |
+| source | <code>Actor,TokenDocument</code> | The source that transferred all of its attributes' values |
+| target | <code>Actor,TokenDocument</code> | The target that received all of the attributes' values    |
 | itemsTransferred | <code>array</code> | An array of objects containing the item data transferred to the target   |
 | itemsTransferred | <code>object</code> | An object containing a key-value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred |
 

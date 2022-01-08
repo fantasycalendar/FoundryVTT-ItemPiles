@@ -17,7 +17,6 @@ Hooks.once("init", () => {
     Hooks.on("canvasReady", module._canvasReady);
     Hooks.on("preCreateToken", module._preCreatePile);
     Hooks.on("createToken", module._createPile);
-    Hooks.on("updateToken", module._updatePile);
     Hooks.on("deleteToken", module._deletePile);
     Hooks.on("dropCanvasData", module._dropCanvasData);
     Hooks.on("updateActor", module._pileAttributeChanged);
@@ -48,6 +47,7 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("ready", () => {
+
     if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
         let word = "install and activate";
         if(game.modules.get('lib-wrapper')) word = "activate";
@@ -58,6 +58,11 @@ Hooks.once("ready", () => {
         if(game.modules.get('socketlib')) word = "activate";
         throw lib.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
     }
+
+    if (!lib.isGMConnected()){
+        lib.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
+    }
+
     checkSystem();
     registerHotkeys();
     Hooks.callAll(HOOKS.READY);
@@ -67,7 +72,7 @@ const module = {
 
     async _pileAttributeChanged(actor, changes) {
         const target = actor?.token ?? actor;
-        if (!API.isValidItemPile(target)) return;
+        if (!lib.isValidItemPile(target)) return;
         const sourceAttributes = API.getItemPileAttributes(target);
         const validProperty = sourceAttributes.find(attribute => {
             return hasProperty(changes, attribute.path);
@@ -83,7 +88,7 @@ const module = {
         let target = item?.parent;
         if (!target) return;
         target = target?.token ?? target;
-        if (!API.isValidItemPile(target)) return;
+        if (!lib.isValidItemPile(target)) return;
         const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
         await API._rerenderItemPileInventoryApplication(target.uuid, deleted);
         if (deleted || !game.user.isGM) return;
@@ -101,32 +106,21 @@ const module = {
     },
 
     async _preCreatePile(token){
-        if (!API.isValidItemPile(token)) return;
+        if (!lib.isValidItemPile(token)) return;
         token.data.update({
-            "img": API._getItemPileTokenImage(token),
-            "scale": API._getItemPileTokenScale(token)
+            "img": lib.getItemPileTokenImage(token),
+            "scale": lib.getItemPileTokenScale(token)
         });
     },
 
     async _createPile(doc) {
-        if (!API.isValidItemPile(doc)) return;
+        if (!lib.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.CREATE, doc, lib.getItemPileData(doc));
         await API._initializeItemPile(doc);
-        if(game.user.isGM) {
-            return API._refreshItemPile(doc.uuid);
-        }
-    },
-
-    async _updatePile(doc){
-        if (!API.isValidItemPile(doc)) return;
-        await API._initializeItemPile(doc);
-        if(game.user.isGM) {
-            return API._refreshItemPile(doc.uuid);
-        }
     },
 
     async _deletePile(doc) {
-        if (!API.isValidItemPile(doc)) return;
+        if (!lib.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.DELETE, doc);
         return API._rerenderItemPileInventoryApplication(doc.uuid, true);
     },
@@ -137,7 +131,7 @@ const module = {
 
         if (!document) return;
 
-        if(!API.isValidItemPile(document)) return;
+        if(!lib.isValidItemPile(document)) return;
 
         const pileData = lib.getItemPileData(document);
 

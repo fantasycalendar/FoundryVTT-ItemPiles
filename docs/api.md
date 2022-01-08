@@ -44,11 +44,11 @@
 <dt><a href="#createItemPile">createItemPile(position, [items], [pileActorName])</a> ⇒ <code>Promise</code></dt>
 <dd><p>Creates the default item pile token at a location.</p>
 </dd>
-<dt><a href="#turnTokenIntoItemPile">turnTokenIntoItemPile(target, pileSettings, tokenSettings)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
-<dd><p>Turns a token and its actor into an item pile</p>
+<dt><a href="#turnTokenIntoItemPile">turnTokensIntoItemPiles(targets, pileSettings, tokenSettings)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
+<dd><p>Turns tokens and their actors into item piles</p>
 </dd>
-<dt><a href="#revertTokenFromItemPile">revertTokenFromItemPile(target, tokenSettings)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
-<dd><p>Reverts a token from an item pile into a normal token and actor</p>
+<dt><a href="#revertTokenFromItemPile">revertTokensFromItemPiles(targets, tokenSettings)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
+<dd><p>Reverts tokens from item piles into normal tokens and actors</p>
 </dd>
 <dt><a href="#openItemPile">openItemPile(target, [interactingToken])</a> ⇒ <code>Promise</code></dt>
 <dd><p>Opens a pile if it is enabled and a container</p>
@@ -236,30 +236,30 @@ Creates the default item pile token at a location.
 | [items] | <code>array/boolean</code> | <code>false</code> | Any items to create on the item pile |
 | [pileActorName] | <code>string/boolean</code> | <code>false</code> | Whether to use an existing item pile actor as the basis of this new token |
 
-<a name="turnTokenIntoItemPile"></a>
+<a name="turnTokensIntoItemPiles"></a>
 
-## turnTokenIntoItemPile(target, pileSettings, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
-Turns a token and its actor into an item pile
+## turnTokensIntoItemPiles(targets, pileSettings, tokenSettings) ⇒ <code>Promise.&lt;Array&gt;</code>
+Turns tokens and its actors into item piles
 
-**Returns**: <code>Promise.&lt;string&gt;</code> - The uuid of the target after it was turned into an item pile  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| target | <code>Token/TokenDocument</code> | The target to be turned into an item pile |
-| pileSettings | <code>object</code> | Overriding settings to be put on the item pile's settings |
-| tokenSettings | <code>object</code> | Overriding settings that will update the token |
-
-<a name="revertTokenFromItemPile"></a>
-
-## revertTokenFromItemPile(target, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
-Reverts a token from an item pile into a normal token and actor
-
-**Returns**: <code>Promise.&lt;string&gt;</code> - The uuid of the target after it was reverted from an item pile  
+**Returns**: <code>Promise.&lt;Array&gt;</code> - The uuids of the targets after they were turned into item piles  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| target | <code>Token/TokenDocument</code> | The target to be reverted from an item pile |
-| tokenSettings | <code>object</code> | Overriding settings that will update the token |
+| targets | <code>Token/TokenDocument/Array<Token/TokenDocument></code> | The targets to be turned into item piles |
+| pileSettings | <code>object</code> | Overriding settings to be put on the item piles' settings |
+| tokenSettings | <code>object</code> | Overriding settings that will update the tokens' settings |
+
+<a name="revertTokensFromItemPiles"></a>
+
+## revertTokensFromItemPiles(target, tokenSettings) ⇒ <code>Promise.&lt;string&gt;</code>
+Reverts tokens from an item pile into a normal token and actor
+
+**Returns**: <code>Promise.&lt;Array&gt;</code> - The uuids of the targets after they were reverted from being item piles  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| targets | <code>Token/TokenDocument/Array<Token/TokenDocument></code> | The targets to be reverted from item piles |
+| tokenSettings | <code>object</code> | Overriding settings that will update the tokens |
 
 <a name="openItemPile"></a>
 

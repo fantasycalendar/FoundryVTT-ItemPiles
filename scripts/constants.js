@@ -6,6 +6,7 @@ const CONSTANTS = {
         distance: 1,
         itemTypeFilters: "",
         overrideAttributes: false,
+        canInspectItems: true,
         macro: "",
         deleteWhenEmpty: "default",
         displayOne: true,

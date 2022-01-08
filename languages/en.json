@@ -66,6 +66,8 @@
             "Update": "Update Item Pile",
             "EnabledPile": "Enabled",
             "EnabledPileExplanation": "Whether this should act as an item pile.",
+            "InspectItems": "Enable Item Inspect",
+            "InspectItemsExplanation": "Clicking item names will open the item's sheet.",
             "Distance": "Interaction Distance",
             "GridUnits": "Grid Units (leave empty for infinite)",
             "ItemTypeFilter": "Item Type Filter",

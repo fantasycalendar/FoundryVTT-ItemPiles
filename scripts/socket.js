@@ -16,8 +16,8 @@ export const SOCKET_HANDLERS = {
     UPDATE_PILE: "updateItemPile",
     UPDATED_PILE: "updatedPile",
     DELETE_PILE: "deleteItemPile",
-    TURN_INTO_PILE: "turnIntoPile",
-    REVERT_FROM_PILE: "revertFromPile",
+    TURN_INTO_PILE: "turnIntoPiles",
+    REVERT_FROM_PILE: "revertFromPiles",
     REFRESH_PILE: "refreshItemPile",
 
     /**
@@ -61,8 +61,8 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.UPDATE_PILE, (...args) => API._updateItemPile(...args))
     itemPileSocket.register(SOCKET_HANDLERS.UPDATED_PILE, (...args) => API._updatedItemPile(...args))
     itemPileSocket.register(SOCKET_HANDLERS.DELETE_PILE, (...args) => API._deleteItemPile(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.TURN_INTO_PILE, (...args) => API._turnTokenIntoItemPile(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.REVERT_FROM_PILE, (...args) => API._revertTokenFromItemPile(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TURN_INTO_PILE, (...args) => API._turnTokensIntoItemPiles(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.REVERT_FROM_PILE, (...args) => API._revertTokensFromItemPiles(...args))
     itemPileSocket.register(SOCKET_HANDLERS.REFRESH_PILE, (...args) => API._refreshItemPile(...args))
 
     /**
@@ -89,7 +89,17 @@ export function registerSocket() {
 }
 
 async function callHook(inHookName, ...args) {
-    return Hooks.callAll(inHookName, ...args);
+    const newArgs = [];
+    for(let arg of args){
+        if(typeof arg === "string"){
+            const testArg = await fromUuid(arg);
+            if(testArg){
+                arg = testArg;
+            }
+        }
+        newArgs.push(arg);
+    }
+    return Hooks.callAll(inHookName, ...newArgs);
 }
 
 export const isPileInventoryOpenForOthers = {

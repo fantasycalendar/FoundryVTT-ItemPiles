@@ -1,4 +1,9 @@
 import CONSTANTS from "../constants.js";
+import API from "../api.js";
+
+export function isGMConnected(){
+    return !!Array.from(game.users).find(user => user.isGM && user.active);
+}
 
 export function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -77,6 +82,15 @@ export function distance_between(a, b) {
     return new Ray(a, b).distance;
 }
 
+export function grids_between_tokens(a, b){
+    return Math.floor(distance_between_rect(a, b) / canvas.grid.size) + 1
+}
+
+export function tokens_close_enough(a, b, maxDistance){
+    const distance = grids_between_tokens(a, b);
+    return maxDistance >= distance;
+}
+
 export function getSimilarItem(items, { itemId, itemName, itemType }={}) {
     for (const item of items) {
         if (item.id === itemId || (item.name === itemName && item.type === itemType)) {
@@ -106,18 +120,6 @@ export function is_real_number(inNumber) {
         && isFinite(inNumber);
 }
 
-export function getItemPileData(document){
-    if(document instanceof TokenDocument && document?.data?.actorLink){
-        document = document?.actor;
-    }
-    try{
-        return foundry.utils.duplicate(document.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
-    }catch(err){
-        return {};
-    }
-
-}
-
 export function hasNonzeroAttribute(target, attribute){
     const actor = target instanceof TokenDocument
         ? target.actor
@@ -126,15 +128,42 @@ export function hasNonzeroAttribute(target, attribute){
     return hasProperty(actor.data, attribute) && attributeValue > 0;
 }
 
+export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
+    return `<p class="item-piles-dialog">
+        <i style="font-size:3rem;" class="${icon}"></i><br><br>
+        <strong style="font-size:1.2rem;">Item Piles</strong>
+        <br><br>${message}
+    </p>`;
+}
+
+
+export function getItemPileData(inDocument){
+    if(inDocument instanceof TokenDocument && inDocument?.data?.actorLink){
+        inDocument = inDocument?.actor;
+    }else if(inDocument instanceof Actor && inDocument.token){
+        inDocument = inDocument?.token;
+    }
+    try{
+        return foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME) ?? {});
+    }catch(err){
+        return {};
+    }
+}
+
 export async function updateItemPile(inDocument, flagData, tokenData){
 
     if(!tokenData) tokenData = {};
 
     if(inDocument instanceof TokenDocument && inDocument.data.actorLink){
-        inDocument = inDocument.actor;
+        inDocument = inDocument?.actor;
     }else if(inDocument instanceof Actor && inDocument.token){
-        inDocument = inDocument.token;
+        inDocument = inDocument?.token;
     }
+
+    tokenData = foundry.utils.mergeObject(tokenData, {
+        "img": getItemPileTokenImage(inDocument, flagData),
+        "scale": getItemPileTokenScale(inDocument, flagData),
+    });
 
     if (inDocument instanceof TokenDocument) {
         return inDocument.update({
@@ -154,10 +183,114 @@ export async function updateItemPile(inDocument, flagData, tokenData){
 
 }
 
-export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
-    return `<p class="item-piles-dialog">
-        <i style="font-size:3rem;" class="${icon}"></i><br><br>
-        <strong style="font-size:1.2rem;">Item Piles</strong>
-        <br><br>${message}
-    </p>`;
+export function getItemPileTokenImage(pileDocument, data = false) {
+
+    if (!data) {
+        data = getItemPileData(pileDocument);
+    }
+
+    let img = pileDocument instanceof TokenDocument && pileDocument.data.actorLink
+        ? pileDocument.actor.data.token.img
+        : pileDocument.data.img;
+
+    if(!isValidItemPile(pileDocument)) return img;
+
+    const items = getItemPileItems(pileDocument);
+
+    if (data.isContainer) {
+
+        img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage || img;
+
+        if (data.locked && data.lockedImage) {
+            img = data.lockedImage;
+        } else if (data.closed && data.closedImage) {
+            img = data.closedImage;
+        } else if (data.emptyImage && isItemPileEmpty(pileDocument)) {
+            img = data.emptyImage;
+        } else if (data.openedImage) {
+            img = data.openedImage;
+        }
+
+    } else if (data.displayOne && items.length === 1) {
+
+        img = items[0].data.img;
+
+    }
+
+    return img;
+
+}
+
+export function getItemPileTokenScale(pileDocument, data) {
+
+    if (!data) {
+        data = getItemPileData(pileDocument);
+    }
+
+    const baseScale = pileDocument instanceof TokenDocument && pileDocument.data.actorLink
+        ? pileDocument.actor.data.token.scale
+        : pileDocument.data.scale;
+
+    if(!isValidItemPile(pileDocument, data)) return baseScale;
+
+    const items = getItemPileItems(pileDocument);
+
+    return data.displayOne && data.overrideSingleItemScale && items.length === 1
+        ? data.singleItemScale
+        : baseScale;
+
+}
+
+export function getItemPileItems(target, itemTypeFilters = false){
+    if(!isValidItemPile(target)) return [];
+
+    const pileItemFilters = Array.isArray(itemTypeFilters)
+        ? new Set(itemTypeFilters)
+        : new Set(getItemPileItemTypeFilters(target));
+
+    const targetActor = target instanceof TokenDocument
+        ? target.actor
+        : target;
+
+    return Array.from(targetActor.items).filter(item => {
+        const itemType = getProperty(item.data, API.ITEM_TYPE_ATTRIBUTE);
+        return !pileItemFilters.has(itemType);
+    })
+}
+
+export function isValidItemPile(inDocument, data = false){
+    const documentActor = inDocument instanceof TokenDocument ? inDocument.actor : inDocument;
+    return inDocument && !inDocument.destroyed && documentActor && (data || getItemPileData(inDocument))?.enabled;
+}
+
+export function getItemPileItemTypeFilters(target){
+    if(!isValidItemPile(target)) return [];
+    const pileData = getItemPileData(target);
+    return pileData.itemTypeFilters
+        ? pileData.itemTypeFilters.split(',').map(str => str.trim().toLowerCase())
+        : API.ITEM_TYPE_FILTERS;
+}
+
+export function isItemPileEmpty(target) {
+
+    const targetActor = target instanceof TokenDocument
+        ? target.actor
+        : target;
+
+    if(!targetActor) return false;
+
+    const hasNoItems = getItemPileItems(target).length === 0;
+
+    const attributes = getItemPileAttributes(target);
+    const hasEmptyAttributes = attributes.filter(attribute => {
+        return hasNonzeroAttribute(targetActor, attribute.path)
+    }).length === 0;
+
+    return hasNoItems && hasEmptyAttributes;
+
+}
+
+export function getItemPileAttributes(target){
+    const pileData = getItemPileData(target);
+    return pileData.overrideAttributes || API.DYNAMIC_ATTRIBUTES;
 }
