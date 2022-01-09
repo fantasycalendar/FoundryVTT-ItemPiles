@@ -96,7 +96,7 @@ Incomplete requests will be rejected.
 
 Any player or GM can drag & drop items - if you drag & drop an item from an actor's inventory, you will be prompted how many of that item that you wish to drop (if they have more than 1 of the item). GMs can also drop items from the item list in the right sidebar.
 
-<img src="https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/wiki-drop.jpg" style="height:425px;"/> <img src="https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/wiki-drop-into.jpg" style="height:425px;"/>
+<img src="https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/wiki-drop.jpg" style="height:400px;"/> <img src="https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/wiki-drop-into.jpg" style="height:400px;"/>
 
 Holding ALT before dragging & dropping an item will make you automatically drop 1 of the items into a new pile without a prompt. **You can also drag and drop items onto an existing pile**, where holding ALT is also supported.
 
