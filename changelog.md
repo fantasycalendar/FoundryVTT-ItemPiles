@@ -1,5 +1,9 @@
 # Item Piles Changelog 
 
+## Version 1.1.2
+- Fixed dropping items onto piles not working when it had an interaction distance of infinite  
+- Fixed macro input field in item pile config was incorrectly set to "number" rather than "text"
+
 ## Version 1.1.1
 - Added support for the Savage Worlds Adventure Edition: <https://foundryvtt.com/packages/swade>
 - Fixed linked token actors not acting like they are linked - now all tokens on the canvas with the same linked actor share the same state and image
