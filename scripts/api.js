@@ -1836,7 +1836,9 @@ export default class API {
 
                 const distance = Math.floor(lib.distance_between_rect(sourceToken, targetToken.object) / canvas.grid.size) + 1
 
-                const maxDistance = lib.getItemPileData(targetToken).distance;
+                const pileData = lib.getItemPileData(targetToken);
+
+                const maxDistance = pileData.distance ? pileData.distance : Infinity;
 
                 if(distance > maxDistance) {
                     lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
