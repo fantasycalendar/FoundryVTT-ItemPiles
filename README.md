@@ -25,7 +25,11 @@ Like what we've done? Buy us a coffee!
 
 ## What is Item Piles?
 
-This module enables dropping items onto the canvas, which then get represented as a pile of items. In order to work in all systems without breaking or messing too much with the core functionality of Foundry, this **creates an unlinked token & actor** to hold these items. When a player double-clicks on an item pile token, it opens a custom UI to show what the pile contains and players can then take items from it.
+Have you ever wished you could represent items in your scenes? A pile of items, something to interact with - or perhaps chests whose appearance changes depending on what happens to it, whether it's open, closed, full, or empty.
+
+Then you need **Item Piles**!
+
+In short, this module enables dropping items onto the canvas, which then get represented as a pile of items. In order to work in all systems without breaking or messing too much with the core functionality of Foundry, this **creates an unlinked token & actor** to hold these items. When a player double-clicks on an item pile token, it opens a custom UI to show what the pile contains and players can then take items from it.
 
 Item Piles can also be configured to act as a container, where it can be open or closed, locked or unlocked, with the ability for the token that represents the pile to change image depending on its state. In addition, when an item pile is interacted with it can also play sounds for the action, such as opening, closing, or attempting to open a locked item pile. Sounds are only played for the user who attempted the action.
 
@@ -88,11 +92,23 @@ Incomplete requests will be rejected.
 
 ## Usage
 
+### Interaction
+
+Any player or GM can drag & drop items - if you drag & drop an item from an actor's inventory, you will be prompted how many of that item that you wish to drop (if they have more than 1 of the item). GMs can also drop items from the item list in the right sidebar.
+
+<img src="https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/wiki-drop.jpg" style="height:425px;"/> <img src="https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/master/docs/images/wiki-drop-into.jpg" style="height:425px;"/>
+
+Holding ALT before dragging & dropping an item will make you automatically drop 1 of the items into a new pile without a prompt. **You can also drag and drop items onto an existing pile**, where holding ALT is also supported.
+
+When players double-click on the item pile (or Left Control + double-click for GMs to inspect, or to inspect as someone else select two tokens, and repeat), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
+
+![Item Pile Token Configuration](./docs/images/wiki-inspect-as.jpg)
+
 ### Initial Setup
 
-Installing this module allows anyone to drag & drop items to the canvas, which creates piles of items on the ground. The default pile is normally relatively unstyled and you can change it all you want, but you **shouldn't delete it** or the module will create a new default item pile actor. This is the actor that is used by everyone in your game to create item piles when they drag & drop items.
+When a player or a GM drops the first item into a scene, the **default item pile actor** will be created. Do **not** delete this actor, as it is the actor and token that is used for all item drops. It's not recommended to change this actor or token styling unless you know what you're doing.
 
-As a GM, you can duplicate the default item pile to create new versions of that pile, or turn existing actors into new item piles through the `Item Pile` button on the actor sheets' header bar. This UI has a wide range of customization, which allows you to control exactly how your players interact with the item pile.
+Instead, we recommend that you duplicate the default item pile to create new versions of that pile, and experiment with that. Alternatively, turn existing actors into new item piles through the `Item Pile` button on the actor sheets' header bar. This UI has a wide range of customization, which allows you to control exactly how your players interact with the item pile.
 
 ![Item Pile Token Configuration](./docs/images/configs.png)
 
@@ -102,13 +118,6 @@ Be sure to set any new Item Piles as **unlinked from its actor data**! Unless yo
 
 ![Item Pile Token Linked](./docs/images/disable-link.jpg)
 
-### Interaction
-
-Any player or GM can drag & drop items - if you drag & drop an item from an actor's inventory, you will be prompted how many of that item that you wish to drop (if they have more than 1 of the item). Holding ALT before dragging & dropping an item, you will automatically drop 1 of the items into a new pile without a prompt. **You can also drag and drop items onto an existing pile**.
-
-When players double-click on the item pile (or Left Control + double-click for GMs to inspect, or to inspect as someone else select two tokens, and repeat), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
-
-![Item Pile Inventory UI](./docs/images/inventory-ui.png)
 
 ### Extra UI and settings
 
