@@ -21,9 +21,10 @@ Like what we've done? Buy us a coffee!
 
 ---
 
+### Chest sprites used on this page is from Forgotten Adventures
+
 ![Item Piles in a nutshell](./docs/images/intro.jpg)
 
-**Chest sprites used on this page is from Forgotten Adventures**
 
 ## What is Item Piles?
 
@@ -179,3 +180,5 @@ This package is under an [MIT](LICENSE) and the [Foundry Virtual Tabletop Limite
 - Padhiver#1916 for the French localization
 - STB#9841 for the German localization
 - Brother Sharp#6921 for the Japanese localization
+- Forgotten Adventures for their amazing chest sprites (not included in the module)
+- Caeora for their great maps and tokens (not included in this module)
