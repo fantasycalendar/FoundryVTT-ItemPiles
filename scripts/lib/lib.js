@@ -190,8 +190,14 @@ export async function updateItemPile(inDocument, flagData, tokenData){
 
     await canvas.scene.updateEmbeddedDocuments("Token", updates);
 
+    const newPrototypeTokenData = foundry.utils.mergeObject(tokenData, {
+        "img": getItemPileTokenImage(documentActor, flagData),
+        "scale": getItemPileTokenScale(documentActor, flagData),
+    });
+
     return documentActor.update({
-        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData
+        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
+        ...newPrototypeTokenData
     });
 
 }

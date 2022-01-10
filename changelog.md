@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.1.3
+- Fixed prototype tokens not being updated when editing an item pile through its sheet  
+
 ## Version 1.1.2
 - Fixed dropping items onto piles not working when it had an interaction distance of infinite  
 - Fixed macro input field in item pile config was incorrectly set to "number" rather than "text"
