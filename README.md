@@ -21,7 +21,9 @@ Like what we've done? Buy us a coffee!
 
 ---
 
-### Chest sprites used on this page is from Forgotten Adventures
+### Chest sprites used on this page is from Forgotten Adventures*
+
+\**not included in this module*
 
 ![Item Piles in a nutshell](./docs/images/intro.jpg)
 
