@@ -23,6 +23,8 @@ Like what we've done? Buy us a coffee!
 
 ![Item Piles in a nutshell](./docs/images/intro.jpg)
 
+**Chest sprites used on this page is from Forgotten Adventures**
+
 ## What is Item Piles?
 
 Have you ever wished you could represent items in your scenes? A pile of items, something to interact with - or perhaps chests whose appearance changes depending on what happens to it, whether it's open, closed, full, or empty.
