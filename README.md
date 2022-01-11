@@ -144,6 +144,22 @@ Each row represents a field on a character sheet that may be picked up. As you c
 
 Keep in mind that the name field in here accepts localization strings, so for D&D5e's currencies, you could enter `DND5E.CurrencyGP` in the name field.
 
+## Useful Macros
+
+Item Piles has a powerful API, which allows you to quickly modify the item piles in your scenes.
+
+### Turn selected tokens into item piles
+
+```js
+if(!canvas.tokens.controlled.length) return;
+ItemPiles.API.turnTokensIntoItemPiles(canvas.tokens.controlled)
+```
+
+### Revert selected tokens from item piles:
+```js
+if(!canvas.tokens.controlled.length) return;
+ItemPiles.API.revertTokensFromItemPiles(canvas.tokens.controlled)
+```
 
 ## Item Piles Settings
 
