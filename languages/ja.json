@@ -87,6 +87,7 @@
             "DisplayOneExplanation": "お宝の中身が単体のアイテムの場合、そのアイテムの画像がお宝の画像そのものになります。",
             "OverrideSingleItemScale": "単体アイテムのコマサイズ調整",
             "SingleItemScale": "単体アイテムコマサイズ",
+            "DisplayOneContainerWarning": "警告：\"単体時、アイテム画像を表示\"と\"コンテナである\"の両方の設定が有効化されています。この場合、コンテナ画像のほうが優先されますのでご注意ください。",
             "IsContainer": "コンテナである",
             "Locked": "ロックされている",
             "Closed": "閉まっている",

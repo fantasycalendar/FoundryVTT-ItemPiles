@@ -87,6 +87,7 @@
             "DisplayOneExplanation": "Besteht der Stapel aus einem einzigen Gegenstand, wird das Bild des Stapels auf das Bild des Gegenstandes gesetzt.",
             "OverrideSingleItemScale": "Einzelne Gegenstands-Token-Skalierung außer Kraft setzen",
             "SingleItemScale": "Gegenstands-Token-Skalierung",
+            "DisplayOneContainerWarning": "Achtung! Du hast sowohl die Einstellung \"Einzelnes Artikelbild anzeigen\" als auch \"Ist Container\" aktiviert. In diesem Fall werden Bilder für den Container bevorzugt verwendet.",
             "IsContainer": "Ist Container",
             "Locked": "Ist verschlossen",
             "Closed": "Ist geschlossen",

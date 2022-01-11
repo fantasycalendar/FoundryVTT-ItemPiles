@@ -4,7 +4,7 @@ import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropDialog from "./formapplications/dropDialog.js";
 import { HOOKS } from "./hooks.js";
-import { getItemPileTokenImage, getItemPileTokenScale, tokens_close_enough } from "./lib/lib.js";
+import { getItemPileAttributes, getItemPileTokenImage, getItemPileTokenScale, tokens_close_enough } from "./lib/lib.js";
 
 export default class API {
 
@@ -207,7 +207,7 @@ export default class API {
 
                 await pileActor.update({
                     "token": {
-                        name: "ItemPile",
+                        name: "Item Pile",
                         actorLink: false,
                         bar1: { attribute: "" },
                         vision: false,
@@ -233,20 +233,31 @@ export default class API {
             overrideData['actorData'] = { "items": items || {} };
 
             const pileConfig = lib.getItemPileData(pileActor);
+            const attributes = getItemPileAttributes(pileActor);
 
-            if (items.length === 1 && pileConfig.displayOne) {
-                overrideData["img"] = items[0].img
+            const numItems = items.length + attributes.length;
+
+            if (pileConfig.displayOne && numItems === 1) {
+                overrideData["img"] = items.length > 0
+                    ? items[0].img
+                    : attributes[0].img;
                 if (pileConfig.overrideSingleItemScale) {
                     overrideData["scale"] = pileConfig.singleItemScale;
                 }
-            }else{
+            }
+
+            if (pileConfig.isContainer) {
+
                 overrideData["img"] = lib.getItemPileTokenImage(pileActor);
                 overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
+
             }
 
         } else {
+
             overrideData["img"] = lib.getItemPileTokenImage(pileActor);
             overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
+
         }
 
         const tokenData = await pileActor.getTokenData(overrideData);

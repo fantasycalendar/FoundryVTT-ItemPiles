@@ -82,6 +82,7 @@
 			"DisplayOneExplanation": "Si la pile est composée d'un seul objet, l'image du token de la pile sera l'image de l'objet.",
 			"OverrideSingleItemScale": "Remplacer l'échelle du Token objet unique",
 			"SingleItemScale": "Échelle du Token",
+            "DisplayOneContainerWarning": "Attention ! Vous avez activé à la fois les options \"Afficher l'image d'un seul élément\" et \"Est un conteneur\". Dans ce cas, l'images du conteneur est prioritaires.",
 			"IsContainer": "Est un conteneur",
 			"Locked": "est verrouillé",
 			"Closed": "Est fermé",

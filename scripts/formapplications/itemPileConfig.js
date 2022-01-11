@@ -63,34 +63,25 @@ export class ItemPileConfig extends FormApplication {
         const slider = html.find("#scaleRange");
         const input = html.find("#scaleInput");
 
-        let firstTime = true;
         enabledCheckbox.change(async function () {
             let isEnabled = $(this).is(":checked");
-            if(!firstTime){
-                const existingData = lib.getItemPileData(self.document);
-                if(isEnabled && !existingData?.enabled) {
-                    const isLinked = self.document instanceof Actor
-                        ? self.document.data.token.actorLink
-                        : self.document.isLinked;
-                    if(isLinked){
-                        const doContinue = await Dialog.confirm({
-                            title: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Title"),
-                            content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content")),
-                            defaultYes: false
-                        });
-                        if (!doContinue) {
-                            isEnabled = false;
-                            $(this).prop("checked", false);
-                        }
+            const existingData = lib.getItemPileData(self.document);
+            if(isEnabled && !existingData?.enabled) {
+                const isLinked = self.document instanceof Actor
+                    ? self.document.data.token.actorLink
+                    : self.document.isLinked;
+                if(isLinked){
+                    const doContinue = await Dialog.confirm({
+                        title: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Title"),
+                        content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content")),
+                        defaultYes: false
+                    });
+                    if (!doContinue) {
+                        $(this).prop("checked", false);
                     }
                 }
             }
-            firstTime = false;
-            html.find('.tab-body').find('input, button, select').not($(this)).each(function () {
-                $(this).prop('disabled', !isEnabled);
-                $(this).closest('.form-group').toggleClass("item-pile-disabled", !isEnabled);
-            });
-        }).change();
+        })
 
         scaleCheckbox.change(function () {
             let isDisabled = !$(this).is(":checked") || !displayOneCheckbox.is(":checked");
@@ -100,32 +91,33 @@ export class ItemPileConfig extends FormApplication {
         }).change();
 
         displayOneCheckbox.change(function () {
-            let isDisabled = !$(this).is(":checked");
-            html.find('.item-pile-display-one-settings').children().each(function () {
-                $(this).toggleClass("item-pile-disabled", isDisabled);
-                $(this).find('input, button').prop("disabled", isDisabled);
-                scaleCheckbox.change();
-            });
+            let isEnabled = $(this).is(":checked");
+            let isScale = scaleCheckbox.is(":checked");
+            let isContainer = containerCheckbox.is(":checked");
+
+            slider.prop('disabled', !isEnabled || !isScale);
+            input.prop('disabled', !isEnabled || !isScale);
+            slider.parent().toggleClass("item-pile-disabled", !isEnabled || !isScale);
+
+            scaleCheckbox.prop('disabled', !isEnabled);
+            scaleCheckbox.parent().toggleClass("item-pile-disabled", !isEnabled);
+
+            html.find(".display-one-warning").css("display", isEnabled && isContainer ? "block" : "none");
+            self.setPosition();
         }).change();
 
-        const containerSettings = html.find('.item-pile-container-settings');
         containerCheckbox.change(function () {
-            let isDisabled = !$(this).is(":checked");
-            containerSettings.children().each(function () {
-                $(this).toggleClass("item-pile-disabled", isDisabled);
-                $(this).find('input, button, select').prop("disabled", isDisabled);
-            });
+            let isEnabled = $(this).is(":checked");
+            let isDisplayOne = displayOneCheckbox.is(":checked");
+            html.find(".display-one-warning").css("display", isEnabled && isDisplayOne ? "block" : "none");
         }).change();
 
         overrideAttributesEnabledCheckbox.change(function () {
             let isChecked = $(this).is(":checked");
-            html.find(".item-pile-config-configure-override-attributes")
-                .toggleClass("item-pile-disabled", !isChecked)
-                .prop("disabled", !isChecked);
             if (isChecked) {
                 self.pileData.overrideAttributes = game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
             }
-        }).change();
+        })
 
         html.find(".item-pile-config-configure-override-attributes").click(function () {
             self.showAttributeEditor();

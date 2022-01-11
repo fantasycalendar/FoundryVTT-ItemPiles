@@ -26,7 +26,7 @@
 
             <div class="item-piles-items">
                 {{#each items as |item id|}}
-                <div class="flexrow item-piles-item-row {{#unless item.maxQuantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
+                <div class="flexrow item-piles-item-row {{#unless item.quantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
                     <img class="item-piles-img" src="{{item.img}}"/>
                     <div class="item-piles-name item-piles-text">
                         {{#if @root.canInspectItems}}<a class="item-piles-item-clickable">{{/if}}
@@ -34,13 +34,13 @@
                         {{#if @root.canInspectItems}}</a>{{/if}}
                     </div>
                     {{#if @root.hasRecipient}}
-                        <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.maxQuantity}}disabled{{/unless}}/>
+                        <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.quantity}}disabled{{/unless}}/>
                     {{/if}}
                     <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
-                        {{#if @root.hasRecipient}}/ {{else}}x{{/if}}{{item.maxQuantity}}
+                        {{#if @root.hasRecipient}}/ {{else}}x{{/if}}{{item.quantity}}
                     </span>
                     {{#if @root.hasRecipient}}
-                        <button class="item-piles-take-button" type="button" {{#unless item.maxQuantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                        <button class="item-piles-take-button" type="button" {{#unless item.quantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
                     {{/if}}
                 </div>
                 {{/each}}
@@ -54,13 +54,13 @@
                     <img class="item-piles-img" src="{{attribute.img}}"/>
                     <div class="item-piles-name item-piles-text">{{attribute.name}}</div>
                     {{#if @root.hasRecipient}}
-                        <input class="item-piles-quantity" type="number" min="1" value="{{attribute.currentQuantity}}" max="{{attribute.quantity}}" {{#unless attribute.maxQuantity}}disabled{{/unless}}/>
+                        <input class="item-piles-quantity" type="number" min="1" value="{{attribute.currentQuantity}}" max="{{attribute.quantity}}" {{#unless attribute.quantity}}disabled{{/unless}}/>
                     {{/if}}
                     <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
-                        {{#if @root.hasRecipient}}/ {{else}}x{{/if}}{{attribute.maxQuantity}}
+                        {{#if @root.hasRecipient}}/ {{else}}x{{/if}}{{attribute.quantity}}
                     </span>
                     {{#if @root.hasRecipient}}
-                        <button class="item-piles-attribute-take-button" type="button" {{#unless attribute.maxQuantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                        <button class="item-piles-attribute-take-button" type="button" {{#unless attribute.quantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
                     {{/if}}
                 </div>
                 {{/each}}

@@ -190,14 +190,11 @@ export async function updateItemPile(inDocument, flagData, tokenData){
 
     await canvas.scene.updateEmbeddedDocuments("Token", updates);
 
-    const newPrototypeTokenData = foundry.utils.mergeObject(tokenData, {
-        "img": getItemPileTokenImage(documentActor, flagData),
-        "scale": getItemPileTokenScale(documentActor, flagData),
-    });
-
     return documentActor.update({
         [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
-        ...newPrototypeTokenData
+        "token": {
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
+        }
     });
 
 }
@@ -208,17 +205,35 @@ export function getItemPileTokenImage(pileDocument, data = false) {
         data = getItemPileData(pileDocument);
     }
 
-    let img = pileDocument instanceof TokenDocument && pileDocument.data.actorLink
-        ? pileDocument.actor.data.token.img
-        : pileDocument.data.img;
+    let originalImg;
+    if(pileDocument instanceof TokenDocument){
+        originalImg = pileDocument.data.actorLink
+            ? pileDocument.actor.data.token.img
+            : pileDocument.data.img;
+    }else{
+        originalImg = pileDocument.data.token.img;
+    }
 
-    if(!isValidItemPile(pileDocument)) return img;
+    if(!isValidItemPile(pileDocument)) return originalImg;
 
     const items = getItemPileItems(pileDocument);
+    const attributes = getItemPileAttributes(pileDocument);
+
+    const numItems = items.length + attributes.length;
+
+    let img;
+
+    if (data.displayOne && numItems === 1) {
+
+        img = items.length > 0
+            ? items[0].data.img
+            : attributes[0].img;
+
+    }
 
     if (data.isContainer) {
 
-        img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage || img;
+        img = data.lockedImage || data.closedImage || data.openedImage || data.emptyImage;
 
         if (data.locked && data.lockedImage) {
             img = data.lockedImage;
@@ -230,13 +245,9 @@ export function getItemPileTokenImage(pileDocument, data = false) {
             img = data.openedImage;
         }
 
-    } else if (data.displayOne && items.length === 1) {
-
-        img = items[0].data.img;
-
     }
 
-    return img;
+    return img || originalImg;
 
 }
 
@@ -246,17 +257,23 @@ export function getItemPileTokenScale(pileDocument, data) {
         data = getItemPileData(pileDocument);
     }
 
-    const baseScale = pileDocument instanceof TokenDocument && pileDocument.data.actorLink
-        ? pileDocument.actor.data.token.scale
-        : pileDocument.data.scale;
-
-    if(!isValidItemPile(pileDocument, data)) return baseScale;
+    let baseScale;
+    if(pileDocument instanceof TokenDocument){
+        baseScale = pileDocument.data.actorLink
+            ? pileDocument.actor.data.token.scale
+            : pileDocument.data.scale;
+    }else{
+        baseScale = pileDocument.data.token.scale;
+    }
 
     const items = getItemPileItems(pileDocument);
+    const attributes = getItemPileAttributes(pileDocument);
 
-    return data.displayOne && data.overrideSingleItemScale && items.length === 1
-        ? data.singleItemScale
-        : baseScale;
+    const numItems = items.length + attributes.length;
+
+    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.overrideSingleItemScale || numItems > 1) return baseScale;
+
+    return data.singleItemScale;
 
 }
 
@@ -299,17 +316,30 @@ export function isItemPileEmpty(target) {
     if(!targetActor) return false;
 
     const hasNoItems = getItemPileItems(target).length === 0;
-
-    const attributes = getItemPileAttributes(target);
-    const hasEmptyAttributes = attributes.filter(attribute => {
-        return hasNonzeroAttribute(targetActor, attribute.path)
-    }).length === 0;
+    const hasEmptyAttributes = getItemPileAttributes(target).length === 0;
 
     return hasNoItems && hasEmptyAttributes;
 
 }
 
-export function getItemPileAttributes(target){
+export function getItemPileAttributeList(target){
     const pileData = getItemPileData(target);
     return pileData.overrideAttributes || API.DYNAMIC_ATTRIBUTES;
+}
+
+export function getItemPileAttributes(target) {
+    let targetActor = target?.actor ?? target;
+    const attributes = getItemPileAttributeList(targetActor);
+    return attributes
+        .filter(attribute => {
+            return hasProperty(targetActor.data, attribute.path) && Number(getProperty(targetActor.data, attribute.path)) > 0;
+        }).map(attribute => {
+            const localizedName = game.i18n.has(attribute.name) ? game.i18n.localize(attribute.name) : attribute.name;
+            return {
+                name: localizedName,
+                path: attribute.path,
+                img: attribute.img,
+                quantity: Number(getProperty(targetActor.data, attribute.path) ?? 1)
+            }
+        });
 }

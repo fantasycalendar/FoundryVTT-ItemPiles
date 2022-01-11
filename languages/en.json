@@ -87,6 +87,7 @@
             "DisplayOneExplanation": "If the pile is made up of a single item, this sets the pile token's image to be the image of the item.",
             "OverrideSingleItemScale": "Override single item token scale",
             "SingleItemScale": "Single item token scale",
+            "DisplayOneContainerWarning": "Warning! You have both \"Display Single Item Image\" and \"Is Container\" enabled. In this case, the container images takes priority.",
             "IsContainer": "Is Container",
             "Locked": "Is Locked",
             "Closed": "Is Closed",
