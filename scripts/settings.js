@@ -80,6 +80,16 @@ export default function registerSettings() {
         type: Boolean
     });
 
+    game.settings.register(CONSTANTS.MODULE_NAME, "hideActorHeaderText", {
+        name: "ITEM-PILES.Setting.HideActorHeaderText.Title",
+        hint: "ITEM-PILES.Setting.HideActorHeaderText.Label",
+        scope: "client",
+        config: true,
+        default: false,
+        type: Boolean,
+        onChange: debounceReload
+    });
+
     game.settings.register(CONSTANTS.MODULE_NAME, "preloadFiles", {
         name: "ITEM-PILES.Setting.PreloadFiles.Title",
         hint: "ITEM-PILES.Setting.PreloadFiles.Label",
@@ -126,14 +136,11 @@ export default function registerSettings() {
         type: Boolean
     });
 
-    game.settings.register(CONSTANTS.MODULE_NAME, 'monksActiveTilesDropItemWarning', {
-        scope: "world",
-        config: false,
-        default: false,
-        type: Boolean
-    });
-
 }
+
+const debounceReload = foundry.utils.debounce(() => {
+    window.location.reload();
+}, 100);
 
 class ResetSettingsDialog extends FormApplication {
     constructor(...args) {

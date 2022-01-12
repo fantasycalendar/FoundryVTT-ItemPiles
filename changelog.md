@@ -1,6 +1,12 @@
 # Item Piles Changelog 
 
 ## Version 1.1.3
+- Tweaked `ItemPiles.API.turnTokensIntoItemPiles` turn tokens into item piles without using the "Display Single Item Image" turned on
+- Fixed users creating item piles would cause the pile to be spawned on the scene that the GM was viewing at that given moment
+- Added setting to hide the "Item Piles" text in the actor header - useful if you have too many modules, and the header is getting crowded
+
+
+## Version 1.1.3
 - Adjusted display one-type item piles to also take into account dynamic attributes (gold piles!)
 - Fixed prototype tokens not being updated when editing an item pile through its sheet  
 - Fixed item piles with both "Is Container" and "Override single item token scale" enabled acting strange - item piles will now prioritize the container images over "Display Single Item Image" when "Is Container" is enabled

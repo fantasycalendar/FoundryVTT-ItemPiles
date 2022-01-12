@@ -44,10 +44,10 @@
 <dt><a href="#createItemPile">createItemPile(position, [items], [pileActorName])</a> ⇒ <code>Promise</code></dt>
 <dd><p>Creates the default item pile token at a location.</p>
 </dd>
-<dt><a href="#turnTokenIntoItemPile">turnTokensIntoItemPiles(targets, pileSettings, tokenSettings)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
+<dt><a href="#turnTokensIntoItemPiles">turnTokensIntoItemPiles(targets, pileSettings, tokenSettings)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
 <dd><p>Turns tokens and their actors into item piles</p>
 </dd>
-<dt><a href="#revertTokenFromItemPile">revertTokensFromItemPiles(targets, tokenSettings)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
+<dt><a href="#revertTokensFromItemPiles">revertTokensFromItemPiles(targets, tokenSettings)</a> ⇒ <code>Promise.&lt;string&gt;</code></dt>
 <dd><p>Reverts tokens from item piles into normal tokens and actors</p>
 </dd>
 <dt><a href="#openItemPile">openItemPile(target, [interactingToken])</a> ⇒ <code>Promise</code></dt>

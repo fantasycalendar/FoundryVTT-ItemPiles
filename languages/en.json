@@ -147,6 +147,10 @@
                 "Title": "Auto-delete empty piles",
                 "Label": "This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles."
             },
+            "HideActorHeaderText": {
+                "Title": "Hide actor header text",
+                "Label": "Hides the \"Item Piles\" text in the actor header - useful if you have too many modules, and the header is getting crowded."
+            },
             "PreloadFiles": {
                 "Title": "Preload Files",
                 "Label": "Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience."

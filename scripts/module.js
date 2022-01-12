@@ -171,7 +171,7 @@ const module = {
         let obj = actorSheet.object;
 
         buttons.unshift({
-            label: "ITEM-PILES.Defaults.Configure",
+            label: game.settings.get(CONSTANTS.MODULE_NAME, "hideActorHeaderText") ? "" : "ITEM-PILES.Defaults.Configure",
             icon: "fas fa-box-open",
             class: "item-piles-config",
             onclick: () => {

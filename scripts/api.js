@@ -176,99 +176,6 @@ export default class API {
     }
 
     /**
-     * @param {object} position
-     * @param {string/boolean} [pileActorName=false]
-     * @param {array/boolean} [items=false]
-     * @returns {Promise<string>}
-     * @private
-     */
-    static async _createItemPile(position, { pileActorName = false, items = false } = {}) {
-
-        let pileActor;
-
-        if (!pileActorName) {
-
-            pileActor = game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID") ? game.actors.get(game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID")) : false;
-
-            if (!pileActor) {
-
-                lib.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
-
-                const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
-
-                pileDataDefaults.deleteWhenEmpty = true;
-
-                pileActor = await Actor.create({
-                    name: "Default Item Pile",
-                    type: game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType"),
-                    img: "icons/svg/item-bag.svg",
-                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
-                });
-
-                await pileActor.update({
-                    "token": {
-                        name: "Item Pile",
-                        actorLink: false,
-                        bar1: { attribute: "" },
-                        vision: false,
-                        displayName: 50,
-                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
-                    }
-                })
-
-                await game.settings.set(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", pileActor.id);
-
-            }
-
-        } else {
-
-            pileActor = game.actors.getName(pileActorName);
-
-        }
-
-        const overrideData = { ...position };
-
-        if (!pileActor.data.token.actorLink) {
-
-            overrideData['actorData'] = { "items": items || {} };
-
-            const pileConfig = lib.getItemPileData(pileActor);
-            const attributes = getItemPileAttributes(pileActor);
-
-            const numItems = items.length + attributes.length;
-
-            if (pileConfig.displayOne && numItems === 1) {
-                overrideData["img"] = items.length > 0
-                    ? items[0].img
-                    : attributes[0].img;
-                if (pileConfig.overrideSingleItemScale) {
-                    overrideData["scale"] = pileConfig.singleItemScale;
-                }
-            }
-
-            if (pileConfig.isContainer) {
-
-                overrideData["img"] = lib.getItemPileTokenImage(pileActor);
-                overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
-
-            }
-
-        } else {
-
-            overrideData["img"] = lib.getItemPileTokenImage(pileActor);
-            overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
-
-        }
-
-        const tokenData = await pileActor.getTokenData(overrideData);
-
-        const [tokenDocument] = await canvas.scene.createEmbeddedDocuments("Token", [tokenData]);
-
-        return lib.getUuid(tokenDocument);
-
-    }
-
-    /**
      * Turns tokens and its actors into item piles
      *
      * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be turned into item piles
@@ -1893,6 +1800,7 @@ export default class API {
         if (hookResult === false) return;
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEMS, {
+            sceneId: canvas.scene.id,
             sourceUuid: lib.getUuid(dropData.source),
             targetUuid: lib.getUuid(dropData.target),
             position: dropData.position,
@@ -1909,6 +1817,7 @@ export default class API {
      *
      * If an actor was provided, it will transfer the item from the actor to the target actor.
      *
+     * @param {string} sceneId
      * @param {string/boolean} [sourceUuid=false]
      * @param {string/boolean} [targetUuid=false]
      * @param {object/boolean} [position=false]
@@ -1919,6 +1828,7 @@ export default class API {
      * @private
      */
     static async _dropItems({
+        sceneId,
         sourceUuid = false,
         targetUuid = false,
         itemData = false,
@@ -1938,7 +1848,7 @@ export default class API {
                 itemsDropped = await API._transferItems(sourceUuid, targetUuid, itemsDropped, { itemTypeFilters });
             } else {
                 const itemsRemoved = await API._removeItems(sourceUuid, itemsDropped, { itemTypeFilters });
-                targetUuid = await API._createItemPile(position, { items: itemsRemoved });
+                targetUuid = await API._createItemPile(sceneId, position, { items: itemsRemoved });
                 const target = await fromUuid(targetUuid);
                 itemsDropped = Array.from(target.actor.items).map(item => item.toObject());
             }
@@ -1950,7 +1860,7 @@ export default class API {
             if (targetUuid) {
                 itemsDropped = await API._addItems(targetUuid, itemsDropped, { itemTypeFilters });
             } else {
-                targetUuid = await API._createItemPile(position, { items: itemsDropped });
+                targetUuid = await API._createItemPile(sceneId, position, { items: itemsDropped });
                 const target = await fromUuid(targetUuid);
                 itemsDropped = Array.from(target.actor.items).map(item => item.toObject());
             }
@@ -1960,6 +1870,105 @@ export default class API {
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemsDropped, position);
 
         return { sourceUuid, targetUuid, position, itemsDropped };
+
+    }
+
+    /**
+     * @param {string} sceneId
+     * @param {object} position
+     * @param {string/boolean} [pileActorName=false]
+     * @param {array/boolean} [items=false]
+     * @returns {Promise<string>}
+     * @private
+     */
+    static async _createItemPile(sceneId, position, { pileActorName = false, items = false } = {}) {
+
+        let pileActor;
+
+        if (!pileActorName) {
+
+            pileActor = game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID") ? game.actors.get(game.settings.get(CONSTANTS.MODULE_NAME, "defaultItemPileActorID")) : false;
+
+            if (!pileActor) {
+
+                lib.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
+
+                const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+
+                pileDataDefaults.deleteWhenEmpty = true;
+                pileDataDefaults.displayOne = true;
+                pileDataDefaults.overrideSingleItemScale = true;
+                pileDataDefaults.singleItemScale = 0.75;
+
+                pileActor = await Actor.create({
+                    name: "Default Item Pile",
+                    type: game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType"),
+                    img: "icons/svg/item-bag.svg",
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
+                });
+
+                await pileActor.update({
+                    "token": {
+                        name: "Item Pile",
+                        actorLink: false,
+                        bar1: { attribute: "" },
+                        vision: false,
+                        displayName: 50,
+                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
+                    }
+                })
+
+                await game.settings.set(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", pileActor.id);
+
+            }
+
+        } else {
+
+            pileActor = game.actors.getName(pileActorName);
+
+        }
+
+        const overrideData = { ...position };
+
+        if (!pileActor.data.token.actorLink) {
+
+            overrideData['actorData'] = { "items": items || {} };
+
+            const pileConfig = lib.getItemPileData(pileActor);
+            const attributes = getItemPileAttributes(pileActor);
+
+            const numItems = items.length + attributes.length;
+
+            if (pileConfig.displayOne && numItems === 1) {
+                overrideData["img"] = items.length > 0
+                    ? items[0].img
+                    : attributes[0].img;
+                if (pileConfig.overrideSingleItemScale) {
+                    overrideData["scale"] = pileConfig.singleItemScale;
+                }
+            }
+
+            if (pileConfig.isContainer) {
+
+                overrideData["img"] = lib.getItemPileTokenImage(pileActor);
+                overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
+
+            }
+
+        } else {
+
+            overrideData["img"] = lib.getItemPileTokenImage(pileActor);
+            overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
+
+        }
+
+        const tokenData = await pileActor.getTokenData(overrideData);
+
+        const scene = game.scenes.get(sceneId);
+
+        const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
+
+        return lib.getUuid(tokenDocument);
 
     }
 
