@@ -2,12 +2,14 @@ import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 import API from "./api.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
+import chatHandler from "./chathandler.js";
 
 export const SOCKET_HANDLERS = {
     /**
      * Generic sockets
      */
     CALL_HOOK: "callHook",
+    PICKUP_CHAT_MESSAGE: "pickupChatMessage",
 
     /**
      * Item pile sockets
@@ -53,6 +55,7 @@ export function registerSocket() {
      * Generic socket
      */
     itemPileSocket.register(SOCKET_HANDLERS.CALL_HOOK, (hook, ...args) => callHook(hook, ...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, (...args) => chatHandler._outputToChat(...args))
 
     /**
      * Item pile sockets
@@ -91,7 +94,7 @@ export function registerSocket() {
 async function callHook(inHookName, ...args) {
     const newArgs = [];
     for(let arg of args){
-        if(typeof arg === "string"){
+        if(lib.is_UUID(arg)){
             const testArg = await fromUuid(arg);
             if(testArg){
                 arg = testArg;

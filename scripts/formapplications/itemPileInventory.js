@@ -19,6 +19,7 @@ export class ItemPileInventory extends FormApplication {
         this.items = [];
         this.attributes = [];
         this.deleted = false;
+        this.interactionId = randomID();
         Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient);
     }
 
@@ -34,9 +35,12 @@ export class ItemPileInventory extends FormApplication {
         });
     }
 
-    static getActiveAppFromPile(inPileUuid) {
+    static getActiveAppFromPile(inPileUuid, recipientUuid = false) {
         for (let app of Object.values(ui.windows)) {
-            if (app instanceof this && (app.pile.uuid === inPileUuid || app.pile.actor.uuid === inPileUuid)) {
+            if (app instanceof this
+                && (app.pile.uuid === inPileUuid || app.pile.actor.uuid === inPileUuid)
+                && (!recipientUuid || (app.recipient.uuid === recipientUuid || app.recipient?.actor?.uuid === recipientUuid)))
+            {
                 return app;
             }
         }
@@ -54,8 +58,9 @@ export class ItemPileInventory extends FormApplication {
     }
 
     static async show(pile, recipient) {
-        const uuid = await lib.getUuid(pile);
-        const app = ItemPileInventory.getActiveAppFromPile(uuid);
+        const pileUuid = await lib.getUuid(pile);
+        const recipientUuid = await lib.getUuid(recipient);
+        const app = ItemPileInventory.getActiveAppFromPile(pileUuid, recipientUuid);
         if (app) {
             return app.render(true, { focus: true });
         }
@@ -273,7 +278,7 @@ export class ItemPileInventory extends FormApplication {
         const item = this.pile.actor.items.get(itemId);
         let quantity = Number(getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1);
         quantity = Math.min(inputQuantity, quantity);
-        await API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }]);
+        await API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }], { interactionId: this.interactionId });
     }
 
     async takeAttribute(attribute, inputQuantity) {
@@ -281,13 +286,13 @@ export class ItemPileInventory extends FormApplication {
         this.saveAttributes();
         let quantity = Number(getProperty(this.pile.actor.data, attribute) ?? 0);
         quantity = Math.min(inputQuantity, quantity);
-        await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity });
+        await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity }, { interactionId: this.interactionId });
     }
 
     async _updateObject(event, formData) {
 
         if (event.submitter.value === "takeAll") {
-            return await API.transferEverything(this.pile, this.recipient);
+            return await API.transferEverything(this.pile, this.recipient, { interactionId: this.interactionId });
         }
 
         if (event.submitter.value === "close") {

@@ -7,6 +7,7 @@ import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { HOOKS } from "./hooks.js";
 import { registerHotkeys } from "./hotkeys.js";
+import chatHandler from "./chathandler.js";
 
 Hooks.once("init", () => {
 
@@ -25,6 +26,10 @@ Hooks.once("init", () => {
     Hooks.on("deleteItem", module._pileInventoryChanged);
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
+
+    Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
+    Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferAttribute.bind(chatHandler));
+    Hooks.on(HOOKS.TRANSFER_EVERYTHING, chatHandler._outputTransferEverything.bind(chatHandler));
 
     if (game.settings.get(CONSTANTS.MODULE_NAME, "debugHooks")) {
         for (let hook of Object.values(HOOKS)) {
@@ -66,14 +71,14 @@ Hooks.once("ready", () => {
     checkSystem();
     registerHotkeys();
     Hooks.callAll(HOOKS.READY);
-})
+});
 
 const module = {
 
     async _pileAttributeChanged(actor, changes) {
         const target = actor?.token ?? actor;
         if (!lib.isValidItemPile(target)) return;
-        const sourceAttributes = API.getItemPileAttributes(target);
+        const sourceAttributes = lib.getItemPileAttributeList(target);
         const validProperty = sourceAttributes.find(attribute => {
             return hasProperty(changes, attribute.path);
         });
@@ -183,4 +188,5 @@ const module = {
     async _dropCanvasData(canvas, data) {
         return API._dropDataOnCanvas(canvas, data);
     },
+
 }

@@ -2,7 +2,6 @@ import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import { ItemPileAttributeEditor } from "./itemPileAttributeEditor.js";
 import * as lib from "../lib/lib.js";
-import { itemPileSocket } from "../socket.js";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -44,7 +43,7 @@ export class ItemPileConfig extends FormApplication {
 
     async getData(options) {
         let data = super.getData(options);
-        data = foundry.utils.mergeObject(data, this.pileData);
+        data.flagData = foundry.utils.mergeObject(foundry.utils.duplicate(data), foundry.utils.duplicate(this.pileData));
         data.defaultItemTypeFilters = API.ITEM_TYPE_FILTERS.length
             ? "Defaults: " + Array.from(API.ITEM_TYPE_FILTERS).join(', ')
             : "Input item type filters...";
@@ -60,8 +59,8 @@ export class ItemPileConfig extends FormApplication {
         const containerCheckbox = html.find('input[name="isContainer"]');
         const overrideAttributesEnabledCheckbox = html.find('.item-pile-config-override-attributes-checkbox');
 
-        const slider = html.find("#scaleRange");
-        const input = html.find("#scaleInput");
+        const slider = html.find(".item-piles-scaleRange");
+        const input = html.find(".item-piles-scaleInput");
 
         enabledCheckbox.change(async function () {
             let isEnabled = $(this).is(":checked");
@@ -153,15 +152,15 @@ export class ItemPileConfig extends FormApplication {
 
         data.overrideAttributes = checked ? this.pileData.overrideAttributes : false;
 
-        if (!formData.enabled) {
+        if (this.pileData.enabled !== data.enabled) {
             setTimeout(canvas.tokens.hud.render(true), 250);
         }
 
-        formData.deleteWhenEmpty = {
+        data.deleteWhenEmpty = {
             "default": "default",
             "true": true,
             "false": false
-        }[formData.deleteWhenEmpty];
+        }[data.deleteWhenEmpty];
 
         API.updateItemPile(this.document, data).then(() => {
             API.rerenderItemPileInventoryApplication(this.document.uuid);

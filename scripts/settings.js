@@ -80,6 +80,21 @@ export default function registerSettings() {
         type: Boolean
     });
 
+    game.settings.register(CONSTANTS.MODULE_NAME, "outputToChat", {
+        name: "ITEM-PILES.Setting.OutputToChat.Title",
+        hint: "ITEM-PILES.Setting.OutputToChat.Label",
+        scope: "world",
+        config: true,
+        default: 1,
+        choices: [
+            "ITEM-PILES.Setting.OutputToChat.Off",
+            "ITEM-PILES.Setting.OutputToChat.Public",
+            "ITEM-PILES.Setting.OutputToChat.SelfGM",
+            "ITEM-PILES.Setting.OutputToChat.Blind",
+        ],
+        type: Number
+    });
+
     game.settings.register(CONSTANTS.MODULE_NAME, "hideActorHeaderText", {
         name: "ITEM-PILES.Setting.HideActorHeaderText.Title",
         hint: "ITEM-PILES.Setting.HideActorHeaderText.Label",

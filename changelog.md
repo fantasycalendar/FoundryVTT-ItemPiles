@@ -1,9 +1,23 @@
 # Item Piles Changelog 
 
 ## Version 1.1.3
-- Tweaked `ItemPiles.API.turnTokensIntoItemPiles` turn tokens into item piles without using the "Display Single Item Image" turned on
-- Fixed users creating item piles would cause the pile to be spawned on the scene that the GM was viewing at that given moment
+- Added setting to output items picked up to chat
 - Added setting to hide the "Item Piles" text in the actor header - useful if you have too many modules, and the header is getting crowded
+- Tweaked `ItemPiles.API.turnTokensIntoItemPiles` to turn tokens into item piles without having the "Display Single Item Image" setting turned on
+- API changes:
+  - Changed: `ItemPiles.API.addItems`
+    - This method now expects an array of objects, with item data or Item (Foundry Item class) (key `item`), and an optional quantity attribute that determines how many of the item to add (key `quantity`)
+    - It now returns an array of objects, with the item's data (key `item`) and the quantity added (key `quantity`)
+  - Changed: `ItemPiles.API.removeItems`
+    - This method now expects an array of objects each containing the item id (key `_id`) and the quantity to remove (key `quantity`), or Items (the Foundry Item class) or strings of IDs to remove all quantities of
+    - It now returns an array of objects, each containing the item that was removed or updated (key `item`), the quantity that was removed (key `quantity`), and whether the item was deleted (key `deleted`)
+  - Changed: `ItemPiles.API.transferItems`
+    - This method now expects an array of objects each containing the item id (key `_id`) and the quantity to transfer (key `quantity`), or Items (the Foundry Item class) or strings of IDs to transfer all quantities of
+    - It now returns an array of objects, each containing the item that was added or updated (key `item`), the quantity that was transferred (key `quantity`)
+- Fixed `ItemPiles.API.transferEverything` not transferring everything from non-item pile actors
+- Fixed item and attribute transfer hooks incorrectly returning the target's final quantities, rather than the transferred quantities 
+- Fixed users creating item piles would cause the pile to be spawned on the scene that the GM was viewing at that given moment
+- Fixed Item Pile config window would not populate some inputs correctly
 
 
 ## Version 1.1.3
@@ -53,8 +67,8 @@
 
 ## Version 1.0.6
 - Added API endpoints:
-    - `ItemPiles.API.getItemPileItemTypeFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
-    - `ItemPiles.API.getItemPileItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
+    - `ItemPiles.API.getDocumentItemTypeFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
+    - `ItemPiles.API.getDocumentItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
 - Updated japanese localization
 - Fixed item piles not respecting item type filters
 - Fixed issue with `ItemPiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile

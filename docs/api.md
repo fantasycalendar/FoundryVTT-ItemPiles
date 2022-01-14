@@ -92,10 +92,10 @@
 <dt><a href="#isItemPileEmpty">isItemPileEmpty(target)</a> ⇒ <code>boolean</code></dt>
 <dd><p>Whether the item pile is empty</p>
 </dd>
-<dt><a href="#getItemPileItemTypeFilters">getItemPileItemTypeFilters(target)</a> ⇒ <code>Array</code></dt>
+<dt><a href="#getItemPileItemTypeFilters">getDocumentItemTypeFilters(target)</a> ⇒ <code>Array</code></dt>
 <dd><p>Returns the item type filters for a given item pile</p>
 </dd>
-<dt><a href="#getItemPileItems">getItemPileItems(target, [itemTypeFilters])</a> ⇒ <code>Array</code></dt>
+<dt><a href="#getItemPileItems">getDocumentItems(target, [itemTypeFilters])</a> ⇒ <code>Array</code></dt>
 <dd><p>Returns the items this item pile can transfer</p>
 </dd>
 <dt><a href="#getItemPileAttributes">getItemPileAttributes(target)</a> ⇒ <code>array</code></dt>
@@ -410,9 +410,9 @@ Whether the item pile is empty
 | --- | --- |
 | target | <code>TokenDocument</code> \| <code>Actor</code> | 
 
-<a name="getItemPileItemTypeFilters"></a>
+<a name="getDocumentItemTypeFilters"></a>
 
-## getItemPileItemTypeFilters(target) ⇒ <code>Array</code>
+## getDocumentItemTypeFilters(target) ⇒ <code>Array</code>
 Returns the item type filters for a given item pile
 
 
@@ -420,9 +420,9 @@ Returns the item type filters for a given item pile
 | --- |
 | target | 
 
-<a name="getItemPileItems"></a>
+<a name="getDocumentItems"></a>
 
-## getItemPileItems(target, [itemTypeFilters]) ⇒ <code>Array</code>
+## getDocumentItems(target, [itemTypeFilters]) ⇒ <code>Array</code>
 Returns the items this item pile can transfer
 
 

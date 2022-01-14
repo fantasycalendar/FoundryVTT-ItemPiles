@@ -105,6 +105,13 @@ export async function getToken(documentUuid) {
     return document?.token ?? document;
 }
 
+export function is_UUID(inId) {
+    return typeof inId === "string"
+        && inId.startsWith("Scene")
+        && (inId.match(/\./g) || []).length
+        && !inId.endsWith(".");
+}
+
 export function getUuid(target) {
     // If it's an actor, get its TokenDocument
     // If it's a token, get its Document
@@ -216,7 +223,7 @@ export function getItemPileTokenImage(pileDocument, data = false) {
 
     if(!isValidItemPile(pileDocument)) return originalImg;
 
-    const items = getItemPileItems(pileDocument);
+    const items = getDocumentItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
@@ -266,7 +273,7 @@ export function getItemPileTokenScale(pileDocument, data) {
         baseScale = pileDocument.data.token.scale;
     }
 
-    const items = getItemPileItems(pileDocument);
+    const items = getDocumentItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
@@ -277,12 +284,11 @@ export function getItemPileTokenScale(pileDocument, data) {
 
 }
 
-export function getItemPileItems(target, itemTypeFilters = false){
-    if(!isValidItemPile(target)) return [];
+export function getDocumentItems(target, itemTypeFilters = false){
 
     const pileItemFilters = Array.isArray(itemTypeFilters)
         ? new Set(itemTypeFilters)
-        : new Set(getItemPileItemTypeFilters(target));
+        : new Set(getDocumentItemTypeFilters(target));
 
     const targetActor = target instanceof TokenDocument
         ? target.actor
@@ -299,10 +305,9 @@ export function isValidItemPile(inDocument, data = false){
     return inDocument && !inDocument.destroyed && documentActor && (data || getItemPileData(inDocument))?.enabled;
 }
 
-export function getItemPileItemTypeFilters(target){
-    if(!isValidItemPile(target)) return [];
+export function getDocumentItemTypeFilters(target){
     const pileData = getItemPileData(target);
-    return pileData.itemTypeFilters
+    return isValidItemPile(target) && pileData?.itemTypeFilters
         ? pileData.itemTypeFilters.split(',').map(str => str.trim().toLowerCase())
         : API.ITEM_TYPE_FILTERS;
 }
@@ -315,7 +320,7 @@ export function isItemPileEmpty(target) {
 
     if(!targetActor) return false;
 
-    const hasNoItems = getItemPileItems(target).length === 0;
+    const hasNoItems = getDocumentItems(target).length === 0;
     const hasEmptyAttributes = getItemPileAttributes(target).length === 0;
 
     return hasNoItems && hasEmptyAttributes;
