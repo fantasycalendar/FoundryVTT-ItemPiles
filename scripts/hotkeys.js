@@ -26,7 +26,7 @@ export function registerHotkeysPre() {
             reservedModifiers: ["SHIFT", "ALT"]
         });
 
-        game.keybindings.register(CONSTANTS.MODULE_NAME, "force-open-item-pile-inventory", {
+        game.keybindings.register(CONSTANTS.MODULE_NAME, "force-drop-item", {
             name: "Force drop item (GM only)",
             uneditable: [
                 { key: "ShiftLeft" },
@@ -40,7 +40,7 @@ export function registerHotkeysPre() {
             reservedModifiers: ["ALT", "CONTROL"]
         });
 
-        game.keybindings.register(CONSTANTS.MODULE_NAME, "force-drop-item", {
+        game.keybindings.register(CONSTANTS.MODULE_NAME, "force-drop-one-item", {
             name: "Force drop one item",
             uneditable: [
                 { key: "AltLeft" },

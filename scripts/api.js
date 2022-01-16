@@ -1817,7 +1817,7 @@ export default class API {
         const pre_drop_determined_hook = Hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.position, dropData.itemData);
         if (pre_drop_determined_hook === false) return;
 
-        let action = "addToPile";
+        let action;
         let droppableDocuments = [];
         let x;
         let y;

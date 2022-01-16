@@ -1,5 +1,9 @@
 # Item Piles Changelog 
 
+## Version 1.2.2 Hotfix
+- Fixed hotkeys being broken on Foundry v9
+- Fixed alt-quickdrop hotkey not creating a pile in the right location
+
 ## Version 1.2.1
 - Fixed hotkey errors on Foundry 0.8.9
 
