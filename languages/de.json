@@ -115,6 +115,12 @@
             "Cancel": "Abbrechen"
         },
 
+        "Chat": {
+            "Pickup":{
+                "Actor": "{name} hat sich folgende Gegenstände genommen:"
+            }
+        },
+
         "Setting": {
             "Reset": {
                 "Title": "Einstellungen zurücksetzen",
@@ -141,6 +147,18 @@
             "ItemTypeFilters": {
                 "Title": "Gegenstand Typ Filter",                
                 "Label": "Hier kannst du konfigurieren, welche Gegenstandstypen ignoriert und nicht in den Gegenstandsstapeldialogen aufgeführt werden sollen. Zum Beispiel willst du in D&D5e wahrscheinlich keine Zauber, Feats und Klassen anzeigen, also würdest du \"spell, feat, class\" eintragen."
+            },
+            "OutputToChat": {
+                "Title": "Ausgabe im Chat",
+                "Label": "Eine Nachricht über den aufgehobenen Gegenstand wird immer in den Chat gesendet wenn ein Spieler einen Gegenstand vom Stapel nimmt.",
+                "Off": "Aus - schaltet Nachrichten ab",
+                "Public": "Öffentlich - jeder kann die Nachrichten sehen",
+                "SelfGM": "Privat - nur GMs und der betroffene User sehen die Nachricht",
+                "Blind": "Blind - nur die GMs sehen die Nachricht"
+            },
+            "HideActorHeaderText": {
+                "Title": "Verstecke Kopftext des Akteurs",
+                "Label": "Blendet den \"Gegenstandsstapel\" Text im Akteur Kopf aus - nützlich wenn du viele Module hast und der Kopftext bereits zu sehr befüllt wird."
             },
             "DeleteEmptyPiles": {
                 "Title": "Leere Stapel automatisch löschen",

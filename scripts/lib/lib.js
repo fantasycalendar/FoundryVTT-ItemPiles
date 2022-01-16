@@ -31,6 +31,10 @@ export function custom_error(error, notify = true) {
     return new Error(error.replace("<br>", "\n"));
 }
 
+export function isVersion9() {
+    return isNewerVersion((game?.version ?? game.data.version), "9.00");
+}
+
 export function getTokensAtLocation(position) {
     const tokens = [...canvas.tokens.placeables];
     return tokens.filter(token => {

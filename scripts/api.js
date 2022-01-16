@@ -151,7 +151,7 @@ export default class API {
      */
     static async createItemPile(position, { items = false, pileActorName = false } = {}) {
 
-        const hookResult = Hooks.call(HOOKS.PILE.PRE_CREATE, position, pileActorName);
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_CREATE, position, items, pileActorName);
         if (hookResult === false) return;
 
         if (pileActorName) {
@@ -365,7 +365,7 @@ export default class API {
         if (!wasClosed && data.closeSound) {
             AudioHelper.play({ src: data.closeSound })
         }
-        return API.updateItemPile(target, data, interactingToken);
+        return API.updateItemPile(target, data, { interactingToken });
     }
 
     /**
@@ -410,7 +410,7 @@ export default class API {
         if (!wasClosed && data.closeSound) {
             AudioHelper.play({ src: data.closeSound })
         }
-        return API.updateItemPile(target, data, interactingToken);
+        return API.updateItemPile(target, data, { interactingToken });
     }
 
     /**
@@ -426,7 +426,7 @@ export default class API {
         if (!data?.enabled || !data?.isContainer) return false;
         data.locked = false;
         Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
-        return API.updateItemPile(target, data, interactingToken);
+        return API.updateItemPile(target, data, { interactingToken });
     }
 
     /**
@@ -639,6 +639,13 @@ export default class API {
     static async _deleteItemPile(targetUuid) {
         const target = await lib.getToken(targetUuid);
         return target.delete();
+    }
+
+    /**
+     *
+     */
+    static async openItemPileInventory(){
+
     }
 
     /**
@@ -947,7 +954,7 @@ export default class API {
 
             if (newQuantity >= 1) {
                 itemsToUpdate.push({ _id: item._id, [API.ITEM_QUANTITY_ATTRIBUTE]: newQuantity });
-                setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, newQuantity);
+                setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, quantityToRemove);
                 itemsRemoved.push({
                     item: item,
                     quantity: quantityToRemove,
@@ -955,7 +962,7 @@ export default class API {
                 });
             } else {
                 itemsToDelete.push(item._id);
-                setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, 0);
+                setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, currentQuantity);
                 itemsRemoved.push({
                     item: item,
                     quantity: currentQuantity,
@@ -1173,7 +1180,7 @@ export default class API {
      * @param {object} attributes                       An object with each key being an attribute path, and its value being the quantity to add
      * @param {string/boolean} [interactionId=false]    The ID of this interaction
      *
-     * @returns {Promise<object>}                       Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed
+     * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      *
      */
     static async addAttributes(target, attributes, { interactionId = false }) {
@@ -1257,7 +1264,7 @@ export default class API {
      * @param {array/object} attributes                 This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
      * @param {string/boolean} [interactionId=false]    The ID of this interaction
      *
-     * @returns {Promise<object>}                       Returns an array containing a key value pair of the attribute path and the quantity of that attribute that was removed
+     * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      */
     static async removeAttributes(target, attributes, { interactionId = false }) {
 
@@ -1772,9 +1779,11 @@ export default class API {
         const dropData = {
             source: false,
             target: target,
-            itemData: itemData,
-            position: false,
-            force: false
+            itemData: {
+                item: itemData,
+                quantity: 1
+            },
+            position: false
         }
 
         const disallowedType = API.isItemTypeDisallowed(itemData);
@@ -1783,12 +1792,12 @@ export default class API {
                 return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
             }
             if (!game.keyboard.downKeys.has("ShiftLeft")) {
-                dropData.force = await Dialog.confirm({
+                const force = await Dialog.confirm({
                     title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
                     content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
                     defaultYes: false
                 });
-                if (!dropData.force) {
+                if (!force) {
                     return;
                 }
             }
@@ -1804,7 +1813,7 @@ export default class API {
             return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
         }
 
-        const pre_drop_determined_hook = Hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.position, dropData.itemData, dropData.force);
+        const pre_drop_determined_hook = Hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.position, dropData.itemData);
         if (pre_drop_determined_hook === false) return;
 
         let action = "addToPile";
@@ -1862,7 +1871,8 @@ export default class API {
                 action = "addToPile";
             }
 
-            setProperty(dropData.itemData, API.ITEM_QUANTITY_ATTRIBUTE, 1);
+            setProperty(dropData.itemData.item, API.ITEM_QUANTITY_ATTRIBUTE, 1);
+            dropData.itemData.quantity = 1;
 
         } else {
 
@@ -1870,7 +1880,8 @@ export default class API {
 
             if (!result) return;
             action = result.action;
-            setProperty(dropData.itemData, API.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
+            setProperty(dropData.itemData.item, API.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
+            dropData.itemData.quantity = Number(result.quantity);
 
         }
 
@@ -1880,16 +1891,16 @@ export default class API {
             dropData.position = { x, y };
         }
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData, dropData.force);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
         if (hookResult === false) return;
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEMS, {
+            userId: game.user.id,
             sceneId: canvas.scene.id,
             sourceUuid: lib.getUuid(dropData.source),
             targetUuid: lib.getUuid(dropData.target),
             position: dropData.position,
-            itemData: dropData.itemData,
-            force: dropData.force
+            itemData: dropData.itemData
         });
 
     }
@@ -1901,40 +1912,38 @@ export default class API {
      *
      * If an actor was provided, it will transfer the item from the actor to the target actor.
      *
+     * @param {string} userId
      * @param {string} sceneId
      * @param {string/boolean} [sourceUuid=false]
      * @param {string/boolean} [targetUuid=false]
      * @param {object/boolean} [position=false]
      * @param {object} [itemData=false]
-     * @param {boolean} [force=false]
      *
      * @returns {Promise<{sourceUuid: string/boolean, targetUuid: string/boolean, position: object/boolean, itemsDropped: array }>}
      * @private
      */
     static async _dropItems({
+        userId,
         sceneId,
         sourceUuid = false,
         targetUuid = false,
         itemData = false,
-        position = false,
-        force = false
+        position = false
     } = {}) {
 
-        const itemTypeFilters = force ? [] : API.ITEM_TYPE_FILTERS;
-
-        let itemsDropped = [itemData];
+        let itemsDropped;
 
         // If there's a source of the item (it wasn't dropped from the item bar)
         if (sourceUuid) {
 
+            const itemsToTransfer = [{ _id: itemData.item._id, quantity: itemData.quantity }];
+
             // If there's a target token, add the item to it, otherwise create a new pile at the drop location
             if (targetUuid) {
-                itemsDropped = await API._transferItems(sourceUuid, targetUuid, itemsDropped, { itemTypeFilters });
+                itemsDropped = await API._transferItems(sourceUuid, targetUuid, itemsToTransfer, userId);
             } else {
-                const itemsRemoved = await API._removeItems(sourceUuid, itemsDropped, { itemTypeFilters });
-                targetUuid = await API._createItemPile(sceneId, position, { items: itemsRemoved });
-                const target = await fromUuid(targetUuid);
-                itemsDropped = Array.from(target.actor.items).map(item => item.toObject());
+                itemsDropped = await API._removeItems(sourceUuid, itemsToTransfer, userId);
+                targetUuid = await API._createItemPile(sceneId, position, { items: itemsDropped });
             }
 
             // If there's no source (it was dropped from the item bar)
@@ -1942,11 +1951,9 @@ export default class API {
 
             // If there's a target token, add the item to it, otherwise create a new pile at the drop location
             if (targetUuid) {
-                itemsDropped = await API._addItems(targetUuid, itemsDropped, { itemTypeFilters });
+                itemsDropped = await API._addItems(targetUuid, [itemData], userId);
             } else {
-                targetUuid = await API._createItemPile(sceneId, position, { items: itemsDropped });
-                const target = await fromUuid(targetUuid);
-                itemsDropped = Array.from(target.actor.items).map(item => item.toObject());
+                targetUuid = await API._createItemPile(sceneId, position, { items: [itemData] });
             }
 
         }
@@ -1979,6 +1986,7 @@ export default class API {
 
                 const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
+                pileDataDefaults.enabled = true;
                 pileDataDefaults.deleteWhenEmpty = true;
                 pileDataDefaults.displayOne = true;
                 pileDataDefaults.overrideSingleItemScale = true;
@@ -2016,7 +2024,9 @@ export default class API {
 
         if (!pileActor.data.token.actorLink) {
 
-            overrideData['actorData'] = { "items": items || {} };
+            items = items ? items.map(itemData => itemData.item ?? itemData) : {};
+
+            overrideData['actorData'] = { items }
 
             const pileConfig = lib.getItemPileData(pileActor);
             const attributes = lib.getItemPileAttributes(pileActor);

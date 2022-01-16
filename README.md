@@ -23,7 +23,7 @@ Like what we've done? Buy us a coffee!
 
 ### Chest sprites used on this page is from Forgotten Adventures*
 
-\**not included in this module*
+**not included in this module*
 
 ![Item Piles in a nutshell](./docs/images/intro.jpg)
 
@@ -39,10 +39,6 @@ In short, this module enables dropping items onto the canvas, which then get rep
 Item Piles can also be configured to act as a container, where it can be open or closed, locked or unlocked, with the ability for the token that represents the pile to change image depending on its state. In addition, when an item pile is interacted with it can also play sounds for the action, such as opening, closing, or attempting to open a locked item pile. Sounds are only played for the user who attempted the action.
 
 In addition, the module features a robust and well documented API, where module and system creators can leverage Item Piles to enrich your looting experience.
-
----
-
-## This is a Foundry v9+ only module
 
 ---
 
@@ -81,6 +77,7 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 - [Dungeon Slayers 4](https://foundryvtt.com/packages/ds4)
 - [D&D 3.5e SRD](https://foundryvtt.com/packages/D35E)
 - [Savage Worlds Adventure Edition](https://foundryvtt.com/packages/swade)
+- [Tormenta20](https://foundryvtt.com/packages/tormenta20)
 
 
 ## Not Supported Systems
@@ -174,6 +171,10 @@ ItemPiles.API.revertTokensFromItemPiles(canvas.tokens.controlled)
 - **Item type filters:** Here you can configure what item types are ignored and not listed in the item pile dialogs. For example, in D&D5e you probably don't want to show spells, feats, and classes, so you'd put `spell, feat, class`.
 
 - **Auto-delete empty piles:** This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles.
+
+- **Output to chat:** Whenever any player picks up items from an item pile, this will send a message showing what was picked up. You can choose to not send messages, send to everyone, whisper to GMs and the user that picked up the item, or just to GMs. 
+  
+- **Hide actor text:** This hides the "Item Piles" text in the actor header - useful if you have too many modules, and the header is getting crowded.
 
 - **Preload Files:** Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience.
 

@@ -6,13 +6,14 @@ import * as lib from "./lib/lib.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { HOOKS } from "./hooks.js";
-import { registerHotkeys } from "./hotkeys.js";
+import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import chatHandler from "./chathandler.js";
 
 Hooks.once("init", () => {
 
     registerSettings();
     registerLibwrappers();
+    registerHotkeysPre();
 
     Hooks.once("socketlib.ready", registerSocket);
     Hooks.on("canvasReady", module._canvasReady);
@@ -69,7 +70,7 @@ Hooks.once("ready", () => {
     }
 
     checkSystem();
-    registerHotkeys();
+    registerHotkeysPost();
     Hooks.callAll(HOOKS.READY);
 });
 

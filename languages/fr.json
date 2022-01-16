@@ -1,5 +1,6 @@
 {
 	"ITEM-PILES": {
+
 		"Inspect": {
 			"Title": "Inspecter le contenu des piles",
 			"AsActor": "Vous inspectez cette pile en tant que {actorName}",
@@ -11,6 +12,7 @@
 			"Close": "Fermer",
 			"Leave": "Partir"
 		},
+
 		"Errors": {
 			"DisallowedItemDrop": "Vous ne pouvez pas déposer des éléments de type \"{type}\"",
 			"NoSourceDrop": "Vous ne pouvez pas déposer d'objets de la barre d'objets, sauf si vous êtes un MJ.",
@@ -18,6 +20,7 @@
 			"PileLocked": "Ce tas d'objets est verrouillé et ne peut pas être ouvert - vous ne pouvez pas y déposer d'objets.",
 			"DropNoToken": "Vous n'avez pas de Token sur cette scène, donc vous ne pouvez pas déposer d'objets ici."
 		},
+
 		"Dialogs": {
 			"DropTypeWarning": {
 				"Title": "Avertissement Type d'objet",
@@ -43,6 +46,7 @@
 			},
             "Cancel": "Annuler"
         },
+
 		"AttributeEditor": {
 			"Title": "Éditeur d'attributs dynamiques",
 			"Explanation": "Ici, vous pouvez définir les attributs des personnages qui peuvent être récupérés dans les piles d'objets, comme les devises. Dans D&D5e, les monnaies existent sur les acteurs dans le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Gold Coins\" et le chemin d'attribut \"data.currency.gp\".",
@@ -52,6 +56,7 @@
 			"AddNew": "Ajouter un nouvel attribut",
 			"Submit": "Soumettre les attributs"
 		},
+
 		"Defaults": {
 			"Title": "Configuration de la pile d'article",
 			"Configure": "Pile d'articles",
@@ -94,11 +99,13 @@
 			"OpenSoundPath": "Chemin du son quand ouvert",
 			"LockedSoundPath": "Chemin du son quand verrouillé"
 		},
+
 		"HUD": {
 			"ToggleLocked": "Verrouillé (Interrupteur)",
 			"ToggleClosed": "Fermé (Interrupteur)",
 			"Configure": "Configurer la pile"
 		},
+
 		"DropItem": {
 			"Title": "Objet lâché",
 			"Dropping": "Vous laissez tomber",
@@ -108,6 +115,13 @@
 			"NewPile": "Créer une nouvelle pile",
 			"Cancel": "Annuler"
 		},
+
+        "Chat": {
+            "Pickup":{
+                "Actor": "{name} a récupéré les articles suivants :"
+            }
+        },
+
 		"Setting": {
 			"Reset": {
 				"Title": "Réinitialiser les paramètres par défaut",
@@ -135,6 +149,18 @@
 				"Title": "Filtres de type d'article",
 				"Label": "Ici, vous pouvez configurer quels types d'objets sont ignorés et ne sont pas listés dans les dialogues de pile d'objets. Par exemple, dans D&D5e, nous ne voulons probablement pas montrer les sorts, les dons et les classes, donc vous mettrez \"sort, dons, classe\"."
 			},
+            "OutputToChat": {
+                "Title": "Afficher dans le chat",
+                "Label": "Chaque fois qu'un joueur ramasse des articles d'une pile d'objets, ceci enverra un message indiquant ce qui a été ramassé",
+                "Off": "Off - désactiver les messages",
+                "Public": "Public - tout le monde peut voir les messages",
+                "SelfGM": "Privé - seuls les MJ et l'utilisateur peuvent voir les messages",
+                "Blind": "Aveugle - seuls les MJ peuvent voir les messages"
+            },
+            "HideActorHeaderText": {
+                "Title": "Masquer le texte de l'en-tête de l'acteur",
+                "Label": "Masque le \"Item Piles\" texte dans l'en-tête de l'acteur - utile si vous avez trop de modules et que l'en-tête devient encombré."
+            },
 			"DeleteEmptyPiles": {
 				"Title": "Suppression automatique des piles vides",
 				"Label": "Les piles d'objets se suppriment d'elles-mêmes lorsqu'elles n'ont plus d'objets. Cette option peut être modifiée pour chaque pile d'objets."

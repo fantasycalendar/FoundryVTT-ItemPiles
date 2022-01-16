@@ -8,8 +8,7 @@ export class ItemPileConfig extends FormApplication {
     constructor(actor) {
         super();
         this.document = actor?.token ?? actor;
-        const flags = lib.getItemPileData(this.document);
-        this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, flags);
+        this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(this.document));
         this.attributeEditor = false;
     }
 
@@ -151,10 +150,6 @@ export class ItemPileConfig extends FormApplication {
         const checked = this.element.find('.item-pile-config-override-attributes-checkbox').is(":checked");
 
         data.overrideAttributes = checked ? this.pileData.overrideAttributes : false;
-
-        if (this.pileData.enabled !== data.enabled) {
-            setTimeout(canvas.tokens.hud.render(true), 250);
-        }
 
         data.deleteWhenEmpty = {
             "default": "default",

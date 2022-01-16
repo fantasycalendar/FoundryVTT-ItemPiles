@@ -1,8 +1,9 @@
 # Item Piles Changelog 
 
-## Version 1.1.3
+## Version 1.2.0
 - Added setting to output items picked up to chat
 - Added setting to hide the "Item Piles" text in the actor header - useful if you have too many modules, and the header is getting crowded
+- Added support for the Tormenta 20 system: <https://foundryvtt.com/packages/tormenta20>
 - Tweaked `ItemPiles.API.turnTokensIntoItemPiles` to turn tokens into item piles without having the "Display Single Item Image" setting turned on
 - API changes:
   - Changed: `ItemPiles.API.addItems`

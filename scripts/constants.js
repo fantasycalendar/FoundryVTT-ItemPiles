@@ -2,7 +2,7 @@ const CONSTANTS = {
     MODULE_NAME: "item-piles",
     FLAG_NAME: "data",
     PILE_DEFAULTS: {
-        enabled: true,
+        enabled: false,
         distance: 1,
         itemTypeFilters: "",
         overrideAttributes: false,
