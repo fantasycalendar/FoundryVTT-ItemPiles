@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.2.1
+- Fixed hotkey errors on Foundry 0.8.9
+
 ## Version 1.2.0
 - Now supports Foundry 0.8.9
 - Added setting to output items picked up to chat

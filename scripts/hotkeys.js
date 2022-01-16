@@ -3,7 +3,9 @@ import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 
 export const hotkeyState = {
-    ctrlDown: false
+    ctrlDown: false,
+    altDown: false,
+    shiftDown: false
 }
 
 export function registerHotkeysPre() {
@@ -21,7 +23,35 @@ export function registerHotkeysPre() {
             onUp: () => {
                 hotkeyState.ctrlDown = false;
             },
-            reservedModifiers: ["SHIFT"]
+            reservedModifiers: ["SHIFT", "ALT"]
+        });
+
+        game.keybindings.register(CONSTANTS.MODULE_NAME, "force-open-item-pile-inventory", {
+            name: "Force drop item (GM only)",
+            uneditable: [
+                { key: "ShiftLeft" },
+            ],
+            onDown: () => {
+                hotkeyState.shiftDown = true;
+            },
+            onUp: () => {
+                hotkeyState.shiftDown = false;
+            },
+            reservedModifiers: ["ALT", "CONTROL"]
+        });
+
+        game.keybindings.register(CONSTANTS.MODULE_NAME, "force-drop-item", {
+            name: "Force drop one item",
+            uneditable: [
+                { key: "AltLeft" },
+            ],
+            onDown: () => {
+                hotkeyState.altDown = true;
+            },
+            onUp: () => {
+                hotkeyState.altDown = false;
+            },
+            reservedModifiers: ["SHIFT", "CONTROL"]
         });
 
     }
@@ -65,6 +95,12 @@ export function registerHotkeysPost() {
                 case "ControlLeft":
                     hotkeyState.ctrlDown = true;
                     break;
+                case "ShiftLeft":
+                    hotkeyState.shiftDown = true;
+                    break;
+                case "AltLeft":
+                    hotkeyState.altDown = true;
+                    break;
             }
         });
 
@@ -72,6 +108,12 @@ export function registerHotkeysPost() {
             switch(event.code){
                 case "ControlLeft":
                     hotkeyState.ctrlDown = false;
+                    break;
+                case "ShiftLeft":
+                    hotkeyState.shiftDown = false;
+                    break;
+                case "AltLeft":
+                    hotkeyState.altDown = false;
                     break;
             }
         });

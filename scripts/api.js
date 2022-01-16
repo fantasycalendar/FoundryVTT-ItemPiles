@@ -4,6 +4,7 @@ import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropDialog from "./formapplications/dropDialog.js";
 import { HOOKS } from "./hooks.js";
+import { hotkeyState } from "./hotkeys.js";
 
 export default class API {
 
@@ -1791,7 +1792,7 @@ export default class API {
             if (!game.user.isGM) {
                 return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
             }
-            if (!game.keyboard.downKeys.has("ShiftLeft")) {
+            if (!hotkeyState.shiftDown) {
                 const force = await Dialog.confirm({
                     title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
                     content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
@@ -1865,7 +1866,7 @@ export default class API {
             }
         }
 
-        if (game.keyboard.downKeys.has("AltLeft")) {
+        if (hotkeyState.altDown) {
 
             if (droppableDocuments.length) {
                 action = "addToPile";
