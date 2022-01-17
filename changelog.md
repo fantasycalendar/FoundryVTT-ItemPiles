@@ -1,5 +1,9 @@
 # Item Piles Changelog 
 
+## Version 1.2.4 Hotfix
+- Fixed error in `ItemPiles.API.addItems` throwing errors
+- Fixed D&D 3.5e system not correctly implemented
+
 ## Version 1.2.3
 - Added API method:
   - `ItemPiles.API.openItemPileInventory` - forces a given set of users to open an item pile's inventory UI

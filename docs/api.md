@@ -57,10 +57,10 @@ ItemPiles.API.revertTokensFromItemPiles(selectedTokens);
 <dt><a href="#createItemPile">createItemPile(position, { items, pileActorName })</a> ⇒ <code>Promise</code></dt>
 <dd><p>Creates the default item pile token at a location.</p>
 </dd>
-<dt><a href="#turnTokensIntoItemPiles">turnTokensIntoItemPiles(targets, pileSettings, tokenSettings)</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
+<dt><a href="#turnTokensIntoItemPiles">turnTokensIntoItemPiles(targets, { pileSettings, tokenSettings })</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
 <dd><p>Turns tokens and its actors into item piles</p>
 </dd>
-<dt><a href="#revertTokensFromItemPiles">revertTokensFromItemPiles(targets, tokenSettings)</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
+<dt><a href="#revertTokensFromItemPiles">revertTokensFromItemPiles(targets, { tokenSettings })</a> ⇒ <code>Promise.&lt;Array&gt;</code></dt>
 <dd><p>Reverts tokens from an item pile into a normal token and actor</p>
 </dd>
 <dt><a href="#openItemPile">openItemPile(target, interactingToken)</a> ⇒ <code>Promise</code></dt>
@@ -265,7 +265,7 @@ Creates the default item pile token at a location.
 
 ---
 
-## turnTokensIntoItemPiles(targets, pileSettings, tokenSettings) ⇒ <code>Promise.&lt;Array&gt;</code>
+## turnTokensIntoItemPiles(targets, { pileSettings, tokenSettings }) ⇒ <code>Promise.&lt;Array&gt;</code>
 Turns tokens and its actors into item piles
 **Returns**: <code>Promise.&lt;Array&gt;</code> - The uuids of the targets after they were turned into item piles  
 
@@ -279,7 +279,7 @@ Turns tokens and its actors into item piles
 
 ---
 
-## revertTokensFromItemPiles(targets, tokenSettings) ⇒ <code>Promise.&lt;Array&gt;</code>
+## revertTokensFromItemPiles(targets, { tokenSettings }) ⇒ <code>Promise.&lt;Array&gt;</code>
 Reverts tokens from an item pile into a normal token and actor
 **Returns**: <code>Promise.&lt;Array&gt;</code> - The uuids of the targets after they were reverted from being item piles  
 

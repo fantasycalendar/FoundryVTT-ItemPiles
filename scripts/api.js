@@ -224,7 +224,8 @@ export default class API {
                 "scale": lib.getItemPileTokenScale(target, pileSettings),
             });
 
-            const [_, sceneId, __, tokenId] = targetUuid.split('.');
+            const sceneId = targetUuid.split('.')[1];
+            const tokenId = targetUuid.split('.')[3];
 
             if (!tokenUpdateGroups[sceneId]) {
                 tokenUpdateGroups[sceneId] = []
@@ -293,7 +294,8 @@ export default class API {
             const pileSettings = foundry.utils.mergeObject(defaults, lib.getItemPileData(target));
             pileSettings.enabled = false;
 
-            const [_, sceneId, __, tokenId] = targetUuid.split('.');
+            const sceneId = targetUuid.split('.')[1];
+            const tokenId = targetUuid.split('.')[3];
 
             if (!tokenUpdateGroups[sceneId]) {
                 tokenUpdateGroups[sceneId] = [];
@@ -865,7 +867,7 @@ export default class API {
             }
             return {
                 item: item,
-                quantity: itemData?.quantity ?? getProperty(foundActorItem.data, API.ITEM_QUANTITY_ATTRIBUTE)
+                quantity: itemData?.quantity ?? getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE)
             }
         });
 
