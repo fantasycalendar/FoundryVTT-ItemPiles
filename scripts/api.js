@@ -848,7 +848,7 @@ export default class API {
      *
      * @returns {Promise<array>}                        An array of objects, each containing the item that was added or updated, and the quantity that was added
      */
-    static async addItems(target, items, { interactionId = false }) {
+    static async addItems(target, items, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, items, interactionId);
         if (hookResult === false) return;
@@ -966,7 +966,7 @@ export default class API {
      *
      * @returns {Promise<array>}                        An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted
      */
-    static async removeItems(target, items, { interactionId = false }) {
+    static async removeItems(target, items, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, items, interactionId);
         if (hookResult === false) return;
@@ -1093,7 +1093,7 @@ export default class API {
      *
      * @returns {Promise<object>}                       An array of objects, each containing the item that was added or updated, and the quantity that was transferred
      */
-    static async transferItems(source, target, items, { interactionId = false }) {
+    static async transferItems(source, target, items, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, items, interactionId);
         if (hookResult === false) return;
@@ -1263,7 +1263,7 @@ export default class API {
      * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      *
      */
-    static async addAttributes(target, attributes, { interactionId = false }) {
+    static async addAttributes(target, attributes, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, target, attributes, interactionId);
         if (hookResult === false) return;
@@ -1346,7 +1346,7 @@ export default class API {
      *
      * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      */
-    static async removeAttributes(target, attributes, { interactionId = false }) {
+    static async removeAttributes(target, attributes, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, target, attributes, interactionId);
         if (hookResult === false) return;
@@ -1454,7 +1454,7 @@ export default class API {
      *
      * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
-    static async transferAttributes(source, target, attributes, { interactionId = false }) {
+    static async transferAttributes(source, target, attributes, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, source, target, attributes, interactionId);
         if (hookResult === false) return;
@@ -1555,7 +1555,7 @@ export default class API {
      *
      * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
-    static async transferAllAttributes(source, target, { interactionId = false }) {
+    static async transferAllAttributes(source, target, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, source, target, interactionId);
         if (hookResult === false) return;
