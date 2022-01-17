@@ -5,7 +5,7 @@ import API from "./api.js";
 import * as lib from "./lib/lib.js";
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
 import { registerLibwrappers } from "./libwrapper.js";
-import { HOOKS } from "./hooks.js";
+import HOOKS from "./hooks.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import chatHandler from "./chathandler.js";
 

@@ -2,7 +2,7 @@ import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import * as lib from "../lib/lib.js";
 import { isPileInventoryOpenForOthers } from "../socket.js";
-import { HOOKS } from "../hooks.js";
+import HOOKS from "../hooks.js";
 
 export class ItemPileInventory extends FormApplication {
 
@@ -10,8 +10,9 @@ export class ItemPileInventory extends FormApplication {
      *
      * @param pile
      * @param recipient
+     * @param overrides
      */
-    constructor(pile, recipient) {
+    constructor(pile, recipient, overrides={}) {
         super();
         this.pile = pile;
         this.recipient = recipient;
@@ -20,6 +21,7 @@ export class ItemPileInventory extends FormApplication {
         this.attributes = [];
         this.deleted = false;
         this.interactionId = randomID();
+        this.overrides = overrides;
         Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient);
     }
 
@@ -57,14 +59,19 @@ export class ItemPileInventory extends FormApplication {
         return true;
     }
 
-    static async show(pile, recipient) {
+    static async show(pile, recipient, overrides={}) {
         const pileUuid = await lib.getUuid(pile);
-        const recipientUuid = await lib.getUuid(recipient);
+        const recipientUuid = recipient ? await lib.getUuid(recipient) : false;
+
         const app = ItemPileInventory.getActiveAppFromPile(pileUuid, recipientUuid);
         if (app) {
             return app.render(true, { focus: true });
         }
-        return new ItemPileInventory(pile, recipient).render(true);
+
+        const result = Hooks.call(HOOKS.PILE.PRE_OPEN_INVENTORY, pile, recipient, overrides);
+        if(result === false) return;
+
+        return new ItemPileInventory(pile, recipient, overrides).render(true);
     }
 
     /* -------------------------------------------- */
@@ -186,6 +193,8 @@ export class ItemPileInventory extends FormApplication {
     getData(options) {
         const data = super.getData(options);
 
+        data.overrides = this.overrides;
+
         data.isDeleted = this.deleted;
 
         data.name = !data.isDeleted ? this.pile.name : "Nonexistent pile";
@@ -297,7 +306,7 @@ export class ItemPileInventory extends FormApplication {
 
         if (event.submitter.value === "close") {
             return isPileInventoryOpenForOthers.query(this.pile).then((result) => {
-                if (!result) API.closeItemPile(this.pile);
+                if (!result) API.closeItemPile(this.pile, this.recipient);
             });
         }
 

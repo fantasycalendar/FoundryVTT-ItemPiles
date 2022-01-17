@@ -1,5 +1,11 @@
 # Item Piles Changelog 
 
+## Version 1.2.3
+- Added API method:
+  - `openItemPileInventory` - forces a given set of users to open an item pile's inventory UI
+- Fixed API methods not accepting `Token` objects, will now properly cast to their `TokenDocument`
+- Fixed hooks and macros not being called on item pile interaction
+
 ## Version 1.2.2 Hotfix
 - Fixed hotkeys being broken on Foundry v9
 - Fixed alt-quickdrop hotkey not creating a pile in the right location

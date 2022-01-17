@@ -75,7 +75,9 @@
                 {{/unless}}
                 {{#unless isDeleted}}
                 {{#if isContainer}}
+                {{#unless overrides.remote}}
                 <button type="submit" name="close" value="close"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Close"}}</button>
+                {{/unless}}
                 {{/if}}
                 {{/unless}}
             {{/if}}

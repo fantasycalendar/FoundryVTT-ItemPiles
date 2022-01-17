@@ -3,7 +3,7 @@ import CONSTANTS from "./constants.js";
 const prefix = (str) => (strs, ...exprs) => `${str}-${strs.reduce((a, c, i) => a + exprs[i - 1] + c)}`
 const module = prefix(CONSTANTS.MODULE_NAME);
 
-export const HOOKS = {
+const HOOKS = {
     READY: module`ready`,
     PRE_TRANSFER_EVERYTHING: module`preTransferEverything`,
     TRANSFER_EVERYTHING: module`transferEverything`,
@@ -55,3 +55,5 @@ export const HOOKS = {
         TRANSFER_ALL: module`transferAllAttributes`,
     }
 }
+
+export default HOOKS;

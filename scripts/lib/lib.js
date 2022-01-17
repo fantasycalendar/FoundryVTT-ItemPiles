@@ -121,8 +121,13 @@ export function getUuid(target) {
     // If it's a token, get its Document
     // If it's a TokenDocument, just use it
     // Otherwise fail
-    const document = target?.document ?? target;
+    const document = getDocument(target);
     return document?.uuid ?? false;
+}
+
+export function getDocument(target){
+    if(target instanceof foundry.abstract.Document) return target;
+    return target?.document;
 }
 
 export function is_real_number(inNumber) {
@@ -132,9 +137,10 @@ export function is_real_number(inNumber) {
 }
 
 export function hasNonzeroAttribute(target, attribute){
-    const actor = target instanceof TokenDocument
-        ? target.actor
-        : target;
+    let inDocument = getDocument(target);
+    const actor = inDocument instanceof TokenDocument
+        ? inDocument.actor
+        : inDocument;
     const attributeValue = Number(getProperty(actor.data, attribute) ?? 0);
     return hasProperty(actor.data, attribute) && attributeValue > 0;
 }
@@ -148,7 +154,8 @@ export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
 }
 
 
-export function getItemPileData(inDocument){
+export function getItemPileData(target){
+    let inDocument = getDocument(target);
     if(inDocument instanceof TokenDocument && inDocument?.data?.actorLink){
         inDocument = inDocument?.actor;
     }else if(inDocument instanceof Actor && inDocument.token){
@@ -164,7 +171,9 @@ export function getItemPileData(inDocument){
     }
 }
 
-export async function updateItemPile(inDocument, flagData, tokenData){
+export async function updateItemPile(target, flagData, tokenData){
+
+    const inDocument = getDocument(target);
 
     if(!tokenData) tokenData = {};
 
@@ -210,7 +219,9 @@ export async function updateItemPile(inDocument, flagData, tokenData){
 
 }
 
-export function getItemPileTokenImage(pileDocument, data = false) {
+export function getItemPileTokenImage(target, data = false) {
+
+    const pileDocument = getDocument(target);
 
     if (!data) {
         data = getItemPileData(pileDocument);
@@ -235,11 +246,9 @@ export function getItemPileTokenImage(pileDocument, data = false) {
     let img;
 
     if (data.displayOne && numItems === 1) {
-
         img = items.length > 0
             ? items[0].data.img
             : attributes[0].img;
-
     }
 
     if (data.isContainer) {
@@ -262,7 +271,9 @@ export function getItemPileTokenImage(pileDocument, data = false) {
 
 }
 
-export function getItemPileTokenScale(pileDocument, data) {
+export function getItemPileTokenScale(target, data) {
+
+    const pileDocument = getDocument(target);
 
     if (!data) {
         data = getItemPileData(pileDocument);
@@ -290,13 +301,15 @@ export function getItemPileTokenScale(pileDocument, data) {
 
 export function getDocumentItems(target, itemTypeFilters = false){
 
+    const inDocument = getDocument(target);
+
     const pileItemFilters = Array.isArray(itemTypeFilters)
         ? new Set(itemTypeFilters)
         : new Set(getDocumentItemTypeFilters(target));
 
-    const targetActor = target instanceof TokenDocument
-        ? target.actor
-        : target;
+    const targetActor = inDocument instanceof TokenDocument
+        ? inDocument.actor
+        : inDocument;
 
     return Array.from(targetActor.items).filter(item => {
         const itemType = getProperty(item.data, API.ITEM_TYPE_ATTRIBUTE);
@@ -304,40 +317,46 @@ export function getDocumentItems(target, itemTypeFilters = false){
     })
 }
 
-export function isValidItemPile(inDocument, data = false){
+export function isValidItemPile(target, data = false){
+    const inDocument = getDocument(target);
     const documentActor = inDocument instanceof TokenDocument ? inDocument.actor : inDocument;
     return inDocument && !inDocument.destroyed && documentActor && (data || getItemPileData(inDocument))?.enabled;
 }
 
 export function getDocumentItemTypeFilters(target){
-    const pileData = getItemPileData(target);
-    return isValidItemPile(target) && pileData?.itemTypeFilters
+    const inDocument = getDocument(target);
+    const pileData = getItemPileData(inDocument);
+    return isValidItemPile(inDocument) && pileData?.itemTypeFilters
         ? pileData.itemTypeFilters.split(',').map(str => str.trim().toLowerCase())
         : API.ITEM_TYPE_FILTERS;
 }
 
 export function isItemPileEmpty(target) {
 
-    const targetActor = target instanceof TokenDocument
-        ? target.actor
-        : target;
+    const inDocument = getDocument(target);
+
+    const targetActor = inDocument instanceof TokenDocument
+        ? inDocument.actor
+        : inDocument;
 
     if(!targetActor) return false;
 
-    const hasNoItems = getDocumentItems(target).length === 0;
-    const hasEmptyAttributes = getItemPileAttributes(target).length === 0;
+    const hasNoItems = getDocumentItems(inDocument).length === 0;
+    const hasEmptyAttributes = getItemPileAttributes(inDocument).length === 0;
 
     return hasNoItems && hasEmptyAttributes;
 
 }
 
 export function getItemPileAttributeList(target){
-    const pileData = getItemPileData(target);
+    const inDocument = getDocument(target);
+    const pileData = getItemPileData(inDocument);
     return pileData.overrideAttributes || API.DYNAMIC_ATTRIBUTES;
 }
 
 export function getItemPileAttributes(target) {
-    let targetActor = target?.actor ?? target;
+    const inDocument = getDocument(target);
+    let targetActor = inDocument?.actor ?? inDocument;
     const attributes = getItemPileAttributeList(targetActor);
     return attributes
         .filter(attribute => {

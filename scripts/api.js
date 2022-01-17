@@ -3,7 +3,7 @@ import CONSTANTS from "./constants.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropDialog from "./formapplications/dropDialog.js";
-import { HOOKS } from "./hooks.js";
+import HOOKS from "./hooks.js";
 import { hotkeyState } from "./hotkeys.js";
 
 export default class API {
@@ -330,22 +330,25 @@ export default class API {
      * @return {Promise}
      */
     static async openItemPile(target, interactingToken = false) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         const wasLocked = data.locked;
         const wasClosed = data.closed;
         data.closed = false;
         data.locked = false;
         if (wasLocked) {
-            const hookResult = Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
+            const hookResult = Hooks.call(HOOKS.PILE.PRE_UNLOCK, targetDocument, data, interactingTokenDocument);
             if (hookResult === false) return;
         }
-        const hookResult = Hooks.call(HOOKS.PILE.PRE_OPEN, target, data, interactingToken);
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_OPEN, targetDocument, data, interactingTokenDocument);
         if (hookResult === false) return;
         if (wasClosed && data.openSound) {
             AudioHelper.play({ src: data.openSound })
         }
-        return API.updateItemPile(target, data, { interactingToken });
+        return API.updateItemPile(targetDocument, data, { interactingToken: interactingTokenDocument });
     }
 
     /**
@@ -357,16 +360,19 @@ export default class API {
      * @return {Promise}
      */
     static async closeItemPile(target, interactingToken = false) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         const wasClosed = data.closed;
         data.closed = true;
-        const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, target, data, interactingToken);
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, targetDocument, data, interactingTokenDocument);
         if (hookResult === false) return;
         if (!wasClosed && data.closeSound) {
             AudioHelper.play({ src: data.closeSound })
         }
-        return API.updateItemPile(target, data, { interactingToken });
+        return API.updateItemPile(targetDocument, data, { interactingToken: interactingTokenDocument });
     }
 
     /**
@@ -378,12 +384,15 @@ export default class API {
      * @return {Promise}
      */
     static async toggleItemPileClosed(target, interactingToken = false) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         if (data.closed) {
-            await API.openItemPile(target, interactingToken);
+            await API.openItemPile(targetDocument, interactingTokenDocument);
         } else {
-            await API.closeItemPile(target, interactingToken);
+            await API.closeItemPile(targetDocument, interactingTokenDocument);
         }
         return !data.closed;
     }
@@ -397,21 +406,24 @@ export default class API {
      * @return {Promise}
      */
     static async lockItemPile(target, interactingToken = false) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         const wasClosed = data.closed;
         data.closed = true;
         data.locked = true;
         if (!wasClosed) {
-            const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, target, data, interactingToken);
+            const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, targetDocument, data, interactingTokenDocument);
             if (hookResult === false) return;
         }
-        const hookResult = Hooks.call(HOOKS.PILE.PRE_LOCK, target, data, interactingToken);
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_LOCK, targetDocument, data, interactingTokenDocument);
         if (hookResult === false) return;
         if (!wasClosed && data.closeSound) {
             AudioHelper.play({ src: data.closeSound })
         }
-        return API.updateItemPile(target, data, { interactingToken });
+        return API.updateItemPile(targetDocument, data, { interactingToken: interactingTokenDocument });
     }
 
     /**
@@ -423,11 +435,14 @@ export default class API {
      * @return {Promise}
      */
     static async unlockItemPile(target, interactingToken = false) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         data.locked = false;
-        Hooks.call(HOOKS.PILE.PRE_UNLOCK, target, data, interactingToken);
-        return API.updateItemPile(target, data, { interactingToken });
+        Hooks.call(HOOKS.PILE.PRE_UNLOCK, targetDocument, data, interactingTokenDocument);
+        return API.updateItemPile(targetDocument, data, { interactingToken: interactingTokenDocument });
     }
 
     /**
@@ -439,12 +454,15 @@ export default class API {
      * @return {Promise}
      */
     static async toggleItemPileLocked(target, interactingToken = false) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         if (data.locked) {
-            return API.unlockItemPile(target, interactingToken);
+            return API.unlockItemPile(targetDocument, interactingTokenDocument);
         }
-        return API.lockItemPile(target, interactingToken);
+        return API.lockItemPile(targetDocument, interactingTokenDocument);
     }
 
     /**
@@ -456,13 +474,16 @@ export default class API {
      * @return {Promise<boolean>}
      */
     static async rattleItemPile(target, interactingToken = false) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer || !data?.locked) return false;
-        Hooks.call(HOOKS.PILE.PRE_RATTLE, target, data, interactingToken);
+        Hooks.call(HOOKS.PILE.PRE_RATTLE, targetDocument, data, interactingTokenDocument);
         if (data.lockedSound) {
             AudioHelper.play({ src: data.lockedSound })
         }
-        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, lib.getUuid(target), data, lib.getUuid(interactingToken));
+        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, lib.getUuid(targetDocument), data, lib.getUuid(interactingTokenDocument));
         return true;
     }
 
@@ -474,7 +495,8 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileLocked(target) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         return data.locked;
     }
@@ -487,7 +509,8 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileClosed(target) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         return data.closed;
     }
@@ -500,7 +523,8 @@ export default class API {
      * @return {boolean}
      */
     static isItemPileContainer(target) {
-        const data = lib.getItemPileData(target);
+        const targetDocument = lib.getDocument(target);
+        const data = lib.getItemPileData(targetDocument);
         return data?.enabled && data?.isContainer;
     }
 
@@ -551,7 +575,7 @@ export default class API {
 
         await lib.updateItemPile(target, data, tokenSettings);
 
-        if (data.isEnabled && data.isContainer) {
+        if (data.enabled && data.isContainer) {
             if (diff?.closed === true) {
                 API._executeItemPileMacro(targetUuid, {
                     action: "closeItemPile",
@@ -600,7 +624,7 @@ export default class API {
 
         Hooks.callAll(HOOKS.PILE.UPDATE, target, diffData, interactingToken)
 
-        if (data.isEnabled && data.isContainer) {
+        if (data.enabled && data.isContainer) {
             if (diffData?.closed === true) {
                 Hooks.callAll(HOOKS.PILE.CLOSE, target, interactingToken)
             }
@@ -643,16 +667,71 @@ export default class API {
     }
 
     /**
+     * Remotely opens an item pile's inventory, if you have permission to edit the item pile. Passing a user ID, or a list of user IDs, will cause those users to open the item pile.
      *
+     * @param {Token/TokenDocument/Actor} target                        The item pile actor or token whose inventory to open
+     * @param {array<string>} userIds                                   The IDs of the users that should open this item pile inventory
+     * @param {boolean/Token/TokenDocument/Actor} inspectingTarget      This will force the users to inspect this item pile as a specific character
+     * @param {boolean} useDefaultCharacter                             Causes the users to inspect the item pile inventory as their default character
+     * @returns {Promise}
      */
-    static async openItemPileInventory(){
+    static async openItemPileInventory(target, userIds = [ game.user.id ], { inspectingTarget = false, useDefaultCharacter = false }={}){
 
+        const targetDocument = lib.getDocument(target);
+        const targetUuid = lib.getUuid(targetDocument);
+        if (!targetUuid) throw lib.custom_error(`openItemPileInventory | Could not determine the UUID, please provide a valid target item pile`);
+
+        if(!targetDocument.canUserModify(game.user, "update")){
+            lib.custom_warning("openItemPileInventory | You do not have permission to remotely interact with this item pile")
+            return;
+        }
+
+        if(!lib.isValidItemPile(targetDocument)){
+            lib.custom_warning("openItemPileInventory | This target is not a valid item pile")
+            return;
+        }
+
+        if(inspectingTarget && useDefaultCharacter){
+            lib.custom_warning("openItemPileInventory | You cannot force users to use both their default character and a specific character to inspect the pile")
+            return;
+        }
+
+        if(!Array.isArray(userIds)) userIds = [userIds];
+
+        for(const userId of userIds){
+            const user = game.users.get(userId);
+            if(!user) throw lib.custom_error(`openItemPileInventory | No user with ID "${userId}" exists`);
+            if(useDefaultCharacter){
+                if(!user.character){
+                    lib.custom_warning(`openItemPileInventory | User with id "${userId}" has no default character`, true);
+                    return
+                }
+            }
+        }
+
+        const inspectingTargetUuid = inspectingTarget ? lib.getUuid(inspectingTarget) : false;
+        if (inspectingTarget && !inspectingTargetUuid) throw lib.custom_error(`openItemPileInventory | Could not determine the UUID, please provide a valid inspecting target`);
+
+        return itemPileSocket.executeForUsers(SOCKET_HANDLERS.OPEN_INVENTORY, userIds, targetUuid, inspectingTargetUuid, useDefaultCharacter)
+    }
+
+    static async _openItemPileInventory(targetUuid, inspectingTargetUuid, useDefaultCharacter){
+        const target = await fromUuid(targetUuid);
+
+        let inspectingTarget;
+        if(useDefaultCharacter){
+            inspectingTarget = game.user.character;
+        }else{
+            inspectingTarget = inspectingTargetUuid ? (await fromUuid(inspectingTargetUuid)) : false;
+        }
+
+        return ItemPileInventory.show(target, inspectingTarget, { remote: true });
     }
 
     /**
      * Whether a given document is a valid pile or not
      *
-     * @param {TokenDocument|Actor} document
+     * @param {Token/TokenDocument|Actor} document
      * @return {boolean}
      */
     static isValidItemPile(document) {
@@ -662,7 +741,7 @@ export default class API {
     /**
      * Whether the item pile is empty
      *
-     * @param {TokenDocument|Actor} target
+     * @param {Token/TokenDocument|Actor} target
      * @returns {boolean}
      */
     static isItemPileEmpty(target){
@@ -672,7 +751,7 @@ export default class API {
     /**
      * Returns the item type filters for a given item pile
      *
-     * @param target
+     * @param {Token/TokenDocument|Actor} target
      * @returns {Array}
      */
     static getItemPileItemTypeFilters(target){
@@ -682,7 +761,7 @@ export default class API {
     /**
      * Returns the items this item pile can transfer
      *
-     * @param {TokenDocument|Actor} target
+     * @param {Token/TokenDocument|Actor} target
      * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
      * @returns {Array}
      */
@@ -693,7 +772,7 @@ export default class API {
     /**
      * Returns the attributes this item pile can transfer
      *
-     * @param {TokenDocument|Actor} target
+     * @param {Token/TokenDocument|Actor} target
      * @returns {array}
      */
     static getItemPileAttributes(target){
@@ -703,7 +782,7 @@ export default class API {
     /**
      * Refreshes the target image of an item pile, ensuring it remains in sync
      *
-     * @param target
+     * @param {Token/TokenDocument|Actor} target
      * @return {Promise}
      */
     static async refreshItemPile(target) {
@@ -2132,9 +2211,6 @@ export default class API {
             }
 
         }
-
-        const result = Hooks.call(HOOKS.PILE.PRE_OPEN_INVENTORY, pileDocument, interactingToken);
-        if(result === false) return;
 
         return ItemPileInventory.show(pileDocument, interactingToken);
 

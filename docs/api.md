@@ -99,6 +99,8 @@ ItemPiles.API.revertTokensFromItemPiles(selectedTokens);
 <dt><a href="#deleteItemPile">deleteItemPile(target)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Deletes a pile, calling the relevant hooks.</p>
 </dd>
+<dt><a href="#openItemPileInventory">openItemPileInventory(target, userId, inspectingTarget, useDefaultCharacter)</a> ⇒ <code>Promise</code></dt>
+<dd></dd>
 <dt><a href="#isValidItemPile">isValidItemPile(document)</a> ⇒ <code>boolean</code></dt>
 <dd><p>Whether a given document is a valid pile or not</p>
 </dd>
@@ -427,6 +429,21 @@ Deletes a pile, calling the relevant hooks.
 | Param | Type |
 | --- | --- |
 | target | <code>Token/TokenDocument</code> | 
+
+
+<a name="openItemPileInventory"></a>
+
+---
+
+## openItemPileInventory(target, userIds, { inspectingTarget, useDefaultCharacter }) ⇒ <code>Promise</code>
+Remotely opens an item pile's inventory, if you have permission to edit the item pile. Passing a user ID, or a list of user IDs, will cause those users to open the item pile.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| target | <code>Token/TokenDocument/Actor</code> | The item pile actor or token whose inventory to open |
+| userIds | <code>array&lt;string&gt;</code> | The IDs of the users that should open this item pile inventory |
+| inspectingTarget | <code>boolean/Token/TokenDocument/Actor</code> | This will force the users to inspect this item pile as a specific character |
+| useDefaultCharacter | <code>boolean</code> | Causes the users to inspect the item pile inventory as their default character |
 
 <a name="isValidItemPile"></a>
 
