@@ -234,3 +234,11 @@ export async function checkSystem(){
 
     return applyDefaultSettings();
 }
+
+export function registerHandlebarHelpers(){
+
+    Handlebars.registerHelper('concat', function(...args) {
+        return args.filter(str => typeof str !== "object").join("");
+    });
+
+}

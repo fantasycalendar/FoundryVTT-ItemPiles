@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.2.5
+- Added missing handlebars method for Foundry v0.8.9
+
 ## Version 1.2.4 Hotfix
 - Fixed error in `ItemPiles.API.addItems` throwing errors
 - Fixed D&D 3.5e system not correctly implemented
@@ -16,10 +19,10 @@
 - Fixed alt-quickdrop hotkey not creating a pile in the right location
 
 ## Version 1.2.1
-- Fixed hotkey errors on Foundry 0.8.9
+- Fixed hotkey errors on Foundry v0.8.9
 
 ## Version 1.2.0
-- Now supports Foundry 0.8.9
+- Now supports Foundry v0.8.9
 - Added setting to output items picked up to chat
 - Added setting to hide the "Item Piles" text in the actor header - useful if you have too many modules, and the header is getting crowded
 - Added support for the Tormenta 20 system: <https://foundryvtt.com/packages/tormenta20>
