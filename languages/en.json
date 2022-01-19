@@ -51,11 +51,20 @@
             "Title": "Dynamic Attributes Editor",
             "Explanation": "Here you can define which attributes on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
             "Name": "Attribute name",
-            "AttributePath": "Attribute path",
             "Icon": "Attribute icon",
             "AddNew": "Add new attribute",
             "Submit": "Submit Attributes"
         },
+
+        "FilterEditor": {
+            "Title": "Item Filters Editor",
+            "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
+            "Filters": "Filters",
+            "AddNew": "Add new filter",
+            "Submit": "Submit Filters"
+        },
+
+        "AttributePath": "Attribute path",
 
         "Defaults": {
             "Title": "Item Pile Configuration",
@@ -78,6 +87,9 @@
             "OverrideAttributes": "Override Dynamic Attributes",
             "OverrideAttributesExplanation": "Configure if this pile should be able to transfer other attributes than the default.",
             "ConfigureOverrideAttributes": "Configure Override Dynamic Attributes",
+            "OverrideItemFilters": "Override Item Filters",
+            "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
+            "ConfigureOverrideItemFilters": "Configure Override Item Filters",
             "DeleteWhenEmpty": "Delete when empty",
             "DeleteWhenEmptyExplanation": "Causes the item pile to auto-delete itself once it's empty.",
             "DeleteWhenEmptyDefault": "Default module setting",
@@ -141,13 +153,10 @@
                 "Label": "Configure Attributes",
                 "Hint": "This setting define the attributes that are eligible for pickup in item paths, such as currencies or power, which may not be actual items."
             },
-            "ItemType": {
-                "Title": "Item type attribute",
-                "Label": "This setting defines the attribute path for determining where the item types live. In D&D5e, it's just \"type\" because the type is defined directly in \"item.data.type\", because each item distinguishes its type with that attribute."
-            },
-            "ItemTypeFilters": {
-                "Title": "Item type filters",
-                "Label": "Here you can configure what item types are ignored and not listed in the item pile dialogs. For example, in D&D5e we probably don't want to show spells, feats, and classes, so you'd put \"spell, feat, class\"."
+            "ItemFilters": {
+                "Title": "Item filters",
+                "Label": "Configure Item Filters",
+                "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
             },
             "OutputToChat": {
                 "Title": "Output to chat",

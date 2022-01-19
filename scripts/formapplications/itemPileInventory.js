@@ -102,7 +102,7 @@ export class ItemPileInventory extends FormApplication {
                 id = foundItem.id;
                 name = foundItem.name;
                 img = foundItem.data.img;
-                type = getProperty(foundItem.data, API.ITEM_TYPE_ATTRIBUTE);
+                type = foundItem.data.type;
                 quantity = Number(getProperty(foundItem.data, API.ITEM_QUANTITY_ATTRIBUTE));
             }else{
                 itemQuantity = 0;
@@ -212,6 +212,8 @@ export class ItemPileInventory extends FormApplication {
             data.hasAttributes = data?.attributes?.length;
             data.canInspectItems = pileData.canInspectItems || game.user.isGM;
         }
+
+        data.hasThings = data?.hasItems || data?.hasAttributes;
 
         data.isEmpty = lib.isItemPileEmpty(this.pile);
 

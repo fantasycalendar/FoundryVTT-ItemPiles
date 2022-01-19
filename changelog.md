@@ -1,5 +1,12 @@
 # Item Piles Changelog 
 
+## Version 1.3.0
+- Added `Item Filters` setting - now you can more accurately filter items you do not want to show up in item piles, such as natural weapons
+- Updated all supported systems to support the above and added migrations to convert existing settings to the new system - reset your Item Piles module settings to ensure you have the latest system configurations  
+- Removed `Item Type Attribute` and `Item Type Filters` as the above feature covers these cases
+- Further fixes to `ItemPiles.API.addItems`
+- Added debounce to the token image refresh so that it doesn't try to change its image too often
+
 ## Version 1.2.5
 - Added missing handlebars method for Foundry v0.8.9
 
@@ -90,8 +97,8 @@
 
 ## Version 1.0.6
 - Added API endpoints:
-    - `ItemPiles.API.getDocumentItemTypeFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
-    - `ItemPiles.API.getDocumentItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
+    - `ItemPiles.API.getDocumentItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
+    - `ItemPiles.API.getValidDocumentItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
 - Updated japanese localization
 - Fixed item piles not respecting item type filters
 - Fixed issue with `ItemPiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile

@@ -107,7 +107,7 @@ ItemPiles.API.revertTokensFromItemPiles(selectedTokens);
 <dt><a href="#isItemPileEmpty">isItemPileEmpty(target)</a> ⇒ <code>boolean</code></dt>
 <dd><p>Whether the item pile is empty</p>
 </dd>
-<dt><a href="#getItemPileItemTypeFilters">getItemPileItemTypeFilters(target)</a> ⇒ <code>Array</code></dt>
+<dt><a href="#getItemPileItemTypeFilters">getItemPileItemFilters(target)</a> ⇒ <code>Array</code></dt>
 <dd><p>Returns the item type filters for a given item pile</p>
 </dd>
 <dt><a href="#getItemPileItems">getItemPileItems(target, [itemTypeFilters])</a> ⇒ <code>Array</code></dt>
@@ -467,11 +467,11 @@ Whether the item pile is empty
 | --- | --- |
 | target | <code>TokenDocument</code> \| <code>Actor</code> | 
 
-<a name="getItemPileItemTypeFilters"></a>
+<a name="getItemPileItemFilters"></a>
 
 ---
 
-## getItemPileItemTypeFilters(target) ⇒ <code>Array</code>
+## getItemPileItemFilters(target) ⇒ <code>Array</code>
 Returns the item type filters for a given item pile
 
 | Param |

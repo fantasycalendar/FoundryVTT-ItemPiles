@@ -1,5 +1,6 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
+import flagManager from "../flagManager.js";
 
 export function isGMConnected(){
     return !!Array.from(game.users).find(user => user.isGM && user.active);
@@ -162,7 +163,7 @@ export function getItemPileData(target){
         inDocument = inDocument?.token;
     }
     try{
-        let data = inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        let data = flagManager.getFlags(inDocument);
         if(!data) return {};
         let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
         return foundry.utils.mergeObject(defaults, data);
@@ -238,7 +239,7 @@ export function getItemPileTokenImage(target, data = false) {
 
     if(!isValidItemPile(pileDocument)) return originalImg;
 
-    const items = getDocumentItems(pileDocument);
+    const items = getValidDocumentItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
@@ -288,7 +289,7 @@ export function getItemPileTokenScale(target, data) {
         baseScale = pileDocument.data.token.scale;
     }
 
-    const items = getDocumentItems(pileDocument);
+    const items = getValidDocumentItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
@@ -299,36 +300,69 @@ export function getItemPileTokenScale(target, data) {
 
 }
 
-export function getDocumentItems(target, itemTypeFilters = false){
+export function getValidDocumentItems(target, itemFilters = false){
+
+    const pileItemFilters = itemFilters || getDocumentItemFilters(target);
 
     const inDocument = getDocument(target);
-
-    const pileItemFilters = Array.isArray(itemTypeFilters)
-        ? new Set(itemTypeFilters)
-        : new Set(getDocumentItemTypeFilters(target));
-
     const targetActor = inDocument instanceof TokenDocument
         ? inDocument.actor
         : inDocument;
 
-    return Array.from(targetActor.items).filter(item => {
-        const itemType = getProperty(item.data, API.ITEM_TYPE_ATTRIBUTE);
-        return !pileItemFilters.has(itemType);
-    })
+    return Array.from(targetActor.items).filter(item => !isItemInvalid(inDocument, item, pileItemFilters));
+
+}
+
+export function isActiveGM(user) {
+    return user.active && user.isGM;
+}
+
+export function isResponsibleGM() {
+    if (!game.user.isGM) return false;
+    const connectedGMs = game.users.filter(isActiveGM);
+    return !connectedGMs.some(other => other.data._id < game.user.data._id);
+}
+
+export function isItemInvalid(target, item, itemFilters = false){
+    const pileItemFilters = itemFilters || getDocumentItemFilters(target);
+    const itemData = item instanceof Item ? item.data : item;
+    for(const filter of pileItemFilters){
+        if(!hasProperty(itemData, filter.path)) continue;
+        const attributeValue = getProperty(itemData, filter.path);
+        if (filter.filters.has(attributeValue)) {
+            return attributeValue;
+        }
+    }
+    return false;
+}
+
+export function getDocumentItemFilters(target){
+    if(!target) return API.ITEM_FILTERS;
+    const inDocument = getDocument(target);
+    const pileData = getItemPileData(inDocument);
+    return isValidItemPile(inDocument) && pileData?.overrideItemFilters
+        ? cleanItemFilters(pileData.overrideItemFilters)
+        : API.ITEM_FILTERS;
+}
+
+/**
+ * Cleans item filters and prepares them for use in above functions
+ *
+ * @param {Array} itemFilters
+ * @returns {Array}
+ */
+export function cleanItemFilters(itemFilters){
+    return itemFilters ? foundry.utils.duplicate(itemFilters).map(filter => {
+        filter.path = filter.path.trim().toLowerCase();
+        filter.filters = new Set(filter.filters.split(',').map(string => string.trim().toLowerCase()));
+        return filter;
+    }) : [];
 }
 
 export function isValidItemPile(target, data = false){
     const inDocument = getDocument(target);
     const documentActor = inDocument instanceof TokenDocument ? inDocument.actor : inDocument;
     return inDocument && !inDocument.destroyed && documentActor && (data || getItemPileData(inDocument))?.enabled;
-}
-
-export function getDocumentItemTypeFilters(target){
-    const inDocument = getDocument(target);
-    const pileData = getItemPileData(inDocument);
-    return isValidItemPile(inDocument) && pileData?.itemTypeFilters
-        ? pileData.itemTypeFilters.split(',').map(str => str.trim().toLowerCase())
-        : API.ITEM_TYPE_FILTERS;
 }
 
 export function isItemPileEmpty(target) {
@@ -341,7 +375,7 @@ export function isItemPileEmpty(target) {
 
     if(!targetActor) return false;
 
-    const hasNoItems = getDocumentItems(inDocument).length === 0;
+    const hasNoItems = getValidDocumentItems(inDocument).length === 0;
     const hasEmptyAttributes = getItemPileAttributes(inDocument).length === 0;
 
     return hasNoItems && hasEmptyAttributes;

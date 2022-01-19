@@ -4,7 +4,7 @@ const CONSTANTS = {
     PILE_DEFAULTS: {
         enabled: false,
         distance: 1,
-        itemTypeFilters: "",
+        overrideItemFilters: false,
         overrideAttributes: false,
         canInspectItems: true,
         macro: "",

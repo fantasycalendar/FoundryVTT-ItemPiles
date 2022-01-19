@@ -52,14 +52,6 @@
 
             <div class="form-group">
                 <label style="flex:4;">
-                    {{localize "ITEM-PILES.Defaults.ItemTypeFilter"}}<br>
-                    <p>{{localize "ITEM-PILES.Defaults.ItemTypeFilterExplanation"}}</p>
-                </label>
-                <input style="flex:4;" type="text" placeholder="{{defaultItemTypeFilters}}" name="itemTypeFilters" value="{{flagData.itemTypeFilters}}"/>
-            </div>
-
-            <div class="form-group">
-                <label style="flex:4;">
                     {{localize "ITEM-PILES.Defaults.Macro"}}<br>
                     <p>{{localize "ITEM-PILES.Defaults.MacroExplanation"}}</p>
                 </label>
@@ -75,7 +67,19 @@
             </div>
 
             <div class="form-group">
-                <button type="button" class="item-pile-config-configure-override-attributes" style="flex:4;">{{localize "ITEM-PILES.Defaults.ConfigureOverrideAttributes"}}</button>
+                <button type="button" class="item-pile-config-configure-override-attributes" {{#unless flagData.overrideAttributes}} disabled {{/unless}} style="flex:4;">{{localize "ITEM-PILES.Defaults.ConfigureOverrideAttributes"}}</button>
+            </div>
+
+            <div class="form-group">
+                <label style="flex:4;">
+                    {{localize "ITEM-PILES.Defaults.OverrideItemFilters"}}<br>
+                    <p>{{localize "ITEM-PILES.Defaults.OverrideItemFiltersExplanation"}}</p>
+                </label><br>
+                <input type="checkbox" class="item-pile-config-override-item-filters-checkbox" {{checked flagData.overrideItemFilters}}/>
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="item-pile-config-configure-override-item-filters" {{#unless flagData.overrideItemFilters}} disabled {{/unless}} style="flex:4;">{{localize "ITEM-PILES.Defaults.ConfigureOverrideItemFilters"}}</button>
             </div>
 
         </div>
@@ -193,6 +197,8 @@
 
 
     </section>
+
+    <hr style="margin-top: 1rem;">
 
     <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
         <button type="submit" name="submit" value="1"><i class="far fa-save"></i> {{localize "ITEM-PILES.Defaults.Update"}}</button>

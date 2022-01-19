@@ -2,10 +2,6 @@
 
     <div class="item-piles-item-drop-container">
 
-        <div id="item-piles-preview-container">
-            <img id="item-piles-preview-image">
-        </div>
-
         {{#if hasRecipient}}
         <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}</p>
         {{else}}
@@ -44,10 +40,8 @@
                     {{/if}}
                 </div>
                 {{/each}}
-                {{#if hasAttributes}}
-                {{#if hasItems}}
+                {{#if hasThings}}
                 <hr>
-                {{/if}}
                 {{/if}}
                 {{#each attributes as |attribute id|}}
                 <div class="flexrow item-piles-item-row item-piles-attribute-row" data-attribute-name="{{attribute.name}}" data-attribute-path="{{attribute.path}}">
