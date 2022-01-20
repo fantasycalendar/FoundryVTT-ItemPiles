@@ -11,7 +11,7 @@
   - [item-piles-preCreateItemPile](#item-piles-preCreateItemPile)
   - [item-piles-createItemPile](#item-piles-createItemPile)
   - [item-piles-preUpdateItemPile](#item-piles-preUpdateItemPile)
-  - [item-piles-updateItemPileData](#item-piles-updateItemPile)
+  - [item-piles-updateItemPile](#item-piles-updateItemPile)
   - [item-piles-preDeleteItemPile](#item-piles-preDeleteItemPile)
   - [item-piles-deleteItemPile](#item-piles-deleteItemPile)
   - [item-piles-preCloseItemPile](#item-piles-preCloseItemPile)
@@ -140,7 +140,7 @@ If the hook returns `false`, the action is interrupted.
 
 ---
 
-### item-piles-updateItemPileData
+### item-piles-updateItemPile
 
 Called after an item pile has been updated (only through the API).
 
