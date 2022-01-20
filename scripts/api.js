@@ -199,6 +199,7 @@ export default class API {
             tokenSettings = foundry.utils.mergeObject(tokenSettings, {
                 "img": lib.getItemPileTokenImage(target, pileSettings),
                 "scale": lib.getItemPileTokenScale(target, pileSettings),
+                "name": lib.getItemPileName(target, pileSettings)
             });
 
             const sceneId = targetUuid.split('.')[1];
@@ -211,8 +212,8 @@ export default class API {
             tokenUpdateGroups[sceneId].push({
                 "_id": tokenId,
                 ...tokenSettings,
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings,
-                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings,
+                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
             });
 
         }
@@ -281,8 +282,8 @@ export default class API {
             tokenUpdateGroups[sceneId].push({
                 "_id": tokenId,
                 ...tokenSettings,
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings,
-                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings,
+                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
             });
 
         }
@@ -552,7 +553,7 @@ export default class API {
 
         await lib.wait(15);
 
-        await lib.updateItemPile(target, data, tokenSettings);
+        await lib.updateItemPileData(target, data, tokenSettings);
 
         if (data.enabled && data.isContainer) {
             if (diff?.closed === true) {
@@ -648,10 +649,10 @@ export default class API {
     /**
      * Remotely opens an item pile's inventory, if you have permission to edit the item pile. Passing a user ID, or a list of user IDs, will cause those users to open the item pile.
      *
-     * @param {Token/TokenDocument/Actor} target                        The item pile actor or token whose inventory to open
-     * @param {array<string>} userIds                                   The IDs of the users that should open this item pile inventory
-     * @param {boolean/Token/TokenDocument/Actor} inspectingTarget      This will force the users to inspect this item pile as a specific character
-     * @param {boolean} useDefaultCharacter                             Causes the users to inspect the item pile inventory as their default character
+     * @param {Token/TokenDocument/Actor} target                                The item pile actor or token whose inventory to open
+     * @param {array<string>} userIds                                           The IDs of the users that should open this item pile inventory
+     * @param {boolean/Token/TokenDocument/Actor} [inspectingTarget=false]      This will force the users to inspect this item pile as a specific character
+     * @param {boolean} [useDefaultCharacter=false]                             Causes the users to inspect the item pile inventory as their default character
      * @returns {Promise}
      */
     static async openItemPileInventory(target, userIds = [ game.user.id ], { inspectingTarget = false, useDefaultCharacter = false }={}){
@@ -781,6 +782,7 @@ export default class API {
                     await _target.update({
                         "img": lib.getItemPileTokenImage(targetDocument),
                         "scale": lib.getItemPileTokenScale(targetDocument),
+                        "name": lib.getItemPileName(targetDocument)
                     })
                 }
                 resolve();
@@ -2024,6 +2026,7 @@ export default class API {
                 pileDataDefaults.enabled = true;
                 pileDataDefaults.deleteWhenEmpty = true;
                 pileDataDefaults.displayOne = true;
+                pileDataDefaults.showItemName = true;
                 pileDataDefaults.overrideSingleItemScale = true;
                 pileDataDefaults.singleItemScale = 0.75;
 
@@ -2031,7 +2034,7 @@ export default class API {
                     name: "Default Item Pile",
                     type: game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType"),
                     img: "icons/svg/item-bag.svg",
-                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileDataDefaults
                 });
 
                 await pileActor.update({
@@ -2041,7 +2044,7 @@ export default class API {
                         bar1: { attribute: "" },
                         vision: false,
                         displayName: 50,
-                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
+                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileDataDefaults
                     }
                 })
 
@@ -2069,11 +2072,17 @@ export default class API {
             const numItems = items.length + attributes.length;
 
             if (pileConfig.displayOne && numItems === 1) {
-                overrideData["img"] = items.length > 0
-                    ? items[0].img
-                    : attributes[0].img;
+                let singleItem = items.length > 0
+                    ? items[0]
+                    : attributes[0];
+
+                overrideData["img"] = singleItem.img;
+
                 if (pileConfig.overrideSingleItemScale) {
                     overrideData["scale"] = pileConfig.singleItemScale;
+                }
+                if(pileConfig.showItemName){
+                    overrideData["name"] = singleItem.name;
                 }
             }
 

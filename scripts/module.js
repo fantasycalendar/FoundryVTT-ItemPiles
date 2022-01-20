@@ -139,7 +139,8 @@ const module = {
         if (!lib.isValidItemPile(token)) return;
         token.data.update({
             "img": lib.getItemPileTokenImage(token),
-            "scale": lib.getItemPileTokenScale(token)
+            "scale": lib.getItemPileTokenScale(token),
+            "name": lib.getItemPileName(token)
         });
     },
 

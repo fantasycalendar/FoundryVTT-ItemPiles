@@ -163,61 +163,13 @@ export function getItemPileData(target){
         inDocument = inDocument?.token;
     }
     try{
-        let data = flagManager.getFlags(inDocument);
+        let data = foundry.utils.duplicate(flagManager.getFlags(inDocument));
         if(!data) return {};
         let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
         return foundry.utils.mergeObject(defaults, data);
     }catch(err){
         return {};
     }
-}
-
-export async function updateItemPile(target, flagData, tokenData){
-
-    const inDocument = getDocument(target);
-
-    if(!tokenData) tokenData = {};
-
-    let documentActor;
-    let documentTokens = [];
-
-    if(inDocument instanceof Actor){
-        documentActor = inDocument;
-        if(inDocument.token) {
-            documentToken.push(inDocument?.token);
-        }else{
-            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
-        }
-    }else{
-        documentActor = inDocument.actor;
-        if(inDocument.isLinked){
-            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
-        }else{
-            documentTokens.push(inDocument);
-        }
-    }
-
-    const updates = documentTokens.map(tokenDocument => {
-        const newTokenData = foundry.utils.mergeObject(tokenData, {
-            "img": getItemPileTokenImage(tokenDocument, flagData),
-            "scale": getItemPileTokenScale(tokenDocument, flagData),
-        });
-        return {
-            "_id": tokenDocument.id,
-            ...newTokenData,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData
-        }
-    });
-
-    await canvas.scene.updateEmbeddedDocuments("Token", updates);
-
-    return documentActor.update({
-        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
-        "token": {
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
-        }
-    });
-
 }
 
 export function getItemPileTokenImage(target, data = false) {
@@ -294,11 +246,35 @@ export function getItemPileTokenScale(target, data) {
 
     const numItems = items.length + attributes.length;
 
-    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.overrideSingleItemScale || numItems > 1) return baseScale;
+    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.overrideSingleItemScale || numItems > 1 || numItems === 0) return baseScale;
 
     return data.singleItemScale;
 
 }
+
+export function getItemPileName(target, data){
+
+    const pileDocument = getDocument(target);
+
+    if (!data) {
+        data = getItemPileData(pileDocument);
+    }
+
+    const items = getValidDocumentItems(pileDocument);
+    const attributes = getItemPileAttributes(pileDocument);
+
+    const numItems = items.length + attributes.length;
+
+    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.showItemName || numItems > 1 || numItems === 0) return pileDocument.name;
+
+    const item = items.length > 0
+        ? items[0]
+        : attributes[0];
+
+    return item.name;
+
+}
+
 
 export function getValidDocumentItems(target, itemFilters = false){
 
@@ -404,4 +380,60 @@ export function getItemPileAttributes(target) {
                 quantity: Number(getProperty(targetActor.data, attribute.path) ?? 1)
             }
         });
+}
+
+function getRelevantTokensAndActor(target){
+
+    const inDocument = getDocument(target);
+
+    let documentActor;
+    let documentTokens = [];
+
+    if(inDocument instanceof Actor){
+        documentActor = inDocument;
+        if(inDocument.token) {
+            documentToken.push(inDocument?.token);
+        }else{
+            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
+        }
+    }else{
+        documentActor = inDocument.actor;
+        if(inDocument.isLinked){
+            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
+        }else{
+            documentTokens.push(inDocument);
+        }
+    }
+
+    return [documentActor, documentTokens]
+
+}
+
+export async function updateItemPileData(target, flagData, tokenData){
+
+    if(!tokenData) tokenData = {};
+
+    const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
+
+    const updates = documentTokens.map(tokenDocument => {
+        const newTokenData = foundry.utils.mergeObject(tokenData, {
+            "img": getItemPileTokenImage(tokenDocument, flagData),
+            "scale": getItemPileTokenScale(tokenDocument, flagData),
+        });
+        return {
+            "_id": tokenDocument.id,
+            ...newTokenData,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData
+        }
+    });
+
+    await canvas.scene.updateEmbeddedDocuments("Token", updates);
+
+    return documentActor.update({
+        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
+        "token": {
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
+        }
+    });
+
 }

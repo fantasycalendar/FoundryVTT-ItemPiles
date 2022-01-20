@@ -1,11 +1,11 @@
 # Item Piles Changelog 
 
-## Version 1.3.0
+## Version 1.2.6
 - Added `Item Filters` setting - now you can more accurately filter items you do not want to show up in item piles, such as natural weapons
 - Updated all supported systems to support the above and added migrations to convert existing settings to the new system - reset your Item Piles module settings to ensure you have the latest system configurations  
 - Removed `Item Type Attribute` and `Item Type Filters` as the above feature covers these cases
-- Further fixes to `ItemPiles.API.addItems`
 - Added debounce to the token image refresh so that it doesn't try to change its image too often
+- Further fixes to `ItemPiles.API.addItems`
 
 ## Version 1.2.5
 - Added missing handlebars method for Foundry v0.8.9

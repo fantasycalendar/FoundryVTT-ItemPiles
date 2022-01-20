@@ -3,6 +3,7 @@ import CONSTANTS from "./constants.js";
 import API from "./api.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import chatHandler from "./chathandler.js";
+import flagManager from "./flagManager.js";
 
 export const SOCKET_HANDLERS = {
     /**
@@ -10,6 +11,7 @@ export const SOCKET_HANDLERS = {
      */
     CALL_HOOK: "callHook",
     PICKUP_CHAT_MESSAGE: "pickupChatMessage",
+
 
     /**
      * Item pile sockets
@@ -21,6 +23,7 @@ export const SOCKET_HANDLERS = {
     TURN_INTO_PILE: "turnIntoPiles",
     REVERT_FROM_PILE: "revertFromPiles",
     REFRESH_PILE: "refreshItemPile",
+    MIGRATE_PILE: "migrateItemPileFlags",
 
     /**
      * UI sockets
@@ -68,6 +71,7 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.TURN_INTO_PILE, (...args) => API._turnTokensIntoItemPiles(...args))
     itemPileSocket.register(SOCKET_HANDLERS.REVERT_FROM_PILE, (...args) => API._revertTokensFromItemPiles(...args))
     itemPileSocket.register(SOCKET_HANDLERS.REFRESH_PILE, (...args) => API._refreshItemPile(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.MIGRATE_PILE, (...args) => flagManager.addDocumentToMigrate(...args))
 
     /**
      * UI sockets
@@ -121,7 +125,14 @@ export const isPileInventoryOpenForOthers = {
 
         itemPileSocket.executeForOthers(SOCKET_HANDLERS.QUERY_PILE_INVENTORY_OPEN, game.user.id, lib.getUuid(inPile));
 
-        setTimeout(this.resolve, 200);
+        if(this.usersToRespond.size > 0) {
+            setTimeout(this.resolve, 200);
+        }else{
+            this.resolve(false);
+            this.usersToRespond = new Set();
+            this.isOpen = false;
+            this.resolve = () => {};
+        }
 
         return promise;
     },
@@ -138,8 +149,7 @@ export const isPileInventoryOpenForOthers = {
         this.resolve(this.isOpen);
         this.usersToRespond = new Set();
         this.isOpen = false;
-        this.resolve = () => {
-        };
+        this.resolve = () => {};
     }
 
 }

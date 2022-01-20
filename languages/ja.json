@@ -5,9 +5,9 @@
             "Title": "お宝の中身",
             "AsActor": "{actorName}としてお宝を確認中",
             "NoActor": "選択中のコマが居ない状態で中身を確認しています。アイテムを取得する先が存在ませんのでアイテムの取得ができません。",
-            "TakeAll": "すべて取得",
             "Empty": "このお宝は空です",
             "Destroyed": "このお宝はもはや存在せず……",
+            "TakeAll": "すべて取得",
             "Take": "取得",
             "Close": "閉じる",
             "Leave": "離れる"
@@ -51,54 +51,74 @@
             "Title": "参照データ設定",
             "Explanation": "お宝として指定されたコマから取得可能なリソースや内部データをここで定義できます。例えばD&D5版の場合、所持しているGPの数は\"actor.data.data.currency.gp\"に保存されています。\"金貨\"という名前とともに\"data.currency.gp\"のデータパスを設定してあげればお宝からGPを取得可能になります。",
             "Name": "データ名",
-            "AttributePath": "データパス",
             "Icon": "データアイコン",
             "AddNew": "新規データ追加",
             "Submit": "データ追加"
         },
 
+        "FilterEditor": {
+            "Title": "Item Filters Editor",
+            "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
+            "Filters": "Filters",
+            "AddNew": "Add new filter",
+            "Submit": "Submit Filters"
+        },
+
+        "AttributePath": "データパス",
+
         "Defaults": {
             "Title": "Item Pile（お宝）設定",
             "Configure": "お宝",
-            "MainSettings": "全体設定",
-            "SingleItemSettings": "単体設定",
-            "ContainerSettings": "コンテナ設定",
             "Update": "お宝更新",
-            "EnabledPile": "有効化",
-            "EnabledPileExplanation": "このキャラクターがお宝として振る舞うかどうかを設定します。",
-            "InspectItems": "アイテム詳細表示",
-            "InspectItemsExplanation": "アイテム名をクリックすると、そのアイテムの詳細が表示されます。",
-            "Distance": "操作可能範囲",
-            "GridUnits": "グリッド単位（空で無限）",
-            "ItemTypeFilter": "アイテム種別フィルタ",
-            "ItemTypeFilterExplanation": "この種別のアイテムは",
-            "Macro": "操作時のマクロ",
-            "MacroExplanation": "このお宝を誰かが操作したときにマクロを実行します（効果音やその他の挙動を自分で追加したい時）",
-            "MacroPlaceholder": "マクロ名",
-            "OverrideAttributes": "参照データ上書き",
-            "OverrideAttributesExplanation": "ここを設定すればデフォルト以外のデータを参照し、中身を取得できるようになります。",
-            "ConfigureOverrideAttributes": "参照データ設定",
-            "DeleteWhenEmpty": "空のお宝を自動削除",
-            "DeleteWhenEmptyExplanation": "中身が空になったら、お宝のコマがシーン上から消滅します。",
-            "DeleteWhenEmptyDefault": "デフォルト設定",
-            "DeleteWhenEmptyYes": "はい、空になったら削除してください",
-            "DeleteWhenEmptyNo": "いいえ、空になっても削除しないでください",
-            "DisplayOne": "単体時、アイテム画像を表示",
-            "DisplayOneExplanation": "お宝の中身が単体のアイテムの場合、そのアイテムの画像がお宝の画像そのものになります。",
-            "OverrideSingleItemScale": "単体アイテムのコマサイズ調整",
-            "SingleItemScale": "単体アイテムコマサイズ",
-            "DisplayOneContainerWarning": "警告：\"単体時、アイテム画像を表示\"と\"コンテナである\"の両方の設定が有効化されています。この場合、コンテナ画像のほうが優先されますのでご注意ください。",
-            "IsContainer": "コンテナである",
-            "Locked": "ロックされている",
-            "Closed": "閉まっている",
-            "ClosedImagePath": "閉まっている時の画像",
-            "EmptyImagePath": "空の時の画像",
-            "OpenedImagePath": "開いている時の画像",
-            "LockedImagePath": "ロック中の画像",
-            "CloseSoundPath": "閉めた時の効果音",
-            "OpenSoundPath": "開いた時の効果音",
-            "LockedSoundPath": "ロック中の効果音"
+
+            "Main": {
+                "Title": "全体設定",
+                "EnabledPile": "有効化",
+                "EnabledPileExplanation": "このキャラクターがお宝として振る舞うかどうかを設定します。",
+                "InspectItems": "アイテム詳細表示",
+                "InspectItemsExplanation": "アイテム名をクリックすると、そのアイテムの詳細が表示されます。",
+                "Distance": "操作可能範囲",
+                "GridUnits": "グリッド単位（空で無限）",
+                "Macro": "操作時のマクロ",
+                "MacroExplanation": "このお宝を誰かが操作したときにマクロを実行します（効果音やその他の挙動を自分で追加したい時）",
+                "MacroPlaceholder": "マクロ名",
+                "DeleteWhenEmpty": "空のお宝を自動削除",
+                "DeleteWhenEmptyExplanation": "中身が空になったら、お宝のコマがシーン上から消滅します。",
+                "DeleteWhenEmptyDefault": "デフォルト設定",
+                "DeleteWhenEmptyYes": "はい、空になったら削除してください",
+                "DeleteWhenEmptyNo": "いいえ、空になっても削除しないでください",
+                "OverrideAttributes": "参照データ上書き",
+                "OverrideAttributesExplanation": "ここを設定すればデフォルト以外のデータを参照し、中身を取得できるようになります。",
+                "ConfigureOverrideAttributes": "参照データ設定",
+                "OverrideItemFilters": "Override Item Filters",
+                "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
+                "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+            },
+
+            "SingleItem": {
+                "Title": "単体設定",
+                "DisplayOneContainerWarning": "警告：\"単体時、アイテム画像を表示\"と\"コンテナである\"の両方の設定が有効化されています。この場合、コンテナ画像のほうが優先されますのでご注意ください。",
+                "DisplayOne": "単体時、アイテム画像を表示",
+                "DisplayOneExplanation": "お宝の中身が単体のアイテムの場合、そのアイテムの画像がお宝の画像そのものになります。",
+                "OverrideScale": "単体アイテムのコマサイズ調整",
+                "Scale": "単体アイテムコマサイズ"
+            },
+
+            "Container": {
+                "Title": "コンテナ設定",
+                "IsContainer": "コンテナである",
+                "Locked": "ロックされている",
+                "Closed": "閉まっている",
+                "ClosedImagePath": "閉まっている時の画像",
+                "EmptyImagePath": "空の時の画像",
+                "OpenedImagePath": "開いている時の画像",
+                "LockedImagePath": "ロック中の画像",
+                "CloseSoundPath": "閉めた時の効果音",
+                "OpenSoundPath": "開いた時の効果音",
+                "LockedSoundPath": "ロック中の効果音"
+            }
         },
+
         "HUD": {
             "ToggleLocked": "ロック切替",
             "ToggleClosed": "開閉",
@@ -140,13 +160,10 @@
                 "Label": "データ設定",
                 "Hint": "（上級設定）ここでは所持金や能力の使用回数など、必ずしもアイテムではないものを設定し中から取得できるようにします。"
             },
-            "ItemType": {
-                "Title": "アイテム種別設定",
-                "Label": "（上級設定）ここではデータ上アイテムとなるものがどんなパスを持つのかを設定します。D&D5版の場合、\"item.data.type\"という形で定義されているので、ここには\"type\"とだけ記入します。"
-            },
-            "ItemTypeFilters": {
-                "Title": "アイテム種別フィルタ",
-                "Label": "お宝として取得不可能なアイテムの種別をここで定義します。それらのアイテムは中に存在しても、ダイアログの中には出現しなくなります。D&D5版では、呪文、特徴、クラスをアイテムとして置きたくないかもしれないので\"spell, feat, class\"を記入します（英語名であることに注意）。"
+            "ItemFilters": {
+                "Title": "Item filters",
+                "Label": "Configure Item Filters",
+                "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
             },
             "OutputToChat": {
                 "Title": "チャット表示",

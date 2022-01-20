@@ -5,9 +5,9 @@
 			"Title": "Inspecter le contenu des piles",
 			"AsActor": "Vous inspectez cette pile en tant que {actorName}",
 			"NoActor": "Vous inspectez le contenu de cette pile sans contrôler un token, ce qui signifie que vous ne pouvez pas y prendre d'objets.",
-			"TakeAll": "Prendre tous les articles",
 			"Empty": "Cette pile est vide.",
 			"Destroyed": "Cette pile n'existe plus.",
+            "TakeAll": "Prendre tous les articles",
 			"Take": "Prendre",
 			"Close": "Fermer",
 			"Leave": "Partir"
@@ -51,53 +51,72 @@
 			"Title": "Éditeur d'attributs dynamiques",
 			"Explanation": "Ici, vous pouvez définir les attributs des personnages qui peuvent être récupérés dans les piles d'objets, comme les devises. Dans D&D5e, les monnaies existent sur les acteurs dans le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Gold Coins\" et le chemin d'attribut \"data.currency.gp\".",
 			"Name": "Nom de l'attribut",
-			"AttributePath": "Chemin de l'attribut",
 			"Icon": "Icône de l'attribut",
 			"AddNew": "Ajouter un nouvel attribut",
 			"Submit": "Soumettre les attributs"
 		},
 
+        "FilterEditor": {
+            "Title": "Item Filters Editor",
+            "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
+            "Filters": "Filters",
+            "AddNew": "Add new filter",
+            "Submit": "Submit Filters"
+        },
+
+        "AttributePath": "Chemin de l'attribut",
+
 		"Defaults": {
-			"Title": "Configuration de la pile d'article",
-			"Configure": "Pile d'articles",
-			"MainSettings": "Paramètres principaux",
-			"SingleItemSettings": "Paramètres objet unique",
-			"ContainerSettings": "Paramètres du conteneur",
-			"Update": "Mise à jour de la pile d'articles",
-			"EnabledPile": "Activé",
-			"EnabledPileExplanation": "Si cela doit agir comme une pile d'articles.",
-            "InspectItems": "Activer l'inspection des éléments",
-            "InspectItemsExplanation": "En cliquant sur les noms des éléments, vous ouvrirez la fiche en question.",
-			"Distance": "Distance d'interaction",
-			"GridUnits": "Unités de grille (laissez vide pour l'infini)",
-			"ItemTypeFilter": "Filtre du type d'article",
-			"ItemTypeFilterExplanation": "Les éléments de ces types ne seront pas affichés dans l'interface de la pile d'éléments, chaque type étant séparé par une virgule. Laissez vide pour utiliser les valeurs par défaut du module.",
-			"Macro": "Macro à l'interaction",
-			"MacroExplanation": "Nom de la macro à exécuter lors de l'interaction avec cette pile.",
-			"MacroPlaceholder": "Insérer le nom de la macro",
-			"OverrideAttributes": "Remplacer les attributs dynamiques",
-			"OverrideAttributesExplanation": "Configurez si cette pile doit être capable d'utiliser d'autres attributs que ceux par défaut.",
-			"ConfigureOverrideAttributes": "Configurer les attributs dynamiques de remplacement",
-			"DeleteWhenEmpty": "Supprimer lorsque vide",
-			"DeleteWhenEmptyExplanation": "Permet à la pile d'objets de s'effacer automatiquement lorsqu'elle est vide.",
-			"DeleteWhenEmptyDefault": "Réglage par défaut du module",
-			"DeleteWhenEmptyYes": "Oui, supprimer quand c'est vide",
-			"DeleteWhenEmptyNo": "Non, ne pas supprimer quand c'est vide",
-			"DisplayOne": "Afficher l'image d'un seul élément",
-			"DisplayOneExplanation": "Si la pile est composée d'un seul objet, l'image du token de la pile sera l'image de l'objet.",
-			"OverrideSingleItemScale": "Remplacer l'échelle du Token objet unique",
-			"SingleItemScale": "Échelle du Token",
-            "DisplayOneContainerWarning": "Attention ! Vous avez activé à la fois les options \"Afficher l'image d'un seul élément\" et \"Est un conteneur\". Dans ce cas, l'images du conteneur est prioritaires.",
-			"IsContainer": "Est un conteneur",
-			"Locked": "est verrouillé",
-			"Closed": "Est fermé",
-			"ClosedImagePath": "Chemin de l'image quand fermé",
-			"EmptyImagePath": "Chemin de l'image quand vide",
-			"OpenedImagePath": "Chemin de l'image quand ouvert",
-			"LockedImagePath": "Chemin de l'image quand verrouillé",
-			"CloseSoundPath": "Chemin du son quand fermé",
-			"OpenSoundPath": "Chemin du son quand ouvert",
-			"LockedSoundPath": "Chemin du son quand verrouillé"
+            "Title": "Configuration de la pile d'article",
+            "Configure": "Pile d'articles",
+            "Update": "Mise à jour de la pile d'articles",
+
+            "Main": {
+                "Title": "Paramètres principaux",
+                "EnabledPile": "Activé",
+                "EnabledPileExplanation": "Si cela doit agir comme une pile d'articles.",
+                "InspectItems": "Activer l'inspection des éléments",
+                "InspectItemsExplanation": "En cliquant sur les noms des éléments, vous ouvrirez la fiche en question.",
+                "Distance": "Distance d'interaction",
+                "GridUnits": "Unités de grille (laissez vide pour l'infini)",
+                "Macro": "Macro à l'interaction",
+                "MacroExplanation": "Nom de la macro à exécuter lors de l'interaction avec cette pile.",
+                "MacroPlaceholder": "Insérer le nom de la macro",
+                "DeleteWhenEmpty": "Supprimer lorsque vide",
+                "DeleteWhenEmptyExplanation": "Permet à la pile d'objets de s'effacer automatiquement lorsqu'elle est vide.",
+                "DeleteWhenEmptyDefault": "Réglage par défaut du module",
+                "DeleteWhenEmptyYes": "Oui, supprimer quand c'est vide",
+                "DeleteWhenEmptyNo": "Non, ne pas supprimer quand c'est vide",
+                "OverrideAttributes": "Remplacer les attributs dynamiques",
+                "OverrideAttributesExplanation": "Configurez si cette pile doit être capable d'utiliser d'autres attributs que ceux par défaut.",
+                "ConfigureOverrideAttributes": "Configurer les attributs dynamiques de remplacement",
+                "OverrideItemFilters": "Override Item Filters",
+                "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
+                "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+            },
+
+            "SingleItem": {
+                "Title": "Paramètres objet unique",
+                "DisplayOneContainerWarning": "Attention ! Vous avez activé à la fois les options \"Afficher l'image d'un seul élément\" et \"Est un conteneur\". Dans ce cas, l'images du conteneur est prioritaires.",
+                "DisplayOne": "Afficher l'image d'un seul élément",
+                "DisplayOneExplanation": "Si la pile est composée d'un seul objet, l'image du token de la pile sera l'image de l'objet.",
+                "OverrideScale": "Remplacer l'échelle du Token objet unique",
+                "Scale": "Échelle du Token"
+            },
+
+            "Container": {
+                "Title": "Paramètres objet unique",
+                "IsContainer": "Est un conteneur",
+                "Locked": "est verrouillé",
+                "Closed": "Est fermé",
+                "ClosedImagePath": "Chemin de l'image quand fermé",
+                "EmptyImagePath": "Chemin de l'image quand vide",
+                "OpenedImagePath": "Chemin de l'image quand ouvert",
+                "LockedImagePath": "Chemin de l'image quand verrouillé",
+                "CloseSoundPath": "Chemin du son quand fermé",
+                "OpenSoundPath": "Chemin du son quand ouvert",
+                "LockedSoundPath": "Chemin du son quand verrouillé"
+            }
 		},
 
 		"HUD": {
@@ -141,14 +160,11 @@
 				"Label": "Configurer les attributs",
 				"Hint": "Ce paramètre définit les attributs qui peuvent être ramassés dans les chemins d'accès aux articles, tels que les devises ou les pouvoirs, qui peuvent ne pas être des articles réels."
 			},
-			"ItemType": {
-				"Title": "Attribut Type d'article",
-				"Label": "Ce paramètre définit le chemin de l'attribut pour déterminer où se trouvent les types d'objets. Dans D&D5e, c'est juste \"type\" parce que le type est défini directement dans \"item.data.type\", parce que chaque objet distingue son type avec cet attribut."
-			},
-			"ItemTypeFilters": {
-				"Title": "Filtres de type d'article",
-				"Label": "Ici, vous pouvez configurer quels types d'objets sont ignorés et ne sont pas listés dans les dialogues de pile d'objets. Par exemple, dans D&D5e, nous ne voulons probablement pas montrer les sorts, les dons et les classes, donc vous mettrez \"sort, dons, classe\"."
-			},
+            "ItemFilters": {
+                "Title": "Item filters",
+                "Label": "Configure Item Filters",
+                "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
+            },
             "OutputToChat": {
                 "Title": "Afficher dans le chat",
                 "Label": "Chaque fois qu'un joueur ramasse des articles d'une pile d'objets, ceci enverra un message indiquant ce qui a été ramassé",

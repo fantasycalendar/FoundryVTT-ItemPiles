@@ -1,5 +1,6 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
+import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 
 const flagManager = {
 
@@ -23,17 +24,15 @@ const flagManager = {
      * @param inDocument
      * @returns {array/boolean}
      */
-    async getFlags(inDocument) {
+    getFlags(inDocument) {
 
-        debugger;
-
-        let pileData = inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        let pileData = inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
 
         if (!pileData) return false;
 
-        let pileVersion = pileData.flagVersion || "1.0.0";
+        const pileVersion = pileData?.flagVersion || "1.0.0";
 
-        if (pileData.flagVersion === this.latestFlagVersion) return pileData;
+        if (pileVersion === this.latestFlagVersion) return pileData;
 
         for (let [version, migration] of Object.entries(this.migrations)) {
 
@@ -45,36 +44,31 @@ const flagManager = {
 
         pileData.flagVersion = this.latestFlagVersion;
 
-        if(lib.isResponsibleGM()){
-            this.addDocumentToMigrate(inDocument, pileData);
-        }
+        itemPileSocket.executeAsGM(SOCKET_HANDLERS.MIGRATE_PILE, lib.getUuid(inDocument), pileData);
 
         return pileData;
 
     },
 
     migrations: {
-        "1.3.0": (inDocument, pileData) => {
-
-            pileData.overrideItemFilters = pileData.itemTypeFilters.length
+        "1.2.6": (inDocument, pileData) => {
+            pileData.overrideItemFilters = pileData?.itemTypeFilters?.length
                 ? pileData.overrideItemFilters = [{
                     path: "type",
                     filters: pileData.itemTypeFilters
                 }] : false;
-
             delete pileData.itemTypeFilters;
 
             return pileData;
         }
     },
 
-    addDocumentToMigrate(inDocument, pileData){
-        const uuid = lib.getUuid(inDocument);
-        this.updateStack.set(uuid, pileData);
+    addDocumentToMigrate(inUuid, pileData){
+        this.updateStack.set(inUuid, pileData);
         this.runUpdates();
     },
 
-    runUpdates: foundry.utils.debounce(this._runUpdates.bind(this), 50),
+    runUpdates: foundry.utils.debounce(() => flagManager._runUpdates(), 100),
 
     async _runUpdates(){
         const stack = Array.from(this.updateStack);
@@ -82,7 +76,8 @@ const flagManager = {
         for(const [uuid, pileData] of stack){
             const pileDocument = await fromUuid(uuid);
             if(!pileDocument) continue;
-            await lib.updateItemPile(pileDocument, pileData);
+            lib.debug(`Updated pile with UUID "${uuid}"`)
+            await lib.updateItemPileData(pileDocument, pileData);
         }
     }
 

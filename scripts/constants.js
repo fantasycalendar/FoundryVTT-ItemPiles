@@ -1,17 +1,26 @@
 const CONSTANTS = {
     MODULE_NAME: "item-piles",
-    FLAG_NAME: "data",
+    PILE_DATA: "data",
+    SHARING_DATA: "sharing",
     PILE_DEFAULTS: {
+        // Core settings
         enabled: false,
         distance: 1,
-        overrideItemFilters: false,
-        overrideAttributes: false,
-        canInspectItems: true,
         macro: "",
         deleteWhenEmpty: "default",
+        canInspectItems: true,
+
+        // Overrides
+        overrideItemFilters: false,
+        overrideAttributes: false,
+
+        // Token settings
         displayOne: false,
+        showItemName: false,
         overrideSingleItemScale: false,
         singleItemScale: 1.0,
+
+        // Container settings
         isContainer: false,
         closed: false,
         locked: false,
@@ -22,7 +31,7 @@ const CONSTANTS = {
         closeSound: "",
         openSound: "",
         lockedSound: "",
-        unlockedSound: "",
+        unlockedSound: ""
     }
 }
 

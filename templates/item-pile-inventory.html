@@ -63,19 +63,9 @@
         {{/if}}
 
         <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
-            {{#if hasRecipient}}
-                {{#unless isEmpty}}
-                <button type="submit" name="takeAll" value="takeAll"><i class="fas fa-download"></i> {{localize "ITEM-PILES.Inspect.TakeAll"}}</button>
-                {{/unless}}
-                {{#unless isDeleted}}
-                {{#if isContainer}}
-                {{#unless overrides.remote}}
-                <button type="submit" name="close" value="close"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Close"}}</button>
-                {{/unless}}
-                {{/if}}
-                {{/unless}}
-            {{/if}}
-            <button type="submit" name="leave" value="leave"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Leave"}}</button>
+            {{#each buttons as |button id|}}
+            <button type="submit" name="{{ button.value }}" value="{{ button.value }}"><i class="{{ button.icon }}"></i> {{ button.text }}</button>
+            {{/each}}
         </footer>
 
     </div>
