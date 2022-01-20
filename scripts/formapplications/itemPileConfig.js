@@ -100,6 +100,9 @@ export class ItemPileConfig extends FormApplication {
             scaleCheckbox.prop('disabled', !isEnabled);
             scaleCheckbox.parent().toggleClass("item-pile-disabled", !isEnabled);
 
+            html.find('input[name="showItemName"]').prop('disabled', !isEnabled);
+            html.find('input[name="showItemName"]').parent().toggleClass("item-pile-disabled", !isEnabled);
+
             html.find(".display-one-warning").css("display", isEnabled && isContainer ? "block" : "none");
             self.setPosition();
         }).change();

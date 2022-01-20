@@ -100,6 +100,14 @@
 
                 <div class="form-group">
                     <label>
+                        {{localize "ITEM-PILES.Defaults.SingleItem.ItemName"}}<br>
+                        <p>{{localize "ITEM-PILES.Defaults.SingleItem.ItemNameExplanation"}}</p>
+                    </label>
+                    <input type="checkbox" name="showItemName" {{checked flagData.showItemName}}/>
+                </div>
+
+                <div class="form-group">
+                    <label>
                         {{localize "ITEM-PILES.Defaults.SingleItem.OverrideScale"}}<br>
                     </label>
                     <input type="checkbox" name="overrideSingleItemScale" {{checked flagData.overrideSingleItemScale}}/>

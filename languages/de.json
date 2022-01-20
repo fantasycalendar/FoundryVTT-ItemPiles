@@ -101,7 +101,9 @@
                 "DisplayOne": "Einzelnes Artikelbild anzeigen",
                 "DisplayOneExplanation": "Besteht der Stapel aus einem einzigen Gegenstand, wird das Bild des Stapels auf das Bild des Gegenstandes gesetzt.",
                 "OverrideScale": "Einzelne Gegenstands-Token-Skalierung außer Kraft setzen",
-                "Scale": "Gegenstands-Token-Skalierung"
+                "Scale": "Gegenstands-Token-Skalierung",
+                "ItemName": "Use Item Name",
+                "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
             },
 
             "Container": {

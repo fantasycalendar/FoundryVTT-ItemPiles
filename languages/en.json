@@ -101,7 +101,9 @@
                 "DisplayOne": "Display Single Item Image",
                 "DisplayOneExplanation": "If the pile is made up of a single item, this sets the pile token's image to be the image of the item.",
                 "OverrideScale": "Override single item token scale",
-                "Scale": "Single item token scale"
+                "Scale": "Single item token scale",
+                "ItemName": "Use Item Name",
+                "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
             },
 
             "Container": {

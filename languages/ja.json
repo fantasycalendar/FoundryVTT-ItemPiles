@@ -101,7 +101,9 @@
                 "DisplayOne": "単体時、アイテム画像を表示",
                 "DisplayOneExplanation": "お宝の中身が単体のアイテムの場合、そのアイテムの画像がお宝の画像そのものになります。",
                 "OverrideScale": "単体アイテムのコマサイズ調整",
-                "Scale": "単体アイテムコマサイズ"
+                "Scale": "単体アイテムコマサイズ",
+                "ItemName": "Use Item Name",
+                "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
             },
 
             "Container": {

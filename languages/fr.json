@@ -101,7 +101,9 @@
                 "DisplayOne": "Afficher l'image d'un seul élément",
                 "DisplayOneExplanation": "Si la pile est composée d'un seul objet, l'image du token de la pile sera l'image de l'objet.",
                 "OverrideScale": "Remplacer l'échelle du Token objet unique",
-                "Scale": "Échelle du Token"
+                "Scale": "Échelle du Token",
+                "ItemName": "Use Item Name",
+                "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
             },
 
             "Container": {
