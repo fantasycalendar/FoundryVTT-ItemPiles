@@ -1,14 +1,15 @@
 import CONSTANTS from "./constants.js";
-import registerSettings, { checkSystem, migrateSettings, registerHandlebarHelpers } from "./settings.js";
-import { registerSocket } from "./socket.js";
+import HOOKS from "./hooks.js";
+
+import chatHandler from "./chathandler.js";
 import API from "./api.js";
 import * as lib from "./lib/lib.js";
+
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
+import { registerSettings, checkSystem, migrateSettings, registerHandlebarHelpers } from "./settings.js";
+import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
-import HOOKS from "./hooks.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
-import chatHandler from "./chathandler.js";
-import { isResponsibleGM } from "./lib/lib.js";
 
 Hooks.once("init", () => {
 
@@ -78,6 +79,7 @@ Hooks.once("ready", () => {
 });
 
 const debounceManager = {
+
     debounces: {},
 
     setDebounce(id, method){
@@ -106,7 +108,7 @@ const module = {
         return debounceManager.setDebounce(targetUuid, async function(uuid){
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
             await API._rerenderItemPileInventoryApplication(uuid, deleted);
-            if (deleted || !isResponsibleGM()) return;
+            if (deleted || !lib.isResponsibleGM()) return;
             return API._refreshItemPile(uuid);
         })(targetUuid);
     },
@@ -120,7 +122,7 @@ const module = {
         return debounceManager.setDebounce(targetUuid, async function(uuid){
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
             await API._rerenderItemPileInventoryApplication(uuid, deleted);
-            if (deleted || !isResponsibleGM()) return;
+            if (deleted || !lib.isResponsibleGM()) return;
             return API._refreshItemPile(uuid);
         })(targetUuid);
     },
@@ -129,7 +131,7 @@ const module = {
         const tokens = [...canvas.tokens.placeables].map(token => token.document);
         for (const doc of tokens) {
             await API._initializeItemPile(doc);
-            if(isResponsibleGM()) {
+            if(lib.isResponsibleGM()) {
                 await API._refreshItemPile(doc.uuid);
             }
         }
@@ -137,10 +139,12 @@ const module = {
 
     async _preCreatePile(token){
         if (!lib.isValidItemPile(token)) return;
+        const itemPileConfig = lib.getItemPileData(token.actor)
         token.data.update({
-            "img": lib.getItemPileTokenImage(token),
-            "scale": lib.getItemPileTokenScale(token),
-            "name": lib.getItemPileName(token)
+            "img": lib.getItemPileTokenImage(token, itemPileConfig),
+            "scale": lib.getItemPileTokenScale(token, itemPileConfig),
+            "name": lib.getItemPileName(token, itemPileConfig),
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: itemPileConfig
         });
     },
 

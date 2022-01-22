@@ -37,7 +37,7 @@ function defaultSettings(apply = false) {
     }
 }
 
-export default function registerSettings() {
+export function registerSettings() {
 
     game.settings.registerMenu(CONSTANTS.MODULE_NAME, "resetAllSettings", {
         name: "ITEM-PILES.Setting.Reset.Title",

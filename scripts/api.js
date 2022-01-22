@@ -2066,38 +2066,6 @@ export default class API {
 
             overrideData['actorData'] = { items }
 
-            const pileConfig = lib.getItemPileData(pileActor);
-            const attributes = lib.getItemPileAttributes(pileActor);
-
-            const numItems = items.length + attributes.length;
-
-            if (pileConfig.displayOne && numItems === 1) {
-                let singleItem = items.length > 0
-                    ? items[0]
-                    : attributes[0];
-
-                overrideData["img"] = singleItem.img;
-
-                if (pileConfig.overrideSingleItemScale) {
-                    overrideData["scale"] = pileConfig.singleItemScale;
-                }
-                if(pileConfig.showItemName){
-                    overrideData["name"] = singleItem.name;
-                }
-            }
-
-            if (pileConfig.isContainer) {
-
-                overrideData["img"] = lib.getItemPileTokenImage(pileActor);
-                overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
-
-            }
-
-        } else {
-
-            overrideData["img"] = lib.getItemPileTokenImage(pileActor);
-            overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
-
         }
 
         const tokenData = await pileActor.getTokenData(overrideData);

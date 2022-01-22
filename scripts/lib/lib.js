@@ -157,10 +157,8 @@ export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
 
 export function getItemPileData(target){
     let inDocument = getDocument(target);
-    if(inDocument instanceof TokenDocument && inDocument?.data?.actorLink){
+    if(inDocument instanceof TokenDocument){
         inDocument = inDocument?.actor;
-    }else if(inDocument instanceof Actor && inDocument.token){
-        inDocument = inDocument?.token;
     }
     try{
         let data = foundry.utils.duplicate(flagManager.getFlags(inDocument));

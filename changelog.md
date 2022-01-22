@@ -6,6 +6,7 @@
 - Removed `Item Type Attribute` and `Item Type Filters` as the above feature covers these cases
 - Added debounce to the token image refresh so that it doesn't try to change its image too often
 - Further fixes to `ItemPiles.API.addItems`
+- Fixed unlinked item piles not retaining their setup when created from the actors directory
 
 ## Version 1.2.5
 - Added missing handlebars method for Foundry v0.8.9

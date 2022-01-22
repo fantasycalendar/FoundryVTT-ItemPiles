@@ -57,11 +57,11 @@
         },
 
         "FilterEditor": {
-            "Title": "Item Filters Editor",
-            "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
-            "Filters": "Filters",
-            "AddNew": "Add new filter",
-            "Submit": "Submit Filters"
+            "Title": "アイテムフィルター設定",
+            "Explanation": "ここではお宝の中に表示されないアイテムの種別を設定できます。設定したパスからアイテムの「種別」が定められ、UI上に非表示になります。",
+            "Filters": "フィルター",
+            "AddNew": "新規フィルター追加",
+            "Submit": "フィルター確定"
         },
 
         "AttributePath": "データパス",
@@ -90,9 +90,9 @@
                 "OverrideAttributes": "参照データ上書き",
                 "OverrideAttributesExplanation": "ここを設定すればデフォルト以外のデータを参照し、中身を取得できるようになります。",
                 "ConfigureOverrideAttributes": "参照データ設定",
-                "OverrideItemFilters": "Override Item Filters",
-                "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
-                "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+                "OverrideItemFilters": "アイテムフィルター上書き",
+                "OverrideItemFiltersExplanation": "設定を上書きし、デフォルトのアイテム種別以外を受け取れるようになります。",
+                "ConfigureOverrideItemFilters": "アイテムフィルター上書き設定"
             },
 
             "SingleItem": {
@@ -163,9 +163,9 @@
                 "Hint": "（上級設定）ここでは所持金や能力の使用回数など、必ずしもアイテムではないものを設定し中から取得できるようにします。"
             },
             "ItemFilters": {
-                "Title": "Item filters",
-                "Label": "Configure Item Filters",
-                "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
+                "Title": "アイテムフィルター",
+                "Label": "アイテムフィルター設定",
+                "Hint": "ここではお宝の中に表示されないアイテムの種別を設定できます。"
             },
             "OutputToChat": {
                 "Title": "チャット表示",
