@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.2.7
+- Fixed newly created item piles would not update their image, scale, or name 
+
 ## Version 1.2.6
 - Added `Item Filters` setting - now you can more accurately filter items you do not want to show up in item piles, such as natural weapons
 - Updated all supported systems to support the above and added migrations to convert existing settings to the new system - reset your Item Piles module settings to ensure you have the latest system configurations  
