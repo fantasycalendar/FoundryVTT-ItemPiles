@@ -168,7 +168,6 @@ export class ItemPileConfig extends FormApplication {
         promise.then(newSettings => {
             this.itemFiltersEditor = false;
             if(newSettings) {
-                console.log(newSettings)
                 this.pileData.overrideItemFilters = newSettings;
             }
         });
