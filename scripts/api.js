@@ -2064,7 +2064,9 @@ export default class API {
 
             items = items ? items.map(itemData => itemData.item ?? itemData) : {};
 
-            overrideData['actorData'] = { items }
+            overrideData['actorData'] = {
+                items: items
+            }
 
         }
 

@@ -19,7 +19,6 @@ Hooks.once("init", () => {
 
     Hooks.once("socketlib.ready", registerSocket);
     Hooks.on("canvasReady", module._canvasReady);
-    Hooks.on("preCreateToken", module._preCreatePile);
     Hooks.on("createToken", module._createPile);
     Hooks.on("deleteToken", module._deletePile);
     Hooks.on("dropCanvasData", module._dropCanvasData);
@@ -137,21 +136,17 @@ const module = {
         }
     },
 
-    async _preCreatePile(token){
-        if (!lib.isValidItemPile(token)) return;
-        const itemPileConfig = lib.getItemPileData(token.actor)
-        token.data.update({
-            "img": lib.getItemPileTokenImage(token, itemPileConfig),
-            "scale": lib.getItemPileTokenScale(token, itemPileConfig),
-            "name": lib.getItemPileName(token, itemPileConfig),
+    async _createPile(tokenDoc) {
+        if (!lib.isValidItemPile(tokenDoc)) return;
+        const itemPileConfig = lib.getItemPileData(tokenDoc.actor)
+        Hooks.callAll(HOOKS.PILE.CREATE, tokenDoc, itemPileConfig);
+        await tokenDoc.update({
+            "img": lib.getItemPileTokenImage(tokenDoc, itemPileConfig),
+            "scale": lib.getItemPileTokenScale(tokenDoc, itemPileConfig),
+            "name": lib.getItemPileName(tokenDoc, itemPileConfig),
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: itemPileConfig
         });
-    },
-
-    async _createPile(doc) {
-        if (!lib.isValidItemPile(doc)) return;
-        Hooks.callAll(HOOKS.PILE.CREATE, doc, lib.getItemPileData(doc));
-        await API._initializeItemPile(doc);
+        await API._initializeItemPile(tokenDoc);
     },
 
     async _deletePile(doc) {
