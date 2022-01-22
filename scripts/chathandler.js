@@ -123,7 +123,7 @@ const chatHandler = {
         const targetActor = target?.actor ?? target;
 
         for(let message of messages){
-            const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+            const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
             if(!flags || flags.interactionId !== interactionId) continue;
             return this._updateExistingMessage(message, sourceActor, targetActor, items, attributes)
         }
@@ -141,7 +141,7 @@ const chatHandler = {
             content: chatCardHtml,
             flavor: "Item Piles",
             speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: {
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: {
                 interactionId: interactionId,
                 items: items,
                 attributes: attributes
@@ -183,7 +183,7 @@ const chatHandler = {
 
     async _updateExistingMessage(message, sourceActor, targetActor, items, attributes) {
 
-        const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
 
         const newItems = this._matchEntries(flags.items, items);
         const newAttributes = this._matchEntries(flags.attributes, attributes);
@@ -199,10 +199,10 @@ const chatHandler = {
             attributes: newAttributes
         });
 
-        message.update({
+        return message.update({
             content: chatCardHtml,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}.items`]:  newItems,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}.attributes`]:  newAttributes,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.items`]:  newItems,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.attributes`]:  newAttributes,
         });
 
     }

@@ -2,10 +2,6 @@
 
     <div class="item-piles-item-drop-container">
 
-        <div id="item-piles-preview-container">
-            <img id="item-piles-preview-image">
-        </div>
-
         {{#if hasRecipient}}
         <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}</p>
         {{else}}
@@ -44,10 +40,8 @@
                     {{/if}}
                 </div>
                 {{/each}}
-                {{#if hasAttributes}}
-                {{#if hasItems}}
+                {{#if hasThings}}
                 <hr>
-                {{/if}}
                 {{/if}}
                 {{#each attributes as |attribute id|}}
                 <div class="flexrow item-piles-item-row item-piles-attribute-row" data-attribute-name="{{attribute.name}}" data-attribute-path="{{attribute.path}}">
@@ -69,19 +63,9 @@
         {{/if}}
 
         <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
-            {{#if hasRecipient}}
-                {{#unless isEmpty}}
-                <button type="submit" name="takeAll" value="takeAll"><i class="fas fa-download"></i> {{localize "ITEM-PILES.Inspect.TakeAll"}}</button>
-                {{/unless}}
-                {{#unless isDeleted}}
-                {{#if isContainer}}
-                {{#unless overrides.remote}}
-                <button type="submit" name="close" value="close"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Close"}}</button>
-                {{/unless}}
-                {{/if}}
-                {{/unless}}
-            {{/if}}
-            <button type="submit" name="leave" value="leave"><i class="fas fa-times"></i> {{localize "ITEM-PILES.Inspect.Leave"}}</button>
+            {{#each buttons as |button id|}}
+            <button type="submit" name="{{ button.value }}" value="{{ button.value }}"><i class="{{ button.icon }}"></i> {{ button.text }}</button>
+            {{/each}}
         </footer>
 
     </div>

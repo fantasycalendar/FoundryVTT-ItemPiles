@@ -22,6 +22,7 @@ export class ItemPileInventory extends FormApplication {
         this.deleted = false;
         this.interactionId = randomID();
         this.overrides = overrides;
+        this.pileData = lib.getItemPileData(this.pile);
         Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient);
     }
 
@@ -65,6 +66,7 @@ export class ItemPileInventory extends FormApplication {
 
         const app = ItemPileInventory.getActiveAppFromPile(pileUuid, recipientUuid);
         if (app) {
+            app.pileData = lib.getItemPileData(app.pile);
             return app.render(true, { focus: true });
         }
 
@@ -102,7 +104,7 @@ export class ItemPileInventory extends FormApplication {
                 id = foundItem.id;
                 name = foundItem.name;
                 img = foundItem.data.img;
-                type = getProperty(foundItem.data, API.ITEM_TYPE_ATTRIBUTE);
+                type = foundItem.data.type;
                 quantity = Number(getProperty(foundItem.data, API.ITEM_QUANTITY_ATTRIBUTE));
             }else{
                 itemQuantity = 0;
@@ -193,27 +195,56 @@ export class ItemPileInventory extends FormApplication {
     getData(options) {
         const data = super.getData(options);
 
-        data.overrides = this.overrides;
-
         data.isDeleted = this.deleted;
 
         data.name = !data.isDeleted ? this.pile.name : "Nonexistent pile";
+
+        if (this.deleted) {
+            return data;
+        }
+
+        data.overrides = this.overrides;
 
         data.hasRecipient = !!this.recipient;
         data.recipient = this.recipient;
         data.isContainer = false;
 
-        if (!data.isDeleted) {
-            const pileData = lib.getItemPileData(this.pile);
-            data.isContainer = pileData.isContainer;
-            data.items = this.items.length ? this.items : this.getPileItemData();
-            data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
-            data.hasItems = API.getItemPileItems(this.pile).length > 0;
-            data.hasAttributes = data?.attributes?.length;
-            data.canInspectItems = pileData.canInspectItems || game.user.isGM;
-        }
+        const pileData = lib.getItemPileData(this.pile);
+        data.isContainer = pileData.isContainer;
+        data.items = this.items.length ? this.items : this.getPileItemData();
+        data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
+        data.hasItems = API.getItemPileItems(this.pile).length > 0;
+        data.hasAttributes = data?.attributes?.length;
+        data.canInspectItems = pileData.canInspectItems || game.user.isGM;
+
+        data.hasThings = data?.hasItems || data?.hasAttributes;
 
         data.isEmpty = lib.isItemPileEmpty(this.pile);
+
+        data.buttons = [];
+
+        if(data.hasRecipient){
+
+            data.buttons.push({
+                value: "takeAll",
+                icon: "fas fa-fist-raised",
+                text: game.i18n.localize("ITEM-PILES.Inspect.TakeAll")
+            });
+
+            if(pileData.isContainer && !this.overrides.remote){
+                data.buttons.push({
+                    value: "close",
+                    icon: "fas fa-box",
+                    text: game.i18n.localize("ITEM-PILES.Inspect.Close")
+                })
+            }
+        }
+
+        data.buttons.push({
+            value: "leave",
+            icon: "fas fa-sign-out-alt",
+            text: game.i18n.localize("ITEM-PILES.Inspect.Leave")
+        });
 
         return data;
     }
@@ -301,11 +332,12 @@ export class ItemPileInventory extends FormApplication {
     async _updateObject(event, formData) {
 
         if (event.submitter.value === "takeAll") {
-            return await API.transferEverything(this.pile, this.recipient, { interactionId: this.interactionId });
+            API.transferEverything(this.pile, this.recipient, { interactionId: this.interactionId });
+            return;
         }
 
         if (event.submitter.value === "close") {
-            return isPileInventoryOpenForOthers.query(this.pile).then((result) => {
+            isPileInventoryOpenForOthers.query(this.pile).then((result) => {
                 if (!result) API.closeItemPile(this.pile, this.recipient);
             });
         }

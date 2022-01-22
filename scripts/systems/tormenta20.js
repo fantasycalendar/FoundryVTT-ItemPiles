@@ -6,8 +6,7 @@ export default {
     "ITEM_QUANTITY_ATTRIBUTE": "data.qtd",
 
     // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
-    "ITEM_TYPE_ATTRIBUTE": "type",
-    "ITEM_TYPE_FILTERS": "",
+    "ITEM_FILTERS": [],
 
     // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
     "DYNAMIC_ATTRIBUTES": [

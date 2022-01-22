@@ -2,6 +2,7 @@ import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import { ItemPileAttributeEditor } from "./itemPileAttributeEditor.js";
 import * as lib from "../lib/lib.js";
+import { ItemPileFiltersEditor } from "./itemPileFiltersEditor.js";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -10,6 +11,7 @@ export class ItemPileConfig extends FormApplication {
         this.document = actor?.token ?? actor;
         this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(this.document));
         this.attributeEditor = false;
+        this.itemFiltersEditor = false;
     }
 
     /** @inheritdoc */
@@ -43,9 +45,6 @@ export class ItemPileConfig extends FormApplication {
     async getData(options) {
         let data = super.getData(options);
         data.flagData = foundry.utils.mergeObject(foundry.utils.duplicate(data), foundry.utils.duplicate(this.pileData));
-        data.defaultItemTypeFilters = API.ITEM_TYPE_FILTERS.length
-            ? "Defaults: " + Array.from(API.ITEM_TYPE_FILTERS).join(', ')
-            : "Input item type filters...";
         return data;
     }
 
@@ -56,6 +55,7 @@ export class ItemPileConfig extends FormApplication {
         const scaleCheckbox = html.find('input[name="overrideSingleItemScale"]');
         const displayOneCheckbox = html.find('input[name="displayOne"]');
         const containerCheckbox = html.find('input[name="isContainer"]');
+        const overrideItemFiltersEnabledCheckbox = html.find('.item-pile-config-override-item-filters-checkbox');
         const overrideAttributesEnabledCheckbox = html.find('.item-pile-config-override-attributes-checkbox');
 
         const slider = html.find(".item-piles-scaleRange");
@@ -100,6 +100,9 @@ export class ItemPileConfig extends FormApplication {
             scaleCheckbox.prop('disabled', !isEnabled);
             scaleCheckbox.parent().toggleClass("item-pile-disabled", !isEnabled);
 
+            html.find('input[name="showItemName"]').prop('disabled', !isEnabled);
+            html.find('input[name="showItemName"]').parent().toggleClass("item-pile-disabled", !isEnabled);
+
             html.find(".display-one-warning").css("display", isEnabled && isContainer ? "block" : "none");
             self.setPosition();
         }).change();
@@ -115,10 +118,23 @@ export class ItemPileConfig extends FormApplication {
             if (isChecked) {
                 self.pileData.overrideAttributes = game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
             }
+            html.find(".item-pile-config-configure-override-attributes").prop('disabled', !isChecked);
         })
 
         html.find(".item-pile-config-configure-override-attributes").click(function () {
             self.showAttributeEditor();
+        })
+
+        overrideItemFiltersEnabledCheckbox.change(function() {
+            let isChecked = $(this).is(":checked");
+            if (isChecked) {
+                self.pileData.overrideItemFilters = game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters");
+            }
+            html.find(".item-pile-config-configure-override-item-filters").prop('disabled', !isChecked);
+        })
+
+        html.find(".item-pile-config-configure-override-item-filters").click(function () {
+            self.showItemFiltersEditor();
         })
 
         slider.on("input", function () {
@@ -137,7 +153,24 @@ export class ItemPileConfig extends FormApplication {
         this.attributeEditor = UI;
         promise.then(newSettings => {
             this.attributeEditor = false;
-            this.pileData.overrideAttributes = newSettings;
+            if(newSettings) {
+                this.pileData.overrideAttributes = newSettings;
+            }
+        });
+    }
+
+    async showItemFiltersEditor() {
+        if (this.itemFiltersEditor) {
+            return this.itemFiltersEditor.render(false, { focus: true });
+        }
+        const [promise, UI] = ItemPileFiltersEditor.showForPile(this.pileData.overrideItemFilters);
+        this.itemFiltersEditor = UI;
+        promise.then(newSettings => {
+            this.itemFiltersEditor = false;
+            if(newSettings) {
+                console.log(newSettings)
+                this.pileData.overrideItemFilters = newSettings;
+            }
         });
     }
 
@@ -147,9 +180,11 @@ export class ItemPileConfig extends FormApplication {
 
         const data = foundry.utils.mergeObject(defaults, formData);
 
-        const checked = this.element.find('.item-pile-config-override-attributes-checkbox').is(":checked");
+        const overrideAttributesChecked = this.element.find('.item-pile-config-override-attributes-checkbox').is(":checked");
+        data.overrideAttributes = overrideAttributesChecked ? this.pileData.overrideAttributes : false;
 
-        data.overrideAttributes = checked ? this.pileData.overrideAttributes : false;
+        const overrideItemFiltersChecked = this.element.find('.item-pile-config-override-item-filters-checkbox').is(":checked");
+        data.overrideItemFilters = overrideItemFiltersChecked ? this.pileData.overrideItemFilters : false;
 
         data.deleteWhenEmpty = {
             "default": "default",
@@ -167,6 +202,9 @@ export class ItemPileConfig extends FormApplication {
         super.close(...args);
         if (this.attributeEditor) {
             this.attributeEditor.close();
+        }
+        if (this.itemFiltersEditor) {
+            this.itemFiltersEditor.close();
         }
     }
 

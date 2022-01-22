@@ -1,5 +1,6 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
+import flagManager from "../flagManager.js";
 
 export function isGMConnected(){
     return !!Array.from(game.users).find(user => user.isGM && user.active);
@@ -156,67 +157,17 @@ export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
 
 export function getItemPileData(target){
     let inDocument = getDocument(target);
-    if(inDocument instanceof TokenDocument && inDocument?.data?.actorLink){
+    if(inDocument instanceof TokenDocument){
         inDocument = inDocument?.actor;
-    }else if(inDocument instanceof Actor && inDocument.token){
-        inDocument = inDocument?.token;
     }
     try{
-        let data = inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.FLAG_NAME);
+        let data = foundry.utils.duplicate(flagManager.getFlags(inDocument));
         if(!data) return {};
         let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
         return foundry.utils.mergeObject(defaults, data);
     }catch(err){
         return {};
     }
-}
-
-export async function updateItemPile(target, flagData, tokenData){
-
-    const inDocument = getDocument(target);
-
-    if(!tokenData) tokenData = {};
-
-    let documentActor;
-    let documentTokens = [];
-
-    if(inDocument instanceof Actor){
-        documentActor = inDocument;
-        if(inDocument.token) {
-            documentToken.push(inDocument?.token);
-        }else{
-            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
-        }
-    }else{
-        documentActor = inDocument.actor;
-        if(inDocument.isLinked){
-            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
-        }else{
-            documentTokens.push(inDocument);
-        }
-    }
-
-    const updates = documentTokens.map(tokenDocument => {
-        const newTokenData = foundry.utils.mergeObject(tokenData, {
-            "img": getItemPileTokenImage(tokenDocument, flagData),
-            "scale": getItemPileTokenScale(tokenDocument, flagData),
-        });
-        return {
-            "_id": tokenDocument.id,
-            ...newTokenData,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData
-        }
-    });
-
-    await canvas.scene.updateEmbeddedDocuments("Token", updates);
-
-    return documentActor.update({
-        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
-        "token": {
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: flagData,
-        }
-    });
-
 }
 
 export function getItemPileTokenImage(target, data = false) {
@@ -238,7 +189,7 @@ export function getItemPileTokenImage(target, data = false) {
 
     if(!isValidItemPile(pileDocument)) return originalImg;
 
-    const items = getDocumentItems(pileDocument);
+    const items = getValidDocumentItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
@@ -288,47 +239,104 @@ export function getItemPileTokenScale(target, data) {
         baseScale = pileDocument.data.token.scale;
     }
 
-    const items = getDocumentItems(pileDocument);
+    const items = getValidDocumentItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
 
-    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.overrideSingleItemScale || numItems > 1) return baseScale;
+    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.overrideSingleItemScale || numItems > 1 || numItems === 0) return baseScale;
 
     return data.singleItemScale;
 
 }
 
-export function getDocumentItems(target, itemTypeFilters = false){
+export function getItemPileName(target, data){
+
+    const pileDocument = getDocument(target);
+
+    if (!data) {
+        data = getItemPileData(pileDocument);
+    }
+
+    const items = getValidDocumentItems(pileDocument);
+    const attributes = getItemPileAttributes(pileDocument);
+
+    const numItems = items.length + attributes.length;
+
+    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.showItemName || numItems > 1 || numItems === 0) return pileDocument.name;
+
+    const item = items.length > 0
+        ? items[0]
+        : attributes[0];
+
+    return item.name;
+
+}
+
+
+export function getValidDocumentItems(target, itemFilters = false){
+
+    const pileItemFilters = itemFilters || getDocumentItemFilters(target);
 
     const inDocument = getDocument(target);
-
-    const pileItemFilters = Array.isArray(itemTypeFilters)
-        ? new Set(itemTypeFilters)
-        : new Set(getDocumentItemTypeFilters(target));
-
     const targetActor = inDocument instanceof TokenDocument
         ? inDocument.actor
         : inDocument;
 
-    return Array.from(targetActor.items).filter(item => {
-        const itemType = getProperty(item.data, API.ITEM_TYPE_ATTRIBUTE);
-        return !pileItemFilters.has(itemType);
-    })
+    return Array.from(targetActor.items).filter(item => !isItemInvalid(inDocument, item, pileItemFilters));
+
+}
+
+export function isActiveGM(user) {
+    return user.active && user.isGM;
+}
+
+export function isResponsibleGM() {
+    if (!game.user.isGM) return false;
+    const connectedGMs = game.users.filter(isActiveGM);
+    return !connectedGMs.some(other => other.data._id < game.user.data._id);
+}
+
+export function isItemInvalid(target, item, itemFilters = false){
+    const pileItemFilters = itemFilters || getDocumentItemFilters(target);
+    const itemData = item instanceof Item ? item.data : item;
+    for(const filter of pileItemFilters){
+        if(!hasProperty(itemData, filter.path)) continue;
+        const attributeValue = getProperty(itemData, filter.path);
+        if (filter.filters.has(attributeValue)) {
+            return attributeValue;
+        }
+    }
+    return false;
+}
+
+export function getDocumentItemFilters(target){
+    if(!target) return API.ITEM_FILTERS;
+    const inDocument = getDocument(target);
+    const pileData = getItemPileData(inDocument);
+    return isValidItemPile(inDocument) && pileData?.overrideItemFilters
+        ? cleanItemFilters(pileData.overrideItemFilters)
+        : API.ITEM_FILTERS;
+}
+
+/**
+ * Cleans item filters and prepares them for use in above functions
+ *
+ * @param {Array} itemFilters
+ * @returns {Array}
+ */
+export function cleanItemFilters(itemFilters){
+    return itemFilters ? foundry.utils.duplicate(itemFilters).map(filter => {
+        filter.path = filter.path.trim().toLowerCase();
+        filter.filters = new Set(filter.filters.split(',').map(string => string.trim().toLowerCase()));
+        return filter;
+    }) : [];
 }
 
 export function isValidItemPile(target, data = false){
     const inDocument = getDocument(target);
     const documentActor = inDocument instanceof TokenDocument ? inDocument.actor : inDocument;
     return inDocument && !inDocument.destroyed && documentActor && (data || getItemPileData(inDocument))?.enabled;
-}
-
-export function getDocumentItemTypeFilters(target){
-    const inDocument = getDocument(target);
-    const pileData = getItemPileData(inDocument);
-    return isValidItemPile(inDocument) && pileData?.itemTypeFilters
-        ? pileData.itemTypeFilters.split(',').map(str => str.trim().toLowerCase())
-        : API.ITEM_TYPE_FILTERS;
 }
 
 export function isItemPileEmpty(target) {
@@ -341,7 +349,7 @@ export function isItemPileEmpty(target) {
 
     if(!targetActor) return false;
 
-    const hasNoItems = getDocumentItems(inDocument).length === 0;
+    const hasNoItems = getValidDocumentItems(inDocument).length === 0;
     const hasEmptyAttributes = getItemPileAttributes(inDocument).length === 0;
 
     return hasNoItems && hasEmptyAttributes;
@@ -370,4 +378,60 @@ export function getItemPileAttributes(target) {
                 quantity: Number(getProperty(targetActor.data, attribute.path) ?? 1)
             }
         });
+}
+
+function getRelevantTokensAndActor(target){
+
+    const inDocument = getDocument(target);
+
+    let documentActor;
+    let documentTokens = [];
+
+    if(inDocument instanceof Actor){
+        documentActor = inDocument;
+        if(inDocument.token) {
+            documentToken.push(inDocument?.token);
+        }else{
+            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
+        }
+    }else{
+        documentActor = inDocument.actor;
+        if(inDocument.isLinked){
+            documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
+        }else{
+            documentTokens.push(inDocument);
+        }
+    }
+
+    return [documentActor, documentTokens]
+
+}
+
+export async function updateItemPileData(target, flagData, tokenData){
+
+    if(!tokenData) tokenData = {};
+
+    const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
+
+    const updates = documentTokens.map(tokenDocument => {
+        const newTokenData = foundry.utils.mergeObject(tokenData, {
+            "img": getItemPileTokenImage(tokenDocument, flagData),
+            "scale": getItemPileTokenScale(tokenDocument, flagData),
+        });
+        return {
+            "_id": tokenDocument.id,
+            ...newTokenData,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData
+        }
+    });
+
+    await canvas.scene.updateEmbeddedDocuments("Token", updates);
+
+    return documentActor.update({
+        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
+        "token": {
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
+        }
+    });
+
 }

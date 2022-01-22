@@ -1,19 +1,19 @@
 import CONSTANTS from "../constants.js";
 
-export class ItemPileAttributeEditor extends FormApplication {
+export class ItemPileFiltersEditor extends FormApplication {
 
     constructor(pileAttributes = false, resolve = false) {
         super();
         this.resolve = resolve;
-        this.attributes = pileAttributes || game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
+        this.filters = pileAttributes || game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters");
     }
 
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             title: game.i18n.localize("ITEM-PILES.AttributeEditor.Title"),
-            classes: ["sheet", "item-pile-attribute-editor"],
-            template: `${CONSTANTS.PATH}templates/attribute-editor.html`,
+            classes: ["sheet", "item-pile-filters-editor"],
+            template: `${CONSTANTS.PATH}templates/filter-editor.html`,
             width: 630,
             height: "auto",
             resizable: false
@@ -25,12 +25,12 @@ export class ItemPileAttributeEditor extends FormApplication {
         const promise = new Promise(_resolve => {
             resolve = _resolve;
         });
-        return [promise, new ItemPileAttributeEditor(foundry.utils.duplicate(pileAttributes), resolve).render(true)]
+        return [promise, new ItemPileFiltersEditor(foundry.utils.duplicate(pileAttributes), resolve).render(true)]
     }
 
     async getData(options) {
         const data = super.getData(options);
-        data.attributes = this.attributes;
+        data.filters = this.filters;
         return data;
     }
 
@@ -39,17 +39,16 @@ export class ItemPileAttributeEditor extends FormApplication {
     activateListeners(html) {
         super.activateListeners(html);
         const self = this;
-        html.find('.item-pile-attribute-remove').click(function () {
-            const index = Number($(this).closest('.item-pile-attribute-row').attr("data-attribute-index"));
-            self.attributes.splice(index, 1);
-            $(this).closest('.item-pile-attribute-row').remove();
+        html.find('.item-pile-filters-remove').click(function () {
+            const index = Number($(this).closest('.item-pile-filters-row').attr("data-filter-index"));
+            self.filters.splice(index, 1);
+            $(this).closest('.item-pile-filters-row').remove();
             self.rerender();
         });
-        html.find('button[name="newAttribute"]').click(function () {
-            self.attributes.push({
-                name: "",
+        html.find('button[name="newFilter"]').click(function () {
+            self.filters.push({
                 path: "",
-                img: ""
+                filters: ""
             })
             self.rerender();
         });
@@ -57,12 +56,11 @@ export class ItemPileAttributeEditor extends FormApplication {
 
     rerender(){
         const self = this;
-        this.element.find('.item-pile-attribute-row').each(function(index){
+        this.element.find('.item-pile-filters-row').each(function(index){
             if(index === 0) return;
-            self.attributes[index-1] = {
-                name: $(this).find('.item-pile-attribute-name-input').val(),
-                path: $(this).find('.item-pile-attribute-path-input').val(),
-                img: $(this).find('.item-pile-attribute-img-input').val()
+            self.filters[index-1] = {
+                path: $(this).find('.item-pile-filters-path-input').val(),
+                filters: $(this).find('.item-pile-filters-input').val()
             }
         });
         return this.render(true);
@@ -76,7 +74,7 @@ export class ItemPileAttributeEditor extends FormApplication {
         }
 
         if (!this.resolve) {
-            game.settings.set(CONSTANTS.MODULE_NAME, "dynamicAttributes", newSettings);
+            game.settings.set(CONSTANTS.MODULE_NAME, "itemFilters", newSettings);
         } else {
             this.resolve(newSettings);
         }

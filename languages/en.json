@@ -5,9 +5,9 @@
             "Title": "Inspecting Pile Contents",
             "AsActor": "You're inspecting this pile as {actorName}",
             "NoActor": "You are inspecting the contents of this pile without controlling a token, which means you can't take items from it.",
-            "TakeAll": "Take All Items",
             "Empty": "This pile is empty.",
             "Destroyed": "This pile no longer exists and lies barren.",
+            "TakeAll": "Take All Items",
             "Take": "Take",
             "Close": "Close Lid",
             "Leave": "Leave"
@@ -51,53 +51,75 @@
             "Title": "Dynamic Attributes Editor",
             "Explanation": "Here you can define which attributes on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
             "Name": "Attribute name",
-            "AttributePath": "Attribute path",
             "Icon": "Attribute icon",
             "AddNew": "Add new attribute",
             "Submit": "Submit Attributes"
         },
 
+        "FilterEditor": {
+            "Title": "Item Filters Editor",
+            "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
+            "Filters": "Filters",
+            "AddNew": "Add new filter",
+            "Submit": "Submit Filters"
+        },
+
+        "AttributePath": "Attribute path",
+
         "Defaults": {
             "Title": "Item Pile Configuration",
             "Configure": "Item Pile",
-            "MainSettings": "Main Settings",
-            "SingleItemSettings": "Single Item Settings",
-            "ContainerSettings": "Container Settings",
             "Update": "Update Item Pile",
-            "EnabledPile": "Enabled",
-            "EnabledPileExplanation": "Whether this should act as an item pile.",
-            "InspectItems": "Enable Item Inspect",
-            "InspectItemsExplanation": "Clicking item names will open the item's sheet.",
-            "Distance": "Interaction Distance",
-            "GridUnits": "Grid Units (leave empty for infinite)",
-            "ItemTypeFilter": "Item Type Filter",
-            "ItemTypeFilterExplanation": "Items of these types will not be shown in any item pile UI, each type separated by a comma. Leave blank to use module defaults.",
-            "Macro": "On Interact Macro",
-            "MacroExplanation": "Name of macro to execute when this pile is interacted with.",
-            "MacroPlaceholder": "Insert macro name",
-            "OverrideAttributes": "Override Dynamic Attributes",
-            "OverrideAttributesExplanation": "Configure if this pile should be able to transfer other attributes than the default.",
-            "ConfigureOverrideAttributes": "Configure Override Dynamic Attributes",
-            "DeleteWhenEmpty": "Delete when empty",
-            "DeleteWhenEmptyExplanation": "Causes the item pile to auto-delete itself once it's empty.",
-            "DeleteWhenEmptyDefault": "Default module setting",
-            "DeleteWhenEmptyYes": "Yes, delete when empty",
-            "DeleteWhenEmptyNo": "No, don't delete when empty",
-            "DisplayOne": "Display Single Item Image",
-            "DisplayOneExplanation": "If the pile is made up of a single item, this sets the pile token's image to be the image of the item.",
-            "OverrideSingleItemScale": "Override single item token scale",
-            "SingleItemScale": "Single item token scale",
-            "DisplayOneContainerWarning": "Warning! You have both \"Display Single Item Image\" and \"Is Container\" enabled. In this case, the container images takes priority.",
-            "IsContainer": "Is Container",
-            "Locked": "Is Locked",
-            "Closed": "Is Closed",
-            "ClosedImagePath": "Closed Image Path",
-            "EmptyImagePath": "Empty Image Path",
-            "OpenedImagePath": "Opened Image Path",
-            "LockedImagePath": "Locked Image Path",
-            "CloseSoundPath": "Closing Sound Path",
-            "OpenSoundPath": "Opening Sound Path",
-            "LockedSoundPath": "Locked Sound Path"
+
+            "Main": {
+                "Title": "Main",
+                "EnabledPile": "Enabled",
+                "EnabledPileExplanation": "Whether this should act as an item pile.",
+                "InspectItems": "Enable Item Inspect",
+                "InspectItemsExplanation": "Clicking item names will open the item's sheet.",
+                "Distance": "Interaction Distance",
+                "GridUnits": "Grid Units (leave empty for infinite)",
+                "Macro": "On Interact Macro",
+                "MacroExplanation": "Name of macro to execute when this pile is interacted with.",
+                "MacroPlaceholder": "Insert macro name",
+                "DeleteWhenEmpty": "Delete when empty",
+                "DeleteWhenEmptyExplanation": "Causes the item pile to auto-delete itself once it's empty.",
+                "DeleteWhenEmptyDefault": "Default module setting",
+                "DeleteWhenEmptyYes": "Yes, delete when empty",
+                "DeleteWhenEmptyNo": "No, don't delete when empty",
+                "OverrideAttributes": "Override Dynamic Attributes",
+                "OverrideAttributesExplanation": "Configure if this pile should be able to transfer other attributes than the default.",
+                "ConfigureOverrideAttributes": "Configure Override Dynamic Attributes",
+                "OverrideItemFilters": "Override Item Filters",
+                "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
+                "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+            },
+
+            "SingleItem": {
+                "Title": "Single Item",
+                "DisplayOneContainerWarning": "Warning! You have both \"Display Single Item Image\" and \"Is Container\" enabled. In this case, the container images takes priority.",
+                "DisplayOne": "Display Single Item Image",
+                "DisplayOneExplanation": "If the pile is made up of a single item, this sets the pile token's image to be the image of the item.",
+                "OverrideScale": "Override single item token scale",
+                "Scale": "Single item token scale",
+                "ItemName": "Use Item Name",
+                "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
+            },
+
+            "Container": {
+                "Title": "Container Settings",
+                "IsContainer": "Is Container",
+                "Locked": "Is Locked",
+                "Closed": "Is Closed",
+                "ClosedImagePath": "Closed Image Path",
+                "EmptyImagePath": "Empty Image Path",
+                "OpenedImagePath": "Opened Image Path",
+                "LockedImagePath": "Locked Image Path",
+                "CloseSoundPath": "Closing Sound Path",
+                "OpenSoundPath": "Opening Sound Path",
+                "LockedSoundPath": "Locked Sound Path"
+            }
+
         },
 
         "HUD": {
@@ -141,13 +163,10 @@
                 "Label": "Configure Attributes",
                 "Hint": "This setting define the attributes that are eligible for pickup in item paths, such as currencies or power, which may not be actual items."
             },
-            "ItemType": {
-                "Title": "Item type attribute",
-                "Label": "This setting defines the attribute path for determining where the item types live. In D&D5e, it's just \"type\" because the type is defined directly in \"item.data.type\", because each item distinguishes its type with that attribute."
-            },
-            "ItemTypeFilters": {
-                "Title": "Item type filters",
-                "Label": "Here you can configure what item types are ignored and not listed in the item pile dialogs. For example, in D&D5e we probably don't want to show spells, feats, and classes, so you'd put \"spell, feat, class\"."
+            "ItemFilters": {
+                "Title": "Item filters",
+                "Label": "Configure Item Filters",
+                "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
             },
             "OutputToChat": {
                 "Title": "Output to chat",

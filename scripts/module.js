@@ -1,13 +1,15 @@
 import CONSTANTS from "./constants.js";
-import registerSettings, { checkSystem, registerHandlebarHelpers } from "./settings.js";
-import { registerSocket } from "./socket.js";
+import HOOKS from "./hooks.js";
+
+import chatHandler from "./chathandler.js";
 import API from "./api.js";
 import * as lib from "./lib/lib.js";
+
 import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
+import { registerSettings, checkSystem, migrateSettings, registerHandlebarHelpers } from "./settings.js";
+import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
-import HOOKS from "./hooks.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
-import chatHandler from "./chathandler.js";
 
 Hooks.once("init", () => {
 
@@ -72,8 +74,25 @@ Hooks.once("ready", () => {
     checkSystem();
     registerHotkeysPost();
     registerHandlebarHelpers();
+    migrateSettings();
     Hooks.callAll(HOOKS.READY);
 });
+
+const debounceManager = {
+
+    debounces: {},
+
+    setDebounce(id, method){
+        if(this.debounces[id]){
+            return this.debounces[id];
+        }
+        this.debounces[id] = debounce(function(...args){
+            delete debounceManager.debounces[id];
+            return method(...args);
+        }, 50);
+        return this.debounces[id];
+    }
+};
 
 const module = {
 
@@ -85,10 +104,13 @@ const module = {
             return hasProperty(changes, attribute.path);
         });
         if (!validProperty) return;
-        const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
-        await API._rerenderItemPileInventoryApplication(target.uuid, deleted);
-        if (deleted || !game.user.isGM) return;
-        return API._refreshItemPile(target.uuid);
+        const targetUuid = target.uuid;
+        return debounceManager.setDebounce(targetUuid, async function(uuid){
+            const deleted = await API._checkItemPileShouldBeDeleted(uuid);
+            await API._rerenderItemPileInventoryApplication(uuid, deleted);
+            if (deleted || !lib.isResponsibleGM()) return;
+            return API._refreshItemPile(uuid);
+        })(targetUuid);
     },
 
     async _pileInventoryChanged(item) {
@@ -96,17 +118,20 @@ const module = {
         if (!target) return;
         target = target?.token ?? target;
         if (!lib.isValidItemPile(target)) return;
-        const deleted = await API._checkItemPileShouldBeDeleted(target.uuid);
-        await API._rerenderItemPileInventoryApplication(target.uuid, deleted);
-        if (deleted || !game.user.isGM) return;
-        return API._refreshItemPile(target.uuid);
+        const targetUuid = target.uuid;
+        return debounceManager.setDebounce(targetUuid, async function(uuid){
+            const deleted = await API._checkItemPileShouldBeDeleted(uuid);
+            await API._rerenderItemPileInventoryApplication(uuid, deleted);
+            if (deleted || !lib.isResponsibleGM()) return;
+            return API._refreshItemPile(uuid);
+        })(targetUuid);
     },
 
     async _canvasReady(canvas) {
         const tokens = [...canvas.tokens.placeables].map(token => token.document);
         for (const doc of tokens) {
             await API._initializeItemPile(doc);
-            if(game.user.isGM) {
+            if(lib.isResponsibleGM()) {
                 await API._refreshItemPile(doc.uuid);
             }
         }
@@ -114,9 +139,12 @@ const module = {
 
     async _preCreatePile(token){
         if (!lib.isValidItemPile(token)) return;
+        const itemPileConfig = lib.getItemPileData(token.actor)
         token.data.update({
-            "img": lib.getItemPileTokenImage(token),
-            "scale": lib.getItemPileTokenScale(token)
+            "img": lib.getItemPileTokenImage(token, itemPileConfig),
+            "scale": lib.getItemPileTokenScale(token, itemPileConfig),
+            "name": lib.getItemPileName(token, itemPileConfig),
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: itemPileConfig
         });
     },
 

@@ -36,21 +36,12 @@ export default class API {
     }
 
     /**
-     * The attribute used to track the item type in this system
-     *
-     * @returns {string}
-     */
-    static get ITEM_TYPE_ATTRIBUTE() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeAttribute");
-    }
-
-    /**
      * The filters for item types eligible for interaction within this system
      *
      * @returns {Array}
      */
-    static get ITEM_TYPE_FILTERS() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemTypeFilters").split(',').map(str => str.trim().toLowerCase());
+    static get ITEM_FILTERS() {
+        return lib.cleanItemFilters(game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters"));
     }
 
     /**
@@ -107,38 +98,24 @@ export default class API {
     }
 
     /**
-     * Sets the attribute used to track the item type in this system
+     * Sets the items filters for interaction within this system
      *
-     * @param {string} inAttribute
-     * @returns {string}
-     */
-    static async setItemTypeAttribute(inAttribute) {
-        if (typeof inAttribute !== "string") {
-            throw lib.custom_error("setItemTypeAttribute | inAttribute must be of type string");
-        }
-        return game.settings.set(CONSTANTS.MODULE_NAME, "itemTypeAttribute", inAttribute);
-    }
-
-    /**
-     * Sets the filters for item types eligible for interaction within this system
-     *
-     * @param {string/array} inFilters
+     * @param {array} inFilters
      * @returns {Promise}
      */
-    static async setItemTypeFilters(inFilters) {
+    static async setItemFilters(inFilters) {
         if (!Array.isArray(inFilters)) {
-            if (typeof inFilters !== "string") {
-                throw lib.custom_error("setItemTypeFilters | inFilters must be of type string or array");
-            }
-            inFilters = inFilters.split(',')
-        } else {
-            inFilters.forEach(filter => {
-                if (typeof filter !== "string") {
-                    throw lib.custom_error("setItemTypeFilters | each entry in inFilters must be of type string");
-                }
-            })
+            throw lib.custom_error("setItemFilters | inFilters must be of type string or array");
         }
-        return game.settings.set(CONSTANTS.MODULE_NAME, "itemTypeFilters", inFilters.join(','));
+        inFilters.forEach(filter => {
+            if (typeof filter?.path !== "string") {
+                throw lib.custom_error("setItemFilters | each entry in inFilters must have a \"path\" property with a value that is of type string");
+            }
+            if (typeof filter?.filters !== "string") {
+                throw lib.custom_error("setItemFilters | each entry in inFilters must have a \"filters\" property with a value that is of type string");
+            }
+        });
+        return game.settings.set(CONSTANTS.MODULE_NAME, "itemFilters", inFilters);
     }
 
     /**
@@ -222,6 +199,7 @@ export default class API {
             tokenSettings = foundry.utils.mergeObject(tokenSettings, {
                 "img": lib.getItemPileTokenImage(target, pileSettings),
                 "scale": lib.getItemPileTokenScale(target, pileSettings),
+                "name": lib.getItemPileName(target, pileSettings)
             });
 
             const sceneId = targetUuid.split('.')[1];
@@ -234,8 +212,8 @@ export default class API {
             tokenUpdateGroups[sceneId].push({
                 "_id": tokenId,
                 ...tokenSettings,
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings,
-                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings,
+                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
             });
 
         }
@@ -304,8 +282,8 @@ export default class API {
             tokenUpdateGroups[sceneId].push({
                 "_id": tokenId,
                 ...tokenSettings,
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings,
-                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileSettings
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings,
+                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
             });
 
         }
@@ -575,7 +553,7 @@ export default class API {
 
         await lib.wait(15);
 
-        await lib.updateItemPile(target, data, tokenSettings);
+        await lib.updateItemPileData(target, data, tokenSettings);
 
         if (data.enabled && data.isContainer) {
             if (diff?.closed === true) {
@@ -671,10 +649,10 @@ export default class API {
     /**
      * Remotely opens an item pile's inventory, if you have permission to edit the item pile. Passing a user ID, or a list of user IDs, will cause those users to open the item pile.
      *
-     * @param {Token/TokenDocument/Actor} target                        The item pile actor or token whose inventory to open
-     * @param {array<string>} userIds                                   The IDs of the users that should open this item pile inventory
-     * @param {boolean/Token/TokenDocument/Actor} inspectingTarget      This will force the users to inspect this item pile as a specific character
-     * @param {boolean} useDefaultCharacter                             Causes the users to inspect the item pile inventory as their default character
+     * @param {Token/TokenDocument/Actor} target                                The item pile actor or token whose inventory to open
+     * @param {array<string>} userIds                                           The IDs of the users that should open this item pile inventory
+     * @param {boolean/Token/TokenDocument/Actor} [inspectingTarget=false]      This will force the users to inspect this item pile as a specific character
+     * @param {boolean} [useDefaultCharacter=false]                             Causes the users to inspect the item pile inventory as their default character
      * @returns {Promise}
      */
     static async openItemPileInventory(target, userIds = [ game.user.id ], { inspectingTarget = false, useDefaultCharacter = false }={}){
@@ -751,24 +729,14 @@ export default class API {
     }
 
     /**
-     * Returns the item type filters for a given item pile
-     *
-     * @param {Token/TokenDocument|Actor} target
-     * @returns {Array}
-     */
-    static getItemPileItemTypeFilters(target){
-        return lib.getDocumentItemTypeFilters(target);
-    }
-
-    /**
      * Returns the items this item pile can transfer
      *
      * @param {Token/TokenDocument|Actor} target
-     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
+     * @param {array/boolean} [itemFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
      * @returns {Array}
      */
-    static getItemPileItems(target, itemTypeFilters = false){
-        return lib.getDocumentItems(target, itemTypeFilters);
+    static getItemPileItems(target, itemFilters = false){
+        return lib.getValidDocumentItems(target, itemFilters);
     }
 
     /**
@@ -814,6 +782,7 @@ export default class API {
                     await _target.update({
                         "img": lib.getItemPileTokenImage(targetDocument),
                         "scale": lib.getItemPileTokenScale(targetDocument),
+                        "name": lib.getItemPileName(targetDocument)
                     })
                 }
                 resolve();
@@ -859,15 +828,19 @@ export default class API {
         if (!targetUuid) throw lib.custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
 
         items = items.map(itemData => {
-            let item;
-            if(itemData.item instanceof Item){
+
+            let item = itemData;
+            if(itemData instanceof Item){
+                item = itemData.toObject();
+            }else if(itemData.item instanceof Item){
                 item = itemData.item.toObject();
-            }else{
+            }else if(itemData.item){
                 item = itemData.item;
             }
+
             return {
                 item: item,
-                quantity: itemData?.quantity ?? getProperty(item.data, API.ITEM_QUANTITY_ATTRIBUTE)
+                quantity: itemData?.quantity ?? getProperty(item?.data ?? item ?? {}, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1
             }
         });
 
@@ -900,7 +873,7 @@ export default class API {
             const foundItem = lib.getSimilarItem(targetActorItems, {
                 itemId: item._id,
                 itemName: item.name,
-                itemType: getProperty(item, API.ITEM_TYPE_ATTRIBUTE)
+                itemType: item.type
             });
 
             const incomingQuantity = Number(itemData?.quantity ?? getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1);
@@ -1186,14 +1159,14 @@ export default class API {
      *
      * @param {Actor/Token/TokenDocument} source        The actor to transfer all items from
      * @param {Actor/Token/TokenDocument} target        The actor to receive all the items
-     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to module settings if none provided
+     * @param {array/boolean} [itemFilters=false]   Array of item types disallowed - will default to module settings if none provided
      * @param {string/boolean} [interactionId=false]    The ID of this interaction
      *
      * @returns {Promise<array>}                        An array containing all of the items that were transferred to the target
      */
-    static async transferAllItems(source, target, { itemTypeFilters = false, interactionId = false } = {}) {
+    static async transferAllItems(source, target, { itemFilters = false, interactionId = false } = {}) {
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, source, target, itemTypeFilters, interactionId);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, source, target, itemFilters, interactionId);
         if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
@@ -1202,9 +1175,9 @@ export default class API {
         const targetUuid = lib.getUuid(target);
         if (!targetUuid) throw lib.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid target`, true)
 
-        if (itemTypeFilters) {
-            itemTypeFilters.forEach(filter => {
-                if (typeof filter !== "string") throw lib.custom_error(`TransferAllItems | entries in the itemTypeFilters must be of type string`);
+        if (itemFilters) {
+            itemFilters.forEach(filter => {
+                if (typeof filter !== "string") throw lib.custom_error(`TransferAllItems | entries in the itemFilters must be of type string`);
             })
         }
 
@@ -1212,17 +1185,17 @@ export default class API {
             throw lib.custom_error(`TransferAllItems | interactionId must be of type string or false`);
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, { itemTypeFilters, interactionId });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, { itemFilters, interactionId });
     }
 
     /**
      * @private
      */
-    static async _transferAllItems(sourceUuid, targetUuid, userId, { itemTypeFilters = false, interactionId = false, isEverything = false } = {}) {
+    static async _transferAllItems(sourceUuid, targetUuid, userId, { itemFilters = false, interactionId = false, isEverything = false } = {}) {
 
         const source = await fromUuid(sourceUuid);
 
-        const itemsToRemove = API.getItemPileItems(source, itemTypeFilters).map(item => item.toObject());
+        const itemsToRemove = API.getItemPileItems(source, itemFilters).map(item => item.toObject());
 
         const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, userId, { isTransfer: true, interactionId: interactionId });
         const itemAdded = await API._addItems(targetUuid, itemsRemoved, userId, { isTransfer: true, interactionId: interactionId });
@@ -1637,14 +1610,14 @@ export default class API {
      *
      * @param {Actor/Token/TokenDocument} source        The actor to transfer all items and attributes from
      * @param {Actor/Token/TokenDocument} target        The actor to receive all the items and attributes
-     * @param {array/boolean} [itemTypeFilters=false]   Array of item types disallowed - will default to module settings if none provided
+     * @param {array/boolean} [itemFilters=false]   Array of item types disallowed - will default to module settings if none provided
      * @param {string/boolean} [interactionId=false]    The ID of this interaction
      *
      * @returns {Promise<object>}                       An object containing all items and attributes transferred to the target
      */
-    static async transferEverything(source, target, { itemTypeFilters = false, interactionId = false } = {}) {
+    static async transferEverything(source, target, { itemFilters = false, interactionId = false } = {}) {
 
-        const hookResult = Hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, source, target, itemTypeFilters, interactionId);
+        const hookResult = Hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, source, target, itemFilters, interactionId);
         if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
@@ -1653,9 +1626,9 @@ export default class API {
         const targetUuid = lib.getUuid(target);
         if (!targetUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid target`, true)
 
-        if (itemTypeFilters) {
-            itemTypeFilters.forEach(filter => {
-                if (typeof filter !== "string") throw lib.custom_error(`TransferEverything | entries in the itemTypeFilters must be of type string`);
+        if (itemFilters) {
+            itemFilters.forEach(filter => {
+                if (typeof filter !== "string") throw lib.custom_error(`TransferEverything | entries in the itemFilters must be of type string`);
             })
         }
 
@@ -1663,16 +1636,16 @@ export default class API {
             throw lib.custom_error(`TransferEverything | interactionId must be of type string or false`);
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, { itemTypeFilters, interactionId })
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, { itemFilters, interactionId })
 
     }
 
     /**
      * @private
      */
-    static async _transferEverything(sourceUuid, targetUuid, userId, { itemTypeFilters = false, interactionId = false } = {}) {
+    static async _transferEverything(sourceUuid, targetUuid, userId, { itemFilters = false, interactionId = false } = {}) {
 
-        const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, userId, { itemTypeFilters, interactionId, isEverything: true });
+        const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, userId, { itemFilters, interactionId, isEverything: true });
         const attributesTransferred = await API._transferAllAttributes(sourceUuid, targetUuid, userId, { interactionId, isEverything: true });
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemsTransferred, attributesTransferred, userId, interactionId);
@@ -1722,24 +1695,6 @@ export default class API {
         if (!canvas.tokens.hud.rendered) return;
         await canvas.tokens.hud.render(true)
         return true;
-    }
-
-    /**
-     * Checks whether an item (or item data) is of a type that is not allowed. If an array whether that type is allowed
-     * or not, returning the type if it is NOT allowed.
-     *
-     * @param {Item/Object} item
-     * @param {array/boolean} [itemTypeFilters=false]
-     * @return {boolean/string}
-     */
-    static isItemTypeDisallowed(item, itemTypeFilters = false) {
-        if (!API.ITEM_TYPE_ATTRIBUTE) return false;
-        if (!Array.isArray(itemTypeFilters)) itemTypeFilters = API.ITEM_TYPE_FILTERS;
-        const itemType = getProperty(item, API.ITEM_TYPE_ATTRIBUTE);
-        if (itemTypeFilters.includes(itemType)) {
-            return itemType;
-        }
-        return false;
     }
 
     /* -------- PRIVATE ITEM PILE METHODS -------- */
@@ -1868,23 +1823,6 @@ export default class API {
             position: false
         }
 
-        const disallowedType = API.isItemTypeDisallowed(itemData);
-        if (disallowedType) {
-            if (!game.user.isGM) {
-                return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
-            }
-            if (!hotkeyState.shiftDown) {
-                const force = await Dialog.confirm({
-                    title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
-                    content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
-                    defaultYes: false
-                });
-                if (!force) {
-                    return;
-                }
-            }
-        }
-
         if (data.tokenId) {
             dropData.source = canvas.tokens.get(data.tokenId).actor;
         } else if (data.actorId) {
@@ -1944,6 +1882,23 @@ export default class API {
             if (!droppableDocuments.length) {
                 lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
                 return;
+            }
+        }
+
+        const disallowedType = lib.isItemInvalid(droppableDocuments?.[0], itemData);
+        if (disallowedType) {
+            if (!game.user.isGM) {
+                return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
+            }
+            if (!hotkeyState.shiftDown) {
+                const force = await Dialog.confirm({
+                    title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
+                    content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
+                    defaultYes: false
+                });
+                if (!force) {
+                    return;
+                }
             }
         }
 
@@ -2071,6 +2026,7 @@ export default class API {
                 pileDataDefaults.enabled = true;
                 pileDataDefaults.deleteWhenEmpty = true;
                 pileDataDefaults.displayOne = true;
+                pileDataDefaults.showItemName = true;
                 pileDataDefaults.overrideSingleItemScale = true;
                 pileDataDefaults.singleItemScale = 0.75;
 
@@ -2078,7 +2034,7 @@ export default class API {
                     name: "Default Item Pile",
                     type: game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType"),
                     img: "icons/svg/item-bag.svg",
-                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileDataDefaults
                 });
 
                 await pileActor.update({
@@ -2088,7 +2044,7 @@ export default class API {
                         bar1: { attribute: "" },
                         vision: false,
                         displayName: 50,
-                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAG_NAME}`]: pileDataDefaults
+                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileDataDefaults
                     }
                 })
 
@@ -2109,32 +2065,6 @@ export default class API {
             items = items ? items.map(itemData => itemData.item ?? itemData) : {};
 
             overrideData['actorData'] = { items }
-
-            const pileConfig = lib.getItemPileData(pileActor);
-            const attributes = lib.getItemPileAttributes(pileActor);
-
-            const numItems = items.length + attributes.length;
-
-            if (pileConfig.displayOne && numItems === 1) {
-                overrideData["img"] = items.length > 0
-                    ? items[0].img
-                    : attributes[0].img;
-                if (pileConfig.overrideSingleItemScale) {
-                    overrideData["scale"] = pileConfig.singleItemScale;
-                }
-            }
-
-            if (pileConfig.isContainer) {
-
-                overrideData["img"] = lib.getItemPileTokenImage(pileActor);
-                overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
-
-            }
-
-        } else {
-
-            overrideData["img"] = lib.getItemPileTokenImage(pileActor);
-            overrideData["scale"] = lib.getItemPileTokenScale(pileActor);
 
         }
 
