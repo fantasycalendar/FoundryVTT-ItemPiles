@@ -149,7 +149,7 @@ Item Piles has a powerful API, which allows you to quickly modify the item piles
 
 ```js
 if(!canvas.tokens.controlled.length) return;
-ItemPiles.API.turnTokensIntoItemPiles(canvas.tokens.controlled, { pileSettings: { displayOne: false })
+ItemPiles.API.turnTokensIntoItemPiles(canvas.tokens.controlled)
 ```
 
 ### Revert selected tokens from item piles:
