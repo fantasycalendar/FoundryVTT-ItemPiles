@@ -10,7 +10,8 @@
             "TakeAll": "Take All Items",
             "Take": "Take",
             "Close": "Close Lid",
-            "Leave": "Leave"
+            "Leave": "Leave",
+            "OpenSheet": "Open Actor Sheet"
         },
 
         "Errors": {

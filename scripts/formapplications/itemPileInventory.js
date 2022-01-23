@@ -3,6 +3,7 @@ import API from "../api.js";
 import * as lib from "../lib/lib.js";
 import { isPileInventoryOpenForOthers } from "../socket.js";
 import HOOKS from "../hooks.js";
+import { ItemPileConfig } from "./itemPileConfig.js";
 
 export class ItemPileInventory extends FormApplication {
 
@@ -23,7 +24,7 @@ export class ItemPileInventory extends FormApplication {
         this.interactionId = randomID();
         this.overrides = overrides;
         this.pileData = lib.getItemPileData(this.pile);
-        Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient);
+        Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient, overrides);
     }
 
     /** @inheritdoc */
@@ -32,7 +33,7 @@ export class ItemPileInventory extends FormApplication {
             title: game.i18n.localize("ITEM-PILES.Inspect.Title"),
             classes: ["sheet", "item-pile-inventory-sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
-            width: 450,
+            width: 500,
             height: "auto",
             dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-item-drop-container" }],
         });
@@ -77,6 +78,35 @@ export class ItemPileInventory extends FormApplication {
     }
 
     /* -------------------------------------------- */
+
+    /** @override */
+    _getHeaderButtons() {
+        let buttons = super._getHeaderButtons();
+        const canConfigure = game.user.isGM;
+        if (canConfigure) {
+            buttons = [
+                {
+                    label: "ITEM-PILES.Inspect.OpenSheet",
+                    class: "item-piles-open-actor-sheet",
+                    icon: "fas fa-user",
+                    onclick: () => {
+                        const actor = this.pile.actor ?? this.pile;
+                        actor.sheet.render(true, { focus: true });
+                    }
+                },
+                {
+                    label: "ITEM-PILES.HUD.Configure",
+                    class: "item-piles-configure-pile",
+                    icon: "fas fa-box-open",
+                    onclick: () => {
+                        const actor = this.pile.actor ?? this.pile;
+                        ItemPileConfig.show(actor);
+                    }
+                },
+            ].concat(buttons);
+        }
+        return buttons
+    }
 
     saveItems() {
         let self = this;

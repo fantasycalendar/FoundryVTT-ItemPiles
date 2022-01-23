@@ -57,11 +57,11 @@
         },
 
         "FilterEditor": {
-            "Title": "Item Filters Editor",
-            "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
-            "Filters": "Filters",
-            "AddNew": "Add new filter",
-            "Submit": "Submit Filters"
+            "Title": "Gegenstandsfilter Editor",
+            "Explanation": "Hier kannst du mehrere Arten von Filtern definieren, die bestimmte Arten von Gegenständen ausschließen. Basierend auf dem angegebenen Attributpfad kann der Gegenstandsstapel den \"Typ\" eines Gegenstands finden, und basierend auf den Filtern werden diese Gegenstände in der Benutzeroberfläche des Gegenstandsstapels ausgeblendet.",
+            "Filters": "Filter",
+            "AddNew": "Neuer Filter zufügen",
+            "Submit": "Filter übertragen"
         },
 
         "AttributePath": "Attributspfad",
@@ -90,9 +90,9 @@
                 "OverrideAttributes": "Dynamische Attribute außer Kraft setzen",
                 "OverrideAttributesExplanation": "Legen Sie fest, ob dieser Stapel andere Attribute als die Standardattribute übertragen können soll.",
                 "ConfigureOverrideAttributes": "Konfiguriere: Dynamische Attribute außer Kraft setzen",
-                "OverrideItemFilters": "Override Item Filters",
-                "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
-                "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+                "OverrideItemFilters": "Übersteuere Gegenstandsfilter",
+                "OverrideItemFiltersExplanation": "Lege fest, ob dieser Stapel in der Lage sein soll, andere Arten von Gegenständen als die Standardtypen zu übertragen.",
+                "ConfigureOverrideItemFilters": "Konfiguriere den Gegenstandsfilter"
             },
 
             "SingleItem": {
@@ -102,8 +102,8 @@
                 "DisplayOneExplanation": "Besteht der Stapel aus einem einzigen Gegenstand, wird das Bild des Stapels auf das Bild des Gegenstandes gesetzt.",
                 "OverrideScale": "Einzelne Gegenstands-Token-Skalierung außer Kraft setzen",
                 "Scale": "Gegenstands-Token-Skalierung",
-                "ItemName": "Use Item Name",
-                "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
+                "ItemName": "Benutze Gegenstandsname",
+                "ItemNameExplanation": "Veranlasst, dass der Gegenstandsstapel nach dem einzelnen darin enthaltenen Gegenstand benannt wird."
             },
 
             "Container": {
@@ -163,9 +163,9 @@
                 "Hint": "Mit dieser Einstellung werden die Attribute festgelegt, die für die Abholung in Artikelpfaden in Frage kommen, z. B. Währungen oder Stärken, bei denen es sich nicht um tatsächliche Artikel handeln muss."
             },
             "ItemFilters": {
-                "Title": "Item filters",
-                "Label": "Configure Item Filters",
-                "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
+                "Title": "Gegenstandsfilter",
+                "Label": "Gegenstandsfilter einstellen",
+                "Hint": "Hier können Sie einstellen, welche Gegenstände ignoriert und nicht in den Gegenstandsstapeldialogen aufgeführt werden."
             },
             "OutputToChat": {
                 "Title": "Ausgabe im Chat",

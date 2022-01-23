@@ -327,8 +327,8 @@ export function getDocumentItemFilters(target){
  */
 export function cleanItemFilters(itemFilters){
     return itemFilters ? foundry.utils.duplicate(itemFilters).map(filter => {
-        filter.path = filter.path.trim().toLowerCase();
-        filter.filters = new Set(filter.filters.split(',').map(string => string.trim().toLowerCase()));
+        filter.path = filter.path.trim();
+        filter.filters = new Set(filter.filters.split(',').map(string => string.trim()));
         return filter;
     }) : [];
 }

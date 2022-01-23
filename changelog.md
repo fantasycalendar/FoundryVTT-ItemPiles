@@ -1,5 +1,10 @@
 # Item Piles Changelog 
 
+## Version 1.2.8
+- Added `Open Actor Sheet` and `Configure Pile` buttons to the Item Pile inventory UI (visible only to GMs)
+- Fixed bug where Item Piles would ignore case-sensitive item filters and attribute paths 
+- Updated German localization
+
 ## Version 1.2.7
 - Fixed newly created item piles would not update their image, scale, or name 
 
