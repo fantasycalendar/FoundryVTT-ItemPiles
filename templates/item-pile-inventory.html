@@ -20,12 +20,16 @@
             <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Empty"}}</p>
             {{/if}}
 
+            <div id="item-piles-preview-container">
+                <img id="item-piles-preview-image"/>
+            </div>
+
             <div class="item-piles-items">
                 {{#each items as |item id|}}
                 <div class="flexrow item-piles-item-row {{#unless item.quantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
                     <img class="item-piles-img" src="{{item.img}}"/>
                     <div class="item-piles-name item-piles-text">
-                        {{#if @root.canInspectItems}}<a class="item-piles-item-clickable">{{/if}}
+                        {{#if @root.canInspectItems}}<a class="item-piles-clickable">{{/if}}
                         {{item.name}}
                         {{#if @root.canInspectItems}}</a>{{/if}}
                     </div>

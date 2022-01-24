@@ -285,6 +285,7 @@ export class ItemPileInventory extends FormApplication {
         let timer;
         html.find('img').mouseenter(function () {
             const element = $(this);
+
             timer = setTimeout(function () {
                 self.previewImage(html, element);
             }, 300);
@@ -294,7 +295,7 @@ export class ItemPileInventory extends FormApplication {
             clearTimeout(timer);
         });
 
-        html.find(".item-piles-item-clickable").click(function () {
+        html.find(".item-piles-clickable").click(function () {
             const itemId = $(this).closest(".item-piles-item-row").attr('data-item-id');
             self.previewItem(itemId);
         })
@@ -313,18 +314,26 @@ export class ItemPileInventory extends FormApplication {
     }
 
     previewImage(html, element) {
+
         const src = element.prop("src");
 
         const pos = element.position();
 
-        html.find("#item-piles-preview-image").prop("src", src);
+        const imageContainer = html.find("#item-piles-preview-image");
+
+        imageContainer.prop("src", src);
 
         let container = html.find("#item-piles-preview-container");
-        container.css({
-            position: "absolute",
-            top: (pos.top - (container.outerHeight() / 2)) + "px",
-            left: (-container.outerWidth() - pos.left) + "px"
-        }).fadeIn(150);
+
+        setTimeout(() => {
+
+            container.css({
+                position: "absolute",
+                top: (pos.top - (container.outerHeight() / 2)) + "px",
+                left: (-container.outerWidth() - pos.left) + "px"
+            }).fadeIn(150);
+
+        }, 10)
     }
 
     clearImage(html) {

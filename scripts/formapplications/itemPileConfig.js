@@ -20,7 +20,7 @@ export class ItemPileConfig extends FormApplication {
             classes: ["sheet", "item-pile-config"],
             template: `${CONSTANTS.PATH}templates/item-pile-config.html`,
             width: 430,
-            height: "auto",
+            height: 620,
             resizable: false,
             tabs: [{ navSelector: ".tabs", contentSelector: ".tab-body", initial: "mainsettings" }]
         });
@@ -57,6 +57,8 @@ export class ItemPileConfig extends FormApplication {
         const containerCheckbox = html.find('input[name="isContainer"]');
         const overrideItemFiltersEnabledCheckbox = html.find('.item-pile-config-override-item-filters-checkbox');
         const overrideAttributesEnabledCheckbox = html.find('.item-pile-config-override-attributes-checkbox');
+        const itemsFreeForAllCheckbox = html.find('input[name="itemsFreeForAll"]');
+        const attributesFreeForAllCheckbox = html.find('input[name="attributesFreeForAll"]');
 
         const slider = html.find(".item-piles-scaleRange");
         const input = html.find(".item-piles-scaleInput");
@@ -143,6 +145,24 @@ export class ItemPileConfig extends FormApplication {
         input.change(function () {
             slider.slider('value', $(this).val());
         })
+
+        const takeAllButtonCheckbox = html.find('input[name="takeAllEnabled"]');
+
+        itemsFreeForAllCheckbox.change(function(){
+            const isDisabled = !itemsFreeForAllCheckbox.is(":checked") || !attributesFreeForAllCheckbox.is(":checked");
+            takeAllButtonCheckbox.prop("disabled", isDisabled).parent().toggleClass("item-pile-disabled", isDisabled);
+            if(isDisabled && takeAllButtonCheckbox.is(':checked')){
+                takeAllButtonCheckbox.prop('checked', false)
+            }
+        });
+
+        attributesFreeForAllCheckbox.change(function(){
+            const isDisabled = !itemsFreeForAllCheckbox.is(":checked") || !attributesFreeForAllCheckbox.is(":checked");
+            takeAllButtonCheckbox.prop("disabled", isDisabled).parent().toggleClass("item-pile-disabled", isDisabled);
+            if(isDisabled && takeAllButtonCheckbox.is(':checked')){
+                takeAllButtonCheckbox.prop('checked', false)
+            }
+        }).change();
     }
 
     async showAttributeEditor() {

@@ -31,7 +31,16 @@ const CONSTANTS = {
         closeSound: "",
         openSound: "",
         lockedSound: "",
-        unlockedSound: ""
+        unlockedSound: "",
+
+        // Sharing settings
+        itemsFreeForAll: true,
+        attributesFreeForAll: false,
+        takeAllEnabled: false,
+        activePlayers: false,
+
+        // Merchant Settings
+        isMerchant: false
     }
 }
 

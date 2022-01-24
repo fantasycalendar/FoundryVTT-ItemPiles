@@ -143,6 +143,8 @@ const chatHandler = {
             speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: {
                 interactionId: interactionId,
+                source: sourceUuid,
+                target: targetUuid,
                 items: items,
                 attributes: attributes
             }

@@ -75,6 +75,11 @@ Hooks.once("ready", () => {
     registerHandlebarHelpers();
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
+
+    const tokenD = canvas.tokens.get("ejVV1jzRMhM9zpec");
+
+    ItemPileConfig.show(tokenD.actor);
+
 });
 
 const debounceManager = {
