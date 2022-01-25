@@ -1,6 +1,10 @@
 {
     "ITEM-PILES": {
 
+        "ContextMenu": {
+            "ShowToPlayers": "Show Item Pile to players"
+        },
+
         "Inspect": {
             "Title": "Inspecting Pile Contents",
             "AsActor": "You're inspecting this pile as {actorName}",
@@ -11,6 +15,7 @@
             "Take": "Take",
             "Close": "Close Lid",
             "Leave": "Leave",
+            "SplitAll": "Split {num_players} ways",
             "OpenSheet": "Open Actor Sheet"
         },
 
@@ -84,7 +89,7 @@
                 "MacroExplanation": "Name of macro to execute when this pile is interacted with.",
                 "MacroPlaceholder": "Insert macro name",
                 "DeleteWhenEmpty": "Delete when empty",
-                "DeleteWhenEmptyExplanation": "Causes the item pile to auto-delete itself once it's empty.",
+                "DeleteWhenEmptyExplanation": "Causes this item pile to auto-delete itself once it's empty.",
                 "DeleteWhenEmptyDefault": "Default module setting",
                 "DeleteWhenEmptyYes": "Yes, delete when empty",
                 "DeleteWhenEmptyNo": "No, don't delete when empty",
@@ -128,19 +133,25 @@
             "Sharing": {
                 "Title": "Sharing Settings",
                 "ItemsFreeForAll": "Free For All: Items",
-                "ItemsFreeForAllExplanation": "Everyone who has access to this item pile will be able to take any amount of items from it.",
+                "ItemsFreeForAllExplanation": "Everyone who has access to this item pile will be able to take any amount of items from it. Disabled means they can only take their share of the available items.",
                 "AttributesFreeForAll": "Free For All: Attributes",
                 "AttributesFreeForAllExplanation": "Similar to the above, but it applies to attributes (usually currencies).",
                 "TakeAllEnabled": "Enable Take All Button",
                 "TakeAllEnabledExplanation": "Enables the \"Take All\" button when looting this item pile. Requires both Free For All settings to be enabled.",
-                "InactivePlayers": "Share Only With Active Players",
-                "InactivePlayersExplanation": "Only players who are active when the item pile is looted will be given their share."
+                "SplitAllEnabled": "Enable Split With Players Button",
+                "SplitAllEnabledExplanation": "Enables the \"Split With [number] Players\" button when looting this item pile. Pressing this button makes all players (or only active players, see below) receive their share of the item pile.",
+                "InactivePlayers": "Split Only With Active Players",
+                "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile."
             },
 
             "Merchant": {
                 "Title": "Merchant Settings",
                 "IsMerchant": "Is Merchant",
-                "IsMerchantExplanation": "When enabled, this pile will use a completely different sheet designed for trading."
+                "IsMerchantExplanation": "When enabled, this pile will use a completely different sheet designed for trading.",
+                "AutoMerchant": "Automatic Merchant",
+                "AutoMerchantExplanation": "When enabled, the merchant sheet will not open for GMs when a player opens it.",
+                "PriceModifier": "Price Modifier",
+                "PriceModifierExplanation": "Sets the modifier for all prices of items of this merchant - 0.5 would put all prices at 50%, 1.5 is 150%, etc."
             }
 
         },

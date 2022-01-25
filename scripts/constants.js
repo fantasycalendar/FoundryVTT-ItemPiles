@@ -37,10 +37,13 @@ const CONSTANTS = {
         itemsFreeForAll: true,
         attributesFreeForAll: false,
         takeAllEnabled: false,
+        splitAllEnabled: true,
         activePlayers: false,
 
         // Merchant Settings
-        isMerchant: false
+        isMerchant: false,
+        autoMerchant: false,
+        priceModifier: 1.0
     }
 }
 

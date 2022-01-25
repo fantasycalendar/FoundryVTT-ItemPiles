@@ -21,12 +21,13 @@ Hooks.once("init", () => {
     Hooks.on("canvasReady", module._canvasReady);
     Hooks.on("createToken", module._createPile);
     Hooks.on("deleteToken", module._deletePile);
-    Hooks.on("dropCanvasData", module._dropCanvasData);
+    Hooks.on("dropCanvasData", module._dropData);
     Hooks.on("updateActor", module._pileAttributeChanged);
     Hooks.on("createItem", module._pileInventoryChanged);
     Hooks.on("updateItem", module._pileInventoryChanged);
     Hooks.on("deleteItem", module._pileInventoryChanged);
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
+    Hooks.on("getActorDirectoryEntryContext", module._handleActorContextMenu);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
     Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
@@ -76,9 +77,9 @@ Hooks.once("ready", () => {
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
 
-    const tokenD = canvas.tokens.get("ejVV1jzRMhM9zpec");
+    const tokenD = canvas.tokens.get("49LMZ9kHkmHrxv3z");
 
-    ItemPileConfig.show(tokenD.actor);
+    //ItemPileConfig.show(tokenD.actor);
 
 });
 
@@ -215,8 +216,25 @@ const module = {
         })
     },
 
-    async _dropCanvasData(canvas, data) {
-        return API._dropDataOnCanvas(canvas, data);
+    async _dropData(canvas, data) {
+        return API._dropData(canvas, data);
     },
 
+    _handleActorContextMenu(html, menuItems) {
+        menuItems.push({
+            name: "ITEM-PILES.ContextMenu.ShowToPlayers",
+            icon: `<i class="fas fa-eye"></i>`,
+            callback: (html) => {
+                const actorId = html[0].dataset.documentId;
+                const actor = game.actors.get(actorId);
+                const users = Array.from(game.users).filter(u => u.active).map(u => u.id);
+                return API.openItemPileInventory(actor, users, { useDefaultCharacter: true });
+            },
+            condition: (html) => {
+                const actorId = html[0].dataset.documentId;
+                const actor = game.actors.get(actorId);
+                return API.isValidItemPile(actor);
+            }
+        });
+    }
 }

@@ -20,8 +20,7 @@ export class ItemPileConfig extends FormApplication {
             classes: ["sheet", "item-pile-config"],
             template: `${CONSTANTS.PATH}templates/item-pile-config.html`,
             width: 430,
-            height: 620,
-            resizable: false,
+            resizable: true,
             tabs: [{ navSelector: ".tabs", contentSelector: ".tab-body", initial: "mainsettings" }]
         });
     }

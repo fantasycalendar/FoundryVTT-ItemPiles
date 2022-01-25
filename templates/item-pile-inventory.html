@@ -25,6 +25,7 @@
             </div>
 
             <div class="item-piles-items">
+
                 {{#each items as |item id|}}
                 <div class="flexrow item-piles-item-row {{#unless item.quantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
                     <img class="item-piles-img" src="{{item.img}}"/>
@@ -37,10 +38,10 @@
                         <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.quantity}}disabled{{/unless}}/>
                     {{/if}}
                     <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
-                        {{#if @root.hasRecipient}}/ {{else}}x{{/if}}{{item.quantity}}
+                        {{item.shareLeft}} | {{item.quantity}}
                     </span>
                     {{#if @root.hasRecipient}}
-                        <button class="item-piles-take-button" type="button" {{#unless item.quantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                        <button class="item-piles-take-button" type="button" {{#unless item.shareLeft}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
                     {{/if}}
                 </div>
                 {{/each}}
@@ -55,7 +56,7 @@
                         <input class="item-piles-quantity" type="number" min="1" value="{{attribute.currentQuantity}}" max="{{attribute.quantity}}" {{#unless attribute.quantity}}disabled{{/unless}}/>
                     {{/if}}
                     <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
-                        {{#if @root.hasRecipient}}/ {{else}}x{{/if}}{{attribute.quantity}}
+                         {{attribute.shareLeft}} | {{attribute.quantity}}
                     </span>
                     {{#if @root.hasRecipient}}
                         <button class="item-piles-attribute-take-button" type="button" {{#unless attribute.quantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
@@ -68,7 +69,14 @@
 
         <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
             {{#each buttons as |button id|}}
-            <button type="submit" name="{{ button.value }}" value="{{ button.value }}"><i class="{{ button.icon }}"></i> {{ button.text }}</button>
+            <button
+                name="{{ button.value }}"
+                value="{{ button.value }}"
+                type="{{#if button.type}}{{button.type}}{{else}}submit{{/if}}"
+                {{#if button.disabled}}disabled{{/if}}
+                >
+                    <i class="{{ button.icon }}"></i> {{ button.text }}
+            </button>
             {{/each}}
         </footer>
 

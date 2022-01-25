@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.3.0
+- Added the ability to split item quantities and 
+
 ## Version 1.2.8
 - Added `Open Actor Sheet` and `Configure Pile` buttons to the Item Pile inventory UI (visible only to GMs)
 - Fixed bug where Item Piles would ignore case-sensitive item filters and attribute paths 
@@ -107,7 +110,7 @@
 ## Version 1.0.6
 - Added API endpoints:
     - `ItemPiles.API.getDocumentItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
-    - `ItemPiles.API.getValidDocumentItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
+    - `ItemPiles.API.getItemPileItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
 - Updated japanese localization
 - Fixed item piles not respecting item type filters
 - Fixed issue with `ItemPiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile

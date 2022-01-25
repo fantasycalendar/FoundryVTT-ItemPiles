@@ -96,9 +96,9 @@ export function tokens_close_enough(a, b, maxDistance){
     return maxDistance >= distance;
 }
 
-export function getSimilarItem(items, { itemId, itemName, itemType }={}) {
+export function findSimilarItem(items, findItem) {
     for (const item of items) {
-        if (item.id === itemId || (item.name === itemName && item.type === itemType)) {
+        if (item.id === (findItem.id ?? findItem._id) || (item.name === findItem.name && item.type === (findItem.type ?? findItem.data.type))) {
             return item;
         }
     }
@@ -180,16 +180,14 @@ export function getItemPileTokenImage(target, data = false) {
 
     let originalImg;
     if(pileDocument instanceof TokenDocument){
-        originalImg = pileDocument.data.actorLink
-            ? pileDocument.actor.data.token.img
-            : pileDocument.data.img;
+        originalImg = pileDocument.actor.data.token.img;
     }else{
         originalImg = pileDocument.data.token.img;
     }
 
     if(!isValidItemPile(pileDocument)) return originalImg;
 
-    const items = getValidDocumentItems(pileDocument);
+    const items = getItemPileItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
@@ -232,14 +230,12 @@ export function getItemPileTokenScale(target, data) {
 
     let baseScale;
     if(pileDocument instanceof TokenDocument){
-        baseScale = pileDocument.data.actorLink
-            ? pileDocument.actor.data.token.scale
-            : pileDocument.data.scale;
+        baseScale = pileDocument.actor.data.token.scale;
     }else{
         baseScale = pileDocument.data.token.scale;
     }
 
-    const items = getValidDocumentItems(pileDocument);
+    const items = getItemPileItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
@@ -258,12 +254,19 @@ export function getItemPileName(target, data){
         data = getItemPileData(pileDocument);
     }
 
-    const items = getValidDocumentItems(pileDocument);
+    const items = getItemPileItems(pileDocument);
     const attributes = getItemPileAttributes(pileDocument);
 
     const numItems = items.length + attributes.length;
 
-    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.showItemName || numItems > 1 || numItems === 0) return pileDocument.name;
+    let name;
+    if(pileDocument instanceof TokenDocument){
+        name = pileDocument.actor.data.token.name;
+    }else{
+        name = pileDocument.data.token.name;
+    }
+
+    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.showItemName || numItems > 1 || numItems === 0) return name;
 
     const item = items.length > 0
         ? items[0]
@@ -274,7 +277,7 @@ export function getItemPileName(target, data){
 }
 
 
-export function getValidDocumentItems(target, itemFilters = false){
+export function getItemPileItems(target, itemFilters = false){
 
     const pileItemFilters = itemFilters || getDocumentItemFilters(target);
 
@@ -295,6 +298,13 @@ export function isResponsibleGM() {
     if (!game.user.isGM) return false;
     const connectedGMs = game.users.filter(isActiveGM);
     return !connectedGMs.some(other => other.data._id < game.user.data._id);
+}
+
+export function getPlayersForItemPile(target){
+    const inDocument = getDocument(target);
+    const pileData = getItemPileData(inDocument);
+    if(!isValidItemPile(inDocument)) return [];
+    return Array.from(game.users).filter(u => (u.active || !pileData.activePlayers) && u.character);
 }
 
 export function isItemInvalid(target, item, itemFilters = false){
@@ -349,7 +359,7 @@ export function isItemPileEmpty(target) {
 
     if(!targetActor) return false;
 
-    const hasNoItems = getValidDocumentItems(inDocument).length === 0;
+    const hasNoItems = getItemPileItems(inDocument).length === 0;
     const hasEmptyAttributes = getItemPileAttributes(inDocument).length === 0;
 
     return hasNoItems && hasEmptyAttributes;
@@ -364,18 +374,19 @@ export function getItemPileAttributeList(target){
 
 export function getItemPileAttributes(target) {
     const inDocument = getDocument(target);
-    let targetActor = inDocument?.actor ?? inDocument;
+    const targetActor = inDocument?.actor ?? inDocument;
     const attributes = getItemPileAttributeList(targetActor);
     return attributes
         .filter(attribute => {
             return hasProperty(targetActor.data, attribute.path) && Number(getProperty(targetActor.data, attribute.path)) > 0;
         }).map(attribute => {
             const localizedName = game.i18n.has(attribute.name) ? game.i18n.localize(attribute.name) : attribute.name;
+            const quantity = Number(getProperty(targetActor.data, attribute.path) ?? 1);
             return {
                 name: localizedName,
                 path: attribute.path,
                 img: attribute.img,
-                quantity: Number(getProperty(targetActor.data, attribute.path) ?? 1)
+                quantity: quantity
             }
         });
 }
@@ -435,3 +446,289 @@ export async function updateItemPileData(target, flagData, tokenData){
     });
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* -------------------------- Sharing Methods ------------------------- */
+
+
+export function getItemQuantity(item){
+    return Number(getProperty(item?._id ? item : item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+}
+
+
+export function getItemPileSharingData(target){
+    let inDocument = getDocument(target);
+    if(inDocument instanceof TokenDocument){
+        inDocument = inDocument?.actor;
+    }
+    return foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA) ?? {});
+}
+
+export function updateItemPileSharingData(target, data){
+    let inDocument = getDocument(target);
+    if(inDocument instanceof TokenDocument){
+        inDocument = inDocument?.actor;
+    }
+    const sharingData = foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA) ?? {});
+    const finalData = foundry.utils.mergeObject(sharingData, data);
+    return inDocument.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA, finalData);
+}
+
+export async function setItemPileSharingData(sourceUuid, targetUuid, items){
+
+    const source = await fromUuid(sourceUuid);
+    const target = await fromUuid(targetUuid);
+
+    const sourceActor = source?.actor ?? source;
+    const targetActor = target?.actor ?? target;
+
+    const sourceIsItemPile = isValidItemPile(sourceActor);
+    const targetIsItemPile = isValidItemPile(target);
+
+    if(sourceIsItemPile && targetIsItemPile) return;
+
+    items = items.map(itemData => {
+        setProperty(itemData.item, API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
+        return itemData.item;
+    })
+
+    if(sourceIsItemPile) {
+
+        const pileData = getItemPileData(sourceActor);
+
+        if (pileData.itemsFreeForAll) return;
+
+        return addItemsToItemPileSharing(sourceActor, targetActor.uuid, items);
+
+    }
+
+    const pileData = getItemPileData(targetActor);
+
+    if (pileData.itemsFreeForAll) return;
+
+    return removeItemsFromItemPileSharing(targetActor, sourceActor.uuid, items);
+
+}
+
+
+
+export async function addItemsToItemPileSharing(itemPile, actorUuid, items){
+
+    const itemPileData = getItemPileData(itemPile);
+
+    let pileSharingData = {};
+
+    if(!itemPileData.itemsFreeForAll) {
+
+        pileSharingData = getItemPileSharingData(itemPile);
+
+        if (!pileSharingData.items) {
+            pileSharingData.items = [];
+        }
+
+        for (const item of items) {
+
+            let existingItem = findSimilarItem(pileSharingData.items, item);
+
+            const itemQuantity = getItemQuantity(item);
+
+            if (!existingItem) {
+                let itemIndex = pileSharingData.items.push({
+                    name: item.name,
+                    type: item.type,
+                    actors: [{ uuid: actorUuid, quantity: 0 }]
+                })
+                existingItem = pileSharingData.items[itemIndex-1];
+            }else{
+                if (!existingItem.actors) {
+                    existingItem.actors = [];
+                }
+            }
+
+            let actorData = existingItem.actors.find(data => data.uuid === actorUuid);
+
+            if (!actorData) {
+                if(itemQuantity > 0) {
+                    existingItem.actors.push({ uuid: actorUuid, quantity: itemQuantity })
+                }
+            } else {
+                actorData.quantity += itemQuantity;
+                if(actorData.quantity <= 0){
+                    existingItem.actors.splice(existingItem.actors.indexOf(actorData), 1);
+                }
+            }
+
+        }
+
+    }
+
+    return updateItemPileSharingData(itemPile, pileSharingData);
+
+}
+
+export async function removeItemsFromItemPileSharing(itemPile, actorUuid, items){
+
+    const itemPileData = getItemPileData(itemPile);
+
+    if(!itemPileData.itemsFreeForAll) {
+
+        items = items.map(item => {
+            setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, getItemQuantity(item) * -1)
+            return item;
+        });
+
+    }
+
+    return addItemsToItemPileSharing(itemPile, actorUuid, items);
+
+}
+
+export function getItemPileItemsForActor(pile, recipient){
+
+    const pileData = getItemPileData(pile);
+    const pileItems = getItemPileItems(pile);
+
+    const players = getPlayersForItemPile(pile);
+    const pileSharingData = getItemPileSharingData(pile);
+    const storedItems = pileSharingData.items ?? [];
+
+    const recipientUuid = getUuid(recipient);
+
+    return pileItems.map(item => {
+
+        const quantity = getItemQuantity(item);
+        let data = {
+            id: item.id,
+            name: item.name,
+            type: item.type,
+            img: item.data?.img ?? "",
+            currentQuantity: 1,
+            quantity: quantity,
+            shareLeft: false
+        };
+
+        if(!pileData.itemsFreeForAll && recipientUuid) {
+
+            const foundItem = findSimilarItem(storedItems, item);
+
+            let totalShares = quantity;
+            if(foundItem) {
+                totalShares += foundItem.actors.reduce((acc, actor) => acc + actor.quantity, 0);
+            }
+
+            let totalActorShare = totalShares / players.length;
+            if(!Number.isInteger(totalActorShare)){
+                totalActorShare += 1;
+            }
+
+            let actorQuantity = foundItem.actors ? foundItem?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
+
+            data.shareLeft = Math.min(quantity, Math.floor(totalActorShare - actorQuantity));
+
+        }
+
+        return data;
+
+    });
+
+}
+
+export function getItemPileAttributesForActor(pile, recipient){
+
+    const pileData = getItemPileData(pile);
+    const pileAttributes = getItemPileAttributes(pile);
+
+    const players = getPlayersForItemPile(pile);
+    const pileSharingData = getItemPileSharingData(pile);
+    const storedAttributes = pileSharingData.attributes ?? [];
+
+    const recipientUuid = getUuid(recipient);
+
+    return pileAttributes.filter(attribute => {
+        return hasProperty(recipient?.data ?? {}, attribute.path);
+    }).map(attribute => {
+
+        attribute.shareLeft = false;
+        attribute.currentQuantity = 1;
+
+        if(!pileData.attributesFreeForAll && recipientUuid) {
+
+            const foundAttribute = findSimilarItem(storedAttributes, attribute.path);
+
+            let totalShares = attribute.quantity;
+            if(foundAttribute) {
+                totalShares += foundAttribute.actors.reduce((acc, actor) => acc + actor.quantity, 0);
+            }
+
+            let totalActorShare = totalShares / players.length;
+            if(!Number.isInteger(totalActorShare)){
+                totalActorShare += 1;
+            }
+
+            let actorQuantity = foundAttribute.actors ? foundAttribute?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
+
+            attribute.shareLeft = Math.min(attribute.quantity, Math.floor(totalActorShare - actorQuantity));
+
+        }
+
+        return attribute;
+
+    });
+
+}
+
+export function getItemPileSplittableItems(target, numTakers, itemFilters = false){
+
+    const inDocument = getDocument(target);
+    let targetActor = inDocument?.actor ?? inDocument;
+    return getItemPileItems(targetActor, itemFilters)
+        .map(item => item.toObject())
+        .filter(item => {
+            return getItemQuantity(item) / numTakers >= 1;
+        }).map(item => {
+            const toRemovePerActor = Math.floor(getItemQuantity(item) / numTakers);
+            return {
+                item,
+                quantity: toRemovePerActor * numTakers
+            };
+        });
+
+}
+
+export function getItemPileSplittableAttributes(target, numTakers) {
+    const inDocument = getDocument(target);
+    let targetActor = inDocument?.actor ?? inDocument;
+    return getItemPileAttributes(targetActor)
+        .filter(attribute => {
+            return attribute.quantity >= numTakers;
+        }).map(attribute => {
+            const toRemovePerActor = Math.floor(getProperty(targetActor.data, attribute.path) / numTakers);
+            attribute.quantity = toRemovePerActor * numTakers;
+            return attribute;
+        });
+}
+
+
+
+

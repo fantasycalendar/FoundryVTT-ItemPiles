@@ -1,5 +1,6 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
+import * as lib from "../lib/lib.js";
 
 export default class DropDialog extends FormApplication {
 
@@ -35,7 +36,7 @@ export default class DropDialog extends FormApplication {
         data.dropObjects = this.dropObjects;
         data.itemPileAtLocation = this.dropObjects.length > 0;
         data.droppedItem = this.droppedItem;
-        data.itemQuantity = Number(getProperty(this.droppedItem, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1);
+        data.itemQuantity = lib.getItemQuantity(this.droppedItem);
         data.itemQuantityMoreThanOne = data.itemQuantity > 1;
 
         return data;

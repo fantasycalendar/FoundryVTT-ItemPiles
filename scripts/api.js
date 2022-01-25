@@ -5,6 +5,7 @@ import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropDialog from "./formapplications/dropDialog.js";
 import HOOKS from "./hooks.js";
 import { hotkeyState } from "./hotkeys.js";
+import { getItemPileSplittableItems } from "./lib/lib.js";
 
 export default class API {
 
@@ -682,7 +683,7 @@ export default class API {
             const user = game.users.get(userId);
             if(!user) throw lib.custom_error(`openItemPileInventory | No user with ID "${userId}" exists`);
             if(useDefaultCharacter){
-                if(!user.character){
+                if(!user.character && !user.isGM){
                     lib.custom_warning(`openItemPileInventory | User with id "${userId}" has no default character`, true);
                     return
                 }
@@ -699,7 +700,7 @@ export default class API {
         const target = await fromUuid(targetUuid);
 
         let inspectingTarget;
-        if(useDefaultCharacter){
+        if(useDefaultCharacter && !game.user.isGM){
             inspectingTarget = game.user.character;
         }else{
             inspectingTarget = inspectingTargetUuid ? (await fromUuid(inspectingTargetUuid)) : false;
@@ -711,7 +712,7 @@ export default class API {
     /**
      * Whether a given document is a valid pile or not
      *
-     * @param {Token/TokenDocument|Actor} document
+     * @param {Token/TokenDocument/Actor} document
      * @return {boolean}
      */
     static isValidItemPile(document) {
@@ -721,7 +722,7 @@ export default class API {
     /**
      * Whether the item pile is empty
      *
-     * @param {Token/TokenDocument|Actor} target
+     * @param {Token/TokenDocument/Actor} target
      * @returns {boolean}
      */
     static isItemPileEmpty(target){
@@ -731,18 +732,30 @@ export default class API {
     /**
      * Returns the items this item pile can transfer
      *
-     * @param {Token/TokenDocument|Actor} target
+     * @param {Token/TokenDocument/Actor} target
      * @param {array/boolean} [itemFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
      * @returns {Array}
      */
     static getItemPileItems(target, itemFilters = false){
-        return lib.getValidDocumentItems(target, itemFilters);
+        return lib.getItemPileItems(target, itemFilters);
+    }
+
+    /**
+     * Returns the items this item pile can transfer
+     *
+     * @param {Token/TokenDocument/Actor} target
+     * @param {number} numTakers
+     * @param {array/boolean} [itemFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
+     * @returns {Array}
+     */
+    static getSplittableItemPileItems(target, numTakers, itemFilters = false){
+        return lib.getItemPileSplittableItems(target, numTakers, itemFilters);
     }
 
     /**
      * Returns the attributes this item pile can transfer
      *
-     * @param {Token/TokenDocument|Actor} target
+     * @param {Token/TokenDocument/Actor} target
      * @returns {array}
      */
     static getItemPileAttributes(target){
@@ -750,9 +763,20 @@ export default class API {
     }
 
     /**
+     * Returns the attributes this item pile can transfer
+     *
+     * @param {Token/TokenDocument/Actor} target
+     * @param {number} numTakers
+     * @returns {array}
+     */
+    static getSplittableItemPileAttributes(target, numTakers){
+        return lib.getItemPileSplittableAttributes(target, true);
+    }
+
+    /**
      * Refreshes the target image of an item pile, ensuring it remains in sync
      *
-     * @param {Token/TokenDocument|Actor} target
+     * @param {Token/TokenDocument/Actor} target
      * @return {Promise}
      */
     static async refreshItemPile(target) {
@@ -808,7 +832,25 @@ export default class API {
         return ItemPileInventory.rerenderActiveApp(inPileUuid, deleted);
     }
 
+    static async splitItemPileContents(itemPile, { actors = false, splitItems = false, splitAttributes = true }={}) {
+
+        if (!lib.isValidItemPile(itemPile)) return false;
+
+        const itemPileUuid = lib.is_UUID(itemPile) ? itemPile : lib.getUuid(itemPile);
+        if (!itemPileUuid) throw lib.custom_error(`SplitItemPileContents | Could not determine the UUID, please provide a valid item pile`, true)
+
+        const itemPileActor = itemPile?.actor ?? itemPile;
+
+        const actorsToTake = actors || lib.getPlayersForItemPile(itemPileActor).map(u => u.character);
+
+        const itemsToSplit = lib.getItemPileSplittableItems(itemPileActor, actorsToTake.length);
+
+        const attributesToSplit = lib.getItemPileSplittableAttributes(itemPileActor, actorsToTake.length)
+
+    }
+
     /* --- ITEM AND ATTRIBUTE METHODS --- */
+
 
     /**
      * Adds item to an actor, increasing item quantities if matches were found
@@ -840,7 +882,7 @@ export default class API {
 
             return {
                 item: item,
-                quantity: itemData?.quantity ?? getProperty(item?.data ?? item ?? {}, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1
+                quantity: itemData?.quantity ?? lib.getItemQuantity(item)
             }
         });
 
@@ -870,17 +912,13 @@ export default class API {
 
             let item = itemData.item;
 
-            const foundItem = lib.getSimilarItem(targetActorItems, {
-                itemId: item._id,
-                itemName: item.name,
-                itemType: item.type
-            });
+            const foundItem = lib.findSimilarItem(targetActorItems, item);
 
-            const incomingQuantity = Number(itemData?.quantity ?? getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1);
+            const incomingQuantity = Number(itemData?.quantity ?? lib.getItemQuantity(itemData));
 
             if (foundItem) {
                 item = foundItem.toObject();
-                const currentQuantity = Number(getProperty(item, API.ITEM_QUANTITY_ATTRIBUTE));
+                const currentQuantity = lib.getItemQuantity(item);
                 const newQuantity = currentQuantity + incomingQuantity;
                 itemsToUpdate.push({
                     "_id": item._id,
@@ -906,7 +944,7 @@ export default class API {
             const itemObject = item.toObject()
             itemsAdded.push({
                 item: itemObject,
-                quantity: getProperty(itemObject, API.ITEM_QUANTITY_ATTRIBUTE)
+                quantity: lib.getItemQuantity(itemObject)
             })
         });
 
@@ -960,20 +998,22 @@ export default class API {
                 if (!item) {
                     throw lib.custom_error(`RemoveItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
                 }
-            }else if(itemData.item instanceof Item){
-                item = itemData.item.toObject();
+                item = item.toObject();
             }else{
-                item = itemData.item;
-            }
-
-            let foundActorItem = targetActorItems.find(actorItem => actorItem.id === item._id);
-            if (!foundActorItem) {
-                throw lib.custom_error(`RemoveItems | Could not find item with id "${item._id}" on target "${targetUuid}"`, true)
+                if(itemData.item instanceof Item){
+                    item = itemData.item.toObject();
+                }else{
+                    item = itemData.item;
+                }
+                let foundActorItem = targetActorItems.find(actorItem => actorItem.id === item._id);
+                if (!foundActorItem) {
+                    throw lib.custom_error(`RemoveItems | Could not find item with id "${item._id}" on target "${targetUuid}"`, true)
+                }
             }
 
             return {
                 _id: item._id,
-                quantity: itemData?.quantity ?? getProperty(foundActorItem.data, API.ITEM_QUANTITY_ATTRIBUTE)
+                quantity: itemData?.quantity ?? lib.getItemQuantity(item)
             }
         });
 
@@ -1001,7 +1041,7 @@ export default class API {
 
             const item = targetActor.items.get(itemData._id).toObject();
 
-            const currentQuantity = Number(getProperty(item, API.ITEM_QUANTITY_ATTRIBUTE));
+            const currentQuantity = lib.getItemQuantity(item);
 
             const quantityToRemove = itemData.quantity;
 
@@ -1101,7 +1141,7 @@ export default class API {
 
             return {
                 _id: item._id,
-                quantity: Math.max((itemData?.quantity ?? 0) ?? getProperty(foundActorItem.data, API.ITEM_QUANTITY_ATTRIBUTE))
+                quantity: Math.max((itemData?.quantity ?? 0) ?? lib.getItemQuantity(itemData))
             }
         });
 
@@ -1126,6 +1166,8 @@ export default class API {
         const itemsAdded = await API._addItems(targetUuid, itemsRemoved, userId, { interactionId: interactionId, isTransfer: true });
 
         if (!isEverything) {
+
+            await lib.setItemPileSharingData(sourceUuid, targetUuid, itemsAdded);
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemsAdded, userId, interactionId);
 
@@ -1569,9 +1611,7 @@ export default class API {
         const sourceAttributes = API.getItemPileAttributes(sourceActor);
 
         const attributesToTransfer = sourceAttributes.filter(attribute => {
-            return hasProperty(sourceActor.data, attribute.path)
-                && Number(getProperty(sourceActor.data, attribute.path)) > 0
-                && hasProperty(targetActor.data, attribute.path);
+            return hasProperty(targetActor.data, attribute.path);
         }).map(attribute => attribute.path);
 
         const attributesRemoved = await API._removeAttributes(sourceUuid, attributesToTransfer, userId, { interactionId: interactionId, isTransfer: true });
@@ -1793,7 +1833,7 @@ export default class API {
      * @return {Promise}
      * @private
      */
-    static async _dropDataOnCanvas(canvas, data, { target = false } = {}) {
+    static async _dropData(canvas, data, { target = false } = {}) {
 
         if (data.type !== "Item") return;
 
@@ -1855,6 +1895,11 @@ export default class API {
                 .map(token => token.document)
                 .filter(token => lib.isValidItemPile(token));
 
+        }
+
+        if(droppableDocuments.length && game.settings.get('midi-qol', "DragDropTarget")){
+            lib.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items")
+            return;
         }
 
         if (droppableDocuments.length > 0 && !game.user.isGM) {

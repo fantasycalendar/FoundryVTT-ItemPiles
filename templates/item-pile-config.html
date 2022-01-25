@@ -236,6 +236,14 @@
 
                 <div class="form-group">
                     <label>
+                        {{localize "ITEM-PILES.Defaults.Sharing.SplitAllEnabled"}}<br>
+                        <p>{{localize "ITEM-PILES.Defaults.Sharing.SplitAllEnabledExplanation"}}</p>
+                    </label>
+                    <input type="checkbox" name="splitAllEnabled" {{checked flagData.splitAllEnabled}}/>
+                </div>
+
+                <div class="form-group">
+                    <label>
                         {{localize "ITEM-PILES.Defaults.Sharing.InactivePlayers"}}<br>
                         <p>{{localize "ITEM-PILES.Defaults.Sharing.InactivePlayersExplanation"}}</p>
                     </label>
@@ -254,6 +262,22 @@
                         <p>{{localize "ITEM-PILES.Defaults.Merchant.IsMerchantExplanation"}}</p>
                     </label>
                     <input type="checkbox" name="isMerchant" {{checked flagData.isMerchant}}/>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        {{localize "ITEM-PILES.Defaults.Merchant.AutoMerchant"}}<br>
+                        <p>{{localize "ITEM-PILES.Defaults.Merchant.AutoMerchantExplanation"}}</p>
+                    </label>
+                    <input type="checkbox" name="autoMerchant" {{checked flagData.autoMerchant}}/>
+                </div>
+
+                <div class="form-group">
+                    <label style="flex:8;">
+                        {{localize "ITEM-PILES.Defaults.Merchant.PriceModifier"}}<br>
+                        <p>{{localize "ITEM-PILES.Defaults.Merchant.PriceModifierExplanation"}}</p>
+                    </label>
+                    <input style="flex:1;" type="number" min="0" placeholder="Input price modifier..." step="0.01" name="priceModifier" value="{{flagData.priceModifier}}"/>
                 </div>
 
             </details>
