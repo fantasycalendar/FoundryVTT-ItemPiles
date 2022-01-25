@@ -580,6 +580,9 @@ export function addToItemPileSharingData(itemPile, actorUuid, { sharingData = fa
                 if(actorData.quantity <= 0){
                     existingItem.actors.splice(existingItem.actors.indexOf(actorData), 1);
                 }
+                if(existingItem.actors.length === 0){
+                    pileSharingData.items.splice(pileSharingData.items.indexOf(existingItem), 1)
+                }
             }
 
         }
@@ -618,6 +621,9 @@ export function addToItemPileSharingData(itemPile, actorUuid, { sharingData = fa
                 actorData.quantity += attribute.quantity;
                 if(actorData.quantity <= 0){
                     existingAttribute.actors.splice(existingAttribute.actors.indexOf(actorData), 1);
+                }
+                if(existingAttribute.actors.length === 0){
+                    pileSharingData.attributes.splice(pileSharingData.items.indexOf(existingAttribute), 1)
                 }
             }
 

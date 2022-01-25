@@ -67,10 +67,11 @@ const chatHandler = {
         let itemData = [];
         if(sharingData.items){
             itemData = sharingData.items.map(item => {
+                const totalQuantity = item.actors.reduce((acc, item) => acc + item.quantity, 0)
                 return {
                     name: item.name,
                     img: item.img,
-                    quantity: Math.floor(item.actors.reduce((acc, item) => acc + item.quantity, 0) / item.actors.length)
+                    quantity: Math.floor( totalQuantity / item.actors.length)
                 }
             })
         }
@@ -80,10 +81,11 @@ const chatHandler = {
             const attributeList = lib.getItemPileAttributeList(source);
             attributeData = sharingData.attributes.map(attributeData => {
                 const attribute = attributeList.find(attribute => attribute.path === attributeData.path);
+                const totalQuantity = attributeData.actors.reduce((acc, storedAttribute) => acc + storedAttribute.quantity, 0);
                 return {
                     name: game.i18n.has(attribute.name) ? game.i18n.localize(attribute.name) : attribute.name,
                     img: attribute.img ?? "",
-                    quantity: Math.floor(attributeData.actors.reduce((acc, storedAttribute) => acc + storedAttribute.quantity, 0) / attributeData.actors.length),
+                    quantity: Math.floor(totalQuantity / attributeData.actors.length),
                     attribute: true,
                     index: attributeList.indexOf(attribute)
                 }
@@ -157,7 +159,7 @@ const chatHandler = {
 
         for(let message of messages){
             const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
-            if(flags && flags.source !== sourceUuid && flags.target === targetUuid) {
+            if(flags && flags.source === sourceUuid && flags.target === targetUuid) {
                 return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, attributes)
             }
         }

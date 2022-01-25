@@ -38,6 +38,12 @@ export class ItemPileInventory extends FormApplication {
         });
     }
 
+    /**
+     *
+     * @param inPileUuid
+     * @param recipientUuid
+     * @returns {Array<ItemPileInventory>[]|boolean}
+     */
     static getActiveAppFromPile(inPileUuid, recipientUuid = false) {
 
         const openApps = Object.values(ui.windows).filter(app => {
@@ -132,10 +138,12 @@ export class ItemPileInventory extends FormApplication {
             // We update the previously listed attribute to reflect this
             oldItem.quantity = foundItem ? foundItem.quantity : 0;
             oldItem.shareLeft = foundItem ? foundItem.shareLeft : 0;
-            oldItem.currentQuantity = foundItem ? Math.min(oldItem.currentQuantity, oldItem.shareLeft) : 0;
+            oldItem.currentQuantity = foundItem ? Math.min(oldItem.currentQuantity, foundItem.shareLeft) : 0;
 
             // We then remove it from the incoming list, as we already have it
-            newItems.splice(newItems.indexOf(foundItem), 1)
+            if(foundItem) {
+                newItems.splice(newItems.indexOf(foundItem), 1)
+            }
 
         }
 
@@ -168,10 +176,12 @@ export class ItemPileInventory extends FormApplication {
             // We update the previously listed attribute to reflect this
             oldAttribute.quantity = foundAttribute ? foundAttribute.quantity : 0;
             oldAttribute.shareLeft = foundAttribute ? foundAttribute.shareLeft : 0;
-            oldAttribute.currentQuantity = foundAttribute ? Math.min(oldAttribute.currentQuantity, oldAttribute.shareLeft) : 0;
+            oldAttribute.currentQuantity = foundAttribute ? Math.min(oldAttribute.currentQuantity, foundAttribute.shareLeft) : 0;
 
-            // We then remove it from the incoming list, as we already have it
-            newAttributes.splice(newAttributes.indexOf(foundAttribute), 1)
+            if(foundAttribute) {
+                // We then remove it from the incoming list, as we already have it
+                newAttributes.splice(newAttributes.indexOf(foundAttribute), 1)
+            }
 
         }
 
@@ -233,19 +243,22 @@ export class ItemPileInventory extends FormApplication {
 
         data.isEmpty = lib.isItemPileEmpty(this.pile);
 
+        const num_players = lib.getPlayersForItemPile(this.pile).length;
+
+        data.hasSplittableQuantities = data.items.find((item) => (item.quantity / num_players) > 1)
+            || data.attributes.find((attribute) => (attribute.quantity / num_players) > 1)
+
         data.buttons = [];
 
         if(data.hasRecipient){
 
-            if(pileData.splitAllEnabled && data.hasThings && !(pileData.itemsFreeForAll && pileData.attributesFreeForAll)) {
-
-                const num_players = Array.from(game.users).filter(u => (u.active || !pileData.activePlayers) && u.character && !u.isGM).length;
+            if(pileData.splitAllEnabled && !(pileData.itemsFreeForAll && pileData.attributesFreeForAll)) {
 
                 data.buttons.push({
                     value: "splitAll",
                     icon: "far fa-handshake",
                     text: game.i18n.format("ITEM-PILES.Inspect.SplitAll", { num_players }),
-                    disabled: !num_players,
+                    disabled: !num_players || !data.hasThings || !data.hasSplittableQuantities,
                     type: "button"
                 });
 
