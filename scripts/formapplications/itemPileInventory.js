@@ -4,7 +4,6 @@ import * as lib from "../lib/lib.js";
 import { isPileInventoryOpenForOthers } from "../socket.js";
 import HOOKS from "../hooks.js";
 import { ItemPileConfig } from "./itemPileConfig.js";
-import { addItemsToItemPileSharing, getItemPileAttributesForActor } from "../lib/lib.js";
 
 export class ItemPileInventory extends FormApplication {
 
@@ -22,7 +21,6 @@ export class ItemPileInventory extends FormApplication {
         this.items = [];
         this.attributes = [];
         this.deleted = false;
-        this.interactionId = randomID();
         this.overrides = overrides;
         this.pileData = lib.getItemPileData(this.pile);
         Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient, overrides);
@@ -132,9 +130,9 @@ export class ItemPileInventory extends FormApplication {
             const foundItem = lib.findSimilarItem(newItems, oldItem);
 
             // We update the previously listed attribute to reflect this
-            oldItem.currentQuantity = foundItem ? foundItem.currentQuantity : 0;
             oldItem.quantity = foundItem ? foundItem.quantity : 0;
             oldItem.shareLeft = foundItem ? foundItem.shareLeft : 0;
+            oldItem.currentQuantity = foundItem ? Math.min(oldItem.currentQuantity, oldItem.shareLeft) : 0;
 
             // We then remove it from the incoming list, as we already have it
             newItems.splice(newItems.indexOf(foundItem), 1)
@@ -168,9 +166,9 @@ export class ItemPileInventory extends FormApplication {
             const foundAttribute = newAttributes.find(currentAttribute => currentAttribute.path === oldAttribute.path);
 
             // We update the previously listed attribute to reflect this
-            oldAttribute.currentQuantity = foundAttribute ? foundAttribute.currentQuantity : 0;
             oldAttribute.quantity = foundAttribute ? foundAttribute.quantity : 0;
             oldAttribute.shareLeft = foundAttribute ? foundAttribute.shareLeft : 0;
+            oldAttribute.currentQuantity = foundAttribute ? Math.min(oldAttribute.currentQuantity, oldAttribute.shareLeft) : 0;
 
             // We then remove it from the incoming list, as we already have it
             newAttributes.splice(newAttributes.indexOf(foundAttribute), 1)
@@ -219,9 +217,14 @@ export class ItemPileInventory extends FormApplication {
         data.isContainer = false;
 
         const pileData = lib.getItemPileData(this.pile);
-        data.isContainer = pileData.isContainer;
+
         data.items = this.items.length ? this.items : this.getPileItemData();
+        this.items = data.items;
+
         data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
+        this.attributes = data.attributes;
+
+        data.isContainer = pileData.isContainer;
         data.hasItems = API.getItemPileItems(this.pile).length > 0;
         data.hasAttributes = data?.attributes?.length;
         data.canInspectItems = pileData.canInspectItems || game.user.isGM;
@@ -234,7 +237,7 @@ export class ItemPileInventory extends FormApplication {
 
         if(data.hasRecipient){
 
-            if(pileData.splitAllEnabled) {
+            if(pileData.splitAllEnabled && data.hasThings && !(pileData.itemsFreeForAll && pileData.attributesFreeForAll)) {
 
                 const num_players = Array.from(game.users).filter(u => (u.active || !pileData.activePlayers) && u.character && !u.isGM).length;
 
@@ -291,6 +294,23 @@ export class ItemPileInventory extends FormApplication {
         html.find('img').mouseleave(function () {
             self.clearImage(html);
             clearTimeout(timer);
+        });
+
+        html.find('.item-piles-quantity').keyup(function(){
+            const isItem = !!$(this).parent().attr("data-item-id");
+
+            const currentQuantity = Number($(this).val());
+
+            if(isItem){
+                const itemId = $(this).parent().attr("data-item-id");
+                const item = self.items.find(item => item.id === itemId)
+                item.currentQuantity = currentQuantity;
+                return;
+            }
+
+            const attributePath = $(this).parent().attr('data-attribute-path');
+            const attribute = self.attributes.find(attribute => attribute.path === attributePath)
+            attribute.currentQuantity = currentQuantity;
         });
 
         html.find(".item-piles-clickable").click(function () {
@@ -357,24 +377,23 @@ export class ItemPileInventory extends FormApplication {
         const item = this.pile.actor.items.get(itemId);
         let quantity = lib.getItemQuantity(item);
         quantity = Math.min(inputQuantity, quantity);
-        return API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }], { interactionId: this.interactionId });
+        return API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }]);
     }
 
     async takeAttribute(attribute, inputQuantity) {
         let quantity = Number(getProperty(this.pile.actor.data, attribute) ?? 0);
         quantity = Math.min(inputQuantity, quantity);
-        await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity }, { interactionId: this.interactionId });
+        await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity });
     }
 
     async splitAll(){
-        this.saveItems();
-        this.saveAttributes();
+        await API.splitItemPileContents(this.pile);
     }
 
     async _updateObject(event, formData) {
 
         if (event.submitter.value === "takeAll") {
-            API.transferEverything(this.pile, this.recipient, { interactionId: this.interactionId });
+            API.transferEverything(this.pile, this.recipient);
             return;
         }
 

@@ -105,31 +105,31 @@
 
 ### Item & Attribute Methods
 
-<dt><a href="#addItems">addItems(target, items, { interactionId })</a> ⇒ <code>Promise.&lt;array&gt;</code></dt>
+<dt><a href="#addItems">addItems(target, items)</a> ⇒ <code>Promise.&lt;array&gt;</code></dt>
 <dd><p>Adds item to an actor, increasing item quantities if matches were found</p>
 </dd>
-<dt><a href="#removeItems">removeItems(target, items, { interactionId })</a> ⇒ <code>Promise.&lt;array&gt;</code></dt>
+<dt><a href="#removeItems">removeItems(target, items)</a> ⇒ <code>Promise.&lt;array&gt;</code></dt>
 <dd><p>Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.</p>
 </dd>
-<dt><a href="#transferItems">transferItems(source, target, items, { interactionId })</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
+<dt><a href="#transferItems">transferItems(source, target, items)</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
 <dd><p>Transfers items from the source to the target, subtracting a number of quantity from the source&#39;s item and adding it to the target&#39;s item, deleting items from the source if their quantity reaches 0</p>
 </dd>
-<dt><a href="#transferAllItems">transferAllItems(source, target, { itemFilters, interactionId })</a> ⇒ <code>Promise.&lt;array&gt;</code></dt>
+<dt><a href="#transferAllItems">transferAllItems(source, target, { itemFilters })</a> ⇒ <code>Promise.&lt;array&gt;</code></dt>
 <dd><p>Transfers all items between the source and the target.</p>
 </dd>
-<dt><a href="#addAttributes">addAttributes(target, attributes, { interactionId })</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
+<dt><a href="#addAttributes">addAttributes(target, attributes)</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
 <dd><p>Adds to attributes on an actor</p>
 </dd>
-<dt><a href="#removeAttributes">removeAttributes(target, attributes, { interactionId })</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
+<dt><a href="#removeAttributes">removeAttributes(target, attributes)</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
 <dd><p>Subtracts attributes on the target</p>
 </dd>
-<dt><a href="#transferAttributes">transferAttributes(source, target, attributes, { interactionId })</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
+<dt><a href="#transferAttributes">transferAttributes(source, target, attributes)</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
 <dd><p>Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target</p>
 </dd>
-<dt><a href="#transferAllAttributes">transferAllAttributes(source, target, { interactionId })</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
+<dt><a href="#transferAllAttributes">transferAllAttributes(source, target)</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
 <dd><p>Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target</p>
 </dd>
-<dt><a href="#transferEverything">transferEverything(source, target, { itemFilters, interactionId })</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
+<dt><a href="#transferEverything">transferEverything(source, target, { itemFilters })</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
 <dd><p>Transfers all items and attributes between the source and the target.</p>
 </dd>
 <dt><a href="#rerenderTokenHud">rerenderTokenHud()</a> ⇒ <code>Promise</code></dt>
@@ -477,7 +477,7 @@ Causes all connected users to re-render a specific pile's inventory UI
 
 ---
 
-### addItems(target, items, { interactionId }) ⇒ <code>Promise.&lt;array&gt;</code>
+### addItems(target, items) ⇒ <code>Promise.&lt;array&gt;</code>
 Adds item to an actor, increasing item quantities if matches were found 
 **Returns**: <code>Promise.&lt;array&gt;</code> - An array of objects, each containing the item that was added or updated, and the quantity that was added  
 
@@ -485,13 +485,12 @@ Adds item to an actor, increasing item quantities if matches were found
 | --- | --- | --- | --- |
 | target | <code>Actor/TokenDocument/Token</code> |  | The target to add an item to |
 | items | <code>array</code> |  | An array of objects, with the key "item" being an item object or an Item class (the foundry class), with an optional key of "quantity" being the amount of the item to add |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="removeItems"></a>
 
 ---
 
-### removeItems(target, items, { interactionId }) ⇒ <code>Promise.&lt;array&gt;</code>
+### removeItems(target, items) ⇒ <code>Promise.&lt;array&gt;</code>
 Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor. 
 **Returns**: <code>Promise.&lt;array&gt;</code> - An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted  
 
@@ -499,13 +498,12 @@ Subtracts the quantity of items on an actor. If the quantity of an item reaches 
 | --- | --- | --- | --- |
 | target | <code>Actor/Token/TokenDocument</code> |  | The target to remove a items from |
 | items | <code>array</code> |  | An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="transferItems"></a>
 
 ---
 
-### transferItems(source, target, items, { interactionId }) ⇒ <code>Promise.&lt;object&gt;</code>
+### transferItems(source, target, items) ⇒ <code>Promise.&lt;object&gt;</code>
 Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0 
 **Returns**: <code>Promise.&lt;object&gt;</code> - An array of objects, each containing the item that was added or updated, and the quantity that was transferred  
 
@@ -514,13 +512,12 @@ Transfers items from the source to the target, subtracting a number of quantity 
 | source | <code>Actor/Token/TokenDocument</code> |  | The source to transfer the items from |
 | target | <code>Actor/Token/TokenDocument</code> |  | The target to transfer the items to |
 | items | <code>array</code> |  | An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity"), or Items (the foundry class) or strings of IDs to transfer all quantities of |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="transferAllItems"></a>
 
 ---
 
-### transferAllItems(source, target, { itemFilters, interactionId }) ⇒ <code>Promise.&lt;array&gt;</code>
+### transferAllItems(source, target, { itemFilters }) ⇒ <code>Promise.&lt;array&gt;</code>
 Transfers all items between the source and the target. 
 **Returns**: <code>Promise.&lt;array&gt;</code> - An array containing all of the items that were transferred to the target  
 
@@ -529,13 +526,12 @@ Transfers all items between the source and the target.
 | source | <code>Actor/Token/TokenDocument</code> |  | The actor to transfer all items from |
 | target | <code>Actor/Token/TokenDocument</code> |  | The actor to receive all the items |
 | [itemFilters] | <code>array/boolean</code> | <code>false</code> | Array of item types disallowed - will default to module settings if none provided |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="addAttributes"></a>
 
 ---
 
-### addAttributes(target, attributes, { interactionId }) ⇒ <code>Promise.&lt;object&gt;</code>
+### addAttributes(target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
 Adds to attributes on an actor 
 **Returns**: <code>Promise.&lt;object&gt;</code> - An array containing a key value pair of the attribute path and the quantity of that attribute that was removed  
 
@@ -543,13 +539,12 @@ Adds to attributes on an actor
 | --- | --- | --- | --- |
 | target | <code>Actor/Token/TokenDocument</code> |  | The target whose attribute will have a set quantity added to it |
 | attributes | <code>object</code> |  | An object with each key being an attribute path, and its value being the quantity to add |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="removeAttributes"></a>
 
 ---
 
-### removeAttributes(target, attributes, { interactionId }) ⇒ <code>Promise.&lt;object&gt;</code>
+### removeAttributes(target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
 Subtracts attributes on the target 
 **Returns**: <code>Promise.&lt;object&gt;</code> - An array containing a key value pair of the attribute path and the quantity of that attribute that was removed  
 
@@ -557,13 +552,12 @@ Subtracts attributes on the target
 | --- | --- | --- | --- |
 | target | <code>Token/TokenDocument</code> |  | The target whose attributes will be subtracted from |
 | attributes | <code>array/object</code> |  | This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="transferAttributes"></a>
 
 ---
 
-### transferAttributes(source, target, attributes, { interactionId }) ⇒ <code>Promise.&lt;object&gt;</code>
+### transferAttributes(source, target, attributes) ⇒ <code>Promise.&lt;object&gt;</code>
 Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target 
 **Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred  
 
@@ -572,13 +566,12 @@ Transfers a set quantity of an attribute from a source to a target, removing it 
 | source | <code>Actor/Token/TokenDocument</code> |  | The source to transfer the attribute from |
 | target | <code>Actor/Token/TokenDocument</code> |  | The target to transfer the attribute to |
 | attributes | <code>array/object</code> |  | This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="transferAllAttributes"></a>
 
 ---
 
-### transferAllAttributes(source, target, { interactionId }) ⇒ <code>Promise.&lt;object&gt;</code>
+### transferAllAttributes(source, target) ⇒ <code>Promise.&lt;object&gt;</code>
 Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target 
 **Returns**: <code>Promise.&lt;object&gt;</code> - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred  
 
@@ -586,13 +579,12 @@ Transfers all dynamic attributes from a source to a target, removing it or subtr
 | --- | --- | --- | --- |
 | source | <code>Actor/Token/TokenDocument</code> |  | The source to transfer the attributes from |
 | target | <code>Actor/Token/TokenDocument</code> |  | The target to transfer the attributes to |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="transferEverything"></a>
 
 ---
 
-### transferEverything(source, target, { itemFilters, interactionId }) ⇒ <code>Promise.&lt;object&gt;</code>
+### transferEverything(source, target, { itemFilters }) ⇒ <code>Promise.&lt;object&gt;</code>
 Transfers all items and attributes between the source and the target. 
 **Returns**: <code>Promise.&lt;object&gt;</code> - An object containing all items and attributes transferred to the target  
 
@@ -601,7 +593,6 @@ Transfers all items and attributes between the source and the target.
 | source | <code>Actor/Token/TokenDocument</code> |  | The actor to transfer all items and attributes from |
 | target | <code>Actor/Token/TokenDocument</code> |  | The actor to receive all the items and attributes |
 | [itemFilters] | <code>array/boolean</code> | <code>false</code> | Array of item types disallowed - will default to module settings if none provided |
-| [interactionId] | <code>string/boolean</code> | <code>false</code> | The ID of this interaction |
 
 <a name="rerenderTokenHud"></a>
 

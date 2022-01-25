@@ -112,7 +112,6 @@ export async function getToken(documentUuid) {
 
 export function is_UUID(inId) {
     return typeof inId === "string"
-        && inId.startsWith("Scene")
         && (inId.match(/\./g) || []).length
         && !inId.endsWith(".");
 }
@@ -495,7 +494,7 @@ export function updateItemPileSharingData(target, data){
     return inDocument.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA, finalData);
 }
 
-export async function setItemPileSharingData(sourceUuid, targetUuid, items){
+export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [], attributes = [] }={}){
 
     const source = await fromUuid(sourceUuid);
     const target = await fromUuid(targetUuid);
@@ -504,44 +503,50 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, items){
     const targetActor = target?.actor ?? target;
 
     const sourceIsItemPile = isValidItemPile(sourceActor);
-    const targetIsItemPile = isValidItemPile(target);
+    const targetIsItemPile = isValidItemPile(targetActor);
 
     if(sourceIsItemPile && targetIsItemPile) return;
 
-    items = items.map(itemData => {
-        setProperty(itemData.item, API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
-        return itemData.item;
-    })
+    if(items.length) {
+        items = items.map(itemData => {
+            setProperty(itemData.item, API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
+            return itemData.item;
+        })
+    }
+
+    if (!Array.isArray(attributes) && typeof attributes === "object") {
+        attributes = Object.entries(attributes).map(entry => {
+            return {
+                path: entry[0],
+                quantity: entry[1]
+            }
+        })
+    }
 
     if(sourceIsItemPile) {
 
-        const pileData = getItemPileData(sourceActor);
+        const sharingData = addToItemPileSharingData(sourceActor, targetActor.uuid, { items, attributes });
 
-        if (pileData.itemsFreeForAll) return;
-
-        return addItemsToItemPileSharing(sourceActor, targetActor.uuid, items);
+        return updateItemPileSharingData(sourceActor, sharingData);
 
     }
 
-    const pileData = getItemPileData(targetActor);
+    const sharingData = removeFromItemPileSharingData(targetActor, sourceActor.uuid, { items, attributes });
 
-    if (pileData.itemsFreeForAll) return;
-
-    return removeItemsFromItemPileSharing(targetActor, sourceActor.uuid, items);
+    return updateItemPileSharingData(targetActor, sharingData);
 
 }
 
-
-
-export async function addItemsToItemPileSharing(itemPile, actorUuid, items){
+export function addToItemPileSharingData(itemPile, actorUuid, { sharingData = false, items = [], attributes = [] }={}){
 
     const itemPileData = getItemPileData(itemPile);
 
-    let pileSharingData = {};
-
-    if(!itemPileData.itemsFreeForAll) {
-
+    let pileSharingData;
+    if(!sharingData && ((!itemPileData.itemsFreeForAll && items.length) || (!itemPileData.attributesFreeForAll && attributes.length))){
         pileSharingData = getItemPileSharingData(itemPile);
+    }
+
+    if(!itemPileData.itemsFreeForAll && items.length) {
 
         if (!pileSharingData.items) {
             pileSharingData.items = [];
@@ -551,23 +556,21 @@ export async function addItemsToItemPileSharing(itemPile, actorUuid, items){
 
             let existingItem = findSimilarItem(pileSharingData.items, item);
 
-            const itemQuantity = getItemQuantity(item);
-
             if (!existingItem) {
                 let itemIndex = pileSharingData.items.push({
                     name: item.name,
                     type: item.type,
+                    img: item.img,
                     actors: [{ uuid: actorUuid, quantity: 0 }]
                 })
                 existingItem = pileSharingData.items[itemIndex-1];
-            }else{
-                if (!existingItem.actors) {
-                    existingItem.actors = [];
-                }
+            }else if (!existingItem.actors) {
+                existingItem.actors = [];
             }
 
             let actorData = existingItem.actors.find(data => data.uuid === actorUuid);
 
+            const itemQuantity = getItemQuantity(item);
             if (!actorData) {
                 if(itemQuantity > 0) {
                     existingItem.actors.push({ uuid: actorUuid, quantity: itemQuantity })
@@ -583,28 +586,66 @@ export async function addItemsToItemPileSharing(itemPile, actorUuid, items){
 
     }
 
-    return updateItemPileSharingData(itemPile, pileSharingData);
+    if(!itemPileData.attributesFreeForAll && attributes.length) {
 
-}
+        if (!pileSharingData.attributes) {
+            pileSharingData.attributes = [];
+        }
 
-export async function removeItemsFromItemPileSharing(itemPile, actorUuid, items){
+        for (const attribute of attributes) {
 
-    const itemPileData = getItemPileData(itemPile);
+            let existingAttribute = pileSharingData.attributes.find(sharingAttribute => sharingAttribute.path === attribute.path);
 
-    if(!itemPileData.itemsFreeForAll) {
+            if (!existingAttribute) {
+                let itemIndex = pileSharingData.attributes.push({
+                    path: attribute.path,
+                    actors: [{ uuid: actorUuid, quantity: 0 }]
+                })
+                existingAttribute = pileSharingData.attributes[itemIndex-1];
+            }else{
+                if (!existingAttribute.actors) {
+                    existingAttribute.actors = [];
+                }
+            }
 
-        items = items.map(item => {
-            setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, getItemQuantity(item) * -1)
-            return item;
-        });
+            let actorData = existingAttribute.actors.find(data => data.uuid === actorUuid);
+
+            if (!actorData) {
+                if(attribute.quantity > 0) {
+                    existingAttribute.actors.push({ uuid: actorUuid, quantity: attribute.quantity })
+                }
+            } else {
+                actorData.quantity += attribute.quantity;
+                if(actorData.quantity <= 0){
+                    existingAttribute.actors.splice(existingAttribute.actors.indexOf(actorData), 1);
+                }
+            }
+
+        }
 
     }
 
-    return addItemsToItemPileSharing(itemPile, actorUuid, items);
+    return pileSharingData ?? {};
 
 }
 
-export function getItemPileItemsForActor(pile, recipient){
+export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [], attributes = [] }={}){
+
+    items = items.map(item => {
+        setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, getItemQuantity(item) * -1)
+        return item;
+    });
+
+    attributes = attributes.map(attribute => {
+        attribute.quantity = attribute.quantity * -1;
+        return attribute;
+    });
+
+    return addToItemPileSharingData(itemPile, actorUuid, { items, attributes });
+
+}
+
+export function getItemPileItemsForActor(pile, recipient, floor = false){
 
     const pileData = getItemPileData(pile);
     const pileItems = getItemPileItems(pile);
@@ -638,11 +679,11 @@ export function getItemPileItemsForActor(pile, recipient){
             }
 
             let totalActorShare = totalShares / players.length;
-            if(!Number.isInteger(totalActorShare)){
+            if(!Number.isInteger(totalActorShare) && !floor){
                 totalActorShare += 1;
             }
 
-            let actorQuantity = foundItem.actors ? foundItem?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
+            let actorQuantity = foundItem?.actors ? foundItem?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
 
             data.shareLeft = Math.min(quantity, Math.floor(totalActorShare - actorQuantity));
 
@@ -654,7 +695,7 @@ export function getItemPileItemsForActor(pile, recipient){
 
 }
 
-export function getItemPileAttributesForActor(pile, recipient){
+export function getItemPileAttributesForActor(pile, recipient, floor){
 
     const pileData = getItemPileData(pile);
     const pileAttributes = getItemPileAttributes(pile);
@@ -674,7 +715,7 @@ export function getItemPileAttributesForActor(pile, recipient){
 
         if(!pileData.attributesFreeForAll && recipientUuid) {
 
-            const foundAttribute = findSimilarItem(storedAttributes, attribute.path);
+            const foundAttribute = storedAttributes.find(storedAttribute => storedAttribute.path === attribute.path);
 
             let totalShares = attribute.quantity;
             if(foundAttribute) {
@@ -682,11 +723,11 @@ export function getItemPileAttributesForActor(pile, recipient){
             }
 
             let totalActorShare = totalShares / players.length;
-            if(!Number.isInteger(totalActorShare)){
+            if(!Number.isInteger(totalActorShare) && !floor){
                 totalActorShare += 1;
             }
 
-            let actorQuantity = foundAttribute.actors ? foundAttribute?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
+            let actorQuantity = foundAttribute?.actors ? foundAttribute?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
 
             attribute.shareLeft = Math.min(attribute.quantity, Math.floor(totalActorShare - actorQuantity));
 
@@ -697,38 +738,3 @@ export function getItemPileAttributesForActor(pile, recipient){
     });
 
 }
-
-export function getItemPileSplittableItems(target, numTakers, itemFilters = false){
-
-    const inDocument = getDocument(target);
-    let targetActor = inDocument?.actor ?? inDocument;
-    return getItemPileItems(targetActor, itemFilters)
-        .map(item => item.toObject())
-        .filter(item => {
-            return getItemQuantity(item) / numTakers >= 1;
-        }).map(item => {
-            const toRemovePerActor = Math.floor(getItemQuantity(item) / numTakers);
-            return {
-                item,
-                quantity: toRemovePerActor * numTakers
-            };
-        });
-
-}
-
-export function getItemPileSplittableAttributes(target, numTakers) {
-    const inDocument = getDocument(target);
-    let targetActor = inDocument?.actor ?? inDocument;
-    return getItemPileAttributes(targetActor)
-        .filter(attribute => {
-            return attribute.quantity >= numTakers;
-        }).map(attribute => {
-            const toRemovePerActor = Math.floor(getProperty(targetActor.data, attribute.path) / numTakers);
-            attribute.quantity = toRemovePerActor * numTakers;
-            return attribute;
-        });
-}
-
-
-
-

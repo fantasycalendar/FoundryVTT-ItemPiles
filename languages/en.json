@@ -173,9 +173,8 @@
         },
 
         "Chat": {
-            "Pickup":{
-                "Actor": "{name} picked up the following items:"
-            }
+            "Pickup": "{name} picked up the following items:",
+            "Split": "An item pile's content was split among {num_players} players:"
         },
 
         "Setting": {

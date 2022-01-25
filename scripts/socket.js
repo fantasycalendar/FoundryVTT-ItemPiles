@@ -10,8 +10,13 @@ export const SOCKET_HANDLERS = {
      * Generic sockets
      */
     CALL_HOOK: "callHook",
-    PICKUP_CHAT_MESSAGE: "pickupChatMessage",
 
+
+    /**
+     * Chat messages
+     */
+    PICKUP_CHAT_MESSAGE: "pickupChatMessage",
+    SPLIT_CHAT_MESSAGE: "splitChatMessage",
 
     /**
      * Item pile sockets
@@ -24,6 +29,7 @@ export const SOCKET_HANDLERS = {
     REVERT_FROM_PILE: "revertFromPiles",
     REFRESH_PILE: "refreshItemPile",
     MIGRATE_PILE: "migrateItemPileFlags",
+    SPLIT_PILE: "splitItemPileContent",
 
     /**
      * UI sockets
@@ -59,7 +65,12 @@ export function registerSocket() {
      * Generic socket
      */
     itemPileSocket.register(SOCKET_HANDLERS.CALL_HOOK, (hook, ...args) => callHook(hook, ...args))
-    itemPileSocket.register(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, (...args) => chatHandler._outputToChat(...args))
+
+    /**
+     * Chat sockets
+     */
+    itemPileSocket.register(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, (...args) => chatHandler._outputPickupToChat(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.SPLIT_CHAT_MESSAGE, (...args) => chatHandler._outputSplitToChat(...args))
 
     /**
      * Item pile sockets
@@ -72,6 +83,7 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.REVERT_FROM_PILE, (...args) => API._revertTokensFromItemPiles(...args))
     itemPileSocket.register(SOCKET_HANDLERS.REFRESH_PILE, (...args) => API._refreshItemPile(...args))
     itemPileSocket.register(SOCKET_HANDLERS.MIGRATE_PILE, (...args) => flagManager.addDocumentToMigrate(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.SPLIT_PILE, (...args) => API._splitItemPileContents(...args))
 
     /**
      * UI sockets

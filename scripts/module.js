@@ -33,6 +33,7 @@ Hooks.once("init", () => {
     Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
     Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferAttribute.bind(chatHandler));
     Hooks.on(HOOKS.TRANSFER_EVERYTHING, chatHandler._outputTransferEverything.bind(chatHandler));
+    Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, chatHandler._outputSplitItemPileInventory.bind(chatHandler));
 
     if (game.settings.get(CONSTANTS.MODULE_NAME, "debugHooks")) {
         for (let hook of Object.values(HOOKS)) {
