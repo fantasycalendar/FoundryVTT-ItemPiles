@@ -19,12 +19,12 @@ export default class API {
     }
 
     /**
-     * The attributes used to track dynamic attributes in this system
+     * The currencies used in this system
      *
      * @returns {array}
      */
-    static get DYNAMIC_ATTRIBUTES() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
+    static get CURRENCIES() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "currencies");
     }
 
     /**
@@ -59,30 +59,30 @@ export default class API {
     }
 
     /**
-     * Sets the attributes used to track dynamic attributes in this system
+     * Sets the currencies used in this system
      *
-     * @param {array} inAttributes
+     * @param {array} inCurrencies
      * @returns {Promise}
      */
-    static async setDynamicAttributes(inAttributes) {
-        if (!Array.isArray(inAttributes)) {
-            throw lib.custom_error("setDynamicAttributes | inAttributes must be of type array");
+    static async setCurrencies(inCurrencies) {
+        if (!Array.isArray(inCurrencies)) {
+            throw lib.custom_error("setCurrencies | inCurrencies must be of type array");
         }
-        inAttributes.forEach(attribute => {
-            if (typeof attribute !== "object") {
-                throw lib.custom_error("setDynamicAttributes | each entry in the inAttributes array must be of type object");
+        inCurrencies.forEach(currency => {
+            if (typeof currency !== "object") {
+                throw lib.custom_error("setCurrencies | each entry in the inCurrencies array must be of type object");
             }
-            if (typeof attribute.name !== "string") {
-                throw lib.custom_error("setDynamicAttributes | attribute.name must be of type string");
+            if (typeof currency.name !== "string") {
+                throw lib.custom_error("setCurrencies | currency.name must be of type string");
             }
-            if (typeof attribute.attribute !== "string") {
-                throw lib.custom_error("setDynamicAttributes | attribute.path must be of type string");
+            if (typeof currency.currency !== "string") {
+                throw lib.custom_error("setCurrencies | currency.path must be of type string");
             }
-            if (attribute.img && typeof attribute.img !== "string") {
-                throw lib.custom_error("setDynamicAttributes | attribute.img must be of type string");
+            if (currency.img && typeof currency.img !== "string") {
+                throw lib.custom_error("setCurrencies | currency.img must be of type string");
             }
         })
-        return game.settings.set(CONSTANTS.MODULE_NAME, "dynamicAttributes", inAttributes);
+        return game.settings.set(CONSTANTS.MODULE_NAME, "currencies", inCurrencies);
     }
 
     /**
@@ -741,13 +741,13 @@ export default class API {
     }
 
     /**
-     * Returns the attributes this item pile can transfer
+     * Returns the currencies this item pile can transfer
      *
      * @param {Token/TokenDocument/Actor} target
      * @returns {array}
      */
-    static getItemPileAttributes(target){
-        return lib.getItemPileAttributes(target);
+    static getItemPileCurrencies(target){
+        return lib.getItemPileCurrencies(target);
     }
 
     /**
@@ -856,26 +856,26 @@ export default class API {
                 return { _id: item.id, quantity: item.shareLeft };
             }).filter(item => item.quantity);
 
-            const attributesToTransfer = Object.fromEntries(lib.getItemPileAttributesForActor(itemPileActor, actor, true).map(entry => {
+            const currenciesToTransfer = Object.fromEntries(lib.getItemPileCurrenciesForActor(itemPileActor, actor, true).map(entry => {
                 return [entry.path, entry.shareLeft]
-            }).filter(attribute => attribute[1]))
+            }).filter(currency => currency[1]))
 
             transferData[actorUuid] = {
                 itemsTransferred: [],
-                attributesTransferred: []
+                currenciesTransferred: []
             }
 
             if(itemsToTransfer.length) {
                 transferData[actorUuid].itemsTransferred = await API._transferItems(itemPileUuid, actorUuid, itemsToTransfer, userId, { isEverything: true });
             }
 
-            if(!foundry.utils.isObjectEmpty(attributesToTransfer)) {
-                transferData[actorUuid].attributesTransferred = await API._transferAttributes(itemPileUuid, actorUuid, attributesToTransfer, userId, { isEverything: true });
+            if(!foundry.utils.isObjectEmpty(currenciesToTransfer)) {
+                transferData[actorUuid].currenciesTransferred = await API._transferAttributes(itemPileUuid, actorUuid, currenciesToTransfer, userId, { isEverything: true });
             }
 
             await lib.setItemPileSharingData(itemPileUuid, actorUuid, {
                 items: transferData[actorUuid].itemsTransferred,
-                attributes: transferData[actorUuid].attributesTransferred
+                currencies: transferData[actorUuid].currenciesTransferred
             });
 
         }
@@ -1624,7 +1624,7 @@ export default class API {
             ? target.actor
             : target;
 
-        const sourceAttributes = API.getItemPileAttributes(sourceActor);
+        const sourceAttributes = API.getItemPileCurrencies(sourceActor);
 
         const attributesToTransfer = sourceAttributes.filter(attribute => {
             return hasProperty(targetActor.data, attribute.path);
@@ -1696,16 +1696,16 @@ export default class API {
     static async _transferEverything(sourceUuid, targetUuid, userId, { itemFilters = false } = {}) {
 
         const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, userId, { itemFilters, isEverything: true });
-        const attributesTransferred = await API._transferAllAttributes(sourceUuid, targetUuid, userId, { isEverything: true });
+        const currenciesTransferred = await API._transferAllAttributes(sourceUuid, targetUuid, userId, { isEverything: true });
 
-        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemsTransferred, attributesTransferred, userId);
+        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemsTransferred, currenciesTransferred, userId);
 
         const macroData = {
             action: "transferEverything",
             source: sourceUuid,
             target: targetUuid,
             items: itemsTransferred,
-            attributes: attributesTransferred,
+            attributes: currenciesTransferred,
             userId: userId
         };
         await API._executeItemPileMacro(sourceUuid, macroData);
@@ -1721,7 +1721,7 @@ export default class API {
 
         return {
             itemsTransferred,
-            attributesTransferred
+            currenciesTransferred
         };
 
     }

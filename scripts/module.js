@@ -10,8 +10,10 @@ import { registerSettings, checkSystem, migrateSettings, registerHandlebarHelper
 import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
+import flagManager from "./flagManager.js";
+import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 
-Hooks.once("init", () => {
+Hooks.once("init", async () => {
 
     registerSettings();
     registerLibwrappers();
@@ -22,7 +24,7 @@ Hooks.once("init", () => {
     Hooks.on("createToken", module._createPile);
     Hooks.on("deleteToken", module._deletePile);
     Hooks.on("dropCanvasData", module._dropData);
-    Hooks.on("updateActor", module._pileAttributeChanged);
+    Hooks.on("updateActor", module._pileCurrencyChanged);
     Hooks.on("createItem", module._pileInventoryChanged);
     Hooks.on("updateItem", module._pileInventoryChanged);
     Hooks.on("deleteItem", module._pileInventoryChanged);
@@ -31,7 +33,7 @@ Hooks.once("init", () => {
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
     Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
-    Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferAttribute.bind(chatHandler));
+    Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferCurrency.bind(chatHandler));
     Hooks.on(HOOKS.TRANSFER_EVERYTHING, chatHandler._outputTransferEverything.bind(chatHandler));
     Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, chatHandler._outputSplitItemPileInventory.bind(chatHandler));
 
@@ -55,7 +57,7 @@ Hooks.once("init", () => {
 
 });
 
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
 
     if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
         let word = "install and activate";
@@ -72,15 +74,15 @@ Hooks.once("ready", () => {
         lib.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
     }
 
+    await flagManager.migrateDocuments();
+
     checkSystem();
     registerHotkeysPost();
     registerHandlebarHelpers();
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
 
-    const tokenD = canvas.tokens.get("49LMZ9kHkmHrxv3z");
-
-    //ItemPileConfig.show(tokenD.actor);
+    ItemPileInventory.show(canvas.tokens.get("L52HMFJ4yn1jEdWS"))
 
 });
 
@@ -102,14 +104,14 @@ const debounceManager = {
 
 const module = {
 
-    async _pileAttributeChanged(actor, changes) {
+    async _pileCurrencyChanged(actor, changes) {
         const target = actor?.token ?? actor;
         if (!lib.isValidItemPile(target)) return;
-        const sourceAttributes = lib.getItemPileAttributeList(target);
-        const validProperty = sourceAttributes.find(attribute => {
-            return hasProperty(changes, attribute.path);
+        const sourceCurrencies = lib.getItemPileCurrencyList(target);
+        const validCurrency = sourceCurrencies.find(currency => {
+            return hasProperty(changes, currency.path);
         });
-        if (!validProperty) return;
+        if (!validCurrency) return;
         const targetUuid = target.uuid;
         return debounceManager.setDebounce(targetUuid, async function(uuid){
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);

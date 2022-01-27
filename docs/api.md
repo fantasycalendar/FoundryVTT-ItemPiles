@@ -4,7 +4,7 @@
 <dt><a href="#ACTOR_CLASS_TYPE">ACTOR_CLASS_TYPE</a> ⇒ <code>string</code></dt>
 <dd><p>The actor class type used for the original item pile actor in this system</p>
 </dd>
-<dt><a href="#DYNAMIC_ATTRIBUTES">DYNAMIC_ATTRIBUTES</a> ⇒ <code>array</code></dt>
+<dt><a href="#DYNAMIC_ATTRIBUTES">CURRENCIES</a> ⇒ <code>array</code></dt>
 <dd><p>The attributes used to track dynamic attributes in this system</p>
 </dd>
 <dt><a href="#ITEM_QUANTITY_ATTRIBUTE">ITEM_QUANTITY_ATTRIBUTE</a> ⇒ <code>string</code></dt>
@@ -93,7 +93,7 @@
 <dt><a href="#getItemPileItems">getItemPileItems(target, [itemFilters])</a> ⇒ <code>Array</code></dt>
 <dd><p>Returns the items this item pile can transfer</p>
 </dd>
-<dt><a href="#getItemPileAttributes">getItemPileAttributes(target)</a> ⇒ <code>array</code></dt>
+<dt><a href="#getItemPileAttributes">getItemPileCurrencies(target)</a> ⇒ <code>array</code></dt>
 <dd><p>Returns the attributes this item pile can transfer</p>
 </dd>
 <dt><a href="#refreshItemPile">refreshItemPile(target)</a> ⇒ <code>Promise</code></dt>
@@ -144,7 +144,7 @@
 ### ACTOR\_CLASS\_TYPE ⇒ <code>string</code>
 The actor class type used for the original item pile actor in this system
 
-<a name="DYNAMIC_ATTRIBUTES"></a>
+<a name="CURRENCIES"></a>
 
 ---
 
@@ -439,11 +439,11 @@ Returns the items this item pile can transfer
 | target | <code>Token/TokenDocument</code> \| <code>Actor</code> |  |  |
 | [itemFilters] | <code>array/boolean</code> | <code>false</code> | Array of item types disallowed - will default to pile settings or module settings if none provided |
 
-<a name="getItemPileAttributes"></a>
+<a name="getItemPileCurrencies"></a>
 
 ---
 
-### getItemPileAttributes(target) ⇒ <code>array</code>
+### getItemPileCurrencies(target) ⇒ <code>array</code>
 Returns the attributes this item pile can transfer 
 
 | Param | Type |

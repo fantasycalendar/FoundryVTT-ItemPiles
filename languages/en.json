@@ -15,8 +15,10 @@
             "Take": "Take",
             "Close": "Close Lid",
             "Leave": "Leave",
+            "OpenSheet": "Open Actor Sheet",
             "SplitAll": "Split {num_players} ways",
-            "OpenSheet": "Open Actor Sheet"
+            "SplitItems": "Split items {num_players} ways",
+            "SplitCurrencies": "Split currencies {num_players} ways"
         },
 
         "Errors": {
@@ -39,7 +41,7 @@
             },
             "LinkedActorWarning": {
                 "Title": "Item Piles & Linked Actor",
-                "Content": "Are you sure you want to turn this <strong>linked actor</strong> into an item pile? This actor's token is linked and all tokens of this actor will share its inventory and attributes."
+                "Content": "Are you sure you want to turn this <strong>linked actor</strong> into an item pile? This actor's token is linked and all tokens of this actor will share its inventory and currencies."
             },
             "NoSystemFound": {
                 "Title": "System Not Recognized",
@@ -53,24 +55,24 @@
             "Cancel": "Cancel"
         },
 
-        "AttributeEditor": {
-            "Title": "Dynamic Attributes Editor",
-            "Explanation": "Here you can define which attributes on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
-            "Name": "Attribute name",
-            "Icon": "Attribute icon",
-            "AddNew": "Add new attribute",
-            "Submit": "Submit Attributes"
+        "CurrenciesEditor": {
+            "Title": "Currencies Editor",
+            "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
+            "Name": "Currency name",
+            "Path": "Currency path",
+            "Icon": "Currency icon",
+            "AddNew": "Add new currency",
+            "Submit": "Submit currencies"
         },
 
         "FilterEditor": {
             "Title": "Item Filters Editor",
             "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
             "Filters": "Filters",
+            "Path": "Attribute path",
             "AddNew": "Add new filter",
             "Submit": "Submit Filters"
         },
-
-        "AttributePath": "Attribute path",
 
         "Defaults": {
             "Title": "Item Pile Configuration",
@@ -93,9 +95,9 @@
                 "DeleteWhenEmptyDefault": "Default module setting",
                 "DeleteWhenEmptyYes": "Yes, delete when empty",
                 "DeleteWhenEmptyNo": "No, don't delete when empty",
-                "OverrideAttributes": "Override Dynamic Attributes",
-                "OverrideAttributesExplanation": "Configure if this pile should be able to transfer other attributes than the default.",
-                "ConfigureOverrideAttributes": "Configure Override Dynamic Attributes",
+                "OverrideCurrencies": "Override Currencies",
+                "OverrideCurrenciesExplanation": "Configure if this pile should be able to transfer other currencies than the default.",
+                "ConfigureOverrideCurrencies": "Configure Override Currencies",
                 "OverrideItemFilters": "Override Item Filters",
                 "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
                 "ConfigureOverrideItemFilters": "Configure Override Item Filters"
@@ -132,14 +134,14 @@
 
             "Sharing": {
                 "Title": "Sharing Settings",
-                "ItemsFreeForAll": "Free For All: Items",
-                "ItemsFreeForAllExplanation": "Everyone who has access to this item pile will be able to take any amount of items from it. Disabled means they can only take their share of the available items.",
-                "AttributesFreeForAll": "Free For All: Attributes",
-                "AttributesFreeForAllExplanation": "Similar to the above, but it applies to attributes (usually currencies).",
+                "ShareItemsEnabled": "Sharing Enabled: Items",
+                "ShareItemsEnabledExplanation": "When this is enabled, players can only take their share of the quantities of items. Disabled means they can take as much as they want.",
+                "ShareCurrenciesEnabled": "Sharing Enabled: Currencies",
+                "ShareCurrenciesEnabledExplanation": "When this is enabled, players can only take their share of the quantities of currencies. Disabled means they can take as much as they want.",
                 "TakeAllEnabled": "Enable Take All Button",
-                "TakeAllEnabledExplanation": "Enables the \"Take All\" button when looting this item pile. Requires both Free For All settings to be enabled.",
+                "TakeAllEnabledExplanation": "Enables the \"Take All\" button when looting this item pile. Requires both of the above sharing settings to be disabled.",
                 "SplitAllEnabled": "Enable Split With Players Button",
-                "SplitAllEnabledExplanation": "Enables the \"Split With [number] Players\" button when looting this item pile. Pressing this button makes all players (or only active players, see below) receive their share of the item pile.",
+                "SplitAllEnabledExplanation": "Enables the \"Split [number] ways\" button when looting this item pile. Pressing this button makes all players (or only active players, see below) receive their share of the item pile.",
                 "InactivePlayers": "Split Only With Active Players",
                 "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile."
             },
@@ -191,10 +193,10 @@
                 "Title": "Item quantity attribute",
                 "Label": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.quantity\" attribute, so you'd put \"data.quantity\" in this setting."
             },
-            "Attributes": {
-                "Title": "Dynamic Attributes",
-                "Label": "Configure Attributes",
-                "Hint": "This setting define the attributes that are eligible for pickup in item paths, such as currencies or power, which may not be actual items."
+            "Currencies": {
+                "Title": "Currencies",
+                "Label": "Configure Currencies",
+                "Hint": "This setting define the currencies that are eligible for pickup, which may not be actual items but numerical inputs on the character sheet."
             },
             "ItemFilters": {
                 "Title": "Item filters",

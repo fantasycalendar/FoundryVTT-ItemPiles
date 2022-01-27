@@ -26,41 +26,63 @@
 
             <div class="item-piles-items">
 
+                <div class="flexrow"><h3>Items:</h3></div>
                 {{#each items as |item id|}}
-                <div class="flexrow item-piles-item-row {{#unless item.quantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
-                    <img class="item-piles-img" src="{{item.img}}"/>
+                <div class="flexrow item-piles-item-row {{#unless item.quantity}}item-piles-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
+
+                    <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
+
                     <div class="item-piles-name item-piles-text">
-                        {{#if @root.canInspectItems}}<a class="item-piles-clickable">{{/if}}
-                        {{item.name}}
-                        {{#if @root.canInspectItems}}</a>{{/if}}
+                        <div class="item-piles-name-container">
+                            <a class="item-piles-clickable">{{item.name}}</a>
+                        </div>
+                        <span class="item-piles-small-text">x{{item.quantity}}</span>
                     </div>
-                    {{#if @root.hasRecipient}}
+
+                    {{#if item.shareLeft}}
                         <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.quantity}}disabled{{/unless}}/>
+
+                        <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
+                            / {{item.shareLeft}}
+                        </span>
                     {{/if}}
-                    <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
-                        {{item.shareLeft}} | {{item.quantity}}
-                    </span>
+
                     {{#if @root.hasRecipient}}
-                        <button class="item-piles-take-button" type="button" {{#unless item.shareLeft}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                    <button class="item-piles-take-button" type="button" {{#unless item.shareLeft}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
                     {{/if}}
+
                 </div>
                 {{/each}}
                 {{#if hasThings}}
                 <hr>
                 {{/if}}
-                {{#each attributes as |attribute id|}}
-                <div class="flexrow item-piles-item-row item-piles-attribute-row" data-attribute-name="{{attribute.name}}" data-attribute-path="{{attribute.path}}">
-                    <img class="item-piles-img" src="{{attribute.img}}"/>
-                    <div class="item-piles-name item-piles-text">{{attribute.name}}</div>
+                <div class="flexrow">
+                    <h3>Currencies:</h3>
                     {{#if @root.hasRecipient}}
-                        <input class="item-piles-quantity" type="number" min="1" value="{{attribute.currentQuantity}}" max="{{attribute.quantity}}" {{#unless attribute.quantity}}disabled{{/unless}}/>
+                    <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i> Add Your Own</a>
                     {{/if}}
+                </div>
+                {{#each currencies as |currency id|}}
+                <div class="flexrow item-piles-item-row item-piles-currency-row" data-currency-name="{{currency.name}}" data-currency-path="{{currency.path}}">
+                    <div class="item-piles-img-container"><img class="item-piles-img" src="{{currency.img}}"/></div>
+
+                    <div class="item-piles-name item-piles-text">
+                        <div>{{currency.name}}</div>
+                        <span class="item-piles-small-text">x{{currency.quantity}}</span>
+                    </div>
+
+                    {{#if currency.shareLeft}}
+                    <input class="item-piles-quantity" type="number" min="1" value="{{currency.currentQuantity}}" max="{{currency.quantity}}" {{#unless currency.quantity}}disabled{{/unless}}/>
+
                     <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
-                         {{attribute.shareLeft}} | {{attribute.quantity}}
-                    </span>
-                    {{#if @root.hasRecipient}}
-                        <button class="item-piles-attribute-take-button" type="button" {{#unless attribute.quantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                            / {{currency.shareLeft}}
+                        </span>
                     {{/if}}
+
+                    {{#if @root.hasRecipient}}
+                    <button class="item-piles-currency-take-button" type="button" {{#unless currency.shareLeft}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                    {{/if}}
+
                 </div>
                 {{/each}}
             </div>

@@ -12,7 +12,7 @@ const CONSTANTS = {
 
         // Overrides
         overrideItemFilters: false,
-        overrideAttributes: false,
+        overrideCurrencies: false,
 
         // Token settings
         displayOne: false,
@@ -34,8 +34,8 @@ const CONSTANTS = {
         unlockedSound: "",
 
         // Sharing settings
-        itemsFreeForAll: true,
-        attributesFreeForAll: false,
+        shareItemsEnabled: false,
+        shareCurrenciesEnabled: true,
         takeAllEnabled: false,
         splitAllEnabled: true,
         activePlayers: false,

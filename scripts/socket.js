@@ -28,7 +28,6 @@ export const SOCKET_HANDLERS = {
     TURN_INTO_PILE: "turnIntoPiles",
     REVERT_FROM_PILE: "revertFromPiles",
     REFRESH_PILE: "refreshItemPile",
-    MIGRATE_PILE: "migrateItemPileFlags",
     SPLIT_PILE: "splitItemPileContent",
 
     /**
@@ -82,7 +81,6 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.TURN_INTO_PILE, (...args) => API._turnTokensIntoItemPiles(...args))
     itemPileSocket.register(SOCKET_HANDLERS.REVERT_FROM_PILE, (...args) => API._revertTokensFromItemPiles(...args))
     itemPileSocket.register(SOCKET_HANDLERS.REFRESH_PILE, (...args) => API._refreshItemPile(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.MIGRATE_PILE, (...args) => flagManager.addDocumentToMigrate(...args))
     itemPileSocket.register(SOCKET_HANDLERS.SPLIT_PILE, (...args) => API._splitItemPileContents(...args))
 
     /**

@@ -1,6 +1,6 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
-import { ItemPileAttributeEditor } from "./itemPileAttributeEditor.js";
+import { ItemPileCurrenciesEditor } from "./itemPileCurrenciesEditor.js";
 import * as lib from "../lib/lib.js";
 import { ItemPileFiltersEditor } from "./itemPileFiltersEditor.js";
 
@@ -10,14 +10,14 @@ export class ItemPileConfig extends FormApplication {
         super();
         this.document = actor?.token ?? actor;
         this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(this.document));
-        this.attributeEditor = false;
+        this.currenciesEditor = false;
         this.itemFiltersEditor = false;
     }
 
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ["sheet", "item-pile-config"],
+            classes: ["sheet", "item-piles-config"],
             template: `${CONSTANTS.PATH}templates/item-pile-config.html`,
             width: 430,
             resizable: true,
@@ -54,10 +54,10 @@ export class ItemPileConfig extends FormApplication {
         const scaleCheckbox = html.find('input[name="overrideSingleItemScale"]');
         const displayOneCheckbox = html.find('input[name="displayOne"]');
         const containerCheckbox = html.find('input[name="isContainer"]');
-        const overrideItemFiltersEnabledCheckbox = html.find('.item-pile-config-override-item-filters-checkbox');
-        const overrideAttributesEnabledCheckbox = html.find('.item-pile-config-override-attributes-checkbox');
-        const itemsFreeForAllCheckbox = html.find('input[name="itemsFreeForAll"]');
-        const attributesFreeForAllCheckbox = html.find('input[name="attributesFreeForAll"]');
+        const overrideItemFiltersEnabledCheckbox = html.find('.item-piles-config-override-item-filters-checkbox');
+        const overrideCurrenciesEnabledCheckbox = html.find('.item-piles-config-override-currencies-checkbox');
+        const shareItemsEnabledCheckbox = html.find('input[name="shareItemsEnabled"]');
+        const shareAttributesEnabledCheckbox = html.find('input[name="shareCurrenciesEnabled"]');
 
         const slider = html.find(".item-piles-scaleRange");
         const input = html.find(".item-piles-scaleInput");
@@ -86,7 +86,7 @@ export class ItemPileConfig extends FormApplication {
             let isDisabled = !$(this).is(":checked") || !displayOneCheckbox.is(":checked");
             slider.prop('disabled', isDisabled);
             input.prop('disabled', isDisabled);
-            slider.parent().toggleClass("item-pile-disabled", isDisabled);
+            slider.parent().toggleClass("item-piles-disabled", isDisabled);
         }).change();
 
         displayOneCheckbox.change(function () {
@@ -96,13 +96,13 @@ export class ItemPileConfig extends FormApplication {
 
             slider.prop('disabled', !isEnabled || !isScale);
             input.prop('disabled', !isEnabled || !isScale);
-            slider.parent().toggleClass("item-pile-disabled", !isEnabled || !isScale);
+            slider.parent().toggleClass("item-piles-disabled", !isEnabled || !isScale);
 
             scaleCheckbox.prop('disabled', !isEnabled);
-            scaleCheckbox.parent().toggleClass("item-pile-disabled", !isEnabled);
+            scaleCheckbox.parent().toggleClass("item-piles-disabled", !isEnabled);
 
             html.find('input[name="showItemName"]').prop('disabled', !isEnabled);
-            html.find('input[name="showItemName"]').parent().toggleClass("item-pile-disabled", !isEnabled);
+            html.find('input[name="showItemName"]').parent().toggleClass("item-piles-disabled", !isEnabled);
 
             html.find(".display-one-warning").css("display", isEnabled && isContainer ? "block" : "none");
             self.setPosition();
@@ -114,16 +114,16 @@ export class ItemPileConfig extends FormApplication {
             html.find(".display-one-warning").css("display", isEnabled && isDisplayOne ? "block" : "none");
         }).change();
 
-        overrideAttributesEnabledCheckbox.change(function () {
+        overrideCurrenciesEnabledCheckbox.change(function () {
             let isChecked = $(this).is(":checked");
             if (isChecked) {
-                self.pileData.overrideAttributes = game.settings.get(CONSTANTS.MODULE_NAME, "dynamicAttributes");
+                self.pileData.overrideCurrencies = game.settings.get(CONSTANTS.MODULE_NAME, "currencies");
             }
-            html.find(".item-pile-config-configure-override-attributes").prop('disabled', !isChecked);
+            html.find(".item-piles-config-configure-override-currencies").prop('disabled', !isChecked);
         })
 
-        html.find(".item-pile-config-configure-override-attributes").click(function () {
-            self.showAttributeEditor();
+        html.find(".item-piles-config-configure-override-currencies").click(function () {
+            self.showCurrenciesEditor();
         })
 
         overrideItemFiltersEnabledCheckbox.change(function() {
@@ -131,10 +131,10 @@ export class ItemPileConfig extends FormApplication {
             if (isChecked) {
                 self.pileData.overrideItemFilters = game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters");
             }
-            html.find(".item-pile-config-configure-override-item-filters").prop('disabled', !isChecked);
+            html.find(".item-piles-config-configure-override-item-filters").prop('disabled', !isChecked);
         })
 
-        html.find(".item-pile-config-configure-override-item-filters").click(function () {
+        html.find(".item-piles-config-configure-override-item-filters").click(function () {
             self.showItemFiltersEditor();
         })
 
@@ -147,33 +147,33 @@ export class ItemPileConfig extends FormApplication {
 
         const takeAllButtonCheckbox = html.find('input[name="takeAllEnabled"]');
 
-        itemsFreeForAllCheckbox.change(function(){
-            const isDisabled = !itemsFreeForAllCheckbox.is(":checked") || !attributesFreeForAllCheckbox.is(":checked");
-            takeAllButtonCheckbox.prop("disabled", isDisabled).parent().toggleClass("item-pile-disabled", isDisabled);
+        shareItemsEnabledCheckbox.change(function(){
+            const isDisabled = shareItemsEnabledCheckbox.is(":checked") || shareAttributesEnabledCheckbox.is(":checked");
+            takeAllButtonCheckbox.prop("disabled", isDisabled).parent().toggleClass("item-piles-disabled", isDisabled);
             if(isDisabled && takeAllButtonCheckbox.is(':checked')){
                 takeAllButtonCheckbox.prop('checked', false)
             }
         });
 
-        attributesFreeForAllCheckbox.change(function(){
-            const isDisabled = !itemsFreeForAllCheckbox.is(":checked") || !attributesFreeForAllCheckbox.is(":checked");
-            takeAllButtonCheckbox.prop("disabled", isDisabled).parent().toggleClass("item-pile-disabled", isDisabled);
+        shareAttributesEnabledCheckbox.change(function(){
+            const isDisabled = shareItemsEnabledCheckbox.is(":checked") || shareAttributesEnabledCheckbox.is(":checked");
+            takeAllButtonCheckbox.prop("disabled", isDisabled).parent().toggleClass("item-piles-disabled", isDisabled);
             if(isDisabled && takeAllButtonCheckbox.is(':checked')){
                 takeAllButtonCheckbox.prop('checked', false)
             }
         }).change();
     }
 
-    async showAttributeEditor() {
-        if (this.attributeEditor) {
-            return this.attributeEditor.render(false, { focus: true });
+    async showCurrenciesEditor() {
+        if (this.currenciesEditor) {
+            return this.currenciesEditor.render(false, { focus: true });
         }
-        const [promise, UI] = ItemPileAttributeEditor.showForPile(this.pileData.overrideAttributes);
-        this.attributeEditor = UI;
+        const [promise, UI] = ItemPileCurrenciesEditor.showForPile(this.pileData.overrideCurrencies);
+        this.currenciesEditor = UI;
         promise.then(newSettings => {
-            this.attributeEditor = false;
+            this.currenciesEditor = false;
             if(newSettings) {
-                this.pileData.overrideAttributes = newSettings;
+                this.pileData.overrideCurrencies = newSettings;
             }
         });
     }
@@ -198,10 +198,10 @@ export class ItemPileConfig extends FormApplication {
 
         const data = foundry.utils.mergeObject(defaults, formData);
 
-        const overrideAttributesChecked = this.element.find('.item-pile-config-override-attributes-checkbox').is(":checked");
-        data.overrideAttributes = overrideAttributesChecked ? this.pileData.overrideAttributes : false;
+        const overrideCurrenciesChecked = this.element.find('.item-piles-config-override-currencies-checkbox').is(":checked");
+        data.overrideCurrencies = overrideCurrenciesChecked ? this.pileData.overrideCurrencies : false;
 
-        const overrideItemFiltersChecked = this.element.find('.item-pile-config-override-item-filters-checkbox').is(":checked");
+        const overrideItemFiltersChecked = this.element.find('.item-piles-config-override-item-filters-checkbox').is(":checked");
         data.overrideItemFilters = overrideItemFiltersChecked ? this.pileData.overrideItemFilters : false;
 
         data.deleteWhenEmpty = {
@@ -218,8 +218,8 @@ export class ItemPileConfig extends FormApplication {
 
     async close(...args) {
         super.close(...args);
-        if (this.attributeEditor) {
-            this.attributeEditor.close();
+        if (this.currenciesEditor) {
+            this.currenciesEditor.close();
         }
         if (this.itemFiltersEditor) {
             this.itemFiltersEditor.close();

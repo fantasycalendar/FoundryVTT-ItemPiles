@@ -2,16 +2,16 @@ import CONSTANTS from "../constants.js";
 
 export class ItemPileFiltersEditor extends FormApplication {
 
-    constructor(pileAttributes = false, resolve = false) {
+    constructor(pileFilters = false, resolve = false) {
         super();
         this.resolve = resolve;
-        this.filters = pileAttributes || game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters");
+        this.filters = pileFilters || game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters");
     }
 
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            title: game.i18n.localize("ITEM-PILES.AttributeEditor.Title"),
+            title: game.i18n.localize("ITEM-PILES.FilterEditor.Title"),
             classes: ["sheet", "item-pile-filters-editor"],
             template: `${CONSTANTS.PATH}templates/filter-editor.html`,
             width: 630,
@@ -20,12 +20,12 @@ export class ItemPileFiltersEditor extends FormApplication {
         });
     }
 
-    static showForPile(pileAttributes) {
+    static showForPile(pileFilters) {
         let resolve;
         const promise = new Promise(_resolve => {
             resolve = _resolve;
         });
-        return [promise, new ItemPileFiltersEditor(foundry.utils.duplicate(pileAttributes), resolve).render(true)]
+        return [promise, new ItemPileFiltersEditor(foundry.utils.duplicate(pileFilters), resolve).render(true)]
     }
 
     async getData(options) {

@@ -19,7 +19,7 @@ export class ItemPileInventory extends FormApplication {
         this.recipient = recipient;
         this.recipientActor = this.recipient?.actor ?? this.recipient;
         this.items = [];
-        this.attributes = [];
+        this.currencies = [];
         this.deleted = false;
         this.overrides = overrides;
         this.pileData = lib.getItemPileData(this.pile);
@@ -30,7 +30,7 @@ export class ItemPileInventory extends FormApplication {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             title: game.i18n.localize("ITEM-PILES.Inspect.Title"),
-            classes: ["sheet", "item-pile-inventory-sheet"],
+            classes: ["sheet", "item-piles-inventory-sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
             width: 500,
             height: "auto",
@@ -64,7 +64,7 @@ export class ItemPileInventory extends FormApplication {
         if (!openApps) return false;
         for(const app of openApps) {
             app.saveItems();
-            app.saveAttributes();
+            app.saveCurrencies();
             app.deleted = deleted;
             app.render(true);
         }
@@ -156,42 +156,42 @@ export class ItemPileInventory extends FormApplication {
         return lib.getItemPileItemsForActor(this.pile, this.recipientActor);
     }
 
-    saveAttributes() {
+    saveCurrencies() {
 
-        // Get all of the attributes on the actor right now
-        const newAttributes = this.getPileAttributeData();
+        // Get all of the currencies on the actor right now
+        const newCurrencies = this.getPileCurrenciesData();
 
         // If there are none, stop displaying them in the UI
-        if (!newAttributes.length){
-            this.attributes = [];
+        if (!newCurrencies.length){
+            this.currencies = [];
             return;
         }
 
-        // Otherwise, loop through the old attributes
-        for(let oldAttribute of this.attributes) {
+        // Otherwise, loop through the old currencies
+        for(let oldCurrency of this.currencies) {
 
-            // If we find an attribute that was previously listed
-            const foundAttribute = newAttributes.find(currentAttribute => currentAttribute.path === oldAttribute.path);
+            // If we find an currency that was previously listed
+            const foundCurrency = newCurrencies.find(newCurrency => newCurrency.path === oldCurrency.path);
 
-            // We update the previously listed attribute to reflect this
-            oldAttribute.quantity = foundAttribute ? foundAttribute.quantity : 0;
-            oldAttribute.shareLeft = foundAttribute ? foundAttribute.shareLeft : 0;
-            oldAttribute.currentQuantity = foundAttribute ? Math.min(oldAttribute.currentQuantity, foundAttribute.shareLeft) : 0;
+            // We update the previously listed currency to reflect this
+            oldCurrency.quantity = foundCurrency ? foundCurrency.quantity : 0;
+            oldCurrency.shareLeft = foundCurrency ? foundCurrency.shareLeft : 0;
+            oldCurrency.currentQuantity = foundCurrency ? Math.min(oldCurrency.currentQuantity, foundCurrency.shareLeft) : 0;
 
-            if(foundAttribute) {
+            if(foundCurrency) {
                 // We then remove it from the incoming list, as we already have it
-                newAttributes.splice(newAttributes.indexOf(foundAttribute), 1)
+                newCurrencies.splice(newCurrencies.indexOf(foundCurrency), 1)
             }
 
         }
 
-        // Add the new attributes to the list
-        this.attributes = this.attributes.concat(newAttributes);
+        // Add the new currencies to the list
+        this.currencies = this.currencies.concat(newCurrencies);
 
     }
 
-    getPileAttributeData() {
-        return lib.getItemPileAttributesForActor(this.pile, this.recipientActor);
+    getPileCurrenciesData() {
+        return lib.getItemPileCurrenciesForActor(this.pile, this.recipientActor);
     }
 
     _onDrop(event) {
@@ -231,40 +231,55 @@ export class ItemPileInventory extends FormApplication {
         data.items = this.items.length ? this.items : this.getPileItemData();
         this.items = data.items;
 
-        data.attributes = this.attributes.length ? this.attributes : this.getPileAttributeData();
-        this.attributes = data.attributes;
+        data.currencies = this.currencies.length ? this.currencies : this.getPileCurrenciesData();
+        this.currencies = data.currencies;
 
         data.isContainer = pileData.isContainer;
         data.hasItems = API.getItemPileItems(this.pile).length > 0;
-        data.hasAttributes = data?.attributes?.length;
+        data.hasCurrencies = data?.currencies?.length;
         data.canInspectItems = pileData.canInspectItems || game.user.isGM;
 
-        data.hasThings = data?.hasItems || data?.hasAttributes;
+        data.hasThings = data?.hasItems || data?.hasCurrencies;
 
         data.isEmpty = lib.isItemPileEmpty(this.pile);
 
         const num_players = lib.getPlayersForItemPile(this.pile).length;
 
         data.hasSplittableQuantities = data.items.find((item) => (item.quantity / num_players) > 1)
-            || data.attributes.find((attribute) => (attribute.quantity / num_players) > 1)
+            || data.currencies.find((attribute) => (attribute.quantity / num_players) > 1)
 
         data.buttons = [];
 
+        data.shareItemsEnabled = pileData.shareItemsEnabled;
+        data.shareCurrenciesEnabled = pileData.shareCurrenciesEnabled;
+
         if(data.hasRecipient){
 
-            if(pileData.splitAllEnabled && !(pileData.itemsFreeForAll && pileData.attributesFreeForAll)) {
+            const hasItemsToShare = pileData.shareItemsEnabled && data.hasItems;
+            const hasCurrenciesToShare = pileData.shareCurrenciesEnabled && data.hasCurrencies;
+
+            if(pileData.splitAllEnabled && (hasItemsToShare || hasCurrenciesToShare)) {
+
+                let buttonText;
+                if(pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled){
+                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitAll", { num_players });
+                }else if(pileData.shareItemsEnabled){
+                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitItems", { num_players });
+                }else{
+                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitCurrencies", { num_players });
+                }
 
                 data.buttons.push({
                     value: "splitAll",
                     icon: "far fa-handshake",
-                    text: game.i18n.format("ITEM-PILES.Inspect.SplitAll", { num_players }),
-                    disabled: !num_players || !data.hasThings || !data.hasSplittableQuantities,
+                    text: buttonText,
+                    disabled: !num_players,
                     type: "button"
                 });
 
             }
 
-            if(pileData.itemsFreeForAll && pileData.attributesFreeForAll && pileData.takeAllEnabled) {
+            if(pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled && pileData.takeAllEnabled) {
 
                 data.buttons.push({
                     value: "takeAll",
@@ -321,8 +336,8 @@ export class ItemPileInventory extends FormApplication {
                 return;
             }
 
-            const attributePath = $(this).parent().attr('data-attribute-path');
-            const attribute = self.attributes.find(attribute => attribute.path === attributePath)
+            const currencyPath = $(this).parent().attr('data-currency-path');
+            const attribute = self.currencies.find(currency => currency.path === currencyPath)
             attribute.currentQuantity = currentQuantity;
         });
 
@@ -337,10 +352,10 @@ export class ItemPileInventory extends FormApplication {
             self.takeItem(itemId, inputQuantity);
         })
 
-        html.find(".item-piles-attribute-take-button").click(function () {
-            const attribute = $(this).closest(".item-piles-item-row").attr('data-attribute-path');
+        html.find(".item-piles-currency-take-button").click(function () {
+            const currency = $(this).closest(".item-piles-item-row").attr('data-currency-path');
             const inputQuantity = $(this).closest(".item-piles-item-row").find(".item-piles-quantity").val();
-            self.takeAttribute(attribute, inputQuantity);
+            self.takeCurrency(currency, inputQuantity);
         })
 
         html.find('button[name="splitAll"]').click(function () {
@@ -393,7 +408,7 @@ export class ItemPileInventory extends FormApplication {
         return API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }]);
     }
 
-    async takeAttribute(attribute, inputQuantity) {
+    async takeCurrency(attribute, inputQuantity) {
         let quantity = Number(getProperty(this.pile.actor.data, attribute) ?? 0);
         quantity = Math.min(inputQuantity, quantity);
         await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity });
