@@ -438,27 +438,6 @@ export async function updateItemPileData(target, flagData, tokenData){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* -------------------------- Sharing Methods ------------------------- */
 
 
