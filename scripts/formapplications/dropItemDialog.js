@@ -1,8 +1,7 @@
 import CONSTANTS from "../constants.js";
-import API from "../api.js";
 import * as lib from "../lib/lib.js";
 
-export default class DropDialog extends FormApplication {
+export default class DropItemDialog extends FormApplication {
 
     constructor(resolve, droppedItem, dropObjects) {
         super();
@@ -16,7 +15,7 @@ export default class DropDialog extends FormApplication {
         return foundry.utils.mergeObject(super.defaultOptions, {
             title: game.i18n.localize("ITEM-PILES.DropItem.Title"),
             classes: ["dialog"],
-            template: `${CONSTANTS.PATH}templates/drop-dialog.html`,
+            template: `${CONSTANTS.PATH}templates/drop-item-dialog.html`,
             width: 430,
             height: "auto"
         });
@@ -25,7 +24,7 @@ export default class DropDialog extends FormApplication {
     static query(droppedItem, dropObjects) {
 
         return new Promise(resolve => {
-            new DropDialog(resolve, droppedItem, dropObjects).render(true);
+            new DropItemDialog(resolve, droppedItem, dropObjects).render(true);
         });
 
     }

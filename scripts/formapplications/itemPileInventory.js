@@ -4,6 +4,7 @@ import * as lib from "../lib/lib.js";
 import { isPileInventoryOpenForOthers } from "../socket.js";
 import HOOKS from "../hooks.js";
 import { ItemPileConfig } from "./itemPileConfig.js";
+import DropCurrencyDialog from "./dropCurrencyDialog.js";
 
 export class ItemPileInventory extends FormApplication {
 
@@ -23,6 +24,7 @@ export class ItemPileInventory extends FormApplication {
         this.deleted = false;
         this.overrides = overrides;
         this.pileData = lib.getItemPileData(this.pile);
+        this.editQuantities = !this.recipient && this.pile.isOwner
         Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient, overrides);
     }
 
@@ -49,7 +51,7 @@ export class ItemPileInventory extends FormApplication {
         const openApps = Object.values(ui.windows).filter(app => {
             return app instanceof this
                 && (app.pile.uuid === inPileUuid || app.pile.actor.uuid === inPileUuid)
-                && (!recipientUuid || (app.recipient.uuid === recipientUuid || app.recipient?.actor?.uuid === recipientUuid))
+                && (!recipientUuid || (app.recipient?.uuid === recipientUuid || app.recipient?.actor?.uuid === recipientUuid))
         })
 
         if(openApps.length){
@@ -65,7 +67,7 @@ export class ItemPileInventory extends FormApplication {
         for(const app of openApps) {
             app.saveItems();
             app.saveCurrencies();
-            app.deleted = deleted;
+            app.deleted = app.deleted || deleted;
             app.render(true);
         }
         return true;
@@ -75,8 +77,9 @@ export class ItemPileInventory extends FormApplication {
         const pileUuid = await lib.getUuid(pile);
         const recipientUuid = recipient ? await lib.getUuid(recipient) : false;
 
-        const app = ItemPileInventory.getActiveAppFromPile(pileUuid, recipientUuid);
+        let app = ItemPileInventory.getActiveAppFromPile(pileUuid, recipientUuid);
         if (app) {
+            [app] = app;
             app.pileData = lib.getItemPileData(app.pile);
             return app.render(true, { focus: true });
         }
@@ -239,7 +242,7 @@ export class ItemPileInventory extends FormApplication {
         data.hasCurrencies = data?.currencies?.length;
         data.canInspectItems = pileData.canInspectItems || game.user.isGM;
 
-        data.hasThings = data?.hasItems || data?.hasCurrencies;
+        data.hasThings = data?.hasItems && data?.hasCurrencies;
 
         data.isEmpty = lib.isItemPileEmpty(this.pile);
 
@@ -252,6 +255,8 @@ export class ItemPileInventory extends FormApplication {
 
         data.shareItemsEnabled = pileData.shareItemsEnabled;
         data.shareCurrenciesEnabled = pileData.shareCurrenciesEnabled;
+
+        data.editQuantities = this.editQuantities;
 
         if(data.hasRecipient){
 
@@ -296,6 +301,12 @@ export class ItemPileInventory extends FormApplication {
                     text: game.i18n.localize("ITEM-PILES.Inspect.Close")
                 })
             }
+        }else if(data.editQuantities){
+            data.buttons.push({
+                value: "update",
+                icon: "fas fa-save",
+                text: game.i18n.localize("ITEM-PILES.Defaults.Update")
+            });
         }
 
         data.buttons.push({
@@ -325,28 +336,32 @@ export class ItemPileInventory extends FormApplication {
         });
 
         html.find('.item-piles-quantity').keyup(function(){
-            const isItem = !!$(this).parent().attr("data-item-id");
+            if(!self.editQuantities) return;
+
+            const itemId = $(this).closest(".item-piles-item-row").attr("data-item-id");
+
+            const isItem = !!itemId;
 
             const currentQuantity = Number($(this).val());
 
             if(isItem){
-                const itemId = $(this).parent().attr("data-item-id");
                 const item = self.items.find(item => item.id === itemId)
                 item.currentQuantity = currentQuantity;
                 return;
             }
 
-            const currencyPath = $(this).parent().attr('data-currency-path');
+            const currencyPath = $(this).closest(".item-piles-item-row").attr('data-currency-path');
             const attribute = self.currencies.find(currency => currency.path === currencyPath)
+
             attribute.currentQuantity = currentQuantity;
         });
 
-        html.find(".item-piles-clickable").click(function () {
+        html.find(".item-piles-name-container .item-piles-clickable").click(function () {
             const itemId = $(this).closest(".item-piles-item-row").attr('data-item-id');
             self.previewItem(itemId);
         })
 
-        html.find(".item-piles-take-button").click(function () {
+        html.find(".item-piles-item-take-button").click(function () {
             const itemId = $(this).closest(".item-piles-item-row").attr('data-item-id');
             const inputQuantity = $(this).closest(".item-piles-item-row").find(".item-piles-quantity").val();
             self.takeItem(itemId, inputQuantity);
@@ -360,6 +375,10 @@ export class ItemPileInventory extends FormApplication {
 
         html.find('button[name="splitAll"]').click(function () {
             self.splitAll();
+        })
+
+        html.find('.item-piles-add-currency').click(function(){
+            self.addCurrency();
         })
     }
 
@@ -418,7 +437,20 @@ export class ItemPileInventory extends FormApplication {
         await API.splitItemPileContents(this.pile);
     }
 
+    async addCurrency(){
+        const currencyToAdd = await DropCurrencyDialog.query(this.pile, this.recipient)
+        if(this.recipient) {
+            await API.transferAttributes(this.recipient, this.pile, currencyToAdd);
+        }else if(game.user.isGM){
+            await API.addAttributes(this.pile, currencyToAdd);
+        }
+    }
+
     async _updateObject(event, formData) {
+
+        if(event.submitter.value === "update"){
+            return this.updatePile(formData);
+        }
 
         if (event.submitter.value === "takeAll") {
             API.transferEverything(this.pile, this.recipient);
@@ -429,6 +461,63 @@ export class ItemPileInventory extends FormApplication {
             isPileInventoryOpenForOthers.query(this.pile).then((result) => {
                 if (!result) API.closeItemPile(this.pile, this.recipient);
             });
+        }
+
+    }
+
+    updatePile(data){
+
+        const items = [];
+        const attributes = {};
+
+        for(let [type, quantity] of Object.entries(data)){
+            if(type.startsWith("currency-")){
+                const path = type.replace("currency-", "");
+                if(quantity === this.currencies.find(currency => currency.path === path).quantity) continue;
+                attributes[path] = quantity;
+            }else{
+                const itemId = type.replace("item-", "");
+                if(itemId === this.items.find(item => item.id === itemId).itemId) continue;
+                items.push({
+                    _id: itemId,
+                    [API.ITEM_QUANTITY_ATTRIBUTE]: quantity
+                })
+            }
+        }
+
+        const pileSharingData = lib.getItemPileSharingData(this.pile);
+
+        const hasAttributes = !foundry.utils.isObjectEmpty(attributes);
+
+        if(hasAttributes){
+            this.pile.actor.update(attributes);
+            pileSharingData.currencies = pileSharingData.currencies.map(currency => {
+                if(attributes[currency.path] !== undefined){
+                    currency.actors = currency.actors.map(actor => {
+                        actor.quantity = Math.max(0, Math.min(actor.quantity,  attributes[currency.path]));
+                        return actor;
+                    })
+                }
+                return currency;
+            })
+        }
+
+        if(items.length){
+            this.pile.actor.updateEmbeddedDocuments("Item", items);
+            pileSharingData.items = pileSharingData.items.map(item => {
+                const sharingItem = items.find(item => item._id === item.id);
+                if(sharingItem){
+                    item.actors = item.actors.map(actor => {
+                        actor.quantity = Math.max(0, Math.min(actor.quantity,  sharingItem.quantity));
+                        return actor;
+                    })
+                }
+                return item;
+            })
+        }
+
+        if(items.length || hasAttributes){
+            lib.updateItemPileSharingData(this.pile, pileSharingData);
         }
 
     }

@@ -78,7 +78,7 @@ const chatHandler = {
 
         let currencyData = [];
         if(sharingData.currencies){
-            const currencyList = lib.getItemPileCurrencyList(source);
+            const currencyList = lib.getActorCurrencyList(source);
             currencyData = sharingData.currencies.map(currencyData => {
                 const currency = currencyList.find(currency => currency.path === currencyData.path);
                 const totalQuantity = currencyData.actors.reduce((acc, storedCurrency) => acc + storedCurrency.quantity, 0);
@@ -123,7 +123,7 @@ const chatHandler = {
      * @private
      */
     _formatCurrencyData(itemPile, currencies){
-        const currencyList = lib.getItemPileCurrencyList(itemPile);
+        const currencyList = lib.getActorCurrencyList(itemPile);
         return Object.entries(currencies).map(entry => {
             const currency = currencyList.find(currency => currency.path === entry[0]);
             return {

@@ -90,10 +90,10 @@
 <dt><a href="#isItemPileEmpty">isItemPileEmpty(target)</a> ⇒ <code>boolean</code></dt>
 <dd><p>Whether the item pile is empty</p>
 </dd>
-<dt><a href="#getItemPileItems">getItemPileItems(target, [itemFilters])</a> ⇒ <code>Array</code></dt>
+<dt><a href="#getItemPileItems">getActorItems(target, [itemFilters])</a> ⇒ <code>Array</code></dt>
 <dd><p>Returns the items this item pile can transfer</p>
 </dd>
-<dt><a href="#getItemPileAttributes">getItemPileCurrencies(target)</a> ⇒ <code>array</code></dt>
+<dt><a href="#getItemPileAttributes">getActorCurrencies(target)</a> ⇒ <code>array</code></dt>
 <dd><p>Returns the attributes this item pile can transfer</p>
 </dd>
 <dt><a href="#refreshItemPile">refreshItemPile(target)</a> ⇒ <code>Promise</code></dt>
@@ -427,11 +427,11 @@ Whether the item pile is empty
 | --- | --- |
 | target | <code>Token/TokenDocument</code> \| <code>Actor</code> | 
 
-<a name="getItemPileItems"></a>
+<a name="getActorItems"></a>
 
 ---
 
-### getItemPileItems(target, [itemFilters]) ⇒ <code>Array</code>
+### getActorItems(target, [itemFilters]) ⇒ <code>Array</code>
 Returns the items this item pile can transfer 
 
 | Param | Type | Default | Description |
@@ -439,11 +439,11 @@ Returns the items this item pile can transfer
 | target | <code>Token/TokenDocument</code> \| <code>Actor</code> |  |  |
 | [itemFilters] | <code>array/boolean</code> | <code>false</code> | Array of item types disallowed - will default to pile settings or module settings if none provided |
 
-<a name="getItemPileCurrencies"></a>
+<a name="getActorCurrencies"></a>
 
 ---
 
-### getItemPileCurrencies(target) ⇒ <code>array</code>
+### getActorCurrencies(target) ⇒ <code>array</code>
 Returns the attributes this item pile can transfer 
 
 | Param | Type |

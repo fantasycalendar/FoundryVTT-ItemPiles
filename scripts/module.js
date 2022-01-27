@@ -12,6 +12,7 @@ import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import flagManager from "./flagManager.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
+import DropCurrencyDialog from "./formapplications/dropCurrencyDialog.js";
 
 Hooks.once("init", async () => {
 
@@ -82,7 +83,7 @@ Hooks.once("ready", async () => {
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
 
-    ItemPileInventory.show(canvas.tokens.get("L52HMFJ4yn1jEdWS"))
+    //DropCurrencyDialog.query(canvas.tokens.get("L52HMFJ4yn1jEdWS"), canvas.tokens.get("NLHSdMRqd5IcizWv"))
 
 });
 
@@ -107,7 +108,7 @@ const module = {
     async _pileCurrencyChanged(actor, changes) {
         const target = actor?.token ?? actor;
         if (!lib.isValidItemPile(target)) return;
-        const sourceCurrencies = lib.getItemPileCurrencyList(target);
+        const sourceCurrencies = lib.getActorCurrencyList(target);
         const validCurrency = sourceCurrencies.find(currency => {
             return hasProperty(changes, currency.path);
         });
@@ -212,7 +213,7 @@ const module = {
         buttons.unshift({
             label: game.settings.get(CONSTANTS.MODULE_NAME, "hideActorHeaderText") ? "" : "ITEM-PILES.Defaults.Configure",
             icon: "fas fa-box-open",
-            class: "item-piles-config",
+            class: "item-piles-config-button",
             onclick: () => {
                 ItemPileConfig.show(obj);
             }

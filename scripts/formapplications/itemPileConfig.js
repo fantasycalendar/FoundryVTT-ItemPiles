@@ -162,6 +162,10 @@ export class ItemPileConfig extends FormApplication {
                 takeAllButtonCheckbox.prop('checked', false)
             }
         }).change();
+
+        html.find(".item-piles-config-reset-sharing-data").click(function(){
+            self.resetSharingData();
+        })
     }
 
     async showCurrenciesEditor() {
@@ -190,6 +194,27 @@ export class ItemPileConfig extends FormApplication {
                 this.pileData.overrideItemFilters = newSettings;
             }
         });
+    }
+
+    async resetSharingData(){
+        return new Dialog({
+            title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
+            content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content")),
+            buttons: {
+                confirm: {
+                    icon: '<i class="fas fa-check"></i>',
+                    label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Confirm"),
+                    callback: () => {
+                        lib.updateItemPileSharingData(this.document, {});
+                    }
+                },
+                cancel: {
+                    icon: '<i class="fas fa-times"></i>',
+                    label: game.i18n.localize("No")
+                }
+            },
+            default: "cancel"
+        }).render(true);
     }
 
     async _updateObject(event, formData) {

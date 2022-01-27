@@ -109,8 +109,8 @@
 
 ## Version 1.0.6
 - Added API endpoints:
-    - `ItemPiles.API.getDocumentItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
-    - `ItemPiles.API.getItemPileItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
+    - `ItemPiles.API.getActorItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
+    - `ItemPiles.API.getActorItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
 - Updated japanese localization
 - Fixed item piles not respecting item type filters
 - Fixed issue with `ItemPiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile

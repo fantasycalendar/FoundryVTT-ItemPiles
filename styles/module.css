@@ -22,6 +22,41 @@
 .item-piles-middle {
   vertical-align: middle;
 }
+.item-piles-img-container {
+  min-height: 37px;
+  max-width: 37px;
+  max-height: 37px;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid black;
+}
+.item-piles-img-container .item-piles-img {
+  border: 0;
+  width: auto;
+  height: 100%;
+  transition: transform 150ms;
+}
+.item-piles-img-container .item-piles-img:hover {
+  transform: scale(1.125, 1.125);
+}
+.item-piles-odd-color:nth-child(even) {
+  background-color: var(--color-text-light-highlight);
+}
+.item-piles-bottom-divider {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.item-piles-disabled {
+  background-color: var(--color-bg-btn-minor-inactive);
+}
+
+.item-piles-slider-group {
+  padding: 0 5px 0 0;
+  margin-bottom: 0.25rem;
+  margin-right: 5px;
+  border-radius: 4px;
+}
 
 /* ----------------------- INVENTORY ----------------------- */
 .item-piles-inventory-sheet #item-piles-preview-container {
@@ -40,36 +75,25 @@
 }
 .item-piles-inventory-sheet .item-piles-items .item-piles-add-currency {
   margin-right: 5px;
+  flex: 0 1 auto;
+  vertical-align: middle;
 }
 .item-piles-inventory-sheet .item-piles-items .item-piles-item-row {
-  padding: 0;
+  padding: 0 5px 0 0;
   margin-bottom: 0.25rem;
   margin-right: 5px;
   border-radius: 4px;
 }
-.item-piles-inventory-sheet .item-piles-items .item-piles-item-row:nth-child(odd) {
-  background-color: rgba(255, 255, 255, 0.25);
-}
-.item-piles-inventory-sheet .item-piles-items .item-piles-item-row:hover {
+.item-piles-inventory-sheet .item-piles-items .item-piles-item-row:nth-child(even):not(.item-piles-disabled) {
   background-color: var(--color-text-light-highlight);
 }
-.item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-item-disabled, .item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-item-disabled:hover {
+.item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-disabled {
   background-color: var(--color-bg-btn-minor-inactive);
 }
-.item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-img-container {
-  min-height: 37px;
-  max-width: 37px;
-  max-height: 37px;
-  overflow: hidden;
-  border-radius: 4px;
-}
-.item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-img-container .item-piles-img {
-  width: auto;
-  height: 100%;
-  transition: transform 150ms;
-}
-.item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-img-container .item-piles-img:hover {
-  transform: scale(1.125, 1.125);
+.item-piles-inventory-sheet .item-piles-items .item-piles-item-row div {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-text {
   line-height: 1.6rem;
@@ -107,8 +131,9 @@
   font-size: 0.8rem;
   line-height: 1.5rem;
 }
-.item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-take-button, .item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-currency-take-button {
-  flex: 1;
+.item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-item-take-button, .item-piles-inventory-sheet .item-piles-items .item-piles-item-row .item-piles-currency-take-button {
+  flex: 0;
+  min-width: 4rem;
   height: 26px;
   padding: 1px 3px;
   line-height: inherit;

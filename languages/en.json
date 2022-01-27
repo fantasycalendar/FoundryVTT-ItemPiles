@@ -1,6 +1,10 @@
 {
     "ITEM-PILES": {
 
+        "Items": "Items",
+        "Currencies": "Currencies",
+        "Currency": "Currency",
+
         "ContextMenu": {
             "ShowToPlayers": "Show Item Pile to players"
         },
@@ -8,14 +12,17 @@
         "Inspect": {
             "Title": "Inspecting Pile Contents",
             "AsActor": "You're inspecting this pile as {actorName}",
-            "NoActor": "You are inspecting the contents of this pile without controlling a token, which means you can't take items from it.",
+            "Owner": "As an owner of this Item Pile, you can edit the item pile's contents.",
             "Empty": "This pile is empty.",
             "Destroyed": "This pile no longer exists and lies barren.",
             "TakeAll": "Take All Items",
             "Take": "Take",
             "Close": "Close Lid",
             "Leave": "Leave",
+            "NoShareLeft": "No share left...",
+            "NoneLeft": "None left...",
             "OpenSheet": "Open Actor Sheet",
+            "AddCurrency": "Add currency",
             "SplitAll": "Split {num_players} ways",
             "SplitItems": "Split items {num_players} ways",
             "SplitCurrencies": "Split currencies {num_players} ways"
@@ -51,6 +58,11 @@
                 "Title": "System Recognized",
                 "Content": "This system was previously not supported, but in an recent update it was added as a supported system!<br><br>Do you want to load this system's default Item Pile settings?",
                 "Confirm": "Apply System Defaults"
+            },
+            "ResetSharingData": {
+                "Title": "Reset Sharing Data",
+                "Content": "This will reset all of the history of players having taken their share from this pile.<br><br>Are you sure you want to do this?",
+                "Confirm": "Reset Sharing Data"
             },
             "Cancel": "Cancel"
         },
@@ -143,7 +155,9 @@
                 "SplitAllEnabled": "Enable Split With Players Button",
                 "SplitAllEnabledExplanation": "Enables the \"Split [number] ways\" button when looting this item pile. Pressing this button makes all players (or only active players, see below) receive their share of the item pile.",
                 "InactivePlayers": "Split Only With Active Players",
-                "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile."
+                "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile.",
+                "ResetSharingData": "Reset Sharing Data",
+                "ResetSharingDataExplanation": "If the Item Pile's content was manually changed while people were looting it, the sharing data may become out of sync with the players' actual shares. Pressing this button will reset everyone's share in this pile."
             },
 
             "Merchant": {
@@ -171,6 +185,14 @@
             "QuantityToDrop": "You have {quantity} of this item, how many do you want to drop?",
             "AddToPile": "Add to pile",
             "NewPile": "Create new pile",
+            "Cancel": "Cancel"
+        },
+
+        "DropCurrencies": {
+            "Title": "Dropping Currencies",
+            "Player": "You can drop the following currencies into this item pile:",
+            "GM": "As a GM, you can add currencies to this item pile:",
+            "AddToPile": "Add to pile",
             "Cancel": "Cancel"
         },
 

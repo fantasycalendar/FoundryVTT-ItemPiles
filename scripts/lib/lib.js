@@ -177,8 +177,8 @@ export function getItemPileTokenImage(target, data = false) {
 
     if(!isValidItemPile(pileDocument)) return originalImg;
 
-    const items = getItemPileItems(pileDocument);
-    const currencies = getItemPileCurrencies(pileDocument);
+    const items = getActorItems(pileDocument);
+    const currencies = getActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -225,8 +225,8 @@ export function getItemPileTokenScale(target, data) {
         baseScale = pileDocument.data.token.scale;
     }
 
-    const items = getItemPileItems(pileDocument);
-    const currencies = getItemPileCurrencies(pileDocument);
+    const items = getActorItems(pileDocument);
+    const currencies = getActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -244,8 +244,8 @@ export function getItemPileName(target, data){
         data = getItemPileData(pileDocument);
     }
 
-    const items = getItemPileItems(pileDocument);
-    const currencies = getItemPileCurrencies(pileDocument);
+    const items = getActorItems(pileDocument);
+    const currencies = getActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -267,9 +267,9 @@ export function getItemPileName(target, data){
 }
 
 
-export function getItemPileItems(target, itemFilters = false){
+export function getActorItems(target, itemFilters = false){
 
-    const pileItemFilters = itemFilters || getDocumentItemFilters(target);
+    const pileItemFilters = itemFilters || getActorItemFilters(target);
 
     const inDocument = getDocument(target);
     const targetActor = inDocument instanceof TokenDocument
@@ -298,7 +298,7 @@ export function getPlayersForItemPile(target){
 }
 
 export function isItemInvalid(target, item, itemFilters = false){
-    const pileItemFilters = itemFilters || getDocumentItemFilters(target);
+    const pileItemFilters = itemFilters || getActorItemFilters(target);
     const itemData = item instanceof Item ? item.data : item;
     for(const filter of pileItemFilters){
         if(!hasProperty(itemData, filter.path)) continue;
@@ -310,7 +310,7 @@ export function isItemInvalid(target, item, itemFilters = false){
     return false;
 }
 
-export function getDocumentItemFilters(target){
+export function getActorItemFilters(target){
     if(!target) return API.ITEM_FILTERS;
     const inDocument = getDocument(target);
     const pileData = getItemPileData(inDocument);
@@ -349,26 +349,26 @@ export function isItemPileEmpty(target) {
 
     if(!targetActor) return false;
 
-    const hasNoItems = getItemPileItems(inDocument).length === 0;
-    const hasNoCurrencies = getItemPileCurrencies(inDocument).length === 0;
+    const hasNoItems = getActorItems(inDocument).length === 0;
+    const hasNoCurrencies = getActorCurrencies(inDocument).length === 0;
 
     return hasNoItems && hasNoCurrencies;
 
 }
 
-export function getItemPileCurrencyList(target){
+export function getActorCurrencyList(target){
     const inDocument = getDocument(target);
     const pileData = getItemPileData(inDocument);
     return pileData.overrideCurrencies || API.CURRENCIES;
 }
 
-export function getItemPileCurrencies(target) {
+export function getActorCurrencies(target, { currencyList = false, getAll = false }={}) {
     const inDocument = getDocument(target);
     const targetActor = inDocument?.actor ?? inDocument;
-    const currencies = getItemPileCurrencyList(targetActor);
+    const currencies = currencyList || getActorCurrencyList(targetActor);
     return currencies
         .filter(currency => {
-            return hasProperty(targetActor.data, currency.path) && Number(getProperty(targetActor.data, currency.path)) > 0;
+            return hasProperty(targetActor.data, currency.path) && (Number(getProperty(targetActor.data, currency.path)) > 0 || getAll);
         }).map(currency => {
             const localizedName = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
             const quantity = Number(getProperty(targetActor.data, currency.path) ?? 1);
@@ -614,7 +614,7 @@ export function addToItemPileSharingData(itemPile, actorUuid, { sharingData = fa
                     existingCurrency.actors.splice(existingCurrency.actors.indexOf(actorData), 1);
                 }
                 if(existingCurrency.actors.length === 0){
-                    pileSharingData.currencies.splice(pileSharingData.items.indexOf(existingCurrency), 1)
+                    pileSharingData.currencies.splice(pileSharingData.currencies.indexOf(existingCurrency), 1)
                 }
             }
 
@@ -645,7 +645,7 @@ export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [],
 export function getItemPileItemsForActor(pile, recipient, floor = false){
 
     const pileData = getItemPileData(pile);
-    const pileItems = getItemPileItems(pile);
+    const pileItems = getActorItems(pile);
 
     const players = getPlayersForItemPile(pile);
     const pileSharingData = getItemPileSharingData(pile);
@@ -663,10 +663,11 @@ export function getItemPileItemsForActor(pile, recipient, floor = false){
             img: item.data?.img ?? "",
             currentQuantity: 1,
             quantity: quantity,
-            shareLeft: false
+            shareLeft: quantity,
+            toShare: pileData.shareItemsEnabled && recipientUuid
         };
 
-        if(pileData.shareItemsEnabled && recipientUuid) {
+        if(data.toShare) {
 
             const foundItem = findSimilarItem(storedItems, item);
 
@@ -682,7 +683,7 @@ export function getItemPileItemsForActor(pile, recipient, floor = false){
 
             let actorQuantity = foundItem?.actors ? foundItem?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
 
-            data.shareLeft = Math.min(quantity, Math.floor(totalActorShare - actorQuantity));
+            data.shareLeft = Math.max(0, Math.min(quantity, Math.floor(totalActorShare - actorQuantity)));
 
         }
 
@@ -695,7 +696,7 @@ export function getItemPileItemsForActor(pile, recipient, floor = false){
 export function getItemPileCurrenciesForActor(pile, recipient, floor){
 
     const pileData = getItemPileData(pile);
-    const pileCurrencies = getItemPileCurrencies(pile);
+    const pileCurrencies = getActorCurrencies(pile, { getAll: !recipient });
 
     const players = getPlayersForItemPile(pile);
     const pileSharingData = getItemPileSharingData(pile);
@@ -707,10 +708,11 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor){
         return !recipient || hasProperty(recipient?.data ?? {}, currency.path);
     }).map(currency => {
 
-        currency.shareLeft = false;
         currency.currentQuantity = 1;
+        currency.shareLeft = currency.quantity;
+        currency.toShare = pileData.shareCurrenciesEnabled && recipientUuid;
 
-        if(pileData.shareCurrenciesEnabled && recipientUuid) {
+        if(currency.toShare) {
 
             const foundCurrency = storedCurrencies.find(storedCurrency => storedCurrency.path === currency.path);
 
@@ -726,7 +728,7 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor){
 
             let actorQuantity = foundCurrency?.actors ? foundCurrency?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
 
-            currency.shareLeft = Math.min(currency.quantity, Math.floor(totalActorShare - actorQuantity));
+            currency.shareLeft = Math.max(0, Math.min(currency.quantity, Math.floor(totalActorShare - actorQuantity)));
 
         }
 

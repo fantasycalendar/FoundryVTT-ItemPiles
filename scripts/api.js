@@ -2,7 +2,7 @@ import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
-import DropDialog from "./formapplications/dropDialog.js";
+import DropItemDialog from "./formapplications/dropItemDialog.js";
 import HOOKS from "./hooks.js";
 import { hotkeyState } from "./hotkeys.js";
 import { getItemPileItemsForActor } from "./lib/lib.js";
@@ -737,7 +737,7 @@ export default class API {
      * @returns {Array}
      */
     static getItemPileItems(target, itemFilters = false){
-        return lib.getItemPileItems(target, itemFilters);
+        return lib.getActorItems(target, itemFilters);
     }
 
     /**
@@ -747,7 +747,7 @@ export default class API {
      * @returns {array}
      */
     static getItemPileCurrencies(target){
-        return lib.getItemPileCurrencies(target);
+        return lib.getActorCurrencies(target);
     }
 
     /**
@@ -852,11 +852,11 @@ export default class API {
 
             const actor = await fromUuid(actorUuid);
 
-            const itemsToTransfer = lib.getItemPileItemsForActor(itemPileActor, actor, true).map(item => {
+            const itemsToTransfer = lib.getItemPileItemsForActor(itemPileActor, actor, true).filter(item => item.toShare).map(item => {
                 return { _id: item.id, quantity: item.shareLeft };
             }).filter(item => item.quantity);
 
-            const currenciesToTransfer = Object.fromEntries(lib.getItemPileCurrenciesForActor(itemPileActor, actor, true).map(entry => {
+            const currenciesToTransfer = Object.fromEntries(lib.getItemPileCurrenciesForActor(itemPileActor, actor, true).filter(item => item.toShare).map(entry => {
                 return [entry.path, entry.shareLeft]
             }).filter(currency => currency[1]))
 
@@ -1556,7 +1556,7 @@ export default class API {
 
         if (!isEverything) {
 
-            await lib.setItemPileSharingData(sourceUuid, targetUuid, { attributes: attributesRemoved });
+            await lib.setItemPileSharingData(sourceUuid, targetUuid, { currencies: attributesRemoved });
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributesRemoved, userId);
 
@@ -1967,7 +1967,7 @@ export default class API {
 
         } else {
 
-            const result = await DropDialog.query(itemData, droppableDocuments);
+            const result = await DropItemDialog.query(itemData, droppableDocuments);
 
             if (!result) return;
             action = result.action;
