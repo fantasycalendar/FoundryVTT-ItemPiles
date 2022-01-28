@@ -39,13 +39,13 @@ export class ItemPileCurrenciesEditor extends FormApplication {
     activateListeners(html) {
         super.activateListeners(html);
         const self = this;
-        html.find('.item-pile-currency-remove').click(function () {
-            const index = Number($(this).closest('.item-pile-currency-row').attr("data-currency-index"));
+        html.find('.item-piles-currency-remove').click(function () {
+            const index = Number($(this).closest('.item-piles-currency-row').attr("data-currency-index"));
             self.currencies.splice(index, 1);
-            $(this).closest('.item-pile-currency-row').remove();
+            $(this).closest('.item-piles-currency-row').remove();
             self.rerender();
         });
-        html.find('button[name="newCurrency"]').click(function () {
+        html.find('.item-piles-add-new-currency').click(function () {
             self.currencies.push({
                 name: "",
                 path: "",
@@ -57,18 +57,22 @@ export class ItemPileCurrenciesEditor extends FormApplication {
 
     rerender(){
         const self = this;
-        this.element.find('.item-pile-currency-row').each(function(index){
+        this.element.find('.item-piles-currency-row').each(function(index){
             if(index === 0) return;
             self.currencies[index-1] = {
-                name: $(this).find('.item-pile-currency-name-input').val(),
-                path: $(this).find('.item-pile-currency-path-input').val(),
-                img: $(this).find('.item-pile-currency-img-input').val()
+                name: $(this).find('.item-piles-currency-name-input').val(),
+                path: $(this).find('.item-piles-currency-path-input').val(),
+                img: $(this).find('.item-piles-currency-img-input').val()
             }
         });
         return this.render(true);
     }
 
     async _updateObject(event, formData) {
+
+        if (event.submitter.value === "cancel") {
+            return this.resolve ? this.resolve() : false;
+        }
 
         const newSettings = [];
         for (let [path, value] of Object.entries(formData)) {

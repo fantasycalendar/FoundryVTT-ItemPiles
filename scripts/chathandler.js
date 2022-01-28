@@ -12,14 +12,15 @@ const chatHandler = {
      * @param target
      * @param items
      * @param userId
+     * @param interactionId
      * @returns {Promise}
      * @private
      */
-    _outputTransferItem(source, target, items, userId) {
+    _outputTransferItem(source, target, items, userId, interactionId) {
         if(!API.isValidItemPile(source)) return;
-        if(game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
+        if(!interactionId || game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
         const itemData = this._formatItemData(items);
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, [], userId);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, [], userId, interactionId);
     },
 
     /**
@@ -29,14 +30,15 @@ const chatHandler = {
      * @param target
      * @param currencies
      * @param userId
+     * @param interactionId
      * @returns {Promise}
      * @private
      */
-    _outputTransferCurrency(source, target, currencies, userId) {
+    _outputTransferCurrency(source, target, currencies, userId, interactionId) {
         if(!API.isValidItemPile(source)) return;
-        if(game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
+        if(!interactionId || game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
         const currencyData = this._formatCurrencyData(source, currencies);
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, [], currencyData, userId);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, [], currencyData, userId, interactionId);
     },
 
     /**
@@ -47,15 +49,16 @@ const chatHandler = {
      * @param items
      * @param currencies
      * @param userId
+     * @param interactionId
      * @returns {Promise}
      * @private
      */
-    _outputTransferEverything(source, target, items, currencies, userId) {
+    _outputTransferEverything(source, target, items, currencies, userId, interactionId) {
         if(!API.isValidItemPile(source)) return;
-        if(game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
+        if(!interactionId || game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
         const itemData = this._formatItemData(items);
         const currencyData = this._formatCurrencyData(source, currencies);
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, currencyData, userId);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, currencyData, userId, interactionId);
     },
 
     _outputSplitItemPileInventory(source, transferData, userId) {
@@ -144,23 +147,28 @@ const chatHandler = {
      * @param items
      * @param currencies
      * @param userId
+     * @param interactionId
      * @returns {Promise}
      * @private
      */
-    async _outputPickupToChat(sourceUuid, targetUuid, items, currencies, userId){
+    async _outputPickupToChat(sourceUuid, targetUuid, items, currencies, userId, interactionId){
 
         const source = await fromUuid(sourceUuid);
         const target = await fromUuid(targetUuid);
 
-        const messages = Array.from(game.messages).slice(-10);
-
         const sourceActor = source?.actor ?? source;
         const targetActor = target?.actor ?? target;
 
-        for(let message of messages){
+        const now = (+new Date());
+
+        // Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
+        const messages = Array.from(game.messages).filter(message => (now - message.data.timestamp) <= (1000*60*60*3)).slice(-10);
+        messages.reverse()
+
+        for(let [index, message] of messages.entries()){
             const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
-            if(flags && flags.source === sourceUuid && flags.target === targetUuid) {
-                return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies)
+            if(flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
+                return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
             }
         }
 
@@ -182,7 +190,8 @@ const chatHandler = {
                 source: sourceUuid,
                 target: targetUuid,
                 items: items,
-                currencies: currencies
+                currencies: currencies,
+                interactionId: interactionId
             }
         })
 
@@ -205,7 +214,7 @@ const chatHandler = {
 
     },
 
-    async _updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies) {
+    async _updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId) {
 
         const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
 
@@ -226,6 +235,7 @@ const chatHandler = {
 
         return message.update({
             content: chatCardHtml,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.interactionId`]: interactionId,
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.items`]:  newItems,
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.currencies`]:  newCurrencies,
         });

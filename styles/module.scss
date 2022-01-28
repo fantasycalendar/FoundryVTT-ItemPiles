@@ -16,12 +16,21 @@
     cursor: pointer;
   }
 
+  &-moveable{
+    cursor: move;
+  }
+
   &-grow {
     flex-grow: 1;
   }
 
-  &-text-right{
-    text-align: right;
+  &-text{
+    &-right {
+      text-align: right;
+    }
+    &-center {
+      text-align: center;
+    }
   }
 
   &-small-text{

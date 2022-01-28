@@ -160,13 +160,11 @@ export function getItemPileData(target){
     }
 }
 
-export function getItemPileTokenImage(target, data = false) {
+export function getItemPileTokenImage(target, { data = false, items = false, currencies = false }={}) {
 
     const pileDocument = getDocument(target);
 
-    if (!data) {
-        data = getItemPileData(pileDocument);
-    }
+    data = data || getItemPileData(pileDocument);
 
     let originalImg;
     if(pileDocument instanceof TokenDocument){
@@ -177,8 +175,8 @@ export function getItemPileTokenImage(target, data = false) {
 
     if(!isValidItemPile(pileDocument)) return originalImg;
 
-    const items = getActorItems(pileDocument);
-    const currencies = getActorCurrencies(pileDocument);
+    items = items || getActorItems(pileDocument).map(item => item.toObject());
+    currencies = currencies || getActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -186,7 +184,7 @@ export function getItemPileTokenImage(target, data = false) {
 
     if (data.displayOne && numItems === 1) {
         img = items.length > 0
-            ? items[0].data.img
+            ? items[0].img
             : currencies[0].img;
     }
 
@@ -210,13 +208,11 @@ export function getItemPileTokenImage(target, data = false) {
 
 }
 
-export function getItemPileTokenScale(target, data) {
+export function getItemPileTokenScale(target, { data = false, items = false, currencies = false }={}) {
 
     const pileDocument = getDocument(target);
 
-    if (!data) {
-        data = getItemPileData(pileDocument);
-    }
+    data = data || getItemPileData(pileDocument);
 
     let baseScale;
     if(pileDocument instanceof TokenDocument){
@@ -225,8 +221,8 @@ export function getItemPileTokenScale(target, data) {
         baseScale = pileDocument.data.token.scale;
     }
 
-    const items = getActorItems(pileDocument);
-    const currencies = getActorCurrencies(pileDocument);
+    items = items || getActorItems(pileDocument);
+    currencies = currencies || getActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -236,16 +232,14 @@ export function getItemPileTokenScale(target, data) {
 
 }
 
-export function getItemPileName(target, data){
+export function getItemPileName(target, { data = false, items = false, currencies = false }={}){
 
     const pileDocument = getDocument(target);
 
-    if (!data) {
-        data = getItemPileData(pileDocument);
-    }
+    data = data || getItemPileData(pileDocument);
 
-    const items = getActorItems(pileDocument);
-    const currencies = getActorCurrencies(pileDocument);
+    items = items || getActorItems(pileDocument);
+    currencies = currencies || getActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -371,7 +365,7 @@ export function getActorCurrencies(target, { currencyList = false, getAll = fals
             return hasProperty(targetActor.data, currency.path) && (Number(getProperty(targetActor.data, currency.path)) > 0 || getAll);
         }).map(currency => {
             const localizedName = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
-            const quantity = Number(getProperty(targetActor.data, currency.path) ?? 1);
+            const quantity = Number(getProperty(targetActor.data, currency.path) ?? 0);
             return {
                 name: localizedName,
                 path: currency.path,
@@ -414,10 +408,16 @@ export async function updateItemPileData(target, flagData, tokenData){
 
     const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
 
+    const targetItems = getActorItems(documentActor, flagData.itemFilters);
+    const targetCurrencies = getActorCurrencies(documentActor, { currencyList: flagData.currencies });
+
+    const data = { data: flagData, items: targetItems, currencies: targetCurrencies };
+
     const updates = documentTokens.map(tokenDocument => {
         const newTokenData = foundry.utils.mergeObject(tokenData, {
-            "img": getItemPileTokenImage(tokenDocument, flagData),
-            "scale": getItemPileTokenScale(tokenDocument, flagData),
+            "img": getItemPileTokenImage(tokenDocument, data),
+            "scale": getItemPileTokenScale(tokenDocument, data),
+            "name": getItemPileName(tokenDocument, data),
         });
         return {
             "_id": tokenDocument.id,

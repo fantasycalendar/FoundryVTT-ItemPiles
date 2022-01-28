@@ -13,6 +13,8 @@ import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import flagManager from "./flagManager.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropCurrencyDialog from "./formapplications/dropCurrencyDialog.js";
+import { ItemPileCurrenciesEditor } from "./formapplications/itemPileCurrenciesEditor.js";
+import { getActorCurrencies, getActorItems } from "./lib/lib.js";
 
 Hooks.once("init", async () => {
 
@@ -83,8 +85,6 @@ Hooks.once("ready", async () => {
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
 
-    //DropCurrencyDialog.query(canvas.tokens.get("L52HMFJ4yn1jEdWS"), canvas.tokens.get("NLHSdMRqd5IcizWv"))
-
 });
 
 const debounceManager = {
@@ -140,23 +140,28 @@ const module = {
         const tokens = [...canvas.tokens.placeables].map(token => token.document);
         for (const doc of tokens) {
             await API._initializeItemPile(doc);
-            if(lib.isResponsibleGM()) {
-                await API._refreshItemPile(doc.uuid);
-            }
         }
     },
 
     async _createPile(tokenDoc) {
+        if (!lib.isResponsibleGM()) return;
         if (!lib.isValidItemPile(tokenDoc)) return;
-        const itemPileConfig = lib.getItemPileData(tokenDoc.actor)
-        Hooks.callAll(HOOKS.PILE.CREATE, tokenDoc, itemPileConfig);
-        await tokenDoc.update({
-            "img": lib.getItemPileTokenImage(tokenDoc, itemPileConfig),
-            "scale": lib.getItemPileTokenScale(tokenDoc, itemPileConfig),
-            "name": lib.getItemPileName(tokenDoc, itemPileConfig),
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: itemPileConfig
-        });
-        await API._initializeItemPile(tokenDoc);
+        setTimeout(async () => {
+            const itemPileConfig = lib.getItemPileData(tokenDoc.actor)
+            Hooks.callAll(HOOKS.PILE.CREATE, tokenDoc, itemPileConfig);
+
+            const targetItems = getActorItems(tokenDoc.actor);
+            const targetCurrencies = getActorCurrencies(tokenDoc.actor);
+            const data = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
+
+            await tokenDoc.update({
+                "img": lib.getItemPileTokenImage(tokenDoc, data),
+                "scale": lib.getItemPileTokenScale(tokenDoc, data),
+                "name": lib.getItemPileName(tokenDoc, data),
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: itemPileConfig
+            });
+            await API._initializeItemPile(tokenDoc);
+        }, 50)
     },
 
     async _deletePile(doc) {

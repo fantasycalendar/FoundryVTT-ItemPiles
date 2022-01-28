@@ -3,8 +3,19 @@ import * as lib from "../lib/lib.js";
 
 export default class DropCurrencyDialog extends FormApplication {
 
-    constructor(resolve, itemPile, dropper = false) {
+    constructor(resolve, {
+        title,
+        content,
+        button,
+        itemPile,
+        dropper = false,
+    }={}) {
         super();
+
+        this._title = title ?? game.i18n.localize("ITEM-PILES.DropCurrencies.Title");
+        this.content = content ?? game.i18n.localize("ITEM-PILES.DropCurrencies.Player");
+        this.button = button ?? game.i18n.localize("ITEM-PILES.DropCurrencies.AddToPile")
+
         this.resolve = resolve;
         this.itemPile = itemPile;
         this.dropper = dropper;
@@ -13,7 +24,6 @@ export default class DropCurrencyDialog extends FormApplication {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            title: game.i18n.localize("ITEM-PILES.DropCurrencies.Title"),
             classes: ["dialog"],
             template: `${CONSTANTS.PATH}templates/drop-currency-dialog.html`,
             width: 430,
@@ -21,10 +31,14 @@ export default class DropCurrencyDialog extends FormApplication {
         });
     }
 
-    static query(itemPile, dropper = false) {
+    get title(){
+        return this._title;
+    }
+
+    static query(parameters) {
 
         return new Promise(resolve => {
-            new DropCurrencyDialog(resolve, itemPile, dropper).render(true);
+            new DropCurrencyDialog(resolve, parameters).render(true);
         });
 
     }
@@ -58,13 +72,8 @@ export default class DropCurrencyDialog extends FormApplication {
 
     async _updateObject(event, formData) {
 
-        if(!Array.isArray(formData.path)) formData.path = [formData.path]
-        if(!Array.isArray(formData.quantity)) formData.quantity = [formData.quantity]
 
-        const currencies = Object.fromEntries(formData.path.map((path, index) => {
-            const quantity = Number(formData.quantity[index]);
-            return quantity ? [path, quantity] : false;
-        }).filter(Boolean));
+        const currencies = Object.fromEntries(Object.entries(formData).filter(entry => entry[1]));
 
         if (event.submitter.value === "cancel" || foundry.utils.isObjectEmpty(currencies)) {
             return this.resolve(false);

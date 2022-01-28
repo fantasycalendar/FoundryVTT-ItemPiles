@@ -17,6 +17,7 @@ export class ItemPileInventory extends FormApplication {
     constructor(pile, recipient, overrides={}) {
         super();
         this.pile = pile;
+        this.pileActor = pile?.actor ?? pile;
         this.recipient = recipient;
         this.recipientActor = this.recipient?.actor ?? this.recipient;
         this.items = [];
@@ -25,6 +26,7 @@ export class ItemPileInventory extends FormApplication {
         this.overrides = overrides;
         this.pileData = lib.getItemPileData(this.pile);
         this.editQuantities = !this.recipient && this.pile.isOwner
+        this.interactionId = randomID();
         Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient, overrides);
     }
 
@@ -103,8 +105,7 @@ export class ItemPileInventory extends FormApplication {
                     class: "item-piles-open-actor-sheet",
                     icon: "fas fa-user",
                     onclick: () => {
-                        const actor = this.pile.actor ?? this.pile;
-                        actor.sheet.render(true, { focus: true });
+                        this.pileActor.sheet.render(true, { focus: true });
                     }
                 },
                 {
@@ -112,8 +113,7 @@ export class ItemPileInventory extends FormApplication {
                     class: "item-piles-configure-pile",
                     icon: "fas fa-box-open",
                     onclick: () => {
-                        const actor = this.pile.actor ?? this.pile;
-                        ItemPileConfig.show(actor);
+                        ItemPileConfig.show(this.pileActor);
                     }
                 },
             ].concat(buttons);
@@ -309,12 +309,6 @@ export class ItemPileInventory extends FormApplication {
             });
         }
 
-        data.buttons.push({
-            value: "leave",
-            icon: "fas fa-sign-out-alt",
-            text: game.i18n.localize("ITEM-PILES.Inspect.Leave")
-        });
-
         return data;
     }
 
@@ -324,7 +318,6 @@ export class ItemPileInventory extends FormApplication {
         let timer;
         html.find('img').mouseenter(function () {
             const element = $(this);
-
             timer = setTimeout(function () {
                 self.previewImage(html, element);
             }, 300);
@@ -410,7 +403,7 @@ export class ItemPileInventory extends FormApplication {
     }
 
     async previewItem(itemId) {
-        const item = this.pile.actor.items.get(itemId);
+        const item = this.pileActor.items.get(itemId);
         if(game.user.isGM || item.data.permission[game.user.id] === 3){
             return item.sheet.render(true);
         }
@@ -421,16 +414,16 @@ export class ItemPileInventory extends FormApplication {
     }
 
     async takeItem(itemId, inputQuantity) {
-        const item = this.pile.actor.items.get(itemId);
+        const item = this.pileActor.items.get(itemId);
         let quantity = lib.getItemQuantity(item);
         quantity = Math.min(inputQuantity, quantity);
-        return API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }]);
+        return API.transferItems(this.pile, this.recipient, [{ _id: itemId, quantity }], { interactionId: this.interactionId });
     }
 
     async takeCurrency(attribute, inputQuantity) {
-        let quantity = Number(getProperty(this.pile.actor.data, attribute) ?? 0);
+        let quantity = Number(getProperty(this.pileActor.data, attribute) ?? 0);
         quantity = Math.min(inputQuantity, quantity);
-        await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity });
+        await API.transferAttributes(this.pile, this.recipient, { [attribute]: quantity }, { interactionId: this.interactionId });
     }
 
     async splitAll(){
@@ -438,11 +431,20 @@ export class ItemPileInventory extends FormApplication {
     }
 
     async addCurrency(){
-        const currencyToAdd = await DropCurrencyDialog.query(this.pile, this.recipient)
+
         if(this.recipient) {
-            await API.transferAttributes(this.recipient, this.pile, currencyToAdd);
-        }else if(game.user.isGM){
-            await API.addAttributes(this.pile, currencyToAdd);
+            const currencyToAdd = await DropCurrencyDialog.query({
+                itemPile: this.pile,
+                dropper: this.recipient
+            })
+            return API.transferAttributes(this.recipient, this.pile, currencyToAdd);
+        }
+
+        if(game.user.isGM){
+            const currencyToAdd = await DropCurrencyDialog.query({
+                itemPile: this.pile
+            })
+            return API.addAttributes(this.pile, currencyToAdd);
         }
     }
 
@@ -453,7 +455,7 @@ export class ItemPileInventory extends FormApplication {
         }
 
         if (event.submitter.value === "takeAll") {
-            API.transferEverything(this.pile, this.recipient);
+            API.transferEverything(this.pile, this.recipient, { interactionId: this.interactionId });
             return;
         }
 
@@ -490,30 +492,34 @@ export class ItemPileInventory extends FormApplication {
         const hasAttributes = !foundry.utils.isObjectEmpty(attributes);
 
         if(hasAttributes){
-            this.pile.actor.update(attributes);
-            pileSharingData.currencies = pileSharingData.currencies.map(currency => {
-                if(attributes[currency.path] !== undefined){
-                    currency.actors = currency.actors.map(actor => {
-                        actor.quantity = Math.max(0, Math.min(actor.quantity,  attributes[currency.path]));
-                        return actor;
-                    })
-                }
-                return currency;
-            })
+            this.pileActor.update(attributes);
+            if(pileSharingData?.currencies) {
+                pileSharingData.currencies = pileSharingData.currencies.map(currency => {
+                    if (attributes[currency.path] !== undefined) {
+                        currency.actors = currency.actors.map(actor => {
+                            actor.quantity = Math.max(0, Math.min(actor.quantity, attributes[currency.path]));
+                            return actor;
+                        })
+                    }
+                    return currency;
+                })
+            }
         }
 
         if(items.length){
-            this.pile.actor.updateEmbeddedDocuments("Item", items);
-            pileSharingData.items = pileSharingData.items.map(item => {
-                const sharingItem = items.find(item => item._id === item.id);
-                if(sharingItem){
-                    item.actors = item.actors.map(actor => {
-                        actor.quantity = Math.max(0, Math.min(actor.quantity,  sharingItem.quantity));
-                        return actor;
-                    })
-                }
-                return item;
-            })
+            this.pileActor.updateEmbeddedDocuments("Item", items);
+            if(pileSharingData?.items) {
+                pileSharingData.items = pileSharingData.items.map(item => {
+                    const sharingItem = items.find(item => item._id === item.id);
+                    if (sharingItem) {
+                        item.actors = item.actors.map(actor => {
+                            actor.quantity = Math.max(0, Math.min(actor.quantity, sharingItem.quantity));
+                            return actor;
+                        })
+                    }
+                    return item;
+                })
+            }
         }
 
         if(items.length || hasAttributes){

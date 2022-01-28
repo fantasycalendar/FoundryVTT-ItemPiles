@@ -10,11 +10,17 @@
 .item-piles-clickable {
   cursor: pointer;
 }
+.item-piles-moveable {
+  cursor: move;
+}
 .item-piles-grow {
   flex-grow: 1;
 }
 .item-piles-text-right {
   text-align: right;
+}
+.item-piles-text-center {
+  text-align: center;
 }
 .item-piles-small-text {
   font-size: 0.75rem;

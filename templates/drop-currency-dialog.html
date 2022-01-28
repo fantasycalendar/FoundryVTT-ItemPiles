@@ -1,7 +1,7 @@
 <form class="flexcol {{cssClasses}}" style="padding:0.5rem;" autocomplete="off">
 
     <p style="text-align: center;" class="item-piles-bottom-divider">
-        {{localize "ITEM-PILES.DropCurrencies.Player"}}
+        {{ content }}
     </p>
 
     {{#each currencies as |currency id|}}
@@ -14,10 +14,8 @@
                 {{/unless}}
             </div>
 
-            <input type="hidden" name="path" value="{{currency.path}}">
-
             <input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{{currency.quantity}}" id="rangeSlider" value="0"/>
-            <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number" id="rangeValue" name="quantity" value="0">
+            <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number" id="rangeValue" name="{{currency.path}}" value="0">
 
             <div style="flex:0 1 50px; margin: 0 5px;">/ {{currency.quantity}}</div>
         </div>

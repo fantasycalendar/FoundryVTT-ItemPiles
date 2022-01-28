@@ -71,7 +71,7 @@ export function registerHotkeysPost() {
             if (event.button !== 0) return;
 
             const pos = canvas.app.renderer.plugins.interaction.mouse.getLocalPosition(canvas.app.stage);
-            const tokens = lib.getTokensAtLocation(pos);
+            const tokens = lib.getTokensAtLocation(pos).filter(token => !token._canView(game.user));
             if(!tokens.length) return;
             tokens.sort((a, b) => b.zIndex - a.zIndex);
             const token = tokens[0].document;
