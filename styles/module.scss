@@ -20,6 +20,11 @@
     cursor: move;
   }
 
+  &-highlight {
+    color: var(--color-text-hyperlink);
+    text-decoration: underline;
+  }
+
   &-grow {
     flex-grow: 1;
   }
@@ -88,6 +93,10 @@
 /* ----------------------- INVENTORY ----------------------- */
 
 .item-piles-inventory-sheet{
+
+  .item-piles-change-actor-select {
+    display:none;
+  }
 
   #item-piles-preview-container{
     position: absolute;

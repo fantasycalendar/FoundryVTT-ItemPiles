@@ -3,14 +3,12 @@ import CONSTANTS from "./constants.js";
 import API from "./api.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import chatHandler from "./chathandler.js";
-import flagManager from "./flagManager.js";
 
 export const SOCKET_HANDLERS = {
     /**
      * Generic sockets
      */
     CALL_HOOK: "callHook",
-
 
     /**
      * Chat messages

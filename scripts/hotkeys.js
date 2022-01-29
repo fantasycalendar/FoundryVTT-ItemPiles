@@ -2,6 +2,12 @@ import API from "./api.js";
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 
+export const hotkeyActionState = {
+    get openPileInventory(){
+        return (!hotkeyState.ctrlDown && !game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen")) || (hotkeyState.ctrlDown && game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"));
+    }
+}
+
 export const hotkeyState = {
     ctrlDown: false,
     altDown: false,

@@ -4,18 +4,18 @@
 
     {{#if itemPileAtLocation}}
 
-    <p>{{localize "ITEM-PILES.DropItem.ExistingPiles"}}</p>
+    <p class="item-piles-text-center">{{localize "ITEM-PILES.DropItem.ExistingPiles" item_pile_name=itemPile.name}}</p>
 
     {{/if}}
 
     {{#if itemQuantityMoreThanOne}}
 
-        <div class="form-group">
+        <div class="form-group item-piles-text-center">
             <label>{{localize "ITEM-PILES.DropItem.QuantityToDrop" quantity=itemQuantity itemName=droppedItem.name}}</label>
         </div>
         <div class="form-group">
-            <input style="flex: 6;" type="range" name="quantity" min="1" max="{{itemQuantity}}" id="rangeSlider" value="1"/>
-            <input style="flex: 1; margin-left:1rem;" type="number" id="rangeValue" value="1">
+            <input style="flex: 6;" type="range" name="quantity" min="1" max="{{itemQuantity}}" class="rangeSlider" value="1"/>
+            <input style="flex: 1; margin-left:1rem;" type="number" class="rangeValue" value="1">
         </div>
 
     {{else}}

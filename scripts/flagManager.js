@@ -20,6 +20,8 @@ const flagManager = {
 
     async migrateDocuments(){
 
+        if(!lib.isResponsibleGM()) return;
+
         const currentVersion = game.settings.get(CONSTANTS.MODULE_NAME, "migrationVersion");
 
         if(this.latestFlagVersion === currentVersion) return;

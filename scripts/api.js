@@ -5,14 +5,6 @@ import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import DropItemDialog from "./formapplications/dropItemDialog.js";
 import HOOKS from "./hooks.js";
 import { hotkeyState } from "./hotkeys.js";
-import {
-    getActorCurrencies,
-    getActorItems,
-    getItemPileItemsForActor,
-    getItemPileName,
-    getItemPileTokenImage,
-    getItemPileTokenScale
-} from "./lib/lib.js";
 
 export default class API {
 
@@ -821,6 +813,14 @@ export default class API {
         return ItemPileInventory.rerenderActiveApp(inPileUuid, deleted);
     }
 
+    /**
+     * Splits an item pile's content between all players (or a specified set of target actors).
+     *
+     * @param itemPile {Token/TokenDocument/Actor}                                              The item pile to split
+     * @param targets {boolean/TokenDocument/Actor/Array<TokenDocument/Actor>} [targets=false]  The targets to receive the split contents
+     * @param instigator {boolean/TokenDocument/Actor} [instigator=false]                       Whether this was triggered by a specific actor
+     * @returns {Promise<object>}
+     */
     static async splitItemPileContents(itemPile, { targets = false, instigator = false }={}){
 
         if (!lib.isValidItemPile(itemPile)) return false;
@@ -909,6 +909,7 @@ export default class API {
             userId: userId,
             instigator: instigator
         };
+
         await API._executeItemPileMacro(itemPileUuid, macroData);
 
         const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(itemPileUuid);
@@ -916,6 +917,8 @@ export default class API {
 
         if (shouldBeDeleted) {
             await API._deleteItemPile(itemPileUuid);
+        }else if(lib.isItemPileEmpty(itemPileActor)){
+            await lib.clearItemPileSharingData(itemPileActor);
         }
 
         return transferData;
@@ -1240,8 +1243,6 @@ export default class API {
 
         if (!isEverything) {
 
-            await lib.setItemPileSharingData(sourceUuid, targetUuid, { items: itemsAdded });
-
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemsAdded, userId, interactionId);
 
             const macroData = {
@@ -1259,8 +1260,14 @@ export default class API {
             await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
             await API.rerenderItemPileInventoryApplication(targetUuid);
 
+            const itemPile = await fromUuid(sourceUuid);
+
             if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
+            } else if (lib.isItemPileEmpty(itemPile)) {
+                await lib.clearItemPileSharingData(itemPile);
+            } else {
+                await lib.setItemPileSharingData(sourceUuid, targetUuid, { items: itemsAdded });
             }
 
         }
@@ -1611,8 +1618,6 @@ export default class API {
 
         if (!isEverything) {
 
-            await lib.setItemPileSharingData(sourceUuid, targetUuid, { currencies: attributesRemoved });
-
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributesRemoved, userId, interactionId);
 
             const macroData = {
@@ -1630,8 +1635,14 @@ export default class API {
             await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
             await API.rerenderItemPileInventoryApplication(targetUuid);
 
+            const itemPile = await fromUuid(sourceUuid)
+
             if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
+            } else if (lib.isItemPileEmpty(itemPile)) {
+                await lib.clearItemPileSharingData(itemPile);
+            } else {
+                await lib.setItemPileSharingData(sourceUuid, targetUuid, { currencies: attributesRemoved });
             }
 
         }
@@ -2040,7 +2051,7 @@ export default class API {
 
         } else {
 
-            const result = await DropItemDialog.query(itemData, droppableDocuments);
+            const result = await DropItemDialog.query(itemData, droppableDocuments[0]);
 
             if (!result) return;
             action = result.action;
@@ -2203,12 +2214,10 @@ export default class API {
             const data = { data: pileData, items: items, currencies: currencies };
 
             overrideData = foundry.utils.mergeObject(overrideData, {
-                "img": getItemPileTokenImage(pileActor, data),
-                "scale": getItemPileTokenScale(pileActor, data),
-                "name": getItemPileName(pileActor, data),
+                "img": lib.getItemPileTokenImage(pileActor, data),
+                "scale": lib.getItemPileTokenScale(pileActor, data),
+                "name": lib.getItemPileName(pileActor, data),
             });
-
-            console.log(overrideData);
 
         }
 
@@ -2227,8 +2236,6 @@ export default class API {
      */
     static async _itemPileClicked(pileDocument) {
 
-        //debugger;
-
         if(!lib.isValidItemPile(pileDocument)) return;
 
         const pileToken = pileDocument.object;
@@ -2244,20 +2251,23 @@ export default class API {
 
         const maxDistance = data.distance ? data.distance : Infinity;
 
-        let validTokens;
+        let validTokens = [];
 
         if(canvas.tokens.controlled.length > 0){
             validTokens = [...canvas.tokens.controlled];
-        }else{
-            validTokens = [...canvas.tokens.placeables];
-            if(_token){
+            validTokens = validTokens.filter(token => token.document !== pileDocument);
+        }
+
+        if(!validTokens.length && !game.user.isGM){
+            validTokens.push(...canvas.tokens.placeables);
+            if (_token) {
                 validTokens.unshift(_token);
             }
         }
 
-        validTokens = validTokens.filter(token => {
+        validTokens = validTokens.filter(token => token.owner && token.document !== pileDocument).filter(token => {
             return lib.tokens_close_enough(pileToken, token, maxDistance) || game.user.isGM;
-        }).filter(token => token.owner && token.document !== pileDocument);
+        });
 
         if (!validTokens.length && !game.user.isGM) {
             lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);

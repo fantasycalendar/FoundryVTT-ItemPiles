@@ -13,6 +13,10 @@
 .item-piles-moveable {
   cursor: move;
 }
+.item-piles-highlight {
+  color: var(--color-text-hyperlink);
+  text-decoration: underline;
+}
 .item-piles-grow {
   flex-grow: 1;
 }
@@ -65,6 +69,9 @@
 }
 
 /* ----------------------- INVENTORY ----------------------- */
+.item-piles-inventory-sheet .item-piles-change-actor-select {
+  display: none;
+}
 .item-piles-inventory-sheet #item-piles-preview-container {
   position: absolute;
   display: none;
