@@ -34,7 +34,7 @@ export class ItemPileInventory extends FormApplication {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             title: game.i18n.localize("ITEM-PILES.Inspect.Title"),
-            classes: ["sheet", "item-piles-inventory-sheet"],
+            classes: ["sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
             width: 500,
             height: "auto",

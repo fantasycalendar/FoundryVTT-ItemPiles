@@ -72,7 +72,7 @@ export class ItemPileConfig extends FormApplication {
                 if(isLinked){
                     const doContinue = await Dialog.confirm({
                         title: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Title"),
-                        content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content")),
+                        content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content") }),
                         defaultYes: false
                     });
                     if (!doContinue) {
@@ -199,7 +199,7 @@ export class ItemPileConfig extends FormApplication {
     async resetSharingData(){
         return new Dialog({
             title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
-            content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content")),
+            content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content") }),
             buttons: {
                 confirm: {
                     icon: '<i class="fas fa-check"></i>',

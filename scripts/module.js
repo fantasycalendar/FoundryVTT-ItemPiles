@@ -11,9 +11,6 @@ import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import flagManager from "./flagManager.js";
-import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
-import DropCurrencyDialog from "./formapplications/dropCurrencyDialog.js";
-import { ItemPileCurrenciesEditor } from "./formapplications/itemPileCurrenciesEditor.js";
 import { getActorCurrencies, getActorItems } from "./lib/lib.js";
 
 Hooks.once("init", async () => {
@@ -84,6 +81,8 @@ Hooks.once("ready", async () => {
     registerHandlebarHelpers();
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
+
+
 
 });
 
@@ -230,6 +229,7 @@ const module = {
     },
 
     _handleActorContextMenu(html, menuItems) {
+
         menuItems.push({
             name: "ITEM-PILES.ContextMenu.ShowToPlayers",
             icon: `<i class="fas fa-eye"></i>`,
@@ -242,7 +242,16 @@ const module = {
             condition: (html) => {
                 const actorId = html[0].dataset.documentId;
                 const actor = game.actors.get(actorId);
-                return API.isValidItemPile(actor);
+                return game.user.isGM && API.isValidItemPile(actor);
+            }
+        }, {
+            name: "ITEM-PILES.ContextMenu.TradeWith",
+            icon: `<i class="fas fa-handshake"></i>`,
+            callback: (html) => {
+                return true;
+            },
+            condition: (html) => {
+                return true;
             }
         });
     }

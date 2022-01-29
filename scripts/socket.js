@@ -4,6 +4,7 @@ import API from "./api.js";
 import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import chatHandler from "./chathandler.js";
 import flagManager from "./flagManager.js";
+import { TradingHandler } from "./formapplications/tradingApp.js";
 
 export const SOCKET_HANDLERS = {
     /**
@@ -52,6 +53,12 @@ export const SOCKET_HANDLERS = {
     TRANSFER_ATTRIBUTES: "transferAttributes",
     TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes",
     TRANSFER_EVERYTHING: "transferEverything",
+
+    /**
+     * Trading sockets
+     */
+    TRADE_PROMPT: "tradePrompt",
+    TRADE_ACCEPTED: "tradeAccepted",
 };
 
 export let itemPileSocket;
@@ -105,6 +112,11 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ATTRIBUTES, (...args) => API._transferAttributes(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_ALL_ATTRIBUTES, (...args) => API._transferAllAttributes(...args))
     itemPileSocket.register(SOCKET_HANDLERS.TRANSFER_EVERYTHING, (...args) => API._transferEverything(...args))
+
+    /**
+     * Trading sockets
+     */
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_PROMPT, (...args) => TradingHandler._respondPrompt(...args))
 }
 
 async function callHook(inHookName, ...args) {

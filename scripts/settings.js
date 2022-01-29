@@ -244,7 +244,7 @@ export async function checkSystem(){
 
         return Dialog.prompt({
             title: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Title"),
-            content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content")),
+            content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content") }),
             callback: () => {}
         });
 
@@ -258,7 +258,7 @@ export async function checkSystem(){
 
         return new Dialog({
             title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
-            content: lib.dialogWarning(game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"), "fas fa-search"),
+            content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"), icon: "fas fa-search" }),
             buttons: {
                 confirm: {
                     icon: '<i class="fas fa-check"></i>',

@@ -6,7 +6,8 @@
         "Currency": "Currency",
 
         "ContextMenu": {
-            "ShowToPlayers": "Show Item Pile to players"
+            "ShowToPlayers": "Item Piles: Show pile to players",
+            "TradeWith": "Item Piles: Initiate Trade"
         },
 
         "Inspect": {
@@ -28,8 +29,16 @@
             "SplitCurrencies": "Split currencies {num_players} ways"
         },
 
+        "Trade": {
+            "Prompt": {
+                "Title": "Trade request",
+                "Content": "{trader_player_name} ({trader_actor_name}) wants to trade with you ({actor_name}).<br><br>Do you accept?"
+            }
+        },
+
         "Errors": {
-            "DisallowedItemDrop": "You cannot an drop \"{type}\" items",
+            "DisallowedItemDrop": "You cannot drop \"{type}\" items",
+            "DisallowedItemTrade": "You cannot trade \"{type}\" items",
             "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM.",
             "PileTooFar": "You're too far away to interact with this pile.",
             "PileLocked": "This item pile is locked and cannot be opened - you can't drop items in it.",
@@ -40,6 +49,10 @@
             "DropTypeWarning": {
                 "Title": "Item Type Warning",
                 "Content": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?"
+            },
+            "TradeTypeWarning": {
+                "Title": "Item Type Warning",
+                "Content": "You're attempting to trade an item that is of a type (\"{type}\") that is normally not allowed to be traded. Are you sure you want to do this?"
             },
             "ResetSettings": {
                 "Title": "Reset Item Piles Module Settings",

@@ -136,12 +136,15 @@ export function is_real_number(inNumber) {
         && isFinite(inNumber);
 }
 
-export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
-    return `<p class="item-piles-dialog">
-        <i style="font-size:3rem;" class="${icon}"></i><br><br>
-        <strong style="font-size:1.2rem;">Item Piles</strong>
-        <br><br>${message}
-    </p>`;
+export function dialogLayout({ title="Item Piles", message, icon = "fas fa-exclamation-triangle", extraHtml = "" }={}){
+    return `
+    <div class="item-piles-dialog">
+        <p><i style="font-size:3rem;" class="${icon}"></i></p>
+        <p style="margin-bottom: 1rem"><strong style="font-size:1.2rem;">${title}</strong></p>
+        <p>${message}</p>
+        ${extraHtml}
+    </div>
+    `;
 }
 
 

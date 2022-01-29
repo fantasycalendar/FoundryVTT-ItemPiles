@@ -2,7 +2,6 @@
 
     <div class="item-piles-item-drop-container">
 
-
         {{#if isDeleted}}
 
             <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Destroyed"}}</p>
@@ -25,7 +24,7 @@
                 <img id="item-piles-preview-image"/>
             </div>
 
-            <div class="item-piles-items">
+            <div class="item-piles-items-list">
 
                 {{#if hasItems}}
                 <div class="flexrow"><h3>{{localize "ITEM-PILES.Items"}}:</h3></div>
@@ -133,11 +132,11 @@
                 {{#if @root.hasRecipient}}
                 {{#unless hasCurrencies}}
                 <hr>
-                    <div>
+                <div>
                     <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i>
                         {{localize "ITEM-PILES.Inspect.AddCurrency"}}
                     </a>
-                <div>
+                </div>
                 {{/unless}}
                 {{/if}}
             </div>

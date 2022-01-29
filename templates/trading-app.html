@@ -1,0 +1,189 @@
+<form class="flexcol {{cssClasses}}" autocomplete="off">
+
+    <style>
+
+        .col{
+            flex-direction: column;
+            margin: 0 5px;
+        }
+
+        .col:not(:last-child){
+            padding-right:10px;
+            border-right:1px solid black;
+        }
+
+        .row{
+            flex: 1;
+        }
+
+        .row:last-child{
+            flex: 0 1 auto;
+        }
+
+        .trader{
+
+        }
+
+    </style>
+
+    <div class="flexrow">
+
+        <div class="col flexcol">
+
+            <div class="character-header item-piles-bottom-divider">
+                <img src="{{ actor.img }}">
+                <h2 class="character-name"><div>{{ actor.name }}</div></h2>
+            </div>
+
+            <div class="flexcol item-piles-item-drop-container">
+
+                <div class="row item-piles-items-list">
+
+                    {{#unless actor.hasItems}}
+                    <div class="flexcol">
+                        <h3 class="item-piles-text-center">Drag & drop items to begin trading</h3>
+                    </div>
+                    {{/unless}}
+
+                    {{#each actor.items as |item id|}}
+
+                    <div class="flexrow item-piles-item-row" data-type="item" data-item="{{item.id}}">
+
+                        <div style="flex: 0 1 auto; margin: 0 6px;">
+                            <a class="item-piles-clickable-red item-piles-remove-item"><i class="fas fa-times"></i></a>
+                        </div>
+
+                        <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
+
+                        <div class="item-piles-name item-piles-text">
+                            <div class="item-piles-name-container">
+                                <a class="item-piles-clickable">{{item.name}}</a>
+                            </div>
+                        </div>
+
+                        <div style="flex: 0 1 auto; margin: 0 5px;">
+                            <a class="item-piles-clickable-green item-piles-confirm-quantity"><i class="fas fa-check"></i></a>
+                        </div>
+
+                        <div style="flex:1;">
+                            <span class="item-piles-text-right item-piles-quantity-text">{{item.quantity}}</span>
+                            <div style="flex-direction: row; display:none;" class="item-piles-quantity-container">
+                                <input class="item-piles-quantity" type="number" min="0" value="{{item.quantity}}" max="{{item.maxQuantity}}"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{/each}}
+
+                </div>
+
+                <div class="row item-piles-items-list item-piles-currency-list">
+
+                    <div class="flexrow item-piles-top-divider">
+                        <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i>
+                            {{localize "ITEM-PILES.Inspect.AddCurrency"}}
+                        </a>
+                    </div>
+
+                    {{#each actor.currencies as |currency id|}}
+
+                    <div class="flexrow item-piles-item-row" data-type="currency" data-currency="{{currency.path}}">
+
+                        <div style="flex: 0 1 auto; margin: 0 6px;">
+                            <a class="item-piles-clickable-red item-piles-remove-item"><i class="fas fa-times"></i></a>
+                        </div>
+
+                        <div class="item-piles-img-container"><img class="item-piles-img" src="{{currency.img}}"/></div>
+
+                        <div class="item-piles-name item-piles-text">
+                            <div class="item-piles-name-container">
+                                <a class="item-piles-clickable">{{currency.name}}</a>
+                            </div>
+                        </div>
+
+                        <div style="flex: 0 1 auto; margin: 0 5px;">
+                            <a class="item-piles-clickable-green item-piles-confirm-quantity"><i class="fas fa-check"></i></a>
+                        </div>
+
+                        <div style="flex:1;">
+                            <span class="item-piles-text-right item-piles-quantity-text">{{currency.quantity}}</span>
+                            <div style="flex-direction: row; display:none;" class="item-piles-quantity-container">
+                                <input class="item-piles-quantity" type="number" min="0" value="{{currency.quantity}}" max="{{currency.maxQuantity}}"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{/each}}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col flexcol">
+
+            <div class="character-header trader item-piles-bottom-divider">
+                <h2 class="character-name"><div>{{ trader.name }}</div></h2>
+                <img src="{{ trader.img }}">
+            </div>
+
+            <div class="flexcol">
+
+                <div class="row item-piles-items-list">
+
+                    {{#each trader.items as |item id|}}
+
+                    <div class="flexrow item-piles-item-row">
+
+                        <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
+
+                        <div class="item-piles-name item-piles-text">
+                            <div class="item-piles-name-container">
+                                <a class="item-piles-clickable">{{item.name}}</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="item-piles-text-right item-piles-text">{{item.quantity}}</span>
+                        </div>
+                    </div>
+
+                    {{/each}}
+
+                </div>
+
+                <div class="row item-piles-items-list item-piles-currency-list">
+
+                    <div class="row item-piles-top-divider item-piles-text-center">
+                    </div>
+
+                    {{#each trader.currencies as |currency id|}}
+
+                    <div class="flexrow item-piles-item-row">
+
+                        <div class="item-piles-img-container"><img class="item-piles-img" src="{{currency.img}}"/></div>
+
+                        <div class="item-piles-name item-piles-text">
+                            <div class="item-piles-name-container">
+                                <a class="item-piles-clickable">{{currency.name}}</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="item-piles-text-right item-piles-text">{{currency.quantity}}</span>
+                        </div>
+                    </div>
+
+                    {{/each}}
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</form>
