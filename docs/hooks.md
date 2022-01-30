@@ -30,6 +30,8 @@
   - [item-piles-revertFromItemPiles](#item-piles-revertFromItemPiles)
   - [item-piles-preOpenItemPileInventory](#item-piles-preOpenItemPileInventory)
   - [item-piles-openItemPileInventory](#item-piles-openItemPileInventory)
+  - [item-piles-preSplitItemPileContent](#item-piles-preSplitItemPileContent)
+  - [item-piles-splitItemPileContent](#item-piles-splitItemPileContent)
 
 - [Items](#Items)
   - [item-piles-preDropItems](#item-piles-preDropItems)
@@ -342,7 +344,7 @@ Called after a token has been reverted from an item pile into a normal token.
 
 ### item-piles-preOpenItemPileInventory
 
-Called before an item pile's inventory is opened.
+Called before an item pile's inventory UI is opened.
 
 | Param          | Type                              | Description                                              |
 |----------------|-----------------------------------|----------------------------------------------------------|
@@ -355,13 +357,41 @@ If the hook returns `false`, the action is interrupted.
 
 ### item-piles-openItemPileInventory
 
-Called after an item pile's inventory has been opened.
+Called after an item pile's inventory UI has been opened.
 
 | Param            | Type                | Description                                               |
 |------------------|---------------------|-----------------------------------------------------------|
 | app    | <code>FormApplication</code>  | The item pile's inventory formapplication |
 | itemPileToken    | <code>TokenDocument</code>  | The item pile whose inventory was opened |
 | interactingToken | <code>TokenDocument/boolean</code>               | The token that interacted with the item pile |
+
+---
+
+### item-piles-preSplitItemPileContent
+
+Called before the content of an item pile is going to be split.
+
+| Param            | Type                | Description                                               |
+|------------------|---------------------|-----------------------------------------------------------|
+| target    | <code>TokenDocument/Actor</code>  | The item pile whose content that is going to be split |
+| targets    | <code>array<Actor></code>  | An array of actors who is going to be splitting the content |
+| userId | <code>string/boolean</code>               | The ID of the user that initiated this action |
+| instigator | <code>Actor</code>               | The actor that initiated this action |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-splitItemPileContent
+
+Called after the content of an item pile has been split.
+
+| Param            | Type                | Description                                               |
+|------------------|---------------------|-----------------------------------------------------------|
+| target    | <code>TokenDocument/Actor</code>  | The item pile whose content was just split |
+| transferData    | <code>object</code>  | The data of the items that were split, keyed by type and by actor UUID |
+| userId | <code>string/boolean</code>               | The ID of the user that initiated this action |
+| instigator | <code>Actor</code>               | The actor that initiated this action |
 
 ---
 

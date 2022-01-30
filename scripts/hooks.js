@@ -30,6 +30,7 @@ const HOOKS = {
         REVERT_FROM: module`revertFromItemPiles`,
         PRE_OPEN_INVENTORY: module`preOpenItemPileInventory`,
         OPEN_INVENTORY: module`openItemPileInventory`,
+        PRE_SPLIT_INVENTORY: module`preSplitItemPileContent`,
         SPLIT_INVENTORY: module`splitItemPileContent`,
     },
     ITEM: {

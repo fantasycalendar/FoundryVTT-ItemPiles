@@ -149,7 +149,7 @@ export default class API {
             })
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position, { items, pileActorName });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position, { pileActorName, items });
     }
 
     /**
@@ -848,6 +848,9 @@ export default class API {
 
         const actorUuids = (targets || lib.getPlayersForItemPile(itemPileActor).map(u => u.character)).map(actor => lib.getUuid(actor));
 
+        const hookResult = Hooks.call(HOOKS.PILE.PRE_SPLIT_INVENTORY, itemPile, targets, game.user.id, instigator);
+        if (hookResult === false) return;
+
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.SPLIT_PILE, itemPileUuid, actorUuids, game.user.id, instigator);
 
     }
@@ -895,7 +898,7 @@ export default class API {
         await itemPileSocket.executeForEveryone(
             SOCKET_HANDLERS.CALL_HOOK,
             HOOKS.PILE.SPLIT_INVENTORY,
-            itemPile,
+            itemPileUuid,
             transferData,
             userId,
             instigator
@@ -926,7 +929,6 @@ export default class API {
     }
 
     /* --- ITEM AND ATTRIBUTE METHODS --- */
-
 
     /**
      * Adds item to an actor, increasing item quantities if matches were found
@@ -2144,11 +2146,10 @@ export default class API {
      * @param {object} position
      * @param {string/boolean} [pileActorName=false]
      * @param {array/boolean} [items=false]
-     * @param {array/boolean} [currencies=false]
      * @returns {Promise<string>}
      * @private
      */
-    static async _createItemPile(sceneId, position, { pileActorName = false, items = false, currencies = false } = {}) {
+    static async _createItemPile(sceneId, position, { pileActorName = false, items = false } = {}) {
 
         let pileActor;
 
@@ -2204,14 +2205,12 @@ export default class API {
         if (!pileActor.data.token.actorLink) {
 
             items = items ? items.map(itemData => itemData.item ?? itemData) : [];
-            currencies = currencies || [];
 
             overrideData['actorData'] = {
-                items: items,
-                ...currencies
+                items: items
             }
 
-            const data = { data: pileData, items: items, currencies: currencies };
+            const data = { data: pileData, items: items };
 
             overrideData = foundry.utils.mergeObject(overrideData, {
                 "img": lib.getItemPileTokenImage(pileActor, data),
