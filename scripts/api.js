@@ -941,7 +941,7 @@ export default class API {
      */
     static async addItems(target, items, { interactionId = false }={}) {
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, items);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, items, interactionId);
         if (hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
@@ -1059,7 +1059,7 @@ export default class API {
      */
     static async removeItems(target, items, { interactionId = false }={}) {
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, items);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, items, interactionId);
         if (hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
@@ -1188,7 +1188,7 @@ export default class API {
      */
     static async transferItems(source, target, items, { interactionId = false }={}) {
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, items);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, items, interactionId);
         if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
@@ -1290,7 +1290,7 @@ export default class API {
      */
     static async transferAllItems(source, target, { itemFilters = false, interactionId = false } = {}) {
 
-        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, source, target, itemFilters);
+        const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, source, target, itemFilters, interactionId);
         if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
@@ -1366,7 +1366,7 @@ export default class API {
      */
     static async addAttributes(target, attributes, { interactionId = false }={}) {
 
-        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, target, attributes);
+        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, target, attributes, interactionId);
         if (hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
@@ -1449,7 +1449,7 @@ export default class API {
      */
     static async removeAttributes(target, attributes, { interactionId = false }={}) {
 
-        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, target, attributes);
+        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, target, attributes, interactionId);
         if (hookResult === false) return;
 
         const targetUuid = lib.getUuid(target);
@@ -1557,7 +1557,7 @@ export default class API {
      */
     static async transferAttributes(source, target, attributes, { interactionId = false }={}) {
 
-        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, source, target, attributes);
+        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, source, target, attributes, interactionId);
         if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
@@ -1662,9 +1662,9 @@ export default class API {
      *
      * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
-    static async transferAllAttributes(source, target,{ interactionId = false }={}) {
+    static async transferAllAttributes(source, target, { interactionId = false }={}) {
 
-        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, source, target);
+        const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, source, target, interactionId);
         if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
@@ -1747,7 +1747,7 @@ export default class API {
      */
     static async transferEverything(source, target, { itemFilters = false, interactionId = false } = {}) {
 
-        const hookResult = Hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, source, target, itemFilters);
+        const hookResult = Hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, source, target, itemFilters, interactionId);
         if (hookResult === false) return;
 
         const sourceUuid = lib.getUuid(source);
