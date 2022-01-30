@@ -1,5 +1,18 @@
 # Item Piles Changelog 
 
+## Version 1.3.0 Beta - Not released (see beta track on readme)
+- Added item pile currency and/or item splitting capabilities
+- Added chat message when currency and/or items are split between players
+- Added API methods:
+  - `ItemPiles.API.splitItemPileContents` - Splits an item pile's content according to its settings
+- Added hooks:
+  - `item-piles-preSplitItemPileContent` - Called before the content of an item pile is going to be split
+  - `item-piles-splitItemPileContent` - Called after the content of an item pile has been split
+- Updated various UIs to be more user-friendly
+- Renamed "Dynamic Attributes" to "Currencies"
+- Inverted the Ctrl + Double Click to open an item pile's inventory UI
+- Fixed various inconsistencies in the API and its return data
+
 ## Version 1.2.8
 - Added `Open Actor Sheet` and `Configure Pile` buttons to the Item Pile inventory UI (visible only to GMs)
 - Fixed bug where Item Piles would ignore case-sensitive item filters and attribute paths 
@@ -106,8 +119,8 @@
 
 ## Version 1.0.6
 - Added API endpoints:
-    - `ItemPiles.API.getDocumentItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
-    - `ItemPiles.API.getValidDocumentItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
+    - `ItemPiles.API.getActorItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
+    - `ItemPiles.API.getActorItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
 - Updated japanese localization
 - Fixed item piles not respecting item type filters
 - Fixed issue with `ItemPiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile

@@ -14,7 +14,7 @@ export default {
     ],
 
     // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
-    "DYNAMIC_ATTRIBUTES": [
+    "CURRENCIES": [
         {
             name: "PF1.CurrencyPlatinumP",
             path: "data.currency.pp",

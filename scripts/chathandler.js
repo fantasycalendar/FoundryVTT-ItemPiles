@@ -18,27 +18,27 @@ const chatHandler = {
      */
     _outputTransferItem(source, target, items, userId, interactionId) {
         if(!API.isValidItemPile(source)) return;
-        if(game.user.id !== userId || !interactionId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
+        if(!interactionId || game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
         const itemData = this._formatItemData(items);
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, [], userId, interactionId);
     },
 
     /**
-     * Outputs to chat based on transferring an attribute from or to an item pile
+     * Outputs to chat based on transferring a currency from or to an item pile
      *
      * @param source
      * @param target
-     * @param attributes
+     * @param currencies
      * @param userId
      * @param interactionId
      * @returns {Promise}
      * @private
      */
-    _outputTransferAttribute(source, target, attributes, userId, interactionId) {
+    _outputTransferCurrency(source, target, currencies, userId, interactionId) {
         if(!API.isValidItemPile(source)) return;
-        if(game.user.id !== userId || !interactionId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
-        const attributeData = this._formatAttributeData(source, attributes);
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, [], attributeData, userId, interactionId);
+        if(!interactionId || game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
+        const currencyData = this._formatCurrencyData(source, currencies);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, [], currencyData, userId, interactionId);
     },
 
     /**
@@ -47,18 +47,57 @@ const chatHandler = {
      * @param source
      * @param target
      * @param items
-     * @param attributes
+     * @param currencies
      * @param userId
      * @param interactionId
      * @returns {Promise}
      * @private
      */
-    _outputTransferEverything(source, target, items, attributes, userId, interactionId){
+    _outputTransferEverything(source, target, items, currencies, userId, interactionId) {
         if(!API.isValidItemPile(source)) return;
-        if(game.user.id !== userId || !interactionId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
+        if(!interactionId || game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
         const itemData = this._formatItemData(items);
-        const attributeData = this._formatAttributeData(source, attributes);
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, attributeData, userId, interactionId);
+        const currencyData = this._formatCurrencyData(source, currencies);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, currencyData, userId, interactionId);
+    },
+
+    _outputSplitItemPileInventory(source, transferData, userId) {
+        if(!API.isValidItemPile(source)) return;
+        if(game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
+
+        const sharingData = lib.getItemPileSharingData(source);
+
+        let itemData = [];
+        if(sharingData.items){
+            itemData = sharingData.items.map(item => {
+                const totalQuantity = item.actors.reduce((acc, item) => acc + item.quantity, 0)
+                return {
+                    name: item.name,
+                    img: item.img,
+                    quantity: Math.floor( totalQuantity / item.actors.length)
+                }
+            })
+        }
+
+        let currencyData = [];
+        if(sharingData.currencies){
+            const currencyList = lib.getActorCurrencyList(source);
+            currencyData = sharingData.currencies.map(currencyData => {
+                const currency = currencyList.find(currency => currency.path === currencyData.path);
+                const totalQuantity = currencyData.actors.reduce((acc, storedCurrency) => acc + storedCurrency.quantity, 0);
+                return {
+                    name: game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name,
+                    img: currency.img ?? "",
+                    quantity: Math.floor(totalQuantity / currencyData.actors.length),
+                    currency: true,
+                    index: currencyList.indexOf(currency)
+                }
+            })
+        }
+
+        const num_players = Object.keys(transferData).length;
+
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.SPLIT_CHAT_MESSAGE, source.uuid, num_players, itemData, currencyData, userId);
     },
 
     /**
@@ -79,23 +118,23 @@ const chatHandler = {
     },
 
     /**
-     * Formats attribute data to a chat friendly structure
+     * Formats currency data to a chat friendly structure
      *
      * @param itemPile
-     * @param attributes
+     * @param currencies
      * @returns {Array}
      * @private
      */
-    _formatAttributeData(itemPile, attributes){
-        return Object.entries(attributes).map(entry => {
-            const attributeList = lib.getItemPileAttributeList(itemPile);
-            const attribute = attributeList.find(attribute => attribute.path === entry[0]);
+    _formatCurrencyData(itemPile, currencies){
+        const currencyList = lib.getActorCurrencyList(itemPile);
+        return Object.entries(currencies).map(entry => {
+            const currency = currencyList.find(currency => currency.path === entry[0]);
             return {
-                name: game.i18n.has(attribute.name) ? game.i18n.localize(attribute.name) : attribute.name,
-                img: attribute.img ?? "",
+                name: game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name,
+                img: currency.img ?? "",
                 quantity: entry[1],
-                attribute: true,
-                index: attributeList.indexOf(attribute)
+                currency: true,
+                index: currencyList.indexOf(currency)
             }
         });
     },
@@ -106,61 +145,55 @@ const chatHandler = {
      * @param sourceUuid
      * @param targetUuid
      * @param items
-     * @param attributes
+     * @param currencies
      * @param userId
      * @param interactionId
      * @returns {Promise}
      * @private
      */
-    async _outputToChat(sourceUuid, targetUuid, items, attributes, userId, interactionId){
+    async _outputPickupToChat(sourceUuid, targetUuid, items, currencies, userId, interactionId){
 
         const source = await fromUuid(sourceUuid);
         const target = await fromUuid(targetUuid);
 
-        const messages = Array.from(game.messages).slice(-10);
-
         const sourceActor = source?.actor ?? source;
         const targetActor = target?.actor ?? target;
 
-        for(let message of messages){
+        const now = (+new Date());
+
+        // Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
+        const messages = Array.from(game.messages).filter(message => (now - message.data.timestamp) <= (1000*60*60*3)).slice(-10);
+        messages.reverse()
+
+        for(let [index, message] of messages.entries()){
             const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
-            if(!flags || flags.interactionId !== interactionId) continue;
-            return this._updateExistingMessage(message, sourceActor, targetActor, items, attributes)
+            if(flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
+                return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
+            }
         }
 
-        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/pickup-chat-message.html", {
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/loot-chat-message.html", {
+            message: game.i18n.format("ITEM-PILES.Chat.Pickup", { name: targetActor.name }),
             itemPile: sourceActor,
             actor: targetActor,
             items: items,
-            attributes: attributes
+            currencies: currencies
         });
 
-        const chatData = {
+        return this._createChatMessage(userId, {
             user: game.user.id,
             type: CONST.CHAT_MESSAGE_TYPES.OTHER,
             content: chatCardHtml,
             flavor: "Item Piles",
             speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: {
-                interactionId: interactionId,
+                source: sourceUuid,
+                target: targetUuid,
                 items: items,
-                attributes: attributes
+                currencies: currencies,
+                interactionId: interactionId
             }
-        };
-
-        const mode = game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat");
-
-        if(mode > 1){
-            chatData.whisper = Array.from(game.users)
-                .filter(user => user.isGM)
-                .map(user => user.id);
-            if(mode === 2){
-                chatData.whisper.push(userId);
-            }
-            chatData.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
-        }
-
-        return ChatMessage.create(chatData);
+        })
 
     },
 
@@ -181,29 +214,73 @@ const chatHandler = {
 
     },
 
-    async _updateExistingMessage(message, sourceActor, targetActor, items, attributes) {
+    async _updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId) {
 
         const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
 
         const newItems = this._matchEntries(flags.items, items);
-        const newAttributes = this._matchEntries(flags.attributes, attributes);
+        const newCurrencies = this._matchEntries(flags.currencies, currencies);
 
-        newAttributes.sort((a, b) => {
+        newCurrencies.sort((a, b) => {
             return a.index - b.index;
         })
 
-        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/pickup-chat-message.html", {
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/loot-chat-message.html", {
+            message: game.i18n.format("ITEM-PILES.Chat.Pickup", { name: targetActor.name }),
             itemPile: sourceActor,
             actor: targetActor,
             items: newItems,
-            attributes: newAttributes
+            currencies: newCurrencies
         });
 
         return message.update({
             content: chatCardHtml,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.interactionId`]: interactionId,
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.items`]:  newItems,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.attributes`]:  newAttributes,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.currencies`]:  newCurrencies,
         });
+
+    },
+
+
+    async _outputSplitToChat(sourceUuid, num_players, items, currencies, userId){
+
+        const source = await fromUuid(sourceUuid);
+
+        const sourceActor = source?.actor ?? source;
+
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/loot-chat-message.html", {
+            message: game.i18n.format("ITEM-PILES.Chat.Split", { num_players: num_players }),
+            itemPile: sourceActor,
+            items: items,
+            currencies: currencies
+        });
+
+        return this._createChatMessage(userId, {
+            user: game.user.id,
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            content: chatCardHtml,
+            flavor: "Item Piles",
+            speaker: ChatMessage.getSpeaker({ alias: game.user.name })
+        });
+
+    },
+
+    _createChatMessage(userId, chatData){
+
+        const mode = game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat");
+
+        if(mode > 1){
+            chatData.whisper = Array.from(game.users)
+                .filter(user => user.isGM)
+                .map(user => user.id);
+            if(mode === 2){
+                chatData.whisper.push(userId);
+            }
+            chatData.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
+        }
+
+        return ChatMessage.create(chatData);
 
     }
 

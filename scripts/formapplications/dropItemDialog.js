@@ -1,13 +1,13 @@
 import CONSTANTS from "../constants.js";
-import API from "../api.js";
+import * as lib from "../lib/lib.js";
 
-export default class DropDialog extends FormApplication {
+export default class DropItemDialog extends FormApplication {
 
-    constructor(resolve, droppedItem, dropObjects) {
+    constructor(resolve, droppedItem, itemPile) {
         super();
         this.resolve = resolve;
         this.droppedItem = droppedItem;
-        this.dropObjects = dropObjects;
+        this.itemPile = itemPile;
     }
 
     /** @inheritdoc */
@@ -15,16 +15,16 @@ export default class DropDialog extends FormApplication {
         return foundry.utils.mergeObject(super.defaultOptions, {
             title: game.i18n.localize("ITEM-PILES.DropItem.Title"),
             classes: ["dialog"],
-            template: `${CONSTANTS.PATH}templates/drop-dialog.html`,
+            template: `${CONSTANTS.PATH}templates/drop-item-dialog.html`,
             width: 430,
             height: "auto"
         });
     }
 
-    static query(droppedItem, dropObjects) {
+    static query(droppedItem, itemPile) {
 
         return new Promise(resolve => {
-            new DropDialog(resolve, droppedItem, dropObjects).render(true);
+            new DropItemDialog(resolve, droppedItem, itemPile).render(true);
         });
 
     }
@@ -32,10 +32,10 @@ export default class DropDialog extends FormApplication {
     async getData(options) {
         const data = super.getData(options);
 
-        data.dropObjects = this.dropObjects;
-        data.itemPileAtLocation = this.dropObjects.length > 0;
+        data.itemPile = this.itemPile;
+        data.itemPileAtLocation = !!this.itemPile;
         data.droppedItem = this.droppedItem;
-        data.itemQuantity = Number(getProperty(this.droppedItem, API.ITEM_QUANTITY_ATTRIBUTE) ?? 1);
+        data.itemQuantity = lib.getItemQuantity(this.droppedItem);
         data.itemQuantityMoreThanOne = data.itemQuantity > 1;
 
         return data;
@@ -45,8 +45,8 @@ export default class DropDialog extends FormApplication {
 
     activateListeners(html) {
         super.activateListeners(html);
-        const slider = html.find("#rangeSlider");
-        const input = html.find("#rangeValue")
+        const slider = html.find(".rangeSlider");
+        const input = html.find(".rangeValue")
         slider.on("input", function () {
             input.val($(this).val());
         })

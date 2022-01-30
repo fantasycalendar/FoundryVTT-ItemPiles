@@ -1,15 +1,16 @@
 import CONSTANTS from "./constants.js";
-import { ItemPileAttributeEditor } from "./formapplications/itemPileAttributeEditor.js";
+import { ItemPileCurrenciesEditor } from "./formapplications/itemPileCurrenciesEditor.js";
 import { SYSTEMS } from "./systems.js";
 import * as lib from "./lib/lib.js";
 import { ItemPileFiltersEditor } from "./formapplications/itemPileFiltersEditor.js";
+import flagManager from "./flagManager.js";
 
 function defaultSettings(apply = false) {
     return {
-        "dynamicAttributes": {
+        "currencies": {
             scope: "world",
             config: false,
-            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.DYNAMIC_ATTRIBUTES : [],
+            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.CURRENCIES : [],
             type: Array
         },
         "itemFilters": {
@@ -48,12 +49,12 @@ export function registerSettings() {
         restricted: true
     });
 
-    game.settings.registerMenu(CONSTANTS.MODULE_NAME, "openDynamicAttributesEditor", {
-        name: "ITEM-PILES.Setting.Attributes.Title",
-        label: "ITEM-PILES.Setting.Attributes.Label",
-        hint: "ITEM-PILES.Setting.Attributes.Hint",
+    game.settings.registerMenu(CONSTANTS.MODULE_NAME, "openCurrenciesEditor", {
+        name: "ITEM-PILES.Setting.Currencies.Title",
+        label: "ITEM-PILES.Setting.Currencies.Label",
+        hint: "ITEM-PILES.Setting.Currencies.Hint",
         icon: "fas fa-coins",
-        type: ItemPileAttributeEditor,
+        type: ItemPileCurrenciesEditor,
         restricted: true
     });
 
@@ -93,6 +94,15 @@ export function registerSettings() {
             "ITEM-PILES.Setting.OutputToChat.Blind",
         ],
         type: Number
+    });
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "invertSheetOpen", {
+        name: "ITEM-PILES.Setting.InvertSheetOpen.Title",
+        hint: "ITEM-PILES.Setting.InvertSheetOpen.Label",
+        scope: "client",
+        config: true,
+        default: false,
+        type: Boolean
     });
 
     game.settings.register(CONSTANTS.MODULE_NAME, "hideActorHeaderText", {
@@ -151,6 +161,15 @@ export function registerSettings() {
         type: Boolean
     });
 
+    const hasFlagMigrationVersion = !!game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.migrationVersion`);
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "migrationVersion", {
+        scope: "world",
+        config: false,
+        default: !hasFlagMigrationVersion ? flagManager.latestFlagVersion : "",
+        type: String
+    });
+
 }
 
 export async function migrateSettings(){
@@ -172,6 +191,18 @@ export async function migrateSettings(){
 
         await itemTypeAttribute.delete();
         await itemTypeFilters.delete();
+
+    }
+
+    const dynamicAttributesSetting = game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.dynamicAttributes`);
+
+    if(dynamicAttributesSetting){
+
+        const dynamicAttributesValue = JSON.parse(dynamicAttributesSetting.data.value)
+
+        game.settings.set(CONSTANTS.MODULE_NAME, "currencies", dynamicAttributesValue)
+
+        await dynamicAttributesSetting.delete();
 
     }
 }

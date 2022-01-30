@@ -2,6 +2,12 @@ import API from "./api.js";
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 
+export const hotkeyActionState = {
+    get openPileInventory(){
+        return (!hotkeyState.ctrlDown && !game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen")) || (hotkeyState.ctrlDown && game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"));
+    }
+}
+
 export const hotkeyState = {
     ctrlDown: false,
     altDown: false,
@@ -71,7 +77,7 @@ export function registerHotkeysPost() {
             if (event.button !== 0) return;
 
             const pos = canvas.app.renderer.plugins.interaction.mouse.getLocalPosition(canvas.app.stage);
-            const tokens = lib.getTokensAtLocation(pos);
+            const tokens = lib.getTokensAtLocation(pos).filter(token => !token._canView(game.user));
             if(!tokens.length) return;
             tokens.sort((a, b) => b.zIndex - a.zIndex);
             const token = tokens[0].document;

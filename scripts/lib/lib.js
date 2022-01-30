@@ -96,9 +96,9 @@ export function tokens_close_enough(a, b, maxDistance){
     return maxDistance >= distance;
 }
 
-export function getSimilarItem(items, { itemId, itemName, itemType }={}) {
+export function findSimilarItem(items, findItem) {
     for (const item of items) {
-        if (item.id === itemId || (item.name === itemName && item.type === itemType)) {
+        if (item.id === (findItem.id ?? findItem._id) || (item.name === findItem.name && item.type === (findItem.type ?? findItem.data.type))) {
             return item;
         }
     }
@@ -112,7 +112,6 @@ export async function getToken(documentUuid) {
 
 export function is_UUID(inId) {
     return typeof inId === "string"
-        && inId.startsWith("Scene")
         && (inId.match(/\./g) || []).length
         && !inId.endsWith(".");
 }
@@ -137,15 +136,6 @@ export function is_real_number(inNumber) {
         && isFinite(inNumber);
 }
 
-export function hasNonzeroAttribute(target, attribute){
-    let inDocument = getDocument(target);
-    const actor = inDocument instanceof TokenDocument
-        ? inDocument.actor
-        : inDocument;
-    const attributeValue = Number(getProperty(actor.data, attribute) ?? 0);
-    return hasProperty(actor.data, attribute) && attributeValue > 0;
-}
-
 export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
     return `<p class="item-piles-dialog">
         <i style="font-size:3rem;" class="${icon}"></i><br><br>
@@ -161,7 +151,7 @@ export function getItemPileData(target){
         inDocument = inDocument?.actor;
     }
     try{
-        let data = foundry.utils.duplicate(flagManager.getFlags(inDocument));
+        let data = foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA));
         if(!data) return {};
         let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
         return foundry.utils.mergeObject(defaults, data);
@@ -170,36 +160,32 @@ export function getItemPileData(target){
     }
 }
 
-export function getItemPileTokenImage(target, data = false) {
+export function getItemPileTokenImage(target, { data = false, items = false, currencies = false }={}) {
 
     const pileDocument = getDocument(target);
 
-    if (!data) {
-        data = getItemPileData(pileDocument);
-    }
+    data = data || getItemPileData(pileDocument);
 
     let originalImg;
     if(pileDocument instanceof TokenDocument){
-        originalImg = pileDocument.data.actorLink
-            ? pileDocument.actor.data.token.img
-            : pileDocument.data.img;
+        originalImg = pileDocument.actor.data.token.img;
     }else{
         originalImg = pileDocument.data.token.img;
     }
 
     if(!isValidItemPile(pileDocument)) return originalImg;
 
-    const items = getValidDocumentItems(pileDocument);
-    const attributes = getItemPileAttributes(pileDocument);
+    items = items || getActorItems(pileDocument).map(item => item.toObject());
+    currencies = currencies || getActorCurrencies(pileDocument);
 
-    const numItems = items.length + attributes.length;
+    const numItems = items.length + currencies.length;
 
     let img;
 
     if (data.displayOne && numItems === 1) {
         img = items.length > 0
-            ? items[0].data.img
-            : attributes[0].img;
+            ? items[0].img
+            : currencies[0].img;
     }
 
     if (data.isContainer) {
@@ -222,27 +208,23 @@ export function getItemPileTokenImage(target, data = false) {
 
 }
 
-export function getItemPileTokenScale(target, data) {
+export function getItemPileTokenScale(target, { data = false, items = false, currencies = false }={}) {
 
     const pileDocument = getDocument(target);
 
-    if (!data) {
-        data = getItemPileData(pileDocument);
-    }
+    data = data || getItemPileData(pileDocument);
 
     let baseScale;
     if(pileDocument instanceof TokenDocument){
-        baseScale = pileDocument.data.actorLink
-            ? pileDocument.actor.data.token.scale
-            : pileDocument.data.scale;
+        baseScale = pileDocument.actor.data.token.scale;
     }else{
         baseScale = pileDocument.data.token.scale;
     }
 
-    const items = getValidDocumentItems(pileDocument);
-    const attributes = getItemPileAttributes(pileDocument);
+    items = items || getActorItems(pileDocument);
+    currencies = currencies || getActorCurrencies(pileDocument);
 
-    const numItems = items.length + attributes.length;
+    const numItems = items.length + currencies.length;
 
     if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.overrideSingleItemScale || numItems > 1 || numItems === 0) return baseScale;
 
@@ -250,33 +232,38 @@ export function getItemPileTokenScale(target, data) {
 
 }
 
-export function getItemPileName(target, data){
+export function getItemPileName(target, { data = false, items = false, currencies = false }={}){
 
     const pileDocument = getDocument(target);
 
-    if (!data) {
-        data = getItemPileData(pileDocument);
+    data = data || getItemPileData(pileDocument);
+
+    items = items || getActorItems(pileDocument);
+    currencies = currencies || getActorCurrencies(pileDocument);
+
+    const numItems = items.length + currencies.length;
+
+    let name;
+    if(pileDocument instanceof TokenDocument){
+        name = pileDocument.actor.data.token.name;
+    }else{
+        name = pileDocument.data.token.name;
     }
 
-    const items = getValidDocumentItems(pileDocument);
-    const attributes = getItemPileAttributes(pileDocument);
-
-    const numItems = items.length + attributes.length;
-
-    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.showItemName || numItems > 1 || numItems === 0) return pileDocument.name;
+    if(!isValidItemPile(pileDocument, data) || data.isContainer || !data.displayOne || !data.showItemName || numItems > 1 || numItems === 0) return name;
 
     const item = items.length > 0
         ? items[0]
-        : attributes[0];
+        : currencies[0];
 
     return item.name;
 
 }
 
 
-export function getValidDocumentItems(target, itemFilters = false){
+export function getActorItems(target, itemFilters = false){
 
-    const pileItemFilters = itemFilters || getDocumentItemFilters(target);
+    const pileItemFilters = itemFilters || getActorItemFilters(target);
 
     const inDocument = getDocument(target);
     const targetActor = inDocument instanceof TokenDocument
@@ -297,8 +284,15 @@ export function isResponsibleGM() {
     return !connectedGMs.some(other => other.data._id < game.user.data._id);
 }
 
+export function getPlayersForItemPile(target){
+    const inDocument = getDocument(target);
+    const pileData = getItemPileData(inDocument);
+    if(!isValidItemPile(inDocument)) return [];
+    return Array.from(game.users).filter(u => (u.active || !pileData.activePlayers) && u.character);
+}
+
 export function isItemInvalid(target, item, itemFilters = false){
-    const pileItemFilters = itemFilters || getDocumentItemFilters(target);
+    const pileItemFilters = itemFilters || getActorItemFilters(target);
     const itemData = item instanceof Item ? item.data : item;
     for(const filter of pileItemFilters){
         if(!hasProperty(itemData, filter.path)) continue;
@@ -310,7 +304,7 @@ export function isItemInvalid(target, item, itemFilters = false){
     return false;
 }
 
-export function getDocumentItemFilters(target){
+export function getActorItemFilters(target){
     if(!target) return API.ITEM_FILTERS;
     const inDocument = getDocument(target);
     const pileData = getItemPileData(inDocument);
@@ -349,33 +343,34 @@ export function isItemPileEmpty(target) {
 
     if(!targetActor) return false;
 
-    const hasNoItems = getValidDocumentItems(inDocument).length === 0;
-    const hasEmptyAttributes = getItemPileAttributes(inDocument).length === 0;
+    const hasNoItems = getActorItems(inDocument).length === 0;
+    const hasNoCurrencies = getActorCurrencies(inDocument).length === 0;
 
-    return hasNoItems && hasEmptyAttributes;
+    return isValidItemPile(targetActor) && hasNoItems && hasNoCurrencies;
 
 }
 
-export function getItemPileAttributeList(target){
+export function getActorCurrencyList(target){
     const inDocument = getDocument(target);
     const pileData = getItemPileData(inDocument);
-    return pileData.overrideAttributes || API.DYNAMIC_ATTRIBUTES;
+    return pileData.overrideCurrencies || API.CURRENCIES;
 }
 
-export function getItemPileAttributes(target) {
+export function getActorCurrencies(target, { currencyList = false, getAll = false }={}) {
     const inDocument = getDocument(target);
-    let targetActor = inDocument?.actor ?? inDocument;
-    const attributes = getItemPileAttributeList(targetActor);
-    return attributes
-        .filter(attribute => {
-            return hasProperty(targetActor.data, attribute.path) && Number(getProperty(targetActor.data, attribute.path)) > 0;
-        }).map(attribute => {
-            const localizedName = game.i18n.has(attribute.name) ? game.i18n.localize(attribute.name) : attribute.name;
+    const targetActor = inDocument?.actor ?? inDocument;
+    const currencies = currencyList || getActorCurrencyList(targetActor);
+    return currencies
+        .filter(currency => {
+            return hasProperty(targetActor.data, currency.path) && (Number(getProperty(targetActor.data, currency.path)) > 0 || getAll);
+        }).map(currency => {
+            const localizedName = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
+            const quantity = Number(getProperty(targetActor.data, currency.path) ?? 0);
             return {
                 name: localizedName,
-                path: attribute.path,
-                img: attribute.img,
-                quantity: Number(getProperty(targetActor.data, attribute.path) ?? 1)
+                path: currency.path,
+                img: currency.img,
+                quantity: quantity
             }
         });
 }
@@ -413,10 +408,16 @@ export async function updateItemPileData(target, flagData, tokenData){
 
     const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
 
+    const targetItems = getActorItems(documentActor, flagData.itemFilters);
+    const targetCurrencies = getActorCurrencies(documentActor, { currencyList: flagData.currencies });
+
+    const data = { data: flagData, items: targetItems, currencies: targetCurrencies };
+
     const updates = documentTokens.map(tokenDocument => {
         const newTokenData = foundry.utils.mergeObject(tokenData, {
-            "img": getItemPileTokenImage(tokenDocument, flagData),
-            "scale": getItemPileTokenScale(tokenDocument, flagData),
+            "img": getItemPileTokenImage(tokenDocument, data),
+            "scale": getItemPileTokenScale(tokenDocument, data),
+            "name": getItemPileName(tokenDocument, data),
         });
         return {
             "_id": tokenDocument.id,
@@ -432,6 +433,298 @@ export async function updateItemPileData(target, flagData, tokenData){
         "token": {
             [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
         }
+    });
+
+}
+
+
+/* -------------------------- Sharing Methods ------------------------- */
+
+
+export function getItemQuantity(item){
+    return Number(getProperty(item?._id ? item : item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+}
+
+
+export function getItemPileSharingData(target){
+    let inDocument = getDocument(target);
+    if(inDocument instanceof TokenDocument){
+        inDocument = inDocument?.actor;
+    }
+    return foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA) ?? {});
+}
+
+export function updateItemPileSharingData(target, data){
+    let inDocument = getDocument(target);
+    if(inDocument instanceof TokenDocument){
+        inDocument = inDocument?.actor;
+    }
+    const sharingData = foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA) ?? {});
+    const finalData = foundry.utils.mergeObject(sharingData, data);
+    return inDocument.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA, finalData);
+}
+
+export function clearItemPileSharingData(target){
+    let inDocument = getDocument(target);
+    if(inDocument instanceof TokenDocument){
+        inDocument = inDocument?.actor;
+    }
+    return inDocument.unsetFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA);
+}
+
+export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [], currencies = [] }={}){
+
+    const source = await fromUuid(sourceUuid);
+    const target = await fromUuid(targetUuid);
+
+    const sourceActor = source?.actor ?? source;
+    const targetActor = target?.actor ?? target;
+
+    const sourceIsItemPile = isValidItemPile(sourceActor);
+    const targetIsItemPile = isValidItemPile(targetActor);
+
+    if(sourceIsItemPile && targetIsItemPile) return;
+
+    if(items.length) {
+        items = items.map(itemData => {
+            setProperty(itemData.item, API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
+            return itemData.item;
+        })
+    }
+
+    if (!Array.isArray(currencies) && typeof currencies === "object") {
+        currencies = Object.entries(currencies).map(entry => {
+            return {
+                path: entry[0],
+                quantity: entry[1]
+            }
+        })
+    }
+
+    if(sourceIsItemPile) {
+
+        if(isItemPileEmpty(sourceIsItemPile)){
+            return clearItemPileSharingData(sourceIsItemPile);
+        }
+
+        const sharingData = addToItemPileSharingData(sourceActor, targetActor.uuid, { items, currencies });
+
+        return updateItemPileSharingData(sourceActor, sharingData);
+
+    }
+
+    const sharingData = removeFromItemPileSharingData(targetActor, sourceActor.uuid, { items, currencies });
+
+    return updateItemPileSharingData(targetActor, sharingData);
+
+}
+
+export function addToItemPileSharingData(itemPile, actorUuid, { sharingData = false, items = [], currencies = [] }={}){
+
+    const pileData = getItemPileData(itemPile);
+
+    let pileSharingData = {};
+    if(!sharingData && ((pileData.shareItemsEnabled && items.length) || (pileData.shareCurrenciesEnabled && currencies.length))){
+        pileSharingData = getItemPileSharingData(itemPile);
+    }
+
+    if(pileData.shareItemsEnabled && items.length) {
+
+        if (!pileSharingData.items) {
+            pileSharingData.items = [];
+        }
+
+        for (const item of items) {
+
+            let existingItem = findSimilarItem(pileSharingData.items, item);
+
+            if (!existingItem) {
+                let itemIndex = pileSharingData.items.push({
+                    name: item.name,
+                    type: item.type,
+                    img: item.img,
+                    actors: [{ uuid: actorUuid, quantity: 0 }]
+                })
+                existingItem = pileSharingData.items[itemIndex-1];
+            }else if (!existingItem.actors) {
+                existingItem.actors = [];
+            }
+
+            let actorData = existingItem.actors.find(data => data.uuid === actorUuid);
+
+            const itemQuantity = getItemQuantity(item);
+            if (!actorData) {
+                if(itemQuantity > 0) {
+                    existingItem.actors.push({ uuid: actorUuid, quantity: itemQuantity })
+                }
+            } else {
+                actorData.quantity += itemQuantity;
+                if(actorData.quantity <= 0){
+                    existingItem.actors.splice(existingItem.actors.indexOf(actorData), 1);
+                }
+                if(existingItem.actors.length === 0){
+                    pileSharingData.items.splice(pileSharingData.items.indexOf(existingItem), 1)
+                }
+            }
+
+        }
+
+    }
+
+    if(pileData.shareCurrenciesEnabled && currencies.length) {
+
+        if (!pileSharingData.currencies) {
+            pileSharingData.currencies = [];
+        }
+
+        for (const currency of currencies) {
+
+            let existingCurrency = pileSharingData.currencies.find(sharingCurrency => sharingCurrency.path === currency.path);
+
+            if (!existingCurrency) {
+                let itemIndex = pileSharingData.currencies.push({
+                    path: currency.path,
+                    actors: [{ uuid: actorUuid, quantity: 0 }]
+                })
+                existingCurrency = pileSharingData.currencies[itemIndex-1];
+            }else{
+                if (!existingCurrency.actors) {
+                    existingCurrency.actors = [];
+                }
+            }
+
+            let actorData = existingCurrency.actors.find(data => data.uuid === actorUuid);
+
+            if (!actorData) {
+                if(currency.quantity > 0) {
+                    existingCurrency.actors.push({ uuid: actorUuid, quantity: currency.quantity })
+                }
+            } else {
+                actorData.quantity += currency.quantity;
+                if(actorData.quantity <= 0){
+                    existingCurrency.actors.splice(existingCurrency.actors.indexOf(actorData), 1);
+                }
+                if(existingCurrency.actors.length === 0){
+                    pileSharingData.currencies.splice(pileSharingData.currencies.indexOf(existingCurrency), 1)
+                }
+            }
+
+        }
+
+    }
+
+    return pileSharingData;
+
+}
+
+export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [], currencies = [] }={}){
+
+    items = items.map(item => {
+        setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, getItemQuantity(item) * -1)
+        return item;
+    });
+
+    currencies = currencies.map(currency => {
+        currency.quantity = currency.quantity * -1;
+        return currency;
+    });
+
+    return addToItemPileSharingData(itemPile, actorUuid, { items, currencies });
+
+}
+
+export function getItemPileItemsForActor(pile, recipient, floor = false){
+
+    const pileData = getItemPileData(pile);
+    const pileItems = getActorItems(pile);
+
+    const players = getPlayersForItemPile(pile);
+    const pileSharingData = getItemPileSharingData(pile);
+    const storedItems = pileSharingData.items ?? [];
+
+    const recipientUuid = getUuid(recipient);
+
+    return pileItems.map(item => {
+
+        const quantity = getItemQuantity(item);
+        let data = {
+            id: item.id,
+            name: item.name,
+            type: item.type,
+            img: item.data?.img ?? "",
+            currentQuantity: 1,
+            quantity: quantity,
+            shareLeft: quantity,
+            toShare: pileData.shareItemsEnabled && recipientUuid
+        };
+
+        if(data.toShare) {
+
+            const foundItem = findSimilarItem(storedItems, item);
+
+            let totalShares = quantity;
+            if(foundItem) {
+                totalShares += foundItem.actors.reduce((acc, actor) => acc + actor.quantity, 0);
+            }
+
+            let totalActorShare = totalShares / players.length;
+            if(!Number.isInteger(totalActorShare) && !floor){
+                totalActorShare += 1;
+            }
+
+            let actorQuantity = foundItem?.actors ? foundItem?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
+
+            data.shareLeft = Math.max(0, Math.min(quantity, Math.floor(totalActorShare - actorQuantity)));
+
+        }
+
+        return data;
+
+    });
+
+}
+
+export function getItemPileCurrenciesForActor(pile, recipient, floor){
+
+    const pileData = getItemPileData(pile);
+    const pileCurrencies = getActorCurrencies(pile, { getAll: !recipient });
+
+    const players = getPlayersForItemPile(pile);
+    const pileSharingData = getItemPileSharingData(pile);
+    const storedCurrencies = pileSharingData.currencies ?? [];
+
+    const recipientUuid = getUuid(recipient);
+
+    return pileCurrencies.filter(currency => {
+        return !recipient || hasProperty(recipient?.data ?? {}, currency.path);
+    }).map(currency => {
+
+        currency.currentQuantity = 1;
+        currency.shareLeft = currency.quantity;
+        currency.toShare = pileData.shareCurrenciesEnabled && recipientUuid;
+
+        if(currency.toShare) {
+
+            const foundCurrency = storedCurrencies.find(storedCurrency => storedCurrency.path === currency.path);
+
+            let totalShares = currency.quantity;
+            if(foundCurrency) {
+                totalShares += foundCurrency.actors.reduce((acc, actor) => acc + actor.quantity, 0);
+            }
+
+            let totalActorShare = totalShares / players.length;
+            if(!Number.isInteger(totalActorShare) && !floor){
+                totalActorShare += 1;
+            }
+
+            let actorQuantity = foundCurrency?.actors ? foundCurrency?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
+
+            currency.shareLeft = Math.max(0, Math.min(currency.quantity, Math.floor(totalActorShare - actorQuantity)));
+
+        }
+
+        return currency;
+
     });
 
 }

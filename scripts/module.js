@@ -10,8 +10,13 @@ import { registerSettings, checkSystem, migrateSettings, registerHandlebarHelper
 import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
+import flagManager from "./flagManager.js";
+import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
+import DropCurrencyDialog from "./formapplications/dropCurrencyDialog.js";
+import { ItemPileCurrenciesEditor } from "./formapplications/itemPileCurrenciesEditor.js";
+import { getActorCurrencies, getActorItems } from "./lib/lib.js";
 
-Hooks.once("init", () => {
+Hooks.once("init", async () => {
 
     registerSettings();
     registerLibwrappers();
@@ -21,17 +26,19 @@ Hooks.once("init", () => {
     Hooks.on("canvasReady", module._canvasReady);
     Hooks.on("createToken", module._createPile);
     Hooks.on("deleteToken", module._deletePile);
-    Hooks.on("dropCanvasData", module._dropCanvasData);
-    Hooks.on("updateActor", module._pileAttributeChanged);
+    Hooks.on("dropCanvasData", module._dropData);
+    Hooks.on("updateActor", module._pileCurrencyChanged);
     Hooks.on("createItem", module._pileInventoryChanged);
     Hooks.on("updateItem", module._pileInventoryChanged);
     Hooks.on("deleteItem", module._pileInventoryChanged);
     Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
+    Hooks.on("getActorDirectoryEntryContext", module._handleActorContextMenu);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
     Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
-    Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferAttribute.bind(chatHandler));
+    Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferCurrency.bind(chatHandler));
     Hooks.on(HOOKS.TRANSFER_EVERYTHING, chatHandler._outputTransferEverything.bind(chatHandler));
+    Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, chatHandler._outputSplitItemPileInventory.bind(chatHandler));
 
     if (game.settings.get(CONSTANTS.MODULE_NAME, "debugHooks")) {
         for (let hook of Object.values(HOOKS)) {
@@ -53,7 +60,7 @@ Hooks.once("init", () => {
 
 });
 
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
 
     if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
         let word = "install and activate";
@@ -70,11 +77,14 @@ Hooks.once("ready", () => {
         lib.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
     }
 
+    await flagManager.migrateDocuments();
+
     checkSystem();
     registerHotkeysPost();
     registerHandlebarHelpers();
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
+
 });
 
 const debounceManager = {
@@ -95,14 +105,14 @@ const debounceManager = {
 
 const module = {
 
-    async _pileAttributeChanged(actor, changes) {
+    async _pileCurrencyChanged(actor, changes) {
         const target = actor?.token ?? actor;
         if (!lib.isValidItemPile(target)) return;
-        const sourceAttributes = lib.getItemPileAttributeList(target);
-        const validProperty = sourceAttributes.find(attribute => {
-            return hasProperty(changes, attribute.path);
+        const sourceCurrencies = lib.getActorCurrencyList(target);
+        const validCurrency = sourceCurrencies.find(currency => {
+            return hasProperty(changes, currency.path);
         });
-        if (!validProperty) return;
+        if (!validCurrency) return;
         const targetUuid = target.uuid;
         return debounceManager.setDebounce(targetUuid, async function(uuid){
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
@@ -130,23 +140,28 @@ const module = {
         const tokens = [...canvas.tokens.placeables].map(token => token.document);
         for (const doc of tokens) {
             await API._initializeItemPile(doc);
-            if(lib.isResponsibleGM()) {
-                await API._refreshItemPile(doc.uuid);
-            }
         }
     },
 
     async _createPile(tokenDoc) {
+        if (!lib.isResponsibleGM()) return;
         if (!lib.isValidItemPile(tokenDoc)) return;
-        const itemPileConfig = lib.getItemPileData(tokenDoc.actor)
-        Hooks.callAll(HOOKS.PILE.CREATE, tokenDoc, itemPileConfig);
-        await tokenDoc.update({
-            "img": lib.getItemPileTokenImage(tokenDoc, itemPileConfig),
-            "scale": lib.getItemPileTokenScale(tokenDoc, itemPileConfig),
-            "name": lib.getItemPileName(tokenDoc, itemPileConfig),
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: itemPileConfig
-        });
-        await API._initializeItemPile(tokenDoc);
+        setTimeout(async () => {
+            const itemPileConfig = lib.getItemPileData(tokenDoc.actor)
+            Hooks.callAll(HOOKS.PILE.CREATE, tokenDoc, itemPileConfig);
+
+            const targetItems = getActorItems(tokenDoc.actor);
+            const targetCurrencies = getActorCurrencies(tokenDoc.actor);
+            const data = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
+
+            await tokenDoc.update({
+                "img": lib.getItemPileTokenImage(tokenDoc, data),
+                "scale": lib.getItemPileTokenScale(tokenDoc, data),
+                "name": lib.getItemPileName(tokenDoc, data),
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: itemPileConfig
+            });
+            await API._initializeItemPile(tokenDoc);
+        }, 50)
     },
 
     async _deletePile(doc) {
@@ -203,15 +218,32 @@ const module = {
         buttons.unshift({
             label: game.settings.get(CONSTANTS.MODULE_NAME, "hideActorHeaderText") ? "" : "ITEM-PILES.Defaults.Configure",
             icon: "fas fa-box-open",
-            class: "item-piles-config",
+            class: "item-piles-config-button",
             onclick: () => {
                 ItemPileConfig.show(obj);
             }
         })
     },
 
-    async _dropCanvasData(canvas, data) {
-        return API._dropDataOnCanvas(canvas, data);
+    async _dropData(canvas, data) {
+        return API._dropData(canvas, data);
     },
 
+    _handleActorContextMenu(html, menuItems) {
+        menuItems.push({
+            name: "ITEM-PILES.ContextMenu.ShowToPlayers",
+            icon: `<i class="fas fa-eye"></i>`,
+            callback: (html) => {
+                const actorId = html[0].dataset.documentId;
+                const actor = game.actors.get(actorId);
+                const users = Array.from(game.users).filter(u => u.active).map(u => u.id);
+                return API.openItemPileInventory(actor, users, { useDefaultCharacter: true });
+            },
+            condition: (html) => {
+                const actorId = html[0].dataset.documentId;
+                const actor = game.actors.get(actorId);
+                return API.isValidItemPile(actor);
+            }
+        });
+    }
 }

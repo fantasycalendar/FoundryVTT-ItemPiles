@@ -2,13 +2,6 @@
 
     <div class="item-piles-item-drop-container">
 
-        {{#if hasRecipient}}
-        <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}</p>
-        {{else}}
-        <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.NoActor"}}</p>
-        {{/if}}
-
-        <hr>
 
         {{#if isDeleted}}
 
@@ -16,56 +9,164 @@
 
         {{else}}
 
+            {{#if editQuantities}}
+            <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Owner"}}</p>
+            {{else}}
+                <p style="text-align: center; flex: 0 1 auto; height: 27px;">
+                    {{{ localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}}
+                    <select class="item-piles-change-actor-select" style="height:auto;">
+                        {{#select recipient.uuid}}
+                        {{#each playerActors as |actor id|}}
+                        <option value="{{actor.uuid}}">{{actor.name}}</option>
+                        {{/each}}
+                        {{/select}}
+                    </select>
+                </p>
+            {{/if}}
+
+            <hr>
+
             {{#if isEmpty}}
             <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Empty"}}</p>
             {{/if}}
 
+            <div id="item-piles-preview-container">
+                <img id="item-piles-preview-image"/>
+            </div>
+
             <div class="item-piles-items">
+
+                {{#if hasItems}}
+                <div class="flexrow"><h3>{{localize "ITEM-PILES.Items"}}:</h3></div>
+                {{/if}}
                 {{#each items as |item id|}}
-                <div class="flexrow item-piles-item-row {{#unless item.quantity}}item-pile-item-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
-                    <img class="item-piles-img" src="{{item.img}}"/>
+                <div class="flexrow item-piles-item-row {{#unless item.quantity}}item-piles-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
+
+                    <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
+
                     <div class="item-piles-name item-piles-text">
-                        {{#if @root.canInspectItems}}<a class="item-piles-item-clickable">{{/if}}
-                        {{item.name}}
-                        {{#if @root.canInspectItems}}</a>{{/if}}
+                        <div class="item-piles-name-container">
+                            <a class="item-piles-clickable">{{item.name}}</a>
+                        </div>
+                        {{#unless @root.editQuantities}}<span class="item-piles-small-text">x{{item.quantity}}</span>{{/unless}}
                     </div>
-                    {{#if @root.hasRecipient}}
-                        <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.quantity}}disabled{{/unless}}/>
+
+                    <div style="flex:2.5;">
+                    {{#if @root.editQuantities}}
+                        <div style="margin-right: 10px;">
+                            <input class="item-piles-quantity" name="item-{{item.id}}" type="number" min="0" value="{{item.quantity}}"/>
+                        </div>
+                    {{else}}
+                        {{#if item.shareLeft}}
+                        <div style="flex-direction: row">
+                            <input class="item-piles-quantity" type="number" min="1" value="{{item.currentQuantity}}" max="{{item.quantity}}" {{#unless item.quantity}}disabled{{/unless}}/>
+
+                            <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
+                                    / {{item.shareLeft}}
+                            </span>
+                        </div>
+                        {{else}}
+                        {{#if @root.shareItemsEnabled}}
+                            <span>{{localize "ITEM-PILES.Inspect.NoShareLeft"}}</span>
+                        {{else}}
+                            <span>{{localize "ITEM-PILES.Inspect.NoneLeft"}}</span>
+                        {{/if}}
+                        {{/if}}
                     {{/if}}
-                    <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
-                        {{#if @root.hasRecipient}}/ {{else}}x{{/if}}{{item.quantity}}
-                    </span>
-                    {{#if @root.hasRecipient}}
-                        <button class="item-piles-take-button" type="button" {{#unless item.quantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
-                    {{/if}}
+                    </div>
+
+                    {{#unless @root.editQuantities}}
+                    <div>
+                        <button class="item-piles-item-take-button" type="button" {{#unless item.shareLeft}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                    </div>
+                    {{/unless}}
+
                 </div>
                 {{/each}}
+
                 {{#if hasThings}}
                 <hr>
                 {{/if}}
-                {{#each attributes as |attribute id|}}
-                <div class="flexrow item-piles-item-row item-piles-attribute-row" data-attribute-name="{{attribute.name}}" data-attribute-path="{{attribute.path}}">
-                    <img class="item-piles-img" src="{{attribute.img}}"/>
-                    <div class="item-piles-name item-piles-text">{{attribute.name}}</div>
+
+                {{#if hasCurrencies}}
+                <div class="flexrow">
+                    <h3>{{localize "ITEM-PILES.Currencies"}}:</h3>
                     {{#if @root.hasRecipient}}
-                        <input class="item-piles-quantity" type="number" min="1" value="{{attribute.currentQuantity}}" max="{{attribute.quantity}}" {{#unless attribute.quantity}}disabled{{/unless}}/>
-                    {{/if}}
-                    <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}">
-                        {{#if @root.hasRecipient}}/ {{else}}x{{/if}}{{attribute.quantity}}
-                    </span>
-                    {{#if @root.hasRecipient}}
-                        <button class="item-piles-attribute-take-button" type="button" {{#unless attribute.quantity}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                    <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i>
+                        {{localize "ITEM-PILES.Inspect.AddCurrency"}}
+                    </a>
                     {{/if}}
                 </div>
+                {{/if}}
+                {{#each currencies as |currency id|}}
+                <div class="flexrow item-piles-item-row item-piles-currency-row {{#unless currency.shareLeft}}{{#unless @root.editQuantities}}item-piles-disabled{{/unless}}{{/unless}}" data-currency-name="{{currency.name}}" data-currency-path="{{currency.path}}">
+
+                    <div class="item-piles-img-container"><img class="item-piles-img" src="{{currency.img}}"/></div>
+
+                    <div class="item-piles-name item-piles-text">
+                        <div>{{currency.name}}</div>
+                        {{#unless @root.editQuantities}}<span class="item-piles-small-text">x{{currency.quantity}}</span>{{/unless}}
+                    </div>
+
+                    <div style="flex:2.5;">
+                    {{#if @root.editQuantities}}
+                        <div style="margin-right: 10px;">
+                            <input class="item-piles-quantity" name="currency-{{currency.path}}" type="number" min="0" value="{{currency.quantity}}"/>
+                        </div>
+                    {{else}}
+                        {{#if currency.shareLeft}}
+                        <div style="flex-direction: row">
+                            <input class="item-piles-quantity" type="number" min="1" value="{{currency.currentQuantity}}" max="{{currency.quantity}}" {{#unless currency.shareLeft}}disabled{{/unless}}/>
+
+                            <span class="item-piles-text item-piles-input-divider {{#unless @root.hasRecipient}}item-piles-text-right{{/unless}}"> / {{currency.shareLeft}}</span>
+                        </div>
+                        {{else}}
+                        {{#if @root.shareCurrenciesEnabled}}
+                        <span>{{localize "ITEM-PILES.Inspect.NoShareLeft"}}</span>
+                        {{else}}
+                        <span>{{localize "ITEM-PILES.Inspect.NoneLeft"}}</span>
+                        {{/if}}
+                        {{/if}}
+                    {{/if}}
+                    </div>
+
+                    {{#unless @root.editQuantities}}
+                        <div>
+                            <button class="item-piles-currency-take-button" type="button" {{#unless currency.shareLeft}}disabled{{/unless}}>{{localize "ITEM-PILES.Inspect.Take"}}</button>
+                        </div>
+                    {{/unless}}
+
+                </div>
                 {{/each}}
+
+                {{#if @root.hasRecipient}}
+                {{#unless hasCurrencies}}
+                <hr>
+                    <div>
+                    <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i>
+                        {{localize "ITEM-PILES.Inspect.AddCurrency"}}
+                    </a>
+                <div>
+                {{/unless}}
+                {{/if}}
             </div>
 
         {{/if}}
 
         <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
             {{#each buttons as |button id|}}
-            <button type="submit" name="{{ button.value }}" value="{{ button.value }}"><i class="{{ button.icon }}"></i> {{ button.text }}</button>
+            <button
+                name="{{ button.value }}"
+                value="{{ button.value }}"
+                type="{{#if button.type}}{{button.type}}{{else}}submit{{/if}}"
+                {{#if button.disabled}}disabled{{/if}}
+                >
+                    <i class="{{ button.icon }}"></i> {{ button.text }}
+            </button>
             {{/each}}
+            <button name="leave" value="leave" type="submit">
+                <i class="fas fa-sign-out-alt"></i> {{ localize "ITEM-PILES.Inspect.Leave" }}
+            </button>
         </footer>
 
     </div>

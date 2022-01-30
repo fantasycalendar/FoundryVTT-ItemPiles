@@ -1,0 +1,51 @@
+<form class="flexcol {{cssClasses}}" style="padding:0.5rem;" autocomplete="off">
+
+    <style>
+    .item-piles-currency-row{
+      margin-bottom:0.5rem;
+    }
+    .item-piles-currency-row > div{
+      margin-left:5px;
+    }
+    .item-piles-currency-submit{
+      padding:1rem;
+    }
+    .item-piles-currency-row button{
+        padding: 0.25rem 0.25rem;
+        line-height: 1rem;
+    }
+    </style>
+
+    <p>{{localize "ITEM-PILES.CurrenciesEditor.Explanation"}}</p>
+
+    <div>
+        <div class="flexrow item-piles-currency-row">
+            <div class="item-piles-text-center" style="flex:2;">{{localize "ITEM-PILES.CurrenciesEditor.Name"}}</div>
+            <div class="item-piles-text-center" style="flex:2.5;">{{localize "ITEM-PILES.CurrenciesEditor.Path"}}</div>
+            <div class="item-piles-text-center" style="flex:4;">{{localize "ITEM-PILES.CurrenciesEditor.Icon"}}</div>
+            <a style="flex:0 1 50px;" class="item-piles-clickable item-piles-add-new-currency"><i class="fas fa-plus"></i> Add</a>
+        </div>
+        <hr>
+        <div class="item-piles-currency-rows">
+        {{#each currencies as |currency id|}}
+            <div class="flexrow item-piles-currency-row" data-currency-index="{{id}}">
+                <div><input type="text" class="item-piles-currency-name-input" required name="{{id}}.name" placeholder="Gold Pieces" value="{{currency.name}}"/></div>
+                <div><input type="text" class="item-piles-currency-path-input" required name="{{id}}.path" placeholder="data.currency.gp" value="{{currency.path}}"/></div>
+                <div class="item-piles-currency-filepicker" style="display:inline-flex;">
+                    {{filePicker target=(concat id ".img") type="imagevideo"}}
+                    <input type="text" class="item-piles-currency-img-input" name="{{id}}.img" placeholder="path/image.png" value="{{currency.img}}"/>
+                </div>
+                <div style="flex:0 1 auto;">
+                    <button type="button" class="item-piles-currency-remove" name="button_remove_{{id}}"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+        {{/each}}
+        </div>
+    </div>
+
+    <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+        <button type="submit" value="submit" name="submit" class="item-piles-currency-submit"><i class="fas fa-download"></i> {{localize "ITEM-PILES.CurrenciesEditor.Submit"}}</button>
+        <button type="cancel" value="cancel" name="cancel" class="item-piles-currency-submit"><i class="fas fa-times"></i> {{localize "Cancel"}}</button>
+    </footer>
+
+</form>
