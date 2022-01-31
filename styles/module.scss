@@ -149,9 +149,10 @@
     display:none;
   }
 
-  #item-piles-preview-container{
+  #item-piles-preview-container {
     position: absolute;
     display: none;
+  }
 
   .item-piles-add-currency {
     margin-right: 5px;
@@ -374,25 +375,25 @@
 /* ---------------------- TRADING UI ---------------------- */
 
 
-.item-piles-trading-sheet{
+.item-piles-trading-sheet {
 
-  .item-piles-item-row{
+  .item-piles-item-row {
     padding: 2px;
   }
 
-  .item-piles-remove-item{
+  .item-piles-remove-item {
     opacity: 0.5;
   }
 
-  .item-piles-remove-item:hover{
+  .item-piles-remove-item:hover {
     opacity: 1;
   }
 
-  .item-piles-confirm-quantity{
-    display:none;
+  .item-piles-confirm-quantity {
+    display: none;
   }
 
-  .item-piles-quantity-text{
+  .item-piles-quantity-text {
     line-height: 1.6rem;
     font-size: 0.85rem;
     background-color: rgba(255, 255, 255, 0.15);
@@ -402,7 +403,7 @@
     margin-left: 10px;
   }
 
-  .item-piles-quantity-text:hover{
+  .item-piles-quantity-text:hover {
     background-color: rgba(255, 255, 255, 0.5);
     border: 1px solid rgba(0, 0, 0, 0.5);
   }
@@ -425,7 +426,7 @@
 
   .item-piles {
 
-    &-img-container{
+    &-img-container {
       min-height: 29px;
       max-width: 29px;
       max-height: 29px;
@@ -434,14 +435,14 @@
       border-radius: 4px;
       border: 1px solid black;
 
-      .item-piles-img{
+      .item-piles-img {
         border: 0;
         width: auto;
         height: 100%;
         transition: transform 250ms;
 
         &:hover {
-          transform: scale(1.25,1.25);
+          transform: scale(1.25, 1.25);
         }
       }
 
@@ -460,15 +461,15 @@
     vertical-align: center;
   }
 
-  .character-header{
+  .character-header {
 
     display: inline-flex;
     flex-direction: row;
     flex: 0 1 auto;
     padding: 5px;
 
-    .character-name{
-      padding-top:0.5rem;
+    .character-name {
+      padding-top: 0.5rem;
       text-align: center;
       flex: 1;
     }
@@ -484,7 +485,7 @@
       border-radius: 5px;
     }
 
-    &.trader{
+    &.trader {
       img {
         margin-left: auto;
       }
