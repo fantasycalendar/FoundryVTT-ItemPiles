@@ -36,6 +36,10 @@
 .item-piles-moveable {
   cursor: move;
 }
+.item-piles-highlight {
+  color: var(--color-text-hyperlink);
+  text-decoration: underline;
+}
 .item-piles-grow {
   flex-grow: 1;
 }

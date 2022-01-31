@@ -11,7 +11,16 @@
             {{#if editQuantities}}
             <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Owner"}}</p>
             {{else}}
-            <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}</p>
+                <p style="text-align: center; flex: 0 1 auto; height: 27px;">
+                    {{{ localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}}
+                    <select class="item-piles-change-actor-select" style="height:auto;">
+                        {{#select recipient.uuid}}
+                        {{#each playerActors as |actor id|}}
+                        <option value="{{actor.uuid}}">{{actor.name}}</option>
+                        {{/each}}
+                        {{/select}}
+                    </select>
+                </p>
             {{/if}}
 
             <hr>

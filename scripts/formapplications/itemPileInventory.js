@@ -17,17 +17,22 @@ export class ItemPileInventory extends FormApplication {
     constructor(pile, recipient, overrides={}) {
         super();
         this.pile = pile;
-        this.pileActor = pile?.actor ?? pile;
         this.recipient = recipient;
-        this.recipientActor = this.recipient?.actor ?? this.recipient;
         this.items = [];
         this.currencies = [];
         this.deleted = false;
         this.overrides = overrides;
         this.pileData = lib.getItemPileData(this.pile);
-        this.editQuantities = !this.recipient && this.pile.isOwner
         this.interactionId = randomID();
         Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient, overrides);
+    }
+
+    async render(...args){
+        this.pileActor = this.pile?.actor ?? this.pile;
+        this.recipientActor = this.recipient?.actor ?? this.recipient;
+        this.editQuantities = !this.recipient && this.pile.isOwner && game.user.isGM;
+        this.playerActors = game.actors.filter(actor => actor.isOwner && actor !== this.pileActor && actor.data.token.actorLink);
+        super.render(...args);
     }
 
     /** @inheritdoc */
@@ -36,7 +41,7 @@ export class ItemPileInventory extends FormApplication {
             title: game.i18n.localize("ITEM-PILES.Inspect.Title"),
             classes: ["sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
-            width: 500,
+            width: 550,
             height: "auto",
             dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-item-drop-container" }],
         });
@@ -223,10 +228,13 @@ export class ItemPileInventory extends FormApplication {
             return data;
         }
 
-        data.overrides = this.overrides;
+        data.playerActors = this.playerActors;
+        data.moreThanOneInspectableActors = data.playerActors.length > 1;
 
-        data.hasRecipient = !!this.recipient;
-        data.recipient = this.recipient;
+        data.overrides = this.overrides;
+        data.editQuantities = this.editQuantities;
+        data.hasRecipient = !!this.recipientActor;
+        data.recipient = this.recipientActor;
         data.isContainer = false;
 
         const pileData = lib.getItemPileData(this.pile);
@@ -238,32 +246,26 @@ export class ItemPileInventory extends FormApplication {
         this.currencies = data.currencies;
 
         data.isContainer = pileData.isContainer;
-        data.hasItems = API.getItemPileItems(this.pile).length > 0;
+        data.hasItems = data.items.length > 0;
         data.hasCurrencies = data?.currencies?.length;
         data.canInspectItems = pileData.canInspectItems || game.user.isGM;
 
         data.hasThings = data?.hasItems && data?.hasCurrencies;
 
-        data.isEmpty = lib.isItemPileEmpty(this.pile);
+        data.isEmpty = !data?.hasItems && !data?.hasCurrencies;
 
         const num_players = lib.getPlayersForItemPile(this.pile).length;
-
-        data.hasSplittableQuantities = data.items.find((item) => (item.quantity / num_players) > 1)
-            || data.currencies.find((attribute) => (attribute.quantity / num_players) > 1)
-
-        data.buttons = [];
 
         data.shareItemsEnabled = pileData.shareItemsEnabled;
         data.shareCurrenciesEnabled = pileData.shareCurrenciesEnabled;
 
-        data.editQuantities = this.editQuantities;
+        const hasSplittableQuantities = (pileData.shareItemsEnabled && data.items.find((item) => (item.quantity / num_players) > 1))
+            || (pileData.shareCurrenciesEnabled && data.currencies.find((attribute) => (attribute.quantity / num_players) > 1))
 
+        data.buttons = [];
         if(data.hasRecipient){
 
-            const hasItemsToShare = pileData.shareItemsEnabled && data.hasItems;
-            const hasCurrenciesToShare = pileData.shareCurrenciesEnabled && data.hasCurrencies;
-
-            if(pileData.splitAllEnabled && (hasItemsToShare || hasCurrenciesToShare)) {
+            if(pileData.splitAllEnabled && hasSplittableQuantities && (pileData.shareItemsEnabled || pileData.shareCurrenciesEnabled)) {
 
                 let buttonText;
                 if(pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled){
@@ -284,7 +286,7 @@ export class ItemPileInventory extends FormApplication {
 
             }
 
-            if(pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled && pileData.takeAllEnabled) {
+            if(!pileData.shareItemsEnabled && !pileData.shareCurrenciesEnabled && pileData.takeAllEnabled) {
 
                 data.buttons.push({
                     value: "takeAll",
@@ -373,6 +375,31 @@ export class ItemPileInventory extends FormApplication {
         html.find('.item-piles-add-currency').click(function(){
             self.addCurrency();
         })
+
+        if(this.playerActors.length > 1) {
+            html.find('.item-piles-change-actor').click(function () {
+                $(this).hide();
+                let select = $(this).parent().find('.item-piles-change-actor-select');
+                select.insertAfter($(this));
+                select.css('display', 'inline-block');
+            });
+
+            html.find(".item-piles-change-actor-select").change(async function () {
+                $(this).css('display', 'none');
+                html.find('.item-piles-change-actor').show();
+                const value = $(this).val();
+                self.recipient = await fromUuid(value);
+                if(!self.recipient){
+                    return;
+                }
+                self.render(true);
+            });
+        }else{
+            const element = html.find('.item-piles-change-actor');
+            const innerHTML = element.html();
+            element.removeClass(".item-piles-change-actor")
+                .replaceWith($('<span>' + innerHTML + '</span>'));
+        }
     }
 
     previewImage(html, element) {

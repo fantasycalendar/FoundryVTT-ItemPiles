@@ -349,7 +349,7 @@ export function isItemPileEmpty(target) {
     const hasNoItems = getActorItems(inDocument).length === 0;
     const hasNoCurrencies = getActorCurrencies(inDocument).length === 0;
 
-    return hasNoItems && hasNoCurrencies;
+    return isValidItemPile(targetActor) && hasNoItems && hasNoCurrencies;
 
 }
 
@@ -467,6 +467,14 @@ export function updateItemPileSharingData(target, data){
     return inDocument.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA, finalData);
 }
 
+export function clearItemPileSharingData(target){
+    let inDocument = getDocument(target);
+    if(inDocument instanceof TokenDocument){
+        inDocument = inDocument?.actor;
+    }
+    return inDocument.unsetFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA);
+}
+
 export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [], currencies = [] }={}){
 
     const source = await fromUuid(sourceUuid);
@@ -497,6 +505,10 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
     }
 
     if(sourceIsItemPile) {
+
+        if(isItemPileEmpty(sourceIsItemPile)){
+            return clearItemPileSharingData(sourceIsItemPile);
+        }
 
         const sharingData = addToItemPileSharingData(sourceActor, targetActor.uuid, { items, currencies });
 

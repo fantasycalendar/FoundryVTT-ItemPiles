@@ -12,7 +12,7 @@
 
         "Inspect": {
             "Title": "Inspecting Pile Contents",
-            "AsActor": "You're inspecting this pile as {actorName}",
+            "AsActor": "You're inspecting this pile as <a class='item-piles-change-actor item-piles-highlight'>{actorName}</a>",
             "Owner": "As an owner of this Item Pile, you can edit the item pile's contents.",
             "Empty": "This pile is empty.",
             "Destroyed": "This pile no longer exists and lies barren.",
@@ -22,11 +22,11 @@
             "Leave": "Leave",
             "NoShareLeft": "No share left...",
             "NoneLeft": "None left...",
-            "OpenSheet": "Open Actor Sheet",
+            "OpenSheet": "Open Sheet",
             "AddCurrency": "Add currency",
             "SplitAll": "Split {num_players} ways",
             "SplitItems": "Split items {num_players} ways",
-            "SplitCurrencies": "Split currencies {num_players} ways"
+            "SplitCurrencies": "Split currency {num_players} ways"
         },
 
         "Trade": {
@@ -171,16 +171,6 @@
                 "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile.",
                 "ResetSharingData": "Reset Sharing Data",
                 "ResetSharingDataExplanation": "If the Item Pile's content was manually changed while people were looting it, the sharing data may become out of sync with the players' actual shares. Pressing this button will reset everyone's share in this pile."
-            },
-
-            "Merchant": {
-                "Title": "Merchant Settings",
-                "IsMerchant": "Is Merchant",
-                "IsMerchantExplanation": "When enabled, this pile will use a completely different sheet designed for trading.",
-                "AutoMerchant": "Automatic Merchant",
-                "AutoMerchantExplanation": "When enabled, the merchant sheet will not open for GMs when a player opens it.",
-                "PriceModifier": "Price Modifier",
-                "PriceModifierExplanation": "Sets the modifier for all prices of items of this merchant - 0.5 would put all prices at 50%, 1.5 is 150%, etc."
             }
 
         },
@@ -194,7 +184,7 @@
         "DropItem": {
             "Title": "Dropping Item",
             "Dropping": "You're dropping",
-            "ExistingPiles": "There's already an item pile at this location, you will add your item(s) to this pile.",
+            "ExistingPiles": "You're adding this item to the item pile \"{item_pile_name}\".",
             "QuantityToDrop": "You have {quantity} of this item, how many do you want to drop?",
             "AddToPile": "Add to pile",
             "NewPile": "Create new pile",
@@ -211,7 +201,7 @@
 
         "Chat": {
             "Pickup": "{name} picked up the following items:",
-            "Split": "An item pile's content was split among {num_players} players, and each one received:"
+            "Split": "An item pile's content was split among {num_players} players, and each one has received:"
         },
 
         "Setting": {
@@ -245,6 +235,10 @@
                 "Public": "Public - everyone can see messages",
                 "SelfGM": "Private - only GMs and user can see messages",
                 "Blind": "Blind - only GMs can see messages"
+            },
+            "InvertSheetOpen": {
+                "Title": "Invert Ctrl + Double Click Open",
+                "Label": "Normally, you have to hold control when you want to open an item pile's actor sheet. Enabling this makes the item pile actor sheet open by default, and holding control opens the item pile inventory UI."
             },
             "HideActorHeaderText": {
                 "Title": "Hide actor header text",

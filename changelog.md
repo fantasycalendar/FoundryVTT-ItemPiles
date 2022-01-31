@@ -1,7 +1,17 @@
 # Item Piles Changelog 
 
 ## Version 1.3.0
-- Added the ability to split item quantities and 
+- Added item pile currency and/or item splitting capabilities
+- Added chat message when currency and/or items are split between players
+- Added API methods:
+  - `ItemPiles.API.splitItemPileContents` - Splits an item pile's content according to its settings
+- Added hooks:
+  - `item-piles-preSplitItemPileContent` - Called before the content of an item pile is going to be split
+  - `item-piles-splitItemPileContent` - Called after the content of an item pile has been split
+- Updated various UIs to be more user-friendly
+- Renamed "Dynamic Attributes" to "Currencies"
+- Inverted the Ctrl + Double Click to open an item pile's inventory UI
+- Fixed various inconsistencies in the API and its return data
 
 ## Version 1.2.8
 - Added `Open Actor Sheet` and `Configure Pile` buttons to the Item Pile inventory UI (visible only to GMs)

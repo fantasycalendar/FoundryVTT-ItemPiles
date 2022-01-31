@@ -3,11 +3,11 @@ import * as lib from "../lib/lib.js";
 
 export default class DropItemDialog extends FormApplication {
 
-    constructor(resolve, droppedItem, dropObjects) {
+    constructor(resolve, droppedItem, itemPile) {
         super();
         this.resolve = resolve;
         this.droppedItem = droppedItem;
-        this.dropObjects = dropObjects;
+        this.itemPile = itemPile;
     }
 
     /** @inheritdoc */
@@ -21,10 +21,10 @@ export default class DropItemDialog extends FormApplication {
         });
     }
 
-    static query(droppedItem, dropObjects) {
+    static query(droppedItem, itemPile) {
 
         return new Promise(resolve => {
-            new DropItemDialog(resolve, droppedItem, dropObjects).render(true);
+            new DropItemDialog(resolve, droppedItem, itemPile).render(true);
         });
 
     }
@@ -32,8 +32,8 @@ export default class DropItemDialog extends FormApplication {
     async getData(options) {
         const data = super.getData(options);
 
-        data.dropObjects = this.dropObjects;
-        data.itemPileAtLocation = this.dropObjects.length > 0;
+        data.itemPile = this.itemPile;
+        data.itemPileAtLocation = !!this.itemPile;
         data.droppedItem = this.droppedItem;
         data.itemQuantity = lib.getItemQuantity(this.droppedItem);
         data.itemQuantityMoreThanOne = data.itemQuantity > 1;
@@ -45,8 +45,8 @@ export default class DropItemDialog extends FormApplication {
 
     activateListeners(html) {
         super.activateListeners(html);
-        const slider = html.find("#rangeSlider");
-        const input = html.find("#rangeValue")
+        const slider = html.find(".rangeSlider");
+        const input = html.find(".rangeValue")
         slider.on("input", function () {
             input.val($(this).val());
         })

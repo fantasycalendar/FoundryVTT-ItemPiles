@@ -50,6 +50,11 @@
     cursor: move;
   }
 
+  &-highlight {
+    color: var(--color-text-hyperlink);
+    text-decoration: underline;
+  }
+
   &-grow {
     flex-grow: 1;
   }
@@ -139,6 +144,14 @@
 .item-piles-items-list {
   max-height: 500px;
   overflow-y: scroll;
+
+  .item-piles-change-actor-select {
+    display:none;
+  }
+
+  #item-piles-preview-container{
+    position: absolute;
+    display: none;
 
   .item-piles-add-currency {
     margin-right: 5px;

@@ -96,6 +96,15 @@ export function registerSettings() {
         type: Number
     });
 
+    game.settings.register(CONSTANTS.MODULE_NAME, "invertSheetOpen", {
+        name: "ITEM-PILES.Setting.InvertSheetOpen.Title",
+        hint: "ITEM-PILES.Setting.InvertSheetOpen.Label",
+        scope: "client",
+        config: true,
+        default: false,
+        type: Boolean
+    });
+
     game.settings.register(CONSTANTS.MODULE_NAME, "hideActorHeaderText", {
         name: "ITEM-PILES.Setting.HideActorHeaderText.Title",
         hint: "ITEM-PILES.Setting.HideActorHeaderText.Label",

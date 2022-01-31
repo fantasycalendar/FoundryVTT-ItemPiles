@@ -38,12 +38,7 @@ const CONSTANTS = {
         shareCurrenciesEnabled: true,
         takeAllEnabled: false,
         splitAllEnabled: true,
-        activePlayers: false,
-
-        // Merchant Settings
-        isMerchant: false,
-        autoMerchant: false,
-        priceModifier: 1.0
+        activePlayers: false
     }
 }
 
