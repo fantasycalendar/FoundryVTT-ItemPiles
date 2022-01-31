@@ -11,9 +11,6 @@ import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import flagManager from "./flagManager.js";
-import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
-import DropCurrencyDialog from "./formapplications/dropCurrencyDialog.js";
-import { ItemPileCurrenciesEditor } from "./formapplications/itemPileCurrenciesEditor.js";
 import { getActorCurrencies, getActorItems } from "./lib/lib.js";
 
 Hooks.once("init", async () => {
@@ -24,6 +21,7 @@ Hooks.once("init", async () => {
 
     Hooks.once("socketlib.ready", registerSocket);
     Hooks.on("canvasReady", module._canvasReady);
+    Hooks.on("preCreateToken", module._preCreatePile);
     Hooks.on("createToken", module._createPile);
     Hooks.on("deleteToken", module._deletePile);
     Hooks.on("dropCanvasData", module._dropData);
@@ -140,6 +138,14 @@ const module = {
         const tokens = [...canvas.tokens.placeables].map(token => token.document);
         for (const doc of tokens) {
             await API._initializeItemPile(doc);
+        }
+    },
+
+    async _preCreatePile(document){
+        if(!document.isLinked){
+            document.data.update({
+                [`actorData.flags.${CONSTANTS.MODULE_NAME}.-=${CONSTANTS.SHARING_DATA}`]: null
+            });
         }
     },
 

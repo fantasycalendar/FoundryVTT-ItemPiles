@@ -1,6 +1,6 @@
 # Item Piles Changelog 
 
-## Version 1.3.0 Beta - Not released (see beta track on readme)
+## Version 1.3.0
 - Added item pile currency and/or item splitting capabilities
 - Added chat message when currency and/or items are split between players
 - Added API methods:
