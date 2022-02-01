@@ -12,6 +12,7 @@ import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import { getActorCurrencies, getActorItems } from "./lib/lib.js";
+import { TradingHandler } from "./formapplications/tradingApp.js";
 
 Hooks.once("init", async () => {
 
@@ -53,7 +54,8 @@ Hooks.once("init", async () => {
     }
 
     window.ItemPiles = {
-        API
+        API,
+        TradingHandler
     }
 
 });

@@ -235,11 +235,34 @@ export class TradingApp extends FormApplication {
 
 export class TradingHandler {
 
-    static async prompt(userId){
+    static async prompt(){
 
-        const uuid = lib.getUuid(target?.actor ?? target)
+        let content = `<p>Pick which player you want to trade with, and which actor represents you in the trade:</p>`;
 
-        const response = await itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_PROMPT, userId, game.user.id, uuid);
+        const users = game.users.filter(user => user.active && user !== game.user).map(user => {
+            return `<option value="${user.id}">${user.name}</option>`;
+        });
+
+        const actors = game.actors.filter(actor => actor.isOwner && actor.data.token.actorLink).map(actor => {
+            return `<option value="${actor.uuid}">${actor.name}</option>`;
+        });
+
+        content += `<div><label>User: </label><select name="user">${users}</select></div>`
+        content += `<div><label>Actor: </label><select name="actor">${actors}</select></div>`
+
+        const [userId, actorUuid] = await Dialog.prompt({
+            title: "Trading Request: Pick an actor",
+            content: content,
+            callback: (html) => {
+                const userId = html.find('select[name="user"]').val()
+                const actorUuid = html.find('select[name="actor"]').val()
+                return [userId, actorUuid]
+            }
+        })
+
+        if(!actorUuid) return false;
+
+        const response = await itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_PROMPT, userId, game.user.id, actorUuid);
 
         if(!response) return;
 
@@ -250,7 +273,7 @@ export class TradingHandler {
         const tradingUser = game.users.get(userId);
         const trader = await fromUuid(traderUuid);
 
-        return new Promise(resolve => {
+        return await new Promise(resolve => {
             let resolved = false;
             const dialog = new Dialog({
                 title: game.i18n.localize("ITEM-PILES.Trade.Prompt.Title"),
@@ -287,9 +310,14 @@ export class TradingHandler {
                 },
                 default: "cancel",
                 render: (html) => {
+                    const progressBarContainer = html.find(".item-piles-progress");
                     const progressBar = html.find(".progress-bar");
-                    progressBar.css("transition", 'width 30s linear')
-                    progressBar.css("width", "100%")
+                    progressBarContainer.css("opacity", "0");
+                    setTimeout(() => {
+                        progressBarContainer.fadeTo(1, 1000)
+                        progressBar.css("transition", 'width 20s linear')
+                        progressBar.css("width", "100%")
+                    }, 14000);
                 }
             })
 
@@ -297,7 +325,8 @@ export class TradingHandler {
                 if(resolved) return;
                 lib.custom_warning("You did not respond to the trade request quickly enough, and thus auto-declined it.")
                 dialog.close();
-            }, 30500)
+                resolve(false);
+            }, 35000)
 
             dialog.render(true);
         })

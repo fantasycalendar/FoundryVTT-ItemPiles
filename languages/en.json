@@ -32,7 +32,7 @@
         "Trade": {
             "Prompt": {
                 "Title": "Trade request",
-                "Content": "{trader_player_name} ({trader_actor_name}) wants to trade with you ({actor_name}).<br><br>Do you accept?"
+                "Content": "{trader_player_name} (as {trader_actor_name}) wants to trade with you (<a class='item-piles-change-actor item-piles-highlight'>{actor_name}</a>).<br><br>Do you accept?"
             }
         },
 
