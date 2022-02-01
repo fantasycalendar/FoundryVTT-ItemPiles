@@ -186,6 +186,7 @@ export default class API {
     static async _turnTokensIntoItemPiles(targetUuids, pileSettings = {}, tokenSettings = {}) {
 
         const tokenUpdateGroups = {};
+        const actorUpdateGroups = {};
         const defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
         for(const targetUuid of targetUuids) {
@@ -196,8 +197,8 @@ export default class API {
             pileSettings = foundry.utils.mergeObject(existingPileSettings, pileSettings);
             pileSettings.enabled = true;
 
-            const targetItems = lib.getActorItems(target, pileSettings);
-            const targetCurrencies = lib.getActorCurrencies(target, pileSettings);
+            const targetItems = lib.getActorItems(target, pileSettings.overrideItemFilters);
+            const targetCurrencies = lib.getActorCurrencies(target, pileSettings.overrideCurrencies);
 
             const data = { data: pileSettings, items: targetItems, currencies: targetCurrencies };
 
@@ -221,7 +222,16 @@ export default class API {
                 [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
             });
 
+            if(target.isLinked){
+                if(actorUpdateGroups[target.actor.id]) continue;
+                actorUpdateGroups[target.actor.id] = {
+                    "_id": target.actor.id,
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
+                }
+            }
         }
+
+        await Actor.updateDocuments(Object.values(actorUpdateGroups));
 
         for(const [sceneId, updateData] of Object.entries(tokenUpdateGroups)){
             const scene = game.scenes.get(sceneId);
@@ -267,6 +277,7 @@ export default class API {
      */
     static async _revertTokensFromItemPiles(targetUuids, tokenSettings) {
 
+        const actorUpdateGroups = {};
         const tokenUpdateGroups = {};
         const defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
@@ -291,7 +302,17 @@ export default class API {
                 [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
             });
 
+            if(target.isLinked){
+                if(actorUpdateGroups[target.actor.id]) continue;
+                actorUpdateGroups[target.actor.id] = {
+                    "_id": target.actor.id,
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
+                }
+            }
+
         }
+
+        await Actor.updateDocuments(Object.values(actorUpdateGroups));
 
         for(const [sceneId, updateData] of Object.entries(tokenUpdateGroups)){
             const scene = game.scenes.get(sceneId);

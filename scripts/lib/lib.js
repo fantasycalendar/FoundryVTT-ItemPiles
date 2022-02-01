@@ -430,9 +430,7 @@ export async function updateItemPileData(target, flagData, tokenData){
 
     return documentActor.update({
         [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
-        "token": {
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
-        }
+        [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData
     });
 
 }

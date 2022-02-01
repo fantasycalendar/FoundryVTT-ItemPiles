@@ -1,5 +1,10 @@
 # Item Piles Changelog 
 
+## Version 1.3.1
+- Fixed `ItemPiles.API.turnTokensIntoItemPiles` failing to turn tokens into item piles
+- Fixed module throwing errors in v8 regarding the actor sidebar
+- Fixed some Item Pile interfaces lacking styling elements in v8 
+
 ## Version 1.3.0
 - Added item pile currency and/or item splitting capabilities
 - Added chat message when currency and/or items are split between players
