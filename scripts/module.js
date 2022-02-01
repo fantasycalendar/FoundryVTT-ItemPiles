@@ -22,6 +22,7 @@ Hooks.once("init", async () => {
 
     Hooks.once("socketlib.ready", registerSocket);
     Hooks.on("canvasReady", module._canvasReady);
+    Hooks.on("preCreateChatMessage", module._preChatMessage);
     Hooks.on("preCreateToken", module._preCreatePile);
     Hooks.on("createToken", module._createPile);
     Hooks.on("deleteToken", module._deletePile);
@@ -265,5 +266,21 @@ const module = {
                 return true;
             }
         });
+    },
+
+    _preChatMessage(chatMessage){
+
+        const content = chatMessage.data.content;
+
+        if(!content.startsWith("!itempiles")) return;
+
+        const args = content.split(" ").slice(1);
+
+        if(args[0] === "trade"){
+            TradingHandler.prompt();
+        }
+
+        return false;
+
     }
 }
