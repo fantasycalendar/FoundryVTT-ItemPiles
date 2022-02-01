@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.3.2 Hotfix
+- Fixed module throwing error about MidiQOL when dropping an item if the module is not installed
+
 ## Version 1.3.1
 - Fixed `ItemPiles.API.turnTokensIntoItemPiles` failing to turn tokens into item piles
 - Fixed module throwing errors in v8 regarding the actor sidebar

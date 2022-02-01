@@ -2010,7 +2010,7 @@ export default class API {
 
         }
 
-        if(droppableDocuments.length && game.settings.get('midi-qol', "DragDropTarget")){
+        if(droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get('midi-qol', "DragDropTarget")){
             lib.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items")
             return;
         }
