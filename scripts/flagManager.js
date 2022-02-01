@@ -89,7 +89,7 @@ const flagManager = {
             return pileVersion !== this.latestFlagVersion;
         });
 
-        game.settings.set(CONSTANTS.MODULE_NAME, "migrationVersion", this.latestFlagVersion);
+        await game.settings.set(CONSTANTS.MODULE_NAME, "migrationVersion", this.latestFlagVersion);
 
 
     },
