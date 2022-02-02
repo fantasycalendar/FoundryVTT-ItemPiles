@@ -168,7 +168,7 @@ export function getItemPileTokenImage(target, { data = false, items = false, cur
 
     let originalImg;
     if(pileDocument instanceof TokenDocument){
-        originalImg = pileDocument.actor.data.token.img;
+        originalImg = pileDocument.data.img;
     }else{
         originalImg = pileDocument.data.token.img;
     }

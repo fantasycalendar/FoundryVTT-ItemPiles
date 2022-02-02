@@ -1,5 +1,9 @@
 # Item Piles Changelog 
 
+## Version 1.3.4
+- Fixed an issue in v8 and in some systems that caused item piles to fail to get the correct item quantities - this does not fix items that had already been put into item piles, you can fix this by editing the quantities of the items in actor's inventory
+- Fixed tokens not retaining their image when they were turned into item piles
+
 ## Version 1.3.3
 - Added missing `Split Only With Active Players` setting on item piles
 
