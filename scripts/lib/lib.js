@@ -440,7 +440,8 @@ export async function updateItemPileData(target, flagData, tokenData){
 
 
 export function getItemQuantity(item){
-    return Number(getProperty(item?._id ? item : item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+    const itemData = item instanceof Item ? item.data : item;
+    return Number(getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
 }
 
 
