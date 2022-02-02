@@ -1,6 +1,6 @@
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import * as lib from "./lib/lib.js";
-import { TradePromptDialog, TradeRequestDialog } from "./formapplications/trade-request-dialog.js";
+import { TradeRequestDialog, TradePromptDialog } from "./formapplications/trade-dialogs.js";
 
 export class TradingAPI {
 
@@ -25,7 +25,7 @@ export class TradingAPI {
             }).render(true);
         }
 
-        const result = await TradeRequestDialog.show(users);
+        const result = await TradePromptDialog.show(users);
         if(!result) return;
 
         const { userId, actorUuid } = result;
@@ -67,7 +67,7 @@ export class TradingAPI {
         const tradingUser = game.users.get(tradingUserId);
         const tradingActor = await fromUuid(tradingActorUuid);
 
-        TradePromptDialog.show(tradingUser, tradingActor);
+        TradeRequestDialog.show(tradingUser, tradingActor);
 
         return false;
 

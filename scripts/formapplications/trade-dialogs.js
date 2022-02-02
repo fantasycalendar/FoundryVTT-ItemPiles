@@ -1,7 +1,7 @@
 import CONSTANTS from "../constants.js";
 import * as lib from "../lib/lib.js";
 
-export class TradeRequestDialog extends FormApplication {
+export class TradePromptDialog extends FormApplication {
 
     constructor(resolve, users = false) {
         super();
@@ -25,7 +25,7 @@ export class TradeRequestDialog extends FormApplication {
 
     static show(users){
         return new Promise(resolve => {
-            new TradeRequestDialog(resolve, users).render(true);
+            new TradePromptDialog(resolve, users).render(true);
         })
     }
 
@@ -121,7 +121,7 @@ export class TradeRequestDialog extends FormApplication {
 
 }
 
-export class TradePromptDialog extends TradeRequestDialog {
+export class TradeRequestDialog extends TradePromptDialog {
 
     constructor(resolve, traderUser, traderActor) {
         super(resolve);
@@ -133,7 +133,7 @@ export class TradePromptDialog extends TradeRequestDialog {
 
     static show(traderUser, traderActor){
         return new Promise(resolve => {
-            new TradePromptDialog(resolve, traderUser, traderActor).render(true);
+            new TradeRequestDialog(resolve, traderUser, traderActor).render(true);
         })
     }
 
