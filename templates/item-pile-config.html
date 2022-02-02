@@ -243,6 +243,14 @@
                 </div>
 
                 <div class="form-group">
+                    <label>
+                        {{localize "ITEM-PILES.Defaults.Sharing.InactivePlayers"}}<br>
+                        <p>{{localize "ITEM-PILES.Defaults.Sharing.InactivePlayersExplanation"}}</p>
+                    </label>
+                    <input type="checkbox" name="activePlayers" {{checked flagData.activePlayers}}/>
+                </div>
+
+                <div class="form-group">
                     <label style="flex:4;">
                         {{localize "ITEM-PILES.Defaults.Sharing.ResetSharingData"}}<br>
                         <p>{{localize "ITEM-PILES.Defaults.Sharing.ResetSharingDataExplanation"}}</p>

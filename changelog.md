@@ -1,5 +1,20 @@
 # Item Piles Changelog 
 
+## Version 1.3.4
+- Fixed an issue in v8 and in some systems that caused item piles to fail to get the correct item quantities - this does not fix items that had already been put into item piles, you can fix this by editing the quantities of the items in actor's inventory
+- Fixed tokens not retaining their image when they were turned into item piles
+
+## Version 1.3.3
+- Added missing `Split Only With Active Players` setting on item piles
+
+## Version 1.3.2 Hotfix
+- Fixed module throwing error about MidiQOL when dropping an item if the module is not installed
+
+## Version 1.3.1
+- Fixed `ItemPiles.API.turnTokensIntoItemPiles` failing to turn tokens into item piles
+- Fixed module throwing errors in v8 regarding the actor sidebar
+- Fixed some Item Pile interfaces lacking styling elements in v8 
+
 ## Version 1.3.0
 - Added item pile currency and/or item splitting capabilities
 - Added chat message when currency and/or items are split between players

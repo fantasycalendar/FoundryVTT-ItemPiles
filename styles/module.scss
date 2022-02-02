@@ -50,7 +50,7 @@
   }
 
   &-highlight {
-    color: var(--color-text-hyperlink);
+    color: var(--color-text-hyperlink, #ff6400);
     text-decoration: underline;
   }
 
@@ -97,7 +97,7 @@
   }
 
   &-odd-color:nth-child(even) {
-    background-color: var(--color-text-light-highlight);
+    background-color: var(--color-text-light-highlight, #f0f0e0);
   }
 
   &-bottom-divider{
@@ -113,7 +113,7 @@
   }
 
   &-disabled {
-    background-color: var(--color-bg-btn-minor-inactive)
+    background-color: var(--color-bg-btn-minor-inactive, #c9c7b8)
   }
 
 }
@@ -166,11 +166,11 @@
     border-radius: 4px;
 
     &:nth-child(even):not(.item-piles-disabled) {
-      background-color: var(--color-text-light-highlight);
+      background-color: var(--color-text-light-highlight, #f0f0e0);
     }
 
     .item-piles-disabled {
-      background-color: var(--color-bg-btn-minor-inactive)
+      background-color: var(--color-bg-btn-minor-inactive, #c9c7b8)
     }
 
     div {
@@ -249,7 +249,7 @@
     .sheet-navigation {
       margin-bottom: 0.5rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--color-border-light-primary);
+      border-bottom: 1px solid var(--color-border-light-primary, #b5b3a4);
     }
 
     .item-piles-sections {
@@ -265,7 +265,7 @@
       color: var(--color-text-dark-secondary);
       padding-right: 1rem;
       margin-top: 0;
-      overflow-y: scroll;
+      overflow-y: hidden;
     }
 
     .item-piles-collapsible {
@@ -273,7 +273,7 @@
       &:not(:last-child) {
         margin-bottom: 0.75rem;
         padding-bottom: 0.75rem;
-        border-bottom: 1px solid var(--color-border-light-primary);
+        border-bottom: 1px solid var(--color-border-light-primary, #b5b3a4);
       }
 
       & > summary {
@@ -303,7 +303,7 @@
     footer {
       margin-top: 0.5rem;
       padding-top: 0.5rem;
-      border-top: 1px solid var(--color-border-light-primary);
+      border-top: 1px solid var(--color-border-light-primary, #b5b3a4);
     }
 
   }
@@ -350,7 +350,7 @@
     align-items: center;
 
     &:nth-child(odd) {
-      background-color: var(--color-text-light-highlight);
+      background-color: var(--color-text-light-highlight, #f0f0e0);
     }
 
     img {

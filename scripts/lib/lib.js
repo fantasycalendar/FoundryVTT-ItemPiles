@@ -171,7 +171,7 @@ export function getItemPileTokenImage(target, { data = false, items = false, cur
 
     let originalImg;
     if(pileDocument instanceof TokenDocument){
-        originalImg = pileDocument.actor.data.token.img;
+        originalImg = pileDocument.data.img;
     }else{
         originalImg = pileDocument.data.token.img;
     }
@@ -189,6 +189,8 @@ export function getItemPileTokenImage(target, { data = false, items = false, cur
         img = items.length > 0
             ? items[0].img
             : currencies[0].img;
+    }else if(data.displayOne && numItems > 1){
+        img = pileDocument.actor.data.token.img;
     }
 
     if (data.isContainer) {
@@ -433,9 +435,7 @@ export async function updateItemPileData(target, flagData, tokenData){
 
     return documentActor.update({
         [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
-        "token": {
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
-        }
+        [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData
     });
 
 }
@@ -445,7 +445,8 @@ export async function updateItemPileData(target, flagData, tokenData){
 
 
 export function getItemQuantity(item){
-    return Number(getProperty(item?._id ? item : item.data, API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+    const itemData = item instanceof Item ? item.data : item;
+    return Number(getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
 }
 
 
