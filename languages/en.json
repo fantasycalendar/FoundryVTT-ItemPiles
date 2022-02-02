@@ -40,8 +40,8 @@
             "Request": {
                 "Title": "Item Piles: Send Trade Request",
                 "User": "Select which user you want to trade with:",
-                "PickActor": "Select which actor to represent you in the trade:",
-                "PickedActor": "The actor that will represent you in the trade is:",
+                "PickActor": "Select which actor you will represent in the trade:",
+                "PickedActor": "The actor that you will represent in the trade:",
                 "PickToken": "Pick selected token",
                 "DropActor": "Drag and drop actor here",
                 "Label": "Send trade request"
