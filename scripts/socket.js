@@ -3,7 +3,7 @@ import CONSTANTS from "./constants.js";
 import API from "./api.js";
 import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
 import chatHandler from "./chathandler.js";
-import { TradingAPI } from "./trade-api.js";
+import { TradeAPI } from "./trade-api.js";
 
 export const SOCKET_HANDLERS = {
     /**
@@ -57,6 +57,7 @@ export const SOCKET_HANDLERS = {
      */
     TRADE_PROMPT: "tradePrompt",
     TRADE_ACCEPTED: "tradeAccepted",
+    TRADE_CANCELLED: "tradeCancelled",
 };
 
 export let itemPileSocket;
@@ -114,7 +115,8 @@ export function registerSocket() {
     /**
      * Trading sockets
      */
-    itemPileSocket.register(SOCKET_HANDLERS.TRADE_PROMPT, (...args) => TradingAPI._respondPrompt(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_PROMPT, (...args) => TradeAPI._respondPrompt(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_CANCELLED, (...args) => TradeAPI._tradeCancelled(...args))
 }
 
 async function callHook(inHookName, ...args) {

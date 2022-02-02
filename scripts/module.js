@@ -12,7 +12,7 @@ import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import { getActorCurrencies, getActorItems } from "./lib/lib.js";
-import { TradingAPI } from "./trade-api.js";
+import { TradeAPI } from "./trade-api.js";
 
 Hooks.once("init", async () => {
 
@@ -56,7 +56,7 @@ Hooks.once("init", async () => {
 
     window.ItemPiles = {
         API,
-        TradingHandler: TradingAPI
+        TradingHandler: TradeAPI
     }
 
 });
@@ -257,13 +257,18 @@ const module = {
                 return game.user.isGM && API.isValidItemPile(actor);
             }
         }, {
-            name: "ITEM-PILES.ContextMenu.TradeWith",
+            name: "ITEM-PILES.ContextMenu.RequestTrade",
             icon: `<i class="fas fa-handshake"></i>`,
             callback: (html) => {
-                return true;
+                const actorId = html[0].dataset.documentId;
+                const actor = game.actors.get(actorId);
+                const user = Array.from(game.users).find(u => u.character === actor && u.active);
+                return TradeAPI.promptUser(user);
             },
             condition: (html) => {
-                return true;
+                const actorId = html[0].dataset.documentId;
+                const actor = game.actors.get(actorId);
+                return game.user?.character !== actor || Array.from(game.users).find(u => u.character === actor && u.active);
             }
         });
     }

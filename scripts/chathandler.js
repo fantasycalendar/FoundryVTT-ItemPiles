@@ -2,7 +2,7 @@ import API from "./api.js";
 import CONSTANTS from "./constants.js";
 import * as lib from "./lib/lib.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
-import { TradingAPI } from "./trade-api.js";
+import { TradeAPI } from "./trade-api.js";
 
 const chatHandler = {
 
@@ -16,7 +16,7 @@ const chatHandler = {
 
         if(args[0] === "trade"){
             setTimeout(() => {
-                TradingAPI.prompt();
+                TradeAPI.promptUser();
             });
         }
 

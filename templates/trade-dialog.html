@@ -19,10 +19,6 @@
             box-shadow: 0 0 20px inset var(--color-shadow-highlight, #ff6400);
         }
 
-        .item-piles-actor-container > * {
-            pointer-events: none;
-        }
-
         .item-piles-actor-container img {
             border: 0;
             max-height:80px;
@@ -39,9 +35,8 @@
             text-align: center;
         }
 
-        .item-piles-actor-select{
-            height: 30px;
-            margin: 2px 5px 2px 0;
+        .item-piles-change-actor-select{
+            height: 23px;
         }
 
     </style>
@@ -58,8 +53,8 @@
 
     {{#if isPrompt}}
 
-        <div class="item-piles-bottom-divider">{{{localize "ITEM-PILES.Trade.Prompt.Content" trader_user_name=traderUser.name
-            trader_actor_name=traderActor.name}}}</div>
+        <div class="item-piles-bottom-divider">{{{localize "ITEM-PILES.Trade.Prompt.Content" trading_user_name=tradingUser.name
+            trading_actor_name=tradingActor.name}}}</div>
 
     {{else}}
 
@@ -68,6 +63,7 @@
         <div class="item-piles-bottom-divider">
             <div class="form-group" style="max-width: 75%;">
                 <label class="item-piles-text-right" style="margin-right: 0.5rem;">User:</label>
+                {{log user}}
                 {{#select user.id}}
                 <select name="user" style="width: 66%;">
                     {{#each users as |user id|}}
@@ -93,28 +89,31 @@
                     {{#if actor.data.img}}
                     <img src="{{actor.data.img}}">
                     {{/if}}
+
+                    {{#if multipleActors}}
+                    {{#select actor.uuid}}
+                    <span><a class='item-piles-change-actor item-piles-highlight'>{{actor.name}}</a>
+                        <select class="item-piles-change-actor-select" name="actor" style="display:none;">
+                            {{#each actors as |actor id|}}
+                            <option value="{{actor.uuid}}">{{actor.name}}</option>
+                            {{/each}}
+                        </select>
+                    </span>
+                    {{/select}}
+                    {{else}}
                     <span>{{actor.name}}</span>
+                    {{/if}}
+
                 </div>
                 {{else}}
                 <p>{{ localize "ITEM-PILES.Trade.Request.DropActor" }}</p>
                 {{/if}}
             </div>
-            {{#unless preselectedActor}}
+            {{#if hasUnlinkedTokenOwnership}}
             <div class="flexrow">
-                {{#unless isGM}}
-                {{#if multipleActors}}
-                {{#select actor.uuid}}
-                <select class="item-piles-actor-select" name="actor">
-                    {{#each actors as |actor id|}}
-                    <option value="{{actor.uuid}}">{{actor.name}}</option>
-                    {{/each}}
-                </select>
-                {{/select}}
-                {{/if}}
-                {{/unless}}
                 <button type="button" class="item-piles-pick-selected-token"><i class="fas fa-expand"></i> {{ localize "ITEM-PILES.Trade.Request.PickToken" }}</button>
             </div>
-            {{/unless}}
+            {{/if}}
         </div>
 
     <footer class="sheet-footer flexrow">

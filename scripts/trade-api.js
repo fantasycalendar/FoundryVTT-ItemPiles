@@ -2,9 +2,9 @@ import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import * as lib from "./lib/lib.js";
 import { TradeRequestDialog, TradePromptDialog } from "./formapplications/trade-dialogs.js";
 
-export class TradingAPI {
+export class TradeAPI {
 
-    static async prompt(){
+    static async promptUser(user = false){
 
         const users = game.users.filter(user => user.active && user !== game.user);
 
@@ -25,15 +25,23 @@ export class TradingAPI {
             }).render(true);
         }
 
-        const result = await TradePromptDialog.show(users);
-        if(!result) return;
+        let userId;
+        let actorUuid;
 
-        const { userId, actorUuid } = result;
+        const actors = game.actors.filter(actor => actor.isOwner);
+        if(actors.length === 1 && user){
+            userId = user.id;
+            actorUuid = actors[0].uuid;
+        }else {
+            const result = await TradePromptDialog.show({ actors, users, user });
+            if (!result) return;
+            userId = result.userId;
+            actorUuid = result.actorUuid;
+        }
 
         const actor = await fromUuid(actorUuid);
         const actorOwner = game.users.find(user => user.character === actor && user !== game.user);
         if(actorOwner){
-
             const doContinue = await Dialog.confirm({
                 title: game.i18n.localize("ITEM-PILES.Trade.Title"),
                 content: lib.dialogLayout({
@@ -52,24 +60,62 @@ export class TradingAPI {
 
         const tradeId = randomID();
 
-        const response = await itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_PROMPT, userId, game.user.id, actorUuid, tradeId);
+        const cancel = Dialog.prompt({
+            title: game.i18n.localize("ITEM-PILES.Trade.Title"),
+            content: `<p style="text-align: center">${game.i18n.format("ITEM-PILES.Trade.OngoingRequest.Content", { user_name: game.users.get(userId).name })}</p>`,
+            label: game.i18n.localize("ITEM-PILES.Trade.OngoingRequest.Label"),
+            callback: () => { return true },
+            options: {
+                top: 50,
+                width: 300
+            }
+        });
 
-        if(!response || !response.id.includes(tradeId)) return false;
+        let response = itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_PROMPT, userId, game.user.id, actorUuid, tradeId);
 
-        console.log(response.id);
+        cancel.then((result) => {
+            if(!result) return;
+            response = null;
+            itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_CANCELLED, userId, game.user.id, tradeId);
+        })
+
+        response.then(() => {
+
+            if(!response || !response.includes(tradeId)) return false;
+
+            itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_ACCEPTED, userId, game.user.id, tradeId);
+
+        })
 
     }
 
-    static async _respondPrompt(tradingUserId, tradingActorUuid, inTradeId){
+    static async _respondPrompt(tradingUserId, tradingActorUuid, tradeId){
 
-        const tradeId = inTradeId + randomID();
+        const fullTradeId = tradeId + randomID();
 
         const tradingUser = game.users.get(tradingUserId);
         const tradingActor = await fromUuid(tradingActorUuid);
 
-        TradeRequestDialog.show(tradingUser, tradingActor);
+        await TradeRequestDialog.show({ tradeId, tradingUser, tradingActor });
 
-        return false;
+        return fullTradeId;
+
+    }
+
+    static async _tradeCancelled(userId, tradeId){
+
+        Dialog.prompt({
+            title: game.i18n.localize("ITEM-PILES.Trade.Title"),
+            content: lib.dialogLayout({
+                message: game.i18n.format("ITEM-PILES.Trade.CancelledRequest.Content", { user_name: game.users.get(userId).name })
+            }),
+            callback: () => {},
+            options: {
+                width: 300
+            }
+        });
+
+        return TradeRequestDialog.cancel(tradeId);
 
     }
 

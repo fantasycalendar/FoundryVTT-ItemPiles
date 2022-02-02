@@ -3,29 +3,22 @@ import * as lib from "../lib/lib.js";
 
 export class TradePromptDialog extends FormApplication {
 
-    constructor(resolve, users = false) {
+    constructor(resolve, { actors = false, actor = false, users = false, user = false }={}) {
         super();
         this.resolve = resolve;
-        this.users = users;
-        this.user = users?.[0] ?? "";
-        this.actor = false;
+        this.users = users || game.users.filter(user => user.active && user !== game.user);
+        this.user = user || users?.[0] || false;
+        this.actors = actors || game.actors.filter(actor => actor.isOwner);
+        this.actor = actor || game.user.character ||this.actors?.[0] || false;
         this.isGM = game.user.isGM;
 
-        this.actors = game.actors.filter(actor => actor.isOwner);
-        this.preselectedActor = false;
-        if(this.actors.length === 1){
-            this.actor = this.actors[0];
-            this.preselectedActor = true;
-        }else if(game.user.character){
-            this.actor = game.user.character;
-        }else if(game.user.isGM && canvas.tokens.controlled.length){
-            this.actor = canvas.tokens.controlled[0].actor;
-        }
+        this.preselectedActor = this.actors.length === 1 || actor;
+
     }
 
-    static show(users){
+    static show({ actors = false, actor = false, users = false, user = false }){
         return new Promise(resolve => {
-            new TradePromptDialog(resolve, users).render(true);
+            new TradePromptDialog(resolve, { actors, actor, users, user }).render(true);
         })
     }
 
@@ -34,7 +27,7 @@ export class TradePromptDialog extends FormApplication {
         return foundry.utils.mergeObject(super.defaultOptions, {
             title: game.i18n.localize("ITEM-PILES.Trade.Title"),
             classes: ["dialog"],
-            template: `${CONSTANTS.PATH}templates/trade-request-dialog.html`,
+            template: `${CONSTANTS.PATH}templates/trade-dialog.html`,
             width: 400,
             height: "auto",
             dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-actor-container" }],
@@ -46,12 +39,20 @@ export class TradePromptDialog extends FormApplication {
         const self = this;
 
         if(!this.preselectedActor) {
-            html.find(".item-piles-actor-container").on("dragenter", function () {
-                $(this).addClass("item-piles-box-highlight");
+            html.find(".item-piles-actor-container").on("dragenter", function (event) {
+                event = event.originalEvent || event;
+                let newElement = document.elementFromPoint(event.pageX, event.pageY);
+                if (!$(this).contains(newElement)) {
+                    $(this).addClass("item-piles-box-highlight");
+                }
             })
 
-            html.find(".item-piles-actor-container").on("dragleave", function () {
-                $(this).removeClass("item-piles-box-highlight");
+            html.find(".item-piles-actor-container").on("dragleave", function (event) {
+                event = event.originalEvent || event;
+                let newElement = document.elementFromPoint(event.pageX, event.pageY);
+                if (!$(this).contains(newElement)) {
+                    $(this).removeClass("item-piles-box-highlight");
+                }
             })
 
             html.find(".item-piles-pick-selected-token").click(() => {
@@ -60,10 +61,18 @@ export class TradePromptDialog extends FormApplication {
             });
         }
 
-        html.find(".item-piles-actor-select").change(function(){
-            console.log($(this).val())
-            console.log(game.actors.get($(this).val()));
-            self.setActor(game.actors.get($(this).val()));
+        html.find('.item-piles-change-actor').click(function () {
+            $(this).hide();
+            let select = $(this).parent().find('.item-piles-change-actor-select');
+            select.insertAfter($(this));
+            select.css('display', 'inline-block');
+        });
+
+        html.find(".item-piles-change-actor-select").change(async function () {
+            $(this).css('display', 'none');
+            html.find('.item-piles-change-actor').show();
+            const actor = await fromUuid($(this).val());
+            self.setActor(actor);
         });
     }
 
@@ -94,11 +103,13 @@ export class TradePromptDialog extends FormApplication {
 
     async getData(options) {
         const data = await super.getData(options);
+        data.user = this.user;
         data.users = this.users;
         data.actor = this.actor;
         data.actors = this.actors;
         data.preselectedActor = this.preselectedActor;
         data.multipleActors = this.actors.length > 1 && !game.user.isGM;
+        data.hasUnlinkedTokenOwnership = this.actors.filter(a => !a.data.token.actorLink).length > 0;
         data.buttons = [{
             value: "accept",
             icon: "fas fa-check",
@@ -117,24 +128,36 @@ export class TradePromptDialog extends FormApplication {
 
     async close(...args) {
         super.close(...args);
+        this.resolve(false);
     }
 
 }
 
 export class TradeRequestDialog extends TradePromptDialog {
 
-    constructor(resolve, traderUser, traderActor) {
+    constructor(resolve, { tradeId, tradingUser, tradingActor }={}) {
         super(resolve);
-        this.traderUser = traderUser;
-        this.traderActor = traderActor;
+        this.tradeId = tradeId;
+        this.tradingUser = tradingUser;
+        this.tradingActor = tradingActor;
         this.progressbarTimeout = false
         this.timeout = false;
     }
 
-    static show(traderUser, traderActor){
+    static show({ tradeId, tradingUser, tradingActor }={}){
         return new Promise(resolve => {
-            new TradeRequestDialog(resolve, traderUser, traderActor).render(true);
+            new TradeRequestDialog(resolve, { tradeId, tradingUser, tradingActor }).render(true);
         })
+    }
+
+    static cancel(tradeId){
+        for(const app of Object.values(ui.windows)){
+            if(app instanceof TradeRequestDialog && app.tradeId === tradeId){
+                app.close();
+                return app;
+            }
+        }
+        return false;
     }
 
     activateListeners(html) {
@@ -160,8 +183,8 @@ export class TradeRequestDialog extends TradePromptDialog {
     async getData(options) {
         let data = await super.getData(options);
         data.isPrompt = true;
-        data.traderUser = this.traderUser;
-        data.traderActor = this.traderActor;
+        data.tradingUser = this.tradingUser;
+        data.tradingActor = this.tradingActor;
         data.buttons = [{
             value: "accept",
             icon: "fas fa-check",
@@ -194,6 +217,12 @@ export class TradeRequestDialog extends TradePromptDialog {
         }
 
         return this.resolve(false);
+    }
+
+    async close(...args) {
+        super.close(...args);
+        if(this.progressbarTimeout) clearTimeout(this.progressbarTimeout);
+        if(this.timeout) clearTimeout(this.timeout);
     }
 
 }

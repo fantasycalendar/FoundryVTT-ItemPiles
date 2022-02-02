@@ -7,7 +7,7 @@
 
         "ContextMenu": {
             "ShowToPlayers": "Item Piles: Show pile to players",
-            "TradeWith": "Item Piles: Initiate Trade"
+            "RequestTrade": "Item Piles: Request Trade"
         },
 
         "Inspect": {
@@ -46,13 +46,24 @@
                 "DropActor": "Drag and drop actor here",
                 "Label": "Send trade request"
             },
+
             "NoActiveUsers": {
                 "Title": "Item Piles: No Active Users",
                 "Content": "No players are active, so you have no one to trade with."
             },
+
             "Prompt": {
                 "Title": "Item Piles: Trade Request",
-                "Content": "<p>{trader_actor_name} (user {trader_user_name}) wants to trade with you.</p><p>Do you accept?</p>"
+                "Content": "<p>{trading_actor_name} (user {trading_user_name}) wants to trade with you.</p><p>Do you accept?</p>"
+            },
+
+            "OngoingRequest": {
+                "Content": "Wait for response from {user_name}...",
+                "Label": "Cancel trade request"
+            },
+
+            "CancelledRequest": {
+                "Content": "The trade request was cancelled by {user_name}."
             },
 
             "UserCharacterWarning": "You picked the actor \"{actor_name}\" which is the assigned character of the player \"{player_name}\".<br><br>Are you sure you want to do this?",
