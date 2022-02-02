@@ -1,9 +1,9 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 import API from "./api.js";
-import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
+import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
 import chatHandler from "./chathandler.js";
-import { TradingHandler } from "./formapplications/tradingApp.js";
+import { TradingAPI } from "./trade-api.js";
 
 export const SOCKET_HANDLERS = {
     /**
@@ -114,7 +114,7 @@ export function registerSocket() {
     /**
      * Trading sockets
      */
-    itemPileSocket.register(SOCKET_HANDLERS.TRADE_PROMPT, (...args) => TradingHandler._respondPrompt(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_PROMPT, (...args) => TradingAPI._respondPrompt(...args))
 }
 
 async function callHook(inHookName, ...args) {

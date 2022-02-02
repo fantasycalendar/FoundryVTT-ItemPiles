@@ -3,18 +3,17 @@
 .item-piles {
 
   &-progress {
-    width: calc(100% - 10px);
-    height: 6px;
+    width: calc(100% - 4px);
     background: #e1e4e8;
     border-radius: 3px;
     overflow: hidden;
-    margin: 0 5px;
+    margin: 0.25rem 2px 0 2px;
+    height: 6px;
 
     .progress-bar {
       display: block;
       height: 100%;
-      background-color: rgba(0,0,0, 0.4);
-
+      background-color: rgba(0,0,0, 0.65);
       transition: width 30s linear;
     }
   }

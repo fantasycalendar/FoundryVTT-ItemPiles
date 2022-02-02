@@ -1,8 +1,8 @@
 import CONSTANTS from "./constants.js";
-import { ItemPileCurrenciesEditor } from "./formapplications/itemPileCurrenciesEditor.js";
+import { ItemPileCurrenciesEditor } from "./formapplications/item-pile-currencies-editor.js";
 import { SYSTEMS } from "./systems.js";
 import * as lib from "./lib/lib.js";
-import { ItemPileFiltersEditor } from "./formapplications/itemPileFiltersEditor.js";
+import { ItemPileFiltersEditor } from "./formapplications/item-pile-filters-editor.js";
 import flagManager from "./flagManager.js";
 
 function defaultSettings(apply = false) {

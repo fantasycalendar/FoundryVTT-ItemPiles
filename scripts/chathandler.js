@@ -2,8 +2,27 @@ import API from "./api.js";
 import CONSTANTS from "./constants.js";
 import * as lib from "./lib/lib.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
+import { TradingAPI } from "./trade-api.js";
 
 const chatHandler = {
+
+    _preCreateChatMessage(chatMessage){
+
+        const content = chatMessage.data.content;
+
+        if(!(content.startsWith("!itempiles") || content.startsWith("!ip"))) return;
+
+        const args = content.split(" ").slice(1);
+
+        if(args[0] === "trade"){
+            setTimeout(() => {
+                TradingAPI.prompt();
+            });
+        }
+
+        return false;
+
+    },
 
     /**
      * Outputs to chat based on transferring an item from or to an item pile

@@ -3,8 +3,8 @@ import API from "../api.js";
 import * as lib from "../lib/lib.js";
 import { isPileInventoryOpenForOthers } from "../socket.js";
 import HOOKS from "../hooks.js";
-import { ItemPileConfig } from "./itemPileConfig.js";
-import DropCurrencyDialog from "./dropCurrencyDialog.js";
+import { ItemPileConfig } from "./item-pile-config.js";
+import DropCurrencyDialog from "./drop-currency-dialog.js";
 
 export class ItemPileInventory extends FormApplication {
 

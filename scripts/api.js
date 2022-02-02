@@ -1,8 +1,8 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
-import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
-import DropItemDialog from "./formapplications/dropItemDialog.js";
+import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
+import DropItemDialog from "./formapplications/drop-item-dialog.js";
 import HOOKS from "./hooks.js";
 import { hotkeyState } from "./hotkeys.js";
 

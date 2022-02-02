@@ -1,8 +1,8 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
-import { ItemPileCurrenciesEditor } from "./itemPileCurrenciesEditor.js";
+import { ItemPileCurrenciesEditor } from "./item-pile-currencies-editor.js";
 import * as lib from "../lib/lib.js";
-import { ItemPileFiltersEditor } from "./itemPileFiltersEditor.js";
+import { ItemPileFiltersEditor } from "./item-pile-filters-editor.js";
 
 export class ItemPileConfig extends FormApplication {
 

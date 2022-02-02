@@ -1,9 +1,7 @@
 import CONSTANTS from "../constants.js";
-import API from "../api.js";
 import * as lib from "../lib/lib.js";
-import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
 import { hotkeyState } from "../hotkeys.js";
-import DropCurrencyDialog from "./dropCurrencyDialog.js";
+import DropCurrencyDialog from "./drop-currency-dialog.js";
 
 export class TradingApp extends FormApplication {
 
@@ -227,110 +225,6 @@ export class TradingApp extends FormApplication {
         };
 
         return data;
-    }
-
-
-}
-
-
-export class TradingHandler {
-
-    static async prompt(){
-
-        let content = `<p>Pick which player you want to trade with, and which actor represents you in the trade:</p>`;
-
-        const users = game.users.filter(user => user.active && user !== game.user).map(user => {
-            return `<option value="${user.id}">${user.name}</option>`;
-        });
-
-        const actors = game.actors.filter(actor => actor.isOwner && actor.data.token.actorLink).map(actor => {
-            return `<option value="${actor.uuid}">${actor.name}</option>`;
-        });
-
-        content += `<div><label>User: </label><select name="user">${users}</select></div>`
-        content += `<div><label>Actor: </label><select name="actor">${actors}</select></div>`
-
-        const [userId, actorUuid] = await Dialog.prompt({
-            title: "Trading Request: Pick an actor",
-            content: content,
-            callback: (html) => {
-                const userId = html.find('select[name="user"]').val()
-                const actorUuid = html.find('select[name="actor"]').val()
-                return [userId, actorUuid]
-            }
-        })
-
-        if(!actorUuid) return false;
-
-        const response = await itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_PROMPT, userId, game.user.id, actorUuid);
-
-        if(!response) return;
-
-    }
-
-    static async _respondPrompt(userId, traderUuid){
-
-        const tradingUser = game.users.get(userId);
-        const trader = await fromUuid(traderUuid);
-
-        return await new Promise(resolve => {
-            let resolved = false;
-            const dialog = new Dialog({
-                title: game.i18n.localize("ITEM-PILES.Trade.Prompt.Title"),
-                content: lib.dialogLayout({
-                    icon: "fas fa-handshake",
-                    title: "Trade Request",
-                    message: game.i18n.format("ITEM-PILES.Trade.Prompt.Content", {
-                        trader_player_name: tradingUser.name,
-                        trader_actor_name: trader.name,
-                        actor_name: game.user.character.name
-                    }),
-                    extraHtml: `
-                    <div class="item-piles-progress" style="margin-top: 1rem;">
-                        <span class="progress-bar" style="width: 0%"></span>
-                    </div>`
-                }),
-                buttons: {
-                    confirm: {
-                        icon: '<i class="fas fa-check"></i>',
-                        label: game.i18n.localize("Yes"),
-                        callback: () => {
-                            resolved = true;
-                            resolve(true)
-                        }
-                    },
-                    cancel: {
-                        icon: '<i class="fas fa-times"></i>',
-                        label: game.i18n.localize("No"),
-                        callback: () => {
-                            resolved = true;
-                            resolve(false);
-                        }
-                    }
-                },
-                default: "cancel",
-                render: (html) => {
-                    const progressBarContainer = html.find(".item-piles-progress");
-                    const progressBar = html.find(".progress-bar");
-                    progressBarContainer.css("opacity", "0");
-                    setTimeout(() => {
-                        progressBarContainer.fadeTo(1, 1000)
-                        progressBar.css("transition", 'width 20s linear')
-                        progressBar.css("width", "100%")
-                    }, 14000);
-                }
-            })
-
-            setTimeout(() => {
-                if(resolved) return;
-                lib.custom_warning("You did not respond to the trade request quickly enough, and thus auto-declined it.")
-                dialog.close();
-                resolve(false);
-            }, 35000)
-
-            dialog.render(true);
-        })
-
     }
 
 

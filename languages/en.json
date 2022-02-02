@@ -30,10 +30,34 @@
         },
 
         "Trade": {
+            "Title": "Item Piles: Trading",
+
+            "Accept": "Accept",
+            "Decline": "Decline",
+            "Mute": "Mute",
+            "AutoDecline": "You did not respond to the trade request quickly enough, so it was auto-declined.",
+
+            "Request": {
+                "Title": "Item Piles: Send Trade Request",
+                "User": "Select which user you want to trade with:",
+                "PickActor": "Select which actor to represent you in the trade:",
+                "PickedActor": "The actor that will represent you in the trade is:",
+                "PickToken": "Pick selected token",
+                "DropActor": "Drag and drop actor here",
+                "Label": "Send trade request"
+            },
+            "NoActiveUsers": {
+                "Title": "Item Piles: No Active Users",
+                "Content": "No players are active, so you have no one to trade with."
+            },
             "Prompt": {
-                "Title": "Trade request",
-                "Content": "{trader_player_name} (as {trader_actor_name}) wants to trade with you (<a class='item-piles-change-actor item-piles-highlight'>{actor_name}</a>).<br><br>Do you accept?"
-            }
+                "Title": "Item Piles: Trade Request",
+                "Content": "<p>{trader_actor_name} (user {trader_user_name}) wants to trade with you.</p><p>Do you accept?</p>"
+            },
+
+            "UserCharacterWarning": "You picked the actor \"{actor_name}\" which is the assigned character of the player \"{player_name}\".<br><br>Are you sure you want to do this?",
+            "UserActiveCharacterWarning": "You picked the actor \"{actor_name}\" which is the assigned character of the player \"{player_name}\", who is <strong>active</strong>.<br><br>Are you sure you want to do this?",
+            "ActorOwnerWarning": "You do not own this actor, so you cannot trade with it."
         },
 
         "Errors": {
