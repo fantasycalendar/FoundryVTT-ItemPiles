@@ -1,5 +1,8 @@
 # Item Piles Changelog 
 
+## Version 1.3.3
+- Added missing `Split Only With Active Players` setting on item piles
+
 ## Version 1.3.2 Hotfix
 - Fixed module throwing error about MidiQOL when dropping an item if the module is not installed
 
