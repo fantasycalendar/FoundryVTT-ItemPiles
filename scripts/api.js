@@ -1138,7 +1138,11 @@ export default class API {
         const itemsToDelete = [];
         for (const itemData of items) {
 
-            const item = targetActor.items.get(itemData._id).toObject();
+            let item = targetActor.items.get(itemData._id);
+
+            if(!item) continue;
+
+            item = item.toObject();
 
             const currentQuantity = lib.getItemQuantity(item);
 

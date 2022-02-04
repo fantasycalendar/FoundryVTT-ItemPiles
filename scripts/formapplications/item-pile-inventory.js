@@ -461,15 +461,16 @@ export class ItemPileInventory extends FormApplication {
 
         if(this.recipient) {
             const currencyToAdd = await DropCurrencyDialog.query({
-                itemPile: this.pile,
-                dropper: this.recipient
+                target: this.pile,
+                source: this.recipient
             })
             return API.transferAttributes(this.recipient, this.pile, currencyToAdd);
         }
 
         if(game.user.isGM){
             const currencyToAdd = await DropCurrencyDialog.query({
-                itemPile: this.pile
+                target: this.pile,
+                source: this.recipient
             })
             return API.addAttributes(this.pile, currencyToAdd);
         }

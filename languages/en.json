@@ -73,6 +73,8 @@
                 "Label": "Update Currencies"
             },
 
+            "GMAddCurrency": "Add Currency (GM mode)",
+
             "Closed": {
                 "Title": "Trade Closed",
                 "You": "You closed the trading window, so the trade was cancelled.",
@@ -246,8 +248,9 @@
             "Title": "Dropping Currencies",
             "Player": "You can drop the following currencies into this item pile:",
             "GM": "As a GM, you can add currencies to this item pile:",
-            "AddToPile": "Add to pile",
-            "Cancel": "Cancel"
+            "NoCurrency": "{actor_name} has no valid currencies...",
+            "Cancel": "Cancel",
+            "AddToPile": "Add to pile"
         },
 
         "Chat": {

@@ -21,10 +21,11 @@ export class TradingApp extends FormApplication {
         this.rightTraderActorCurrencies = [];
         this.rightTraderAccepted = false;
 
-        this.users = [this.leftTraderUser.id, this.rightTraderUser.id];
-
         this.publicTradeId = publicTradeId;
         this.privateTradeId = privateTradeId;
+
+        this.editingInput = false;
+        this.openCurrencyApp = false;
     }
 
 
@@ -36,6 +37,7 @@ export class TradingApp extends FormApplication {
             width: 800,
             height: "auto",
             dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-item-drop-container" }],
+            closeOnSubmit: false
         });
     }
 
@@ -108,7 +110,7 @@ export class TradingApp extends FormApplication {
             }
         }
 
-        return this.addItem(itemData, !!data.actorId);
+        return this.addItem(itemData,!!data.actorId && game.user.isGM);
 
     }
 
@@ -130,7 +132,7 @@ export class TradingApp extends FormApplication {
             item.quantity += Math.min(item.quantity+1, lib.getItemQuantity(newItem));
         }
 
-        await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, this.users, this.privateTradeId, game.user.id, this.leftTraderActorItems);
+        await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorItems);
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
 
     }
@@ -154,19 +156,20 @@ export class TradingApp extends FormApplication {
         this.render(true);
     }
 
-    async addCurrency(){
+    async addCurrency(asGM = false){
 
         const currencyToAdd = await DropCurrencyDialog.query({
-            dropper: this.leftTraderActor,
+            source: this.leftTraderActor,
             target: this.rightTraderActor,
             existingCurrencies: this.leftTraderActorCurrencies,
             title: game.i18n.localize("ITEM-PILES.Trade.AddCurrency.Title"),
             content: game.i18n.format("ITEM-PILES.Trade.AddCurrency.Content", { trader_actor_name: this.rightTraderActor.name }),
-            button: game.i18n.localize("ITEM-PILES.Trade.AddCurrency.Label")
+            button: game.i18n.localize("ITEM-PILES.Trade.AddCurrency.Label"),
+            includeAllCurrencies: asGM
         });
         if(!currencyToAdd) return;
 
-        const currencies = lib.getActorCurrencies(this.leftTraderActor);
+        const currencies = lib.getActorCurrencies(this.leftTraderActor, { getAll: asGM });
 
         Object.entries(currencyToAdd).forEach(entry => {
 
@@ -184,15 +187,17 @@ export class TradingApp extends FormApplication {
                 quantity: entry[1],
                 name: currency.name,
                 img: currency.img,
-                maxQuantity: currency.quantity,
+                maxQuantity: !asGM ? currency.quantity : Infinity,
                 index: currency.index
             });
 
         });
 
+        this.leftTraderActorCurrencies = this.leftTraderActorCurrencies.filter(currency => currency.quantity);
+
         this.leftTraderActorCurrencies.sort((a, b) => a.index - b.index);
 
-        await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.users, this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
+        await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
 
     }
@@ -253,7 +258,18 @@ export class TradingApp extends FormApplication {
         super.activateListeners(html);
         let self = this;
 
+        setTimeout(() =>{
+            let element = html.find(`.item-piles-item-row[data-item="${this.editingInput}"]`)
+            element = element.length ? element : html.find(`.item-piles-item-row[data-currency="${this.editingInput}"]`)
+            if(element.length){
+                element.find(".item-piles-quantity").focus()
+            }
+        }, 50);
+
         html.find('.item-piles-item-row .item-piles-quantity').keyup(function(event){
+            if(event.key === "Enter"){
+                event.preventDefault();
+            }
 
             const parent = $(this).closest(".item-piles-item-row");
 
@@ -263,10 +279,12 @@ export class TradingApp extends FormApplication {
                 const itemId = parent.attr("data-item");
                 const item = self.leftTraderActorItems.find(item => item.id === itemId);
                 quantity = Math.min(value, item.maxQuantity);
+                item.quantity = quantity;
             }else{
                 const currencyPath = parent.attr("data-currency");
                 const currency = self.leftTraderActorCurrencies.find(currency => currency.path === currencyPath);
                 quantity = Math.min(value, currency.maxQuantity);
+                currency.quantity = quantity;
             }
 
             $(this).val(quantity);
@@ -285,18 +303,27 @@ export class TradingApp extends FormApplication {
             parent.find(".item-piles-confirm-quantity").show();
             const quantityInput = parent.find(".item-piles-quantity");
             quantityInput.focus().select();
+            self.editingInput = parent.attr('data-type') === "item"
+                ? parent.attr('data-item')
+                : parent.attr('data-currency');
         });
 
+        html.find(".item-piles-remove-item").click(function(){
+            self.editingInput = false;
+            const parent = $(this).closest(".item-piles-item-row");
+            if(parent.attr('data-type') === "item"){
+                return self.setItemQuantity(parent.attr('data-item'), 0)
+            }
+            return self.setCurrencyQuantity(parent.attr('data-currency'), 0)
+        })
+
         html.find(".item-piles-confirm-quantity").click(function(){
+            self.editingInput = false;
             const parent = $(this).closest(".item-piles-item-row");
             $(this).hide();
             parent.find(".item-piles-quantity-container").hide();
             parent.find(".item-piles-quantity-text").show();
             const value = Number(parent.find(".item-piles-quantity").val())
-
-            if(value === 0){
-                parent.remove();
-            }
 
             parent.find(".item-piles-quantity-text").text(value);
 
@@ -305,21 +332,25 @@ export class TradingApp extends FormApplication {
             }
 
             return self.setCurrencyQuantity(parent.attr('data-currency'), value)
-
         })
 
         html.find(".item-piles-add-currency").click(() => {
             this.addCurrency()
         });
 
-        html.find(".item-piles-accept-button").click(() => {
-            itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, this.users, this.privateTradeId, game.user.id, !this.leftTraderAccepted);
-            itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_STATE, this.publicTradeId, game.user.id, !this.leftTraderAccepted);
+        html.find(".item-piles-gm-add-currency").click(() => {
+            this.addCurrency(true)
+        });
+
+        html.find(".item-piles-accept-button").click(function(){
+            itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, [self.leftTraderUser.id, self.rightTraderUser.id], self.privateTradeId, game.user.id, !self.leftTraderAccepted);
+            itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_STATE, self.publicTradeId, game.user.id, !self.leftTraderAccepted);
         });
 
     }
 
     resetInputs(){
+        this.editingInput = false;
         this.element.find(".item-piles-confirm-quantity").each(function(){
             const parent = $(this).closest(".item-piles-item-row");
             $(this).hide();
@@ -336,7 +367,7 @@ export class TradingApp extends FormApplication {
         if(!quantity){
             this.leftTraderActorItems.splice(this.leftTraderActorItems.indexOf(item), 1);
         }
-        await itemPileSocket.executeForusers(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, this.users, this.privateTradeId, game.user.id, this.leftTraderActorItems);
+        await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorItems);
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
     }
 
@@ -344,21 +375,32 @@ export class TradingApp extends FormApplication {
         const currency = this.leftTraderActorCurrencies.find(currency => currency.path === currencyPath);
         currency.quantity = quantity;
         if(!quantity){
-            this.leftTraderActorCurrencies.splice(this.leftTraderActorCurrencies.indexOf(quantity), 1);
-            this.setPosition()
+            this.leftTraderActorCurrencies.splice(this.leftTraderActorCurrencies.indexOf(currency), 1);
         }
-        await itemPileSocket.executeForusers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, this.users, this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
+        await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
     }
 
     getData(options) {
         const data = super.getData(options);
 
+        data.isGM = this.leftTraderUser === game.user && game.user.isGM;
+
         data.leftActor = {
             name: this.leftTraderActor.name,
             img: this.leftTraderActor.img,
-            items: this.leftTraderActorItems,
-            currencies: this.leftTraderActorCurrencies,
+            items: foundry.utils.duplicate(this.leftTraderActorItems).map(item => {
+                if(this.editingInput === item.id){
+                    item.editing = true;
+                }
+                return item;
+            }),
+            currencies: foundry.utils.duplicate(this.leftTraderActorCurrencies).map(currency => {
+                if(this.editingInput === currency.path){
+                    currency.editing = true;
+                }
+                return currency;
+            }),
             hasItems: !!this.leftTraderActorItems.length,
             accepted: this.leftTraderAccepted
         };
@@ -401,6 +443,10 @@ export class TradingApp extends FormApplication {
             }
         }
         return super.close(options);
+    }
+
+    _updateObject(event, formData) {
+        return false;
     }
 
 

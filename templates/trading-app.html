@@ -67,7 +67,7 @@
 
                         <div style="flex:1;">
                             <span class="item-piles-text-right item-piles-quantity-text">{{item.quantity}}</span>
-                            <div style="flex-direction: row; display:none;" class="item-piles-quantity-container">
+                            <div style="flex-direction: row; {{#unless editing}}display:none;{{/unless}}" class="item-piles-quantity-container">
                                 <input class="item-piles-quantity" type="number" min="0" value="{{item.quantity}}" max="{{item.maxQuantity}}"/>
                             </div>
                         </div>
@@ -80,6 +80,11 @@
                 <div class="row item-piles-items-list item-piles-currency-list">
 
                     <div class="flexrow item-piles-top-divider">
+                        {{#if isGM}}
+                        <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-gm-add-currency"><i class="fas fa-plus"></i>
+                            {{localize "ITEM-PILES.Trade.GMAddCurrency"}}
+                        </a>
+                        {{/if}}
                         <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i>
                             {{localize "ITEM-PILES.Inspect.AddCurrency"}}
                         </a>
@@ -102,12 +107,12 @@
                         </div>
 
                         <div style="flex: 0 1 auto; margin: 0 5px;">
-                            <a class="item-piles-clickable-green item-piles-confirm-quantity"><i class="fas fa-check"></i></a>
+                            <a class="item-piles-clickable-green item-piles-confirm-quantity" style="{{#if editing}}display:block;{{/if}}"><i class="fas fa-check"></i></a>
                         </div>
 
                         <div style="flex:1;">
-                            <span class="item-piles-text-right item-piles-quantity-text">{{currency.quantity}}</span>
-                            <div style="flex-direction: row; display:none;" class="item-piles-quantity-container">
+                            <span class="item-piles-text-right item-piles-quantity-text" style="{{#if editing}}display:none;{{/if}}">{{currency.quantity}}</span>
+                            <div style="flex-direction: row; {{#unless editing}}display:none;{{/unless}}" class="item-piles-quantity-container">
                                 <input class="item-piles-quantity" type="number" min="0" value="{{currency.quantity}}" max="{{currency.maxQuantity}}"/>
                             </div>
                         </div>
@@ -119,10 +124,13 @@
 
             </div>
 
-            <button type="button" class="item-piles-accept-button" style="flex:0 1 auto;"><i class="fas fa-check"></i> Accept</button>
+            {{#if leftActor.accepted}}
+                <button type="button" class="item-piles-accept-button" style="flex:0 1 auto;"><i class="fas fa-times"></i> {{localize "Cancel"}}</button>
+            {{else}}
+                <button type="button" class="item-piles-accept-button" style="flex:0 1 auto;"><i class="fas fa-check"></i> {{localize "ITEM-PILES.Trade.Accept"}}</button>
+            {{/if}}
 
         </div>
-
 
 
         <div class="col flexcol">

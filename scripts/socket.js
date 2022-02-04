@@ -63,16 +63,15 @@ export const SOCKET_HANDLERS = {
         TRADE_UPDATE_ITEMS: "publicTradeUpdateItems",
         TRADE_UPDATE_CURRENCIES: "publicTradeUpdateCurrencies",
         TRADE_CLOSED: "publicTradeClosed",
+        TRADE_STATE: "publicTradeAcceptedState",
         TRADE_ACCEPTED: "publicTradeAccepted",
-        TRADE_STATE: "publicTradeAcceptedState"
     },
     PRIVATE:  {
         TRADE_UPDATE_ITEMS: "privateTradeUpdateItems",
         TRADE_UPDATE_CURRENCIES: "privateTradeUpdateCurrencies",
-        TRADE_ACCEPTED: "privateTradeAccepted",
         TRADE_STATE: "privateTradeAcceptedState",
-        TRADE_CONNECTION: "privateTradeAcceptedState",
     },
+    TRADE_COMPLETED: "tradeCompleted"
 };
 
 export let itemPileSocket;
@@ -145,10 +144,11 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, (...args) => {
         TradingApp._tradeClosed(...args);
         TradeAPI._tradeClosed(...args);
-    })
+    });
 
-    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_ACCEPTED, (...args) => TradingApp._tradeAccepted(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_ACCEPTED, (...args) => TradeAPI._tradeAccepted(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_ACCEPTED, (...args) => TradingApp._tradeAccepted(...args));
+
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_COMPLETED, (...args) => TradeAPI._tradeCompleted(...args));
 }
 
 async function callHook(inHookName, ...args) {
