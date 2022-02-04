@@ -368,14 +368,15 @@ export function getActorCurrencies(target, { currencyList = false, getAll = fals
     return currencies
         .filter(currency => {
             return hasProperty(targetActor.data, currency.path) && (Number(getProperty(targetActor.data, currency.path)) > 0 || getAll);
-        }).map(currency => {
+        }).map((currency, index) => {
             const localizedName = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
             const quantity = Number(getProperty(targetActor.data, currency.path) ?? 0);
             return {
                 name: localizedName,
                 path: currency.path,
                 img: currency.img,
-                quantity: quantity
+                quantity: quantity,
+                index: index
             }
         });
 }

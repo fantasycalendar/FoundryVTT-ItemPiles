@@ -1,13 +1,16 @@
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import * as lib from "./lib/lib.js";
 import { TradeRequestDialog, TradePromptDialog } from "./formapplications/trade-dialogs.js";
+import { TradingApp } from "./formapplications/trading-app.js";
 
 export class TradeAPI {
 
     static async promptUser(user = false){
 
+        // Grab all of the active users (not self)
         const users = game.users.filter(user => user.active && user !== game.user);
 
+        // No users!
         if(!users.length){
             return new Dialog({
                 title: game.i18n.localize("ITEM-PILES.Trade.Title"),
@@ -26,22 +29,28 @@ export class TradeAPI {
         }
 
         let userId;
-        let actorUuid;
+        let actor;
 
+        // Find actors you own
         const actors = game.actors.filter(actor => actor.isOwner);
+
+        // If you only own one actor, and the user was already preselected (through the right click menu in the actors list)
         if(actors.length === 1 && user){
             userId = user.id;
-            actorUuid = actors[0].uuid;
+            actor = actors[0];
         }else {
+            // If you have more than 1 owned actor, prompt to choose which one
             const result = await TradePromptDialog.show({ actors, users, user });
             if (!result) return;
             userId = result.userId;
-            actorUuid = result.actorUuid;
+            actor = result.actor;
         }
 
-        const actor = await fromUuid(actorUuid);
+        if(!actor) return false;
+
         const actorOwner = game.users.find(user => user.character === actor && user !== game.user);
         if(actorOwner){
+            // If you're not the only owner of the actor you chose, make sure you picked the correct one
             const doContinue = await Dialog.confirm({
                 title: game.i18n.localize("ITEM-PILES.Trade.Title"),
                 content: lib.dialogLayout({
@@ -56,53 +65,98 @@ export class TradeAPI {
             }
         }
 
-        if(!actorUuid) return false;
+        const privateTradeId = randomID();
+        const publicTradeId = randomID();
 
-        const tradeId = randomID();
-
-        const cancel = Dialog.prompt({
+        // Spawn a cancel dialog
+        const cancelDialog = new Dialog({
             title: game.i18n.localize("ITEM-PILES.Trade.Title"),
             content: `<p style="text-align: center">${game.i18n.format("ITEM-PILES.Trade.OngoingRequest.Content", { user_name: game.users.get(userId).name })}</p>`,
-            label: game.i18n.localize("ITEM-PILES.Trade.OngoingRequest.Label"),
-            callback: () => { return true },
-            options: {
-                top: 50,
-                width: 300
+            buttons: {
+                confirm: {
+                    icon: '<i class="fas fa-times"></i>',
+                    label: game.i18n.localize("ITEM-PILES.Trade.OngoingRequest.Label"),
+                    callback: () => {
+                        itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_REQUEST_CANCELLED, userId, game.user.id, privateTradeId);
+                    }
+                }
             }
-        });
+        }, {
+            top: 50,
+            width: 300
+        }).render(true);
 
-        let response = itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_PROMPT, userId, game.user.id, actorUuid, tradeId);
+        // Send out the request
+        return itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_REQUEST_PROMPT, userId, game.user.id, actor.uuid, privateTradeId, publicTradeId)
+            .then(async (data) => {
 
-        cancel.then((result) => {
-            if(!result) return;
-            response = null;
-            itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_CANCELLED, userId, game.user.id, tradeId);
-        })
+                if(data === "cancelled") return;
 
-        response.then(() => {
+                cancelDialog.close();
 
-            if(!response || !response.includes(tradeId)) return false;
+                // If they declined, show warning
+                if(!data || !data.fullPrivateTradeId.includes(privateTradeId)){
+                    return lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Declined"), true);
+                }
 
-            itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_ACCEPTED, userId, game.user.id, tradeId);
+                const traderActor = await fromUuid(data.actorUuid);
 
-        })
+                // Otherwise, open trade interface and spawn private trade instance
+                new TradingApp({ user: game.user, actor }, { user: game.users.get(userId), actor: traderActor }, data.fullPublicTradeId,  data.fullPrivateTradeId).render(true);
+                ongoingTrades[data.fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor }, { user: game.users.get(userId), actor: traderActor }, data.fullPublicTradeId, data.fullPrivateTradeId);
+
+            }).catch((err) => {
+                console.log(err);
+                // If the counterparty disconnected, show that and close dialog
+                lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true);
+                cancelDialog.close()
+            });
 
     }
 
-    static async _respondPrompt(tradingUserId, tradingActorUuid, tradeId){
+    static async _respondPrompt(tradingUserId, tradingActorUuid, privateTradeId, publicTradeId){
 
-        const fullTradeId = tradeId + randomID();
+        // If the user was previously muted, wait for a random amount of time and respond with false
+        if(mutedUsers.find(u => u === tradingUserId)){
+            await lib.wait(Math.random() * 10000);
+            return false;
+        }
+
+        // Complete the private and public trade IDs
+        const fullPrivateTradeId = privateTradeId + randomID();
+        const fullPublicTradeId = publicTradeId + randomID();
 
         const tradingUser = game.users.get(tradingUserId);
         const tradingActor = await fromUuid(tradingActorUuid);
 
-        await TradeRequestDialog.show({ tradeId, tradingUser, tradingActor });
+        // Make em pick an actor (if more than one) and accept/decline/mute
+        const result = await TradeRequestDialog.show({ tradeId: privateTradeId, tradingUser, tradingActor });
 
-        return fullTradeId;
+        if(!result) return false;
+
+        if(result === "cancelled"){
+            return "cancelled";
+        }
+
+        // If muted, add user to blacklist locally
+        if(result === "mute"){
+            mutedUsers.push(tradingUserId);
+            return false;
+        }
+
+        // Spawn trading app and new ongoing trade interface
+        new TradingApp({ user: game.user, actor: result }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId).render(true);
+        ongoingTrades[fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor: result }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId);
+
+        return {
+            fullPrivateTradeId,
+            fullPublicTradeId,
+            actorUuid: result.uuid
+        };
 
     }
 
-    static async _tradeCancelled(userId, tradeId){
+    static async _tradeCancelled(userId, privateTradeId){
 
         Dialog.prompt({
             title: game.i18n.localize("ITEM-PILES.Trade.Title"),
@@ -115,7 +169,122 @@ export class TradeAPI {
             }
         });
 
-        return TradeRequestDialog.cancel(tradeId);
+        return TradeRequestDialog.cancel(privateTradeId);
+
+    }
+
+    static async _updateItems(privateTradeId, userId, items){
+        if(!ongoingTrades[privateTradeId]) return;
+        return ongoingTrades[privateTradeId].updateItems(userId, items);
+    }
+
+    static async _updateCurrencies(privateTradeId, userId, items){
+        if(!ongoingTrades[privateTradeId]) return;
+        return ongoingTrades[privateTradeId].updateCurrencies(userId, items);
+    }
+
+    static async _setAcceptedState(privateTradeId, userId, status){
+        if(!ongoingTrades[privateTradeId]) return;
+        return ongoingTrades[privateTradeId].setAcceptedState(userId, status);
+    }
+
+    static async _tradeAccepted(privateTradeId){
+        if(!ongoingTrades[privateTradeId]) return;
+        return ongoingTrades[privateTradeId].execute();
+    }
+
+    static async _tradeClosed(privateTradeId){
+        if(!ongoingTrades[privateTradeId]) return;
+        return ongoingTrades[privateTradeId].tradeClosed();
+    }
+
+}
+
+const mutedUsers = [];
+const ongoingTrades = {};
+
+class OngoingTrade{
+
+    constructor(self, rightTrader, publicTradeId, privateTradeId) {
+
+        this.actor = self.actor;
+        this.user = self.user;
+        this.actorItems = [];
+        this.actorCurrencies = [];
+        this.accepted = false;
+
+        this.traderActor = rightTrader.actor;
+        this.traderUser = rightTrader.user;
+        this.traderActorItems = [];
+        this.traderActorCurrencies = [];
+        this.traderAccepted = false;
+
+        this.privateTradeId = privateTradeId;
+        this.publicTradeId = publicTradeId;
+
+        this.setupConnection();
+
+    }
+
+    async setupConnection(){
+        this.connectionInterval = setInterval(() => {
+            const user = game.users.find(u => u === this.traderUser);
+            if(!user.active){
+                this.tradeClosed();
+            }
+        }, 100)
+    }
+
+    async tradeClosed(){
+        clearInterval(this.connectionInterval);
+        delete ongoingTrades[this.privateTradeId];
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, this.publicTradeId, this.traderUser.id);
+    }
+
+    updateItems(userId, newItems){
+        this.accepted = false;
+        this.traderAccepted = false;
+        if(userId === this.user.id){
+            this.actorItems = newItems;
+        }else if(userId === this.traderUser.id){
+            this.traderActorItems = newItems;
+        }
+    }
+
+    updateCurrencies(userId, newItems){
+        console.log("updated currencies")
+        this.accepted = false;
+        this.traderAccepted = false;
+        if(userId === this.user.id){
+            this.actorCurrencies = newItems;
+        }else if(userId === this.traderUser.id){
+            this.traderActorCurrencies = newItems;
+        }
+    }
+
+    setAcceptedState(userId, status){
+        if(userId === this.user.id){
+            this.accepted = status;
+        }else if(userId === this.traderUser.id){
+            this.traderAccepted = status;
+        }
+        if (this.accepted && this.traderAccepted) {
+            setTimeout(() => {
+                if (this.accepted && this.traderAccepted) {
+                    itemPileSocket.executeAsUser(SOCKET_HANDLERS.PRIVATE.TRADE_ACCEPTED, this.traderUser.id, this.privateTradeId);
+                    itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_ACCEPTED, this.publicTradeId);
+                }
+            }, 2000);
+        }
+    }
+
+    async execute(){
+        delete ongoingTrades[this.privateTradeId];
+
+        /*await API.transferItems(this.actor, this.traderActor, this.actorItems);
+        await API.transferAttributes(this.actor, this.traderActor, this.actorCurrencies);*/
+
+        return true;
 
     }
 

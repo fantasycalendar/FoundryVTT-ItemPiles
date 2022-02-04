@@ -120,9 +120,10 @@ export class TradePromptDialog extends FormApplication {
     }
 
     async _updateObject(event, formData) {
+        const actor = await fromUuid(formData?.actor || this.actor.uuid);
         return this.resolve({
             userId: formData.user,
-            actorUuid: formData?.actor || this.actor.uuid
+            actor: actor
         });
     }
 
@@ -142,6 +143,13 @@ export class TradeRequestDialog extends TradePromptDialog {
         this.tradingActor = tradingActor;
         this.progressbarTimeout = false
         this.timeout = false;
+        this.interval = setInterval(() => {
+            const user = game.users.get(this.tradingUser.id)
+            if(!user.active){
+                lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true)
+                this.close();
+            }
+        }, 100)
     }
 
     static show({ tradeId, tradingUser, tradingActor }={}){
@@ -153,8 +161,7 @@ export class TradeRequestDialog extends TradePromptDialog {
     static cancel(tradeId){
         for(const app of Object.values(ui.windows)){
             if(app instanceof TradeRequestDialog && app.tradeId === tradeId){
-                app.close();
-                return app;
+                return app.close({ type: "cancelled" });
             }
         }
         return false;
@@ -203,26 +210,28 @@ export class TradeRequestDialog extends TradePromptDialog {
 
     async _updateObject(event, formData) {
 
+        clearInterval(this.interval);
         if(this.progressbarTimeout) clearTimeout(this.progressbarTimeout);
         if(this.timeout) clearTimeout(this.timeout);
 
         if(event.submitter.value === "accept"){
-            return this.resolve({
-                actorUuid: formData?.actor || this.actor.uuid
-            })
+            const actor = await fromUuid(formData?.actor || this.actor.uuid);
+            return this.resolve(actor)
         }
 
         if(event.submitter.value === "mute"){
-            return this.resolve(false);
+            return this.resolve("mute");
         }
 
         return this.resolve(false);
     }
 
-    async close(...args) {
-        super.close(...args);
+    async close(options) {
+        clearInterval(this.interval);
         if(this.progressbarTimeout) clearTimeout(this.progressbarTimeout);
         if(this.timeout) clearTimeout(this.timeout);
+        this.resolve(options?.type);
+        return super.close(options);
     }
 
 }

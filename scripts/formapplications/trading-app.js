@@ -2,17 +2,29 @@ import CONSTANTS from "../constants.js";
 import * as lib from "../lib/lib.js";
 import { hotkeyState } from "../hotkeys.js";
 import DropCurrencyDialog from "./drop-currency-dialog.js";
+import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
 
 export class TradingApp extends FormApplication {
 
-    constructor(options) {
+    constructor(leftTrader, rightTrader, publicTradeId, privateTradeId = false) {
         super();
-        this.actor = options.actor;
-        this.trader = options.trader;
-        this.traderUserID = options.traderUserID;
 
-        this.actorItems = [];
-        this.actorCurrencies = [];
+        this.leftTraderActor = leftTrader.actor;
+        this.leftTraderUser = leftTrader.user;
+        this.leftTraderActorItems = [];
+        this.leftTraderActorCurrencies = [];
+        this.leftTraderAccepted = false;
+
+        this.rightTraderActor = rightTrader.actor;
+        this.rightTraderUser = rightTrader.user;
+        this.rightTraderActorItems = [];
+        this.rightTraderActorCurrencies = [];
+        this.rightTraderAccepted = false;
+
+        this.users = [this.leftTraderUser.id, this.rightTraderUser.id];
+
+        this.publicTradeId = publicTradeId;
+        this.privateTradeId = privateTradeId;
     }
 
 
@@ -27,30 +39,59 @@ export class TradingApp extends FormApplication {
         });
     }
 
+    static getAppByPublicTradeId(publicTradeId){
+        for(const app of Object.values(ui.windows)){
+            if(app instanceof TradingApp && app?.publicTradeId === publicTradeId){
+                return app;
+            }
+        }
+        return false;
+    }
+
     get title(){
-        return `Trade between ${this.actor.name} and ${this.trader.name}`
+        return `Trade between ${this.leftTraderActor.name} and ${this.rightTraderActor.name}`
     }
 
     async _onDrop(event) {
 
+        if(game.user !== this.leftTraderUser) return;
+
         super._onDrop(event);
 
-        let dropData;
+        let data;
         try {
-            dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+            data = JSON.parse(event.dataTransfer.getData('text/plain'));
         } catch (err) {
             return false;
         }
 
-        if (dropData.type !== "Item") return;
+        if (data.type !== "Item") return;
 
-        const itemData = dropData.data;
-
-        if (!dropData.actorId && !game.user.isGM) {
-            return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
+        if (!data.actorId) {
+            if (!game.user.isGM) return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
         }
 
-        const disallowedType = lib.isItemInvalid(this.trader, itemData);
+        if(data.actorId && data.actorId !== this.leftTraderActor.id){
+            throw lib.custom_error(`You cannot drop items into the trade UI from a different actor than ${this.leftTraderActor.name}!`)
+        }
+
+        let itemData;
+        if(data.pack){
+            const uuid = `Compendium.${data.pack}.${data.id}`;
+            const item = await fromUuid(uuid);
+            itemData = item.toObject();
+        }else if(data.id){
+            itemData = game.items.get(data.id)?.toObject();
+        }else{
+            itemData = data.data;
+        }
+
+        if (!itemData) {
+            console.error(data);
+            throw lib.custom_error("Something went wrong when dropping this item!")
+        }
+
+        const disallowedType = lib.isItemInvalid(this.rightTraderActor, itemData);
         if (disallowedType) {
             if (!game.user.isGM) {
                 return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemTrade", { type: disallowedType }), true)
@@ -67,16 +108,145 @@ export class TradingApp extends FormApplication {
             }
         }
 
-        this.actorItems.push({
-            id: itemData._id,
-            name: itemData.name,
-            img: itemData?.img ?? "",
-            quantity: 1,
-            maxQuantity: lib.getItemQuantity(itemData)
+        return this.addItem(itemData, !!data.actorId);
+
+    }
+
+    async addItem(newItem, limitQuantity = true){
+
+        const item = lib.findSimilarItem(this.leftTraderActorItems, newItem)
+
+        if(!item){
+            this.leftTraderActorItems.push({
+                id: newItem._id,
+                name: newItem.name,
+                img: newItem?.img ?? "",
+                quantity: 1,
+                maxQuantity: limitQuantity ? lib.getItemQuantity(newItem) : Infinity,
+                data: newItem
+            })
+        }else{
+            if(item.quantity >= lib.getItemQuantity(newItem)) return;
+            item.quantity += Math.min(item.quantity+1, lib.getItemQuantity(newItem));
+        }
+
+        await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, this.users, this.privateTradeId, game.user.id, this.leftTraderActorItems);
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
+
+    }
+
+    static _updateItems(publicTradeId, userId, itemData){
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if(app){
+            return app.updateItems(userId, itemData);
+        }
+        return false;
+    }
+
+    updateItems(userId, inItems){
+        if(userId === this.leftTraderUser.id){
+            this.leftTraderActorItems = inItems;
+        }else if(userId === this.rightTraderUser.id){
+            this.rightTraderActorItems = inItems;
+        }
+        this.leftTraderAccepted = false;
+        this.rightTraderAccepted = false;
+        this.render(true);
+    }
+
+    async addCurrency(){
+
+        const currencyToAdd = await DropCurrencyDialog.query({
+            dropper: this.leftTraderActor,
+            target: this.rightTraderActor,
+            existingCurrencies: this.leftTraderActorCurrencies,
+            title: game.i18n.localize("ITEM-PILES.Trade.AddCurrency.Title"),
+            content: game.i18n.format("ITEM-PILES.Trade.AddCurrency.Content", { trader_actor_name: this.rightTraderActor.name }),
+            button: game.i18n.localize("ITEM-PILES.Trade.AddCurrency.Label")
+        });
+        if(!currencyToAdd) return;
+
+        const currencies = lib.getActorCurrencies(this.leftTraderActor);
+
+        Object.entries(currencyToAdd).forEach(entry => {
+
+            const existingCurrency = this.leftTraderActorCurrencies.find(currency => currency.path === entry[0]);
+
+            if(existingCurrency){
+                existingCurrency.quantity = entry[1];
+                return;
+            }
+
+            const currency = currencies.find(currency => currency.path === entry[0]);
+
+            this.leftTraderActorCurrencies.push({
+                path: entry[0],
+                quantity: entry[1],
+                name: currency.name,
+                img: currency.img,
+                maxQuantity: currency.quantity,
+                index: currency.index
+            });
+
         });
 
-        this.render(true);
+        this.leftTraderActorCurrencies.sort((a, b) => a.index - b.index);
 
+        await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.users, this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
+
+    }
+
+    static _updateCurrencies(publicTradeId, userId, currencyData){
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if(app){
+            return app.updateCurrencies(userId, currencyData);
+        }
+        return false;
+    }
+
+    updateCurrencies(userId, inCurrencies){
+        if(userId === this.leftTraderUser.id){
+            this.leftTraderActorCurrencies = inCurrencies;
+        }else if(userId === this.rightTraderUser.id){
+            this.rightTraderActorCurrencies = inCurrencies;
+        }
+        this.leftTraderAccepted = false;
+        this.rightTraderAccepted = false;
+        this.render(true);
+    }
+
+    static _setAcceptedState(publicTradeId, userId, state){
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if(app){
+            return app.setAcceptedState(userId, state);
+        }
+        return false;
+    }
+
+    setAcceptedState(userId, state){
+        if(userId === this.leftTraderUser.id){
+            this.leftTraderAccepted = state;
+        }else if(userId === this.rightTraderUser.id){
+            this.rightTraderAccepted = state;
+        }
+        this.render(true);
+    }
+
+    static _tradeAccepted(publicTradeId){
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if(app){
+            return app.close({ accepted: true });
+        }
+        return false;
+    }
+
+    static _tradeClosed(publicTradeId, userId){
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if(app){
+            return app.close({ userId });
+        }
+        return false;
     }
 
     activateListeners(html) {
@@ -91,11 +261,11 @@ export class TradingApp extends FormApplication {
             const value = Number($(this).val());
             if(parent.attr('data-type') === "item") {
                 const itemId = parent.attr("data-item");
-                const item = self.actorItems.find(item => item.id === itemId);
+                const item = self.leftTraderActorItems.find(item => item.id === itemId);
                 quantity = Math.min(value, item.maxQuantity);
             }else{
                 const currencyPath = parent.attr("data-currency");
-                const currency = self.actorCurrencies.find(currency => currency.path === currencyPath);
+                const currency = self.leftTraderActorCurrencies.find(currency => currency.path === currencyPath);
                 quantity = Math.min(value, currency.maxQuantity);
             }
 
@@ -140,7 +310,12 @@ export class TradingApp extends FormApplication {
 
         html.find(".item-piles-add-currency").click(() => {
             this.addCurrency()
-        })
+        });
+
+        html.find(".item-piles-accept-button").click(() => {
+            itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, this.users, this.privateTradeId, game.user.id, !this.leftTraderAccepted);
+            itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_STATE, this.publicTradeId, game.user.id, !this.leftTraderAccepted);
+        });
 
     }
 
@@ -155,76 +330,77 @@ export class TradingApp extends FormApplication {
         });
     }
 
-    setItemQuantity(itemId, quantity){
-        const item = this.actorItems.find(item => item.id === itemId);
+    async setItemQuantity(itemId, quantity){
+        const item = this.leftTraderActorItems.find(item => item.id === itemId);
         item.quantity = quantity;
         if(!quantity){
-            this.actorItems.splice(this.actorItems.indexOf(item), 1);
+            this.leftTraderActorItems.splice(this.leftTraderActorItems.indexOf(item), 1);
         }
+        await itemPileSocket.executeForusers(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, this.users, this.privateTradeId, game.user.id, this.leftTraderActorItems);
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
     }
 
-    setCurrencyQuantity(currencyPath, quantity){
-        const currency = this.actorCurrencies.find(currency => currency.path === currencyPath);
+    async setCurrencyQuantity(currencyPath, quantity){
+        const currency = this.leftTraderActorCurrencies.find(currency => currency.path === currencyPath);
         currency.quantity = quantity;
         if(!quantity){
-            this.actorCurrencies.splice(this.actorCurrencies.indexOf(quantity), 1);
+            this.leftTraderActorCurrencies.splice(this.leftTraderActorCurrencies.indexOf(quantity), 1);
             this.setPosition()
         }
-    }
-
-    async addCurrency(){
-        const currencyToAdd = await DropCurrencyDialog.query({
-            dropper: this.actor,
-            itemPile: this.trader
-        });
-        if(!currencyToAdd) return;
-
-        const currencies = lib.getActorCurrencies(this.actor);
-
-        Object.entries(currencyToAdd).forEach(entry => {
-
-            const existingCurrency = this.actorCurrencies.find(currency => currency.path === entry[0]);
-
-            if(existingCurrency){
-                existingCurrency.quantity = entry[1];
-                return;
-            }
-
-            const currency = currencies.find(currency => currency.path === entry[0]);
-
-            this.actorCurrencies.push({
-                path: entry[0],
-                quantity: entry[1],
-                name: currency.name,
-                img: currency.img,
-                maxQuantity: currency.quantity
-            });
-
-        });
-
-        this.render(true);
+        await itemPileSocket.executeForusers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, this.users, this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
     }
 
     getData(options) {
         const data = super.getData(options);
 
-        data.actor = {
-            name: this.actor.name,
-            img: this.actor.img,
-            items: this.actorItems,
-            currencies: this.actorCurrencies
+        data.leftActor = {
+            name: this.leftTraderActor.name,
+            img: this.leftTraderActor.img,
+            items: this.leftTraderActorItems,
+            currencies: this.leftTraderActorCurrencies,
+            hasItems: !!this.leftTraderActorItems.length,
+            accepted: this.leftTraderAccepted
         };
 
-        data.actor.hasItems = !!data.actor.items.length;
+        data.leftActor.hasItems = !!data.leftActor.items.length;
 
-        data.trader = {
-            name: this.trader.name,
-            img: this.trader.img,
-            items: [],
-            currencies: []
+        data.rightActor = {
+            name: this.rightTraderActor.name,
+            img: this.rightTraderActor.img,
+            items: this.rightTraderActorItems,
+            currencies: this.rightTraderActorCurrencies,
+            hasItems: !!this.rightTraderActorItems.length,
+            accepted: this.rightTraderAccepted
         };
 
         return data;
+    }
+
+    async close(options){
+        if(!options?.accepted){
+            if(!options?.userId && (this.leftTraderUser.id === game.user.id || this.rightTraderUser.id === game.user.id)) {
+                itemPileSocket.executeForOthers(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, this.publicTradeId, game.user.id);
+                Dialog.prompt({
+                    title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
+                    content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Trade.Closed.You") }),
+                    callback: () => {},
+                    rejectClose: false
+                })
+            }else{
+                if(this.leftTraderUser.id === game.user.id && options?.userId === this.rightTraderUser.id){
+                    Dialog.prompt({
+                        title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
+                        content: lib.dialogLayout({ message: game.i18n.format("ITEM-PILES.Trade.Closed.Them", { user_name: this.rightTraderUser.name }) }),
+                        callback: () => {},
+                        rejectClose: false
+                    })
+                }else{
+                    lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Closed.Sometime"), true)
+                }
+            }
+        }
+        return super.close(options);
     }
 
 

@@ -4,6 +4,7 @@ import API from "./api.js";
 import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
 import chatHandler from "./chathandler.js";
 import { TradeAPI } from "./trade-api.js";
+import { TradingApp } from "./formapplications/trading-app.js";
 
 export const SOCKET_HANDLERS = {
     /**
@@ -55,9 +56,23 @@ export const SOCKET_HANDLERS = {
     /**
      * Trading sockets
      */
-    TRADE_PROMPT: "tradePrompt",
-    TRADE_ACCEPTED: "tradeAccepted",
-    TRADE_CANCELLED: "tradeCancelled",
+    TRADE_REQUEST_PROMPT: "tradePrompt",
+    TRADE_REQUEST_CANCELLED: "tradeCancelled",
+    TRADE_PREVIEW: "tradePreview",
+    PUBLIC: {
+        TRADE_UPDATE_ITEMS: "publicTradeUpdateItems",
+        TRADE_UPDATE_CURRENCIES: "publicTradeUpdateCurrencies",
+        TRADE_CLOSED: "publicTradeClosed",
+        TRADE_ACCEPTED: "publicTradeAccepted",
+        TRADE_STATE: "publicTradeAcceptedState"
+    },
+    PRIVATE:  {
+        TRADE_UPDATE_ITEMS: "privateTradeUpdateItems",
+        TRADE_UPDATE_CURRENCIES: "privateTradeUpdateCurrencies",
+        TRADE_ACCEPTED: "privateTradeAccepted",
+        TRADE_STATE: "privateTradeAcceptedState",
+        TRADE_CONNECTION: "privateTradeAcceptedState",
+    },
 };
 
 export let itemPileSocket;
@@ -115,8 +130,25 @@ export function registerSocket() {
     /**
      * Trading sockets
      */
-    itemPileSocket.register(SOCKET_HANDLERS.TRADE_PROMPT, (...args) => TradeAPI._respondPrompt(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.TRADE_CANCELLED, (...args) => TradeAPI._tradeCancelled(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_REQUEST_PROMPT, (...args) => TradeAPI._respondPrompt(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_REQUEST_CANCELLED, (...args) => TradeAPI._tradeCancelled(...args))
+
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, (...args) => TradingApp._updateItems(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, (...args) => TradingApp._updateCurrencies(...args));
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_STATE, (...args) => TradingApp._setAcceptedState(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, (...args) => TradingApp._tradeClosed(...args))
+
+    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, (...args) => TradeAPI._updateItems(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, (...args) => TradeAPI._updateCurrencies(...args));
+    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, (...args) => TradeAPI._setAcceptedState(...args))
+
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, (...args) => {
+        TradingApp._tradeClosed(...args);
+        TradeAPI._tradeClosed(...args);
+    })
+
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_ACCEPTED, (...args) => TradingApp._tradeAccepted(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_ACCEPTED, (...args) => TradeAPI._tradeAccepted(...args))
 }
 
 async function callHook(inHookName, ...args) {
