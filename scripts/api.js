@@ -2293,38 +2293,43 @@ export default class API {
             return lib.tokens_close_enough(pileToken, token, maxDistance) || game.user.isGM;
         });
 
-        if (!validTokens.length && !game.user.isGM) {
-            lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
-            return;
-        }
+        let interactingActor;
+        if(maxDistance !== Infinity){
 
-        let interactingToken;
-        if(validTokens.length) {
-            if (validTokens.includes(_token)) {
-                interactingToken = _token.document;
-            } else {
-                validTokens.sort((potentialTargetA, potentialTargetB) => {
-                    return lib.grids_between_tokens(pileToken, potentialTargetA) - lib.grids_between_tokens(pileToken, potentialTargetB);
-                })
-                interactingToken = validTokens[0].document;
+            if (!validTokens.length && !game.user.isGM) {
+                lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
+                return;
             }
+
+            if(validTokens.length) {
+                if (validTokens.includes(_token)) {
+                    interactingActor = _token.actor;
+                } else {
+                    validTokens.sort((potentialTargetA, potentialTargetB) => {
+                        return lib.grids_between_tokens(pileToken, potentialTargetA) - lib.grids_between_tokens(pileToken, potentialTargetB);
+                    })
+                    interactingActor = validTokens[0].actor;
+                }
+            }
+        }else if(game.user.character){
+            interactingActor = game.user.character;
         }
 
-        if (data.isContainer && interactingToken) {
+        if (data.isContainer && interactingActor) {
 
             if (data.locked && !game.user.isGM) {
                 lib.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
-                return API.rattleItemPile(pileDocument, interactingToken);
+                return API.rattleItemPile(pileDocument, interactingActor);
             }
 
             if (data.closed) {
                 lib.debug(`Opened item pile with UUID ${pileDocument.uuid}`);
-                await API.openItemPile(pileDocument, interactingToken);
+                await API.openItemPile(pileDocument, interactingActor);
             }
 
         }
 
-        return ItemPileInventory.show(pileDocument, interactingToken);
+        return ItemPileInventory.show(pileDocument, interactingActor);
 
     }
 

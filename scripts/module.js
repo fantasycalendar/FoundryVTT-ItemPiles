@@ -58,8 +58,7 @@ Hooks.once("init", async () => {
     }
 
     window.ItemPiles = {
-        API,
-        TradingHandler: TradeAPI
+        API
     }
 
 });

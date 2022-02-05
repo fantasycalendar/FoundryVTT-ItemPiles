@@ -399,6 +399,7 @@ export class ItemPileInventory extends FormApplication {
             const innerHTML = element.html();
             element.removeClass(".item-piles-change-actor")
                 .replaceWith($('<span>' + innerHTML + '</span>'));
+            html.find('.item-piles-change-actor-select').remove();
         }
     }
 
