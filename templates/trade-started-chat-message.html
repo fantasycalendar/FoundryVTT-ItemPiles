@@ -1,0 +1,17 @@
+<div class="item-piles-chat-card" data-trade-id="{{publicTradeId}}">
+
+    <div class="item-piles-chat-card-title item-piles-bottom-divider">
+        <p>
+            <img src="{{party_1_actor.data.img}}" title="{{party_1_actor.name}}" height="32"/>
+            <i class="fas fa-handshake"></i> <img src="{{party_2_actor.data.img}}" title="{{party_2_actor.name}}" height="32"/>
+        </p>
+        <p style="margin:0;">{{ localize "ITEM-PILES.Chat.TradeStarted" party_1=party_1_actor.name party_2=party_2_actor.name}}</p>
+    </div>
+
+    <p>{{ localize "ITEM-PILES.Chat.TradeStartedButton" }}</p>
+
+    <button type="button" class="item-piles-specate-trade" data-trade-user="{{userId}}" data-trade-id="{{publicTradeId}}">
+        {{ localize "ITEM-PILES.Chat.TradeSpectate" }}
+    </button>
+
+</div>

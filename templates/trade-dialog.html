@@ -45,16 +45,21 @@
 
     <p style="margin-bottom: 1rem"><strong style="font-size:1.2rem;">
         {{#if isPrompt}}
-        {{localize "ITEM-PILES.Trade.Prompt.Title"}}
+            {{localize "ITEM-PILES.Trade.Prompt.Title"}}
         {{else}}
-        {{localize "ITEM-PILES.Trade.Request.Title"}}
+            {{localize "ITEM-PILES.Trade.Request.Title"}}
         {{/if}}
     </strong></p>
 
     {{#if isPrompt}}
-
-        <div class="item-piles-bottom-divider">{{{localize "ITEM-PILES.Trade.Prompt.Content" trading_user_name=tradingUser.name
-            trading_actor_name=tradingActor.name}}}</div>
+        <div class="item-piles-bottom-divider">
+            {{#if isPrivate}}
+                <p>{{{localize "ITEM-PILES.Trade.Prompt.PrivateContent" trading_user_name=tradingUser.name trading_actor_name=tradingActor.name}}}</p>
+            {{else}}
+                <p>{{{localize "ITEM-PILES.Trade.Prompt.Content" trading_user_name=tradingUser.name trading_actor_name=tradingActor.name}}}</p>
+            {{/if}}
+            <p>{{localize "ITEM-PILES.Trade.Prompt.AcceptQuery"}}</p>
+        </div>
 
     {{else}}
 
@@ -70,6 +75,15 @@
                     {{/each}}
                 </select>
                 {{/select}}
+            </div>
+        </div>
+        <div class="item-piles-bottom-divider">
+            <div class="form-group" style="flex-direction: column;">
+                <label style="display:flex;">
+                    <input type="checkbox" name="private" class="item-piles-private-trade">
+                    <span>{{localize "ITEM-PILES.Trade.Private"}}</span>
+                </label>
+                <small>{{ localize "ITEM-PILES.Trade.PrivateExplanation"}}</small>
             </div>
         </div>
 

@@ -35,10 +35,13 @@ Hooks.once("init", async () => {
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
     Hooks.on("preCreateChatMessage", chatHandler._preCreateChatMessage.bind(chatHandler));
+    Hooks.on("renderChatMessage", chatHandler._renderChatMessage.bind(chatHandler));
     Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
     Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferCurrency.bind(chatHandler));
     Hooks.on(HOOKS.TRANSFER_EVERYTHING, chatHandler._outputTransferEverything.bind(chatHandler));
     Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, chatHandler._outputSplitItemPileInventory.bind(chatHandler));
+    Hooks.on(HOOKS.TRADE.STARTED, chatHandler._outputTradeStarted.bind(chatHandler));
+    Hooks.on(HOOKS.TRADE.COMPLETE, chatHandler._outputTradeComplete.bind(chatHandler));
 
     if (game.settings.get(CONSTANTS.MODULE_NAME, "debugHooks")) {
         for (let hook of Object.values(HOOKS)) {

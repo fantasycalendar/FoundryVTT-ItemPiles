@@ -58,7 +58,7 @@ export const SOCKET_HANDLERS = {
      */
     TRADE_REQUEST_PROMPT: "tradePrompt",
     TRADE_REQUEST_CANCELLED: "tradeCancelled",
-    TRADE_PREVIEW: "tradePreview",
+    TRADE_SPECTATE: "tradeSpectate",
     PUBLIC: {
         TRADE_UPDATE_ITEMS: "publicTradeUpdateItems",
         TRADE_UPDATE_CURRENCIES: "publicTradeUpdateCurrencies",
@@ -146,9 +146,12 @@ export function registerSocket() {
         TradeAPI._tradeClosed(...args);
     });
 
-    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_ACCEPTED, (...args) => TradingApp._tradeAccepted(...args));
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_COMPLETED, (...args) => {
+        TradingApp._tradeCompleted(...args)
+        TradeAPI._tradeCompleted(...args)
+    });
 
-    itemPileSocket.register(SOCKET_HANDLERS.TRADE_COMPLETED, (...args) => TradeAPI._tradeCompleted(...args));
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_SPECTATE, (...args) => TradeAPI._spectateTrade(...args));
 }
 
 async function callHook(inHookName, ...args) {

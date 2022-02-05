@@ -37,6 +37,9 @@
             "Mute": "Mute",
             "AutoDecline": "You did not respond to the trade request quickly enough, so it was auto-declined.",
             "Declined": "The other user declined the trade request.",
+            "Private": "Make this trade private",
+            "PrivateExplanation": "No chat card are posted, and no one can spectate",
+            "Over": "This trade is no longer active.",
 
             "Request": {
                 "Title": "Item Piles: Send Trade Request",
@@ -55,7 +58,9 @@
 
             "Prompt": {
                 "Title": "Item Piles: Trade Request",
-                "Content": "<p>{trading_actor_name} (user {trading_user_name}) wants to trade with you.</p><p>Do you accept?</p>"
+                "Content": "{trading_actor_name} (user {trading_user_name}) wants to trade with you.",
+                "PrivateContent": "{trading_actor_name} (user {trading_user_name}) wants to <strong>privately</strong> trade with you.",
+                "AcceptQuery": "Do you accept?"
             },
 
             "OngoingRequest": {
@@ -255,7 +260,11 @@
 
         "Chat": {
             "Pickup": "{name} picked up the following items:",
-            "Split": "An item pile's content was split among {num_players} players, and each one has received:"
+            "Split": "An item pile's content was split among {num_players} players, and each one has received:",
+            "TradeComplete": "{party_1} and {party_2} completed a trade.",
+            "TradeStarted": "{party_1} and {party_2} started a trade.",
+            "TradeStartedButton": "Click the button below to spectate:",
+            "TradeSpectate": "Spectate Trade"
         },
 
         "Setting": {

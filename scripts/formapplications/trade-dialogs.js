@@ -123,7 +123,8 @@ export class TradePromptDialog extends FormApplication {
         const actor = await fromUuid(formData?.actor || this.actor.uuid);
         return this.resolve({
             userId: formData.user,
-            actor: actor
+            actor: actor,
+            private: formData.private
         });
     }
 
@@ -136,13 +137,15 @@ export class TradePromptDialog extends FormApplication {
 
 export class TradeRequestDialog extends TradePromptDialog {
 
-    constructor(resolve, { tradeId, tradingUser, tradingActor }={}) {
+    constructor(resolve, { tradeId, tradingUser, tradingActor, isPrivate }={}) {
         super(resolve);
         this.tradeId = tradeId;
         this.tradingUser = tradingUser;
         this.tradingActor = tradingActor;
+        this.isPrivate = isPrivate;
         this.progressbarTimeout = false
         this.timeout = false;
+        this._hasClosed = false;
         this.interval = setInterval(() => {
             const user = game.users.get(this.tradingUser.id)
             if(!user.active){
@@ -152,9 +155,9 @@ export class TradeRequestDialog extends TradePromptDialog {
         }, 100)
     }
 
-    static show({ tradeId, tradingUser, tradingActor }={}){
+    static show({ tradeId, tradingUser, tradingActor, isPrivate }={}){
         return new Promise(resolve => {
-            new TradeRequestDialog(resolve, { tradeId, tradingUser, tradingActor }).render(true);
+            new TradeRequestDialog(resolve, { tradeId, tradingUser, tradingActor, isPrivate }).render(true);
         })
     }
 
@@ -174,6 +177,7 @@ export class TradeRequestDialog extends TradePromptDialog {
         const progressBar = html.find(".progress-bar");
         progressBarContainer.hide();
         this.progressbarTimeout = setTimeout(() => {
+            if(this._hasClosed) return;
             progressBarContainer.fadeIn(1000)
             progressBar.css("transition", 'width 20s linear')
             progressBar.css("width", "100%")
@@ -181,6 +185,7 @@ export class TradeRequestDialog extends TradePromptDialog {
         }, 14000);
 
         this.timeout = setTimeout(() => {
+            if(this._hasClosed) return;
             lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.AutoDecline"), true)
             html.find('button[name="decline"]').click();
         }, 35000)
@@ -192,6 +197,7 @@ export class TradeRequestDialog extends TradePromptDialog {
         data.isPrompt = true;
         data.tradingUser = this.tradingUser;
         data.tradingActor = this.tradingActor;
+        data.isPrivate = this.isPrivate;
         data.buttons = [{
             value: "accept",
             icon: "fas fa-check",
@@ -209,10 +215,10 @@ export class TradeRequestDialog extends TradePromptDialog {
     }
 
     async _updateObject(event, formData) {
-
+        this._hasClosed = true;
         clearInterval(this.interval);
-        if(this.progressbarTimeout) clearTimeout(this.progressbarTimeout);
-        if(this.timeout) clearTimeout(this.timeout);
+        clearTimeout(this.progressbarTimeout);
+        clearTimeout(this.timeout);
 
         if(event.submitter.value === "accept"){
             const actor = await fromUuid(formData?.actor || this.actor.uuid);
@@ -227,9 +233,10 @@ export class TradeRequestDialog extends TradePromptDialog {
     }
 
     async close(options) {
+        this._hasClosed = true;
         clearInterval(this.interval);
-        if(this.progressbarTimeout) clearTimeout(this.progressbarTimeout);
-        if(this.timeout) clearTimeout(this.timeout);
+        clearTimeout(this.progressbarTimeout);
+        clearTimeout(this.timeout);
         this.resolve(options?.type);
         return super.close(options);
     }

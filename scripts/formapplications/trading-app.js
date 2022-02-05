@@ -11,21 +11,20 @@ export class TradingApp extends FormApplication {
 
         this.leftTraderActor = leftTrader.actor;
         this.leftTraderUser = leftTrader.user;
-        this.leftTraderActorItems = [];
-        this.leftTraderActorCurrencies = [];
-        this.leftTraderAccepted = false;
+        this.leftTraderActorItems = leftTrader.items ?? [];
+        this.leftTraderActorCurrencies = leftTrader.currencies ?? [];
+        this.leftTraderAccepted = leftTrader.accepted ?? false;
 
         this.rightTraderActor = rightTrader.actor;
         this.rightTraderUser = rightTrader.user;
-        this.rightTraderActorItems = [];
-        this.rightTraderActorCurrencies = [];
-        this.rightTraderAccepted = false;
+        this.rightTraderActorItems = rightTrader.items ?? [];
+        this.rightTraderActorCurrencies = rightTrader.currencies ?? [];
+        this.rightTraderAccepted = rightTrader.accepted ?? false;
 
         this.publicTradeId = publicTradeId;
         this.privateTradeId = privateTradeId;
 
         this.editingInput = false;
-        this.openCurrencyApp = false;
     }
 
 
@@ -33,7 +32,6 @@ export class TradingApp extends FormApplication {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["dialog", "item-piles-trading-sheet"],
-            template: `${CONSTANTS.PATH}templates/trading-app.html`,
             width: 800,
             height: "auto",
             dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-item-drop-container" }],
@@ -48,6 +46,12 @@ export class TradingApp extends FormApplication {
             }
         }
         return false;
+    }
+
+    get template(){
+        return this.leftTraderUser === game.user || this.rightTraderUser === game.user
+            ? `${CONSTANTS.PATH}templates/trading-app.html`
+            : `${CONSTANTS.PATH}templates/trading-app-spectate.html`;
     }
 
     get title(){
@@ -73,7 +77,7 @@ export class TradingApp extends FormApplication {
             if (!game.user.isGM) return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
         }
 
-        if(data.actorId && data.actorId !== this.leftTraderActor.id){
+        if(!game.user.isGM && data.actorId && data.actorId !== this.leftTraderActor.id){
             throw lib.custom_error(`You cannot drop items into the trade UI from a different actor than ${this.leftTraderActor.name}!`)
         }
 
@@ -238,7 +242,8 @@ export class TradingApp extends FormApplication {
         this.render(true);
     }
 
-    static _tradeAccepted(publicTradeId){
+    static _tradeCompleted(party_1, party_2, publicTradeId, isPrivate){
+        if(isPrivate) return;
         const app = TradingApp.getAppByPublicTradeId(publicTradeId);
         if(app){
             return app.close({ accepted: true });
@@ -422,7 +427,7 @@ export class TradingApp extends FormApplication {
     async close(options){
         if(!options?.accepted){
             if(!options?.userId && (this.leftTraderUser.id === game.user.id || this.rightTraderUser.id === game.user.id)) {
-                itemPileSocket.executeForOthers(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, this.publicTradeId, game.user.id);
+                itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, this.privateTradeId, game.user.id);
                 Dialog.prompt({
                     title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
                     content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Trade.Closed.You") }),
@@ -437,8 +442,6 @@ export class TradingApp extends FormApplication {
                         callback: () => {},
                         rejectClose: false
                     })
-                }else{
-                    lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Closed.Sometime"), true)
                 }
             }
         }

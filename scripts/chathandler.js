@@ -24,6 +24,12 @@ const chatHandler = {
 
     },
 
+    _renderChatMessage(app, html, data){
+        html.find(".item-piles-specate-trade").click(function(){
+            TradeAPI.spectateTrade($(this).data());
+        });
+    },
+
     /**
      * Outputs to chat based on transferring an item from or to an item pile
      *
@@ -119,6 +125,46 @@ const chatHandler = {
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.SPLIT_CHAT_MESSAGE, source.uuid, num_players, itemData, currencyData, userId);
     },
 
+    async _outputTradeStarted(party_1, party_2, publicTradeId, isPrivate){
+        if(party_1.user !== game.user.id || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off" || isPrivate) return;
+
+        let party_1_actor = await fromUuid(party_1.actor);
+        party_1_actor = party_1_actor?.actor ?? party_1_actor;
+
+        let party_2_actor = await fromUuid(party_2.actor);
+        party_2_actor = party_2_actor?.actor ?? party_2_actor;
+
+        return this._outputTradeStartedToChat(party_1_actor, party_2_actor, publicTradeId);
+    },
+
+    async _outputTradeComplete(party_1, party_2, publicTradeId, isPrivate){
+
+        if(!lib.isResponsibleGM() || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off" || isPrivate) return;
+
+        let party_1_actor = await fromUuid(party_1.actor);
+        party_1_actor = party_1_actor?.actor ?? party_1_actor;
+        const party_1_data = {
+            actor: party_1_actor,
+            items: party_2.items,
+            currencies: party_2.currencies
+        }
+        party_1_data.got_nothing = !party_1_data.items.length && !party_1_data.currencies.length;
+
+        let party_2_actor = await fromUuid(party_2.actor);
+        party_2_actor = party_2_actor?.actor ?? party_2_actor;
+        const party_2_data = {
+            actor: party_2_actor,
+            items: party_1.items,
+            currencies: party_1.currencies
+        }
+        party_2_data.got_nothing = !party_2_data.items.length && !party_2_data.currencies.length;
+
+        if(party_1_data.got_nothing && party_2_data.got_nothing) return;
+
+        return this._outputTradeCompleteToChat(party_1_data, party_2_data, publicTradeId);
+
+    },
+
     /**
      * Formats item data to a chat friendly structure
      *
@@ -199,7 +245,7 @@ const chatHandler = {
             currencies: currencies
         });
 
-        return this._createChatMessage(userId, {
+        return this._createNewChatMessage(userId, {
             user: game.user.id,
             type: CONST.CHAT_MESSAGE_TYPES.OTHER,
             content: chatCardHtml,
@@ -275,7 +321,7 @@ const chatHandler = {
             currencies: currencies
         });
 
-        return this._createChatMessage(userId, {
+        return this._createNewChatMessage(userId, {
             user: game.user.id,
             type: CONST.CHAT_MESSAGE_TYPES.OTHER,
             content: chatCardHtml,
@@ -285,7 +331,47 @@ const chatHandler = {
 
     },
 
-    _createChatMessage(userId, chatData){
+    async _outputTradeStartedToChat(party_1_actor, party_2_actor, publicTradeId){
+
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/trade-started-chat-message.html", {
+            party_1_actor,
+            party_2_actor,
+            publicTradeId,
+            userId: game.user.id
+        });
+
+        return this._createNewChatMessage(game.user.id, {
+            user: game.user.id,
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            content: chatCardHtml,
+            flavor: "Item Piles",
+            speaker: ChatMessage.getSpeaker({ alias: game.user.name })
+        });
+    },
+
+    async _outputTradeCompleteToChat(party_1, party_2, publicTradeId){
+
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/trade-complete-chat-message.html", {
+            party_1,
+            party_2,
+            publicTradeId
+        });
+
+        const message = Array.from(game.messages).find(message => {
+            return message.getFlag(CONSTANTS.MODULE_NAME, "publicTradeId") === publicTradeId;
+        })
+
+        return this._createNewChatMessage(game.user.id, {
+            user: game.user.id,
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            content: chatCardHtml,
+            flavor: "Item Piles",
+            speaker: ChatMessage.getSpeaker({ alias: game.user.name })
+        });
+
+    },
+
+    _createNewChatMessage(userId, chatData){
 
         const mode = game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat");
 
