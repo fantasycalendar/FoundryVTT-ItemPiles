@@ -161,7 +161,7 @@ export class TradeAPI {
 
         // Spawn trading app and new ongoing trade interface
         new TradingApp({ user: game.user, actor }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId).render(true);
-        ongoingTrades[fullPrivateTradeId] = new OngoingTrade({ user: tradingUser, actor: tradingActor }, { user: game.user, actor }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
+        ongoingTrades[fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
 
         return {
             fullPrivateTradeId,
@@ -199,12 +199,14 @@ export class TradeAPI {
         const user = game.users.get(tradeUser);
 
         if(!user.active){
+            itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
             return lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
         }
 
         const ongoingTrade = await itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_SPECTATE, tradeUser, tradeId);
 
         if(!ongoingTrade){
+            itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
             return lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
         }
 
@@ -324,15 +326,16 @@ class OngoingTrade{
     }
 
     userDisconnected(app, html, data){
+        console.log('here?', this.traderUser, data.users)
         if(!data.users.find(u => u === this.traderUser)){
             Hooks.off("renderPlayerList", this.userHook);
-            this.tradeClosed();
+            itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
+            itemPileSocket.executeForEveryone(SOCKET_HANDLERS.TRADE_CLOSED, this.publicTradeId, this.traderUser.id);
         }
     }
 
     async tradeClosed(){
         delete ongoingTrades[this.privateTradeId];
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, this.publicTradeId, this.traderUser.id);
     }
 
     updateItems(userId, newItems){

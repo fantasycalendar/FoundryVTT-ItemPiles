@@ -30,6 +30,20 @@ const chatHandler = {
         });
     },
 
+
+    _disableTradingButton(publicTradeId) {
+        const message = Array.from(game.messages).find(message => {
+            return message.getFlag(CONSTANTS.MODULE_NAME, "publicTradeId") === publicTradeId;
+        })
+        const html = $(message.data.content);
+        html.find(".item-piles-specate-trade")
+            .prop('disabled', true)
+            .text(game.i18n.localize("ITEM-PILES.Chat.SpectateDisabled"));
+        return message.update({
+            content: html.prop("outerHTML")
+        })
+    },
+
     /**
      * Outputs to chat based on transferring an item from or to an item pile
      *
@@ -159,7 +173,7 @@ const chatHandler = {
         }
         party_2_data.got_nothing = !party_2_data.items.length && !party_2_data.currencies.length;
 
-        if(party_1_data.got_nothing && party_2_data.got_nothing) return;
+        if(party_1.got_nothing && party_2.got_nothing) return;
 
         return this._outputTradeCompleteToChat(party_1_data, party_2_data, publicTradeId);
 
@@ -345,7 +359,8 @@ const chatHandler = {
             type: CONST.CHAT_MESSAGE_TYPES.OTHER,
             content: chatCardHtml,
             flavor: "Item Piles",
-            speaker: ChatMessage.getSpeaker({ alias: game.user.name })
+            speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
+            [`flags.${CONSTANTS.MODULE_NAME}.publicTradeId`]: publicTradeId
         });
     },
 
@@ -356,10 +371,6 @@ const chatHandler = {
             party_2,
             publicTradeId
         });
-
-        const message = Array.from(game.messages).find(message => {
-            return message.getFlag(CONSTANTS.MODULE_NAME, "publicTradeId") === publicTradeId;
-        })
 
         return this._createNewChatMessage(game.user.id, {
             user: game.user.id,

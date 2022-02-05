@@ -3,6 +3,7 @@ import * as lib from "../lib/lib.js";
 import { hotkeyState } from "../hotkeys.js";
 import DropCurrencyDialog from "./drop-currency-dialog.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
+import { TradeAPI } from "../trade-api.js";
 
 export class TradingApp extends FormApplication {
 
@@ -425,9 +426,12 @@ export class TradingApp extends FormApplication {
     }
 
     async close(options){
+        super.close(options);
         if(!options?.accepted){
             if(!options?.userId && (this.leftTraderUser.id === game.user.id || this.rightTraderUser.id === game.user.id)) {
-                itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, this.privateTradeId, game.user.id);
+                itemPileSocket.executeForOthers(SOCKET_HANDLERS.TRADE_CLOSED, this.publicTradeId, game.user.id);
+                itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
+                TradeAPI._tradeClosed(this.privateTradeId);
                 Dialog.prompt({
                     title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
                     content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Trade.Closed.You") }),
@@ -436,16 +440,18 @@ export class TradingApp extends FormApplication {
                 })
             }else{
                 if(this.leftTraderUser.id === game.user.id && options?.userId === this.rightTraderUser.id){
+                    TradeAPI._tradeClosed(this.privateTradeId);
                     Dialog.prompt({
                         title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
                         content: lib.dialogLayout({ message: game.i18n.format("ITEM-PILES.Trade.Closed.Them", { user_name: this.rightTraderUser.name }) }),
                         callback: () => {},
                         rejectClose: false
                     })
+                }else{
+                    lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Closed.Someone"), true);
                 }
             }
         }
-        return super.close(options);
     }
 
     _updateObject(event, formData) {

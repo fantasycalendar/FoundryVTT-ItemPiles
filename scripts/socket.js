@@ -17,6 +17,7 @@ export const SOCKET_HANDLERS = {
      */
     PICKUP_CHAT_MESSAGE: "pickupChatMessage",
     SPLIT_CHAT_MESSAGE: "splitChatMessage",
+    DISABLE_CHAT_TRADE_BUTTON: "disableChatTradeButton",
 
     /**
      * Item pile sockets
@@ -59,19 +60,18 @@ export const SOCKET_HANDLERS = {
     TRADE_REQUEST_PROMPT: "tradePrompt",
     TRADE_REQUEST_CANCELLED: "tradeCancelled",
     TRADE_SPECTATE: "tradeSpectate",
+    TRADE_CLOSED: "publicTradeClosed",
     PUBLIC: {
         TRADE_UPDATE_ITEMS: "publicTradeUpdateItems",
         TRADE_UPDATE_CURRENCIES: "publicTradeUpdateCurrencies",
-        TRADE_CLOSED: "publicTradeClosed",
         TRADE_STATE: "publicTradeAcceptedState",
-        TRADE_ACCEPTED: "publicTradeAccepted",
     },
     PRIVATE:  {
         TRADE_UPDATE_ITEMS: "privateTradeUpdateItems",
         TRADE_UPDATE_CURRENCIES: "privateTradeUpdateCurrencies",
         TRADE_STATE: "privateTradeAcceptedState",
     },
-    TRADE_COMPLETED: "tradeCompleted"
+    TRADE_COMPLETED: "tradeCompleted",
 };
 
 export let itemPileSocket;
@@ -129,29 +129,28 @@ export function registerSocket() {
     /**
      * Trading sockets
      */
-    itemPileSocket.register(SOCKET_HANDLERS.TRADE_REQUEST_PROMPT, (...args) => TradeAPI._respondPrompt(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.TRADE_REQUEST_CANCELLED, (...args) => TradeAPI._tradeCancelled(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_REQUEST_PROMPT, (...args) => TradeAPI._respondPrompt(...args));
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_REQUEST_CANCELLED, (...args) => TradeAPI._tradeCancelled(...args));
 
-    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, (...args) => TradingApp._updateItems(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, (...args) => TradingApp._updateItems(...args));
     itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, (...args) => TradingApp._updateCurrencies(...args));
-    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_STATE, (...args) => TradingApp._setAcceptedState(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, (...args) => TradingApp._tradeClosed(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_STATE, (...args) => TradingApp._setAcceptedState(...args));
 
-    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, (...args) => TradeAPI._updateItems(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, (...args) => TradeAPI._updateItems(...args));
     itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, (...args) => TradeAPI._updateCurrencies(...args));
-    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, (...args) => TradeAPI._setAcceptedState(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, (...args) => TradeAPI._setAcceptedState(...args));
 
-    itemPileSocket.register(SOCKET_HANDLERS.PUBLIC.TRADE_CLOSED, (...args) => {
-        TradingApp._tradeClosed(...args);
-        TradeAPI._tradeClosed(...args);
-    });
+    itemPileSocket.register(SOCKET_HANDLERS.TRADE_CLOSED, (...args) => TradingApp._tradeClosed(...args));
 
     itemPileSocket.register(SOCKET_HANDLERS.TRADE_COMPLETED, (...args) => {
         TradingApp._tradeCompleted(...args)
         TradeAPI._tradeCompleted(...args)
+        itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, args[2]);
     });
 
     itemPileSocket.register(SOCKET_HANDLERS.TRADE_SPECTATE, (...args) => TradeAPI._spectateTrade(...args));
+
+    itemPileSocket.register(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, (...args) => chatHandler._disableTradingButton(...args));
 }
 
 async function callHook(inHookName, ...args) {

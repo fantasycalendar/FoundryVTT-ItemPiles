@@ -1,4 +1,7 @@
 /* ----------------------- Generic ----------------------- */
+.item-piles-specate-trade:disabled {
+  background-color: rgba(0, 0, 0, 0.25);
+}
 .item-piles-progress {
   width: calc(100% - 4px);
   background: #e1e4e8;
