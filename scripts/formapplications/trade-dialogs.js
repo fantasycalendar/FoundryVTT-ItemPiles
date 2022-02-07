@@ -9,7 +9,7 @@ export class TradePromptDialog extends FormApplication {
         this.users = users || game.users.filter(user => user.active && user !== game.user);
         this.user = user || users?.[0] || false;
         this.actors = actors || game.actors.filter(actor => actor.isOwner);
-        this.actor = actor || game.user.character || this.actors?.[2] || false;
+        this.actor = actor || game.user.character || (!game.user.isGM ? this.actors?.[0] : false);
         this.isGM = game.user.isGM;
 
         this.preselectedActor = this.actors.length === 1 || actor;

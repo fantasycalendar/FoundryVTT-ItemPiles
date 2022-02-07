@@ -263,47 +263,47 @@ export class ItemPileInventory extends FormApplication {
             || (pileData.shareCurrenciesEnabled && data.currencies.find((attribute) => (attribute.quantity / num_players) > 1))
 
         data.buttons = [];
-        if(data.hasRecipient){
 
-            if(pileData.splitAllEnabled && hasSplittableQuantities && (pileData.shareItemsEnabled || pileData.shareCurrenciesEnabled)) {
+        if((data.hasRecipient || game.user.isGM) && pileData.splitAllEnabled && hasSplittableQuantities && (pileData.shareItemsEnabled || pileData.shareCurrenciesEnabled)) {
 
-                let buttonText;
-                if(pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled){
-                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitAll", { num_players });
-                }else if(pileData.shareItemsEnabled){
-                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitItems", { num_players });
-                }else{
-                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitCurrencies", { num_players });
-                }
-
-                data.buttons.push({
-                    value: "splitAll",
-                    icon: "far fa-handshake",
-                    text: buttonText,
-                    disabled: !num_players,
-                    type: "button"
-                });
-
+            let buttonText;
+            if(pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled){
+                buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitAll", { num_players });
+            }else if(pileData.shareItemsEnabled){
+                buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitItems", { num_players });
+            }else{
+                buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitCurrencies", { num_players });
             }
 
-            if(!pileData.shareItemsEnabled && !pileData.shareCurrenciesEnabled && pileData.takeAllEnabled) {
+            data.buttons.push({
+                value: "splitAll",
+                icon: "far fa-handshake",
+                text: buttonText,
+                disabled: !num_players,
+                type: "button"
+            });
 
-                data.buttons.push({
-                    value: "takeAll",
-                    icon: "fas fa-fist-raised",
-                    text: game.i18n.localize("ITEM-PILES.Inspect.TakeAll")
-                });
+        }
 
-            }
+        if(pileData.isContainer && !this.overrides.remote){
+            data.buttons.push({
+                value: "close",
+                icon: "fas fa-box",
+                text: game.i18n.localize("ITEM-PILES.Inspect.Close")
+            })
+        }
 
-            if(pileData.isContainer && !this.overrides.remote){
-                data.buttons.push({
-                    value: "close",
-                    icon: "fas fa-box",
-                    text: game.i18n.localize("ITEM-PILES.Inspect.Close")
-                })
-            }
-        }else if(data.editQuantities){
+        if(data.hasRecipient && !pileData.shareItemsEnabled && !pileData.shareCurrenciesEnabled && pileData.takeAllEnabled) {
+
+            data.buttons.push({
+                value: "takeAll",
+                icon: "fas fa-fist-raised",
+                text: game.i18n.localize("ITEM-PILES.Inspect.TakeAll")
+            });
+
+        }
+
+       if(!data.hasRecipient && data.editQuantities){
             data.buttons.push({
                 value: "update",
                 icon: "fas fa-save",
