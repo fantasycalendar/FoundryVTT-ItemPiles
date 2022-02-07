@@ -8,7 +8,7 @@ const chatHandler = {
 
     _preCreateChatMessage(chatMessage){
 
-        const content = chatMessage.data.content;
+        const content = chatMessage.data.content.toLowerCase();
 
         if(!(content.startsWith("!itempiles") || content.startsWith("!ip"))) return;
 
@@ -16,7 +16,7 @@ const chatHandler = {
 
         if(args[0] === "trade"){
             setTimeout(() => {
-                TradeAPI.promptUser();
+                TradeAPI.requestTrade();
             });
         }
 

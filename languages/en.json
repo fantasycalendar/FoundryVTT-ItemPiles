@@ -292,6 +292,10 @@
                 "Label": "Configure Item Filters",
                 "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
             },
+            "ShowTradeButton": {
+                "Title": "Show Trade Button",
+                "Hint": "Enabling this will display a trade button just above the player list in the bottom right."
+            },
             "OutputToChat": {
                 "Title": "Output to chat",
                 "Label": "Whenever any player picks up items from an item pile, this will send a message showing what was picked up.",

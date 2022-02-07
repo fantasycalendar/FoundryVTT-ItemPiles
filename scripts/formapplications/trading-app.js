@@ -4,6 +4,7 @@ import { hotkeyState } from "../hotkeys.js";
 import DropCurrencyDialog from "./drop-currency-dialog.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
 import { TradeAPI } from "../trade-api.js";
+import API from "../api.js";
 
 export class TradingApp extends FormApplication {
 
@@ -26,6 +27,7 @@ export class TradingApp extends FormApplication {
         this.privateTradeId = privateTradeId;
 
         this.editingInput = false;
+        this.currencyWindow = false;
     }
 
 
@@ -134,7 +136,7 @@ export class TradingApp extends FormApplication {
             })
         }else{
             if(item.quantity >= lib.getItemQuantity(newItem)) return;
-            item.quantity += Math.min(item.quantity+1, lib.getItemQuantity(newItem));
+            item.quantity = Math.min(item.quantity+1, lib.getItemQuantity(newItem));
         }
 
         await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorItems);
@@ -163,6 +165,10 @@ export class TradingApp extends FormApplication {
 
     async addCurrency(asGM = false){
 
+        if(this.currencyWindow){
+            this.currencyWindow.close();
+        }
+
         const currencyToAdd = await DropCurrencyDialog.query({
             source: this.leftTraderActor,
             target: this.rightTraderActor,
@@ -172,6 +178,7 @@ export class TradingApp extends FormApplication {
             button: game.i18n.localize("ITEM-PILES.Trade.AddCurrency.Label"),
             includeAllCurrencies: asGM
         });
+
         if(!currencyToAdd) return;
 
         const currencies = lib.getActorCurrencies(this.leftTraderActor, { getAll: asGM });
@@ -421,6 +428,8 @@ export class TradingApp extends FormApplication {
             hasItems: !!this.rightTraderActorItems.length,
             accepted: this.rightTraderAccepted
         };
+
+        data.systemHasCurrencies = !!API.CURRENCIES.length;
 
         return data;
     }

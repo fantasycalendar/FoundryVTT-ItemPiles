@@ -4,11 +4,10 @@ import { TradeRequestDialog, TradePromptDialog } from "./formapplications/trade-
 import { TradingApp } from "./formapplications/trading-app.js";
 import API from "./api.js";
 import HOOKS from "./hooks.js";
-import chatHandler from "./chathandler.js";
 
 export class TradeAPI {
 
-    static async promptUser(user = false){
+    static async requestTrade(user = false){
 
         // Grab all of the active users (not self)
         const users = game.users.filter(user => user.active && user !== game.user);
@@ -63,8 +62,8 @@ export class TradeAPI {
                 title: game.i18n.localize("ITEM-PILES.Trade.Title"),
                 content: lib.dialogLayout({
                     message: actorOwner.active
-                        ? game.i18n.format("ITEM-PILES.Trade.UserCharacterWarning", { actor_name: actor.name, player_name: actorOwner.name })
-                        : game.i18n.format("ITEM-PILES.Trade.UserActiveCharacterWarning", { actor_name: actor.name, player_name: actorOwner.name })
+                        ? game.i18n.format("ITEM-PILES.Trade.UserActiveCharacterWarning", { actor_name: actor.name, player_name: actorOwner.name })
+                        : game.i18n.format("ITEM-PILES.Trade.UserCharacterWarning", { actor_name: actor.name, player_name: actorOwner.name })
                 }),
                 defaultYes: false
             });
@@ -111,8 +110,10 @@ export class TradeAPI {
                 traderActor = traderActor?.actor ?? traderActor;
 
                 // Otherwise, open trade interface and spawn private trade instance
-                new TradingApp({ user: game.user, actor }, { user: game.users.get(userId), actor: traderActor }, data.fullPublicTradeId,  data.fullPrivateTradeId).render(true);
+                new TradingApp({ user: game.user, actor }, { user: game.users.get(userId), actor: traderActor }, data.fullPublicTradeId,  data.fullPrivateTradeId).render(true, this.getAppOptions(actor).tradeApp);
                 ongoingTrades[data.fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor }, { user: game.users.get(userId), actor: traderActor }, data.fullPublicTradeId, data.fullPrivateTradeId, isPrivate);
+
+                actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
 
                 itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRADE.STARTED, { user: game.user.id, actor: actor.uuid }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
 
@@ -159,9 +160,13 @@ export class TradeAPI {
 
         const actor = result?.actor ?? result;
 
+        console.log(this.getAppOptions(actor).tradeApp)
+
         // Spawn trading app and new ongoing trade interface
-        new TradingApp({ user: game.user, actor }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId).render(true);
+        new TradingApp({ user: game.user, actor }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId).render(true, this.getAppOptions(actor).tradeApp);
         ongoingTrades[fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
+
+        actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
 
         return {
             fullPrivateTradeId,
@@ -169,6 +174,14 @@ export class TradeAPI {
             actorUuid: result.uuid
         };
 
+    }
+
+    static getAppOptions(actor){
+        const midPoint = (window.innerWidth/2) - 200;
+        return {
+            tradeApp: { left: midPoint + 25 },
+            actorSheet: { left: midPoint - actor.sheet.position.width - 25 }
+        }
     }
 
     static async _tradeCancelled(userId, privateTradeId){

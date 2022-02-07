@@ -9,7 +9,7 @@ export class TradePromptDialog extends FormApplication {
         this.users = users || game.users.filter(user => user.active && user !== game.user);
         this.user = user || users?.[0] || false;
         this.actors = actors || game.actors.filter(actor => actor.isOwner);
-        this.actor = actor || game.user.character ||this.actors?.[0] || false;
+        this.actor = actor || game.user.character || this.actors?.[2] || false;
         this.isGM = game.user.isGM;
 
         this.preselectedActor = this.actors.length === 1 || actor;
@@ -42,7 +42,7 @@ export class TradePromptDialog extends FormApplication {
             html.find(".item-piles-actor-container").on("dragenter", function (event) {
                 event = event.originalEvent || event;
                 let newElement = document.elementFromPoint(event.pageX, event.pageY);
-                if (!$(this).contains(newElement)) {
+                if (!$.contains(this, newElement)) {
                     $(this).addClass("item-piles-box-highlight");
                 }
             })
@@ -50,7 +50,7 @@ export class TradePromptDialog extends FormApplication {
             html.find(".item-piles-actor-container").on("dragleave", function (event) {
                 event = event.originalEvent || event;
                 let newElement = document.elementFromPoint(event.pageX, event.pageY);
-                if (!$(this).contains(newElement)) {
+                if (!$.contains(this, newElement)) {
                     $(this).removeClass("item-piles-box-highlight");
                 }
             })
@@ -60,6 +60,15 @@ export class TradePromptDialog extends FormApplication {
                 this.setActor(canvas.tokens.controlled[0].actor);
             });
         }
+
+        html.find('select[name="user"]').change(function(){
+            const userId = $(this).val();
+            self.user = game.users.get(userId);
+        });
+
+        html.find('input[name="private"]').change(function(){
+            self.private = $(this).is(":checked");
+        });
 
         html.find('.item-piles-change-actor').click(function () {
             $(this).hide();
@@ -107,6 +116,7 @@ export class TradePromptDialog extends FormApplication {
         data.users = this.users;
         data.actor = this.actor;
         data.actors = this.actors;
+        data.private = this.private;
         data.preselectedActor = this.preselectedActor;
         data.multipleActors = this.actors.length > 1 && !game.user.isGM;
         data.hasUnlinkedTokenOwnership = this.actors.filter(a => !a.data.token.actorLink).length > 0;

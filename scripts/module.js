@@ -43,6 +43,16 @@ Hooks.once("init", async () => {
     Hooks.on(HOOKS.TRADE.STARTED, chatHandler._outputTradeStarted.bind(chatHandler));
     Hooks.on(HOOKS.TRADE.COMPLETE, chatHandler._outputTradeComplete.bind(chatHandler));
 
+    if(game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")){
+        Hooks.on("renderPlayerList", (app, html) => {
+            const button = $(`<button type="button" class="item-piles-player-list-trade-button"><i class="fas fa-handshake"></i> Request Trade</button>`)
+            button.click(() => {
+                TradeAPI.requestTrade();
+            });
+            html.append(button);
+        })
+    }
+
     if (game.settings.get(CONSTANTS.MODULE_NAME, "debugHooks")) {
         for (let hook of Object.values(HOOKS)) {
             if (typeof hook === "string") {
@@ -265,7 +275,7 @@ const module = {
                 const actorId = html[0].dataset.documentId;
                 const actor = game.actors.get(actorId);
                 const user = Array.from(game.users).find(u => u.character === actor && u.active);
-                return TradeAPI.promptUser(user);
+                return TradeAPI.requestTrade(user);
             },
             condition: (html) => {
                 const actorId = html[0].dataset.documentId;

@@ -5,6 +5,10 @@ import * as lib from "./lib/lib.js";
 import { ItemPileFiltersEditor } from "./formapplications/item-pile-filters-editor.js";
 import flagManager from "./flagManager.js";
 
+const debounceReload = foundry.utils.debounce(() => {
+    window.location.reload();
+}, 100);
+
 function defaultSettings(apply = false) {
     return {
         "currencies": {
@@ -35,6 +39,108 @@ function defaultSettings(apply = false) {
             default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_QUANTITY_ATTRIBUTE : "",
             type: String
         }
+    }
+}
+
+const otherSettings = {
+
+    "outputToChat": {
+        name: "ITEM-PILES.Setting.OutputToChat.Title",
+        hint: "ITEM-PILES.Setting.OutputToChat.Label",
+        scope: "world",
+        config: true,
+        default: 1,
+        choices: [
+            "ITEM-PILES.Setting.OutputToChat.Off",
+            "ITEM-PILES.Setting.OutputToChat.Public",
+            "ITEM-PILES.Setting.OutputToChat.SelfGM",
+            "ITEM-PILES.Setting.OutputToChat.Blind",
+        ],
+        type: Number
+    },
+
+    "deleteEmptyPiles": {
+        name: "ITEM-PILES.Setting.DeleteEmptyPiles.Title",
+        hint: "ITEM-PILES.Setting.DeleteEmptyPiles.Label",
+        scope: "world",
+        config: true,
+        default: false,
+        type: Boolean
+    },
+
+    "showTradeButton": {
+        name: "ITEM-PILES.Setting.ShowTradeButton.Title",
+        hint: "ITEM-PILES.Setting.ShowTradeButton.Hint",
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+        onChange: debounceReload
+    },
+
+    "invertSheetOpen": {
+        name: "ITEM-PILES.Setting.InvertSheetOpen.Title",
+        hint: "ITEM-PILES.Setting.InvertSheetOpen.Label",
+        scope: "client",
+        config: true,
+        default: false,
+        type: Boolean
+    },
+
+    "hideActorHeaderText": {
+        name: "ITEM-PILES.Setting.HideActorHeaderText.Title",
+        hint: "ITEM-PILES.Setting.HideActorHeaderText.Label",
+        scope: "client",
+        config: true,
+        default: false,
+        type: Boolean,
+        onChange: debounceReload
+    },
+
+    "preloadFiles": {
+        name: "ITEM-PILES.Setting.PreloadFiles.Title",
+        hint: "ITEM-PILES.Setting.PreloadFiles.Label",
+        scope: "client",
+        config: true,
+        default: true,
+        type: Boolean
+    },
+
+    "defaultItemPileActorID": {
+        scope: "world",
+        config: false,
+        default: "",
+        type: String
+    },
+
+    "debug": {
+        name: "ITEM-PILES.Setting.Debug.Title",
+        hint: "ITEM-PILES.Setting.Debug.Label",
+        scope: "client",
+        config: true,
+        default: false,
+        type: Boolean
+    },
+
+    "debugHooks": {
+        scope: "world",
+        config: false,
+        default: false,
+        type: Boolean
+    },
+
+    "systemFound": {
+        scope: "world",
+        config: false,
+        default: false,
+        type: Boolean
+    },
+
+    "systemNotFoundWarningShown": {
+        scope: "world",
+        config: false,
+        default: false,
+        type: Boolean
     }
 }
 
@@ -72,94 +178,9 @@ export function registerSettings() {
         game.settings.register(CONSTANTS.MODULE_NAME, name, data);
     }
 
-    game.settings.register(CONSTANTS.MODULE_NAME, "deleteEmptyPiles", {
-        name: "ITEM-PILES.Setting.DeleteEmptyPiles.Title",
-        hint: "ITEM-PILES.Setting.DeleteEmptyPiles.Label",
-        scope: "world",
-        config: true,
-        default: false,
-        type: Boolean
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "outputToChat", {
-        name: "ITEM-PILES.Setting.OutputToChat.Title",
-        hint: "ITEM-PILES.Setting.OutputToChat.Label",
-        scope: "world",
-        config: true,
-        default: 1,
-        choices: [
-            "ITEM-PILES.Setting.OutputToChat.Off",
-            "ITEM-PILES.Setting.OutputToChat.Public",
-            "ITEM-PILES.Setting.OutputToChat.SelfGM",
-            "ITEM-PILES.Setting.OutputToChat.Blind",
-        ],
-        type: Number
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "invertSheetOpen", {
-        name: "ITEM-PILES.Setting.InvertSheetOpen.Title",
-        hint: "ITEM-PILES.Setting.InvertSheetOpen.Label",
-        scope: "client",
-        config: true,
-        default: false,
-        type: Boolean
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "hideActorHeaderText", {
-        name: "ITEM-PILES.Setting.HideActorHeaderText.Title",
-        hint: "ITEM-PILES.Setting.HideActorHeaderText.Label",
-        scope: "client",
-        config: true,
-        default: false,
-        type: Boolean,
-        onChange: debounceReload
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "preloadFiles", {
-        name: "ITEM-PILES.Setting.PreloadFiles.Title",
-        hint: "ITEM-PILES.Setting.PreloadFiles.Label",
-        scope: "client",
-        config: true,
-        default: true,
-        type: Boolean
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", {
-        scope: "world",
-        config: false,
-        default: "",
-        type: String
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "debug", {
-        name: "ITEM-PILES.Setting.Debug.Title",
-        hint: "ITEM-PILES.Setting.Debug.Label",
-        scope: "client",
-        config: true,
-        default: false,
-        type: Boolean
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "debugHooks", {
-        scope: "world",
-        config: false,
-        default: false,
-        type: Boolean
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "systemFound", {
-        scope: "world",
-        config: false,
-        default: false,
-        type: Boolean
-    });
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown", {
-        scope: "world",
-        config: false,
-        default: false,
-        type: Boolean
-    });
+    for (const [name, data] of Object.entries(otherSettings)) {
+        game.settings.register(CONSTANTS.MODULE_NAME, name, data);
+    }
 
     const hasFlagMigrationVersion = !!game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.migrationVersion`);
 
@@ -206,10 +227,6 @@ export async function migrateSettings(){
 
     }
 }
-
-const debounceReload = foundry.utils.debounce(() => {
-    window.location.reload();
-}, 100);
 
 class ResetSettingsDialog extends FormApplication {
     constructor(...args) {

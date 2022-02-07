@@ -80,7 +80,7 @@
         <div class="item-piles-bottom-divider">
             <div class="form-group" style="flex-direction: column;">
                 <label style="display:flex;">
-                    <input type="checkbox" name="private" class="item-piles-private-trade">
+                    <input type="checkbox" name="private" class="item-piles-private-trade" {{#if private}}checked="checked"{{/if}}>
                     <span>{{localize "ITEM-PILES.Trade.Private"}}</span>
                 </label>
                 <small>{{ localize "ITEM-PILES.Trade.PrivateExplanation"}}</small>

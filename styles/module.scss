@@ -2,6 +2,13 @@
 
 .item-piles {
 
+  &-player-list-trade-button {
+    line-height: inherit;
+    font-size: 0.85rem;
+    width: calc(100% - 0.5rem);
+    margin: 0.25rem;
+  }
+
   &-specate-trade:disabled{
     background-color: rgba(0,0,0, 0.25);
   }
