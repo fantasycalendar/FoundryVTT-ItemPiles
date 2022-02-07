@@ -12,8 +12,6 @@ export class TradePromptDialog extends FormApplication {
         this.actor = actor || game.user.character || (!game.user.isGM ? this.actors?.[0] : false);
         this.isGM = game.user.isGM;
 
-        this.preselectedActor = this.actors.length === 1 || actor;
-
     }
 
     static show({ actors = false, actor = false, users = false, user = false }){
@@ -38,28 +36,26 @@ export class TradePromptDialog extends FormApplication {
         super.activateListeners(html);
         const self = this;
 
-        if(!this.preselectedActor) {
-            html.find(".item-piles-actor-container").on("dragenter", function (event) {
-                event = event.originalEvent || event;
-                let newElement = document.elementFromPoint(event.pageX, event.pageY);
-                if (!$.contains(this, newElement)) {
-                    $(this).addClass("item-piles-box-highlight");
-                }
-            })
+        html.find(".item-piles-actor-container").on("dragenter", function (event) {
+            event = event.originalEvent || event;
+            let newElement = document.elementFromPoint(event.pageX, event.pageY);
+            if (!$.contains(this, newElement)) {
+                $(this).addClass("item-piles-box-highlight");
+            }
+        })
 
-            html.find(".item-piles-actor-container").on("dragleave", function (event) {
-                event = event.originalEvent || event;
-                let newElement = document.elementFromPoint(event.pageX, event.pageY);
-                if (!$.contains(this, newElement)) {
-                    $(this).removeClass("item-piles-box-highlight");
-                }
-            })
+        html.find(".item-piles-actor-container").on("dragleave", function (event) {
+            event = event.originalEvent || event;
+            let newElement = document.elementFromPoint(event.pageX, event.pageY);
+            if (!$.contains(this, newElement)) {
+                $(this).removeClass("item-piles-box-highlight");
+            }
+        })
 
-            html.find(".item-piles-pick-selected-token").click(() => {
-                if(canvas.tokens.controlled.length === 0) return;
-                this.setActor(canvas.tokens.controlled[0].actor);
-            });
-        }
+        html.find(".item-piles-pick-selected-token").click(() => {
+            if(canvas.tokens.controlled.length === 0) return;
+            this.setActor(canvas.tokens.controlled[0].actor);
+        });
 
         html.find('select[name="user"]').change(function(){
             const userId = $(this).val();
@@ -117,7 +113,6 @@ export class TradePromptDialog extends FormApplication {
         data.actor = this.actor;
         data.actors = this.actors;
         data.private = this.private;
-        data.preselectedActor = this.preselectedActor;
         data.multipleActors = this.actors.length > 1 && !game.user.isGM;
         data.hasUnlinkedTokenOwnership = this.actors.filter(a => !a.data.token.actorLink).length > 0;
         data.buttons = [{
