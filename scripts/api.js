@@ -1018,7 +1018,7 @@ export default class API {
         const itemsToUpdate = [];
         for (const itemData of items) {
 
-            let item = itemData.item;
+            let item = itemData?.item ?? itemData;
 
             const foundItem = lib.findSimilarItem(targetActorItems, item);
 
