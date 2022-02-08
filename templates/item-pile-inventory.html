@@ -13,7 +13,7 @@
             {{else}}
                 <p style="text-align: center; flex: 0 1 auto; height: 27px;">
                     {{{ localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}}
-                    <select class="item-piles-change-actor-select" style="height:auto;">
+                    <select class="item-piles-change-actor-select" style="height:auto;display:none;">
                         {{#select recipient.uuid}}
                         {{#each playerActors as |actor id|}}
                         <option value="{{actor.uuid}}">{{actor.name}}</option>

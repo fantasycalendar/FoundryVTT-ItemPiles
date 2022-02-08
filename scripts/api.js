@@ -2329,25 +2329,22 @@ export default class API {
             return lib.tokens_close_enough(pileToken, token, maxDistance) || game.user.isGM;
         });
 
+        if (!validTokens.length && !game.user.isGM && maxDistance !== Infinity) {
+            lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
+            return;
+        }
+
         let interactingActor;
-        if(maxDistance !== Infinity){
-
-            if (!validTokens.length && !game.user.isGM) {
-                lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
-                return;
+        if(validTokens.length) {
+            if (validTokens.includes(_token)) {
+                interactingActor = _token.actor;
+            } else {
+                validTokens.sort((potentialTargetA, potentialTargetB) => {
+                    return lib.grids_between_tokens(pileToken, potentialTargetA) - lib.grids_between_tokens(pileToken, potentialTargetB);
+                })
+                interactingActor = validTokens[0].actor;
             }
-
-            if(validTokens.length) {
-                if (validTokens.includes(_token)) {
-                    interactingActor = _token.actor;
-                } else {
-                    validTokens.sort((potentialTargetA, potentialTargetB) => {
-                        return lib.grids_between_tokens(pileToken, potentialTargetA) - lib.grids_between_tokens(pileToken, potentialTargetB);
-                    })
-                    interactingActor = validTokens[0].actor;
-                }
-            }
-        }else if(game.user.character){
+        } else if(game.user.character){
             interactingActor = game.user.character;
         }
 
