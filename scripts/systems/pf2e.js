@@ -1,41 +1,41 @@
 export default {
     // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
-    "ACTOR_CLASS_TYPE": "npc",
+    "ACTOR_CLASS_TYPE": "loot",
 
     // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
-    "ITEM_QUANTITY_ATTRIBUTE": "data.quantity",
+    "ITEM_QUANTITY_ATTRIBUTE": "data.quantity.value",
 
     // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
     "ITEM_FILTERS": [
         {
             "path": "type",
-            "filters": "spell,feat,class,race,attack,full-attack,buff,aura,alignment,enhancement,damage-type,material"
+            "filters": "action,spell,melee,lore,heritage,feat,effect,class,background,ancestry"
         }
     ],
 
-    "ITEM_SIMILARITIES": ["name", "type"],
+    "ITEM_SIMILARITIES": ["name", "type", "data.temporary.value"],
 
     // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
     "CURRENCIES": [
         {
-            name: "D35E.CurrencyPP",
+            name: "PF1.CurrencyPlatinumP",
             path: "data.currency.pp",
-            img: "icons/commodities/currency/coin-inset-snail-silver.webp"
+            img: "systems/pf1/icons/items/inventory/coins-silver.jpg"
         },
         {
-            name: "D35E.CurrencyGP",
+            name: "PF1.CurrencyGoldP",
             path: "data.currency.gp",
-            img: "icons/commodities/currency/coin-embossed-crown-gold.webp"
+            img: "systems/pf1/icons/items/inventory/coin-gold.jpg"
         },
         {
-            name: "D35E.CurrencySP",
+            name: "PF1.CurrencySilverP",
             path: "data.currency.sp",
-            img: "icons/commodities/currency/coin-engraved-moon-silver.webp"
+            img: "systems/pf1/icons/items/inventory/coin-silver.jpg"
         },
         {
-            name: "D35E.CurrencyCP",
+            name: "PF1.CurrencyCopperP",
             path: "data.currency.cp",
-            img: "icons/commodities/currency/coin-engraved-waves-copper.webp"
+            img: "systems/pf1/icons/items/inventory/coin-copper.jpg"
         }
     ]
 }

@@ -154,7 +154,16 @@
             "Filters": "Filters",
             "Path": "Attribute path",
             "AddNew": "Add new filter",
-            "Submit": "Submit Filters"
+            "Submit": "Submit filters"
+        },
+
+        "SimilaritiesEditor": {
+            "Title": "Item Similarities Editor",
+            "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
+            "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", you temporary items are considered \"unique\".",
+            "Path": "Attribute path",
+            "AddNew": "Add new attribute path",
+            "Submit": "Submit item similarities"
         },
 
         "Defaults": {
@@ -293,6 +302,11 @@
                 "Title": "Item filters",
                 "Label": "Configure Item Filters",
                 "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
+            },
+            "ItemSimilarities": {
+                "Title": "Item Similarities",
+                "Label": "Configure Item Similarities",
+                "Hint": "Here you can configure what how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
             },
             "ShowTradeButton": {
                 "Title": "Show Trade Button",

@@ -4,6 +4,7 @@ import { SYSTEMS } from "./systems.js";
 import * as lib from "./lib/lib.js";
 import { ItemPileFiltersEditor } from "./formapplications/item-pile-filters-editor.js";
 import flagManager from "./flagManager.js";
+import { ItemPileSimilaritiesEditor } from "./formapplications/item-pile-similarities-editor.js";
 
 const debounceReload = foundry.utils.debounce(() => {
     window.location.reload();
@@ -38,6 +39,14 @@ function defaultSettings(apply = false) {
             config: true,
             default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_QUANTITY_ATTRIBUTE : "",
             type: String
+        },
+        "itemSimilarities": {
+            name: "ITEM-PILES.Setting.ItemSimilarities.Title",
+            hint: "ITEM-PILES.Setting.ItemSimilarities.Label",
+            scope: "world",
+            config: false,
+            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_SIMILARITIES : ['name', 'type'],
+            type: Array
         }
     }
 }
@@ -173,6 +182,15 @@ export function registerSettings() {
         restricted: true
     });
 
+    game.settings.registerMenu(CONSTANTS.MODULE_NAME, "openItemSimilaritiesEditor", {
+        name: "ITEM-PILES.Setting.ItemSimilarities.Title",
+        label: "ITEM-PILES.Setting.ItemSimilarities.Label",
+        hint: "ITEM-PILES.Setting.ItemSimilarities.Hint",
+        icon: "fas fa-list-ul",
+        type: ItemPileSimilaritiesEditor,
+        restricted: true
+    });
+
     const settings = defaultSettings();
     for (const [name, data] of Object.entries(settings)) {
         game.settings.register(CONSTANTS.MODULE_NAME, name, data);
@@ -226,6 +244,7 @@ export async function migrateSettings(){
         await dynamicAttributesSetting.delete();
 
     }
+
 }
 
 class ResetSettingsDialog extends FormApplication {

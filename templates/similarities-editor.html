@@ -1,0 +1,36 @@
+<form class="flexcol {{cssClasses}}" style="padding:0.5rem;" autocomplete="off">
+
+  <style>
+    .item-pile-similarities-row{
+      margin-bottom:0.5rem;
+    }
+    .item-pile-similarities-row > div{
+      margin-left:5px;
+    }
+    .item-pile-similarities-submit{
+      padding:1rem;
+    }
+    .item-pile-similarities-remove{
+      padding:0.25rem 0.25rem;
+      line-height: 1rem;
+    }
+  </style>
+
+  <p>{{localize "ITEM-PILES.SimilaritiesEditor.Explanation_P1"}}</p>
+  <p>{{localize "ITEM-PILES.SimilaritiesEditor.Explanation_P2"}}</p>
+
+  <div>
+    <hr>
+    {{#each similarities as |path id|}}
+      <div class="flexrow item-pile-similarities-row" data-similarities-index="{{id}}">
+        <div style="flex:0 1 auto;"><button type="button" class="item-pile-similarities-remove" name="button_remove_{{id}}"><i class="fas fa-times"></i></button></div>
+        <div style="flex:2;"><input type="text" class="item-pile-similarities-path-input" required name="{{id}}" placeholder="type" value="{{path}}"/></div>
+      </div>
+    {{/each}}
+    <button type="button" name="newPath"><i class="fas fa-coins"></i> {{localize "ITEM-PILES.SimilaritiesEditor.AddNew"}}</button>
+  </div>
+  <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+    <button type="submit" name="submit" class="item-pile-similarities-submit"><i class="fas fa-download"></i> {{localize "ITEM-PILES.SimilaritiesEditor.Submit"}}</button>
+  </footer>
+
+</form>

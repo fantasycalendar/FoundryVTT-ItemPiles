@@ -1,6 +1,5 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
-import flagManager from "../flagManager.js";
 
 export function isGMConnected(){
     return !!Array.from(game.users).find(user => user.isGM && user.active);
@@ -97,12 +96,18 @@ export function tokens_close_enough(a, b, maxDistance){
 }
 
 export function findSimilarItem(items, findItem) {
-    for (const item of items) {
-        if (item.id === (findItem.id ?? findItem._id) || (item.name === findItem.name && item.type === (findItem.type ?? findItem.data.type))) {
-            return item;
+
+    const itemSimilarities = API.ITEM_SIMILARITIES;
+
+    const itemId = findItem?.id ?? findItem?._id;
+
+    return items.find(item => {
+        if(item.id === itemId) return true;
+        for(const path of itemSimilarities){
+            if(getProperty(item.data, path) !== getProperty(findItem, path)) return false;
         }
-    }
-    return false;
+        return true;
+    });
 }
 
 export async function getToken(documentUuid) {
@@ -221,7 +226,7 @@ export function getItemPileTokenScale(target, { data = false, items = false, cur
 
     let baseScale;
     if(pileDocument instanceof TokenDocument){
-        baseScale = pileDocument.actor.data.token.scale;
+        baseScale = pileDocument.data.scale;
     }else{
         baseScale = pileDocument.data.token.scale;
     }
@@ -250,7 +255,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
     let name;
     if(pileDocument instanceof TokenDocument){
-        name = pileDocument.actor.data.token.name;
+        name = pileDocument.data.name;
     }else{
         name = pileDocument.data.token.name;
     }

@@ -45,6 +45,15 @@ export default class API {
     }
 
     /**
+     * The attributes for detecting item similarities
+     *
+     * @returns {Array}
+     */
+    static get ITEM_SIMILARITIES() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemSimilarities");
+    }
+
+    /**
      * Sets the actor class type used for the original item pile actor in this system
      *
      * @param {string} inClassType
@@ -105,7 +114,7 @@ export default class API {
      */
     static async setItemFilters(inFilters) {
         if (!Array.isArray(inFilters)) {
-            throw lib.custom_error("setItemFilters | inFilters must be of type string or array");
+            throw lib.custom_error("setItemFilters | inFilters must be of type array");
         }
         inFilters.forEach(filter => {
             if (typeof filter?.path !== "string") {
@@ -116,6 +125,24 @@ export default class API {
             }
         });
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemFilters", inFilters);
+    }
+
+    /**
+     * Sets the attributes for detecting item similarities
+     *
+     * @param {array} inPaths
+     * @returns {Promise}
+     */
+    static async setItemSimilarities(inPaths) {
+        if (!Array.isArray(inPaths)) {
+            throw lib.custom_error("setItemSimilarities | inPaths must be of type array");
+        }
+        inPaths.forEach(path => {
+            if (typeof path !== "string") {
+                throw lib.custom_error("setItemSimilarities | each entry in inPaths must be of type string");
+            }
+        });
+        return game.settings.set(CONSTANTS.MODULE_NAME, "itemSimilarities", inPaths);
     }
 
     /**

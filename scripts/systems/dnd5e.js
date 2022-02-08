@@ -17,6 +17,8 @@ export default {
         }
     ],
 
+    "ITEM_SIMILARITIES": ["name", "type"],
+
     // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
     "CURRENCIES": [
         {
