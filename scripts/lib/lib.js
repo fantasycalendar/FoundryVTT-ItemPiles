@@ -283,10 +283,13 @@ export function isActiveGM(user) {
     return user.active && user.isGM;
 }
 
+export function getActiveGMs(){
+    return game.users.filter(isActiveGM);
+}
+
 export function isResponsibleGM() {
     if (!game.user.isGM) return false;
-    const connectedGMs = game.users.filter(isActiveGM);
-    return !connectedGMs.some(other => other.data._id < game.user.data._id);
+    return !getActiveGMs().some(other => other.data._id < game.user.data._id);
 }
 
 export function getPlayersForItemPile(target){

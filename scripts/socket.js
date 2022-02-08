@@ -145,7 +145,6 @@ export function registerSocket() {
     itemPileSocket.register(SOCKET_HANDLERS.TRADE_COMPLETED, (...args) => {
         TradingApp._tradeCompleted(...args)
         TradeAPI._tradeCompleted(...args)
-        itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, args[2]);
     });
 
     itemPileSocket.register(SOCKET_HANDLERS.TRADE_SPECTATE, (...args) => TradeAPI._spectateTrade(...args));

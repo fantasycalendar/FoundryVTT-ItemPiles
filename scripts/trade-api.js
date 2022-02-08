@@ -110,12 +110,22 @@ export class TradeAPI {
                 traderActor = traderActor?.actor ?? traderActor;
 
                 // Otherwise, open trade interface and spawn private trade instance
-                new TradingApp({ user: game.user, actor }, { user: game.users.get(userId), actor: traderActor }, data.fullPublicTradeId,  data.fullPrivateTradeId).render(true, this.getAppOptions(actor).tradeApp);
+                new TradingApp({ user: game.user, actor }, { user: game.users.get(userId), actor: traderActor }, data.fullPublicTradeId,  data.fullPrivateTradeId, isPrivate).render(true, this.getAppOptions(actor).tradeApp);
                 ongoingTrades[data.fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor }, { user: game.users.get(userId), actor: traderActor }, data.fullPublicTradeId, data.fullPrivateTradeId, isPrivate);
 
                 actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
 
-                itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRADE.STARTED, { user: game.user.id, actor: actor.uuid }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
+                if(isPrivate) {
+                    return itemPileSocket.executeForUsers(SOCKET_HANDLERS.CALL_HOOK, [game.user.id, userId], HOOKS.TRADE.STARTED, {
+                        user: game.user.id,
+                        actor: actor.uuid
+                    }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
+                }
+
+                return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRADE.STARTED, {
+                    user: game.user.id,
+                    actor: actor.uuid
+                }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
 
             }).catch((err) => {
                 console.log(err);
@@ -160,10 +170,8 @@ export class TradeAPI {
 
         const actor = result?.actor ?? result;
 
-        console.log(this.getAppOptions(actor).tradeApp)
-
         // Spawn trading app and new ongoing trade interface
-        new TradingApp({ user: game.user, actor }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId).render(true, this.getAppOptions(actor).tradeApp);
+        new TradingApp({ user: game.user, actor }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId, isPrivate).render(true, this.getAppOptions(actor).tradeApp);
         ongoingTrades[fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor }, { user: tradingUser, actor: tradingActor }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
 
         actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
@@ -179,8 +187,8 @@ export class TradeAPI {
     static getAppOptions(actor){
         const midPoint = (window.innerWidth/2) - 200;
         return {
-            tradeApp: { left: midPoint + 25 },
-            actorSheet: { left: midPoint - actor.sheet.position.width - 25 }
+            actorSheet: { left: midPoint - actor.sheet.position.width - 25 },
+            tradeApp: { left: midPoint + 25 }
         }
     }
 
@@ -270,32 +278,32 @@ export class TradeAPI {
             const items = party_1.items.map(item => {
                 return { _id: item.id, quantity: item.quantity, item: item.data }
             })
-            await API._addItems(party_2.actor, items, party_1.user, { isTransfer: true });
-            await API._removeItems(party_1.actor, items, party_1.user, { isTransfer: true });
+            await API._addItems(party_2.actor, items, party_1.user, { runHooks: false });
+            await API._removeItems(party_1.actor, items, party_1.user, { runHooks: false });
         }
 
         if(party_2.items.length) {
             const items = party_2.items.map(item => {
                 return { _id: item.id, quantity: item.quantity, item: item.data }
             })
-            await API._addItems(party_1.actor, items, party_2.user, { isTransfer: true });
-            await API._removeItems(party_2.actor, items, party_2.user, { isTransfer: true });
+            await API._addItems(party_1.actor, items, party_2.user, { runHooks: false });
+            await API._removeItems(party_2.actor, items, party_2.user, { runHooks: false });
         }
 
         if(party_1.currencies.length) {
             const currencies = Object.fromEntries(party_1.currencies.map(currency => {
                 return [currency.path, currency.quantity];
             }));
-            await API._addAttributes(party_2.actor, currencies, party_1.user, { isTransfer: true });
-            await API._removeAttributes(party_1.actor, currencies, party_1.user, { isTransfer: true });
+            await API._addAttributes(party_2.actor, currencies, party_1.user, { runHooks: false });
+            await API._removeAttributes(party_1.actor, currencies, party_1.user, { runHooks: false });
         }
 
         if(party_2.currencies.length) {
             const currencies = Object.fromEntries(party_2.currencies.map(currency => {
                 return [currency.path, currency.quantity];
             }));
-            await API._addAttributes(party_1.actor, currencies, party_2.user, { isTransfer: true });
-            await API._removeAttributes(party_2.actor, currencies, party_2.user, { isTransfer: true });
+            await API._addAttributes(party_1.actor, currencies, party_2.user, { runHooks: false });
+            await API._removeAttributes(party_2.actor, currencies, party_2.user, { runHooks: false });
         }
 
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRADE.COMPLETE, party_1, party_2, publicTradeId, isPrivate);
@@ -307,7 +315,7 @@ export class TradeAPI {
 const mutedUsers = [];
 const ongoingTrades = {};
 
-class OngoingTrade{
+export class OngoingTrade{
 
     constructor(self, rightTrader, publicTradeId, privateTradeId, isPrivate) {
 
@@ -339,15 +347,19 @@ class OngoingTrade{
     }
 
     userDisconnected(app, html, data){
-        console.log('here?', this.traderUser, data.users)
         if(!data.users.find(u => u === this.traderUser)){
-            Hooks.off("renderPlayerList", this.userHook);
-            itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
-            itemPileSocket.executeForEveryone(SOCKET_HANDLERS.TRADE_CLOSED, this.publicTradeId, this.traderUser.id);
+            this.tradeClosed();
+            if(!this.isPrivate){
+                itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
+                itemPileSocket.executeForEveryone(SOCKET_HANDLERS.TRADE_CLOSED, this.publicTradeId, this.traderUser.id);
+            }else{
+                TradingApp._tradeClosed(this.publicTradeId, this.traderUser.id);
+            }
         }
     }
 
-    async tradeClosed(){
+    tradeClosed(){
+        Hooks.off("renderPlayerList", this.userHook);
         delete ongoingTrades[this.privateTradeId];
     }
 
@@ -388,13 +400,11 @@ class OngoingTrade{
 
     async execute(userId){
 
-        Hooks.off("renderPlayerList", this.userHook);
-
-        delete ongoingTrades[this.privateTradeId];
+        this.tradeClosed();
 
         if (game.user.id !== userId) return;
 
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.TRADE_COMPLETED,
+        const args = [
             {
                 user: this.user.id,
                 actor: this.actor.uuid,
@@ -409,6 +419,13 @@ class OngoingTrade{
             },
             this.publicTradeId,
             this.isPrivate
-        );
+        ]
+
+        if(this.isPrivate){
+            return itemPileSocket.executeForUsers(SOCKET_HANDLERS.TRADE_COMPLETED, [this.user.id, this.traderUser.id], ...args);
+        }
+
+        await itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.TRADE_COMPLETED, ...args);
     }
 }

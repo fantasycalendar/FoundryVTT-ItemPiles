@@ -34,14 +34,7 @@ Hooks.once("init", async () => {
     Hooks.on("getActorDirectoryEntryContext", module._handleActorContextMenu);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
-    Hooks.on("preCreateChatMessage", chatHandler._preCreateChatMessage.bind(chatHandler));
-    Hooks.on("renderChatMessage", chatHandler._renderChatMessage.bind(chatHandler));
-    Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
-    Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferCurrency.bind(chatHandler));
-    Hooks.on(HOOKS.TRANSFER_EVERYTHING, chatHandler._outputTransferEverything.bind(chatHandler));
-    Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, chatHandler._outputSplitItemPileInventory.bind(chatHandler));
-    Hooks.on(HOOKS.TRADE.STARTED, chatHandler._outputTradeStarted.bind(chatHandler));
-    Hooks.on(HOOKS.TRADE.COMPLETE, chatHandler._outputTradeComplete.bind(chatHandler));
+    chatHandler.init();
 
     if(game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")){
         Hooks.on("renderPlayerList", (app, html) => {

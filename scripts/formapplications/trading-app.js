@@ -8,7 +8,7 @@ import API from "../api.js";
 
 export class TradingApp extends FormApplication {
 
-    constructor(leftTrader, rightTrader, publicTradeId, privateTradeId = false) {
+    constructor(leftTrader, rightTrader, publicTradeId, privateTradeId = false, isPrivate = false) {
         super();
 
         this.leftTraderActor = leftTrader.actor;
@@ -25,6 +25,8 @@ export class TradingApp extends FormApplication {
 
         this.publicTradeId = publicTradeId;
         this.privateTradeId = privateTradeId;
+
+        this.isPrivate = isPrivate;
 
         this.editingInput = false;
         this.currencyWindow = false;
@@ -59,6 +61,13 @@ export class TradingApp extends FormApplication {
 
     get title(){
         return `Trade between ${this.leftTraderActor.name} and ${this.rightTraderActor.name}`
+    }
+
+    async executeSocketAction(socketHandler, ...args){
+        if(this.isPrivate) {
+            return itemPileSocket.executeForUsers(socketHandler, [this.leftTraderUser.id, this.rightTraderUser.id], ...args);
+        }
+        return itemPileSocket.executeForEveryone(socketHandler, ...args);
     }
 
     async _onDrop(event) {
@@ -140,7 +149,7 @@ export class TradingApp extends FormApplication {
         }
 
         await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorItems);
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
+        return this.executeSocketAction(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
 
     }
 
@@ -210,7 +219,7 @@ export class TradingApp extends FormApplication {
         this.leftTraderActorCurrencies.sort((a, b) => a.index - b.index);
 
         await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
+        return this.executeSocketAction(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
 
     }
 
@@ -250,8 +259,7 @@ export class TradingApp extends FormApplication {
         this.render(true);
     }
 
-    static _tradeCompleted(party_1, party_2, publicTradeId, isPrivate){
-        if(isPrivate) return;
+    static _tradeCompleted(party_1, party_2, publicTradeId){
         const app = TradingApp.getAppByPublicTradeId(publicTradeId);
         if(app){
             return app.close({ accepted: true });
@@ -355,9 +363,9 @@ export class TradingApp extends FormApplication {
             this.addCurrency(true)
         });
 
-        html.find(".item-piles-accept-button").click(function(){
-            itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, [self.leftTraderUser.id, self.rightTraderUser.id], self.privateTradeId, game.user.id, !self.leftTraderAccepted);
-            itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_STATE, self.publicTradeId, game.user.id, !self.leftTraderAccepted);
+        html.find(".item-piles-accept-button").click(async () => {
+            await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_STATE, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, !this.leftTraderAccepted);
+            return this.executeSocketAction(SOCKET_HANDLERS.PUBLIC.TRADE_STATE, this.publicTradeId, game.user.id, !this.leftTraderAccepted);
         });
 
     }
@@ -381,7 +389,7 @@ export class TradingApp extends FormApplication {
             this.leftTraderActorItems.splice(this.leftTraderActorItems.indexOf(item), 1);
         }
         await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorItems);
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
+        return this.executeSocketAction(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
     }
 
     async setCurrencyQuantity(currencyPath, quantity){
@@ -391,7 +399,7 @@ export class TradingApp extends FormApplication {
             this.leftTraderActorCurrencies.splice(this.leftTraderActorCurrencies.indexOf(currency), 1);
         }
         await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
+        return this.executeSocketAction(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
     }
 
     getData(options) {
@@ -438,8 +446,13 @@ export class TradingApp extends FormApplication {
         super.close(options);
         if(!options?.accepted){
             if(!options?.userId && (this.leftTraderUser.id === game.user.id || this.rightTraderUser.id === game.user.id)) {
-                itemPileSocket.executeForOthers(SOCKET_HANDLERS.TRADE_CLOSED, this.publicTradeId, game.user.id);
-                itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
+                if(this.isPrivate) {
+                    itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
+                    itemPileSocket.executeForOthers(SOCKET_HANDLERS.TRADE_CLOSED, this.publicTradeId, game.user.id);
+                }else{
+                    const otherUserId = this.leftTraderUser.id === game.user.id ? this.rightTraderUser.id : this.leftTraderUser.id;
+                    itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_CLOSED, otherUserId, this.publicTradeId, game.user.id);
+                }
                 TradeAPI._tradeClosed(this.privateTradeId);
                 Dialog.prompt({
                     title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),

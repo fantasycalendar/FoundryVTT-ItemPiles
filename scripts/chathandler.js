@@ -3,8 +3,28 @@ import CONSTANTS from "./constants.js";
 import * as lib from "./lib/lib.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { TradeAPI } from "./trade-api.js";
+import HOOKS from "./hooks.js";
 
 const chatHandler = {
+
+    init(){
+
+        Hooks.on("preCreateChatMessage", chatHandler._preCreateChatMessage.bind(chatHandler));
+        Hooks.on("renderChatMessage", chatHandler._renderChatMessage.bind(chatHandler));
+        Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
+        Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferCurrency.bind(chatHandler));
+        Hooks.on(HOOKS.TRANSFER_EVERYTHING, chatHandler._outputTransferEverything.bind(chatHandler));
+        Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, chatHandler._outputSplitItemPileInventory.bind(chatHandler));
+        Hooks.on(HOOKS.TRADE.STARTED, chatHandler._outputTradeStarted.bind(chatHandler));
+        Hooks.on(HOOKS.TRADE.COMPLETE, chatHandler._outputTradeComplete.bind(chatHandler));
+
+        $(document).on("click", ".item-piles-chat-card .item-piles-collapsible", async function(){
+            if($(this).attr("open")) return;
+            await lib.wait(25);
+            $(this).parent()[0].scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'});
+        });
+
+    },
 
     _preCreateChatMessage(chatMessage){
 
@@ -24,7 +44,7 @@ const chatHandler = {
 
     },
 
-    _renderChatMessage(app, html, data){
+    _renderChatMessage(app, html){
         html.find(".item-piles-specate-trade").click(function(){
             TradeAPI.spectateTrade($(this).data());
         });
@@ -34,7 +54,8 @@ const chatHandler = {
     _disableTradingButton(publicTradeId) {
         const message = Array.from(game.messages).find(message => {
             return message.getFlag(CONSTANTS.MODULE_NAME, "publicTradeId") === publicTradeId;
-        })
+        });
+        if(!message) return;
         const html = $(message.data.content);
         html.find(".item-piles-specate-trade")
             .prop('disabled', true)
@@ -141,41 +162,14 @@ const chatHandler = {
 
     async _outputTradeStarted(party_1, party_2, publicTradeId, isPrivate){
         if(party_1.user !== game.user.id || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off" || isPrivate) return;
-
-        let party_1_actor = await fromUuid(party_1.actor);
-        party_1_actor = party_1_actor?.actor ?? party_1_actor;
-
-        let party_2_actor = await fromUuid(party_2.actor);
-        party_2_actor = party_2_actor?.actor ?? party_2_actor;
-
-        return this._outputTradeStartedToChat(party_1_actor, party_2_actor, publicTradeId);
+        return this._outputTradeStartedToChat(party_1, party_2, publicTradeId);
     },
 
     async _outputTradeComplete(party_1, party_2, publicTradeId, isPrivate){
 
-        if(!lib.isResponsibleGM() || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off" || isPrivate) return;
+        if(game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
 
-        let party_1_actor = await fromUuid(party_1.actor);
-        party_1_actor = party_1_actor?.actor ?? party_1_actor;
-        const party_1_data = {
-            actor: party_1_actor,
-            items: party_2.items,
-            currencies: party_2.currencies
-        }
-        party_1_data.got_nothing = !party_1_data.items.length && !party_1_data.currencies.length;
-
-        let party_2_actor = await fromUuid(party_2.actor);
-        party_2_actor = party_2_actor?.actor ?? party_2_actor;
-        const party_2_data = {
-            actor: party_2_actor,
-            items: party_1.items,
-            currencies: party_1.currencies
-        }
-        party_2_data.got_nothing = !party_2_data.items.length && !party_2_data.currencies.length;
-
-        if(party_1.got_nothing && party_2.got_nothing) return;
-
-        return this._outputTradeCompleteToChat(party_1_data, party_2_data, publicTradeId);
+        return this._outputTradeCompleteToChat(party_1, party_2, publicTradeId, isPrivate);
 
     },
 
@@ -345,7 +339,13 @@ const chatHandler = {
 
     },
 
-    async _outputTradeStartedToChat(party_1_actor, party_2_actor, publicTradeId){
+    async _outputTradeStartedToChat(party_1, party_2, publicTradeId){
+
+        let party_1_actor = await fromUuid(party_1.actor);
+        party_1_actor = party_1_actor?.actor ?? party_1_actor;
+
+        let party_2_actor = await fromUuid(party_2.actor);
+        party_2_actor = party_2_actor?.actor ?? party_2_actor;
 
         const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/trade-started-chat-message.html", {
             party_1_actor,
@@ -360,40 +360,74 @@ const chatHandler = {
             content: chatCardHtml,
             flavor: "Item Piles",
             speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
-            [`flags.${CONSTANTS.MODULE_NAME}.publicTradeId`]: publicTradeId
+            [`flags.${CONSTANTS.MODULE_NAME}`]: {
+                publicTradeId,
+                tradeUsers: [ party_1.user, party_2.user ]
+            }
         });
     },
 
-    async _outputTradeCompleteToChat(party_1, party_2, publicTradeId){
+    async _outputTradeCompleteToChat(party_1, party_2, publicTradeId, isPrivate){
+
+        if(party_1.user !== game.user.id) return;
+
+        let party_1_actor = await fromUuid(party_1.actor);
+        party_1_actor = party_1_actor?.actor ?? party_1_actor;
+        const party_1_data = {
+            actor: party_1_actor,
+            items: party_2.items,
+            currencies: party_2.currencies
+        }
+        party_1_data.got_nothing = !party_1_data.items.length && !party_1_data.currencies.length;
+
+        let party_2_actor = await fromUuid(party_2.actor);
+        party_2_actor = party_2_actor?.actor ?? party_2_actor;
+        const party_2_data = {
+            actor: party_2_actor,
+            items: party_1.items,
+            currencies: party_1.currencies
+        }
+        party_2_data.got_nothing = !party_2_data.items.length && !party_2_data.currencies.length;
+
+        if(party_1.got_nothing && party_2.got_nothing) return;
+
+        const enableCollapse = (party_1_data.items.length + party_1_data.currencies.length + party_2_data.items.length + party_2_data.currencies.length) > 6;
 
         const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/trade-complete-chat-message.html", {
-            party_1,
-            party_2,
-            publicTradeId
+            party_1: party_1_data,
+            party_2: party_2_data,
+            publicTradeId,
+            isPrivate,
+            enableCollapse
         });
 
         return this._createNewChatMessage(game.user.id, {
             user: game.user.id,
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: isPrivate ? CONST.CHAT_MESSAGE_TYPES.WHISPER : CONST.CHAT_MESSAGE_TYPES.OTHER,
             content: chatCardHtml,
-            flavor: "Item Piles",
-            speaker: ChatMessage.getSpeaker({ alias: game.user.name })
+            flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
+            speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
+            whisper: isPrivate ? [party_2.user] : []
         });
 
     },
 
     _createNewChatMessage(userId, chatData){
 
-        const mode = game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat");
+        if(!chatData.whisper) {
 
-        if(mode > 1){
-            chatData.whisper = Array.from(game.users)
-                .filter(user => user.isGM)
-                .map(user => user.id);
-            if(mode === 2){
-                chatData.whisper.push(userId);
+            const mode = game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat");
+
+            if (mode > 1) {
+                chatData.whisper = Array.from(game.users)
+                    .filter(user => user.isGM)
+                    .map(user => user.id);
+                if (mode === 2) {
+                    chatData.whisper.push(userId);
+                }
+                chatData.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
             }
-            chatData.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
+
         }
 
         return ChatMessage.create(chatData);
