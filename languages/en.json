@@ -308,9 +308,13 @@
                 "Label": "Configure Item Similarities",
                 "Hint": "Here you can configure what how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
             },
+            "EnableTrading": {
+                "Title": "Enable Trading",
+                "Hint": "This enables trading - with this disabled, no one can initiate any trade."
+            },
             "ShowTradeButton": {
                 "Title": "Show Trade Button",
-                "Hint": "Enabling this will display a trade button just above the player list in the bottom right."
+                "Hint": "Enabling this will display a trade button just below the player list in the bottom right."
             },
             "OutputToChat": {
                 "Title": "Output to chat",

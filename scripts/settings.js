@@ -77,6 +77,16 @@ const otherSettings = {
         type: Boolean
     },
 
+    "enableTrading": {
+        name: "ITEM-PILES.Setting.EnableTrading.Title",
+        hint: "ITEM-PILES.Setting.EnableTrading.Hint",
+        scope: "world",
+        config: true,
+        default: true,
+        type: Boolean,
+        onChange: debounceReload
+    },
+
     "showTradeButton": {
         name: "ITEM-PILES.Setting.ShowTradeButton.Title",
         hint: "ITEM-PILES.Setting.ShowTradeButton.Hint",

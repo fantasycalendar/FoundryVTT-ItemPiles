@@ -36,7 +36,7 @@ Hooks.once("init", async () => {
 
     chatHandler.init();
 
-    if(game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")){
+    if(game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") && game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")){
         Hooks.on("renderPlayerList", (app, html) => {
             const button = $(`<button type="button" class="item-piles-player-list-trade-button"><i class="fas fa-handshake"></i> Request Trade</button>`)
             button.click(() => {
@@ -90,8 +90,6 @@ Hooks.once("ready", async () => {
     registerHandlebarHelpers();
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
-
-
 
 });
 
@@ -273,7 +271,8 @@ const module = {
             condition: (html) => {
                 const actorId = html[0].dataset.documentId;
                 const actor = game.actors.get(actorId);
-                return game.user?.character !== actor || Array.from(game.users).find(u => u.character === actor && u.active);
+                return game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading")
+                    && (game.user?.character !== actor || Array.from(game.users).find(u => u.character === actor && u.active));
             }
         });
     }

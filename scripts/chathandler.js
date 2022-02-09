@@ -27,6 +27,7 @@ const chatHandler = {
     },
 
     _preCreateChatMessage(chatMessage){
+        if(!game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading")) return;
 
         const content = chatMessage.data.content.toLowerCase();
 
