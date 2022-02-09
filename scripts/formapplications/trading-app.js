@@ -409,7 +409,7 @@ export class TradingApp extends FormApplication {
 
         data.leftActor = {
             name: this.leftTraderActor.name,
-            img: this.leftTraderActor.img,
+            img: this.leftTraderActor.data.img,
             items: foundry.utils.duplicate(this.leftTraderActorItems).map(item => {
                 if(this.editingInput === item.id){
                     item.editing = true;
@@ -428,9 +428,11 @@ export class TradingApp extends FormApplication {
 
         data.leftActor.hasItems = !!data.leftActor.items.length;
 
+        debugger;
+
         data.rightActor = {
             name: this.rightTraderActor.name,
-            img: this.rightTraderActor.img,
+            img: this.rightTraderActor.data.img,
             items: this.rightTraderActorItems,
             currencies: this.rightTraderActorCurrencies,
             hasItems: !!this.rightTraderActorItems.length,
