@@ -1,6 +1,5 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
-import flagManager from "../flagManager.js";
 
 export function isGMConnected(){
     return !!Array.from(game.users).find(user => user.isGM && user.active);
@@ -97,12 +96,18 @@ export function tokens_close_enough(a, b, maxDistance){
 }
 
 export function findSimilarItem(items, findItem) {
-    for (const item of items) {
-        if (item.id === (findItem.id ?? findItem._id) || (item.name === findItem.name && item.type === (findItem.type ?? findItem.data.type))) {
-            return item;
+
+    const itemSimilarities = API.ITEM_SIMILARITIES;
+
+    const itemId = findItem?.id ?? findItem?._id;
+
+    return items.find(item => {
+        if(item.id === itemId) return true;
+        for(const path of itemSimilarities){
+            if(getProperty(item.data, path) !== getProperty(findItem, path)) return false;
         }
-    }
-    return false;
+        return true;
+    });
 }
 
 export async function getToken(documentUuid) {
@@ -136,12 +141,15 @@ export function is_real_number(inNumber) {
         && isFinite(inNumber);
 }
 
-export function dialogWarning(message, icon = "fas fa-exclamation-triangle"){
-    return `<p class="item-piles-dialog">
-        <i style="font-size:3rem;" class="${icon}"></i><br><br>
-        <strong style="font-size:1.2rem;">Item Piles</strong>
-        <br><br>${message}
-    </p>`;
+export function dialogLayout({ title="Item Piles", message, icon = "fas fa-exclamation-triangle", extraHtml = "" }={}){
+    return `
+    <div class="item-piles-dialog">
+        <p><i style="font-size:3rem;" class="${icon}"></i></p>
+        <p style="margin-bottom: 1rem"><strong style="font-size:1.2rem;">${title}</strong></p>
+        <p>${message}</p>
+        ${extraHtml}
+    </div>
+    `;
 }
 
 
@@ -218,7 +226,7 @@ export function getItemPileTokenScale(target, { data = false, items = false, cur
 
     let baseScale;
     if(pileDocument instanceof TokenDocument){
-        baseScale = pileDocument.actor.data.token.scale;
+        baseScale = pileDocument.data.scale;
     }else{
         baseScale = pileDocument.data.token.scale;
     }
@@ -247,7 +255,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
     let name;
     if(pileDocument instanceof TokenDocument){
-        name = pileDocument.actor.data.token.name;
+        name = pileDocument.data.name;
     }else{
         name = pileDocument.data.token.name;
     }
@@ -280,10 +288,13 @@ export function isActiveGM(user) {
     return user.active && user.isGM;
 }
 
+export function getActiveGMs(){
+    return game.users.filter(isActiveGM);
+}
+
 export function isResponsibleGM() {
     if (!game.user.isGM) return false;
-    const connectedGMs = game.users.filter(isActiveGM);
-    return !connectedGMs.some(other => other.data._id < game.user.data._id);
+    return !getActiveGMs().some(other => other.data._id < game.user.data._id);
 }
 
 export function getPlayersForItemPile(target){
@@ -365,14 +376,15 @@ export function getActorCurrencies(target, { currencyList = false, getAll = fals
     return currencies
         .filter(currency => {
             return hasProperty(targetActor.data, currency.path) && (Number(getProperty(targetActor.data, currency.path)) > 0 || getAll);
-        }).map(currency => {
+        }).map((currency, index) => {
             const localizedName = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
             const quantity = Number(getProperty(targetActor.data, currency.path) ?? 0);
             return {
                 name: localizedName,
                 path: currency.path,
                 img: currency.img,
-                quantity: quantity
+                quantity: quantity,
+                index: index
             }
         });
 }

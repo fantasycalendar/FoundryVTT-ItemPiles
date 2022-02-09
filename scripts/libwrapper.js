@@ -1,8 +1,8 @@
 import API from "./api.js";
 import CONSTANTS from "./constants.js";
 import { hotkeyActionState } from "./hotkeys.js";
-import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
 import * as lib from "./lib/lib.js";
+import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
 
 export function registerLibwrappers() {
 

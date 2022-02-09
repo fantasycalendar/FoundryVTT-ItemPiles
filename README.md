@@ -104,7 +104,7 @@ Any player or GM can drag & drop items - if you drag & drop an item from an acto
 
 ![Dropping items into a chest](./docs/images/wiki-drop-into.jpg)
 
-Holding ALT before dragging & dropping an item will make you automatically drop 1 of the items into a new pile without a prompt. **You can also drag and drop items onto an existing pile**, where holding ALT is also supported.
+Holding ALT before dragging & dropping an item will make you automatically drop 1 of the items into a new pile without a promptUser. **You can also drag and drop items onto an existing pile**, where holding ALT is also supported.
 
 When players double-click on the item pile (or Left Control + double-click for GMs to inspect, or to inspect as someone else select two tokens, and repeat), they will get a custom UI where they can choose what they want to take from the item pile, or all of it (if they're loot goblins).
 

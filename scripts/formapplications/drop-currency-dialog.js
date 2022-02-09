@@ -7,18 +7,22 @@ export default class DropCurrencyDialog extends FormApplication {
         title,
         content,
         button,
-        itemPile,
-        dropper = false,
+        target,
+        source,
+        existingCurrencies = false,
+        includeAllCurrencies = true
     }={}) {
         super();
 
         this._title = title ?? game.i18n.localize("ITEM-PILES.DropCurrencies.Title");
-        this.content = content ?? game.i18n.localize("ITEM-PILES.DropCurrencies.Player");
-        this.button = button ?? game.i18n.localize("ITEM-PILES.DropCurrencies.AddToPile")
+        this._content = content ?? game.i18n.localize("ITEM-PILES.DropCurrencies.Player");
+        this._button = button ?? game.i18n.localize("ITEM-PILES.DropCurrencies.AddToPile")
 
         this.resolve = resolve;
-        this.itemPile = itemPile;
-        this.dropper = dropper;
+        this.target = target;
+        this.source = source;
+        this.existingCurrencies = existingCurrencies;
+        this.includeAllCurrencies = includeAllCurrencies;
     }
 
     /** @inheritdoc */
@@ -35,18 +39,48 @@ export default class DropCurrencyDialog extends FormApplication {
         return this._title;
     }
 
+    /**
+     * @param parameters
+     * @returns {Promise<Object/Boolean>}
+     */
     static query(parameters) {
-
         return new Promise(resolve => {
             new DropCurrencyDialog(resolve, parameters).render(true);
         });
-
     }
 
     async getData(options) {
         const data = super.getData(options);
 
-        data.currencies = lib.getActorCurrencies(this.dropper, { currencyList: lib.getActorCurrencyList(this.itemPile) }).filter(currency => currency.quantity)
+        data.source = this.source;
+        data.target = this.target;
+
+        let currencyList = { currencyList: lib.getActorCurrencyList(this.target), getAll: this.includeAllCurrencies };
+
+        if(lib.isValidItemPile(this.source)) {
+            currencyList.currencyList = {};
+        }
+
+        data.currencies = lib.getActorCurrencies(this.source, currencyList);
+
+        if(!this.includeAllCurrencies) {
+            data.currencies = data.currencies.filter(currency => currency.quantity)
+        }
+
+        data.currencies.map(currency => {
+            currency.currentQuantity = 0;
+            if(this.existingCurrencies) {
+                const existingCurrency = this.existingCurrencies.find(existingCurrency => existingCurrency.path === currency.path);
+                if (existingCurrency) {
+                    currency.currentQuantity = existingCurrency.quantity;
+                }
+            }
+            return currency;
+        })
+
+        data.includeAllCurrencies = this.includeAllCurrencies;
+        data.content = this._content;
+        data.button = this._button;
 
         return data;
     }
@@ -72,14 +106,11 @@ export default class DropCurrencyDialog extends FormApplication {
 
     async _updateObject(event, formData) {
 
-
-        const currencies = Object.fromEntries(Object.entries(formData).filter(entry => entry[1]));
-
-        if (event.submitter.value === "cancel" || foundry.utils.isObjectEmpty(currencies)) {
+        if (event.submitter.value === "cancel") {
             return this.resolve(false);
         }
 
-        return this.resolve(currencies);
+        return this.resolve(formData);
 
     }
 
