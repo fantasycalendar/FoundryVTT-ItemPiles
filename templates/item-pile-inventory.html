@@ -87,6 +87,7 @@
                 <hr>
                 {{/if}}
 
+                {{#if systemHasCurrencies}}
                 {{#if hasCurrencies}}
                 <div class="flexrow">
                     <h3>{{localize "ITEM-PILES.Currencies"}}:</h3>
@@ -96,6 +97,7 @@
                     </a>
                     {{/if}}
                 </div>
+                {{/if}}
                 {{/if}}
                 {{#each currencies as |currency id|}}
                 <div class="flexrow item-piles-item-row item-piles-currency-row {{#unless currency.shareLeft}}{{#unless @root.editQuantities}}item-piles-disabled{{/unless}}{{/unless}}" data-currency-name="{{currency.name}}" data-currency-path="{{currency.path}}">
@@ -137,17 +139,7 @@
 
                 </div>
                 {{/each}}
-
-                {{#if @root.hasRecipient}}
-                {{#unless hasCurrencies}}
-                <hr>
-                <div>
-                    <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i>
-                        {{localize "ITEM-PILES.Inspect.AddCurrency"}}
-                    </a>
-                </div>
-                {{/unless}}
-                {{/if}}
+                
             </div>
 
         {{/if}}

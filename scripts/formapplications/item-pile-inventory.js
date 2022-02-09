@@ -228,6 +228,8 @@ export class ItemPileInventory extends FormApplication {
             return data;
         }
 
+        data.systemHasCurrencies = !!API.CURRENCIES.length;
+
         data.playerActors = this.playerActors;
         data.moreThanOneInspectableActors = data.playerActors.length > 1;
 
@@ -263,6 +265,14 @@ export class ItemPileInventory extends FormApplication {
             || (pileData.shareCurrenciesEnabled && data.currencies.find((attribute) => (attribute.quantity / num_players) > 1))
 
         data.buttons = [];
+
+        if(!data.hasRecipient && data.editQuantities){
+            data.buttons.push({
+                value: "update",
+                icon: "fas fa-save",
+                text: game.i18n.localize("ITEM-PILES.Defaults.Update")
+            });
+        }
 
         if((data.hasRecipient || game.user.isGM) && pileData.splitAllEnabled && hasSplittableQuantities && (pileData.shareItemsEnabled || pileData.shareCurrenciesEnabled)) {
 
@@ -301,14 +311,6 @@ export class ItemPileInventory extends FormApplication {
                 text: game.i18n.localize("ITEM-PILES.Inspect.TakeAll")
             });
 
-        }
-
-       if(!data.hasRecipient && data.editQuantities){
-            data.buttons.push({
-                value: "update",
-                icon: "fas fa-save",
-                text: game.i18n.localize("ITEM-PILES.Defaults.Update")
-            });
         }
 
         return data;
