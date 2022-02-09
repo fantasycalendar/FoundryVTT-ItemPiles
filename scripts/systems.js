@@ -2,6 +2,7 @@ import dnd5e from "./systems/dnd5e.js";
 
 // ↓ IMPORT SYSTEMS HERE ↓
 import pf1 from "./systems/pf1.js";
+import pf2e from "./systems/pf2e.js";
 import ds4 from "./systems/ds4.js";
 import d35e from "./systems/d35e.js";
 import swade from "./systems/swade.js";
@@ -18,6 +19,7 @@ export const SYSTEMS = {
             dnd5e,
             // ↓ ADD SYSTEMS HERE ↓
             pf1,
+            pf2e,
             ds4,
             d35e,
             swade,

@@ -1,5 +1,22 @@
 # Item Piles Changelog 
 
+## Version 1.4.0 - Trading Edition!
+- Added user-to-user trading!
+  - Multiple ways to initiate a trade:
+    - Type `!itempiles trade` or `!ip trade` in the chat
+    - Right-click on your fellow user's actors in the actor list
+    - Click the `Request Trade` button below the users list
+  - GMs can be represented in a trade by any actor or unlinked token in the game
+  - Players can only be represented in trades with actors they own
+  - Public and private trades, with the option to spectate public trades
+  - Option to mute another player who spam trades
+  - This is an optional setting that can be turned off  
+- Added setting for detecting item similarities and differences
+- Added split button for GMs editing item piles
+- Fixed token name changing when turning tokens into item piles
+- Fixed PF1e item quantity attribute being wrong
+- Temporarily removed other localizations as this update contains a huge amount of updates 
+
 ## Version 1.3.4
 - Fixed an issue in v8 and in some systems that caused item piles to fail to get the correct item quantities - this does not fix items that had already been put into item piles, you can fix this by editing the quantities of the items in actor's inventory
 - Fixed tokens not retaining their image when they were turned into item piles

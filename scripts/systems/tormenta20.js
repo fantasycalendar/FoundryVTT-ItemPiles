@@ -8,6 +8,8 @@ export default {
     // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
     "ITEM_FILTERS": [],
 
+    "ITEM_SIMILARITIES": ["name", "type"],
+
     // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
     "CURRENCIES": [
         {

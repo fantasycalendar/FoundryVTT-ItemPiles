@@ -2,7 +2,6 @@
 
     <div class="item-piles-item-drop-container">
 
-
         {{#if isDeleted}}
 
             <p style="text-align: center; flex: 0 1 auto;">{{localize "ITEM-PILES.Inspect.Destroyed"}}</p>
@@ -14,7 +13,7 @@
             {{else}}
                 <p style="text-align: center; flex: 0 1 auto; height: 27px;">
                     {{{ localize "ITEM-PILES.Inspect.AsActor" actorName=recipient.name }}}
-                    <select class="item-piles-change-actor-select" style="height:auto;">
+                    <select class="item-piles-change-actor-select" style="height:auto;display:none;">
                         {{#select recipient.uuid}}
                         {{#each playerActors as |actor id|}}
                         <option value="{{actor.uuid}}">{{actor.name}}</option>
@@ -34,7 +33,7 @@
                 <img id="item-piles-preview-image"/>
             </div>
 
-            <div class="item-piles-items">
+            <div class="item-piles-items-list">
 
                 {{#if hasItems}}
                 <div class="flexrow"><h3>{{localize "ITEM-PILES.Items"}}:</h3></div>
@@ -88,6 +87,7 @@
                 <hr>
                 {{/if}}
 
+                {{#if systemHasCurrencies}}
                 {{#if hasCurrencies}}
                 <div class="flexrow">
                     <h3>{{localize "ITEM-PILES.Currencies"}}:</h3>
@@ -97,6 +97,7 @@
                     </a>
                     {{/if}}
                 </div>
+                {{/if}}
                 {{/if}}
                 {{#each currencies as |currency id|}}
                 <div class="flexrow item-piles-item-row item-piles-currency-row {{#unless currency.shareLeft}}{{#unless @root.editQuantities}}item-piles-disabled{{/unless}}{{/unless}}" data-currency-name="{{currency.name}}" data-currency-path="{{currency.path}}">
@@ -138,17 +139,7 @@
 
                 </div>
                 {{/each}}
-
-                {{#if @root.hasRecipient}}
-                {{#unless hasCurrencies}}
-                <hr>
-                    <div>
-                    <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i>
-                        {{localize "ITEM-PILES.Inspect.AddCurrency"}}
-                    </a>
-                <div>
-                {{/unless}}
-                {{/if}}
+                
             </div>
 
         {{/if}}

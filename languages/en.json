@@ -6,7 +6,8 @@
         "Currency": "Currency",
 
         "ContextMenu": {
-            "ShowToPlayers": "Show Item Pile to players"
+            "ShowToPlayers": "Item Piles: Show pile to players",
+            "RequestTrade": "Item Piles: Request Trade"
         },
 
         "Inspect": {
@@ -28,8 +29,74 @@
             "SplitCurrencies": "Split currency {num_players} ways"
         },
 
+        "Trade": {
+            "Title": "Item Piles: Trading",
+
+            "Accept": "Accept",
+            "Decline": "Decline",
+            "Mute": "Mute",
+            "AutoDecline": "You did not respond to the trade request quickly enough, so it was auto-declined.",
+            "Declined": "The other user declined the trade request.",
+            "Private": "Make this trade private",
+            "PrivateExplanation": "No chat card are posted, and no one can spectate",
+            "Over": "This trade is no longer active.",
+
+            "Request": {
+                "Title": "Item Piles: Send Trade Request",
+                "User": "Select which user you want to trade with:",
+                "PickActor": "Select which actor you will represent in the trade:",
+                "PickedActor": "The actor that you will represent in the trade:",
+                "PickToken": "Pick selected token",
+                "DropActor": "Drag and drop actor here",
+                "Label": "Send trade request"
+            },
+
+            "NoActiveUsers": {
+                "Title": "Item Piles: No Active Users",
+                "Content": "No players are active, so you have no one to trade with."
+            },
+
+            "Prompt": {
+                "Title": "Item Piles: Trade Request",
+                "Content": "{trading_actor_name} (user {trading_user_name}) wants to trade with you.",
+                "PrivateContent": "{trading_actor_name} (user {trading_user_name}) wants to <strong>privately</strong> trade with you.",
+                "AcceptQuery": "Do you accept?"
+            },
+
+            "OngoingRequest": {
+                "Content": "Wait for response from {user_name}...",
+                "Label": "Cancel trade request"
+            },
+
+            "CancelledRequest": {
+                "Content": "The trade request was cancelled by {user_name}."
+            },
+
+            "AddCurrency": {
+                "Title": "Add Currencies",
+                "Content": "Add currencies to the active trade with {trader_actor_name}",
+                "Label": "Update Currencies"
+            },
+
+            "GMAddCurrency": "Add Currency (GM mode)",
+
+            "Closed": {
+                "Title": "Trade Closed",
+                "You": "You closed the trading window, so the trade was cancelled.",
+                "Them": "User \"{user_name}\" closed the trading window, so the trade was cancelled.",
+                "Someone": "One of the users closed the trading window, so the trade was cancelled."
+            },
+
+            "Disconnected": "One of the users was disconnected, so the trade was cancelled.",
+
+            "UserCharacterWarning": "You picked the actor \"{actor_name}\" which is the assigned character of the player \"{player_name}\".<br><br>Are you sure you want to do this?",
+            "UserActiveCharacterWarning": "You picked the actor \"{actor_name}\" which is the assigned character of the player \"{player_name}\", who is <strong>active</strong>.<br><br>Are you sure you want to do this?",
+            "ActorOwnerWarning": "You do not own this actor, so you cannot trade with it."
+        },
+
         "Errors": {
-            "DisallowedItemDrop": "You cannot an drop \"{type}\" items",
+            "DisallowedItemDrop": "You cannot drop \"{type}\" items",
+            "DisallowedItemTrade": "You cannot trade \"{type}\" items",
             "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM.",
             "PileTooFar": "You're too far away to interact with this pile.",
             "PileLocked": "This item pile is locked and cannot be opened - you can't drop items in it.",
@@ -40,6 +107,10 @@
             "DropTypeWarning": {
                 "Title": "Item Type Warning",
                 "Content": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?"
+            },
+            "TradeTypeWarning": {
+                "Title": "Item Type Warning",
+                "Content": "You're attempting to trade an item that is of a type (\"{type}\") that is normally not allowed to be traded. Are you sure you want to do this?"
             },
             "ResetSettings": {
                 "Title": "Reset Item Piles Module Settings",
@@ -83,7 +154,16 @@
             "Filters": "Filters",
             "Path": "Attribute path",
             "AddNew": "Add new filter",
-            "Submit": "Submit Filters"
+            "Submit": "Submit filters"
+        },
+
+        "SimilaritiesEditor": {
+            "Title": "Item Similarities Editor",
+            "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
+            "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", you temporary items are considered \"unique\".",
+            "Path": "Attribute path",
+            "AddNew": "Add new attribute path",
+            "Submit": "Submit item similarities"
         },
 
         "Defaults": {
@@ -182,13 +262,21 @@
             "Title": "Dropping Currencies",
             "Player": "You can drop the following currencies into this item pile:",
             "GM": "As a GM, you can add currencies to this item pile:",
-            "AddToPile": "Add to pile",
-            "Cancel": "Cancel"
+            "NoCurrency": "{actor_name} has no valid currencies...",
+            "Cancel": "Cancel",
+            "AddToPile": "Add to pile"
         },
 
         "Chat": {
             "Pickup": "{name} picked up the following items:",
-            "Split": "An item pile's content was split among {num_players} players, and each one has received:"
+            "Split": "An item pile's content was split among {num_players} players, and each one has received:",
+            "TradeComplete": "{party_1} and {party_2} completed a trade.",
+            "TradeStarted": "{party_1} and {party_2} started a trade.",
+            "TradeStartedButton": "Click the button below to spectate:",
+            "TradeSpectate": "Spectate Trade",
+            "SpectateDisabled": "Trade Completed",
+            "PrivateTrade": "Private Trade",
+            "ExpandTrade": "View full trade details"
         },
 
         "Setting": {
@@ -214,6 +302,19 @@
                 "Title": "Item filters",
                 "Label": "Configure Item Filters",
                 "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
+            },
+            "ItemSimilarities": {
+                "Title": "Item Similarities",
+                "Label": "Configure Item Similarities",
+                "Hint": "Here you can configure what how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
+            },
+            "EnableTrading": {
+                "Title": "Enable Trading",
+                "Hint": "This enables trading - with this disabled, no one can initiate any trade."
+            },
+            "ShowTradeButton": {
+                "Title": "Show Trade Button",
+                "Hint": "Enabling this will display a trade button just below the player list in the bottom right."
             },
             "OutputToChat": {
                 "Title": "Output to chat",

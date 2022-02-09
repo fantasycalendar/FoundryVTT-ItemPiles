@@ -50,7 +50,7 @@ export class ItemPileFiltersEditor extends FormApplication {
                 path: "",
                 filters: ""
             })
-            self.rerender();
+            self.render(true);
         });
     }
 

@@ -55,6 +55,10 @@ const HOOKS = {
         REMOVE: module`removeAttributes`,
         PRE_TRANSFER_ALL: module`preTransferAllAttributes`,
         TRANSFER_ALL: module`transferAllAttributes`,
+    },
+    TRADE: {
+        STARTED: module`tradeStarted`,
+        COMPLETE: module`tradeComplete`
     }
 }
 

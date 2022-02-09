@@ -3,8 +3,8 @@ import API from "../api.js";
 import * as lib from "../lib/lib.js";
 import { isPileInventoryOpenForOthers } from "../socket.js";
 import HOOKS from "../hooks.js";
-import { ItemPileConfig } from "./itemPileConfig.js";
-import DropCurrencyDialog from "./dropCurrencyDialog.js";
+import { ItemPileConfig } from "./item-pile-config.js";
+import DropCurrencyDialog from "./drop-currency-dialog.js";
 
 export class ItemPileInventory extends FormApplication {
 
@@ -39,7 +39,7 @@ export class ItemPileInventory extends FormApplication {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             title: game.i18n.localize("ITEM-PILES.Inspect.Title"),
-            classes: ["sheet", "item-piles-inventory-sheet"],
+            classes: ["sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
             width: 550,
             height: "auto",
@@ -228,6 +228,8 @@ export class ItemPileInventory extends FormApplication {
             return data;
         }
 
+        data.systemHasCurrencies = !!API.CURRENCIES.length;
+
         data.playerActors = this.playerActors;
         data.moreThanOneInspectableActors = data.playerActors.length > 1;
 
@@ -263,52 +265,52 @@ export class ItemPileInventory extends FormApplication {
             || (pileData.shareCurrenciesEnabled && data.currencies.find((attribute) => (attribute.quantity / num_players) > 1))
 
         data.buttons = [];
-        if(data.hasRecipient){
 
-            if(pileData.splitAllEnabled && hasSplittableQuantities && (pileData.shareItemsEnabled || pileData.shareCurrenciesEnabled)) {
-
-                let buttonText;
-                if(pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled){
-                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitAll", { num_players });
-                }else if(pileData.shareItemsEnabled){
-                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitItems", { num_players });
-                }else{
-                    buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitCurrencies", { num_players });
-                }
-
-                data.buttons.push({
-                    value: "splitAll",
-                    icon: "far fa-handshake",
-                    text: buttonText,
-                    disabled: !num_players,
-                    type: "button"
-                });
-
-            }
-
-            if(!pileData.shareItemsEnabled && !pileData.shareCurrenciesEnabled && pileData.takeAllEnabled) {
-
-                data.buttons.push({
-                    value: "takeAll",
-                    icon: "fas fa-fist-raised",
-                    text: game.i18n.localize("ITEM-PILES.Inspect.TakeAll")
-                });
-
-            }
-
-            if(pileData.isContainer && !this.overrides.remote){
-                data.buttons.push({
-                    value: "close",
-                    icon: "fas fa-box",
-                    text: game.i18n.localize("ITEM-PILES.Inspect.Close")
-                })
-            }
-        }else if(data.editQuantities){
+        if(!data.hasRecipient && data.editQuantities){
             data.buttons.push({
                 value: "update",
                 icon: "fas fa-save",
                 text: game.i18n.localize("ITEM-PILES.Defaults.Update")
             });
+        }
+
+        if((data.hasRecipient || game.user.isGM) && pileData.splitAllEnabled && hasSplittableQuantities && (pileData.shareItemsEnabled || pileData.shareCurrenciesEnabled)) {
+
+            let buttonText;
+            if(pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled){
+                buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitAll", { num_players });
+            }else if(pileData.shareItemsEnabled){
+                buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitItems", { num_players });
+            }else{
+                buttonText = game.i18n.format("ITEM-PILES.Inspect.SplitCurrencies", { num_players });
+            }
+
+            data.buttons.push({
+                value: "splitAll",
+                icon: "far fa-handshake",
+                text: buttonText,
+                disabled: !num_players,
+                type: "button"
+            });
+
+        }
+
+        if(pileData.isContainer && !this.overrides.remote){
+            data.buttons.push({
+                value: "close",
+                icon: "fas fa-box",
+                text: game.i18n.localize("ITEM-PILES.Inspect.Close")
+            })
+        }
+
+        if(data.hasRecipient && !pileData.shareItemsEnabled && !pileData.shareCurrenciesEnabled && pileData.takeAllEnabled) {
+
+            data.buttons.push({
+                value: "takeAll",
+                icon: "fas fa-fist-raised",
+                text: game.i18n.localize("ITEM-PILES.Inspect.TakeAll")
+            });
+
         }
 
         return data;
@@ -399,6 +401,7 @@ export class ItemPileInventory extends FormApplication {
             const innerHTML = element.html();
             element.removeClass(".item-piles-change-actor")
                 .replaceWith($('<span>' + innerHTML + '</span>'));
+            html.find('.item-piles-change-actor-select').remove();
         }
     }
 
@@ -461,15 +464,16 @@ export class ItemPileInventory extends FormApplication {
 
         if(this.recipient) {
             const currencyToAdd = await DropCurrencyDialog.query({
-                itemPile: this.pile,
-                dropper: this.recipient
+                target: this.pile,
+                source: this.recipient
             })
             return API.transferAttributes(this.recipient, this.pile, currencyToAdd);
         }
 
         if(game.user.isGM){
             const currencyToAdd = await DropCurrencyDialog.query({
-                itemPile: this.pile
+                target: this.pile,
+                source: this.recipient
             })
             return API.addAttributes(this.pile, currencyToAdd);
         }

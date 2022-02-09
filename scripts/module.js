@@ -1,17 +1,18 @@
 import CONSTANTS from "./constants.js";
 import HOOKS from "./hooks.js";
 
+import flagManager from "./flagManager.js";
 import chatHandler from "./chathandler.js";
 import API from "./api.js";
 import * as lib from "./lib/lib.js";
 
-import { ItemPileConfig } from "./formapplications/itemPileConfig.js";
+import { ItemPileConfig } from "./formapplications/item-pile-config.js";
 import { registerSettings, checkSystem, migrateSettings, registerHandlebarHelpers } from "./settings.js";
 import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
-import flagManager from "./flagManager.js";
 import { getActorCurrencies, getActorItems } from "./lib/lib.js";
+import { TradeAPI } from "./trade-api.js";
 
 Hooks.once("init", async () => {
 
@@ -33,10 +34,17 @@ Hooks.once("init", async () => {
     Hooks.on("getActorDirectoryEntryContext", module._handleActorContextMenu);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
 
-    Hooks.on(HOOKS.ITEM.TRANSFER, chatHandler._outputTransferItem.bind(chatHandler));
-    Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, chatHandler._outputTransferCurrency.bind(chatHandler));
-    Hooks.on(HOOKS.TRANSFER_EVERYTHING, chatHandler._outputTransferEverything.bind(chatHandler));
-    Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, chatHandler._outputSplitItemPileInventory.bind(chatHandler));
+    chatHandler.init();
+
+    if(game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") && game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")){
+        Hooks.on("renderPlayerList", (app, html) => {
+            const button = $(`<button type="button" class="item-piles-player-list-trade-button"><i class="fas fa-handshake"></i> Request Trade</button>`)
+            button.click(() => {
+                TradeAPI.requestTrade();
+            });
+            html.append(button);
+        })
+    }
 
     if (game.settings.get(CONSTANTS.MODULE_NAME, "debugHooks")) {
         for (let hook of Object.values(HOOKS)) {
@@ -236,6 +244,7 @@ const module = {
     },
 
     _handleActorContextMenu(html, menuItems) {
+
         menuItems.push({
             name: "ITEM-PILES.ContextMenu.ShowToPlayers",
             icon: `<i class="fas fa-eye"></i>`,
@@ -248,7 +257,22 @@ const module = {
             condition: (html) => {
                 const actorId = html[0].dataset.documentId;
                 const actor = game.actors.get(actorId);
-                return API.isValidItemPile(actor);
+                return game.user.isGM && API.isValidItemPile(actor);
+            }
+        }, {
+            name: "ITEM-PILES.ContextMenu.RequestTrade",
+            icon: `<i class="fas fa-handshake"></i>`,
+            callback: (html) => {
+                const actorId = html[0].dataset.documentId;
+                const actor = game.actors.get(actorId);
+                const user = Array.from(game.users).find(u => u.character === actor && u.active);
+                return TradeAPI.requestTrade(user);
+            },
+            condition: (html) => {
+                const actorId = html[0].dataset.documentId;
+                const actor = game.actors.get(actorId);
+                return game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading")
+                    && (game.user?.character !== actor || Array.from(game.users).find(u => u.character === actor && u.active));
             }
         });
     }

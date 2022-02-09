@@ -1,0 +1,151 @@
+<form class="flexcol item-piles-dialog" style="padding:0.5rem; margin:0;" autocomplete="off">
+
+    <style>
+
+        .item-piles-header-icon{
+            font-size:3rem;
+        }
+
+        .item-piles-actor-container{
+            margin-bottom: 1rem;
+            min-height: 150px;
+            padding: 0.5rem;
+            text-align: center;
+            border: 1px solid gray;
+            border-radius:5px;
+        }
+
+        .item-piles-box-highlight{
+            box-shadow: 0 0 20px inset var(--color-shadow-highlight, #ff6400);
+        }
+
+        .item-piles-actor-container img {
+            border: 0;
+            max-height:80px;
+            max-width:80px;
+            width: auto;
+            height: auto;
+            border-radius: 5px;
+            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+            margin-bottom: 10px;
+        }
+
+        .item-piles-actor-container span {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .item-piles-change-actor-select{
+            height: 23px;
+        }
+
+    </style>
+
+    <p><i class="item-piles-header-icon fas fa-handshake"></i></p>
+
+    <p style="margin-bottom: 1rem"><strong style="font-size:1.2rem;">
+        {{#if isPrompt}}
+            {{localize "ITEM-PILES.Trade.Prompt.Title"}}
+        {{else}}
+            {{localize "ITEM-PILES.Trade.Request.Title"}}
+        {{/if}}
+    </strong></p>
+
+    {{#if isPrompt}}
+        <div class="item-piles-bottom-divider">
+            {{#if isPrivate}}
+                <p>{{{localize "ITEM-PILES.Trade.Prompt.PrivateContent" trading_user_name=tradingUser.name trading_actor_name=tradingActor.name}}}</p>
+            {{else}}
+                <p>{{{localize "ITEM-PILES.Trade.Prompt.Content" trading_user_name=tradingUser.name trading_actor_name=tradingActor.name}}}</p>
+            {{/if}}
+            <p>{{localize "ITEM-PILES.Trade.Prompt.AcceptQuery"}}</p>
+        </div>
+
+    {{else}}
+
+        <p>{{localize "ITEM-PILES.Trade.Request.User"}}</p>
+
+        <div class="item-piles-bottom-divider">
+            <div class="form-group" style="max-width: 75%;">
+                <label class="item-piles-text-right" style="margin-right: 0.5rem;">User:</label>
+                {{#select user.id}}
+                <select name="user" style="width: 66%;">
+                    {{#each users as |user id|}}
+                        <option value="{{user.id}}">{{user.name}}</option>
+                    {{/each}}
+                </select>
+                {{/select}}
+            </div>
+        </div>
+        <div class="item-piles-bottom-divider">
+            <div class="form-group" style="flex-direction: column;">
+                <label style="display:flex;">
+                    <input type="checkbox" name="private" class="item-piles-private-trade" {{#if private}}checked="checked"{{/if}}>
+                    <span>{{localize "ITEM-PILES.Trade.Private"}}</span>
+                </label>
+                <small>{{ localize "ITEM-PILES.Trade.PrivateExplanation"}}</small>
+            </div>
+        </div>
+
+    {{/if}}
+
+        {{#if actor}}
+            <p>{{localize "ITEM-PILES.Trade.Request.PickedActor"}}</p>
+        {{else}}
+            <p>{{localize "ITEM-PILES.Trade.Request.PickActor"}}</p>
+        {{/if}}
+
+        <div class="item-piles-bottom-divider">
+            <div class="form-group item-piles-actor-container">
+                {{#if actor}}
+                <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                    {{#if actor.data.img}}
+                    <img src="{{actor.data.img}}">
+                    {{/if}}
+
+                    {{#if multipleActors}}
+                    {{#select actor.uuid}}
+                    <span><a class='item-piles-change-actor item-piles-highlight'>{{actor.name}}</a>
+                        <select class="item-piles-change-actor-select" name="actor" style="display:none;">
+                            {{#each actors as |actor id|}}
+                            <option value="{{actor.uuid}}">{{actor.name}}</option>
+                            {{/each}}
+                        </select>
+                    </span>
+                    {{/select}}
+                    {{else}}
+                    <span>{{actor.name}}</span>
+                    {{/if}}
+
+                </div>
+                {{else}}
+                <p>{{ localize "ITEM-PILES.Trade.Request.DropActor" }}</p>
+                {{/if}}
+            </div>
+            {{#if hasUnlinkedTokenOwnership}}
+            <div class="flexrow">
+                <button type="button" class="item-piles-pick-selected-token"><i class="fas fa-expand"></i> {{ localize "ITEM-PILES.Trade.Request.PickToken" }}</button>
+            </div>
+            {{/if}}
+        </div>
+
+    <footer class="sheet-footer flexrow">
+        {{#each buttons as |button id|}}
+        <button
+                name="{{ button.value }}"
+                value="{{ button.value }}"
+                type="{{#if button.type}}{{button.type}}{{else}}submit{{/if}}"
+                {{#if button.disabled}}disabled{{/if}}
+        >
+        <i class="{{ button.icon }}"></i> {{{ button.text }}}
+        </button>
+        {{/each}}
+    </footer>
+
+    {{#if isPrompt}}
+    <div class="item-piles-progress" style="flex: 1 0 auto;">
+        <span class="progress-bar" style="width: 0;"></span>
+    </div>
+    {{/if}}
+
+</form>

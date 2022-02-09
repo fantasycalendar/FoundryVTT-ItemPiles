@@ -1,8 +1,8 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
-import { ItemPileInventory } from "./formapplications/itemPileInventory.js";
-import DropItemDialog from "./formapplications/dropItemDialog.js";
+import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
+import DropItemDialog from "./formapplications/drop-item-dialog.js";
 import HOOKS from "./hooks.js";
 import { hotkeyState } from "./hotkeys.js";
 
@@ -42,6 +42,15 @@ export default class API {
      */
     static get ITEM_FILTERS() {
         return lib.cleanItemFilters(game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters"));
+    }
+
+    /**
+     * The attributes for detecting item similarities
+     *
+     * @returns {Array}
+     */
+    static get ITEM_SIMILARITIES() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemSimilarities");
     }
 
     /**
@@ -105,7 +114,7 @@ export default class API {
      */
     static async setItemFilters(inFilters) {
         if (!Array.isArray(inFilters)) {
-            throw lib.custom_error("setItemFilters | inFilters must be of type string or array");
+            throw lib.custom_error("setItemFilters | inFilters must be of type array");
         }
         inFilters.forEach(filter => {
             if (typeof filter?.path !== "string") {
@@ -116,6 +125,24 @@ export default class API {
             }
         });
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemFilters", inFilters);
+    }
+
+    /**
+     * Sets the attributes for detecting item similarities
+     *
+     * @param {array} inPaths
+     * @returns {Promise}
+     */
+    static async setItemSimilarities(inPaths) {
+        if (!Array.isArray(inPaths)) {
+            throw lib.custom_error("setItemSimilarities | inPaths must be of type array");
+        }
+        inPaths.forEach(path => {
+            if (typeof path !== "string") {
+                throw lib.custom_error("setItemSimilarities | each entry in inPaths must be of type string");
+            }
+        });
+        return game.settings.set(CONSTANTS.MODULE_NAME, "itemSimilarities", inPaths);
     }
 
     /**
@@ -956,11 +983,12 @@ export default class API {
      *
      * @param {Actor/TokenDocument/Token} target        The target to add an item to
      * @param {array} items                             An array of objects, with the key "item" being an item object or an Item class (the foundry class), with an optional key of "quantity" being the amount of the item to add
+     * @param {boolean} [mergeSimilarItems=true]        Whether to merge similar items based on their name and type
      * @param {string/boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<array>}                        An array of objects, each containing the item that was added or updated, and the quantity that was added
      */
-    static async addItems(target, items, { interactionId = false }={}) {
+    static async addItems(target, items, { mergeSimilarItems = true, interactionId = false }={}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, items, interactionId);
         if (hookResult === false) return;
@@ -968,7 +996,8 @@ export default class API {
         const targetUuid = lib.getUuid(target);
         if (!targetUuid) throw lib.custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
 
-        items = items.map(itemData => {
+        const itemsToAdd = []
+        items.forEach(itemData => {
 
             let item = itemData;
             if(itemData instanceof Item){
@@ -979,23 +1008,30 @@ export default class API {
                 item = itemData.item;
             }
 
-            return {
-                item: item,
-                quantity: itemData?.quantity ?? lib.getItemQuantity(item)
+            if(itemData?.quantity !== undefined){
+                setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity)
             }
+
+            const existingItems = mergeSimilarItems ? lib.findSimilarItem(itemsToAdd, item) : false;
+            if(existingItems){
+                setProperty(existingItems, API.ITEM_QUANTITY_ATTRIBUTE, lib.getItemQuantity(existingItems) + lib.getItemQuantity(item))
+            }else{
+                itemsToAdd.push(item);
+            }
+
         });
 
         if(interactionId){
             if (typeof interactionId !== "string") throw lib.custom_error(`AddItems | interactionId must be of type string`);
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEMS, targetUuid, items, game.user.id, { interactionId });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, { interactionId });
     }
 
     /**
      * @private
      */
-    static async _addItems(targetUuid, items, userId, { isTransfer = false, interactionId = false } = {}) {
+    static async _addItems(targetUuid, items, userId, { runHooks = true, interactionId = false } = {}) {
 
         const target = await fromUuid(targetUuid);
         const targetActor = target instanceof TokenDocument
@@ -1009,7 +1045,7 @@ export default class API {
         const itemsToUpdate = [];
         for (const itemData of items) {
 
-            let item = itemData.item;
+            let item = itemData?.item ?? itemData;
 
             const foundItem = lib.findSimilarItem(targetActorItems, item);
 
@@ -1047,7 +1083,7 @@ export default class API {
             })
         });
 
-        if (!isTransfer) {
+        if (runHooks) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.ADD, targetUuid, itemsAdded, userId, interactionId);
 
@@ -1126,7 +1162,7 @@ export default class API {
     /**
      * @private
      */
-    static async _removeItems(targetUuid, items, userId, { isTransfer = false, interactionId = false } = {}) {
+    static async _removeItems(targetUuid, items, userId, { runHooks = true, interactionId = false } = {}) {
 
         const target = await fromUuid(targetUuid);
         const targetActor = target instanceof TokenDocument
@@ -1138,7 +1174,11 @@ export default class API {
         const itemsToDelete = [];
         for (const itemData of items) {
 
-            const item = targetActor.items.get(itemData._id).toObject();
+            let item = targetActor.items.get(itemData._id);
+
+            if(!item) continue;
+
+            item = item.toObject();
 
             const currentQuantity = lib.getItemQuantity(item);
 
@@ -1169,7 +1209,7 @@ export default class API {
         await targetActor.updateEmbeddedDocuments("Item", itemsToUpdate);
         await targetActor.deleteEmbeddedDocuments("Item", itemsToDelete);
 
-        if (!isTransfer) {
+        if (runHooks) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.REMOVE, targetUuid, itemsRemoved, userId, interactionId);
 
@@ -1258,13 +1298,13 @@ export default class API {
     /**
      * @private
      */
-    static async _transferItems(sourceUuid, targetUuid, items, userId, { isEverything = false, interactionId = false } = {}) {
+    static async _transferItems(sourceUuid, targetUuid, items, userId, { runHooks = true, interactionId = false } = {}) {
 
-        const itemsRemoved = await API._removeItems(sourceUuid, items, userId, { isTransfer: true });
+        const itemsRemoved = await API._removeItems(sourceUuid, items, userId, { runHooks: false });
 
-        const itemsAdded = await API._addItems(targetUuid, itemsRemoved, userId, { isTransfer: true });
+        const itemsAdded = await API._addItems(targetUuid, itemsRemoved, userId, { runHooks: false });
 
-        if (!isEverything) {
+        if (runHooks) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemsAdded, userId, interactionId);
 
@@ -1338,16 +1378,16 @@ export default class API {
     /**
      * @private
      */
-    static async _transferAllItems(sourceUuid, targetUuid, userId, { itemFilters = false, isEverything = false, interactionId = false } = {}) {
+    static async _transferAllItems(sourceUuid, targetUuid, userId, { itemFilters = false, runHooks = false, interactionId = false } = {}) {
 
         const source = await fromUuid(sourceUuid);
 
         const itemsToRemove = API.getItemPileItems(source, itemFilters).map(item => item.toObject());
 
-        const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, userId, { isTransfer: true, interactionId });
-        const itemAdded = await API._addItems(targetUuid, itemsRemoved, userId, { isTransfer: true, interactionId });
+        const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, userId, { runHooks: false, interactionId });
+        const itemAdded = await API._addItems(targetUuid, itemsRemoved, userId, { runHooks: false, interactionId });
 
-        if (!isEverything) {
+        if (runHooks) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, HOOKS.ITEM.TRANSFER_ALL, sourceUuid, targetUuid, itemAdded, userId, interactionId);
 
@@ -1418,7 +1458,7 @@ export default class API {
     /**
      * @private
      */
-    static async _addAttributes(targetUuid, attributes, userId, { isTransfer = false, interactionId = false } = {}) {
+    static async _addAttributes(targetUuid, attributes, userId, { runHooks = true, interactionId = false } = {}) {
 
         const target = await fromUuid(targetUuid);
         const targetActor = target instanceof TokenDocument
@@ -1439,7 +1479,7 @@ export default class API {
 
         await targetActor.update(updates);
 
-        if (!isTransfer) {
+        if (runHooks) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.ADD, targetUuid, attributesAdded, userId, interactionId);
 
@@ -1512,7 +1552,7 @@ export default class API {
     /**
      * @private
      */
-    static async _removeAttributes(targetUuid, attributes, userId, { isTransfer = false, interactionId = false } = {}) {
+    static async _removeAttributes(targetUuid, attributes, userId, { runHooks = true, interactionId = false } = {}) {
 
         const target = await fromUuid(targetUuid);
         const targetActor = target instanceof TokenDocument
@@ -1541,7 +1581,7 @@ export default class API {
 
         await targetActor.update(updates);
 
-        if (!isTransfer) {
+        if (runHooks) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.REMOVE, targetUuid, attributesRemoved, userId, interactionId);
 
@@ -1633,13 +1673,13 @@ export default class API {
     /**
      * @private
      */
-    static async _transferAttributes(sourceUuid, targetUuid, attributes, userId, { isEverything = false, interactionId = false }={}) {
+    static async _transferAttributes(sourceUuid, targetUuid, attributes, userId, { runHooks = true, interactionId = false }={}) {
 
-        const attributesRemoved = await API._removeAttributes(sourceUuid, attributes, userId, { isTransfer: true });
+        const attributesRemoved = await API._removeAttributes(sourceUuid, attributes, userId, { runHooks: false });
 
-        await API._addAttributes(targetUuid, attributesRemoved, userId, { isTransfer: true });
+        await API._addAttributes(targetUuid, attributesRemoved, userId, { runHooks: false });
 
-        if (!isEverything) {
+        if (runHooks) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributesRemoved, userId, interactionId);
 
@@ -1705,7 +1745,7 @@ export default class API {
     /**
      * @private
      */
-    static async _transferAllAttributes(sourceUuid, targetUuid, userId, { isEverything = false, interactionId = false } = {}) {
+    static async _transferAllAttributes(sourceUuid, targetUuid, userId, { runHooks = true, interactionId = false } = {}) {
 
         const source = await fromUuid(sourceUuid);
 
@@ -1725,10 +1765,10 @@ export default class API {
             return hasProperty(targetActor.data, attribute.path);
         }).map(attribute => attribute.path);
 
-        const attributesRemoved = await API._removeAttributes(sourceUuid, attributesToTransfer, userId, { isTransfer: true });
-        const attributesAdded = await API._addAttributes(targetUuid, attributesRemoved, userId, { isTransfer: true });
+        const attributesRemoved = await API._removeAttributes(sourceUuid, attributesToTransfer, userId, { runHooks: false });
+        const attributesAdded = await API._addAttributes(targetUuid, attributesRemoved, userId, { runHooks: false });
 
-        if (!isEverything) {
+        if (runHooks) {
 
             await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER_ALL, sourceUuid, targetUuid, attributesAdded, userId, interactionId);
 
@@ -2289,38 +2329,40 @@ export default class API {
             return lib.tokens_close_enough(pileToken, token, maxDistance) || game.user.isGM;
         });
 
-        if (!validTokens.length && !game.user.isGM) {
+        if (!validTokens.length && !game.user.isGM && maxDistance !== Infinity) {
             lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
             return;
         }
 
-        let interactingToken;
+        let interactingActor;
         if(validTokens.length) {
             if (validTokens.includes(_token)) {
-                interactingToken = _token.document;
+                interactingActor = _token.actor;
             } else {
                 validTokens.sort((potentialTargetA, potentialTargetB) => {
                     return lib.grids_between_tokens(pileToken, potentialTargetA) - lib.grids_between_tokens(pileToken, potentialTargetB);
                 })
-                interactingToken = validTokens[0].document;
+                interactingActor = validTokens[0].actor;
             }
+        } else if(game.user.character){
+            interactingActor = game.user.character;
         }
 
-        if (data.isContainer && interactingToken) {
+        if (data.isContainer && interactingActor) {
 
             if (data.locked && !game.user.isGM) {
                 lib.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
-                return API.rattleItemPile(pileDocument, interactingToken);
+                return API.rattleItemPile(pileDocument, interactingActor);
             }
 
             if (data.closed) {
                 lib.debug(`Opened item pile with UUID ${pileDocument.uuid}`);
-                await API.openItemPile(pileDocument, interactingToken);
+                await API.openItemPile(pileDocument, interactingActor);
             }
 
         }
 
-        return ItemPileInventory.show(pileDocument, interactingToken);
+        return ItemPileInventory.show(pileDocument, interactingActor);
 
     }
 
