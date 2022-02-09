@@ -39,7 +39,7 @@
                 <div class="flexrow"><h3>{{localize "ITEM-PILES.Items"}}:</h3></div>
                 {{/if}}
                 {{#each items as |item id|}}
-                <div class="flexrow item-piles-item-row {{#unless item.quantity}}item-piles-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
+                <div class="flexrow item-piles-item-row item-piles-even-color {{#unless item.quantity}}item-piles-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
 
                     <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
 
@@ -100,7 +100,7 @@
                 {{/if}}
                 {{/if}}
                 {{#each currencies as |currency id|}}
-                <div class="flexrow item-piles-item-row item-piles-currency-row {{#unless currency.shareLeft}}{{#unless @root.editQuantities}}item-piles-disabled{{/unless}}{{/unless}}" data-currency-name="{{currency.name}}" data-currency-path="{{currency.path}}">
+                <div class="flexrow item-piles-item-row item-piles-even-color item-piles-currency-row {{#unless currency.shareLeft}}{{#unless @root.editQuantities}}item-piles-disabled{{/unless}}{{/unless}}" data-currency-name="{{currency.name}}" data-currency-path="{{currency.path}}">
 
                     <div class="item-piles-img-container"><img class="item-piles-img" src="{{currency.img}}"/></div>
 
@@ -139,7 +139,6 @@
 
                 </div>
                 {{/each}}
-                
             </div>
 
         {{/if}}

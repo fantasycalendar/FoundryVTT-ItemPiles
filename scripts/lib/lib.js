@@ -741,3 +741,38 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor){
     });
 
 }
+
+
+/* -------------------------- Merchant Methods ------------------------- */
+
+export function getItemPrices(item){
+
+    const itemData = item instanceof Item
+        ? item.data
+        : item;
+
+    return getProperty(itemData, "data.price");
+
+}
+
+export function getMerchantItemsForActor(merchant, actor = false){
+
+    const pileData = getItemPileData(merchant);
+    const pileItems = getActorItems(merchant);
+
+
+    return pileItems.map(item => {
+
+        return {
+            id: item.id,
+            name: item.name,
+            type: item.type,
+            img: item.data?.img ?? "",
+            quantity: getItemQuantity(item),
+            price: {
+                cost: getItemPrices(item)
+            }
+        };
+    })
+
+}

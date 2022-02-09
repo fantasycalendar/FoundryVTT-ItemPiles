@@ -81,7 +81,10 @@
 .item-piles-img-container .item-piles-img:hover {
   transform: scale(1.125, 1.125);
 }
-.item-piles-odd-color:nth-child(even) {
+.item-piles-even-color:nth-child(even) {
+  background-color: var(--color-text-light-highlight, #f0f0e0);
+}
+.item-piles-odd-color:nth-child(odd) {
   background-color: var(--color-text-light-highlight, #f0f0e0);
 }
 .item-piles-bottom-divider {
@@ -139,8 +142,8 @@
   margin-right: 5px;
   border-radius: 4px;
 }
-.item-piles-items-list .item-piles-item-row:nth-child(even):not(.item-piles-disabled) {
-  background-color: var(--color-text-light-highlight, #f0f0e0);
+.item-piles-items-list .item-piles-item-row .item-piles-disabled {
+  background-color: var(--color-bg-btn-minor-inactive, #c9c7b8);
 }
 .item-piles-items-list .item-piles-item-row .item-piles-disabled {
   background-color: var(--color-bg-btn-minor-inactive, #c9c7b8);
@@ -391,6 +394,102 @@
 }
 .item-piles-trading-sheet .character-header.trader img {
   margin-left: auto;
+}
+
+/* ---------------------- MERCHANT UI ---------------------- */
+.item-piles-merchant-sheet {
+  min-width: 600px;
+  min-height: 600px;
+}
+.item-piles-merchant-sheet .merchant-top-bar {
+  flex: 0 1 auto;
+}
+.item-piles-merchant-sheet .merchant-top-bar .opening-hours {
+  text-align: right;
+  flex: 0 1 auto;
+}
+.item-piles-merchant-sheet .merchant-top-bar .merchant-name {
+  font-size: 2em;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content {
+  max-height: calc(100% - 59px);
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-left-pane {
+  flex: 0 1 35%;
+  padding-right: 10px;
+  margin-right: 10px;
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+  max-height: 100%;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-left-pane .merchant-img {
+  flex: 0 1 auto;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-left-pane .merchant-img img {
+  width: 100%;
+  height: auto;
+  border: 0;
+  border-radius: 3px;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-left-pane .merchant-description {
+  overflow-y: scroll;
+  padding: 5px 10px 5px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  margin-bottom: 5px;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-left-pane .merchant-details {
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  flex: 0;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane {
+  flex: 1;
+  max-height: 100%;
+  overflow-y: scroll;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .merchant-item-group-type {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  text-transform: capitalize;
+  margin-top: 10px;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .item-piles-items-list {
+  overflow: auto;
+  padding-right: 10px;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .item-piles-items-list .item-piles-item-row {
+  margin: 0;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .item-piles-items-list .item-piles-item-row .item-piles-text {
+  font-size: inherit;
+  padding-left: 0.25rem;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .item-piles-items-list .item-piles-item-row .item-piles-img-container {
+  min-height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  margin: 2px;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid black;
+  align-self: center;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .item-piles-items-list .item-piles-item-row .item-piles-img-container .item-piles-img {
+  border: 0;
+  width: auto;
+  height: 100%;
+  transition: transform 150ms;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .item-piles-items-list .item-piles-item-row .item-piles-img-container .item-piles-img:hover {
+  transform: scale(1.125, 1.125);
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .item-piles-items-list .item-piles-item-row .item-piles-name-container {
+  line-height: 1.6;
+}
+.item-piles-merchant-sheet .item-pile-merchant-content .merchant-right-pane .item-piles-items-list .item-piles-item-row .item-piles-disabled {
+  background-color: var(--color-bg-btn-minor-inactive, #c9c7b8);
 }
 
 /*# sourceMappingURL=module.css.map */

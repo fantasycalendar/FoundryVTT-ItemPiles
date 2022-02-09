@@ -246,7 +246,7 @@ const chatHandler = {
             }
         }
 
-        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/loot-chat-message.html", {
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/looted.html", {
             message: game.i18n.format("ITEM-PILES.Chat.Pickup", { name: targetActor.name }),
             itemPile: sourceActor,
             actor: targetActor,
@@ -299,7 +299,7 @@ const chatHandler = {
             return a.index - b.index;
         })
 
-        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/loot-chat-message.html", {
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/looted.html", {
             message: game.i18n.format("ITEM-PILES.Chat.Pickup", { name: targetActor.name }),
             itemPile: sourceActor,
             actor: targetActor,
@@ -323,7 +323,7 @@ const chatHandler = {
 
         const sourceActor = source?.actor ?? source;
 
-        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/loot-chat-message.html", {
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/looted.html", {
             message: game.i18n.format("ITEM-PILES.Chat.Split", { num_players: num_players }),
             itemPile: sourceActor,
             items: items,
@@ -348,7 +348,7 @@ const chatHandler = {
         let party_2_actor = await fromUuid(party_2.actor);
         party_2_actor = party_2_actor?.actor ?? party_2_actor;
 
-        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/trade-started-chat-message.html", {
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/trade-started.html", {
             party_1_actor,
             party_2_actor,
             publicTradeId,
@@ -394,7 +394,7 @@ const chatHandler = {
 
         const enableCollapse = (party_1_data.items.length + party_1_data.currencies.length + party_2_data.items.length + party_2_data.currencies.length) > 6;
 
-        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/trade-complete-chat-message.html", {
+        const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/trade-complete.html", {
             party_1: party_1_data,
             party_2: party_2_data,
             publicTradeId,
@@ -427,6 +427,7 @@ const chatHandler = {
                     chatData.whisper.push(userId);
                 }
                 chatData.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
+
             }
 
         }

@@ -1,6 +1,6 @@
 import CONSTANTS from "../constants.js";
 
-export class ItemPileFiltersEditor extends FormApplication {
+export class ItemFiltersEditor extends FormApplication {
 
     constructor(pileFilters = false, resolve = false) {
         super();
@@ -13,7 +13,7 @@ export class ItemPileFiltersEditor extends FormApplication {
         return foundry.utils.mergeObject(super.defaultOptions, {
             title: game.i18n.localize("ITEM-PILES.FilterEditor.Title"),
             classes: ["sheet", "item-pile-filters-editor"],
-            template: `${CONSTANTS.PATH}templates/filter-editor.html`,
+            template: `${CONSTANTS.PATH}templates/item-filters-editor.html`,
             width: 630,
             height: "auto",
             resizable: false
@@ -25,7 +25,7 @@ export class ItemPileFiltersEditor extends FormApplication {
         const promise = new Promise(_resolve => {
             resolve = _resolve;
         });
-        return [promise, new ItemPileFiltersEditor(foundry.utils.duplicate(pileFilters), resolve).render(true)]
+        return [promise, new ItemFiltersEditor(foundry.utils.duplicate(pileFilters), resolve).render(true)]
     }
 
     async getData(options) {

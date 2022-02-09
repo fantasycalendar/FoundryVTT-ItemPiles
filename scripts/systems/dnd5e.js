@@ -5,6 +5,9 @@ export default {
     // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
     "ITEM_QUANTITY_ATTRIBUTE": "data.quantity",
 
+    // The item price attribute is the path to the attribute on each item that determine how much it costs
+    "ITEM_PRICE_ATTRIBUTE": "data.price",
+
     // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
     "ITEM_FILTERS": [
         {
@@ -17,6 +20,7 @@ export default {
         }
     ],
 
+    // This makes items differentiate themselves with these attribute paths.
     "ITEM_SIMILARITIES": ["name", "type"],
 
     // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets

@@ -1,27 +1,28 @@
-import CONSTANTS from "./constants.js";
-import { ItemPileCurrenciesEditor } from "./formapplications/item-pile-currencies-editor.js";
+import { CurrenciesEditor } from "./formapplications/currencies-editor.js";
 import { SYSTEMS } from "./systems.js";
 import * as lib from "./lib/lib.js";
-import { ItemPileFiltersEditor } from "./formapplications/item-pile-filters-editor.js";
-import flagManager from "./flagManager.js";
-import { ItemPileSimilaritiesEditor } from "./formapplications/item-pile-similarities-editor.js";
+import { ItemFiltersEditor } from "./formapplications/item-filters-editor.js";
+import migrations from "./migrations.js";
+import { ItemSimilaritiesEditor } from "./formapplications/item-similarities-editor.js";
+import CONSTANTS from "./constants.js";
+
 
 const debounceReload = foundry.utils.debounce(() => {
     window.location.reload();
 }, 100);
 
-function defaultSettings(apply = false) {
+function defaultSettings() {
     return {
         "currencies": {
             scope: "world",
             config: false,
-            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.CURRENCIES : [],
+            default: SYSTEMS.DATA ? SYSTEMS.DATA.CURRENCIES : [],
             type: Array
         },
         "itemFilters": {
             scope: "world",
             config: false,
-            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_FILTERS : [],
+            default: SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_FILTERS : [],
             type: Array
         },
         "actorClassType": {
@@ -29,7 +30,7 @@ function defaultSettings(apply = false) {
             hint: "ITEM-PILES.Setting.ActorClass.Label",
             scope: "world",
             config: true,
-            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ACTOR_CLASS_TYPE : game.system.template.Actor.types[0],
+            default: SYSTEMS.DATA ? SYSTEMS.DATA.ACTOR_CLASS_TYPE : game.system.template.Actor.types[0],
             type: String
         },
         "itemQuantityAttribute": {
@@ -37,7 +38,15 @@ function defaultSettings(apply = false) {
             hint: "ITEM-PILES.Setting.Quantity.Label",
             scope: "world",
             config: true,
-            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_QUANTITY_ATTRIBUTE : "",
+            default: SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_QUANTITY_ATTRIBUTE : "",
+            type: String
+        },
+        "itemPriceAttribute": {
+            name: "ITEM-PILES.Setting.Price.Title",
+            hint: "ITEM-PILES.Setting.Price.Label",
+            scope: "world",
+            config: true,
+            default: SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE : "",
             type: String
         },
         "itemSimilarities": {
@@ -45,7 +54,7 @@ function defaultSettings(apply = false) {
             hint: "ITEM-PILES.Setting.ItemSimilarities.Label",
             scope: "world",
             config: false,
-            default: apply && SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_SIMILARITIES : ['name', 'type'],
+            default: SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_SIMILARITIES : ['name', 'type'],
             type: Array
         }
     }
@@ -165,6 +174,26 @@ const otherSettings = {
 
 export function registerSettings() {
 
+    const freshCopy = !game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.debug`);
+
+    const hasFlagMigrationVersion = !!game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.flagMigrationVersion`);
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "flagMigrationVersion", {
+        scope: "world",
+        config: false,
+        default: !hasFlagMigrationVersion && freshCopy ? migrations.latestFlagVersion : "1.0.0",
+        type: String
+    });
+
+    const hasSettingMigrationVersion = !!game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.settingMigrationVersion`);
+
+    game.settings.register(CONSTANTS.MODULE_NAME, "settingMigrationVersion", {
+        scope: "world",
+        config: false,
+        default: !hasSettingMigrationVersion && freshCopy ? migrations.latestSettingVersion : "1.0.0",
+        type: String
+    });
+
     game.settings.registerMenu(CONSTANTS.MODULE_NAME, "resetAllSettings", {
         name: "ITEM-PILES.Setting.Reset.Title",
         label: "ITEM-PILES.Setting.Reset.Label",
@@ -179,7 +208,7 @@ export function registerSettings() {
         label: "ITEM-PILES.Setting.Currencies.Label",
         hint: "ITEM-PILES.Setting.Currencies.Hint",
         icon: "fas fa-coins",
-        type: ItemPileCurrenciesEditor,
+        type: CurrenciesEditor,
         restricted: true
     });
 
@@ -188,7 +217,7 @@ export function registerSettings() {
         label: "ITEM-PILES.Setting.ItemFilters.Label",
         hint: "ITEM-PILES.Setting.ItemFilters.Hint",
         icon: "fas fa-list-ul",
-        type: ItemPileFiltersEditor,
+        type: ItemFiltersEditor,
         restricted: true
     });
 
@@ -197,7 +226,7 @@ export function registerSettings() {
         label: "ITEM-PILES.Setting.ItemSimilarities.Label",
         hint: "ITEM-PILES.Setting.ItemSimilarities.Hint",
         icon: "fas fa-list-ul",
-        type: ItemPileSimilaritiesEditor,
+        type: ItemSimilaritiesEditor,
         restricted: true
     });
 
@@ -209,52 +238,6 @@ export function registerSettings() {
     for (const [name, data] of Object.entries(otherSettings)) {
         game.settings.register(CONSTANTS.MODULE_NAME, name, data);
     }
-
-    const hasFlagMigrationVersion = !!game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.migrationVersion`);
-
-    game.settings.register(CONSTANTS.MODULE_NAME, "migrationVersion", {
-        scope: "world",
-        config: false,
-        default: !hasFlagMigrationVersion ? flagManager.latestFlagVersion : "",
-        type: String
-    });
-
-}
-
-export async function migrateSettings(){
-
-    const itemTypeAttribute = game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.itemTypeAttribute`);
-    const itemTypeFilters = game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.itemTypeFilters`);
-
-    if(itemTypeAttribute && itemTypeFilters){
-
-        const itemTypeAttributeValue = JSON.parse(itemTypeAttribute.data.value)
-        const itemTypeFiltersValue = JSON.parse(itemTypeFilters.data.value)
-
-        game.settings.set(CONSTANTS.MODULE_NAME, "itemFilters", [
-            {
-                "path": itemTypeAttributeValue,
-                "filters": itemTypeFiltersValue
-            }
-        ])
-
-        await itemTypeAttribute.delete();
-        await itemTypeFilters.delete();
-
-    }
-
-    const dynamicAttributesSetting = game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.dynamicAttributes`);
-
-    if(dynamicAttributesSetting){
-
-        const dynamicAttributesValue = JSON.parse(dynamicAttributesSetting.data.value)
-
-        game.settings.set(CONSTANTS.MODULE_NAME, "currencies", dynamicAttributesValue)
-
-        await dynamicAttributesSetting.delete();
-
-    }
-
 }
 
 class ResetSettingsDialog extends FormApplication {
@@ -283,7 +266,7 @@ class ResetSettingsDialog extends FormApplication {
 }
 
 async function applyDefaultSettings() {
-    const settings = defaultSettings(true);
+    const settings = defaultSettings();
     for (const [name, data] of Object.entries(settings)) {
         await game.settings.set(CONSTANTS.MODULE_NAME, name, data.default);
     }

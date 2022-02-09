@@ -1,18 +1,20 @@
 import CONSTANTS from "./constants.js";
 import HOOKS from "./hooks.js";
 
-import flagManager from "./flagManager.js";
+import migrations from "./migrations.js";
 import chatHandler from "./chathandler.js";
 import API from "./api.js";
 import * as lib from "./lib/lib.js";
 
 import { ItemPileConfig } from "./formapplications/item-pile-config.js";
-import { registerSettings, checkSystem, migrateSettings, registerHandlebarHelpers } from "./settings.js";
+import { registerSettings, checkSystem, registerHandlebarHelpers } from "./settings.js";
 import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 import { getActorCurrencies, getActorItems } from "./lib/lib.js";
+
 import { TradeAPI } from "./trade-api.js";
+import { MerchantApp } from "./formapplications/merchant-app.js";
 
 Hooks.once("init", async () => {
 
@@ -83,13 +85,14 @@ Hooks.once("ready", async () => {
         lib.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
     }
 
-    await flagManager.migrateDocuments();
+    await migrations.migrate();
 
     checkSystem();
     registerHotkeysPost();
     registerHandlebarHelpers();
-    migrateSettings();
     Hooks.callAll(HOOKS.READY);
+
+    new MerchantApp(game.actors.getName("Trade Tester")).render(true);
 
 });
 

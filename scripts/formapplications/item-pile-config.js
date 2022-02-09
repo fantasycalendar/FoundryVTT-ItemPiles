@@ -1,8 +1,8 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
-import { ItemPileCurrenciesEditor } from "./item-pile-currencies-editor.js";
+import { CurrenciesEditor } from "./currencies-editor.js";
 import * as lib from "../lib/lib.js";
-import { ItemPileFiltersEditor } from "./item-pile-filters-editor.js";
+import { ItemFiltersEditor } from "./item-filters-editor.js";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -172,7 +172,7 @@ export class ItemPileConfig extends FormApplication {
         if (this.currenciesEditor) {
             return this.currenciesEditor.render(false, { focus: true });
         }
-        const [promise, UI] = ItemPileCurrenciesEditor.showForPile(this.pileData.overrideCurrencies);
+        const [promise, UI] = CurrenciesEditor.showForPile(this.pileData.overrideCurrencies);
         this.currenciesEditor = UI;
         promise.then(newSettings => {
             this.currenciesEditor = false;
@@ -186,7 +186,7 @@ export class ItemPileConfig extends FormApplication {
         if (this.itemFiltersEditor) {
             return this.itemFiltersEditor.render(false, { focus: true });
         }
-        const [promise, UI] = ItemPileFiltersEditor.showForPile(this.pileData.overrideItemFilters);
+        const [promise, UI] = ItemFiltersEditor.showForPile(this.pileData.overrideItemFilters);
         this.itemFiltersEditor = UI;
         promise.then(newSettings => {
             this.itemFiltersEditor = false;

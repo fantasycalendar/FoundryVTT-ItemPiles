@@ -1,6 +1,6 @@
 import CONSTANTS from "../constants.js";
 
-export class ItemPileCurrenciesEditor extends FormApplication {
+export class CurrenciesEditor extends FormApplication {
 
     constructor(pileCurrencies = false, resolve = false) {
         super();
@@ -25,7 +25,7 @@ export class ItemPileCurrenciesEditor extends FormApplication {
         const promise = new Promise(_resolve => {
             resolve = _resolve;
         });
-        return [promise, new ItemPileCurrenciesEditor(foundry.utils.duplicate(pileCurrencies), resolve).render(true)]
+        return [promise, new CurrenciesEditor(foundry.utils.duplicate(pileCurrencies), resolve).render(true)]
     }
 
     async getData(options) {

@@ -1,15 +1,17 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
+import { SYSTEMS } from "./systems.js";
 
-const flagManager = {
+const migrations = {
 
     _latestFlagVersion: false,
+    _latestSettingVersion: false,
     updateStack: new Map(),
     localStack: new Map(),
 
     get latestFlagVersion() {
         if (!this._latestFlagVersion) {
-            const versions = Object.keys(this.migrations);
+            const versions = Object.keys(this.document_migrations);
             versions.sort((a, b) => {
                 return isNewerVersion(a, b) ? -1 : 1;
             })
@@ -18,13 +20,45 @@ const flagManager = {
         return this._latestFlagVersion;
     },
 
-    async migrateDocuments(){
+    get latestSettingVersion() {
+        if (!this._latestSettingVersion) {
+            const versions = Object.keys(this.setting_migrations);
+            versions.sort((a, b) => {
+                return isNewerVersion(a, b) ? -1 : 1;
+            })
+            this._latestSettingVersion = versions[0];
+        }
+        return this._latestSettingVersion;
+    },
 
+    async migrate(){
         if(!lib.isResponsibleGM()) return;
 
-        const currentVersion = game.settings.get(CONSTANTS.MODULE_NAME, "migrationVersion");
+        const currentFlagVersion = game.settings.get(CONSTANTS.MODULE_NAME, "flagMigrationVersion");
+        if(this.latestFlagVersion !== currentFlagVersion){
+            await this.migrateDocuments();
+            await game.settings.set(CONSTANTS.MODULE_NAME, "migrationVersion", this.latestFlagVersion);
+        }
 
-        if(this.latestFlagVersion === currentVersion) return;
+        const currentSettingVersion = game.settings.get(CONSTANTS.MODULE_NAME, "settingMigrationVersion");
+        if(this.latestSettingVersion !== currentSettingVersion){
+            await this.migrateSettings();
+            await game.settings.set(CONSTANTS.MODULE_NAME, "settingMigrationVersion", this.latestSettingVersion);
+        }
+    },
+
+    async migrateSettings() {
+
+        const currentSettingVersion = game.settings.get(CONSTANTS.MODULE_NAME, "settingMigrationVersion");
+        for (let [version, migration] of Object.entries(this.setting_migrations)) {
+            if (!isNewerVersion(version, currentSettingVersion)) continue;
+            await migration();
+            lib.debug(`Successfully migrated settings to version ${version}`);
+        }
+
+    },
+
+    async migrateDocuments(){
 
         const scenes = Array.from(game.scenes);
 
@@ -41,7 +75,7 @@ const flagManager = {
                 const pileVersion = pileData?.flagVersion || "1.0.0";
                 if (pileVersion === this.latestFlagVersion) return false;
 
-                for (let [version, migration] of Object.entries(this.migrations)) {
+                for (let [version, migration] of Object.entries(this.document_migrations)) {
                     if (!isNewerVersion(version, pileVersion)) continue;
                     pileData = migration(token, pileData);
 
@@ -68,7 +102,7 @@ const flagManager = {
 
             const pileVersion = pileData?.flagVersion || "1.0.0";
 
-            for (let [version, migration] of Object.entries(this.migrations)) {
+            for (let [version, migration] of Object.entries(this.document_migrations)) {
                 if (!isNewerVersion(version, pileVersion)) continue;
                 pileData = migration(actor, pileData);
 
@@ -89,12 +123,9 @@ const flagManager = {
             return pileVersion !== this.latestFlagVersion;
         });
 
-        await game.settings.set(CONSTANTS.MODULE_NAME, "migrationVersion", this.latestFlagVersion);
-
-
     },
 
-    migrations: {
+    document_migrations: {
 
         "1.2.6": (inDocument, pileData) => {
             pileData.overrideItemFilters = pileData?.itemTypeFilters?.length
@@ -122,8 +153,48 @@ const flagManager = {
         },
     },
 
+    setting_migrations: {
+
+        "1.3.0": async () => {
+
+            const itemTypeAttribute = game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.itemTypeAttribute`);
+            const itemTypeFilters = game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.itemTypeFilters`);
+
+            if(itemTypeAttribute && itemTypeFilters){
+
+                const itemTypeAttributeValue = JSON.parse(itemTypeAttribute.data.value)
+                const itemTypeFiltersValue = JSON.parse(itemTypeFilters.data.value)
+
+                game.settings.set(CONSTANTS.MODULE_NAME, "itemFilters", [
+                    {
+                        "path": itemTypeAttributeValue,
+                        "filters": itemTypeFiltersValue
+                    }
+                ])
+
+                await itemTypeAttribute.delete();
+                await itemTypeFilters.delete();
+
+            }
+
+            const dynamicAttributesSetting = game.settings.storage.get("world").getSetting(`${CONSTANTS.MODULE_NAME}.dynamicAttributes`);
+
+            if(dynamicAttributesSetting){
+
+                const dynamicAttributesValue = JSON.parse(dynamicAttributesSetting.data.value)
+
+                game.settings.set(CONSTANTS.MODULE_NAME, "currencies", dynamicAttributesValue)
+
+                await dynamicAttributesSetting.delete();
+
+            }
+
+        }
+
+    }
+
 }
 
 
 
-export default flagManager;
+export default migrations;
