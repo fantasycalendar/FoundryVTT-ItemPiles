@@ -233,6 +233,8 @@ export class ItemPileInventory extends FormApplication {
 
         data.systemHasCurrencies = !!API.CURRENCIES.length;
 
+        console.log(data.systemHasCurrencies)
+
         data.playerActors = this.playerActors;
         data.moreThanOneInspectableActors = data.playerActors.length > 1;
 
@@ -255,7 +257,7 @@ export class ItemPileInventory extends FormApplication {
         data.hasCurrencies = data?.currencies?.length;
         data.canInspectItems = pileData.canInspectItems || game.user.isGM;
 
-        data.hasThings = data?.hasItems && data?.hasCurrencies;
+        data.hasThings = data?.hasItems && (data.systemHasCurrencies && data?.hasCurrencies);
 
         data.isEmpty = !data?.hasItems && !data?.hasCurrencies;
 
