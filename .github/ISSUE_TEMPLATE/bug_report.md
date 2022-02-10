@@ -25,10 +25,9 @@ If applicable, add screenshots to help explain your problem.
 
 **Setup:**
  - Foundry Version: [e.g. 9.238]
+ - System Version: [e.g. DND5e 1.5.7]
  - Item Piles Version: [e.g. 1.0.0]
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+ - Browser & version [e.g. Google Chrome 98.0.4758.82]
 
 **Active modules:**
  - Item Piles
