@@ -81,10 +81,9 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 - [Savage Worlds Adventure Edition](https://foundryvtt.com/packages/swade)
 - [Tormenta20](https://foundryvtt.com/packages/tormenta20)
 
+## Semi-supported systems
 
-## Not Supported Systems
-
-- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - This system already has a robust loot actor & token system, and feature rich systems. After speaking to the devs, they expressed interest in developing a similar system as the Drag & Drop system from Item Piles.
+- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - While Item Piles _works_ in this system, item piles is not strictly needed as PF2e already has a robust loot actor & token system, and feature rich systems.
 
 ## Requesting New Systems
 
