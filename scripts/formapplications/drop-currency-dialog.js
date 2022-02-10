@@ -57,10 +57,6 @@ export default class DropCurrencyDialog extends FormApplication {
 
         let currencyList = { currencyList: lib.getActorCurrencyList(this.target), getAll: this.includeAllCurrencies };
 
-        if(lib.isValidItemPile(this.source)) {
-            currencyList.currencyList = {};
-        }
-
         data.currencies = lib.getActorCurrencies(this.source, currencyList);
 
         if(!this.includeAllCurrencies) {

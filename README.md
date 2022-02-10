@@ -74,6 +74,8 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 
 ## Natively Supported Systems
 
+Item Piles is designed to work in all systems, but may require some setup for it to fully function. Please refer to the module settings to configure that.
+
 - [Dungeons & Dragons 5e](https://foundryvtt.com/packages/dnd5e)
 - [Pathfinder 1e](https://foundryvtt.com/packages/pf1)
 - [Dungeon Slayers 4](https://foundryvtt.com/packages/ds4)

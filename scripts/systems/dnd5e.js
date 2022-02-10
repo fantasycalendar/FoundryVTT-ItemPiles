@@ -5,7 +5,7 @@ export default {
     // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
     "ITEM_QUANTITY_ATTRIBUTE": "data.quantity",
 
-    // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
+    // Item filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
     "ITEM_FILTERS": [
         {
             "path": "type",
@@ -17,9 +17,10 @@ export default {
         }
     ],
 
+    // Item similarities determines how item piles detect similarities and differences in the system
     "ITEM_SIMILARITIES": ["name", "type"],
 
-    // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
+    // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
     "CURRENCIES": [
         {
             name: "DND5E.CurrencyPP",

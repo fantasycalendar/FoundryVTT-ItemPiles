@@ -77,7 +77,7 @@
 <dt><a href="#deleteItemPile">deleteItemPile(target)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Deletes a pile, calling the relevant hooks.</p>
 </dd>
-<dt><a href="#openItemPileInventory">openItemPileInventory(target, userIds, {inspectingTarget, useDefaultCharacter})</a> ⇒ <code>Promise</code></dt>
+<dt><a href="#renderItemPileInterface">renderItemPileInterface(target, userIds, {inspectingTarget, useDefaultCharacter})</a> ⇒ <code>Promise</code></dt>
 <dd><p>Remotely opens an item pile&#39;s inventory, if you have permission to edit the item pile. Passing a user ID, or a list of user IDs, will cause those users to open the item pile.</p>
 </dd>
 <dt><a href="#isValidItemPile">isValidItemPile(document)</a> ⇒ <code>boolean</code></dt>
@@ -373,9 +373,9 @@ Deletes a pile, calling the relevant hooks.
 | --- | --- |
 | target | <code>Token/TokenDocument</code> | 
 
-<a name="openItemPileInventory"></a>
+<a name="renderItemPileInterface"></a>
 
-## ItemPiles.API.openItemPileInventory(target, userIds, {inspectingTarget, useDefaultCharacter}) ⇒ <code>Promise</code>
+## ItemPiles.API.renderItemPileInterface(target, userIds, {inspectingTarget, useDefaultCharacter}) ⇒ <code>Promise</code>
 Remotely opens an item pile's inventory, if you have permission to edit the item pile. Passing a user ID, or a list of user IDs, will cause those users to open the item pile.
 
 

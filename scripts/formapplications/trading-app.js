@@ -428,8 +428,6 @@ export class TradingApp extends FormApplication {
 
         data.leftActor.hasItems = !!data.leftActor.items.length;
 
-        debugger;
-
         data.rightActor = {
             name: this.rightTraderActor.name,
             img: this.rightTraderActor.data.img,

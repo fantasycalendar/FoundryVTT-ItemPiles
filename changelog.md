@@ -1,5 +1,13 @@
 # Item Piles Changelog 
 
+## Version 1.4.1
+- Fixed opening more than one item pile inventory would result in an error
+- Fixed not being able to add currencies to item piles
+- Fixed bug causing `Add Currency (GM mode)` to throw an error when using tokens as the trader
+- Minor fixes and adjustments to the Item Pile Inventory UI
+- Renamed `openItemPileInventory` to `renderItemPileInterface` which will become deprecated in 1.5.0
+- Removed stray `Debugger`, whoops
+
 ## Version 1.4.0 - Trading Edition!
 - Added user-to-user trading!
   - Multiple ways to initiate a trade:

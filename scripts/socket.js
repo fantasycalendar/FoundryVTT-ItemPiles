@@ -34,7 +34,7 @@ export const SOCKET_HANDLERS = {
     /**
      * UI sockets
      */
-    OPEN_INVENTORY: "openItemPileInventory",
+    RENDER_INTERFACE: "renderItemPileInterface",
     RERENDER_TOKEN_HUD: "rerenderTokenHud",
     RERENDER_PILE_INVENTORY: "rerenderItemPileInventory",
     QUERY_PILE_INVENTORY_OPEN: "queryItemPileInventoryOpen",
@@ -106,7 +106,7 @@ export function registerSocket() {
     /**
      * UI sockets
      */
-    itemPileSocket.register(SOCKET_HANDLERS.OPEN_INVENTORY, (...args) => API._openItemPileInventory(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.RENDER_INTERFACE, (...args) => API._renderItemPileInterface(...args))
     itemPileSocket.register(SOCKET_HANDLERS.RERENDER_TOKEN_HUD, (...args) => API._rerenderTokenHud(...args))
     itemPileSocket.register(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, (...args) => API._rerenderItemPileInventoryApplication(...args))
     itemPileSocket.register(SOCKET_HANDLERS.QUERY_PILE_INVENTORY_OPEN, (...args) => isPileInventoryOpenForOthers.respond(...args))
