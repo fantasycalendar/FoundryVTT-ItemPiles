@@ -7,33 +7,35 @@ assignees: Haxxer
 
 ---
 
-**[INSERT FOUNDRY PAGE LINK TO SYSTEM HERE]**
+# **[INSERT FOUNDRY PAGE LINK TO SYSTEM HERE]**
 
 ### **Actor Class Type**: "[WRITE TYPE HERE]"
 
 *The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.*
 
-D&D5e system example: "character"
+D&D5e system example: `character`
 
 ### **Item Quantity Attribute**: "[WRITE ATTRIBUTE PATH HERE]"
 
 *The item quantity attribute is the path to the attribute on items that denote how many of that item that exists.*
 
-D&D5e system example: "data.quantity"
+D&D5e system example: `data.quantity`
 
-### **Item Type Attribute**: "[WRITE ATTRIBUTE PATH HERE]"
+### **Item Filters**: "[WRITE ITEM FILTERS HERE]"
 
-D&D5e system example: "type"
+*Item filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes.*
 
-### **Item Type Filters**: "[WRITE ATTRIBUTE FILTERS HERE]"
+D&D5e system example: `spell, feat, class`
 
-*Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes.*
+### **Item Similarities**: [WRITE ITEM SIMILARITIES HERE]
 
-D&D5e system example: "spell, feat, class"
+*Item similarities determines how item piles detect similarities and differences in the system.*
 
-### **Dynamic Attributes**:
+D&D5e system example: `name, type`
 
-*Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets.*
+### **Currencies**:
+
+*Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data.*
 
 - **Name**: [WRITE ATTRIBUTE NAME HERE]
     - **Path**: [WRITE ATTRIBUTE PATH HERE]
