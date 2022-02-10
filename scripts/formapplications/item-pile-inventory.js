@@ -38,13 +38,16 @@ export class ItemPileInventory extends FormApplication {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            title: game.i18n.localize("ITEM-PILES.Inspect.Title"),
             classes: ["sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
             width: 550,
             height: "auto",
             dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-item-drop-container" }],
         });
+    }
+
+    get title(){
+        return this.pile.name;
     }
 
     /**
@@ -57,8 +60,8 @@ export class ItemPileInventory extends FormApplication {
 
         const openApps = Object.values(ui.windows).filter(app => {
             return app instanceof this
-                && (app.pile.uuid === inPileUuid || app.pile.actor.uuid === inPileUuid)
-                && (!recipientUuid || (app.recipient?.uuid === recipientUuid || app.recipient?.actor?.uuid === recipientUuid))
+                && (app?.pile?.uuid === inPileUuid || app?.pile?.actor?.uuid === inPileUuid)
+                && (!recipientUuid || (app?.recipient?.uuid === recipientUuid || app?.recipient?.actor?.uuid === recipientUuid))
         })
 
         if(openApps.length){
