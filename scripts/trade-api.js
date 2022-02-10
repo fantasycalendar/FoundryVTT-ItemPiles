@@ -128,7 +128,6 @@ export class TradeAPI {
                 }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
 
             }).catch((err) => {
-                console.log(err);
                 // If the counterparty disconnected, show that and close dialog
                 lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true);
                 cancelDialog.close()
