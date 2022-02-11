@@ -1,20 +1,102 @@
 {
     "ITEM-PILES": {
 
+        "Items": "アイテム",
+        "Currencies": "硬貨",
+        "Currency": "硬貨",
+
+        "ContextMenu": {
+            "ShowToPlayers": "PLに中身を表示する",
+            "RequestTrade": "トレード依頼"
+        },
+
         "Inspect": {
             "Title": "お宝の中身",
             "AsActor": "{actorName}としてお宝を確認中",
-            "NoActor": "選択中のコマが居ない状態で中身を確認しています。アイテムを取得する先が存在ませんのでアイテムの取得ができません。",
+            "Owner": "このお宝の所有者権限を持っているので中身を編集できます。",
             "Empty": "このお宝は空です",
             "Destroyed": "このお宝はもはや存在せず……",
             "TakeAll": "すべて取得",
             "Take": "取得",
             "Close": "閉じる",
-            "Leave": "離れる"
+            "Leave": "離れる",
+            "NoShareLeft": "取り分がなくなりました…",
+            "NoneLeft": "中身がなくなりました",
+            "OpenSheet": "シートを開く",
+            "AddCurrency": "硬貨追加",
+            "SplitAll": "{num_players}等分に分ける",
+            "SplitItems": "アイテムを{num_players}等分に分ける",
+            "SplitCurrencies": "硬貨{num_players}等分に分ける"
+        },
+
+            "Trade": {
+                "Title": "トレード中",
+    
+                "Accept": "承諾",
+                "Decline": "拒否",
+                "Mute": "ミュート",
+                "AutoDecline": "トレード依頼に返信するのが遅すぎたため、自動的に拒否されました。",
+                "Declined": "トレード先が拒否しました。",
+                "Private": "トレードを秘匿する。",
+                "PrivateExplanation": "チャットカードが表示されていないため閲覧できません。",
+                "Over": "このトレードは終了しています。",
+    
+                "Request": {
+                    "Title": "トレード依頼を送る",
+                    "User": "誰とトレードしますか？",
+                    "PickActor": "あなたはどのキャラクターとしてトレードしますか？",
+                    "PickedActor": "トレードするキャラクター：",
+                    "PickToken": "選択されたコマ",
+                    "DropActor": "キャラクターをここにドラッグ＆ドロップ",
+                    "Label": "依頼送信"
+                },
+    
+                "NoActiveUsers": {
+                    "Title": "お宝：アクティブなユーザがいません",
+                    "Content": "プレイヤーがアクティブじゃないためトレードできません。"
+                },
+    
+                "Prompt": {
+                    "Title": "トレード依頼",
+                    "Content": "{trading_actor_name} (PL {trading_user_name}) があなたにトレードを持ちかけてきました。",
+                    "PrivateContent": "{trading_actor_name} (PL {trading_user_name}) があなたに<strong>秘匿</strong>トレードを持ちかけてきました。",
+                    "AcceptQuery": "許可しますか？"
+                },
+    
+                "OngoingRequest": {
+                    "Content": "{user_name}の返答を待っています...",
+                    "Label": "トレード依頼取り消し"
+                },
+    
+                "CancelledRequest": {
+                    "Content": "{user_name}がトレードを中止しました"
+                },
+    
+                "AddCurrency": {
+                    "Title": "硬貨追加",
+                    "Content": "{trader_actor_name}とのトレードに硬貨を追加",
+                    "Label": "硬貨更新"
+                },
+    
+                "GMAddCurrency": "硬貨追加（GMモード）",
+    
+                "Closed": {
+                    "Title": "トレード終了",
+                    "You": "ウィンドウが閉じられたため、トレードが中止されました。",
+                    "Them": "\"{user_name}\"がトレードウィンドウを閉じたのでトレードが中止されました。",
+                    "Someone": "ユーザの誰かがトレードウィンドウを閉じたためトレードが中止されました。"
+                },
+    
+                "Disconnected": "ユーザの誰かが切断されたのでトレードが中止されました。",
+    
+                "UserCharacterWarning": "選択されたキャラクター \"{actor_name}\" は\"{player_name}\"の所有キャラクターです。<br><br>本当によろしいですか？",
+                "UserActiveCharacterWarning": "選択されたキャラクター \"{actor_name}\" は\"{player_name}\"の現在<strong>アクティブ</strong>な所有キャラクターです。本当によろしいですか？",
+                "ActorOwnerWarning": "このキャラクターを所有していないため、トレードできません。"
         },
 
         "Errors": {
-            "DisallowedItemDrop": "\"{type}\"アイテムを置く事はできません",
+            "DisallowedItemDrop": "\"{type}\"アイテムを置く事はできません。",
+            "DisallowedItemTrade": "\"{type}\"種別のアイテムはトレードできません。",
             "NoSourceDrop": "アイテム一覧からシーンにアイテムを置くにはGM権限が必要です。",
             "PileTooFar": "距離が離れすぎているためお宝を確認できません。",
             "PileLocked": "このお宝はロック中です。中身の確認とアイテムの追加ができません。",
@@ -25,9 +107,13 @@
             "DropTypeWarning": {
                 "Title": "アイテム種別警告",
                 "Content": "種別が\"{type}\"のアイテムを置こうとしています。このアイテムはシーンに置くことが推薦されていません。本当に置きますか？"
+                },
+                "TradeTypeWarning": {
+                    "Title": "アイテム種別警告",
+                    "Content": "現在トレードしている(\"{type}\")種別のアイテムはトレードが禁止されているものです。本当にトレードを続行しますか？"
             },
             "ResetSettings": {
-                "Title": "Item Piles（お宝）設定初期化",
+                "Title": "設定初期化",
                 "Content": "設定を現在のシステムのデフォルトに初期化しますか？<strong>この操作を取り消すことはできません！</strong>",
                 "Confirm": "設定初期化"
             },
@@ -44,13 +130,19 @@
                 "Content": "現在使用中のシステムは前のバージョンでは未対応でしたが、現在のバージョンでは最適なデフォルト設定が追加されています。<br><br>現在の設定を破棄し、デフォルトの設定を読み込みますか？",
                 "Confirm": "デフォルト設定適用"
             },
+            "ResetSharingData": {
+                "Title": "配分データ初期化",
+                "Content": "お宝に設定されている取り分の現在の取得状況をリセットします。<br><br>本当によろしいですか？",
+                "Confirm": "配分データ初期化"
+            },
             "Cancel": "キャンセル"
         },
 
-        "AttributeEditor": {
+        "CurrenciesEditor": {
             "Title": "参照データ設定",
             "Explanation": "お宝として指定されたコマから取得可能なリソースや内部データをここで定義できます。例えばD&D5版の場合、所持しているGPの数は\"actor.data.data.currency.gp\"に保存されています。\"金貨\"という名前とともに\"data.currency.gp\"のデータパスを設定してあげればお宝からGPを取得可能になります。",
             "Name": "データ名",
+            "Path": "データパス",
             "Icon": "データアイコン",
             "AddNew": "新規データ追加",
             "Submit": "データ追加"
@@ -60,11 +152,19 @@
             "Title": "アイテムフィルター設定",
             "Explanation": "ここではお宝の中に表示されないアイテムの種別を設定できます。設定したパスからアイテムの「種別」が定められ、UI上に非表示になります。",
             "Filters": "フィルター",
+            "Path": "データパス",
             "AddNew": "新規フィルター追加",
             "Submit": "フィルター確定"
         },
 
-        "AttributePath": "データパス",
+        "SimilaritiesEditor": {
+            "Title": "類似アイテム識別",
+            "Explanation_P1": "類似するアイテムをどのように識別するのかをここで設定します。ほとんどのシステムは\"名前\"と\"種別\"で識別を行います。",
+            "Explanation_P2": "パスファインダー2eなどのシステムでは一時アイテムが通常アイテムと同じデータを持つことがあります。\"data.temporary.value\"を追加することでこれらのアイテムを\"ユニーク\"なものとして認識させることができます。",
+            "Path": "データパス",
+            "AddNew": "新しいデータパス追加",
+            "Submit": "アイテムの類似"
+        },
 
         "Defaults": {
             "Title": "Item Pile（お宝）設定",
@@ -95,6 +195,10 @@
                 "ConfigureOverrideItemFilters": "アイテムフィルター上書き設定"
             },
 
+            "Other": {
+                "Title": "その他の設定"
+            },
+
             "SingleItem": {
                 "Title": "単体設定",
                 "DisplayOneContainerWarning": "警告：\"単体時、アイテム画像を表示\"と\"コンテナである\"の両方の設定が有効化されています。この場合、コンテナ画像のほうが優先されますのでご注意ください。",
@@ -118,7 +222,24 @@
                 "CloseSoundPath": "閉めた時の効果音",
                 "OpenSoundPath": "開いた時の効果音",
                 "LockedSoundPath": "ロック中の効果音"
+            },
+
+            "Sharing": {
+                "Title": "配分設定",
+                "ShareItemsEnabled": "アイテムを配分する",
+                "ShareItemsEnabledExplanation": "有効化時、プレイヤーはお宝の中から自分の取り分だけ取得できるようになります。無効化時は制限なく取得できるようになります。",
+                "ShareCurrenciesEnabled": "硬貨を配分する",
+                "ShareCurrenciesEnabledExplanation": "有効化時、プレイヤーはお宝の中から自分の取り分だけ取得できるようになります。無効化時は制限なく取得できるようになります。",
+                "TakeAllEnabled": "全取得ボタン配置",
+                "TakeAllEnabledExplanation": "\"全取得\"ボタンを表示します。上記の配分設定をオフにする必要があります。",
+                "SplitAllEnabled": "等分設定を有効化する",
+                "SplitAllEnabledExplanation": "\"○○等分に分ける\"ボタンを配置します。押すことですべてのまたはアクティブなプレイヤーたちに現在の宝の中身を自動的に頭わりして配布します。",
+                "InactivePlayers": "アクティブプレイヤーのみ配分",
+                "InactivePlayersExplanation": "このお宝を配分するとき、アクティブなプレイヤーキャラクターのみが対象になります。",
+                "ResetSharingData": "配分データ同期",
+                "ResetSharingDataExplanation": "お宝を閲覧中に中身が変更された場合、配分のデータ同期がずれる可能性があります。このボタンを押すことでそれらのデータを強制的に同期します。"
             }
+
         },
 
         "HUD": {
@@ -137,9 +258,25 @@
             "Cancel": "キャンセル"
         },
 
+        "DropCurrencies": {
+            "Title": "硬貨を置こうとしています",
+            "Player": "置こうとしている硬貨",
+            "GM": "GMであるあなたは硬貨を追加することができます：",
+            "NoCurrency": "{actor_name}には有効な硬貨がありません...",
+            "Cancel": "キャンセル",
+            "AddToPile": "お宝に追加"
+        },
+
         "Chat": {
-            "Pickup":{
-                "Actor": "{name}が次のアイテムを拾いました："
+            "Pickup": "{name}が次のアイテムを拾いました：",
+            "Split": "お宝の中身が{num_players}等分されて、それぞれが以下のアイテムを受け取りました：",
+            "TradeComplete": "{party_1}と{party_2}がトレードを完了しました。",
+            "TradeStarted": "{party_1}と{party_2}がトレードを開始しました。",
+            "TradeStartedButton": "下記のボタンで閲覧できます：",
+            "TradeSpectate": "トレードを閲覧",
+            "SpectateDisabled": "トレード完了",
+            "PrivateTrade": "秘匿トレード",
+            "ExpandTrade": "トレード詳細を表示"
             }
         },
 
@@ -167,6 +304,19 @@
                 "Label": "アイテムフィルター設定",
                 "Hint": "ここではお宝の中に表示されないアイテムの種別を設定できます。"
             },
+            "ItemSimilarities": {
+                "Title": "類似アイテム",
+                "Label": "類似アイテム設定",
+                "Hint": "一時アイテムと一般アイテムなどを区別するために使用する類似性の識別設定を定義します。"
+            },
+            "EnableTrading": {
+                "Title": "トレード有効化",
+                "Hint": "有効化することでプレイヤー同士でトレードを行うことが可能になります。"
+            },
+            "ShowTradeButton": {
+                "Title": "トレード表示",
+                "Hint": "プレイヤーリストの右下にトレード用のボタンを表示する。"
+            },
             "OutputToChat": {
                 "Title": "チャット表示",
                 "Label": "プレイヤーがお宝の中身を拾った時、チャットに拾った物の内容が記録されます。",
@@ -174,6 +324,10 @@
                 "Public": "全体表示 - 全員にメッセージを表示",
                 "SelfGM": "秘話 - GMと拾ったPLにのみ表示",
                 "Blind": "GMのみ - GMにのみ表示"
+            },
+            "InvertSheetOpen": {
+                "Title": "CTRL+ダブルクリック反転",
+                "Label": "通常であれば、CTRLを押しながらダブルクリックすることでお宝の中身のUIを表示します。この設定を有効化するとダブルクリックのみで中身のUIを表示するようになって、CTRLを追加することで通常のキャラシのUIを開きます。"
             },
             "HideActorHeaderText": {
                 "Title": "キャラシのヘッダーテキスト非表示",
