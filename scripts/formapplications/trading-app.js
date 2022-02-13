@@ -60,7 +60,7 @@ export class TradingApp extends FormApplication {
     }
 
     get title(){
-        return `Trade between ${this.leftTraderActor.name} and ${this.rightTraderActor.name}`
+        return game.i18n.format("ITEM-PILES.Trade.Between", { actor_1: this.leftTraderActor.name, actor_2: this.rightTraderActor.name });
     }
 
     async executeSocketAction(socketHandler, ...args){

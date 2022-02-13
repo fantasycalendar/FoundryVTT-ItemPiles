@@ -10,7 +10,7 @@ export default class DropCurrencyDialog extends FormApplication {
         target,
         source,
         existingCurrencies = false,
-        includeAllCurrencies = true
+        includeAllCurrencies = false
     }={}) {
         super();
 

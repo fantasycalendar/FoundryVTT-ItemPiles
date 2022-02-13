@@ -1,5 +1,11 @@
 # Item Piles Changelog 
 
+## Version 1.4.2
+- Updated Japanese Localization (thanks you to Brother Sharp#6921!)
+- Updated French Localization (thanks you to Padhiver#1916!)
+- Fixed GMs having a character assigned to their user account would cause strangeness in some interfaces
+- Fixed `ItemPiles.API.addItems` failing to merge similar items
+
 ## Version 1.4.1
 - Fixed opening more than one item pile inventory would result in an error
 - Fixed not being able to add currencies to item piles

@@ -99,13 +99,17 @@ export function findSimilarItem(items, findItem) {
 
     const itemSimilarities = API.ITEM_SIMILARITIES;
 
-    const itemId = findItem?.id ?? findItem?._id;
+    const findItemId = findItem?.id ?? findItem?._id;
 
     return items.find(item => {
-        if(item.id === itemId) return true;
+        const itemId = item.id ?? item._id;
+        if(itemId === findItemId) return true;
+
+        const itemData = item instanceof Item ? item.data : item;
         for(const path of itemSimilarities){
-            if(getProperty(item.data, path) !== getProperty(findItem, path)) return false;
+            if(getProperty(itemData, path) !== getProperty(findItem, path)) return false;
         }
+
         return true;
     });
 }

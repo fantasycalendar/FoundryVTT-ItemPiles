@@ -2355,7 +2355,7 @@ const API = {
                 })
                 interactingActor = validTokens[0].actor;
             }
-        } else if(game.user.character){
+        } else if(game.user.character && !game.user.isGM){
             interactingActor = game.user.character;
         }
 

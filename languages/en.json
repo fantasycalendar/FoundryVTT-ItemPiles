@@ -40,6 +40,8 @@
             "Private": "Make this trade private",
             "PrivateExplanation": "No chat card are posted, and no one can spectate",
             "Over": "This trade is no longer active.",
+            "Between": "Trade between {actor_1} and {actor_2}",
+            "DragDrop": "Drag & drop items to begin trading",
 
             "Request": {
                 "Title": "Item Piles: Send Trade Request",
