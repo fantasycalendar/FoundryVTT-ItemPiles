@@ -149,12 +149,13 @@ const API = {
      * Creates the default item pile token at a location.
      *
      * @param {object} position                         The position to create the item pile at
+     * @param {string/boolean} [sceneId=false]          Which scene to create the item pile on
      * @param {array/boolean} [items=false]             Any items to create on the item pile
      * @param {string/boolean} [pileActorName=false]    Whether to use an existing item pile actor as the basis of this new token
      *
      * @returns {Promise}
      */
-    async createItemPile(position, { items = false, pileActorName = false } = {}) {
+    async createItemPile(position, { sceneId = game.user.viewedScene, items = false, pileActorName = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.PILE.PRE_CREATE, position, items, pileActorName);
         if (hookResult === false) return;
@@ -176,7 +177,7 @@ const API = {
             })
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, position, { pileActorName, items });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.CREATE_PILE, sceneId, position, { pileActorName, items });
     },
 
     /**
@@ -726,21 +727,18 @@ const API = {
         if (!targetUuid) throw lib.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid target item pile`);
 
         if (!lib.isValidItemPile(targetDocument)) {
-            lib.custom_warning("renderItemPileInterface | This target is not a valid item pile")
-            return;
+            throw lib.custom_error("renderItemPileInterface | This target is not a valid item pile")
         }
 
         if (inspectingTarget && useDefaultCharacter) {
-            lib.custom_warning("renderItemPileInterface | You cannot force users to use both their default character and a specific character to inspect the pile")
-            return;
+            throw lib.custom_error("renderItemPileInterface | You cannot force users to use both their default character and a specific character to inspect the pile")
         }
 
         if (!Array.isArray(userIds)) userIds = [userIds];
 
         if (!game.user.isGM) {
-            if (!userIds.includes(game.user.id)) {
-                lib.custom_warning(`renderItemPileInterface | You are not a GM, so you cannot force others to render an item pile's interface`);
-                return;
+            if (userIds.length > 1 || !userIds.includes(game.user.id)) {
+                throw lib.custom_error(`renderItemPileInterface | You are not a GM, so you cannot force others to render an item pile's interface`);
             }
             userIds = [game.user.id];
         }

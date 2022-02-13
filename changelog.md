@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 1.4.3
+
+- Fixed minor issue with creating item piles
+
 ## Version 1.4.2
 
 - Updated Japanese Localization (thanks to Brother Sharp#6921!)
