@@ -1,15 +1,12 @@
 {
     "ITEM-PILES": {
-
         "Items": "アイテム",
         "Currencies": "硬貨",
         "Currency": "硬貨",
-
         "ContextMenu": {
             "ShowToPlayers": "PLに中身を表示する",
             "RequestTrade": "トレード依頼"
         },
-
         "Inspect": {
             "Title": "お宝の中身",
             "AsActor": "{actorName}としてお宝を確認中",
@@ -28,72 +25,61 @@
             "SplitItems": "アイテムを{num_players}等分に分ける",
             "SplitCurrencies": "硬貨{num_players}等分に分ける"
         },
-
-            "Trade": {
-                "Title": "トレード中",
-    
-                "Accept": "承諾",
-                "Decline": "拒否",
-                "Mute": "ミュート",
-                "AutoDecline": "トレード依頼に返信するのが遅すぎたため、自動的に拒否されました。",
-                "Declined": "トレード先が拒否しました。",
-                "Private": "トレードを秘匿する。",
-                "PrivateExplanation": "チャットカードが表示されていないため閲覧できません。",
-                "Over": "このトレードは終了しています。",
-    
-                "Request": {
-                    "Title": "トレード依頼を送る",
-                    "User": "誰とトレードしますか？",
-                    "PickActor": "あなたはどのキャラクターとしてトレードしますか？",
-                    "PickedActor": "トレードするキャラクター：",
-                    "PickToken": "選択されたコマ",
-                    "DropActor": "キャラクターをここにドラッグ＆ドロップ",
-                    "Label": "依頼送信"
-                },
-    
-                "NoActiveUsers": {
-                    "Title": "お宝：アクティブなユーザがいません",
-                    "Content": "プレイヤーがアクティブじゃないためトレードできません。"
-                },
-    
-                "Prompt": {
-                    "Title": "トレード依頼",
-                    "Content": "{trading_actor_name} (PL {trading_user_name}) があなたにトレードを持ちかけてきました。",
-                    "PrivateContent": "{trading_actor_name} (PL {trading_user_name}) があなたに<strong>秘匿</strong>トレードを持ちかけてきました。",
-                    "AcceptQuery": "許可しますか？"
-                },
-    
-                "OngoingRequest": {
-                    "Content": "{user_name}の返答を待っています...",
-                    "Label": "トレード依頼取り消し"
-                },
-    
-                "CancelledRequest": {
-                    "Content": "{user_name}がトレードを中止しました"
-                },
-    
-                "AddCurrency": {
-                    "Title": "硬貨追加",
-                    "Content": "{trader_actor_name}とのトレードに硬貨を追加",
-                    "Label": "硬貨更新"
-                },
-    
-                "GMAddCurrency": "硬貨追加（GMモード）",
-    
-                "Closed": {
-                    "Title": "トレード終了",
-                    "You": "ウィンドウが閉じられたため、トレードが中止されました。",
-                    "Them": "\"{user_name}\"がトレードウィンドウを閉じたのでトレードが中止されました。",
-                    "Someone": "ユーザの誰かがトレードウィンドウを閉じたためトレードが中止されました。"
-                },
-    
-                "Disconnected": "ユーザの誰かが切断されたのでトレードが中止されました。",
-    
-                "UserCharacterWarning": "選択されたキャラクター \"{actor_name}\" は\"{player_name}\"の所有キャラクターです。<br><br>本当によろしいですか？",
-                "UserActiveCharacterWarning": "選択されたキャラクター \"{actor_name}\" は\"{player_name}\"の現在<strong>アクティブ</strong>な所有キャラクターです。本当によろしいですか？",
-                "ActorOwnerWarning": "このキャラクターを所有していないため、トレードできません。"
+        "Trade": {
+            "Title": "トレード中",
+            "Accept": "承諾",
+            "Decline": "拒否",
+            "Mute": "ミュート",
+            "AutoDecline": "トレード依頼に返信するのが遅すぎたため、自動的に拒否されました。",
+            "Declined": "トレード先が拒否しました。",
+            "Private": "トレードを秘匿する。",
+            "PrivateExplanation": "チャットカードが表示されていないため閲覧できません。",
+            "Over": "このトレードは終了しています。",
+            "Between": "{actor_1}と{actor_2}の間のトレード",
+            "DragDrop": "トレードを開始するにはアイテムをドラッグ＆ドロップしてください",
+            "Request": {
+                "Title": "トレード依頼を送る",
+                "User": "誰とトレードしますか？",
+                "PickActor": "あなたはどのキャラクターとしてトレードしますか？",
+                "PickedActor": "トレードするキャラクター：",
+                "PickToken": "選択されたコマ",
+                "DropActor": "キャラクターをここにドラッグ＆ドロップ",
+                "Label": "依頼送信"
+            },
+            "NoActiveUsers": {
+                "Title": "お宝：アクティブなユーザがいません",
+                "Content": "プレイヤーがアクティブじゃないためトレードできません。"
+            },
+            "Prompt": {
+                "Title": "トレード依頼",
+                "Content": "{trading_actor_name} (PL {trading_user_name}) があなたにトレードを持ちかけてきました。",
+                "PrivateContent": "{trading_actor_name} (PL {trading_user_name}) があなたに<strong>秘匿</strong>トレードを持ちかけてきました。",
+                "AcceptQuery": "許可しますか？"
+            },
+            "OngoingRequest": {
+                "Content": "{user_name}の返答を待っています...",
+                "Label": "トレード依頼取り消し"
+            },
+            "CancelledRequest": {
+                "Content": "{user_name}がトレードを中止しました"
+            },
+            "AddCurrency": {
+                "Title": "硬貨追加",
+                "Content": "{trader_actor_name}とのトレードに硬貨を追加",
+                "Label": "硬貨更新"
+            },
+            "GMAddCurrency": "硬貨追加（GMモード）",
+            "Closed": {
+                "Title": "トレード終了",
+                "You": "ウィンドウが閉じられたため、トレードが中止されました。",
+                "Them": "\"{user_name}\"がトレードウィンドウを閉じたのでトレードが中止されました。",
+                "Someone": "ユーザの誰かがトレードウィンドウを閉じたためトレードが中止されました。"
+            },
+            "Disconnected": "ユーザの誰かが切断されたのでトレードが中止されました。",
+            "UserCharacterWarning": "選択されたキャラクター \"{actor_name}\" は\"{player_name}\"の所有キャラクターです。<br><br>本当によろしいですか？",
+            "UserActiveCharacterWarning": "選択されたキャラクター \"{actor_name}\" は\"{player_name}\"の現在<strong>アクティブ</strong>な所有キャラクターです。本当によろしいですか？",
+            "ActorOwnerWarning": "このキャラクターを所有していないため、トレードできません。"
         },
-
         "Errors": {
             "DisallowedItemDrop": "\"{type}\"アイテムを置く事はできません。",
             "DisallowedItemTrade": "\"{type}\"種別のアイテムはトレードできません。",
@@ -102,15 +88,14 @@
             "PileLocked": "このお宝はロック中です。中身の確認とアイテムの追加ができません。",
             "DropNoToken": "このシーンにコマを所持していませんのでシーンにアイテムを置くことができません。"
         },
-
         "Dialogs": {
             "DropTypeWarning": {
                 "Title": "アイテム種別警告",
                 "Content": "種別が\"{type}\"のアイテムを置こうとしています。このアイテムはシーンに置くことが推薦されていません。本当に置きますか？"
-                },
-                "TradeTypeWarning": {
-                    "Title": "アイテム種別警告",
-                    "Content": "現在トレードしている(\"{type}\")種別のアイテムはトレードが禁止されているものです。本当にトレードを続行しますか？"
+            },
+            "TradeTypeWarning": {
+                "Title": "アイテム種別警告",
+                "Content": "現在トレードしている(\"{type}\")種別のアイテムはトレードが禁止されているものです。本当にトレードを続行しますか？"
             },
             "ResetSettings": {
                 "Title": "設定初期化",
@@ -137,7 +122,6 @@
             },
             "Cancel": "キャンセル"
         },
-
         "CurrenciesEditor": {
             "Title": "参照データ設定",
             "Explanation": "お宝として指定されたコマから取得可能なリソースや内部データをここで定義できます。例えばD&D5版の場合、所持しているGPの数は\"actor.data.data.currency.gp\"に保存されています。\"金貨\"という名前とともに\"data.currency.gp\"のデータパスを設定してあげればお宝からGPを取得可能になります。",
@@ -147,7 +131,6 @@
             "AddNew": "新規データ追加",
             "Submit": "データ追加"
         },
-
         "FilterEditor": {
             "Title": "アイテムフィルター設定",
             "Explanation": "ここではお宝の中に表示されないアイテムの種別を設定できます。設定したパスからアイテムの「種別」が定められ、UI上に非表示になります。",
@@ -156,7 +139,6 @@
             "AddNew": "新規フィルター追加",
             "Submit": "フィルター確定"
         },
-
         "SimilaritiesEditor": {
             "Title": "類似アイテム識別",
             "Explanation_P1": "類似するアイテムをどのように識別するのかをここで設定します。ほとんどのシステムは\"名前\"と\"種別\"で識別を行います。",
@@ -165,12 +147,10 @@
             "AddNew": "新しいデータパス追加",
             "Submit": "アイテムの類似"
         },
-
         "Defaults": {
             "Title": "Item Pile（お宝）設定",
             "Configure": "お宝",
             "Update": "お宝更新",
-
             "Main": {
                 "Title": "全体設定",
                 "EnabledPile": "有効化",
@@ -194,11 +174,9 @@
                 "OverrideItemFiltersExplanation": "設定を上書きし、デフォルトのアイテム種別以外を受け取れるようになります。",
                 "ConfigureOverrideItemFilters": "アイテムフィルター上書き設定"
             },
-
             "Other": {
                 "Title": "その他の設定"
             },
-
             "SingleItem": {
                 "Title": "単体設定",
                 "DisplayOneContainerWarning": "警告：\"単体時、アイテム画像を表示\"と\"コンテナである\"の両方の設定が有効化されています。この場合、コンテナ画像のほうが優先されますのでご注意ください。",
@@ -209,7 +187,6 @@
                 "ItemName": "アイテム名使用",
                 "ItemNameExplanation": "お宝の中身が単体アイテムの場合はそのアイテムの名前を使用します。"
             },
-
             "Container": {
                 "Title": "コンテナ設定",
                 "IsContainer": "コンテナである",
@@ -223,7 +200,6 @@
                 "OpenSoundPath": "開いた時の効果音",
                 "LockedSoundPath": "ロック中の効果音"
             },
-
             "Sharing": {
                 "Title": "配分設定",
                 "ShareItemsEnabled": "アイテムを配分する",
@@ -239,15 +215,12 @@
                 "ResetSharingData": "配分データ同期",
                 "ResetSharingDataExplanation": "お宝を閲覧中に中身が変更された場合、配分のデータ同期がずれる可能性があります。このボタンを押すことでそれらのデータを強制的に同期します。"
             }
-
         },
-
         "HUD": {
             "ToggleLocked": "ロック切替",
             "ToggleClosed": "開閉",
             "Configure": "お宝設定"
         },
-
         "DropItem": {
             "Title": "アイテムを置こうとしています",
             "Dropping": "置こうとしているアイテム",
@@ -257,7 +230,6 @@
             "NewPile": "新たなお宝を作成",
             "Cancel": "キャンセル"
         },
-
         "DropCurrencies": {
             "Title": "硬貨を置こうとしています",
             "Player": "置こうとしている硬貨",
@@ -266,7 +238,6 @@
             "Cancel": "キャンセル",
             "AddToPile": "お宝に追加"
         },
-
         "Chat": {
             "Pickup": "{name}が次のアイテムを拾いました：",
             "Split": "お宝の中身が{num_players}等分されて、それぞれが以下のアイテムを受け取りました：",
@@ -278,7 +249,6 @@
             "PrivateTrade": "秘匿トレード",
             "ExpandTrade": "トレード詳細を表示"
         },
-
         "Setting": {
             "Reset": {
                 "Title": "設定初期化",

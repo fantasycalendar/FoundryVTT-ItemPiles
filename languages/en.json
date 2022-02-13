@@ -1,15 +1,12 @@
 {
     "ITEM-PILES": {
-
         "Items": "Items",
         "Currencies": "Currencies",
         "Currency": "Currency",
-
         "ContextMenu": {
             "ShowToPlayers": "Item Piles: Show pile to players",
             "RequestTrade": "Item Piles: Request Trade"
         },
-
         "Inspect": {
             "Title": "Inspecting Pile Contents",
             "AsActor": "You're inspecting this pile as <a class='item-piles-change-actor item-piles-highlight'>{actorName}</a>",
@@ -28,10 +25,8 @@
             "SplitItems": "Split items {num_players} ways",
             "SplitCurrencies": "Split currency {num_players} ways"
         },
-
         "Trade": {
             "Title": "Item Piles: Trading",
-
             "Accept": "Accept",
             "Decline": "Decline",
             "Mute": "Mute",
@@ -42,7 +37,6 @@
             "Over": "This trade is no longer active.",
             "Between": "Trade between {actor_1} and {actor_2}",
             "DragDrop": "Drag & drop items to begin trading",
-
             "Request": {
                 "Title": "Item Piles: Send Trade Request",
                 "User": "Select which user you want to trade with:",
@@ -52,50 +46,40 @@
                 "DropActor": "Drag and drop actor here",
                 "Label": "Send trade request"
             },
-
             "NoActiveUsers": {
                 "Title": "Item Piles: No Active Users",
                 "Content": "No players are active, so you have no one to trade with."
             },
-
             "Prompt": {
                 "Title": "Item Piles: Trade Request",
                 "Content": "{trading_actor_name} (user {trading_user_name}) wants to trade with you.",
                 "PrivateContent": "{trading_actor_name} (user {trading_user_name}) wants to <strong>privately</strong> trade with you.",
                 "AcceptQuery": "Do you accept?"
             },
-
             "OngoingRequest": {
                 "Content": "Wait for response from {user_name}...",
                 "Label": "Cancel trade request"
             },
-
             "CancelledRequest": {
                 "Content": "The trade request was cancelled by {user_name}."
             },
-
             "AddCurrency": {
                 "Title": "Add Currencies",
                 "Content": "Add currencies to the active trade with {trader_actor_name}",
                 "Label": "Update Currencies"
             },
-
             "GMAddCurrency": "Add Currency (GM mode)",
-
             "Closed": {
                 "Title": "Trade Closed",
                 "You": "You closed the trading window, so the trade was cancelled.",
                 "Them": "User \"{user_name}\" closed the trading window, so the trade was cancelled.",
                 "Someone": "One of the users closed the trading window, so the trade was cancelled."
             },
-
             "Disconnected": "One of the users was disconnected, so the trade was cancelled.",
-
             "UserCharacterWarning": "You picked the actor \"{actor_name}\" which is the assigned character of the player \"{player_name}\".<br><br>Are you sure you want to do this?",
             "UserActiveCharacterWarning": "You picked the actor \"{actor_name}\" which is the assigned character of the player \"{player_name}\", who is <strong>active</strong>.<br><br>Are you sure you want to do this?",
             "ActorOwnerWarning": "You do not own this actor, so you cannot trade with it."
         },
-
         "Errors": {
             "DisallowedItemDrop": "You cannot drop \"{type}\" items",
             "DisallowedItemTrade": "You cannot trade \"{type}\" items",
@@ -104,7 +88,6 @@
             "PileLocked": "This item pile is locked and cannot be opened - you can't drop items in it.",
             "DropNoToken": "You don't have a token on this scene, so you can't drop any items here."
         },
-
         "Dialogs": {
             "DropTypeWarning": {
                 "Title": "Item Type Warning",
@@ -139,7 +122,6 @@
             },
             "Cancel": "Cancel"
         },
-
         "CurrenciesEditor": {
             "Title": "Currencies Editor",
             "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
@@ -149,7 +131,6 @@
             "AddNew": "Add new currency",
             "Submit": "Submit currencies"
         },
-
         "FilterEditor": {
             "Title": "Item Filters Editor",
             "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
@@ -158,7 +139,6 @@
             "AddNew": "Add new filter",
             "Submit": "Submit filters"
         },
-
         "SimilaritiesEditor": {
             "Title": "Item Similarities Editor",
             "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
@@ -167,12 +147,10 @@
             "AddNew": "Add new attribute path",
             "Submit": "Submit item similarities"
         },
-
         "Defaults": {
             "Title": "Item Pile Configuration",
             "Configure": "Item Pile",
             "Update": "Update Item Pile",
-
             "Main": {
                 "Title": "Main Settings",
                 "EnabledPile": "Enabled",
@@ -196,11 +174,9 @@
                 "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
                 "ConfigureOverrideItemFilters": "Configure Override Item Filters"
             },
-
             "Other": {
                 "Title": "Other Settings"
             },
-
             "SingleItem": {
                 "Title": "Single Item Settings",
                 "DisplayOneContainerWarning": "Warning! You have both \"Display Single Item Image\" and \"Is Container\" enabled. In this case, the container images takes priority.",
@@ -211,7 +187,6 @@
                 "ItemName": "Use Item Name",
                 "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
             },
-
             "Container": {
                 "Title": "Container Settings",
                 "IsContainer": "Is Container",
@@ -225,7 +200,6 @@
                 "OpenSoundPath": "Opening Sound Path",
                 "LockedSoundPath": "Locked Sound Path"
             },
-
             "Sharing": {
                 "Title": "Sharing Settings",
                 "ShareItemsEnabled": "Sharing Enabled: Items",
@@ -241,15 +215,12 @@
                 "ResetSharingData": "Reset Sharing Data",
                 "ResetSharingDataExplanation": "If the Item Pile's content was manually changed while people were looting it, the sharing data may become out of sync with the players' actual shares. Pressing this button will reset everyone's share in this pile."
             }
-
         },
-
         "HUD": {
             "ToggleLocked": "Toggle Locked",
             "ToggleClosed": "Toggle Closed",
             "Configure": "Configure Pile"
         },
-
         "DropItem": {
             "Title": "Dropping Item",
             "Dropping": "You're dropping",
@@ -259,7 +230,6 @@
             "NewPile": "Create new pile",
             "Cancel": "Cancel"
         },
-
         "DropCurrencies": {
             "Title": "Dropping Currencies",
             "Player": "You can drop the following currencies into this item pile:",
@@ -268,7 +238,6 @@
             "Cancel": "Cancel",
             "AddToPile": "Add to pile"
         },
-
         "Chat": {
             "Pickup": "{name} picked up the following items:",
             "Split": "An item pile's content was split among {num_players} players, and each one has received:",
@@ -280,7 +249,6 @@
             "PrivateTrade": "Private Trade",
             "ExpandTrade": "View full trade details"
         },
-
         "Setting": {
             "Reset": {
                 "Title": "Reset settings to default",
