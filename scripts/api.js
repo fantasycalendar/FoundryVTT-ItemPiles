@@ -193,10 +193,10 @@ const API = {
         const hookResult = Hooks.call(HOOKS.PILE.PRE_TURN_INTO, targets, pileSettings, tokenSettings);
         if (hookResult === false) return;
 
-        if(!Array.isArray(targets)) targets = [targets];
+        if (!Array.isArray(targets)) targets = [targets];
 
         const targetUuids = targets.map(target => {
-            if(!(target instanceof Token || target instanceof TokenDocument)){
+            if (!(target instanceof Token || target instanceof TokenDocument)) {
                 throw lib.custom_error(`turnTokensIntoItemPiles | Target must be of type Token or TokenDocument`, true)
             }
             const targetUuid = lib.getUuid(target);
@@ -216,7 +216,7 @@ const API = {
         const actorUpdateGroups = {};
         const defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
-        for(const targetUuid of targetUuids) {
+        for (const targetUuid of targetUuids) {
 
             let target = await fromUuid(targetUuid);
 
@@ -249,8 +249,8 @@ const API = {
                 [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
             });
 
-            if(target.isLinked){
-                if(actorUpdateGroups[target.actor.id]) continue;
+            if (target.isLinked) {
+                if (actorUpdateGroups[target.actor.id]) continue;
                 actorUpdateGroups[target.actor.id] = {
                     "_id": target.actor.id,
                     [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
@@ -260,7 +260,7 @@ const API = {
 
         await Actor.updateDocuments(Object.values(actorUpdateGroups));
 
-        for(const [sceneId, updateData] of Object.entries(tokenUpdateGroups)){
+        for (const [sceneId, updateData] of Object.entries(tokenUpdateGroups)) {
             const scene = game.scenes.get(sceneId);
             await scene.updateEmbeddedDocuments("Token", updateData);
         }
@@ -285,10 +285,10 @@ const API = {
         const hookResult = Hooks.call(HOOKS.PILE.PRE_REVERT_FROM, targets, tokenSettings);
         if (hookResult === false) return;
 
-        if(!Array.isArray(targets)) targets = [targets];
+        if (!Array.isArray(targets)) targets = [targets];
 
         const targetUuids = targets.map(target => {
-            if(!(target instanceof Token || target instanceof TokenDocument)){
+            if (!(target instanceof Token || target instanceof TokenDocument)) {
                 throw lib.custom_error(`revertTokensFromItemPiles | Target must be of type Token or TokenDocument`, true)
             }
             const targetUuid = lib.getUuid(target);
@@ -308,7 +308,7 @@ const API = {
         const tokenUpdateGroups = {};
         const defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
-        for(const targetUuid of targetUuids) {
+        for (const targetUuid of targetUuids) {
 
             let target = await fromUuid(targetUuid);
 
@@ -329,8 +329,8 @@ const API = {
                 [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
             });
 
-            if(target.isLinked){
-                if(actorUpdateGroups[target.actor.id]) continue;
+            if (target.isLinked) {
+                if (actorUpdateGroups[target.actor.id]) continue;
                 actorUpdateGroups[target.actor.id] = {
                     "_id": target.actor.id,
                     [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
@@ -341,7 +341,7 @@ const API = {
 
         await Actor.updateDocuments(Object.values(actorUpdateGroups));
 
-        for(const [sceneId, updateData] of Object.entries(tokenUpdateGroups)){
+        for (const [sceneId, updateData] of Object.entries(tokenUpdateGroups)) {
             const scene = game.scenes.get(sceneId);
             await scene.updateEmbeddedDocuments("Token", updateData);
         }
@@ -702,7 +702,7 @@ const API = {
     /**
      * @deprecated
      */
-    async openItemPileInventory(...args){
+    async openItemPileInventory(...args) {
         lib.custom_warning("deprecation warning - openItemPileInventory has been renamed to renderItemPileInventory")
         return this.renderItemPileInterface(...args);
     },
@@ -716,37 +716,40 @@ const API = {
      * @param {boolean} [useDefaultCharacter=true]                              Causes the users to inspect the item pile inventory as their default character
      * @returns {Promise}
      */
-    async renderItemPileInterface(target, userIds = [ game.user.id ], { inspectingTarget = false, useDefaultCharacter = true }={}){
+    async renderItemPileInterface(target, userIds = [game.user.id], {
+        inspectingTarget = false,
+        useDefaultCharacter = true
+    } = {}) {
 
         const targetDocument = lib.getDocument(target);
         const targetUuid = lib.getUuid(targetDocument);
         if (!targetUuid) throw lib.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid target item pile`);
 
-        if(!lib.isValidItemPile(targetDocument)){
+        if (!lib.isValidItemPile(targetDocument)) {
             lib.custom_warning("renderItemPileInterface | This target is not a valid item pile")
             return;
         }
 
-        if(inspectingTarget && useDefaultCharacter){
+        if (inspectingTarget && useDefaultCharacter) {
             lib.custom_warning("renderItemPileInterface | You cannot force users to use both their default character and a specific character to inspect the pile")
             return;
         }
 
-        if(!Array.isArray(userIds)) userIds = [userIds];
+        if (!Array.isArray(userIds)) userIds = [userIds];
 
-        if(!game.user.isGM){
-            if(!userIds.includes(game.user.id)) {
+        if (!game.user.isGM) {
+            if (!userIds.includes(game.user.id)) {
                 lib.custom_warning(`renderItemPileInterface | You are not a GM, so you cannot force others to render an item pile's interface`);
                 return;
             }
             userIds = [game.user.id];
         }
 
-        for(const userId of userIds){
+        for (const userId of userIds) {
             const user = game.users.get(userId);
-            if(!user) throw lib.custom_error(`renderItemPileInterface | No user with ID "${userId}" exists`);
-            if(useDefaultCharacter){
-                if(!user.character){
+            if (!user) throw lib.custom_error(`renderItemPileInterface | No user with ID "${userId}" exists`);
+            if (useDefaultCharacter) {
+                if (!user.character) {
                     lib.custom_warning(`renderItemPileInterface | User with id "${userId}" has no default character`, true);
                     return;
                 }
@@ -759,13 +762,13 @@ const API = {
         return itemPileSocket.executeForUsers(SOCKET_HANDLERS.RENDER_INTERFACE, userIds, targetUuid, inspectingTargetUuid, useDefaultCharacter)
     },
 
-    async _renderItemPileInterface(targetUuid, inspectingTargetUuid, useDefaultCharacter){
+    async _renderItemPileInterface(targetUuid, inspectingTargetUuid, useDefaultCharacter) {
         const target = await fromUuid(targetUuid);
 
         let inspectingTarget;
-        if(useDefaultCharacter && !game.user.isGM){
+        if (useDefaultCharacter && !game.user.isGM) {
             inspectingTarget = game.user.character;
-        }else{
+        } else {
             inspectingTarget = inspectingTargetUuid ? (await fromUuid(inspectingTargetUuid)) : false;
         }
 
@@ -788,7 +791,7 @@ const API = {
      * @param {Token/TokenDocument/Actor} target
      * @returns {boolean}
      */
-    isItemPileEmpty(target){
+    isItemPileEmpty(target) {
         return lib.isItemPileEmpty(target);
     },
 
@@ -799,7 +802,7 @@ const API = {
      * @param {array/boolean} [itemFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
      * @returns {Array}
      */
-    getItemPileItems(target, itemFilters = false){
+    getItemPileItems(target, itemFilters = false) {
         return lib.getActorItems(target, itemFilters);
     },
 
@@ -809,7 +812,7 @@ const API = {
      * @param {Token/TokenDocument/Actor} target
      * @returns {array}
      */
-    getItemPileCurrencies(target){
+    getItemPileCurrencies(target) {
         return lib.getActorCurrencies(target);
     },
 
@@ -880,7 +883,7 @@ const API = {
      * @param instigator {boolean/TokenDocument/Actor} [instigator=false]                       Whether this was triggered by a specific actor
      * @returns {Promise<object>}
      */
-    async splitItemPileContents(itemPile, { targets = false, instigator = false }={}){
+    async splitItemPileContents(itemPile, { targets = false, instigator = false } = {}) {
 
         if (!lib.isValidItemPile(itemPile)) return false;
 
@@ -889,19 +892,19 @@ const API = {
 
         const itemPileActor = itemPile?.actor ?? itemPile;
 
-        if(targets){
-            if(!Array.isArray(targets)){
+        if (targets) {
+            if (!Array.isArray(targets)) {
                 targets = [targets]
             }
             targets.forEach(actor => {
-                if(!(actor instanceof TokenDocument || actor instanceof Actor)){
+                if (!(actor instanceof TokenDocument || actor instanceof Actor)) {
                     throw lib.custom_error("SplitItemPileContents | Each of the entries in targets must be of type TokenDocument or Actor")
                 }
             })
             targets = targets.map(target => target?.character ?? target?.actor ?? target);
         }
 
-        if(instigator && !(instigator instanceof TokenDocument || instigator instanceof Actor)){
+        if (instigator && !(instigator instanceof TokenDocument || instigator instanceof Actor)) {
             throw lib.custom_error("SplitItemPileContents | splitter must be of type TokenDocument or Actor")
         }
 
@@ -922,7 +925,7 @@ const API = {
 
         const transferData = {};
 
-        for(let actorUuid of actorUuids){
+        for (let actorUuid of actorUuids) {
 
             const actor = await fromUuid(actorUuid);
 
@@ -939,11 +942,11 @@ const API = {
                 currenciesTransferred: []
             }
 
-            if(itemsToTransfer.length) {
+            if (itemsToTransfer.length) {
                 transferData[actorUuid].itemsTransferred = await API._transferItems(itemPileUuid, actorUuid, itemsToTransfer, userId, { isEverything: true });
             }
 
-            if(!foundry.utils.isObjectEmpty(currenciesToTransfer)) {
+            if (!foundry.utils.isObjectEmpty(currenciesToTransfer)) {
                 transferData[actorUuid].currenciesTransferred = await API._transferAttributes(itemPileUuid, actorUuid, currenciesToTransfer, userId, { isEverything: true });
             }
 
@@ -979,7 +982,7 @@ const API = {
 
         if (shouldBeDeleted) {
             await API._deleteItemPile(itemPileUuid);
-        }else if(lib.isItemPileEmpty(itemPileActor)){
+        } else if (lib.isItemPileEmpty(itemPileActor)) {
             await lib.clearItemPileSharingData(itemPileActor);
         }
 
@@ -999,7 +1002,7 @@ const API = {
      *
      * @returns {Promise<array>}                        An array of objects, each containing the item that was added or updated, and the quantity that was added
      */
-    async addItems(target, items, { mergeSimilarItems = true, interactionId = false }={}) {
+    async addItems(target, items, { mergeSimilarItems = true, interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, items, interactionId);
         if (hookResult === false) return;
@@ -1011,28 +1014,28 @@ const API = {
         items.forEach(itemData => {
 
             let item = itemData;
-            if(itemData instanceof Item){
+            if (itemData instanceof Item) {
                 item = itemData.toObject();
-            }else if(itemData.item instanceof Item){
+            } else if (itemData.item instanceof Item) {
                 item = itemData.item.toObject();
-            }else if(itemData.item){
+            } else if (itemData.item) {
                 item = itemData.item;
             }
 
-            if(itemData?.quantity !== undefined){
+            if (itemData?.quantity !== undefined) {
                 setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity)
             }
 
             const existingItems = mergeSimilarItems ? lib.findSimilarItem(itemsToAdd, item) : false;
-            if(existingItems){
+            if (existingItems) {
                 setProperty(existingItems, API.ITEM_QUANTITY_ATTRIBUTE, lib.getItemQuantity(existingItems) + lib.getItemQuantity(item))
-            }else{
+            } else {
                 itemsToAdd.push(item);
             }
 
         });
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`AddItems | interactionId must be of type string`);
         }
 
@@ -1125,7 +1128,7 @@ const API = {
      *
      * @returns {Promise<array>}                        An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted
      */
-    async removeItems(target, items, { interactionId = false }={}) {
+    async removeItems(target, items, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, items, interactionId);
         if (hookResult === false) return;
@@ -1138,17 +1141,17 @@ const API = {
         items = items.map(itemData => {
 
             let item;
-            if(typeof itemData === "string" || itemData._id){
+            if (typeof itemData === "string" || itemData._id) {
                 const itemId = typeof itemData === "string" ? itemData : itemData._id;
                 item = targetActorItems.find(actorItem => actorItem.id === itemId);
                 if (!item) {
                     throw lib.custom_error(`RemoveItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
                 }
                 item = item.toObject();
-            }else{
-                if(itemData.item instanceof Item){
+            } else {
+                if (itemData.item instanceof Item) {
                     item = itemData.item.toObject();
-                }else{
+                } else {
                     item = itemData.item;
                 }
                 let foundActorItem = targetActorItems.find(actorItem => actorItem.id === item._id);
@@ -1163,7 +1166,7 @@ const API = {
             }
         });
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`RemoveItems | interactionId must be of type string`);
         }
 
@@ -1187,7 +1190,7 @@ const API = {
 
             let item = targetActor.items.get(itemData._id);
 
-            if(!item) continue;
+            if (!item) continue;
 
             item = item.toObject();
 
@@ -1258,7 +1261,7 @@ const API = {
      *
      * @returns {Promise<object>}                       An array of objects, each containing the item that was added or updated, and the quantity that was transferred
      */
-    async transferItems(source, target, items, { interactionId = false }={}) {
+    async transferItems(source, target, items, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, items, interactionId);
         if (hookResult === false) return;
@@ -1271,16 +1274,16 @@ const API = {
         items = items.map(itemData => {
 
             let item;
-            if(typeof itemData === "string" || itemData._id){
+            if (typeof itemData === "string" || itemData._id) {
                 const itemId = typeof itemData === "string" ? itemData : itemData._id;
                 item = sourceActorItems.find(actorItem => actorItem.id === itemId);
                 if (!item) {
                     throw lib.custom_error(`TransferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`, true)
                 }
                 item = item.toObject();
-            }else if(itemData.item instanceof Item){
+            } else if (itemData.item instanceof Item) {
                 item = itemData.item.toObject();
-            }else{
+            } else {
                 item = itemData.item;
             }
 
@@ -1298,7 +1301,7 @@ const API = {
         const targetUuid = lib.getUuid(target);
         if (!targetUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid target`, true)
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`TransferItems | interactionId must be of type string`);
         }
 
@@ -1379,23 +1382,33 @@ const API = {
             })
         }
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`TransferAllItems | interactionId must be of type string`);
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, { itemFilters, interactionId });
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, {
+            itemFilters,
+            interactionId
+        });
     },
 
     /**
      * @private
      */
-    async _transferAllItems(sourceUuid, targetUuid, userId, { itemFilters = false, runHooks = false, interactionId = false } = {}) {
+    async _transferAllItems(sourceUuid, targetUuid, userId, {
+        itemFilters = false,
+        runHooks = false,
+        interactionId = false
+    } = {}) {
 
         const source = await fromUuid(sourceUuid);
 
         const itemsToRemove = API.getItemPileItems(source, itemFilters).map(item => item.toObject());
 
-        const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, userId, { runHooks: false, interactionId });
+        const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, userId, {
+            runHooks: false,
+            interactionId
+        });
         const itemAdded = await API._addItems(targetUuid, itemsRemoved, userId, { runHooks: false, interactionId });
 
         if (runHooks) {
@@ -1436,7 +1449,7 @@ const API = {
      * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      *
      */
-    async addAttributes(target, attributes, { interactionId = false }={}) {
+    async addAttributes(target, attributes, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, target, attributes, interactionId);
         if (hookResult === false) return;
@@ -1458,7 +1471,7 @@ const API = {
             }
         });
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`AddAttributes | interactionId must be of type string`);
         }
 
@@ -1519,7 +1532,7 @@ const API = {
      *
      * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      */
-    async removeAttributes(target, attributes, { interactionId = false }={}) {
+    async removeAttributes(target, attributes, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, target, attributes, interactionId);
         if (hookResult === false) return;
@@ -1552,7 +1565,7 @@ const API = {
             });
         }
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`RemoveAttributes | interactionId must be of type string`);
         }
 
@@ -1627,7 +1640,7 @@ const API = {
      *
      * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
-    async transferAttributes(source, target, attributes, { interactionId = false }={}) {
+    async transferAttributes(source, target, attributes, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, source, target, attributes, interactionId);
         if (hookResult === false) return;
@@ -1673,7 +1686,7 @@ const API = {
             });
         }
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`TransferAttributes | interactionId must be of type string`);
         }
 
@@ -1684,7 +1697,10 @@ const API = {
     /**
      * @private
      */
-    async _transferAttributes(sourceUuid, targetUuid, attributes, userId, { runHooks = true, interactionId = false }={}) {
+    async _transferAttributes(sourceUuid, targetUuid, attributes, userId, {
+        runHooks = true,
+        interactionId = false
+    } = {}) {
 
         const attributesRemoved = await API._removeAttributes(sourceUuid, attributes, userId, { runHooks: false });
 
@@ -1734,7 +1750,7 @@ const API = {
      *
      * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
-    async transferAllAttributes(source, target, { interactionId = false }={}) {
+    async transferAllAttributes(source, target, { interactionId = false } = {}) {
 
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, source, target, interactionId);
         if (hookResult === false) return;
@@ -1745,7 +1761,7 @@ const API = {
         const targetUuid = lib.getUuid(target);
         if (!targetUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`TransferAllAttributes | interactionId must be of type string`);
         }
 
@@ -1836,11 +1852,14 @@ const API = {
             })
         }
 
-        if(interactionId){
+        if (interactionId) {
             if (typeof interactionId !== "string") throw lib.custom_error(`TransferEverything | interactionId must be of type string`);
         }
 
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, { itemFilters, interactionId })
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, {
+            itemFilters,
+            interactionId
+        })
 
     },
 
@@ -1849,8 +1868,15 @@ const API = {
      */
     async _transferEverything(sourceUuid, targetUuid, userId, { itemFilters = false, interactionId } = {}) {
 
-        const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, userId, { itemFilters, isEverything: true, interactionId });
-        const currenciesTransferred = await API._transferAllAttributes(sourceUuid, targetUuid, userId, { isEverything: true, interactionId });
+        const itemsTransferred = await API._transferAllItems(sourceUuid, targetUuid, userId, {
+            itemFilters,
+            isEverything: true,
+            interactionId
+        });
+        const currenciesTransferred = await API._transferAllAttributes(sourceUuid, targetUuid, userId, {
+            isEverything: true,
+            interactionId
+        });
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemsTransferred, currenciesTransferred, userId, interactionId);
 
@@ -1920,7 +1946,7 @@ const API = {
             await Promise.allSettled(Object.entries(pileData).map(entry => {
                 return new Promise(async (resolve) => {
                     const [key, value] = entry;
-                    if (preloadedFiles.has(value) || !value){
+                    if (preloadedFiles.has(value) || !value) {
                         return resolve();
                     }
                     if (key.toLowerCase().includes("image")) {
@@ -2002,13 +2028,13 @@ const API = {
         if (data.type !== "Item") return;
 
         let itemData;
-        if(data.pack){
+        if (data.pack) {
             const uuid = `Compendium.${data.pack}.${data.id}`;
             const item = await fromUuid(uuid);
             itemData = item.toObject();
-        }else if(data.id){
+        } else if (data.id) {
             itemData = game.items.get(data.id)?.toObject();
-        }else{
+        } else {
             itemData = data.data;
         }
 
@@ -2061,14 +2087,14 @@ const API = {
 
         }
 
-        if(droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get('midi-qol', "DragDropTarget")){
+        if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get('midi-qol', "DragDropTarget")) {
             lib.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items")
             return;
         }
 
         if (droppableDocuments.length > 0 && !game.user.isGM) {
 
-            if(!(droppableDocuments[0] instanceof Actor && dropData.source instanceof Actor)) {
+            if (!(droppableDocuments[0] instanceof Actor && dropData.source instanceof Actor)) {
 
                 const sourceToken = canvas.tokens.placeables.find(token => token.actor === dropData.source);
 
@@ -2172,13 +2198,13 @@ const API = {
      * @private
      */
     async _dropItems({
-        userId,
-        sceneId,
-        sourceUuid = false,
-        targetUuid = false,
-        itemData = false,
-        position = false
-    } = {}) {
+                         userId,
+                         sceneId,
+                         sourceUuid = false,
+                         targetUuid = false,
+                         itemData = false,
+                         position = false
+                     } = {}) {
 
         let itemsDropped;
 
@@ -2307,11 +2333,11 @@ const API = {
      */
     async _itemPileClicked(pileDocument) {
 
-        if(!lib.isValidItemPile(pileDocument)) return;
+        if (!lib.isValidItemPile(pileDocument)) return;
 
         const pileToken = pileDocument.object;
 
-        if (!lib.isGMConnected()){
+        if (!lib.isGMConnected()) {
             lib.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
             return;
         }
@@ -2324,12 +2350,12 @@ const API = {
 
         let validTokens = [];
 
-        if(canvas.tokens.controlled.length > 0){
+        if (canvas.tokens.controlled.length > 0) {
             validTokens = [...canvas.tokens.controlled];
             validTokens = validTokens.filter(token => token.document !== pileDocument);
         }
 
-        if(!validTokens.length && !game.user.isGM){
+        if (!validTokens.length && !game.user.isGM) {
             validTokens.push(...canvas.tokens.placeables);
             if (_token) {
                 validTokens.unshift(_token);
@@ -2346,7 +2372,7 @@ const API = {
         }
 
         let interactingActor;
-        if(validTokens.length) {
+        if (validTokens.length) {
             if (validTokens.includes(_token)) {
                 interactingActor = _token.actor;
             } else {
@@ -2355,7 +2381,7 @@ const API = {
                 })
                 interactingActor = validTokens[0].actor;
             }
-        } else if(game.user.character && !game.user.isGM){
+        } else if (game.user.character && !game.user.isGM) {
             interactingActor = game.user.character;
         }
 

@@ -18,17 +18,17 @@ const flagManager = {
         return this._latestFlagVersion;
     },
 
-    async migrateDocuments(){
+    async migrateDocuments() {
 
-        if(!lib.isResponsibleGM()) return;
+        if (!lib.isResponsibleGM()) return;
 
         const currentVersion = game.settings.get(CONSTANTS.MODULE_NAME, "migrationVersion");
 
-        if(this.latestFlagVersion === currentVersion) return;
+        if (this.latestFlagVersion === currentVersion) return;
 
         const scenes = Array.from(game.scenes);
 
-        for(const scene of scenes){
+        for (const scene of scenes) {
 
             const tokens = Array.from(scene.tokens)
 
@@ -36,7 +36,7 @@ const flagManager = {
 
                 let pileData = token.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
 
-                if(!pileData) return false;
+                if (!pileData) return false;
 
                 const pileVersion = pileData?.flagVersion || "1.0.0";
                 if (pileVersion === this.latestFlagVersion) return false;
@@ -84,7 +84,7 @@ const flagManager = {
 
         }, (actor) => {
             let pileData = actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
-            if(!pileData) return false;
+            if (!pileData) return false;
             const pileVersion = pileData?.flagVersion || "1.0.0";
             return pileVersion !== this.latestFlagVersion;
         });
@@ -109,7 +109,7 @@ const flagManager = {
 
             const newPileData = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
-            for(const key of Object.keys(newPileData)){
+            for (const key of Object.keys(newPileData)) {
                 newPileData[key] = pileData[key] ?? newPileData[key];
             }
 
@@ -123,7 +123,6 @@ const flagManager = {
     },
 
 }
-
 
 
 export default flagManager;

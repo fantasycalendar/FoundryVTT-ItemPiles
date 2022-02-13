@@ -9,8 +9,8 @@
     margin: 0.25rem;
   }
 
-  &-specate-trade:disabled{
-    background-color: rgba(0,0,0, 0.25);
+  &-specate-trade:disabled {
+    background-color: rgba(0, 0, 0, 0.25);
   }
 
   &-progress {
@@ -24,7 +24,7 @@
     .progress-bar {
       display: block;
       height: 100%;
-      background-color: rgba(0,0,0, 0.65);
+      background-color: rgba(0, 0, 0, 0.65);
       transition: width 30s linear;
     }
   }
@@ -33,30 +33,30 @@
   &-dialog {
     text-align: center;
     font-size: 0.9rem;
-    margin-bottom:1rem;
+    margin-bottom: 1rem;
   }
 
-  &-disabled{
+  &-disabled {
     opacity: 0.75;
   }
 
-  &-clickable{
+  &-clickable {
     cursor: pointer;
 
-    &-red{
-      color:red;
+    &-red {
+      color: red;
     }
 
-    &-green{
-      color:green;
+    &-green {
+      color: green;
     }
 
-    &-green:hover{
+    &-green:hover {
       text-shadow: 0 0 8px rgba(0, 125, 0, 1);
     }
   }
 
-  &-moveable{
+  &-moveable {
     cursor: move;
   }
 
@@ -69,24 +69,25 @@
     flex-grow: 1;
   }
 
-  &-text{
+  &-text {
     &-right {
       text-align: right;
     }
+
     &-center {
       text-align: center;
     }
   }
 
-  &-small-text{
+  &-small-text {
     font-size: 0.75rem;
   }
 
-  &-middle{
+  &-middle {
     vertical-align: middle;
   }
 
-  &-img-container{
+  &-img-container {
     min-height: 37px;
     max-width: 37px;
     max-height: 37px;
@@ -95,14 +96,14 @@
     border-radius: 4px;
     border: 1px solid black;
 
-    .item-piles-img{
+    .item-piles-img {
       border: 0;
       width: auto;
       height: 100%;
       transition: transform 150ms;
 
       &:hover {
-        transform: scale(1.125,1.125);
+        transform: scale(1.125, 1.125);
       }
     }
   }
@@ -111,14 +112,14 @@
     background-color: var(--color-text-light-highlight, #f0f0e0);
   }
 
-  &-bottom-divider{
-    border-bottom: 1px solid rgba(0,0,0,0.35);
+  &-bottom-divider {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
   }
 
-  &-top-divider{
-    border-top: 1px solid rgba(0,0,0,0.35);
+  &-top-divider {
+    border-top: 1px solid rgba(0, 0, 0, 0.35);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
   }
@@ -129,18 +130,18 @@
 
 }
 
-.item-piles-slider-group{
+.item-piles-slider-group {
   padding: 0 5px 0 0;
   margin-bottom: 0.25rem;
   margin-right: 5px;
   border-radius: 4px;
 }
 
-#item-piles-preview-container{
+#item-piles-preview-container {
   position: absolute;
   display: none;
 
-  #item-piles-preview-image{
+  #item-piles-preview-image {
     border: 0;
     width: 300px;
     border-radius: 1rem;
@@ -156,7 +157,7 @@
   overflow-y: scroll;
 
   .item-piles-change-actor-select {
-    display:none;
+    display: none;
   }
 
   #item-piles-preview-container {
@@ -197,14 +198,14 @@
       flex: 0 1 auto;
     }
 
-    .item-piles-name{
+    .item-piles-name {
       padding: 0 0.5rem;
       flex: 4;
       display: inline-flex;
       flex-direction: column;
 
-      .item-piles-name-container{
-        flex:1;
+      .item-piles-name-container {
+        flex: 1;
         display: inline-flex;
         flex-direction: column;
         justify-content: center;
@@ -216,24 +217,24 @@
 
       span {
         line-height: 1;
-        flex:0;
+        flex: 0;
       }
     }
 
-    .item-piles-quantity{
+    .item-piles-quantity {
       flex: 1;
       margin-left: 0.5rem;
-      text-align:right;
+      text-align: right;
     }
 
-    .item-piles-input-divider{
+    .item-piles-input-divider {
       flex: 1;
       margin: 0.1rem 0.5rem 0 0.25rem;
       font-size: 0.8rem;
       line-height: 1.5rem;
     }
 
-    .item-piles-item-take-button, .item-piles-currency-take-button{
+    .item-piles-item-take-button, .item-piles-currency-take-button {
       flex: 0;
       min-width: 4rem;
       height: 26px;
@@ -343,7 +344,7 @@
   }
 
   ul {
-    display:inline-flex;
+    display: inline-flex;
     flex-direction: column;
     list-style-type: none;
     padding: 0;
@@ -352,7 +353,7 @@
   }
 
   li {
-    display:inline-flex;
+    display: inline-flex;
     flex-direction: row;
     width: 100%;
     margin: 1px 0;
@@ -375,7 +376,7 @@
     }
 
     small {
-      min-width:1rem;
+      min-width: 1rem;
       text-align: right;
       padding-right: 2px;
     }

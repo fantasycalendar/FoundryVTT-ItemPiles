@@ -66,7 +66,7 @@ export const SOCKET_HANDLERS = {
         TRADE_UPDATE_CURRENCIES: "publicTradeUpdateCurrencies",
         TRADE_STATE: "publicTradeAcceptedState",
     },
-    PRIVATE:  {
+    PRIVATE: {
         TRADE_UPDATE_ITEMS: "privateTradeUpdateItems",
         TRADE_UPDATE_CURRENCIES: "privateTradeUpdateCurrencies",
         TRADE_STATE: "privateTradeAcceptedState",
@@ -154,10 +154,10 @@ export function registerSocket() {
 
 async function callHook(inHookName, ...args) {
     const newArgs = [];
-    for(let arg of args){
-        if(lib.is_UUID(arg)){
+    for (let arg of args) {
+        if (lib.is_UUID(arg)) {
             const testArg = await fromUuid(arg);
-            if(testArg){
+            if (testArg) {
                 arg = testArg;
             }
         }
@@ -180,13 +180,14 @@ export const isPileInventoryOpenForOthers = {
 
         itemPileSocket.executeForOthers(SOCKET_HANDLERS.QUERY_PILE_INVENTORY_OPEN, game.user.id, lib.getUuid(inPile));
 
-        if(this.usersToRespond.size > 0) {
+        if (this.usersToRespond.size > 0) {
             setTimeout(this.resolve, 200);
-        }else{
+        } else {
             this.resolve(false);
             this.usersToRespond = new Set();
             this.isOpen = false;
-            this.resolve = () => {};
+            this.resolve = () => {
+            };
         }
 
         return promise;
@@ -204,7 +205,8 @@ export const isPileInventoryOpenForOthers = {
         this.resolve(this.isOpen);
         this.usersToRespond = new Set();
         this.isOpen = false;
-        this.resolve = () => {};
+        this.resolve = () => {
+        };
     }
 
 }

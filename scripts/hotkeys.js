@@ -3,7 +3,7 @@ import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 
 export const hotkeyActionState = {
-    get openPileInventory(){
+    get openPileInventory() {
         return (!hotkeyState.ctrlDown && !game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen")) || (hotkeyState.ctrlDown && game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"));
     }
 }
@@ -66,7 +66,7 @@ export function registerHotkeysPre() {
 
 export function registerHotkeysPost() {
 
-    if(!game.user.isGM) {
+    if (!game.user.isGM) {
         let clicked = false;
         window.addEventListener("mousedown", (event) => {
             if (!canvas.ready) return;
@@ -78,7 +78,7 @@ export function registerHotkeysPost() {
 
             const pos = canvas.app.renderer.plugins.interaction.mouse.getLocalPosition(canvas.app.stage);
             const tokens = lib.getTokensAtLocation(pos).filter(token => !token._canView(game.user));
-            if(!tokens.length) return;
+            if (!tokens.length) return;
             tokens.sort((a, b) => b.zIndex - a.zIndex);
             const token = tokens[0].document;
 
@@ -97,7 +97,7 @@ export function registerHotkeysPost() {
     if (!lib.isVersion9()) {
 
         window.addEventListener("keydown", (event) => {
-            switch(event.code){
+            switch (event.code) {
                 case "ControlLeft":
                     hotkeyState.ctrlDown = true;
                     break;
@@ -111,7 +111,7 @@ export function registerHotkeysPost() {
         });
 
         window.addEventListener("keyup", (event) => {
-            switch(event.code){
+            switch (event.code) {
                 case "ControlLeft":
                     hotkeyState.ctrlDown = false;
                     break;

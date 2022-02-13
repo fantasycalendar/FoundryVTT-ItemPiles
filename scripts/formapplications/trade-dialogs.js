@@ -3,7 +3,7 @@ import * as lib from "../lib/lib.js";
 
 export class TradePromptDialog extends FormApplication {
 
-    constructor(resolve, { actors = false, actor = false, users = false, user = false }={}) {
+    constructor(resolve, { actors = false, actor = false, users = false, user = false } = {}) {
         super();
         this.resolve = resolve;
         this.users = users || game.users.filter(user => user.active && user !== game.user);
@@ -12,12 +12,6 @@ export class TradePromptDialog extends FormApplication {
         this.actor = actor || game.user.character || (!game.user.isGM ? this.actors?.[0] : false);
         this.isGM = game.user.isGM;
 
-    }
-
-    static show({ actors = false, actor = false, users = false, user = false }){
-        return new Promise(resolve => {
-            new TradePromptDialog(resolve, { actors, actor, users, user }).render(true);
-        })
     }
 
     /** @inheritdoc */
@@ -30,6 +24,12 @@ export class TradePromptDialog extends FormApplication {
             height: "auto",
             dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-actor-container" }],
         });
+    }
+
+    static show({ actors = false, actor = false, users = false, user = false }) {
+        return new Promise(resolve => {
+            new TradePromptDialog(resolve, { actors, actor, users, user }).render(true);
+        })
     }
 
     activateListeners(html) {
@@ -53,16 +53,16 @@ export class TradePromptDialog extends FormApplication {
         })
 
         html.find(".item-piles-pick-selected-token").click(() => {
-            if(canvas.tokens.controlled.length === 0) return;
+            if (canvas.tokens.controlled.length === 0) return;
             this.setActor(canvas.tokens.controlled[0].actor);
         });
 
-        html.find('select[name="user"]').change(function(){
+        html.find('select[name="user"]').change(function () {
             const userId = $(this).val();
             self.user = game.users.get(userId);
         });
 
-        html.find('input[name="private"]').change(function(){
+        html.find('input[name="private"]').change(function () {
             self.private = $(this).is(":checked");
         });
 
@@ -92,14 +92,14 @@ export class TradePromptDialog extends FormApplication {
             return false;
         }
 
-        if(data.type !== "Actor") return;
+        if (data.type !== "Actor") return;
 
         this.setActor(game.actors.get(data.id));
 
     }
 
-    setActor(actor){
-        if(!actor.isOwner){
+    setActor(actor) {
+        if (!actor.isOwner) {
             return lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.ActorOwnerWarning"), true);
         }
         this.actor = actor;
@@ -142,7 +142,7 @@ export class TradePromptDialog extends FormApplication {
 
 export class TradeRequestDialog extends TradePromptDialog {
 
-    constructor(resolve, { tradeId, tradingUser, tradingActor, isPrivate }={}) {
+    constructor(resolve, { tradeId, tradingUser, tradingActor, isPrivate } = {}) {
         super(resolve);
         this.tradeId = tradeId;
         this.tradingUser = tradingUser;
@@ -153,22 +153,22 @@ export class TradeRequestDialog extends TradePromptDialog {
         this._hasClosed = false;
         this.interval = setInterval(() => {
             const user = game.users.get(this.tradingUser.id)
-            if(!user.active){
+            if (!user.active) {
                 lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true)
                 this.close();
             }
         }, 100)
     }
 
-    static show({ tradeId, tradingUser, tradingActor, isPrivate }={}){
+    static show({ tradeId, tradingUser, tradingActor, isPrivate } = {}) {
         return new Promise(resolve => {
             new TradeRequestDialog(resolve, { tradeId, tradingUser, tradingActor, isPrivate }).render(true);
         })
     }
 
-    static cancel(tradeId){
-        for(const app of Object.values(ui.windows)){
-            if(app instanceof TradeRequestDialog && app.tradeId === tradeId){
+    static cancel(tradeId) {
+        for (const app of Object.values(ui.windows)) {
+            if (app instanceof TradeRequestDialog && app.tradeId === tradeId) {
                 return app.close({ type: "cancelled" });
             }
         }
@@ -182,7 +182,7 @@ export class TradeRequestDialog extends TradePromptDialog {
         const progressBar = html.find(".progress-bar");
         progressBarContainer.hide();
         this.progressbarTimeout = setTimeout(() => {
-            if(this._hasClosed) return;
+            if (this._hasClosed) return;
             progressBarContainer.fadeIn(1000)
             progressBar.css("transition", 'width 20s linear')
             progressBar.css("width", "100%")
@@ -190,7 +190,7 @@ export class TradeRequestDialog extends TradePromptDialog {
         }, 14000);
 
         this.timeout = setTimeout(() => {
-            if(this._hasClosed) return;
+            if (this._hasClosed) return;
             lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.AutoDecline"), true)
             html.find('button[name="decline"]').click();
         }, 35000)
@@ -207,11 +207,11 @@ export class TradeRequestDialog extends TradePromptDialog {
             value: "accept",
             icon: "fas fa-check",
             text: game.i18n.localize("ITEM-PILES.Trade.Accept")
-        },{
+        }, {
             value: "decline",
             icon: "fas fa-times",
             text: game.i18n.localize("ITEM-PILES.Trade.Decline")
-        },{
+        }, {
             value: "mute",
             icon: "fas fa-comment-slash",
             text: game.i18n.localize("ITEM-PILES.Trade.Mute")
@@ -225,12 +225,12 @@ export class TradeRequestDialog extends TradePromptDialog {
         clearTimeout(this.progressbarTimeout);
         clearTimeout(this.timeout);
 
-        if(event.submitter.value === "accept"){
+        if (event.submitter.value === "accept") {
             const actor = await fromUuid(formData?.actor || this.actor.uuid);
             return this.resolve(actor)
         }
 
-        if(event.submitter.value === "mute"){
+        if (event.submitter.value === "mute") {
             return this.resolve("mute");
         }
 

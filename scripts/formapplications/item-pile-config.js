@@ -65,11 +65,11 @@ export class ItemPileConfig extends FormApplication {
         enabledCheckbox.change(async function () {
             let isEnabled = $(this).is(":checked");
             const existingData = lib.getItemPileData(self.document);
-            if(isEnabled && !existingData?.enabled) {
+            if (isEnabled && !existingData?.enabled) {
                 const isLinked = self.document instanceof Actor
                     ? self.document.data.token.actorLink
                     : self.document.isLinked;
-                if(isLinked){
+                if (isLinked) {
                     const doContinue = await Dialog.confirm({
                         title: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Title"),
                         content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content") }),
@@ -126,7 +126,7 @@ export class ItemPileConfig extends FormApplication {
             self.showCurrenciesEditor();
         })
 
-        overrideItemFiltersEnabledCheckbox.change(function() {
+        overrideItemFiltersEnabledCheckbox.change(function () {
             let isChecked = $(this).is(":checked");
             if (isChecked) {
                 self.pileData.overrideItemFilters = game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters");
@@ -147,23 +147,23 @@ export class ItemPileConfig extends FormApplication {
 
         const takeAllButtonCheckbox = html.find('input[name="takeAllEnabled"]');
 
-        shareItemsEnabledCheckbox.change(function(){
+        shareItemsEnabledCheckbox.change(function () {
             const isDisabled = shareItemsEnabledCheckbox.is(":checked") || shareAttributesEnabledCheckbox.is(":checked");
             takeAllButtonCheckbox.prop("disabled", isDisabled).parent().toggleClass("item-piles-disabled", isDisabled);
-            if(isDisabled && takeAllButtonCheckbox.is(':checked')){
+            if (isDisabled && takeAllButtonCheckbox.is(':checked')) {
                 takeAllButtonCheckbox.prop('checked', false)
             }
         });
 
-        shareAttributesEnabledCheckbox.change(function(){
+        shareAttributesEnabledCheckbox.change(function () {
             const isDisabled = shareItemsEnabledCheckbox.is(":checked") || shareAttributesEnabledCheckbox.is(":checked");
             takeAllButtonCheckbox.prop("disabled", isDisabled).parent().toggleClass("item-piles-disabled", isDisabled);
-            if(isDisabled && takeAllButtonCheckbox.is(':checked')){
+            if (isDisabled && takeAllButtonCheckbox.is(':checked')) {
                 takeAllButtonCheckbox.prop('checked', false)
             }
         }).change();
 
-        html.find(".item-piles-config-reset-sharing-data").click(function(){
+        html.find(".item-piles-config-reset-sharing-data").click(function () {
             self.resetSharingData();
         })
     }
@@ -176,7 +176,7 @@ export class ItemPileConfig extends FormApplication {
         this.currenciesEditor = UI;
         promise.then(newSettings => {
             this.currenciesEditor = false;
-            if(newSettings) {
+            if (newSettings) {
                 this.pileData.overrideCurrencies = newSettings;
             }
         });
@@ -190,13 +190,13 @@ export class ItemPileConfig extends FormApplication {
         this.itemFiltersEditor = UI;
         promise.then(newSettings => {
             this.itemFiltersEditor = false;
-            if(newSettings) {
+            if (newSettings) {
                 this.pileData.overrideItemFilters = newSettings;
             }
         });
     }
 
-    async resetSharingData(){
+    async resetSharingData() {
         return new Dialog({
             title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
             content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content") }),

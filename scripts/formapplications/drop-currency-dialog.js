@@ -11,7 +11,7 @@ export default class DropCurrencyDialog extends FormApplication {
         source,
         existingCurrencies = false,
         includeAllCurrencies = false
-    }={}) {
+    } = {}) {
         super();
 
         this._title = title ?? game.i18n.localize("ITEM-PILES.DropCurrencies.Title");
@@ -35,7 +35,7 @@ export default class DropCurrencyDialog extends FormApplication {
         });
     }
 
-    get title(){
+    get title() {
         return this._title;
     }
 
@@ -59,13 +59,13 @@ export default class DropCurrencyDialog extends FormApplication {
 
         data.currencies = lib.getActorCurrencies(this.source, currencyList);
 
-        if(!this.includeAllCurrencies) {
+        if (!this.includeAllCurrencies) {
             data.currencies = data.currencies.filter(currency => currency.quantity)
         }
 
         data.currencies.map(currency => {
             currency.currentQuantity = 0;
-            if(this.existingCurrencies) {
+            if (this.existingCurrencies) {
                 const existingCurrency = this.existingCurrencies.find(existingCurrency => existingCurrency.path === currency.path);
                 if (existingCurrency) {
                     currency.currentQuantity = existingCurrency.quantity;
@@ -86,7 +86,7 @@ export default class DropCurrencyDialog extends FormApplication {
     activateListeners(html) {
         super.activateListeners(html);
 
-        html.find('.item-piles-slider-group').each(function(){
+        html.find('.item-piles-slider-group').each(function () {
 
             const slider = $(this).find(".item-piles-range-slider")
             const input = $(this).find(".item-piles-range-input")

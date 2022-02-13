@@ -42,11 +42,11 @@ export class ItemPileSimilaritiesEditor extends FormApplication {
         });
     }
 
-    rerender(){
+    rerender() {
         const self = this;
-        this.element.find('.item-pile-similarities-row').each(function(index){
-            if(index === 0) return;
-            self.similarities[index-1] = $(this).find('.item-pile-similarities-path-input').val()
+        this.element.find('.item-pile-similarities-row').each(function (index) {
+            if (index === 0) return;
+            self.similarities[index - 1] = $(this).find('.item-pile-similarities-path-input').val()
         });
         return this.render(true);
     }

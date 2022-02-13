@@ -54,11 +54,11 @@ export class ItemPileFiltersEditor extends FormApplication {
         });
     }
 
-    rerender(){
+    rerender() {
         const self = this;
-        this.element.find('.item-pile-filters-row').each(function(index){
-            if(index === 0) return;
-            self.filters[index-1] = {
+        this.element.find('.item-pile-filters-row').each(function (index) {
+            if (index === 0) return;
+            self.filters[index - 1] = {
                 path: $(this).find('.item-pile-filters-path-input').val(),
                 filters: $(this).find('.item-pile-filters-input').val()
             }
@@ -81,8 +81,8 @@ export class ItemPileFiltersEditor extends FormApplication {
 
     }
 
-    async close(...args){
-        if(this.resolve){
+    async close(...args) {
+        if (this.resolve) {
             this.resolve()
         }
         return super.close(...args)
