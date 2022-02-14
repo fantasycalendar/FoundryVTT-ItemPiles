@@ -44,27 +44,70 @@ export class TradingApp extends FormApplication {
         });
     }
 
-    static getAppByPublicTradeId(publicTradeId){
-        for(const app of Object.values(ui.windows)){
-            if(app instanceof TradingApp && app?.publicTradeId === publicTradeId){
+    get template() {
+        return this.leftTraderUser === game.user || this.rightTraderUser === game.user
+            ? `${CONSTANTS.PATH}templates/trading-app.html`
+            : `${CONSTANTS.PATH}templates/trading-app-spectate.html`;
+    }
+
+    get title() {
+        return game.i18n.format("ITEM-PILES.Trade.Between", {
+            actor_1: this.leftTraderActor.name,
+            actor_2: this.rightTraderActor.name
+        });
+    }
+
+    static getAppByPublicTradeId(publicTradeId) {
+        for (const app of Object.values(ui.windows)) {
+            if (app instanceof TradingApp && app?.publicTradeId === publicTradeId) {
                 return app;
             }
         }
         return false;
     }
 
-    get template(){
-        return this.leftTraderUser === game.user || this.rightTraderUser === game.user
-            ? `${CONSTANTS.PATH}templates/trading-app.html`
-            : `${CONSTANTS.PATH}templates/trading-app-spectate.html`;
+    static _updateItems(publicTradeId, userId, itemData) {
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if (app) {
+            return app.updateItems(userId, itemData);
+        }
+        return false;
     }
 
-    get title(){
-        return `Trade between ${this.leftTraderActor.name} and ${this.rightTraderActor.name}`
+    static _updateCurrencies(publicTradeId, userId, currencyData) {
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if (app) {
+            return app.updateCurrencies(userId, currencyData);
+        }
+        return false;
     }
 
-    async executeSocketAction(socketHandler, ...args){
-        if(this.isPrivate) {
+    static _setAcceptedState(publicTradeId, userId, state) {
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if (app) {
+            return app.setAcceptedState(userId, state);
+        }
+        return false;
+    }
+
+    static _tradeCompleted(party_1, party_2, publicTradeId) {
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if (app) {
+            return app.close({ accepted: true });
+        }
+        return false;
+    }
+
+    static _tradeClosed(publicTradeId, userId) {
+        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
+        if (app) {
+            return app.close({ userId });
+        }
+        return false;
+    }
+
+    async executeSocketAction(socketHandler, ...args) {
+        if (this.isPrivate) {
             return itemPileSocket.executeForUsers(socketHandler, [this.leftTraderUser.id, this.rightTraderUser.id], ...args);
         }
         return itemPileSocket.executeForEveryone(socketHandler, ...args);
@@ -72,7 +115,7 @@ export class TradingApp extends FormApplication {
 
     async _onDrop(event) {
 
-        if(game.user !== this.leftTraderUser) return;
+        if (game.user !== this.leftTraderUser) return;
 
         super._onDrop(event);
 
@@ -89,18 +132,18 @@ export class TradingApp extends FormApplication {
             if (!game.user.isGM) return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
         }
 
-        if(!game.user.isGM && data.actorId && data.actorId !== this.leftTraderActor.id){
+        if (!game.user.isGM && data.actorId && data.actorId !== this.leftTraderActor.id) {
             throw lib.custom_error(`You cannot drop items into the trade UI from a different actor than ${this.leftTraderActor.name}!`)
         }
 
         let itemData;
-        if(data.pack){
+        if (data.pack) {
             const uuid = `Compendium.${data.pack}.${data.id}`;
             const item = await fromUuid(uuid);
             itemData = item.toObject();
-        }else if(data.id){
+        } else if (data.id) {
             itemData = game.items.get(data.id)?.toObject();
-        }else{
+        } else {
             itemData = data.data;
         }
 
@@ -126,15 +169,15 @@ export class TradingApp extends FormApplication {
             }
         }
 
-        return this.addItem(itemData,!!data.actorId && game.user.isGM);
+        return this.addItem(itemData, !!data.actorId && game.user.isGM);
 
     }
 
-    async addItem(newItem, limitQuantity = true){
+    async addItem(newItem, limitQuantity = true) {
 
         const item = lib.findSimilarItem(this.leftTraderActorItems, newItem)
 
-        if(!item){
+        if (!item) {
             this.leftTraderActorItems.push({
                 id: newItem._id,
                 name: newItem.name,
@@ -143,9 +186,9 @@ export class TradingApp extends FormApplication {
                 maxQuantity: limitQuantity ? lib.getItemQuantity(newItem) : Infinity,
                 data: newItem
             })
-        }else{
-            if(item.quantity >= lib.getItemQuantity(newItem)) return;
-            item.quantity = Math.min(item.quantity+1, lib.getItemQuantity(newItem));
+        } else {
+            if (item.quantity >= lib.getItemQuantity(newItem)) return;
+            item.quantity = Math.min(item.quantity + 1, lib.getItemQuantity(newItem));
         }
 
         await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorItems);
@@ -153,18 +196,10 @@ export class TradingApp extends FormApplication {
 
     }
 
-    static _updateItems(publicTradeId, userId, itemData){
-        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
-        if(app){
-            return app.updateItems(userId, itemData);
-        }
-        return false;
-    }
-
-    updateItems(userId, inItems){
-        if(userId === this.leftTraderUser.id){
+    updateItems(userId, inItems) {
+        if (userId === this.leftTraderUser.id) {
             this.leftTraderActorItems = inItems;
-        }else if(userId === this.rightTraderUser.id){
+        } else if (userId === this.rightTraderUser.id) {
             this.rightTraderActorItems = inItems;
         }
         this.leftTraderAccepted = false;
@@ -172,9 +207,9 @@ export class TradingApp extends FormApplication {
         this.render(true);
     }
 
-    async addCurrency(asGM = false){
+    async addCurrency(asGM = false) {
 
-        if(this.currencyWindow){
+        if (this.currencyWindow) {
             this.currencyWindow.close();
         }
 
@@ -188,7 +223,7 @@ export class TradingApp extends FormApplication {
             includeAllCurrencies: asGM
         });
 
-        if(!currencyToAdd) return;
+        if (!currencyToAdd) return;
 
         const currencies = lib.getActorCurrencies(this.leftTraderActor, { getAll: asGM });
 
@@ -196,7 +231,7 @@ export class TradingApp extends FormApplication {
 
             const existingCurrency = this.leftTraderActorCurrencies.find(currency => currency.path === entry[0]);
 
-            if(existingCurrency){
+            if (existingCurrency) {
                 existingCurrency.quantity = entry[1];
                 return;
             }
@@ -223,18 +258,10 @@ export class TradingApp extends FormApplication {
 
     }
 
-    static _updateCurrencies(publicTradeId, userId, currencyData){
-        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
-        if(app){
-            return app.updateCurrencies(userId, currencyData);
-        }
-        return false;
-    }
-
-    updateCurrencies(userId, inCurrencies){
-        if(userId === this.leftTraderUser.id){
+    updateCurrencies(userId, inCurrencies) {
+        if (userId === this.leftTraderUser.id) {
             this.leftTraderActorCurrencies = inCurrencies;
-        }else if(userId === this.rightTraderUser.id){
+        } else if (userId === this.rightTraderUser.id) {
             this.rightTraderActorCurrencies = inCurrencies;
         }
         this.leftTraderAccepted = false;
@@ -242,53 +269,29 @@ export class TradingApp extends FormApplication {
         this.render(true);
     }
 
-    static _setAcceptedState(publicTradeId, userId, state){
-        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
-        if(app){
-            return app.setAcceptedState(userId, state);
-        }
-        return false;
-    }
-
-    setAcceptedState(userId, state){
-        if(userId === this.leftTraderUser.id){
+    setAcceptedState(userId, state) {
+        if (userId === this.leftTraderUser.id) {
             this.leftTraderAccepted = state;
-        }else if(userId === this.rightTraderUser.id){
+        } else if (userId === this.rightTraderUser.id) {
             this.rightTraderAccepted = state;
         }
         this.render(true);
-    }
-
-    static _tradeCompleted(party_1, party_2, publicTradeId){
-        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
-        if(app){
-            return app.close({ accepted: true });
-        }
-        return false;
-    }
-
-    static _tradeClosed(publicTradeId, userId){
-        const app = TradingApp.getAppByPublicTradeId(publicTradeId);
-        if(app){
-            return app.close({ userId });
-        }
-        return false;
     }
 
     activateListeners(html) {
         super.activateListeners(html);
         let self = this;
 
-        setTimeout(() =>{
+        setTimeout(() => {
             let element = html.find(`.item-piles-item-row[data-item="${this.editingInput}"]`)
             element = element.length ? element : html.find(`.item-piles-item-row[data-currency="${this.editingInput}"]`)
-            if(element.length){
+            if (element.length) {
                 element.find(".item-piles-quantity").focus()
             }
         }, 50);
 
-        html.find('.item-piles-item-row .item-piles-quantity').keyup(function(event){
-            if(event.key === "Enter"){
+        html.find('.item-piles-item-row .item-piles-quantity').keyup(function (event) {
+            if (event.key === "Enter") {
                 event.preventDefault();
             }
 
@@ -296,12 +299,12 @@ export class TradingApp extends FormApplication {
 
             let quantity;
             const value = Number($(this).val());
-            if(parent.attr('data-type') === "item") {
+            if (parent.attr('data-type') === "item") {
                 const itemId = parent.attr("data-item");
                 const item = self.leftTraderActorItems.find(item => item.id === itemId);
                 quantity = Math.min(value, item.maxQuantity);
                 item.quantity = quantity;
-            }else{
+            } else {
                 const currencyPath = parent.attr("data-currency");
                 const currency = self.leftTraderActorCurrencies.find(currency => currency.path === currencyPath);
                 quantity = Math.min(value, currency.maxQuantity);
@@ -310,13 +313,13 @@ export class TradingApp extends FormApplication {
 
             $(this).val(quantity);
 
-            if(event.key === "Enter"){
+            if (event.key === "Enter") {
                 parent.find(".item-piles-confirm-quantity").click();
             }
 
         });
 
-        html.find(".item-piles-quantity-text").dblclick(function(){
+        html.find(".item-piles-quantity-text").dblclick(function () {
             self.resetInputs();
             const parent = $(this).closest(".item-piles-item-row");
             $(this).hide();
@@ -329,16 +332,16 @@ export class TradingApp extends FormApplication {
                 : parent.attr('data-currency');
         });
 
-        html.find(".item-piles-remove-item").click(function(){
+        html.find(".item-piles-remove-item").click(function () {
             self.editingInput = false;
             const parent = $(this).closest(".item-piles-item-row");
-            if(parent.attr('data-type') === "item"){
+            if (parent.attr('data-type') === "item") {
                 return self.setItemQuantity(parent.attr('data-item'), 0)
             }
             return self.setCurrencyQuantity(parent.attr('data-currency'), 0)
         })
 
-        html.find(".item-piles-confirm-quantity").click(function(){
+        html.find(".item-piles-confirm-quantity").click(function () {
             self.editingInput = false;
             const parent = $(this).closest(".item-piles-item-row");
             $(this).hide();
@@ -348,7 +351,7 @@ export class TradingApp extends FormApplication {
 
             parent.find(".item-piles-quantity-text").text(value);
 
-            if(parent.attr('data-type') === "item"){
+            if (parent.attr('data-type') === "item") {
                 return self.setItemQuantity(parent.attr('data-item'), value)
             }
 
@@ -370,9 +373,9 @@ export class TradingApp extends FormApplication {
 
     }
 
-    resetInputs(){
+    resetInputs() {
         this.editingInput = false;
-        this.element.find(".item-piles-confirm-quantity").each(function(){
+        this.element.find(".item-piles-confirm-quantity").each(function () {
             const parent = $(this).closest(".item-piles-item-row");
             $(this).hide();
             parent.find(".item-piles-quantity-container").hide();
@@ -382,20 +385,20 @@ export class TradingApp extends FormApplication {
         });
     }
 
-    async setItemQuantity(itemId, quantity){
+    async setItemQuantity(itemId, quantity) {
         const item = this.leftTraderActorItems.find(item => item.id === itemId);
         item.quantity = quantity;
-        if(!quantity){
+        if (!quantity) {
             this.leftTraderActorItems.splice(this.leftTraderActorItems.indexOf(item), 1);
         }
         await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_ITEMS, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorItems);
         return this.executeSocketAction(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, this.leftTraderActorItems);
     }
 
-    async setCurrencyQuantity(currencyPath, quantity){
+    async setCurrencyQuantity(currencyPath, quantity) {
         const currency = this.leftTraderActorCurrencies.find(currency => currency.path === currencyPath);
         currency.quantity = quantity;
-        if(!quantity){
+        if (!quantity) {
             this.leftTraderActorCurrencies.splice(this.leftTraderActorCurrencies.indexOf(currency), 1);
         }
         await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
@@ -411,13 +414,13 @@ export class TradingApp extends FormApplication {
             name: this.leftTraderActor.name,
             img: this.leftTraderActor.data.img,
             items: foundry.utils.duplicate(this.leftTraderActorItems).map(item => {
-                if(this.editingInput === item.id){
+                if (this.editingInput === item.id) {
                     item.editing = true;
                 }
                 return item;
             }),
             currencies: foundry.utils.duplicate(this.leftTraderActorCurrencies).map(currency => {
-                if(this.editingInput === currency.path){
+                if (this.editingInput === currency.path) {
                     currency.editing = true;
                 }
                 return currency;
@@ -427,8 +430,6 @@ export class TradingApp extends FormApplication {
         };
 
         data.leftActor.hasItems = !!data.leftActor.items.length;
-
-        debugger;
 
         data.rightActor = {
             name: this.rightTraderActor.name,
@@ -444,14 +445,14 @@ export class TradingApp extends FormApplication {
         return data;
     }
 
-    async close(options){
+    async close(options) {
         super.close(options);
-        if(!options?.accepted){
-            if(!options?.userId && (this.leftTraderUser.id === game.user.id || this.rightTraderUser.id === game.user.id)) {
-                if(this.isPrivate) {
+        if (!options?.accepted) {
+            if (!options?.userId && (this.leftTraderUser.id === game.user.id || this.rightTraderUser.id === game.user.id)) {
+                if (this.isPrivate) {
                     itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
                     itemPileSocket.executeForOthers(SOCKET_HANDLERS.TRADE_CLOSED, this.publicTradeId, game.user.id);
-                }else{
+                } else {
                     const otherUserId = this.leftTraderUser.id === game.user.id ? this.rightTraderUser.id : this.leftTraderUser.id;
                     itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_CLOSED, otherUserId, this.publicTradeId, game.user.id);
                 }
@@ -459,19 +460,21 @@ export class TradingApp extends FormApplication {
                 Dialog.prompt({
                     title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
                     content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Trade.Closed.You") }),
-                    callback: () => {},
+                    callback: () => {
+                    },
                     rejectClose: false
                 })
-            }else{
-                if(this.leftTraderUser.id === game.user.id && options?.userId === this.rightTraderUser.id){
+            } else {
+                if (this.leftTraderUser.id === game.user.id && options?.userId === this.rightTraderUser.id) {
                     TradeAPI._tradeClosed(this.privateTradeId);
                     Dialog.prompt({
                         title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
                         content: lib.dialogLayout({ message: game.i18n.format("ITEM-PILES.Trade.Closed.Them", { user_name: this.rightTraderUser.name }) }),
-                        callback: () => {},
+                        callback: () => {
+                        },
                         rejectClose: false
                     })
-                }else{
+                } else {
                     lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Closed.Someone"), true);
                 }
             }

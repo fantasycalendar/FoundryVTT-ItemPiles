@@ -11,7 +11,6 @@ import { registerSettings, checkSystem, registerHandlebarHelpers } from "./setti
 import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
-import { getActorCurrencies, getActorItems } from "./lib/lib.js";
 
 import { TradeAPI } from "./trade-api.js";
 import { MerchantApp } from "./formapplications/merchant-app.js";
@@ -38,7 +37,7 @@ Hooks.once("init", async () => {
 
     chatHandler.init();
 
-    if(game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") && game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")){
+    if (game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") && game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")) {
         Hooks.on("renderPlayerList", (app, html) => {
             const button = $(`<button type="button" class="item-piles-player-list-trade-button"><i class="fas fa-handshake"></i> Request Trade</button>`)
             button.click(() => {
@@ -72,16 +71,16 @@ Hooks.once("ready", async () => {
 
     if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
         let word = "install and activate";
-        if(game.modules.get('lib-wrapper')) word = "activate";
+        if (game.modules.get('lib-wrapper')) word = "activate";
         throw lib.custom_error(`Item Piles requires the 'libWrapper' module. Please ${word} it.`)
     }
     if (!game.modules.get('socketlib')?.active && game.user.isGM) {
         let word = "install and activate";
-        if(game.modules.get('socketlib')) word = "activate";
+        if (game.modules.get('socketlib')) word = "activate";
         throw lib.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
     }
 
-    if (!lib.isGMConnected()){
+    if (!lib.isGMConnected()) {
         lib.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
     }
 
@@ -100,11 +99,11 @@ const debounceManager = {
 
     debounces: {},
 
-    setDebounce(id, method){
-        if(this.debounces[id]){
+    setDebounce(id, method) {
+        if (this.debounces[id]) {
             return this.debounces[id];
         }
-        this.debounces[id] = debounce(function(...args){
+        this.debounces[id] = debounce(function (...args) {
             delete debounceManager.debounces[id];
             return method(...args);
         }, 50);
@@ -123,7 +122,7 @@ const module = {
         });
         if (!validCurrency) return;
         const targetUuid = target.uuid;
-        return debounceManager.setDebounce(targetUuid, async function(uuid){
+        return debounceManager.setDebounce(targetUuid, async function (uuid) {
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
             await API._rerenderItemPileInventoryApplication(uuid, deleted);
             if (deleted || !lib.isResponsibleGM()) return;
@@ -137,7 +136,7 @@ const module = {
         target = target?.token ?? target;
         if (!lib.isValidItemPile(target)) return;
         const targetUuid = target.uuid;
-        return debounceManager.setDebounce(targetUuid, async function(uuid){
+        return debounceManager.setDebounce(targetUuid, async function (uuid) {
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
             await API._rerenderItemPileInventoryApplication(uuid, deleted);
             if (deleted || !lib.isResponsibleGM()) return;
@@ -152,8 +151,8 @@ const module = {
         }
     },
 
-    async _preCreatePile(document){
-        if(!document.isLinked){
+    async _preCreatePile(document) {
+        if (!document.isLinked) {
             document.data.update({
                 [`actorData.flags.${CONSTANTS.MODULE_NAME}.-=${CONSTANTS.SHARING_DATA}`]: null
             });
@@ -193,7 +192,7 @@ const module = {
 
         if (!document) return;
 
-        if(!lib.isValidItemPile(document)) return;
+        if (!lib.isValidItemPile(document)) return;
 
         const pileData = lib.getItemPileData(document);
 
@@ -228,7 +227,7 @@ const module = {
 
     _insertItemPileHeaderButtons(actorSheet, buttons) {
 
-        if(!game.user.isGM) return;
+        if (!game.user.isGM) return;
 
         let obj = actorSheet.object;
 

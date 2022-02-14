@@ -8,9 +8,10 @@ export default {
     // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
     "ITEM_FILTERS": [],
 
+    // Item similarities determines how item piles detect similarities and differences in the system
     "ITEM_SIMILARITIES": ["name", "type"],
 
-    // Dynamic attributes are things like currencies or transferable powers that exist as editable number fields on character sheets
+    // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
     "CURRENCIES": [
         {
             name: "Ouro",

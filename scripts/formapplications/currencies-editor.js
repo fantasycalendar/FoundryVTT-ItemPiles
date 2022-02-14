@@ -55,11 +55,11 @@ export class CurrenciesEditor extends FormApplication {
         });
     }
 
-    rerender(){
+    rerender() {
         const self = this;
-        this.element.find('.item-piles-currency-row').each(function(index){
-            if(index === 0) return;
-            self.currencies[index-1] = {
+        this.element.find('.item-piles-currency-row').each(function (index) {
+            if (index === 0) return;
+            self.currencies[index - 1] = {
                 name: $(this).find('.item-piles-currency-name-input').val(),
                 path: $(this).find('.item-piles-currency-path-input').val(),
                 img: $(this).find('.item-piles-currency-img-input').val()
@@ -87,8 +87,8 @@ export class CurrenciesEditor extends FormApplication {
 
     }
 
-    async close(...args){
-        if(this.resolve){
+    async close(...args) {
+        if (this.resolve) {
             this.resolve()
         }
         return super.close(...args)

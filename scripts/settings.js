@@ -272,31 +272,35 @@ async function applyDefaultSettings() {
     }
 }
 
-export async function checkSystem(){
+export async function checkSystem() {
 
-    if(!SYSTEMS.DATA){
+    if (!SYSTEMS.DATA) {
 
-        if(game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")) return;
+        if (game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")) return;
 
         await game.settings.set(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown", true);
 
         return Dialog.prompt({
             title: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Title"),
             content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content") }),
-            callback: () => {}
+            callback: () => {
+            }
         });
 
     }
 
-    if(game.settings.get(CONSTANTS.MODULE_NAME, "systemFound")) return;
+    if (game.settings.get(CONSTANTS.MODULE_NAME, "systemFound")) return;
 
     game.settings.set(CONSTANTS.MODULE_NAME, "systemFound", true);
 
-    if(game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")){
+    if (game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")) {
 
         return new Dialog({
             title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
-            content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"), icon: "fas fa-search" }),
+            content: lib.dialogLayout({
+                message: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"),
+                icon: "fas fa-search"
+            }),
             buttons: {
                 confirm: {
                     icon: '<i class="fas fa-check"></i>',
@@ -318,9 +322,9 @@ export async function checkSystem(){
     return applyDefaultSettings();
 }
 
-export function registerHandlebarHelpers(){
+export function registerHandlebarHelpers() {
 
-    Handlebars.registerHelper('concat', function(...args) {
+    Handlebars.registerHelper('concat', function (...args) {
         return args.filter(str => typeof str !== "object").join("");
     });
 

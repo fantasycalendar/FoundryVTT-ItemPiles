@@ -1,6 +1,5 @@
 {
     "ITEM-PILES": {
-
         "Inspect": {
             "Title": "Untersuche Gegenstandstapel",
             "AsActor": "Du untersuchst diesen Stapel als {actorName}",
@@ -12,7 +11,6 @@
             "Close": "Kiste schliessen",
             "Leave": "Verlassen"
         },
-
         "Errors": {
             "DisallowedItemDrop": "Du kannst keinen Gegenstand vom Typ \"{type}\" hier fallen lassen.",
             "NoSourceDrop": "Du kannst keine Gegenstände aus der Gegenstandsleiste fallen lassen, es sei denn, du bist ein GM.",
@@ -20,7 +18,6 @@
             "PileLocked": "Dieser Stapel ist gesperrt und verschlossen - du kannst keine Gegenstände hier fallen lassen.",
             "DropNoToken": "Du hast kein Token in dieser Szene, daher kannst du hier keinen Gegenstand fallen lassen."
         },
-
         "Dialogs": {
             "DropTypeWarning": {
                 "Title": "Gegenstand Typ Warnung",
@@ -46,7 +43,6 @@
             },
             "Cancel": "Abbrechen"
         },
-
         "AttributeEditor": {
             "Title": "Dynamischer Attribute Editor",
             "Explanation": "Hier kannst du festlegen, welche Attribute von Charakteren von Gegenstandsstapeln abgeholt werden können, z.B. Währungen. In D&D5e gibt es Währungen für Akteure mit dem Attributspfad \"actor.data.data.currency.gp\", also fügst du deine eigene mit dem Namen \"Goldmünzen\" und dem Attributspfad \"data.currency.gp\" hinzu.",
@@ -55,7 +51,6 @@
             "AddNew": "Neues Attribut zufügen",
             "Submit": "Attribut übermitteln"
         },
-
         "FilterEditor": {
             "Title": "Gegenstandsfilter Editor",
             "Explanation": "Hier kannst du mehrere Arten von Filtern definieren, die bestimmte Arten von Gegenständen ausschließen. Basierend auf dem angegebenen Attributpfad kann der Gegenstandsstapel den \"Typ\" eines Gegenstands finden, und basierend auf den Filtern werden diese Gegenstände in der Benutzeroberfläche des Gegenstandsstapels ausgeblendet.",
@@ -63,14 +58,11 @@
             "AddNew": "Neuer Filter zufügen",
             "Submit": "Filter übertragen"
         },
-
         "AttributePath": "Attributspfad",
-
         "Defaults": {
             "Title": "Gegenstandsstapel Konfiguration",
             "Configure": "Gegenstandsstapel",
             "Update": "Gegenstandsstapel aktualisieren",
-
             "Main": {
                 "Title": "Hauptmenü",
                 "EnabledPile": "Aktiviert",
@@ -94,7 +86,6 @@
                 "OverrideItemFiltersExplanation": "Lege fest, ob dieser Stapel in der Lage sein soll, andere Arten von Gegenständen als die Standardtypen zu übertragen.",
                 "ConfigureOverrideItemFilters": "Konfiguriere den Gegenstandsfilter"
             },
-
             "SingleItem": {
                 "Title": "Einstellungen einzelner Gegenstand",
                 "DisplayOneContainerWarning": "Achtung! Du hast sowohl die Einstellung \"Einzelnes Artikelbild anzeigen\" als auch \"Ist Container\" aktiviert. In diesem Fall werden Bilder für den Container bevorzugt verwendet.",
@@ -105,7 +96,6 @@
                 "ItemName": "Benutze Gegenstandsname",
                 "ItemNameExplanation": "Veranlasst, dass der Gegenstandsstapel nach dem einzelnen darin enthaltenen Gegenstand benannt wird."
             },
-
             "Container": {
                 "Title": "Einstellungen Container",
                 "IsContainer": "Ist Container",
@@ -120,13 +110,11 @@
                 "LockedSoundPath": "Pfad Geräusch Verschlossen"
             }
         },
-
         "HUD": {
             "ToggleLocked": "Setze verschlossen",
             "ToggleClosed": "Setze geschlossen",
             "Configure": "Stapel konfigurieren"
         },
-
         "DropItem": {
             "Title": "Gegenstand fallenlassen",
             "Dropping": "Du lässt Gegenstand fallen",
@@ -136,13 +124,11 @@
             "NewPile": "Neuen Stapel erzeugen",
             "Cancel": "Abbrechen"
         },
-
         "Chat": {
-            "Pickup":{
+            "Pickup": {
                 "Actor": "{name} hat sich folgende Gegenstände genommen:"
             }
         },
-
         "Setting": {
             "Reset": {
                 "Title": "Einstellungen zurücksetzen",
@@ -154,7 +140,7 @@
                 "Label": "Diese Einstellung definiert den Typ des Akteurs, der für den Standard-Gegenstandsstapel-Akteur verwendet wird, der beim ersten Erzeugen eines Stapels erstellt wird. Im Falle von D&D5e ist dies \"character\", da es keinen eigenen Beuteakteurstyp gibt."
             },
             "Quantity": {
-                "Title": "Gegenstand Attribut Artikelmenge",                
+                "Title": "Gegenstand Attribut Artikelmenge",
                 "Label": "Hier können Sie den Attributspfad für die Menge der einzelnen Gegenstände konfigurieren. Im D&D5e-System zum Beispiel wird die Menge jedes Gegenstands im Attribut \"item.data.data.quantity\" gespeichert, so dass Sie hier \"data.quantity\" eingeben müssen."
             },
             "Attributes": {
