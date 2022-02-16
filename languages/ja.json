@@ -147,9 +147,8 @@
             "AddNew": "新しいデータパス追加",
             "Submit": "アイテムの類似"
         },
-        "Defaults": {
+        "ItemPileConfig": {
             "Title": "Item Pile（お宝）設定",
-            "Configure": "お宝",
             "Update": "お宝更新",
             "Main": {
                 "Title": "全体設定",

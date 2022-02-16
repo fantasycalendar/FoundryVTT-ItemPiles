@@ -27,6 +27,7 @@ export class MerchantApp extends FormApplication {
             width: 800,
             height: 700,
             dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-item-drop-container" }],
+            tabs: [{ navSelector: ".tabs", contentSelector: ".tab-body", initial: "description" }],
             closeOnSubmit: false,
             resizable: true
         });
@@ -36,20 +37,38 @@ export class MerchantApp extends FormApplication {
         return `Merchant: ${this.merchant.name}`
     }
 
-    getMerchantItems(){
+    activateListeners(html) {
+        super.activateListeners(html);
+        const self = this;
+        html.find(".item-piles-name-container .item-piles-clickable").click(function () {
+            const itemId = $(this).closest(".item-piles-item-row").attr('data-item-id');
+            self.previewItem(itemId);
+        })
+    }
 
+    previewItem(itemId){
+        const item = this.merchant.items.get(itemId);
+        if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+            return item.sheet.render(true);
+        }
 
-
+        const cls = item._getSheetClass()
+        const sheet = new cls(item, { editable: false })
+        return sheet._render(true);
     }
 
     getData(options){
         const data = super.getData(options);
 
-        data.cssClasses = "item-pile-merchant"
-
         const items = {};
 
-        lib.getMerchantItemsForActor(this.merchant).forEach(item => {
+        let merchantItems = lib.getMerchantItemsForActor(this.merchant);
+
+        merchantItems.sort((a, b) => {
+            return a.type < b.type || a.name < b.name ? -1 : 1;
+        })
+
+        merchantItems.forEach(item => {
             if(!items[item.type]){
                 items[item.type] = [];
             }
@@ -60,11 +79,8 @@ export class MerchantApp extends FormApplication {
             name: this.merchant.name,
             img: this.merchant.img,
             description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-            items: items,
-            currencies: lib.getItemPileCurrenciesForActor(this.merchant)
+            items: items
         };
-
-        console.log(data.merchant)
 
         data.buyer = this.buyer;
 

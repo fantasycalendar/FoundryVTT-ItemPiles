@@ -27,6 +27,15 @@ const API = {
     },
 
     /**
+     * The attribute used to track the price of items in this system
+     *
+     * @returns {string}
+     */
+    get ITEM_PRICE_ATTRIBUTE() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemPriceAttribute");
+    },
+
+    /**
      * The attribute used to track the quantity of items in this system
      *
      * @returns {string}
@@ -94,7 +103,20 @@ const API = {
     },
 
     /**
-     * Sets the inAttribute used to track the quantity of items in this system
+     * Sets the attribute used to track the price of items in this system
+     *
+     * @param {string} inAttribute
+     * @returns {Promise}
+     */
+    async setItemPriceAttribute(inAttribute) {
+        if (typeof inAttribute !== "string") {
+            throw lib.custom_error("setItemPriceAttribute | inAttribute must be of type string");
+        }
+        return game.settings.set(CONSTANTS.MODULE_NAME, "itemPriceAttribute", inAttribute);
+    },
+
+    /**
+     * Sets the attribute used to track the quantity of items in this system
      *
      * @param {string} inAttribute
      * @returns {Promise}

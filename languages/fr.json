@@ -147,9 +147,8 @@
             "AddNew": "Ajouter un nouveau chemin d'accès aux attributs",
             "Submit": "Soumettre les similarités."
         },
-        "Defaults": {
+        "ItemPileConfig": {
             "Title": "Configuration de la piles d'objet",
-            "Configure": "Item Pile",
             "Update": "Mettre à jour",
             "Main": {
                 "Title": "Paramètres principaux",

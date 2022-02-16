@@ -147,9 +147,20 @@
             "AddNew": "Add new attribute path",
             "Submit": "Submit item similarities"
         },
-        "Defaults": {
+        "PriceModifiersEditor": {
+            "Title": "Price Modifiers Editor",
+            "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors.",
+            "DragDrop": "Drag and drop an actor to add it to the list",
+            "Actor": "Actor",
+            "PriceModifier": "Price Modifier (%)",
+            "SellModifier": "Sell Price Modifier (%)",
+            "Submit": "Submit filters"
+        },
+        "ItemConfig": {
+            "Title": "Item Configuration"
+        },
+        "ItemPileConfig": {
             "Title": "Item Pile Configuration",
-            "Configure": "Item Pile",
             "Update": "Update Item Pile",
             "Main": {
                 "Title": "Main Settings",
@@ -214,6 +225,18 @@
                 "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile.",
                 "ResetSharingData": "Reset Sharing Data",
                 "ResetSharingDataExplanation": "If the Item Pile's content was manually changed while people were looting it, the sharing data may become out of sync with the players' actual shares. Pressing this button will reset everyone's share in this pile."
+            },
+            "Merchant": {
+                "Title": "Merchant Settings",
+                "Enabled": "Is Merchant",
+                "EnabledExplanation": "Players cannot pick up items from merchants, but must instead purchase them",
+                "OpenTimes": "Open Times",
+                "OpenTimesExplanation": "When enabled, the merchant is can only be interacted by players at certain times of the day.",
+                "PriceModifier": "Price Modifier (%)",
+                "SellModifier": "Sell Price Modifier (%)",
+                "ActorPriceModifiers": "Per-Actor Override Price Modifiers",
+                "ActorPriceModifiersExplanation": "Here you can configure if certain specific actors should have different price modifiers than the price modifiers above.",
+                "ConfigureActorPriceModifiers": "Configure Override Price Modifiers."
             }
         },
         "HUD": {

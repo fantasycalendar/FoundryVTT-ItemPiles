@@ -1,0 +1,19 @@
+<form class="flex {{cssClasses}} item-piles-config-container" autocomplete="off">
+
+    <div class="flex">
+
+        <div class="form-group">
+            <label>
+                {{localize "ITEM-PILES.ItemPileConfig.Main.EnabledPile"}}
+                <p>{{localize "ITEM-PILES.ItemPileConfig.Main.EnabledPileExplanation"}}</p>
+            </label>
+            <input type="checkbox" name="enabled" {{checked flagData.enabled}}/>
+        </div>
+
+    </div>
+
+    <footer class="sheet-footer flexrow">
+        <button type="submit" name="submit" value="1"><i class="far fa-save"></i> {{localize "ITEM-PILES.ItemPileConfig.Update"}}</button>
+    </footer>
+
+</form>

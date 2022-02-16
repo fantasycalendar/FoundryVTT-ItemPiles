@@ -59,9 +59,8 @@
             "Submit": "Filter übertragen"
         },
         "AttributePath": "Attributspfad",
-        "Defaults": {
+        "ItemPileConfig": {
             "Title": "Gegenstandsstapel Konfiguration",
-            "Configure": "Gegenstandsstapel",
             "Update": "Gegenstandsstapel aktualisieren",
             "Main": {
                 "Title": "Hauptmenü",

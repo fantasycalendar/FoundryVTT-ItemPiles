@@ -1,10 +1,8 @@
-import { CurrenciesEditor } from "./formapplications/currencies-editor.js";
 import { SYSTEMS } from "./systems.js";
 import * as lib from "./lib/lib.js";
-import { ItemFiltersEditor } from "./formapplications/item-filters-editor.js";
 import migrations from "./migrations.js";
-import { ItemSimilaritiesEditor } from "./formapplications/item-similarities-editor.js";
 import CONSTANTS from "./constants.js";
+import { CurrenciesEditor, ItemFiltersEditor, ItemSimilaritiesEditor } from "./formapplications/base-config-dialog.js";
 
 
 const debounceReload = foundry.utils.debounce(() => {

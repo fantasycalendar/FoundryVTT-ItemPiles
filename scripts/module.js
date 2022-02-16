@@ -14,6 +14,7 @@ import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 
 import { TradeAPI } from "./trade-api.js";
 import { MerchantApp } from "./formapplications/merchant-app.js";
+import { ItemConfig } from "./formapplications/item-config.js";
 
 Hooks.once("init", async () => {
 
@@ -31,35 +32,13 @@ Hooks.once("init", async () => {
     Hooks.on("createItem", module._pileInventoryChanged);
     Hooks.on("updateItem", module._pileInventoryChanged);
     Hooks.on("deleteItem", module._pileInventoryChanged);
-    Hooks.on("getActorSheetHeaderButtons", module._insertItemPileHeaderButtons);
+    Hooks.on("getActorSheetHeaderButtons", module._insertActorHeaderButtons);
+    Hooks.on("getItemSheetHeaderButtons", module._insertItemHeaderButtons);
     Hooks.on("getActorDirectoryEntryContext", module._handleActorContextMenu);
     Hooks.on("renderTokenHUD", module._renderPileHUD);
+    Hooks.on("renderPlayerList", module._renderPlayerList);
 
     chatHandler.init();
-
-    if (game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") && game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")) {
-        Hooks.on("renderPlayerList", (app, html) => {
-            const button = $(`<button type="button" class="item-piles-player-list-trade-button"><i class="fas fa-handshake"></i> Request Trade</button>`)
-            button.click(() => {
-                TradeAPI.requestTrade();
-            });
-            html.append(button);
-        })
-    }
-
-    if (game.settings.get(CONSTANTS.MODULE_NAME, "debugHooks")) {
-        for (let hook of Object.values(HOOKS)) {
-            if (typeof hook === "string") {
-                Hooks.on(hook, (...args) => lib.debug(`Hook called: ${hook}`, ...args));
-                lib.debug(`Registered hook: ${hook}`)
-            } else {
-                for (let innerHook of Object.values(hook)) {
-                    Hooks.on(innerHook, (...args) => lib.debug(`Hook called: ${innerHook}`, ...args));
-                    lib.debug(`Registered hook: ${innerHook}`)
-                }
-            }
-        }
-    }
 
     window.ItemPiles = {
         API
@@ -91,7 +70,9 @@ Hooks.once("ready", async () => {
     registerHandlebarHelpers();
     Hooks.callAll(HOOKS.READY);
 
-    new MerchantApp(game.actors.getName("Trade Tester")).render(true);
+    //new CurrenciesEditor().render(true);
+    //new MerchantApp(game.actors.getName("Trade Tester")).render(true);
+    new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
 
 });
 
@@ -225,20 +206,47 @@ const module = {
 
     },
 
-    _insertItemPileHeaderButtons(actorSheet, buttons) {
+    _renderPlayerList(app, html){
+        if(!game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") || !game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")) return;
+
+        const button = $(`<button type="button" class="item-piles-player-list-trade-button"><i class="fas fa-handshake"></i> Request Trade</button>`)
+        button.click(() => {
+            TradeAPI.requestTrade();
+        });
+        html.append(button);
+    },
+
+    _insertActorHeaderButtons(actorSheet, buttons) {
 
         if (!game.user.isGM) return;
 
         let obj = actorSheet.object;
 
         buttons.unshift({
-            label: game.settings.get(CONSTANTS.MODULE_NAME, "hideActorHeaderText") ? "" : "ITEM-PILES.Defaults.Configure",
+            label: game.settings.get(CONSTANTS.MODULE_NAME, "hideActorHeaderText") ? "" : "Configure",
             icon: "fas fa-box-open",
             class: "item-piles-config-button",
             onclick: () => {
                 ItemPileConfig.show(obj);
             }
         })
+    },
+
+    _insertItemHeaderButtons(itemSheet, buttons){
+
+        if (!game.user.isGM) return;
+
+        let obj = itemSheet.object;
+
+        buttons.unshift({
+            label: game.settings.get(CONSTANTS.MODULE_NAME, "hideActorHeaderText") ? "" : "Configure",
+            icon: "fas fa-box-open",
+            class: "item-piles-config-button",
+            onclick: () => {
+                ItemConfig.show(obj);
+            }
+        })
+
     },
 
     async _dropData(canvas, data) {

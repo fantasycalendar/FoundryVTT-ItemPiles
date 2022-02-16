@@ -16,8 +16,25 @@
                 <img src="{{merchant.img}}">
             </div>
 
-            <div class="merchant-description">
-                {{{ merchant.description }}}
+            <div class="flexcol item-piles-top-divider">
+
+                <nav class="sheet-navigation tabs" style="flex:0 1 auto;" data-group="primary">
+                    <a class="item active" data-tab="description">Description</a>
+                    <a class="item" data-tab="settings">Merchant Settings</a>
+                </nav>
+
+                <section class="tab-body item-piles-sections flexcol" style="padding:0.25rem;margin-top:0.5rem;">
+
+                    <div class="tab flex item-piles-grow" data-group="primary" data-tab="description">
+                        {{{ merchant.description }}}
+                    </div>
+
+                    <div class="tab flex item-piles-grow" data-group="primary" data-tab="settings">
+                        WHATUP
+                    </div>
+
+                </section>
+
             </div>
 
         </div>
@@ -40,7 +57,8 @@
             <div class="item-piles-items-list">
 
                 {{#each items as |item id|}}
-                <div class="flexrow item-piles-item-row item-piles-odd-color" style="flex: 1 0 auto;">
+
+                <div class="flexrow item-piles-item-row item-piles-odd-color" data-item-id="{{item.id}}" style="flex: 1 0 auto;">
 
                     <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
 

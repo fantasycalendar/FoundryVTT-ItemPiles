@@ -1,8 +1,7 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
-import { CurrenciesEditor } from "./currencies-editor.js";
 import * as lib from "../lib/lib.js";
-import { ItemFiltersEditor } from "./item-filters-editor.js";
+import { CurrenciesEditor, ItemFiltersEditor, PriceModifiersEditor } from "./base-config-dialog.js";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -10,6 +9,7 @@ export class ItemPileConfig extends FormApplication {
         super();
         this.document = actor?.token ?? actor;
         this.pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(this.document));
+        this.actorPriceOverridesEditor = false;
         this.currenciesEditor = false;
         this.itemFiltersEditor = false;
     }
@@ -26,7 +26,7 @@ export class ItemPileConfig extends FormApplication {
     }
 
     get title() {
-        return `${game.i18n.localize("ITEM-PILES.Defaults.Title")}: ${this.document.data.name}`
+        return `${game.i18n.localize("ITEM-PILES.ItemPileConfig.Title")}: ${this.document.data.name}`
     }
 
     static show(actor) {
@@ -49,6 +49,22 @@ export class ItemPileConfig extends FormApplication {
 
     activateListeners(html) {
         super.activateListeners(html);
+
+        html.find("input").keydown(function(e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                $(this).change();
+                return false;
+            }
+        });
+
+        this.activateMainListeners(html);
+        this.activateSharingListeners(html);
+        this.activateMerchantListeners(html);
+    }
+
+    activateMainListeners(html){
+
         const self = this;
         const enabledCheckbox = html.find('input[name="enabled"]');
         const scaleCheckbox = html.find('input[name="overrideSingleItemScale"]');
@@ -56,8 +72,6 @@ export class ItemPileConfig extends FormApplication {
         const containerCheckbox = html.find('input[name="isContainer"]');
         const overrideItemFiltersEnabledCheckbox = html.find('.item-piles-config-override-item-filters-checkbox');
         const overrideCurrenciesEnabledCheckbox = html.find('.item-piles-config-override-currencies-checkbox');
-        const shareItemsEnabledCheckbox = html.find('input[name="shareItemsEnabled"]');
-        const shareAttributesEnabledCheckbox = html.find('input[name="shareCurrenciesEnabled"]');
 
         const slider = html.find(".item-piles-scaleRange");
         const input = html.find(".item-piles-scaleInput");
@@ -138,14 +152,21 @@ export class ItemPileConfig extends FormApplication {
             self.showItemFiltersEditor();
         })
 
-        slider.on("input", function () {
-            input.val($(this).val());
-        })
-        input.change(function () {
-            slider.slider('value', $(this).val());
+        html.find('input[type="range"]').on("input", function () {
+            $(this).next().val($(this).val());
         })
 
+        html.find('input[type="range"]').next().on("change", function () {
+            $(this).prev().val($(this).val());
+        })
+
+    }
+
+    activateSharingListeners(html){
+        const self = this;
         const takeAllButtonCheckbox = html.find('input[name="takeAllEnabled"]');
+        const shareItemsEnabledCheckbox = html.find('input[name="shareItemsEnabled"]');
+        const shareAttributesEnabledCheckbox = html.find('input[name="shareCurrenciesEnabled"]');
 
         shareItemsEnabledCheckbox.change(function () {
             const isDisabled = shareItemsEnabledCheckbox.is(":checked") || shareAttributesEnabledCheckbox.is(":checked");
@@ -166,13 +187,45 @@ export class ItemPileConfig extends FormApplication {
         html.find(".item-piles-config-reset-sharing-data").click(function () {
             self.resetSharingData();
         })
+
+    }
+
+    activateMerchantListeners(html){
+        const self = this;
+        const enabledOpenTimesCheck = html.find('.item-piles-config-open-times-enable');
+        const openTimesContainer = html.find('.item-piles-open-times-container')
+        const configurePriceModifiers = html.find('.item-piles-config-configure-override-price-modifiers');
+
+        enabledOpenTimesCheck.change(function () {
+            const isEnabled = enabledOpenTimesCheck.is(":checked");
+            openTimesContainer.find('input').prop("disabled", !isEnabled).parent().parent().parent().toggleClass("item-piles-disabled", !isEnabled);
+        }).change();
+
+        configurePriceModifiers.click(function(){
+            self.showActorPriceOverrides();
+        })
+
+    }
+
+    async showActorPriceOverrides() {
+        if (this.actorPriceOverridesEditor) {
+            return this.actorPriceOverridesEditor.render(false, { focus: true });
+        }
+        const [promise, UI] = PriceModifiersEditor.show(this.pileData.overridePriceModifiers ?? []);
+        this.actorPriceOverridesEditor = UI;
+        promise.then(newSettings => {
+            this.actorPriceOverridesEditor = false;
+            if (newSettings) {
+                this.pileData.overridePriceModifiers = newSettings;
+            }
+        });
     }
 
     async showCurrenciesEditor() {
         if (this.currenciesEditor) {
             return this.currenciesEditor.render(false, { focus: true });
         }
-        const [promise, UI] = CurrenciesEditor.showForPile(this.pileData.overrideCurrencies);
+        const [promise, UI] = CurrenciesEditor.show(this.pileData.overrideCurrencies);
         this.currenciesEditor = UI;
         promise.then(newSettings => {
             this.currenciesEditor = false;
@@ -186,7 +239,7 @@ export class ItemPileConfig extends FormApplication {
         if (this.itemFiltersEditor) {
             return this.itemFiltersEditor.render(false, { focus: true });
         }
-        const [promise, UI] = ItemFiltersEditor.showForPile(this.pileData.overrideItemFilters);
+        const [promise, UI] = ItemFiltersEditor.show(this.pileData.overrideItemFilters);
         this.itemFiltersEditor = UI;
         promise.then(newSettings => {
             this.itemFiltersEditor = false;
@@ -219,9 +272,14 @@ export class ItemPileConfig extends FormApplication {
 
     async _updateObject(event, formData) {
 
+        const pileSettings = {};
+        for (let [path, value] of Object.entries(formData)) {
+            setProperty(pileSettings, path, value)
+        }
+
         let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
-        const data = foundry.utils.mergeObject(defaults, formData);
+        const data = foundry.utils.mergeObject(defaults, pileSettings);
 
         const overrideCurrenciesChecked = this.element.find('.item-piles-config-override-currencies-checkbox').is(":checked");
         data.overrideCurrencies = overrideCurrenciesChecked ? this.pileData.overrideCurrencies : false;

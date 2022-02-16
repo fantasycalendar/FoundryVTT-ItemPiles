@@ -271,7 +271,7 @@ export class ItemPileInventory extends FormApplication {
             data.buttons.push({
                 value: "update",
                 icon: "fas fa-save",
-                text: game.i18n.localize("ITEM-PILES.Defaults.Update")
+                text: game.i18n.localize("ITEM-PILES.ItemPileConfig.Update")
             });
         }
 

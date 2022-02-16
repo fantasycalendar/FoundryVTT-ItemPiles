@@ -370,7 +370,10 @@ export function isItemPileEmpty(target) {
 export function getActorCurrencyList(target) {
     const inDocument = getDocument(target);
     const pileData = getItemPileData(inDocument);
-    return pileData.overrideCurrencies || API.CURRENCIES;
+    return (pileData.overrideCurrencies || API.CURRENCIES).map(currency => {
+        currency.name = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
+        return currency;
+    });
 }
 
 export function getActorCurrencies(target, { currencyList = false, getAll = false } = {}) {
@@ -381,10 +384,9 @@ export function getActorCurrencies(target, { currencyList = false, getAll = fals
         .filter(currency => {
             return hasProperty(targetActor.data, currency.path) && (Number(getProperty(targetActor.data, currency.path)) > 0 || getAll);
         }).map((currency, index) => {
-            const localizedName = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
             const quantity = Number(getProperty(targetActor.data, currency.path) ?? 0);
             return {
-                name: localizedName,
+                name: currency.name,
                 path: currency.path,
                 img: currency.img,
                 quantity: quantity,
@@ -753,21 +755,20 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor) {
 
 /* -------------------------- Merchant Methods ------------------------- */
 
-export function getItemPrices(item){
+export function getItemPrice(item) {
+    const itemData = item instanceof Item ? item.data : item;
+    return getProperty(itemData, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.ITEM_DATA}`)
+}
 
-    const itemData = item instanceof Item
-        ? item.data
-        : item;
-
-    return getProperty(itemData, "data.price");
-
+export function getActorPrimaryCurrency(actor){
+    return getActorCurrencyList(actor).find(currency => currency.primary);
 }
 
 export function getMerchantItemsForActor(merchant, actor = false){
 
     const pileData = getItemPileData(merchant);
     const pileItems = getActorItems(merchant);
-
+    const primaryCurrency = getActorPrimaryCurrency(actor);
 
     return pileItems.map(item => {
 
@@ -777,8 +778,10 @@ export function getMerchantItemsForActor(merchant, actor = false){
             type: item.type,
             img: item.data?.img ?? "",
             quantity: getItemQuantity(item),
-            price: {
-                cost: getItemPrices(item)
+            price: getItemPrice(item, primaryCurrency) ?? {
+                img: primaryCurrency.img,
+                name: primaryCurrency.name,
+                cost: getProperty(item.data, API.ITEM_PRICE_ATTRIBUTE)
             }
         };
     })

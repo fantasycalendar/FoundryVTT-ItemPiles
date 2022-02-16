@@ -2,6 +2,7 @@ const CONSTANTS = {
     MODULE_NAME: "item-piles",
     PILE_DATA: "data",
     SHARING_DATA: "sharing",
+    ITEM_DATA: "item",
     PILE_DEFAULTS: {
         // Core settings
         enabled: false,
@@ -38,7 +39,24 @@ const CONSTANTS = {
         shareCurrenciesEnabled: true,
         takeAllEnabled: false,
         splitAllEnabled: true,
-        activePlayers: false
+        activePlayers: false,
+
+        // Merchant settings
+        isMerchant: false,
+        priceModifier: 100,
+        sellModifier: 50,
+        overridePriceModifiers: [],
+        openTimes: {
+            enabled: false,
+            open: {
+                hour: 9,
+                minute: 0
+            },
+            close: {
+                hour: 18,
+                minute: 0
+            }
+        },
     }
 }
 
