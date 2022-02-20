@@ -87,9 +87,9 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 so that any macros can use extra data provided by the Item Piles module. This is an optional install, but highly
 recommended.
 
-## Requesting New Systems
+## Requesting Support for System
 
-If you wish to request a new system, please create a
+Item Piles works in any system, but requires setup. If you wish to request native support for a system, please create a
 new [system request here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here)
 
 Fill in _all_ of the information, and ask in the system's discord channel if you don't know what something means.
