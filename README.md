@@ -87,6 +87,15 @@ This module leverages the [Advanced Macros](https://github.com/League-of-Foundry
 so that any macros can use extra data provided by the Item Piles module. This is an optional install, but highly
 recommended.
 
+## Requesting New Systems
+
+If you wish to request a new system, please create a
+new [system request here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here)
+
+Fill in _all_ of the information, and ask in the system's discord channel if you don't know what something means.
+
+Incomplete requests will be rejected.
+
 ## Natively Supported Systems
 
 Item Piles is designed to work in all systems, but may require some setup for it to fully function. Please refer to the
@@ -103,16 +112,6 @@ module settings to configure that.
 
 - [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - While Item Piles _works_ in this system, item piles is not
   strictly needed as PF2e already has a robust loot actor & token system, and feature rich systems.
-
-## Requesting New Systems
-
-If you wish to request a new system, please create a
-new [system request here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here)
-.
-
-Fill in _all_ of the information, and ask in the system's discord channel if you don't know what something means.
-
-Incomplete requests will be rejected.
 
 ## Usage
 
