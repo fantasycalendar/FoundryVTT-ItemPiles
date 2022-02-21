@@ -262,8 +262,8 @@ export class ItemPileInventory extends FormApplication {
         data.shareItemsEnabled = pileData.shareItemsEnabled;
         data.shareCurrenciesEnabled = pileData.shareCurrenciesEnabled;
 
-        const hasSplittableQuantities = (pileData.shareItemsEnabled && data.items.find((item) => (item.quantity / num_players) > 1))
-            || (pileData.shareCurrenciesEnabled && data.currencies.find((attribute) => (attribute.quantity / num_players) > 1))
+        const hasSplittableQuantities = (pileData.shareItemsEnabled && data.items.find((item) => (item.quantity / num_players) >= 1))
+            || (pileData.shareCurrenciesEnabled && data.currencies.find((attribute) => (attribute.quantity / num_players) >= 1))
 
         data.buttons = [];
 

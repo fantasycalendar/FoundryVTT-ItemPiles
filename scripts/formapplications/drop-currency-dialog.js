@@ -57,7 +57,7 @@ export default class DropCurrencyDialog extends FormApplication {
 
         let currencyList = { currencyList: lib.getActorCurrencyList(this.target), getAll: this.includeAllCurrencies };
 
-        data.currencies = lib.getActorCurrencies(this.source, currencyList);
+        data.currencies = lib.getFormattedActorCurrencies(this.source, currencyList);
 
         if (!this.includeAllCurrencies) {
             data.currencies = data.currencies.filter(currency => currency.quantity)

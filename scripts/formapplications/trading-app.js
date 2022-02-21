@@ -225,7 +225,7 @@ export class TradingApp extends FormApplication {
 
         if (!currencyToAdd) return;
 
-        const currencies = lib.getActorCurrencies(this.leftTraderActor, { getAll: asGM });
+        const currencies = lib.getFormattedActorCurrencies(this.leftTraderActor, { getAll: asGM });
 
         Object.entries(currencyToAdd).forEach(entry => {
 

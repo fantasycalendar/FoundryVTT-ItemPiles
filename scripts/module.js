@@ -71,8 +71,8 @@ Hooks.once("ready", async () => {
     Hooks.callAll(HOOKS.READY);
 
     //new CurrenciesEditor().render(true);
-    //new MerchantApp(game.actors.getName("Trade Tester")).render(true);
-    new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
+    new MerchantApp(game.actors.getName("Trade Tester")).render(true);
+    //new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
 
 });
 
@@ -148,7 +148,7 @@ const module = {
             Hooks.callAll(HOOKS.PILE.CREATE, tokenDoc, itemPileConfig);
 
             const targetItems = getActorItems(tokenDoc.actor);
-            const targetCurrencies = getActorCurrencies(tokenDoc.actor);
+            const targetCurrencies = getFormattedActorCurrencies(tokenDoc.actor);
             const data = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
 
             await tokenDoc.update({

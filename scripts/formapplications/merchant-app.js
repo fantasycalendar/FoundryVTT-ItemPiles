@@ -43,7 +43,7 @@ export class MerchantApp extends FormApplication {
         html.find(".item-piles-name-container .item-piles-clickable").click(function () {
             const itemId = $(this).closest(".item-piles-item-row").attr('data-item-id');
             self.previewItem(itemId);
-        })
+        });
     }
 
     previewItem(itemId){

@@ -248,7 +248,7 @@ const API = {
             pileSettings.enabled = true;
 
             const targetItems = lib.getActorItems(target, pileSettings.overrideItemFilters);
-            const targetCurrencies = lib.getActorCurrencies(target, pileSettings.overrideCurrencies);
+            const targetCurrencies = lib.getFormattedActorCurrencies(target, pileSettings.overrideCurrencies);
 
             const data = { data: pileSettings, items: targetItems, currencies: targetCurrencies };
 
@@ -816,14 +816,30 @@ const API = {
     },
 
     /**
+     * @deprecated
+     */
+    getItemPileItems(target, itemFilters = false) {
+        lib.custom_warning("DEPRECATION WARNING - getItemPileItems has become getActorItems");
+        return this.getActorItems(target, itemFilters);
+    },
+
+    /**
      * Returns the items this item pile can transfer
      *
      * @param {Token/TokenDocument/Actor} target
      * @param {array/boolean} [itemFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
      * @returns {Array}
      */
-    getItemPileItems(target, itemFilters = false) {
+    getActorItems(target, itemFilters = false) {
         return lib.getActorItems(target, itemFilters);
+    },
+
+    /**
+     * @deprecated
+     */
+    getItemPileCurrencies(target) {
+        lib.custom_warning("DEPRECATION WARNING - getItemPileCurrencies has become getActorCurrencies");
+        return this.getActorCurrencies(target);
     },
 
     /**
@@ -832,7 +848,7 @@ const API = {
      * @param {Token/TokenDocument/Actor} target
      * @returns {array}
      */
-    getItemPileCurrencies(target) {
+    getActorCurrencies(target) {
         return lib.getActorCurrencies(target);
     },
 

@@ -188,7 +188,7 @@ export function getItemPileTokenImage(target, { data = false, items = false, cur
     if (!isValidItemPile(pileDocument)) return originalImg;
 
     items = items || getActorItems(pileDocument).map(item => item.toObject());
-    currencies = currencies || getActorCurrencies(pileDocument);
+    currencies = currencies || getFormattedActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -236,7 +236,7 @@ export function getItemPileTokenScale(target, { data = false, items = false, cur
     }
 
     items = items || getActorItems(pileDocument);
-    currencies = currencies || getActorCurrencies(pileDocument);
+    currencies = currencies || getFormattedActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -253,7 +253,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
     data = data || getItemPileData(pileDocument);
 
     items = items || getActorItems(pileDocument);
-    currencies = currencies || getActorCurrencies(pileDocument);
+    currencies = currencies || getFormattedActorCurrencies(pileDocument);
 
     const numItems = items.length + currencies.length;
 
@@ -361,7 +361,7 @@ export function isItemPileEmpty(target) {
     if (!targetActor) return false;
 
     const hasNoItems = getActorItems(inDocument).length === 0;
-    const hasNoCurrencies = getActorCurrencies(inDocument).length === 0;
+    const hasNoCurrencies = getFormattedActorCurrencies(inDocument).length === 0;
 
     return isValidItemPile(targetActor) && hasNoItems && hasNoCurrencies;
 
@@ -376,7 +376,14 @@ export function getActorCurrencyList(target) {
     });
 }
 
-export function getActorCurrencies(target, { currencyList = false, getAll = false } = {}) {
+export function getActorCurrencies(target){
+    const inDocument = getDocument(target);
+    return Object.fromEntries(getActorCurrencies(inDocument).map(currency => {
+        return [currency, getProperty(currency, target)];
+    }))
+}
+
+export function getFormattedActorCurrencies(target, { currencyList = false, getAll = false } = {}) {
     const inDocument = getDocument(target);
     const targetActor = inDocument?.actor ?? inDocument;
     const currencies = currencyList || getActorCurrencyList(targetActor);
@@ -429,7 +436,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
     const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
 
     const targetItems = getActorItems(documentActor, flagData.itemFilters);
-    const targetCurrencies = getActorCurrencies(documentActor, { currencyList: flagData.currencies });
+    const targetCurrencies = getFormattedActorCurrencies(documentActor, { currencyList: flagData.currencies });
 
     const data = { data: flagData, items: targetItems, currencies: targetCurrencies };
 
@@ -710,7 +717,7 @@ export function getItemPileItemsForActor(pile, recipient, floor = false) {
 export function getItemPileCurrenciesForActor(pile, recipient, floor) {
 
     const pileData = getItemPileData(pile);
-    const pileCurrencies = getActorCurrencies(pile, { getAll: !recipient });
+    const pileCurrencies = getFormattedActorCurrencies(pile, { getAll: !recipient });
 
     const players = getPlayersForItemPile(pile);
     const pileSharingData = getItemPileSharingData(pile);
@@ -755,35 +762,50 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor) {
 
 /* -------------------------- Merchant Methods ------------------------- */
 
-export function getItemPrice(item) {
+export function getItemPrice(item, priceModifier = 1.0) {
     const itemData = item instanceof Item ? item.data : item;
-    return getProperty(itemData, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.ITEM_DATA}`)
+    const price = getProperty(itemData, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.ITEM_DATA}`);
+    return price ? {
+        img: price.img,
+        name: price.name,
+        cost: price.cost * priceModifier,
+    } : false;
 }
 
 export function getActorPrimaryCurrency(actor){
     return getActorCurrencyList(actor).find(currency => currency.primary);
 }
 
+export function getActorModifiersForMerchant(merchant, actor = false){
+    const pileData = getItemPileData(merchant);
+    const actorSpecificModifiers = pileData.overridePriceModifiers.find(data => data.actor === getUuid(actor));
+    const priceModifier = (actorSpecificModifiers?.priceModifier || pileData.priceModifier) / 100;
+    const sellModifier = (actorSpecificModifiers?.sellModifier || pileData.sellModifier) / 100;
+    return {
+        priceModifier,
+        sellModifier
+    }
+}
+
 export function getMerchantItemsForActor(merchant, actor = false){
 
-    const pileData = getItemPileData(merchant);
     const pileItems = getActorItems(merchant);
     const primaryCurrency = getActorPrimaryCurrency(actor);
+    const { priceModifier } = getActorModifiersForMerchant(merchant, actor);
 
     return pileItems.map(item => {
-
         return {
             id: item.id,
             name: item.name,
             type: item.type,
             img: item.data?.img ?? "",
             quantity: getItemQuantity(item),
-            price: getItemPrice(item, primaryCurrency) ?? {
+            price: getItemPrice(item, priceModifier) || {
                 img: primaryCurrency.img,
                 name: primaryCurrency.name,
-                cost: getProperty(item.data, API.ITEM_PRICE_ATTRIBUTE)
+                cost: Math.floor(getProperty(item.data, API.ITEM_PRICE_ATTRIBUTE) * priceModifier)
             }
-        };
-    })
+        }
+    });
 
 }
