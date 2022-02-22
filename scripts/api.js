@@ -8,7 +8,7 @@ import { hotkeyState } from "./hotkeys.js";
 
 const preloadedFiles = new Set();
 
-export default {
+const API = {
 
     /**
      * The actor class type used for the original item pile actor in this system
@@ -2453,3 +2453,5 @@ export default {
     }
 
 };
+
+export default API;

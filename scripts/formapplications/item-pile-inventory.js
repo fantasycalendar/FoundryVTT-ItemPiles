@@ -425,6 +425,40 @@ export class ItemPileInventory extends FormApplication {
                 .replaceWith($('<span>' + innerHTML + '</span>'));
             html.find('.item-piles-change-actor-select').remove();
         }
+
+        // Activate context menu
+        this._contextMenu(html);
+    }
+
+    /* -------------------------------------------- */
+
+    /** @inheritdoc */
+    _contextMenu(html) {
+        ContextMenu.create(this, html, ".item-piles-item-row", this._getEntryContextOptions());
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Get the Macro entry context options
+     * @returns {object[]}  The Macro entry context options
+     * @private
+     */
+    _getEntryContextOptions() {
+        return [
+            {
+                name: "JOURNAL.ActionShow",
+                icon: '<i class="fas fa-eye"></i>',
+                condition: (div) => {
+                    return game.user.isGM && div.data("item-id");
+                },
+                callback: (div) => {
+                    const item = this.pileActor.items.get(div.data("item-id"));
+                    const popout = new ImagePopout(item.data.img, { title: item.name }).render(true);
+                    popout.shareImage();
+                }
+            }
+        ];
     }
 
     previewImage(html, element) {

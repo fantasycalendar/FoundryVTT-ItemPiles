@@ -2,6 +2,8 @@
 
 ## Version 1.4.4
 
+- Added a right click context menu to the item pile inventory UI, with an option to show an item's image to everyone
+- Improved Request Trade button in the player list when the Minimal UI module is active
 - Improved splitting API functions to improve performance when playing on Forge 
 - Improved documentation to better describe what each API method requires
 - Tweaked `Split n ways` button to disable itself instead of becoming hidden

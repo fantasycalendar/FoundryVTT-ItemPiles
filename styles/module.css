@@ -5,6 +5,13 @@
   width: calc(100% - 0.5rem);
   margin: 0.25rem;
 }
+.item-piles-player-list-trade-button.item-piles-minimal-ui {
+  padding: 2px 0 0 0;
+  text-align: center;
+}
+.item-piles-player-list-trade-button.item-piles-minimal-ui i {
+  width: 100%;
+}
 .item-piles-specate-trade:disabled {
   background-color: rgba(0, 0, 0, 0.25);
 }
