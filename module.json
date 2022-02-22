@@ -2,7 +2,7 @@
     "name": "item-piles",
     "title": "Item Piles",
     "description": "This module adds the ability for items to be dropped onto the ground, and then picked up.",
-    "version": "1.4.!4",
+    "version": "1.4.3.!0",
     "library": "false",
     "manifestPlusVersion": "1.0.0",
     "minimumCoreVersion": "0.8.9",
@@ -25,6 +25,16 @@
             "lang": "en",
             "name": "English",
             "path": "languages/en.json"
+        },
+        {
+            "lang": "fr",
+            "name": "French",
+            "path": "languages/fr.json"
+        },
+        {
+            "lang": "ja",
+            "name": "日本語",
+            "path": "languages/ja.json"
         }
     ],
     "dependencies": [
@@ -38,7 +48,7 @@
     "socket": true,
     "url": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles",
     "manifest": "https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/next/module.json",
-    "download": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/releases/download/1.4.!4/module.zip",
+    "download": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/releases/download/1.4.3.!0/module.zip",
     "bugs": "This is auto replaced",
     "allowBugReporter": true
 }
