@@ -1,7 +1,7 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
-import { ItemPileCurrenciesEditor } from "./item-pile-currencies-editor.js";
 import * as lib from "../lib/lib.js";
+import { ItemPileCurrenciesEditor } from "./item-pile-currencies-editor.js";
 import { ItemPileFiltersEditor } from "./item-pile-filters-editor.js";
 
 export class ItemPileConfig extends FormApplication {
@@ -205,7 +205,7 @@ export class ItemPileConfig extends FormApplication {
                     icon: '<i class="fas fa-check"></i>',
                     label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Confirm"),
                     callback: () => {
-                        lib.updateItemPileSharingData(this.document, {});
+                        lib.clearItemPileSharingData(this.document);
                     }
                 },
                 cancel: {

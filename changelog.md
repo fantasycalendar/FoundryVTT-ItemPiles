@@ -1,5 +1,14 @@
 # Item Piles Changelog
 
+## Version 1.4.4
+
+- Improved splitting API functions to improve performance when playing on Forge 
+- Improved documentation to better describe what each API method requires
+- Tweaked `Split n ways` button to disable itself instead of becoming hidden
+- Tweaked system recognition to allow systems to set the required settings through the API, which suppresses the system incompatibility warning
+- Fixed various bugs surrounding splitting item piles
+- Fixed issue with the `Split n ways` button not working sometimes
+
 ## Version 1.4.3
 
 - Fixed minor issue with creating item piles

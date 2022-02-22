@@ -125,40 +125,7 @@ const chatHandler = {
     _outputSplitItemPileInventory(source, transferData, userId) {
         if (!API.isValidItemPile(source)) return;
         if (game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
-
-        const sharingData = lib.getItemPileSharingData(source);
-
-        let itemData = [];
-        if (sharingData.items) {
-            itemData = sharingData.items.map(item => {
-                const totalQuantity = item.actors.reduce((acc, item) => acc + item.quantity, 0)
-                return {
-                    name: item.name,
-                    img: item.img,
-                    quantity: Math.floor(totalQuantity / item.actors.length)
-                }
-            })
-        }
-
-        let currencyData = [];
-        if (sharingData.currencies) {
-            const currencyList = lib.getActorCurrencyList(source);
-            currencyData = sharingData.currencies.map(currencyData => {
-                const currency = currencyList.find(currency => currency.path === currencyData.path);
-                const totalQuantity = currencyData.actors.reduce((acc, storedCurrency) => acc + storedCurrency.quantity, 0);
-                return {
-                    name: game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name,
-                    img: currency.img ?? "",
-                    quantity: Math.floor(totalQuantity / currencyData.actors.length),
-                    currency: true,
-                    index: currencyList.indexOf(currency)
-                }
-            })
-        }
-
-        const num_players = Object.keys(transferData).length;
-
-        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.SPLIT_CHAT_MESSAGE, source.uuid, num_players, itemData, currencyData, userId);
+        return itemPileSocket.executeAsGM(SOCKET_HANDLERS.SPLIT_CHAT_MESSAGE, source.uuid, transferData, userId);
     },
 
     async _outputTradeStarted(party_1, party_2, publicTradeId, isPrivate) {
@@ -167,11 +134,8 @@ const chatHandler = {
     },
 
     async _outputTradeComplete(party_1, party_2, publicTradeId, isPrivate) {
-
         if (game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
-
         return this._outputTradeCompleteToChat(party_1, party_2, publicTradeId, isPrivate);
-
     },
 
     /**
@@ -207,7 +171,6 @@ const chatHandler = {
                 name: game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name,
                 img: currency.img ?? "",
                 quantity: entry[1],
-                currency: true,
                 index: currencyList.indexOf(currency)
             }
         });
@@ -316,18 +279,17 @@ const chatHandler = {
 
     },
 
-
-    async _outputSplitToChat(sourceUuid, num_players, items, currencies, userId) {
+    async _outputSplitToChat(sourceUuid, transferData, userId) {
 
         const source = await fromUuid(sourceUuid);
 
         const sourceActor = source?.actor ?? source;
 
         const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/loot-chat-message.html", {
-            message: game.i18n.format("ITEM-PILES.Chat.Split", { num_players: num_players }),
+            message: game.i18n.format("ITEM-PILES.Chat.Split", { num_players: transferData.num_players }),
             itemPile: sourceActor,
-            items: items,
-            currencies: currencies
+            items: transferData.items,
+            currencies: transferData.currencies
         });
 
         return this._createNewChatMessage(userId, {
