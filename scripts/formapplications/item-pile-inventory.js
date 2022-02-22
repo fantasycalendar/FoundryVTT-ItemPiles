@@ -542,6 +542,7 @@ export class ItemPileInventory extends FormApplication {
     async _updateObject(event, formData) {
 
         if (event.submitter.value === "update") {
+            lib.custom_notify("Item Pile successfully updated.");
             await this.updatePile(formData);
             return this.render(true);
         }
