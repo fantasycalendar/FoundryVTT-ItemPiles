@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 1.4.5
+
+- Fixed Item Piles inventory UI in GM mode making item quantity inputs look disabled when an item had 0 quantity  
+
 ## Version 1.4.4
 
 - Added a right click context menu to the item pile inventory UI, with an option to show an item's image to everyone
