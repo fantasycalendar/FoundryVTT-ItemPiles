@@ -42,7 +42,7 @@ jobs:
 
 
       # Create a zip file with all files required by the module to add to the release
-      - run: zip -r ./module.zip module.json LICENSE styles/ scripts/ templates/ languages/
+      - run: zip -r ./module.zip module.json LICENSE styles/ dist/ templates/ languages/
 
       # Create a release for this specific version
       - name: Update Release with Files

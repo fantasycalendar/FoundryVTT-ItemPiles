@@ -1,7 +1,7 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
 import API from "./api.js";
-import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
+import { ItemPileInventory } from "./formapplications/inventory/item-pile-inventory.js";
 import chatHandler from "./chathandler.js";
 import { TradeAPI } from "./trade-api.js";
 import { TradingApp } from "./formapplications/trading-app.js";
