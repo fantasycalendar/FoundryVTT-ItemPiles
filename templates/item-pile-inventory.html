@@ -39,7 +39,7 @@
                 <div class="flexrow"><h3>{{localize "ITEM-PILES.Items"}}:</h3></div>
                 {{/if}}
                 {{#each items as |item id|}}
-                <div class="flexrow item-piles-item-row item-piles-even-color {{#unless item.quantity}}item-piles-disabled{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
+                <div class="flexrow item-piles-item-row item-piles-even-color {{#unless @root.editQuantities}}{{#unless item.shareLeft}}item-piles-disabled{{/unless}}{{/unless}}" data-item-id="{{item.id}}" data-item-type="{{item.type}}">
 
                     <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
 

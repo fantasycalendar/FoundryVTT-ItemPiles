@@ -391,9 +391,10 @@ export function getFormattedActorCurrencies(target, { currencyList = false, getA
         .filter(currency => {
             return hasProperty(targetActor.data, currency.path) && (Number(getProperty(targetActor.data, currency.path)) > 0 || getAll);
         }).map((currency, index) => {
+            const localizedName = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
             const quantity = Number(getProperty(targetActor.data, currency.path) ?? 0);
             return {
-                name: currency.name,
+                name: localizedName,
                 path: currency.path,
                 img: currency.img,
                 quantity: quantity,
@@ -685,6 +686,7 @@ export function getItemPileItemsForActor(pile, recipient, floor = false) {
             currentQuantity: 1,
             quantity: quantity,
             shareLeft: quantity,
+            previouslyTaken: 0,
             toShare: pileData.shareItemsEnabled && recipientUuid
         };
 
@@ -694,7 +696,9 @@ export function getItemPileItemsForActor(pile, recipient, floor = false) {
 
             let totalShares = quantity;
             if (foundItem) {
-                totalShares += foundItem.actors.reduce((acc, actor) => acc + actor.quantity, 0);
+                totalShares += foundItem.actors.reduce((acc, actor) => {
+                    return acc + actor.quantity;
+                }, 0);
             }
 
             let totalActorShare = totalShares / players.length;
@@ -702,9 +706,10 @@ export function getItemPileItemsForActor(pile, recipient, floor = false) {
                 totalActorShare += 1;
             }
 
-            let actorQuantity = foundItem?.actors ? foundItem?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
+            const takenBefore = foundItem?.actors?.find(actor => actor.uuid === recipientUuid);
+            data.previouslyTaken = takenBefore ? takenBefore.quantity : 0;
 
-            data.shareLeft = Math.max(0, Math.min(quantity, Math.floor(totalActorShare - actorQuantity)));
+            data.shareLeft = Math.max(0, Math.min(quantity, Math.floor(totalActorShare - data.previouslyTaken)));
 
         }
 
@@ -727,11 +732,13 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor) {
 
     return pileCurrencies.filter(currency => {
         return !recipient || hasProperty(recipient?.data ?? {}, currency.path);
-    }).map(currency => {
+    }).map((currency, index) => {
 
         currency.currentQuantity = 1;
         currency.shareLeft = currency.quantity;
-        currency.toShare = pileData.shareCurrenciesEnabled && recipientUuid;
+        currency.toShare = pileData.shareCurrenciesEnabled && !!recipientUuid;
+        currency.previouslyTaken = 0;
+        currency.index = index;
 
         if (currency.toShare) {
 
@@ -747,9 +754,10 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor) {
                 totalActorShare += 1;
             }
 
-            let actorQuantity = foundCurrency?.actors ? foundCurrency?.actors?.find(actor => actor.uuid === recipientUuid)?.quantity ?? 0 : 0;
+            const takenBefore = foundCurrency?.actors?.find(actor => actor.uuid === recipientUuid);
+            currency.previouslyTaken = takenBefore ? takenBefore.quantity : 0;
 
-            currency.shareLeft = Math.max(0, Math.min(currency.quantity, Math.floor(totalActorShare - actorQuantity)));
+            currency.shareLeft = Math.max(0, Math.min(currency.quantity, Math.floor(totalActorShare - currency.previouslyTaken)));
 
         }
 

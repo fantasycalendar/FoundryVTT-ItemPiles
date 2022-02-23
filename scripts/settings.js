@@ -167,6 +167,13 @@ const otherSettings = {
         config: false,
         default: false,
         type: Boolean
+    },
+
+    "preconfiguredSystem": {
+        scope: "world",
+        config: false,
+        default: false,
+        type: Boolean
     }
 }
 
@@ -272,9 +279,20 @@ async function applyDefaultSettings() {
 
 export async function checkSystem() {
 
+    await lib.wait(1000);
+
+    if(game.settings.get(CONSTANTS.MODULE_NAME, "preconfiguredSystem")) return;
+
     if (!SYSTEMS.DATA) {
 
         if (game.settings.get(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown")) return;
+
+        let settingsValid = true;
+        for (const [name, data] of Object.entries(defaultSettings())) {
+            settingsValid = settingsValid && game.settings.get(CONSTANTS.MODULE_NAME, name).length !== (new data.type).length
+        }
+
+        if(settingsValid) return;
 
         await game.settings.set(CONSTANTS.MODULE_NAME, "systemNotFoundWarningShown", true);
 

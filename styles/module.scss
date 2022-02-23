@@ -7,6 +7,15 @@
     font-size: 0.85rem;
     width: calc(100% - 0.5rem);
     margin: 0.25rem;
+
+    &.item-piles-minimal-ui {
+      padding: 2px 0 0 0;
+      text-align: center;
+
+      i {
+        width: 100%;
+      }
+    }
   }
 
   &-specate-trade:disabled {

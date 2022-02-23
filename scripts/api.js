@@ -6,12 +6,14 @@ import DropItemDialog from "./formapplications/drop-item-dialog.js";
 import HOOKS from "./hooks.js";
 import { hotkeyState } from "./hotkeys.js";
 
+const preloadedFiles = new Set();
+
 const API = {
 
     /**
      * The actor class type used for the original item pile actor in this system
      *
-     * @returns {string}
+     * @returns {String}
      */
     get ACTOR_CLASS_TYPE() {
         return game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType");
@@ -20,7 +22,7 @@ const API = {
     /**
      * The currencies used in this system
      *
-     * @returns {array}
+     * @returns {Array<{name: String, currency: String, img: String}>}
      */
     get CURRENCIES() {
         return game.settings.get(CONSTANTS.MODULE_NAME, "currencies");
@@ -38,7 +40,7 @@ const API = {
     /**
      * The attribute used to track the quantity of items in this system
      *
-     * @returns {string}
+     * @returns {String}
      */
     get ITEM_QUANTITY_ATTRIBUTE() {
         return game.settings.get(CONSTANTS.MODULE_NAME, "itemQuantityAttribute");
@@ -47,7 +49,7 @@ const API = {
     /**
      * The filters for item types eligible for interaction within this system
      *
-     * @returns {Array}
+     * @returns {Array<{name: String, filters: String}>}
      */
     get ITEM_FILTERS() {
         return lib.cleanItemFilters(game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters"));
@@ -56,7 +58,7 @@ const API = {
     /**
      * The attributes for detecting item similarities
      *
-     * @returns {Array}
+     * @returns {Array<String>}
      */
     get ITEM_SIMILARITIES() {
         return game.settings.get(CONSTANTS.MODULE_NAME, "itemSimilarities");
@@ -65,20 +67,21 @@ const API = {
     /**
      * Sets the actor class type used for the original item pile actor in this system
      *
-     * @param {string} inClassType
+     * @param {String} inClassType
      * @returns {Promise}
      */
     async setActorClassType(inClassType) {
         if (typeof inClassType !== "string") {
             throw lib.custom_error("setActorTypeClass | inClassType must be of type string");
         }
+        await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
         return game.settings.set(CONSTANTS.MODULE_NAME, "actorClassType", inClassType);
     },
 
     /**
      * Sets the currencies used in this system
      *
-     * @param {array} inCurrencies
+     * @param {Array<{name: String, currency: String, img: String}>} inCurrencies
      * @returns {Promise}
      */
     async setCurrencies(inCurrencies) {
@@ -99,6 +102,7 @@ const API = {
                 throw lib.custom_error("setCurrencies | currency.img must be of type string");
             }
         })
+        await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
         return game.settings.set(CONSTANTS.MODULE_NAME, "currencies", inCurrencies);
     },
 
@@ -118,20 +122,21 @@ const API = {
     /**
      * Sets the attribute used to track the quantity of items in this system
      *
-     * @param {string} inAttribute
+     * @param {String} inAttribute
      * @returns {Promise}
      */
     async setItemQuantityAttribute(inAttribute) {
         if (typeof inAttribute !== "string") {
             throw lib.custom_error("setItemQuantityAttribute | inAttribute must be of type string");
         }
+        await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemQuantityAttribute", inAttribute);
     },
 
     /**
      * Sets the items filters for interaction within this system
      *
-     * @param {array} inFilters
+     * @param {Array<{path: String, filters: String}>} inFilters
      * @returns {Promise}
      */
     async setItemFilters(inFilters) {
@@ -146,13 +151,14 @@ const API = {
                 throw lib.custom_error("setItemFilters | each entry in inFilters must have a \"filters\" property with a value that is of type string");
             }
         });
+        await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemFilters", inFilters);
     },
 
     /**
      * Sets the attributes for detecting item similarities
      *
-     * @param {array} inPaths
+     * @param {Array<String>} inPaths
      * @returns {Promise}
      */
     async setItemSimilarities(inPaths) {
@@ -164,16 +170,17 @@ const API = {
                 throw lib.custom_error("setItemSimilarities | each entry in inPaths must be of type string");
             }
         });
+        await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemSimilarities", inPaths);
     },
 
     /**
      * Creates the default item pile token at a location.
      *
-     * @param {object} position                         The position to create the item pile at
-     * @param {string/boolean} [sceneId=false]          Which scene to create the item pile on
-     * @param {array/boolean} [items=false]             Any items to create on the item pile
-     * @param {string/boolean} [pileActorName=false]    Whether to use an existing item pile actor as the basis of this new token
+     * @param {Object} position                         The position to create the item pile at
+     * @param {String/Boolean} [sceneId=false]          Which scene to create the item pile on
+     * @param {Array/Boolean} [items=false]             Any items to create on the item pile
+     * @param {String/Boolean} [pileActorName=false]    Whether to use an existing item pile actor as the basis of this new token
      *
      * @returns {Promise}
      */
@@ -206,8 +213,8 @@ const API = {
      * Turns tokens and its actors into item piles
      *
      * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be turned into item piles
-     * @param {object} pileSettings                                     Overriding settings to be put on the item piles' settings
-     * @param {object} tokenSettings                                    Overriding settings that will update the tokens' settings
+     * @param {Object} pileSettings                                     Overriding settings to be put on the item piles' settings
+     * @param {Object} tokenSettings                                    Overriding settings that will update the tokens' settings
      *
      * @return {Promise<Array>}                                         The uuids of the targets after they were turned into item piles
      */
@@ -300,7 +307,7 @@ const API = {
      * Reverts tokens from an item pile into a normal token and actor
      *
      * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be reverted from item piles
-     * @param {object} tokenSettings                                    Overriding settings that will update the tokens
+     * @param {Object} tokenSettings                                    Overriding settings that will update the tokens
      *
      * @return {Promise<Array>}                                         The uuids of the targets after they were reverted from being item piles
      */
@@ -381,7 +388,7 @@ const API = {
      * Opens a pile if it is enabled and a container
      *
      * @param {Token/TokenDocument} target
-     * @param {Token/TokenDocument/boolean} [interactingToken=false]
+     * @param {Token/TokenDocument/Boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -411,7 +418,7 @@ const API = {
      * Closes a pile if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to close
-     * @param {Token/TokenDocument/boolean} [interactingToken=false]
+     * @param {Token/TokenDocument/Boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -435,7 +442,7 @@ const API = {
      * Toggles a pile's closed state if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to open or close
-     * @param {Token/TokenDocument/boolean} [interactingToken=false]
+     * @param {Token/TokenDocument/Boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -457,7 +464,7 @@ const API = {
      * Locks a pile if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to lock
-     * @param {Token/TokenDocument/boolean} [interactingToken=false]
+     * @param {Token/TokenDocument/Boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -486,7 +493,7 @@ const API = {
      * Unlocks a pile if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to unlock
-     * @param {Token/TokenDocument/boolean} [interactingToken=false]
+     * @param {Token/TokenDocument/Boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -505,7 +512,7 @@ const API = {
      * Toggles a pile's locked state if it is enabled and a container
      *
      * @param {Token/TokenDocument} target          Target pile to lock or unlock
-     * @param {Token/TokenDocument/boolean} [interactingToken=false]
+     * @param {Token/TokenDocument/Boolean} [interactingToken=false]
      *
      * @return {Promise}
      */
@@ -525,7 +532,7 @@ const API = {
      * Causes the item pile to play a sound as it was attempted to be opened, but was locked
      *
      * @param {Token/TokenDocument} target
-     * @param {Token/TokenDocument/boolean} [interactingToken=false]
+     * @param {Token/TokenDocument/Boolean} [interactingToken=false]
      *
      * @return {Promise<boolean>}
      */
@@ -548,7 +555,7 @@ const API = {
      *
      * @param {Token/TokenDocument} target
      *
-     * @return {boolean}
+     * @return {Boolean}
      */
     isItemPileLocked(target) {
         const targetDocument = lib.getDocument(target);
@@ -562,7 +569,7 @@ const API = {
      *
      * @param {Token/TokenDocument} target
      *
-     * @return {boolean}
+     * @return {Boolean}
      */
     isItemPileClosed(target) {
         const targetDocument = lib.getDocument(target);
@@ -576,7 +583,7 @@ const API = {
      *
      * @param {Token/TokenDocument} target
      *
-     * @return {boolean}
+     * @return {Boolean}
      */
     isItemPileContainer(target) {
         const targetDocument = lib.getDocument(target);
@@ -588,9 +595,9 @@ const API = {
      * Updates a pile with new data.
      *
      * @param {Token/TokenDocument} target
-     * @param {object} newData
-     * @param {Token/TokenDocument/boolean} [interactingToken=false]
-     * @param {object/boolean} [tokenSettings=false]
+     * @param {Object} newData
+     * @param {Token/TokenDocument/Boolean} [interactingToken=false]
+     * @param {Object/Boolean} [tokenSettings=false]
      *
      * @return {Promise}
      */
@@ -734,9 +741,9 @@ const API = {
      * Remotely opens an item pile's inventory, if you have permission to edit the item pile. Passing a user ID, or a list of user IDs, will cause those users to open the item pile.
      *
      * @param {Token/TokenDocument/Actor} target                                The item pile actor or token whose inventory to open
-     * @param {array<string>} userIds                                           The IDs of the users that should open this item pile inventory
+     * @param {Array<string>} userIds                                           The IDs of the users that should open this item pile inventory
      * @param {boolean/Token/TokenDocument/Actor} [inspectingTarget=false]      This will force the users to inspect this item pile as a specific character
-     * @param {boolean} [useDefaultCharacter=true]                              Causes the users to inspect the item pile inventory as their default character
+     * @param {Boolean} [useDefaultCharacter=true]                              Causes the users to inspect the item pile inventory as their default character
      * @returns {Promise}
      */
     async renderItemPileInterface(target, userIds = [game.user.id], {
@@ -799,7 +806,7 @@ const API = {
      * Whether a given document is a valid pile or not
      *
      * @param {Token/TokenDocument/Actor} document
-     * @return {boolean}
+     * @return {Boolean}
      */
     isValidItemPile(document) {
         return lib.isValidItemPile(document);
@@ -809,7 +816,7 @@ const API = {
      * Whether the item pile is empty
      *
      * @param {Token/TokenDocument/Actor} target
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     isItemPileEmpty(target) {
         return lib.isItemPileEmpty(target);
@@ -827,7 +834,7 @@ const API = {
      * Returns the items this item pile can transfer
      *
      * @param {Token/TokenDocument/Actor} target
-     * @param {array/boolean} [itemFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
+     * @param {Array/Boolean} [itemFilters=false]   Array of item types disallowed - will default to pile settings or module settings if none provided
      * @returns {Array}
      */
     getActorItems(target, itemFilters = false) {
@@ -846,7 +853,7 @@ const API = {
      * Returns the currencies this item pile can transfer
      *
      * @param {Token/TokenDocument/Actor} target
-     * @returns {array}
+     * @returns {Array}
      */
     getActorCurrencies(target) {
         return lib.getActorCurrencies(target);
@@ -896,8 +903,8 @@ const API = {
     /**
      * Causes all connected users to re-render a specific pile's inventory UI
      *
-     * @param {string} inPileUuid           The uuid of the pile to be re-rendered
-     * @param {boolean} [deleted=false]     Whether the pile was deleted as a part of this re-render
+     * @param {String} inPileUuid           The uuid of the pile to be re-rendered
+     * @param {Boolean} [deleted=false]     Whether the pile was deleted as a part of this re-render
      * @return {Promise}
      */
     async rerenderItemPileInventoryApplication(inPileUuid, deleted = false) {
@@ -953,45 +960,70 @@ const API = {
 
     },
 
+    /**
+     * @private
+     */
     async _splitItemPileContents(itemPileUuid, actorUuids, userId, instigator) {
 
         const itemPile = await fromUuid(itemPileUuid);
 
         const itemPileActor = itemPile?.actor ?? itemPile;
 
-        const transferData = {};
+        const actors = await Promise.all(actorUuids.map((uuid) => fromUuid(uuid)));
 
-        for (let actorUuid of actorUuids) {
+        const itemsToRemove = {};
+        const currenciesToRemove = {}
 
-            const actor = await fromUuid(actorUuid);
+        const transferData = {
+            items: {},
+            currencies: {},
+            num_players: actors.length
+        }
+
+        for(const actor of actors){
 
             const itemsToTransfer = lib.getItemPileItemsForActor(itemPileActor, actor, true).filter(item => item.toShare).map(item => {
+                itemsToRemove[item.id] = (itemsToRemove[item.id] ?? 0) + item.shareLeft;
+                transferData.items[item.id] = {
+                    id: item.id,
+                    name: item.name,
+                    img: item.img,
+                    quantity: (transferData.items[item.id]?.quantity ?? 0) + (item.shareLeft + item.previouslyTaken)
+                }
                 return { _id: item.id, quantity: item.shareLeft };
             }).filter(item => item.quantity);
 
-            const currenciesToTransfer = Object.fromEntries(lib.getItemPileCurrenciesForActor(itemPileActor, actor, true).filter(item => item.toShare).map(entry => {
-                return [entry.path, entry.shareLeft]
-            }).filter(currency => currency[1]))
+            const currenciesToTransfer = Object.fromEntries(lib.getItemPileCurrenciesForActor(itemPileActor, actor, true).filter(item => item.toShare).map(currency => {
+                currenciesToRemove[currency.path] = (currenciesToRemove[currency.path] ?? 0) + currency.shareLeft;
+                transferData.currencies[currency.path] = {
+                    path: currency.path,
+                    name: currency.name,
+                    img: currency.img,
+                    quantity: (transferData.currencies[currency.path]?.quantity ?? 0) + (currency.shareLeft + currency.previouslyTaken),
+                    index: currency.index
+                }
+                return [currency.path, currency.shareLeft]
+            }).filter(currency => currency[1]));
 
-            transferData[actorUuid] = {
-                itemsTransferred: [],
-                currenciesTransferred: []
-            }
-
-            if (itemsToTransfer.length) {
-                transferData[actorUuid].itemsTransferred = await API._transferItems(itemPileUuid, actorUuid, itemsToTransfer, userId, { isEverything: true });
-            }
-
-            if (!foundry.utils.isObjectEmpty(currenciesToTransfer)) {
-                transferData[actorUuid].currenciesTransferred = await API._transferAttributes(itemPileUuid, actorUuid, currenciesToTransfer, userId, { isEverything: true });
-            }
-
-            await lib.setItemPileSharingData(itemPileUuid, actorUuid, {
-                items: transferData[actorUuid].itemsTransferred,
-                currencies: transferData[actorUuid].currenciesTransferred
-            });
+            await API._addItems(actor.uuid, itemsToTransfer, userId, { runHooks: false });
+            await API._addAttributes(actor.uuid, currenciesToTransfer, userId, { runHooks: false });
 
         }
+
+        transferData.items = Object.values(transferData.items).map(item => {
+            item.quantity = item.quantity / actors.length;
+            return item;
+        });
+
+        transferData.currencies = Object.values(transferData.currencies).map(currency => {
+            currency.quantity = currency.quantity / actors.length;
+            return currency;
+        });
+
+        await lib.clearItemPileSharingData(itemPileActor);
+
+        await API._removeItems(itemPileUuid, Object.entries(itemsToRemove).map(entry => ({ _id: entry[0], quantity: entry[1] })), userId, { runHooks: false });
+        await API._removeAttributes(itemPileUuid, currenciesToRemove, userId, { runHooks: false });
 
         await itemPileSocket.executeForEveryone(
             SOCKET_HANDLERS.CALL_HOOK,
@@ -1018,8 +1050,6 @@ const API = {
 
         if (shouldBeDeleted) {
             await API._deleteItemPile(itemPileUuid);
-        } else if (lib.isItemPileEmpty(itemPileActor)) {
-            await lib.clearItemPileSharingData(itemPileActor);
         }
 
         return transferData;
@@ -1032,9 +1062,9 @@ const API = {
      * Adds item to an actor, increasing item quantities if matches were found
      *
      * @param {Actor/TokenDocument/Token} target        The target to add an item to
-     * @param {array} items                             An array of objects, with the key "item" being an item object or an Item class (the foundry class), with an optional key of "quantity" being the amount of the item to add
-     * @param {boolean} [mergeSimilarItems=true]        Whether to merge similar items based on their name and type
-     * @param {string/boolean} [interactionId=false]    The interaction ID of this action
+     * @param {Array} items                             An array of objects, with the key "item" being an item object or an Item class (the foundry class), with an optional key of "quantity" being the amount of the item to add
+     * @param {Boolean} [mergeSimilarItems=true]        Whether to merge similar items based on their name and type
+     * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<array>}                        An array of objects, each containing the item that was added or updated, and the quantity that was added
      */
@@ -1159,8 +1189,8 @@ const API = {
      * Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
      *
      * @param {Actor/Token/TokenDocument} target        The target to remove a items from
-     * @param {array} items                             An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of
-     * @param {string/boolean} [interactionId=false]    The interaction ID of this action
+     * @param {Array} items                             An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of
+     * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<array>}                        An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted
      */
@@ -1292,8 +1322,8 @@ const API = {
      *
      * @param {Actor/Token/TokenDocument} source        The source to transfer the items from
      * @param {Actor/Token/TokenDocument} target        The target to transfer the items to
-     * @param {array} items                             An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity"), or Items (the foundry class) or strings of IDs to transfer all quantities of
-     * @param {string/boolean} [interactionId=false]    The interaction ID of this action
+     * @param {Array} items                             An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity"), or Items (the foundry class) or strings of IDs to transfer all quantities of
+     * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<object>}                       An array of objects, each containing the item that was added or updated, and the quantity that was transferred
      */
@@ -1394,8 +1424,8 @@ const API = {
      *
      * @param {Actor/Token/TokenDocument} source        The actor to transfer all items from
      * @param {Actor/Token/TokenDocument} target        The actor to receive all the items
-     * @param {array/boolean} [itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
-     * @param {string/boolean} [interactionId=false]    The interaction ID of this action
+     * @param {Array/Boolean} [itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
+     * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<array>}                        An array containing all of the items that were transferred to the target
      */
@@ -1479,8 +1509,8 @@ const API = {
      * Adds to attributes on an actor
      *
      * @param {Actor/Token/TokenDocument} target        The target whose attribute will have a set quantity added to it
-     * @param {object} attributes                       An object with each key being an attribute path, and its value being the quantity to add
-     * @param {string/boolean} [interactionId=false]    The interaction ID of this action
+     * @param {Object} attributes                       An object with each key being an attribute path, and its value being the quantity to add
+     * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      *
@@ -1563,8 +1593,8 @@ const API = {
      * Subtracts attributes on the target
      *
      * @param {Token/TokenDocument} target              The target whose attributes will be subtracted from
-     * @param {array/object} attributes                 This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
-     * @param {string/boolean} [interactionId=false]    The interaction ID of this action
+     * @param {Array/object} attributes                 This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
+     * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
      */
@@ -1671,8 +1701,8 @@ const API = {
      *
      * @param {Actor/Token/TokenDocument} source        The source to transfer the attribute from
      * @param {Actor/Token/TokenDocument} target        The target to transfer the attribute to
-     * @param {array/object} attributes                 This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer
-     * @param {string/boolean} [interactionId=false]    The interaction ID of this action
+     * @param {Array/object} attributes                 This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer
+     * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
@@ -1782,7 +1812,7 @@ const API = {
      *
      * @param {Actor/Token/TokenDocument} source        The source to transfer the attributes from
      * @param {Actor/Token/TokenDocument} target        The target to transfer the attributes to
-     * @param {string/boolean} [interactionId=false]    The interaction ID of this action
+     * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
      *
      * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
      */
@@ -1864,8 +1894,8 @@ const API = {
      *
      * @param {Actor/Token/TokenDocument} source        The actor to transfer all items and attributes from
      * @param {Actor/Token/TokenDocument} target        The actor to receive all the items and attributes
-     * @param {array/boolean} [itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
-     * @param {string/boolean} [interactionId=false]    The ID of this interaction
+     * @param {Array/Boolean} [itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
+     * @param {String/Boolean} [interactionId=false]    The ID of this interaction
      *
      * @returns {Promise<object>}                       An object containing all items and attributes transferred to the target
      */
@@ -2054,8 +2084,8 @@ const API = {
      * This handles any dropped data onto the canvas or a set item pile
      *
      * @param {canvas} canvas
-     * @param {object} data
-     * @param {Actor/Token/TokenDocument/boolean}[target=false]
+     * @param {Object} data
+     * @param {Actor/Token/TokenDocument/Boolean}[target=false]
      * @return {Promise}
      * @private
      */
@@ -2223,12 +2253,12 @@ const API = {
      *
      * If an actor was provided, it will transfer the item from the actor to the target actor.
      *
-     * @param {string} userId
-     * @param {string} sceneId
-     * @param {string/boolean} [sourceUuid=false]
-     * @param {string/boolean} [targetUuid=false]
-     * @param {object/boolean} [position=false]
-     * @param {object} [itemData=false]
+     * @param {String} userId
+     * @param {String} sceneId
+     * @param {String/Boolean} [sourceUuid=false]
+     * @param {String/Boolean} [targetUuid=false]
+     * @param {Object/Boolean} [position=false]
+     * @param {Object} [itemData=false]
      *
      * @returns {Promise<{sourceUuid: string/boolean, targetUuid: string/boolean, position: object/boolean, itemsDropped: array }>}
      * @private
@@ -2276,10 +2306,10 @@ const API = {
     },
 
     /**
-     * @param {string} sceneId
-     * @param {object} position
-     * @param {string/boolean} [pileActorName=false]
-     * @param {array/boolean} [items=false]
+     * @param {String} sceneId
+     * @param {Object} position
+     * @param {String/Boolean} [pileActorName=false]
+     * @param {Array/Boolean} [items=false]
      * @returns {Promise<string>}
      * @private
      */
@@ -2460,8 +2490,6 @@ const API = {
 
     }
 
-}
-
-const preloadedFiles = new Set();
+};
 
 export default API;

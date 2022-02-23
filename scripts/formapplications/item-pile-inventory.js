@@ -30,6 +30,7 @@ export class ItemPileInventory extends FormApplication {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
+            closeOnSubmit: false,
             classes: ["sheet"],
             template: `${CONSTANTS.PATH}templates/item-pile-inventory.html`,
             width: 550,
@@ -257,13 +258,33 @@ export class ItemPileInventory extends FormApplication {
 
         data.isEmpty = !data?.hasItems && !data?.hasCurrencies;
 
-        const num_players = lib.getPlayersForItemPile(this.pile).length;
-
         data.shareItemsEnabled = pileData.shareItemsEnabled;
         data.shareCurrenciesEnabled = pileData.shareCurrenciesEnabled;
 
-        const hasSplittableQuantities = (pileData.shareItemsEnabled && data.items.find((item) => (item.quantity / num_players) >= 1))
-            || (pileData.shareCurrenciesEnabled && data.currencies.find((attribute) => (attribute.quantity / num_players) >= 1))
+        const sharingData = lib.getItemPileSharingData(this.pile);
+        const num_players = lib.getPlayersForItemPile(this.pile).length;
+
+        const hasSplittableItems = pileData.shareItemsEnabled && data.items && !!data.items?.find(item => {
+            let quantity = item.quantity;
+            if(sharingData.currencies){
+                const itemSharingData = sharingData.currencies.find(sharingCurrency => sharingCurrency.path === item.path);
+                if(itemSharingData){
+                    quantity += itemSharingData.actors.reduce((acc, data) => acc + data.quantity, 0);
+                }
+            }
+            return (quantity / num_players) >= 1;
+        });
+
+        const hasSplittableCurrencies = pileData.shareCurrenciesEnabled && data.currencies && !!data.currencies?.find(currency => {
+            let quantity = currency.quantity;
+            if(sharingData.currencies) {
+                const currencySharingData = sharingData.currencies.find(sharingCurrency => sharingCurrency.path === currency.path);
+                if (currencySharingData) {
+                    quantity += currencySharingData.actors.reduce((acc, data) => acc + data.quantity, 0);
+                }
+            }
+            return (quantity / num_players) >= 1;
+        });
 
         data.buttons = [];
 
@@ -275,7 +296,7 @@ export class ItemPileInventory extends FormApplication {
             });
         }
 
-        if ((data.hasRecipient || game.user.isGM) && pileData.splitAllEnabled && hasSplittableQuantities && (pileData.shareItemsEnabled || pileData.shareCurrenciesEnabled)) {
+        if (pileData.splitAllEnabled && (data.hasRecipient || game.user.isGM)) {
 
             let buttonText;
             if (pileData.shareItemsEnabled && pileData.shareCurrenciesEnabled) {
@@ -290,7 +311,7 @@ export class ItemPileInventory extends FormApplication {
                 value: "splitAll",
                 icon: "far fa-handshake",
                 text: buttonText,
-                disabled: !num_players,
+                disabled: !num_players || !(hasSplittableItems || hasSplittableCurrencies),
                 type: "button"
             });
 
@@ -404,6 +425,40 @@ export class ItemPileInventory extends FormApplication {
                 .replaceWith($('<span>' + innerHTML + '</span>'));
             html.find('.item-piles-change-actor-select').remove();
         }
+
+        // Activate context menu
+        this._contextMenu(html);
+    }
+
+    /* -------------------------------------------- */
+
+    /** @inheritdoc */
+    _contextMenu(html) {
+        ContextMenu.create(this, html, ".item-piles-item-row", this._getEntryContextOptions());
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Get the Macro entry context options
+     * @returns {object[]}  The Macro entry context options
+     * @private
+     */
+    _getEntryContextOptions() {
+        return [
+            {
+                name: "JOURNAL.ActionShow",
+                icon: '<i class="fas fa-eye"></i>',
+                condition: (div) => {
+                    return game.user.isGM && div.data("item-id");
+                },
+                callback: (div) => {
+                    const item = this.pileActor.items.get(div.data("item-id"));
+                    const popout = new ImagePopout(item.data.img, { title: item.name }).render(true);
+                    popout.shareImage();
+                }
+            }
+        ];
     }
 
     previewImage(html, element) {
@@ -487,12 +542,13 @@ export class ItemPileInventory extends FormApplication {
     async _updateObject(event, formData) {
 
         if (event.submitter.value === "update") {
-            return this.updatePile(formData);
+            lib.custom_notify("Item Pile successfully updated.");
+            await this.updatePile(formData);
+            return this.render(true);
         }
 
         if (event.submitter.value === "takeAll") {
             API.transferEverything(this.pile, this.recipient, { interactionId: this.interactionId });
-            return;
         }
 
         if (event.submitter.value === "close") {
@@ -500,6 +556,8 @@ export class ItemPileInventory extends FormApplication {
                 if (!result) API.closeItemPile(this.pile, this.recipient);
             });
         }
+
+        return this.close();
 
     }
 

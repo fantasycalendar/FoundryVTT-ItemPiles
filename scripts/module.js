@@ -209,7 +209,11 @@ const module = {
     _renderPlayerList(app, html){
         if(!game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") || !game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")) return;
 
-        const button = $(`<button type="button" class="item-piles-player-list-trade-button"><i class="fas fa-handshake"></i> Request Trade</button>`)
+        const minimalUI = game.modules.get('minimal-ui')?.active;
+        const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "")
+        const text = !minimalUI ? " Request Trade" : ""
+        const button = $(`<button type="button" class="${classes}"><i class="fas fa-handshake"></i>${text}</button>`)
+
         button.click(() => {
             TradeAPI.requestTrade();
         });

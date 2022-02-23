@@ -258,7 +258,7 @@ export class ItemPileConfig extends FormApplication {
                     icon: '<i class="fas fa-check"></i>',
                     label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Confirm"),
                     callback: () => {
-                        lib.updateItemPileSharingData(this.document, {});
+                        lib.clearItemPileSharingData(this.document);
                     }
                 },
                 cancel: {
