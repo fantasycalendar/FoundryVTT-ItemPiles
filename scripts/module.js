@@ -13,6 +13,7 @@ import { registerSocket } from "./socket.js";
 import { registerLibwrappers } from "./libwrapper.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import { TradeAPI } from "./trade-api.js";
+import ItemPileCurrenciesEditor from "./formapplications/currency-editor/item-pile-currencies-editor.js";
 
 Hooks.once("init", async () => {
 
@@ -93,6 +94,8 @@ Hooks.once("ready", async () => {
     registerHandlebarHelpers();
     migrateSettings();
     Hooks.callAll(HOOKS.READY);
+
+    new ItemPileCurrenciesEditor().render(true);
 
 });
 

@@ -6,4 +6,4 @@ lang/
 scripts/
 styles/
 templates/
-src/**/*.svelte
+scripts/**/*.svelte

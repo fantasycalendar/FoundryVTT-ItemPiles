@@ -23,13 +23,7 @@
 
    function onClick()
    {
-      TJSDialog.prompt({
-         title: 'A modal dialog!',
-         draggable: false,
-         modal: false,
-         content: 'A cool modal dialog!',  // You can set content with a Svelte component!
-         label: 'Ok'
-      });
+      console.log("neat");
    }
 </script>
 
