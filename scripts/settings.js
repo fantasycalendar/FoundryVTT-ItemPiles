@@ -4,6 +4,58 @@ import migrations from "./migrations.js";
 import CONSTANTS from "./constants.js";
 import { CurrenciesEditor, ItemFiltersEditor, ItemSimilaritiesEditor } from "./formapplications/base-config-dialog.js";
 
+export const MODULE_SETTINGS = {
+
+    get ACTOR_CLASS_TYPE() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType");
+    },
+
+    /**
+     * The currencies used in this system
+     *
+     * @returns {Array<{name: String, currency: String, img: String, exchange: Number, primary: Boolean}>}
+     */
+    get CURRENCIES() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "currencies");
+    },
+
+    /**
+     * The attribute used to track the price of items in this system
+     *
+     * @returns {string}
+     */
+    get ITEM_PRICE_ATTRIBUTE() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemPriceAttribute");
+    },
+
+    /**
+     * The attribute used to track the quantity of items in this system
+     *
+     * @returns {String}
+     */
+    get ITEM_QUANTITY_ATTRIBUTE() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemQuantityAttribute");
+    },
+
+    /**
+     * The filters for item types eligible for interaction within this system
+     *
+     * @returns {Array<{name: String, filters: String}>}
+     */
+    get ITEM_FILTERS() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters");
+    },
+
+    /**
+     * The attributes for detecting item similarities
+     *
+     * @returns {Array<String>}
+     */
+    get ITEM_SIMILARITIES() {
+        return game.settings.get(CONSTANTS.MODULE_NAME, "itemSimilarities");
+    }
+
+}
 
 const debounceReload = foundry.utils.debounce(() => {
     window.location.reload();

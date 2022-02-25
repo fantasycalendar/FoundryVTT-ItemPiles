@@ -4,9 +4,6 @@ const template_path = `${CONSTANTS.PATH}templates/editors`;
 
 class BaseConfigDialog extends FormApplication {
 
-    settingName = ""
-    baseData = {}
-
     /**
      *
      * @param {Boolean/Object} data
@@ -15,9 +12,6 @@ class BaseConfigDialog extends FormApplication {
     constructor(data = false, resolve = false) {
         super();
         this.resolve = resolve;
-        this.data = typeof data === "object" ?
-            foundry.utils.duplicate(data)
-            : game.settings.get(CONSTANTS.MODULE_NAME, this.settingName);
     }
 
     /** @inheritdoc */
@@ -99,6 +93,13 @@ export class ItemFiltersEditor extends BaseConfigDialog {
         filters: ""
     }
 
+    constructor(data, resolve) {
+        super(data, resolve);
+        this.data = typeof data === "object" ?
+            foundry.utils.duplicate(data)
+            : game.settings.get(CONSTANTS.MODULE_NAME, this.settingName);
+    }
+
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
@@ -120,6 +121,13 @@ export class CurrenciesEditor extends BaseConfigDialog {
         img: "",
         exchange: 1,
         primary: false,
+    }
+
+    constructor(data, resolve) {
+        super(data, resolve);
+        this.data = typeof data === "object" ?
+            foundry.utils.duplicate(data)
+            : game.settings.get(CONSTANTS.MODULE_NAME, this.settingName);
     }
 
     /** @inheritdoc */
@@ -163,6 +171,13 @@ export class ItemSimilaritiesEditor extends BaseConfigDialog {
     settingName = "itemSimilarities"
     baseData = ""
 
+    constructor(data, resolve) {
+        super(data, resolve);
+        this.data = typeof data === "object" ?
+            foundry.utils.duplicate(data)
+            : game.settings.get(CONSTANTS.MODULE_NAME, this.settingName);
+    }
+
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
@@ -181,6 +196,13 @@ export class PriceModifiersEditor extends BaseConfigDialog {
         actor: "",
         priceModifier: 100,
         sellModifier: 50
+    }
+
+    constructor(data, resolve) {
+        super(data, resolve);
+        this.data = typeof data === "object" ?
+            foundry.utils.duplicate(data)
+            : game.settings.get(CONSTANTS.MODULE_NAME, this.settingName);
     }
 
     /** @inheritdoc */

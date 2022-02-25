@@ -1,5 +1,5 @@
 import CONSTANTS from "../constants.js";
-import API from "../api.js";
+import { MODULE_SETTINGS } from "../settings.js";
 
 export function isGMConnected() {
     return !!Array.from(game.users).find(user => user.isGM && user.active);
@@ -97,7 +97,7 @@ export function tokens_close_enough(a, b, maxDistance) {
 
 export function findSimilarItem(items, findItem) {
 
-    const itemSimilarities = API.ITEM_SIMILARITIES;
+    const itemSimilarities = MODULE_SETTINGS.ITEM_SIMILARITIES;
 
     const findItemId = findItem?.id ?? findItem?._id;
 
@@ -322,12 +322,12 @@ export function isItemInvalid(target, item, itemFilters = false) {
 }
 
 export function getActorItemFilters(target) {
-    if (!target) return API.ITEM_FILTERS;
+    if (!target) return MODULE_SETTINGS.ITEM_FILTERS;
     const inDocument = getDocument(target);
     const pileData = getItemPileData(inDocument);
     return isValidItemPile(inDocument) && pileData?.overrideItemFilters
         ? cleanItemFilters(pileData.overrideItemFilters)
-        : API.ITEM_FILTERS;
+        : cleanItemFilters(MODULE_SETTINGS.ITEM_FILTERS);
 }
 
 /**
@@ -370,7 +370,7 @@ export function isItemPileEmpty(target) {
 export function getActorCurrencyList(target) {
     const inDocument = getDocument(target);
     const pileData = getItemPileData(inDocument);
-    return (pileData.overrideCurrencies || API.CURRENCIES).map(currency => {
+    return (pileData.overrideCurrencies || MODULE_SETTINGS.CURRENCIES).map(currency => {
         currency.name = game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name;
         return currency;
     });
@@ -469,7 +469,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
 export function getItemQuantity(item) {
     const itemData = item instanceof Item ? item.data : item;
-    return Number(getProperty(itemData, API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+    return Number(getProperty(itemData, MODULE_SETTINGS.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
 }
 
 
@@ -514,7 +514,7 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
 
     if (items.length) {
         items = items.map(itemData => {
-            setProperty(itemData.item, API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
+            setProperty(itemData.item, MODULE_SETTINGS.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
             return itemData.item;
         })
     }
@@ -651,7 +651,7 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
 export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [], currencies = [] } = {}) {
 
     items = items.map(item => {
-        setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, getItemQuantity(item) * -1)
+        setProperty(item, MODULE_SETTINGS.ITEM_QUANTITY_ATTRIBUTE, getItemQuantity(item) * -1)
         return item;
     });
 
@@ -770,25 +770,47 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor) {
 
 /* -------------------------- Merchant Methods ------------------------- */
 
-export function getItemPrice(item, priceModifier = 1.0) {
+
+export function isValidMerchant(target, data = false){
+    const inDocument = getDocument(target);
+    return isValidItemPile(target, data) && (data || getItemPileData(inDocument))?.isMerchant;
+}
+
+export function getItemPriceData(item, merchant = false, actor = false) {
+
+    const currencyList = getActorCurrencyList(merchant);
+    const { priceModifier } = merchant ? getMerchantModifiersForActor(merchant, actor) : { priceModifier: 100 };
+
     const itemData = item instanceof Item ? item.data : item;
+
     const price = getProperty(itemData, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.ITEM_DATA}`);
-    return price ? {
-        img: price.img,
-        name: price.name,
-        cost: price.cost * priceModifier,
-    } : false;
+
+    if(price){
+        price.originalCost = price.cost;
+        price.cost = Math.floor(price.cost * priceModifier);
+        return price;
+    }
+
+    const cost = getProperty(item.data, MODULE_SETTINGS.ITEM_PRICE_ATTRIBUTE);
+
+    const primaryCurrency = currencyList.find(currency => currency.primary);
+
+    return {
+        attribute: true,
+        img: primaryCurrency.img,
+        name: primaryCurrency.name,
+        path: primaryCurrency.path,
+        originalCost: cost,
+        cost: Math.floor(cost * priceModifier)
+    }
+
 }
 
-export function getActorPrimaryCurrency(actor){
-    return getActorCurrencyList(actor).find(currency => currency.primary);
-}
-
-export function getActorModifiersForMerchant(merchant, actor = false){
+export function getMerchantModifiersForActor(merchant, actor = false){
     const pileData = getItemPileData(merchant);
-    const actorSpecificModifiers = pileData.overridePriceModifiers.find(data => data.actor === getUuid(actor));
-    const priceModifier = (actorSpecificModifiers?.priceModifier || pileData.priceModifier) / 100;
-    const sellModifier = (actorSpecificModifiers?.sellModifier || pileData.sellModifier) / 100;
+    const actorSpecificModifiers = pileData?.overridePriceModifiers?.find(data => data.actor === getUuid(actor));
+    const priceModifier = (actorSpecificModifiers?.priceModifier || pileData.priceModifier || 100) / 100;
+    const sellModifier = (actorSpecificModifiers?.sellModifier || pileData.sellModifier || 100) / 100;
     return {
         priceModifier,
         sellModifier
@@ -798,8 +820,6 @@ export function getActorModifiersForMerchant(merchant, actor = false){
 export function getMerchantItemsForActor(merchant, actor = false){
 
     const pileItems = getActorItems(merchant);
-    const primaryCurrency = getActorPrimaryCurrency(actor);
-    const { priceModifier } = getActorModifiersForMerchant(merchant, actor);
 
     return pileItems.map(item => {
         return {
@@ -808,11 +828,7 @@ export function getMerchantItemsForActor(merchant, actor = false){
             type: item.type,
             img: item.data?.img ?? "",
             quantity: getItemQuantity(item),
-            price: getItemPrice(item, priceModifier) || {
-                img: primaryCurrency.img,
-                name: primaryCurrency.name,
-                cost: Math.floor(getProperty(item.data, API.ITEM_PRICE_ATTRIBUTE) * priceModifier)
-            }
+            price: getItemPriceData(item, merchant, actor)
         }
     });
 

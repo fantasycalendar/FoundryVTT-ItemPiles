@@ -77,8 +77,8 @@ export class ItemPileInventory extends FormApplication {
     }
 
     static async show(pile, recipient, overrides = {}) {
-        const pileUuid = await lib.getUuid(pile);
-        const recipientUuid = recipient ? await lib.getUuid(recipient) : false;
+        const pileUuid = lib.getUuid(pile);
+        const recipientUuid = recipient ? lib.getUuid(recipient) : false;
 
         let app = ItemPileInventory.getActiveAppFromPile(pileUuid, recipientUuid);
         if (app) {

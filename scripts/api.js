@@ -1,10 +1,14 @@
 import * as lib from "./lib/lib.js";
 import CONSTANTS from "./constants.js";
+import HOOKS from "./hooks.js";
+import { MODULE_SETTINGS } from "./settings.js";
+
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
 import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
 import DropItemDialog from "./formapplications/drop-item-dialog.js";
-import HOOKS from "./hooks.js";
 import { hotkeyState } from "./hotkeys.js";
+import { MerchantApp } from "./formapplications/merchant-app.js";
+import { getItemPriceData } from "./lib/lib.js";
 
 const preloadedFiles = new Set();
 
@@ -16,7 +20,7 @@ const API = {
      * @returns {String}
      */
     get ACTOR_CLASS_TYPE() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType");
+        return MODULE_SETTINGS.ACTOR_CLASS_TYPE;
     },
 
     /**
@@ -25,7 +29,7 @@ const API = {
      * @returns {Array<{name: String, currency: String, img: String}>}
      */
     get CURRENCIES() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "currencies");
+        return MODULE_SETTINGS.CURRENCIES;
     },
 
     /**
@@ -34,7 +38,7 @@ const API = {
      * @returns {string}
      */
     get ITEM_PRICE_ATTRIBUTE() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemPriceAttribute");
+        return MODULE_SETTINGS.ITEM_PRICE_ATTRIBUTE;
     },
 
     /**
@@ -43,7 +47,7 @@ const API = {
      * @returns {String}
      */
     get ITEM_QUANTITY_ATTRIBUTE() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemQuantityAttribute");
+        return MODULE_SETTINGS.ITEM_QUANTITY_ATTRIBUTE;
     },
 
     /**
@@ -52,7 +56,7 @@ const API = {
      * @returns {Array<{name: String, filters: String}>}
      */
     get ITEM_FILTERS() {
-        return lib.cleanItemFilters(game.settings.get(CONSTANTS.MODULE_NAME, "itemFilters"));
+        return lib.cleanItemFilters(MODULE_SETTINGS.ITEM_FILTERS);
     },
 
     /**
@@ -61,7 +65,7 @@ const API = {
      * @returns {Array<String>}
      */
     get ITEM_SIMILARITIES() {
-        return game.settings.get(CONSTANTS.MODULE_NAME, "itemSimilarities");
+        return MODULE_SETTINGS.ITEM_SIMILARITIES;
     },
 
     /**
@@ -786,10 +790,11 @@ const API = {
         const inspectingTargetUuid = inspectingTarget ? lib.getUuid(inspectingTarget) : false;
         if (inspectingTarget && !inspectingTargetUuid) throw lib.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid inspecting target`);
 
-        return itemPileSocket.executeForUsers(SOCKET_HANDLERS.RENDER_INTERFACE, userIds, targetUuid, inspectingTargetUuid, useDefaultCharacter)
+        return itemPileSocket.executeForUsers(SOCKET_HANDLERS.RENDER_INTERFACE, userIds, targetUuid, { inspectingTargetUuid, useDefaultCharacter, remote: true })
     },
 
-    async _renderItemPileInterface(targetUuid, inspectingTargetUuid, useDefaultCharacter) {
+    async _renderItemPileInterface(targetUuid, { inspectingTargetUuid = false , useDefaultCharacter = false, remote = false }={}) {
+
         const target = await fromUuid(targetUuid);
 
         let inspectingTarget;
@@ -799,17 +804,29 @@ const API = {
             inspectingTarget = inspectingTargetUuid ? (await fromUuid(inspectingTargetUuid)) : false;
         }
 
-        return ItemPileInventory.show(target, inspectingTarget, { remote: true });
+        return API.isValidMerchant(target)
+            ? MerchantApp.show(target, inspectingTarget)
+            : ItemPileInventory.show(target, inspectingTarget, { remote });
     },
 
     /**
-     * Whether a given document is a valid pile or not
+     * Whether a given token or actor is a merchant or not
      *
-     * @param {Token/TokenDocument/Actor} document
+     * @param {Token/TokenDocument/Actor} target
+     * @returns {Boolean}
+     */
+    isValidMerchant(target) {
+        return lib.isValidMerchant(target);
+    },
+
+    /**
+     * Whether a given token or document is a valid pile or not
+     *
+     * @param {Token/TokenDocument/Actor} target
      * @return {Boolean}
      */
-    isValidItemPile(document) {
-        return lib.isValidItemPile(document);
+    isValidItemPile(target) {
+        return lib.isValidItemPile(target);
     },
 
     /**
@@ -1202,7 +1219,7 @@ const API = {
         const targetUuid = lib.getUuid(target);
         if (!targetUuid) throw lib.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
 
-        const targetActorItems = API.getItemPileItems(target);
+        const targetActorItems = API.getActorItems(target);
 
         items = items.map(itemData => {
 
@@ -1217,6 +1234,8 @@ const API = {
             } else {
                 if (itemData.item instanceof Item) {
                     item = itemData.item.toObject();
+                } else if(itemData instanceof Item) {
+                    item = itemData.toObject();
                 } else {
                     item = itemData.item;
                 }
@@ -1335,7 +1354,7 @@ const API = {
         const sourceUuid = lib.getUuid(source);
         if (!sourceUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid source`, true)
 
-        const sourceActorItems = API.getItemPileItems(source);
+        const sourceActorItems = API.getActorItems(source);
 
         items = items.map(itemData => {
 
@@ -1347,6 +1366,8 @@ const API = {
                     throw lib.custom_error(`TransferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`, true)
                 }
                 item = item.toObject();
+            } else if(itemData instanceof Item) {
+                item = itemData.toObject();
             } else if (itemData.item instanceof Item) {
                 item = itemData.item.toObject();
             } else {
@@ -1469,7 +1490,7 @@ const API = {
 
         const source = await fromUuid(sourceUuid);
 
-        const itemsToRemove = API.getItemPileItems(source, itemFilters).map(item => item.toObject());
+        const itemsToRemove = API.getActorItems(source, itemFilters).map(item => item.toObject());
 
         const itemsRemoved = await API._removeItems(sourceUuid, itemsToRemove, userId, {
             runHooks: false,
@@ -1852,7 +1873,7 @@ const API = {
             ? target.actor
             : target;
 
-        const sourceAttributes = API.getItemPileCurrencies(sourceActor);
+        const sourceAttributes = API.getActorCurrencies(sourceActor);
 
         const attributesToTransfer = sourceAttributes.filter(attribute => {
             return hasProperty(targetActor.data, attribute.path);
@@ -1970,6 +1991,36 @@ const API = {
             itemsTransferred,
             currenciesTransferred
         };
+
+    },
+
+    /* ------- MERCHANT METHODS -------- */
+
+    async buyItem(merchant, buyer, itemId) {
+
+        const item = merchant.items.get(itemId);
+
+        if(!item){
+            return lib.custom_warning(`Could not purchase ${item.name} from ${merchant.name} - merchant does not have this item`, true);
+        }
+
+        const priceData = lib.getItemPriceData(item, merchant, buyer);
+
+        if(getProperty(item.data, MODULE_SETTINGS.ITEM_QUANTITY_ATTRIBUTE) <= 0){
+            return lib.custom_warning(`Could not purchase ${item.name} from ${merchant.name} - merchant has no quantity left`, true);
+        }
+
+        const buyerCurrency = getProperty(buyer.data, priceData.path);
+        if(buyerCurrency < priceData.cost){
+            lib.custom_warning(`Could not purchase ${item.name} from ${merchant.name} - not enough ${priceData.name} (lacking ${priceData.cost - buyerCurrency})`, true);
+            return;
+        }
+
+        const attr = Object.fromEntries([[priceData.path, priceData.cost]]);
+
+        await API.transferAttributes(buyer, merchant, attr);
+
+        await API.transferItems(merchant, buyer, [{ item, quantity: 1 }]);
 
     },
 
@@ -2465,7 +2516,7 @@ const API = {
 
         }
 
-        return ItemPileInventory.show(pileDocument, interactingActor);
+        return API._renderItemPileInterface(pileDocument.uuid, { inspectingTargetUuid: interactingActor?.uuid });
 
     },
 

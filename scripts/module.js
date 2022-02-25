@@ -71,7 +71,7 @@ Hooks.once("ready", async () => {
     Hooks.callAll(HOOKS.READY);
 
     //new CurrenciesEditor().render(true);
-    new MerchantApp(game.actors.getName("Trade Tester")).render(true);
+    //new MerchantApp(game.actors.getName("Trade Tester")).render(true);
     //new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
 
 });

@@ -21,7 +21,7 @@
 
   <div>
     <hr>
-    {{#each similarities as |path id|}}
+    {{#each data as |path id|}}
       <div class="flexrow item-piles-input-row" data-index="{{id}}">
         <div style="flex:0 1 auto;"><button type="button" class="item-piles-input-remove" name="button_remove_{{id}}"><i class="fas fa-times"></i></button></div>
         <div style="flex:2;"><input type="text" class="item-piles-input-path-input" required name="{{id}}" placeholder="type" value="{{path}}"/></div>

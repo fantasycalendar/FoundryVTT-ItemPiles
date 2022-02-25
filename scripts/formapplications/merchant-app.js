@@ -6,6 +6,8 @@ import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
 import { TradeAPI } from "../trade-api.js";
 import API from "../api.js";
 import { getMerchantItemsForActor } from "../lib/lib.js";
+import HOOKS from "../hooks.js";
+import { ItemPileConfig } from "./item-pile-config.js";
 
 export class MerchantApp extends FormApplication {
 
@@ -13,10 +15,43 @@ export class MerchantApp extends FormApplication {
         super();
 
         this.merchant = merchant?.actor ?? merchant;
-        this.buyer = merchant?.actor ?? merchant;
+        this.buyer = buyer?.actor ?? buyer;
 
         this.merchantItems = {};
 
+    }
+
+    /**
+     *
+     * @param inPileUuid
+     * @param buyerUuid
+     * @returns {Array<ItemPileInventory>[]|boolean}
+     */
+    static getActiveAppFromPile(inPileUuid, buyerUuid = false) {
+
+        const openApps = Object.values(ui.windows).filter(app => {
+            return app instanceof this
+                && (app?.merchant?.uuid === inPileUuid || app?.merchant?.actor?.uuid === inPileUuid)
+                && (!buyerUuid || (app?.buyer?.uuid === buyerUuid || app?.buyer?.actor?.uuid === buyerUuid))
+        })
+
+        if (openApps.length) {
+            return openApps;
+        }
+
+        return false;
+    }
+
+    static async show(merchant, buyer = false) {
+        const merchantUuid = lib.getUuid(merchant);
+        const buyerUuid = buyer ? lib.getUuid(buyer) : false;
+
+        let app = this.getActiveAppFromPile(merchantUuid, buyerUuid);
+        if (app) {
+            return app[0].render(true, { focus: true });
+        }
+
+        return new this(merchant, buyer).render(true);
     }
 
     /** @inheritdoc */
@@ -37,12 +72,44 @@ export class MerchantApp extends FormApplication {
         return `Merchant: ${this.merchant.name}`
     }
 
+    /** @override */
+    _getHeaderButtons() {
+        let buttons = super._getHeaderButtons();
+        const canConfigure = game.user.isGM;
+        if (canConfigure) {
+            buttons = [
+                {
+                    label: "ITEM-PILES.Inspect.OpenSheet",
+                    class: "item-piles-open-actor-sheet",
+                    icon: "fas fa-user",
+                    onclick: () => {
+                        this.merchant.sheet.render(true, { focus: true });
+                    }
+                },
+                {
+                    label: "ITEM-PILES.HUD.Configure",
+                    class: "item-piles-configure-pile",
+                    icon: "fas fa-box-open",
+                    onclick: () => {
+                        ItemPileConfig.show(this.merchant);
+                    }
+                },
+            ].concat(buttons);
+        }
+        return buttons
+    }
+
     activateListeners(html) {
         super.activateListeners(html);
         const self = this;
         html.find(".item-piles-name-container .item-piles-clickable").click(function () {
             const itemId = $(this).closest(".item-piles-item-row").attr('data-item-id');
             self.previewItem(itemId);
+        });
+
+        html.find(".item-piles-buy-button").click(function () {
+            const itemId = $(this).closest(".item-piles-item-row").attr('data-item-id');
+            self.buyItem(itemId);
         });
     }
 
@@ -55,6 +122,10 @@ export class MerchantApp extends FormApplication {
         const cls = item._getSheetClass()
         const sheet = new cls(item, { editable: false })
         return sheet._render(true);
+    }
+
+    buyItem(itemId){
+        return API.buyItem(this.merchant, this.buyer, itemId);
     }
 
     getData(options){
