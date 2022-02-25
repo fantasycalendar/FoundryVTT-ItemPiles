@@ -1,23 +1,19 @@
 <script>
    export let index;
    export let img;
-   export let showImg = false;
-   let filepicker;
-
+   let filepicker = new FilePicker({
+      type: "image",
+      current: img,
+      callback: path => {
+         img = path;
+      }
+   });
    function handleClick(){
-      if(filepicker) return filepicker.render(false, { focus: true });
-      filepicker = new FilePicker({
-         type: "image",
-         current: img,
-         callback: path => {
-            img = path;
-         }
-      }).render(true);
+      filepicker.render(true, { focus: true });
    }
 </script>
 
 <div>
-   {#if showImg}<img alt="Currency" src="{img}" style="flex:0 1 auto;">{/if}
    <input type="text" placeholder="path/image.png" bind:value="{img}"/>
    <button on:click={handleClick} type="button"><i class="fas fa-file-import"></i></button>
 </div>
@@ -25,7 +21,7 @@
 <style lang="scss">
 
    div {
-      flex:1;
+      width:100%;
       display:inline-flex;
       flex-direction: row;
       align-items: center;
