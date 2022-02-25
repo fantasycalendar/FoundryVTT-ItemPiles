@@ -9,7 +9,7 @@
     "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
   ],
   "dependencies": {
-    "@typhonjs-fvtt/runtime": "0.0.5",
+    "@typhonjs-fvtt/runtime": "0.0.6",
     "svelte": "^3.46.4",
     "svelte-preprocess": "^4.10.3"
   },
