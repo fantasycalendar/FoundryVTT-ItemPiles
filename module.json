@@ -15,10 +15,11 @@
         }
     ],
     "esmodules": [
-        "/scripts/module.js"
+      "./dist/module.js"
     ],
     "styles": [
-        "/styles/module.css"
+      "./dist/module.css",
+      "./styles/module.css"
     ],
     "languages": [
         {

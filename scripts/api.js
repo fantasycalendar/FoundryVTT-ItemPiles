@@ -4,7 +4,7 @@ import HOOKS from "./hooks.js";
 import { MODULE_SETTINGS } from "./settings.js";
 
 import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
-import { ItemPileInventory } from "./formapplications/item-pile-inventory.js";
+import { ItemPileInventory } from "./formapplications/inventory/item-pile-inventory.js";
 import DropItemDialog from "./formapplications/drop-item-dialog.js";
 import { hotkeyState } from "./hotkeys.js";
 import { MerchantApp } from "./formapplications/merchant-app.js";
