@@ -5,6 +5,7 @@ import pf1 from "./systems/pf1.js";
 import pf2e from "./systems/pf2e.js";
 import ds4 from "./systems/ds4.js";
 import d35e from "./systems/d35e.js";
+import sfrpg from "./systems/sfrpg.js";
 import swade from "./systems/swade.js";
 import tormenta20 from "./systems/tormenta20.js";
 // ↑ IMPORT SYSTEMS HERE ↑
@@ -24,6 +25,7 @@ export const SYSTEMS = {
             d35e,
             swade,
             tormenta20,
+            sfrpg,
             // ↑ ADD SYSTEMS HERE ↑
         }?.[game.system.id];
     }
