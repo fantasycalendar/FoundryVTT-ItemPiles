@@ -79,7 +79,6 @@ Hooks.once("ready", async () => {
     // new MerchantApp(game.actors.getName("Trade Tester")).render(true);
     // new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
     // ItemSimilaritiesEditor.show()
-    // console.log('wot')
 
 });
 

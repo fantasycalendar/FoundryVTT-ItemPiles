@@ -1,67 +1,23 @@
 <script>
    import { getContext } from 'svelte';
    import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-   import FilePicker from "../../components/FilePicker.svelte";
 
    const { application } = getContext('external');
 
    let form;
-   let hovering = false;
-   let dragging = false;
 
-   export let currencies;
-   export let primary_currency;
-
-   function add() {
-      currencies.push({ primary: false, name: "", exchange: 1, path: "", img: "" });
-      currencies = currencies;
-   }
+   export let priceModifiers;
 
    function remove(index) {
-      currencies.splice(index, 1)
-      currencies = currencies;
-   }
-
-   function dragstart(event, i) {
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.dropEffect = 'move';
-      event.dataTransfer.setData('text/plain', i);
-      dragging = i;
-   }
-
-   function drop(event, target){
-      event.dataTransfer.dropEffect = 'move';
-      const start = parseInt(event.dataTransfer.getData("text/plain"));
-      const newCurrencies = currencies;
-
-      currencies.forEach((currency, index) => {
-         currency.primary = index === primary_currency;
-      })
-
-      if (start < target) {
-         newCurrencies.splice(target + 1, 0, newCurrencies[start]);
-         newCurrencies.splice(start, 1);
-      } else {
-         newCurrencies.splice(target, 0, newCurrencies[start]);
-         newCurrencies.splice(start + 1, 1);
-      }
-
-      currencies = newCurrencies;
-
-      primary_currency = currencies.indexOf(currencies.find(currency => currency.primary))
-
-      hovering = null;
-      dragging = null;
+      priceModifiers.splice(index, 1)
+      priceModifiers = priceModifiers;
    }
 
    async function updateSettings() {
-      currencies.forEach((currency, index) => {
-         currency.primary = index === primary_currency;
+      priceModifiers.forEach(data => {
+         data.actor = data.actor.id;
       })
-      application.options.resolve?.(currencies);
-      if(!application.options.resolve){
-         application.submit(currencies);
-      }
+      application.options.resolve?.(priceModifiers);
       application.close();
    }
 
@@ -69,67 +25,100 @@
       form.requestSubmit();
    }
 
+   function dropData(event){
+
+      event.preventDefault();
+
+      let data;
+      try {
+         data = JSON.parse(event.dataTransfer.getData('text/plain'));
+      } catch (err) {
+         return false;
+      }
+
+      if (data.type !== "Actor") return;
+
+      const actor = game.actors.get(data.id);
+
+      if(!actor) return;
+
+      if(priceModifiers.find(data => data.actor === actor)) return;
+
+      priceModifiers.push({
+         actor: actor,
+         priceModifier: 100,
+         sellModifier: 50
+      });
+
+      priceModifiers = priceModifiers;
+   }
+
+   function preventDefault(event){
+      event.preventDefault();
+   }
+
 </script>
 
 <svelte:options accessors={true}/>
 
-<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-pile-currencies-editor">
+<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+
    <p>{localize("ITEM-PILES.PriceModifiersEditor.Explanation")}</p>
 
-   <table>
-      <tr>
-         <th class="small">Primary</th>
-         <th>{localize("ITEM-PILES.PriceModifiersEditor.Name")}</th>
-         <th>Exchange</th>
-         <th>{localize("ITEM-PILES.PriceModifiersEditor.Path")}</th>
-         <th>{localize("ITEM-PILES.PriceModifiersEditor.Icon")}</th>
-         <th class="small"><a on:click={add} class="item-piles-clickable item-piles-add-new-currency"><i class="fas fa-plus"></i></a></th>
-      </tr>
-      {#each currencies as { primary, name, exchange, path, img }, index (index)}
-         <tr
-          class:is-active={hovering === index}
-          class:is-dragging={dragging === index}
-          on:dragenter={() => hovering = index}
-          on:drop|preventDefault={event => drop(event, index)}
-         >
-            <td class="small">
-               <a
-                class="item-piles-moveable"
-                draggable="{true}"
-                on:dragstart={event => dragstart(event, index)}
-                ondragover="return false"
-               ><i class="fas fa-bars"></i></a>
-               <input type="radio" bind:group={primary_currency} value={index} required name="primary_currency"/>
-            </td>
-            <td><input type="text" required placeholder="Gold Pieces" bind:value="{name}"/></td>
-            <td class="small"><input type="number" required step="0.0000000001" bind:value="{exchange}" /></td>
-            <td><input type="text" required placeholder="data.currency.gp" bind:value="{path}"/></td>
-            <td><FilePicker index="{index}" bind:img="{img}" showImg=true/></td>
-            <td class="small"><button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button></td>
+   <div on:dragstart={preventDefault} on:drop={dropData} on:dragover={preventDefault} class:border-highlight={!priceModifiers.length}>
+
+      {#if priceModifiers.length}
+      <table>
+         <tr>
+            <th style="width:25%;">{localize("ITEM-PILES.PriceModifiersEditor.Actor")}</th>
+            <th style="width:35%;">{localize("ITEM-PILES.PriceModifiersEditor.PriceModifier")}</th>
+            <th style="width:35%;">{localize("ITEM-PILES.PriceModifiersEditor.SellModifier")}</th>
+            <th style="width:5%;"></th>
          </tr>
-      {/each}
-   </table>
+         {#each priceModifiers as priceData, index (index)}
+            <tr>
+               <td>
+                  <a class="item-piles-actor-name-clickable" on:click={(priceData.actor.sheet.render(true))}>{priceData.actor.name}</a>
+               </td>
+               <td>
+                  <div class="flexrow" style="margin: 0 0.25rem">
+                     <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{priceData.priceModifier}"/>
+                     <input style="flex:0.5; margin-left:0.5rem;" type="number" min="0" step="1" required bind:value="{priceData.priceModifier}"/>
+                  </div>
+               </td>
+               <td>
+                  <div class="flexrow" style="margin: 0 0.25rem">
+                     <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{priceData.sellModifier}"/>
+                     <input style="flex:0.5; margin-left:0.5rem;" type="number" min="0" step="1" required bind:value="{priceData.sellModifier}"/>
+                  </div>
+               </td>
+               <td class="small"><button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button></td>
+            </tr>
+         {/each}
+      </table>
+      {/if}
+
+      <p class="item-piles-text-center">{localize("ITEM-PILES.PriceModifiersEditor.DragDrop")}</p>
+
+   </div>
 
 </form>
 
 
 <style lang="scss">
 
+   .border-highlight{
+      padding: 1rem;
+      margin: 0.25rem;
+      border-radius: 10px;
+      border:2px dashed gray;
+   }
+
    table {
       vertical-align:middle;
 
       tr{
          border-spacing: 15px;
-
-         &.is-active {
-            background-color: #3273dc;
-            color: #fff;
-         }
-
-         &.is-dragging {
-            background-color: rgba(50, 220, 132, 0.55);
-            color: #fff;
-         }
       }
 
       .small{

@@ -39,13 +39,13 @@ export default class ItemPileConfig extends TJSDialog {
         this.document = document;
         this.overrideCurrencies = false;
         this.overrideItemFilters = false;
-        this.actorPriceOverrides = false;
+        this.overridePriceModifiers = pileData.overridePriceModifiers;
     }
 
     async showCurrenciesEditor() {
         const pileData = this.svelte.applicationShell.pileData;
         const data = pileData?.overrideCurrencies ?? MODULE_SETTINGS.CURRENCIES;
-        return CurrenciesEditor.show(data, { id: `item-pile-config-${document.uuid}` })
+        return CurrenciesEditor.show(data, { id: `item-pile-config-${this.document.uuid}` })
             .then((result) => {
                 this.overrideCurrencies = result;
             });
@@ -54,16 +54,15 @@ export default class ItemPileConfig extends TJSDialog {
     async showItemFiltersEditor() {
         const pileData = this.svelte.applicationShell.pileData;
         const data = pileData?.overrideItemFilters ?? MODULE_SETTINGS.ITEM_FILTERS;
-        return ItemFiltersEditor.show(data, { id: `item-pile-config-${document.uuid}` })
+        return ItemFiltersEditor.show(data, { id: `item-pile-config-${this.document.uuid}` })
             .then((result) => {
                 this.overrideItemFilters = result;
             });
     }
 
     async showActorPriceOverrides() {
-        const pileData = this.svelte.applicationShell.pileData;
-        const data = pileData?.overridePriceModifiers ?? [];
-        return PriceModifiersEditor.show(data, { id: `item-pile-config-${document.uuid}` })
+        const data = this.overridePriceModifiers || [];
+        return PriceModifiersEditor.show(data, { id: `item-pile-config-${this.document.uuid}` })
             .then((result) => {
                 this.overridePriceModifiers = result;
             });
@@ -98,6 +97,7 @@ export default class ItemPileConfig extends TJSDialog {
 
         data.overrideCurrencies = data.overrideCurrencies ? this.overrideCurrencies : false;
         data.overrideItemFilters = data.overrideItemFilters ? this.overrideItemFilters : false;
+        data.overridePriceModifiers = this.overridePriceModifiers;
 
         data.deleteWhenEmpty = {
             "default": "default",

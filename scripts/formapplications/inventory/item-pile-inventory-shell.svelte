@@ -23,7 +23,6 @@
 
    function onClick()
    {
-      console.log("neat");
    }
 </script>
 

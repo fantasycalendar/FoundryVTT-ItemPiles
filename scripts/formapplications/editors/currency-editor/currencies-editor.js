@@ -40,12 +40,6 @@ export default class CurrenciesEditor extends TJSDialog {
         }, {width: 630, height: "auto", ...options});
     }
 
-    /*static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            dragDrop: [{dragSelector: null, dropSelector: ".item-pile-currencies-editor"}],
-        });
-    }*/
-
     static async show(data = false, options = {}, dialogData = {}) {
         return new Promise((resolve) => {
             if (data) options.resolve = resolve;
@@ -56,23 +50,4 @@ export default class CurrenciesEditor extends TJSDialog {
     submit(data) {
         return game.settings.set(CONSTANTS.MODULE_NAME, "currencies", data);
     }
-
-    /*async _onDrop(event) {
-
-        super._onDrop(event);
-
-        let data;
-        try {
-            data = JSON.parse(event.dataTransfer.getData('text/plain'));
-        } catch (err) {
-            return false;
-        }
-
-        if (data.type !== "Item") return;
-
-        const itemData = (await Item.fromDropData(data)).toObject();
-
-        console.log(itemData)
-
-    }*/
 }

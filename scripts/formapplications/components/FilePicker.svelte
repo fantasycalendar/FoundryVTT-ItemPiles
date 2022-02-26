@@ -36,7 +36,7 @@
 
       button {
          padding: 0.25rem 0.25rem;
-         line-height: 1rem;
+         line-height: 1rem !important;
          flex:0;
       }
    }

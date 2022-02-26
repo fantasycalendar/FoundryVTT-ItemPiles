@@ -151,12 +151,12 @@
                         <input type="checkbox" bind:checked={pileData.overrideSingleItemScale}/>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" class:item-piles-disabled={!pileData.overrideSingleItemScale}>
                         <label style="flex:3;">
                             {localize("ITEM-PILES.ItemPileConfig.SingleItem.Scale")}<br>
                         </label>
-                        <input style="flex:3;" type="range" min="0.2" step="0.1" max="3" class="item-piles-scaleRange" bind:value="{pileData.singleItemScale}"/>
-                        <input style="flex:0.5; margin-left:1rem;" type="number" step="0.1" class="item-piles-scaleInput" bind:value="{pileData.singleItemScale}"/>
+                        <input style="flex:3;" type="range" min="0.2" step="0.1" max="3" class="item-piles-scaleRange" disabled="{!pileData.overrideSingleItemScale}" bind:value="{pileData.singleItemScale}"/>
+                        <input style="flex:0.5; margin-left:1rem;" type="number" step="0.1" class="item-piles-scaleInput" disabled="{!pileData.overrideSingleItemScale}" bind:value="{pileData.singleItemScale}"/>
                     </div>
 
                 </div>
@@ -344,9 +344,9 @@
                             Open Time:
                         </label>
                         <div class="flexrow">
-                            <input type="number" style="text-align: right;" bind:value="{pileData.openTimes.open.hour}"/>
+                            <input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}" bind:value="{pileData.openTimes.open.hour}"/>
                             <span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
-                            <input type="number" bind:value="{pileData.openTimes.open.minute}"/>
+                            <input type="number" disabled="{!pileData.openTimes.enabled}" bind:value="{pileData.openTimes.open.minute}"/>
                         </div>
                     </div>
                     <div class="flexcol">
@@ -354,9 +354,9 @@
                             Close Time:
                         </label>
                         <div class="flexrow">
-                            <input type="number" style="text-align: right;" bind:value="{pileData.openTimes.close.hour}"/>
+                            <input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}" bind:value="{pileData.openTimes.close.hour}"/>
                             <span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
-                            <input type="number" bind:value="{pileData.openTimes.close.minute}"/>
+                            <input type="number" disabled="{!pileData.openTimes.enabled}" bind:value="{pileData.openTimes.close.minute}"/>
                         </div>
                     </div>
                 </div>

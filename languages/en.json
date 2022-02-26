@@ -154,7 +154,7 @@
             "Actor": "Actor",
             "PriceModifier": "Price Modifier (%)",
             "SellModifier": "Sell Price Modifier (%)",
-            "Submit": "Submit filters"
+            "Submit": "Submit price modifiers"
         },
         "ItemConfig": {
             "Title": "Item Configuration",

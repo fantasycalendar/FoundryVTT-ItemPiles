@@ -5,10 +5,14 @@ import PriceModifiersShell from './price-modifiers-editor.svelte';
 export default class PriceModifiersEditor extends TJSDialog {
 
    constructor(priceModifiers, options, dialogData = {}) {
+      priceModifiers = priceModifiers.map(data => {
+         data.actor = game.actors.get(data.actor);
+         if(!data.actor) return false;
+         return data;
+      }).filter(Boolean);
       super({
          ...dialogData,
          title: "ITEM-PILES.PriceModifiersEditor.Title",
-         zIndex: 50,
          content: {
             class: PriceModifiersShell,
             props: {
@@ -33,8 +37,12 @@ export default class PriceModifiersEditor extends TJSDialog {
          },
          default: 'save',
          autoClose: false, // Don't automatically close on button onclick.
-         close: () => this.options.resolve?.(null)
-      }, { width: 630, height: "auto", ...options });
+         close: () => this.options.resolve?.(false)
+      }, {
+         width: 600,
+         height: "auto",
+         ...options
+      });
    }
 
    static async show(data = false, options = {}, dialogData = {}) {
@@ -43,4 +51,5 @@ export default class PriceModifiersEditor extends TJSDialog {
          new this(data, options, dialogData).render(true);
       })
    }
+
 }
