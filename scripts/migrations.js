@@ -1,6 +1,5 @@
-import * as lib from "./lib/lib.js";
-import CONSTANTS from "./constants.js";
-import { SYSTEMS } from "./systems.js";
+import {CONSTANTS} from "./constants.js";
+import {debug, isResponsibleGM} from "./lib/utils";
 
 const migrations = {
 
@@ -32,7 +31,7 @@ const migrations = {
     },
 
     async migrate(){
-        if(!lib.isResponsibleGM()) return;
+        if(!isResponsibleGM()) return;
 
         const currentFlagVersion = game.settings.get(CONSTANTS.MODULE_NAME, "flagMigrationVersion");
         if(this.latestFlagVersion !== currentFlagVersion){
@@ -53,7 +52,7 @@ const migrations = {
         for (let [version, migration] of Object.entries(this.setting_migrations)) {
             if (!isNewerVersion(version, currentSettingVersion)) continue;
             await migration();
-            lib.debug(`Successfully migrated settings to version ${version}`);
+            debug(`Successfully migrated settings to version ${version}`);
         }
 
     },
@@ -79,7 +78,7 @@ const migrations = {
                     if (!isNewerVersion(version, pileVersion)) continue;
                     pileData = migration(token, pileData);
 
-                    lib.debug(`Migration token with UUID "${token.uuid}" to version ${version}`);
+                    debug(`Migration token with UUID "${token.uuid}" to version ${version}`);
                 }
 
                 pileData.flagVersion = this.latestFlagVersion;
@@ -106,7 +105,7 @@ const migrations = {
                 if (!isNewerVersion(version, pileVersion)) continue;
                 pileData = migration(actor, pileData);
 
-                lib.debug(`Migration actor with UUID "${actor.uuid}" to version ${version}`);
+                debug(`Migration actor with UUID "${actor.uuid}" to version ${version}`);
             }
 
             pileData.flagVersion = this.latestFlagVersion;

@@ -1,6 +1,6 @@
 import API from "./api.js";
-import * as lib from "./lib/lib.js";
-import CONSTANTS from "./constants.js";
+import {CONSTANTS} from "./constants.js";
+import {getTokensAtLocation, isVersion9} from "./lib/utils";
 
 export const hotkeyActionState = {
     get openPileInventory() {
@@ -16,7 +16,7 @@ export const hotkeyState = {
 
 export function registerHotkeysPre() {
 
-    if (lib.isVersion9()) {
+    if (isVersion9()) {
 
         game.keybindings.register(CONSTANTS.MODULE_NAME, "force-open-item-pile-inventory", {
             name: "Force open inventory",
@@ -77,7 +77,7 @@ export function registerHotkeysPost() {
             if (event.button !== 0) return;
 
             const pos = canvas.app.renderer.plugins.interaction.mouse.getLocalPosition(canvas.app.stage);
-            const tokens = lib.getTokensAtLocation(pos).filter(token => !token._canView(game.user));
+            const tokens = getTokensAtLocation(pos).filter(token => !token._canView(game.user));
             if (!tokens.length) return;
             tokens.sort((a, b) => b.zIndex - a.zIndex);
             const token = tokens[0].document;
@@ -94,7 +94,7 @@ export function registerHotkeysPost() {
         });
     }
 
-    if (!lib.isVersion9()) {
+    if (!isVersion9()) {
 
         window.addEventListener("keydown", (event) => {
             switch (event.code) {

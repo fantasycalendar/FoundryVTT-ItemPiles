@@ -36,6 +36,7 @@
 }
 .item-piles-disabled {
   opacity: 0.75;
+  background-color: var(--color-bg-btn-minor-inactive, #c9c7b8);
 }
 .item-piles-clickable {
   cursor: pointer;
@@ -103,9 +104,6 @@
   border-top: 1px solid rgba(0, 0, 0, 0.35);
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-}
-.item-piles-disabled {
-  background-color: var(--color-bg-btn-minor-inactive, #c9c7b8);
 }
 
 .item-piles-slider-group {
@@ -230,43 +228,9 @@
 }
 
 /* ----------------------- CONFIG ----------------------- */
-.item-piles-config {
-  width: 430px;
-}
-.item-piles-config .item-piles-config-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+.item-piles-config .dialog-content {
+  height: 100%;
   overflow: hidden;
-}
-.item-piles-config .item-piles-config-container .sheet-navigation {
-  margin-bottom: 0.25rem;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid var(--color-border-light-primary, #b5b3a4);
-}
-.item-piles-config .item-piles-config-container .item-piles-sections {
-  padding: 0.25rem;
-  max-height: calc(100% - 51px - 34px);
-  overflow-y: scroll;
-}
-.item-piles-config .item-piles-config-container .form-group {
-  padding: 0.2rem;
-  border-radius: 5px;
-  margin: 0.2rem 0;
-}
-.item-piles-config .item-piles-config-container p {
-  flex: 0;
-  line-height: 14px;
-  font-size: var(--font-size-12);
-  color: var(--color-text-dark-secondary);
-  padding-right: 1rem;
-  margin-top: 0;
-  overflow-y: hidden;
-}
-.item-piles-config .item-piles-config-container footer {
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--color-border-light-primary, #b5b3a4);
 }
 
 /* ---------------------- CHAT CARDS ---------------------- */

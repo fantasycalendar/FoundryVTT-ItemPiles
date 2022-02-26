@@ -1,7 +1,11 @@
-import CONSTANTS from "../constants.js";
+import {CONSTANTS} from "../constants.js";
 import API from "../api.js";
 import * as lib from "../lib/lib.js";
-import { CurrenciesEditor, ItemFiltersEditor, PriceModifiersEditor } from "./base-config-dialog.js";
+import CurrenciesEditor from "./editors/currency-editor/currencies-editor";
+import ItemFiltersEditor from "./editors/item-filters-editor/item-filters-editor";
+import PriceModifiersEditor from "./editors/price-modifiers-editor/price-modifiers-editor";
+
+import {dialogLayout} from "../lib/utils";
 
 export class ItemPileConfig extends FormApplication {
 
@@ -86,7 +90,7 @@ export class ItemPileConfig extends FormApplication {
                 if (isLinked) {
                     const doContinue = await Dialog.confirm({
                         title: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Title"),
-                        content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content") }),
+                        content: dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.LinkedActorWarning.Content") }),
                         defaultYes: false
                     });
                     if (!doContinue) {
@@ -252,7 +256,7 @@ export class ItemPileConfig extends FormApplication {
     async resetSharingData() {
         return new Dialog({
             title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
-            content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content") }),
+            content: dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content") }),
             buttons: {
                 confirm: {
                     icon: '<i class="fas fa-check"></i>',

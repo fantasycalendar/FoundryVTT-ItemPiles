@@ -1,10 +1,11 @@
-import CONSTANTS from "../constants.js";
+import {CONSTANTS, SOCKET_HANDLERS} from "../constants.js";
 import * as lib from "../lib/lib.js";
-import { hotkeyState } from "../hotkeys.js";
+import {hotkeyState} from "../hotkeys.js";
 import DropCurrencyDialog from "./drop-currency-dialog.js";
-import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
-import { TradeAPI } from "../trade-api.js";
+import {itemPileSocket} from "../socket.js";
+import {TradeAPI} from "../trade-api.js";
 import API from "../api.js";
+import {custom_error, custom_warning, dialogLayout, findSimilarItem} from "../lib/utils";
 
 export class TradingApp extends FormApplication {
 
@@ -129,11 +130,11 @@ export class TradingApp extends FormApplication {
         if (data.type !== "Item") return;
 
         if (!data.actorId) {
-            if (!game.user.isGM) return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
+            if (!game.user.isGM) return custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
         }
 
         if (!game.user.isGM && data.actorId && data.actorId !== this.leftTraderActor.id) {
-            throw lib.custom_error(`You cannot drop items into the trade UI from a different actor than ${this.leftTraderActor.name}!`)
+            throw custom_error(`You cannot drop items into the trade UI from a different actor than ${this.leftTraderActor.name}!`)
         }
 
         let itemData;
@@ -149,13 +150,13 @@ export class TradingApp extends FormApplication {
 
         if (!itemData) {
             console.error(data);
-            throw lib.custom_error("Something went wrong when dropping this item!")
+            throw custom_error("Something went wrong when dropping this item!")
         }
 
         const disallowedType = lib.isItemInvalid(this.rightTraderActor, itemData);
         if (disallowedType) {
             if (!game.user.isGM) {
-                return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemTrade", { type: disallowedType }), true)
+                return custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemTrade", { type: disallowedType }), true)
             }
             if (!hotkeyState.shiftDown) {
                 const force = await Dialog.confirm({
@@ -175,7 +176,7 @@ export class TradingApp extends FormApplication {
 
     async addItem(newItem, limitQuantity = true) {
 
-        const item = lib.findSimilarItem(this.leftTraderActorItems, newItem)
+        const item = findSimilarItem(this.leftTraderActorItems, newItem)
 
         if (!item) {
             this.leftTraderActorItems.push({
@@ -459,7 +460,7 @@ export class TradingApp extends FormApplication {
                 TradeAPI._tradeClosed(this.privateTradeId);
                 Dialog.prompt({
                     title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
-                    content: lib.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Trade.Closed.You") }),
+                    content: dialogLayout({ message: game.i18n.localize("ITEM-PILES.Trade.Closed.You") }),
                     callback: () => {
                     },
                     rejectClose: false
@@ -469,13 +470,13 @@ export class TradingApp extends FormApplication {
                     TradeAPI._tradeClosed(this.privateTradeId);
                     Dialog.prompt({
                         title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
-                        content: lib.dialogLayout({ message: game.i18n.format("ITEM-PILES.Trade.Closed.Them", { user_name: this.rightTraderUser.name }) }),
+                        content: dialogLayout({ message: game.i18n.format("ITEM-PILES.Trade.Closed.Them", { user_name: this.rightTraderUser.name }) }),
                         callback: () => {
                         },
                         rejectClose: false
                     })
                 } else {
-                    lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Closed.Someone"), true);
+                    custom_warning(game.i18n.localize("ITEM-PILES.Trade.Closed.Someone"), true);
                 }
             }
         }

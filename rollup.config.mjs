@@ -50,6 +50,7 @@ export default () =>
                   // Suppress `a11y-missing-attribute` for missing href in <a> links.
                   // Foundry doesn't follow accessibility rules.
                   if (warning.message.includes(`<a> element should have an href attribute`)) { return; }
+                  if (warning.message.includes(`A form label must be associated with a control.`)) { return; }
 
                   // Let Rollup handle all other warnings normally.
                   handler(warning);

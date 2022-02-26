@@ -1,9 +1,9 @@
 import API from "./api.js";
-import CONSTANTS from "./constants.js";
+import { HOOKS, CONSTANTS, SOCKET_HANDLERS} from "./constants.js";
 import * as lib from "./lib/lib.js";
-import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
-import { TradeAPI } from "./trade-api.js";
-import HOOKS from "./hooks.js";
+import {itemPileSocket} from "./socket.js";
+import {TradeAPI} from "./trade-api.js";
+import {wait} from "./lib/utils";
 
 const chatHandler = {
 
@@ -20,7 +20,7 @@ const chatHandler = {
 
         $(document).on("click", ".item-piles-chat-card .item-piles-collapsible", async function () {
             if ($(this).attr("open")) return;
-            await lib.wait(25);
+            await wait(25);
             $(this).parent()[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
         });
 

@@ -1,9 +1,9 @@
-import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
-import * as lib from "./lib/lib.js";
-import { TradePromptDialog, TradeRequestDialog } from "./formapplications/trade-dialogs.js";
-import { TradingApp } from "./formapplications/trading-app.js";
+import {itemPileSocket} from "./socket.js";
+import {TradePromptDialog, TradeRequestDialog} from "./formapplications/trade-dialogs.js";
+import {TradingApp} from "./formapplications/trading-app.js";
 import API from "./api.js";
-import HOOKS from "./hooks.js";
+import { HOOKS, SOCKET_HANDLERS} from "./constants";
+import {custom_warning, dialogLayout, isResponsibleGM, wait} from "./lib/utils";
 
 export class TradeAPI {
 
@@ -16,7 +16,7 @@ export class TradeAPI {
         if (!users.length) {
             return new Dialog({
                 title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-                content: lib.dialogLayout({
+                content: dialogLayout({
                     title: game.i18n.localize("ITEM-PILES.Trade.NoActiveUsers.Title"),
                     message: game.i18n.localize("ITEM-PILES.Trade.NoActiveUsers.Content"),
                     icon: "fas fa-heart-broken"
@@ -60,7 +60,7 @@ export class TradeAPI {
             // If you're not the only owner of the actor you chose, make sure you picked the correct one
             const doContinue = await Dialog.confirm({
                 title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-                content: lib.dialogLayout({
+                content: dialogLayout({
                     message: actorOwner.active
                         ? game.i18n.format("ITEM-PILES.Trade.UserActiveCharacterWarning", {
                             actor_name: actor.name,
@@ -109,7 +109,7 @@ export class TradeAPI {
 
                 // If they declined, show warning
                 if (!data || !data.fullPrivateTradeId.includes(privateTradeId)) {
-                    return lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Declined"), true);
+                    return custom_warning(game.i18n.localize("ITEM-PILES.Trade.Declined"), true);
                 }
 
                 let traderActor = await fromUuid(data.actorUuid);
@@ -144,7 +144,7 @@ export class TradeAPI {
 
             }).catch((err) => {
                 // If the counterparty disconnected, show that and close dialog
-                lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true);
+                custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true);
                 cancelDialog.close()
             });
 
@@ -154,7 +154,7 @@ export class TradeAPI {
 
         // If the user was previously muted, wait for a random amount of time and respond with false
         if (mutedUsers.find(u => u === tradingUserId)) {
-            await lib.wait(Math.random() * 10000);
+            await wait(Math.random() * 10000);
             return false;
         }
 
@@ -216,7 +216,7 @@ export class TradeAPI {
 
         Dialog.prompt({
             title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-            content: lib.dialogLayout({
+            content: dialogLayout({
                 message: game.i18n.format("ITEM-PILES.Trade.CancelledRequest.Content", { user_name: game.users.get(userId).name })
             }),
             callback: () => {
@@ -242,14 +242,14 @@ export class TradeAPI {
 
         if (!user.active) {
             itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
-            return lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
+            return custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
         }
 
         const ongoingTrade = await itemPileSocket.executeAsUser(SOCKET_HANDLERS.TRADE_SPECTATE, tradeUser, tradeId);
 
         if (!ongoingTrade) {
             itemPileSocket.executeAsGM(SOCKET_HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
-            return lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
+            return custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
         }
 
         ongoingTrade[0].user = game.users.get(ongoingTrade[0].user);
@@ -305,7 +305,7 @@ export class TradeAPI {
     }
 
     static async _tradeCompleted(party_1, party_2, publicTradeId, isPrivate) {
-        if (!lib.isResponsibleGM()) return;
+        if (!isResponsibleGM()) return;
 
         if (party_1.items.length) {
             const items = party_1.items.map(item => {

@@ -1,20 +1,23 @@
-import CONSTANTS from "./constants.js";
-import HOOKS from "./hooks.js";
+import {CONSTANTS, HOOKS} from "./constants.js";
 
 import migrations from "./migrations.js";
 import chatHandler from "./chathandler.js";
 import API from "./api.js";
 import * as lib from "./lib/lib.js";
 
-import { ItemPileConfig } from "./formapplications/item-pile-config.js";
-import { registerSettings, checkSystem, registerHandlebarHelpers } from "./settings.js";
-import { registerSocket } from "./socket.js";
-import { registerLibwrappers } from "./libwrapper.js";
-import { registerHotkeysPre, registerHotkeysPost } from "./hotkeys.js";
 
-import { TradeAPI } from "./trade-api.js";
-import { MerchantApp } from "./formapplications/merchant-app.js";
-import { ItemConfig } from "./formapplications/item-config.js";
+
+//import {ItemPileConfig} from "./formapplications/item-pile-config.js";
+import {checkSystem, registerHandlebarHelpers, registerSettings} from "./settings.js";
+import {registerSocket} from "./socket.js";
+import {registerLibwrappers} from "./libwrapper.js";
+import {registerHotkeysPost, registerHotkeysPre} from "./hotkeys.js";
+
+import {TradeAPI} from "./trade-api.js";
+import {ItemConfig} from "./formapplications/item-config.js";
+import {custom_error, custom_warning, isGMConnected, isResponsibleGM} from "./lib/utils";
+import CurrenciesEditor from "./formapplications/editors/currency-editor/currencies-editor";
+import ItemPileConfig from "./formapplications/item-pile-config/item-pile-config";
 
 Hooks.once("init", async () => {
 
@@ -51,16 +54,16 @@ Hooks.once("ready", async () => {
     if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
         let word = "install and activate";
         if (game.modules.get('lib-wrapper')) word = "activate";
-        throw lib.custom_error(`Item Piles requires the 'libWrapper' module. Please ${word} it.`)
+        throw custom_error(`Item Piles requires the 'libWrapper' module. Please ${word} it.`)
     }
     if (!game.modules.get('socketlib')?.active && game.user.isGM) {
         let word = "install and activate";
         if (game.modules.get('socketlib')) word = "activate";
-        throw lib.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
+        throw custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
     }
 
-    if (!lib.isGMConnected()) {
-        lib.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
+    if (!isGMConnected()) {
+        custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
     }
 
     await migrations.migrate();
@@ -70,9 +73,13 @@ Hooks.once("ready", async () => {
     registerHandlebarHelpers();
     Hooks.callAll(HOOKS.READY);
 
-    //new CurrenciesEditor().render(true);
-    //new MerchantApp(game.actors.getName("Trade Tester")).render(true);
-    //new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
+    ItemPileConfig.show(canvas.tokens.get("Q5IxEiNxZtj0nSCC").document);
+    //new CurrenciesEditor().render(true)
+    // new PriceModifiersEditor().render(true);
+    // new MerchantApp(game.actors.getName("Trade Tester")).render(true);
+    // new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
+    // ItemSimilaritiesEditor.show()
+    // console.log('wot')
 
 });
 
@@ -106,7 +113,7 @@ const module = {
         return debounceManager.setDebounce(targetUuid, async function (uuid) {
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
             await API._rerenderItemPileInventoryApplication(uuid, deleted);
-            if (deleted || !lib.isResponsibleGM()) return;
+            if (deleted || !isResponsibleGM()) return;
             return API._refreshItemPile(uuid);
         })(targetUuid);
     },
@@ -120,7 +127,7 @@ const module = {
         return debounceManager.setDebounce(targetUuid, async function (uuid) {
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
             await API._rerenderItemPileInventoryApplication(uuid, deleted);
-            if (deleted || !lib.isResponsibleGM()) return;
+            if (deleted || !isResponsibleGM()) return;
             return API._refreshItemPile(uuid);
         })(targetUuid);
     },
@@ -141,7 +148,7 @@ const module = {
     },
 
     async _createPile(tokenDoc) {
-        if (!lib.isResponsibleGM()) return;
+        if (!isResponsibleGM()) return;
         if (!lib.isValidItemPile(tokenDoc)) return;
         setTimeout(async () => {
             const itemPileConfig = lib.getItemPileData(tokenDoc.actor)
@@ -149,7 +156,7 @@ const module = {
 
             const targetItems = getActorItems(tokenDoc.actor);
             const targetCurrencies = getFormattedActorCurrencies(tokenDoc.actor);
-            const data = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
+            const data = {data: itemPileConfig, items: targetItems, currencies: targetCurrencies};
 
             await tokenDoc.update({
                 "img": lib.getItemPileTokenImage(tokenDoc, data),
@@ -206,8 +213,8 @@ const module = {
 
     },
 
-    _renderPlayerList(app, html){
-        if(!game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") || !game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")) return;
+    _renderPlayerList(app, html) {
+        if (!game.settings.get(CONSTANTS.MODULE_NAME, "enableTrading") || !game.settings.get(CONSTANTS.MODULE_NAME, "showTradeButton")) return;
 
         const minimalUI = game.modules.get('minimal-ui')?.active;
         const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "")
@@ -236,7 +243,7 @@ const module = {
         })
     },
 
-    _insertItemHeaderButtons(itemSheet, buttons){
+    _insertItemHeaderButtons(itemSheet, buttons) {
 
         if (!game.user.isGM) return;
 
@@ -266,7 +273,7 @@ const module = {
                 const actorId = html[0].dataset.documentId;
                 const actor = game.actors.get(actorId);
                 const users = Array.from(game.users).filter(u => u.active).map(u => u.id);
-                return API.openItemPileInventory(actor, users, { useDefaultCharacter: true });
+                return API.openItemPileInventory(actor, users, {useDefaultCharacter: true});
             },
             condition: (html) => {
                 const actorId = html[0].dataset.documentId;

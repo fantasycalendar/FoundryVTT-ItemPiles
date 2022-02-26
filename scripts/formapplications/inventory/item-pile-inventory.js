@@ -1,10 +1,10 @@
-import CONSTANTS from "../constants.js";
-import API from "../api.js";
-import * as lib from "../lib/lib.js";
-import { isPileInventoryOpenForOthers } from "../socket.js";
-import HOOKS from "../hooks.js";
-import { ItemPileConfig } from "./item-pile-config.js";
-import DropCurrencyDialog from "./drop-currency-dialog.js";
+import { HOOKS, CONSTANTS} from "../../constants.js";
+import API from "../../api.js";
+import * as lib from "../../lib/lib.js";
+import { isPileInventoryOpenForOthers } from "../../socket.js";
+import {ItemPileConfig} from "../item-pile-config.js";
+import DropCurrencyDialog from "../drop-currency-dialog.js";
+import {custom_notify, findSimilarItem, getUuid} from "../../lib/utils";
 
 export class ItemPileInventory extends FormApplication {
 
@@ -77,8 +77,8 @@ export class ItemPileInventory extends FormApplication {
     }
 
     static async show(pile, recipient, overrides = {}) {
-        const pileUuid = lib.getUuid(pile);
-        const recipientUuid = recipient ? lib.getUuid(recipient) : false;
+        const pileUuid = getUuid(pile);
+        const recipientUuid = recipient ? getUuid(recipient) : false;
 
         let app = ItemPileInventory.getActiveAppFromPile(pileUuid, recipientUuid);
         if (app) {
@@ -145,7 +145,7 @@ export class ItemPileInventory extends FormApplication {
         for (let oldItem of this.items) {
 
             // If we find an item that was previously listed
-            const foundItem = lib.findSimilarItem(newItems, oldItem);
+            const foundItem = findSimilarItem(newItems, oldItem);
 
             // We update the previously listed attribute to reflect this
             oldItem.quantity = foundItem ? foundItem.quantity : 0;
@@ -542,7 +542,7 @@ export class ItemPileInventory extends FormApplication {
     async _updateObject(event, formData) {
 
         if (event.submitter.value === "update") {
-            lib.custom_notify("Item Pile successfully updated.");
+            custom_notify("Item Pile successfully updated.");
             await this.updatePile(formData);
             return this.render(true);
         }

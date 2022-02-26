@@ -1,5 +1,5 @@
-import CONSTANTS from "../constants.js";
-import * as lib from "../lib/lib.js";
+import {CONSTANTS} from "../constants.js";
+import {custom_warning} from "../lib/utils";
 
 export class TradePromptDialog extends FormApplication {
 
@@ -100,7 +100,7 @@ export class TradePromptDialog extends FormApplication {
 
     setActor(actor) {
         if (!actor.isOwner) {
-            return lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.ActorOwnerWarning"), true);
+            return custom_warning(game.i18n.localize("ITEM-PILES.Trade.ActorOwnerWarning"), true);
         }
         this.actor = actor;
         this.render(true);
@@ -154,7 +154,7 @@ export class TradeRequestDialog extends TradePromptDialog {
         this.interval = setInterval(() => {
             const user = game.users.get(this.tradingUser.id)
             if (!user.active) {
-                lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true)
+                custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true)
                 this.close();
             }
         }, 100)
@@ -191,7 +191,7 @@ export class TradeRequestDialog extends TradePromptDialog {
 
         this.timeout = setTimeout(() => {
             if (this._hasClosed) return;
-            lib.custom_warning(game.i18n.localize("ITEM-PILES.Trade.AutoDecline"), true)
+            custom_warning(game.i18n.localize("ITEM-PILES.Trade.AutoDecline"), true)
             html.find('button[name="decline"]').click();
         }, 35000)
 

@@ -142,7 +142,7 @@
         "SimilaritiesEditor": {
             "Title": "Item Similarities Editor",
             "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
-            "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", you temporary items are considered \"unique\".",
+            "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", your temporary items are considered \"unique\".",
             "Path": "Attribute path",
             "AddNew": "Add new attribute path",
             "Submit": "Submit item similarities"

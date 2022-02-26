@@ -1,4 +1,4 @@
-import CONSTANTS from "../constants.js";
+import { CONSTANTS } from "../constants.js";
 
 const template_path = `${CONSTANTS.PATH}templates/editors`;
 
@@ -84,7 +84,7 @@ class BaseConfigDialog extends FormApplication {
 
 }
 
-export class ItemFiltersEditor extends BaseConfigDialog {
+class ItemFiltersEditor extends BaseConfigDialog {
 
     settingName = "itemFilters"
 
@@ -111,7 +111,7 @@ export class ItemFiltersEditor extends BaseConfigDialog {
 
 }
 
-export class CurrenciesEditor extends BaseConfigDialog {
+class CurrenciesEditor extends BaseConfigDialog {
 
     settingName = "currencies"
 
@@ -133,7 +133,7 @@ export class CurrenciesEditor extends BaseConfigDialog {
     /** @inheritdoc */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
-            title: game.i18n.localize("ITEM-PILES.CurrenciesEditor.Title"),
+            title: game.i18n.localize("ITEM-PILES.PriceModifiersEditor.Title"),
             classes: ["sheet", "item-pile-currencies-editor"],
             template: `${template_path}/currencies-editor.html`
         });
@@ -166,7 +166,7 @@ export class CurrenciesEditor extends BaseConfigDialog {
 
 }
 
-export class ItemSimilaritiesEditor extends BaseConfigDialog {
+class ItemSimilaritiesEditor extends BaseConfigDialog {
 
     settingName = "itemSimilarities"
     baseData = ""
@@ -190,7 +190,7 @@ export class ItemSimilaritiesEditor extends BaseConfigDialog {
 
 }
 
-export class PriceModifiersEditor extends BaseConfigDialog {
+class PriceModifiersEditor extends BaseConfigDialog {
 
     baseData = {
         actor: "",

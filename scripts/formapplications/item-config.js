@@ -1,13 +1,12 @@
-import CONSTANTS from "../constants.js";
-import API from "../api.js";
+import {CONSTANTS} from "../constants.js";
 import * as lib from "../lib/lib.js";
-import { getItemFlagData } from "../lib/lib.js";
+import {getDocument} from "../lib/utils";
 
 export class ItemConfig extends FormApplication {
 
     constructor(item) {
         super();
-        this.document = lib.getDocument(item);
+        this.document = getDocument(item);
         this.itemFlagData = foundry.utils.mergeObject(CONSTANTS.ITEM_DEFAULTS, lib.getItemFlagData(this.document));
     }
 
@@ -27,7 +26,7 @@ export class ItemConfig extends FormApplication {
     }
 
     static show(item) {
-        const document = lib.getDocument(item);
+        const document = getDocument(item);
         for (let app of Object.values(ui.windows)) {
             if (app instanceof this && app.document === document) {
                 return app.render(false, { focus: true });

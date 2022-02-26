@@ -1,13 +1,8 @@
-import CONSTANTS from "../constants.js";
+import {CONSTANTS} from "../constants.js";
 import * as lib from "../lib/lib.js";
-import { hotkeyState } from "../hotkeys.js";
-import DropCurrencyDialog from "./drop-currency-dialog.js";
-import { itemPileSocket, SOCKET_HANDLERS } from "../socket.js";
-import { TradeAPI } from "../trade-api.js";
 import API from "../api.js";
-import { getMerchantItemsForActor } from "../lib/lib.js";
-import HOOKS from "../hooks.js";
-import { ItemPileConfig } from "./item-pile-config.js";
+import {ItemPileConfig} from "./item-pile-config.js";
+import {getUuid} from "../lib/utils";
 
 export class MerchantApp extends FormApplication {
 
@@ -43,8 +38,8 @@ export class MerchantApp extends FormApplication {
     }
 
     static async show(merchant, buyer = false) {
-        const merchantUuid = lib.getUuid(merchant);
-        const buyerUuid = buyer ? lib.getUuid(buyer) : false;
+        const merchantUuid = getUuid(merchant);
+        const buyerUuid = buyer ? getUuid(buyer) : false;
 
         let app = this.getActiveAppFromPile(merchantUuid, buyerUuid);
         if (app) {

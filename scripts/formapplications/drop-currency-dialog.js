@@ -1,4 +1,4 @@
-import CONSTANTS from "../constants.js";
+import { CONSTANTS } from "../constants.js";
 import * as lib from "../lib/lib.js";
 
 export default class DropCurrencyDialog extends FormApplication {

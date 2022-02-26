@@ -1,8 +1,8 @@
 import API from "./api.js";
-import CONSTANTS from "./constants.js";
-import { hotkeyActionState } from "./hotkeys.js";
-import * as lib from "./lib/lib.js";
-import { ItemPileInventory } from "./formapplications/inventory/item-pile-inventory.js";
+import {CONSTANTS} from "./constants.js";
+import {hotkeyActionState} from "./hotkeys.js";
+import {ItemPileInventory} from "./formapplications/inventory/item-pile-inventory.js";
+import {isVersion9} from "./lib/utils";
 
 export function registerLibwrappers() {
 
@@ -13,7 +13,7 @@ export function registerLibwrappers() {
         return wrapped(...args);
     });
 
-    const actorSidebarMethodName = lib.isVersion9() ? "_onClickDocumentName" : "_onClickEntityName";
+    const actorSidebarMethodName = isVersion9() ? "_onClickDocumentName" : "_onClickEntityName";
 
     libWrapper.register(CONSTANTS.MODULE_NAME, `SidebarDirectory.prototype.${actorSidebarMethodName}`, function (wrapped, event) {
 

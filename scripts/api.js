@@ -1,14 +1,28 @@
 import * as lib from "./lib/lib.js";
-import CONSTANTS from "./constants.js";
-import HOOKS from "./hooks.js";
-import { MODULE_SETTINGS } from "./settings.js";
+import { HOOKS, CONSTANTS, MODULE_SETTINGS, SOCKET_HANDLERS} from "./constants.js";
 
-import { itemPileSocket, SOCKET_HANDLERS } from "./socket.js";
-import { ItemPileInventory } from "./formapplications/inventory/item-pile-inventory.js";
+import {itemPileSocket} from "./socket.js";
+import {ItemPileInventory} from "./formapplications/inventory/item-pile-inventory.js";
 import DropItemDialog from "./formapplications/drop-item-dialog.js";
-import { hotkeyState } from "./hotkeys.js";
-import { MerchantApp } from "./formapplications/merchant-app.js";
-import { getItemPriceData } from "./lib/lib.js";
+import {hotkeyState} from "./hotkeys.js";
+import {MerchantApp} from "./formapplications/merchant-app.js";
+import {
+   custom_error,
+   custom_notify,
+   custom_warning,
+   debug,
+   distance_between_rect,
+   findSimilarItem,
+   getDocument,
+   getToken,
+   getTokensAtLocation,
+   getUuid,
+   grids_between_tokens,
+   is_real_number,
+   isGMConnected,
+   tokens_close_enough,
+   wait
+} from "./lib/utils";
 
 const preloadedFiles = new Set();
 
@@ -76,7 +90,7 @@ const API = {
      */
     async setActorClassType(inClassType) {
         if (typeof inClassType !== "string") {
-            throw lib.custom_error("setActorTypeClass | inClassType must be of type string");
+            throw custom_error("setActorTypeClass | inClassType must be of type string");
         }
         await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
         return game.settings.set(CONSTANTS.MODULE_NAME, "actorClassType", inClassType);
@@ -90,20 +104,20 @@ const API = {
      */
     async setCurrencies(inCurrencies) {
         if (!Array.isArray(inCurrencies)) {
-            throw lib.custom_error("setCurrencies | inCurrencies must be of type array");
+            throw custom_error("setCurrencies | inCurrencies must be of type array");
         }
         inCurrencies.forEach(currency => {
             if (typeof currency !== "object") {
-                throw lib.custom_error("setCurrencies | each entry in the inCurrencies array must be of type object");
+                throw custom_error("setCurrencies | each entry in the inCurrencies array must be of type object");
             }
             if (typeof currency.name !== "string") {
-                throw lib.custom_error("setCurrencies | currency.name must be of type string");
+                throw custom_error("setCurrencies | currency.name must be of type string");
             }
             if (typeof currency.currency !== "string") {
-                throw lib.custom_error("setCurrencies | currency.path must be of type string");
+                throw custom_error("setCurrencies | currency.path must be of type string");
             }
             if (currency.img && typeof currency.img !== "string") {
-                throw lib.custom_error("setCurrencies | currency.img must be of type string");
+                throw custom_error("setCurrencies | currency.img must be of type string");
             }
         })
         await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
@@ -118,7 +132,7 @@ const API = {
      */
     async setItemPriceAttribute(inAttribute) {
         if (typeof inAttribute !== "string") {
-            throw lib.custom_error("setItemPriceAttribute | inAttribute must be of type string");
+            throw custom_error("setItemPriceAttribute | inAttribute must be of type string");
         }
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemPriceAttribute", inAttribute);
     },
@@ -131,7 +145,7 @@ const API = {
      */
     async setItemQuantityAttribute(inAttribute) {
         if (typeof inAttribute !== "string") {
-            throw lib.custom_error("setItemQuantityAttribute | inAttribute must be of type string");
+            throw custom_error("setItemQuantityAttribute | inAttribute must be of type string");
         }
         await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
         return game.settings.set(CONSTANTS.MODULE_NAME, "itemQuantityAttribute", inAttribute);
@@ -145,14 +159,14 @@ const API = {
      */
     async setItemFilters(inFilters) {
         if (!Array.isArray(inFilters)) {
-            throw lib.custom_error("setItemFilters | inFilters must be of type array");
+            throw custom_error("setItemFilters | inFilters must be of type array");
         }
         inFilters.forEach(filter => {
             if (typeof filter?.path !== "string") {
-                throw lib.custom_error("setItemFilters | each entry in inFilters must have a \"path\" property with a value that is of type string");
+                throw custom_error("setItemFilters | each entry in inFilters must have a \"path\" property with a value that is of type string");
             }
             if (typeof filter?.filters !== "string") {
-                throw lib.custom_error("setItemFilters | each entry in inFilters must have a \"filters\" property with a value that is of type string");
+                throw custom_error("setItemFilters | each entry in inFilters must have a \"filters\" property with a value that is of type string");
             }
         });
         await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
@@ -167,11 +181,11 @@ const API = {
      */
     async setItemSimilarities(inPaths) {
         if (!Array.isArray(inPaths)) {
-            throw lib.custom_error("setItemSimilarities | inPaths must be of type array");
+            throw custom_error("setItemSimilarities | inPaths must be of type array");
         }
         inPaths.forEach(path => {
             if (typeof path !== "string") {
-                throw lib.custom_error("setItemSimilarities | each entry in inPaths must be of type string");
+                throw custom_error("setItemSimilarities | each entry in inPaths must be of type string");
             }
         });
         await game.settings.set(CONSTANTS.MODULE_NAME, "preconfiguredSystem", true);
@@ -196,9 +210,9 @@ const API = {
         if (pileActorName) {
             const pileActor = game.actors.getName(pileActorName);
             if (!pileActor) {
-                throw lib.custom_error(`There is no actor of the name "${pileActorName}"`, true);
+                throw custom_error(`There is no actor of the name "${pileActorName}"`, true);
             } else if (!lib.isValidItemPile(pileActor)) {
-                throw lib.custom_error(`The actor of name "${pileActorName}" is not a valid item pile actor.`, true);
+                throw custom_error(`The actor of name "${pileActorName}" is not a valid item pile actor.`, true);
             }
         }
 
@@ -231,10 +245,10 @@ const API = {
 
         const targetUuids = targets.map(target => {
             if (!(target instanceof Token || target instanceof TokenDocument)) {
-                throw lib.custom_error(`turnTokensIntoItemPiles | Target must be of type Token or TokenDocument`, true)
+                throw custom_error(`turnTokensIntoItemPiles | Target must be of type Token or TokenDocument`, true)
             }
-            const targetUuid = lib.getUuid(target);
-            if (!targetUuid) throw lib.custom_error(`turnTokensIntoItemPiles | Could not determine the UUID, please provide a valid target`, true)
+            const targetUuid = getUuid(target);
+            if (!targetUuid) throw custom_error(`turnTokensIntoItemPiles | Could not determine the UUID, please provide a valid target`, true)
             return targetUuid;
         })
 
@@ -323,10 +337,10 @@ const API = {
 
         const targetUuids = targets.map(target => {
             if (!(target instanceof Token || target instanceof TokenDocument)) {
-                throw lib.custom_error(`revertTokensFromItemPiles | Target must be of type Token or TokenDocument`, true)
+                throw custom_error(`revertTokensFromItemPiles | Target must be of type Token or TokenDocument`, true)
             }
-            const targetUuid = lib.getUuid(target);
-            if (!targetUuid) throw lib.custom_error(`revertTokensFromItemPiles | Could not determine the UUID, please provide a valid target`, true)
+            const targetUuid = getUuid(target);
+            if (!targetUuid) throw custom_error(`revertTokensFromItemPiles | Could not determine the UUID, please provide a valid target`, true)
             return targetUuid;
         })
 
@@ -397,8 +411,8 @@ const API = {
      * @return {Promise}
      */
     async openItemPile(target, interactingToken = false) {
-        const targetDocument = lib.getDocument(target);
-        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+        const targetDocument = getDocument(target);
+        const interactingTokenDocument = interactingToken ? getDocument(interactingToken) : false;
 
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
@@ -427,8 +441,8 @@ const API = {
      * @return {Promise}
      */
     async closeItemPile(target, interactingToken = false) {
-        const targetDocument = lib.getDocument(target);
-        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+        const targetDocument = getDocument(target);
+        const interactingTokenDocument = interactingToken ? getDocument(interactingToken) : false;
 
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
@@ -451,8 +465,8 @@ const API = {
      * @return {Promise}
      */
     async toggleItemPileClosed(target, interactingToken = false) {
-        const targetDocument = lib.getDocument(target);
-        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+        const targetDocument = getDocument(target);
+        const interactingTokenDocument = interactingToken ? getDocument(interactingToken) : false;
 
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
@@ -473,8 +487,8 @@ const API = {
      * @return {Promise}
      */
     async lockItemPile(target, interactingToken = false) {
-        const targetDocument = lib.getDocument(target);
-        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+        const targetDocument = getDocument(target);
+        const interactingTokenDocument = interactingToken ? getDocument(interactingToken) : false;
 
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
@@ -502,8 +516,8 @@ const API = {
      * @return {Promise}
      */
     async unlockItemPile(target, interactingToken = false) {
-        const targetDocument = lib.getDocument(target);
-        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+        const targetDocument = getDocument(target);
+        const interactingTokenDocument = interactingToken ? getDocument(interactingToken) : false;
 
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
@@ -521,8 +535,8 @@ const API = {
      * @return {Promise}
      */
     async toggleItemPileLocked(target, interactingToken = false) {
-        const targetDocument = lib.getDocument(target);
-        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+        const targetDocument = getDocument(target);
+        const interactingTokenDocument = interactingToken ? getDocument(interactingToken) : false;
 
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
@@ -541,8 +555,8 @@ const API = {
      * @return {Promise<boolean>}
      */
     async rattleItemPile(target, interactingToken = false) {
-        const targetDocument = lib.getDocument(target);
-        const interactingTokenDocument = interactingToken ? lib.getDocument(interactingToken) : false;
+        const targetDocument = getDocument(target);
+        const interactingTokenDocument = interactingToken ? getDocument(interactingToken) : false;
 
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer || !data?.locked) return false;
@@ -550,7 +564,7 @@ const API = {
         if (data.lockedSound) {
             AudioHelper.play({ src: data.lockedSound })
         }
-        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, lib.getUuid(targetDocument), data, lib.getUuid(interactingTokenDocument));
+        await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, getUuid(targetDocument), data, getUuid(interactingTokenDocument));
         return true;
     },
 
@@ -562,7 +576,7 @@ const API = {
      * @return {Boolean}
      */
     isItemPileLocked(target) {
-        const targetDocument = lib.getDocument(target);
+        const targetDocument = getDocument(target);
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         return data.locked;
@@ -576,7 +590,7 @@ const API = {
      * @return {Boolean}
      */
     isItemPileClosed(target) {
-        const targetDocument = lib.getDocument(target);
+        const targetDocument = getDocument(target);
         const data = lib.getItemPileData(targetDocument);
         if (!data?.enabled || !data?.isContainer) return false;
         return data.closed;
@@ -590,7 +604,7 @@ const API = {
      * @return {Boolean}
      */
     isItemPileContainer(target) {
-        const targetDocument = lib.getDocument(target);
+        const targetDocument = getDocument(target);
         const data = lib.getItemPileData(targetDocument);
         return data?.enabled && data?.isContainer;
     },
@@ -607,11 +621,11 @@ const API = {
      */
     async updateItemPile(target, newData, { interactingToken = false, tokenSettings = false } = {}) {
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
 
-        const interactingTokenUuid = interactingToken ? lib.getUuid(interactingToken) : false;
-        if (interactingToken && !interactingTokenUuid) throw lib.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
+        const interactingTokenUuid = interactingToken ? getUuid(interactingToken) : false;
+        if (interactingToken && !interactingTokenUuid) throw custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
 
         const hookResult = Hooks.call(HOOKS.PILE.PRE_UPDATE, target, newData, interactingToken, tokenSettings);
         if (hookResult === false) return;
@@ -638,7 +652,7 @@ const API = {
 
         const diff = foundry.utils.diffObject(oldData, data);
 
-        await lib.wait(15);
+        await wait(15);
 
         await lib.updateItemPileData(target, data, tokenSettings);
 
@@ -681,7 +695,7 @@ const API = {
      */
     async _updatedItemPile(targetUuid, diffData, interactingTokenUuid) {
 
-        const target = await lib.getToken(targetUuid);
+        const target = await getToken(targetUuid);
 
         const interactingToken = interactingTokenUuid ? await fromUuid(interactingTokenUuid) : false;
 
@@ -716,12 +730,12 @@ const API = {
      */
     async deleteItemPile(target) {
         if (!lib.isValidItemPile(target)) {
-            if (!targetUuid) throw lib.custom_error(`deleteItemPile | This is not an item pile, please provide a valid target`, true);
+            if (!targetUuid) throw custom_error(`deleteItemPile | This is not an item pile, please provide a valid target`, true);
         }
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`deleteItemPile | Could not determine the UUID, please provide a valid target`, true);
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`deleteItemPile | Could not determine the UUID, please provide a valid target`, true);
         if (!targetUuid.includes("Token")) {
-            throw lib.custom_error(`deleteItemPile | Please provide a Token or TokenDocument`, true);
+            throw custom_error(`deleteItemPile | Please provide a Token or TokenDocument`, true);
         }
         const hookResult = Hooks.call(HOOKS.PILE.PRE_DELETE, target);
         if (hookResult === false) return;
@@ -729,7 +743,7 @@ const API = {
     },
 
     async _deleteItemPile(targetUuid) {
-        const target = await lib.getToken(targetUuid);
+        const target = await getToken(targetUuid);
         return target.delete();
     },
 
@@ -737,7 +751,7 @@ const API = {
      * @deprecated
      */
     async openItemPileInventory(...args) {
-        lib.custom_warning("deprecation warning - openItemPileInventory has been renamed to renderItemPileInventory")
+        custom_warning("deprecation warning - openItemPileInventory has been renamed to renderItemPileInventory")
         return this.renderItemPileInterface(...args);
     },
 
@@ -755,40 +769,40 @@ const API = {
         useDefaultCharacter = true
     } = {}) {
 
-        const targetDocument = lib.getDocument(target);
-        const targetUuid = lib.getUuid(targetDocument);
-        if (!targetUuid) throw lib.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid target item pile`);
+        const targetDocument = getDocument(target);
+        const targetUuid = getUuid(targetDocument);
+        if (!targetUuid) throw custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid target item pile`);
 
         if (!lib.isValidItemPile(targetDocument)) {
-            throw lib.custom_error("renderItemPileInterface | This target is not a valid item pile")
+            throw custom_error("renderItemPileInterface | This target is not a valid item pile")
         }
 
         if (inspectingTarget && useDefaultCharacter) {
-            throw lib.custom_error("renderItemPileInterface | You cannot force users to use both their default character and a specific character to inspect the pile")
+            throw custom_error("renderItemPileInterface | You cannot force users to use both their default character and a specific character to inspect the pile")
         }
 
         if (!Array.isArray(userIds)) userIds = [userIds];
 
         if (!game.user.isGM) {
             if (userIds.length > 1 || !userIds.includes(game.user.id)) {
-                throw lib.custom_error(`renderItemPileInterface | You are not a GM, so you cannot force others to render an item pile's interface`);
+                throw custom_error(`renderItemPileInterface | You are not a GM, so you cannot force others to render an item pile's interface`);
             }
             userIds = [game.user.id];
         }
 
         for (const userId of userIds) {
             const user = game.users.get(userId);
-            if (!user) throw lib.custom_error(`renderItemPileInterface | No user with ID "${userId}" exists`);
+            if (!user) throw custom_error(`renderItemPileInterface | No user with ID "${userId}" exists`);
             if (useDefaultCharacter) {
                 if (!user.character) {
-                    lib.custom_warning(`renderItemPileInterface | User with id "${userId}" has no default character`, true);
+                    custom_warning(`renderItemPileInterface | User with id "${userId}" has no default character`, true);
                     return;
                 }
             }
         }
 
-        const inspectingTargetUuid = inspectingTarget ? lib.getUuid(inspectingTarget) : false;
-        if (inspectingTarget && !inspectingTargetUuid) throw lib.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid inspecting target`);
+        const inspectingTargetUuid = inspectingTarget ? getUuid(inspectingTarget) : false;
+        if (inspectingTarget && !inspectingTargetUuid) throw custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid inspecting target`);
 
         return itemPileSocket.executeForUsers(SOCKET_HANDLERS.RENDER_INTERFACE, userIds, targetUuid, { inspectingTargetUuid, useDefaultCharacter, remote: true })
     },
@@ -843,7 +857,7 @@ const API = {
      * @deprecated
      */
     getItemPileItems(target, itemFilters = false) {
-        lib.custom_warning("DEPRECATION WARNING - getItemPileItems has become getActorItems");
+        custom_warning("DEPRECATION WARNING - getItemPileItems has become getActorItems");
         return this.getActorItems(target, itemFilters);
     },
 
@@ -862,7 +876,7 @@ const API = {
      * @deprecated
      */
     getItemPileCurrencies(target) {
-        lib.custom_warning("DEPRECATION WARNING - getItemPileCurrencies has become getActorCurrencies");
+        custom_warning("DEPRECATION WARNING - getItemPileCurrencies has become getActorCurrencies");
         return this.getActorCurrencies(target);
     },
 
@@ -884,7 +898,7 @@ const API = {
      */
     async refreshItemPile(target) {
         if (!lib.isValidItemPile(target)) return;
-        const targetUuid = lib.getUuid(target);
+        const targetUuid = getUuid(target);
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REFRESH_PILE, targetUuid)
     },
 
@@ -903,7 +917,7 @@ const API = {
 
         return Promise.allSettled(targets.map(_target => {
             return new Promise(async (resolve) => {
-                const uuid = lib.getUuid(_target);
+                const uuid = getUuid(_target);
                 const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(uuid);
                 if (!shouldBeDeleted) {
                     await _target.update({
@@ -947,8 +961,8 @@ const API = {
 
         if (!lib.isValidItemPile(itemPile)) return false;
 
-        const itemPileUuid = lib.getUuid(itemPile);
-        if (!itemPileUuid) throw lib.custom_error(`SplitItemPileContents | Could not determine the UUID, please provide a valid item pile`, true)
+        const itemPileUuid = getUuid(itemPile);
+        if (!itemPileUuid) throw custom_error(`SplitItemPileContents | Could not determine the UUID, please provide a valid item pile`, true)
 
         const itemPileActor = itemPile?.actor ?? itemPile;
 
@@ -958,17 +972,17 @@ const API = {
             }
             targets.forEach(actor => {
                 if (!(actor instanceof TokenDocument || actor instanceof Actor)) {
-                    throw lib.custom_error("SplitItemPileContents | Each of the entries in targets must be of type TokenDocument or Actor")
+                    throw custom_error("SplitItemPileContents | Each of the entries in targets must be of type TokenDocument or Actor")
                 }
             })
             targets = targets.map(target => target?.character ?? target?.actor ?? target);
         }
 
         if (instigator && !(instigator instanceof TokenDocument || instigator instanceof Actor)) {
-            throw lib.custom_error("SplitItemPileContents | splitter must be of type TokenDocument or Actor")
+            throw custom_error("SplitItemPileContents | splitter must be of type TokenDocument or Actor")
         }
 
-        const actorUuids = (targets || lib.getPlayersForItemPile(itemPileActor).map(u => u.character)).map(actor => lib.getUuid(actor));
+        const actorUuids = (targets || lib.getPlayersForItemPile(itemPileActor).map(u => u.character)).map(actor => getUuid(actor));
 
         const hookResult = Hooks.call(HOOKS.PILE.PRE_SPLIT_INVENTORY, itemPile, targets, game.user.id, instigator);
         if (hookResult === false) return;
@@ -1090,8 +1104,8 @@ const API = {
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_ADD, target, items, interactionId);
         if (hookResult === false) return;
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
 
         const itemsToAdd = []
         items.forEach(itemData => {
@@ -1109,7 +1123,7 @@ const API = {
                 setProperty(item, API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity)
             }
 
-            const existingItems = mergeSimilarItems ? lib.findSimilarItem(itemsToAdd, item) : false;
+            const existingItems = mergeSimilarItems ? findSimilarItem(itemsToAdd, item) : false;
             if (existingItems) {
                 setProperty(existingItems, API.ITEM_QUANTITY_ATTRIBUTE, lib.getItemQuantity(existingItems) + lib.getItemQuantity(item))
             } else {
@@ -1119,7 +1133,7 @@ const API = {
         });
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`AddItems | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`AddItems | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, { interactionId });
@@ -1144,7 +1158,7 @@ const API = {
 
             let item = itemData?.item ?? itemData;
 
-            const foundItem = lib.findSimilarItem(targetActorItems, item);
+            const foundItem = findSimilarItem(targetActorItems, item);
 
             const incomingQuantity = Number(itemData?.quantity ?? lib.getItemQuantity(itemData));
 
@@ -1216,8 +1230,8 @@ const API = {
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_REMOVE, target, items, interactionId);
         if (hookResult === false) return;
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
 
         const targetActorItems = API.getActorItems(target);
 
@@ -1228,7 +1242,7 @@ const API = {
                 const itemId = typeof itemData === "string" ? itemData : itemData._id;
                 item = targetActorItems.find(actorItem => actorItem.id === itemId);
                 if (!item) {
-                    throw lib.custom_error(`RemoveItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
+                    throw custom_error(`RemoveItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
                 }
                 item = item.toObject();
             } else {
@@ -1241,7 +1255,7 @@ const API = {
                 }
                 let foundActorItem = targetActorItems.find(actorItem => actorItem.id === item._id);
                 if (!foundActorItem) {
-                    throw lib.custom_error(`RemoveItems | Could not find item with id "${item._id}" on target "${targetUuid}"`, true)
+                    throw custom_error(`RemoveItems | Could not find item with id "${item._id}" on target "${targetUuid}"`, true)
                 }
             }
 
@@ -1252,7 +1266,7 @@ const API = {
         });
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`RemoveItems | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`RemoveItems | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ITEMS, targetUuid, items, game.user.id, { interactionId });
@@ -1351,8 +1365,8 @@ const API = {
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, source, target, items, interactionId);
         if (hookResult === false) return;
 
-        const sourceUuid = lib.getUuid(source);
-        if (!sourceUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid source`, true)
+        const sourceUuid = getUuid(source);
+        if (!sourceUuid) throw custom_error(`TransferItems | Could not determine the UUID, please provide a valid source`, true)
 
         const sourceActorItems = API.getActorItems(source);
 
@@ -1363,7 +1377,7 @@ const API = {
                 const itemId = typeof itemData === "string" ? itemData : itemData._id;
                 item = sourceActorItems.find(actorItem => actorItem.id === itemId);
                 if (!item) {
-                    throw lib.custom_error(`TransferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`, true)
+                    throw custom_error(`TransferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`, true)
                 }
                 item = item.toObject();
             } else if(itemData instanceof Item) {
@@ -1376,7 +1390,7 @@ const API = {
 
             let foundActorItem = sourceActorItems.find(actorItem => actorItem.id === item._id);
             if (!foundActorItem) {
-                throw lib.custom_error(`TransferItems | Could not find item with id "${item._id}" on target "${sourceUuid}"`, true)
+                throw custom_error(`TransferItems | Could not find item with id "${item._id}" on target "${sourceUuid}"`, true)
             }
 
             return {
@@ -1385,11 +1399,11 @@ const API = {
             }
         });
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`TransferItems | Could not determine the UUID, please provide a valid target`, true)
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`TransferItems | Could not determine the UUID, please provide a valid target`, true)
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`TransferItems | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`TransferItems | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ITEMS, sourceUuid, targetUuid, items, game.user.id, { interactionId });
@@ -1455,22 +1469,22 @@ const API = {
         const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, source, target, itemFilters, interactionId);
         if (hookResult === false) return;
 
-        const sourceUuid = lib.getUuid(source);
-        if (!sourceUuid) throw lib.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid source`, true)
+        const sourceUuid = getUuid(source);
+        if (!sourceUuid) throw custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid source`, true)
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid target`, true)
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid target`, true)
 
         if (itemFilters) {
-            if (!Array.isArray(itemFilters)) throw lib.custom_error(`TransferAllItems | itemFilters must be of type array`);
+            if (!Array.isArray(itemFilters)) throw custom_error(`TransferAllItems | itemFilters must be of type array`);
             itemFilters.forEach(entry => {
-                if (typeof entry?.path !== "string") throw lib.custom_error(`TransferAllItems | each entry in the itemFilters must have a "path" property that is of type string`);
-                if (typeof entry?.filter !== "string") throw lib.custom_error(`TransferAllItems | each entry in the itemFilters must have a "filter" property that is of type string`);
+                if (typeof entry?.path !== "string") throw custom_error(`TransferAllItems | each entry in the itemFilters must have a "path" property that is of type string`);
+                if (typeof entry?.filter !== "string") throw custom_error(`TransferAllItems | each entry in the itemFilters must have a "filter" property that is of type string`);
             })
         }
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`TransferAllItems | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`TransferAllItems | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, {
@@ -1541,8 +1555,8 @@ const API = {
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, target, attributes, interactionId);
         if (hookResult === false) return;
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`AddAttributes | Could not determine the UUID, please provide a valid target`, true)
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`AddAttributes | Could not determine the UUID, please provide a valid target`, true)
 
         const targetActor = target instanceof TokenDocument
             ? target.actor
@@ -1551,15 +1565,15 @@ const API = {
         Object.entries(attributes).forEach(entry => {
             const [attribute, quantity] = entry;
             if (!hasProperty(targetActor.data, attribute)) {
-                throw lib.custom_error(`AddAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+                throw custom_error(`AddAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
             }
-            if (!lib.is_real_number(quantity) && quantity > 0) {
-                throw lib.custom_error(`AddAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+            if (!is_real_number(quantity) && quantity > 0) {
+                throw custom_error(`AddAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
             }
         });
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`AddAttributes | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`AddAttributes | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.ADD_ATTRIBUTE, targetUuid, attributes, game.user.id, { interactionId });
@@ -1624,8 +1638,8 @@ const API = {
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, target, attributes, interactionId);
         if (hookResult === false) return;
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`RemoveAttributes | Could not determine the UUID, please provide a valid target`, true)
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`RemoveAttributes | Could not determine the UUID, please provide a valid target`, true)
 
         const targetActor = target instanceof TokenDocument
             ? target.actor
@@ -1634,26 +1648,26 @@ const API = {
         if (Array.isArray(attributes)) {
             attributes.forEach(attribute => {
                 if (typeof attribute !== "string") {
-                    throw lib.custom_error(`RemoveAttributes | Each attribute in the array must be of type string`, true)
+                    throw custom_error(`RemoveAttributes | Each attribute in the array must be of type string`, true)
                 }
                 if (!hasProperty(targetActor.data, attribute)) {
-                    throw lib.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+                    throw custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
             });
         } else {
             Object.entries(attributes).forEach(entry => {
                 const [attribute, quantity] = entry;
                 if (!hasProperty(targetActor.data, attribute)) {
-                    throw lib.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+                    throw custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
-                if (!lib.is_real_number(quantity) && quantity > 0) {
-                    throw lib.custom_error(`RemoveAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+                if (!is_real_number(quantity) && quantity > 0) {
+                    throw custom_error(`RemoveAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
                 }
             });
         }
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`RemoveAttributes | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`RemoveAttributes | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.REMOVE_ATTRIBUTES, targetUuid, attributes, game.user.id, { interactionId });
@@ -1732,11 +1746,11 @@ const API = {
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, source, target, attributes, interactionId);
         if (hookResult === false) return;
 
-        const sourceUuid = lib.getUuid(source);
-        if (!sourceUuid) throw lib.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid source`, true)
+        const sourceUuid = getUuid(source);
+        if (!sourceUuid) throw custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid source`, true)
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid target`, true)
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid target`, true)
 
         const sourceActor = source instanceof TokenDocument
             ? source.actor
@@ -1749,32 +1763,32 @@ const API = {
         if (Array.isArray(attributes)) {
             attributes.forEach(attribute => {
                 if (typeof attribute !== "string") {
-                    throw lib.custom_error(`TransferAttributes | Each attribute in the array must be of type string`, true)
+                    throw custom_error(`TransferAttributes | Each attribute in the array must be of type string`, true)
                 }
                 if (!hasProperty(sourceActor.data, attribute)) {
-                    throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
+                    throw custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
                 }
                 if (!hasProperty(targetActor.data, attribute)) {
-                    throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+                    throw custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
             });
         } else {
             Object.entries(attributes).forEach(entry => {
                 const [attribute, quantity] = entry;
                 if (!hasProperty(sourceActor.data, attribute)) {
-                    throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
+                    throw custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
                 }
                 if (!hasProperty(targetActor.data, attribute)) {
-                    throw lib.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+                    throw custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
                 }
-                if (!lib.is_real_number(quantity) && quantity > 0) {
-                    throw lib.custom_error(`TransferAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+                if (!is_real_number(quantity) && quantity > 0) {
+                    throw custom_error(`TransferAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
                 }
             });
         }
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`TransferAttributes | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`TransferAttributes | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ATTRIBUTES, sourceUuid, targetUuid, attributes, game.user.id, { interactionId });
@@ -1842,14 +1856,14 @@ const API = {
         const hookResult = Hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, source, target, interactionId);
         if (hookResult === false) return;
 
-        const sourceUuid = lib.getUuid(source);
-        if (!sourceUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
+        const sourceUuid = getUuid(source);
+        if (!sourceUuid) throw custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`TransferAllAttributes | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`TransferAllAttributes | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_ALL_ATTRIBUTES, sourceUuid, targetUuid, game.user.id, { interactionId });
@@ -1925,22 +1939,22 @@ const API = {
         const hookResult = Hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, source, target, itemFilters, interactionId);
         if (hookResult === false) return;
 
-        const sourceUuid = lib.getUuid(source);
-        if (!sourceUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid source`, true)
+        const sourceUuid = getUuid(source);
+        if (!sourceUuid) throw custom_error(`TransferEverything | Could not determine the UUID, please provide a valid source`, true)
 
-        const targetUuid = lib.getUuid(target);
-        if (!targetUuid) throw lib.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid target`, true)
+        const targetUuid = getUuid(target);
+        if (!targetUuid) throw custom_error(`TransferEverything | Could not determine the UUID, please provide a valid target`, true)
 
         if (itemFilters) {
-            if (!Array.isArray(itemFilters)) throw lib.custom_error(`TransferEverything | itemFilters must be of type array`);
+            if (!Array.isArray(itemFilters)) throw custom_error(`TransferEverything | itemFilters must be of type array`);
             itemFilters.forEach(entry => {
-                if (typeof entry?.path !== "string") throw lib.custom_error(`TransferEverything | each entry in the itemFilters must have a "path" property that is of type string`);
-                if (typeof entry?.filter !== "string") throw lib.custom_error(`TransferEverything | each entry in the itemFilters must have a "filter" property that is of type string`);
+                if (typeof entry?.path !== "string") throw custom_error(`TransferEverything | each entry in the itemFilters must have a "path" property that is of type string`);
+                if (typeof entry?.filter !== "string") throw custom_error(`TransferEverything | each entry in the itemFilters must have a "filter" property that is of type string`);
             })
         }
 
         if (interactionId) {
-            if (typeof interactionId !== "string") throw lib.custom_error(`TransferEverything | interactionId must be of type string`);
+            if (typeof interactionId !== "string") throw custom_error(`TransferEverything | interactionId must be of type string`);
         }
 
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, {
@@ -2001,18 +2015,18 @@ const API = {
         const item = merchant.items.get(itemId);
 
         if(!item){
-            return lib.custom_warning(`Could not purchase ${item.name} from ${merchant.name} - merchant does not have this item`, true);
+            return custom_warning(`Could not purchase ${item.name} from ${merchant.name} - merchant does not have this item`, true);
         }
 
         const priceData = lib.getItemPriceData(item, merchant, buyer);
 
         if(getProperty(item.data, MODULE_SETTINGS.ITEM_QUANTITY_ATTRIBUTE) <= 0){
-            return lib.custom_warning(`Could not purchase ${item.name} from ${merchant.name} - merchant has no quantity left`, true);
+            return custom_warning(`Could not purchase ${item.name} from ${merchant.name} - merchant has no quantity left`, true);
         }
 
         const buyerCurrency = getProperty(buyer.data, priceData.path);
         if(buyerCurrency < priceData.cost){
-            lib.custom_warning(`Could not purchase ${item.name} from ${merchant.name} - not enough ${priceData.name} (lacking ${priceData.cost - buyerCurrency})`, true);
+            custom_warning(`Could not purchase ${item.name} from ${merchant.name} - not enough ${priceData.name} (lacking ${priceData.cost - buyerCurrency})`, true);
             return;
         }
 
@@ -2068,11 +2082,11 @@ const API = {
                     }
                     if (key.toLowerCase().includes("image")) {
                         preloadedFiles.add(value);
-                        lib.debug(`Preloaded image: ${value}`);
+                        debug(`Preloaded image: ${value}`);
                         await loadTexture(value);
                     } else if (key.toLowerCase().includes("sound")) {
                         preloadedFiles.add(value);
-                        lib.debug(`Preloaded sound: ${value}`);
+                        debug(`Preloaded sound: ${value}`);
                         await AudioHelper.preloadSound(value);
                     }
                     return resolve();
@@ -2080,7 +2094,7 @@ const API = {
             }));
         }
 
-        lib.debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
+        debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
 
         return true;
     },
@@ -2107,7 +2121,7 @@ const API = {
         const macro = game.macros.getName(pileData.macro);
 
         if (!macro) {
-            throw lib.custom_error(`Could not find macro with name "${pileData.macro}" on target with UUID ${target.uuid}`);
+            throw custom_error(`Could not find macro with name "${pileData.macro}" on target with UUID ${target.uuid}`);
         }
 
         // Reformat macro data to contain useful information
@@ -2144,20 +2158,11 @@ const API = {
 
         if (data.type !== "Item") return;
 
-        let itemData;
-        if (data.pack) {
-            const uuid = `Compendium.${data.pack}.${data.id}`;
-            const item = await fromUuid(uuid);
-            itemData = item.toObject();
-        } else if (data.id) {
-            itemData = game.items.get(data.id)?.toObject();
-        } else {
-            itemData = data.data;
-        }
+        const itemData = (await Item.fromDropData(data)).toObject();
 
         if (!itemData) {
             console.error(data);
-            throw lib.custom_error("Something went wrong when dropping this item!")
+            throw custom_error("Something went wrong when dropping this item!")
         }
 
         const dropData = {
@@ -2177,7 +2182,7 @@ const API = {
         }
 
         if (!dropData.source && !game.user.isGM) {
-            return lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
+            return custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
         }
 
         const pre_drop_determined_hook = Hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.position, dropData.itemData);
@@ -2198,14 +2203,14 @@ const API = {
             x = position[0];
             y = position[1];
 
-            droppableDocuments = lib.getTokensAtLocation({ x, y })
+            droppableDocuments = getTokensAtLocation({ x, y })
                 .map(token => token.document)
                 .filter(token => lib.isValidItemPile(token));
 
         }
 
         if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get('midi-qol', "DragDropTarget")) {
-            lib.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items")
+            custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items")
             return;
         }
 
@@ -2219,14 +2224,14 @@ const API = {
 
                     const targetToken = droppableDocuments[0];
 
-                    const distance = Math.floor(lib.distance_between_rect(sourceToken, targetToken.object) / canvas.grid.size) + 1
+                    const distance = Math.floor(distance_between_rect(sourceToken, targetToken.object) / canvas.grid.size) + 1
 
                     const pileData = lib.getItemPileData(targetToken);
 
                     const maxDistance = pileData.distance ? pileData.distance : Infinity;
 
                     if (distance > maxDistance) {
-                        lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
+                        custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
                         return;
                     }
                 }
@@ -2235,7 +2240,7 @@ const API = {
             droppableDocuments = droppableDocuments.filter(token => !API.isItemPileLocked(token));
 
             if (!droppableDocuments.length) {
-                lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
+                custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
                 return;
             }
         }
@@ -2243,7 +2248,7 @@ const API = {
         const disallowedType = lib.isItemInvalid(droppableDocuments?.[0], itemData);
         if (disallowedType) {
             if (!game.user.isGM) {
-                return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
+                return custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
             }
             if (!hotkeyState.shiftDown) {
                 const force = await Dialog.confirm({
@@ -2289,8 +2294,8 @@ const API = {
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.DROP_ITEMS, {
             userId: game.user.id,
             sceneId: canvas.scene.id,
-            sourceUuid: lib.getUuid(dropData.source),
-            targetUuid: lib.getUuid(dropData.target),
+            sourceUuid: getUuid(dropData.source),
+            targetUuid: getUuid(dropData.target),
             position: dropData.position,
             itemData: dropData.itemData
         });
@@ -2374,7 +2379,7 @@ const API = {
 
             if (!pileActor) {
 
-                lib.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
+                custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
                 const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
@@ -2441,7 +2446,7 @@ const API = {
 
         const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
 
-        return lib.getUuid(tokenDocument);
+        return getUuid(tokenDocument);
 
     },
 
@@ -2454,12 +2459,12 @@ const API = {
 
         const pileToken = pileDocument.object;
 
-        if (!lib.isGMConnected()) {
-            lib.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
+        if (!isGMConnected()) {
+            custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
             return;
         }
 
-        lib.debug(`Clicked: ${pileDocument.uuid}`);
+        debug(`Clicked: ${pileDocument.uuid}`);
 
         const data = lib.getItemPileData(pileDocument);
 
@@ -2480,11 +2485,11 @@ const API = {
         }
 
         validTokens = validTokens.filter(token => token.owner && token.document !== pileDocument).filter(token => {
-            return lib.tokens_close_enough(pileToken, token, maxDistance) || game.user.isGM;
+            return tokens_close_enough(pileToken, token, maxDistance) || game.user.isGM;
         });
 
         if (!validTokens.length && !game.user.isGM && maxDistance !== Infinity) {
-            lib.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
+            custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
             return;
         }
 
@@ -2494,7 +2499,7 @@ const API = {
                 interactingActor = _token.actor;
             } else {
                 validTokens.sort((potentialTargetA, potentialTargetB) => {
-                    return lib.grids_between_tokens(pileToken, potentialTargetA) - lib.grids_between_tokens(pileToken, potentialTargetB);
+                    return grids_between_tokens(pileToken, potentialTargetA) - grids_between_tokens(pileToken, potentialTargetB);
                 })
                 interactingActor = validTokens[0].actor;
             }
@@ -2505,12 +2510,12 @@ const API = {
         if (data.isContainer && interactingActor) {
 
             if (data.locked && !game.user.isGM) {
-                lib.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
+                debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
                 return API.rattleItemPile(pileDocument, interactingActor);
             }
 
             if (data.closed) {
-                lib.debug(`Opened item pile with UUID ${pileDocument.uuid}`);
+                debug(`Opened item pile with UUID ${pileDocument.uuid}`);
                 await API.openItemPile(pileDocument, interactingActor);
             }
 

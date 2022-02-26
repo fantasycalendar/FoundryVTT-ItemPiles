@@ -1,29 +1,24 @@
-
 import { TJSDialog }          from '@typhonjs-fvtt/runtime/svelte/application';
 
-import ItemPileCurrenciesEditorShell from './item-pile-currencies-editor.svelte';
-import CONSTANTS from "../../constants";
+import PriceModifiersShell from './price-modifiers-editor.svelte';
 
-export default class ItemPileCurrenciesEditor extends TJSDialog {
+export default class PriceModifiersEditor extends TJSDialog {
 
-   constructor(data = false, options, dialogData = {}) {
-      const currencies = data || game.settings.get(CONSTANTS.MODULE_NAME, "currencies")
-      const primary_currency = currencies.indexOf(currencies.find(currency => currency.primary))
+   constructor(priceModifiers, options, dialogData = {}) {
       super({
          ...dialogData,
-         title: game.i18n.localize("ITEM-PILES.CurrenciesEditor.Title"),
+         title: "ITEM-PILES.PriceModifiersEditor.Title",
          zIndex: 50,
          content: {
-            class: ItemPileCurrenciesEditorShell,
+            class: PriceModifiersShell,
             props: {
-               primary_currency,
-               currencies
+               priceModifiers
             }
          },
          buttons: {
             save: {
                icon: 'fas fa-save',
-               label: "ITEM-PILES.CurrenciesEditor.Submit",
+               label: "ITEM-PILES.PriceModifiersEditor.Submit",
                onclick: "requestSubmit"
             },
             no: {
@@ -42,14 +37,10 @@ export default class ItemPileCurrenciesEditor extends TJSDialog {
       }, { width: 630, height: "auto", ...options });
    }
 
-   submit(data){
-      return game.settings.set(CONSTANTS.MODULE_NAME, "currencies", data);
-   }
-
    static async show(data = false, options = {}, dialogData = {}) {
       return new Promise((resolve) => {
          options.resolve = resolve;
-         new this(data, options, dialogData);
+         new this(data, options, dialogData).render(true);
       })
    }
 }

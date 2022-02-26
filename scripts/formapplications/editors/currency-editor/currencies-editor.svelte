@@ -1,13 +1,13 @@
 <script>
    import { getContext } from 'svelte';
    import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-   import FilePicker from "../components/FilePicker.svelte";
+   import FilePicker from "../../components/FilePicker.svelte";
 
    const { application } = getContext('external');
 
    let form;
-   let hovering = false;
-   let dragging = false;
+   let hovering = null;
+   let dragging = null;
 
    export let currencies;
    export let primary_currency;
@@ -30,6 +30,7 @@
    }
 
    function drop(event, target){
+      if(dragging !== null) return;
       event.dataTransfer.dropEffect = 'move';
       const start = parseInt(event.dataTransfer.getData("text/plain"));
       const newCurrencies = currencies;
@@ -87,9 +88,9 @@
       </tr>
       {#each currencies as { primary, name, exchange, path, img }, index (index)}
          <tr
-          class:is-active={hovering === index}
+          class:is-active={hovering === index && dragging !== null}
           class:is-dragging={dragging === index}
-          on:dragenter={() => hovering = index}
+          on:dragenter={() => hovering = index && dragging !== null}
           on:drop|preventDefault={event => drop(event, index)}
          >
             <td class="small">
@@ -104,7 +105,7 @@
             <td><input type="text" required placeholder="Gold Pieces" bind:value="{name}"/></td>
             <td class="small"><input type="number" required step="0.0000000001" bind:value="{exchange}" /></td>
             <td><input type="text" required placeholder="data.currency.gp" bind:value="{path}"/></td>
-            <td><FilePicker index="{index}" bind:img="{img}" showImg=true/></td>
+            <td><FilePicker bind:value="{img}" type="imagevideo" placeholder="images/image.png"/></td>
             <td class="small"><button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button></td>
          </tr>
       {/each}
@@ -116,10 +117,12 @@
 <style lang="scss">
 
    table {
-      vertical-align:middle;
+
+      td {
+         vertical-align: middle;
+      }
 
       tr{
-         border-spacing: 15px;
 
          &.is-active {
             background-color: #3273dc;
