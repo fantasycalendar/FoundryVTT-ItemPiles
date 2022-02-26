@@ -1,12 +1,14 @@
 import CONSTANTS from "../constants.js";
 import API from "../api.js";
 import * as lib from "../lib/lib.js";
+import { getItemFlagData } from "../lib/lib.js";
 
 export class ItemConfig extends FormApplication {
 
     constructor(item) {
         super();
         this.document = lib.getDocument(item);
+        this.itemFlagData = foundry.utils.mergeObject(CONSTANTS.ITEM_DEFAULTS, lib.getItemFlagData(this.document));
     }
 
     /** @inheritdoc */
@@ -38,7 +40,7 @@ export class ItemConfig extends FormApplication {
 
     async getData(options) {
         let data = super.getData(options);
-        data.enabled = true;
+        data.flagData = foundry.utils.mergeObject(foundry.utils.duplicate(data), foundry.utils.duplicate(this.itemFlagData));
         return data;
     }
 
@@ -47,7 +49,15 @@ export class ItemConfig extends FormApplication {
     }
 
     async _updateObject(event, formData) {
-        console.log(formData);
+
+
+        const itemFlagData = {};
+        for (let [path, value] of Object.entries(formData)) {
+            setProperty(itemFlagData, path, value)
+        }
+
+        this.document.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.ITEM_FLAGS, itemFlagData);
+
     }
 
 }

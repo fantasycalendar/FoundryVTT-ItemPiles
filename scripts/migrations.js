@@ -68,7 +68,7 @@ const migrations = {
 
             const updates = tokens.map(token => {
 
-                let pileData = token.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
+                let pileData = token.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_FLAGS);
 
                 if(!pileData) return false;
 
@@ -86,8 +86,8 @@ const migrations = {
 
                 return {
                     "_id": token.id,
-                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileData,
-                    [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileData
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileData,
+                    [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileData
                 };
 
             }).filter(Boolean);
@@ -98,7 +98,7 @@ const migrations = {
 
         await game.actors.updateAll((actor) => {
 
-            let pileData = actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
+            let pileData = actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_FLAGS);
 
             const pileVersion = pileData?.flagVersion || "1.0.0";
 
@@ -112,12 +112,12 @@ const migrations = {
             pileData.flagVersion = this.latestFlagVersion;
 
             return {
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileData,
-                [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileData
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileData,
+                [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileData
             };
 
         }, (actor) => {
-            let pileData = actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
+            let pileData = actor.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_FLAGS);
             if(!pileData) return false;
             const pileVersion = pileData?.flagVersion || "1.0.0";
             return pileVersion !== this.latestFlagVersion;

@@ -203,7 +203,7 @@ const chatHandler = {
         messages.reverse()
 
         for (let [index, message] of messages.entries()) {
-            const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
+            const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_FLAGS);
             if (flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
                 return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
             }
@@ -223,7 +223,7 @@ const chatHandler = {
             content: chatCardHtml,
             flavor: "Item Piles",
             speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: {
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: {
                 source: sourceUuid,
                 target: targetUuid,
                 items: items,
@@ -253,7 +253,7 @@ const chatHandler = {
 
     async _updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId) {
 
-        const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA);
+        const flags = message.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_FLAGS);
 
         const newItems = this._matchEntries(flags.items, items);
         const newCurrencies = this._matchEntries(flags.currencies, currencies);
@@ -272,9 +272,9 @@ const chatHandler = {
 
         return message.update({
             content: chatCardHtml,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.interactionId`]: interactionId,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.items`]: newItems,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}.currencies`]: newCurrencies,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}.interactionId`]: interactionId,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}.items`]: newItems,
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}.currencies`]: newCurrencies,
         });
 
     },

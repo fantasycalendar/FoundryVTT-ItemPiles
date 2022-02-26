@@ -135,7 +135,7 @@ const module = {
     async _preCreatePile(document) {
         if (!document.isLinked) {
             document.data.update({
-                [`actorData.flags.${CONSTANTS.MODULE_NAME}.-=${CONSTANTS.SHARING_DATA}`]: null
+                [`actorData.flags.${CONSTANTS.MODULE_NAME}.-=${CONSTANTS.SHARING_FLAGS}`]: null
             });
         }
     },
@@ -155,7 +155,7 @@ const module = {
                 "img": lib.getItemPileTokenImage(tokenDoc, data),
                 "scale": lib.getItemPileTokenScale(tokenDoc, data),
                 "name": lib.getItemPileName(tokenDoc, data),
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: itemPileConfig
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: itemPileConfig
             });
             await API._initializeItemPile(tokenDoc);
         }, 50)

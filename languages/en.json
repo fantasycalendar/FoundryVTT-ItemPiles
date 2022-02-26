@@ -157,7 +157,10 @@
             "Submit": "Submit filters"
         },
         "ItemConfig": {
-            "Title": "Item Configuration"
+            "Title": "Item Configuration",
+            "Update": "Update Item",
+            "Override": "Override Cost",
+            "OverrideExplanation": "Toggles whether this item should have its price overridden."
         },
         "ItemPileConfig": {
             "Title": "Item Pile Configuration",

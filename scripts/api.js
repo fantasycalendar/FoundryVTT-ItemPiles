@@ -279,15 +279,15 @@ const API = {
             tokenUpdateGroups[sceneId].push({
                 "_id": tokenId,
                 ...tokenSettings,
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings,
-                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileSettings,
+                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileSettings
             });
 
             if (target.isLinked) {
                 if (actorUpdateGroups[target.actor.id]) continue;
                 actorUpdateGroups[target.actor.id] = {
                     "_id": target.actor.id,
-                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileSettings
                 }
             }
         }
@@ -359,15 +359,15 @@ const API = {
             tokenUpdateGroups[sceneId].push({
                 "_id": tokenId,
                 ...tokenSettings,
-                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings,
-                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
+                [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileSettings,
+                [`actorData.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileSettings
             });
 
             if (target.isLinked) {
                 if (actorUpdateGroups[target.actor.id]) continue;
                 actorUpdateGroups[target.actor.id] = {
                     "_id": target.actor.id,
-                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileSettings
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileSettings
                 }
             }
 
@@ -2389,7 +2389,7 @@ const API = {
                     name: "Default Item Pile",
                     type: game.settings.get(CONSTANTS.MODULE_NAME, "actorClassType"),
                     img: "icons/svg/item-bag.svg",
-                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileDataDefaults
+                    [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileDataDefaults
                 });
 
                 await pileActor.update({
@@ -2399,7 +2399,7 @@ const API = {
                         bar1: { attribute: "" },
                         vision: false,
                         displayName: 50,
-                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: pileDataDefaults
+                        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: pileDataDefaults
                     }
                 })
 

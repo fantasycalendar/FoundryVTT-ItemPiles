@@ -1,8 +1,8 @@
 const CONSTANTS = {
     MODULE_NAME: "item-piles",
-    PILE_DATA: "data",
-    SHARING_DATA: "sharing",
-    ITEM_DATA: "item",
+    PILE_FLAGS: "data",
+    SHARING_FLAGS: "sharing",
+    ITEM_FLAGS: "item",
     PILE_DEFAULTS: {
         // Core settings
         enabled: false,
@@ -57,6 +57,9 @@ const CONSTANTS = {
                 minute: 0
             }
         },
+    },
+    ITEM_DEFAULTS: {
+        override: false
     }
 }
 

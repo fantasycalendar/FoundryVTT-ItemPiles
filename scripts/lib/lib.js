@@ -156,20 +156,23 @@ export function dialogLayout({ title="Item Piles", message, icon = "fas fa-excla
     `;
 }
 
+export function getItemFlagData(item){
+    return getFlagData(getDocument(item), CONSTANTS.ITEM_FLAGS, CONSTANTS.ITEM_DEFAULTS);
+}
 
 export function getItemPileData(target) {
     let inDocument = getDocument(target);
     if (inDocument instanceof TokenDocument) {
         inDocument = inDocument?.actor;
     }
-    try {
-        let data = foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.PILE_DATA));
-        if (!data) return {};
-        let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
-        return foundry.utils.mergeObject(defaults, data);
-    } catch (err) {
-        return {};
-    }
+    return getFlagData(inDocument, CONSTANTS.PILE_FLAGS, CONSTANTS.PILE_DEFAULTS);
+}
+
+function getFlagData(inDocument, flag, defaults){
+    defaults = foundry.utils.duplicate(defaults);
+    const flags = inDocument.getFlag(CONSTANTS.MODULE_NAME, flag) ?? {};
+    const data = foundry.utils.duplicate(flags);
+    return foundry.utils.mergeObject(defaults, data);
 }
 
 export function getItemPileTokenImage(target, { data = false, items = false, currencies = false } = {}) {
@@ -450,15 +453,15 @@ export async function updateItemPileData(target, flagData, tokenData) {
         return {
             "_id": tokenDocument.id,
             ...newTokenData,
-            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData
+            [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: flagData
         }
     });
 
     await canvas.scene.updateEmbeddedDocuments("Token", updates);
 
     return documentActor.update({
-        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData,
-        [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_DATA}`]: flagData
+        [`flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: flagData,
+        [`token.flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.PILE_FLAGS}`]: flagData
     });
 
 }
@@ -478,7 +481,7 @@ export function getItemPileSharingData(target) {
     if (inDocument instanceof TokenDocument) {
         inDocument = inDocument?.actor;
     }
-    return foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA) ?? {});
+    return foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_FLAGS) ?? {});
 }
 
 export function updateItemPileSharingData(target, data) {
@@ -486,9 +489,9 @@ export function updateItemPileSharingData(target, data) {
     if (inDocument instanceof TokenDocument) {
         inDocument = inDocument?.actor;
     }
-    const sharingData = foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA) ?? {});
+    const sharingData = foundry.utils.duplicate(inDocument.getFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_FLAGS) ?? {});
     const finalData = foundry.utils.mergeObject(sharingData, data);
-    return inDocument.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA, finalData);
+    return inDocument.setFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_FLAGS, finalData);
 }
 
 export function clearItemPileSharingData(target) {
@@ -496,7 +499,7 @@ export function clearItemPileSharingData(target) {
     if (inDocument instanceof TokenDocument) {
         inDocument = inDocument?.actor;
     }
-    return inDocument.unsetFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_DATA);
+    return inDocument.unsetFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_FLAGS);
 }
 
 export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [], currencies = [] } = {}) {
@@ -783,7 +786,7 @@ export function getItemPriceData(item, merchant = false, actor = false) {
 
     const itemData = item instanceof Item ? item.data : item;
 
-    const price = getProperty(itemData, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.ITEM_DATA}`);
+    const price = getProperty(itemData, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.ITEM_FLAGS}`);
 
     if(price){
         price.originalCost = price.cost;
