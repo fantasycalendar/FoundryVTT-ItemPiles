@@ -2,9 +2,9 @@ import { HOOKS, CONSTANTS} from "../../constants.js";
 import API from "../../api.js";
 import * as lib from "../../lib/lib.js";
 import { isPileInventoryOpenForOthers } from "../../socket.js";
-import {ItemPileConfig} from "../item-pile-config.js";
 import DropCurrencyDialog from "../drop-currency-dialog.js";
 import {custom_notify, findSimilarItem, getUuid} from "../../lib/utils";
+import ItemPileConfig from "../item-pile-config/item-pile-config";
 
 export class ItemPileInventory extends FormApplication {
 

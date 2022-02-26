@@ -1,8 +1,8 @@
 import {CONSTANTS} from "../constants.js";
 import * as lib from "../lib/lib.js";
 import API from "../api.js";
-import {ItemPileConfig} from "./item-pile-config.js";
 import {getUuid} from "../lib/utils";
+import ItemPileConfig from "./item-pile-config/item-pile-config";
 
 export class MerchantApp extends FormApplication {
 

@@ -7,7 +7,6 @@ import * as lib from "./lib/lib.js";
 
 
 
-//import {ItemPileConfig} from "./formapplications/item-pile-config.js";
 import {checkSystem, registerHandlebarHelpers, registerSettings} from "./settings.js";
 import {registerSocket} from "./socket.js";
 import {registerLibwrappers} from "./libwrapper.js";
@@ -73,7 +72,7 @@ Hooks.once("ready", async () => {
     registerHandlebarHelpers();
     Hooks.callAll(HOOKS.READY);
 
-    ItemPileConfig.show(canvas.tokens.get("Q5IxEiNxZtj0nSCC").document);
+    // ItemPileConfig.show(canvas.tokens.get("Q5IxEiNxZtj0nSCC").document);
     //new CurrenciesEditor().render(true)
     // new PriceModifiersEditor().render(true);
     // new MerchantApp(game.actors.getName("Trade Tester")).render(true);
