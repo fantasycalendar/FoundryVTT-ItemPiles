@@ -1,7 +1,7 @@
-import { CONSTANTS, MODULE_SETTINGS } from "../constants.js";
-import { findSimilarItem, getDocument, getUuid } from "./utils.js";
+import {CONSTANTS, MODULE_SETTINGS} from "../constants.js";
+import {getDocument, getUuid} from "./utils.js";
 
-export function getItemFlagData(item){
+export function getItemFlagData(item) {
     return getFlagData(getDocument(item), CONSTANTS.ITEM_FLAGS, CONSTANTS.ITEM_DEFAULTS);
 }
 
@@ -13,14 +13,14 @@ export function getItemPileData(target) {
     return getFlagData(inDocument, CONSTANTS.PILE_FLAGS, CONSTANTS.PILE_DEFAULTS);
 }
 
-function getFlagData(inDocument, flag, defaults){
+function getFlagData(inDocument, flag, defaults) {
     defaults = foundry.utils.duplicate(defaults);
     const flags = inDocument.getFlag(CONSTANTS.MODULE_NAME, flag) ?? {};
     const data = foundry.utils.duplicate(flags);
     return foundry.utils.mergeObject(defaults, data);
 }
 
-export function getItemPileTokenImage(target, { data = false, items = false, currencies = false } = {}) {
+export function getItemPileTokenImage(target, {data = false, items = false, currencies = false} = {}) {
 
     const pileDocument = getDocument(target);
 
@@ -70,7 +70,7 @@ export function getItemPileTokenImage(target, { data = false, items = false, cur
 
 }
 
-export function getItemPileTokenScale(target, { data = false, items = false, currencies = false } = {}) {
+export function getItemPileTokenScale(target, {data = false, items = false, currencies = false} = {}) {
 
     const pileDocument = getDocument(target);
 
@@ -94,7 +94,7 @@ export function getItemPileTokenScale(target, { data = false, items = false, cur
 
 }
 
-export function getItemPileName(target, { data = false, items = false, currencies = false } = {}) {
+export function getItemPileName(target, {data = false, items = false, currencies = false} = {}) {
 
     const pileDocument = getDocument(target);
 
@@ -122,11 +122,32 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
 }
 
+export function findSimilarItem(items, findItem) {
+
+    const itemSimilarities = MODULE_SETTINGS.ITEM_SIMILARITIES;
+
+    const findItemId = findItem?.id ?? findItem?._id;
+
+    return items.find(item => {
+        const itemId = item.id ?? item._id;
+        if (itemId === findItemId) {
+            return true;
+        }
+
+        const itemData = item instanceof Item ? item.data : item;
+        for (const path of itemSimilarities) {
+            if (getProperty(itemData, path) !== getProperty(findItem, path)) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+
 
 export function getActorItems(target, itemFilters = false) {
-
-    const pileItemFilters = itemFilters || getActorItemFilters(target);
-
+    const pileItemFilters = itemFilters ? itemFilters : getActorItemFilters(target)
     const inDocument = getDocument(target);
     const targetActor = inDocument instanceof TokenDocument
         ? inDocument.actor
@@ -144,7 +165,7 @@ export function getPlayersForItemPile(target) {
 }
 
 export function isItemInvalid(target, item, itemFilters = false) {
-    const pileItemFilters = itemFilters || getActorItemFilters(target);
+    const pileItemFilters = itemFilters ? itemFilters : getActorItemFilters(target)
     const itemData = item instanceof Item ? item.data : item;
     for (const filter of pileItemFilters) {
         if (!hasProperty(itemData, filter.path)) continue;
@@ -157,7 +178,7 @@ export function isItemInvalid(target, item, itemFilters = false) {
 }
 
 export function getActorItemFilters(target) {
-    if (!target) return MODULE_SETTINGS.ITEM_FILTERS;
+    if (!target) return cleanItemFilters(foundry.utils.duplicate(MODULE_SETTINGS.ITEM_FILTERS));
     const inDocument = getDocument(target);
     const pileData = getItemPileData(inDocument);
     return isValidItemPile(inDocument) && pileData?.overrideItemFilters
@@ -174,7 +195,9 @@ export function getActorItemFilters(target) {
 export function cleanItemFilters(itemFilters) {
     return itemFilters ? foundry.utils.duplicate(itemFilters).map(filter => {
         filter.path = filter.path.trim();
-        filter.filters = new Set(filter.filters.split(',').map(string => string.trim()));
+        filter.filters = Array.isArray(filter.filters) ? filter.filters
+            : filter.filters.split(',').map(string => string.trim());
+        filter.filters = new Set(filter.filters)
         return filter;
     }) : [];
 }
@@ -211,14 +234,14 @@ export function getActorCurrencyList(target) {
     });
 }
 
-export function getActorCurrencies(target){
+export function getActorCurrencies(target) {
     const inDocument = getDocument(target);
     return Object.fromEntries(getActorCurrencies(inDocument).map(currency => {
         return [currency, getProperty(currency, target)];
     }))
 }
 
-export function getFormattedActorCurrencies(target, { currencyList = false, getAll = false } = {}) {
+export function getFormattedActorCurrencies(target, {currencyList = false, getAll = false} = {}) {
     const inDocument = getDocument(target);
     const targetActor = inDocument?.actor ?? inDocument;
     const currencies = currencyList || getActorCurrencyList(targetActor);
@@ -272,9 +295,9 @@ export async function updateItemPileData(target, flagData, tokenData) {
     const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
 
     const targetItems = getActorItems(documentActor, flagData.itemFilters);
-    const targetCurrencies = getFormattedActorCurrencies(documentActor, { currencyList: flagData.currencies });
+    const targetCurrencies = getFormattedActorCurrencies(documentActor, {currencyList: flagData.currencies});
 
-    const data = { data: flagData, items: targetItems, currencies: targetCurrencies };
+    const data = {data: flagData, items: targetItems, currencies: targetCurrencies};
 
     const updates = documentTokens.map(tokenDocument => {
         const newTokenData = foundry.utils.mergeObject(tokenData, {
@@ -334,7 +357,7 @@ export function clearItemPileSharingData(target) {
     return inDocument.unsetFlag(CONSTANTS.MODULE_NAME, CONSTANTS.SHARING_FLAGS);
 }
 
-export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [], currencies = [] } = {}) {
+export async function setItemPileSharingData(sourceUuid, targetUuid, {items = [], currencies = []} = {}) {
 
     const source = await fromUuid(sourceUuid);
     const target = await fromUuid(targetUuid);
@@ -369,13 +392,13 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
             return clearItemPileSharingData(sourceIsItemPile);
         }
 
-        const sharingData = addToItemPileSharingData(sourceActor, targetActor.uuid, { items, currencies });
+        const sharingData = addToItemPileSharingData(sourceActor, targetActor.uuid, {items, currencies});
 
         return updateItemPileSharingData(sourceActor, sharingData);
 
     }
 
-    const sharingData = removeFromItemPileSharingData(targetActor, sourceActor.uuid, { items, currencies });
+    const sharingData = removeFromItemPileSharingData(targetActor, sourceActor.uuid, {items, currencies});
 
     return updateItemPileSharingData(targetActor, sharingData);
 
@@ -409,7 +432,7 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
                     name: item.name,
                     type: item.type,
                     img: item.img,
-                    actors: [{ uuid: actorUuid, quantity: 0 }]
+                    actors: [{uuid: actorUuid, quantity: 0}]
                 })
                 existingItem = pileSharingData.items[itemIndex - 1];
             } else if (!existingItem.actors) {
@@ -421,7 +444,7 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
             const itemQuantity = getItemQuantity(item);
             if (!actorData) {
                 if (itemQuantity > 0) {
-                    existingItem.actors.push({ uuid: actorUuid, quantity: itemQuantity })
+                    existingItem.actors.push({uuid: actorUuid, quantity: itemQuantity})
                 }
             } else {
                 actorData.quantity += itemQuantity;
@@ -450,7 +473,7 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
             if (!existingCurrency) {
                 let itemIndex = pileSharingData.currencies.push({
                     path: currency.path,
-                    actors: [{ uuid: actorUuid, quantity: 0 }]
+                    actors: [{uuid: actorUuid, quantity: 0}]
                 })
                 existingCurrency = pileSharingData.currencies[itemIndex - 1];
             } else {
@@ -463,7 +486,7 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
 
             if (!actorData) {
                 if (currency.quantity > 0) {
-                    existingCurrency.actors.push({ uuid: actorUuid, quantity: currency.quantity })
+                    existingCurrency.actors.push({uuid: actorUuid, quantity: currency.quantity})
                 }
             } else {
                 actorData.quantity += currency.quantity;
@@ -483,7 +506,7 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
 
 }
 
-export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [], currencies = [] } = {}) {
+export function removeFromItemPileSharingData(itemPile, actorUuid, {items = [], currencies = []} = {}) {
 
     items = items.map(item => {
         setProperty(item, MODULE_SETTINGS.ITEM_QUANTITY_ATTRIBUTE, getItemQuantity(item) * -1)
@@ -495,7 +518,7 @@ export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [],
         return currency;
     });
 
-    return addToItemPileSharingData(itemPile, actorUuid, { items, currencies });
+    return addToItemPileSharingData(itemPile, actorUuid, {items, currencies});
 
 }
 
@@ -522,7 +545,8 @@ export function getItemPileItemsForActor(pile, recipient, floor = false) {
             quantity: quantity,
             shareLeft: quantity,
             previouslyTaken: 0,
-            toShare: pileData.shareItemsEnabled && recipientUuid
+            toShare: pileData.shareItemsEnabled && recipientUuid,
+            visible: true
         };
 
         if (data.toShare) {
@@ -557,7 +581,7 @@ export function getItemPileItemsForActor(pile, recipient, floor = false) {
 export function getItemPileCurrenciesForActor(pile, recipient, floor) {
 
     const pileData = getItemPileData(pile);
-    const pileCurrencies = getFormattedActorCurrencies(pile, { getAll: !recipient });
+    const pileCurrencies = getFormattedActorCurrencies(pile, {getAll: !recipient});
 
     const players = getPlayersForItemPile(pile);
     const pileSharingData = getItemPileSharingData(pile);
@@ -574,6 +598,7 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor) {
         currency.toShare = pileData.shareCurrenciesEnabled && !!recipientUuid;
         currency.previouslyTaken = 0;
         currency.index = index;
+        currency.visible = true;
 
         if (currency.toShare) {
 
@@ -606,7 +631,7 @@ export function getItemPileCurrenciesForActor(pile, recipient, floor) {
 /* -------------------------- Merchant Methods ------------------------- */
 
 
-export function isValidMerchant(target, data = false){
+export function isValidMerchant(target, data = false) {
     const inDocument = getDocument(target);
     return isValidItemPile(target, data) && (data || getItemPileData(inDocument))?.isMerchant;
 }
@@ -614,13 +639,13 @@ export function isValidMerchant(target, data = false){
 export function getItemPriceData(item, merchant = false, actor = false) {
 
     const currencyList = getActorCurrencyList(merchant);
-    const { priceModifier } = merchant ? getMerchantModifiersForActor(merchant, actor) : { priceModifier: 100 };
+    const {priceModifier} = merchant ? getMerchantModifiersForActor(merchant, actor) : {priceModifier: 100};
 
     const itemData = item instanceof Item ? item.data : item;
 
     const price = getProperty(itemData, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.ITEM_FLAGS}`);
 
-    if(price){
+    if (price) {
         price.originalCost = price.cost;
         price.cost = Math.floor(price.cost * priceModifier);
         return price;
@@ -641,7 +666,7 @@ export function getItemPriceData(item, merchant = false, actor = false) {
 
 }
 
-export function getMerchantModifiersForActor(merchant, actor = false){
+export function getMerchantModifiersForActor(merchant, actor = false) {
     const pileData = getItemPileData(merchant);
     const actorSpecificModifiers = pileData?.overridePriceModifiers?.find(data => data.actor === getUuid(actor));
     const priceModifier = (actorSpecificModifiers?.priceModifier || pileData.priceModifier || 100) / 100;
@@ -652,7 +677,7 @@ export function getMerchantModifiersForActor(merchant, actor = false){
     }
 }
 
-export function getMerchantItemsForActor(merchant, actor = false){
+export function getMerchantItemsForActor(merchant, actor = false) {
 
     const pileItems = getActorItems(merchant);
 
@@ -663,7 +688,8 @@ export function getMerchantItemsForActor(merchant, actor = false){
             type: item.type,
             img: item.data?.img ?? "",
             quantity: getItemQuantity(item),
-            price: getItemPriceData(item, merchant, actor)
+            price: getItemPriceData(item, merchant, actor),
+            visible: true
         }
     });
 

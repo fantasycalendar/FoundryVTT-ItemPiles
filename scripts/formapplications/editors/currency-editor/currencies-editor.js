@@ -11,7 +11,7 @@ export default class CurrenciesEditor extends TJSDialog {
         super({
             ...dialogData,
             title: game.i18n.localize("ITEM-PILES.CurrenciesEditor.Title"),
-            zIndex: 50,
+            zIndex: 102,
             content: {
                 class: CurrenciesEditorShell,
                 props: {

@@ -6,7 +6,7 @@
 
     {{#each currencies as |currency id|}}
         <div class="form-group item-piles-slider-group item-piles-odd-color">
-            <div class="item-piles-img-container" style="transform: scale(0.75)"><img class="item-piles-img" src="{{currency.img}}"></div>
+            <div class="item-piles-img-container"><img class="item-piles-img" src="{{currency.img}}"></div>
             <div class="item-piles-name item-piles-text">
                 <div>{{currency.name}}</div>
                 {{#unless @root.source}}

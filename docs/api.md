@@ -95,7 +95,7 @@
 <dt><a href="#refreshItemPile">refreshItemPile(target)</a> ⇒ <code>Promise</code></dt>
 <dd><p>Refreshes the target image of an item pile, ensuring it remains in sync</p>
 </dd>
-<dt><a href="#rerenderItemPileInventoryApplication">rerenderItemPileInventoryApplication(inPileUuid, {deleted})</a> ⇒ <code>Promise</code></dt>
+<dt><a href="#updateItemPileInventoryApplication">updateItemPileInventoryApplication(inPileUuid, {deleted})</a> ⇒ <code>Promise</code></dt>
 <dd><p>Causes all connected users to re-render a specific pile&#39;s inventory UI</p>
 </dd>
 <dt><a href="#splitItemPileContents">splitItemPileContents(itemPile, targets, instigator)</a> ⇒ <code>Promise.&lt;object&gt;</code></dt>
@@ -437,9 +437,9 @@ Refreshes the target image of an item pile, ensuring it remains in sync
 | --- | --- |
 | target | <code>Token/TokenDocument/Actor</code> | 
 
-<a name="rerenderItemPileInventoryApplication"></a>
+<a name="updateItemPileInventoryApplication"></a>
 
-## ItemPiles.API.rerenderItemPileInventoryApplication(inPileUuid, {deleted}) ⇒ <code>Promise</code>
+## ItemPiles.API.updateItemPileInventoryApplication(inPileUuid, {deleted}) ⇒ <code>Promise</code>
 Causes all connected users to re-render a specific pile's inventory UI
 
 

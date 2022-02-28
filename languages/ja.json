@@ -9,7 +9,7 @@
         },
         "Inspect": {
             "Title": "お宝の中身",
-            "AsActor": "{actorName}としてお宝を確認中",
+            "AsActor": "{actorName}としてお宝を確認中。",
             "Owner": "このお宝の所有者権限を持っているので中身を編集できます。",
             "Empty": "このお宝は空です",
             "Destroyed": "このお宝はもはや存在せず……",

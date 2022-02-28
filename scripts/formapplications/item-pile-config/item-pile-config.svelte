@@ -17,18 +17,6 @@
         form.requestSubmit();
     }
 
-    async function showCurrenciesEditor(){
-        application.showCurrenciesEditor();
-    }
-
-    async function showItemFiltersEditor(){
-        application.showItemFiltersEditor();
-    }
-
-    async function showActorPriceOverrides(){
-        application.showActorPriceOverrides();
-    }
-
 </script>
 
 <svelte:options accessors={true}/>
@@ -97,7 +85,7 @@
             </div>
 
             <div class="form-group">
-                <button type="button" on:click={showCurrenciesEditor} disabled={!pileData.overrideCurrencies} style="flex:4;">
+                <button type="button" on:click={() => { application.showCurrenciesEditor() }} disabled={!pileData.overrideCurrencies} style="flex:4;">
                     {localize("ITEM-PILES.ItemPileConfig.Main.ConfigureOverrideCurrencies")}
                 </button>
             </div>
@@ -111,7 +99,7 @@
             </div>
 
             <div class="form-group">
-                <button type="button" on:click={showItemFiltersEditor} disabled={!pileData.overrideItemFilters} style="flex:4;">
+                <button type="button" on:click={() => { application.showItemFiltersEditor() }} disabled={!pileData.overrideItemFilters} style="flex:4;">
                     {localize("ITEM-PILES.ItemPileConfig.Main.ConfigureOverrideItemFilters")}
                 </button>
             </div>
@@ -285,7 +273,7 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="button" class="item-piles-config-reset-sharing-data" style="flex:4;">{localize("ITEM-PILES.ItemPileConfig.Sharing.ResetSharingData")}</button>
+                    <button type="button" class="item-piles-config-reset-sharing-data" style="flex:4;" on:click={() => { application.resetSharingData() }}>{localize("ITEM-PILES.ItemPileConfig.Sharing.ResetSharingData")}</button>
                 </div>
 
             </details>
@@ -324,7 +312,7 @@
                             {localize("ITEM-PILES.ItemPileConfig.Merchant.ActorPriceModifiers")}<br>
                             <p>{localize("ITEM-PILES.ItemPileConfig.Merchant.ActorPriceModifiersExplanation")}</p>
                         </label>
-                        <button type="button" on:click={showActorPriceOverrides}>
+                        <button type="button" on:click={() => { application.showActorPriceOverrides() }}>
                             {localize("ITEM-PILES.ItemPileConfig.Merchant.ConfigureActorPriceModifiers")}
                         </button>
                     </div>

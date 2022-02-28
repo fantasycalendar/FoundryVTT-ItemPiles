@@ -9,7 +9,7 @@ export default class ItemSimilaritiesEditor extends TJSDialog {
       super({
          ...dialogData,
          title: "ITEM-PILES.SimilaritiesEditor.Title",
-         zIndex: 50,
+         zIndex: 102,
          content: {
             class: ItemSimilaritiesShell,
             props: {

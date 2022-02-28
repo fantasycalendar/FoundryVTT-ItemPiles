@@ -17,6 +17,10 @@ import {ItemConfig} from "./formapplications/item-config.js";
 import {custom_error, custom_warning, isGMConnected, isResponsibleGM} from "./lib/utils";
 import CurrenciesEditor from "./formapplications/editors/currency-editor/currencies-editor";
 import ItemPileConfig from "./formapplications/item-pile-config/item-pile-config";
+import MerchantApp from "./formapplications/merchant-app/merchant-app";
+import {ItemPileInventory} from "./formapplications/inventory/item-pile-inventory";
+import ItemFiltersEditor from "./formapplications/editors/item-filters-editor/item-filters-editor";
+
 
 Hooks.once("init", async () => {
 
@@ -75,9 +79,11 @@ Hooks.once("ready", async () => {
     // ItemPileConfig.show(canvas.tokens.get("Q5IxEiNxZtj0nSCC").document);
     //new CurrenciesEditor().render(true)
     // new PriceModifiersEditor().render(true);
-    // new MerchantApp(game.actors.getName("Trade Tester")).render(true);
+    // MerchantApp.show(game.actors.getName("Trade Tester"));
+    ItemPileInventory.show(game.actors.getName("Trade Tester"), canvas.tokens.get("6F6uQxj5cpMTciQ7"));
     // new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
     // ItemSimilaritiesEditor.show()
+    //ItemFiltersEditor.show()
 
 });
 
@@ -110,7 +116,7 @@ const module = {
         const targetUuid = target.uuid;
         return debounceManager.setDebounce(targetUuid, async function (uuid) {
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
-            await API._rerenderItemPileInventoryApplication(uuid, deleted);
+            await API._updateItemPileInventoryApplication(uuid, deleted);
             if (deleted || !isResponsibleGM()) return;
             return API._refreshItemPile(uuid);
         })(targetUuid);
@@ -124,7 +130,7 @@ const module = {
         const targetUuid = target.uuid;
         return debounceManager.setDebounce(targetUuid, async function (uuid) {
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
-            await API._rerenderItemPileInventoryApplication(uuid, deleted);
+            await API._updateItemPileInventoryApplication(uuid, deleted);
             if (deleted || !isResponsibleGM()) return;
             return API._refreshItemPile(uuid);
         })(targetUuid);
@@ -152,8 +158,8 @@ const module = {
             const itemPileConfig = lib.getItemPileData(tokenDoc.actor)
             Hooks.callAll(HOOKS.PILE.CREATE, tokenDoc, itemPileConfig);
 
-            const targetItems = getActorItems(tokenDoc.actor);
-            const targetCurrencies = getFormattedActorCurrencies(tokenDoc.actor);
+            const targetItems = lib.getActorItems(tokenDoc.actor);
+            const targetCurrencies = lib.getFormattedActorCurrencies(tokenDoc.actor);
             const data = {data: itemPileConfig, items: targetItems, currencies: targetCurrencies};
 
             await tokenDoc.update({
@@ -169,7 +175,7 @@ const module = {
     async _deletePile(doc) {
         if (!lib.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.DELETE, doc);
-        return API._rerenderItemPileInventoryApplication(doc.uuid, true);
+        return API._updateItemPileInventoryApplication(doc.uuid, true);
     },
 
     _renderPileHUD(app, html) {

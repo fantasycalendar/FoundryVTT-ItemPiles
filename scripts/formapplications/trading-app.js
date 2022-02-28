@@ -5,7 +5,8 @@ import DropCurrencyDialog from "./drop-currency-dialog.js";
 import {itemPileSocket} from "../socket.js";
 import {TradeAPI} from "../trade-api.js";
 import API from "../api.js";
-import {custom_error, custom_warning, dialogLayout, findSimilarItem} from "../lib/utils";
+import {custom_error, custom_warning, dialogLayout} from "../lib/utils";
+import {findSimilarItem} from "../lib/lib.js";
 
 export class TradingApp extends FormApplication {
 

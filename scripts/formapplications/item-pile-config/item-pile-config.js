@@ -1,6 +1,6 @@
 import { TJSDialog }          from '@typhonjs-fvtt/runtime/svelte/application';
-
 import ItemPileConfigShell from './item-pile-config.svelte';
+
 import {CONSTANTS, MODULE_SETTINGS} from "../../constants";
 import * as lib from "../../lib/lib";
 import PriceModifiersEditor from "../editors/price-modifiers-editor/price-modifiers-editor";
@@ -13,14 +13,14 @@ export default class ItemPileConfig extends TJSDialog {
 
     constructor(target, options = {}, dialogData = {}) {
 
-        let document = getDocument(target?.token ?? target);
+        let document = getDocument(target?.actor ?? target);
         let pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, lib.getItemPileData(document));
 
         super({
             ...dialogData,
             title: `${game.i18n.localize("ITEM-PILES.ItemPileConfig.Title")}: ${document.data.name}`,
             id: `item-pile-config-${document.uuid}`,
-            zIndex: 50,
+            zIndex: 101,
             content: {
                 class: ItemPileConfigShell,
                 props: {
@@ -70,6 +70,7 @@ export default class ItemPileConfig extends TJSDialog {
 
     async resetSharingData() {
         return new Dialog({
+            id: `item-pile-config-${this.document.uuid}`,
             title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
             content: dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content") }),
             buttons: {
@@ -77,7 +78,7 @@ export default class ItemPileConfig extends TJSDialog {
                     icon: '<i class="fas fa-check"></i>',
                     label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Confirm"),
                     callback: () => {
-                        lib.clearItemPileSharingData(this.svelte.applicationShell.document);
+                        lib.clearItemPileSharingData(this.document);
                     }
                 },
                 cancel: {
@@ -106,7 +107,7 @@ export default class ItemPileConfig extends TJSDialog {
         }[data.deleteWhenEmpty];
 
         API.updateItemPile(this.document, data).then(() => {
-            API.rerenderItemPileInventoryApplication(this.document.uuid);
+            API.updateItemPileInventoryApplication(this.document.uuid);
         });
 
     }
@@ -115,6 +116,15 @@ export default class ItemPileConfig extends TJSDialog {
         return new Promise((resolve) => {
             options.resolve = resolve;
             new this(document, options, dialogData).render(true);
+        })
+    }
+
+    async close(options){
+        super.close(options);
+        Object.values(ui.windows).forEach(app => {
+            if(app.id === `item-pile-config-${this.document.uuid}`){
+                app.close();
+            }
         })
     }
 }

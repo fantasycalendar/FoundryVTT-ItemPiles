@@ -10,6 +10,7 @@ export default class ItemFiltersEditor extends TJSDialog {
       super({
          ...dialogData,
          title: "ITEM-PILES.FilterEditor.Title",
+         zIndex: 102,
          content: {
             class: ItemFiltersShell,
             props: {

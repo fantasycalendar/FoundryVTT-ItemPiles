@@ -13,6 +13,7 @@ export default class PriceModifiersEditor extends TJSDialog {
       super({
          ...dialogData,
          title: "ITEM-PILES.PriceModifiersEditor.Title",
+         zIndex: 102,
          content: {
             class: PriceModifiersShell,
             props: {

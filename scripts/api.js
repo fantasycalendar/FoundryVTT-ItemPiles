@@ -5,14 +5,13 @@ import {itemPileSocket} from "./socket.js";
 import {ItemPileInventory} from "./formapplications/inventory/item-pile-inventory.js";
 import DropItemDialog from "./formapplications/drop-item-dialog.js";
 import {hotkeyState} from "./hotkeys.js";
-import {MerchantApp} from "./formapplications/merchant-app.js";
+import MerchantApp from "./formapplications/merchant-app/merchant-app.js";
 import {
    custom_error,
    custom_notify,
    custom_warning,
    debug,
    distance_between_rect,
-   findSimilarItem,
    getDocument,
    getToken,
    getTokensAtLocation,
@@ -23,6 +22,7 @@ import {
    tokens_close_enough,
    wait
 } from "./lib/utils";
+import {findSimilarItem} from "./lib/lib.js";
 
 const preloadedFiles = new Set();
 
@@ -313,7 +313,7 @@ const API = {
             await scene.updateEmbeddedDocuments("Token", updateData);
         }
 
-        setTimeout(API.rerenderTokenHud, 100);
+        setTimeout(API.updateTokenHud, 100);
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.PILE.TURN_INTO, targetUuids);
 
@@ -394,7 +394,7 @@ const API = {
             await scene.updateEmbeddedDocuments("Token", updateData);
         }
 
-        setTimeout(API.rerenderTokenHud, 100);
+        setTimeout(API.updateTokenHud, 100);
 
         await itemPileSocket.executeForEveryone(SOCKET_HANDLERS.CALL_HOOK, HOOKS.PILE.REVERT_FROM, targetUuids);
 
@@ -938,15 +938,15 @@ const API = {
      * @param {Boolean} [deleted=false]     Whether the pile was deleted as a part of this re-render
      * @return {Promise}
      */
-    async rerenderItemPileInventoryApplication(inPileUuid, deleted = false) {
+    async updateItemPileInventoryApplication(inPileUuid, deleted = false) {
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, inPileUuid, deleted);
     },
 
     /**
      * @private
      */
-    async _rerenderItemPileInventoryApplication(inPileUuid, deleted = false) {
-        return ItemPileInventory.rerenderActiveApp(inPileUuid, deleted);
+    async _updateItemPileInventoryApplication(inPileUuid, deleted = false) {
+        return ItemPileInventory.updateActiveApp(inPileUuid, deleted);
     },
 
     /**
@@ -1077,7 +1077,7 @@ const API = {
         await API._executeItemPileMacro(itemPileUuid, macroData);
 
         const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(itemPileUuid);
-        await API.rerenderItemPileInventoryApplication(itemPileUuid, shouldBeDeleted);
+        await API.updateItemPileInventoryApplication(itemPileUuid, shouldBeDeleted);
 
         if (shouldBeDeleted) {
             await API._deleteItemPile(itemPileUuid);
@@ -1208,7 +1208,7 @@ const API = {
 
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            await API.rerenderItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileInventoryApplication(targetUuid);
 
         }
 
@@ -1338,7 +1338,7 @@ const API = {
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(targetUuid);
 
-            await API.rerenderItemPileInventoryApplication(targetUuid, shouldBeDeleted);
+            await API.updateItemPileInventoryApplication(targetUuid, shouldBeDeleted);
 
             if (shouldBeDeleted) {
                 await API._deleteItemPile(targetUuid);
@@ -1435,8 +1435,8 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
-            await API.rerenderItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
+            await API.updateItemPileInventoryApplication(targetUuid);
 
             const itemPile = await fromUuid(sourceUuid);
 
@@ -1528,8 +1528,8 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
-            await API.rerenderItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
+            await API.updateItemPileInventoryApplication(targetUuid);
 
             if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
@@ -1617,7 +1617,7 @@ const API = {
             };
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            await API.rerenderItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileInventoryApplication(targetUuid);
         }
 
         return attributesAdded;
@@ -1720,7 +1720,7 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(targetUuid);
-            await API.rerenderItemPileInventoryApplication(targetUuid, shouldBeDeleted);
+            await API.updateItemPileInventoryApplication(targetUuid, shouldBeDeleted);
 
             if (shouldBeDeleted) {
                 await API._deleteItemPile(targetUuid);
@@ -1823,8 +1823,8 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
-            await API.rerenderItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
+            await API.updateItemPileInventoryApplication(targetUuid);
 
             const itemPile = await fromUuid(sourceUuid)
 
@@ -1912,7 +1912,7 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
+            await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
 
             if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
@@ -1994,8 +1994,8 @@ const API = {
         await API._executeItemPileMacro(targetUuid, macroData);
 
         const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-        await API.rerenderItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
-        await API.rerenderItemPileInventoryApplication(targetUuid);
+        await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
+        await API.updateItemPileInventoryApplication(targetUuid);
 
         if (shouldBeDeleted) {
             await API._deleteItemPile(sourceUuid);
@@ -2041,18 +2041,18 @@ const API = {
     /* -------- UTILITY METHODS -------- */
 
     /**
-     * Causes every user's token HUD to rerender
+     * Causes every user's token HUD to update
      *
      * @return {Promise}
      */
-    async rerenderTokenHud() {
+    async updateTokenHud() {
         return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_TOKEN_HUD);
     },
 
     /**
      * @private
      */
-    async _rerenderTokenHud() {
+    async _updateTokenHud() {
         if (!canvas.tokens.hud.rendered) return;
         await canvas.tokens.hud.render(true)
         return true;
