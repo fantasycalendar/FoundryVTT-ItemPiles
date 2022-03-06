@@ -6,7 +6,7 @@
 
 <img src="https://app.fantasy-calendar.com/resources/computerworks-logo-full.png" alt="Fantasy Computerworks Logo" style="width:250px;"/>
 
-A module made by Fantasy Computerworks.
+A module made by [Fantasy Computerworks](http://fantasycomputer.works/).
 
 Other works by us:
 
