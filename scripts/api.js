@@ -2055,16 +2055,7 @@ const API = {
 
         if (data.type !== "Item") return;
 
-        let itemData;
-        if (data.pack) {
-            const uuid = `Compendium.${data.pack}.${data.id}`;
-            const item = await fromUuid(uuid);
-            itemData = item.toObject();
-        } else if (data.id) {
-            itemData = game.items.get(data.id)?.toObject();
-        } else {
-            itemData = data.data;
-        }
+        const itemData = (await Item.fromDropData(data)).toObject();
 
         if (!itemData) {
             console.error(data);
