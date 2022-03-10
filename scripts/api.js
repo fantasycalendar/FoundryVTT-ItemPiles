@@ -1088,6 +1088,7 @@ const API = {
         for (const itemData of items) {
 
             let item = itemData?.item ?? itemData;
+            delete item._id;
 
             const foundItem = lib.findSimilarItem(targetActorItems, item);
 
@@ -2055,7 +2056,8 @@ const API = {
 
         if (data.type !== "Item") return;
 
-        const itemData = (await Item.fromDropData(data)).toObject();
+        let item = await Item.implementation.fromDropData(data)
+        let itemData = item.toObject();
 
         if (!itemData) {
             console.error(data);
@@ -2142,7 +2144,7 @@ const API = {
             }
         }
 
-        const disallowedType = lib.isItemInvalid(droppableDocuments?.[0], itemData);
+        const disallowedType = lib.isItemInvalid(droppableDocuments?.[0], item);
         if (disallowedType) {
             if (!game.user.isGM) {
                 return lib.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
@@ -2170,7 +2172,7 @@ const API = {
 
         } else {
 
-            const result = await DropItemDialog.query(itemData, droppableDocuments[0]);
+            const result = await DropItemDialog.query(item, droppableDocuments[0]);
 
             if (!result) return;
             action = result.action;
