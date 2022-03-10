@@ -105,6 +105,7 @@ module settings to configure that.
 - [D&D 3.5e SRD](https://foundryvtt.com/packages/D35E)
 - [Savage Worlds Adventure Edition](https://foundryvtt.com/packages/swade)
 - [Tormenta20](https://foundryvtt.com/packages/tormenta20)
+- [Warhammer Fantasy Roleplay 4th Ed](https://foundryvtt.com/packages/wfrp4e)
 
 ## Semi-supported systems
 

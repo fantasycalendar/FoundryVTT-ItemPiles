@@ -7,6 +7,7 @@ import ds4 from "./systems/ds4.js";
 import d35e from "./systems/d35e.js";
 import swade from "./systems/swade.js";
 import tormenta20 from "./systems/tormenta20.js";
+import wfrp4e from "./systems/wfrp4e.js"
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -24,6 +25,7 @@ export const SYSTEMS = {
             d35e,
             swade,
             tormenta20,
+            wfrp4e,
             // ↑ ADD SYSTEMS HERE ↑
         }?.[game.system.id];
     }
