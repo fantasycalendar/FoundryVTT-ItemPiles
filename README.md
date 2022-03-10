@@ -6,14 +6,12 @@
 
 <img src="https://app.fantasy-calendar.com/resources/computerworks-logo-full.png" alt="Fantasy Computerworks Logo" style="width:250px;"/>
 
-A module made by Fantasy Computerworks.
+A module made by [Fantasy Computerworks](http://fantasycomputer.works/).
 
 Other works by us:
 
 - [Fantasy Calendar](https://app.fantasy-calendar.com) - The best calendar creator and management app on the internet
 - [Sequencer](https://foundryvtt.com/packages/sequencer) - Wow your players by playing visual effects on the canvas
-- [Potato Or Not](https://foundryvtt.com/packages/potato-or-not) - Automatically set up Foundry to the best visual
-  settings for your players' potato computers
 - [Tagger](https://foundryvtt.com/packages/tagger) - Tag objects in the scene and retrieve them with a powerful API
 - [Token Ease](https://foundryvtt.com/packages/token-ease) - Make your tokens _feel good_ to move around on the board
 
@@ -107,6 +105,8 @@ module settings to configure that.
 - [D&D 3.5e SRD](https://foundryvtt.com/packages/D35E)
 - [Savage Worlds Adventure Edition](https://foundryvtt.com/packages/swade)
 - [Tormenta20](https://foundryvtt.com/packages/tormenta20)
+- [Warhammer Fantasy Roleplay 4th Ed](https://foundryvtt.com/packages/wfrp4e)
+- [Splittermond](https://foundryvtt.com/packages/splittermond)
 
 ## Semi-supported systems
 

@@ -47,7 +47,7 @@ export function getItemPileTokenImage(target, {data = false, items = false, curr
             ? items[0].img
             : currencies[0].img;
     } else if (data.displayOne && numItems > 1) {
-        img = pileDocument.actor.data.token.img;
+        img = (pileDocument.actor ?? pileDocument).data.token.img;
     }
 
     if (data.isContainer) {

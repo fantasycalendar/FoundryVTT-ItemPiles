@@ -77,10 +77,10 @@ const chatHandler = {
      * @returns {Promise}
      * @private
      */
-    _outputTransferItem(source, target, items, userId, interactionId) {
+    async _outputTransferItem(source, target, items, userId, interactionId) {
         if (!API.isValidItemPile(source)) return;
         if (!interactionId || game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
-        const itemData = this._formatItemData(items);
+        const itemData = await this._formatItemData(items);
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, [], userId, interactionId);
     },
 
@@ -114,10 +114,10 @@ const chatHandler = {
      * @returns {Promise}
      * @private
      */
-    _outputTransferEverything(source, target, items, currencies, userId, interactionId) {
+    async _outputTransferEverything(source, target, items, currencies, userId, interactionId) {
         if (!API.isValidItemPile(source)) return;
         if (!interactionId || game.user.id !== userId || game.settings.get(CONSTANTS.MODULE_NAME, "outputToChat") === "off") return;
-        const itemData = this._formatItemData(items);
+        const itemData = await this._formatItemData(items);
         const currencyData = this._formatCurrencyData(source, currencies);
         return itemPileSocket.executeAsGM(SOCKET_HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, currencyData, userId, interactionId);
     },
@@ -145,14 +145,17 @@ const chatHandler = {
      * @returns {Array}
      * @private
      */
-    _formatItemData(items) {
-        return items.map(itemData => {
-            return {
-                name: itemData.item.name,
+    async _formatItemData(items) {
+        const formattedItems = [];
+        for(const itemData of items){
+            const tempItem = await Item.implementation.create(itemData.item, { temporary: true });
+            formattedItems.push({
+                name: tempItem.name,
                 img: itemData.item.img ?? "",
                 quantity: itemData.quantity
-            }
-        });
+            });
+        }
+        return formattedItems;
     },
 
     /**
@@ -168,7 +171,7 @@ const chatHandler = {
         return Object.entries(currencies).map(entry => {
             const currency = currencyList.find(currency => currency.path === entry[0]);
             return {
-                name: game.i18n.has(currency.name) ? game.i18n.localize(currency.name) : currency.name,
+                name: currency.name,
                 img: currency.img ?? "",
                 quantity: entry[1],
                 index: currencyList.indexOf(currency)
