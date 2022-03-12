@@ -79,7 +79,6 @@
       "Disconnected": "Die Verbindung von einem der Spieler wurde unterbrochen und der Handel wurde abgebrochen.",
       "UserCharacterWarning": "Du hast den Akteur \"{actor_name}\" ausgewählt. Dieser gehört dem Spieler \"{player_name}\".<br><br>Möchtest du trotzdem fortfahren?",
       "UserActiveCharacterWarning": "Du hast den Akteur \"{actor_name}\" ausgewählt. Dieser gehört dem Spieler \"{player_name}\", welcher gerade <strong>aktiv</strong> ist.<br><br>Möchtest du trotzdem fortfahren?",
-      "ActorOwnerWarning": "You do not own this actor, so you cannot trade with it."
       "ActorOwnerWarning": "Dieser Akteur gehört dir nicht. Du kannst ihn nicht für einen Handel benutzen."
     },
     "Errors": {
@@ -120,7 +119,6 @@
       "ResetSharingData": {
         "Title": "Bisherige Anteil-Daten löschen",
         "Content": "Hierdurch wird die Historie gelöscht, welche Spieler bereits welchen Anteil aus dem Stapel genommen haben. Bist du sicher, dass du das tun möchtest?",
-        "Confirm": "Reset Sharing Data"
         "Confirm": "Anteil-Daten löschen"
       },
       "Cancel": "Abbrechen"
@@ -170,10 +168,10 @@
         "DeleteWhenEmptyDefault": "Standardeinstellung des Moduls",
         "DeleteWhenEmptyYes": "Ja, löschen, wenn leer",
         "DeleteWhenEmptyNo": "Nein, nicht löschen wenn leer",
-        "OverrideCurrencies": "Override Currencies",
-        "OverrideCurrenciesExplanation": "Configure if this pile should be able to transfer other currencies than the default.",
-        "ConfigureOverrideCurrencies": "Configure Override Currencies",
-        "OverrideItemFilters": "Übersteuere Gegenstandsfilter",
+        "OverrideCurrencies": "Währungen überschreiben",
+        "OverrideCurrenciesExplanation": "Konfiguriere, ob dieser Stapel andere als die Standardwährungen transferieren darf.",
+        "ConfigureOverrideCurrencies": "Konfiguriere die zu überschreibenden Währungen",
+        "OverrideItemFilters": "Überschreibe Gegenstandsfilter",
         "OverrideItemFiltersExplanation": "Lege fest, ob dieser Stapel in der Lage sein soll, andere Arten von Gegenständen als die Standardtypen zu übertragen.",
         "ConfigureOverrideItemFilters": "Konfiguriere den Gegenstandsfilter",
         "OverrideAttributes": "Dynamische Attribute außer Kraft setzen",
