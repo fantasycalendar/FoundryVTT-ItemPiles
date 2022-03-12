@@ -3,7 +3,7 @@ export default {
     "ACTOR_CLASS_TYPE": "loot",
 
     // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
-    "ITEM_QUANTITY_ATTRIBUTE": "data.quantity.value",
+    "ITEM_QUANTITY_ATTRIBUTE": "data.quantity",
 
     // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
     "ITEM_FILTERS": [
