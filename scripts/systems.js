@@ -23,9 +23,9 @@ export const SYSTEMS = {
             pf2e,
             ds4,
             d35e,
+            sfrpg,
             swade,
             tormenta20,
-            sfrpg,
             // ↑ ADD SYSTEMS HERE ↑
         }?.[game.system.id];
     }
