@@ -4,6 +4,7 @@
 - Updated German localization (Thank you, gsterling on GitHub)
 - Added Starfinder system support (Thank you, dizko on GitHub)
 - Updated Tormenta20 system configuration (Thank you, mclemente on GitHub)
+- Fixed hidden item piles being able to be opened
 
 ## Version 1.4.7
 - Fixed issue in latest PF2 update which changed the attribute path for quantities
