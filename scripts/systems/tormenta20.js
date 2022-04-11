@@ -6,7 +6,16 @@ export default {
     "ITEM_QUANTITY_ATTRIBUTE": "data.qtd",
 
     // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
-    "ITEM_FILTERS": [],
+    "ITEM_FILTERS": [
+				{
+						"path": "type",
+						"filters": "magia, poder, classe"
+				},
+				{
+						"path": "data.tipoUso",
+						"filters": "nat"
+				}
+		],
 
     // Item similarities determines how item piles detect similarities and differences in the system
     "ITEM_SIMILARITIES": ["name", "type"],

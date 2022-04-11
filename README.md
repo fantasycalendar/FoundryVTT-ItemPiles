@@ -14,6 +14,7 @@ Other works by us:
 - [Sequencer](https://foundryvtt.com/packages/sequencer) - Wow your players by playing visual effects on the canvas
 - [Tagger](https://foundryvtt.com/packages/tagger) - Tag objects in the scene and retrieve them with a powerful API
 - [Token Ease](https://foundryvtt.com/packages/token-ease) - Make your tokens _feel good_ to move around on the board
+- [Rest Recovery](https://foundryvtt.com/packages/rest-recovery) - Automate most D&D 5e long and short rest mechanics
 
 Like what we've done? Buy us a coffee!
 
@@ -107,6 +108,7 @@ module settings to configure that.
 - [Tormenta20](https://foundryvtt.com/packages/tormenta20)
 - [Warhammer Fantasy Roleplay 4th Ed](https://foundryvtt.com/packages/wfrp4e)
 - [Splittermond](https://foundryvtt.com/packages/splittermond)
+- [Starfinder](https://foundryvtt.com/packages/sfrpg)
 
 ## Semi-supported systems
 
