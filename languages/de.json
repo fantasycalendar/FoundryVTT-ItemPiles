@@ -1,182 +1,340 @@
 {
-    "ITEM-PILES": {
-        "Inspect": {
-            "Title": "Untersuche Gegenstandstapel",
-            "AsActor": "Du untersuchst diesen Stapel als {actorName}",
-            "NoActor": "Du untersuchst den Inhalt dieses Stapels ohne ein Token zu kontrollieren. Dies bedeutet du kannst keine Gegenstände vom Stapel nehmen.",
-            "Empty": "Dieser Stapel ist leer.",
-            "Destroyed": "Dieser Stapel existiert nicht mehr und liegt brach.",
-            "TakeAll": "Alles nehmen",
-            "Take": "Nehmen",
-            "Close": "Kiste schliessen",
-            "Leave": "Verlassen"
-        },
-        "Errors": {
-            "DisallowedItemDrop": "Du kannst keinen Gegenstand vom Typ \"{type}\" hier fallen lassen.",
-            "NoSourceDrop": "Du kannst keine Gegenstände aus der Gegenstandsleiste fallen lassen, es sei denn, du bist ein GM.",
-            "PileTooFar": "Du bist zu weit entfernt um mit dem Stapel zu interagieren",
-            "PileLocked": "Dieser Stapel ist gesperrt und verschlossen - du kannst keine Gegenstände hier fallen lassen.",
-            "DropNoToken": "Du hast kein Token in dieser Szene, daher kannst du hier keinen Gegenstand fallen lassen."
-        },
-        "Dialogs": {
-            "DropTypeWarning": {
-                "Title": "Gegenstand Typ Warnung",
-                "Content": "Du versuchst einen Gegenstand vom Typ (\"{type}\") hier abzulegen was normal nicht erlaubt ist. Bist du sicher das du das tun willst?"
-            },
-            "ResetSettings": {
-                "Title": "Setze Einstellungen von Gegenstandsstapel zurück",
-                "Content": "Bist du sicher das du alle Einstellungen vom Gegenstandsstapelmodul auf die Standardwerte des Systems zurücksetzen willst ? <strong>DIES KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!</strong>",
-                "Confirm": "Moduleinstellungen zurücksetzen"
-            },
-            "LinkedActorWarning": {
-                "Title": "Gegenstandsstapel & verlinkter Akteur",
-                "Content": "Bist du sicher das du diesen <strong>verlinkten Akteuer</strong> in einen Gegenstandstapel ändern willst ? Alle Akteur-Token bei verlinkten Akteueren teilen sich ein Inventar und Attribute"
-            },
-            "NoSystemFound": {
-                "Title": "System nicht erkannt",
-                "Content": "Dein Spielsystem wird im Moment nicht vollständig unterstützt. Das bedeutet das diesem Modul nicht bekannt ist wie es am besten mit den Gegenständen des Systems umgehen muss. Du kannst dieses Modul trotzdem verwenden, aber die Funktionalität könnte eingeschränkt sein.<br><br>Du kannst die Einstellung für dein Spielsystem selbst vornehmen, dies erfordert ein wenig technische Kenntnis.<br><br>Wenn du Fragen hast kontaktiere <strong>Wasp#2005</strong> auf dem Foundry Discord Server."
-            },
-            "SystemFound": {
-                "Title": "Spielsystem erfolgreich erkannt",
-                "Content": "Dein Spielsystem wurde in vorherigen Versionen dieses Modules nicht untersützt. Diese Unterstützung wurde nun mit dem Update hinzugefügt!<br><br>Möchtest du nun die Standardeinstellungen deines Spielsystems im Gegenstandsstapel-Modul laden?",
-                "Confirm": "Standardeinstellungen setzen"
-            },
-            "Cancel": "Abbrechen"
-        },
-        "AttributeEditor": {
-            "Title": "Dynamischer Attribute Editor",
-            "Explanation": "Hier kannst du festlegen, welche Attribute von Charakteren von Gegenstandsstapeln abgeholt werden können, z.B. Währungen. In D&D5e gibt es Währungen für Akteure mit dem Attributspfad \"actor.data.data.currency.gp\", also fügst du deine eigene mit dem Namen \"Goldmünzen\" und dem Attributspfad \"data.currency.gp\" hinzu.",
-            "Name": "Attributsname",
-            "Icon": "Attribut Icon",
-            "AddNew": "Neues Attribut zufügen",
-            "Submit": "Attribut übermitteln"
-        },
-        "FilterEditor": {
-            "Title": "Gegenstandsfilter Editor",
-            "Explanation": "Hier kannst du mehrere Arten von Filtern definieren, die bestimmte Arten von Gegenständen ausschließen. Basierend auf dem angegebenen Attributpfad kann der Gegenstandsstapel den \"Typ\" eines Gegenstands finden, und basierend auf den Filtern werden diese Gegenstände in der Benutzeroberfläche des Gegenstandsstapels ausgeblendet.",
-            "Filters": "Filter",
-            "AddNew": "Neuer Filter zufügen",
-            "Submit": "Filter übertragen"
-        },
-        "AttributePath": "Attributspfad",
-        "Defaults": {
-            "Title": "Gegenstandsstapel Konfiguration",
-            "Configure": "Gegenstandsstapel",
-            "Update": "Gegenstandsstapel aktualisieren",
-            "Main": {
-                "Title": "Hauptmenü",
-                "EnabledPile": "Aktiviert",
-                "EnabledPileExplanation": "Bestimmt ob sich dies als Gegenstandsstapel verhalten soll.",
-                "InspectItems": "Gegenstände prüfbar aktivieren",
-                "InspectItemsExplanation": "Durch Klick auf den Namen des Gegenständes wird das Gegenstandsfenster geöffnet.",
-                "Distance": "Interaktionsreichweite",
-                "GridUnits": "Gittereinheiten (leer lassen für unbegrenzt)",
-                "Macro": "Macro bei Interaktion",
-                "MacroExplanation": "Name des Makros, das ausgeführt werden soll, wenn mit diesem Stapel interagiert wird.",
-                "MacroPlaceholder": "Macro Name einfügen",
-                "DeleteWhenEmpty": "Löschen wenn leer",
-                "DeleteWhenEmptyExplanation": "Bewirkt, dass sich der Gegenstandsstapel selbst löscht, sobald er leer ist.",
-                "DeleteWhenEmptyDefault": "Standardeinstellung des Moduls",
-                "DeleteWhenEmptyYes": "Ja, löschen, wenn leer",
-                "DeleteWhenEmptyNo": "Nein, nicht löschen wenn leer",
-                "OverrideAttributes": "Dynamische Attribute außer Kraft setzen",
-                "OverrideAttributesExplanation": "Legen Sie fest, ob dieser Stapel andere Attribute als die Standardattribute übertragen können soll.",
-                "ConfigureOverrideAttributes": "Konfiguriere: Dynamische Attribute außer Kraft setzen",
-                "OverrideItemFilters": "Übersteuere Gegenstandsfilter",
-                "OverrideItemFiltersExplanation": "Lege fest, ob dieser Stapel in der Lage sein soll, andere Arten von Gegenständen als die Standardtypen zu übertragen.",
-                "ConfigureOverrideItemFilters": "Konfiguriere den Gegenstandsfilter"
-            },
-            "SingleItem": {
-                "Title": "Einstellungen einzelner Gegenstand",
-                "DisplayOneContainerWarning": "Achtung! Du hast sowohl die Einstellung \"Einzelnes Artikelbild anzeigen\" als auch \"Ist Container\" aktiviert. In diesem Fall werden Bilder für den Container bevorzugt verwendet.",
-                "DisplayOne": "Einzelnes Artikelbild anzeigen",
-                "DisplayOneExplanation": "Besteht der Stapel aus einem einzigen Gegenstand, wird das Bild des Stapels auf das Bild des Gegenstandes gesetzt.",
-                "OverrideScale": "Einzelne Gegenstands-Token-Skalierung außer Kraft setzen",
-                "Scale": "Gegenstands-Token-Skalierung",
-                "ItemName": "Benutze Gegenstandsname",
-                "ItemNameExplanation": "Veranlasst, dass der Gegenstandsstapel nach dem einzelnen darin enthaltenen Gegenstand benannt wird."
-            },
-            "Container": {
-                "Title": "Einstellungen Container",
-                "IsContainer": "Ist Container",
-                "Locked": "Ist verschlossen",
-                "Closed": "Ist geschlossen",
-                "ClosedImagePath": "Pfad Bild Geschlossener Container",
-                "EmptyImagePath": "Pfad Bild Leerer Container",
-                "OpenedImagePath": "Pfad Bild Geöffneter Container",
-                "LockedImagePath": "Pfad Bild Verschlossener Container",
-                "CloseSoundPath": "Pfad Geräusch Schliessen",
-                "OpenSoundPath": "Pfad Geräusch Öffnen",
-                "LockedSoundPath": "Pfad Geräusch Verschlossen"
-            }
-        },
-        "HUD": {
-            "ToggleLocked": "Setze verschlossen",
-            "ToggleClosed": "Setze geschlossen",
-            "Configure": "Stapel konfigurieren"
-        },
-        "DropItem": {
-            "Title": "Gegenstand fallenlassen",
-            "Dropping": "Du lässt Gegenstand fallen",
-            "ExistingPiles": "Es gibt bereits einen Gegenstandsstapel an dieser Stelle, Sie werden Ihre(n) Gegenstand(e) zu diesem Stapel hinzufügen.",
-            "QuantityToDrop": "Du hast {Menge} Stück dieses Gegenstandes, wie viele willst du abgeben?",
-            "AddToPile": "Zum Stapel zufügen",
-            "NewPile": "Neuen Stapel erzeugen",
-            "Cancel": "Abbrechen"
-        },
-        "Chat": {
-            "Pickup": {
-                "Actor": "{name} hat sich folgende Gegenstände genommen:"
-            }
-        },
-        "Setting": {
-            "Reset": {
-                "Title": "Einstellungen zurücksetzen",
-                "Label": "Einstellungen auf Standard zurücksetzen",
-                "Hint": "Dadurch werden alle Einstellungen der Gegenstandsstapel auf die Standardeinstellungen des aktiven Spielsystems zurückgesetzt."
-            },
-            "ActorClass": {
-                "Title": "Akteur Klassentyp",
-                "Label": "Diese Einstellung definiert den Typ des Akteurs, der für den Standard-Gegenstandsstapel-Akteur verwendet wird, der beim ersten Erzeugen eines Stapels erstellt wird. Im Falle von D&D5e ist dies \"character\", da es keinen eigenen Beuteakteurstyp gibt."
-            },
-            "Quantity": {
-                "Title": "Gegenstand Attribut Artikelmenge",
-                "Label": "Hier können Sie den Attributspfad für die Menge der einzelnen Gegenstände konfigurieren. Im D&D5e-System zum Beispiel wird die Menge jedes Gegenstands im Attribut \"item.data.data.quantity\" gespeichert, so dass Sie hier \"data.quantity\" eingeben müssen."
-            },
-            "Attributes": {
-                "Title": "Dynamische Attribute",
-                "Label": "Attribute konfigurieren",
-                "Hint": "Mit dieser Einstellung werden die Attribute festgelegt, die für die Abholung in Artikelpfaden in Frage kommen, z. B. Währungen oder Stärken, bei denen es sich nicht um tatsächliche Artikel handeln muss."
-            },
-            "ItemFilters": {
-                "Title": "Gegenstandsfilter",
-                "Label": "Gegenstandsfilter einstellen",
-                "Hint": "Hier können Sie einstellen, welche Gegenstände ignoriert und nicht in den Gegenstandsstapeldialogen aufgeführt werden."
-            },
-            "OutputToChat": {
-                "Title": "Ausgabe im Chat",
-                "Label": "Eine Nachricht über den aufgehobenen Gegenstand wird immer in den Chat gesendet wenn ein Spieler einen Gegenstand vom Stapel nimmt.",
-                "Off": "Aus - schaltet Nachrichten ab",
-                "Public": "Öffentlich - jeder kann die Nachrichten sehen",
-                "SelfGM": "Privat - nur GMs und der betroffene User sehen die Nachricht",
-                "Blind": "Blind - nur die GMs sehen die Nachricht"
-            },
-            "HideActorHeaderText": {
-                "Title": "Verstecke Kopftext des Akteurs",
-                "Label": "Blendet den \"Gegenstandsstapel\" Text im Akteur Kopf aus - nützlich wenn du viele Module hast und der Kopftext bereits zu sehr befüllt wird."
-            },
-            "DeleteEmptyPiles": {
-                "Title": "Leere Stapel automatisch löschen",
-                "Label": "Dies führt dazu, dass sich Gegenstandsstapel selbst löschen, sobald sie keine Gegenstände mehr enthalten. Dies kann bei einzelnen Gegenstandsstapeln außer Kraft gesetzt werden."
-            },
-            "PreloadFiles": {
-                "Title": "Dateien vorladen",
-                "Label": "Veranlasst, dass Dateien (Bilder und Audio) von Stapeln vorgeladen werden, was zu einem nahtlosen Erlebnis führt."
-            },
-            "Debug": {
-                "Title": "Debugging einschalten",
-                "Label": "Gibt Debug-Meldungen auf der Konsole aus"
-            }
-        }
-    }
+  "ITEM-PILES": {
+    "Items": "Gegenstände",
+    "Currencies": "Währungen",
+    "Currency": "Währung",
+    "ContextMenu": {
+      "ShowToPlayers": "Item Piles: Zeige Stapel den Spielern",
+      "RequestTrade": "Item Piles: Handelsanfrage"
+    },
+    "Inspect": {
+      "Title": "Untersuche Gegenstandstapel",
+      "AsActor": "Du untersuchst diesen Stapel als {actorName}",
+      "Owner": "Als Besitzer dieses Gegestandsstapels kannst du den Inhalt verändern.",
+      "Empty": "Dieser Stapel ist leer.",
+      "Destroyed": "Dieser Stapel existiert nicht mehr und liegt brach.",
+      "TakeAll": "Alles nehmen",
+      "Take": "Nehmen",
+      "Close": "Kiste schliessen",
+      "Leave": "Verlassen",
+      "NoShareLeft": "Kein Anteil übrig...",
+      "NoneLeft": "Nichts übrig...",
+      "OpenSheet": "Bogen öffnen",
+      "AddCurrency": "Währung hinzufügen",
+      "SplitAll": "Auf {num_players} verteilen",
+      "SplitItems": "Gegenstände auf {num_players} verteilen",
+      "SplitCurrencies": "Währung auf {num_players} verteilen",
+      "NoActor": "Du untersuchst den Inhalt dieses Stapels ohne ein Token zu kontrollieren. Dies bedeutet du kannst keine Gegenstände vom Stapel nehmen."
+    },
+    "Trade": {
+      "Title": "Item Piles: Handel",
+      "Accept": "Annehmen",
+      "Decline": "Ablehnen",
+      "Mute": "Stummschalten",
+      "AutoDecline": "Du hast nicht schnell genug auf die Handelsanfrage reagiert, daher wurde sie automatisch abgelehnt.",
+      "Declined": "Der andere Spieler hat die Handelsanfrage abgelehnt.",
+      "Private": "Den Handel privat machen",
+      "PrivateExplanation": "Es wird keine Nachricht in den Chat geschrieben und niemand kann den Handel beobachten",
+      "Over": "Dieser Handel ist nicht mehr aktiv.",
+      "Between": "Handel zwischen {actor_1} und {actor_2}",
+      "DragDrop": "Ziehe Gegenstände hier herein um zu handeln",
+      "Request": {
+        "Title": "Item Piles: Handelsanfrage senden",
+        "User": "Wähle aus mit welchem Spieler zu handeln möchtest:",
+        "PickActor": "Wähle aus welchen Akteur du in diesem Handel repräsentieren möchtest:",
+        "PickedActor": "Der Akteur der in diesem Handel rerpäsentiert wird:",
+        "PickToken": "Wähle den aktuell ausgewählten Token",
+        "DropActor": "Akteur hierher ziehen",
+        "Label": "Handelsanfrage senden"
+      },
+      "NoActiveUsers": {
+        "Title": "Item Piles: Keine aktiven Spieler",
+        "Content": "Kein anderer Spieler ist online. Du kannst mit niemandem handeln."
+      },
+      "Prompt": {
+        "Title": "Item Piles: Handelsanfrage",
+        "Content": "{trading_actor_name} (user {trading_user_name}) möchte mit dir handeln.",
+        "PrivateContent": "{trading_actor_name} (user {trading_user_name}) möchte <strong>privat</strong> mit dir handeln.",
+        "AcceptQuery": "Akzeptieren?"
+      },
+      "OngoingRequest": {
+        "Content": "Warte auf Antwort von {user_name}...",
+        "Label": "Handelsanfrage abbrechen"
+      },
+      "CancelledRequest": {
+        "Content": "Die Handelsanfrage wurde von {user_name} abgebrochen."
+      },
+      "AddCurrency": {
+        "Title": "Währungen hinzufügen",
+        "Content": "Währungen zum aktuellen Handel mit {trader_actor_name} hinzufügen",
+        "Label": "Währungen aktualisieren"
+      },
+      "GMAddCurrency": "Währungen hinzufügen (GM-Modus)",
+      "Closed": {
+        "Title": "Handelsfenster geschlossen",
+        "You": "Du hast das Handelsfenster geschlossen und der Handel wurde abgebrochen.",
+        "Them": "Spieler \"{user_name}\" hat das Handelsfenster geschlossen und der Handel wurde abgebrochen.",
+        "Someone": "Einer der Spieler hat das Handelsfenster geschlossen und der Handel wurde abgebrochen."
+      },
+      "Disconnected": "Die Verbindung von einem der Spieler wurde unterbrochen und der Handel wurde abgebrochen.",
+      "UserCharacterWarning": "Du hast den Akteur \"{actor_name}\" ausgewählt. Dieser gehört dem Spieler \"{player_name}\".<br><br>Möchtest du trotzdem fortfahren?",
+      "UserActiveCharacterWarning": "Du hast den Akteur \"{actor_name}\" ausgewählt. Dieser gehört dem Spieler \"{player_name}\", welcher gerade <strong>aktiv</strong> ist.<br><br>Möchtest du trotzdem fortfahren?",
+      "ActorOwnerWarning": "Dieser Akteur gehört dir nicht. Du kannst ihn nicht für einen Handel benutzen."
+    },
+    "Errors": {
+      "DisallowedItemDrop": "Du kannst keinen Gegenstand vom Typ \"{type}\" hier fallen lassen.",
+      "DisallowedItemTrade": "Du kannst keine \"{type}\"-Gegenstände handeln",
+      "NoSourceDrop": "Du kannst keine Gegenstände aus der Gegenstandsleiste fallen lassen, es sei denn, du bist ein GM.",
+      "PileTooFar": "Du bist zu weit entfernt um mit dem Stapel zu interagieren",
+      "PileLocked": "Dieser Stapel ist gesperrt und verschlossen - du kannst keine Gegenstände hier fallen lassen.",
+      "DropNoToken": "Du hast kein Token in dieser Szene, daher kannst du hier keinen Gegenstand fallen lassen."
+    },
+    "Dialogs": {
+      "DropTypeWarning": {
+        "Title": "Gegenstand Typ Warnung",
+        "Content": "Du versuchst einen Gegenstand vom Typ (\"{type}\") hier abzulegen was normal nicht erlaubt ist. Bist du sicher das du das tun willst?"
+      },
+      "TradeTypeWarning": {
+        "Title": "Gegenstandsartwarnung",
+        "Content": "Du versuchst gerade einen Gegenstand vom Typ (\"{type}\") zu handeln. Das ist normalerweise nicht erlaubt. Bist du dir sicher, dass du das tun möchtest?"
+      },
+      "ResetSettings": {
+        "Title": "Setze Einstellungen von Gegenstandsstapel zurück",
+        "Content": "Bist du sicher das du alle Einstellungen vom Gegenstandsstapelmodul auf die Standardwerte des Systems zurücksetzen willst? <strong>DIES KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!</strong>",
+        "Confirm": "Moduleinstellungen zurücksetzen"
+      },
+      "LinkedActorWarning": {
+        "Title": "Gegenstandsstapel & verlinkter Akteur",
+        "Content": "Bist du sicher das du diesen <strong>verlinkten Akteuer</strong> in einen Gegenstandstapel ändern willst? Alle Akteur-Token bei verlinkten Akteueren teilen sich ein Inventar und Attribute"
+      },
+      "NoSystemFound": {
+        "Title": "System nicht erkannt",
+        "Content": "Dein Spielsystem wird im Moment nicht vollständig unterstützt. Das bedeutet das diesem Modul nicht bekannt ist wie es am besten mit den Gegenständen des Systems umgehen muss. Du kannst dieses Modul trotzdem verwenden, aber die Funktionalität könnte eingeschränkt sein.<br><br>Du kannst die Einstellung für dein Spielsystem selbst vornehmen, dies erfordert ein wenig technische Kenntnis.<br><br>Wenn du Fragen hast kontaktiere <strong>Wasp#2005</strong> auf dem Foundry Discord Server."
+      },
+      "SystemFound": {
+        "Title": "Spielsystem erfolgreich erkannt",
+        "Content": "Dein Spielsystem wurde in vorherigen Versionen dieses Modules nicht untersützt. Diese Unterstützung wurde nun mit dem Update hinzugefügt!<br><br>Möchtest du nun die Standardeinstellungen deines Spielsystems im Gegenstandsstapel-Modul laden?",
+        "Confirm": "Standardeinstellungen setzen"
+      },
+      "ResetSharingData": {
+        "Title": "Bisherige Anteil-Daten löschen",
+        "Content": "Hierdurch wird die Historie gelöscht, welche Spieler bereits welchen Anteil aus dem Stapel genommen haben. Bist du sicher, dass du das tun möchtest?",
+        "Confirm": "Anteil-Daten löschen"
+      },
+      "Cancel": "Abbrechen"
+    },
+    "CurrenciesEditor": {
+      "Title": "Währungseditor",
+      "Explanation": "Hier kannst du definieren, welche Währungen ein Charakter aus Gegenstandsstapeln nehmen kann. In D&D5e existieren Währungen als Attribute eines Akteurs z.B. unter \"actor.data.data.currency.gp\", also würdest du deine eigene Währung mit dem Namen \"Goldmünzen\" und dem Attribut  \"data.currency.gp\" hinzufügen.",
+      "Name": "Währungsname",
+      "Path": "Währungspfad",
+      "Icon": "Währungsymbol",
+      "AddNew": "Neue Währung hinzufügen",
+      "Submit": "Währungen abschicken"
+    },
+    "FilterEditor": {
+      "Title": "Gegenstandsfilter Editor",
+      "Explanation": "Hier kannst du mehrere Arten von Filtern definieren, die bestimmte Arten von Gegenständen ausschließen. Basierend auf dem angegebenen Attributpfad kann der Gegenstandsstapel den \"Typ\" eines Gegenstands finden, und basierend auf den Filtern werden diese Gegenstände in der Benutzeroberfläche des Gegenstandsstapels ausgeblendet.",
+      "Filters": "Filter",
+      "Path": "Attributspfad",
+      "AddNew": "Neuer Filter zufügen",
+      "Submit": "Filter übertragen"
+    },
+    "SimilaritiesEditor": {
+      "Title": "Gegenstandsähnlichkeiten editieren",
+      "Explanation_P1": "Hier kannst du verschiedene Idenfikatoren definieren, die Item Piles helfen zwischen Gegenständen der gleichen Art zu unterscheiden. So gut wie jedes Rollenspielsystem unterscheidet Gegenstände an ihrem Namen (name) und Typ (type).",
+      "Explanation_P2": "In manchen Fällen, wie z.B. Pathfinder 2nd Edition, gibt es temporäre Gegenstände, die den gleichen Namen wie permanente haben. Daher kann man mit dem hinzufügen von \"data.temporary.value\" sicherstellen, dass diese sich \"unterscheiden\".",
+      "Path": "Attributspfad",
+      "AddNew": "Neuen Attributspfad hinzufügen",
+      "Submit": "Gegenstandsähnlichkeiten abschicken"
+    },
+    "Defaults": {
+      "Title": "Gegenstandsstapel Konfiguration",
+      "Configure": "Gegenstandsstapel",
+      "Update": "Gegenstandsstapel aktualisieren",
+      "Main": {
+        "Title": "Hauptmenü",
+        "EnabledPile": "Aktiviert",
+        "EnabledPileExplanation": "Bestimmt ob sich dies als Gegenstandsstapel verhalten soll.",
+        "InspectItems": "Gegenstände prüfbar aktivieren",
+        "InspectItemsExplanation": "Durch Klick auf den Namen des Gegenständes wird das Gegenstandsfenster geöffnet.",
+        "Distance": "Interaktionsreichweite",
+        "GridUnits": "Gittereinheiten (leer lassen für unbegrenzt)",
+        "Macro": "Macro bei Interaktion",
+        "MacroExplanation": "Name des Makros, das ausgeführt werden soll, wenn mit diesem Stapel interagiert wird.",
+        "MacroPlaceholder": "Macro Name einfügen",
+        "DeleteWhenEmpty": "Löschen wenn leer",
+        "DeleteWhenEmptyExplanation": "Bewirkt, dass sich der Gegenstandsstapel selbst löscht, sobald er leer ist.",
+        "DeleteWhenEmptyDefault": "Standardeinstellung des Moduls",
+        "DeleteWhenEmptyYes": "Ja, löschen, wenn leer",
+        "DeleteWhenEmptyNo": "Nein, nicht löschen wenn leer",
+        "OverrideCurrencies": "Währungen überschreiben",
+        "OverrideCurrenciesExplanation": "Konfiguriere, ob dieser Stapel andere als die Standardwährungen transferieren darf.",
+        "ConfigureOverrideCurrencies": "Konfiguriere die zu überschreibenden Währungen",
+        "OverrideItemFilters": "Überschreibe Gegenstandsfilter",
+        "OverrideItemFiltersExplanation": "Lege fest, ob dieser Stapel in der Lage sein soll, andere Arten von Gegenständen als die Standardtypen zu übertragen.",
+        "ConfigureOverrideItemFilters": "Konfiguriere den Gegenstandsfilter",
+        "OverrideAttributes": "Dynamische Attribute außer Kraft setzen",
+        "OverrideAttributesExplanation": "Legen Sie fest, ob dieser Stapel andere Attribute als die Standardattribute übertragen können soll.",
+        "ConfigureOverrideAttributes": "Konfiguriere: Dynamische Attribute außer Kraft setzen"
+      },
+      "Other": {
+        "Title": "Weitere Einstellungen"
+      },
+      "SingleItem": {
+        "Title": "Einstellungen einzelner Gegenstand",
+        "DisplayOneContainerWarning": "Achtung! Du hast sowohl die Einstellung \"Einzelnes Artikelbild anzeigen\" als auch \"Ist Container\" aktiviert. In diesem Fall werden Bilder für den Container bevorzugt verwendet.",
+        "DisplayOne": "Einzelnes Artikelbild anzeigen",
+        "DisplayOneExplanation": "Besteht der Stapel aus einem einzigen Gegenstand, wird das Bild des Stapels auf das Bild des Gegenstandes gesetzt.",
+        "OverrideScale": "Einzelne Gegenstands-Token-Skalierung außer Kraft setzen",
+        "Scale": "Gegenstands-Token-Skalierung",
+        "ItemName": "Benutze Gegenstandsname",
+        "ItemNameExplanation": "Veranlasst, dass der Gegenstandsstapel nach dem einzelnen darin enthaltenen Gegenstand benannt wird."
+      },
+      "Container": {
+        "Title": "Einstellungen Container",
+        "IsContainer": "Ist Container",
+        "Locked": "Ist verschlossen",
+        "Closed": "Ist geschlossen",
+        "ClosedImagePath": "Pfad Bild Geschlossener Container",
+        "EmptyImagePath": "Pfad Bild Leerer Container",
+        "OpenedImagePath": "Pfad Bild Geöffneter Container",
+        "LockedImagePath": "Pfad Bild Verschlossener Container",
+        "CloseSoundPath": "Pfad Geräusch Schliessen",
+        "OpenSoundPath": "Pfad Geräusch Öffnen",
+        "LockedSoundPath": "Pfad Geräusch Verschlossen"
+      },
+      "Sharing": {
+        "Title": "Teilen-Einstellungen",
+        "ShareItemsEnabled": "Teilen aktivieren: Gegenstände",
+        "ShareItemsEnabledExplanation": "Wenn diese Option aktiviert wird, können Spieler nur ihren fairen Anteil von der Gesamtmenge nehmen. Wenn sie deaktiviert ist, kann jeder so viel nehmen, wie er möchte.",
+        "ShareCurrenciesEnabled": "Teilen aktivieren: Währungen",
+        "ShareCurrenciesEnabledExplanation": "Wenn diese Option aktiviert wird, können Spieler nur ihren fairen Anteil der Währungen nehmen. Wenn sie deaktiviert ist, kann jeder so viel nehmen, wie er möchte..",
+        "TakeAllEnabled": "\"Alles nehmen\"-Knopf aktivieren",
+        "TakeAllEnabledExplanation": "Aktiviert den \"Alles nehmen\"-Knopf beim Plündern des Gegenstandsstapels. Beide darüberliegenden Optionen müssen dafür aktiviert sein.",
+        "SplitAllEnabled": "\"Mit Spielern teilen\"-Knopf aktivieren",
+        "SplitAllEnabledExplanation": "Aktiviert den \"Durch [number] teilen\"-Knopf beim Plündern des Gegenstandsstapels. Durch diesen Knopf wird die komplette Beute durch alle Spieler geteilt.",
+        "InactivePlayers": "Nur zwischen aktiven Spielern aufteilen",
+        "InactivePlayersExplanation": "Nur Spieler, welche zur Zeit aktiv sind, wenn der Gegenstandsstapel geplündert wird, erhalten ihren Anteil.",
+        "ResetSharingData": "Anteil-Daten löschen",
+        "ResetSharingDataExplanation": "Falls der Inhalt dieses Gegenstandsstapels händisch verändert wurde, während Spieler ihn geplündert haben, kann es vorkommen, dass die fairen Anteile der Spieler nicht mehr gleich sind. Diser Knopf setzt die Daten für alle Spieler zurück."
+      }
+    },
+    "HUD": {
+      "ToggleLocked": "Setze verschlossen",
+      "ToggleClosed": "Setze geschlossen",
+      "Configure": "Stapel konfigurieren"
+    },
+    "DropItem": {
+      "Title": "Gegenstand fallenlassen",
+      "Dropping": "Du lässt Gegenstand fallen",
+      "ExistingPiles": "Es gibt bereits einen Gegenstandsstapel an dieser Stelle, Sie werden Ihre(n) Gegenstand(e) zu diesem Stapel hinzufügen.",
+      "QuantityToDrop": "Du hast {Menge} Stück dieses Gegenstandes, wie viele willst du abgeben?",
+      "AddToPile": "Zum Stapel zufügen",
+      "NewPile": "Neuen Stapel erzeugen",
+      "Cancel": "Abbrechen"
+    },
+    "DropCurrencies": {
+      "Title": "Währungen hinzufügen",
+      "Player": "Du kannst die folgenden Währungen zum Gegenstandsstapel hinzufügen:",
+      "GM": "Als GM kannst du Währungen hinzufügen:",
+      "NoCurrency": "{actor_name} hat keine gültigen Währungen...",
+      "Cancel": "Abbrechen",
+      "AddToPile": "Zum Stapel hinzufügen"
+    },
+    "Chat": {
+      "Pickup": {
+        "Actor": "{name} hat sich folgende Gegenstände genommen:"
+      },
+      "Split": "Der Gegenstandsstapel wurde zwischen {num_players} Spielern aufgeteilt und jeder hat folgende Dinge erhalten:",
+      "TradeComplete": "{party_1} und {party_2} haben einen Handel abgeschlossen.",
+      "TradeStarted": "{party_1} und {party_2} haben einen Handel begonnen.",
+      "TradeStartedButton": "Click the button below to spectate:",
+      "TradeStartedButton": "Drücke den untenstehenden Knopf um als Beobachter teilzunehmen:",
+      "TradeSpectate": "Handel beobachten",
+      "SpectateDisabled": "Handel beendet",
+      "PrivateTrade": "Privater Handel",
+      "ExpandTrade": "Komplette Details des Handels anzeigen"
+    },
+    "Setting": {
+      "Reset": {
+        "Title": "Einstellungen zurücksetzen",
+        "Label": "Einstellungen auf Standard zurücksetzen",
+        "Hint": "Dadurch werden alle Einstellungen der Gegenstandsstapel auf die Standardeinstellungen des aktiven Spielsystems zurückgesetzt."
+      },
+      "ActorClass": {
+        "Title": "Akteur Klassentyp",
+        "Label": "Diese Einstellung definiert den Typ des Akteurs, der für den Standard-Gegenstandsstapel-Akteur verwendet wird, der beim ersten Erzeugen eines Stapels erstellt wird. Im Falle von D&D5e ist dies \"character\", da es keinen eigenen Beuteakteurstyp gibt."
+      },
+      "Quantity": {
+        "Title": "Gegenstand Attribut Artikelmenge",
+        "Label": "Hier können Sie den Attributspfad für die Menge der einzelnen Gegenstände konfigurieren. Im D&D5e-System zum Beispiel wird die Menge jedes Gegenstands im Attribut \"item.data.data.quantity\" gespeichert, so dass Sie hier \"data.quantity\" eingeben müssen."
+      },
+      "Currencies": {
+        "Title": "Währungen",
+        "Label": "Währungen konfigurieren",
+        "Hint": "Diese Einstellung definiert die Währungen, die man aufheben kann, die keine Gegenstände sondern numerische Werte auf dem Charakterbogen sind."
+      },
+      "ItemFilters": {
+        "Title": "Gegenstandsfilter",
+        "Label": "Gegenstandsfilter einstellen",
+        "Hint": "Hier kannst du einstellen, welche Gegenstände ignoriert und nicht in den Gegenstandsstapeldialogen aufgeführt werden."
+      },
+      "ItemSimilarities": {
+        "Title": "Gegenstandsähnlichkeiten",
+        "Label": "Gegenstandsähnlichkeiten konfigurieren",
+        "Hint": "Hier kannst du einstellen, wie das System erkennen soll, welche Gegenstände identisch sind. In manchen Systemen wird zwischen Gegenständen gleicher Art unterschieden. Z.B. zwischen temporären oder beschädigten Gegenständen."
+      },
+      "EnableTrading": {
+        "Title": "Handel aktivieren",
+        "Hint": "Erlaube Handel - falls diese Option deaktiviert ist, kann niemand einen Handel beginnen."
+      },
+      "ShowTradeButton": {
+        "Title": "Handelsanfragenknopf anzeigen",
+        "Hint": "Das Aktivieren dieser Option fügt der Spielerliste einen Handelsanfragenknopf hinzu mit dem jeder Spieler eine Handelsanfrage stellen kann."
+      },
+      "OutputToChat": {
+        "Title": "Ausgabe im Chat",
+        "Label": "Eine Nachricht über den aufgehobenen Gegenstand wird immer in den Chat gesendet wenn ein Spieler einen Gegenstand vom Stapel nimmt.",
+        "Off": "Aus - schaltet Nachrichten ab",
+        "Public": "Öffentlich - jeder kann die Nachrichten sehen",
+        "SelfGM": "Privat - nur GMs und der betroffene User sehen die Nachricht",
+        "Blind": "Blind - nur die GMs sehen die Nachricht"
+      },
+      "InvertSheetOpen": {
+        "Title": "Invertiere die Funktion von Strg + Doppelklick um den Gegenstandsstapel zu öffnen",
+        "Label": "Normalerweise muss man Strg gedrückt halten, wenn man den Akteurbogen eines Gegenstandsstapels direkt öffnen möchte. Diese Option macht das Öffnen des Charakterbogens zum Standard und Strg+Doppelklick öffnet das Gegenstandsstapelinventar."
+      },
+      "HideActorHeaderText": {
+        "Title": "Verstecke Kopftext des Akteurs",
+        "Label": "Blendet den \"Gegenstandsstapel\" Text im Akteur Kopf aus - nützlich wenn du viele Module hast und der Kopftext bereits zu sehr befüllt wird."
+      },
+      "DeleteEmptyPiles": {
+        "Title": "Leere Stapel automatisch löschen",
+        "Label": "Dies führt dazu, dass sich Gegenstandsstapel selbst löschen, sobald sie keine Gegenstände mehr enthalten. Dies kann bei einzelnen Gegenstandsstapeln außer Kraft gesetzt werden."
+      },
+      "PreloadFiles": {
+        "Title": "Dateien vorladen",
+        "Label": "Veranlasst, dass Dateien (Bilder und Audio) von Stapeln vorgeladen werden, was zu einem nahtlosen Erlebnis führt."
+      },
+      "Debug": {
+        "Title": "Debugging einschalten",
+        "Label": "Gibt Debug-Meldungen auf der Konsole aus"
+      },
+      "Attributes": {
+        "Title": "Dynamische Attribute",
+        "Label": "Attribute konfigurieren",
+        "Hint": "Mit dieser Einstellung werden die Attribute festgelegt, die für die Abholung in Artikelpfaden in Frage kommen, z. B. Währungen oder Stärken, bei denen es sich nicht um tatsächliche Artikel handeln muss."
+      }
+    },
+    "AttributeEditor": {
+      "Title": "Dynamischer Attribute Editor",
+      "Explanation": "Hier kannst du festlegen, welche Attribute von Charakteren von Gegenstandsstapeln abgeholt werden können, z.B. Währungen. In D&D5e gibt es Währungen für Akteure mit dem Attributspfad \"actor.data.data.currency.gp\", also fügst du deine eigene mit dem Namen \"Goldmünzen\" und dem Attributspfad \"data.currency.gp\" hinzu.",
+      "Name": "Attributsname",
+      "Icon": "Attribut Icon",
+      "AddNew": "Neues Attribut zufügen",
+      "Submit": "Attribut übermitteln"
+    },
+    "AttributePath": "Attributspfad"
+  }
 }
