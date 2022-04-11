@@ -9,6 +9,7 @@ import swade from "./systems/swade.js";
 import tormenta20 from "./systems/tormenta20.js";
 import wfrp4e from "./systems/wfrp4e.js"
 import splittermond from "./systems/splittermond.js"
+import sfrpg from "./systems/sfrpg.js"
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -28,6 +29,7 @@ export const SYSTEMS = {
             tormenta20,
             wfrp4e,
             splittermond,
+            sfrpg,
             // ↑ ADD SYSTEMS HERE ↑
         }?.[game.system.id];
     }

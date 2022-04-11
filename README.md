@@ -108,6 +108,7 @@ module settings to configure that.
 - [Tormenta20](https://foundryvtt.com/packages/tormenta20)
 - [Warhammer Fantasy Roleplay 4th Ed](https://foundryvtt.com/packages/wfrp4e)
 - [Splittermond](https://foundryvtt.com/packages/splittermond)
+- [Starfinder](https://foundryvtt.com/packages/sfrpg)
 
 ## Semi-supported systems
 

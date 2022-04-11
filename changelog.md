@@ -1,10 +1,15 @@
 # Item Piles Changelog
 
+## Version 1.4.8
+- Updated German localization (Thank you, gsterling on GitHub)
+- Added Starfinder system support (Thank you, dizko on GitHub)
+- Updated Tormenta20 system configuration (Thank you, mclemente on GitHub)
+
 ## Version 1.4.7
 - Fixed issue in latest PF2 update which changed the attribute path for quantities
 
 ## Version 1.4.6
-- Adjusted API to use native foundry `Item#fromDropData` instead of my own implementation (Thank you, TheGiddyLimit on github!)
+- Adjusted API to use native foundry `Item#fromDropData` instead of my own implementation (Thank you, TheGiddyLimit on GitHub!)
 - Fixed issue relating to some systems not generating a new ID for items, which caused false-positives when trying to find similar items on actors that were the source of said items
 - Fixed issue where systems would override core functions on items that modify names and other data, Item Piles will now always call the system's Item specific functions 
   - Fixes issue with PF1 items sometimes showing up as identified when they were unidentified
