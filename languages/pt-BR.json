@@ -1,0 +1,319 @@
+{
+    "ITEM-PILES": {
+        "Items": "Itens",
+        "Currencies": "Moedas",
+        "Currency": "Moeday",
+        "ContextMenu": {
+            "ShowToPlayers": "Item Piles: Show pile to players",
+            "RequestTrade": "Item Piles: Pedir pra Negociar"
+        },
+        "Inspect": {
+            "Title": "Inspecionando Conteúdo da Pilha",
+            "AsActor": "Você está inspecionando esta pilha como o(a)<a class='item-piles-change-actor item-piles-highlight'>{actorName}</a>",
+            "Owner": "As an owner of this Item Pile, you can edit the item pile's contents.",
+            "Empty": "Esta pilha está fazia.",
+            "Destroyed": "Esta pilha não existe mais e está desolada.",
+            "TakeAll": "Pegar todos os Itens",
+            "Take": "Pegar",
+            "Close": "Fechar Tampa",
+            "Leave": "Sair",
+            "NoShareLeft": "No share left...",
+            "NoneLeft": "Nenhum sobrando...",
+            "OpenSheet": "Abrir Ficha",
+            "AddCurrency": "Adicionar moeda",
+            "SplitAll": "Dividir em {num_players}",
+            "SplitItems": "Dividir os itens em {num_players}",
+            "SplitCurrencies": "Dividir as moedas em {num_players}"
+        },
+        "Trade": {
+            "Title": "Item Piles: Negociando",
+            "Accept": "Aceitar",
+            "Decline": "Recusar",
+            "Mute": "Mutar",
+            "AutoDecline": "Você não respondeu à negociação rápido o suficiente, então ela foi auto-cancelada.",
+            "Declined": "O outro usuário recusou a negociação.",
+            "Private": "Tornar essa negociação privada",
+            "PrivateExplanation": "Nenhum cartão de chat é postado e ninguém pode assistir.",
+            "Over": "Essa negociação não está mais ativa.",
+            "Between": "Negociação entre {actor_1} e {actor_2}",
+            "DragDrop": "Arraste itens aqui para começar a negociação",
+            "Request": {
+                "Title": "Item Piles: Enviar pedido de negociação",
+                "User": "Selecione com qual usuário você quer negociar:",
+                "PickActor": "Selecione qual ator representará a negociação:",
+                "PickedActor": "O ator que representará a negociação:",
+                "PickToken": "Escolher token selecionado",
+                "DropActor": "Arreste o ator aqui",
+                "Label": "Enviar pedido de negociação"
+            },
+            "NoActiveUsers": {
+                "Title": "Item Piles: Nenhum Usuário Ativo",
+                "Content": "Nenhum jogador está ativo, então você não tem ninguém com quem negociar."
+            },
+            "Prompt": {
+                "Title": "Item Piles: Pedir para Negociar",
+                "Content": "{trading_actor_name} ({trading_user_name}) quer negociar com você.",
+                "PrivateContent": "{trading_actor_name} ({trading_user_name}) quer negociar com você <strong>em segredo</strong>.",
+                "AcceptQuery": "Você aceita?"
+            },
+            "OngoingRequest": {
+                "Content": "Esperando a responsa de {user_name}...",
+                "Label": "Cancelar pedido de negociação"
+            },
+            "CancelledRequest": {
+                "Content": "O pedido de negociação foi cancelado por {user_name}."
+            },
+            "AddCurrency": {
+                "Title": "Adicionar Moedas",
+                "Content": "Adicione moedas à negociação ativa com {trader_actor_name}",
+                "Label": "Atualizar Moedas"
+            },
+            "GMAddCurrency": "Add Currency (GM mode)",
+            "Closed": {
+                "Title": "Negociação Fechada",
+                "You": "Você fechou a janela de negociação, então a negociação foi cancelada.",
+                "Them": "\"{user_name}\" fechou a janela de negociação, então a negociação foi cancelada.",
+                "Someone": "Um dos usuário fechou a janela de negociação, então a negociação foi cancelada."
+            },
+            "Disconnected": "Um dos usuários deconectou, então a negociação foi cancelada.",
+            "UserCharacterWarning": "Você escolheu o ator \"{actor_name}\" o qual está vinculado ao personagem do jogador(a) \"{player_name}\".<br><br>Tem certeza de que quer fazer isso?",
+            "UserActiveCharacterWarning": "Você escolheu o ator \"{actor_name}\" o qual está vinculado ao personagem do jogador(a) \"{player_name}\", o qual está <strong>ativo</strong>.<br><br>Tem certeza de que quer fazer isso?",
+            "ActorOwnerWarning": "Você não possui este ator, então não pode negociar com ele."
+        },
+        "Errors": {
+            "DisallowedItemDrop": "You cannot drop \"{type}\" items",
+            "DisallowedItemTrade": "You cannot trade \"{type}\" items",
+            "NoSourceDrop": "Você não pode colocar itens do barra de itens a não ser que seja um GM.",
+            "PileTooFar": "Você está longe demais para interagir com esta pilha.",
+            "PileLocked": "Esta pilha de itens está trancada e não pode ser aberta - você não pode colocar itens nela.",
+            "DropNoToken": "Você não tem um token nesta cena, então não pode colocar nenhum item aqui."
+        },
+        "Dialogs": {
+            "DropTypeWarning": {
+                "Title": "Item Type Warning",
+                "Content": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?"
+            },
+            "TradeTypeWarning": {
+                "Title": "Item Type Warning",
+                "Content": "You're attempting to trade an item that is of a type (\"{type}\") that is normally not allowed to be traded. Are you sure you want to do this?"
+            },
+            "ResetSettings": {
+                "Title": "Reset Item Piles Module Settings",
+                "Content": "Are you sure you want to reset all of the Item Piles module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
+                "Confirm": "Reset Module Settings"
+            },
+            "LinkedActorWarning": {
+                "Title": "Item Piles & Linked Actor",
+                "Content": "Are you sure you want to turn this <strong>linked actor</strong> into an item pile? This actor's token is linked and all tokens of this actor will share its inventory and currencies."
+            },
+            "NoSystemFound": {
+                "Title": "System Not Recognized",
+                "Content": "This system is not currently fully supported. This means that the module does not know how to best handle this system's items, but can still operate in a limited fashion.<br><br>You can configure the module's settings yourself, but it requires a bit of technical know-how.<br><br>If you have any questions, ping <strong>Wasp#2005</strong> on the Foundry discord."
+            },
+            "SystemFound": {
+                "Title": "System Recognized",
+                "Content": "This system was previously not supported, but in an recent update it was added as a supported system!<br><br>Do you want to load this system's default Item Pile settings?",
+                "Confirm": "Apply System Defaults"
+            },
+            "ResetSharingData": {
+                "Title": "Reset Sharing Data",
+                "Content": "This will reset all of the history of players having taken their share from this pile.<br><br>Are you sure you want to do this?",
+                "Confirm": "Reset Sharing Data"
+            },
+            "Cancel": "Cancel"
+        },
+        "CurrenciesEditor": {
+            "Title": "Currencies Editor",
+            "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
+            "Name": "Currency name",
+            "Path": "Currency path",
+            "Icon": "Currency icon",
+            "AddNew": "Add new currency",
+            "Submit": "Submit currencies"
+        },
+        "FilterEditor": {
+            "Title": "Item Filters Editor",
+            "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
+            "Filters": "Filters",
+            "Path": "Attribute path",
+            "AddNew": "Add new filter",
+            "Submit": "Submit filters"
+        },
+        "SimilaritiesEditor": {
+            "Title": "Item Similarities Editor",
+            "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
+            "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", you temporary items are considered \"unique\".",
+            "Path": "Attribute path",
+            "AddNew": "Add new attribute path",
+            "Submit": "Submit item similarities"
+        },
+        "Defaults": {
+            "Title": "Item Pile Configuration",
+            "Configure": "Item Pile",
+            "Update": "Update Item Pile",
+            "Main": {
+                "Title": "Main Settings",
+                "EnabledPile": "Enabled",
+                "EnabledPileExplanation": "Whether this should act as an item pile.",
+                "InspectItems": "Enable Item Inspect",
+                "InspectItemsExplanation": "Clicking item names will open the item's sheet.",
+                "Distance": "Interaction Distance",
+                "GridUnits": "Grid Units (leave empty for infinite)",
+                "Macro": "On Interact Macro",
+                "MacroExplanation": "Name of macro to execute when this pile is interacted with.",
+                "MacroPlaceholder": "Insert macro name",
+                "DeleteWhenEmpty": "Delete when empty",
+                "DeleteWhenEmptyExplanation": "Causes this item pile to auto-delete itself once it's empty.",
+                "DeleteWhenEmptyDefault": "Default module setting",
+                "DeleteWhenEmptyYes": "Yes, delete when empty",
+                "DeleteWhenEmptyNo": "No, don't delete when empty",
+                "OverrideCurrencies": "Override Currencies",
+                "OverrideCurrenciesExplanation": "Configure if this pile should be able to transfer other currencies than the default.",
+                "ConfigureOverrideCurrencies": "Configure Override Currencies",
+                "OverrideItemFilters": "Override Item Filters",
+                "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
+                "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+            },
+            "Other": {
+                "Title": "Other Settings"
+            },
+            "SingleItem": {
+                "Title": "Single Item Settings",
+                "DisplayOneContainerWarning": "Warning! You have both \"Display Single Item Image\" and \"Is Container\" enabled. In this case, the container images takes priority.",
+                "DisplayOne": "Display Single Item Image",
+                "DisplayOneExplanation": "If the pile is made up of a single item, this sets the pile token's image to be the image of the item.",
+                "OverrideScale": "Override single item token scale",
+                "Scale": "Single item token scale",
+                "ItemName": "Use Item Name",
+                "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
+            },
+            "Container": {
+                "Title": "Container Settings",
+                "IsContainer": "Is Container",
+                "Locked": "Is Locked",
+                "Closed": "Is Closed",
+                "ClosedImagePath": "Closed Image Path",
+                "EmptyImagePath": "Empty Image Path",
+                "OpenedImagePath": "Opened Image Path",
+                "LockedImagePath": "Locked Image Path",
+                "CloseSoundPath": "Closing Sound Path",
+                "OpenSoundPath": "Opening Sound Path",
+                "LockedSoundPath": "Locked Sound Path"
+            },
+            "Sharing": {
+                "Title": "Sharing Settings",
+                "ShareItemsEnabled": "Sharing Enabled: Items",
+                "ShareItemsEnabledExplanation": "When this is enabled, players can only take their share of the quantities of items. Disabled means they can take as much as they want.",
+                "ShareCurrenciesEnabled": "Sharing Enabled: Currencies",
+                "ShareCurrenciesEnabledExplanation": "When this is enabled, players can only take their share of the quantities of currencies. Disabled means they can take as much as they want.",
+                "TakeAllEnabled": "Enable Take All Button",
+                "TakeAllEnabledExplanation": "Enables the \"Take All\" button when looting this item pile. Requires both of the above sharing settings to be disabled.",
+                "SplitAllEnabled": "Enable Split With Players Button",
+                "SplitAllEnabledExplanation": "Enables the \"Split [number] ways\" button when looting this item pile. Pressing this button makes all players (or only active players, see below) receive their share of the item pile.",
+                "InactivePlayers": "Split Only With Active Players",
+                "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile.",
+                "ResetSharingData": "Reset Sharing Data",
+                "ResetSharingDataExplanation": "If the Item Pile's content was manually changed while people were looting it, the sharing data may become out of sync with the players' actual shares. Pressing this button will reset everyone's share in this pile."
+            }
+        },
+        "HUD": {
+            "ToggleLocked": "Toggle Locked",
+            "ToggleClosed": "Toggle Closed",
+            "Configure": "Configure Pile"
+        },
+        "DropItem": {
+            "Title": "Colocan Item",
+            "Dropping": "Você está colocando",
+            "ExistingPiles": "Você está adicionando este item para a pilha de itens \"{item_pile_name}\".",
+            "QuantityToDrop": "Você tem {quantity} desse item, quantos você quer colocar?",
+            "AddToPile": "Adicionar à pilha",
+            "NewPile": "Criar nova pilha",
+            "Cancel": "Cancelar"
+        },
+        "DropCurrencies": {
+            "Title": "Colocando Moedas",
+            "Player": "Você pode colocar as seguintes moedas nesta pilha de itens:",
+            "GM": "As a GM, you can add currencies to this item pile:",
+            "NoCurrency": "{actor_name} não tem moedas válidas...",
+            "Cancel": "Cancelar",
+            "AddToPile": "Adicionar à pilha"
+        },
+        "Chat": {
+            "Pickup": "{name} pegou os seguintes itens:",
+            "Split": "O conteúdo de uma pilha de itens foi dividido entre {num_players} jogadores, e cada um recebeu:",
+            "TradeComplete": "{party_1} e {party_2} completaram a negociação.",
+            "TradeStarted": "{party_1} e {party_2} iniciaram uma negociação.",
+            "TradeStartedButton": "Clique no botão abaixo para assistir:",
+            "TradeSpectate": "Assistir Negociação",
+            "SpectateDisabled": "Negociação Completada",
+            "PrivateTrade": "Negociação Privada",
+            "ExpandTrade": "Ver todos os detalhes da negociação"
+        },
+        "Setting": {
+            "Reset": {
+                "Title": "Reset settings to default",
+                "Label": "Reset Item Piles Settings To Default",
+                "Hint": "This will reset all of the settings of Item Piles back to the active game system's default."
+            },
+            "ActorClass": {
+                "Title": "Actor class type",
+                "Label": "This setting defines the type of actor that will be used for the default item pile actor that is created on first item drop. In the case of D&D5e, this is \"character\", as it does not have a dedicated loot actor type."
+            },
+            "Quantity": {
+                "Title": "Item quantity attribute",
+                "Label": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.quantity\" attribute, so you'd put \"data.quantity\" in this setting."
+            },
+            "Currencies": {
+                "Title": "Currencies",
+                "Label": "Configure Currencies",
+                "Hint": "This setting define the currencies that are eligible for pickup, which may not be actual items but numerical inputs on the character sheet."
+            },
+            "ItemFilters": {
+                "Title": "Item filters",
+                "Label": "Configure Item Filters",
+                "Hint": "Here you can configure what items are ignored and not listed in the item pile dialogs."
+            },
+            "ItemSimilarities": {
+                "Title": "Item Similarities",
+                "Label": "Configure Item Similarities",
+                "Hint": "Here you can configure what how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
+            },
+            "EnableTrading": {
+                "Title": "Enable Trading",
+                "Hint": "This enables trading - with this disabled, no one can initiate any trade."
+            },
+            "ShowTradeButton": {
+                "Title": "Show Trade Button",
+                "Hint": "Enabling this will display a trade button just below the player list in the bottom right."
+            },
+            "OutputToChat": {
+                "Title": "Output to chat",
+                "Label": "Whenever any player picks up items from an item pile, this will send a message showing what was picked up.",
+                "Off": "Off - turn off messages",
+                "Public": "Public - everyone can see messages",
+                "SelfGM": "Private - only GMs and user can see messages",
+                "Blind": "Blind - only GMs can see messages"
+            },
+            "InvertSheetOpen": {
+                "Title": "Invert Ctrl + Double Click Open",
+                "Label": "Normally, you have to hold control when you want to open an item pile's actor sheet. Enabling this makes the item pile actor sheet open by default, and holding control opens the item pile inventory UI."
+            },
+            "HideActorHeaderText": {
+                "Title": "Hide actor header text",
+                "Label": "Hides the \"Item Piles\" text in the actor header - useful if you have too many modules, and the header is getting crowded."
+            },
+            "DeleteEmptyPiles": {
+                "Title": "Auto-delete empty piles",
+                "Label": "This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles."
+            },
+            "PreloadFiles": {
+                "Title": "Preload Files",
+                "Label": "Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience."
+            },
+            "Debug": {
+                "Title": "Enable debugging",
+                "Label": "Prints debug messages to the console"
+            }
+        }
+    }
+}
