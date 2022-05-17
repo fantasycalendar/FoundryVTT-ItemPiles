@@ -35,6 +35,11 @@
             "lang": "ja",
             "name": "日本語",
             "path": "languages/ja.json"
+        },
+        {   
+            "lang": "pt-BR",
+            "name": "Português Brasil",
+            "path": "languages/pt-BR.json"
         }
     ],
     "dependencies": [
