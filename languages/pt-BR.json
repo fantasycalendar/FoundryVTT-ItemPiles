@@ -1,0 +1,319 @@
+{
+    "ITEM-PILES": {
+        "Items": "Itens",
+        "Currencies": "Moedas",
+        "Currency": "Moeda",
+        "ContextMenu": {
+            "ShowToPlayers": "Item Piles: Mostrar pilha para os jogadores",
+            "RequestTrade": "Item Piles: Solicitar negociação"
+        },
+        "Inspect": {
+            "Title": "Inspecionar conteúdo da pilha",
+            "AsActor": "Você está inspecionando esta pilha de itens como <strong><a class='item-piles-change-actor item-piles-highlight'>{actorName}</a></strong>",
+            "Owner": "Como dono desta pilha de itens, você pode editar seu conteúdo.",
+            "Empty": "Esta pilha de itens está vazia.",
+            "Destroyed": "Esta pilha de itens não existe mais.",
+            "TakeAll": "Pegar todos os itens",
+            "Take": "Pegar",
+            "Close": "Fechar",
+            "Leave": "Sair",
+            "NoShareLeft": "Pegou sua parte...",
+            "NoneLeft": "Nada restou...",
+            "OpenSheet": "Abrir ficha",
+            "AddCurrency": "Adicionar moedas",
+            "SplitAll": "Dividir em {num_players}",
+            "SplitItems": "Dividir itens em {num_players}",
+            "SplitCurrencies": "Dividir moedas em {num_players}"
+        },
+        "Trade": {
+            "Title": "Item Piles: Negociação",
+            "Accept": "Aceitar",
+            "Decline": "Recusar",
+            "Mute": "Mutar",
+            "AutoDecline": "Você não respondeu a solicitação de negociação rápido o suficiente, então ela foi recusada automaticamente.",
+            "Declined": "O outro jogador recusou sua solicitação.",
+            "Private": "Tornar esta negociação privada",
+            "PrivateExplanation": "Nenhuma mensagem é enviada para o chat e ninguém pode assistir a negociação",
+            "Over": "Esta negociação não está mais ativa.",
+            "Between": "Negociação entre {actor_1} e {actor_2}",
+            "DragDrop": "Arraste e solte itens para começar a negociação",
+            "Request": {
+                "Title": "Item Piles: Enviar solicitação de negociação",
+                "User": "Selecione com qual jogador você quer negociar:",
+                "PickActor": "Selecione qual ator você vai representar nesta negociação:",
+                "PickedActor": "O ator que você vai representar nesta negociação:",
+                "PickToken": "Escolha o token selecionado",
+                "DropActor": "Arraste e solte um ator aqui",
+                "Label": "Enviar solicitação de negociação"
+            },
+            "NoActiveUsers": {
+                "Title": "Item Piles: Sem jogadores ativos",
+                "Content": "Sem jogadores ativos, então você não tem com quem negociar."
+            },
+            "Prompt": {
+                "Title": "Item Piles: Solicitação de negociação",
+                "Content": "<strong>{trading_actor_name} (user {trading_user_name})</strong> quer negociar com você.",
+                "PrivateContent": "<strong>{trading_actor_name} (user {trading_user_name})</strong> quer negociar de forma <strong>privada</strong> com você.",
+                "AcceptQuery": "Você aceita?"
+            },
+            "OngoingRequest": {
+                "Content": "Esperando a resposta de <strong>{user_name}</strong>...",
+                "Label": "Cancelar solicitação de negociação"
+            },
+            "CancelledRequest": {
+                "Content": "A solicitação de negociação foi cancelada por {user_name}."
+            },
+            "AddCurrency": {
+                "Title": "Adicionar moedas",
+                "Content": "Adicionar moedas à negociação ativa com {trader_actor_name}",
+                "Label": "Atualizar moedas"
+            },
+            "GMAddCurrency": "Adicionar moedas (modo GM)",
+            "Closed": {
+                "Title": "Negociação fechada",
+                "You": "Você fechou a janela de negociação, então ela foi cancelada.",
+                "Them": "O jogador {user_name} fechou a janela de negociação, então ela foi cancelada.",
+                "Someone": "Um dos jogadores fechou a janela de negociação, então ela foi cancelada."
+            },
+            "Disconnected": "Um dos jogadores foi desconectados, então a negociação foi cancelada.",
+            "UserCharacterWarning": "Você selecionou o ator <strong>{actor_name}</strong>, que está atribuído como personagem do jogador <strong>{player_name}</strong>.<br><br>Você está certo de que quer fazer isso?",
+            "UserActiveCharacterWarning": "Você selecionou o ator <strong>{actor_name}</strong> , que está atribuído como personagem do jogador <strong>{player_name}</strong>, que está <strong>ativo</strong>.<br><br>Você está certo de que quer fazer isso?",
+            "ActorOwnerWarning": "Você não é dono deste ator, então você não pode negociar com ele."
+        },
+        "Errors": {
+            "DisallowedItemDrop": "Você não pode selecionar {type}",
+            "DisallowedItemTrade": "Você não pode negociar {type}",
+            "NoSourceDrop": "Você não pode selecionar itens das barra dee itens, a menos que seja um GM.",
+            "PileTooFar": "Você está muito distante para interagir com esta pilha de itens.",
+            "PileLocked": "Esta pilha de itens está trancada ou não pode ser aberta - você não pode soltar itens nela.",
+            "DropNoToken": "Você não tem um token nesta cena, então não pode soltar itens aqui."
+        },
+        "Dialogs": {
+            "DropTypeWarning": {
+                "Title": "Aviso de tipo de item",
+                "Content": "Você está selecionando um item que é do tipo: ({type}). Normalmente não é permitido selecionar este tipo de item. Você está certo de que quer fazer isso?"
+            },
+            "TradeTypeWarning": {
+                "Title": "Aviso de tipo de item",
+                "Content": "Você está tentando negociar um item que é do tipo: ({type}). Normalmente não é permitido negociar este tipo de item. Você está certo de que quer fazer isso?"
+            },
+            "ResetSettings": {
+                "Title": "Redefinir configurações de módulo Item Piles",
+                "Content": "Você tem certeza de que quer redefinir todas as configurações do módulo Item Piles para o padrão do sistema atual? <strong>ISTO NÃO PODE SER DESFEITO!</strong>",
+                "Confirm": "Reedefinir configurações do módulo"
+            },
+            "LinkedActorWarning": {
+                "Title": "Item Piles e atores vinculados",
+                "Content": "Você tem certeza de que quer transformar este <strong>ator vinculado</strong> em uma pilha de itens? Este ator está vinculado e todos os demais tokens dele vão compartilhar seu inventário e moedas."
+            },
+            "NoSystemFound": {
+                "Title": "Sistema não reconhecido",
+                "Content": "Este sistema não é completamente suportado atualmente. Isto significa que o Item Piles não sabe a melhor maneira de lidar com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você pode configurar o módulo por si mesmo, mas isto requer um pouco de conhecimento técnico.<br><br>Se você tiver alguma dúvida, procure por Wasp#2005 no servidor de Discord do Foundry."
+            },
+            "SystemFound": {
+                "Title": "Sistema reconhecido",
+                "Content": "Este sistema não era suportado anteriormente, mas em uma atualização recente foi adicionado aos sistemas suportados!<br><br>Você quer carregar as configurações padrão do Item Pile para este sistema?",
+                "Confirm": "Aplicar configurações padrões"
+            },
+            "ResetSharingData": {
+                "Title": "Redefinir informações de partilhamento",
+                "Content": "Isto vai redefinir todo o histórico de partilhamento dos jogadores com esta pilha de itens.<br><br>Você está certo de que quer fazer isso?",
+                "Confirm": "Redefinir informações"
+            },
+            "Cancel": "Cancelar"
+        },
+        "CurrenciesEditor": {
+            "Title": "Editor de moedas",
+            "Explanation": "Aqui você pode definir quais e que tipos de moedas os jogadores podem pegar de uma pilha de itens. No D&D5e, moedas existem nos atores no caminho de atributo \"actor.data.data.currency.gp\", então você adicionaria sua própria com o nome \"Moedas de ouro\" e o caminho de atributo \"data.currency.gp\".",
+            "Name": "Nome da moeda",
+            "Path": "Caminho da moeda",
+            "Icon": "Ícone da moeda",
+            "AddNew": "Adicionar nova moeda",
+            "Submit": "Confirmar moedas"
+        },
+        "FilterEditor": {
+            "Title": "Editor de filtro de itens",
+            "Explanation": "Aqui você pode definir vários tipos de filtros que excluirão certos tipos de itens. Com base no caminho do atributo fornecido, o Item Piles pode encontrar o \"tipo\" de um item e com base nos filtros, ele oculta esses itens na interface do usuário do inventário do Item Piles.",
+            "Filters": "Filtros",
+            "Path": "Caminho de atributo",
+            "AddNew": "Adicionar novo filtro",
+            "Submit": "Confirmar filtros"
+        },
+        "SimilaritiesEditor": {
+            "Title": "Editor de similaridades de itens",
+            "Explanation_P1": "Aqui você pode definir vários tipos de identificadores que ajudam o Item Piles a diferenciar entre itens semelhantes. Em quase todos os sistemas, os itens podem ser diferenciados com seus \"nome\" e \"tipo\".",
+            "Explanation_P2": "Mas em alguns casos, como no Pathfinder 2ª Edição, itens temporários podem se parecer com itens permanentes. Então, adicionando \"data.temporary.value\", seus itens temporários são considerados \"únicos\".",
+            "Path": "Caminho de attreibuto",
+            "AddNew": "Adicionar novo caminho de atributo",
+            "Submit": "Confirmar similaridades"
+        },
+        "Defaults": {
+            "Title": "Configuração do Item Pile",
+            "Configure": "Item Pile",
+            "Update": "Atualizar pilha",
+            "Main": {
+                "Title": "Configurações principais",
+                "EnabledPile": "Habilitar",
+                "EnabledPileExplanation": "Se isso deve funcionar como uma pilha de itens.",
+                "InspectItems": "Habilitar inspeção de item",
+                "InspectItemsExplanation": "Clicar nos nomes dos itens abrirá a ficha do item.",
+                "Distance": "Distância de interação",
+                "GridUnits": "Unidades do grid (deixe em branco para infinito)",
+                "Macro": "Macro ao interagir",
+                "MacroExplanation": "Nome da macro a ser executada ao interagir com esta pilha de itens.",
+                "MacroPlaceholder": "Inserir nome da macro",
+                "DeleteWhenEmpty": "Excluir quando vazia",
+                "DeleteWhenEmptyExplanation": "Faz com que esta pilha de itens se exclua automaticamente quando estiver vazia.",
+                "DeleteWhenEmptyDefault": "Configuração padrão do módulo",
+                "DeleteWhenEmptyYes": "Sim, excluir quando estiver vazia",
+                "DeleteWhenEmptyNo": "Não, não exclua quando estiver vazia",
+                "OverrideCurrencies": "Substituir moedas",
+                "OverrideCurrenciesExplanation": "Configure se esta pilha de itens eve ser capaz de transferir outras moedas além do padrão.",
+                "ConfigureOverrideCurrencies": "Configurar substituição de moedas",
+                "OverrideItemFilters": "Substituir filtros",
+                "OverrideItemFiltersExplanation": "Configure se esta pilha deve ser capaz de transferir outros tipos de itens além do padrão.",
+                "ConfigureOverrideItemFilters": "Configurar substituição de filtros"
+            },
+            "Other": {
+                "Title": "Outras configurações"
+            },
+            "SingleItem": {
+                "Title": "Configurações de item individual",
+                "DisplayOneContainerWarning": "Aviso! Você tem ambas as opções \"Exibir imagem de itens individuais\" e \"É um contêiner\" habilitadas. Neste caso, as imagens de contêiner têm prioridade.",
+                "DisplayOne": "Exibir imagem de item individual",
+                "DisplayOneExplanation": "Se a pilha de itens for composta por um único item, isso define a imagem do token da pilha como a imagem do item.",
+                "OverrideScale": "Substituir escala de token de item individual",
+                "Scale": "Escala de token de item individual",
+                "ItemName": "Usar nome do item",
+                "ItemNameExplanation": "Faz com que a pilha de itens tenha o nome do item único que ela contém."
+            },
+            "Container": {
+                "Title": "Configurações de contêiner",
+                "IsContainer": "É um contêiner",
+                "Locked": "Está trancado",
+                "Closed": "Está fechado",
+                "ClosedImagePath": "Imagem do contêiner fechado",
+                "EmptyImagePath": "Imagem do contêiner vazio",
+                "OpenedImagePath": "Imagem do contêiner aberto",
+                "LockedImagePath": "Imagem do contêiner trancado",
+                "CloseSoundPath": "Caminho do som de fechamento",
+                "OpenSoundPath": "Caminho do som de abertura",
+                "LockedSoundPath": "Caminho do som de tranca"
+            },
+            "Sharing": {
+                "Title": "Configurações de partilhamento",
+                "ShareItemsEnabled": "Partilhamento habilitado: Itens",
+                "ShareItemsEnabledExplanation": "Quando isso está ativado, os jogadores só podem levar sua parte das quantidades de itens. Desativado significa que eles podem pegar o quanto quiserem.",
+                "ShareCurrenciesEnabled": "Partilhamento habilitado: Moedas",
+                "ShareCurrenciesEnabledExplanation": "Quando isso está ativado, os jogadores só podem pegar sua parte das quantidades de moedas. Desativado significa que eles podem pegar o quanto quiserem.",
+                "TakeAllEnabled": "Habilitar o botão pegar tudo",
+                "TakeAllEnabledExplanation": "Habilita o botão \"Pegar tudo\" ao inspecionar esta pilha de itens. Requer que ambas as configurações de partilhamento acima sejam desativadas.",
+                "SplitAllEnabled": "Habilitar botão dividir entre jogadores",
+                "SplitAllEnabledExplanation": "Habilita o botão \"Dividir em [número]\" ao inspecionar esta pilha de itens. Pressionar este botão faz com que todos os jogadores (ou apenas jogadores ativos, veja abaixo) recebam sua parte da pilha de itens.",
+                "InactivePlayers": "Partilhar apenas entre jogadores ativos",
+                "InactivePlayersExplanation": "Apenas os jogadores que estiverem ativos quando esta pilha de itens for partilhada receberão sua parte da pilha.",
+                "ResetSharingData": "Redefinir informações de partilhamento",
+                "ResetSharingDataExplanation": "Se o conteúdo da pilha de itens foi alterado manualmente enquanto as pessoas estavam inspecionando, os dados de partilhamento podem ficar fora de sincronia com os partilhamentos reais dos jogadores. Pressionar este botão irá redefinir o partilhamento de todos nesta pilha."
+            }
+        },
+        "HUD": {
+            "ToggleLocked": "Alternar trancamento",
+            "ToggleClosed": "Alternar abertura",
+            "Configure": "Configurar pilha de itens"
+        },
+        "DropItem": {
+            "Title": "Derrubando item",
+            "Dropping": "Você está descartando",
+            "ExistingPiles": "Você está adicionando este item à pilha de itens \"{item_pile_name}\".",
+            "QuantityToDrop": "Você tem {quantity} deste item, quantos você quer descartar?",
+            "AddToPile": "Adicionar à pilha",
+            "NewPile": "Criar nova pilha",
+            "Cancel": "Cancelar"
+        },
+        "DropCurrencies": {
+            "Title": "Descartar moedas",
+            "Player": "Você pode colocar as seguintes moedas nesta pilha de itens:",
+            "GM": "Como GM, você pode adicionar moedas a esta pilha de itens:",
+            "NoCurrency": "{actor_name} não tem moedas válidas...",
+            "Cancel": "Cancelar",
+            "AddToPile": "Adicionar à pilha"
+        },
+        "Chat": {
+            "Pickup": "{name} pegou os seguintes itens:",
+            "Split": "O conteúdo de uma pilha de itens foi dividido entre {num_players} jogadores, e cada um recebeu:",
+            "TradeComplete": "{party_1} e {party_2} completaram uma negociação.",
+            "TradeStarted": "{party_1} e {party_2} começaram uma negociação.",
+            "TradeStartedButton": "Clique no botão abaixo para assistir:",
+            "TradeSpectate": "Assistir negociação",
+            "SpectateDisabled": "Negociação completa",
+            "PrivateTrade": "Negociação privada",
+            "ExpandTrade": "Veja detalhes da negociação"
+        },
+        "Setting": {
+            "Reset": {
+                "Title": "Redefinir configurações para o padrão",
+                "Label": "Redefinir as configurações do Item Piles para o padrão",
+                "Hint": "Isso redefinirá todas as configurações do Item Piles de volta ao padrão do sistema de jogo atual."
+            },
+            "ActorClass": {
+                "Title": "Tipo de classe de ator",
+                "Label": "Essa configuração define o tipo de ator que será usado para por padrão pelo Item Pile ao descartar itens. No caso do D&D5e, é \"character\", pois o sistema não possui um tipo de ator de dedicado ao saque."
+            },
+            "Quantity": {
+                "Title": "Atributo de quantidade de item",
+                "Label": "Aqui você pode configurar qual é o caminho de atributo para a quantidade de cada item. Por exemplo, no sistema D&D5e, a quantidade de cada item é armazenada no atributo \"item.data.data.quantity\" do item, então você deve colocar \"data.quantity\" nesta configuração."
+            },
+            "Currencies": {
+                "Title": "Moedas",
+                "Label": "Configurar moedas",
+                "Hint": "Esta configuração define as moedas que são elegíveis para serem coletadas, que podem não ser itens reais, mas entradas numéricas na ficha de personagem."
+            },
+            "ItemFilters": {
+                "Title": "Filtros de itens",
+                "Label": "Configurar filtros de itens",
+                "Hint": "Aqui você poderá configurar quais itens são ignorados e não listados nas caixas de diálogo de pilhas de itens."
+            },
+            "ItemSimilarities": {
+                "Title": "Similaridade de itens",
+                "Label": "Configurar similaridade de itens",
+                "Hint": "Aqui você pode configurar como os itens são detectados para serem os mesmos neste sistema. Alguns sistemas podem ter dados que distinguem itens de forma diferente de outros, como itens temporários."
+            },
+            "EnableTrading": {
+                "Title": "Habilitar negociação",
+                "Hint": "Isso permite a negociação - com isso desativado, ninguém pode iniciar qualquer negociação."
+            },
+            "ShowTradeButton": {
+                "Title": "Mostrar o botão de negociação",
+                "Hint": "Habilitar isso exibirá um botão de negociação logo abaixo da lista de jogadores no canto inferior esquerdo."
+            },
+            "OutputToChat": {
+                "Title": "Saída para o chat",
+                "Label": "Sempre que qualquer jogador pegar itens de uma pilha de itens, isso enviará uma mensagem mostrando o que foi coletado.",
+                "Off": "Desligado - desliga as mensagens",
+                "Public": "Público - todos podem ver as mensagens",
+                "SelfGM": "Privado - apenas GMs e realizadores podem ver as mensagens",
+                "Blind": "Blind - apenas GMs podem ver as mensagens"
+            },
+            "InvertSheetOpen": {
+                "Title": "Inverter Ctrl + Duplo Clique para abrir",
+                "Label": "Normalmente, você precisa segurar Ctrl quando deseja abrir a ficha de uma pilha de itens. Habilitar isso faz com que a ficha da pilha de itens seja aberta por padrão e manter o Ctrl pressionado abre a interface do usuário do inventário da pilha de itens."
+            },
+            "HideActorHeaderText": {
+                "Title": "Ocultar o texto da janela do ator",
+                "Label": "Oculta o texto \"Pilhas de itens\" na janela do ator - útil se você tiver muitos módulos e o cabeçalho da janela estiver ficando lotado."
+            },
+            "DeleteEmptyPiles": {
+                "Title": "Excluir pilhas vazias automaticamente",
+                "Label": "Isso faz com que as pilhas de itens se excluam assim que ficarem sem itens. Isso pode ser substituído em pilhas de itens individuais."
+            },
+            "PreloadFiles": {
+                "Title": "Pré-carregar arquivos",
+                "Label": "Faz com que arquivos (imagens e áudio) de pilhas sejam pré-carregados, resultando em uma experiência perfeita."
+            },
+            "Debug": {
+                "Title": "Habilitar depuração",
+                "Label": "Imprime mensagens de depuração no console"
+            }
+        }
+    }
+}
