@@ -9,8 +9,8 @@
     export let pileData;
 
     async function updateSettings() {
-        application.update(pileData);
         application.close();
+        application.update(pileData);
     }
 
     function requestSubmit(){

@@ -938,15 +938,20 @@ const API = {
      * @param {Boolean} [deleted=false]     Whether the pile was deleted as a part of this re-render
      * @return {Promise}
      */
-    async updateItemPileInventoryApplication(inPileUuid, deleted = false) {
-        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, inPileUuid, deleted);
+    async updateItemPileApplication(inPileUuid, deleted = false) {
+        return itemPileSocket.executeForEveryone(SOCKET_HANDLERS.RERENDER_PILE_APPLICATION, inPileUuid, deleted);
     },
 
     /**
      * @private
      */
-    async _updateItemPileInventoryApplication(inPileUuid, deleted = false) {
-        return ItemPileInventory.updateActiveApp(inPileUuid, deleted);
+    async _updateItemPileApplication(inPileUuid, deleted = false) {
+        for(const app of Object.values(ui.windows)){
+            if(app.id.includes(inPileUuid) && app.svelte && app.rendered && app._state > -2){
+                app.svelte.applicationShell.updateContents();
+            }
+        }
+        return true;
     },
 
     /**
@@ -1077,7 +1082,7 @@ const API = {
         await API._executeItemPileMacro(itemPileUuid, macroData);
 
         const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(itemPileUuid);
-        await API.updateItemPileInventoryApplication(itemPileUuid, shouldBeDeleted);
+        await API.updateItemPileApplication(itemPileUuid, shouldBeDeleted);
 
         if (shouldBeDeleted) {
             await API._deleteItemPile(itemPileUuid);
@@ -1209,7 +1214,7 @@ const API = {
 
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            await API.updateItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileApplication(targetUuid);
 
         }
 
@@ -1339,7 +1344,7 @@ const API = {
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(targetUuid);
 
-            await API.updateItemPileInventoryApplication(targetUuid, shouldBeDeleted);
+            await API.updateItemPileApplication(targetUuid, shouldBeDeleted);
 
             if (shouldBeDeleted) {
                 await API._deleteItemPile(targetUuid);
@@ -1436,8 +1441,8 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
-            await API.updateItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileApplication(sourceUuid, shouldBeDeleted);
+            await API.updateItemPileApplication(targetUuid);
 
             const itemPile = await fromUuid(sourceUuid);
 
@@ -1529,8 +1534,8 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
-            await API.updateItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileApplication(sourceUuid, shouldBeDeleted);
+            await API.updateItemPileApplication(targetUuid);
 
             if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
@@ -1618,7 +1623,7 @@ const API = {
             };
             await API._executeItemPileMacro(targetUuid, macroData);
 
-            await API.updateItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileApplication(targetUuid);
         }
 
         return attributesAdded;
@@ -1721,7 +1726,7 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(targetUuid);
-            await API.updateItemPileInventoryApplication(targetUuid, shouldBeDeleted);
+            await API.updateItemPileApplication(targetUuid, shouldBeDeleted);
 
             if (shouldBeDeleted) {
                 await API._deleteItemPile(targetUuid);
@@ -1824,8 +1829,8 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
-            await API.updateItemPileInventoryApplication(targetUuid);
+            await API.updateItemPileApplication(sourceUuid, shouldBeDeleted);
+            await API.updateItemPileApplication(targetUuid);
 
             const itemPile = await fromUuid(sourceUuid)
 
@@ -1913,7 +1918,7 @@ const API = {
             await API._executeItemPileMacro(targetUuid, macroData);
 
             const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-            await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
+            await API.updateItemPileApplication(sourceUuid, shouldBeDeleted);
 
             if (shouldBeDeleted) {
                 await API._deleteItemPile(sourceUuid);
@@ -1995,8 +2000,8 @@ const API = {
         await API._executeItemPileMacro(targetUuid, macroData);
 
         const shouldBeDeleted = await API._checkItemPileShouldBeDeleted(sourceUuid);
-        await API.updateItemPileInventoryApplication(sourceUuid, shouldBeDeleted);
-        await API.updateItemPileInventoryApplication(targetUuid);
+        await API.updateItemPileApplication(sourceUuid, shouldBeDeleted);
+        await API.updateItemPileApplication(targetUuid);
 
         if (shouldBeDeleted) {
             await API._deleteItemPile(sourceUuid);

@@ -76,14 +76,13 @@ Hooks.once("ready", async () => {
     registerHandlebarHelpers();
     Hooks.callAll(HOOKS.READY);
 
-    // ItemPileConfig.show(canvas.tokens.get("Q5IxEiNxZtj0nSCC").document);
-    //new CurrenciesEditor().render(true)
+    ItemPileConfig.show(game.actors.getName("Default Item Pile"));
+    // new CurrenciesEditor().render(true)
     // new PriceModifiersEditor().render(true);
     // MerchantApp.show(game.actors.getName("Trade Tester"));
-    ItemPileInventory.show(game.actors.getName("Trade Tester"), canvas.tokens.get("6F6uQxj5cpMTciQ7"));
-    // new ItemPileConfig(game.actors.getName("Trade Tester")).render(true);
+    // ItemPileInventory.show(game.actors.getName("Trade Tester"), canvas.tokens.get("6F6uQxj5cpMTciQ7"));
     // ItemSimilaritiesEditor.show()
-    //ItemFiltersEditor.show()
+    // ItemFiltersEditor.show()
 
 });
 
@@ -116,7 +115,7 @@ const module = {
         const targetUuid = target.uuid;
         return debounceManager.setDebounce(targetUuid, async function (uuid) {
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
-            await API._updateItemPileInventoryApplication(uuid, deleted);
+            await API._updateItemPileApplication(uuid, deleted);
             if (deleted || !isResponsibleGM()) return;
             return API._refreshItemPile(uuid);
         })(targetUuid);
@@ -130,7 +129,7 @@ const module = {
         const targetUuid = target.uuid;
         return debounceManager.setDebounce(targetUuid, async function (uuid) {
             const deleted = await API._checkItemPileShouldBeDeleted(uuid);
-            await API._updateItemPileInventoryApplication(uuid, deleted);
+            await API._updateItemPileApplication(uuid, deleted);
             if (deleted || !isResponsibleGM()) return;
             return API._refreshItemPile(uuid);
         })(targetUuid);
@@ -175,7 +174,7 @@ const module = {
     async _deletePile(doc) {
         if (!lib.isValidItemPile(doc)) return;
         Hooks.callAll(HOOKS.PILE.DELETE, doc);
-        return API._updateItemPileInventoryApplication(doc.uuid, true);
+        return API._updateItemPileApplication(doc.uuid, true);
     },
 
     _renderPileHUD(app, html) {

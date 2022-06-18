@@ -97,7 +97,7 @@ export const SOCKET_HANDLERS = {
     */
    RENDER_INTERFACE: "renderItemPileInterface",
    RERENDER_TOKEN_HUD: "rerenderTokenHud",
-   RERENDER_PILE_INVENTORY: "rerenderItemPileInventory",
+   RERENDER_PILE_APPLICATION: "rerenderItemPileApplication",
    QUERY_PILE_INVENTORY_OPEN: "queryItemPileInventoryOpen",
    RESPOND_PILE_INVENTORY_OPEN: "responseItemPileInventoryOpen",
 

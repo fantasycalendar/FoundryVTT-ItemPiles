@@ -17,21 +17,24 @@ export default {
     "ITEM_SIMILARITIES": ["name", "type", "data.sufferedDamage", "data.quality"],
 
     // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
-    "CURRENCIES": [
-        {
-            name: "Telare",
-            path: "data.currency.T",
-            img: "icons/commodities/currency/coins-assorted-mix-platinum.webp"
-        },
-        {
-            name: "Lunare",
-            path: "data.currency.L",
-            img: "icons/commodities/currency/coin-embossed-unicorn-silver.webp"
-        },
-        {
-            name: "Solare",
-            path: "data.currency.S",
-            img: "icons/commodities/currency/coins-assorted-mix-copper.webp"
-        }
-    ]
+    "CURRENCIES": {
+        "itemBased": false,
+        "list": [
+            {
+                name: "Telare",
+                path: "data.currency.T",
+                img: "icons/commodities/currency/coins-assorted-mix-platinum.webp"
+            },
+            {
+                name: "Lunare",
+                path: "data.currency.L",
+                img: "icons/commodities/currency/coin-embossed-unicorn-silver.webp"
+            },
+            {
+                name: "Solare",
+                path: "data.currency.S",
+                img: "icons/commodities/currency/coins-assorted-mix-copper.webp"
+            }
+        ]
+    }
 }

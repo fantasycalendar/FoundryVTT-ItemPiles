@@ -39,7 +39,7 @@ export function registerSocket() {
      * UI sockets
      */
     itemPileSocket.register(SOCKET_HANDLERS.RENDER_INTERFACE, (...args) => API._renderItemPileInterface(...args))
-    itemPileSocket.register(SOCKET_HANDLERS.RERENDER_PILE_INVENTORY, (...args) => API._updateItemPileInventoryApplication(...args))
+    itemPileSocket.register(SOCKET_HANDLERS.RERENDER_PILE_APPLICATION, (...args) => API._updateItemPileApplication(...args))
     itemPileSocket.register(SOCKET_HANDLERS.QUERY_PILE_INVENTORY_OPEN, (...args) => isPileInventoryOpenForOthers.respond(...args))
     itemPileSocket.register(SOCKET_HANDLERS.RESPOND_PILE_INVENTORY_OPEN, (...args) => isPileInventoryOpenForOthers.handleResponse(...args))
 
@@ -125,7 +125,7 @@ export const isPileInventoryOpenForOthers = {
     },
 
     async respond(inUserId, inPileUuid) {
-        const app = ItemPileInventory.getActiveAppFromPile(inPileUuid);
+        const app = ItemPileInventory.getActiveApp(inPileUuid);
         return itemPileSocket.executeAsUser(SOCKET_HANDLERS.RESPOND_PILE_INVENTORY_OPEN, inUserId, game.user.id, !!app);
     },
 

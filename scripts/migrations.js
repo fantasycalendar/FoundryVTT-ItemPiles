@@ -188,6 +188,15 @@ const migrations = {
 
             }
 
+        },
+
+        "1.5.0": async () => {
+
+            await game.settings.set(CONSTANTS.MODULE_NAME, "currencies", {
+                "itemBased": false,
+                "list": game.settings.get(CONSTANTS.MODULE_NAME, "currencies")
+            });
+
         }
 
     }

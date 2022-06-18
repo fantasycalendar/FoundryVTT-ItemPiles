@@ -124,7 +124,13 @@
         },
         "CurrenciesEditor": {
             "Title": "Currencies Editor",
+            "AttributeTitle": "Attribute Based Currencies:",
             "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
+            "ItemTitle": "Item Based Currencies:",
+            "ItemExplanation": "In some systems, currencies are actual items. Drag and drop any items into the lower part here to add a new item-based currency.",
+            "AttributeBased": "Attribute Based",
+            "ItemBased": "Item Based",
+            "ItemBasedExplanation": "By changing this, all currencies will be removed.",
             "Name": "Currency name",
             "Path": "Currency path",
             "Icon": "Currency icon",

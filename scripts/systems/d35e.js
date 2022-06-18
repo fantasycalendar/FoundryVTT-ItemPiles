@@ -17,26 +17,37 @@ export default {
     "ITEM_SIMILARITIES": ["name", "type"],
 
     // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
-    "CURRENCIES": [
-        {
-            name: "D35E.CurrencyPP",
-            path: "data.currency.pp",
-            img: "icons/commodities/currency/coin-inset-snail-silver.webp"
-        },
-        {
-            name: "D35E.CurrencyGP",
-            path: "data.currency.gp",
-            img: "icons/commodities/currency/coin-embossed-crown-gold.webp"
-        },
-        {
-            name: "D35E.CurrencySP",
-            path: "data.currency.sp",
-            img: "icons/commodities/currency/coin-engraved-moon-silver.webp"
-        },
-        {
-            name: "D35E.CurrencyCP",
-            path: "data.currency.cp",
-            img: "icons/commodities/currency/coin-engraved-waves-copper.webp"
-        }
-    ]
+    "CURRENCIES": {
+        "itemBased": false,
+        "list": [
+            {
+                name: "D35E.CurrencyPP",
+                path: "data.currency.pp",
+                img: "icons/commodities/currency/coin-inset-snail-silver.webp",
+                primary: false,
+                exchange: 10
+            },
+            {
+                name: "D35E.CurrencyGP",
+                path: "data.currency.gp",
+                img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
+                primary: true,
+                exchange: 1
+            },
+            {
+                name: "D35E.CurrencySP",
+                path: "data.currency.sp",
+                img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
+                primary: false,
+                exchange: 0.1
+            },
+            {
+                name: "D35E.CurrencyCP",
+                path: "data.currency.cp",
+                img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
+                primary: false,
+                exchange: 0.01
+            }
+        ]
+    }
 }

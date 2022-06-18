@@ -130,7 +130,7 @@ export function findSimilarItem(items, findItem) {
 
     return items.find(item => {
         const itemId = item.id ?? item._id;
-        if (itemId === findItemId) {
+        if (itemId && findItemId && itemId === findItemId) {
             return true;
         }
 

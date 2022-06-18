@@ -6,8 +6,7 @@ import {CONSTANTS} from "../../../constants";
 export default class CurrenciesEditor extends TJSDialog {
 
     constructor(data = false, options, dialogData = {}) {
-        const currencies = data || game.settings.get(CONSTANTS.MODULE_NAME, "currencies");
-        const primary_currency = currencies.indexOf(currencies.find(currency => currency.primary));
+        data = data || game.settings.get(CONSTANTS.MODULE_NAME, "currencies");
         super({
             ...dialogData,
             title: game.i18n.localize("ITEM-PILES.CurrenciesEditor.Title"),
@@ -15,8 +14,7 @@ export default class CurrenciesEditor extends TJSDialog {
             content: {
                 class: CurrenciesEditorShell,
                 props: {
-                    primary_currency,
-                    currencies
+                    data
                 }
             },
             buttons: {

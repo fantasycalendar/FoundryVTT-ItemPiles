@@ -12,8 +12,8 @@ function defaultSettings() {
         "currencies": {
             scope: "world",
             config: false,
-            default: SYSTEMS.DATA ? SYSTEMS.DATA.CURRENCIES : [],
-            type: Array
+            default: SYSTEMS.DATA ? SYSTEMS.DATA.CURRENCIES : {},
+            type: Object
         },
         "itemFilters": {
             scope: "world",

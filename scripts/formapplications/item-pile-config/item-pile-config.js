@@ -19,7 +19,6 @@ export default class ItemPileConfig extends TJSDialog {
         super({
             ...dialogData,
             title: `${game.i18n.localize("ITEM-PILES.ItemPileConfig.Title")}: ${document.data.name}`,
-            id: `item-pile-config-${document.uuid}`,
             zIndex: 101,
             content: {
                 class: ItemPileConfigShell,
@@ -30,6 +29,7 @@ export default class ItemPileConfig extends TJSDialog {
             autoClose: true, // Don't automatically close on button onclick.
             close: () => this.options.resolve?.(null)
         }, {
+            id: `item-pile-config-${document.id}`,
             width: 430,
             resizable: true,
             classes: ["sheet", "item-piles-config"],
@@ -45,7 +45,7 @@ export default class ItemPileConfig extends TJSDialog {
     async showCurrenciesEditor() {
         const pileData = this.svelte.applicationShell.pileData;
         const data = pileData?.overrideCurrencies ?? MODULE_SETTINGS.CURRENCIES;
-        return CurrenciesEditor.show(data, { id: `item-pile-config-${this.document.uuid}` })
+        return CurrenciesEditor.show(data, { id: `item-pile-config-${this.document.id}` })
             .then((result) => {
                 this.overrideCurrencies = result;
             });
@@ -54,7 +54,7 @@ export default class ItemPileConfig extends TJSDialog {
     async showItemFiltersEditor() {
         const pileData = this.svelte.applicationShell.pileData;
         const data = pileData?.overrideItemFilters ?? MODULE_SETTINGS.ITEM_FILTERS;
-        return ItemFiltersEditor.show(data, { id: `item-pile-config-${this.document.uuid}` })
+        return ItemFiltersEditor.show(data, { id: `item-pile-config-${this.document.id}` })
             .then((result) => {
                 this.overrideItemFilters = result;
             });
@@ -62,7 +62,7 @@ export default class ItemPileConfig extends TJSDialog {
 
     async showActorPriceOverrides() {
         const data = this.overridePriceModifiers || [];
-        return PriceModifiersEditor.show(data, { id: `item-pile-config-${this.document.uuid}` })
+        return PriceModifiersEditor.show(data, { id: `item-pile-config-${this.document.id}` })
             .then((result) => {
                 this.overridePriceModifiers = result;
             });
@@ -70,7 +70,7 @@ export default class ItemPileConfig extends TJSDialog {
 
     async resetSharingData() {
         return new Dialog({
-            id: `item-pile-config-${this.document.uuid}`,
+            id: `item-pile-config-${this.document.id}`,
             title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
             content: dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content") }),
             buttons: {
@@ -107,12 +107,19 @@ export default class ItemPileConfig extends TJSDialog {
         }[data.deleteWhenEmpty];
 
         API.updateItemPile(this.document, data).then(() => {
-            API.updateItemPileInventoryApplication(this.document.uuid);
+            API.updateItemPileApplication(this.document.uuid);
         });
 
     }
 
+    static getActiveApp(id){
+        return Object.values(ui.windows).find(app => app.id === `item-pile-config-${id}`)
+    }
+
     static async show(document, options = {}, dialogData = {}) {
+        document = getDocument(document?.actor ?? document);
+        const app = this.getActiveApp(document.id);
+        if(app) return app.render(false, { focus: true });
         return new Promise((resolve) => {
             options.resolve = resolve;
             new this(document, options, dialogData).render(true);
@@ -122,7 +129,7 @@ export default class ItemPileConfig extends TJSDialog {
     async close(options){
         super.close(options);
         Object.values(ui.windows).forEach(app => {
-            if(app.id === `item-pile-config-${this.document.uuid}`){
+            if(app !== this && app.rendered && app.id === `item-pile-config-${this.document.id}`){
                 app.close();
             }
         })

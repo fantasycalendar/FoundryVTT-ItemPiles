@@ -17,26 +17,37 @@ export default {
     "ITEM_SIMILARITIES": ["name", "type"],
 
     // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
-    "CURRENCIES": [
-        {
-            name: "PF1.CurrencyPlatinumP",
-            path: "data.currency.pp",
-            img: "systems/pf1/icons/items/inventory/coins-silver.jpg"
-        },
-        {
-            name: "PF1.CurrencyGoldP",
-            path: "data.currency.gp",
-            img: "systems/pf1/icons/items/inventory/coin-gold.jpg"
-        },
-        {
-            name: "PF1.CurrencySilverP",
-            path: "data.currency.sp",
-            img: "systems/pf1/icons/items/inventory/coin-silver.jpg"
-        },
-        {
-            name: "PF1.CurrencyCopperP",
-            path: "data.currency.cp",
-            img: "systems/pf1/icons/items/inventory/coin-copper.jpg"
-        }
-    ]
+    "CURRENCIES": {
+        "itemBased": false,
+        "list": [
+            {
+                name: "PF1.CurrencyPlatinumP",
+                path: "data.currency.pp",
+                img: "systems/pf1/icons/items/inventory/coins-silver.jpg",
+                primary: false,
+                exchange: 10
+            },
+            {
+                name: "PF1.CurrencyGoldP",
+                path: "data.currency.gp",
+                img: "systems/pf1/icons/items/inventory/coin-gold.jpg",
+                primary: true,
+                exchange: 1
+            },
+            {
+                name: "PF1.CurrencySilverP",
+                path: "data.currency.sp",
+                img: "systems/pf1/icons/items/inventory/coin-silver.jpg",
+                primary: false,
+                exchange: 0.1
+            },
+            {
+                name: "PF1.CurrencyCopperP",
+                path: "data.currency.cp",
+                img: "systems/pf1/icons/items/inventory/coin-copper.jpg",
+                primary: false,
+                exchange: 0.01
+            }
+        ]
+    }
 }

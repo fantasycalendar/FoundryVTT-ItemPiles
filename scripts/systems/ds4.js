@@ -19,21 +19,30 @@ export default {
     "ITEM_SIMILARITIES": ["name", "type"],
 
     // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
-    "CURRENCIES": [
-        {
-            name: "DS4.CharacterCurrencyGold",
-            path: "data.currency.gold",
-            img: "icons/commodities/currency/coin-embossed-crown-gold.webp"
-        },
-        {
-            name: "DS4.CharacterCurrencySilver",
-            path: "data.currency.silver",
-            img: "icons/commodities/currency/coin-inset-snail-silver.webp"
-        },
-        {
-            name: "DS4.CharacterCurrencyCopper",
-            path: "data.currency.copper",
-            img: "icons/commodities/currency/coin-inset-copper-axe.webp"
-        }
-    ]
+    "CURRENCIES": {
+        "itemBased": false,
+        "list": [
+            {
+                name: "DS4.CharacterCurrencyGold",
+                path: "data.currency.gold",
+                img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
+                primary: false,
+                exchange: 10
+            },
+            {
+                name: "DS4.CharacterCurrencySilver",
+                path: "data.currency.silver",
+                img: "icons/commodities/currency/coin-inset-snail-silver.webp",
+                primary: true,
+                exchange: 1
+            },
+            {
+                name: "DS4.CharacterCurrencyCopper",
+                path: "data.currency.copper",
+                img: "icons/commodities/currency/coin-inset-copper-axe.webp",
+                primary: false,
+                exchange: 0.1
+            }
+        ]
+    }
 }

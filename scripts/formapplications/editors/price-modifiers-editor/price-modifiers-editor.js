@@ -5,11 +5,13 @@ import PriceModifiersShell from './price-modifiers-editor.svelte';
 export default class PriceModifiersEditor extends TJSDialog {
 
    constructor(priceModifiers, options, dialogData = {}) {
+
       priceModifiers = priceModifiers.map(data => {
          data.actor = game.actors.get(data.actor);
          if(!data.actor) return false;
          return data;
       }).filter(Boolean);
+
       super({
          ...dialogData,
          title: "ITEM-PILES.PriceModifiersEditor.Title",

@@ -5,11 +5,9 @@ import MerchantAppShell from "./merchant-app.svelte";
 export default class MerchantApp extends SvelteApplication {
 
     constructor(merchant, buyer = false, options, dialogData) {
-        merchant = merchant?.actor ?? merchant
-        buyer = buyer?.actor ?? buyer
         super({
-            id: `merchant-app-${merchant.id}-${buyer?.id ?? ""}`,
             title: `Merchant: ${merchant.name}`,
+            id: `item-pile-merchant-${merchant.id}`,
             svelte: {
                 class: MerchantAppShell,
                 target: document.body,
@@ -20,10 +18,18 @@ export default class MerchantApp extends SvelteApplication {
             },
             ...options
         }, dialogData);
-        this.merchant = merchant?.actor ?? merchant;
+        this.merchant = merchant;
+    }
+
+    static getActiveApp(id){
+        return Object.values(ui.windows).find(app => app.id === `item-pile-merchant-${id}`);
     }
 
     static async show(merchant, buyer = false, options = {}, dialogData = {}) {
+        merchant = merchant?.actor ?? merchant;
+        buyer = buyer?.actor ?? buyer
+        const app = this.getActiveApp(merchant.id);
+        if(app) return app.render(false, { focus: true });
         return new Promise((resolve) => {
             options.resolve = resolve;
             new this(merchant, buyer, options, dialogData).render(true, { focus: true });

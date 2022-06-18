@@ -12,23 +12,34 @@
     export let merchant;
     export let buyer;
 
-    let merchantData = lib.getItemPileData(merchant);
-
-    let merchantItems = lib.getMerchantItemsForActor(merchant);
-
-    merchantItems.sort((a, b) => {
-        return a.type < b.type || a.name < b.name ? -1 : 1;
-    })
-
-    merchantItems = merchantItems.reduce(function (list, item) {
-        list[item.type] = list[item.type] || [];
-        list[item.type].push(item);
-        return list;
-    }, Object.create(null));
-
-    let description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-
+    let merchantData;
+    let merchantItems;
+    let description;
     let search = '';
+
+    updateContents();
+
+    export function updateContents() {
+
+       merchantData = lib.getItemPileData(merchant);
+
+        merchantItems = lib.getMerchantItemsForActor(merchant);
+
+        merchantItems.sort((a, b) => {
+            return a.type < b.type || a.name < b.name ? -1 : 1;
+        })
+
+        merchantItems = merchantItems.reduce(function (list, item) {
+            list[item.type] = list[item.type] || [];
+            list[item.type].push(item);
+            return list;
+        }, Object.create(null));
+
+        description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+        filterItems();
+    }
+
     function filterItems(){
         Object.values(merchantItems).forEach(itemGroup => {
             itemGroup.forEach(item => {
@@ -44,6 +55,20 @@
         open = `${open.hour.toString().padStart(2, "0")}:${open.minute.toString().padStart(2, "0")}`;
         close = `${close.hour.toString().padStart(2, "0")}:${close.minute.toString().padStart(2, "0")}`;
         return `${open} - ${close}`;
+    }
+
+    function previewItem(item){
+        item = merchant.items.get(item.id);
+        if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+            return item.sheet.render(true);
+        }
+        const cls = item._getSheetClass()
+        const sheet = new cls(item, { editable: false })
+        return sheet._render(true);
+    }
+
+    function buyItem(item){
+        console.log(item)
     }
 
 </script>
@@ -110,7 +135,7 @@
                             <div>
                                 {type}
                             </div>
-                            <div style="flex: 0 1 168px;">
+                            <div style="flex: 0 1 162px;">
                                 <small>Price</small>
                             </div>
                         </h3>
@@ -127,17 +152,21 @@
 
                                     <div class="item-piles-name item-piles-text">
                                         <div class="item-piles-name-container">
-                                            <a class="item-piles-clickable">{item.name}</a>
+                                            {#if merchantData.canInspectItems}
+                                                <a class="item-piles-clickable" on:click={previewItem(item)}>{item.name}</a>
+                                            {:else}
+                                                {item.name}
+                                            {/if}
                                         </div>
                                     </div>
 
-                                    <div class="flexrow" style="flex-direction:row;flex: 0 1 100px;">
-                                        <div style="flex:0;"><img src="{item.price.img}" title="{item.price.name}" style=" border-radius: 4px; max-height:20px; max-width: 20px; margin-right: 5px;"></div>
-                                        <div><small>{item.price.cost}</small></div>
+                                    <div class="flexrow" style="flex-direction:row; flex: 0 1 100px; align-items: center;">
+                                        <img src="{item.price.img}" title="{item.price.name}" style=" border-radius: 4px; max-height:20px; max-width: 20px; margin-right: 5px;">
+                                        <small>{item.price.cost}</small>
                                     </div>
 
-                                    <div style="flex: 0 1 50px;">
-                                        <a class="item-piles-buy-button"><i class="fas fa-shopping-cart"></i> Buy</a>
+                                    <div class="flexrow" style="flex: 0 1 50px; align-items: center;">
+                                        <a class="item-piles-buy-button" on:click={buyItem(item)}><i class="fas fa-shopping-cart"></i> Buy</a>
                                     </div>
 
                                 </div>

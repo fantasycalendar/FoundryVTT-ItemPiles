@@ -17,5 +17,8 @@ export default {
     "ITEM_SIMILARITIES": ["name", "type", "data.temporary.value"],
 
     // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
-    "CURRENCIES": []
+    "CURRENCIES": {
+        "itemBased": true,
+        "list": []
+    }
 }

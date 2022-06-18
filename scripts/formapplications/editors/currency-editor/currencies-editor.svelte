@@ -1,19 +1,24 @@
 <script>
-   import { getContext } from 'svelte';
-   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+   import {getContext} from 'svelte';
+   import {localize} from '@typhonjs-fvtt/runtime/svelte/helper';
    import FilePicker from "../../components/FilePicker.svelte";
+   import SwitchCheckbox from "../../components/SwitchCheckbox.svelte";
 
-   const { application } = getContext('external');
+   const {application} = getContext('external');
 
    let form;
    let hovering = null;
    let dragging = null;
 
-   export let currencies;
-   export let primary_currency;
+   export let data;
+
+   let itemBased = data.itemBased;
+   let currencies = data.list;
+
+   let primary_currency = currencies.indexOf(currencies.find(currency => currency.primary));
 
    function add() {
-      currencies.push({ primary: false, name: "", exchange: 1, path: "", img: "" });
+      currencies.push({primary: false, name: "", exchange: 1, path: "", img: ""});
       currencies = currencies;
    }
 
@@ -29,8 +34,8 @@
       dragging = i;
    }
 
-   function drop(event, target){
-      if(dragging !== null) return;
+   function drop(event, target) {
+      if (dragging !== null) return;
       event.dataTransfer.dropEffect = 'move';
       const start = parseInt(event.dataTransfer.getData("text/plain"));
       const newCurrencies = currencies;
@@ -60,14 +65,19 @@
          currency.primary = index === primary_currency;
       })
       application.options.resolve?.(currencies);
-      if(!application.options.resolve){
+      if (!application.options.resolve) {
          application.submit(currencies);
       }
       application.close();
    }
 
-   export function requestSubmit(){
+   export function requestSubmit() {
       form.requestSubmit();
+   }
+
+   function toggleItemBased() {
+      console.log("oh no!")
+      currencies = [];
    }
 
 </script>
@@ -75,7 +85,22 @@
 <svelte:options accessors={true}/>
 
 <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-pile-currencies-editor">
+
    <p>{localize("ITEM-PILES.CurrenciesEditor.Explanation")}</p>
+
+   <div class="form-group flexcol" style="max-width:300px;">
+      <div>
+         <SwitchCheckbox
+              offText={localize("ITEM-PILES.CurrenciesEditor.AttributeBased")}
+              onText={localize("ITEM-PILES.CurrenciesEditor.ItemBased")}
+              bind:checked={itemBased}
+              on:click={toggleItemBased}
+         />
+      </div>
+      <label>
+         <p>{localize("ITEM-PILES.CurrenciesEditor.ItemBasedExplanation")}</p>
+      </label>
+   </div>
 
    <table>
       <tr>
@@ -88,17 +113,17 @@
       </tr>
       {#each currencies as { primary, name, exchange, path, img }, index (index)}
          <tr
-          class:is-active={hovering === index && dragging !== null}
-          class:is-dragging={dragging === index}
-          on:dragenter={() => hovering = index && dragging !== null}
-          on:drop|preventDefault={event => drop(event, index)}
+                 class:is-active={hovering === index && dragging !== null}
+                 class:is-dragging={dragging === index}
+                 on:dragenter={() => hovering = index && dragging !== null}
+                 on:drop|preventDefault={event => drop(event, index)}
          >
             <td class="small">
                <a
-                class="item-piles-moveable"
-                draggable="{true}"
-                on:dragstart={event => dragstart(event, index)}
-                ondragover="return false"
+                       class="item-piles-moveable"
+                       draggable="{true}"
+                       on:dragstart={event => dragstart(event, index)}
+                       ondragover="return false"
                ><i class="fas fa-bars"></i></a>
                <input type="radio" bind:group={primary_currency} value={index} required name="primary_currency"/>
             </td>
@@ -115,6 +140,20 @@
 
 
 <style lang="scss">
+
+   .form-group {
+      label {
+         p {
+            flex: 0;
+            line-height: 14px;
+            font-size: var(--font-size-12);
+            color: var(--color-text-dark-secondary);
+            padding-right: 1rem;
+            margin-top: 0;
+            overflow-y: hidden;
+         }
+      }
+   }
 
    table {
 

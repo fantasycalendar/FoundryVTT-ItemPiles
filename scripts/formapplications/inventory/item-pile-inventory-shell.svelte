@@ -13,13 +13,12 @@
 
    export let elementRoot;
 
-   export let pile;
+   export let pileActor;
    export let recipient;
    export let overrides;
 
-   let pileActor = pile?.actor ?? pile;
    let recipientActor = recipient?.actor ?? recipient;
-   let editQuantities = !recipient && pile.isOwner && game.user.isGM;
+   let editQuantities = !recipient && pileActor.isOwner && game.user.isGM;
    let playerActors = game.actors.filter(actor => actor.isOwner && actor !== pileActor && actor.data.token.actorLink);
 
    let recipientActorUuid = recipientActor ? recipientActor.uuid : false;

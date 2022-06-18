@@ -17,17 +17,15 @@ export class ItemPileInventory extends SvelteApplication {
      */
     constructor(pile, recipient, overrides = {}, options = {}, dialogData = {}) {
 
-        let pileActor = pile?.actor ?? pile;
-
         super({
-            id: `pile-inventory-${pileActor.uuid}`,
+            id: `item-pile-inventory-${pile.id}`,
             title: pile.name,
             zIndex: 100,
             svelte: {
-                class: ItemPileInventoryShell,
-                target: document.body,
+                    class: ItemPileInventoryShell,
+                    target: document.body,
                 props: {
-                    pile: getDocument(pile),
+                    pileActor: getDocument(pile),
                     recipient: getDocument(recipient),
                     overrides
                 }
@@ -36,7 +34,6 @@ export class ItemPileInventory extends SvelteApplication {
         }, dialogData);
 
         this.pile = pile;
-        this.pileActor = pileActor;
 
         Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient, overrides);
 
@@ -54,28 +51,18 @@ export class ItemPileInventory extends SvelteApplication {
         });
     }
 
+    static getActiveApp(id){
+        return Object.values(ui.windows).find(app => app.id === `item-pile-inventory-${id}`);
+    }
+
     static async show(pile, recipient = false, overrides = {}, options = {}, dialogData = {}) {
+        let pileActor = pile?.actor ?? pile;
+        const app = this.getActiveApp(pileActor.id)
+        if(app) return app.render(false, { focus: true });
         return new Promise((resolve) => {
             options.resolve = resolve;
-            new this(pile, recipient, overrides, options, dialogData).render(true, { focus: true });
+            new this(pileActor, recipient, overrides, options, dialogData).render(true, { focus: true });
         })
-    }
-
-    static getActiveAppFromPile(uuid){
-        for(let app of Object.values(ui.windows)){
-            if(app instanceof this && (app.pile.uuid === uuid || app.pileActor.uuid === uuid)){
-                return app;
-            }
-        }
-        return false;
-    }
-
-    static async updateActiveApp(uuid){
-        const app = this.getActiveAppFromPile(uuid)
-        if(app){
-            return app.svelte.applicationShell.updateContents();
-        }
-        return false;
     }
 
     /* -------------------------------------------- */
@@ -91,7 +78,7 @@ export class ItemPileInventory extends SvelteApplication {
                     class: "item-piles-open-actor-sheet",
                     icon: "fas fa-user",
                     onclick: () => {
-                        this.pileActor.sheet.render(true, { focus: true });
+                        this.pile.sheet.render(true, { focus: true });
                     }
                 },
                 {
@@ -99,7 +86,7 @@ export class ItemPileInventory extends SvelteApplication {
                     class: "item-piles-configure-pile",
                     icon: "fas fa-box-open",
                     onclick: () => {
-                        ItemPileConfig.show(this.pileActor);
+                        ItemPileConfig.show(this.pile);
                     }
                 },
             ].concat(buttons);
