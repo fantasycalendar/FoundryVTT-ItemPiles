@@ -115,65 +115,65 @@ export const CONSTANTS = {
 CONSTANTS.SETTINGS.DEFAULTS = () => ({
 
     [CONSTANTS.SETTINGS.CURRENCIES]: {
-        name: "ITEM-PILES.Setting.Currencies.Title",
-        label: "ITEM-PILES.Setting.Currencies.Label",
-        hint: "ITEM-PILES.Setting.Currencies.Hint",
+        name: "ITEM-PILES.Settings.Currencies.Title",
+        label: "ITEM-PILES.Settings.Currencies.Label",
+        hint: "ITEM-PILES.Settings.Currencies.Hint",
         icon: "fa fa-money-bill-alt",
         application: "currencies",
         scope: "world",
         config: false,
-        default: SYSTEMS.DATA ? SYSTEMS.DATA.CURRENCIES : {},
+        default: SYSTEMS.DATA.CURRENCIES,
         type: Object
     },
 
     [CONSTANTS.SETTINGS.ITEM_FILTERS]: {
-        name: "ITEM-PILES.Setting.ItemFilters.Title",
-        label: "ITEM-PILES.Setting.ItemFilters.Label",
-        hint: "ITEM-PILES.Setting.ItemFilters.Hint",
+        name: "ITEM-PILES.Settings.ItemFilters.Title",
+        label: "ITEM-PILES.Settings.ItemFilters.Label",
+        hint: "ITEM-PILES.Settings.ItemFilters.Hint",
         icon: "fa fa-filter",
         application: "item-filters",
         scope: "world",
         config: false,
-        default: SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_FILTERS : [],
+        default: SYSTEMS.DATA.ITEM_FILTERS,
         type: Array
     },
 
     [CONSTANTS.SETTINGS.ITEM_SIMILARITIES]: {
-        name: "ITEM-PILES.Setting.ItemSimilarities.Title",
-        label: "ITEM-PILES.Setting.ItemSimilarities.Label",
-        hint: "ITEM-PILES.Setting.ItemSimilarities.Hint",
+        name: "ITEM-PILES.Settings.ItemSimilarities.Title",
+        label: "ITEM-PILES.Settings.ItemSimilarities.Label",
+        hint: "ITEM-PILES.Settings.ItemSimilarities.Hint",
         icon: "fa fa-equals",
         application: "item-similarities",
         scope: "world",
         config: false,
-        default: SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_SIMILARITIES : ['name', 'type'],
+        default: SYSTEMS.DATA.ITEM_SIMILARITIES,
         type: Array
     },
 
     [CONSTANTS.SETTINGS.ACTOR_CLASS_TYPE]: {
-        name: "ITEM-PILES.Setting.ActorClass.Title",
-        hint: "ITEM-PILES.Setting.ActorClass.Hint",
+        name: "ITEM-PILES.Settings.ActorClass.Title",
+        hint: "ITEM-PILES.Settings.ActorClass.Hint",
         scope: "world",
-        config: true,
-        default: SYSTEMS.DATA ? SYSTEMS.DATA.ACTOR_CLASS_TYPE : game.system.template.Actor.types[0],
+        config: false,
+        default: SYSTEMS.DATA.ACTOR_CLASS_TYPE,
         type: String
     },
 
     [CONSTANTS.SETTINGS.ITEM_QUANTITY_ATTRIBUTE]: {
-        name: "ITEM-PILES.Setting.Quantity.Title",
-        hint: "ITEM-PILES.Setting.Quantity.Hint",
+        name: "ITEM-PILES.Settings.Quantity.Title",
+        hint: "ITEM-PILES.Settings.Quantity.Hint",
         scope: "world",
-        config: true,
-        default: SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_QUANTITY_ATTRIBUTE : "",
+        config: false,
+        default: SYSTEMS.DATA.ITEM_QUANTITY_ATTRIBUTE,
         type: String
     },
 
     [CONSTANTS.SETTINGS.ITEM_PRICE_ATTRIBUTE]: {
-        name: "ITEM-PILES.Setting.Price.Title",
-        hint: "ITEM-PILES.Setting.Price.Hint",
+        name: "ITEM-PILES.Settings.Price.Title",
+        hint: "ITEM-PILES.Settings.Price.Hint",
         scope: "world",
-        config: true,
-        default: SYSTEMS.DATA ? SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE : "",
+        config: false,
+        default: SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE,
         type: String
     },
 
@@ -206,23 +206,23 @@ CONSTANTS.SETTINGS.DEFAULTS = () => ({
     },
 
     [CONSTANTS.SETTINGS.OUTPUT_TO_CHAT]: {
-        name: "ITEM-PILES.Setting.OutputToChat.Title",
-        hint: "ITEM-PILES.Setting.OutputToChat.Hint",
+        name: "ITEM-PILES.Settings.OutputToChat.Title",
+        hint: "ITEM-PILES.Settings.OutputToChat.Hint",
         scope: "world",
         config: false,
         default: 1,
         choices: [
-            "ITEM-PILES.Setting.OutputToChat.Off",
-            "ITEM-PILES.Setting.OutputToChat.Public",
-            "ITEM-PILES.Setting.OutputToChat.SelfGM",
-            "ITEM-PILES.Setting.OutputToChat.Blind",
+            "ITEM-PILES.Settings.OutputToChat.Off",
+            "ITEM-PILES.Settings.OutputToChat.Public",
+            "ITEM-PILES.Settings.OutputToChat.SelfGM",
+            "ITEM-PILES.Settings.OutputToChat.Blind",
         ],
         type: Number
     },
 
     [CONSTANTS.SETTINGS.DELETE_EMPTY_PILES]: {
-        name: "ITEM-PILES.Setting.DeleteEmptyPiles.Title",
-        hint: "ITEM-PILES.Setting.DeleteEmptyPiles.Hint",
+        name: "ITEM-PILES.Settings.DeleteEmptyPiles.Title",
+        hint: "ITEM-PILES.Settings.DeleteEmptyPiles.Hint",
         scope: "world",
         config: false,
         default: false,
@@ -230,8 +230,8 @@ CONSTANTS.SETTINGS.DEFAULTS = () => ({
     },
 
     [CONSTANTS.SETTINGS.ENABLE_TRADING]: {
-        name: "ITEM-PILES.Setting.EnableTrading.Title",
-        hint: "ITEM-PILES.Setting.EnableTrading.Hint",
+        name: "ITEM-PILES.Settings.EnableTrading.Title",
+        hint: "ITEM-PILES.Settings.EnableTrading.Hint",
         scope: "world",
         config: false,
         default: true,
@@ -239,8 +239,8 @@ CONSTANTS.SETTINGS.DEFAULTS = () => ({
     },
 
     [CONSTANTS.SETTINGS.SHOW_TRADE_BUTTON]: {
-        name: "ITEM-PILES.Setting.ShowTradeButton.Title",
-        hint: "ITEM-PILES.Setting.ShowTradeButton.Hint",
+        name: "ITEM-PILES.Settings.ShowTradeButton.Title",
+        hint: "ITEM-PILES.Settings.ShowTradeButton.Hint",
         scope: "world",
         config: false,
         default: true,
@@ -248,8 +248,8 @@ CONSTANTS.SETTINGS.DEFAULTS = () => ({
     },
 
     [CONSTANTS.SETTINGS.INVERT_SHEET_OPEN]: {
-        name: "ITEM-PILES.Setting.InvertSheetOpen.Title",
-        hint: "ITEM-PILES.Setting.InvertSheetOpen.Hint",
+        name: "ITEM-PILES.Settings.InvertSheetOpen.Title",
+        hint: "ITEM-PILES.Settings.InvertSheetOpen.Hint",
         scope: "client",
         config: false,
         default: false,
@@ -257,8 +257,8 @@ CONSTANTS.SETTINGS.DEFAULTS = () => ({
     },
 
     [CONSTANTS.SETTINGS.HIDE_ACTOR_HEADER_TEXT]: {
-        name: "ITEM-PILES.Setting.HideActorHeaderText.Title",
-        hint: "ITEM-PILES.Setting.HideActorHeaderText.Hint",
+        name: "ITEM-PILES.Settings.HideActorHeaderText.Title",
+        hint: "ITEM-PILES.Settings.HideActorHeaderText.Hint",
         scope: "client",
         config: false,
         default: false,
@@ -266,8 +266,8 @@ CONSTANTS.SETTINGS.DEFAULTS = () => ({
     },
 
     [CONSTANTS.SETTINGS.PRELOAD_FILES]: {
-        name: "ITEM-PILES.Setting.PreloadFiles.Title",
-        hint: "ITEM-PILES.Setting.PreloadFiles.Hint",
+        name: "ITEM-PILES.Settings.PreloadFiles.Title",
+        hint: "ITEM-PILES.Settings.PreloadFiles.Hint",
         scope: "client",
         config: false,
         default: true,
@@ -275,8 +275,8 @@ CONSTANTS.SETTINGS.DEFAULTS = () => ({
     },
 
     [CONSTANTS.SETTINGS.DEBUG]: {
-        name: "ITEM-PILES.Setting.Debug.Title",
-        hint: "ITEM-PILES.Setting.Debug.Hint",
+        name: "ITEM-PILES.Settings.Debug.Title",
+        hint: "ITEM-PILES.Settings.Debug.Hint",
         scope: "client",
         config: false,
         default: false,
@@ -285,8 +285,8 @@ CONSTANTS.SETTINGS.DEFAULTS = () => ({
 
 
     [CONSTANTS.SETTINGS.DEBUG_HOOKS]: {
-        name: "ITEM-PILES.Setting.DebugHooks.Title",
-        hint: "ITEM-PILES.Setting.DebugHooks.Hint",
+        name: "ITEM-PILES.Settings.DebugHooks.Title",
+        hint: "ITEM-PILES.Settings.DebugHooks.Hint",
         scope: "client",
         config: false,
         default: false,

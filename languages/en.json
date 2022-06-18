@@ -120,6 +120,12 @@
                 "Content": "This will reset all of the history of players having taken their share from this pile.<br><br>Are you sure you want to do this?",
                 "Confirm": "Reset Sharing Data"
             },
+            "SwitchCurrencyType": {
+                "Title": "Switching Currency Type",
+                "Header": "Are you sure?",
+                "Content1": "Are you sure you want to switch currency type?",
+                "Content2": "This will reset the existing currency setup."
+            },
             "Cancel": "Cancel"
         },
         "Applications": {
@@ -135,7 +141,15 @@
             },
             "CurrenciesEditor": {
                 "Title": "Currencies Editor",
+
+                "AttributeTitle": "Attribute Based Currencies",
                 "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
+
+                "ItemTitle": "Item Based Currencies",
+                "ItemExplanation": "In some systems, currencies are actual items in character inventories. Drag and drop any items into the lower part here to add a new item-based currency.",
+
+                "DragDrop": "Drag and drop an item to add it to the list",
+
                 "Name": "Currency name",
                 "Path": "Currency path",
                 "Icon": "Currency icon",
@@ -153,10 +167,19 @@
             "SimilaritiesEditor": {
                 "Title": "Item Similarities Editor",
                 "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
-                "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", you temporary items are considered \"unique\".",
+                "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
                 "Path": "Attribute path",
                 "AddNew": "Add new attribute path",
                 "Submit": "Submit item similarities"
+            },
+            "PriceModifiersEditor": {
+                "Title": "Price Modifiers Editor",
+                "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors.",
+                "DragDrop": "Drag and drop an actor to add it to the list",
+                "Actor": "Actor",
+                "PriceModifier": "Price Modifier (%)",
+                "SellModifier": "Sell Price Modifier (%)",
+                "Submit": "Submit price modifiers"
             },
             "Defaults": {
                 "Title": "Item Pile Configuration",
@@ -261,7 +284,12 @@
             "PrivateTrade": "Private Trade",
             "ExpandTrade": "View full trade details"
         },
-        "Setting": {
+        "Settings": {
+            "Configure": {
+                "Title": "Module Configuration",
+                "Label": "Configure Module",
+                "Hint": "You can configure Item Piles in this dialog."
+            },
             "Reset": {
                 "Title": "Reset settings to default",
                 "Label": "Reset Item Piles Settings To Default",
@@ -269,15 +297,15 @@
             },
             "ActorClass": {
                 "Title": "Actor class type",
-                "Label": "This setting defines the type of actor that will be used for the default item pile actor that is created on first item drop. In the case of D&D5e, this is \"character\", as it does not have a dedicated loot actor type."
+                "Hint": "This setting defines the type of actor that will be used for the default item pile actor that is created on first item drop. In the case of D&D5e, this is \"character\", as it does not have a dedicated loot actor type."
             },
             "Quantity": {
                 "Title": "Item quantity attribute",
-                "Label": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.quantity\" attribute, so you'd put \"data.quantity\" in this setting."
+                "Hint": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.quantity\" attribute, so you'd put \"data.quantity\" in this setting."
             },
             "Price": {
                 "Title": "Item price attribute",
-                "Label": "Here you can configure what the attribute path is for each item's price. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.price\" attribute, so you'd put \"data.price\" in this setting."
+                "Hint": "Here you can configure what the attribute path is for each item's price. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.price\" attribute, so you'd put \"data.price\" in this setting."
             },
             "Currencies": {
                 "Title": "Currencies",

@@ -3,8 +3,6 @@ import { CONSTANTS } from "./constants.js";
 
 const API = {
 
-    _SETTINGS_CACHE: {},
-
     /**
      * The actor class type used for the original item pile actor in this system
      *
