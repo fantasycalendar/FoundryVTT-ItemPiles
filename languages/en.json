@@ -122,98 +122,110 @@
             },
             "Cancel": "Cancel"
         },
-        "CurrenciesEditor": {
-            "Title": "Currencies Editor",
-            "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
-            "Name": "Currency name",
-            "Path": "Currency path",
-            "Icon": "Currency icon",
-            "AddNew": "Add new currency",
-            "Submit": "Submit currencies"
-        },
-        "FilterEditor": {
-            "Title": "Item Filters Editor",
-            "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
-            "Filters": "Filters",
-            "Path": "Attribute path",
-            "AddNew": "Add new filter",
-            "Submit": "Submit filters"
-        },
-        "SimilaritiesEditor": {
-            "Title": "Item Similarities Editor",
-            "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
-            "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", you temporary items are considered \"unique\".",
-            "Path": "Attribute path",
-            "AddNew": "Add new attribute path",
-            "Submit": "Submit item similarities"
-        },
-        "Defaults": {
-            "Title": "Item Pile Configuration",
-            "Configure": "Item Pile",
-            "Update": "Update Item Pile",
-            "Main": {
-                "Title": "Main Settings",
-                "EnabledPile": "Enabled",
-                "EnabledPileExplanation": "Whether this should act as an item pile.",
-                "InspectItems": "Enable Item Inspect",
-                "InspectItemsExplanation": "Clicking item names will open the item's sheet.",
-                "Distance": "Interaction Distance",
-                "GridUnits": "Grid Units (leave empty for infinite)",
-                "Macro": "On Interact Macro",
-                "MacroExplanation": "Name of macro to execute when this pile is interacted with.",
-                "MacroPlaceholder": "Insert macro name",
-                "DeleteWhenEmpty": "Delete when empty",
-                "DeleteWhenEmptyExplanation": "Causes this item pile to auto-delete itself once it's empty.",
-                "DeleteWhenEmptyDefault": "Default module setting",
-                "DeleteWhenEmptyYes": "Yes, delete when empty",
-                "DeleteWhenEmptyNo": "No, don't delete when empty",
-                "OverrideCurrencies": "Override Currencies",
-                "OverrideCurrenciesExplanation": "Configure if this pile should be able to transfer other currencies than the default.",
-                "ConfigureOverrideCurrencies": "Configure Override Currencies",
-                "OverrideItemFilters": "Override Item Filters",
-                "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
-                "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+        "Applications": {
+            "Settings": {
+                "Title": "Item Piles Module Configuration",
+                "Local": "Local Settings",
+                "Module": "Module Settings",
+                "System": "System Specific Settings",
+                "Donate": "If you like this module, consider donating to keep it running!",
+                "MoreToCome": "And with more configuration options to come...",
+                "Request": "Request new features here.",
+                "Submit": "Submit Settings"
             },
-            "Other": {
-                "Title": "Other Settings"
+            "CurrenciesEditor": {
+                "Title": "Currencies Editor",
+                "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
+                "Name": "Currency name",
+                "Path": "Currency path",
+                "Icon": "Currency icon",
+                "AddNew": "Add new currency",
+                "Submit": "Submit currencies"
             },
-            "SingleItem": {
-                "Title": "Single Item Settings",
-                "DisplayOneContainerWarning": "Warning! You have both \"Display Single Item Image\" and \"Is Container\" enabled. In this case, the container images takes priority.",
-                "DisplayOne": "Display Single Item Image",
-                "DisplayOneExplanation": "If the pile is made up of a single item, this sets the pile token's image to be the image of the item.",
-                "OverrideScale": "Override single item token scale",
-                "Scale": "Single item token scale",
-                "ItemName": "Use Item Name",
-                "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
+            "FilterEditor": {
+                "Title": "Item Filters Editor",
+                "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
+                "Filters": "Filters",
+                "Path": "Attribute path",
+                "AddNew": "Add new filter",
+                "Submit": "Submit filters"
             },
-            "Container": {
-                "Title": "Container Settings",
-                "IsContainer": "Is Container",
-                "Locked": "Is Locked",
-                "Closed": "Is Closed",
-                "ClosedImagePath": "Closed Image Path",
-                "EmptyImagePath": "Empty Image Path",
-                "OpenedImagePath": "Opened Image Path",
-                "LockedImagePath": "Locked Image Path",
-                "CloseSoundPath": "Closing Sound Path",
-                "OpenSoundPath": "Opening Sound Path",
-                "LockedSoundPath": "Locked Sound Path"
+            "SimilaritiesEditor": {
+                "Title": "Item Similarities Editor",
+                "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
+                "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", you temporary items are considered \"unique\".",
+                "Path": "Attribute path",
+                "AddNew": "Add new attribute path",
+                "Submit": "Submit item similarities"
             },
-            "Sharing": {
-                "Title": "Sharing Settings",
-                "ShareItemsEnabled": "Sharing Enabled: Items",
-                "ShareItemsEnabledExplanation": "When this is enabled, players can only take their share of the quantities of items. Disabled means they can take as much as they want.",
-                "ShareCurrenciesEnabled": "Sharing Enabled: Currencies",
-                "ShareCurrenciesEnabledExplanation": "When this is enabled, players can only take their share of the quantities of currencies. Disabled means they can take as much as they want.",
-                "TakeAllEnabled": "Enable Take All Button",
-                "TakeAllEnabledExplanation": "Enables the \"Take All\" button when looting this item pile. Requires both of the above sharing settings to be disabled.",
-                "SplitAllEnabled": "Enable Split With Players Button",
-                "SplitAllEnabledExplanation": "Enables the \"Split [number] ways\" button when looting this item pile. Pressing this button makes all players (or only active players, see below) receive their share of the item pile.",
-                "InactivePlayers": "Split Only With Active Players",
-                "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile.",
-                "ResetSharingData": "Reset Sharing Data",
-                "ResetSharingDataExplanation": "If the Item Pile's content was manually changed while people were looting it, the sharing data may become out of sync with the players' actual shares. Pressing this button will reset everyone's share in this pile."
+            "Defaults": {
+                "Title": "Item Pile Configuration",
+                "Configure": "Item Pile",
+                "Update": "Update Item Pile",
+                "Main": {
+                    "Title": "Main Settings",
+                    "EnabledPile": "Enabled",
+                    "EnabledPileExplanation": "Whether this should act as an item pile.",
+                    "InspectItems": "Enable Item Inspect",
+                    "InspectItemsExplanation": "Clicking item names will open the item's sheet.",
+                    "Distance": "Interaction Distance",
+                    "GridUnits": "Grid Units (leave empty for infinite)",
+                    "Macro": "On Interact Macro",
+                    "MacroExplanation": "Name of macro to execute when this pile is interacted with.",
+                    "MacroPlaceholder": "Insert macro name",
+                    "DeleteWhenEmpty": "Delete when empty",
+                    "DeleteWhenEmptyExplanation": "Causes this item pile to auto-delete itself once it's empty.",
+                    "DeleteWhenEmptyDefault": "Default module setting",
+                    "DeleteWhenEmptyYes": "Yes, delete when empty",
+                    "DeleteWhenEmptyNo": "No, don't delete when empty",
+                    "OverrideCurrencies": "Override Currencies",
+                    "OverrideCurrenciesExplanation": "Configure if this pile should be able to transfer other currencies than the default.",
+                    "ConfigureOverrideCurrencies": "Configure Override Currencies",
+                    "OverrideItemFilters": "Override Item Filters",
+                    "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
+                    "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+                },
+                "Other": {
+                    "Title": "Other Settings"
+                },
+                "SingleItem": {
+                    "Title": "Single Item Settings",
+                    "DisplayOneContainerWarning": "Warning! You have both \"Display Single Item Image\" and \"Is Container\" enabled. In this case, the container images takes priority.",
+                    "DisplayOne": "Display Single Item Image",
+                    "DisplayOneExplanation": "If the pile is made up of a single item, this sets the pile token's image to be the image of the item.",
+                    "OverrideScale": "Override single item token scale",
+                    "Scale": "Single item token scale",
+                    "ItemName": "Use Item Name",
+                    "ItemNameExplanation": "Causes the item pile to be named after the single item it contains."
+                },
+                "Container": {
+                    "Title": "Container Settings",
+                    "IsContainer": "Is Container",
+                    "Locked": "Is Locked",
+                    "Closed": "Is Closed",
+                    "ClosedImagePath": "Closed Image Path",
+                    "EmptyImagePath": "Empty Image Path",
+                    "OpenedImagePath": "Opened Image Path",
+                    "LockedImagePath": "Locked Image Path",
+                    "CloseSoundPath": "Closing Sound Path",
+                    "OpenSoundPath": "Opening Sound Path",
+                    "LockedSoundPath": "Locked Sound Path"
+                },
+                "Sharing": {
+                    "Title": "Sharing Settings",
+                    "ShareItemsEnabled": "Sharing Enabled: Items",
+                    "ShareItemsEnabledExplanation": "When this is enabled, players can only take their share of the quantities of items. Disabled means they can take as much as they want.",
+                    "ShareCurrenciesEnabled": "Sharing Enabled: Currencies",
+                    "ShareCurrenciesEnabledExplanation": "When this is enabled, players can only take their share of the quantities of currencies. Disabled means they can take as much as they want.",
+                    "TakeAllEnabled": "Enable Take All Button",
+                    "TakeAllEnabledExplanation": "Enables the \"Take All\" button when looting this item pile. Requires both of the above sharing settings to be disabled.",
+                    "SplitAllEnabled": "Enable Split With Players Button",
+                    "SplitAllEnabledExplanation": "Enables the \"Split [number] ways\" button when looting this item pile. Pressing this button makes all players (or only active players, see below) receive their share of the item pile.",
+                    "InactivePlayers": "Split Only With Active Players",
+                    "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile.",
+                    "ResetSharingData": "Reset Sharing Data",
+                    "ResetSharingDataExplanation": "If the Item Pile's content was manually changed while people were looting it, the sharing data may become out of sync with the players' actual shares. Pressing this button will reset everyone's share in this pile."
+                }
             }
         },
         "HUD": {
@@ -263,6 +275,10 @@
                 "Title": "Item quantity attribute",
                 "Label": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.quantity\" attribute, so you'd put \"data.quantity\" in this setting."
             },
+            "Price": {
+                "Title": "Item price attribute",
+                "Label": "Here you can configure what the attribute path is for each item's price. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.price\" attribute, so you'd put \"data.price\" in this setting."
+            },
             "Currencies": {
                 "Title": "Currencies",
                 "Label": "Configure Currencies",
@@ -288,7 +304,7 @@
             },
             "OutputToChat": {
                 "Title": "Output to chat",
-                "Label": "Whenever any player picks up items from an item pile, this will send a message showing what was picked up.",
+                "Hint": "Whenever any player picks up items from an item pile, this will send a message showing what was picked up.",
                 "Off": "Off - turn off messages",
                 "Public": "Public - everyone can see messages",
                 "SelfGM": "Private - only GMs and user can see messages",
@@ -296,23 +312,27 @@
             },
             "InvertSheetOpen": {
                 "Title": "Invert Ctrl + Double Click Open",
-                "Label": "Normally, you have to hold control when you want to open an item pile's actor sheet. Enabling this makes the item pile actor sheet open by default, and holding control opens the item pile inventory UI."
+                "Hint": "Normally, you have to hold control when you want to open an item pile's actor sheet. Enabling this makes the item pile actor sheet open by default, and holding control opens the item pile inventory UI."
             },
             "HideActorHeaderText": {
                 "Title": "Hide actor header text",
-                "Label": "Hides the \"Item Piles\" text in the actor header - useful if you have too many modules, and the header is getting crowded."
+                "Hint": "Hides the \"Item Piles\" text in the actor header - useful if you have too many modules, and the header is getting crowded."
             },
             "DeleteEmptyPiles": {
                 "Title": "Auto-delete empty piles",
-                "Label": "This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles."
+                "Hint": "This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles."
             },
             "PreloadFiles": {
                 "Title": "Preload Files",
-                "Label": "Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience."
+                "Hint": "Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience."
             },
             "Debug": {
                 "Title": "Enable debugging",
-                "Label": "Prints debug messages to the console"
+                "Hint": "Prints debug messages to the console"
+            },
+            "DebugHooks": {
+                "Title": "Enable debugging of hooks",
+                "Hint": "Prints the item pile hooks and their contents to the console"
             }
         }
     }
