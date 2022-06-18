@@ -5,7 +5,7 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
 
-  import * as lib from "../../lib/lib.js"
+  import * as helpers from "../../helpers/helpers.js"
 
   import Setting from "./Setting.svelte";
   import SettingButton from "./SettingButton.svelte";
@@ -17,7 +17,7 @@
   let form;
 
   let settings = Object.fromEntries(Object.entries(CONSTANTS.SETTINGS.GET_DEFAULT()).map(entry => {
-    entry[1].value = lib.getSetting(entry[0]);
+    entry[1].value = helpers.getSetting(entry[0]);
     return entry;
   }));
 
@@ -30,7 +30,7 @@
   async function updateSettings() {
     let settingsToUpdate = Object.entries(settings).filter(entry => userIsGM || entry[1].scope === "client");
     for (let [key, setting] of settingsToUpdate) {
-      await lib.setSetting(key, setting.value);
+      await helpers.setSetting(key, setting.value);
     }
     application.close();
   }
