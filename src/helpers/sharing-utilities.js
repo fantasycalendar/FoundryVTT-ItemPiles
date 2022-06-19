@@ -10,8 +10,8 @@ import * as PileUtilities from "./pile-utilities.js"
  */
 export function getPlayersForItemPile(target) {
   const targetActor = Utilities.getActor(target);
-  const pileData = PileUtilities.getActorFlagData(targetActor);
   if (!PileUtilities.isValidItemPile(targetActor)) return [];
+  const pileData = PileUtilities.getActorFlagData(targetActor);
   return Array.from(game.users).filter(u => (u.active || !pileData.activePlayers) && u.character);
 }
 
@@ -317,7 +317,7 @@ export function getItemPileAttributesForActor(pile, recipient, floor) {
         totalActorShare += 1;
       }
       
-      const takenBefore = foundCurrency?.actors?.find(actor => actor.uuid === recipientUuid);
+      const takenBefore = existingCurrency?.actors?.find(actor => actor.uuid === recipientUuid);
       attribute.previouslyTaken = takenBefore ? takenBefore.quantity : 0;
       
       attribute.shareLeft = Math.max(0, Math.min(attribute.quantity, Math.floor(totalActorShare - attribute.previouslyTaken)));

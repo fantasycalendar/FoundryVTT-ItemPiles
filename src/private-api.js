@@ -81,7 +81,7 @@ export default class PrivateAPI {
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
     
-    const sourceUpdates = PileUtilities.getItemsToRemove(sourceUuid, items);
+    const sourceUpdates = PileUtilities.getItemsToRemove(sourceActor, items);
     const targetUpdates = PileUtilities.getItemsToAdd(targetActor, sourceUpdates.itemsRemoved);
     
     const hookResult = Hooks.call(HOOKS.ITEM.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
@@ -680,7 +680,7 @@ export default class PrivateAPI {
   static async _updateItemPile(targetUuid, newData, { interactingTokenUuid = false, tokenSettings = false } = {}) {
     
     const targetActor = Utilities.getActor(targetUuid);
-    const interactingToken = Utilities.getToken(interactingTokenUuid);
+    const interactingToken = interactingTokenUuid ? Utilities.getToken(interactingTokenUuid) : false;
     
     const oldData = PileUtilities.getActorFlagData(targetActor);
     

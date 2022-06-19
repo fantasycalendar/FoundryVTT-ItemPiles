@@ -6,12 +6,31 @@ import * as PileUtilities from "../../helpers/pile-utilities.js";
 export default class ItemPileStore {
   
   constructor(pileActor, recipientActor) {
+    this.interactionId = randomID();
     this.pileActor = pileActor;
     this.recipientActor = recipientActor;
     this.pileData = PileUtilities.getActorFlagData(pileActor)
+    
     this.attributes = writable([]);
     this.items = writable([]);
-    this.editQuantities = writable(false);
+    this.search = writable("");
+    this.editQuantities = writable(!recipientActor && pileActor.isOwner && game.user.isGM);
+    
+    const searchDebounce = debounce((str) => {
+      this.filter(str);
+    }, 300);
+    
+    this.search.subscribe((str) => {
+      searchDebounce(str);
+    });
+    
+    this.update();
+    
+  }
+  
+  update() {
+    this.updateItems();
+    this.updateAttributes();
   }
   
   updateItems() {
@@ -55,12 +74,14 @@ export default class ItemPileStore {
     
   }
   
-  updateCurrencies() {
+  updateAttributes() {
     
     const attributes = get(this.attributes);
     
     // Get all the attributes on the actor right now
     const newAttributes = SharingUtilities.getItemPileAttributesForActor(this.pileActor, this.recipientActor);
+    
+    console.log(newAttributes);
     
     if (!attributes) {
       this.attributes.set(newAttributes);
@@ -96,7 +117,46 @@ export default class ItemPileStore {
     
   }
   
-  filterByName(search) {
+  take(data) {
+    
+    const quantity = Math.min(data.currentQuantity, data.quantity);
+    
+    if (data.id) {
+      return game.itempiles.transferItems(
+        this.pileActor,
+        this.recipientActor,
+        [{ _id: data.id, quantity }],
+        { interactionId: this.interactionId }
+      );
+    }
+    
+    return game.itempiles.transferAttributes(
+      this.pileActor,
+      this.recipientActor,
+      { [data.path]: quantity },
+      { interactionId: this.interactionId }
+    );
+    
+  }
+  
+  takeAll() {
+    game.itempiles.transferEverything(
+      this.pileActor,
+      this.recipientActor,
+      { interactionId: this.interactionId }
+    );
+  }
+  
+  splitAll() {
+    game.itempiles.splitItemPileContents(this.pileActor);
+  }
+  
+  closeContainer() {
+  
+  }
+  
+  filter(search) {
+    
     const items = get(this.items);
     const attributes = get(this.attributes);
     

@@ -5,10 +5,14 @@
   export let store;
   export let attribute;
 
+  const editQuantitiesStore = store.editQuantities;
+
+  $: editQuantities = $editQuantitiesStore;
+
 </script>
 
 <div class="flexrow item-piles-item-row item-piles-even-color"
-     class:item-piles-disabled={!$store.editQuantities && !attribute.shareLeft}>
+     class:item-piles-disabled={!editQuantities && !attribute.shareLeft}>
 
   <div class="item-piles-img-container">
     <!--<img class="item-piles-img" on:mouseenter={mouseEnterImage} on:mouseleave={mouseLeaveImage} src="{attribute.img}"/>-->
@@ -24,7 +28,7 @@
 
   <div style="flex:2.5;">
 
-    {#if $store.editQuantities}
+    {#if editQuantities}
 
       <div class="item-piles-quantity-container">
         <input class="item-piles-quantity" type="number" min="0" bind:value="{attribute.quantity}"/>
@@ -36,22 +40,21 @@
         <div class="item-piles-quantity-container">
           <input class="item-piles-quantity" type="number" min="1" bind:value="{attribute.currentQuantity}"
                  max="{attribute.quantity}" disabled="{!attribute.quantity}"/>
-          <span class="item-piles-input-divider" class:item-piles-text-right={!$store.recipientActor}>
+          <span class="item-piles-input-divider" class:item-piles-text-right={!store.recipientActor}>
                      / {attribute.shareLeft}
                   </span>
         </div>
       {:else}
-        <span>{localize(`ITEM-PILES.Inspect.${$store.pileData.shareCurrenciesEnabled ? "NoShareLeft" : "NoneLeft"}`)}</span>
+        <span>{localize(`ITEM-PILES.Inspect.${store.pileData.shareCurrenciesEnabled ? "NoShareLeft" : "NoneLeft"}`)}</span>
       {/if}
     {/if}
 
   </div>
 
-  {#if !$store.editQuantities}
+  {#if !editQuantities}
 
-    <!--<button on:click={take(currency)} class="item-piles-item-take-button" type="button"
-            disabled={!attribute.shareLeft}>-->
-    <button class="item-piles-item-take-button" type="button" disabled={!attribute.shareLeft}>
+    <button on:click={store.take(attribute)} class="item-piles-item-take-button" type="button"
+            disabled={!attribute.shareLeft}>
       {localize("ITEM-PILES.Inspect.Take")}
     </button>
 

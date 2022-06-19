@@ -9,7 +9,7 @@ export default class ItemPileConfig extends TJSDialog {
   
   constructor(pileActor, options = {}, dialogData = {}) {
     
-    let pileData = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, PileUtilities.getActorFlagData(pileActor));
+    const pileData = PileUtilities.getActorFlagData(pileActor);
     
     super({
       ...dialogData,

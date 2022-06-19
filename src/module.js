@@ -6,6 +6,7 @@ import Socket from "./socket.js";
 import SettingsShim from "./applications/settings/settings-app.js";
 import CurrenciesEditor from "./applications/editors/currencies/currencies-editor.js";
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
+import { ItemPileInventory } from "./applications/item-pile-inventory/item-pile-inventory.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -19,7 +20,7 @@ Hooks.once("ready", () => {
   Socket.initialize();
   
   setTimeout(() => {
-    ItemPileConfig.show(game.actors.getName("Almighty Spark"))
+    ItemPileInventory.show('Scene.Kf2SPAzQ0mTN4VCJ.Token.n4s3wgi8yfs9cjnn', 'Scene.Kf2SPAzQ0mTN4VCJ.Token.SHzadZJZY0NeKpzo')
   })
 })
 
@@ -28,3 +29,42 @@ Hooks.on("reset-item-pile-settings", async () => {
     await setting.delete();
   }
 })
+
+Hooks.on("createItem", (doc, data) => {
+  const actor = doc.parent;
+  if (actor === this.pileActor) {
+  }
+});
+
+Hooks.on("updateItem", (doc, data) => {
+  const actor = doc.parent;
+  if (actor === this.pileActor) {
+    this.svelte.applicationShell.store.updateItems();
+  }
+});
+
+Hooks.on("deleteItem", (doc, data) => {
+  const actor = doc.parent;
+  if (actor === this.pileActor) {
+    this.svelte.applicationShell.store.updateItems();
+  }
+});
+
+Hooks.on("createItem", (doc) => {
+  ItemPileInventory.refreshItems(doc.parent);
+});
+Hooks.on("updateItem", (doc) => {
+  ItemPileInventory.refreshItems(doc.parent);
+});
+Hooks.on("deleteItem", (doc) => {
+  ItemPileInventory.refreshItems(doc.parent);
+});
+Hooks.on("updateActor", (doc) => {
+  ItemPileInventory.refreshAttributes(doc);
+});
+Hooks.on("deleteToken", (doc) => {
+  ItemPileInventory.refreshDeletedPile(doc);
+});
+Hooks.on("deleteActor", (doc) => {
+  ItemPileInventory.refreshDeletedPile(doc);
+});

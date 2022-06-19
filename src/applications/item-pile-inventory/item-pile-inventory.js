@@ -1,66 +1,97 @@
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import ItemPileInventoryShell from "./item-pile-inventory-shell.svelte";
 import * as Utilities from "../../helpers/utilities.js";
-import CONSTANTS from "../../constants/constants.js";
-
-//import ItemPileConfig from "../item-pile-config/item-pile-config";
+import ItemPileConfig from "../item-pile-config/item-pile-config";
+import HOOKS from "../../constants/hooks.js";
 
 export class ItemPileInventory extends SvelteApplication {
   
   /**
    *
-   * @param pile
-   * @param recipient
+   * @param pileActor
+   * @param recipientActor
    * @param overrides
    * @param options
    * @param dialogData
    */
-  constructor(pile, recipient, overrides = {}, options = {}, dialogData = {}) {
+  constructor(pileActor, recipientActor, overrides = {}, options = {}, dialogData = {}) {
     
     super({
-      id: `item-pile-inventory-${pile.id}`,
-      title: pile.name,
+      id: `item-pile-inventory-${pileActor.id}`,
+      title: pileActor.name,
       zIndex: 100,
       svelte: {
         class: ItemPileInventoryShell,
         target: document.body,
         props: {
-          pileActor: Utilities.getDocument(pile),
-          recipient: Utilities.getDocument(recipient),
+          pileActor,
+          recipientActor,
           overrides
         }
       },
       ...options
     }, dialogData);
     
-    this.pile = pile;
+    this.pileActor = pileActor;
     
-    Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, pile, recipient, overrides);
+    Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, this.pileActor, recipientActor, overrides);
     
+  }
+  
+  addHook(hook, callback) {
+    const id = Hooks.on(hook, callback);
+    this.hooks.push({ hook, id });
   }
   
   /** @inheritdoc */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       closeOnSubmit: false,
-      classes: ["app window-app sheet"],
+      classes: ["app window-app sheet item-pile-inventory"],
       width: 550,
       height: "auto",
     });
   }
   
-  static getActiveApp(id) {
-    return Object.values(ui.windows).find(app => app.id === `item-pile-inventory-${id}`);
+  static getActiveApps(id) {
+    return Object.values(ui.windows).filter(app => app.id === `item-pile-inventory-${id}`);
   }
   
   static async show(pile, recipient = false, overrides = {}, options = {}, dialogData = {}) {
-    let pileActor = pile?.actor ?? pile;
-    const app = this.getActiveApp(pileActor.id)
-    if (app) return app.render(false, { focus: true });
+    const pileActor = Utilities.getActor(pile)
+    const recipientActor = Utilities.getActor(recipient);
+    const apps = this.getActiveApps(pileActor.id);
+    if (apps.length) {
+      for (let app of apps) {
+        app.render(false, { focus: true });
+      }
+      return
+    }
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(pileActor, recipient, overrides, options, dialogData).render(true, { focus: true });
+      new this(pileActor, recipientActor, overrides, options, dialogData).render(true, { focus: true });
     })
+  }
+  
+  static refreshItems(doc) {
+    const actor = Utilities.getActor(doc);
+    for (const app of this.getActiveApps(actor.id)) {
+      app.svelte.applicationShell.store.updateItems();
+    }
+  }
+  
+  static refreshAttributes(doc) {
+    const actor = Utilities.getActor(doc);
+    for (const app of this.getActiveApps(actor.id)) {
+      app.svelte.applicationShell.store.updateAttributes();
+    }
+  }
+  
+  static refreshDeletedPile(doc) {
+    const actor = Utilities.getActor(doc);
+    for (const app of this.getActiveApps(actor.id)) {
+      app.svelte.applicationShell.deleted = true;
+    }
   }
   
   /* -------------------------------------------- */
@@ -76,7 +107,7 @@ export class ItemPileInventory extends SvelteApplication {
           class: "item-piles-open-actor-sheet",
           icon: "fas fa-user",
           onclick: () => {
-            this.pile.sheet.render(true, { focus: true });
+            this.pileActor.sheet.render(true, { focus: true });
           }
         },
         {
@@ -84,7 +115,7 @@ export class ItemPileInventory extends SvelteApplication {
           class: "item-piles-configure-pile",
           icon: "fas fa-box-open",
           onclick: () => {
-            //ItemPileConfig.show(this.pile);
+            ItemPileConfig.show(this.pileActor);
           }
         },
       ].concat(buttons);

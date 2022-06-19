@@ -6,10 +6,24 @@
   export let store;
   export let item;
 
+  const editQuantitiesStore = store.editQuantities;
+
+  $: editQuantities = $editQuantitiesStore;
+
+  function previewItem(item) {
+    item = store.pileActor.items.get(item.id);
+    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+      return item.sheet.render(true);
+    }
+    const cls = item._getSheetClass()
+    const sheet = new cls(item, { editable: false })
+    return sheet._render(true);
+  }
+
 </script>
 
 <div class="flexrow item-piles-item-row item-piles-even-color" transition:fade={{duration: 250}}
-     class:item-piles-disabled={!$store.editQuantities && !item.shareLeft}>
+     class:item-piles-disabled={!editQuantities && !item.shareLeft}>
 
   <div class="item-piles-img-container">
     <!--<img class="item-piles-img"
@@ -17,9 +31,7 @@
          on:mouseenter={mouseEnterImage}
          on:mouseleave={mouseLeaveImage}
     />-->
-    <img class="item-piles-img"
-         src="{item.img}"
-    />
+    <img class="item-piles-img" src="{item.img}"/>
   </div>
 
   <div class="item-piles-name">
@@ -32,7 +44,7 @@
 
   <div style="flex:2.5;">
 
-    {#if $store.editQuantities}
+    {#if editQuantities}
 
       <div class="item-piles-quantity-container">
         <input class="item-piles-quantity" type="number" min="0" bind:value="{item.quantity}"/>
@@ -45,28 +57,21 @@
           <input class="item-piles-quantity" type="number" min="1" bind:value="{item.currentQuantity}"
                  max="{item.quantity}" disabled="{!item.quantity}"/>
 
-          <span class="item-piles-input-divider" class:item-piles-text-right={!$store.recipientActor}>
-                     / {item.shareLeft}
-                  </span>
+          <span class="item-piles-input-divider" class:item-piles-text-right={!store.recipientActor}>
+             / {item.shareLeft}
+          </span>
         </div>
       {:else}
-        <span>{localize(`ITEM-PILES.Inspect.${$store.pileData.shareItemsEnabled ? "NoShareLeft" : "NoneLeft"}`)}</span>
+        <span>{localize(`ITEM-PILES.Inspect.${store.pileData.shareItemsEnabled ? "NoShareLeft" : "NoneLeft"}`)}</span>
       {/if}
     {/if}
 
   </div>
 
-  {#if !$store.editQuantities}
-
-    <!--<button
-        on:click={take(item)}
-        class="item-piles-item-take-button"
-        type="button"
-        disabled={!item.shareLeft}>
-      {localize("ITEM-PILES.Inspect.Take")}
-    </button>-->
+  {#if !editQuantities}
 
     <button
+        on:click={store.take(item)}
         class="item-piles-item-take-button"
         type="button"
         disabled={!item.shareLeft}>

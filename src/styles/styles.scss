@@ -180,6 +180,14 @@
 
 /* ----------------------- INVENTORY ----------------------- */
 
+
+/* ----------------------- CONFIG ----------------------- */
+
+.item-piles-config .dialog-content {
+  height: 100%;
+  overflow: hidden;
+}
+
 .item-piles-collapsible {
 
   &:not(:last-child) {
@@ -210,14 +218,6 @@
       margin-right: 0.275rem;
     }
   }
-}
-
-/* ----------------------- CONFIG ----------------------- */
-
-
-.item-piles-config .dialog-content {
-  height: 100%;
-  overflow: hidden;
 }
 
 /* ---------------------- CHAT CARDS ---------------------- */

@@ -2,10 +2,10 @@ import * as Utilities from "./utilities.js"
 import CONSTANTS from "../constants/constants.js";
 
 function getFlagData(inDocument, flag, defaults) {
-  defaults = foundry.utils.duplicate(defaults);
-  const flags = getProperty(inDocument, CONSTANTS.FLAGS.PILE) ?? {};
+  const defaultFlags = foundry.utils.duplicate(defaults);
+  const flags = getProperty(inDocument.data, flag) ?? {};
   const data = foundry.utils.duplicate(flags);
-  return foundry.utils.mergeObject(defaults, data);
+  return foundry.utils.mergeObject(defaultFlags, data);
 }
 
 export function getItemFlagData(item) {
@@ -18,7 +18,8 @@ export function getActorFlagData(target) {
 
 export function isValidItemPile(target, data = false) {
   const targetActor = Utilities.getActor(target);
-  return targetActor && !targetActor.destroyed && (data || getActorFlagData(targetActor))?.enabled;
+  const pileData = data || getActorFlagData(targetActor);
+  return targetActor && pileData?.enabled;
 }
 
 export function isItemPileContainer(target) {

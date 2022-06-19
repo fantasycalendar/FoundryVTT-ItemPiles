@@ -9,7 +9,7 @@
         },
         "Inspect": {
             "Title": "Inspecting Pile Contents",
-            "AsActor": "You're inspecting this pile as <a class='item-piles-change-actor item-piles-highlight'>{actorName}</a>",
+            "AsActor": "You're inspecting this pile as {actorName}.",
             "Owner": "As an owner of this Item Pile, you can edit the item pile's contents.",
             "Empty": "This pile is empty.",
             "Destroyed": "This pile no longer exists and lies barren.",

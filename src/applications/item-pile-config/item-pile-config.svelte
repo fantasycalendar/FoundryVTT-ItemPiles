@@ -13,6 +13,7 @@
 
   import Tabs from "../components/Tabs.svelte";
   import SETTINGS from "../../constants/settings.js";
+  import PileAPI from "../../api.js";
 
   const { application } = getContext('external');
 
@@ -49,7 +50,7 @@
       "false": false
     }[data.deleteWhenEmpty];
 
-    pileActor.updateItemPile(pileActor, data);
+    PileAPI.updateItemPile(pileActor, data);
 
     application.close();
   }

@@ -9,7 +9,7 @@
         },
         "Inspect": {
             "Title": "Inspection de la pile",
-            "AsActor": "Vous inspectez cette pile en tant que <a class='item-piles-change-actor item-piles-highlight'>{actorName}</a>",
+            "AsActor": "Vous inspectez cette pile en tant que {actorName}.",
             "Owner": "En tant que propriétaire de ce tas d'objets, vous pouvez en modifier le contenu.",
             "Empty": "Cette pile est vide.",
             "Destroyed": "Cette pile n'existe plus.",
