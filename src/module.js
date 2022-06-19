@@ -36,20 +36,6 @@ Hooks.on("createItem", (doc, data) => {
   }
 });
 
-Hooks.on("updateItem", (doc, data) => {
-  const actor = doc.parent;
-  if (actor === this.pileActor) {
-    this.svelte.applicationShell.store.updateItems();
-  }
-});
-
-Hooks.on("deleteItem", (doc, data) => {
-  const actor = doc.parent;
-  if (actor === this.pileActor) {
-    this.svelte.applicationShell.store.updateItems();
-  }
-});
-
 Hooks.on("createItem", (doc) => {
   ItemPileInventory.refreshItems(doc.parent);
 });
