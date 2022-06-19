@@ -141,15 +141,11 @@
             },
             "CurrenciesEditor": {
                 "Title": "Currencies Editor",
-
                 "AttributeTitle": "Attribute Based Currencies",
                 "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
-
                 "ItemTitle": "Item Based Currencies",
                 "ItemExplanation": "In some systems, currencies are actual items in character inventories. Drag and drop any items into the lower part here to add a new item-based currency.",
-
                 "DragDrop": "Drag and drop an item to add it to the list",
-
                 "Name": "Currency name",
                 "Path": "Currency path",
                 "Icon": "Currency icon",
@@ -181,7 +177,7 @@
                 "SellModifier": "Sell Price Modifier (%)",
                 "Submit": "Submit price modifiers"
             },
-            "Defaults": {
+            "ItemPileConfig": {
                 "Title": "Item Pile Configuration",
                 "Configure": "Item Pile",
                 "Update": "Update Item Pile",
@@ -248,6 +244,18 @@
                     "InactivePlayersExplanation": "Only players who are active when this item pile is looted will be given their share of the pile.",
                     "ResetSharingData": "Reset Sharing Data",
                     "ResetSharingDataExplanation": "If the Item Pile's content was manually changed while people were looting it, the sharing data may become out of sync with the players' actual shares. Pressing this button will reset everyone's share in this pile."
+                },
+                "Merchant": {
+                    "Title": "Merchant Settings",
+                    "Enabled": "Is Merchant",
+                    "EnabledExplanation": "Players cannot pick up items from merchants, but must instead purchase them",
+                    "OpenTimes": "Open Times",
+                    "OpenTimesExplanation": "When enabled, the merchant is can only be interacted by players at certain times of the day.",
+                    "PriceModifier": "Price Modifier (%)",
+                    "SellModifier": "Sell Price Modifier (%)",
+                    "ActorPriceModifiers": "Per-Actor Override Price Modifiers",
+                    "ActorPriceModifiersExplanation": "Here you can configure if certain specific actors should have different price modifiers than the price modifiers above.",
+                    "ConfigureActorPriceModifiers": "Configure Override Price Modifiers."
                 }
             }
         },

@@ -36,9 +36,9 @@
   }
 
   let tabs = [
-    { value: "local", label: localize("ITEM-PILES.Applications.Settings.Local"), visible: true },
-    { value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), visible: userIsGM },
-    { value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), visible: userIsGM },
+    { value: "local", label: localize("ITEM-PILES.Applications.Settings.Local") },
+    { value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), hidden: !userIsGM },
+    { value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userIsGM },
   ];
 
   let activeTab = tabs[0].value;

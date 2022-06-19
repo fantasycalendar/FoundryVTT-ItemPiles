@@ -2,11 +2,12 @@
   import { get } from 'svelte/store';
 
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { currencyStore } from "./currency-store.js"
 
   import FilePicker from "../../components/FilePicker.svelte";
 
-  let itemStore = currencyStore.items;
+  export let store;
+
+  let itemStore = store.items;
 
   let hovering = null;
   let dragging = null;
@@ -64,13 +65,13 @@
     let currentItems = get(itemStore);
     if (currentItems.find(existingItem => existingItem.name === item.name && existingItem.type === existingItem.type)) return;
     itemStore.set([...currentItems, {
-      primary: !get(currencyStore.primary),
+      primary: !get(store.primary),
       name: item.name,
       type: item.type,
       exchange: 1,
       img: item.img
     }]);
-    currencyStore.primary.set(true);
+    store.primary.set(true);
   }
 
   function preventDefault(event) {
@@ -102,7 +103,7 @@
              ondragover="return false"
           ><i class="fas fa-bars"></i></a>
           <input type="radio" required name="primaryCurrency" checked={primary}
-                 on:change={() => { currencyStore.setPrimary(index, true) }}/>
+                 on:change={() => { store.setPrimary(index, true) }}/>
         </td>
         <td><input type="text" required placeholder="Gold Pieces" bind:value="{name}"/></td>
         <td class="small"><input type="number" required step="0.0000000001" bind:value="{exchange}"/></td>

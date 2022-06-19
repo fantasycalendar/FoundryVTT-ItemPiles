@@ -9,7 +9,9 @@
   import { getSetting, setSetting } from "../../../helpers/helpers.js";
   import SETTINGS from "../../../constants/settings.js";
 
-  import { currencyStore } from "./currency-store.js"
+  import CurrencyStore from "./currency-store.js"
+
+  const store = new CurrencyStore();
 
   const { application } = getContext('external');
 
@@ -17,16 +19,16 @@
   let mainSettings = !data;
   data = data || getSetting(SETTINGS.CURRENCIES);
 
-  currencyStore.items.set([...data.items]);
-  currencyStore.attributes.set([...data.attributes]);
+  store.items.set([...data.items]);
+  store.attributes.set([...data.attributes]);
 
   const primary = data.attributes.find(attr => attr.primary) ?? data.items.find(item => item.primary) ?? false;
-  currencyStore.primary.set(primary)
+  store.primary.set(primary)
 
   let form;
 
   async function updateSettings() {
-    const newData = currencyStore.export();
+    const newData = store.export();
     application.options.resolve(newData);
     if (mainSettings) {
       await setSetting(SETTINGS.CURRENCIES, newData);
@@ -47,12 +49,12 @@
   <h1>Attribute based currencies:</h1>
 
   <p>{localize("ITEM-PILES.Applications.CurrenciesEditor.Explanation")}</p>
-  <AttributeCurrencyList/>
+  <AttributeCurrencyList {store}/>
 
   <h1>Item based currencies:</h1>
 
   <p>{localize("ITEM-PILES.Applications.CurrenciesEditor.ItemExplanation")}</p>
-  <ItemCurrencyList/>
+  <ItemCurrencyList {store}/>
 
 </form>
 

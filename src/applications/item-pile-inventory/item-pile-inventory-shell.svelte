@@ -321,7 +321,7 @@
          <footer class="sheet-footer flexrow item-piles-top-divider">
             {#if !recipient && editQuantities}
                <button type="button" on:click={updatePile}>
-                  <i class="fas fa-save"></i> {localize("ITEM-PILES.ItemPileConfig.Update")}
+                  <i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
                </button>
             {/if}
 

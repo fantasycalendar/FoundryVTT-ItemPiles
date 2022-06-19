@@ -1,38 +1,42 @@
 import { writable, get } from 'svelte/store';
 
-const currencyStore = writable([]);
-
-currencyStore.attributes = writable([]);
-currencyStore.items = writable([]);
-currencyStore.primary = writable(false)
-
-currencyStore.setPrimary = (index, item = false) => {
-    const attributes = get(currencyStore.attributes);
-    const items = get(currencyStore.items);
-
+export default class CurrencyStore {
+  
+  constructor() {
+    
+    this.attributes = writable([]);
+    this.items = writable([]);
+    this.primary = writable(false)
+    
+  }
+  
+  setPrimary(index, item = false) {
+    const attributes = get(this.attributes);
+    const items = get(this.items);
+    
     items.forEach(item => {
-        item.primary = false;
+      item.primary = false;
     });
     attributes.forEach(attr => {
-        attr.primary = false;
+      attr.primary = false;
     });
-
-    if(item){
-        items[index].primary = true;
-    }else{
-        attributes[index].primary = true;
+    
+    if (item) {
+      items[index].primary = true;
+    } else {
+      attributes[index].primary = true;
     }
-    currencyStore.primary.set(true);
-
-    currencyStore.attributes.set(attributes);
-    currencyStore.items.set(items);
-}
-
-currencyStore.export = () => {
+    this.primary.set(true);
+    
+    this.attributes.set(attributes);
+    this.items.set(items);
+  }
+  
+  export() {
     return {
-        attributes: get(currencyStore.attributes),
-        items: get(currencyStore.items)
+      attributes: get(this.attributes),
+      items: get(this.items)
     };
+  }
+  
 }
-
-export { currencyStore };
