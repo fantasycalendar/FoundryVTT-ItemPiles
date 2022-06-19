@@ -1,9 +1,19 @@
 <script>
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import editors from "../editors/index.js";
+  import { getContext } from 'svelte';
+
+  const { application } = getContext('external');
 
   export let data;
   let editor = editors[data.application];
+
+  function showEditor() {
+    if (editor) {
+      editor.show();
+      application.options.zLevel = 100;
+    }
+  }
 
 </script>
 
@@ -17,7 +27,7 @@
 
   <div class="form-fields input-side">
     <div class="button-container">
-      <button type="button" on:click={() => { if(editor) editor.show() }}>
+      <button type="button" on:click={showEditor}>
         <i class="{data.icon}"></i>
         {localize(data.label)}
       </button>

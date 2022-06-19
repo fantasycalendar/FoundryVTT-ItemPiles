@@ -1,4 +1,5 @@
-import { CONSTANTS } from "./constants.js";
+import CONSTANTS from "./constants/constants.js";
+import SETTINGS from "./constants/settings.js";
 import * as helpers from "./helpers/helpers.js";
 import { SYSTEMS } from "./systems.js";
 import SettingsShim from "./applications/settings/settings-app.js";
@@ -14,7 +15,7 @@ export default function registerSettings() {
     restricted: false
   });
 
-  for (let [name, data] of Object.entries(CONSTANTS.SETTINGS.GET_DEFAULT())) {
+  for (let [name, data] of Object.entries(SETTINGS.GET_DEFAULT())) {
     game.settings.register(CONSTANTS.MODULE_NAME, name, data);
   }
 
@@ -23,7 +24,7 @@ export default function registerSettings() {
 }
 
 async function applyDefaultSettings() {
-  const settings = CONSTANTS.SETTINGS.GET_DEFAULT();
+  const settings = SETTINGS.GET_DEFAULT();
   for (const [name, data] of Object.entries(settings)) {
     await helpers.setSetting(name, data.default);
   }
@@ -33,20 +34,20 @@ export async function checkSystem() {
 
   await helpers.wait(1000);
 
-  if (helpers.getSetting(CONSTANTS.SETTINGS.PRECONFIGURED_SYSTEM)) return;
+  if (helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
 
   if (!SYSTEMS.HAS_SYSTEM_SUPPORT) {
 
-    if (helpers.getSetting(CONSTANTS.SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) return;
+    if (helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) return;
 
     let settingsValid = true;
-    for (const [name, data] of Object.entries(CONSTANTS.SETTINGS.GET_DEFAULT())) {
+    for (const [name, data] of Object.entries(SETTINGS.GET_DEFAULT())) {
       settingsValid = settingsValid && helpers.getSetting(name).length !== (new data.type).length
     }
 
     if (settingsValid) return;
 
-    await helpers.setSetting(CONSTANTS.SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN, true);
+    await helpers.setSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN, true);
 
     return Dialog.prompt({
       title: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Title"),
@@ -57,11 +58,11 @@ export async function checkSystem() {
 
   }
 
-  if (helpers.getSetting(CONSTANTS.SETTINGS.SYSTEM_FOUND)) return;
+  if (helpers.getSetting(SETTINGS.SYSTEM_FOUND)) return;
 
-  await helpers.setSetting(CONSTANTS.SETTINGS.SYSTEM_FOUND, true);
+  await helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
 
-  if (helpers.getSetting(CONSTANTS.SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
+  if (helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
 
     return new Dialog({
       title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),

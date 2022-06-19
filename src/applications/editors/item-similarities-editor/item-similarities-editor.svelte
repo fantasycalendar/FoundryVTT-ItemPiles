@@ -1,16 +1,16 @@
 <script>
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import FilePicker from "../../components/FilePicker.svelte";
+  import SETTINGS from "../../../constants/settings.js";
 
   const { application } = getContext('external');
 
   import { getSetting, setSetting } from "../../../helpers/helpers.js";
-  import { CONSTANTS } from "../../../constants.js";
+  import CONSTANTS from "../../../constants/constants.js";
 
   let form;
 
-  let itemSimilarities = getSetting(CONSTANTS.SETTINGS.ITEM_SIMILARITIES);
+  let itemSimilarities = getSetting(SETTINGS.ITEM_SIMILARITIES);
 
   function add() {
     itemSimilarities = [...itemSimilarities, ""];
@@ -23,7 +23,7 @@
   }
 
   async function updateSettings() {
-    await setSetting(CONSTANTS.SETTINGS.ITEM_SIMILARITIES, itemSimilarities);
+    await setSetting(SETTINGS.ITEM_SIMILARITIES, itemSimilarities);
     application.close();
   }
 

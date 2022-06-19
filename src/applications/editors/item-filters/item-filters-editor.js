@@ -28,12 +28,12 @@ export default class ItemFiltersEditor extends TJSDialog {
           }
         }
       },
-      zIndex: 102,
       default: 'save',
       autoClose: false, // Don't automatically close on button onclick.
       close: () => this.options.resolve(null)
     }, {
       width: 400,
+      zIndex: 202,
       height: "auto",
       ...options
     });

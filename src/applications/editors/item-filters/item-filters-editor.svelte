@@ -3,7 +3,7 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
   import { getSetting, setSetting } from "../../../helpers/helpers.js";
-  import { CONSTANTS } from "../../../constants.js";
+  import SETTINGS from "../../../constants/settings.js";
 
   const { application } = getContext('external');
 
@@ -13,7 +13,7 @@
 
   let mainSettings = !itemFilters?.length;
   if (!itemFilters) {
-    itemFilters = getSetting(CONSTANTS.SETTINGS.ITEM_FILTERS);
+    itemFilters = getSetting(SETTINGS.ITEM_FILTERS);
   }
 
   function add() {
@@ -29,7 +29,7 @@
   async function updateSettings() {
     application.options.resolve(itemFilters);
     if (mainSettings) {
-      await setSetting(CONSTANTS.SETTINGS.ITEM_FILTERS, itemFilters);
+      await setSetting(SETTINGS.ITEM_FILTERS, itemFilters);
     }
     application.close();
   }

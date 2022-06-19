@@ -30,10 +30,10 @@ export default class CurrenciesEditor extends TJSDialog {
       },
       default: 'save',
       autoClose: false, // Don't automatically close on button onclick.
-      zIndex: 102,
       close: () => this.options.resolve?.(null)
     }, {
       width: 630,
+      zIndex: 202,
       height: "auto",
       ...options,
     });

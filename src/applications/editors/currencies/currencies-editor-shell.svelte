@@ -1,5 +1,5 @@
 <script>
-  const { application } = getContext('external');
+
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
@@ -7,15 +7,17 @@
   import ItemCurrencyList from "./ItemCurrencyList.svelte";
 
   import { getSetting, setSetting } from "../../../helpers/helpers.js";
-  import { CONSTANTS } from "../../../constants.js";
+  import SETTINGS from "../../../constants/settings.js";
 
   import { currencyStore } from "./currency-store.js"
+
+  const { application } = getContext('external');
 
   export let data;
 
   let mainSettings = !data;
   if (!data) {
-    data = getSetting(CONSTANTS.SETTINGS.CURRENCIES);
+    data = getSetting(SETTINGS.CURRENCIES);
   }
 
   currencyStore.items.set([...data.items]);
@@ -30,7 +32,7 @@
     const newData = currencyStore.export();
     application.options.resolve(newData);
     if (mainSettings) {
-      await setSetting(CONSTANTS.SETTINGS.CURRENCIES, newData);
+      await setSetting(SETTINGS.CURRENCIES, newData);
     }
     application.close();
   }

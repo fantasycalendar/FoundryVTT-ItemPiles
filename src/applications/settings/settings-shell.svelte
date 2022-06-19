@@ -1,5 +1,5 @@
 <script>
-  import { CONSTANTS } from "../../constants.js";
+  import SETTINGS from "../../constants/settings.js";
 
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
@@ -16,7 +16,7 @@
   export let elementRoot;
   let form;
 
-  let settings = Object.fromEntries(Object.entries(CONSTANTS.SETTINGS.GET_DEFAULT()).map(entry => {
+  let settings = Object.fromEntries(Object.entries(SETTINGS.GET_DEFAULT()).map(entry => {
     entry[1].value = helpers.getSetting(entry[0]);
     return entry;
   }));
@@ -58,11 +58,11 @@
 
       <div class="tab flex" class:active={activeTab === 'local'} data-scope="primary" data-tab="local">
 
-        <Setting bind:data="{settings[CONSTANTS.SETTINGS.INVERT_SHEET_OPEN]}"/>
-        <Setting bind:data="{settings[CONSTANTS.SETTINGS.HIDE_ACTOR_HEADER_TEXT]}"/>
-        <Setting bind:data="{settings[CONSTANTS.SETTINGS.PRELOAD_FILES]}"/>
-        <Setting bind:data="{settings[CONSTANTS.SETTINGS.DEBUG]}"/>
-        <Setting bind:data="{settings[CONSTANTS.SETTINGS.DEBUG_HOOKS]}"/>
+        <Setting bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}"/>
+        <Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}"/>
+        <Setting bind:data="{settings[SETTINGS.PRELOAD_FILES]}"/>
+        <Setting bind:data="{settings[SETTINGS.DEBUG]}"/>
+        <Setting bind:data="{settings[SETTINGS.DEBUG_HOOKS]}"/>
 
         <div style="text-align: center; font-size: 1rem; margin-top:3rem;">
           <p>{localize("ITEM-PILES.Applications.Settings.MoreToCome")}
@@ -90,19 +90,19 @@
 
       {#if userIsGM}
         <div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
-          <Setting bind:data="{settings[CONSTANTS.SETTINGS.OUTPUT_TO_CHAT]}"/>
-          <Setting bind:data="{settings[CONSTANTS.SETTINGS.DELETE_EMPTY_PILES]}"/>
-          <Setting bind:data="{settings[CONSTANTS.SETTINGS.ENABLE_TRADING]}"/>
-          <Setting bind:data="{settings[CONSTANTS.SETTINGS.SHOW_TRADE_BUTTON]}"/>
+          <Setting bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
+          <Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
+          <Setting bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>
+          <Setting bind:data="{settings[SETTINGS.SHOW_TRADE_BUTTON]}"/>
         </div>
 
         <div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
-          <Setting bind:data="{settings[CONSTANTS.SETTINGS.ACTOR_CLASS_TYPE]}"/>
-          <Setting bind:data="{settings[CONSTANTS.SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
-          <Setting bind:data="{settings[CONSTANTS.SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
-          <SettingButton bind:data="{settings[CONSTANTS.SETTINGS.CURRENCIES]}"/>
-          <SettingButton bind:data="{settings[CONSTANTS.SETTINGS.ITEM_FILTERS]}"/>
-          <SettingButton bind:data="{settings[CONSTANTS.SETTINGS.ITEM_SIMILARITIES]}"/>
+          <Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}"/>
+          <Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
+          <Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
+          <SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>
+          <SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
+          <SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
         </div>
       {/if}
 
