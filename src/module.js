@@ -30,12 +30,6 @@ Hooks.on("reset-item-pile-settings", async () => {
   }
 })
 
-Hooks.on("createItem", (doc, data) => {
-  const actor = doc.parent;
-  if (actor === this.pileActor) {
-  }
-});
-
 Hooks.on("createItem", (doc) => {
   ItemPileInventory.refreshItems(doc.parent);
 });
