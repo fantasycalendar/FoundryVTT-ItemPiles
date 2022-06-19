@@ -5,6 +5,7 @@ import * as SharingUtilities from "./helpers/sharing-utilities.js";
 import SETTINGS from "./constants/settings.js";
 import ItemPileSocket from "./socket.js";
 import HOOKS from "./constants/hooks.js";
+import { isItemPileClosed, isItemPileContainer, isItemPileLocked } from "./helpers/pile-utilities.js";
 
 export default class API {
   
@@ -292,25 +293,24 @@ export default class API {
    * @return {Promise/Boolean}
    */
   static openItemPile(target, interactingToken = false) {
-    const targetDocument = Utilities.getActor(target);
+    const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-    
-    const data = PileUtilities.getActorFlagData(targetDocument);
+    const data = PileUtilities.getActorFlagData(targetActor);
     if (!data?.enabled || !data?.isContainer) return false;
     const wasLocked = data.locked;
     const wasClosed = data.closed;
     data.closed = false;
     data.locked = false;
     if (wasLocked) {
-      const hookResult = Hooks.call(HOOKS.PILE.PRE_UNLOCK, targetDocument, data, interactingTokenDocument);
+      const hookResult = Hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, data, interactingTokenDocument);
       if (hookResult === false) return false;
     }
-    const hookResult = Hooks.call(HOOKS.PILE.PRE_OPEN, targetDocument, data, interactingTokenDocument);
+    const hookResult = Hooks.call(HOOKS.PILE.PRE_OPEN, targetActor, data, interactingTokenDocument);
     if (hookResult === false) return false;
     if (wasClosed && data.openSound) {
       AudioHelper.play({ src: data.openSound })
     }
-    return this.updateItemPile(targetDocument, data, { interactingToken: interactingTokenDocument });
+    return this.updateItemPile(targetActor, data, { interactingToken: interactingTokenDocument });
   }
   
   /**
@@ -324,7 +324,6 @@ export default class API {
   static closeItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-    
     const pileData = PileUtilities.getActorFlagData(targetActor);
     if (!pileData?.enabled || !pileData?.isContainer) return false;
     const wasClosed = pileData.closed;
@@ -348,7 +347,6 @@ export default class API {
   static async toggleItemPileClosed(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-    
     const pileData = PileUtilities.getActorFlagData(targetActor);
     if (!pileData?.enabled || !pileData?.isContainer) return false;
     if (pileData.closed) {
@@ -370,7 +368,6 @@ export default class API {
   static lockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-    
     const pileData = PileUtilities.getActorFlagData(targetActor);
     if (!pileData?.enabled || !pileData?.isContainer) return false;
     const wasClosed = pileData.closed;
@@ -399,7 +396,6 @@ export default class API {
   static unlockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-    
     const pileData = PileUtilities.getActorFlagData(targetActor);
     if (!pileData?.enabled || !pileData?.isContainer) return false;
     pileData.locked = false;
@@ -418,7 +414,6 @@ export default class API {
   static toggleItemPileLocked(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-    
     const pileData = PileUtilities.getActorFlagData(targetActor);
     if (!pileData?.enabled || !pileData?.isContainer) return false;
     if (pileData.locked) {
@@ -466,10 +461,7 @@ export default class API {
    * @return {Boolean}
    */
   static isItemPileLocked(target) {
-    const targetActor = Utilities.getActor(target);
-    const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
-    return pileData.locked;
+    return PileUtilities.isItemPileLocked(target);
   }
   
   /**
@@ -480,10 +472,7 @@ export default class API {
    * @return {Boolean}
    */
   static isItemPileClosed(target) {
-    const targetActor = Utilities.getActor(target);
-    const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
-    return pileData.closed;
+    return PileUtilities.isItemPileClosed(target);
   }
   
   /**
@@ -494,9 +483,7 @@ export default class API {
    * @return {Boolean}
    */
   static isItemPileContainer(target) {
-    const targetActor = Utilities.getActor(target);
-    const pileData = PileUtilities.getActorFlagData(targetActor);
-    return pileData?.enabled && pileData?.isContainer;
+    return PileUtilities.isItemPileContainer(target);
   }
   
   /**
@@ -517,13 +504,10 @@ export default class API {
     const interactingTokenUuid = interactingToken ? Utilities.getUuid(interactingToken) : false;
     if (interactingToken && !interactingTokenUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
     
-    const hookResult = Hooks.call(HOOKS.PILE.PRE_UPDATE, target, newData, interactingToken, tokenSettings);
-    if (hookResult === false) return false;
-    
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.UPDATE_PILE, targetUuid, newData, {
       interactingTokenUuid,
       tokenSettings
-    })
+    });
   }
   
   /**

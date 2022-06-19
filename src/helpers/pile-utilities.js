@@ -21,6 +21,26 @@ export function isValidItemPile(target, data = false) {
   return targetActor && !targetActor.destroyed && (data || getActorFlagData(targetActor))?.enabled;
 }
 
+export function isItemPileContainer(target) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor);
+  return pileData?.enabled && pileData?.isContainer;
+}
+
+export function isItemPileClosed(target) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor);
+  if (!pileData?.enabled || !pileData?.isContainer) return false;
+  return pileData.closed;
+}
+
+export function isItemPileLocked(target) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor);
+  if (!pileData?.enabled || !pileData?.isContainer) return false;
+  return pileData.locked;
+}
+
 export function getActorItems(target, { itemFilters = false, itemCurrencies = true } = {}) {
   const targetActor = Utilities.getActor(target);
   const pileItemFilters = itemFilters ? itemFilters : getActorItemFilters(targetActor);

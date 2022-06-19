@@ -14,7 +14,6 @@ Hooks.once("init", async () => {
 
 Hooks.once("ready", () => {
   Socket.initialize();
-  new SettingsShim().render(true);
 })
 
 Hooks.on("reset-item-pile-settings", async () => {

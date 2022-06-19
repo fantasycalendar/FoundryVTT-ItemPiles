@@ -433,7 +433,6 @@ export default class PrivateAPI {
    * @param {Object} [itemData=false]
    *
    * @returns {Promise<{sourceUuid: string/boolean, targetUuid: string/boolean, position: object/boolean, itemsDropped: array }>}
-   * @private
    */
   static async _dropItems({
                             userId,
@@ -680,9 +679,10 @@ export default class PrivateAPI {
   
   static async _updateItemPile(targetUuid, newData, { interactingTokenUuid = false, tokenSettings = false } = {}) {
     
-    const target = Utilities.getActor(targetUuid);
+    const targetActor = Utilities.getActor(targetUuid);
+    const interactingToken = Utilities.getToken(interactingTokenUuid);
     
-    const oldData = PileUtilities.getActorFlagData(target);
+    const oldData = PileUtilities.getActorFlagData(targetActor);
     
     const data = foundry.utils.mergeObject(
       foundry.utils.duplicate(oldData),
@@ -691,9 +691,12 @@ export default class PrivateAPI {
     
     const diff = foundry.utils.diffObject(oldData, data);
     
+    const hookResult = Hooks.call(HOOKS.PILE.PRE_UPDATE, targetActor, data, interactingToken, tokenSettings);
+    if (hookResult === false) return false;
+    
     await Helpers.wait(15);
     
-    await PileUtilities.updateItemPileData(target, data, tokenSettings);
+    await PileUtilities.updateItemPileData(targetActor, data, tokenSettings);
     
     if (data.enabled && data.isContainer) {
       if (diff?.closed === true) {
@@ -772,7 +775,6 @@ export default class PrivateAPI {
    *
    * @param {TokenDocument} tokenDocument
    * @return {Promise<boolean>}
-   * @private
    */
   static async _initializeItemPile(tokenDocument) {
     
@@ -783,18 +785,18 @@ export default class PrivateAPI {
     if (Helpers.getSetting("preloadFiles")) {
       await Promise.allSettled(Object.entries(pileData).map(entry => {
         return new Promise(async (resolve) => {
-          const [key, value] = entry;
-          if (preloadedFiles.has(value) || !value) {
-            return resolve();
-          }
-          if (key.toLowerCase().includes("image")) {
-            preloadedFiles.add(value);
-            Helpers.debug(`Preloaded image: ${value}`);
-            await loadTexture(value);
-          } else if (key.toLowerCase().includes("sound")) {
-            preloadedFiles.add(value);
-            Helpers.debug(`Preloaded sound: ${value}`);
-            await AudioHelper.preloadSound(value);
+          const [property, filePath] = entry;
+          const isImage = property.toLowerCase().includes("image");
+          const isSound = property.toLowerCase().includes("sound");
+          if ((!isImage && !isSound) || (!filePath || preloadedFiles.has(filePath))) return resolve();
+          preloadedFiles.add(filePath);
+          
+          if (isImage) {
+            await loadTexture(filePath);
+            Helpers.debug(`Preloaded image: ${filePath}`);
+          } else if (isSound) {
+            Helpers.debug(`Preloaded sound: ${filePath}`);
+            await AudioHelper.preloadSound(filePath);
           }
           return resolve();
         });
@@ -858,7 +860,6 @@ export default class PrivateAPI {
    * @param {Object} data
    * @param {Actor/Token/TokenDocument/Boolean}[target=false]
    * @return {Promise/Boolean}
-   * @private
    */
   static async _dropData(canvas, data, { target = false } = {}) {
     
