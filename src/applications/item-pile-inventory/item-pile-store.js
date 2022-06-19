@@ -13,6 +13,7 @@ export default class ItemPileStore {
     
     this.attributes = writable([]);
     this.items = writable([]);
+    this.itemCurrencies = writable([]);
     this.search = writable("");
     this.editQuantities = writable(!recipientActor && pileActor.isOwner && game.user.isGM);
     
@@ -41,13 +42,13 @@ export default class ItemPileStore {
     const newItems = SharingUtilities.getItemPileItemsForActor(this.pileActor, this.recipientActor);
     
     if (!items.length) {
-      this.items.set(newItems);
+      this.setItems(newItems)
       return;
     }
     
     // If there are none, stop displaying them in the UI
     if (!newItems.length) {
-      this.items.set([]);
+      this.setItems([])
       return;
     }
     
@@ -69,9 +70,13 @@ export default class ItemPileStore {
       
     }
     
+    this.setItems(items.concat(newItems))
+  }
+  
+  setItems(newItems) {
     // Add the new items to the list
-    this.items.set(items.concat(newItems));
-    
+    this.items.set(newItems.filter(item => !item.currency));
+    this.itemCurrencies.set(newItems.filter(item => item.currency));
   }
   
   updateAttributes() {
@@ -80,8 +85,6 @@ export default class ItemPileStore {
     
     // Get all the attributes on the actor right now
     const newAttributes = SharingUtilities.getItemPileAttributesForActor(this.pileActor, this.recipientActor);
-    
-    console.log(newAttributes);
     
     if (!attributes) {
       this.attributes.set(newAttributes);
@@ -118,6 +121,8 @@ export default class ItemPileStore {
   }
   
   take(data) {
+    
+    console.log(data);
     
     const quantity = Math.min(data.currentQuantity, data.quantity);
     

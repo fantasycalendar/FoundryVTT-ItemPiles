@@ -6,6 +6,7 @@ import HOOKS from "./constants/hooks.js";
 import ItemPileSocket from "./socket.js";
 import SETTINGS from "./constants/settings.js";
 import CONSTANTS from "./constants/constants.js";
+import { hotkeyState } from "./hotkeys.js";
 
 const preloadedFiles = new Set();
 

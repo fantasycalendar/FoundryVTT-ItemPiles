@@ -226,7 +226,10 @@ export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [],
 export function getItemPileItemsForActor(pile, recipient, floor = false) {
   
   const pileData = PileUtilities.getActorFlagData(pile);
+  
   const pileItems = PileUtilities.getActorItems(pile);
+  
+  const pileItemCurrencies = new Set(PileUtilities.getActorCurrencyItems(pile).map(item => item.id));
   
   const players = getPlayersForItemPile(pile);
   const pileSharingData = getItemPileSharingData(pile);
@@ -237,16 +240,22 @@ export function getItemPileItemsForActor(pile, recipient, floor = false) {
   return pileItems.map(item => {
     
     const quantity = Utilities.getItemQuantity(item);
-    let data = {
+    
+    const isCurrency = pileItemCurrencies.has(item.id);
+    
+    const data = {
       id: item.id,
       name: item.name,
       type: item.type,
       img: item.data?.img ?? "",
+      currency: isCurrency,
       currentQuantity: 1,
       quantity: quantity,
       shareLeft: quantity,
       previouslyTaken: 0,
-      toShare: pileData.shareItemsEnabled && recipientUuid,
+      toShare: isCurrency
+        ? pileData.shareCurrenciesEnabled && recipientUuid
+        : pileData.shareItemsEnabled && recipientUuid,
       visible: true
     };
     

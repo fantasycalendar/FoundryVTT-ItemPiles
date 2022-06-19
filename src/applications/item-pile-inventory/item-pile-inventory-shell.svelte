@@ -9,7 +9,7 @@
   import PrivateAPI from "../../private-api.js";
 
   import ItemList from "./ItemList.svelte";
-  import AttributeList from "./AttributeList.svelte";
+  import CurrencyList from "./CurrencyList.svelte";
 
   import ItemPileStore from "./item-pile-store.js";
   import ActorPicker from "./ActorPicker.svelte";
@@ -28,13 +28,14 @@
 
   // Stores
   let itemStore = store.items;
+  let itemCurrenciesStore = store.itemCurrencies;
   let attributeStore = store.attributes;
   let searchStore = store.search;
   let editQuantitiesStore = store.editQuantities;
 
   $: hasItems = !!$itemStore.length;
-  $: hasAttributes = !!$attributeStore.length;
-  $: isPileEmpty = !hasItems && !hasAttributes;
+  $: hasCurrencies = !!$attributeStore.length || !!itemCurrenciesStore.length;
+  $: isPileEmpty = !hasItems && !hasCurrencies;
   $: showSearchBar = ($itemStore.length + $attributeStore.length) > 10;
   $: editQuantities = $editQuantitiesStore;
 
@@ -117,8 +118,6 @@
 
   function dropData(event) {
 
-    debugger;
-
     event.preventDefault();
 
     let data;
@@ -187,7 +186,7 @@
             <hr>
           {/if}
 
-          <AttributeList {store}/>
+          <CurrencyList {store}/>
 
         </div>
 

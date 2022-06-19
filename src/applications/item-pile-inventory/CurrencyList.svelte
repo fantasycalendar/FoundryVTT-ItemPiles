@@ -1,18 +1,20 @@
 <script>
 
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import AttributeEntry from "./AttributeEntry.svelte";
+  import CurrencyEntry from "./CurrencyEntry.svelte";
+  import ItemEntry from "./ItemEntry.svelte";
 
   export let store;
   const attributeStore = store.attributes;
+  const itemStore = store.itemCurrencies;
 
   let attributes;
-  let hasAttributes;
+  let itemCurrencies;
+  let hasCurrencies;
 
-  $: {
-    attributes = $attributeStore;
-    hasAttributes = !!attributes.length;
-  }
+  $: attributes = $attributeStore;
+  $: itemCurrencies = $itemStore;
+  $: hasCurrencies = !!attributes.length && !!itemCurrencies.length;
 
 </script>
 
@@ -30,17 +32,19 @@
       </a>
     {/if}
   </div>
-
-  {#if hasAttributes}
-
+  {#if !hasCurrencies}
     <div>
       {#each attributes as attribute, index (attribute.path)}
         {#if attribute.visible}
-          <AttributeEntry {store} {attribute}/>
+          <CurrencyEntry {store} {attribute}/>
+        {/if}
+      {/each}
+      {#each itemCurrencies as item, index (item.id)}
+        {#if item.visible}
+          <ItemEntry {store} {item}/>
         {/if}
       {/each}
     </div>
-
   {/if}
 
 </div>

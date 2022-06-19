@@ -7,8 +7,10 @@ import SettingsShim from "./applications/settings/settings-app.js";
 import CurrenciesEditor from "./applications/editors/currencies/currencies-editor.js";
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 import { ItemPileInventory } from "./applications/item-pile-inventory/item-pile-inventory.js";
+import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 
 Hooks.once("init", async () => {
+  registerHotkeysPre();
   registerSettings();
   game.itempiles = API;
   window.ItemPiles = {
@@ -18,7 +20,7 @@ Hooks.once("init", async () => {
 
 Hooks.once("ready", () => {
   Socket.initialize();
-  
+  registerHotkeysPost();
   setTimeout(() => {
     ItemPileInventory.show('Scene.Kf2SPAzQ0mTN4VCJ.Token.n4s3wgi8yfs9cjnn', 'Scene.Kf2SPAzQ0mTN4VCJ.Token.SHzadZJZY0NeKpzo')
   })

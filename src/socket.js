@@ -33,7 +33,6 @@ export default class ItemPileSocket {
     /**
      * UI sockets
      */
-    RENDER_INTERFACE: "renderItemPileInterface",
     RERENDER_TOKEN_HUD: "rerenderTokenHud",
     RERENDER_PILE_APPLICATION: "rerenderItemPileApplication",
     QUERY_PILE_INVENTORY_OPEN: "queryItemPileInventoryOpen",
@@ -71,6 +70,8 @@ export default class ItemPileSocket {
   
   static BINDINGS = {
     [this.HANDLERS.CALL_HOOK]: (hook, response, ...args) => callHook(hook, response, ...args),
+    
+    [this.HANDLERS.DROP_ITEMS]: (args) => PrivateAPI._dropItems(args),
     [this.HANDLERS.ADD_ITEMS]: (...args) => PrivateAPI._addItems(...args),
     [this.HANDLERS.REMOVE_ITEMS]: (...args) => PrivateAPI._removeItems(...args),
     [this.HANDLERS.TRANSFER_ITEMS]: (...args) => PrivateAPI._transferItems(...args),
