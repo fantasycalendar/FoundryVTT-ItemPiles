@@ -2,12 +2,13 @@ import API from "./api.js";
 import registerSettings from "./settings.js";
 import Socket from "./socket.js";
 import SettingsShim from "./applications/settings/settings-app.js";
+import CurrenciesEditor from "./applications/editors/currencies/currencies-editor.js";
 
 Hooks.once("init", async () => {
   registerSettings();
   game.itempiles = API;
   window.ItemPiles = {
-    API
+    API: API
   };
 });
 

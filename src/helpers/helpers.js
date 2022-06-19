@@ -13,7 +13,7 @@ export function getSetting(key) {
 }
 
 export function setSetting(key, value) {
-  if (value === undefined) throw new Error("setSetting | value must not be undefined!")
+  if (value === undefined) throw new Error("setSetting | value must not be undefined!");
   return game.settings.set(CONSTANTS.MODULE_NAME, key, value);
 }
 
@@ -61,3 +61,9 @@ export function dialogLayout({
     `;
 }
 
+
+export function isRealNumber(inNumber) {
+  return !isNaN(inNumber)
+    && typeof inNumber === "number"
+    && isFinite(inNumber);
+}

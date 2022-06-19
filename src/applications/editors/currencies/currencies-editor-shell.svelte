@@ -14,11 +14,8 @@
   const { application } = getContext('external');
 
   export let data;
-
   let mainSettings = !data;
-  if (!data) {
-    data = getSetting(SETTINGS.CURRENCIES);
-  }
+  data = data || getSetting(SETTINGS.CURRENCIES);
 
   currencyStore.items.set([...data.items]);
   currencyStore.attributes.set([...data.attributes]);

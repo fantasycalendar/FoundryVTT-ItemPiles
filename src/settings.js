@@ -1,11 +1,11 @@
 import CONSTANTS from "./constants/constants.js";
 import SETTINGS from "./constants/settings.js";
-import * as helpers from "./helpers/helpers.js";
+import * as Helpers from "./helpers/helpers.js";
 import { SYSTEMS } from "./systems.js";
 import SettingsShim from "./applications/settings/settings-app.js";
 
 export default function registerSettings() {
-
+  
   game.settings.registerMenu(CONSTANTS.MODULE_NAME, "configure-settings", {
     name: "ITEM-PILES.Settings.Configure.Title",
     label: "ITEM-PILES.Settings.Configure.Label",
@@ -14,59 +14,59 @@ export default function registerSettings() {
     type: SettingsShim,
     restricted: false
   });
-
+  
   for (let [name, data] of Object.entries(SETTINGS.GET_DEFAULT())) {
     game.settings.register(CONSTANTS.MODULE_NAME, name, data);
   }
-
+  
   checkSystem();
-
+  
 }
 
 async function applyDefaultSettings() {
-  const settings = SETTINGS.GET_DEFAULT();
+  const settings = SETTINGS.GET_SYSTEM_DEFAULTS();
   for (const [name, data] of Object.entries(settings)) {
-    await helpers.setSetting(name, data.default);
+    await Helpers.setSetting(name, data.default);
   }
 }
 
 export async function checkSystem() {
-
-  await helpers.wait(1000);
-
-  if (helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
-
+  
+  await Helpers.wait(1000);
+  
+  if (Helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
+  
   if (!SYSTEMS.HAS_SYSTEM_SUPPORT) {
-
-    if (helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) return;
-
+    
+    if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) return;
+    
     let settingsValid = true;
     for (const [name, data] of Object.entries(SETTINGS.GET_DEFAULT())) {
-      settingsValid = settingsValid && helpers.getSetting(name).length !== (new data.type).length
+      settingsValid = settingsValid && Helpers.getSetting(name).length !== (new data.type).length
     }
-
+    
     if (settingsValid) return;
-
-    await helpers.setSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN, true);
-
+    
+    await Helpers.setSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN, true);
+    
     return Dialog.prompt({
       title: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Title"),
       content: dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content") }),
       callback: () => {
       }
     });
-
+    
   }
-
-  if (helpers.getSetting(SETTINGS.SYSTEM_FOUND)) return;
-
-  await helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
-
-  if (helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
-
+  
+  if (Helpers.getSetting(SETTINGS.SYSTEM_FOUND)) return;
+  
+  await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
+  
+  if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
+    
     return new Dialog({
       title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
-      content: helpers.dialogLayout({
+      content: Helpers.dialogLayout({
         message: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"),
         icon: "fas fa-search"
       }),
@@ -85,8 +85,8 @@ export async function checkSystem() {
       },
       default: "cancel"
     }).render(true);
-
+    
   }
-
+  
   return applyDefaultSettings();
 }

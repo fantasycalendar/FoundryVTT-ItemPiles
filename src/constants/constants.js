@@ -3,20 +3,20 @@ const module_path = `modules/${module_name}/`;
 const baseFlag = `flags.${module_name}.`
 
 const CONSTANTS = {
-
+  
   MODULE_NAME: module_name,
   PATH: module_path,
-
+  
   FLAGS: {
     PILE: baseFlag + "data",
     SHARING: baseFlag + "sharing",
     ITEM: baseFlag + "item"
   },
-
+  
   ITEM_DEFAULTS: {
     override: false
   },
-
+  
   PILE_DEFAULTS: {
     // Core settings
     enabled: false,
@@ -24,55 +24,51 @@ const CONSTANTS = {
     macro: "",
     deleteWhenEmpty: "default",
     canInspectItems: true,
-
+    
     // Overrides
     overrideItemFilters: false,
     overrideCurrencies: false,
-
+    
     // Token settings
     displayOne: false,
     showItemName: false,
     overrideSingleItemScale: false,
     singleItemScale: 1.0,
-
+    
     // Sharing settings
     shareItemsEnabled: false,
     shareCurrenciesEnabled: true,
     takeAllEnabled: false,
     splitAllEnabled: true,
     activePlayers: false,
-
+    
     // Container settings
-    container: {
-      enabled: false,
-      closed: false,
-      locked: false,
-      closedImage: "",
-      emptyImage: "",
-      openedImage: "",
-      lockedImage: "",
-      closeSound: "",
-      openSound: "",
-      lockedSound: "",
-      unlockedSound: "",
-    },
-
+    isContainer: false,
+    closed: false,
+    locked: false,
+    closedImage: "",
+    emptyImage: "",
+    openedImage: "",
+    lockedImage: "",
+    closeSound: "",
+    openSound: "",
+    lockedSound: "",
+    unlockedSound: "",
+    
     // Merchant settings
-    merchant: {
+    isMerchant: false,
+    priceModifier: 100,
+    sellModifier: 50,
+    overridePriceModifiers: [],
+    openTimes: {
       enabled: false,
-      priceModifier: 100,
-      sellModifier: 50,
-      overridePriceModifiers: [],
-      openTimes: {
-        enabled: false,
-        open: {
-          hour: 9,
-          minute: 0
-        },
-        close: {
-          hour: 18,
-          minute: 0
-        }
+      open: {
+        hour: 9,
+        minute: 0
+      },
+      close: {
+        hour: 18,
+        minute: 0
       }
     }
   }
