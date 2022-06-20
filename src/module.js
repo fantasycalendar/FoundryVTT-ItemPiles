@@ -6,9 +6,10 @@ import Socket from "./socket.js";
 import SettingsShim from "./applications/settings-interface/settings-app.js";
 import CurrenciesEditor from "./applications/editors/currencies-editor/currencies-editor.js";
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
-import { ItemPileInventory } from "./applications/item-pile-inventory/item-pile-inventory.js";
+import { ItemPileInventory } from "./applications/item-pile-inventory-interface/item-pile-inventory.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import * as Utilities from "./helpers/utilities.js";
+import { TradeRequestDialog } from "./applications/trade-dialogs/trade-dialogs.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -23,7 +24,11 @@ Hooks.once("ready", () => {
   Socket.initialize();
   registerHotkeysPost();
   setTimeout(() => {
-    ItemPileInventory.show('Scene.Kf2SPAzQ0mTN4VCJ.Token.n4s3wgi8yfs9cjnn', 'Scene.Kf2SPAzQ0mTN4VCJ.Token.SHzadZJZY0NeKpzo')
+    TradeRequestDialog.show({
+      tradingUser: game.users.getName("Gamemaster"),
+      tradingActor: game.actors.getName("Almighty Spark"),
+      isPrivate: true
+    });
   })
 })
 

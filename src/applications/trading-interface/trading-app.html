@@ -1,0 +1,208 @@
+<form class="flexcol {{cssClasses}}" autocomplete="off">
+
+    <style>
+
+        .col{
+            flex-direction: column;
+            margin: 0 5px;
+        }
+
+        .col:not(:last-child){
+            padding-right:10px;
+            border-right:1px solid black;
+        }
+
+        .row{
+            flex: 1;
+        }
+
+        .row:last-child{
+            flex: 0 1 auto;
+        }
+
+        .trader{
+
+        }
+
+    </style>
+
+    <div class="flexrow">
+
+        <div class="col flexcol">
+
+            <div class="character-header item-piles-bottom-divider">
+                <img src="{{ leftActor.img }}">
+                <h2 class="character-name"><div>{{ leftActor.name }}</div></h2>
+            </div>
+
+            <div class="flexcol item-piles-item-drop-container {{#if leftActor.accepted}}accepted{{/if}}">
+
+                <div class="row item-piles-items-list">
+
+                    {{#unless leftActor.hasItems}}
+                    <div class="flexcol">
+                        <h3 class="item-piles-text-center">{{ localize "ITEM-PILES.Trade.DragDrop" }}</h3>
+                    </div>
+                    {{/unless}}
+
+                    {{#each leftActor.items as |item id|}}
+
+                    <div class="flexrow item-piles-item-row" data-type="item" data-item="{{item.id}}">
+
+                        <div style="flex: 0 1 auto; margin: 0 6px;">
+                            <a class="item-piles-clickable-red item-piles-remove-item"><i class="fas fa-times"></i></a>
+                        </div>
+
+                        <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
+
+                        <div class="item-piles-name item-piles-text">
+                            <div class="item-piles-name-container">
+                                <a class="item-piles-clickable">{{item.name}}</a>
+                            </div>
+                        </div>
+
+                        <div style="flex: 0 1 auto; margin: 0 5px;">
+                            <a class="item-piles-clickable-green item-piles-confirm-quantity" style="{{#if editing}}display:block;{{/if}}"><i class="fas fa-check"></i></a>
+                        </div>
+
+                        <div style="flex:1;">
+                            <span class="item-piles-text-right item-piles-quantity-text" style="{{#if editing}}display:none;{{/if}}">{{item.quantity}}</span>
+                            <div style="flex-direction: row; {{#unless editing}}display:none;{{/unless}}" class="item-piles-quantity-container">
+                                <input class="item-piles-quantity" type="number" min="0" value="{{item.quantity}}" max="{{item.maxQuantity}}"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{/each}}
+
+                </div>
+
+                {{#if systemHasCurrencies}}
+
+                <div class="row item-piles-items-list item-piles-currency-list">
+
+                    <div class="flexrow item-piles-top-divider">
+                        {{#if isGM}}
+                        <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-gm-add-currency"><i class="fas fa-plus"></i>
+                            {{localize "ITEM-PILES.Trade.GMAddCurrency"}}
+                        </a>
+                        {{/if}}
+                        <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i class="fas fa-plus"></i>
+                            {{localize "ITEM-PILES.Inspect.AddCurrency"}}
+                        </a>
+                    </div>
+
+                    {{#each leftActor.currencies as |currency id|}}
+
+                    <div class="flexrow item-piles-item-row" data-type="currency" data-currency="{{currency.path}}">
+
+                        <div style="flex: 0 1 auto; margin: 0 6px;">
+                            <a class="item-piles-clickable-red item-piles-remove-item"><i class="fas fa-times"></i></a>
+                        </div>
+
+                        <div class="item-piles-img-container"><img class="item-piles-img" src="{{currency.img}}"/></div>
+
+                        <div class="item-piles-name item-piles-text">
+                            <div class="item-piles-name-container">
+                                <a class="item-piles-clickable">{{currency.name}}</a>
+                            </div>
+                        </div>
+
+                        <div style="flex: 0 1 auto; margin: 0 5px;">
+                            <a class="item-piles-clickable-green item-piles-confirm-quantity" style="{{#if editing}}display:block;{{/if}}"><i class="fas fa-check"></i></a>
+                        </div>
+
+                        <div style="flex:1;">
+                            <span class="item-piles-text-right item-piles-quantity-text" style="{{#if editing}}display:none;{{/if}}">{{currency.quantity}}</span>
+                            <div style="flex-direction: row; {{#unless editing}}display:none;{{/unless}}" class="item-piles-quantity-container">
+                                <input class="item-piles-quantity" type="number" min="0" value="{{currency.quantity}}" max="{{currency.maxQuantity}}"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{/each}}
+
+                </div>
+
+                {{/if}}
+
+            </div>
+
+            {{#if leftActor.accepted}}
+                <button type="button" class="item-piles-accept-button" style="flex:0 1 auto;"><i class="fas fa-times"></i> {{localize "Cancel"}}</button>
+            {{else}}
+                <button type="button" class="item-piles-accept-button" style="flex:0 1 auto;"><i class="fas fa-check"></i> {{localize "ITEM-PILES.Trade.Accept"}}</button>
+            {{/if}}
+
+        </div>
+
+
+        <div class="col flexcol">
+
+            <div class="character-header trader item-piles-bottom-divider">
+                <h2 class="character-name"><div>{{ rightActor.name }}</div></h2>
+                <img src="{{ rightActor.img }}">
+            </div>
+
+            <div class="flexcol {{#if rightActor.accepted}}accepted{{/if}}">
+
+                <div class="row item-piles-items-list">
+
+                    {{#each rightActor.items as |item id|}}
+
+                    <div class="flexrow item-piles-item-row">
+
+                        <div class="item-piles-img-container"><img class="item-piles-img" src="{{item.img}}"/></div>
+
+                        <div class="item-piles-name item-piles-text">
+                            <div class="item-piles-name-container">
+                                <a class="item-piles-clickable">{{item.name}}</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="item-piles-text-right item-piles-text">{{item.quantity}}</span>
+                        </div>
+                    </div>
+
+                    {{/each}}
+
+                </div>
+
+                {{#if systemHasCurrencies}}
+
+                <div class="row item-piles-items-list item-piles-currency-list">
+
+                    {{#if rightActor.currencies.length}}
+                    <div class="row item-piles-top-divider"></div>
+                    {{/if}}
+
+                    {{#each rightActor.currencies as |currency id|}}
+
+                    <div class="flexrow item-piles-item-row">
+
+                        <div class="item-piles-img-container"><img class="item-piles-img" src="{{currency.img}}"/></div>
+
+                        <div class="item-piles-name item-piles-text">
+                            <div class="item-piles-name-container">
+                                <a class="item-piles-clickable">{{currency.name}}</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="item-piles-text-right item-piles-text">{{currency.quantity}}</span>
+                        </div>
+                    </div>
+
+                    {{/each}}
+
+                </div>
+
+                {{/if}}
+
+            </div>
+
+        </div>
+    </div>
+
+</form>

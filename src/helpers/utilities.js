@@ -1,5 +1,3 @@
-import { ItemPileInventory } from "../applications/item-pile-inventory/item-pile-inventory.js";
-
 export function getActor(target) {
   if (target instanceof Actor) return target;
   if (stringIsUuid(target)) {

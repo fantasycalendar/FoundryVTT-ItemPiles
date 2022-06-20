@@ -22,23 +22,6 @@
     background-color: rgba(0, 0, 0, 0.25);
   }
 
-  &-progress {
-    width: calc(100% - 4px);
-    background: #e1e4e8;
-    border-radius: 3px;
-    overflow: hidden;
-    margin: 0.25rem 2px 0 2px;
-    height: 6px;
-
-    .progress-bar {
-      display: block;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.65);
-      transition: width 30s linear;
-    }
-  }
-
-
   &-dialog {
     text-align: center;
     font-size: 0.9rem;
@@ -117,6 +100,22 @@
     padding-top: 0.5rem;
   }
 
+}
+
+.align-center {
+  &-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  &-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+  }
 }
 
 .item-piles-slider-group {
