@@ -195,7 +195,7 @@
 
       <footer class="sheet-footer flexrow item-piles-top-divider">
         {#if !store.recipientActor && editQuantities}
-          <button type="button" on:click={updatePile}>
+          <button type="button" on:click|once={updatePile}>
             <i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
           </button>
         {/if}

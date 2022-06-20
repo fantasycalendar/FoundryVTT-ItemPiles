@@ -7,6 +7,7 @@ import ItemPileSocket from "./socket.js";
 import SETTINGS from "./constants/settings.js";
 import CONSTANTS from "./constants/constants.js";
 import { hotkeyState } from "./hotkeys.js";
+import DropItemDialog from "./applications/drop-item-dialog/drop-item-dialog.js";
 
 const preloadedFiles = new Set();
 
@@ -982,7 +983,7 @@ export default class PrivateAPI {
       
     } else {
       
-      const result = await DropItemDialog.query(item, droppableDocuments[0]);
+      const result = await DropItemDialog.show(item, droppableDocuments[0]);
       
       if (!result) return false;
       action = result.action;

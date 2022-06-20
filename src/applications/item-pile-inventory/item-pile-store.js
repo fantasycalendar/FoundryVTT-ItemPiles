@@ -122,8 +122,6 @@ export default class ItemPileStore {
   
   take(data) {
     
-    console.log(data);
-    
     const quantity = Math.min(data.currentQuantity, data.quantity);
     
     if (data.id) {

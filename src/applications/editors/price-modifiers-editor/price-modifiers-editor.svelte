@@ -1,61 +1,61 @@
 <script>
-   import { getContext } from 'svelte';
-   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import { getContext } from 'svelte';
+  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-   const { application } = getContext('external');
+  const { application } = getContext('external');
 
-   let form;
+  let form;
 
-   export let priceModifiers;
+  export let priceModifiers;
 
-   function remove(index) {
-      priceModifiers.splice(index, 1)
-      priceModifiers = priceModifiers;
-   }
+  function remove(index) {
+    priceModifiers.splice(index, 1)
+    priceModifiers = priceModifiers;
+  }
 
-   async function updateSettings() {
-      priceModifiers.forEach(data => {
-         data.actor = data.actor.id;
-      })
-      application.options.resolve?.(priceModifiers);
-      application.close();
-   }
+  async function updateSettings() {
+    priceModifiers.forEach(data => {
+      data.actor = data.actor.id;
+    })
+    application.options.resolve?.(priceModifiers);
+    application.close();
+  }
 
-   export function requestSubmit(){
-      form.requestSubmit();
-   }
+  export function requestSubmit() {
+    form.requestSubmit();
+  }
 
-   function dropData(event){
+  function dropData(event) {
 
-      event.preventDefault();
+    event.preventDefault();
 
-      let data;
-      try {
-         data = JSON.parse(event.dataTransfer.getData('text/plain'));
-      } catch (err) {
-         return false;
-      }
+    let data;
+    try {
+      data = JSON.parse(event.dataTransfer.getData('text/plain'));
+    } catch (err) {
+      return false;
+    }
 
-      if (data.type !== "Actor") return;
+    if (data.type !== "Actor") return;
 
-      const actor = game.actors.get(data.id);
+    const actor = game.actors.get(data.id);
 
-      if(!actor) return;
+    if (!actor) return;
 
-      if(priceModifiers.find(data => data.actor === actor)) return;
+    if (priceModifiers.find(data => data.actor === actor)) return;
 
-      priceModifiers.push({
-         actor: actor,
-         priceModifier: 100,
-         sellModifier: 50
-      });
+    priceModifiers.push({
+      actor: actor,
+      priceModifier: 100,
+      sellModifier: 50
+    });
 
-      priceModifiers = priceModifiers;
-   }
+    priceModifiers = priceModifiers;
+  }
 
-   function preventDefault(event){
-      event.preventDefault();
-   }
+  function preventDefault(event) {
+    event.preventDefault();
+  }
 
 </script>
 
@@ -63,78 +63,84 @@
 
 <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
 
-   <p>{localize("ITEM-PILES.Applications.PriceModifiersEditor.Explanation")}</p>
+  <p>{localize("ITEM-PILES.Applications.PriceModifiersEditor.Explanation")}</p>
 
-   <div on:dragstart={preventDefault} on:drop={dropData} on:dragover={preventDefault} class:border-highlight={!priceModifiers.length}>
+  <div on:dragstart={preventDefault} on:drop={dropData} on:dragover={preventDefault}
+       class:border-highlight={!priceModifiers.length}>
 
-      {#if priceModifiers.length}
+    {#if priceModifiers.length}
       <table>
-         <tr>
-            <th style="width:25%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Actor")}</th>
-            <th style="width:35%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.PriceModifier")}</th>
-            <th style="width:35%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.SellModifier")}</th>
-            <th style="width:5%;"></th>
-         </tr>
-         {#each priceModifiers as priceData, index (index)}
-            <tr>
-               <td>
-                  <a class="item-piles-actor-name-clickable" on:click={(priceData.actor.sheet.render(true))}>{priceData.actor.name}</a>
-               </td>
-               <td>
-                  <div class="flexrow" style="margin: 0 0.25rem">
-                     <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{priceData.priceModifier}"/>
-                     <input style="flex:0.5; margin-left:0.5rem;" type="number" min="0" step="1" required bind:value="{priceData.priceModifier}"/>
-                  </div>
-               </td>
-               <td>
-                  <div class="flexrow" style="margin: 0 0.25rem">
-                     <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{priceData.sellModifier}"/>
-                     <input style="flex:0.5; margin-left:0.5rem;" type="number" min="0" step="1" required bind:value="{priceData.sellModifier}"/>
-                  </div>
-               </td>
-               <td class="small"><button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button></td>
-            </tr>
-         {/each}
+        <tr>
+          <th style="width:25%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Actor")}</th>
+          <th style="width:35%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.PriceModifier")}</th>
+          <th style="width:35%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.SellModifier")}</th>
+          <th style="width:5%;"></th>
+        </tr>
+        {#each priceModifiers as priceData, index (index)}
+          <tr>
+            <td>
+              <a class="item-piles-actor-name-clickable"
+                 on:click={(priceData.actor.sheet.render(true))}>{priceData.actor.name}</a>
+            </td>
+            <td>
+              <div class="flexrow" style="margin: 0 0.25rem">
+                <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{priceData.priceModifier}"/>
+                <input style="flex:0.5; margin-left:0.5rem;" type="number" min="0" step="1" required
+                       bind:value="{priceData.priceModifier}"/>
+              </div>
+            </td>
+            <td>
+              <div class="flexrow" style="margin: 0 0.25rem">
+                <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{priceData.sellModifier}"/>
+                <input style="flex:0.5; margin-left:0.5rem;" type="number" min="0" step="1" required
+                       bind:value="{priceData.sellModifier}"/>
+              </div>
+            </td>
+            <td class="small">
+              <button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
+            </td>
+          </tr>
+        {/each}
       </table>
-      {/if}
+    {/if}
 
-      <p class="item-piles-text-center">{localize("ITEM-PILES.Applications.PriceModifiersEditor.DragDrop")}</p>
+    <p class="item-piles-text-center">{localize("ITEM-PILES.Applications.PriceModifiersEditor.DragDrop")}</p>
 
-   </div>
+  </div>
 
 </form>
 
 
 <style lang="scss">
 
-   .border-highlight{
-      padding: 1rem;
-      margin: 0.25rem;
-      border-radius: 10px;
-      border:2px dashed gray;
-   }
+  .border-highlight {
+    padding: 1rem;
+    margin: 0.25rem;
+    border-radius: 10px;
+    border: 2px dashed gray;
+  }
 
-   table {
-      vertical-align:middle;
+  table {
+    vertical-align: middle;
 
-      tr{
-         border-spacing: 15px;
-      }
+    tr {
+      border-spacing: 15px;
+    }
 
-      .small{
-         width: 26px;
-      }
+    .small {
+      width: 26px;
+    }
 
-      button {
-         padding: 0.25rem 0.25rem;
-         line-height: 1rem;
-         flex:0;
-         text-align: center;
-      }
+    button {
+      padding: 0.25rem 0.25rem;
+      line-height: 1rem;
+      flex: 0;
+      text-align: center;
+    }
 
-      a {
-         text-align: center;
-      }
-   }
+    a {
+      text-align: center;
+    }
+  }
 
 </style>

@@ -109,7 +109,7 @@
     </section>
 
     <footer>
-      <button type="button" on:click={requestSubmit}><i
+      <button type="button" on:click|once={requestSubmit}><i
           class="far fa-save"></i> {localize("ITEM-PILES.Applications.Settings.Submit")}</button>
     </footer>
   </form>

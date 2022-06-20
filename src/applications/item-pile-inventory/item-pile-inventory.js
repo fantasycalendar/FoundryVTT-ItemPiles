@@ -38,11 +38,6 @@ export class ItemPileInventory extends SvelteApplication {
     
   }
   
-  addHook(hook, callback) {
-    const id = Hooks.on(hook, callback);
-    this.hooks.push({ hook, id });
-  }
-  
   /** @inheritdoc */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {

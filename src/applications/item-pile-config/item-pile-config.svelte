@@ -472,8 +472,10 @@
   </section>
 
   <footer>
-    <button type="button" on:click={requestSubmit}><i
-        class="far fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}</button>
+    <button type="button" on:click|once={requestSubmit}>
+      <i class="far fa-save"></i>
+      {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
+    </button>
   </footer>
 
 </form>
