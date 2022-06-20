@@ -30,6 +30,12 @@ export function isItemPileContainer(target) {
   return pileData?.enabled && pileData?.isContainer;
 }
 
+export function isItemPileMerchant(target) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor);
+  return pileData?.enabled && pileData?.isMerchant;
+}
+
 export function isItemPileClosed(target) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor);

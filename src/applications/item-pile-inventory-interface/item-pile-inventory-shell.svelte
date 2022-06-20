@@ -196,7 +196,7 @@
           </button>
         {/if}
 
-        {#if store.pileData.isContainer && !overrides.remove}
+        {#if store.pileData.isContainer && !overrides.remote}
           <button type="submit" on:click={() => { store.closeContainer() }}>
             <i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
           </button>

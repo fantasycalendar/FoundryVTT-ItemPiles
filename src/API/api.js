@@ -6,6 +6,7 @@ import SETTINGS from "../constants/settings.js";
 import ItemPileSocket from "../socket.js";
 import HOOKS from "../constants/hooks.js";
 import TradeAPI from "./trade-api.js";
+import PrivateAPI from "./private-api.js";
 
 export default class API {
   
@@ -210,9 +211,7 @@ export default class API {
    * @returns {Promise<String>}
    */
   static createItemPile(position, {
-    sceneId = game.user.viewedScene,
-    items = false,
-    pileActorName = false
+    sceneId = game.user.viewedScene, items = false, pileActorName = false
   } = {}) {
     
     if (pileActorName) {
@@ -226,9 +225,7 @@ export default class API {
     
     if (items) {
       items = items.map(item => {
-        return item instanceof Item
-          ? item.toObject()
-          : item;
+        return item instanceof Item ? item.toObject() : item;
       })
     }
     
@@ -448,13 +445,7 @@ export default class API {
       AudioHelper.play({ src: pileData.lockedSound })
     }
     
-    return ItemPileSocket.executeForEveryone(
-      ItemPileSocket.HANDLERS.CALL_HOOK,
-      HOOKS.PILE.RATTLE,
-      Utilities.getUuid(targetActor),
-      pileData,
-      Utilities.getUuid(interactingTokenDocument)
-    );
+    return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, Utilities.getUuid(targetActor), pileData, Utilities.getUuid(interactingTokenDocument));
   }
   
   /**
@@ -509,8 +500,7 @@ export default class API {
     if (interactingToken && !interactingTokenUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.UPDATE_PILE, targetUuid, newData, {
-      interactingTokenUuid,
-      tokenSettings
+      interactingTokenUuid, tokenSettings
     });
   }
   
@@ -661,8 +651,7 @@ export default class API {
       }
       
       return {
-        _id: item._id,
-        quantity: itemData?.quantity ?? Utilities.getItemQuantity(item)
+        _id: item._id, quantity: itemData?.quantity ?? Utilities.getItemQuantity(item)
       }
     });
     
@@ -714,8 +703,7 @@ export default class API {
       }
       
       return {
-        _id: item._id,
-        quantity: Math.max((itemData?.quantity ?? 0) ?? Utilities.getItemQuantity(itemData))
+        _id: item._id, quantity: Math.max((itemData?.quantity ?? 0) ?? Utilities.getItemQuantity(itemData))
       }
     });
     
@@ -761,8 +749,7 @@ export default class API {
     }
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, {
-      itemFilters,
-      interactionId
+      itemFilters, interactionId
     });
   }
   
@@ -957,10 +944,13 @@ export default class API {
     }
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, {
-      itemFilters,
-      interactionId
+      itemFilters, interactionId
     });
     
+  }
+  
+  static updateTokenHud() {
+    return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.RERENDER_TOKEN_HUD);
   }
   
   static requestTrade(user) {
@@ -969,6 +959,53 @@ export default class API {
   
   static spectateTrade(tradeId) {
     return TradeAPI._spectateTrade(tradeId);
+  }
+  
+  static renderItemPileInterface(target, {
+    userIds = [game.user.id], inspectingTarget = false, useDefaultCharacter = true
+  } = {}) {
+    
+    const targetDocument = Utilities.getDocument(target);
+    const targetUuid = Utilities.getUuid(targetDocument);
+    if (!targetUuid) throw Helpers.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid target item pile`);
+    
+    if (!PileUtilities.isValidItemPile(targetDocument)) {
+      throw Helpers.custom_error("renderItemPileInterface | This target is not a valid item pile")
+    }
+    
+    if (inspectingTarget && useDefaultCharacter) {
+      throw Helpers.custom_error("renderItemPileInterface | You cannot force users to use both their default character and a specific character to inspect the pile")
+    }
+    
+    if (!Array.isArray(userIds)) userIds = [userIds];
+    
+    if (!game.user.isGM) {
+      if (userIds.length > 1 || !userIds.includes(game.user.id)) {
+        throw Helpers.custom_error(`renderItemPileInterface | You are not a GM, so you cannot force others to render an item pile's interface`);
+      }
+      userIds = [game.user.id];
+    }
+    
+    for (const userId of userIds) {
+      const user = game.users.get(userId);
+      if (!user) throw Helpers.custom_error(`renderItemPileInterface | No user with ID "${userId}" exists`);
+      if (useDefaultCharacter) {
+        if (!user.character) {
+          Helpers.custom_warning(`renderItemPileInterface | User with id "${userId}" has no default character`, true);
+          return;
+        }
+      }
+    }
+    
+    const inspectingTargetUuid = inspectingTarget ? Utilities.getUuid(inspectingTarget) : false;
+    if (inspectingTarget && !inspectingTargetUuid) throw Helpers.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid inspecting target`);
+    
+    return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.RENDER_INTERFACE, userIds, targetUuid, {
+      inspectingTargetUuid,
+      useDefaultCharacter,
+      remote: true
+    });
+    
   }
   
 }

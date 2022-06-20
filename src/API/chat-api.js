@@ -76,7 +76,6 @@ export default class ChatAPI {
    * @param userId
    * @param interactionId
    * @returns {Promise}
-   * @private
    */
   static async _outputTransferItem(source, target, items, userId, interactionId) {
     if (!PileUtilities.isValidItemPile(source)) return;
@@ -94,7 +93,6 @@ export default class ChatAPI {
    * @param userId
    * @param interactionId
    * @returns {Promise}
-   * @private
    */
   static async _outputTransferCurrency(source, target, currencies, userId, interactionId) {
     if (!PileUtilities.isValidItemPile(source)) return;
@@ -113,7 +111,6 @@ export default class ChatAPI {
    * @param userId
    * @param interactionId
    * @returns {Promise}
-   * @private
    */
   static async _outputTransferEverything(source, target, items, currencies, userId, interactionId) {
     if (!PileUtilities.isValidItemPile(source)) return;
@@ -144,7 +141,6 @@ export default class ChatAPI {
    *
    * @param items
    * @returns {Promise<Array>}
-   * @private
    */
   static async _formatItemData(items) {
     const formattedItems = [];
@@ -165,7 +161,6 @@ export default class ChatAPI {
    * @param itemPile
    * @param currencies
    * @returns {Array}
-   * @private
    */
   static _formatCurrencyData(itemPile, currencies) {
     const currencyList = PileUtilities.getActorCurrencyAttributes(itemPile);
@@ -190,7 +185,6 @@ export default class ChatAPI {
    * @param userId
    * @param interactionId
    * @returns {Promise}
-   * @private
    */
   static async _outputPickupToChat(sourceUuid, targetUuid, items, currencies, userId, interactionId) {
     

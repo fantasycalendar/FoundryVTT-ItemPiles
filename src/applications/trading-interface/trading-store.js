@@ -1,12 +1,10 @@
 import { writable, get } from 'svelte/store';
 import * as Utilities from "../../helpers/utilities.js";
-import * as SharingUtilities from "../../helpers/sharing-utilities.js";
-import * as PileUtilities from "../../helpers/pile-utilities.js";
 import ItemPileSocket from "../../socket.js";
 
 export default class TradingStore {
   
-  constructor(leftTrader, rightTrader, publicTradeId, privateTradeId, isPrivate) {
+  constructor(leftTrader, rightTrader, publicTradeId, privateTradeId = false, isPrivate = false) {
     
     this.publicTradeId = publicTradeId;
     this.privateTradeId = privateTradeId;
@@ -14,18 +12,59 @@ export default class TradingStore {
     
     this.leftTraderUser = leftTrader.user;
     this.leftTraderActor = leftTrader.actor;
-    this.leftTraderItems = writable([]);
-    this.leftTraderCurrencies = writable([]);
-    this.leftTraderItemCurrencies = writable([]);
-    this.leftTraderAccepted = writable(false);
+    this.leftTraderItems = writable(leftTrader.items ?? []);
+    this.leftTraderCurrencies = writable(leftTrader.currencies ?? []);
+    this.leftTraderItemCurrencies = writable(leftTrader.itemCurrencies ?? []);
+    this.leftTraderAccepted = writable(leftTrader.accepted ?? false);
     
     this.rightTraderUser = rightTrader.user;
     this.rightTraderActor = rightTrader.actor;
-    this.rightTraderItems = writable([]);
-    this.rightTraderCurrencies = writable([]);
-    this.rightTraderItemCurrencies = writable([]);
-    this.rightTraderAccepted = writable(false);
+    this.rightTraderItems = writable(rightTrader.items ?? []);
+    this.rightTraderCurrencies = writable(rightTrader.currencies ?? []);
+    this.rightTraderItemCurrencies = writable(rightTrader.itemCurrencies ?? []);
+    this.rightTraderAccepted = writable(rightTrader?.accepted ?? false);
     
+  }
+  
+  static import(leftTraderData, rightTraderData, publicTradeId) {
+    
+    const leftTrader = {
+      user: game.users.get(leftTraderData.user),
+      actor: Utilities.fromUuidFast(leftTraderData.actorUiid),
+      items: leftTraderData.items,
+      currencies: leftTraderData.currencies,
+      itemCurrencies: leftTraderData.itemCurrencies,
+      accepted: leftTraderData.accepted
+    };
+    
+    const rightTrader = {
+      user: game.users.get(rightTraderData.user),
+      actor: Utilities.fromUuidFast(rightTraderData.actorUiid),
+      items: rightTraderData.items,
+      currencies: rightTraderData.currencies,
+      itemCurrencies: rightTraderData.itemCurrencies,
+      accepted: rightTraderData.accepted
+    };
+    
+    return new this(leftTrader, rightTrader, publicTradeId);
+  }
+  
+  export() {
+    return [{
+      userId: get(this.leftTraderUser.id),
+      actorUiid: get(Utilities.getUuid(this.leftTraderActor)),
+      items: get(this.leftTraderItems),
+      currencies: get(this.leftTraderCurrencies),
+      itemCurrencies: get(this.leftTraderItemCurrencies),
+      accepted: get(this.leftTraderAccepted)
+    }, {
+      userId: get(this.rightTraderUser.id),
+      actorUiid: get(Utilities.getUuid(this.rightTraderActor)),
+      items: get(this.rightTraderItems),
+      currencies: get(this.rightTraderCurrencies),
+      itemCurrencies: get(this.rightTraderItemCurrencies),
+      accepted: get(this.rightTraderAccepted)
+    }, this.publicTradeId]
   }
   
   getTradeData() {
@@ -34,8 +73,7 @@ export default class TradingStore {
         actor: this.leftTraderActor,
         items: get(this.leftTraderItems).concat(get(this.leftTraderItemCurrencies)),
         attributes: get(this.leftTraderCurrencies)
-      },
-      add: {
+      }, add: {
         actor: this.rightTraderActor,
         items: get(this.rightTraderItems).concat(get(this.rightTraderItemCurrencies)),
         attributes: get(this.rightTraderCurrencies)

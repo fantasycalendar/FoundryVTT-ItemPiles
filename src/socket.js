@@ -35,8 +35,8 @@ export default class ItemPileSocket {
     /**
      * UI sockets
      */
+    RENDER_INTERFACE: "renderItemPileApplication",
     RERENDER_TOKEN_HUD: "rerenderTokenHud",
-    RERENDER_PILE_APPLICATION: "rerenderItemPileApplication",
     QUERY_PILE_INVENTORY_OPEN: "queryItemPileInventoryOpen",
     RESPOND_PILE_INVENTORY_OPEN: "responseItemPileInventoryOpen",
     
@@ -59,7 +59,7 @@ export default class ItemPileSocket {
      */
     TRADE_REQUEST_PROMPT: "tradePrompt",
     TRADE_REQUEST_CANCELLED: "tradeCancelled",
-    TRADE_SPECTATE: "tradeSpectate",
+    REQUEST_TRADE_DATA: "requestTradeData",
     TRADE_CLOSED: "publicTradeClosed",
     PUBLIC_TRADE_UPDATE_ITEMS: "publicTradeUpdateItems",
     PUBLIC_TRADE_UPDATE_CURRENCIES: "publicTradeUpdateCurrencies",
@@ -105,15 +105,25 @@ export default class ItemPileSocket {
     
     [this.HANDLERS.EXECUTE_TRADE]: (...args) => TradeAPI._executeTrade(...args),
     [this.HANDLERS.TRADE_COMPLETED]: (...args) => TradeAPI._tradeCompleted(...args),
-    [this.HANDLERS.TRADE_SPECTATE]: (...args) => TradeAPI._spectateTrade(...args),
+    [this.HANDLERS.REQUEST_TRADE_DATA]: (...args) => TradeAPI._respondActiveTradeData(...args),
     
-    [this.HANDLERS.DISABLE_CHAT_TRADE_BUTTON]: (...args) => ChatAPI._disableTradingButton(...args)
+    [this.HANDLERS.PICKUP_CHAT_MESSAGE]: (...args) => ChatAPI._outputPickupToChat(...args),
+    [this.HANDLERS.SPLIT_CHAT_MESSAGE]: (...args) => ChatAPI._outputSplitToChat(...args),
+    [this.HANDLERS.DISABLE_CHAT_TRADE_BUTTON]: (...args) => ChatAPI._disableTradingButton(...args),
+    
+    [this.HANDLERS.RENDER_INTERFACE]: (...args) => {
+    },
+    [this.HANDLERS.RERENDER_TOKEN_HUD]: (...args) => PrivateAPI._updateTokenHud(),
+    [this.HANDLERS.QUERY_PILE_INVENTORY_OPEN]: (...args) => {
+    },
+    [this.HANDLERS.RESPOND_PILE_INVENTORY_OPEN]: (...args) => {
+    },
   }
   
   static _socket;
   
   static initialize() {
-    this._socket = globalThis.socketlib.registerModule(CONSTANTS.MODULE_NAME);
+    this._socket = socketlib.registerModule(CONSTANTS.MODULE_NAME);
     for (let [key, callback] of Object.entries(this.BINDINGS)) {
       this._socket.register(key, callback);
       debug(`Registered itemPileSocket: ${key}`);

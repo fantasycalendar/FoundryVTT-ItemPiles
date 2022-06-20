@@ -8,7 +8,8 @@ import SETTINGS from "../constants/settings.js";
 import CONSTANTS from "../constants/constants.js";
 import { hotkeyState } from "../hotkeys.js";
 import DropItemDialog from "../applications/drop-item-dialog/drop-item-dialog.js";
-import { shouldItemPileBeDeleted, updateItemPileData } from "../helpers/pile-utilities.js";
+import { isItemPileMerchant, shouldItemPileBeDeleted, updateItemPileData } from "../helpers/pile-utilities.js";
+import { ItemPileInventory } from "../applications/item-pile-inventory-interface/item-pile-inventory.js";
 
 const preloadedFiles = new Set();
 
@@ -1347,4 +1348,29 @@ export default class PrivateAPI {
     
   }
   
+  static async _updateTokenHud() {
+    if (!canvas.tokens.hud.rendered) return;
+    return canvas.tokens.hud.render(true);
+  }
+  
+  static async _renderItemPileInterface(targetUuid, {
+    inspectingTargetUuid = false,
+    useDefaultCharacter = false,
+    remote = false
+  } = {}) {
+    
+    const target = Utilities.getActor(targetUuid);
+    
+    let inspectingTarget;
+    if (useDefaultCharacter && !game.user.isGM) {
+      inspectingTarget = game.user.character;
+    } else {
+      inspectingTarget = inspectingTargetUuid ? Utilities.fromUuidFast(inspectingTargetUuid) : false;
+    }
+    
+    const merchant = PileUtilities.isItemPileMerchant(target);
+    
+    return ItemPileInventory.show(target, inspectingTarget, { remote });
+    
+  }
 }
