@@ -13,7 +13,7 @@
 
   import Tabs from "../components/Tabs.svelte";
   import SETTINGS from "../../constants/settings.js";
-  import PileAPI from "../../api.js";
+  import PileAPI from "../../API/api.js";
 
   const { application } = getContext('external');
 

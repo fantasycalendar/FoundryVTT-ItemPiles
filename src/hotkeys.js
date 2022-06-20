@@ -1,6 +1,6 @@
 import CONSTANTS from "./constants/constants.js";
 import * as Utilities from "./helpers/utilities.js";
-import PrivateAPI from "./private-api.js";
+import PrivateAPI from "./API/private-api.js";
 
 export const hotkeyActionState = {
   get openPileInventory() {

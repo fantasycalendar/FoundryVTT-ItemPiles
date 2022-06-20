@@ -4,8 +4,8 @@ import registerSettings from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import * as Utilities from "./helpers/utilities.js";
 import Socket from "./socket.js";
-import API from "./api.js";
-import TradeAPI from "./trade-api.js";
+import API from "./API/api.js";
+import TradeAPI from "./API/trade-api.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();

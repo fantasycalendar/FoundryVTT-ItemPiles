@@ -1,0 +1,39 @@
+<div class="item-piles-chat-card" data-actor-id="{{actor.id}}">
+
+    <div class="item-piles-chat-card-title">
+        <p>
+            <img src="{{itemPile.data.img}}" title="{{itemPile.name}}" height="32"/>
+            {{#if actor}}<i class="fas fa-arrow-right"></i> <img src="{{actor.data.img}}" title="{{actor.name}}" height="32"/>{{/if}}
+        </p>
+        <p>{{message}}</p>
+    </div>
+
+    {{#if items}}
+        <ul>
+        {{#each items as |item id|}}
+            <li>
+                <img src="{{item.img}}" title="{{item.name}}" height="16"/>
+                <label>{{item.name}}</label>
+                <small>{{item.quantity}}</small>
+            </li>
+        {{/each}}
+        </ul>
+    {{/if}}
+    {{#if items}}
+    {{#if currencies}}
+    <hr>
+    {{/if}}
+    {{/if}}
+    {{#if currencies}}
+        <ul>
+        {{#each currencies as |currency id|}}
+            <li>
+                <img src="{{currency.img}}" title="{{currency.name}}" height="16"/>
+                <label>{{currency.name}}</label>
+                <small>{{currency.quantity}}</small>
+            </li>
+        {{/each}}
+        </ul>
+    {{/if}}
+
+</div>

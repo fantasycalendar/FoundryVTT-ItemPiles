@@ -1,10 +1,10 @@
-import * as Helpers from "./helpers/helpers.js";
-import * as Utilities from "./helpers/utilities.js";
-import * as PileUtilities from "./helpers/pile-utilities.js";
-import * as SharingUtilities from "./helpers/sharing-utilities.js";
-import SETTINGS from "./constants/settings.js";
-import ItemPileSocket from "./socket.js";
-import HOOKS from "./constants/hooks.js";
+import * as Helpers from "../helpers/helpers.js";
+import * as Utilities from "../helpers/utilities.js";
+import * as PileUtilities from "../helpers/pile-utilities.js";
+import * as SharingUtilities from "../helpers/sharing-utilities.js";
+import SETTINGS from "../constants/settings.js";
+import ItemPileSocket from "../socket.js";
+import HOOKS from "../constants/hooks.js";
 import TradeAPI from "./trade-api.js";
 
 export default class API {
@@ -965,6 +965,10 @@ export default class API {
   
   static requestTrade(user) {
     return TradeAPI._requestTrade(user);
+  }
+  
+  static spectateTrade(tradeId) {
+    return TradeAPI._spectateTrade(tradeId);
   }
   
 }

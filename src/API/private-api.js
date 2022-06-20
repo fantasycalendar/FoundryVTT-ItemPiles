@@ -1,13 +1,13 @@
-import * as Helpers from "./helpers/helpers.js";
-import * as Utilities from "./helpers/utilities.js";
-import * as PileUtilities from "./helpers/pile-utilities.js";
-import * as SharingUtilities from "./helpers/sharing-utilities.js";
-import HOOKS from "./constants/hooks.js";
-import ItemPileSocket from "./socket.js";
-import SETTINGS from "./constants/settings.js";
-import CONSTANTS from "./constants/constants.js";
-import { hotkeyState } from "./hotkeys.js";
-import DropItemDialog from "./applications/drop-item-dialog/drop-item-dialog.js";
+import * as Helpers from "../helpers/helpers.js";
+import * as Utilities from "../helpers/utilities.js";
+import * as PileUtilities from "../helpers/pile-utilities.js";
+import * as SharingUtilities from "../helpers/sharing-utilities.js";
+import HOOKS from "../constants/hooks.js";
+import ItemPileSocket from "../socket.js";
+import SETTINGS from "../constants/settings.js";
+import CONSTANTS from "../constants/constants.js";
+import { hotkeyState } from "../hotkeys.js";
+import DropItemDialog from "../applications/drop-item-dialog/drop-item-dialog.js";
 
 const preloadedFiles = new Set();
 

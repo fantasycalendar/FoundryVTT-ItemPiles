@@ -1,8 +1,9 @@
 import CONSTANTS from "./constants/constants.js";
 import { debug } from "./helpers/helpers.js";
 import { stringIsUuid } from "./helpers/utilities.js";
-import PrivateAPI from "./private-api.js";
-import TradeAPI from "./trade-api.js";
+import PrivateAPI from "./API/private-api.js";
+import TradeAPI from "./API/trade-api.js";
+import ChatAPI from "./API/chat-api.js";
 
 export default class ItemPileSocket {
   
@@ -105,6 +106,8 @@ export default class ItemPileSocket {
     [this.HANDLERS.EXECUTE_TRADE]: (...args) => TradeAPI._executeTrade(...args),
     [this.HANDLERS.TRADE_COMPLETED]: (...args) => TradeAPI._tradeCompleted(...args),
     [this.HANDLERS.TRADE_SPECTATE]: (...args) => TradeAPI._spectateTrade(...args),
+    
+    [this.HANDLERS.DISABLE_CHAT_TRADE_BUTTON]: (...args) => ChatAPI._disableTradingButton(...args)
   }
   
   static _socket;

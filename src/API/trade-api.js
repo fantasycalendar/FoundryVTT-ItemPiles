@@ -1,13 +1,13 @@
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-import CustomDialog from "./applications/components/CustomDialog.svelte";
-import { TradePromptDialog, TradeRequestDialog } from "./applications/trade-dialogs/trade-dialogs.js";
+import CustomDialog from "../applications/components/CustomDialog.svelte";
+import { TradePromptDialog, TradeRequestDialog } from "../applications/trade-dialogs/trade-dialogs.js";
 
-import ItemPileSocket from "./socket.js";
-import * as Helpers from "./helpers/helpers.js";
-import * as Utilities from "./helpers/utilities.js";
-import HOOKS from "./constants/hooks.js";
-import TradingStore from "./applications/trading-interface/trading-store.js";
-import TradingApp from "./applications/trading-interface/trading-app.js";
+import ItemPileSocket from "../socket.js";
+import * as Helpers from "../helpers/helpers.js";
+import * as Utilities from "../helpers/utilities.js";
+import HOOKS from "../constants/hooks.js";
+import TradingStore from "../applications/trading-interface/trading-store.js";
+import TradingApp from "../applications/trading-interface/trading-app.js";
 
 const mutedUsers = new Set();
 const ongoingTrades = new Map();
@@ -428,6 +428,9 @@ export default class TradeAPI {
     const tradeApp = this.getOngoingTrade(tradeId);
     if (!tradeApp) return;
     const updates = tradeApp.store.getTradeData();
+    
+    // Todo: Actually implement each user updating the actor they own
+    
     if (tradeApp.store.isPrivate) {
       tradeApp.close();
       ongoingTrades.delete(tradeId);

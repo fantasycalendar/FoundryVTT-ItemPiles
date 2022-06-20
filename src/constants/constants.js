@@ -10,7 +10,8 @@ const CONSTANTS = {
   FLAGS: {
     PILE: baseFlag + "data",
     SHARING: baseFlag + "sharing",
-    ITEM: baseFlag + "item"
+    ITEM: baseFlag + "item",
+    PUBLIC_TRADE_ID: baseFlag + "publicTradeId"
   },
   
   ITEM_DEFAULTS: {
