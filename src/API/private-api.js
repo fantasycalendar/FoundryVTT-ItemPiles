@@ -8,10 +8,120 @@ import SETTINGS from "../constants/settings.js";
 import CONSTANTS from "../constants/constants.js";
 import { hotkeyState } from "../hotkeys.js";
 import DropItemDialog from "../applications/drop-item-dialog/drop-item-dialog.js";
+import { shouldItemPileBeDeleted, updateItemPileData } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
 export default class PrivateAPI {
+  
+  /**
+   * Initializes the API for Foundry's core hooks
+   */
+  static initialize() {
+    Hooks.on("canvasReady", this._onCanvasReady.bind(this));
+    Hooks.on("createItem", this._onCreateItem.bind(this));
+    Hooks.on("updateItem", this._onUpdateItem.bind(this));
+    Hooks.on("deleteItem", this._onDeleteItem.bind(this));
+    Hooks.on("updateActor", this._onUpdateActor.bind(this));
+    Hooks.on("deleteToken", this._onDeleteToken.bind(this));
+    Hooks.on("deleteActor", this._onDeleteActor.bind(this));
+    Hooks.on("preCreateToken", this._onPreCreateToken.bind(this))
+    Hooks.on("createToken", this._onCreateToken.bind(this))
+    Hooks.on("dropCanvasData", this._dropData.bind(this));
+  }
+  
+  /**
+   * @private
+   */
+  static async _onCanvasReady(canvas) {
+    const tokens = [...canvas.tokens.placeables].map(token => token.document);
+    for (const doc of tokens) {
+      await this._preloadItemPileFiles(doc);
+    }
+  }
+  
+  /**
+   * @private
+   */
+  static _onCreateItem(doc) {
+    if (!PileUtilities.isValidItemPile(doc.parent)) return;
+    Utilities.refreshAppsWithDocument(doc.parent, "refreshItems")
+    this._evaluateItemPileChange(doc.parent);
+  }
+  
+  /**
+   * @private
+   */
+  static _onUpdateItem(doc) {
+    if (!PileUtilities.isValidItemPile(doc.parent)) return;
+    Utilities.refreshAppsWithDocument(doc.parent, "refreshItems")
+    this._evaluateItemPileChange(doc.parent);
+  }
+  
+  /**
+   * @private
+   */
+  static _onDeleteItem(doc) {
+    if (!PileUtilities.isValidItemPile(doc.parent)) return;
+    Utilities.refreshAppsWithDocument(doc.parent, "refreshItems")
+    this._evaluateItemPileChange(doc.parent);
+  }
+  
+  /**
+   * @private
+   */
+  static _onUpdateActor(doc, changes) {
+    if (!PileUtilities.isValidItemPile(doc)) return;
+    Utilities.refreshAppsWithDocument(doc, "refreshAttributes")
+    this._evaluateItemPileChange(doc, changes);
+  }
+  
+  /**
+   * @private
+   */
+  static _onDeleteToken(doc) {
+    if (!PileUtilities.isValidItemPile(doc)) return;
+    Hooks.callAll(HOOKS.PILE.DELETE, doc);
+    Utilities.refreshAppsWithDocument(doc, "refreshDeletedPile")
+  }
+  
+  /**
+   * @private
+   */
+  static _onDeleteActor(doc) {
+    Utilities.refreshAppsWithDocument(doc, "refreshDeletedPile")
+  }
+  
+  /**
+   * @private
+   */
+  static _onPreCreateToken(doc) {
+    if (!doc.isLinked) {
+      doc.data.update({
+        [`actorData.flags.${CONSTANTS.MODULE_NAME}.-=sharing`]: null
+      });
+    }
+    const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
+    const targetItems = PileUtilities.getActorItems(doc.actor);
+    const targetCurrencies = PileUtilities.getFormattedActorCurrencies(doc.actor);
+    const data = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
+    doc.data.update({
+      "img": PileUtilities.getItemPileTokenImage(doc, data),
+      "scale": PileUtilities.getItemPileTokenScale(doc, data),
+      "name": PileUtilities.getItemPileName(doc, data),
+      [CONSTANTS.FLAGS.PILE]: itemPileConfig
+    });
+  }
+  
+  /**
+   * @private
+   */
+  static _onCreateToken(doc) {
+    if (!PileUtilities.isValidItemPile(doc)) return;
+    const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
+    Hooks.callAll(HOOKS.PILE.CREATE, doc, itemPileConfig);
+    this._preloadItemPileFiles(doc);
+  }
   
   static async _addItems(targetUuid, items, userId, { interactionId = false } = {}) {
     
@@ -69,7 +179,7 @@ export default class PrivateAPI {
       interactionId: interactionId
     });
     
-    const shouldBeDeleted = await this._checkItemPileShouldBeDeleted(targetUuid);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(targetUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(targetUuid);
     }
@@ -119,7 +229,7 @@ export default class PrivateAPI {
     
     const itemPile = Utilities.getToken(sourceUuid);
     
-    const shouldBeDeleted = await this._checkItemPileShouldBeDeleted(sourceUuid);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
     } else if (PileUtilities.isItemPileEmpty(itemPile)) {
@@ -181,7 +291,7 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
     
-    const shouldBeDeleted = await this._checkItemPileShouldBeDeleted(sourceUuid);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
     }
@@ -235,7 +345,7 @@ export default class PrivateAPI {
       interactionId: interactionId
     });
     
-    const shouldBeDeleted = await this._checkItemPileShouldBeDeleted(targetUuid);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(targetUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(targetUuid);
     }
@@ -279,7 +389,7 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
     
-    const shouldBeDeleted = await this._checkItemPileShouldBeDeleted(sourceUuid);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     
     const itemPile = await fromUuid(sourceUuid)
     
@@ -329,7 +439,7 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
     
-    const shouldBeDeleted = await this._checkItemPileShouldBeDeleted(sourceUuid);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
@@ -408,7 +518,7 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
     
-    const shouldBeDeleted = await this._checkItemPileShouldBeDeleted(sourceUuid);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
     }
@@ -773,12 +883,41 @@ export default class PrivateAPI {
   /* -------- PRIVATE ITEM PILE METHODS -------- */
   
   /**
-   * Initializes a pile on the client-side.
+   * Checks whether a given item pile would need to update its images, text, and/or scale
+   *
+   * @param {foundry.abstract.Document} doc
+   * @param [changes]
+   * @returns {*}
+   * @private
+   */
+  static _evaluateItemPileChange(doc, changes) {
+    const target = doc?.token ?? doc;
+    if (!PileUtilities.isValidItemPile(target)) return;
+    
+    if (changes) {
+      const sourceCurrencies = PileUtilities.getActorCurrencyAttributes(target);
+      const validCurrency = sourceCurrencies.find(currency => {
+        return hasProperty(changes, currency.path);
+      });
+      if (!validCurrency) return;
+    }
+    
+    const targetUuid = target.uuid;
+    return Helpers.debounceManager.setDebounce(targetUuid, async function (uuid) {
+      const deleted = PileUtilities.shouldItemPileBeDeleted(uuid);
+      if (deleted || !Helpers.isResponsibleGM()) return;
+      return PileUtilities.updateItemPileData(uuid);
+    })(targetUuid);
+    
+  }
+  
+  /**
+   * Pre-loads all images and sounds related to a given token document on the client-side.
    *
    * @param {TokenDocument} tokenDocument
    * @return {Promise<boolean>}
    */
-  static async _initializeItemPile(tokenDocument) {
+  static async _preloadItemPileFiles(tokenDocument) {
     
     if (!PileUtilities.isValidItemPile(tokenDocument)) return false;
     
@@ -800,7 +939,7 @@ export default class PrivateAPI {
             Helpers.debug(`Preloaded sound: ${filePath}`);
             await AudioHelper.preloadSound(filePath);
           }
-          return resolve();
+          resolve();
         });
       }));
     }
@@ -1089,24 +1228,6 @@ export default class PrivateAPI {
     
   }
   
-  static async _checkItemPileShouldBeDeleted(targetUuid) {
-    
-    const target = await fromUuid(targetUuid);
-    
-    if (!(target instanceof TokenDocument)) return false;
-    
-    const pileData = PileUtilities.getActorFlagData(target);
-    
-    const shouldDelete = {
-      "default": Helpers.getSetting("deleteEmptyPiles"),
-      "true": true,
-      "false": false
-    }[pileData?.deleteWhenEmpty ?? "default"]
-    
-    return pileData?.enabled && shouldDelete && PileUtilities.isItemPileEmpty(target);
-    
-  }
-  
   static async _splitItemPileContents(itemPileUuid, actorUuids, userId, instigator) {
     
     const itemPileActor = Utilities.getActor(itemPileUuid);
@@ -1217,7 +1338,7 @@ export default class PrivateAPI {
       instigator: instigator
     });
     
-    const shouldBeDeleted = await this._checkItemPileShouldBeDeleted(itemPileUuid);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(itemPileUuid);
     }

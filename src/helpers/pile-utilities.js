@@ -1,5 +1,7 @@
 import * as Utilities from "./utilities.js"
 import CONSTANTS from "../constants/constants.js";
+import * as Helpers from "./helpers.js";
+import * as Util from "util";
 
 function getFlagData(inDocument, flag, defaults) {
   const defaultFlags = foundry.utils.duplicate(defaults);
@@ -40,6 +42,24 @@ export function isItemPileLocked(target) {
   const pileData = getActorFlagData(targetActor);
   if (!pileData?.enabled || !pileData?.isContainer) return false;
   return pileData.locked;
+}
+
+export function shouldItemPileBeDeleted(targetUuid) {
+  
+  const target = Utilities.fromUuidFast(targetUuid);
+  
+  if (!(target instanceof TokenDocument)) return false;
+  
+  const pileData = getActorFlagData(target);
+  
+  const shouldDelete = {
+    "default": Helpers.getSetting("deleteEmptyPiles"),
+    "true": true,
+    "false": false
+  }[pileData?.deleteWhenEmpty ?? "default"]
+  
+  return pileData?.enabled && shouldDelete && isItemPileEmpty(target);
+  
 }
 
 export function getActorItems(target, { itemFilters = false, itemCurrencies = true } = {}) {
@@ -419,7 +439,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
   
   const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
   
-  const targetItems = getActorItems(documentActor, { itemFilters: flagData.itemFilters, itemCurrencies: true });
+  const targetItems = getActorItems(documentActor, { itemFilters: flagData.itemFilters });
   const attributes = getFormattedActorCurrencies(documentActor, { currencyList: flagData.currencies });
   
   const pileData = { data: flagData, items: targetItems, currencies: attributes };

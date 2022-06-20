@@ -1,5 +1,21 @@
 import CONSTANTS from "../constants/constants.js";
 
+export const debounceManager = {
+  
+  debounces: {},
+  
+  setDebounce(id, method) {
+    if (this.debounces[id]) {
+      return this.debounces[id];
+    }
+    this.debounces[id] = debounce(function (...args) {
+      delete debounceManager.debounces[id];
+      return method(...args);
+    }, 50);
+    return this.debounces[id];
+  }
+};
+
 export function isGMConnected() {
   return !!Array.from(game.users).find(user => user.isGM && user.active);
 }
@@ -66,4 +82,19 @@ export function isRealNumber(inNumber) {
   return !isNaN(inNumber)
     && typeof inNumber === "number"
     && isFinite(inNumber);
+}
+
+export function isActiveGM(user) {
+  return user.active && user.isGM;
+}
+
+export function getActiveGMs() {
+  return game.users.filter(isActiveGM);
+}
+
+export function isResponsibleGM() {
+  if (!game.user.isGM) {
+    return false;
+  }
+  return !getActiveGMs().some(other => other.data._id < game.user.data._id);
 }

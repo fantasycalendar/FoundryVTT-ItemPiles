@@ -2,8 +2,8 @@ import SETTINGS from "../constants/settings.js";
 import * as Helpers from "../helpers/helpers.js";
 import CONSTANTS from "../constants/constants.js";
 import HOOKS from "../constants/hooks.js";
-import * as PileUtiltiies from "../helpers/pile-utilities.js";
 import ItemPileSocket from "../socket.js";
+import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
 
 export default class ChatAPI {
@@ -27,6 +27,7 @@ export default class ChatAPI {
   }
   
   static _preCreateChatMessage(chatMessage) {
+    
     if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING)) return;
     
     const content = chatMessage.data.content.toLowerCase();
@@ -78,7 +79,7 @@ export default class ChatAPI {
    * @private
    */
   static async _outputTransferItem(source, target, items, userId, interactionId) {
-    if (!PileUtiltiies.isValidItemPile(source)) return;
+    if (!PileUtilities.isValidItemPile(source)) return;
     if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
     const itemData = await this._formatItemData(items);
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, [], userId, interactionId);
@@ -96,7 +97,7 @@ export default class ChatAPI {
    * @private
    */
   static async _outputTransferCurrency(source, target, currencies, userId, interactionId) {
-    if (!PileUtiltiies.isValidItemPile(source)) return;
+    if (!PileUtilities.isValidItemPile(source)) return;
     if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
     const currencyData = this._formatCurrencyData(source, currencies);
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, [], currencyData, userId, interactionId);
@@ -115,7 +116,7 @@ export default class ChatAPI {
    * @private
    */
   static async _outputTransferEverything(source, target, items, currencies, userId, interactionId) {
-    if (!PileUtiltiies.isValidItemPile(source)) return;
+    if (!PileUtilities.isValidItemPile(source)) return;
     if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
     const itemData = await this._formatItemData(items);
     const currencyData = this._formatCurrencyData(source, currencies);
@@ -123,7 +124,7 @@ export default class ChatAPI {
   }
   
   static _outputSplitItemPileInventory(source, transferData, userId) {
-    if (!PileUtiltiies.isValidItemPile(source)) return;
+    if (!PileUtilities.isValidItemPile(source)) return;
     if (game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_CHAT_MESSAGE, source.uuid, transferData, userId);
   }
@@ -167,7 +168,7 @@ export default class ChatAPI {
    * @private
    */
   static _formatCurrencyData(itemPile, currencies) {
-    const currencyList = PileUtiltiies.getActorCurrencyAttributes(itemPile);
+    const currencyList = PileUtilities.getActorCurrencyAttributes(itemPile);
     return Object.entries(currencies).map(entry => {
       const currency = currencyList.find(currency => currency.path === entry[0]);
       return {
