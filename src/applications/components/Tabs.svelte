@@ -4,8 +4,6 @@
   export let activeTab;
   export let tabs;
 
-  console.log(tabs, activeTab)
-
 </script>
 
 <nav class="tabs" data-group="primary">

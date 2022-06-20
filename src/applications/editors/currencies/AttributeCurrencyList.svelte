@@ -14,7 +14,6 @@
 
   function add() {
     const currentAttributes = get(attributesStore);
-    console.log(get(store.primary))
     attributesStore.set([...currentAttributes, {
       primary: !get(store.primary),
       name: "",
@@ -36,7 +35,6 @@
     event.dataTransfer.dropEffect = 'move';
     event.dataTransfer.setData('text/plain', i);
     dragging = i;
-    console.log(dragging, i)
   }
 
   function attributeDrop(event, target) {
