@@ -4,17 +4,13 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
 
-  // import DropCurrencyDialog from "../drop-currency-dialog";
-
-  import PrivateAPI from "../../private-api.js";
-
   import ItemList from "./ItemList.svelte";
   import CurrencyList from "./CurrencyList.svelte";
-
-  import ItemPileStore from "./item-pile-store.js";
   import ActorPicker from "./ActorPicker.svelte";
-  import { getPlayersForItemPile } from "../../helpers/sharing-utilities.js";
+  import ItemPileStore from "./item-pile-store.js";
+
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
+  import PrivateAPI from "../../private-api.js";
 
   const { application } = getContext('external');
 
@@ -27,17 +23,20 @@
   export let store = new ItemPileStore(pileActor, recipientActor);
 
   // Stores
-  let itemStore = store.items;
+  let attributesStore = store.attributes;
+  let itemsStore = store.items;
   let itemCurrenciesStore = store.itemCurrencies;
-  let attributeStore = store.attributes;
   let searchStore = store.search;
-  let editQuantitiesStore = store.editQuantities;
+  let numItemsStore = store.numItems;
+  let numCurrenciesStore = store.numCurrencies;
+  let editQuantities = store.editQuantities;
 
-  $: hasItems = !!$itemStore.length;
-  $: hasCurrencies = !!$attributeStore.length || !!itemCurrenciesStore.length;
-  $: isPileEmpty = !hasItems && !hasCurrencies;
-  $: showSearchBar = ($itemStore.length + $attributeStore.length) > 10;
-  $: editQuantities = $editQuantitiesStore;
+  let showSearchBar;
+  let isPileEmpty;
+
+  $: isPileEmpty = $numItemsStore === 0 && $numCurrenciesStore === 0;
+  $: hasItems = $numItemsStore > 0;
+  $: showSearchBar = ($numItemsStore + $numCurrenciesStore) >= 10;
 
   let num_players = SharingUtilities.getPlayersForItemPile(pileActor).length;
 
@@ -98,24 +97,6 @@
     // }
   }
 
-  async function addCurrency() {
-
-    // if (store.recipientActor) {
-    //    const currencyToAdd = await DropCurrencyDialog.query({
-    //       target: pileActor,
-    //       source: store.recipientActor
-    //    })
-    //    return API.transferAttributes(store.recipientActor, pileActor, currencyToAdd);
-    // } else if (game.user.isGM) {
-    //    const currencyToAdd = await DropCurrencyDialog.query({
-    //       target: pileActor,
-    //       source: store.recipientActor,
-    //       includeAllCurrencies: true
-    //    })
-    //    return API.addAttributes(pileActor, currencyToAdd);
-    // }
-  }
-
   function dropData(event) {
 
     event.preventDefault();
@@ -154,23 +135,26 @@
          on:dragover={preventDefault}>
 
       {#if deleted}
-        <p style="text-align: center; flex: 0 1 auto;">{localize("ITEM-PILES.Inspect.Destroyed")}</p>
+        <p style="text-align: center; flex: 0 1 auto;">
+          {localize("ITEM-PILES.Inspect.Destroyed")}
+        </p>
       {:else}
 
+        <ActorPicker {store}/>
+
+        {#if showSearchBar}
+          <div class="form-group flexrow item-piles-top-divider item-piles-bottom-divider"
+               style="margin-bottom: 0.5rem; align-items: center;" transition:fade={{duration: 250}}>
+            <label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
+            <input type="text" bind:value={$searchStore}>
+          </div>
+        {/if}
+
         {#if isPileEmpty}
-          <p class="item-piles-top-divider"
-             style="text-align: center; flex: 0 1 auto;">{localize("ITEM-PILES.Inspect.Empty")}</p>
-        {:else}
+          <p class="item-piles-top-divider" style="text-align: center; flex: 0 1 auto;">
+            {localize("ITEM-PILES.Inspect.Empty")}
+          </p>
 
-          <ActorPicker {store}/>
-
-          {#if showSearchBar}
-            <div class="form-group flexrow item-piles-top-divider item-piles-bottom-divider"
-                 style="margin-bottom: 0.5rem; align-items: center;" transition:fade={{duration: 250}}>
-              <label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
-              <input type="text" bind:value={$searchStore}>
-            </div>
-          {/if}
         {/if}
 
         <div class="item-piles-items-list" bind:this={itemListElement} on:scroll={evaluateShadow}>
@@ -192,9 +176,8 @@
 
       {/if}
 
-
       <footer class="sheet-footer flexrow item-piles-top-divider">
-        {#if !store.recipientActor && editQuantities}
+        {#if !store.recipientActor && $editQuantities}
           <button type="button" on:click|once={updatePile}>
             <i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
           </button>
@@ -233,6 +216,7 @@
     </div>
 
   </main>
+
 </ApplicationShell>
 
 <style lang="scss">

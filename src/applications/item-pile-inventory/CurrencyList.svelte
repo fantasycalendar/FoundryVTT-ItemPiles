@@ -1,20 +1,40 @@
 <script>
 
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import CurrencyEntry from "./CurrencyEntry.svelte";
-  import ItemEntry from "./ItemEntry.svelte";
+  import DropCurrencyDialog from "../drop-currency-dialog/drop-currency-dialog.js";
+  import ListEntry from "./ListEntry.svelte";
 
   export let store;
   const attributeStore = store.attributes;
   const itemStore = store.itemCurrencies;
+  const numCurrenciesStore = store.numCurrencies;
 
-  let attributes;
-  let itemCurrencies;
-  let hasCurrencies;
+  async function addCurrency() {
+    const result = await DropCurrencyDialog.show(store.recipientActor, store.pileActor);
+    if (!result) return;
+    if (!foundry.utils.isObjectEmpty(result.currencies)) {
+      await game.itempiles.transferAttributes(store.recipientActor, store.pileActor, result.currencies, { interactionId: store.interactionId })
+    }
+    if (result.itemCurrencies.length) {
+      await game.itempiles.transferItems(store.recipientActor, store.pileActor, result.itemCurrencies, { interactionId: store.interactionId })
+    }
+  }
 
-  $: attributes = $attributeStore;
-  $: itemCurrencies = $itemStore;
-  $: hasCurrencies = !!attributes.length && !!itemCurrencies.length;
+  let entries;
+
+  $: {
+    entries = $attributeStore.map(attribute => ({
+      identifier: attribute.path,
+      data: attribute
+    })).concat($itemStore.map(item => ({
+      identifier: `${item.name}-${item.type}`,
+      data: item
+    })))
+  }
+
+  $: {
+    numCurrenciesStore.set(entries.filter(entry => entry.data.quantity).length);
+  }
 
 </script>
 
@@ -23,25 +43,17 @@
   <div class="flexrow">
     <h3>{localize("ITEM-PILES.Currencies")}:</h3>
     {#if store.recipientActor}
-      <!--<a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
+      <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
          on:click={addCurrency}>
-        <i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
-      </a>-->
-      <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle">
         <i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
       </a>
     {/if}
   </div>
-  {#if !hasCurrencies}
+  {#if $numCurrenciesStore > 0}
     <div>
-      {#each attributes as attribute, index (attribute.path)}
-        {#if attribute.visible}
-          <CurrencyEntry {store} {attribute}/>
-        {/if}
-      {/each}
-      {#each itemCurrencies as item, index (item.id)}
-        {#if item.visible}
-          <ItemEntry {store} {item}/>
+      {#each entries as entry, index (entry.identifier)}
+        {#if entry.data.visible}
+          <ListEntry {store} bind:data={entry.data}/>
         {/if}
       {/each}
     </div>

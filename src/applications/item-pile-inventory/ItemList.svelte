@@ -1,30 +1,28 @@
 <script>
 
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import ItemEntry from "./ItemEntry.svelte";
+  import ListEntry from "./ListEntry.svelte";
 
   export let store;
   const itemStore = store.items;
+  const numItemsStore = store.numItems;
 
-  let hasItems;
-  let items;
-
+  $: items = $itemStore;
   $: {
-    items = $itemStore;
-    hasItems = !!items.length;
+    numItemsStore.set(items.filter(item => item.quantity).length);
   }
 
 </script>
 
 <div>
 
-  {#if hasItems}
+  {#if $numItemsStore > 0}
 
     <div class="flexrow"><h3>{localize("ITEM-PILES.Items")}:</h3></div>
 
-    {#each items as item (item.id)}
+    {#each items as item (`${item.name}-${item.type}`)}
       {#if item.visible}
-        <ItemEntry {store} {item}/>
+        <ListEntry {store} data={item}/>
       {/if}
     {/each}
 
