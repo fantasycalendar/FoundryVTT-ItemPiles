@@ -1,14 +1,20 @@
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-import * as Helpers from "./helpers/helpers.js";
-import ItemPileSocket from "./socket.js";
-import { TradePromptDialog } from "./applications/trade-dialogs/trade-dialogs.js";
 import CustomDialog from "./applications/components/CustomDialog.svelte";
+import { TradePromptDialog, TradeRequestDialog } from "./applications/trade-dialogs/trade-dialogs.js";
+
+import ItemPileSocket from "./socket.js";
+import * as Helpers from "./helpers/helpers.js";
+import * as Utilities from "./helpers/utilities.js";
+import HOOKS from "./constants/hooks.js";
+
+const mutedUsers = new Set();
+const ongoingTrades = new Map();
 
 export default class TradeAPI {
   
   static async _requestTrade(user = false) {
     
-    // Grab all of the active users (not self)
+    // Grab all the active users (not self)
     const users = game.users.filter(user => user.active && user !== game.user);
     
     // No users!
@@ -162,4 +168,309 @@ export default class TradeAPI {
     
   }
   
+  static async _respondPrompt(tradingUserId, tradingActorUuid, privateTradeId, publicTradeId, isPrivate) {
+    
+    // If the user was previously muted, wait for a random amount of time and respond with false
+    if (mutedUsers.has(tradingUserId)) {
+      await Helpers.wait(Math.random() * 15000);
+      return false;
+    }
+    
+    // Complete the private and public trade IDs
+    const fullPrivateTradeId = privateTradeId + randomID();
+    const fullPublicTradeId = publicTradeId + randomID();
+    
+    const tradingUser = game.users.get(tradingUserId);
+    let tradingActor = Utilities.fromUuidFast(tradingActorUuid);
+    
+    tradingActor = tradingActor?.actor ?? tradingActor;
+    
+    // Make em pick an actor (if more than one) and accept/decline/mute
+    const result = await TradeRequestDialog.show({ tradeId: privateTradeId, tradingUser, tradingActor, isPrivate });
+    
+    if (!result) return false;
+    
+    if (result === "cancelled") {
+      return "cancelled";
+    }
+    
+    // If muted, add user to blacklist locally
+    if (result === "mute") {
+      mutedUsers.push(tradingUserId);
+      return false;
+    }
+    
+    /*const actor = result?.actor ?? result;
+    
+    // Spawn trading app and new ongoing trade interface
+    new TradingApp({ user: game.user, actor }, {
+      user: tradingUser,
+      actor: tradingActor
+    }, fullPublicTradeId, fullPrivateTradeId, isPrivate).render(true, this.getAppOptions(actor).tradeApp);
+    ongoingTrades[fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor }, {
+      user: tradingUser,
+      actor: tradingActor
+    }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
+    
+    actor.sheet.render(true, this.getAppOptions(actor).actorSheet);*/
+    
+    return {
+      fullPrivateTradeId,
+      fullPublicTradeId,
+      actorUuid: result.uuid
+    };
+    
+  }
+  
+  static async _tradeCancelled(userId, privateTradeId) {
+    
+    TJSDialog.prompt({
+      title: game.i18n.localize("ITEM-PILES.Trade.Title"),
+      content: {
+        class: CustomDialog,
+        props: {
+          header: game.i18n.localize("ITEM-PILES.Trade.Title"),
+          content: game.i18n.format("ITEM-PILES.Trade.CancelledRequest.Content", { user_name: game.users.get(userId).name }),
+          icon: "fas fa-exclamation-triangle"
+        }
+      },
+      modal: true,
+      draggable: false,
+      options: {
+        height: "auto"
+      }
+    });
+    
+    return TradeRequestDialog.cancel(privateTradeId);
+    
+  }
+  
+  
+  static async spectateTrade(data) {
+    
+    // const { tradeId, tradeUser } = data;
+    //
+    // if (TradingApp.getAppByPublicTradeId(tradeId)) {
+    //   return TradingApp.getAppByPublicTradeId(tradeId).render(false, { focus: true });
+    // }
+    //
+    // const user = game.users.get(tradeUser);
+    //
+    // if (!user.active) {
+    //   ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
+    //   return custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
+    // }
+    //
+    // const ongoingTrade = await ItemPileSocket.executeAsUser(ItemPileSocket.HANDLERS.TRADE_SPECTATE, tradeUser, tradeId);
+    //
+    // if (!ongoingTrade) {
+    //   ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
+    //   return custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
+    // }
+    //
+    // ongoingTrade[0].user = game.users.get(ongoingTrade[0].user);
+    // ongoingTrade[0].actor = await fromUuid(ongoingTrade[0].actor);
+    //
+    // ongoingTrade[1].user = game.users.get(ongoingTrade[1].user);
+    // ongoingTrade[1].actor = await fromUuid(ongoingTrade[1].actor);
+    //
+    // return new TradingApp(...ongoingTrade).render(true);
+    
+  }
+  
+  static async _spectateTrade(tradeId) {
+    const trade = OngoingTrade.getActiveTrade(tradeId);
+    if (!trade) return false;
+    return [
+      {
+        user: trade[1].user.id,
+        actor: trade[1].actor.uuid,
+        items: trade[1].actorItems,
+        currencies: trade[1].actorCurrencies,
+        accepted: trade[1].accepted
+      },
+      {
+        user: trade[1].traderUser.id,
+        actor: trade[1].traderActor.uuid,
+        items: trade[1].traderActorItems,
+        currencies: trade[1].traderActorCurrencies,
+        accepted: trade[1].traderAccepted
+      },
+      tradeId
+    ]
+  }
+  
+  static async _updateItems(privateTradeId, userId, items) {
+    if (!ongoingTrades.has(privateTradeId)) return;
+    return ongoingTrades.get(privateTradeId).updateItems(userId, items);
+  }
+  
+  static async _updateCurrencies(privateTradeId, userId, items) {
+    if (!ongoingTrades.has(privateTradeId)) return;
+    return ongoingTrades.get(privateTradeId).updateCurrencies(userId, items);
+  }
+  
+  static async _setAcceptedState(privateTradeId, userId, status) {
+    if (!ongoingTrades.has(privateTradeId)) return;
+    return ongoingTrades.get(privateTradeId).setAcceptedState(userId, status);
+  }
+  
+  static async _tradeClosed(privateTradeId) {
+    if (!ongoingTrades.has(privateTradeId)) return;
+    return ongoingTrades.get(privateTradeId).tradeClosed();
+  }
+  
+  static async _tradeCompleted(party_1, party_2, publicTradeId, isPrivate) {
+    
+    // if (party_1.items.length) {
+    //   const items = party_1.items.map(item => {
+    //     return { _id: item.id, quantity: item.quantity, item: item.data }
+    //   })
+    //   await API._addItems(party_2.actor, items, party_1.user);
+    //   await API._removeItems(party_1.actor, items, party_1.user);
+    // }
+    //
+    // if (party_2.items.length) {
+    //   const items = party_2.items.map(item => {
+    //     return { _id: item.id, quantity: item.quantity, item: item.data }
+    //   })
+    //   await API._addItems(party_1.actor, items, party_2.user);
+    //   await API._removeItems(party_2.actor, items, party_2.user);
+    // }
+    //
+    // if (party_1.currencies.length) {
+    //   const currencies = Object.fromEntries(party_1.currencies.map(currency => {
+    //     return [currency.path, currency.quantity];
+    //   }));
+    //   await API._addAttributes(party_2.actor, currencies, party_1.user);
+    //   await API._removeAttributes(party_1.actor, currencies, party_1.user);
+    // }
+    //
+    // if (party_2.currencies.length) {
+    //   const currencies = Object.fromEntries(party_2.currencies.map(currency => {
+    //     return [currency.path, currency.quantity];
+    //   }));
+    //   await API._addAttributes(party_1.actor, currencies, party_2.user);
+    //   await API._removeAttributes(party_2.actor, currencies, party_2.user);
+    // }
+    //
+    // return
+    
+  }
+  
+}
+
+export class OngoingTrade {
+  
+  constructor(self, rightTrader, publicTradeId, privateTradeId, isPrivate) {
+    
+    this.actor = self.actor;
+    this.user = self.user;
+    this.actorItems = [];
+    this.actorCurrencies = [];
+    this.accepted = false;
+    
+    this.traderActor = rightTrader.actor;
+    this.traderUser = rightTrader.user;
+    this.traderActorItems = [];
+    this.traderActorCurrencies = [];
+    this.traderAccepted = false;
+    
+    this.privateTradeId = privateTradeId;
+    this.publicTradeId = publicTradeId;
+    
+    this.isPrivate = isPrivate;
+    
+    this.userHook = Hooks.on("renderPlayerList", this.userDisconnected.bind(this));
+    
+  }
+  
+  static getActiveTrade(publicId) {
+    return Object.entries(ongoingTrades).find(trade => {
+      return trade[1].publicTradeId === publicId;
+    })
+  }
+  
+  userDisconnected(app, html, data) {
+    if (!data.users.find(u => u === this.traderUser)) {
+      this.tradeClosed();
+      if (!this.isPrivate) {
+        ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
+        ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_CLOSED, this.publicTradeId, this.traderUser.id);
+      } else {
+        TradingApp._tradeClosed(this.publicTradeId, this.traderUser.id);
+      }
+    }
+  }
+  
+  tradeClosed() {
+    Hooks.off("renderPlayerList", this.userHook);
+    delete ongoingTrades[this.privateTradeId];
+  }
+  
+  updateItems(userId, newItems) {
+    this.accepted = false;
+    this.traderAccepted = false;
+    if (userId === this.user.id) {
+      this.actorItems = newItems;
+    } else if (userId === this.traderUser.id) {
+      this.traderActorItems = newItems;
+    }
+  }
+  
+  updateCurrencies(userId, newItems) {
+    this.accepted = false;
+    this.traderAccepted = false;
+    if (userId === this.user.id) {
+      this.actorCurrencies = newItems;
+    } else if (userId === this.traderUser.id) {
+      this.traderActorCurrencies = newItems;
+    }
+  }
+  
+  setAcceptedState(userId, status) {
+    if (userId === this.user.id) {
+      this.accepted = status;
+    } else if (userId === this.traderUser.id) {
+      this.traderAccepted = status;
+    }
+    if (this.accepted && this.traderAccepted) {
+      setTimeout(() => {
+        if (this.accepted && this.traderAccepted) {
+          this.execute(userId);
+        }
+      }, 2000);
+    }
+  }
+  
+  async execute(userId) {
+    
+    this.tradeClosed();
+    
+    const args = [
+      {
+        user: this.user.id,
+        actor: this.actor.uuid,
+        items: this.actorItems,
+        currencies: this.actorCurrencies
+      },
+      {
+        user: this.traderUser.id,
+        actor: this.traderActor.uuid,
+        items: this.traderActorItems,
+        currencies: this.traderActorCurrencies
+      },
+      this.publicTradeId,
+      this.isPrivate
+    ]
+    
+    if (this.isPrivate) {
+      return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.TRADE_COMPLETED, [this.user.id, this.traderUser.id], ...args);
+    }
+    
+    if (game.user.id !== userId) return;
+    ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.TRADE.COMPLETE, args, this.publicTradeId);
+    await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
+    return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_COMPLETED, ...args);
+  }
 }
