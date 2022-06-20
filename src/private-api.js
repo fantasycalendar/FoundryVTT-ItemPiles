@@ -947,7 +947,7 @@ export default class PrivateAPI {
         }
       }
       
-      droppableDocuments = droppableDocuments.filter(token => !this.isItemPileLocked(token));
+      droppableDocuments = droppableDocuments.filter(token => !game.itempiles.isItemPileLocked(token));
       
       if (!droppableDocuments.length) {
         Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
@@ -983,9 +983,14 @@ export default class PrivateAPI {
       
     } else {
       
-      const result = await DropItemDialog.show(item, droppableDocuments[0]);
+      const quantity = getProperty(dropData.itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE);
       
-      if (!result) return false;
+      let result = { action: "addToPile", quantity: 1 }
+      if (quantity > 1) {
+        result = await DropItemDialog.show(item, droppableDocuments[0]);
+        if (!result) return false;
+      }
+      
       action = result.action;
       setProperty(dropData.itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
       dropData.itemData.quantity = Number(result.quantity);

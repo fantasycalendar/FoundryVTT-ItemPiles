@@ -8,9 +8,6 @@
   const numItemsStore = store.numItems;
 
   $: items = $itemStore;
-  $: {
-    numItemsStore.set(items.filter(item => item.quantity).length);
-  }
 
 </script>
 

@@ -8,6 +8,7 @@ import CurrenciesEditor from "./applications/editors/currencies/currencies-edito
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 import { ItemPileInventory } from "./applications/item-pile-inventory/item-pile-inventory.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
+import * as Utilities from "./helpers/utilities.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -32,21 +33,9 @@ Hooks.on("reset-item-pile-settings", async () => {
   }
 })
 
-Hooks.on("createItem", (doc) => {
-  ItemPileInventory.refreshItems(doc.parent);
-});
-Hooks.on("updateItem", (doc) => {
-  ItemPileInventory.refreshItems(doc.parent);
-});
-Hooks.on("deleteItem", (doc) => {
-  ItemPileInventory.refreshItems(doc.parent);
-});
-Hooks.on("updateActor", (doc) => {
-  ItemPileInventory.refreshAttributes(doc);
-});
-Hooks.on("deleteToken", (doc) => {
-  ItemPileInventory.refreshDeletedPile(doc);
-});
-Hooks.on("deleteActor", (doc) => {
-  ItemPileInventory.refreshDeletedPile(doc);
-});
+Hooks.on("createItem", (doc) => Utilities.refreshAppsWithDocument(doc.parent, "refreshItems"));
+Hooks.on("updateItem", (doc) => Utilities.refreshAppsWithDocument(doc.parent, "refreshItems"));
+Hooks.on("deleteItem", (doc) => Utilities.refreshAppsWithDocument(doc.parent, "refreshItems"));
+Hooks.on("updateActor", (doc) => Utilities.refreshAppsWithDocument(doc, "refreshAttributes"));
+Hooks.on("deleteToken", (doc) => Utilities.refreshAppsWithDocument(doc, "refreshDeletedPile"));
+Hooks.on("deleteActor", (doc) => Utilities.refreshAppsWithDocument(doc, "refreshDeletedPile"));

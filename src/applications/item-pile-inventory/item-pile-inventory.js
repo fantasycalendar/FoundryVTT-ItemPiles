@@ -68,25 +68,16 @@ export class ItemPileInventory extends SvelteApplication {
     })
   }
   
-  static refreshItems(doc) {
-    const actor = Utilities.getActor(doc);
-    for (const app of this.getActiveApps(actor.id)) {
-      app.svelte.applicationShell.store.updateItems();
-    }
+  refreshItems() {
+    this.svelte.applicationShell.store.refreshItems();
   }
   
-  static refreshAttributes(doc) {
-    const actor = Utilities.getActor(doc);
-    for (const app of this.getActiveApps(actor.id)) {
-      app.svelte.applicationShell.store.updateAttributes();
-    }
+  refreshAttributes() {
+    this.svelte.applicationShell.store.refreshAttributes();
   }
   
-  static refreshDeletedPile(doc) {
-    const actor = Utilities.getActor(doc);
-    for (const app of this.getActiveApps(actor.id)) {
-      app.svelte.applicationShell.deleted = true;
-    }
+  refreshDeletedPile() {
+    this.svelte.applicationShell.deleted = true;
   }
   
   /* -------------------------------------------- */

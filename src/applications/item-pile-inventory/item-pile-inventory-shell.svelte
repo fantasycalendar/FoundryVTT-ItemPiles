@@ -23,16 +23,10 @@
   export let store = new ItemPileStore(pileActor, recipientActor);
 
   // Stores
-  let attributesStore = store.attributes;
-  let itemsStore = store.items;
-  let itemCurrenciesStore = store.itemCurrencies;
   let searchStore = store.search;
   let numItemsStore = store.numItems;
   let numCurrenciesStore = store.numCurrencies;
   let editQuantities = store.editQuantities;
-
-  let showSearchBar;
-  let isPileEmpty;
 
   $: isPileEmpty = $numItemsStore === 0 && $numCurrenciesStore === 0;
   $: hasItems = $numItemsStore > 0;

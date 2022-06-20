@@ -1,3 +1,5 @@
+import { ItemPileInventory } from "../applications/item-pile-inventory/item-pile-inventory.js";
+
 export function getActor(target) {
   if (target instanceof Actor) return target;
   if (stringIsUuid(target)) {
@@ -159,4 +161,13 @@ export function grids_between_tokens(a, b) {
 export function tokens_close_enough(a, b, maxDistance) {
   const distance = grids_between_tokens(a, b);
   return maxDistance >= distance;
+}
+
+export function refreshAppsWithDocument(doc, callback) {
+  const apps = Object.values(ui.windows).filter(app => app.id.endsWith(doc.id));
+  for (const app of apps) {
+    if (app[callback]) {
+      app[callback]();
+    }
+  }
 }

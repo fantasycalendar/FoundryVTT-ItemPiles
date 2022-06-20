@@ -29,23 +29,36 @@ export default class ItemPileStore {
       searchDebounce(str);
     });
     
-    this.update();
+    this.attributes.subscribe(this.refreshNumItems.bind(this));
+    this.items.subscribe(this.refreshNumItems.bind(this));
+    this.itemCurrencies.subscribe(this.refreshNumItems.bind(this));
+    
+    this.refresh();
     
   }
   
-  update() {
-    this.updateAttributes();
-    this.updateItems();
+  refreshNumItems() {
+    let numItems = get(this.items).filter(item => item.quantity).length;
+    this.numItems.set(numItems);
+    
+    let numCurrencies = get(this.attributes).filter(attribute => attribute.quantity).length;
+    let numItemCurrencies = get(this.itemCurrencies).filter(item => item.quantity).length;
+    this.numCurrencies.set(numCurrencies + numItemCurrencies);
   }
   
-  updateItems() {
+  refresh() {
+    this.refreshAttributes();
+    this.refreshItems();
+  }
+  
+  refreshItems() {
     
     const items = get(this.items);
     
     // Get all the items on the actor right now
     const mixedItems = SharingUtilities.getItemPileItemsForActor(this.pileActor, this.recipientActor);
     
-    this.updateItemCurrencies(mixedItems.filter(item => item.currency));
+    this.refreshItemCurrencies(mixedItems.filter(item => item.currency));
     
     const newItems = mixedItems.filter(item => !item.currency);
     
@@ -60,7 +73,7 @@ export default class ItemPileStore {
       // If we find an item that was previously listed
       const foundItem = Utilities.findSimilarItem(newItems, oldItem);
       
-      // We update the previously listed attribute to reflect this
+      // We refresh the previously listed attribute to reflect this
       oldItem.quantity = foundItem ? foundItem.quantity : 0;
       oldItem.shareLeft = foundItem ? foundItem.shareLeft : 0;
       oldItem.currentQuantity = foundItem ? Math.max(1, Math.min(oldItem.currentQuantity, foundItem.shareLeft)) : 1;
@@ -76,26 +89,26 @@ export default class ItemPileStore {
     this.items.set(items.concat(newItems))
   }
   
-  updateItemCurrencies(newItems) {
+  refreshItemCurrencies(newItems) {
     
-    const items = get(this.itemCurrencies);
+    const itemCurrencies = get(this.itemCurrencies);
     
-    if (!items.length && !newItems.length) {
+    if (!itemCurrencies.length && !newItems.length) {
       this.itemCurrencies.set([]);
       return;
     }
     
     // Loop through the old items
-    for (let oldItem of items) {
+    for (let oldCurrency of itemCurrencies) {
       
       // If we find an item that was previously listed
-      const foundItem = Utilities.findSimilarItem(newItems, oldItem);
+      const foundItem = Utilities.findSimilarItem(newItems, oldCurrency);
       
-      // We update the previously listed attribute to reflect this
-      oldItem.quantity = foundItem ? foundItem.quantity : 0;
-      oldItem.shareLeft = foundItem ? foundItem.shareLeft : 0;
-      oldItem.currentQuantity = foundItem ? Math.max(1, Math.min(oldItem.currentQuantity, foundItem.shareLeft)) : 1;
-      oldItem.id = foundItem ? foundItem.id : oldItem.id;
+      // We refresh the previously listed attribute to reflect this
+      oldCurrency.quantity = foundItem ? foundItem.quantity : 0;
+      oldCurrency.shareLeft = foundItem ? foundItem.shareLeft : 0;
+      oldCurrency.currentQuantity = foundItem ? Math.max(1, Math.min(oldCurrency.currentQuantity, foundItem.shareLeft)) : 1;
+      oldCurrency.id = foundItem ? foundItem.id : oldCurrency.id;
       
       // We then remove it from the incoming list, as we already have it
       if (foundItem) {
@@ -104,10 +117,10 @@ export default class ItemPileStore {
       
     }
     
-    this.itemCurrencies.set(items.concat(newItems))
+    this.itemCurrencies.set(itemCurrencies.concat(newItems))
   }
   
-  updateAttributes() {
+  refreshAttributes() {
     
     const attributes = get(this.attributes);
     
@@ -125,7 +138,7 @@ export default class ItemPileStore {
       // If we find attribute that was previously listed
       const foundAttribute = newAttributes.find(newCurrency => newCurrency.path === oldCurrency.path);
       
-      // We update the previously listed attribute to reflect this
+      // We refresh the previously listed attribute to reflect this
       oldCurrency.quantity = foundAttribute ? foundAttribute.quantity : 0;
       oldCurrency.shareLeft = foundAttribute ? foundAttribute.shareLeft : 0;
       oldCurrency.currentQuantity = foundAttribute ? Math.max(1, Math.min(oldCurrency.currentQuantity, foundAttribute.shareLeft)) : 1;

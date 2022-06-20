@@ -32,10 +32,6 @@
     })))
   }
 
-  $: {
-    numCurrenciesStore.set(entries.filter(entry => entry.data.quantity).length);
-  }
-
 </script>
 
 <div>

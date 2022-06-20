@@ -5,7 +5,6 @@ import * as SharingUtilities from "./helpers/sharing-utilities.js";
 import SETTINGS from "./constants/settings.js";
 import ItemPileSocket from "./socket.js";
 import HOOKS from "./constants/hooks.js";
-import { isItemPileClosed, isItemPileContainer, isItemPileLocked } from "./helpers/pile-utilities.js";
 
 export default class API {
   
@@ -326,13 +325,17 @@ export default class API {
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
     if (!pileData?.enabled || !pileData?.isContainer) return false;
-    const wasClosed = pileData.closed;
+    
+    const wasOpen = !pileData.closed;
     pileData.closed = true;
+    
     const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
-    if (!wasClosed && pileData.closeSound) {
+    
+    if (wasOpen && pileData.closeSound) {
       AudioHelper.play({ src: pileData.closeSound })
     }
+    
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
   }
   
@@ -958,11 +961,5 @@ export default class API {
     });
     
   }
-  
-  static getActorStuff(target) {
-    const targetActor = Utilities.getActor(target);
-    return PileUtilities.getActorItems(targetActor);
-  }
-  
   
 }
