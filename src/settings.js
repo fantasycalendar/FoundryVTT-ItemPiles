@@ -2,7 +2,7 @@ import CONSTANTS from "./constants/constants.js";
 import SETTINGS from "./constants/settings.js";
 import * as Helpers from "./helpers/helpers.js";
 import { SYSTEMS } from "./systems.js";
-import SettingsShim from "./applications/settings/settings-app.js";
+import SettingsShim from "./applications/settings-interface/settings-app.js";
 
 export default function registerSettings() {
   

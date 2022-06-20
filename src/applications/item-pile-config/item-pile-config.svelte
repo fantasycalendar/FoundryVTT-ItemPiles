@@ -8,8 +8,8 @@
   import * as Helpers from "../../helpers/helpers.js";
 
   import PriceModifiersEditor from "../editors/price-modifiers-editor/price-modifiers-editor.js";
-  import CurrenciesEditor from "../editors/currencies/currencies-editor.js";
-  import ItemFiltersEditor from "../editors/item-filters/item-filters-editor.js";
+  import CurrenciesEditor from "../editors/currencies-editor/currencies-editor.js";
+  import ItemFiltersEditor from "../editors/item-filters-editor/item-filters-editor.js";
 
   import Tabs from "../components/Tabs.svelte";
   import SETTINGS from "../../constants/settings.js";
