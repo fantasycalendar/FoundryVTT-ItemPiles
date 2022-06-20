@@ -2,6 +2,7 @@ import CONSTANTS from "./constants/constants.js";
 import { debug } from "./helpers/helpers.js";
 import { stringIsUuid } from "./helpers/utilities.js";
 import PrivateAPI from "./private-api.js";
+import TradeAPI from "./trade-api.js";
 
 export default class ItemPileSocket {
   
@@ -65,6 +66,7 @@ export default class ItemPileSocket {
     PRIVATE_TRADE_UPDATE_ITEMS: "privateTradeUpdateItems",
     PRIVATE_TRADE_UPDATE_CURRENCIES: "privateTradeUpdateCurrencies",
     PRIVATE_TRADE_STATE: "privateTradeAcceptedState",
+    EXECUTE_TRADE: "executeTrade",
     TRADE_COMPLETED: "tradeCompleted",
   }
   
@@ -89,6 +91,20 @@ export default class ItemPileSocket {
     [this.HANDLERS.TURN_INTO_PILE]: (...args) => PrivateAPI._turnTokensIntoItemPiles(...args),
     [this.HANDLERS.REVERT_FROM_PILE]: (...args) => PrivateAPI._revertTokensFromItemPiles(...args),
     [this.HANDLERS.SPLIT_PILE]: (...args) => PrivateAPI._splitItemPileContents(...args),
+    
+    [this.HANDLERS.TRADE_REQUEST_PROMPT]: (...args) => TradeAPI._respondPrompt(...args),
+    [this.HANDLERS.TRADE_REQUEST_CANCELLED]: (...args) => TradeAPI._tradeCancelled(...args),
+    [this.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS]: (...args) => TradeAPI._updateItems(...args),
+    [this.HANDLERS.PUBLIC_TRADE_UPDATE_CURRENCIES]: (...args) => TradeAPI._updateCurrencies(...args),
+    [this.HANDLERS.PUBLIC_TRADE_STATE]: (...args) => TradeAPI._updateAcceptedState(...args),
+    [this.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS]: (...args) => TradeAPI._updateItems(...args),
+    [this.HANDLERS.PRIVATE_TRADE_UPDATE_CURRENCIES]: (...args) => TradeAPI._updateCurrencies(...args),
+    [this.HANDLERS.PRIVATE_TRADE_STATE]: (...args) => TradeAPI._updateAcceptedState(...args),
+    [this.HANDLERS.TRADE_CLOSED]: (...args) => TradeAPI._tradeClosed(...args),
+    
+    [this.HANDLERS.EXECUTE_TRADE]: (...args) => TradeAPI._executeTrade(...args),
+    [this.HANDLERS.TRADE_COMPLETED]: (...args) => TradeAPI._tradeCompleted(...args),
+    [this.HANDLERS.TRADE_SPECTATE]: (...args) => TradeAPI._spectateTrade(...args),
   }
   
   static _socket;

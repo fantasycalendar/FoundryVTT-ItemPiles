@@ -6,11 +6,17 @@ import ItemPileSocket from "./socket.js";
 import * as Helpers from "./helpers/helpers.js";
 import * as Utilities from "./helpers/utilities.js";
 import HOOKS from "./constants/hooks.js";
+import TradingStore from "./applications/trading-interface/trading-store.js";
+import TradingApp from "./applications/trading-interface/trading-app.js";
 
 const mutedUsers = new Set();
 const ongoingTrades = new Map();
 
 export default class TradeAPI {
+  
+  static initialize() {
+    Hooks.on("renderPlayerList", this._userDisconnected.bind(this));
+  }
   
   static async _requestTrade(user = false) {
     
@@ -53,7 +59,7 @@ export default class TradeAPI {
       // If you have more than 1 owned actor, prompt to choose which one
       const result = await TradePromptDialog.show({ actors, users, user });
       if (!result) return;
-      userId = result.userId;
+      userId = result.user.id;
       actor = result.actor;
       isPrivate = result.private;
     }
@@ -121,24 +127,17 @@ export default class TradeAPI {
     return ItemPileSocket.executeAsUser(ItemPileSocket.HANDLERS.TRADE_REQUEST_PROMPT, userId, game.user.id, actor.uuid, privateTradeId, publicTradeId, isPrivate)
       .then(async (data) => {
         
-        /*if (data === "cancelled") return;
-        
+        if (data === "cancelled") return;
         cancelDialog.close();
         
         // If they declined, show warning
         if (!data || !data.fullPrivateTradeId.includes(privateTradeId)) {
-          return custom_warning(game.i18n.localize("ITEM-PILES.Trade.Declined"), true);
+          return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Declined"), true);
         }
         
-        let traderActor = await fromUuid(data.actorUuid);
-        traderActor = traderActor?.actor ?? traderActor;
+        const traderActor = Utilities.getActor(data.actorUuid);
         
-        // Otherwise, open trade interface and spawn private trade instance
-        new TradingApp({ user: game.user, actor }, {
-          user: game.users.get(userId),
-          actor: traderActor
-        }, data.fullPublicTradeId, data.fullPrivateTradeId, isPrivate).render(true, this.getAppOptions(actor).tradeApp);
-        ongoingTrades[data.fullPrivateTradeId] = new OngoingTrade({
+        const store = new TradingStore({
           user: game.user,
           actor
         }, {
@@ -146,7 +145,11 @@ export default class TradeAPI {
           actor: traderActor
         }, data.fullPublicTradeId, data.fullPrivateTradeId, isPrivate);
         
-        actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
+        const app = new TradingApp(store).render(true);
+        
+        ongoingTrades.set(data.fullPublicTradeId, app);
+        
+        actor.sheet.render(true);
         
         if (isPrivate) {
           return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.CALL_HOOK, [game.user.id, userId], HOOKS.TRADE.STARTED, {
@@ -158,11 +161,12 @@ export default class TradeAPI {
         return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.TRADE.STARTED, {
           user: game.user.id,
           actor: actor.uuid
-        }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);*/
+        }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
         
       }).catch((err) => {
+        console.error(err);
         // If the counterparty disconnected, show that and close dialog
-        custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true);
+        Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true);
         cancelDialog.close()
       });
     
@@ -200,19 +204,18 @@ export default class TradeAPI {
       return false;
     }
     
-    /*const actor = result?.actor ?? result;
+    const actor = result.actor ?? result;
     
-    // Spawn trading app and new ongoing trade interface
-    new TradingApp({ user: game.user, actor }, {
-      user: tradingUser,
-      actor: tradingActor
-    }, fullPublicTradeId, fullPrivateTradeId, isPrivate).render(true, this.getAppOptions(actor).tradeApp);
-    ongoingTrades[fullPrivateTradeId] = new OngoingTrade({ user: game.user, actor }, {
+    const store = new TradingStore({ user: game.user, actor }, {
       user: tradingUser,
       actor: tradingActor
     }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
     
-    actor.sheet.render(true, this.getAppOptions(actor).actorSheet);*/
+    const app = new TradingApp(store).render(true);
+    
+    ongoingTrades.set(fullPublicTradeId, app);
+    
+    actor.sheet.render(true);
     
     return {
       fullPrivateTradeId,
@@ -244,7 +247,6 @@ export default class TradeAPI {
     return TradeRequestDialog.cancel(privateTradeId);
     
   }
-  
   
   static async spectateTrade(data) {
     
@@ -300,177 +302,146 @@ export default class TradeAPI {
     ]
   }
   
-  static async _updateItems(privateTradeId, userId, items) {
-    if (!ongoingTrades.has(privateTradeId)) return;
-    return ongoingTrades.get(privateTradeId).updateItems(userId, items);
+  static getOngoingTrade(tradeId) {
+    if (!ongoingTrades.has(tradeId)) return false;
+    const tradeApp = ongoingTrades.get(tradeId);
+    if (!tradeApp.store.isPrivate) {
+      return tradeApp;
+    }
+    if (tradeApp.store.leftTraderUser !== game.user && tradeApp.store.rightTraderUser !== game.user) return false;
+    return tradeApp;
   }
   
-  static async _updateCurrencies(privateTradeId, userId, items) {
-    if (!ongoingTrades.has(privateTradeId)) return;
-    return ongoingTrades.get(privateTradeId).updateCurrencies(userId, items);
+  static async _updateItems(tradeId, userId, items) {
+    const tradeApp = this.getOngoingTrade(tradeId);
+    if (!tradeApp) return;
+    tradeApp.store.updateItems(userId, items);
   }
   
-  static async _setAcceptedState(privateTradeId, userId, status) {
-    if (!ongoingTrades.has(privateTradeId)) return;
-    return ongoingTrades.get(privateTradeId).setAcceptedState(userId, status);
+  static async _updateCurrencies(tradeId, userId, currencies) {
+    const tradeApp = this.getOngoingTrade(tradeId);
+    if (!tradeApp) return;
+    tradeApp.store.updateCurrencies(userId, currencies);
   }
   
-  static async _tradeClosed(privateTradeId) {
-    if (!ongoingTrades.has(privateTradeId)) return;
-    return ongoingTrades.get(privateTradeId).tradeClosed();
-  }
-  
-  static async _tradeCompleted(party_1, party_2, publicTradeId, isPrivate) {
-    
-    // if (party_1.items.length) {
-    //   const items = party_1.items.map(item => {
-    //     return { _id: item.id, quantity: item.quantity, item: item.data }
-    //   })
-    //   await API._addItems(party_2.actor, items, party_1.user);
-    //   await API._removeItems(party_1.actor, items, party_1.user);
-    // }
-    //
-    // if (party_2.items.length) {
-    //   const items = party_2.items.map(item => {
-    //     return { _id: item.id, quantity: item.quantity, item: item.data }
-    //   })
-    //   await API._addItems(party_1.actor, items, party_2.user);
-    //   await API._removeItems(party_2.actor, items, party_2.user);
-    // }
-    //
-    // if (party_1.currencies.length) {
-    //   const currencies = Object.fromEntries(party_1.currencies.map(currency => {
-    //     return [currency.path, currency.quantity];
-    //   }));
-    //   await API._addAttributes(party_2.actor, currencies, party_1.user);
-    //   await API._removeAttributes(party_1.actor, currencies, party_1.user);
-    // }
-    //
-    // if (party_2.currencies.length) {
-    //   const currencies = Object.fromEntries(party_2.currencies.map(currency => {
-    //     return [currency.path, currency.quantity];
-    //   }));
-    //   await API._addAttributes(party_1.actor, currencies, party_2.user);
-    //   await API._removeAttributes(party_2.actor, currencies, party_2.user);
-    // }
-    //
-    // return
-    
-  }
-  
-}
-
-export class OngoingTrade {
-  
-  constructor(self, rightTrader, publicTradeId, privateTradeId, isPrivate) {
-    
-    this.actor = self.actor;
-    this.user = self.user;
-    this.actorItems = [];
-    this.actorCurrencies = [];
-    this.accepted = false;
-    
-    this.traderActor = rightTrader.actor;
-    this.traderUser = rightTrader.user;
-    this.traderActorItems = [];
-    this.traderActorCurrencies = [];
-    this.traderAccepted = false;
-    
-    this.privateTradeId = privateTradeId;
-    this.publicTradeId = publicTradeId;
-    
-    this.isPrivate = isPrivate;
-    
-    this.userHook = Hooks.on("renderPlayerList", this.userDisconnected.bind(this));
-    
-  }
-  
-  static getActiveTrade(publicId) {
-    return Object.entries(ongoingTrades).find(trade => {
-      return trade[1].publicTradeId === publicId;
-    })
-  }
-  
-  userDisconnected(app, html, data) {
-    if (!data.users.find(u => u === this.traderUser)) {
-      this.tradeClosed();
-      if (!this.isPrivate) {
-        ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
-        ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_CLOSED, this.publicTradeId, this.traderUser.id);
-      } else {
-        TradingApp._tradeClosed(this.publicTradeId, this.traderUser.id);
+  static async _updateAcceptedState(tradeId, userId, status) {
+    const tradeApp = this.getOngoingTrade(tradeId);
+    if (!tradeApp) return;
+    tradeApp.store.updateAcceptedState(userId, status);
+    if (userId === game.user.id && (tradeApp.store.leftTraderUser.id === game.user.id || tradeApp.store.rightTraderUser.id === game.user.id)) {
+      if (tradeApp.store.tradeIsAccepted) {
+        setTimeout(async () => {
+          if (tradeApp.store.tradeIsAccepted) {
+            ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.EXECUTE_TRADE, [tradeApp.store.leftTraderUser.id, tradeApp.store.rightTraderUser.id], tradeId, userId);
+          }
+        }, 2000);
       }
     }
   }
   
-  tradeClosed() {
-    Hooks.off("renderPlayerList", this.userHook);
-    delete ongoingTrades[this.privateTradeId];
+  static async _userDisconnected(app, html, data) {
+    const tradesToDelete = [];
+    for (let [tradeId, application] of ongoingTrades) {
+      const foundLeft = data.users.find(u => u === application.store.leftTraderUser);
+      const foundRight = data.users.find(u => u === application.store.rightTraderUser);
+      if (foundLeft && foundRight) continue;
+      tradesToDelete.push(tradeId);
+      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true);
+      application.close();
+      if (foundLeft === game.user || foundRight === game.user) {
+        await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
+      }
+    }
+    tradesToDelete.forEach(tradeId => ongoingTrades.delete(tradeId));
   }
   
-  updateItems(userId, newItems) {
-    this.accepted = false;
-    this.traderAccepted = false;
-    if (userId === this.user.id) {
-      this.actorItems = newItems;
-    } else if (userId === this.traderUser.id) {
-      this.traderActorItems = newItems;
-    }
-  }
-  
-  updateCurrencies(userId, newItems) {
-    this.accepted = false;
-    this.traderAccepted = false;
-    if (userId === this.user.id) {
-      this.actorCurrencies = newItems;
-    } else if (userId === this.traderUser.id) {
-      this.traderActorCurrencies = newItems;
-    }
-  }
-  
-  setAcceptedState(userId, status) {
-    if (userId === this.user.id) {
-      this.accepted = status;
-    } else if (userId === this.traderUser.id) {
-      this.traderAccepted = status;
-    }
-    if (this.accepted && this.traderAccepted) {
-      setTimeout(() => {
-        if (this.accepted && this.traderAccepted) {
-          this.execute(userId);
+  static async _tradeClosed(tradeId, closeUserId) {
+    const tradeApp = this.getOngoingTrade(tradeId);
+    if (!tradeApp) return;
+    
+    if (tradeApp.store.leftTraderUser.id === game.user.id || tradeApp.store.rightTraderUser.id === game.user.id) {
+      
+      if (closeUserId === tradeApp.store.rightTraderUser.id) {
+        
+        TJSDialog.prompt({
+          title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
+          content: {
+            class: CustomDialog,
+            props: {
+              header: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
+              content: game.i18n.format("ITEM-PILES.Trade.Closed.Them", {
+                user_name: tradeApp.store.rightTraderUser.name
+              }),
+              icon: "fas fa-exclamation-triangle",
+            }
+          },
+          modal: false,
+          draggable: true,
+          options: {
+            height: "auto"
+          }
+        });
+        
+      } else {
+        
+        if (tradeApp.store.isPrivate) {
+          ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
+          ItemPileSocket.executeForOthers(ItemPileSocket.HANDLERS.TRADE_CLOSED, tradeId, game.user.id);
+        } else {
+          const otherUserId = tradeApp.store.leftTraderUser.id === game.user.id
+            ? tradeApp.store.rightTraderUser.id
+            : tradeApp.store.leftTraderUser.id;
+          ItemPileSocket.executeAsUser(ItemPileSocket.HANDLERS.TRADE_CLOSED, otherUserId, tradeId, game.user.id);
         }
-      }, 2000);
+        
+        TJSDialog.prompt({
+          title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
+          content: {
+            class: CustomDialog,
+            props: {
+              header: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
+              content: game.i18n.format("ITEM-PILES.Trade.Closed.You"),
+              icon: "fas fa-exclamation-triangle",
+            }
+          },
+          modal: false,
+          draggable: true,
+          options: {
+            height: "auto"
+          }
+        });
+        
+        await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
+      }
+      
+    } else {
+      
+      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Closed.Someone"), true);
+      
+    }
+    
+    tradeApp.close({ callback: true });
+    ongoingTrades.delete(tradeId);
+  }
+  
+  static async _executeTrade(tradeId, userId) {
+    const tradeApp = this.getOngoingTrade(tradeId);
+    if (!tradeApp) return;
+    const updates = tradeApp.store.getTradeData();
+    if (tradeApp.store.isPrivate) {
+      tradeApp.close();
+      ongoingTrades.delete(tradeId);
+    } else if (userId === game.user.id) {
+      return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_COMPLETED, tradeId, updates);
     }
   }
   
-  async execute(userId) {
-    
-    this.tradeClosed();
-    
-    const args = [
-      {
-        user: this.user.id,
-        actor: this.actor.uuid,
-        items: this.actorItems,
-        currencies: this.actorCurrencies
-      },
-      {
-        user: this.traderUser.id,
-        actor: this.traderActor.uuid,
-        items: this.traderActorItems,
-        currencies: this.traderActorCurrencies
-      },
-      this.publicTradeId,
-      this.isPrivate
-    ]
-    
-    if (this.isPrivate) {
-      return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.TRADE_COMPLETED, [this.user.id, this.traderUser.id], ...args);
-    }
-    
-    if (game.user.id !== userId) return;
-    ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.TRADE.COMPLETE, args, this.publicTradeId);
-    await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, this.publicTradeId);
-    return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_COMPLETED, ...args);
+  static async _tradeCompleted(tradeId, updates) {
+    const tradeApp = this.getOngoingTrade(tradeId);
+    if (!tradeApp) return;
+    Hooks.callAll(HOOKS.TRADE.COMPLETE, updates, tradeId)
+    tradeApp.close();
+    ongoingTrades.delete(tradeId);
   }
+  
 }

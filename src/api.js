@@ -5,6 +5,7 @@ import * as SharingUtilities from "./helpers/sharing-utilities.js";
 import SETTINGS from "./constants/settings.js";
 import ItemPileSocket from "./socket.js";
 import HOOKS from "./constants/hooks.js";
+import TradeAPI from "./trade-api.js";
 
 export default class API {
   
@@ -960,6 +961,10 @@ export default class API {
       interactionId
     });
     
+  }
+  
+  static requestTrade(user) {
+    return TradeAPI._requestTrade(user);
   }
   
 }

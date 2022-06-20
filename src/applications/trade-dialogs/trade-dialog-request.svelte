@@ -110,7 +110,7 @@
     <p>{localize("ITEM-PILES.Trade.Prompt.PickActor")}</p>
   {/if}
 
-  <ActorDropSelect {actor} {actors}/>
+  <ActorDropSelect bind:actor={actor} {actors}/>
 
   <footer class="sheet-footer flexrow">
     <button type="button" on:click|once={accept}>
