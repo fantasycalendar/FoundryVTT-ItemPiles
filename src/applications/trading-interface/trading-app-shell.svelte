@@ -6,6 +6,7 @@
   import * as Helpers from "../../helpers/helpers.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import { hotkeyState } from "../../hotkeys.js";
+  import ItemPileSocket from "../../socket.js";
 
   export let elementRoot;
   export let store;
@@ -65,6 +66,23 @@
 
   }
 
+  leftItems.subscribe(async (items) => {
+    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
+    return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS, store.publicTradeId, game.user.id, items);
+  })
+
+  leftTraderAccepted.subscribe(async (acceptedState) => {
+    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_STATE, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, acceptedState);
+    return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_STATE, store.publicTradeId, game.user.id, acceptedState);
+  })
+
+  async function executeSocketAction(socketHandler, ...args) {
+    if (store.isPrivate) {
+      return ItemPileSocket.executeForUsers(socketHandler, [store.leftTraderUser.id, store.rightTraderUser.id], ...args);
+    }
+    return ItemPileSocket.executeForEveryone(socketHandler, ...args);
+  }
+
 </script>
 
 
@@ -102,7 +120,7 @@
                 <div class="flexrow item-piles-item-row">
 
                   <div style="flex: 0 1 auto; margin: 0 6px;">
-                    <a class="item-piles-clickable-red item-piles-remove-item">
+                    <a class="item-piles-clickable-red" on:click={store.removeItem(item)}>
                       <i class="fas fa-times"></i>
                     </a>
                   </div>
@@ -128,8 +146,14 @@
                   <div style="flex:1;">
                     {#if item.editing}
                       <div style="flex-direction: row;" class="item-piles-quantity-container">
-                        <input class="item-piles-quantity" type="number" min="0" bind:value="{item.quantity}"
-                               max="{item.maxQuantity}"/>
+                        <input
+                            class="item-piles-quantity"
+                            type="number"
+                            min="0"
+                            value="{item.quantity}"
+                            max="{item.maxQuantity}"
+                            on:change="{(event) => { item.quantity = Number(event.target.value); item.editing = false; }}"
+                        />
                       </div>
                     {:else}
                   <span class="item-piles-text-right item-piles-quantity-text"
@@ -188,8 +212,14 @@
                     <div style="flex:1;">
                       {#if currency.editing}
                         <div style="flex-direction: row;" class="item-piles-quantity-container">
-                          <input class="item-piles-quantity" type="number" min="0" value="{currency.quantity}"
-                                 max="{currency.maxQuantity}"/>
+                          <input
+                              class="item-piles-quantity"
+                              type="number"
+                              min="0"
+                              value="{currency.quantity}"
+                              max="{currency.maxQuantity}"
+                              on:change="{(event) => { currency.quantity = Number(event.target.value); currency.editing = false; }}"
+                          />
                         </div>
                       {:else}
                     <span class="item-piles-text-right item-piles-quantity-text"

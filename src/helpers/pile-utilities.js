@@ -1,7 +1,6 @@
 import * as Utilities from "./utilities.js"
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "./helpers.js";
-import * as Util from "util";
 
 function getFlagData(inDocument, flag, defaults) {
   const defaultFlags = foundry.utils.duplicate(defaults);

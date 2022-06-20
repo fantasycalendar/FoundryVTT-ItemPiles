@@ -1,6 +1,5 @@
 import { writable, get } from 'svelte/store';
 import * as Utilities from "../../helpers/utilities.js";
-import ItemPileSocket from "../../socket.js";
 
 export default class TradingStore {
   
@@ -86,9 +85,7 @@ export default class TradingStore {
   }
   
   async toggleAccepted() {
-    const acceptedState = get(this.leftTraderAccepted);
-    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_STATE, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, !acceptedState);
-    return this.executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_STATE, this.publicTradeId, game.user.id, !acceptedState);
+    this.leftTraderAccepted.set(!get(this.leftTraderAccepted));
   }
   
   updateItems(userId, inItems) {
@@ -96,10 +93,7 @@ export default class TradingStore {
     this.rightTraderAccepted.set(false);
     const items = inItems.filter(item => !item.currency);
     const itemCurrencies = inItems.filter(item => item.currency);
-    if (userId === this.leftTraderUser.id) {
-      this.leftTraderItems.set(items)
-      this.leftTraderItemCurrencies.set(itemCurrencies)
-    } else if (userId === this.rightTraderUser.id) {
+    if (userId === this.rightTraderUser.id) {
       this.rightTraderItems.set(items)
       this.rightTraderItemCurrencies.set(itemCurrencies)
     }
@@ -108,17 +102,13 @@ export default class TradingStore {
   updateCurrencies(userId, inCurrencies) {
     this.leftTraderAccepted.set(false);
     this.rightTraderAccepted.set(false);
-    if (userId === this.leftTraderUser.id) {
-      this.leftTraderCurrencies.set(inCurrencies)
-    } else if (userId === this.rightTraderUser.id) {
+    if (userId === this.rightTraderUser.id) {
       this.rightTraderCurrencies.set(inCurrencies)
     }
   }
   
   updateAcceptedState(userId, state) {
-    if (userId === this.leftTraderUser.id) {
-      this.leftTraderAccepted.set(state);
-    } else if (userId === this.rightTraderUser.id) {
+    if (userId === this.rightTraderUser.id) {
       this.rightTraderAccepted.set(state);
     }
   }
@@ -145,16 +135,15 @@ export default class TradingStore {
     
     this.leftTraderItems.set(items);
     
-    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, items);
-    return this.executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS, this.publicTradeId, game.user.id, items);
-    
   }
   
-  async executeSocketAction(socketHandler, ...args) {
-    if (this.isPrivate) {
-      return ItemPileSocket.executeForUsers(socketHandler, [this.leftTraderUser.id, this.rightTraderUser.id], ...args);
-    }
-    return ItemPileSocket.executeForEveryone(socketHandler, ...args);
+  removeItem(removedItem) {
+    
+    const items = get(this.leftTraderItems)
+      .filter(item => item.id !== removedItem.id);
+    
+    this.leftTraderItems.set(items);
+    
   }
   
 }

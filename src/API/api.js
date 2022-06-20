@@ -8,61 +8,61 @@ import HOOKS from "../constants/hooks.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 
-export default class API {
+const API = {
   
   /**
    * The actor class type used for the original item pile actor in this system
    *
    * @returns {String}
    */
-  static get ACTOR_CLASS_TYPE() {
+  get ACTOR_CLASS_TYPE() {
     return Helpers.getSetting(SETTINGS.ACTOR_CLASS_TYPE);
-  }
+  },
   
   /**
    * The currencies used in this system
    *
    * @returns {Array<{name: String, currency: String, img: String}>}
    */
-  static get CURRENCIES() {
+  get CURRENCIES() {
     return Helpers.getSetting(SETTINGS.CURRENCIES);
-  }
+  },
   
   /**
    * The attribute used to track the price of items in this system
    *
    * @returns {string}
    */
-  static get ITEM_PRICE_ATTRIBUTE() {
+  get ITEM_PRICE_ATTRIBUTE() {
     return Helpers.getSetting(SETTINGS.ITEM_PRICE_ATTRIBUTE);
-  }
+  },
   
   /**
    * The attribute used to track the quantity of items in this system
    *
    * @returns {String}
    */
-  static get ITEM_QUANTITY_ATTRIBUTE() {
+  get ITEM_QUANTITY_ATTRIBUTE() {
     return Helpers.getSetting(SETTINGS.ITEM_QUANTITY_ATTRIBUTE);
-  }
+  },
   
   /**
    * The filters for item types eligible for interaction within this system
    *
    * @returns {Array<{name: String, filters: String}>}
    */
-  static get ITEM_FILTERS() {
+  get ITEM_FILTERS() {
     return Helpers.getSetting(SETTINGS.ITEM_FILTERS);
-  }
+  },
   
   /**
    * The attributes for detecting item similarities
    *
    * @returns {Array<String>}
    */
-  static get ITEM_SIMILARITIES() {
+  get ITEM_SIMILARITIES() {
     return Helpers.getSetting(SETTINGS.ITEM_SIMILARITIES);
-  }
+  },
   
   /**
    * Sets the actor class type used for the original item pile actor in this system
@@ -70,12 +70,12 @@ export default class API {
    * @param {String} inClassType
    * @returns {Promise|Boolean}
    */
-  static setActorClassType(inClassType) {
+  setActorClassType(inClassType) {
     if (typeof inClassType !== "string") {
       throw Helpers.custom_error("setActorTypeClass | inClassType must be of type string");
     }
     return Helpers.setSetting(SETTINGS.ACTOR_CLASS_TYPE, inClassType);
-  }
+  },
   
   /**
    * Sets the currencies used in this system
@@ -83,7 +83,7 @@ export default class API {
    * @param {Object<{attributes: Array, items: Array}>} inCurrencies
    * @returns {Promise}
    */
-  static setCurrencies(inCurrencies) {
+  setCurrencies(inCurrencies) {
     if (!Array.isArray(inCurrencies.attributes) || Array.isArray(inCurrencies.items)) {
       throw Helpers.custom_error("setCurrencies | inCurrencies must be an object with the 'attributes' and 'items' keys, and both must be arrays");
     }
@@ -131,7 +131,7 @@ export default class API {
     });
     
     return Helpers.setSetting(SETTINGS.CURRENCIES, inCurrencies);
-  }
+  },
   
   /**
    * Sets the attribute used to track the price of items in this system
@@ -139,12 +139,12 @@ export default class API {
    * @param {string} inAttribute
    * @returns {Promise}
    */
-  static setItemPriceAttribute(inAttribute) {
+  setItemPriceAttribute(inAttribute) {
     if (typeof inAttribute !== "string") {
       throw Helpers.custom_error("setItemPriceAttribute | inAttribute must be of type string");
     }
     return Helpers.setSetting(SETTINGS.ITEM_PRICE_ATTRIBUTE, inAttribute);
-  }
+  },
   
   /**
    * Sets the attribute used to track the quantity of items in this system
@@ -152,12 +152,12 @@ export default class API {
    * @param {String} inAttribute
    * @returns {Promise}
    */
-  static setItemQuantityAttribute(inAttribute) {
+  setItemQuantityAttribute(inAttribute) {
     if (typeof inAttribute !== "string") {
       throw Helpers.custom_error("setItemQuantityAttribute | inAttribute must be of type string");
     }
     return Helpers.setSetting(SETTINGS.ITEM_QUANTITY_ATTRIBUTE, inAttribute);
-  }
+  },
   
   /**
    * Sets the items filters for interaction within this system
@@ -165,7 +165,7 @@ export default class API {
    * @param {Array<{path: String, filters: String}>} inFilters
    * @returns {Promise}
    */
-  static setItemFilters(inFilters) {
+  setItemFilters(inFilters) {
     if (!Array.isArray(inFilters)) {
       throw Helpers.custom_error("setItemFilters | inFilters must be of type array");
     }
@@ -178,7 +178,7 @@ export default class API {
       }
     });
     return Helpers.setSetting(SETTINGS.ITEM_FILTERS, inFilters);
-  }
+  },
   
   /**
    * Sets the attributes for detecting item similarities
@@ -186,7 +186,7 @@ export default class API {
    * @param {Array<String>} inPaths
    * @returns {Promise}
    */
-  static setItemSimilarities(inPaths) {
+  setItemSimilarities(inPaths) {
     if (!Array.isArray(inPaths)) {
       throw Helpers.custom_error("setItemSimilarities | inPaths must be of type array");
     }
@@ -196,7 +196,7 @@ export default class API {
       }
     });
     return Helpers.setSetting(SETTINGS.ITEM_SIMILARITIES, inPaths);
-  }
+  },
   
   /* ================= ITEM PILE METHODS ================= */
   
@@ -210,7 +210,7 @@ export default class API {
    *
    * @returns {Promise<String>}
    */
-  static createItemPile(position, {
+  createItemPile(position, {
     sceneId = game.user.viewedScene, items = false, pileActorName = false
   } = {}) {
     
@@ -230,7 +230,7 @@ export default class API {
     }
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.CREATE_PILE, sceneId, position, { pileActorName, items });
-  }
+  },
   
   /**
    * Turns tokens and its actors into item piles
@@ -241,7 +241,7 @@ export default class API {
    *
    * @return {Promise<Array>}                                         The uuids of the targets after they were turned into item piles
    */
-  static turnTokensIntoItemPiles(targets, { pileSettings = {}, tokenSettings = {} } = {}) {
+  turnTokensIntoItemPiles(targets, { pileSettings = {}, tokenSettings = {} } = {}) {
     
     if (!Array.isArray(targets)) targets = [targets];
     
@@ -255,7 +255,7 @@ export default class API {
     })
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TURN_INTO_PILE, targetUuids, pileSettings, tokenSettings);
-  }
+  },
   
   /**
    * Reverts tokens from an item pile into a normal token and actor
@@ -265,7 +265,7 @@ export default class API {
    *
    * @return {Promise<Array>}                                         The uuids of the targets after they were reverted from being item piles
    */
-  static revertTokensFromItemPiles(targets, { tokenSettings = {} } = {}) {
+  revertTokensFromItemPiles(targets, { tokenSettings = {} } = {}) {
     
     if (!Array.isArray(targets)) targets = [targets];
     
@@ -279,7 +279,7 @@ export default class API {
     })
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REVERT_FROM_PILE, targetUuids, tokenSettings);
-  }
+  },
   
   /**
    * Opens a pile if it is enabled and a container
@@ -289,7 +289,7 @@ export default class API {
    *
    * @return {Promise/Boolean}
    */
-  static openItemPile(target, interactingToken = false) {
+  openItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const data = PileUtilities.getActorFlagData(targetActor);
@@ -308,7 +308,7 @@ export default class API {
       AudioHelper.play({ src: data.openSound })
     }
     return this.updateItemPile(targetActor, data, { interactingToken: interactingTokenDocument });
-  }
+  },
   
   /**
    * Closes a pile if it is enabled and a container
@@ -318,7 +318,7 @@ export default class API {
    *
    * @return {Promise/Boolean}
    */
-  static closeItemPile(target, interactingToken = false) {
+  closeItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
@@ -335,7 +335,7 @@ export default class API {
     }
     
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
-  }
+  },
   
   /**
    * Toggles a pile's closed state if it is enabled and a container
@@ -345,7 +345,7 @@ export default class API {
    *
    * @return {Promise/Boolean}
    */
-  static async toggleItemPileClosed(target, interactingToken = false) {
+  async toggleItemPileClosed(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
@@ -356,7 +356,7 @@ export default class API {
       await this.closeItemPile(targetActor, interactingTokenDocument);
     }
     return !pileData.closed;
-  }
+  },
   
   /**
    * Locks a pile if it is enabled and a container
@@ -366,7 +366,7 @@ export default class API {
    *
    * @return {Promise/Boolean}
    */
-  static lockItemPile(target, interactingToken = false) {
+  lockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
@@ -384,7 +384,7 @@ export default class API {
       AudioHelper.play({ src: pileData.closeSound })
     }
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
-  }
+  },
   
   /**
    * Unlocks a pile if it is enabled and a container
@@ -394,7 +394,7 @@ export default class API {
    *
    * @return {Promise/Boolean}
    */
-  static unlockItemPile(target, interactingToken = false) {
+  unlockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
@@ -402,7 +402,7 @@ export default class API {
     pileData.locked = false;
     Hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
-  }
+  },
   
   /**
    * Toggles a pile's locked state if it is enabled and a container
@@ -412,7 +412,7 @@ export default class API {
    *
    * @return {Promise/Boolean}
    */
-  static toggleItemPileLocked(target, interactingToken = false) {
+  toggleItemPileLocked(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
@@ -421,7 +421,7 @@ export default class API {
       return this.unlockItemPile(targetActor, interactingTokenDocument);
     }
     return this.lockItemPile(targetActor, interactingTokenDocument);
-  }
+  },
   
   /**
    * Causes the item pile to play a sound as it was attempted to be opened, but was locked
@@ -431,7 +431,7 @@ export default class API {
    *
    * @return {Promise<boolean>}
    */
-  static rattleItemPile(target, interactingToken = false) {
+  rattleItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     
@@ -446,7 +446,7 @@ export default class API {
     }
     
     return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, Utilities.getUuid(targetActor), pileData, Utilities.getUuid(interactingTokenDocument));
-  }
+  },
   
   /**
    * Whether an item pile is locked. If it is not enabled or not a container, it is always false.
@@ -455,9 +455,9 @@ export default class API {
    *
    * @return {Boolean}
    */
-  static isItemPileLocked(target) {
+  isItemPileLocked(target) {
     return PileUtilities.isItemPileLocked(target);
-  }
+  },
   
   /**
    * Whether an item pile is closed. If it is not enabled or not a container, it is always false.
@@ -466,9 +466,9 @@ export default class API {
    *
    * @return {Boolean}
    */
-  static isItemPileClosed(target) {
+  isItemPileClosed(target) {
     return PileUtilities.isItemPileClosed(target);
-  }
+  },
   
   /**
    * Whether an item pile is a container. If it is not enabled, it is always false.
@@ -477,9 +477,9 @@ export default class API {
    *
    * @return {Boolean}
    */
-  static isItemPileContainer(target) {
+  isItemPileContainer(target) {
     return PileUtilities.isItemPileContainer(target);
-  }
+  },
   
   /**
    * Updates a pile with new data.
@@ -491,7 +491,7 @@ export default class API {
    *
    * @return {Promise/Boolean}
    */
-  static updateItemPile(target, newData, { interactingToken = false, tokenSettings = false } = {}) {
+  updateItemPile(target, newData, { interactingToken = false, tokenSettings = false } = {}) {
     
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
@@ -502,7 +502,7 @@ export default class API {
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.UPDATE_PILE, targetUuid, newData, {
       interactingTokenUuid, tokenSettings
     });
-  }
+  },
   
   /**
    * Deletes a pile, calling the relevant hooks.
@@ -511,7 +511,7 @@ export default class API {
    *
    * @return {Promise/Boolean}
    */
-  static deleteItemPile(target) {
+  deleteItemPile(target) {
     if (!PileUtilities.isValidItemPile(target)) {
       throw Helpers.custom_error(`deleteItemPile | This is not an item pile, please provide a valid target`, true);
     }
@@ -521,7 +521,7 @@ export default class API {
       throw Helpers.custom_error(`deleteItemPile | Please provide a Token or TokenDocument`, true);
     }
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DELETE_PILE, targetUuid);
-  }
+  },
   
   /**
    * Splits an item pile's content between all players (or a specified set of target actors).
@@ -531,7 +531,7 @@ export default class API {
    * @param instigator {boolean/TokenDocument/Actor} [instigator=false]                       Whether this was triggered by a specific actor
    * @returns {Promise<object>/Boolean}
    */
-  static splitItemPileContents(target, { targets = false, instigator = false } = {}) {
+  splitItemPileContents(target, { targets = false, instigator = false } = {}) {
     
     if (!PileUtilities.isValidItemPile(target)) return false;
     
@@ -560,7 +560,7 @@ export default class API {
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_PILE, itemPileUuid, actorUuids, game.user.id, instigator);
     
-  }
+  },
   
   /* ================= ITEM AND ATTRIBUTE METHODS ================= */
   
@@ -574,7 +574,7 @@ export default class API {
    *
    * @returns {Promise<array>}                        An array of objects, each containing the item that was added or updated, and the quantity that was added
    */
-  static addItems(target, items, { mergeSimilarItems = true, interactionId = false } = {}) {
+  addItems(target, items, { mergeSimilarItems = true, interactionId = false } = {}) {
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
     
@@ -608,7 +608,7 @@ export default class API {
     }
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, { interactionId });
-  }
+  },
   
   /**
    * Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
@@ -619,7 +619,7 @@ export default class API {
    *
    * @returns {Promise<array>}                        An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted
    */
-  static removeItems(target, items, { interactionId = false } = {}) {
+  removeItems(target, items, { interactionId = false } = {}) {
     
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
@@ -660,7 +660,7 @@ export default class API {
     }
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ITEMS, targetUuid, items, game.user.id, { interactionId });
-  }
+  },
   
   /**
    * Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0
@@ -672,7 +672,7 @@ export default class API {
    *
    * @returns {Promise<object>}                       An array of objects, each containing the item that was added or updated, and the quantity that was transferred
    */
-  static transferItems(source, target, items, { interactionId = false } = {}) {
+  transferItems(source, target, items, { interactionId = false } = {}) {
     
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`TransferItems | Could not determine the UUID, please provide a valid source`, true)
@@ -716,7 +716,7 @@ export default class API {
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ITEMS, sourceUuid, targetUuid, items, game.user.id, { interactionId });
     
-  }
+  },
   
   /**
    * Transfers all items between the source and the target.
@@ -728,7 +728,7 @@ export default class API {
    *
    * @returns {Promise<array>}                        An array containing all of the items that were transferred to the target
    */
-  static transferAllItems(source, target, { itemFilters = false, interactionId = false } = {}) {
+  transferAllItems(source, target, { itemFilters = false, interactionId = false } = {}) {
     
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid source`, true)
@@ -751,7 +751,7 @@ export default class API {
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, {
       itemFilters, interactionId
     });
-  }
+  },
   
   /**
    * Adds attributes on an actor
@@ -763,7 +763,7 @@ export default class API {
    * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
    *
    */
-  static addAttributes(target, attributes, { interactionId = false } = {}) {
+  addAttributes(target, attributes, { interactionId = false } = {}) {
     
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`AddAttributes | Could not determine the UUID, please provide a valid target`, true)
@@ -786,7 +786,7 @@ export default class API {
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ATTRIBUTE, targetUuid, attributes, game.user.id, { interactionId });
     
-  }
+  },
   
   /**
    * Subtracts attributes on the target
@@ -797,7 +797,7 @@ export default class API {
    *
    * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
    */
-  static removeAttributes(target, attributes, { interactionId = false } = {}) {
+  removeAttributes(target, attributes, { interactionId = false } = {}) {
     
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`RemoveAttributes | Could not determine the UUID, please provide a valid target`, true)
@@ -831,7 +831,7 @@ export default class API {
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ATTRIBUTES, targetUuid, attributes, game.user.id, { interactionId });
     
-  }
+  },
   
   /**
    * Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target
@@ -843,7 +843,7 @@ export default class API {
    *
    * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
    */
-  static transferAttributes(source, target, attributes, { interactionId = false } = {}) {
+  transferAttributes(source, target, attributes, { interactionId = false } = {}) {
     
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid source`, true)
@@ -886,7 +886,7 @@ export default class API {
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ATTRIBUTES, sourceUuid, targetUuid, attributes, game.user.id, { interactionId });
     
-  }
+  },
   
   /**
    * Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target
@@ -897,7 +897,7 @@ export default class API {
    *
    * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
    */
-  static transferAllAttributes(source, target, { interactionId = false } = {}) {
+  transferAllAttributes(source, target, { interactionId = false } = {}) {
     
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
@@ -911,7 +911,7 @@ export default class API {
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ATTRIBUTES, sourceUuid, targetUuid, game.user.id, { interactionId });
     
-  }
+  },
   
   /**
    * Transfers all items and attributes between the source and the target.
@@ -923,7 +923,7 @@ export default class API {
    *
    * @returns {Promise<object>}                       An object containing all items and attributes transferred to the target
    */
-  static transferEverything(source, target, { itemFilters = false, interactionId = false } = {}) {
+  transferEverything(source, target, { itemFilters = false, interactionId = false } = {}) {
     
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid source`, true)
@@ -947,22 +947,22 @@ export default class API {
       itemFilters, interactionId
     });
     
-  }
+  },
   
-  static updateTokenHud() {
+  updateTokenHud() {
     return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.RERENDER_TOKEN_HUD);
-  }
+  },
   
-  static requestTrade(user) {
+  requestTrade(user) {
     return TradeAPI._requestTrade(user);
-  }
+  },
   
-  static spectateTrade(tradeId) {
+  spectateTrade(tradeId) {
     return TradeAPI._spectateTrade(tradeId);
-  }
+  },
   
-  static renderItemPileInterface(target, {
-    userIds = [game.user.id], inspectingTarget = false, useDefaultCharacter = true
+  renderItemPileInterface(target, {
+    userIds = false, inspectingTarget = false, useDefaultCharacter = true
   } = {}) {
     
     const targetDocument = Utilities.getDocument(target);
@@ -977,7 +977,10 @@ export default class API {
       throw Helpers.custom_error("renderItemPileInterface | You cannot force users to use both their default character and a specific character to inspect the pile")
     }
     
-    if (!Array.isArray(userIds)) userIds = [userIds];
+    const inspectingTargetUuid = inspectingTarget ? Utilities.getUuid(inspectingTarget) : false;
+    if (inspectingTarget && !inspectingTargetUuid) throw Helpers.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid inspecting target`);
+    
+    if (!Array.isArray(userIds)) userIds = [game.user.id];
     
     if (!game.user.isGM) {
       if (userIds.length > 1 || !userIds.includes(game.user.id)) {
@@ -986,19 +989,24 @@ export default class API {
       userIds = [game.user.id];
     }
     
+    if (userIds.length === 1 && userIds[0] === game.user.id) {
+      return PrivateAPI._renderItemPileInterface(targetUuid, {
+        inspectingTargetUuid,
+        useDefaultCharacter,
+        remote: true
+      })
+    }
+    
     for (const userId of userIds) {
       const user = game.users.get(userId);
       if (!user) throw Helpers.custom_error(`renderItemPileInterface | No user with ID "${userId}" exists`);
       if (useDefaultCharacter) {
         if (!user.character) {
-          Helpers.custom_warning(`renderItemPileInterface | User with id "${userId}" has no default character`, true);
+          Helpers.custom_warning(`renderItemPileInterface | User "${user.name}" has no default character`, true);
           return;
         }
       }
     }
-    
-    const inspectingTargetUuid = inspectingTarget ? Utilities.getUuid(inspectingTarget) : false;
-    if (inspectingTarget && !inspectingTargetUuid) throw Helpers.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid inspecting target`);
     
     return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.RENDER_INTERFACE, userIds, targetUuid, {
       inspectingTargetUuid,
@@ -1009,3 +1017,5 @@ export default class API {
   }
   
 }
+
+export default API;
