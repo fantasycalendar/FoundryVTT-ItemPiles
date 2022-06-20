@@ -16,25 +16,7 @@ const ongoingTrades = new Map();
 export default class TradeAPI {
   
   static initialize() {
-    Hooks.on("renderPlayerList", (...args) => {
-      this._addTradeButton(...args);
-      this._userDisconnected(...args);
-    });
-  }
-  
-  static _addTradeButton(app, html) {
-    if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING) || !Helpers.getSetting(SETTINGS.SHOW_TRADE_BUTTON)) return;
-    
-    const minimalUI = game.modules.get('minimal-ui')?.active;
-    const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "")
-    const text = !minimalUI ? " Request Trade" : ""
-    const button = $(`<button type="button" class="${classes}"><i class="fas fa-handshake"></i>${text}</button>`)
-    
-    button.click(() => {
-      game.itempiles.requestTrade();
-    });
-    html.append(button);
-    
+    Hooks.on("renderPlayerList", this._userDisconnected.bind(this));
   }
   
   static async _requestTrade(user = false) {

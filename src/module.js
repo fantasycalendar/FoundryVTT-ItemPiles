@@ -1,5 +1,7 @@
 import "./styles/styles.scss";
 
+import registerUIOverrides from "./foundry-ui-overrides.js";
+import registerLibwrappers from "./libwrapper.js";
 import registerSettings from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import Socket from "./socket.js";
@@ -13,6 +15,8 @@ import * as Helpers from "./helpers/helpers.js";
 Hooks.once("init", async () => {
   registerSettings();
   registerHotkeysPre();
+  registerUIOverrides();
+  registerLibwrappers();
   
   PrivateAPI.initialize();
   TradeAPI.initialize();
@@ -40,7 +44,6 @@ Hooks.once("ready", () => {
   if (!Helpers.isGMConnected()) {
     Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
   }
-  
   registerHotkeysPost();
   Hooks.callAll(HOOKS.READY);
 });
