@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store';
 import * as Utilities from "../../helpers/utilities.js";
+import { getFormattedActorCurrencies } from "../../helpers/pile-utilities.js";
 
 export default class TradeStore {
   
@@ -96,14 +97,22 @@ export default class TradeStore {
     if (userId === game.user.id) return;
     this.leftTraderAccepted.set(false);
     this.rightTraderAccepted.set(false);
-    const items = inItems.filter(item => !item.currency);
-    const itemCurrencies = inItems.filter(item => item.currency);
     if (userId === this.leftTraderUser.id) {
-      this.leftTraderItems.set(items)
+      this.leftTraderItems.set(inItems)
+    }
+    if (userId === this.rightTraderUser.id) {
+      this.rightTraderItems.set(inItems)
+    }
+  }
+  
+  updateItemCurrencies(userId, itemCurrencies) {
+    if (userId === game.user.id) return;
+    this.leftTraderAccepted.set(false);
+    this.rightTraderAccepted.set(false);
+    if (userId === this.leftTraderUser.id) {
       this.leftTraderItemCurrencies.set(itemCurrencies)
     }
     if (userId === this.rightTraderUser.id) {
-      this.rightTraderItems.set(items)
       this.rightTraderItemCurrencies.set(itemCurrencies)
     }
   }
@@ -130,28 +139,56 @@ export default class TradeStore {
     }
   }
   
-  async addItem(newItem, isGM = false) {
+  addItem(newItem, { quantity = false, currency = false } = {}) {
     
-    const items = get(this.leftTraderItems);
+    const items = !currency ? get(this.leftTraderItems) : get(this.leftTraderItemCurrencies);
     
     const item = Utilities.findSimilarItem(items, newItem)
+    
+    const maxQuantity = game.user.isGM ? Infinity : Utilities.getItemQuantity(newItem);
     
     if (!item) {
       items.push({
         id: newItem._id,
         name: newItem.name,
         img: newItem?.img ?? "",
-        quantity: 1,
-        newQuantity: 1,
-        maxQuantity: isGM ? Infinity : Utilities.getItemQuantity(newItem),
+        currency: currency,
+        quantity: quantity ? quantity : 1,
+        newQuantity: quantity ? quantity : 1,
+        maxQuantity: maxQuantity,
         data: newItem
       })
     } else {
-      if (item.quantity >= Utilities.getItemQuantity(newItem)) return;
-      item.quantity = Math.min(item.quantity + 1, Utilities.getItemQuantity(newItem));
+      if (item.quantity >= maxQuantity) return;
+      item.quantity = Math.min(quantity ? quantity : item.quantity + 1, maxQuantity);
+      item.newQuantity = item.quantity;
+      item.maxQuantity = maxQuantity;
     }
     
-    this.leftTraderItems.set(items);
+    if (!currency) {
+      this.leftTraderItems.set(items);
+    } else {
+      this.leftTraderItemCurrencies.set(items);
+    }
+    
+  }
+  
+  addAttribute(newCurrency) {
+    
+    const currencies = get(this.leftTraderCurrencies);
+    
+    const existingCurrency = currencies.find(currency => currency.path === newCurrency.path);
+    
+    if (existingCurrency) {
+      existingCurrency.quantity = newCurrency.quantity;
+      existingCurrency.newQuantity = newCurrency.quantity;
+    } else {
+      currencies.push(newCurrency);
+    }
+    
+    currencies.sort((a, b) => a.index - b.index);
+    
+    this.leftTraderCurrencies.set(currencies);
     
   }
   

@@ -1,5 +1,6 @@
 <script>
 
+  import { fade } from 'svelte/transition';
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import DropZone from "../components/DropZone.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
@@ -7,9 +8,9 @@
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import { hotkeyState } from "../../hotkeys.js";
   import ItemPileSocket from "../../socket.js";
-  import SETTINGS from "../../constants/settings.js";
   import TradeEntry from "./TradeEntry.svelte";
   import DropCurrencyDialog from "../drop-currency-dialog/drop-currency-dialog.js";
+  import * as Utilities from "../../helpers/utilities.js";
 
   export let elementRoot;
   export let store;
@@ -27,6 +28,7 @@
   let isGM = game.user.isGM;
   let systemHasCurrencies = game.itempiles.CURRENCIES.items.length > 0
     && game.itempiles.CURRENCIES.attributes.length > 0;
+  let spectator = game.user !== store.leftTraderUser && game.user !== store.rightTraderUser;
 
   async function dropItem(data) {
 
@@ -65,19 +67,36 @@
       }
     }
 
-    return store.addItem(itemData, game.user.isGM);
+    const actorItemCurrencyList = PileUtilities.getActorCurrencyData(store.leftTraderActor).items;
+    const isCurrency = !!Utilities.findSimilarItem(actorItemCurrencyList, itemData);
+
+    return store.addItem(itemData, { currency: isCurrency });
 
   }
 
-  leftItems.subscribe(async (items) => {
+  const itemsUpdatedDebounce = debounce(async (items) => {
     await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
     return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS, store.publicTradeId, game.user.id, items);
-  })
+  }, 20)
+  leftItems.subscribe(itemsUpdatedDebounce)
 
-  leftTraderAccepted.subscribe(async (acceptedState) => {
+  const itemCurrenciesUpdatedDebounce = debounce(async (items) => {
+    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEM_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
+    return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEM_CURRENCIES, store.publicTradeId, game.user.id, items);
+  }, 20)
+  leftItemCurrencies.subscribe(itemCurrenciesUpdatedDebounce)
+
+  const attributesUpdatedDebounce = debounce(async (attributes) => {
+    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, attributes);
+    return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_CURRENCIES, store.publicTradeId, game.user.id, attributes);
+  }, 40)
+  leftItems.subscribe(attributesUpdatedDebounce)
+
+  const acceptedDebounce = debounce(async (acceptedState) => {
     await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_STATE, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, acceptedState);
     return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_STATE, store.publicTradeId, game.user.id, acceptedState);
-  })
+  }, 10)
+  leftTraderAccepted.subscribe(acceptedDebounce)
 
   async function executeSocketAction(socketHandler, ...args) {
     if (store.isPrivate) {
@@ -88,7 +107,7 @@
 
   async function addCurrency(asGM = false) {
 
-    const currencyToAdd = await DropCurrencyDialog.show(
+    const currenciesToAdd = await DropCurrencyDialog.show(
       store.leftTraderActor,
       store.rightTraderActor,
       {
@@ -100,41 +119,26 @@
       }
     );
 
-    console.log(currencyToAdd)
+    if (!currenciesToAdd || (foundry.utils.isObjectEmpty(currenciesToAdd.attributes) && !currenciesToAdd.items.length)) return;
 
-    /*if (!currencyToAdd) return;
-
-    const currencies = lib.getFormattedActorCurrencies(this.leftTraderActor, { getAll: asGM });
-
-    Object.entries(currencyToAdd).forEach(entry => {
-
-      const existingCurrency = this.leftTraderActorCurrencies.find(currency => currency.path === entry[0]);
-
-      if (existingCurrency) {
-        existingCurrency.quantity = entry[1];
-        return;
-      }
-
-      const currency = currencies.find(currency => currency.path === entry[0]);
-
-      this.leftTraderActorCurrencies.push({
-        path: entry[0],
-        quantity: entry[1],
-        name: currency.name,
-        img: currency.img,
-        maxQuantity: !asGM ? currency.quantity : Infinity,
-        index: currency.index
-      });
-
+    currenciesToAdd.items.forEach(item => {
+      const itemData = store.leftTraderActor.items.get(item._id).toObject();
+      store.addItem(itemData, { quantity: item.quantity, currency: true })
     });
 
-    this.leftTraderActorCurrencies = this.leftTraderActorCurrencies.filter(currency => currency.quantity);
-
-    this.leftTraderActorCurrencies.sort((a, b) => a.index - b.index);
-
-    await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
-    return this.executeSocketAction(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
-*/
+    const currencies = PileUtilities.getFormattedActorCurrencies(store.leftTraderActor, { getAll: asGM });
+    Object.entries(currenciesToAdd.attributes).forEach(([path, quantity]) => {
+      const currency = currencies.find(currency => currency.path === path);
+      store.addAttribute({
+        path: path,
+        quantity: quantity,
+        newQuantity: quantity,
+        name: currency.name,
+        img: currency.img,
+        maxQuantity: !game.user.isGM ? currency.quantity : Infinity,
+        index: currency.index
+      });
+    });
   }
 
 
@@ -144,6 +148,15 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
+
+  {#if $leftTraderAccepted && $rightTraderAccepted}
+    <div class="lds-ellipsis" transition:fade>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  {/if}
 
   <div class="flexcol">
 
@@ -156,11 +169,19 @@
           <h2 class="character-name">
             <div>{store.leftTraderActor.name}</div>
           </h2>
+          <div>
+            <i
+                class:accepted={$leftTraderAccepted}
+                class:fa-user-check={$leftTraderAccepted}
+                class:fa-user-times={!$leftTraderAccepted}
+                class="fas accepted-icon"
+            ></i>
+          </div>
         </div>
 
         <DropZone callback={dropItem}>
 
-          <div class="flexcol" class:accepted={$leftTraderAccepted}>
+          <div class="flexcol">
 
             <div class="row item-piles-items-list">
 
@@ -171,32 +192,38 @@
               {/if}
 
               {#each $leftItems as item (item.id)}
-                <TradeEntry bind:data={item} {store}/>
+                <TradeEntry bind:data={item} {store} editable={!spectator}/>
               {/each}
 
             </div>
 
             {#if systemHasCurrencies}
 
-              <div class="row item-piles-items-list item-piles-currency-list">
+              <div class="row item-piles-items-list item-piles-currency-list item-piles-top-divider">
 
-                <div class="flexrow item-piles-top-divider">
-                  {#if isGM}
-                    <a on:click={() => { addCurrency(true) }}
-                       class="item-piles-text-right item-piles-small-text item-piles-middle item-piles-gm-add-currency">
+                {#if !spectator}
+                  <div class="flexrow">
+                    {#if isGM}
+                      <a on:click={() => { addCurrency(true) }}
+                         class="item-piles-text-right item-piles-small-text item-piles-middle item-piles-gm-add-currency">
+                        <i class="fas fa-plus"></i>
+                        {localize("ITEM-PILES.Trade.GMAddCurrency")}
+                      </a>
+                    {/if}
+                    <a on:click={() => { addCurrency() }}
+                       class="item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency">
                       <i class="fas fa-plus"></i>
-                      {localize("ITEM-PILES.Trade.GMAddCurrency")}
+                      {localize("ITEM-PILES.Inspect.AddCurrency")}
                     </a>
-                  {/if}
-                  <a on:click={() => { addCurrency() }}
-                     class="item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency">
-                    <i class="fas fa-plus"></i>
-                    {localize("ITEM-PILES.Inspect.AddCurrency")}
-                  </a>
-                </div>
+                  </div>
+                {/if}
 
-                {#each $leftCurrencies as currency (currency.path)}}
-                  <TradeEntry bind:data={currency} {store} editable={false}/>
+                {#each $leftCurrencies as currency (currency.path)}
+                  <TradeEntry bind:data={currency} {store} editable={!spectator}/>
+                {/each}
+
+                {#each $leftItemCurrencies as currency (currency.path)}
+                  <TradeEntry bind:data={currency} {store} editable={!spectator}/>
                 {/each}
 
               </div>
@@ -207,7 +234,8 @@
 
         </DropZone>
 
-        <button type="button" style="flex:0 1 auto;" on:click={() => { store.toggleAccepted(store.leftTraderUser.id) }}>
+        <button type="button" style="flex:0 1 auto; margin-top: 0.25rem;"
+                on:click={() => { store.toggleAccepted(store.leftTraderUser.id) }}>
           {#if $leftTraderAccepted}
             <i class="fas fa-times"></i>
             {localize("Cancel")}
@@ -222,13 +250,21 @@
       <div class="col flexcol">
 
         <div class="character-header trader item-piles-bottom-divider">
+          <div>
+            <i
+                class:accepted={$rightTraderAccepted}
+                class:fa-user-check={$rightTraderAccepted}
+                class:fa-user-times={!$rightTraderAccepted}
+                class="fas accepted-icon"
+            ></i>
+          </div>
           <h2 class="character-name">
             {store.rightTraderActor.name}
           </h2>
           <img src="{store.rightTraderActor.img}">
         </div>
 
-        <div class="flexcol" class:accepted={$rightTraderAccepted}>
+        <div class="flexcol">
 
           <div class="row item-piles-items-list">
 
@@ -246,7 +282,11 @@
                 <div class="row item-piles-top-divider"></div>
               {/if}
 
-              {#each $rightCurrencies as currency (currency.path)}}
+              {#each $rightCurrencies as currency (currency.path)}
+                <TradeEntry bind:data={currency} {store} editable={false}/>
+              {/each}
+
+              {#each $rightItemCurrencies as currency (currency.path)}
                 <TradeEntry bind:data={currency} {store} editable={false}/>
               {/each}
 
@@ -273,7 +313,7 @@
 
   .col:not(:last-child) {
     padding-right: 10px;
-    border-right: 1px solid black;
+    border-right: 1px solid rgba(0, 0, 0, 0.35);
   }
 
   .row {
@@ -287,5 +327,72 @@
   .trader {
 
   }
+
+  .lds-ellipsis {
+    position: absolute;
+    left: calc(50% - 38px);
+    top: calc(50% - 40px);
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+  }
+
+  .lds-ellipsis div {
+    position: absolute;
+    top: 33px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #435068;
+    animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  }
+
+  .lds-ellipsis div:nth-child(1) {
+    left: 8px;
+    animation: lds-ellipsis1 0.6s infinite;
+  }
+
+  .lds-ellipsis div:nth-child(2) {
+    left: 8px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+
+  .lds-ellipsis div:nth-child(3) {
+    left: 32px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+
+  .lds-ellipsis div:nth-child(4) {
+    left: 56px;
+    animation: lds-ellipsis3 0.6s infinite;
+  }
+
+  @keyframes lds-ellipsis1 {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes lds-ellipsis3 {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+
+  @keyframes lds-ellipsis2 {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(24px, 0);
+    }
+  }
+
 
 </style>

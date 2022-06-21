@@ -33,6 +33,13 @@ export default class TradingApp extends SvelteApplication {
     });
   }
   
+  async close(options = {}) {
+    if (!options?.callback) {
+      await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_CLOSED, this.store.publicTradeId, game.user.id);
+    }
+    return super.close(options)
+  }
+  
   static getActiveApp(publicTradeId) {
     for (const app of Object.values(ui.windows)) {
       if (app instanceof this && app?.publicTradeId === publicTradeId) {
@@ -40,12 +47,5 @@ export default class TradingApp extends SvelteApplication {
       }
     }
     return false;
-  }
-  
-  async close(options = {}) {
-    if (!options?.callback) {
-      await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_CLOSED, this.store.publicTradeId, game.user.id);
-    }
-    return super.close(options)
   }
 }

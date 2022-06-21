@@ -12,11 +12,11 @@
   async function addCurrency() {
     const result = await DropCurrencyDialog.show(store.recipientActor, store.pileActor);
     if (!result) return;
-    if (!foundry.utils.isObjectEmpty(result.currencies)) {
-      await game.itempiles.transferAttributes(store.recipientActor, store.pileActor, result.currencies, { interactionId: store.interactionId })
+    if (!foundry.utils.isObjectEmpty(result.attributes)) {
+      await game.itempiles.transferAttributes(store.recipientActor, store.pileActor, result.attributes, { interactionId: store.interactionId })
     }
-    if (result.itemCurrencies.length) {
-      await game.itempiles.transferItems(store.recipientActor, store.pileActor, result.itemCurrencies, { interactionId: store.interactionId })
+    if (result.items.length) {
+      await game.itempiles.transferItems(store.recipientActor, store.pileActor, result.items, { interactionId: store.interactionId })
     }
   }
 

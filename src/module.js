@@ -51,38 +51,24 @@ Hooks.once("ready", () => {
   Hooks.callAll(HOOKS.READY);
   
   
-  const store = new TradeStore({
+  /*const store = new TradeStore({
     user: game.user,
     actor: game.actors.getName("Almighty Spark"),
-    items: [{
-      id: "3wVsWXOQW1BLDs7u",
-      name: "New weapon",
-      img: "icons/svg/item-bag.svg",
-      quantity: 1,
-      newQuantity: 1,
-      maxQuantity: Infinity
-    }, {
-      id: "fBpmgiUCPmy1ovCx",
-      name: "Another Weapon With A Very Very Incredibly Long Name",
-      img: "icons/svg/item-bag.svg",
-      quantity: 1,
-      newQuantity: 1,
-      maxQuantity: Infinity
-    }]
+    items: []
   }, {
     user: game.users.getName("Frozen"),
     actor: game.actors.getName("Player Token"),
-    items: [{
+    /!*items: [{
       id: "fBpmgiUCPmy1ovCx",
       name: "Another Weapon With A Very Very Incredibly Long Name",
       img: "icons/svg/item-bag.svg",
       quantity: 1,
       newQuantity: 1,
       maxQuantity: Infinity
-    }]
+    }]*!/
   }, randomID())
   
-  new TradingApp(store).render(true)
+  new TradingApp(store).render(true)*/
   
 });
 

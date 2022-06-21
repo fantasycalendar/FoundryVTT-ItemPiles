@@ -57,11 +57,11 @@
 
   function submit() {
     application.options.resolve({
-      currencies: Object.fromEntries(currencies
+      attributes: Object.fromEntries(currencies
         .filter(currency => currency.currentQuantity)
         .map(currency => [currency.path, currency.currentQuantity])
       ),
-      itemCurrencies: itemCurrencies
+      items: itemCurrencies
         .filter(item => item.currentQuantity)
         .map(item => ({ _id: item.id, quantity: item.currentQuantity }))
     });

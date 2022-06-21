@@ -304,6 +304,12 @@ export default class TradeAPI {
     trade.store.updateItems(userId, items);
   }
   
+  static async _updateItemCurrencies(tradeId, userId, items) {
+    const trade = this._getOngoingTrade(tradeId);
+    if (!trade) return;
+    trade.store.updateItemCurrencies(userId, items);
+  }
+  
   static async _updateCurrencies(tradeId, userId, currencies) {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;

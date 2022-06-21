@@ -21,6 +21,21 @@
     return sheet._render(true);
   }
 
+  function onKeyDown(e) {
+    if (e.keyCode === 13) {
+      updateQuantity();
+    }
+  }
+
+  function updateQuantity() {
+    data.quantity = Math.max(0, Math.min(data.maxQuantity, data.newQuantity));
+    if (data.quantity === 0) {
+      return store.removeEntry(data);
+    }
+    data.newQuantity = data.quantity;
+    data.editing = false;
+  }
+
 </script>
 
 <div class="flexrow item-piles-item-row item-piles-even-color">
@@ -43,41 +58,33 @@
     </div>
   </div>
 
-  {#if data.editing}
-    <div style="flex: 0 1 auto; margin: 0 5px;">
-      <a class="item-piles-clickable-green item-piles-confirm-quantity" on:click="{() => {
-                            data.quantity = Math.max(0, Math.min(data.maxQuantity, data.newQuantity));
-                            if(data.quantity === 0){
-                              return store.removeEntry(data);
-                            }
-                            data.newQuantity = data.quantity;
-                            data.editing = false;
-                          }}">
+  <div style="flex: 0 1 17px; margin: 0 5px;">
+    {#if data.editing}
+      <a class="item-piles-clickable-green item-piles-confirm-quantity" on:click="{updateQuantity}">
         <i class="fas fa-check"></i>
       </a>
-    </div>
-  {/if}
-
+    {/if}
+  </div>
 
   <div class="item-piles-text-right" class:item-piles-quantity-container={editable}>
     {#if editable}
-      {#if data.editing}
-        <div style="flex-direction: row;">
-          <input
-              class="item-piles-quantity"
-              type="number"
-              min="0"
-              max="{data.maxQuantity}"
-              bind:value={data.newQuantity}
-              on:input={() => { data.newQuantity = Math.max(0, Math.min(data.maxQuantity, data.newQuantity)); }}
-          />
-        </div>
-      {:else}
-        <span class="item-piles-quantity-text"
-              on:click="{ () => { data.editing = true }}">
-          {data.quantity}
-        </span>
-      {/if}
+      <div class="item-piles-quantity-container">
+        {#if data.editing}
+          <div class="item-piles-quantity-input-container">
+            <input
+                class="item-piles-quantity"
+                type="number"
+                bind:value={data.newQuantity}
+                on:keydown={onKeyDown}
+            />
+          </div>
+        {:else}
+            <span class="item-piles-quantity-text"
+                  on:click="{ () => { data.editing = true } }">
+              {data.quantity}
+            </span>
+        {/if}
+      </div>
     {:else}
       <span class="item-piles-text" style="padding-right:0.5rem;">{data.quantity}</span>
     {/if}

@@ -387,16 +387,9 @@
 .item-piles-trading-sheet {
 
   .item-piles-item-row {
-    padding: 2px;
+    padding: 0 2px 0 0;
+    border-radius: 4px;
     align-items: center;
-  }
-
-  .item-piles-remove-item {
-    opacity: 0.5;
-  }
-
-  .item-piles-remove-item:hover {
-    opacity: 1;
   }
 
   .item-piles-confirm-quantity {
@@ -409,16 +402,20 @@
     padding-right: 3px;
   }
 
+  .item-piles-quantity {
+    margin: 0 !important;
+  }
+
   .item-piles-quantity-text {
-    line-height: 1.6rem;
+    line-height: 1.25rem;
     font-size: 0.85rem;
     background-color: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(0, 0, 0, 0.15);
     padding-right: 0.2rem;
     border-radius: 4px;
-    margin-left: 2px;
+    margin: 0 2px;
     width: 100%;
-    height: 26px;
+    height: 20px;
     letter-spacing: 0.2px;
   }
 
@@ -443,38 +440,6 @@
     max-height: unset;
   }
 
-  .item-piles {
-
-    &-img-container {
-      min-height: 29px;
-      max-width: 29px;
-      max-height: 29px;
-
-      overflow: hidden;
-      border-radius: 4px;
-      border: 1px solid black;
-
-      .item-piles-img {
-        border: 0;
-        width: auto;
-        height: 100%;
-        transition: transform 250ms;
-
-        &:hover {
-          transform: scale(1.25, 1.25);
-        }
-      }
-
-
-    }
-
-  }
-
-  .accepted {
-    box-shadow: 0 0 40px rgba(0, 255, 0, 0.35) inset, 0 0 10px rgba(0, 255, 0, 0.35);
-    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
-
   h1, h2 {
     border: 0;
     vertical-align: center;
@@ -486,6 +451,7 @@
     flex-direction: row;
     flex: 0 1 auto;
     padding: 5px;
+    align-items: center;
 
     .character-name {
       padding-top: 0.5rem;
@@ -504,14 +470,16 @@
       border-radius: 5px;
     }
 
-    &.trader {
-      img {
-        margin-left: auto;
+    .accepted-icon {
+      font-size: 2rem;
+      color: #979797;
+
+
+      &.accepted {
+        color: rgb(5, 150, 105);
       }
     }
-
   }
-
 }
 
 /* ---------------------- MERCHANT UI ---------------------- */
