@@ -65,18 +65,4 @@
     padding: 0 0.25rem;
   }
 
-  .form-group {
-    label {
-      p {
-        flex: 0;
-        line-height: 14px;
-        font-size: var(--font-size-12);
-        color: var(--color-text-dark-secondary);
-        padding-right: 1rem;
-        margin-top: 0;
-        overflow-y: hidden;
-      }
-    }
-  }
-
 </style>

@@ -6,7 +6,6 @@
 
   const { application } = getContext('external');
 
-  export let elementRoot;
   export let sourceActor;
   export let targetActor;
   export let settings;
