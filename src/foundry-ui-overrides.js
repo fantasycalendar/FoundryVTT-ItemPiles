@@ -1,17 +1,14 @@
 import * as Helpers from "./helpers/helpers.js";
 import SETTINGS from "./constants/settings.js";
-import * as PileUtilies from "./helpers/pile-utilities.js";
+import * as PileUtilities from "./helpers/pile-utilities.js";
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 
 export default function registerUIOverrides() {
-  
   Hooks.on("renderPlayerList", addTradeButton);
   Hooks.on("getActorDirectoryEntryContext", insertActorContextMenuItems);
   Hooks.on("getActorSheetHeaderButtons", insertActorHeaderButtons);
   Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
-  
 }
-
 
 function addTradeButton(app, html) {
   if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING) || !Helpers.getSetting(SETTINGS.SHOW_TRADE_BUTTON)) return;
@@ -27,7 +24,6 @@ function addTradeButton(app, html) {
   html.append(button);
 }
 
-
 function insertActorContextMenuItems(html, menuItems) {
   
   menuItems.push({
@@ -42,7 +38,7 @@ function insertActorContextMenuItems(html, menuItems) {
     condition: (html) => {
       const actorId = html[0].dataset.documentId;
       const actor = game.actors.get(actorId);
-      return game.user.isGM && PileUtilies.isValidItemPile(actor);
+      return game.user.isGM && PileUtilities.isValidItemPile(actor);
     }
   }, {
     name: "ITEM-PILES.ContextMenu.RequestTrade",
@@ -92,5 +88,4 @@ function insertItemHeaderButtons(itemSheet, buttons) {
       //ItemConfig.show(obj);
     }
   })
-  
 }
