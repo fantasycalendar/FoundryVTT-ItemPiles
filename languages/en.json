@@ -338,6 +338,10 @@
         "Title": "Show Trade Button",
         "Hint": "Enabling this will display a trade button just below the player list in the bottom right."
       },
+      "InspectItemsTrade": {
+        "Title": "Enable Inspecting Items During Trades",
+        "Hint": "Enabling this makes it so that users can click items that are being traded and open the item's sheet to preview them."
+      },
       "OutputToChat": {
         "Title": "Output to chat",
         "Hint": "Whenever any player picks up items from an item pile, this will send a message showing what was picked up.",

@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store';
 import * as Utilities from "../../helpers/utilities.js";
 
-export default class TradingStore {
+export default class TradeStore {
   
   constructor(leftTrader, rightTrader, publicTradeId, privateTradeId = false, isPrivate = false) {
     
@@ -89,10 +89,15 @@ export default class TradingStore {
   }
   
   updateItems(userId, inItems) {
+    if (userId === game.user.id) return;
     this.leftTraderAccepted.set(false);
     this.rightTraderAccepted.set(false);
     const items = inItems.filter(item => !item.currency);
     const itemCurrencies = inItems.filter(item => item.currency);
+    if (userId === this.leftTraderUser.id) {
+      this.leftTraderItems.set(items)
+      this.leftTraderItemCurrencies.set(itemCurrencies)
+    }
     if (userId === this.rightTraderUser.id) {
       this.rightTraderItems.set(items)
       this.rightTraderItemCurrencies.set(itemCurrencies)
@@ -100,24 +105,34 @@ export default class TradingStore {
   }
   
   updateCurrencies(userId, inCurrencies) {
+    if (userId === game.user.id) return;
     this.leftTraderAccepted.set(false);
     this.rightTraderAccepted.set(false);
+    if (userId === this.leftTraderUser.id) {
+      this.leftTraderCurrencies.set(inCurrencies)
+    }
     if (userId === this.rightTraderUser.id) {
       this.rightTraderCurrencies.set(inCurrencies)
     }
   }
   
   updateAcceptedState(userId, state) {
+    if (userId === game.user.id) return;
+    if (userId === this.leftTraderUser.id) {
+      this.leftTraderAccepted.set(state);
+    }
     if (userId === this.rightTraderUser.id) {
       this.rightTraderAccepted.set(state);
     }
   }
   
-  async addItem(newItem, limitQuantity = true) {
+  async addItem(newItem, isGM = false) {
     
     const items = get(this.leftTraderItems);
     
     const item = Utilities.findSimilarItem(items, newItem)
+    
+    debugger;
     
     if (!item) {
       items.push({
@@ -125,7 +140,8 @@ export default class TradingStore {
         name: newItem.name,
         img: newItem?.img ?? "",
         quantity: 1,
-        maxQuantity: limitQuantity ? Utilities.getItemQuantity(newItem) : Infinity,
+        newQuantity: 1,
+        maxQuantity: isGM ? Infinity : Utilities.getItemQuantity(newItem),
         data: newItem
       })
     } else {

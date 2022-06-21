@@ -6,7 +6,20 @@
   export let store;
   export let data;
 
+  function previewItem() {
+    if (!canPreview) return;
+    const item = store.pileActor.items.get(data.id);
+    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+      return item.sheet.render(true);
+    }
+    const cls = item._getSheetClass()
+    const sheet = new cls(item, { editable: false })
+    return sheet._render(true);
+  }
+
   const editQuantitiesStore = store.editQuantities;
+
+  const canPreview = data.id && store.pileData.canInspectItems;
 
 </script>
 
@@ -24,9 +37,10 @@
 
   <div class="item-piles-name">
     <div class="item-piles-name-container">
-      <!--<a class="item-piles-clickable" on:click={previewItem(item)}>{data.name}</a>-->
-      <a class="item-piles-clickable">{data.name}</a>
-      <span class="item-piles-small-text">(x{data.quantity})</span>
+      <p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{data.name}</p>
+      {#if !$editQuantitiesStore}
+        <span class="item-piles-small-text">(x{data.quantity})</span>
+      {/if}
     </div>
   </div>
 
@@ -73,92 +87,5 @@
 </div>
 
 <style lang="scss">
-
-  .item-piles-item-row {
-    padding: 0 2px 0 0;
-    border-radius: 4px;
-
-    .item-piles-disabled {
-      background-color: var(--color-bg-btn-minor-inactive, #c9c7b8)
-    }
-
-    .item-piles-disabled {
-      background-color: var(--color-bg-btn-minor-inactive, #c9c7b8)
-    }
-
-    .item-piles-name {
-
-      margin-left: 5px;
-      text-wrap: normal;
-      flex: 1 0 45%;
-      display: inline-flex;
-      flex-direction: column;
-      align-items: flex-start;
-
-      .item-piles-name-container {
-        flex: 1;
-        display: inline-flex;
-        flex-direction: row;
-        align-items: center;
-
-        a {
-          flex: 1 0 auto;
-        }
-
-        span {
-          margin-left: 5px;
-          margin-top: 2px;
-          flex: 0 1 auto;
-        }
-      }
-
-      span {
-        line-height: 1;
-        flex: 0;
-      }
-    }
-
-    .item-piles-quantity-container {
-
-      align-items: center;
-      display: flex;
-
-      .item-piles-quantity-input-container {
-
-        height: 100%;
-        display: flex;
-        flex: 1;
-        align-items: center;
-        flex-direction: row;
-        padding: 2px;
-
-        .item-piles-quantity {
-          height: 20px;
-          flex: 1;
-          margin-left: 0.5rem;
-          text-align: right;
-        }
-
-      }
-    }
-
-    .item-piles-input-divider {
-      flex: 1;
-      margin: 0.1rem 0.5rem 0 0.25rem;
-      font-size: 0.8rem;
-      line-height: 1.25rem;
-    }
-
-    .item-piles-item-take-button, .item-piles-currency-take-button {
-      flex: 0;
-      min-width: 4rem;
-      height: 22px;
-      padding: 1px 3px;
-      margin: 3px;
-      line-height: inherit;
-      border-radius: 4px;
-    }
-
-  }
 
 </style>

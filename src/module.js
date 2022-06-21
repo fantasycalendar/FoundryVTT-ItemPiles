@@ -11,6 +11,9 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
+import TradingApp from "./applications/trading-interface/trading-app.js";
+import TradeStore from "./applications/trading-interface/trade-store.js";
+import * as Utilities from "./helpers/utilities.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -46,6 +49,33 @@ Hooks.once("ready", () => {
   }
   registerHotkeysPost();
   Hooks.callAll(HOOKS.READY);
+  
+  
+  const store = new TradeStore({
+    user: game.user,
+    actor: game.actors.getName("Almighty Spark"),
+    items: [{
+      id: "3wVsWXOQW1BLDs7u",
+      name: "New weapon",
+      img: "icons/svg/item-bag.svg",
+      quantity: 1,
+      newQuantity: 1,
+      maxQuantity: Infinity
+    }, {
+      id: "fBpmgiUCPmy1ovCx",
+      name: "Another Weapon With A Very Very Incredibly Long Name",
+      img: "icons/svg/item-bag.svg",
+      quantity: 1,
+      newQuantity: 1,
+      maxQuantity: Infinity
+    }]
+  }, {
+    user: game.users.getName("Frozen"),
+    actor: game.actors.getName("Player Token"),
+  }, randomID())
+  
+  new TradingApp(store).render(true)
+  
 });
 
 Hooks.once("socketlib.ready", () => {

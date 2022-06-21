@@ -10,6 +10,7 @@ const SETTINGS = {
   INVERT_SHEET_OPEN: "invertSheetOpen",
   HIDE_ACTOR_HEADER_TEXT: "hideActorHeaderText",
   PRELOAD_FILES: "preloadFiles",
+  INSPECT_ITEMS_IN_TRADE: "inspectItemsInTrade",
   
   // Private Settings
   CURRENCIES: "currencies",
@@ -156,6 +157,15 @@ const SETTINGS = {
         "ITEM-PILES.Settings.OutputToChat.Blind",
       ],
       type: Number
+    },
+    
+    [SETTINGS.INSPECT_ITEMS_IN_TRADE]: {
+      name: "ITEM-PILES.Settings.InspectItemsTrade.Title",
+      hint: "ITEM-PILES.Settings.InspectItemsTrade.Hint",
+      scope: "world",
+      config: false,
+      default: true,
+      type: Boolean
     },
     
     [SETTINGS.DELETE_EMPTY_PILES]: {

@@ -94,6 +94,7 @@
           <Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
           <Setting bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>
           <Setting bind:data="{settings[SETTINGS.SHOW_TRADE_BUTTON]}"/>
+          <Setting bind:data="{settings[SETTINGS.INSPECT_ITEMS_IN_TRADE]}"/>
         </div>
 
         <div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">

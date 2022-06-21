@@ -37,15 +37,23 @@
     cursor: pointer;
 
     &-red {
+      cursor: pointer;
       color: red;
     }
 
     &-green {
+      cursor: pointer;
       color: green;
     }
 
     &-green:hover {
+      cursor: pointer;
       text-shadow: 0 0 8px rgba(0, 125, 0, 1);
+    }
+
+    &-link:hover {
+      cursor: pointer;
+      text-shadow: 0 0 8px var(--color-shadow-primary);
     }
   }
 
@@ -98,6 +106,11 @@
     border-top: 1px solid rgba(0, 0, 0, 0.35);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
+  }
+
+  &-quantity-container {
+    align-items: center;
+    display: flex;
   }
 
 }
@@ -179,6 +192,93 @@
 
 /* ----------------------- INVENTORY ----------------------- */
 
+.item-piles-item-row {
+  padding: 0 2px 0 0;
+  border-radius: 4px;
+
+  .item-piles-disabled {
+    background-color: var(--color-bg-btn-minor-inactive, #c9c7b8)
+  }
+
+  .item-piles-disabled {
+    background-color: var(--color-bg-btn-minor-inactive, #c9c7b8)
+  }
+
+  .item-piles-name {
+
+    margin-left: 5px;
+    text-wrap: normal;
+    flex: 1 0 45%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .item-piles-name-container {
+      flex: 1;
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      word-break: break-word;
+
+      p {
+        margin: 0;
+      }
+
+      span {
+        margin-left: 5px;
+        margin-top: 2px;
+        flex: 1 0 auto;
+      }
+    }
+
+    span {
+      line-height: 1;
+      flex: 0;
+    }
+  }
+
+  .item-piles-quantity-container {
+
+    align-items: center;
+    display: flex;
+
+    .item-piles-quantity-input-container {
+
+      height: 100%;
+      display: flex;
+      flex: 1;
+      align-items: center;
+      flex-direction: row;
+      padding: 2px;
+
+      .item-piles-quantity {
+        height: 20px;
+        flex: 1;
+        margin-left: 0.5rem;
+        text-align: right;
+      }
+
+    }
+  }
+
+  .item-piles-input-divider {
+    flex: 1;
+    margin: 0.1rem 0.5rem 0 0.25rem;
+    font-size: 0.8rem;
+    line-height: 1.25rem;
+  }
+
+  .item-piles-item-take-button, .item-piles-currency-take-button {
+    flex: 0;
+    min-width: 4rem;
+    height: 22px;
+    padding: 1px 3px;
+    margin: 3px;
+    line-height: inherit;
+    border-radius: 4px;
+  }
+
+}
 
 /* ----------------------- CONFIG ----------------------- */
 
@@ -288,6 +388,7 @@
 
   .item-piles-item-row {
     padding: 2px;
+    align-items: center;
   }
 
   .item-piles-remove-item {
@@ -299,17 +400,25 @@
   }
 
   .item-piles-confirm-quantity {
-    display: none;
+    justify-self: flex-end;
+  }
+
+  .item-piles-quantity-container {
+    flex: 0 1 75px;
+    display: flex;
   }
 
   .item-piles-quantity-text {
-    line-height: 1.6rem;
+    line-height: 1.5rem;
     font-size: 0.85rem;
     background-color: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(0, 0, 0, 0.15);
-    padding-right: 5px;
+    padding-right: 0.2rem;
     border-radius: 4px;
-    margin-left: 10px;
+    margin-left: 2px;
+    width: 100%;
+    height: 26px;
+    letter-spacing: 0.2px;
   }
 
   .item-piles-quantity-text:hover {

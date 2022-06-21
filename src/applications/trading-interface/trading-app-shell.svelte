@@ -7,6 +7,7 @@
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import { hotkeyState } from "../../hotkeys.js";
   import ItemPileSocket from "../../socket.js";
+  import SETTINGS from "../../constants/settings.js";
 
   export let elementRoot;
   export let store;
@@ -62,7 +63,7 @@
       }
     }
 
-    return store.addItem(itemData, !!data.actorId && game.user.isGM);
+    return store.addItem(itemData, game.user.isGM);
 
   }
 
@@ -81,6 +82,19 @@
       return ItemPileSocket.executeForUsers(socketHandler, [store.leftTraderUser.id, store.rightTraderUser.id], ...args);
     }
     return ItemPileSocket.executeForEveryone(socketHandler, ...args);
+  }
+
+  const canPreview = Helpers.getSetting(SETTINGS.INSPECT_ITEMS_IN_TRADE)
+
+  function previewItem() {
+    if (!canPreview) return;
+    const item = store.pileActor.items.get(data.id);
+    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+      return item.sheet.render(true);
+    }
+    const cls = item._getSheetClass()
+    const sheet = new cls(item, { editable: false })
+    return sheet._render(true);
   }
 
 </script>
@@ -117,7 +131,7 @@
 
               {#each $leftItems as item (item.id)}
 
-                <div class="flexrow item-piles-item-row">
+                <div class="flexrow item-piles-item-row item-piles-even-color">
 
                   <div style="flex: 0 1 auto; margin: 0 6px;">
                     <a class="item-piles-clickable-red" on:click={store.removeItem(item)}>
@@ -131,35 +145,42 @@
 
                   <div class="item-piles-name item-piles-text">
                     <div class="item-piles-name-container">
-                      <a class="item-piles-clickable">{item.name}</a>
+                      <p class="item-piles-clickable">{item.name}</p>
                     </div>
                   </div>
 
                   {#if item.editing}
                     <div style="flex: 0 1 auto; margin: 0 5px;">
-                      <a class="item-piles-clickable-green item-piles-confirm-quantity">
+                      <a class="item-piles-clickable-green item-piles-confirm-quantity" on:click="{() => {
+                            item.quantity = Math.max(0, Math.min(item.maxQuantity, item.newQuantity));
+                            if(item.quantity === 0){
+                              return store.removeItem(item);
+                            }
+                            item.newQuantity = item.quantity;
+                            item.editing = false;
+                          }}">
                         <i class="fas fa-check"></i>
                       </a>
                     </div>
                   {/if}
 
-                  <div style="flex:1;">
+                  <div class="item-piles-text-right item-piles-quantity-container">
                     {#if item.editing}
-                      <div style="flex-direction: row;" class="item-piles-quantity-container">
+                      <div style="flex-direction: row;">
                         <input
                             class="item-piles-quantity"
                             type="number"
                             min="0"
-                            value="{item.quantity}"
                             max="{item.maxQuantity}"
-                            on:change="{(event) => { item.quantity = Number(event.target.value); item.editing = false; }}"
+                            bind:value={item.newQuantity}
+                            on:input={() => { item.newQuantity = Math.max(0, Math.min(item.maxQuantity, item.newQuantity)); }}
                         />
                       </div>
                     {:else}
-                  <span class="item-piles-text-right item-piles-quantity-text"
-                        on:click="{ () => { item.editing = true }}">
-                    {item.quantity}
-                  </span>
+                      <span class="item-piles-text-right item-piles-quantity-text"
+                            on:click="{ () => { item.editing = true }}">
+                        {item.quantity}
+                      </span>
                     {/if}
                   </div>
                 </div>
@@ -218,7 +239,7 @@
                               min="0"
                               value="{currency.quantity}"
                               max="{currency.maxQuantity}"
-                              on:change="{(event) => { currency.quantity = Number(event.target.value); currency.editing = false; }}"
+                              on:change="{(event) => setEntryQuantity(event, currency)}"
                           />
                         </div>
                       {:else}

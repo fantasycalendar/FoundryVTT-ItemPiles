@@ -6,7 +6,7 @@ import ItemPileSocket from "../socket.js";
 import * as Helpers from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
 import HOOKS from "../constants/hooks.js";
-import TradingStore from "../applications/trading-interface/trading-store.js";
+import TradeStore from "../applications/trading-interface/trade-store.js";
 import TradingApp from "../applications/trading-interface/trading-app.js";
 import SETTINGS from "../constants/settings.js";
 
@@ -138,7 +138,7 @@ export default class TradeAPI {
         
         const traderActor = Utilities.getActor(data.actorUuid);
         
-        const store = new TradingStore({
+        const store = new TradeStore({
           user: game.user,
           actor
         }, {
@@ -146,11 +146,11 @@ export default class TradeAPI {
           actor: traderActor
         }, data.fullPublicTradeId, data.fullPrivateTradeId, isPrivate);
         
-        const app = new TradingApp(store).render(true);
+        const app = new TradingApp(store, this.getAppOptions(actor).tradeApp).render(true);
         
         ongoingTrades.set(data.fullPublicTradeId, { app, store });
         
-        actor.sheet.render(true);
+        actor.sheet.render(true, this.getAppOptions(actor).actorSheet)
         
         if (isPrivate) {
           return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.CALL_HOOK, [game.user.id, userId], HOOKS.TRADE.STARTED, {
@@ -207,16 +207,16 @@ export default class TradeAPI {
     
     const actor = result.actor ?? result;
     
-    const store = new TradingStore({ user: game.user, actor }, {
+    const store = new TradeStore({ user: game.user, actor }, {
       user: tradingUser,
       actor: tradingActor
     }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
     
-    const app = new TradingApp(store).render(true);
+    const app = new TradingApp(store, this.getAppOptions(actor).tradeApp).render(true);
     
     ongoingTrades.set(fullPublicTradeId, { app, store });
     
-    actor.sheet.render(true);
+    actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
     
     return {
       fullPrivateTradeId,
@@ -224,6 +224,14 @@ export default class TradeAPI {
       actorUuid: result.uuid
     };
     
+  }
+  
+  static getAppOptions(actor) {
+    const midPoint = (window.innerWidth / 2) - 200;
+    return {
+      actorSheet: { left: midPoint - actor.sheet.position.width - 25 },
+      tradeApp: { left: midPoint + 25 }
+    }
   }
   
   static async _tradeCancelled(userId, privateTradeId) {
@@ -269,7 +277,7 @@ export default class TradeAPI {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
     }
     
-    const store = TradingStore.import(...ongoingTradeData);
+    const store = TradeStore.import(...ongoingTradeData);
     return new TradingApp(store).render(true);
     
   }
@@ -325,7 +333,7 @@ export default class TradeAPI {
       if (foundLeft && foundRight) continue;
       tradesToDelete.push(tradeId);
       Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true);
-      trade.app.close();
+      await trade.app.close({ callback: true });
       if (foundLeft === game.user || foundRight === game.user) {
         await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
       }
@@ -410,7 +418,7 @@ export default class TradeAPI {
     // Todo: Actually implement each user updating the actor they own
     
     if (trade.store.isPrivate) {
-      trade.app.close();
+      trade.app.close({ callback: true });
       ongoingTrades.delete(tradeId);
     } else if (userId === game.user.id) {
       return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_COMPLETED, tradeId, updates);
@@ -421,7 +429,7 @@ export default class TradeAPI {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;
     Hooks.callAll(HOOKS.TRADE.COMPLETE, updates, tradeId)
-    trade.app.close();
+    trade.app.close({ callback: true });
     ongoingTrades.delete(tradeId);
   }
   
