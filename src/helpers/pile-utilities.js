@@ -76,10 +76,11 @@ export function getActorItems(target, { itemFilters = false, itemCurrencies = tr
   });
 }
 
-export function getActorCurrencyItems(target) {
+export function getActorCurrencyItems(target, { currencyFilters = false } = {}) {
   const targetActor = Utilities.getActor(target)
   const targetItems = Array.from(targetActor.items);
-  return getActorCurrencyData(targetActor)?.items.map(currency => {
+  const currencyItemList = currencyFilters || getActorCurrencyData(targetActor)?.items || [];
+  return currencyItemList.map(currency => {
     return Utilities.findSimilarItem(targetItems, currency) || false;
   }).filter(Boolean) ?? [];
 }
@@ -440,6 +441,7 @@ function getRelevantTokensAndActor(target) {
 
 export async function updateItemPileData(target, flagData, tokenData) {
   
+  if (!flagData) flagData = getActorFlagData(target);
   if (!tokenData) tokenData = {};
   
   const [documentActor, documentTokens] = getRelevantTokensAndActor(target);

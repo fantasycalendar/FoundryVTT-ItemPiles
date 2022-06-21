@@ -80,6 +80,10 @@ export default class TradeStore {
     };
   }
   
+  getExistingCurrencies() {
+    return [...get(this.leftTraderCurrencies), ...get(this.leftTraderItemCurrencies)]
+  }
+  
   get tradeIsAccepted() {
     return get(this.leftTraderAccepted) && get(this.rightTraderAccepted);
   }
@@ -132,8 +136,6 @@ export default class TradeStore {
     
     const item = Utilities.findSimilarItem(items, newItem)
     
-    debugger;
-    
     if (!item) {
       items.push({
         id: newItem._id,
@@ -153,12 +155,34 @@ export default class TradeStore {
     
   }
   
-  removeItem(removedItem) {
+  removeEntry(entry) {
     
-    const items = get(this.leftTraderItems)
-      .filter(item => item.id !== removedItem.id);
-    
-    this.leftTraderItems.set(items);
+    if (entry.id) {
+      
+      if (!entry.currency) {
+        
+        const items = get(this.leftTraderItems)
+          .filter(item => item.id !== entry.id);
+        
+        this.leftTraderItems.set(items);
+        
+      } else {
+        
+        const items = get(this.leftTraderItemCurrencies)
+          .filter(item => item.id !== entry.id);
+        
+        this.leftTraderItemCurrencies.set(items);
+        
+      }
+      
+    } else {
+      
+      const items = get(this.leftTraderCurrencies)
+        .filter(currency => currency.path !== entry.path);
+      
+      this.leftTraderCurrencies.set(items);
+      
+    }
     
   }
   

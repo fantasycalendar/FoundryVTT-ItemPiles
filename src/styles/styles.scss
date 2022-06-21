@@ -406,10 +406,11 @@
   .item-piles-quantity-container {
     flex: 0 1 75px;
     display: flex;
+    padding-right: 3px;
   }
 
   .item-piles-quantity-text {
-    line-height: 1.5rem;
+    line-height: 1.6rem;
     font-size: 0.85rem;
     background-color: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(0, 0, 0, 0.15);

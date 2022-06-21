@@ -7,11 +7,16 @@
   const { application } = getContext('external');
 
   export let elementRoot;
-  export let actor;
-  export let itemPile;
+  export let sourceActor;
+  export let targetActor;
   export let settings;
 
-  let currencies = PileUtilities.getFormattedActorCurrencies(actor)
+  const targetCurrencyData = PileUtilities.getActorCurrencyData(targetActor);
+
+  let currencies = PileUtilities.getFormattedActorCurrencies(sourceActor, {
+      currencyList: targetCurrencyData.currencies,
+      getAll: settings?.unlimitedCurrencies
+    })
     .map(currency => {
       currency.currentQuantity = 0;
       return currency;
@@ -26,7 +31,7 @@
     });
   }
 
-  let itemCurrencies = PileUtilities.getActorCurrencyItems(actor)
+  let itemCurrencies = PileUtilities.getActorCurrencyItems(sourceActor, { currencyList: targetCurrencyData.items })
     .map(item => ({
       id: item.id,
       name: item.name,
@@ -73,7 +78,7 @@
   {#if currencies.length || itemCurrencies.length}
 
     <p style="text-align: center;" class="item-piles-bottom-divider">
-      {localize("ITEM-PILES.DropCurrencies.Player")}
+      {settings?.content ?? localize("ITEM-PILES.DropCurrencies.Player")}
     </p>
 
     {#each currencies as currency, index (currency.path)}
@@ -85,11 +90,19 @@
           <div>{currency.name}</div>
         </div>
 
-        <input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{currency.quantity}"
-               bind:value="{currency.currentQuantity}"/>
-        <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
-               bind:value="{currency.currentQuantity}"/>
-        <div style="flex:0 1 50px; margin: 0 5px;">/ {currency.quantity}</div>
+        {#if settings?.unlimitedCurrencies}
+          <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
+                 bind:value={currency.currentQuantity}/>
+        {:else}
+          <input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{currency.quantity}"
+                 bind:value={currency.currentQuantity}/>
+          <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
+                 bind:value={currency.currentQuantity}
+                 on:click={() => {
+                      currency.currentQuantity = Math.max(0, Math.min(currency.quantity, currency.currentQuantity));
+                 }}/>
+          <div style="flex:0 1 50px; margin: 0 5px;">/ {currency.quantity}</div>
+        {/if}
       </div>
     {/each}
 
@@ -102,18 +115,26 @@
           <div>{item.name}</div>
         </div>
 
-        <input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{item.quantity}"
-               bind:value="{item.currentQuantity}"/>
-        <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number" name="{item.path}"
-               bind:value="{item.currentQuantity}"/>
-        <div style="flex:0 1 50px; margin: 0 5px;">/ {item.quantity}</div>
+        {#if settings?.unlimitedCurrencies}
+          <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
+                 bind:value={item.currentQuantity}/>
+        {:else}
+          <input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{item.quantity}"
+                 bind:value={item.currentQuantity}/>
+          <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
+                 bind:value={item.currentQuantity}
+                 on:click={() => {
+                      item.currentQuantity = Math.max(0, Math.min(item.quantity, item.currentQuantity));
+                 }}/>
+          <div style="flex:0 1 50px; margin: 0 5px;">/ {item.quantity}</div>
+        {/if}
       </div>
     {/each}
 
   {:else}
 
     <p style="text-align: center;">
-      {localize("ITEM-PILES.DropCurrencies.NoCurrency", { actor_name: actor.name })}
+      {localize("ITEM-PILES.DropCurrencies.NoCurrency", { actor_name: sourceActor.name })}
     </p>
 
   {/if}
@@ -122,7 +143,7 @@
     {#if currencies.length || itemCurrencies.length}
       <button type="button" on:click|once={requestSubmit}>
         <i class="fas fa-download"></i>
-        {localize("ITEM-PILES.DropCurrencies.AddToPile")}
+        {settings?.button ?? localize("ITEM-PILES.DropCurrencies.AddToPile")}
       </button>
     {/if}
 

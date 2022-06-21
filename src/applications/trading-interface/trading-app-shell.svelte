@@ -8,6 +8,8 @@
   import { hotkeyState } from "../../hotkeys.js";
   import ItemPileSocket from "../../socket.js";
   import SETTINGS from "../../constants/settings.js";
+  import TradeEntry from "./TradeEntry.svelte";
+  import DropCurrencyDialog from "../drop-currency-dialog/drop-currency-dialog.js";
 
   export let elementRoot;
   export let store;
@@ -84,18 +86,57 @@
     return ItemPileSocket.executeForEveryone(socketHandler, ...args);
   }
 
-  const canPreview = Helpers.getSetting(SETTINGS.INSPECT_ITEMS_IN_TRADE)
+  async function addCurrency(asGM = false) {
 
-  function previewItem() {
-    if (!canPreview) return;
-    const item = store.pileActor.items.get(data.id);
-    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
-      return item.sheet.render(true);
-    }
-    const cls = item._getSheetClass()
-    const sheet = new cls(item, { editable: false })
-    return sheet._render(true);
+    const currencyToAdd = await DropCurrencyDialog.show(
+      store.leftTraderActor,
+      store.rightTraderActor,
+      {
+        existingCurrencies: store.getExistingCurrencies(),
+        title: game.i18n.localize("ITEM-PILES.Trade.AddCurrency.Title"),
+        content: game.i18n.format("ITEM-PILES.Trade.AddCurrency.Content", { trader_actor_name: store.rightTraderActor.name }),
+        button: game.i18n.localize("ITEM-PILES.Trade.AddCurrency.Label"),
+        unlimitedCurrencies: asGM
+      }
+    );
+
+    console.log(currencyToAdd)
+
+    /*if (!currencyToAdd) return;
+
+    const currencies = lib.getFormattedActorCurrencies(this.leftTraderActor, { getAll: asGM });
+
+    Object.entries(currencyToAdd).forEach(entry => {
+
+      const existingCurrency = this.leftTraderActorCurrencies.find(currency => currency.path === entry[0]);
+
+      if (existingCurrency) {
+        existingCurrency.quantity = entry[1];
+        return;
+      }
+
+      const currency = currencies.find(currency => currency.path === entry[0]);
+
+      this.leftTraderActorCurrencies.push({
+        path: entry[0],
+        quantity: entry[1],
+        name: currency.name,
+        img: currency.img,
+        maxQuantity: !asGM ? currency.quantity : Infinity,
+        index: currency.index
+      });
+
+    });
+
+    this.leftTraderActorCurrencies = this.leftTraderActorCurrencies.filter(currency => currency.quantity);
+
+    this.leftTraderActorCurrencies.sort((a, b) => a.index - b.index);
+
+    await itemPileSocket.executeForUsers(SOCKET_HANDLERS.PRIVATE.TRADE_UPDATE_CURRENCIES, [this.leftTraderUser.id, this.rightTraderUser.id], this.privateTradeId, game.user.id, this.leftTraderActorCurrencies);
+    return this.executeSocketAction(SOCKET_HANDLERS.PUBLIC.TRADE_UPDATE_CURRENCIES, this.publicTradeId, game.user.id, this.leftTraderActorCurrencies);
+*/
   }
+
 
 </script>
 
@@ -130,61 +171,7 @@
               {/if}
 
               {#each $leftItems as item (item.id)}
-
-                <div class="flexrow item-piles-item-row item-piles-even-color">
-
-                  <div style="flex: 0 1 auto; margin: 0 6px;">
-                    <a class="item-piles-clickable-red" on:click={store.removeItem(item)}>
-                      <i class="fas fa-times"></i>
-                    </a>
-                  </div>
-
-                  <div class="item-piles-img-container">
-                    <img class="item-piles-img" src="{item.img}"/>
-                  </div>
-
-                  <div class="item-piles-name item-piles-text">
-                    <div class="item-piles-name-container">
-                      <p class="item-piles-clickable">{item.name}</p>
-                    </div>
-                  </div>
-
-                  {#if item.editing}
-                    <div style="flex: 0 1 auto; margin: 0 5px;">
-                      <a class="item-piles-clickable-green item-piles-confirm-quantity" on:click="{() => {
-                            item.quantity = Math.max(0, Math.min(item.maxQuantity, item.newQuantity));
-                            if(item.quantity === 0){
-                              return store.removeItem(item);
-                            }
-                            item.newQuantity = item.quantity;
-                            item.editing = false;
-                          }}">
-                        <i class="fas fa-check"></i>
-                      </a>
-                    </div>
-                  {/if}
-
-                  <div class="item-piles-text-right item-piles-quantity-container">
-                    {#if item.editing}
-                      <div style="flex-direction: row;">
-                        <input
-                            class="item-piles-quantity"
-                            type="number"
-                            min="0"
-                            max="{item.maxQuantity}"
-                            bind:value={item.newQuantity}
-                            on:input={() => { item.newQuantity = Math.max(0, Math.min(item.maxQuantity, item.newQuantity)); }}
-                        />
-                      </div>
-                    {:else}
-                      <span class="item-piles-text-right item-piles-quantity-text"
-                            on:click="{ () => { item.editing = true }}">
-                        {item.quantity}
-                      </span>
-                    {/if}
-                  </div>
-                </div>
-
+                <TradeEntry bind:data={item} {store}/>
               {/each}
 
             </div>
@@ -195,63 +182,21 @@
 
                 <div class="flexrow item-piles-top-divider">
                   {#if isGM}
-                    <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-gm-add-currency"><i
-                        class="fas fa-plus"></i>
+                    <a on:click={() => { addCurrency(true) }}
+                       class="item-piles-text-right item-piles-small-text item-piles-middle item-piles-gm-add-currency">
+                      <i class="fas fa-plus"></i>
                       {localize("ITEM-PILES.Trade.GMAddCurrency")}
                     </a>
                   {/if}
-                  <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency"><i
-                      class="fas fa-plus"></i>
+                  <a on:click={() => { addCurrency() }}
+                     class="item-piles-text-right item-piles-small-text item-piles-middle item-piles-add-currency">
+                    <i class="fas fa-plus"></i>
                     {localize("ITEM-PILES.Inspect.AddCurrency")}
                   </a>
                 </div>
 
                 {#each $leftCurrencies as currency (currency.path)}}
-
-                  <div class="flexrow item-piles-item-row" data-type="currency" data-currency="{currency.path}">
-
-                    <div style="flex: 0 1 auto; margin: 0 6px;">
-                      <a class="item-piles-clickable-red item-piles-remove-item"><i class="fas fa-times"></i></a>
-                    </div>
-
-                    <div class="item-piles-img-container"><img class="item-piles-img" src="{currency.img}"/></div>
-
-                    <div class="item-piles-name item-piles-text">
-                      <div class="item-piles-name-container">
-                        <a class="item-piles-clickable">{currency.name}</a>
-                      </div>
-                    </div>
-
-                    {#if currency.editing}
-                      <div style="flex: 0 1 auto; margin: 0 5px;">
-                        <a class="item-piles-clickable-green item-piles-confirm-quantity">
-                          <i class="fas fa-check"></i>
-                        </a>
-                      </div>
-                    {/if}
-
-                    <div style="flex:1;">
-                      {#if currency.editing}
-                        <div style="flex-direction: row;" class="item-piles-quantity-container">
-                          <input
-                              class="item-piles-quantity"
-                              type="number"
-                              min="0"
-                              value="{currency.quantity}"
-                              max="{currency.maxQuantity}"
-                              on:change="{(event) => setEntryQuantity(event, currency)}"
-                          />
-                        </div>
-                      {:else}
-                    <span class="item-piles-text-right item-piles-quantity-text"
-                          on:click="{ () => { currency.editing = true }}">
-                      {currency.quantity}
-                    </span>
-                      {/if}
-                    </div>
-
-                  </div>
-
+                  <TradeEntry bind:data={currency} {store} editable={false}/>
                 {/each}
 
               </div>
@@ -288,22 +233,7 @@
           <div class="row item-piles-items-list">
 
             {#each $rightItems as item (item.id)}
-
-              <div class="flexrow item-piles-item-row">
-
-                <div class="item-piles-img-container"><img class="item-piles-img" src="{item.img}"/></div>
-
-                <div class="item-piles-name item-piles-text">
-                  <div class="item-piles-name-container">
-                    <a class="item-piles-clickable">{item.name}</a>
-                  </div>
-                </div>
-
-                <div>
-                  <span class="item-piles-text-right item-piles-text">{item.quantity}</span>
-                </div>
-              </div>
-
+              <TradeEntry bind:data={item} {store} editable={false}/>
             {/each}
 
           </div>
@@ -317,22 +247,7 @@
               {/if}
 
               {#each $rightCurrencies as currency (currency.path)}}
-
-                <div class="flexrow item-piles-item-row">
-
-                  <div class="item-piles-img-container"><img class="item-piles-img" src="{currency.img}"/></div>
-
-                  <div class="item-piles-name item-piles-text">
-                    <div class="item-piles-name-container">
-                      <a class="item-piles-clickable">{currency.name}</a>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span class="item-piles-text-right item-piles-text">{currency.quantity}</span>
-                  </div>
-                </div>
-
+                <TradeEntry bind:data={currency} {store} editable={false}/>
               {/each}
 
             </div>

@@ -72,6 +72,14 @@ Hooks.once("ready", () => {
   }, {
     user: game.users.getName("Frozen"),
     actor: game.actors.getName("Player Token"),
+    items: [{
+      id: "fBpmgiUCPmy1ovCx",
+      name: "Another Weapon With A Very Very Incredibly Long Name",
+      img: "icons/svg/item-bag.svg",
+      quantity: 1,
+      newQuantity: 1,
+      maxQuantity: Infinity
+    }]
   }, randomID())
   
   new TradingApp(store).render(true)
