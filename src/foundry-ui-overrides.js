@@ -1,5 +1,5 @@
-import * as Helpers from "./helpers/helpers.js";
 import SETTINGS from "./constants/settings.js";
+import * as Helpers from "./helpers/helpers.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 
