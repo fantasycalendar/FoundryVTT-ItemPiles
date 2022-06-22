@@ -19,7 +19,7 @@
   actors = actors || game.actors.filter(actor => actor.isOwner);
   actor = actor || game.user.character || (!isGM ? actors?.[0] : false);
 
-  function accept() {
+  function requestTrade() {
     application.options.resolve({
       user,
       actor,
@@ -71,7 +71,7 @@
   <ActorDropSelect bind:actor={actor} {actors}/>
 
   <footer class="sheet-footer flexrow">
-    <button type="button" on:click|once={accept}>
+    <button type="button" on:click|once={requestTrade} disabled={!actor}>
       <i class="fas fa-check"></i> {localize("ITEM-PILES.Trade.Prompt.Label")}
     </button>
   </footer>
@@ -120,6 +120,10 @@
 
   .item-piles-change-actor-select {
     height: 23px;
+  }
+
+  button:disabled {
+    opacity: 0.75;
   }
 
 </style>

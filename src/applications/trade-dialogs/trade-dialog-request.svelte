@@ -113,7 +113,7 @@
   <ActorDropSelect bind:actor={actor} {actors}/>
 
   <footer class="sheet-footer flexrow">
-    <button type="button" on:click|once={accept}>
+    <button type="button" on:click|once={accept} disabled={!actor}>
       <i class="fas fa-check"></i> {localize("ITEM-PILES.Trade.Accept")}
     </button>
     <button type="button" on:click|once={decline}>
@@ -158,6 +158,10 @@
       height: 100%;
       background-color: rgba(255, 20, 20, 0.65);
     }
+  }
+
+  button:disabled {
+    opacity: 0.75;
   }
 
 </style>

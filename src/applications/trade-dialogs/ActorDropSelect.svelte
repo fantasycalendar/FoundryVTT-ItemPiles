@@ -15,20 +15,15 @@
   }
 
   function dropData(event) {
-
+    counter = 0;
     let data;
     try {
       data = JSON.parse(event.dataTransfer.getData('text/plain'));
     } catch (err) {
       return false;
     }
-
     if (data.type !== "Actor") return;
-
     actor = game.actors.get(data.id);
-
-    counter = 0;
-
   }
 
   let counter = 0;
