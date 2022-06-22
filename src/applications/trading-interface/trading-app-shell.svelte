@@ -158,28 +158,28 @@
     </div>
   {/if}
 
-  <div class="flexcol">
+  <DropZone callback={dropItem}>
 
-    <div class="flexrow">
+    <div class="flexcol">
 
-      <div class="col flexcol">
+      <div class="flexrow">
 
-        <div class="character-header item-piles-bottom-divider">
-          <img src="{store.leftTraderActor.img}">
-          <h2 class="character-name">
-            <div>{store.leftTraderActor.name}</div>
-          </h2>
-          <div>
-            <i
-                class:accepted={$leftTraderAccepted}
-                class:fa-user-check={$leftTraderAccepted}
-                class:fa-user-times={!$leftTraderAccepted}
-                class="fas accepted-icon"
-            ></i>
+        <div class="col flexcol">
+
+          <div class="character-header item-piles-bottom-divider">
+            <img src="{store.leftTraderActor.img}">
+            <h2 class="character-name">
+              <div>{store.leftTraderActor.name}</div>
+            </h2>
+            <div>
+              <i
+                  class:accepted={$leftTraderAccepted}
+                  class:fa-user-check={$leftTraderAccepted}
+                  class:fa-user-times={!$leftTraderAccepted}
+                  class="fas accepted-icon"
+              ></i>
+            </div>
           </div>
-        </div>
-
-        <DropZone callback={dropItem}>
 
           <div class="flexcol">
 
@@ -232,74 +232,74 @@
 
           </div>
 
-        </DropZone>
+          <button type="button" style="flex:0 1 auto; margin-top: 0.25rem;"
+                  on:click={() => { store.toggleAccepted(store.leftTraderUser.id) }}>
+            {#if $leftTraderAccepted}
+              <i class="fas fa-times"></i>
+              {localize("Cancel")}
+            {:else}
+              <i class="fas fa-check"></i>
+              {localize("ITEM-PILES.Trade.Accept")}
+            {/if}
+          </button>
 
-        <button type="button" style="flex:0 1 auto; margin-top: 0.25rem;"
-                on:click={() => { store.toggleAccepted(store.leftTraderUser.id) }}>
-          {#if $leftTraderAccepted}
-            <i class="fas fa-times"></i>
-            {localize("Cancel")}
-          {:else}
-            <i class="fas fa-check"></i>
-            {localize("ITEM-PILES.Trade.Accept")}
-          {/if}
-        </button>
-
-      </div>
-
-      <div class="col flexcol">
-
-        <div class="character-header trader item-piles-bottom-divider">
-          <div>
-            <i
-                class:accepted={$rightTraderAccepted}
-                class:fa-user-check={$rightTraderAccepted}
-                class:fa-user-times={!$rightTraderAccepted}
-                class="fas accepted-icon"
-            ></i>
-          </div>
-          <h2 class="character-name">
-            {store.rightTraderActor.name}
-          </h2>
-          <img src="{store.rightTraderActor.img}">
         </div>
 
-        <div class="flexcol">
+        <div class="col flexcol">
 
-          <div class="row item-piles-items-list">
-
-            {#each $rightItems as item (item.id)}
-              <TradeEntry bind:data={item} {store} editable={false}/>
-            {/each}
-
+          <div class="character-header trader item-piles-bottom-divider">
+            <div>
+              <i
+                  class:accepted={$rightTraderAccepted}
+                  class:fa-user-check={$rightTraderAccepted}
+                  class:fa-user-times={!$rightTraderAccepted}
+                  class="fas accepted-icon"
+              ></i>
+            </div>
+            <h2 class="character-name">
+              {store.rightTraderActor.name}
+            </h2>
+            <img src="{store.rightTraderActor.img}">
           </div>
 
-          {#if systemHasCurrencies}
+          <div class="flexcol">
 
-            <div class="row item-piles-items-list item-piles-currency-list">
+            <div class="row item-piles-items-list">
 
-              {#if $rightCurrencies.length }
-                <div class="row item-piles-top-divider"></div>
-              {/if}
-
-              {#each $rightCurrencies as currency (currency.path)}
-                <TradeEntry bind:data={currency} {store} editable={false}/>
-              {/each}
-
-              {#each $rightItemCurrencies as item (item.path)}
+              {#each $rightItems as item (item.id)}
                 <TradeEntry bind:data={item} {store} editable={false}/>
               {/each}
 
             </div>
 
-          {/if}
+            {#if systemHasCurrencies}
+
+              <div class="row item-piles-items-list item-piles-currency-list">
+
+                {#if $rightCurrencies.length }
+                  <div class="row item-piles-top-divider"></div>
+                {/if}
+
+                {#each $rightCurrencies as currency (currency.path)}
+                  <TradeEntry bind:data={currency} {store} editable={false}/>
+                {/each}
+
+                {#each $rightItemCurrencies as item (item.path)}
+                  <TradeEntry bind:data={item} {store} editable={false}/>
+                {/each}
+
+              </div>
+
+            {/if}
+
+          </div>
 
         </div>
-
       </div>
+
     </div>
 
-  </div>
+  </DropZone>
 
 </ApplicationShell>
 

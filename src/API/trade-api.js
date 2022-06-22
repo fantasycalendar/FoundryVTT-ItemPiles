@@ -9,6 +9,7 @@ import HOOKS from "../constants/hooks.js";
 import TradeStore from "../applications/trading-interface/trade-store.js";
 import TradingApp from "../applications/trading-interface/trading-app.js";
 import PrivateAPI from "./private-api.js";
+import Transaction from "../helpers/transaction.js";
 
 const mutedUsers = new Set();
 const ongoingTrades = new Map();
