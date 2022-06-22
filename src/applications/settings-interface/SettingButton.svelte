@@ -1,7 +1,7 @@
 <script>
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import editors from "../editors/index.js";
   import { getContext } from 'svelte';
+  import editors from "../editors/index.js";
 
   const { application } = getContext('external');
 
@@ -66,10 +66,6 @@
 
   .form-fields {
     flex: 0 1 auto;
-  }
-
-  select {
-    min-width: 200px;
   }
 
   .setting-container {
