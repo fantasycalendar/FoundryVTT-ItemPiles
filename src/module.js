@@ -11,6 +11,7 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
+import MerchantApp from "./applications/merchant-app/merchant-app.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -49,6 +50,8 @@ Hooks.once("ready", () => {
   Hooks.callAll(HOOKS.READY);
   
   ChatAPI.disablePastTradingButtons();
+  
+  MerchantApp.show(game.actors.getName("Almighty Spark"))
   
 });
 

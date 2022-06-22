@@ -9,9 +9,7 @@
 
   let form;
 
-  export let itemFilters = [];
-
-  let mainSettings = !itemFilters?.length;
+  export let itemFilters;
   if (!itemFilters) {
     itemFilters = getSetting(SETTINGS.ITEM_FILTERS);
   }
@@ -28,9 +26,6 @@
 
   async function updateSettings() {
     application.options.resolve(itemFilters);
-    if (mainSettings) {
-      await setSetting(SETTINGS.ITEM_FILTERS, itemFilters);
-    }
     application.close();
   }
 

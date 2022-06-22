@@ -16,7 +16,7 @@ const CONSTANTS = {
   },
   
   ITEM_DEFAULTS: {
-    override: false
+    prices: []
   },
   
   PILE_DEFAULTS: {

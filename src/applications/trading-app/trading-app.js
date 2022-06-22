@@ -28,7 +28,6 @@ export default class TradingApp extends SvelteApplication {
       classes: ["dialog", "item-piles-trading-sheet"],
       width: 800,
       height: "auto",
-      dragDrop: [{ dragSelector: null, dropSelector: ".item-piles-item-drop-container" }],
       closeOnSubmit: false
     });
   }

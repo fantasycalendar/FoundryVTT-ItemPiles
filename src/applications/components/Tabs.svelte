@@ -6,7 +6,7 @@
 
 </script>
 
-<nav class="tabs" data-group="primary">
+<nav class="tabs" data-group="primary" style={$$props.style}>
   {#each tabs.filter(tab => !tab.hidden) as tab, index (tab.value)}
     <a on:click={() => { activeTab = tab.value}} class="item flexrow" class:active={activeTab === tab.value}
        data-tab="rest">

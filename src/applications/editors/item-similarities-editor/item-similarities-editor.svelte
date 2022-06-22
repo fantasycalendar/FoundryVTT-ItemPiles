@@ -23,7 +23,7 @@
   }
 
   async function updateSettings() {
-    await setSetting(SETTINGS.ITEM_SIMILARITIES, itemSimilarities);
+    application.options.resolve(itemSimilarities);
     application.close();
   }
 

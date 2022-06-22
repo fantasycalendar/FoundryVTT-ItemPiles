@@ -16,7 +16,6 @@
   const { application } = getContext('external');
 
   export let data;
-  let mainSettings = !data;
   data = data || getSetting(SETTINGS.CURRENCIES);
 
   store.items.set([...data.items]);
@@ -30,9 +29,6 @@
   async function updateSettings() {
     const newData = store.export();
     application.options.resolve(newData);
-    if (mainSettings) {
-      await setSetting(SETTINGS.CURRENCIES, newData);
-    }
     application.close();
   }
 

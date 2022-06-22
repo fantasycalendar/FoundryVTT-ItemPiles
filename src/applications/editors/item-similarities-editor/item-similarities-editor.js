@@ -2,7 +2,7 @@ import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import ItemSimilaritiesShell from './item-similarities-editor.svelte';
 
 export default class ItemSimilaritiesEditor extends TJSDialog {
-
+  
   constructor(options, dialogData = {}) {
     super({
       ...dialogData,
@@ -26,6 +26,7 @@ export default class ItemSimilaritiesEditor extends TJSDialog {
       },
       default: 'save',
       autoClose: false, // Don't automatically close on button onclick.
+      close: () => this.options.resolve(null)
     }, {
       width: 400,
       zIndex: 202,
@@ -33,8 +34,11 @@ export default class ItemSimilaritiesEditor extends TJSDialog {
       ...options
     });
   }
-
+  
   static async show(options = {}, dialogData = {}) {
-    return new this(options, dialogData).render(true, { focus: true });
+    return new Promise(resolve => {
+      options.resolve = resolve;
+      return new this(options, dialogData).render(true, { focus: true });
+    });
   }
 }

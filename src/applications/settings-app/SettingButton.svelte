@@ -10,7 +10,11 @@
 
   function showEditor() {
     if (editor) {
-      editor.show();
+      editor.show().then((result) => {
+        if (result) {
+          data.value = result;
+        }
+      });
       application.options.zLevel = 100;
     }
   }

@@ -73,7 +73,7 @@ export function findSimilarItem(items, findItem) {
       return true;
     }
     
-    const itemData = item instanceof Item ? item.data : item;
+    const itemData = item instanceof Item ? item.toObject() : item;
     for (const path of itemSimilarities) {
       if (getProperty(itemData, path) !== getProperty(findItem, path)) {
         return false;
@@ -91,7 +91,7 @@ export function findSimilarItem(items, findItem) {
  * @returns {number}
  */
 export function getItemQuantity(item) {
-  const itemData = item instanceof Item ? item.data : item;
+  const itemData = item instanceof Item ? item.toObject() : item;
   return Number(getProperty(itemData, game.itempiles.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
 }
 
