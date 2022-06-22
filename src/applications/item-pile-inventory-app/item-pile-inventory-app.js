@@ -5,7 +5,7 @@ import ItemPileConfig from "../item-pile-config/item-pile-config.js";
 import HOOKS from "../../constants/hooks.js";
 import * as Helpers from "../../helpers/helpers.js";
 
-export class ItemPileInventory extends SvelteApplication {
+export class ItemPileInventoryApp extends SvelteApplication {
   
   /**
    *

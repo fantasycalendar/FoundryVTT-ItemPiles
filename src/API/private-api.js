@@ -8,7 +8,7 @@ import SETTINGS from "../constants/settings.js";
 import CONSTANTS from "../constants/constants.js";
 import { hotkeyState } from "../hotkeys.js";
 import DropItemDialog from "../applications/drop-item-dialog/drop-item-dialog.js";
-import { ItemPileInventory } from "../applications/item-pile-inventory-interface/item-pile-inventory.js";
+import { ItemPileInventoryApp } from "../applications/item-pile-inventory-app/item-pile-inventory.js";
 import Transaction from "../helpers/transaction.js";
 
 const preloadedFiles = new Set();
@@ -1282,7 +1282,7 @@ export default class PrivateAPI {
     // const merchant = PileUtilities.isItemPileMerchant(target);
     // Todo: Utilize merchant UI
     
-    return ItemPileInventory.show(target, inspectingTarget, { remote });
+    return ItemPileInventoryApp.show(target, inspectingTarget, { remote });
     
   }
 }
