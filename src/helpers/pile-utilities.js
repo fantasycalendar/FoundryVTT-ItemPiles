@@ -480,7 +480,9 @@ export async function updateItemPileData(target, flagData, tokenData) {
 export function getItemPriceData(item, merchant = false, actor = false) {
   
   const currencyList = getActorCurrencyData(merchant);
-  const { priceModifier } = merchant ? getMerchantModifiersForActor(merchant, item, actor) : { priceModifier: 100 };
+  const { priceModifier } = merchant ? getMerchantModifiersForActor(merchant, { item, actor }) : {
+    priceModifier: 1
+  };
   
   const itemData = item instanceof Item ? item.toObject() : item;
   const itemFlagData = getItemFlagData(itemData);
@@ -510,26 +512,26 @@ export function getItemPriceData(item, merchant = false, actor = false) {
   
 }
 
-export function getMerchantModifiersForActor(merchant, item = false, actor = false) {
+export function getMerchantModifiersForActor(merchant, { item = false, actor = false } = {}) {
   const pileData = getActorFlagData(merchant);
-  let { priceModifier, sellModifier, itemTypePriceModifiers } = pileData;
+  let { priceModifier, sellModifier, itemTypePriceModifiers, actorPriceModifiers } = pileData;
   
-  
-  const itemTypePriceModifier = itemTypePriceModifiers[item.type];
-  if (itemTypePriceModifier !== undefined) {
-    priceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.priceModifier : priceModifier * itemTypePriceModifier.priceModifier;
+  if (item) {
+    const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => priceData.type === item.type);
+    if (itemTypePriceModifier) {
+      priceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.priceModifier : priceModifier * itemTypePriceModifier.priceModifier;
+      sellModifier = itemTypePriceModifier.override ? itemTypePriceModifier.sellModifier : sellModifier * itemTypePriceModifier.sellModifier;
+    }
   }
   
+  if (actor) {
+    const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor));
+    if (actorSpecificModifiers) {
+      priceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.priceModifier : priceModifier * actorSpecificModifiers.priceModifier;
+      sellModifier = actorSpecificModifiers.override ? actorSpecificModifiers.sellModifier : sellModifier * actorSpecificModifiers.sellModifier;
+    }
+  }
   
-  //
-  // const actorSpecificModifiers = pileData?.overridePriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor));
-  // if(actorSpecificModifiers){
-  //   if(actorSpecificModifiers)
-  // }
-  //
-  //
-  // const priceModifier = (actorSpecificModifiers?.priceModifier || pileData.priceModifier || 100) / 100;
-  // const sellModifier = (actorSpecificModifiers?.sellModifier || pileData.sellModifier || 100) / 100;
   return {
     priceModifier,
     sellModifier

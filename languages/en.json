@@ -173,11 +173,21 @@
         "AddNew": "Add new attribute path",
         "Submit": "Submit item similarities"
       },
+      "ItemTypePriceModifiersEditor": {
+        "Title": "Item Type Price Modifiers Editor",
+        "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific item types. The \"Override\" setting means that it overrides the merchant's normal price modifiers.",
+        "ItemType": "Item Type",
+        "Override": "Override",
+        "PriceModifier": "Price Modifier (%)",
+        "SellModifier": "Sell Price Modifier (%)",
+        "Submit": "Submit price modifiers"
+      },
       "PriceModifiersEditor": {
         "Title": "Price Modifiers Editor",
-        "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors.",
+        "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors. The \"Override\" setting means that it overrides the merchant's normal price modifiers, including item-type specific price modifiers.",
         "DragDrop": "Drag and drop an actor to add it to the list",
         "Actor": "Actor",
+        "Override": "Override",
         "PriceModifier": "Price Modifier (%)",
         "SellModifier": "Sell Price Modifier (%)",
         "Submit": "Submit price modifiers"
@@ -258,9 +268,12 @@
           "OpenTimesExplanation": "When enabled, the merchant is can only be interacted by players at certain times of the day.",
           "PriceModifier": "Price Modifier (%)",
           "SellModifier": "Sell Price Modifier (%)",
+          "ItemTypeModifier": "Item Type Price Modifiers",
+          "ItemTypeModifiersExplanation": "In this dialog you can configure price modifiers for individual item types.",
+          "ConfigureItemTypePriceModifiers": "Configure Item Type Price Modifiers.",
           "ActorPriceModifiers": "Per-Actor Override Price Modifiers",
           "ActorPriceModifiersExplanation": "Here you can configure if certain specific actors should have different price modifiers than the price modifiers above.",
-          "ConfigureActorPriceModifiers": "Configure Override Price Modifiers."
+          "ConfigureActorPriceModifiers": "Configure Actor Price Modifiers."
         }
       }
     },

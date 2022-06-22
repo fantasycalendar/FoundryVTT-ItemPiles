@@ -15,6 +15,8 @@
   import SETTINGS from "../../constants/settings.js";
   import PileAPI from "../../API/api.js";
   import SliderInput from "../components/SliderInput.svelte";
+  import ItemTypePriceModifiersEditor
+    from "../editors/item-type-price-modifiers-editor/item-type-price-modifiers-editor.js";
 
   const { application } = getContext('external');
 
@@ -72,11 +74,19 @@
       });
   }
 
-  async function showActorPriceOverrides() {
-    const data = pileData.overridePriceModifiers || [];
+  async function showItemTypePriceModifiers() {
+    const data = pileData.itemTypePriceModifiers || [];
+    return ItemTypePriceModifiersEditor.show(data, { id: `item-type-price-modifier-item-pile-config-${pileActor.id}` })
+      .then((result) => {
+        pileData.itemTypePriceModifiers = result;
+      });
+  }
+
+  async function showActorPriceModifiers() {
+    const data = pileData.actorPriceModifiers || [];
     return PriceModifiersEditor.show(data, { id: `price-modifier-item-pile-config-${pileActor.id}` })
       .then((result) => {
-        pileData.overridePriceModifiers = result;
+        pileData.actorPriceModifiers = result;
       });
   }
 
@@ -418,10 +428,22 @@
         <div class="form-group">
           <div class="flexcol">
             <label>
+              {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifier")}<br>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifiersExplanation")}</p>
+            </label>
+            <button type="button" on:click={() => { showItemTypePriceModifiers() }}>
+              {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureItemTypePriceModifiers")}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="flexcol">
+            <label>
               {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiers")}<br>
               <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiersExplanation")}</p>
             </label>
-            <button type="button" on:click={() => { showActorPriceOverrides() }}>
+            <button type="button" on:click={() => { showActorPriceModifiers() }}>
               {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureActorPriceModifiers")}
             </button>
           </div>

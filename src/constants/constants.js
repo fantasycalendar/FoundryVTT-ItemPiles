@@ -63,8 +63,8 @@ const CONSTANTS = {
     isMerchant: false,
     priceModifier: 1,
     sellModifier: 0.5,
-    itemTypePriceModifiers: {},
-    overridePriceModifiers: [],
+    itemTypePriceModifiers: [],
+    actorPriceModifiers: [],
     openTimes: {
       enabled: false,
       open: {

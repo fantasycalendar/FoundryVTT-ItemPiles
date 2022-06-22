@@ -24,6 +24,7 @@
 
   .slider-group {
     display: flex;
+    align-items: center;
     flex: 3;
 
     input[type="range"] {
@@ -31,7 +32,7 @@
     }
 
     input[type="number"] {
-      flex: 0.55;
+      flex: 0 1 40px;
       margin-left: 1rem;
     }
   }

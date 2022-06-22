@@ -1,6 +1,7 @@
 <script>
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import SliderInput from "../../components/SliderInput.svelte";
 
   const { application } = getContext('external');
 
@@ -46,8 +47,8 @@
 
     priceModifiers.push({
       actor: actor,
-      priceModifier: 100,
-      sellModifier: 50
+      priceModifier: 1,
+      sellModifier: 0.5
     });
 
     priceModifiers = priceModifiers;
@@ -84,16 +85,12 @@
             </td>
             <td>
               <div class="flexrow" style="margin: 0 0.25rem">
-                <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{priceData.priceModifier}"/>
-                <input style="flex:0.5; margin-left:0.5rem;" type="number" min="0" step="1" required
-                       bind:value="{priceData.priceModifier}"/>
+                <SliderInput bind:value={priceData.priceModifier}/>
               </div>
             </td>
             <td>
               <div class="flexrow" style="margin: 0 0.25rem">
-                <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{priceData.sellModifier}"/>
-                <input style="flex:0.5; margin-left:0.5rem;" type="number" min="0" step="1" required
-                       bind:value="{priceData.sellModifier}"/>
+                <SliderInput bind:value={priceData.sellModifier}/>
               </div>
             </td>
             <td class="small">

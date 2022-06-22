@@ -51,9 +51,6 @@ export default class MerchantStore {
     
     this.items.set(items);
     
-    console.log(get(this.categories))
-    console.log(get(this.items))
-    
   }
   
   filter(search) {
