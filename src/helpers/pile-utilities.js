@@ -483,8 +483,6 @@ export function getItemPriceData(item, merchant = false, actor = false) {
   const itemData = item instanceof Item ? item.toObject() : item;
   const itemFlagData = getItemFlagData(itemData);
   
-  debugger;
-  
   if (itemFlagData?.prices?.length) {
     return itemFlagData.prices.map(price => {
       price.originalCost = price.cost;
