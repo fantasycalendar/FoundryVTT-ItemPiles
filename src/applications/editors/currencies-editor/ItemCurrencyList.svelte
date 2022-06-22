@@ -4,6 +4,8 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
   import FilePicker from "../../components/FilePicker.svelte";
+  import DropZone from "../../components/DropZone.svelte";
+  import * as Helpers from "../../../helpers/helpers.js";
 
   export let store;
 
@@ -44,24 +46,19 @@
     dragging = null;
   }
 
-  async function dropData(event) {
-    event.preventDefault();
-    let data;
-    try {
-      data = JSON.parse(event.dataTransfer.getData('text/plain'));
-    } catch (err) {
-      return false;
-    }
+  async function dropData(data) {
+
     if (data.type !== "Item") return;
 
-    let item;
-    if (!data.data) {
-      item = game.items.get(data.id).toObject();
-    } else {
-      item = data.data;
+    let item = await Item.fromDropData(data);
+
+    if (!item) {
+      console.error(data);
+      throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
 
-    if (!item) return;
+    item = item.toObject();
+
     let currentItems = get(itemStore);
     if (currentItems.find(existingItem => existingItem.name === item.name && existingItem.type === existingItem.type)) return;
     itemStore.set([...currentItems, {
@@ -117,11 +114,12 @@
     {/each}
   </table>
 
-  <div on:dragstart={preventDefault} on:drop={dropData} on:dragover={preventDefault} class="border-highlight">
+  <DropZone callback={dropData}>
+    <div class="border-highlight">
+      <p class="item-piles-text-center">{localize("ITEM-PILES.Applications.CurrenciesEditor.DragDrop")}</p>
+    </div>
+  </DropZone>
 
-    <p class="item-piles-text-center">{localize("ITEM-PILES.Applications.CurrenciesEditor.DragDrop")}</p>
-
-  </div>
 </div>
 
 <style lang="scss">

@@ -1,7 +1,6 @@
 <script>
 
   export let callback;
-  export let classes = {};
 
   function dropData(event) {
     let data;
