@@ -65,10 +65,10 @@ export function findSimilarItem(items, findItem) {
   
   const itemSimilarities = game.itempiles.ITEM_SIMILARITIES;
   
-  const findItemId = findItem?.id ?? findItem?._id;
+  const findItemId = findItem instanceof Item ? findItem.id : findItem._id;
   
   return items.find(item => {
-    const itemId = item.id ?? item._id;
+    const itemId = item instanceof Item ? item.id : item._id;
     if (itemId && findItemId && itemId === findItemId) {
       return true;
     }

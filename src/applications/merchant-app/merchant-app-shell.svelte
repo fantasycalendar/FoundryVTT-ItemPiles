@@ -5,6 +5,7 @@
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import Tabs from "../components/Tabs.svelte";
+  import MerchantStore from "./merchant-store.js";
 
   const { application } = getContext('external');
 
@@ -13,45 +14,13 @@
   export let merchant;
   export let buyer;
 
-  let merchantData;
-  let merchantItems;
-  let description;
-  let search = '';
+  export let store = new MerchantStore(merchant, buyer);
 
-  updateContents();
+  let searchStore = store.search;
+  let itemStore = store.items;
+  let categoryStore = store.categories;
 
-  export function updateContents() {
-
-    merchantData = PileUtilities.getActorFlagData(merchant);
-
-    merchantItems = PileUtilities.getMerchantItemsForActor(merchant, buyer);
-
-    console.log(merchantItems);
-
-    merchantItems.sort((a, b) => {
-      return a.type < b.type || a.name < b.name ? -1 : 1;
-    })
-
-    merchantItems = merchantItems.reduce(function (list, item) {
-      list[item.type] = list[item.type] || [];
-      list[item.type].push(item);
-      console.log(item)
-      return list;
-    }, {});
-
-    description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-
-    filterItems();
-  }
-
-  function filterItems() {
-    Object.values(merchantItems).forEach(itemGroup => {
-      itemGroup.forEach(item => {
-        item.visible = !search || item.name.toLowerCase().includes(search.toLowerCase());
-      });
-    });
-    merchantItems = merchantItems;
-  }
+  let merchantData = PileUtilities.getActorFlagData(merchant);
 
   function getOpenTimes() {
     let open = merchantData.openTimes.open;
@@ -113,7 +82,7 @@
 
             {#if activeSidebarTab === 'description'}
               <div class="tab flex item-piles-grow">
-                { description }
+                AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
               </div>
             {/if}
 
@@ -133,26 +102,28 @@
 
         <h2 style="flex: 0; border:0;">For sale</h2>
 
-        <input type="text" bind:value={search} on:keyup={foundry.utils.debounce(filterItems, 250)}>
+        <input type="text" bind:value={$searchStore}>
 
-        {#each Object.entries(merchantItems) as [type, items] (type)}
+        {#each $categoryStore as category, index (category)}
 
-          {#if items.filter(item => item.visible).length}
+          {#if $itemStore.filter(item => item.type === category && item.visible).length}
 
             <div transition:fade={{duration: 150}}>
 
               <h3 class="merchant-item-group-type flexrow">
                 <div>
-                  {type}
+                  {category}
                 </div>
-                <div style="flex: 0 1 162px;">
-                  <small>Price(s)</small>
-                </div>
+                {#if index === 0}
+                  <div style="flex: 0 1 162px;">
+                    <small>Prices</small>
+                  </div>
+                {/if}
               </h3>
 
               <div class="item-piles-items-list">
 
-                {#each items as item (item.id)}
+                {#each $itemStore.filter(item => item.type === category) as item (item.id)}
 
                   {#if item.visible}
 

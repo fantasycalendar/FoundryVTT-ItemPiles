@@ -248,6 +248,7 @@ export function getItemPileItemsForActor(pile, recipient, floor = false) {
       name: item.name,
       type: item.type,
       img: item.data?.img ?? "",
+      data: item.toObject(),
       currency: isCurrency,
       currentQuantity: 1,
       quantity: quantity,

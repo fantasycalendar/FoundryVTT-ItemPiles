@@ -152,6 +152,11 @@
         "AddNew": "Add new currency",
         "Submit": "Submit currencies"
       },
+      "ItemEditor": {
+        "Title": "Item Editor",
+        "Explanation": "hi there",
+        "Submit": "Submit"
+      },
       "FilterEditor": {
         "Title": "Item Filters Editor",
         "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",

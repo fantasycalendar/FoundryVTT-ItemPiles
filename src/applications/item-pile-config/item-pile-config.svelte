@@ -14,6 +14,7 @@
   import Tabs from "../components/Tabs.svelte";
   import SETTINGS from "../../constants/settings.js";
   import PileAPI from "../../API/api.js";
+  import SliderInput from "../components/SliderInput.svelte";
 
   const { application } = getContext('external');
 
@@ -400,22 +401,18 @@
           <input type="checkbox" class="item-piles-config-merchant-enabled" bind:checked={pileData.isMerchant}/>
         </div>
 
-        <div class="form-group">
+        <div class="form-group slider-group">
           <label style="flex:3;">
             {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifier")}<br>
           </label>
-          <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{pileData.priceModifier}"/>
-          <input style="flex:0.5; margin-left:1rem;" type="number" min="0" step="1" required
-                 bind:value="{pileData.priceModifier}"/>
+          <SliderInput style="flex:4;" bind:value={pileData.priceModifier}/>
         </div>
 
-        <div class="form-group">
+        <div class="form-group slider-group">
           <label style="flex:3;">
             {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellModifier")}<br>
           </label>
-          <input style="flex:3;" type="range" min="0" step="1" max="200" bind:value="{pileData.sellModifier}"/>
-          <input style="flex:0.5; margin-left:1rem;" type="number" min="0" step="1" required
-                 bind:value="{pileData.sellModifier}"/>
+          <SliderInput style="flex:4;" bind:value={pileData.sellModifier}/>
         </div>
 
         <div class="form-group">

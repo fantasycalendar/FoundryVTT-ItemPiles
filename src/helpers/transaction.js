@@ -47,6 +47,10 @@ export default class Transaction {
   }
   
   appendActorChanges(attributes, remove = false) {
+    if (!Array.isArray(attributes)) {
+      attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
+    }
+    
     this.actorUpdates = attributes.reduce((acc, attribute) => {
       const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
       acc[attribute.path] = acc[attribute.path] ?? Number(getProperty(this.actor.data, attribute.path));

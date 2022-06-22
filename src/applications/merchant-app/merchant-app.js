@@ -47,6 +47,10 @@ export default class MerchantApp extends SvelteApplication {
     })
   }
   
+  refreshItems() {
+    this.svelte.applicationShell.store.refreshItems();
+  }
+  
   /** @override */
   _getHeaderButtons() {
     let buttons = super._getHeaderButtons();

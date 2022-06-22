@@ -1,22 +1,22 @@
 import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
-import ItemFiltersShell from './item-filters-editor.svelte';
+import ItemEditorShell from './item-editor-shell.svelte';
 
-export default class ItemFiltersEditor extends TJSDialog {
+export default class ItemEditor extends TJSDialog {
   
-  constructor(item, options, dialogData = {}) {
+  constructor(data = false, options, dialogData = {}) {
     super({
       ...dialogData,
-      title: "ITEM-PILES.Applications.FilterEditor.Title",
+      title: "ITEM-PILES.Applications.ItemEditor.Title",
       content: {
-        class: ItemFiltersShell,
+        class: ItemEditorShell,
         props: {
-          item
+          itemFilters: data
         }
       },
       buttons: {
         save: {
           icon: 'fas fa-save',
-          label: "ITEM-PILES.Applications.FilterEditor.Submit",
+          label: "ITEM-PILES.Applications.ItemEditor.Submit",
           onclick: "requestSubmit"
         },
         no: {
@@ -39,10 +39,10 @@ export default class ItemFiltersEditor extends TJSDialog {
     });
   }
   
-  static async show(item, options = {}, dialogData = {}) {
+  static async show(data = false, options = {}, dialogData = {}) {
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(item, options, dialogData).render(true, { focus: true });
+      new this(data, options, dialogData).render(true, { focus: true });
     })
   }
 }

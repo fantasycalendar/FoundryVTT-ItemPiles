@@ -70,8 +70,13 @@ export function shouldItemPileBeDeleted(targetUuid) {
 export function getActorItems(target, { itemFilters = false, itemCurrencies = true } = {}) {
   const targetActor = Utilities.getActor(target);
   const pileItemFilters = itemFilters ? itemFilters : getActorItemFilters(targetActor);
-  const currencyItems = itemCurrencies ? getActorCurrencyItems(targetActor) : [];
-  return targetActor.items.filter(item => {
+  const currencyItems = getActorCurrencyItems(targetActor);
+  let actorItems = targetActor.items;
+  if (!itemCurrencies) {
+    currencyItems.forEach(item => actorItems.delete(item.id, { modifySource: false }));
+  }
+  actorItems = Array.from(actorItems)
+  return actorItems.filter(item => {
     return !currencyItems.find(currency => currency.item === item) && !isItemInvalid(targetActor, item, pileItemFilters);
   });
 }
@@ -478,44 +483,56 @@ export async function updateItemPileData(target, flagData, tokenData) {
 export function getItemPriceData(item, merchant = false, actor = false) {
   
   const currencyList = getActorCurrencyData(merchant);
-  const { priceModifier } = merchant ? getMerchantModifiersForActor(merchant, actor) : { priceModifier: 100 };
+  const { priceModifier } = merchant ? getMerchantModifiersForActor(merchant, item, actor) : { priceModifier: 100 };
   
   const itemData = item instanceof Item ? item.toObject() : item;
   const itemFlagData = getItemFlagData(itemData);
   
-  if (itemFlagData?.prices?.length) {
-    return itemFlagData.prices.map(price => {
-      price.originalCost = price.cost;
-      if (!price.static) {
-        price.cost = Math.floor(price.cost * priceModifier);
-      }
-      return price;
-    });
+  if (itemFlagData.enabled) {
+    if (itemFlagData.prices.length) {
+      return itemFlagData.prices.map(price => {
+        price.originalCost = price.cost;
+        if (!price.static) {
+          price.cost = Math.floor(price.cost * priceModifier);
+        }
+        return price;
+      });
+    } else if (itemFlagData.free) {
+      return [];
+    }
   }
   
+  const primaryCurrency = currencyList.attributes.find(attribute => attribute.primary) ?? currencyList.items.find(item => item.primary);
   const cost = getProperty(item.data, game.itempiles.ITEM_PRICE_ATTRIBUTE);
-  
-  let primaryCurrency = currencyList.attributes.find(attribute => attribute.primary);
-  if (!primaryCurrency) {
-    primaryCurrency = currencyList.items.find(item => item.primary);
-    primaryCurrency.attribute = false;
-  } else {
-    primaryCurrency.attribute = true;
-  }
   
   return [{
     ...primaryCurrency,
     originalCost: cost,
     cost: Math.floor(cost * priceModifier)
-  }]
+  }];
   
 }
 
-export function getMerchantModifiersForActor(merchant, actor = false) {
+export function getMerchantModifiersForActor(merchant, item = false, actor = false) {
   const pileData = getActorFlagData(merchant);
-  const actorSpecificModifiers = pileData?.overridePriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor));
-  const priceModifier = (actorSpecificModifiers?.priceModifier || pileData.priceModifier || 100) / 100;
-  const sellModifier = (actorSpecificModifiers?.sellModifier || pileData.sellModifier || 100) / 100;
+  let { priceModifier, sellModifier, itemTypePriceModifiers } = pileData;
+  
+  
+  const itemTypePriceModifier = itemTypePriceModifiers[item.type];
+  if (itemTypePriceModifier !== undefined) {
+    priceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.priceModifier : priceModifier * itemTypePriceModifier.priceModifier;
+  }
+  
+  
+  //
+  // const actorSpecificModifiers = pileData?.overridePriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor));
+  // if(actorSpecificModifiers){
+  //   if(actorSpecificModifiers)
+  // }
+  //
+  //
+  // const priceModifier = (actorSpecificModifiers?.priceModifier || pileData.priceModifier || 100) / 100;
+  // const sellModifier = (actorSpecificModifiers?.sellModifier || pileData.sellModifier || 100) / 100;
   return {
     priceModifier,
     sellModifier
@@ -524,17 +541,20 @@ export function getMerchantModifiersForActor(merchant, actor = false) {
 
 export function getMerchantItemsForActor(merchant, actor = false) {
   
-  const pileItems = getActorItems(merchant);
+  const pileItems = getActorItems(merchant, { itemCurrencies: false });
   
   return pileItems.map(item => {
+    const quantity = Utilities.getItemQuantity(item);
     return {
       id: item.id,
       name: item.name,
       type: item.type,
       img: item.data?.img ?? "",
-      quantity: Utilities.getItemQuantity(item),
+      quantity: quantity,
+      currentQuantity: quantity,
       prices: getItemPriceData(item, merchant, actor),
-      visible: true
+      visible: true,
+      item
     }
   });
   

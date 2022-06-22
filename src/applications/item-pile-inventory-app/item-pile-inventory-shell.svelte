@@ -11,6 +11,7 @@
 
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import PrivateAPI from "../../API/private-api.js";
+  import * as Helpers from "../../helpers/helpers.js";
 
   const { application } = getContext('external');
 
@@ -33,63 +34,6 @@
   $: showSearchBar = ($numItemsStore + $numCurrenciesStore) >= 10;
 
   let num_players = SharingUtilities.getPlayersForItemPile(pileActor).length;
-
-  async function updatePile() {
-    // utils.custom_notify("Item Pile successfully updated.");
-    //
-    // const itemsToUpdate = [];
-    // const currenciesToUpdate = {};
-    //
-    // for(let item of items){
-    //    itemsToUpdate.push({
-    //       _id: item.id,
-    //       [API.ITEM_QUANTITY_ATTRIBUTE]: item.quantity
-    //    })
-    // }
-    //
-    // for(let currency of currencies){
-    //    currenciesToUpdate[currency.path] = currency.quantity;
-    // }
-    //
-    // const pileSharingData = lib.getItemPileSharingData(pile);
-    //
-    // const hasAttributes = !foundry.utils.isObjectEmpty(currenciesToUpdate);
-    //
-    // if (hasAttributes) {
-    //    await pileActor.update(currenciesToUpdate);
-    //    if (pileSharingData?.currencies) {
-    //       pileSharingData.currencies = pileSharingData.currencies.map(currency => {
-    //          if (currenciesToUpdate[currency.path] !== undefined) {
-    //             currency.actors = currency.actors.map(actor => {
-    //                actor.quantity = Math.max(0, Math.min(actor.quantity, currenciesToUpdate[currency.path]));
-    //                return actor;
-    //             })
-    //          }
-    //          return currency;
-    //       })
-    //    }
-    // }
-    //
-    // if (itemsToUpdate.length) {
-    //    await pileActor.updateEmbeddedDocuments("Item", itemsToUpdate);
-    //    if (pileSharingData?.items) {
-    //       pileSharingData.items = pileSharingData.items.map(item => {
-    //          const sharingItem = itemsToUpdate.find(item => item._id === item.id);
-    //          if (sharingItem) {
-    //             item.actors = item.actors.map(actor => {
-    //                actor.quantity = Math.max(0, Math.min(actor.quantity, sharingItem.quantity));
-    //                return actor;
-    //             })
-    //          }
-    //          return item;
-    //       })
-    //    }
-    // }
-    //
-    // if (itemsToUpdate.length || hasAttributes) {
-    //    await lib.updateItemPileSharingData(pile, pileSharingData);
-    // }
-  }
 
   function dropData(event) {
 
@@ -172,7 +116,7 @@
 
       <footer class="sheet-footer flexrow item-piles-top-divider">
         {#if !store.recipientActor && $editQuantities}
-          <button type="button" on:click|once={updatePile}>
+          <button type="button" on:click={() => { store.updatePile() }}>
             <i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
           </button>
         {/if}

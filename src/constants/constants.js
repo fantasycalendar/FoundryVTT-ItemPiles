@@ -16,6 +16,8 @@ const CONSTANTS = {
   },
   
   ITEM_DEFAULTS: {
+    enabled: false,
+    free: false,
     prices: []
   },
   
@@ -59,8 +61,9 @@ const CONSTANTS = {
     
     // Merchant settings
     isMerchant: false,
-    priceModifier: 100,
-    sellModifier: 50,
+    priceModifier: 1,
+    sellModifier: 0.5,
+    itemTypePriceModifiers: {},
     overridePriceModifiers: [],
     openTimes: {
       enabled: false,

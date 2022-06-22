@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store';
 import * as Utilities from "../../helpers/utilities.js";
 import * as SharingUtilities from "../../helpers/sharing-utilities.js";
 import * as PileUtilities from "../../helpers/pile-utilities.js";
+import * as Helpers from "../../helpers/helpers.js";
 
 export default class ItemPileStore {
   
@@ -155,6 +156,71 @@ export default class ItemPileStore {
     
   }
   
+  async updatePile() {
+    
+    const itemsToUpdate = [];
+    const itemsToDelete = [];
+    const attributesToUpdate = {};
+    
+    const items = get(this.items).concat(get(this.itemCurrencies));
+    for (let item of items) {
+      if (item.quantity === 0) {
+        itemsToDelete.push(item.id);
+      } else {
+        itemsToUpdate.push({
+          _id: item.id,
+          [game.itempiles.ITEM_QUANTITY_ATTRIBUTE]: item.quantity
+        })
+      }
+    }
+    
+    const attributes = get(this.attributes);
+    for (let attribute of attributes) {
+      attributesToUpdate[attribute.path] = attribute.quantity;
+    }
+    
+    const pileSharingData = SharingUtilities.getItemPileSharingData(this.pileActor);
+    
+    await this.pileActor.update(attributesToUpdate);
+    if (pileSharingData?.currencies) {
+      pileSharingData.currencies = pileSharingData.currencies.map(currency => {
+        if (attributesToUpdate[currency.path] !== undefined) {
+          currency.actors = currency.actors.map(actor => {
+            actor.quantity = Math.max(0, Math.min(actor.quantity, attributesToUpdate[currency.path]));
+            return actor;
+          })
+        }
+        return currency;
+      })
+    }
+    
+    await this.pileActor.updateEmbeddedDocuments("Item", itemsToUpdate);
+    await this.pileActor.deleteEmbeddedDocuments("Item", itemsToDelete);
+    if (pileSharingData?.items) {
+      pileSharingData.items = pileSharingData.items.map(item => {
+        const sharingItem = itemsToUpdate.find(item => item._id === item.id);
+        if (sharingItem) {
+          item.actors = item.actors.map(actor => {
+            actor.quantity = Math.max(0, Math.min(actor.quantity, sharingItem.quantity));
+            return actor;
+          })
+        }
+        return item;
+      })
+    }
+    
+    await SharingUtilities.updateItemPileSharingData(this.pileActor, pileSharingData);
+    
+    Helpers.custom_notify("Item Pile successfully updated.");
+    
+    this.items.set([]);
+    this.itemCurrencies.set([]);
+    this.attributes.set([]);
+    
+    this.refresh();
+    
+  }
+  
   take(data) {
     
     const quantity = Math.min(data.currentQuantity, data.quantity);
@@ -190,7 +256,7 @@ export default class ItemPileStore {
   }
   
   closeContainer() {
-  
+    // TODO: close friggin container
   }
   
   filter(search) {
