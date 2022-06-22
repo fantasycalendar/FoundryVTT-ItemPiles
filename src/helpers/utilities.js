@@ -87,12 +87,24 @@ export function findSimilarItem(items, findItem) {
 /**
  * Returns a given item's quantity
  *
- * @param {Item} item
+ * @param {Item/Object} item
  * @returns {number}
  */
 export function getItemQuantity(item) {
   const itemData = item instanceof Item ? item.data : item;
   return Number(getProperty(itemData, game.itempiles.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+}
+
+/**
+ * Returns a given item's quantity
+ *
+ * @param {Object} itemData
+ * @param {Number} quantity
+ * @returns {Object}
+ */
+export function setItemQuantity(itemData, quantity) {
+  setProperty(itemData, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, quantity)
+  return itemData;
 }
 
 /**

@@ -8,7 +8,7 @@ import * as Utilities from "../helpers/utilities.js";
 import HOOKS from "../constants/hooks.js";
 import TradeStore from "../applications/trading-interface/trade-store.js";
 import TradingApp from "../applications/trading-interface/trading-app.js";
-import SETTINGS from "../constants/settings.js";
+import PrivateAPI from "./private-api.js";
 
 const mutedUsers = new Set();
 const ongoingTrades = new Map();
@@ -27,18 +27,13 @@ export default class TradeAPI {
     // No users!
     if (!users.length) {
       return TJSDialog.prompt({
-        title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-        content: {
-          class: CustomDialog,
-          props: {
+        title: game.i18n.localize("ITEM-PILES.Trade.Title"), content: {
+          class: CustomDialog, props: {
             header: game.i18n.localize("ITEM-PILES.Trade.NoActiveUsers.Title"),
             content: game.i18n.localize("ITEM-PILES.Trade.NoActiveUsers.Content"),
             icon: "fas fa-heart-broken"
           }
-        },
-        modal: true,
-        draggable: false,
-        options: {
+        }, modal: true, draggable: false, options: {
           height: "auto"
         }
       });
@@ -73,28 +68,17 @@ export default class TradeAPI {
     if (actorOwner) {
       
       const doContinue = TJSDialog.confirm({
-        title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-        content: {
-          class: CustomDialog,
-          props: {
+        title: game.i18n.localize("ITEM-PILES.Trade.Title"), content: {
+          class: CustomDialog, props: {
             header: game.i18n.localize("ITEM-PILES.Trade.Title"),
-            content: actorOwner.active
-              ? game.i18n.format("ITEM-PILES.Trade.UserActiveCharacterWarning", {
-                actor_name: actor.name,
-                player_name: actorOwner.name
-              })
-              : game.i18n.format("ITEM-PILES.Trade.UserCharacterWarning", {
-                actor_name: actor.name,
-                player_name: actorOwner.name
-              }),
+            content: actorOwner.active ? game.i18n.format("ITEM-PILES.Trade.UserActiveCharacterWarning", {
+              actor_name: actor.name, player_name: actorOwner.name
+            }) : game.i18n.format("ITEM-PILES.Trade.UserCharacterWarning", {
+              actor_name: actor.name, player_name: actorOwner.name
+            }),
             icon: "fas fa-exclamation-triangle",
           }
-        },
-        modal: true,
-        draggable: false,
-        rejectClose: false,
-        defaultYes: true,
-        options: {
+        }, modal: true, draggable: false, rejectClose: false, defaultYes: true, options: {
           height: "auto"
         }
       });
@@ -120,8 +104,7 @@ export default class TradeAPI {
         }
       }
     }, {
-      top: 50,
-      width: 300
+      top: 50, width: 300
     }).render(true);
     
     // Send out the request
@@ -139,11 +122,9 @@ export default class TradeAPI {
         const traderActor = Utilities.getActor(data.actorUuid);
         
         const store = new TradeStore({
-          user: game.user,
-          actor
+          user: game.user, actor
         }, {
-          user: game.users.get(userId),
-          actor: traderActor
+          user: game.users.get(userId), actor: traderActor
         }, data.fullPublicTradeId, data.fullPrivateTradeId, isPrivate);
         
         const app = new TradingApp(store, this.getAppOptions(actor).tradeApp).render(true);
@@ -154,14 +135,12 @@ export default class TradeAPI {
         
         if (isPrivate) {
           return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.CALL_HOOK, [game.user.id, userId], HOOKS.TRADE.STARTED, {
-            user: game.user.id,
-            actor: actor.uuid
+            user: game.user.id, actor: actor.uuid
           }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
         }
         
         return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.TRADE.STARTED, {
-          user: game.user.id,
-          actor: actor.uuid
+          user: game.user.id, actor: actor.uuid
         }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
         
       }).catch((err) => {
@@ -208,8 +187,7 @@ export default class TradeAPI {
     const actor = result.actor ?? result;
     
     const store = new TradeStore({ user: game.user, actor }, {
-      user: tradingUser,
-      actor: tradingActor
+      user: tradingUser, actor: tradingActor
     }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
     
     const app = new TradingApp(store, this.getAppOptions(actor).tradeApp).render(true);
@@ -219,9 +197,7 @@ export default class TradeAPI {
     actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
     
     return {
-      fullPrivateTradeId,
-      fullPublicTradeId,
-      actorUuid: result.uuid
+      fullPrivateTradeId, fullPublicTradeId, actorUuid: result.uuid
     };
     
   }
@@ -229,26 +205,20 @@ export default class TradeAPI {
   static getAppOptions(actor) {
     const midPoint = (window.innerWidth / 2) - 200;
     return {
-      actorSheet: { left: midPoint - actor.sheet.position.width - 25 },
-      tradeApp: { left: midPoint + 25 }
+      actorSheet: { left: midPoint - actor.sheet.position.width - 25 }, tradeApp: { left: midPoint + 25 }
     }
   }
   
   static async _tradeCancelled(userId, privateTradeId) {
     
     TJSDialog.prompt({
-      title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-      content: {
-        class: CustomDialog,
-        props: {
+      title: game.i18n.localize("ITEM-PILES.Trade.Title"), content: {
+        class: CustomDialog, props: {
           header: game.i18n.localize("ITEM-PILES.Trade.Title"),
           content: game.i18n.format("ITEM-PILES.Trade.CancelledRequest.Content", { user_name: game.users.get(userId).name }),
           icon: "fas fa-exclamation-triangle"
         }
-      },
-      modal: true,
-      draggable: false,
-      options: {
+      }, modal: true, draggable: false, options: {
         height: "auto"
       }
     });
@@ -324,7 +294,12 @@ export default class TradeAPI {
       if (trade.store.tradeIsAccepted) {
         setTimeout(async () => {
           if (trade.store.tradeIsAccepted) {
-            ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.EXECUTE_TRADE, [trade.store.leftTraderUser.id, trade.store.rightTraderUser.id], tradeId, userId);
+            ItemPileSocket.executeForUsers(
+              ItemPileSocket.HANDLERS.EXECUTE_TRADE,
+              [trade.store.leftTraderUser.id, trade.store.rightTraderUser.id],
+              trade.store.publicTradeId,
+              trade.store.privateTradeId,
+              userId);
           }
         }, 2000);
       }
@@ -356,20 +331,15 @@ export default class TradeAPI {
       if (closeUserId === trade.store.rightTraderUser.id) {
         
         TJSDialog.prompt({
-          title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
-          content: {
-            class: CustomDialog,
-            props: {
+          title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"), content: {
+            class: CustomDialog, props: {
               header: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
               content: game.i18n.format("ITEM-PILES.Trade.Closed.Them", {
                 user_name: trade.store.rightTraderUser.name
               }),
               icon: "fas fa-exclamation-triangle",
             }
-          },
-          modal: false,
-          draggable: true,
-          options: {
+          }, modal: false, draggable: true, options: {
             height: "auto"
           }
         });
@@ -380,25 +350,18 @@ export default class TradeAPI {
           ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
           ItemPileSocket.executeForOthers(ItemPileSocket.HANDLERS.TRADE_CLOSED, tradeId, game.user.id);
         } else {
-          const otherUserId = trade.store.leftTraderUser.id === game.user.id
-            ? trade.store.rightTraderUser.id
-            : trade.store.leftTraderUser.id;
+          const otherUserId = trade.store.leftTraderUser.id === game.user.id ? trade.store.rightTraderUser.id : trade.store.leftTraderUser.id;
           ItemPileSocket.executeAsUser(ItemPileSocket.HANDLERS.TRADE_CLOSED, otherUserId, tradeId, game.user.id);
         }
         
         TJSDialog.prompt({
-          title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
-          content: {
-            class: CustomDialog,
-            props: {
+          title: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"), content: {
+            class: CustomDialog, props: {
               header: game.i18n.localize("ITEM-PILES.Trade.Closed.Title"),
               content: game.i18n.format("ITEM-PILES.Trade.Closed.You"),
               icon: "fas fa-exclamation-triangle",
             }
-          },
-          modal: false,
-          draggable: true,
-          options: {
+          }, modal: false, draggable: true, options: {
             height: "auto"
           }
         });
@@ -416,12 +379,28 @@ export default class TradeAPI {
     ongoingTrades.delete(tradeId);
   }
   
-  static async _executeTrade(tradeId, userId) {
+  static async _executeTrade(tradeId, privateId, userId) {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;
+    if (trade.store.privateTradeId !== privateId) return;
     const updates = trade.store.getTradeData();
     
-    // Todo: Actually implement each user updating the actor they own
+    const itemsToAdd = updates.add.items.map(entry => {
+      const itemData = updates.targetActor.items.get(entry.id).toObject();
+      return Utilities.setItemQuantity(itemData, entry.quantity);
+    });
+    
+    const itemsToRemove = updates.remove.items.map(entry => {
+      const itemData = updates.sourceActor.items.get(entry.id).toObject();
+      return Utilities.setItemQuantity(itemData, entry.quantity);
+    });
+    
+    const transaction = new Transaction(updates.sourceActor);
+    transaction.appendItemChanges(itemsToAdd);
+    transaction.appendItemChanges(itemsToRemove, true);
+    transaction.appendActorChanges(updates.add.attributes);
+    transaction.appendActorChanges(updates.remove.attributes, true);
+    await transaction.commit();
     
     if (trade.store.isPrivate) {
       trade.app.close({ callback: true });
@@ -434,9 +413,10 @@ export default class TradeAPI {
   static async _tradeCompleted(tradeId, updates) {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;
-    Hooks.callAll(HOOKS.TRADE.COMPLETE, updates, tradeId)
+    Helpers.hooks.callAll(HOOKS.TRADE.COMPLETE, updates, tradeId)
     trade.app.close({ callback: true });
     ongoingTrades.delete(tradeId);
   }
   
 }
+

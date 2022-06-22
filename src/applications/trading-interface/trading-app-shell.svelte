@@ -90,7 +90,7 @@
     await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, attributes);
     return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_CURRENCIES, store.publicTradeId, game.user.id, attributes);
   }, 40)
-  leftItems.subscribe(attributesUpdatedDebounce)
+  leftCurrencies.subscribe(attributesUpdatedDebounce)
 
   const acceptedDebounce = debounce(async (acceptedState) => {
     await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_STATE, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, acceptedState);
@@ -222,8 +222,8 @@
                   <TradeEntry bind:data={currency} {store} editable={!spectator}/>
                 {/each}
 
-                {#each $leftItemCurrencies as currency (currency.path)}
-                  <TradeEntry bind:data={currency} {store} editable={!spectator}/>
+                {#each $leftItemCurrencies as item (item.path)}
+                  <TradeEntry bind:data={item} {store} editable={!spectator}/>
                 {/each}
 
               </div>
@@ -286,8 +286,8 @@
                 <TradeEntry bind:data={currency} {store} editable={false}/>
               {/each}
 
-              {#each $rightItemCurrencies as currency (currency.path)}
-                <TradeEntry bind:data={currency} {store} editable={false}/>
+              {#each $rightItemCurrencies as item (item.path)}
+                <TradeEntry bind:data={item} {store} editable={false}/>
               {/each}
 
             </div>

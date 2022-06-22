@@ -76,7 +76,7 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
   
   if (items.length) {
     items = items.map(itemData => {
-      setProperty(itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
+      setProperty(itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, Math.abs(itemData.quantity));
       return itemData.item;
     })
   }
@@ -85,7 +85,7 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
     attributes = Object.entries(attributes).map(entry => {
       return {
         path: entry[0],
-        quantity: entry[1]
+        quantity: Math.abs(entry[1])
       }
     })
   }

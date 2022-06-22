@@ -16,6 +16,26 @@ export const debounceManager = {
   }
 };
 
+export const hooks = {
+  run: true,
+  
+  async runWithout(callback) {
+    this.run = false;
+    await callback();
+    this.run = true;
+  },
+  
+  call(hook, ...args) {
+    if (!this.run) return;
+    return Hooks.call(hook, ...args);
+  },
+  
+  callAll(hook, ...args) {
+    if (!this.run) return;
+    return Hooks.callAll(hook, ...args);
+  }
+}
+
 export function isGMConnected() {
   return !!Array.from(game.users).find(user => user.isGM && user.active);
 }

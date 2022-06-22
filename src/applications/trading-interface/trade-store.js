@@ -69,12 +69,12 @@ export default class TradeStore {
   
   getTradeData() {
     return {
+      sourceActor: this.leftTraderActor,
+      targetActor: this.rightTraderActor,
       remove: {
-        actor: this.leftTraderActor,
         items: get(this.leftTraderItems).concat(get(this.leftTraderItemCurrencies)),
         attributes: get(this.leftTraderCurrencies)
       }, add: {
-        actor: this.rightTraderActor,
         items: get(this.rightTraderItems).concat(get(this.rightTraderItemCurrencies)),
         attributes: get(this.rightTraderCurrencies)
       }

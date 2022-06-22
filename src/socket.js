@@ -4,6 +4,7 @@ import { stringIsUuid } from "./helpers/utilities.js";
 import PrivateAPI from "./API/private-api.js";
 import TradeAPI from "./API/trade-api.js";
 import ChatAPI from "./API/chat-api.js";
+import * as Helpers from "./helpers/helpers.js";
 
 export default class ItemPileSocket {
   
@@ -53,6 +54,7 @@ export default class ItemPileSocket {
     TRANSFER_ATTRIBUTES: "transferAttributes",
     TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes",
     TRANSFER_EVERYTHING: "transferEverything",
+    COMMIT_ACTOR_CHANGES: "commitActorChanges",
     
     /**
      * Trading sockets
@@ -86,6 +88,7 @@ export default class ItemPileSocket {
     [this.HANDLERS.TRANSFER_ATTRIBUTES]: (...args) => PrivateAPI._transferAttributes(...args),
     [this.HANDLERS.TRANSFER_ALL_ATTRIBUTES]: (...args) => PrivateAPI._transferAllAttributes(...args),
     [this.HANDLERS.TRANSFER_EVERYTHING]: (...args) => PrivateAPI._transferEverything(...args),
+    [this.HANDLERS.COMMIT_ACTOR_CHANGES]: (...args) => PrivateAPI._commitActorChanges(...args),
     
     [this.HANDLERS.CREATE_PILE]: (...args) => PrivateAPI._createItemPile(...args),
     [this.HANDLERS.UPDATE_PILE]: (...args) => PrivateAPI._updateItemPile(...args),
@@ -97,20 +100,20 @@ export default class ItemPileSocket {
     
     [this.HANDLERS.TRADE_REQUEST_PROMPT]: (...args) => TradeAPI._respondPrompt(...args),
     [this.HANDLERS.TRADE_REQUEST_CANCELLED]: (...args) => TradeAPI._tradeCancelled(...args),
-    [this.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS]: (...args) => TradeAPI._updateItems(...args),
+    [this.HANDLERS.EXECUTE_TRADE]: (...args) => TradeAPI._executeTrade(...args),
+    [this.HANDLERS.TRADE_COMPLETED]: (...args) => TradeAPI._tradeCompleted(...args),
+    [this.HANDLERS.REQUEST_TRADE_DATA]: (...args) => TradeAPI._respondActiveTradeData(...args),
+    [this.HANDLERS.TRADE_CLOSED]: (...args) => TradeAPI._tradeClosed(...args),
+    
     [this.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS]: (...args) => TradeAPI._updateItems(...args),
     [this.HANDLERS.PUBLIC_TRADE_UPDATE_ITEM_CURRENCIES]: (...args) => TradeAPI._updateItemCurrencies(...args),
     [this.HANDLERS.PUBLIC_TRADE_UPDATE_CURRENCIES]: (...args) => TradeAPI._updateCurrencies(...args),
     [this.HANDLERS.PUBLIC_TRADE_STATE]: (...args) => TradeAPI._updateAcceptedState(...args),
-    [this.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS]: (...args) => TradeAPI._updateItems(...args),
-    [this.HANDLERS.PRIVATE_TRADE_UPDATE_ITEM_CURRENCIES]: (...args) => TradeAPI._updateItems(...args),
-    [this.HANDLERS.PRIVATE_TRADE_UPDATE_CURRENCIES]: (...args) => TradeAPI._updateItemCurrencies(...args),
-    [this.HANDLERS.PRIVATE_TRADE_STATE]: (...args) => TradeAPI._updateAcceptedState(...args),
-    [this.HANDLERS.TRADE_CLOSED]: (...args) => TradeAPI._tradeClosed(...args),
     
-    [this.HANDLERS.EXECUTE_TRADE]: (...args) => TradeAPI._executeTrade(...args),
-    [this.HANDLERS.TRADE_COMPLETED]: (...args) => TradeAPI._tradeCompleted(...args),
-    [this.HANDLERS.REQUEST_TRADE_DATA]: (...args) => TradeAPI._respondActiveTradeData(...args),
+    [this.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS]: (...args) => TradeAPI._updateItems(...args),
+    [this.HANDLERS.PRIVATE_TRADE_UPDATE_ITEM_CURRENCIES]: (...args) => TradeAPI._updateItemCurrencies(...args),
+    [this.HANDLERS.PRIVATE_TRADE_UPDATE_CURRENCIES]: (...args) => TradeAPI._updateCurrencies(...args),
+    [this.HANDLERS.PRIVATE_TRADE_STATE]: (...args) => TradeAPI._updateAcceptedState(...args),
     
     [this.HANDLERS.PICKUP_CHAT_MESSAGE]: (...args) => ChatAPI._outputPickupToChat(...args),
     [this.HANDLERS.SPLIT_CHAT_MESSAGE]: (...args) => ChatAPI._outputSplitToChat(...args),
@@ -164,6 +167,7 @@ export default class ItemPileSocket {
   }
   
   static callHook(hook, ...args) {
+    if (!Helpers.hooks.run) return;
     return this._socket.executeForEveryone(this.HANDLERS.CALL_HOOK, ...args);
   }
   

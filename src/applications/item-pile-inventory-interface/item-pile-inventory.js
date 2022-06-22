@@ -3,6 +3,7 @@ import ItemPileInventoryShell from "./item-pile-inventory-shell.svelte";
 import * as Utilities from "../../helpers/utilities.js";
 import ItemPileConfig from "../item-pile-config/item-pile-config.js";
 import HOOKS from "../../constants/hooks.js";
+import * as Helpers from "../../helpers/helpers.js";
 
 export class ItemPileInventory extends SvelteApplication {
   
@@ -34,7 +35,7 @@ export class ItemPileInventory extends SvelteApplication {
     
     this.pileActor = pileActor;
     
-    Hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, this.pileActor, recipientActor, overrides);
+    Helpers.hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, this.pileActor, recipientActor, overrides);
     
   }
   

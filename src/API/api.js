@@ -299,10 +299,10 @@ const API = {
     data.closed = false;
     data.locked = false;
     if (wasLocked) {
-      const hookResult = Hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, data, interactingTokenDocument);
+      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, data, interactingTokenDocument);
       if (hookResult === false) return false;
     }
-    const hookResult = Hooks.call(HOOKS.PILE.PRE_OPEN, targetActor, data, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_OPEN, targetActor, data, interactingTokenDocument);
     if (hookResult === false) return false;
     if (wasClosed && data.openSound) {
       AudioHelper.play({ src: data.openSound })
@@ -327,7 +327,7 @@ const API = {
     const wasOpen = !pileData.closed;
     pileData.closed = true;
     
-    const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
     
     if (wasOpen && pileData.closeSound) {
@@ -375,10 +375,10 @@ const API = {
     pileData.closed = true;
     pileData.locked = true;
     if (!wasClosed) {
-      const hookResult = Hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
+      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
       if (hookResult === false) return false;
     }
-    const hookResult = Hooks.call(HOOKS.PILE.PRE_LOCK, targetActor, pileData, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_LOCK, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
     if (!wasClosed && pileData.closeSound) {
       AudioHelper.play({ src: pileData.closeSound })
@@ -400,7 +400,7 @@ const API = {
     const pileData = PileUtilities.getActorFlagData(targetActor);
     if (!pileData?.enabled || !pileData?.isContainer) return false;
     pileData.locked = false;
-    Hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
+    Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
   },
   
@@ -439,7 +439,7 @@ const API = {
     
     if (!pileData?.enabled || !pileData?.isContainer || !pileData?.locked) return false;
     
-    Hooks.call(HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
+    Helpers.hooks.call(HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
     
     if (pileData.lockedSound) {
       AudioHelper.play({ src: pileData.lockedSound })
