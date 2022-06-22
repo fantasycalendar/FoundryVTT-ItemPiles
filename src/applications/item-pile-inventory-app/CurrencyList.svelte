@@ -8,6 +8,7 @@
   const attributeStore = store.attributes;
   const itemStore = store.itemCurrencies;
   const numCurrenciesStore = store.numCurrencies;
+  const editQuantitiesStore = store.editQuantities;
 
   async function addCurrency() {
     const result = await DropCurrencyDialog.show(store.recipientActor, store.pileActor);
@@ -45,7 +46,7 @@
       </a>
     {/if}
   </div>
-  {#if $numCurrenciesStore > 0}
+  {#if $numCurrenciesStore > 0 || $editQuantitiesStore}
     <div>
       {#each entries as entry, index (entry.identifier)}
         {#if entry.data.visible}

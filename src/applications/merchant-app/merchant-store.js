@@ -40,12 +40,19 @@ export default class MerchantStore {
     const items = PileUtilities.getMerchantItemsForActor(this.merchant, this.buyer);
     
     items.sort((a, b) => {
-      return a.type < b.type || a.name < b.name ? -1 : 1;
+      return CONFIG.Item.typeLabels[a.type] < CONFIG.Item.typeLabels[b.type] || a.name < b.name ? -1 : 1;
     });
     
-    this.categories.set([...new Set(items.map(item => item.type))]);
+    const categories = [...new Set(items.map(item => item.type))].map(type => ({
+      type, label: CONFIG.Item.typeLabels[type]
+    }));
+    
+    this.categories.set(categories);
     
     this.items.set(items);
+    
+    console.log(get(this.categories))
+    console.log(get(this.items))
     
   }
   

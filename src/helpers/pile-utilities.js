@@ -71,23 +71,20 @@ export function getActorItems(target, { itemFilters = false, itemCurrencies = tr
   const targetActor = Utilities.getActor(target);
   const pileItemFilters = itemFilters ? itemFilters : getActorItemFilters(targetActor);
   const currencyItems = getActorCurrencyItems(targetActor);
-  let actorItems = targetActor.items;
+  let actorItems = Array.from(targetActor.items);
   if (!itemCurrencies) {
-    currencyItems.forEach(item => actorItems.delete(item.id, { modifySource: false }));
+    actorItems = actorItems.filter(item => currencyItems.indexOf(item) === -1);
   }
-  actorItems = Array.from(actorItems)
-  return actorItems.filter(item => {
-    return !currencyItems.find(currency => currency.item === item) && !isItemInvalid(targetActor, item, pileItemFilters);
-  });
+  return actorItems.filter(item => !isItemInvalid(targetActor, item, pileItemFilters));
 }
 
 export function getActorCurrencyItems(target, { currencyFilters = false } = {}) {
   const targetActor = Utilities.getActor(target)
   const targetItems = Array.from(targetActor.items);
   const currencyItemList = currencyFilters || getActorCurrencyData(targetActor)?.items || [];
-  return currencyItemList.map(currency => {
-    return Utilities.findSimilarItem(targetItems, currency) || false;
-  }).filter(Boolean) ?? [];
+  return targetItems.filter(item => {
+    return Utilities.findSimilarItem(currencyItemList, item);
+  });
 }
 
 export function isItemInvalid(targetActor, item, itemFilters = false) {

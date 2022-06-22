@@ -104,15 +104,15 @@
 
         <input type="text" bind:value={$searchStore}>
 
-        {#each $categoryStore as category, index (category)}
+        {#each $categoryStore as category, index (category.type)}
 
-          {#if $itemStore.filter(item => item.type === category && item.visible).length}
+          {#if $itemStore.filter(item => item.type === category.type && item.visible).length}
 
             <div transition:fade={{duration: 150}}>
 
               <h3 class="merchant-item-group-type flexrow">
                 <div>
-                  {category}
+                  {localize(category.label)}
                 </div>
                 {#if index === 0}
                   <div style="flex: 0 1 162px;">
@@ -123,7 +123,7 @@
 
               <div class="item-piles-items-list">
 
-                {#each $itemStore.filter(item => item.type === category) as item (item.id)}
+                {#each $itemStore.filter(item => item.type === category.type) as item (item.id)}
 
                   {#if item.visible}
 
@@ -258,7 +258,6 @@
 
         .merchant-item-group-type {
           border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-          text-transform: capitalize;
           margin-top: 10px;
         }
 
