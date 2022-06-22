@@ -288,7 +288,7 @@
       "TradeStarted": "{party_1} and {party_2} started a trade.",
       "TradeStartedButton": "Click the button below to spectate:",
       "TradeSpectate": "Spectate Trade",
-      "SpectateDisabled": "Trade Completed",
+      "SpectateDisabled": "Trade Concluded",
       "PrivateTrade": "Private Trade",
       "ExpandTrade": "View full trade details"
     },

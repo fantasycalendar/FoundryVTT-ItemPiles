@@ -51,15 +51,15 @@ export default class TradeStore {
   
   export() {
     return [{
-      userId: get(this.leftTraderUser.id),
-      actorUiid: get(Utilities.getUuid(this.leftTraderActor)),
+      userId: this.leftTraderUser.id,
+      actorUiid: Utilities.getUuid(this.leftTraderActor),
       items: get(this.leftTraderItems),
       currencies: get(this.leftTraderCurrencies),
       itemCurrencies: get(this.leftTraderItemCurrencies),
       accepted: get(this.leftTraderAccepted)
     }, {
-      userId: get(this.rightTraderUser.id),
-      actorUiid: get(Utilities.getUuid(this.rightTraderActor)),
+      userId: this.rightTraderUser.id,
+      actorUiid: Utilities.getUuid(this.rightTraderActor),
       items: get(this.rightTraderItems),
       currencies: get(this.rightTraderCurrencies),
       itemCurrencies: get(this.rightTraderItemCurrencies),

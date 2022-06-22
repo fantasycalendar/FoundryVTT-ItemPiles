@@ -35,7 +35,7 @@ export default class TradingApp extends SvelteApplication {
   
   async close(options = {}) {
     if (!options?.callback) {
-      await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_CLOSED, this.store.publicTradeId, game.user.id);
+      await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_CLOSED, this.publicTradeId, game.user.id);
     }
     return super.close(options)
   }

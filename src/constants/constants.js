@@ -11,7 +11,8 @@ const CONSTANTS = {
     PILE: baseFlag + "data",
     SHARING: baseFlag + "sharing",
     ITEM: baseFlag + "item",
-    PUBLIC_TRADE_ID: baseFlag + "publicTradeId"
+    PUBLIC_TRADE_ID: baseFlag + "publicTradeId",
+    TRADE_USERS: baseFlag + "tradeUsers"
   },
   
   ITEM_DEFAULTS: {

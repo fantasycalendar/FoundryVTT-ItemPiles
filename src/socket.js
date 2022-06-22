@@ -1,6 +1,6 @@
 import CONSTANTS from "./constants/constants.js";
 import { debug } from "./helpers/helpers.js";
-import { stringIsUuid } from "./helpers/utilities.js";
+import { fromUuidFast, stringIsUuid } from "./helpers/utilities.js";
 import PrivateAPI from "./API/private-api.js";
 import TradeAPI from "./API/trade-api.js";
 import ChatAPI from "./API/chat-api.js";
@@ -168,16 +168,21 @@ export default class ItemPileSocket {
   
   static callHook(hook, ...args) {
     if (!Helpers.hooks.run) return;
-    return this._socket.executeForEveryone(this.HANDLERS.CALL_HOOK, ...args);
+    return this._socket.executeForEveryone(this.HANDLERS.CALL_HOOK, hook, ...args);
+  }
+  
+  static callHookForUsers(hook, users, ...args) {
+    if (!Helpers.hooks.run) return;
+    return this._socket.executeForUsers(this.HANDLERS.CALL_HOOK, users, hook, ...args);
   }
   
 }
 
-async function callHook(hook, response, ...args) {
+async function callHook(hook, ...args) {
   const newArgs = [];
   for (let arg of args) {
     if (stringIsUuid(arg)) {
-      const testArg = await fromUuid(arg);
+      const testArg = fromUuidFast(arg);
       if (testArg) {
         arg = testArg;
       }

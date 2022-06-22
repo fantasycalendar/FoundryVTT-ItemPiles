@@ -5,6 +5,7 @@ import HOOKS from "../constants/hooks.js";
 import ItemPileSocket from "../socket.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
+import TradeAPI from "./trade-api.js";
 
 export default class ChatAPI {
   
@@ -57,13 +58,53 @@ export default class ChatAPI {
       return getProperty(message.data, CONSTANTS.FLAGS.PUBLIC_TRADE_ID) === publicTradeId;
     });
     if (!message) return;
-    const html = $(message.data.content);
-    html.find(".item-piles-specate-trade")
-      .prop('disabled', true)
-      .text(game.i18n.localize("ITEM-PILES.Chat.SpectateDisabled"));
-    return message.update({
-      content: html.prop("outerHTML")
-    })
+    const update = this._replaceChatContent(message);
+    return message.update(update)
+  }
+  
+  static async disablePastTradingButtons() {
+    if (!game.user.isGM) return;
+    
+    const messages = Array.from(game.messages).filter(message => {
+      return getProperty(message.data, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+    });
+    
+    if (!messages.length) return;
+    const updates = [];
+    for (let message of messages) {
+      const update = this._replaceChatContent(message);
+      const tradeId = getProperty(message.data, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+      const tradeUsers = getProperty(message.data, CONSTANTS.FLAGS.TRADE_USERS);
+      const bothUsersActive = tradeUsers.filter(userId => game.users.get(userId).active).length === tradeUsers.length;
+      if (!bothUsersActive) {
+        updates.push(update);
+      } else {
+        const otherUsers = tradeUsers.filter(userId => userId !== game.user.id);
+        const tradeData = await TradeAPI._requestTradeData({ tradeId, tradeUser: otherUsers[0] });
+        if (!tradeData) {
+          updates.push(update);
+        }
+      }
+    }
+    
+    if (!updates.length) return;
+    
+    return ChatMessage.updateDocuments(updates);
+    
+  }
+  
+  static _replaceChatContent(message) {
+    const tradeId = getProperty(message.data, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+    const stringToFind = `data-trade-id="${tradeId}"`;
+    let content = message.data.content;
+    content = content.replace(stringToFind, "");
+    content = content.replace(stringToFind, "disabled");
+    content = content.replace(game.i18n.localize("ITEM-PILES.Chat.TradeSpectate"), game.i18n.localize("ITEM-PILES.Chat.SpectateDisabled"));
+    return {
+      _id: message.id,
+      content,
+      [`flags.-=${CONSTANTS.MODULE_NAME}`]: null
+    };
   }
   
   
@@ -315,10 +356,8 @@ export default class ChatAPI {
       content: chatCardHtml,
       flavor: "Item Piles",
       speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
-      [`flags.${CONSTANTS.MODULE_NAME}`]: {
-        publicTradeId,
-        tradeUsers: [party_1.user, party_2.user]
-      }
+      [CONSTANTS.FLAGS.PUBLIC_TRADE_ID]: publicTradeId,
+      [CONSTANTS.FLAGS.TRADE_USERS]: [party_1.user, party_2.user]
     });
   }
   

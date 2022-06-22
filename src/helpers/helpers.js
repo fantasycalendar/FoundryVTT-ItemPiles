@@ -36,10 +36,6 @@ export const hooks = {
   }
 }
 
-export function isGMConnected() {
-  return !!Array.from(game.users).find(user => user.isGM && user.active);
-}
-
 export function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -117,4 +113,8 @@ export function isResponsibleGM() {
     return false;
   }
   return !getActiveGMs().some(other => other.data._id < game.user.data._id);
+}
+
+export function isGMConnected() {
+  return !!Array.from(game.users).find(user => user.isGM && user.active);
 }
