@@ -16,15 +16,20 @@ export default class MerchantStore {
     this.description = writable("");
     this.description.set(this.merchant.data.data.details.biography.value);
     
+    this.priceDataPerCategory = writable(this.merchantData.itemTypePriceModifiers.reduce((acc, priceData) => {
+      acc[priceData.type] = priceData;
+      return acc;
+    }, {}));
+    
     this.search = writable("");
     this.editQuantities = writable(!buyer && merchant.isOwner && game.user.isGM);
     
-    const searchDebounce = debounce((str) => {
-      this.filter(str);
+    const searchDebounce = debounce(() => {
+      this.filter();
     }, 300);
     
-    this.search.subscribe((str) => {
-      searchDebounce(str);
+    this.search.subscribe(() => {
+      searchDebounce();
     });
     
     this.refresh();
@@ -51,9 +56,13 @@ export default class MerchantStore {
     
     this.items.set(items);
     
+    this.filter();
+    
   }
   
-  filter(search) {
+  filter() {
+    
+    const search = get(this.search);
     
     const items = get(this.items);
     
@@ -62,6 +71,16 @@ export default class MerchantStore {
     });
     
     this.items.set(items);
+  }
+  
+}
+
+class ItemStore {
+  
+  constructor(store, item) {
+    
+    this.item = item;
+    
   }
   
 }

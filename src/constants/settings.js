@@ -2,17 +2,22 @@ import { SYSTEMS } from "../systems.js";
 
 const SETTINGS = {
   
-  // Public settings
+  // Client settings
   OUTPUT_TO_CHAT: "outputToChat",
-  DELETE_EMPTY_PILES: "deleteEmptyPiles",
-  ENABLE_TRADING: "enableTrading",
-  SHOW_TRADE_BUTTON: "showTradeButton",
   INVERT_SHEET_OPEN: "invertSheetOpen",
   HIDE_ACTOR_HEADER_TEXT: "hideActorHeaderText",
   PRELOAD_FILES: "preloadFiles",
+  DEBUG: "debug",
+  DEBUG_HOOKS: "debugHooks",
+  
+  // Module Settings
+  ENABLE_DROPPING_ITEMS: "enableDroppingItems",
+  ENABLE_TRADING: "enableTrading",
+  SHOW_TRADE_BUTTON: "showTradeButton",
+  DELETE_EMPTY_PILES: "deleteEmptyPiles",
   INSPECT_ITEMS_IN_TRADE: "inspectItemsInTrade",
   
-  // Private Settings
+  // System Settings
   CURRENCIES: "currencies",
   ITEM_FILTERS: "itemFilters",
   ACTOR_CLASS_TYPE: "actorClassType",
@@ -20,10 +25,9 @@ const SETTINGS = {
   ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
   ITEM_SIMILARITIES: "itemSimilarities",
   
+  // Hidden settings
   DEFAULT_ITEM_PILE_JOURNAL_ID: "defaultItemPileJournalID",
   DEFAULT_ITEM_PILE_ACTOR_ID: "defaultItemPileActorID",
-  DEBUG: "debug",
-  DEBUG_HOOKS: "debugHooks",
   SYSTEM_FOUND: "systemFound",
   SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
   PRECONFIGURED_SYSTEM: "preconfiguredSystem",
@@ -174,6 +178,15 @@ const SETTINGS = {
       scope: "world",
       config: false,
       default: false,
+      type: Boolean
+    },
+    
+    [SETTINGS.ENABLE_DROPPING_ITEMS]: {
+      name: "ITEM-PILES.Settings.EnableDroppingItems.Title",
+      hint: "ITEM-PILES.Settings.EnableDroppingItems.Hint",
+      scope: "world",
+      config: false,
+      default: true,
       type: Boolean
     },
     

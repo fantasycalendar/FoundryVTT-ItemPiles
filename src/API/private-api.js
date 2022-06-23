@@ -73,7 +73,6 @@ export default class PrivateAPI {
    */
   static _onUpdateActor(doc, changes) {
     if (!PileUtilities.isValidItemPile(doc)) return;
-    Utilities.refreshAppsWithDocument(doc, "refreshAttributes")
     this._evaluateItemPileChange(doc, changes);
   }
   

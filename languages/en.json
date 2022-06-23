@@ -348,6 +348,10 @@
         "Label": "Configure Item Similarities",
         "Hint": "Here you can configure what how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
       },
+      "EnableDroppingItems": {
+        "Title": "Enable Dropping Items",
+        "Hint": "This enables users being able to drop items on the ground to create their own item piles - with this disabled, users cannot create new piles, nor add items to existing piles."
+      },
       "EnableTrading": {
         "Title": "Enable Trading",
         "Hint": "This enables trading - with this disabled, no one can initiate any trade."

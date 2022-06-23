@@ -73,10 +73,6 @@ export class ItemPileInventoryApp extends SvelteApplication {
     this.svelte.applicationShell.store.refreshItems();
   }
   
-  refreshAttributes() {
-    this.svelte.applicationShell.store.refreshAttributes();
-  }
-  
   refreshDeletedPile() {
     this.svelte.applicationShell.deleted = true;
   }

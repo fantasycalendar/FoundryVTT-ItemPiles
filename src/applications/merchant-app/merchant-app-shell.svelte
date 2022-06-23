@@ -3,9 +3,11 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+  import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import Tabs from "../components/Tabs.svelte";
   import MerchantStore from "./merchant-store.js";
+  import SliderInput from "../components/SliderInput.svelte";
 
   const { application } = getContext('external');
 
@@ -19,8 +21,16 @@
   let searchStore = store.search;
   let itemStore = store.items;
   let categoryStore = store.categories;
+  let merchantData = store.merchantData;
+  let priceDataPerCategory = store.priceDataPerCategory;
+  let editPrices = false;
 
-  let merchantData = PileUtilities.getActorFlagData(merchant);
+  const doc = new TJSDocument(merchant);
+  $: {
+    $doc;
+    store.merchantData = PileUtilities.getActorFlagData(merchant);
+    store.refresh();
+  }
 
   function getOpenTimes() {
     let open = merchantData.openTimes.open;
@@ -114,11 +124,19 @@
                 <div>
                   {localize(category.label)}
                 </div>
-                {#if index === 0}
-                  <div style="flex: 0 1 162px;">
+                <div style="flex: 0 1 250px; padding-right:10px; justify-content: center; display: flex;">
+                  {#if editPrices}
+                    <SliderInput bind:value={$priceDataPerCategory[category.type].priceModifier}/>
+                  {:else if index === 0}
                     <small>Prices</small>
-                  </div>
-                {/if}
+                  {/if}
+                </div>
+                <div style="flex: 0 1 18px;">
+                  {#if index === 0}
+                    <i class="fas item-piles-clickable-link" class:fa-edit={!editPrices} class:fa-check={editPrices}
+                       on:click={() => { editPrices = !editPrices; }}></i>
+                  {/if}
+                </div>
               </h3>
 
               <div class="item-piles-items-list">
@@ -259,6 +277,7 @@
         .merchant-item-group-type {
           border-bottom: 1px solid rgba(0, 0, 0, 0.2);
           margin-top: 10px;
+          padding-right: 10px;
         }
 
         .item-piles-items-list {

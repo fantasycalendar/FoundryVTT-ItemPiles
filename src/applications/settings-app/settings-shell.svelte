@@ -90,6 +90,7 @@
 
       {#if userIsGM}
         <div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
+          <Setting bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
           <Setting bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
           <Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
           <Setting bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>

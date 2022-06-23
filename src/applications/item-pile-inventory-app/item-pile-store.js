@@ -22,12 +22,12 @@ export default class ItemPileStore {
     this.search = writable("");
     this.editQuantities = writable(!recipientActor && pileActor.isOwner && game.user.isGM);
     
-    const searchDebounce = debounce((str) => {
-      this.filter(str);
+    const searchDebounce = debounce(() => {
+      this.filter();
     }, 300);
     
-    this.search.subscribe((str) => {
-      searchDebounce(str);
+    this.search.subscribe(() => {
+      searchDebounce();
     });
     
     this.attributes.subscribe(this.refreshNumItems.bind(this));
@@ -72,7 +72,7 @@ export default class ItemPileStore {
     for (let oldItem of items) {
       
       // If we find an item that was previously listed
-      const foundItem = Utilities.findSimilarItem(newItems, oldItem);
+      const foundItem = newItems.find(item => item.id === oldItem.id)
       
       // We refresh the previously listed attribute to reflect this
       oldItem.quantity = foundItem ? foundItem.quantity : 0;
@@ -103,7 +103,7 @@ export default class ItemPileStore {
     for (let oldCurrency of itemCurrencies) {
       
       // If we find an item that was previously listed
-      const foundItem = Utilities.findSimilarItem(newItems, oldCurrency);
+      const foundItem = newItems.find(item => item.id === oldCurrency.id)
       
       // We refresh the previously listed attribute to reflect this
       oldCurrency.quantity = foundItem ? foundItem.quantity : 0;
@@ -259,8 +259,9 @@ export default class ItemPileStore {
     // TODO: close friggin container
   }
   
-  filter(search) {
+  filter() {
     
+    const search = get(this.search);
     const items = get(this.items);
     const attributes = get(this.attributes);
     

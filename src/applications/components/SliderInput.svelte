@@ -34,6 +34,8 @@
     input[type="number"] {
       flex: 0 1 40px;
       margin-left: 1rem;
+      height: 20px;
+      font-size: 0.8rem;
     }
   }
 

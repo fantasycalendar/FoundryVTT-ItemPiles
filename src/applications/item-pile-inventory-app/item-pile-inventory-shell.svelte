@@ -11,7 +11,8 @@
 
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import PrivateAPI from "../../API/private-api.js";
-  import * as Helpers from "../../helpers/helpers.js";
+  import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
+  import * as PileUtilities from "../../helpers/pile-utilities.js";
 
   const { application } = getContext('external');
 
@@ -32,6 +33,13 @@
   $: isPileEmpty = $numItemsStore === 0 && $numCurrenciesStore === 0;
   $: hasItems = $numItemsStore > 0;
   $: showSearchBar = ($numItemsStore + $numCurrenciesStore) >= 10;
+
+  const doc = new TJSDocument(pileActor);
+  $: {
+    $doc;
+    store.pileData = PileUtilities.getActorFlagData(pileActor);
+    store.refresh();
+  }
 
   let num_players = SharingUtilities.getPlayersForItemPile(pileActor).length;
 
