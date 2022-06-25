@@ -2,14 +2,18 @@
 
   import { fade } from 'svelte/transition';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import { get } from "svelte/store";
 
   export let store;
-  export let data;
+  export let entry;
+
+  const { quantityLeft, quantity, currentQuantity } = entry.data;
 
   function previewItem() {
     if (!canPreview) return;
-    const item = store.pileActor.items.get(data.id);
-    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+    const item = store.source.items.get(entry.id);
+    if(!item) return;
+    if (game.user.isGM || item.entry.permission[game.user.id] === 3) {
       return item.sheet.render(true);
     }
     const cls = item._getSheetClass()
@@ -17,68 +21,68 @@
     return sheet._render(true);
   }
 
-  const editQuantitiesStore = store.editQuantities;
+  const editQuantities = store.editQuantities;
 
-  const canPreview = data.id && store.pileData.canInspectItems;
+  const canPreview = entry.id && get(store.pileData).canInspectItems;
 
 </script>
 
 <div class="flexrow item-piles-item-row item-piles-even-color" transition:fade={{duration: 250}}
-     class:item-piles-disabled={!$editQuantitiesStore && !data.shareLeft}>
+     class:item-piles-disabled={!editQuantities && !$quantityLeft}>
 
   <div class="item-piles-img-container">
     <!--<img class="item-piles-img"
-         src="{data.img}"
+         src="{entry.img}"
          on:mouseenter={mouseEnterImage}
          on:mouseleave={mouseLeaveImage}
     />-->
-    <img class="item-piles-img" src="{data.img}"/>
+    <img class="item-piles-img" src="{entry.img}"/>
   </div>
 
   <div class="item-piles-name">
     <div class="item-piles-name-container">
-      <p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{data.name}</p>
-      {#if !$editQuantitiesStore}
-        <span class="item-piles-small-text">(x{data.quantity})</span>
+      <p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{entry.name}</p>
+      {#if !editQuantities}
+        <span class="item-piles-small-text">(x{$quantity})</span>
       {/if}
     </div>
   </div>
 
   <div class="item-piles-quantity-container" style="flex:2.5;">
 
-    {#if $editQuantitiesStore}
+    {#if editQuantities}
 
       <div class="item-piles-quantity-input-container">
-        <input class="item-piles-quantity" type="number" min="0" bind:value="{data.quantity}"/>
+        <input class="item-piles-quantity" type="number" min="0" bind:value="{$quantity}"/>
       </div>
 
     {:else}
 
-      {#if data.shareLeft}
+      {#if $quantityLeft}
         <div class="item-piles-quantity-input-container">
-          <input class="item-piles-quantity" type="number" min="1" bind:value="{data.currentQuantity}"
-                 max="{data.quantity}" disabled="{!data.quantity}"/>
+          <input class="item-piles-quantity" type="number" min="1" bind:value="{$currentQuantity}"
+                 max="{$quantity}" disabled="{!$quantity}"/>
 
-          <span class="item-piles-input-divider" class:item-piles-text-right={!store.recipientActor}>
-             / {data.shareLeft}
+          <span class="item-piles-input-divider" class:item-piles-text-right={!store.recipient}>
+             / {$quantityLeft}
           </span>
         </div>
       {:else}
         <span>
-          {localize(`ITEM-PILES.Inspect.${data.toShare ? "NoShareLeft" : "NoneLeft"}`)}
+          {localize(`ITEM-PILES.Inspect.${entry.toShare ? "NoShareLeft" : "NoneLeft"}`)}
         </span>
       {/if}
     {/if}
 
   </div>
 
-  {#if !$editQuantitiesStore}
+  {#if !editQuantities}
 
     <button
-        on:click={store.take(data)}
+        on:click={() => { entry.take() }}
         class="item-piles-item-take-button"
         type="button"
-        disabled={!data.shareLeft}>
+        disabled={!$quantityLeft}>
       {localize("ITEM-PILES.Inspect.Take")}
     </button>
 

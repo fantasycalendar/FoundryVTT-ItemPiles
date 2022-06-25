@@ -10,6 +10,7 @@ import { hotkeyState } from "../hotkeys.js";
 import DropItemDialog from "../applications/drop-item-dialog/drop-item-dialog.js";
 import { ItemPileInventoryApp } from "../applications/item-pile-inventory-app/item-pile-inventory-app.js";
 import Transaction from "../helpers/transaction.js";
+import ItemPileStore from "../stores/item-store.js";
 
 const preloadedFiles = new Set();
 
@@ -46,7 +47,7 @@ export default class PrivateAPI {
    */
   static _onCreateItem(doc) {
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
-    Utilities.refreshAppsWithDocument(doc.parent, "refreshItems")
+    ItemPileStore.notifyChanges("createItem", doc.parent, doc);
     this._evaluateItemPileChange(doc.parent);
   }
   
@@ -55,7 +56,6 @@ export default class PrivateAPI {
    */
   static _onUpdateItem(doc) {
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
-    Utilities.refreshAppsWithDocument(doc.parent, "refreshItems")
     this._evaluateItemPileChange(doc.parent);
   }
   
@@ -64,7 +64,7 @@ export default class PrivateAPI {
    */
   static _onDeleteItem(doc) {
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
-    Utilities.refreshAppsWithDocument(doc.parent, "refreshItems")
+    ItemPileStore.notifyChanges("deleteItem", doc.parent, doc );
     this._evaluateItemPileChange(doc.parent);
   }
   
@@ -82,14 +82,14 @@ export default class PrivateAPI {
   static _onDeleteToken(doc) {
     if (!PileUtilities.isValidItemPile(doc)) return;
     Helpers.hooks.callAll(HOOKS.PILE.DELETE, doc);
-    Utilities.refreshAppsWithDocument(doc, "refreshDeletedPile")
+    ItemPileStore.notifyChanges("delete", doc.actor)
   }
   
   /**
    * @private
    */
   static _onDeleteActor(doc) {
-    Utilities.refreshAppsWithDocument(doc, "refreshDeletedPile")
+    ItemPileStore.notifyChanges("delete", doc)
   }
   
   /**

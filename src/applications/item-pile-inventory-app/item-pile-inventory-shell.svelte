@@ -1,5 +1,5 @@
 <script>
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy } from 'svelte';
   import { fade } from 'svelte/transition';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
@@ -7,41 +7,34 @@
   import ItemList from "./ItemList.svelte";
   import CurrencyList from "./CurrencyList.svelte";
   import ActorPicker from "./ActorPicker.svelte";
-  import ItemPileStore from "./item-pile-store.js";
 
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import PrivateAPI from "../../API/private-api.js";
-  import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
+  import ItemPileStore from "../../stores/item-store.js";
 
   const { application } = getContext('external');
 
   export let elementRoot;
-  export let pileActor;
-  export let recipientActor;
+  export let source;
+  export let recipient;
   export let overrides;
-  export let deleted = false;
 
-  export let store = new ItemPileStore(pileActor, recipientActor);
+  export let store = new ItemPileStore(source, recipient);
 
   // Stores
   let searchStore = store.search;
-  let numItemsStore = store.numItems;
-  let numCurrenciesStore = store.numCurrencies;
   let editQuantities = store.editQuantities;
+  let pileData = store.pileData;
+  let deleted = store.deleted;
 
-  $: isPileEmpty = $numItemsStore === 0 && $numCurrenciesStore === 0;
-  $: hasItems = $numItemsStore > 0;
-  $: showSearchBar = ($numItemsStore + $numCurrenciesStore) >= 10;
+  let numItems = store.numItems;
+  let numCurrencies = store.numCurrencies;
 
-  const doc = new TJSDocument(pileActor);
-  $: {
-    $doc;
-    store.pileData = PileUtilities.getActorFlagData(pileActor);
-    store.refresh();
-  }
+  $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
+  $: hasItems = $numItems > 0;
+  $: showSearchBar = ($numItems + $numCurrencies) >= 3;
 
-  let num_players = SharingUtilities.getPlayersForItemPile(pileActor).length;
+  let num_players = SharingUtilities.getPlayersForItemPile(source).length;
 
   function dropData(event) {
 
@@ -54,7 +47,7 @@
       return false;
     }
 
-    return PrivateAPI._dropData(canvas, data, { target: store.pileActor });
+    return PrivateAPI._dropData(canvas, data, { target: store.source });
 
   }
 
@@ -69,6 +62,10 @@
     scrolled = itemListElement.scrollTop > 20;
   }
 
+  onDestroy(() => {
+    store.onDestroy();
+  })
+
 </script>
 
 <svelte:options accessors={true}/>
@@ -80,7 +77,7 @@
     <div class="item-piles-item-drop-container" on:dragstart={preventDefault} on:drop={dropData}
          on:dragover={preventDefault}>
 
-      {#if deleted}
+      {#if $deleted}
         <p style="text-align: center; flex: 0 1 auto;">
           {localize("ITEM-PILES.Inspect.Destroyed")}
         </p>
@@ -123,18 +120,18 @@
       {/if}
 
       <footer class="sheet-footer flexrow item-piles-top-divider">
-        {#if !store.recipientActor && $editQuantities}
-          <button type="button" on:click={() => { store.updatePile() }}>
+        {#if editQuantities}
+          <button type="button" on:click={() => { store.update() }}>
             <i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
           </button>
         {/if}
 
-        {#if store.pileData.splitAllEnabled}
+        {#if $pileData.splitAllEnabled}
           <button type="button" on:click={() => { store.splitAll() }}>
             <i class="fas fa-handshake"></i>
-            {#if store.pileData.shareItemsEnabled && store.pileData.shareCurrenciesEnabled}
+            {#if $pileData.shareItemsEnabled && $pileData.shareCurrenciesEnabled}
               {localize("ITEM-PILES.Inspect.SplitAll", { num_players: num_players })}
-            {:else if store.pileData.shareItemsEnabled}
+            {:else if $pileData.shareItemsEnabled}
               {localize("ITEM-PILES.Inspect.SplitAll", { num_players: num_players })}
             {:else}
               {localize("ITEM-PILES.Inspect.SplitCurrencies", { num_players: num_players })}
@@ -142,13 +139,13 @@
           </button>
         {/if}
 
-        {#if store.recipientActor && store.pileData.takeAllEnabled}
+        {#if store.recipient && $pileData.takeAllEnabled}
           <button type="submit" on:click={() => { store.takeAll() }}>
             <i class="fas fa-fist-raised"></i> {localize("ITEM-PILES.Inspect.TakeAll")}
           </button>
         {/if}
 
-        {#if store.pileData.isContainer && !overrides.remote}
+        {#if $pileData.isContainer && !overrides.remote}
           <button type="submit" on:click={() => { store.closeContainer() }}>
             <i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
           </button>

@@ -84,6 +84,15 @@ export function findSimilarItem(items, findItem) {
   });
 }
 
+export function setSimilarityProperties(obj, item){
+  const itemData = item instanceof Item ? item.toObject() : item;
+  setProperty(obj, "_id", itemData._id);
+  game.itempiles.ITEM_SIMILARITIES.forEach(prop => {
+    setProperty(obj, prop, getProperty(itemData, prop));
+  })
+  return obj;
+}
+
 /**
  * Returns a given item's quantity
  *

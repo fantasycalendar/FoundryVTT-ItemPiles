@@ -87,6 +87,17 @@ export function getActorCurrencyItems(target, { currencyFilters = false } = {}) 
   });
 }
 
+export function isItemCurrency(item, { currencyFilters = false, target = false }={}){
+  if(!target && !currencyFilters){
+    target = item.parent;
+  }
+  if(target){
+    const targetActor = Utilities.getActor(target);
+    currencyFilters = getActorCurrencyData(targetActor)?.items || [];
+  }
+  return !!Utilities.findSimilarItem(currencyFilters, item);
+}
+
 export function isItemInvalid(targetActor, item, itemFilters = false) {
   const pileItemFilters = itemFilters ? itemFilters : getActorItemFilters(targetActor)
   const itemData = item instanceof Item ? item.toObject() : item;

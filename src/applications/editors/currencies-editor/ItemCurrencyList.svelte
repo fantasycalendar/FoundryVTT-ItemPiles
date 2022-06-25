@@ -6,6 +6,7 @@
   import FilePicker from "../../components/FilePicker.svelte";
   import DropZone from "../../components/DropZone.svelte";
   import * as Helpers from "../../../helpers/helpers.js";
+  import * as Utilities from "../../../helpers/utilities.js";
 
   export let store;
 
@@ -59,15 +60,14 @@
 
     item = item.toObject();
 
-    let currentItems = get(itemStore);
-    if (currentItems.find(existingItem => existingItem.name === item.name && existingItem.type === existingItem.type)) return;
-    itemStore.set([...currentItems, {
+    const currentItems = get(itemStore);
+    const foundItem = Utilities.findSimilarItem(currentItems, item)
+    if (foundItem) return;
+    const itemData = Utilities.setSimilarityProperties({
       primary: !get(store.primary),
-      name: item.name,
-      type: item.type,
-      exchange: 1,
-      img: item.img
-    }]);
+      exchange: 1
+    }, item);
+    itemStore.set([...currentItems, itemData]);
     store.primary.set(true);
   }
 

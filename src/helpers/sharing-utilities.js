@@ -1,6 +1,7 @@
 import CONSTANTS from "../constants/constants.js";
 import * as Utilities from "./utilities.js"
 import * as PileUtilities from "./pile-utilities.js"
+import { setSimilarityProperties } from "./utilities.js";
 
 /**
  * Gets the players that can interact with this item pile
@@ -24,6 +25,10 @@ export function getPlayersForItemPile(target) {
 export function getItemPileSharingData(target) {
   const targetActor = Utilities.getActor(target);
   return foundry.utils.duplicate(getProperty(targetActor, CONSTANTS.FLAGS.SHARING) ?? {});
+}
+
+export function getItemPileSharingDataForItem(target, item){
+  const sharingData = getItemPileSharingData(target);
 }
 
 /**
@@ -130,15 +135,13 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
       let existingItem = Utilities.findSimilarItem(pileSharingData.items, item);
       
       if (!existingItem) {
-        let itemIndex = pileSharingData.items.push({
-          name: item.name,
-          type: item.type,
-          img: item.img,
+        let itemIndex = pileSharingData.items.push(Utilities.setSimilarityProperties({
           actors: [{ uuid: actorUuid, quantity: 0 }]
-        })
+        }, item))
         existingItem = pileSharingData.items[itemIndex - 1];
       } else if (!existingItem.actors) {
         existingItem.actors = [];
+        existingItem._id = item.id;
       }
       
       let actorData = existingItem.actors.find(data => data.uuid === actorUuid);

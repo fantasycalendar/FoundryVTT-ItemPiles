@@ -5,14 +5,14 @@
 
   export let store;
 
-  let editQuantitiesStore = store.editQuantities;
+  let editQuantities = store.editQuantities;
 
   let changingActor = false;
   let playerActors = game.actors.filter(actor => actor.isOwner && actor !== store.pileActor && actor.data.token.actorLink);
-  let recipientActorUuid = Utilities.getUuid(store.recipientActor);
+  let recipientUuid = Utilities.getUuid(store.recipient);
 
   function changeRecipientActor() {
-    store.recipientActor = playerActors.find(actor => Utilities.getUuid(actor) === recipientActorUuid);
+    store.recipient = playerActors.find(actor => Utilities.getUuid(actor) === recipientUuid);
     store.update();
     changingActor = false;
   }
@@ -21,11 +21,11 @@
 
 <div>
 
-  {#if $editQuantitiesStore}
+  {#if editQuantities}
     <p style="text-align: center; flex: 0 1 auto;">{localize("ITEM-PILES.Inspect.Owner")}</p>
   {:else}
     <p style="text-align: center; flex: 0 1 auto; height: 27px;">
-      {localize("ITEM-PILES.Inspect.AsActor", { actorName: store.recipientActor.name })}
+      {localize("ITEM-PILES.Inspect.AsActor", { actorName: store.recipient.name })}
       {#if playerActors.length > 1}
         {#if !changingActor}
           <a class='item-piles-highlight' on:click={() => { changingActor = true }} class:active={!changingActor}>Change
@@ -33,7 +33,7 @@
         {:else}
           <select
               class="item-piles-change-actor-select"
-              bind:value={recipientActorUuid}
+              bind:value={recipientUuid}
               on:change={changeRecipientActor}
               class:active={changingActor}
               style="height:auto;"

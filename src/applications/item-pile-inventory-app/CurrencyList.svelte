@@ -5,32 +5,17 @@
   import ListEntry from "./ListEntry.svelte";
 
   export let store;
-  const attributeStore = store.attributes;
-  const itemStore = store.itemCurrencies;
-  const numCurrenciesStore = store.numCurrencies;
-  const editQuantitiesStore = store.editQuantities;
+  const currencies = store.currencies;
 
   async function addCurrency() {
-    const result = await DropCurrencyDialog.show(store.recipientActor, store.pileActor);
+    const result = await DropCurrencyDialog.show(store.recipient, store.source);
     if (!result) return;
     if (!foundry.utils.isObjectEmpty(result.attributes)) {
-      await game.itempiles.transferAttributes(store.recipientActor, store.pileActor, result.attributes, { interactionId: store.interactionId })
+      await game.itempiles.transferAttributes(store.recipient, store.source, result.attributes, { interactionId: store.interactionId })
     }
     if (result.items.length) {
-      await game.itempiles.transferItems(store.recipientActor, store.pileActor, result.items, { interactionId: store.interactionId })
+      await game.itempiles.transferItems(store.recipient, store.source, result.items, { interactionId: store.interactionId })
     }
-  }
-
-  let entries;
-
-  $: {
-    entries = $attributeStore.map(attribute => ({
-      identifier: attribute.path,
-      data: attribute
-    })).concat($itemStore.map(item => ({
-      identifier: `${item.name}-${item.type}`,
-      data: item
-    })))
   }
 
 </script>
@@ -39,21 +24,17 @@
 
   <div class="flexrow">
     <h3>{localize("ITEM-PILES.Currencies")}:</h3>
-    {#if store.recipientActor}
+    {#if store.recipient}
       <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
          on:click={addCurrency}>
         <i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
       </a>
     {/if}
   </div>
-  {#if $numCurrenciesStore > 0 || $editQuantitiesStore}
-    <div>
-      {#each entries as entry, index (entry.identifier)}
-        {#if entry.data.visible}
-          <ListEntry {store} bind:data={entry.data}/>
-        {/if}
-      {/each}
-    </div>
-  {/if}
+  <div>
+    {#each $currencies as currency, index (currency.identifier)}
+      <ListEntry {store} bind:entry={currency}/>
+    {/each}
+  </div>
 
 </div>
