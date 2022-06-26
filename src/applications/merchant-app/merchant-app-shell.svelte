@@ -1,13 +1,12 @@
 <script>
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
-  import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
   import Tabs from "../components/Tabs.svelte";
-  import MerchantStore from "./merchant-store.js";
   import SliderInput from "../components/SliderInput.svelte";
+  import MerchantStore from "../../stores/merchant-store.js";
+  import MerchantItemEntry from "./MerchantItemEntry.svelte";
 
   const { application } = getContext('external');
 
@@ -16,38 +15,30 @@
   export let merchant;
   export let buyer;
 
-  export let store = new MerchantStore(merchant, buyer);
+  export let store = new MerchantStore(application, merchant, buyer);
+
+  onDestroy(() => {
+    store.onDestroy();
+  })
 
   let searchStore = store.search;
-  let itemStore = store.items;
+  let itemsPerCategoryStore = store.itemsPerCategory;
   let categoryStore = store.categories;
-  let merchantData = store.merchantData;
-  let priceDataPerCategory = store.priceDataPerCategory;
-  let editPrices = false;
+  let priceModifiersPerType = store.priceModifiersPerType;
+  let editPrices = !buyer;
+  const pileDataStore = store.pileData;
 
-  const doc = new TJSDocument(merchant);
-  $: {
-    $doc;
-    store.merchantData = PileUtilities.getActorFlagData(merchant);
-    store.refresh();
-  }
+  const merchantName = store.name;
+  const merchantImg = store.img;
+
+  $: pileData = $pileDataStore;
 
   function getOpenTimes() {
-    let open = merchantData.openTimes.open;
-    let close = merchantData.openTimes.close;
+    let open = pileData.openTimes.open;
+    let close = pileData.openTimes.close;
     open = `${open.hour.toString().padStart(2, "0")}:${open.minute.toString().padStart(2, "0")}`;
     close = `${close.hour.toString().padStart(2, "0")}:${close.minute.toString().padStart(2, "0")}`;
     return `${open} - ${close}`;
-  }
-
-  function previewItem(item) {
-    item = merchant.items.get(item.id);
-    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
-      return item.sheet.render(true);
-    }
-    const cls = item._getSheetClass()
-    const sheet = new cls(item, { editable: false })
-    return sheet._render(true);
   }
 
   function buyItem(item) {
@@ -64,8 +55,8 @@
   <main>
 
     <div class="flexrow merchant-top-bar item-piles-bottom-divider">
-      <div class="merchant-name">{ merchant.name }</div>
-      {#if merchantData.openTimes.enabled}
+      <div class="merchant-name">{ $merchantName }</div>
+      {#if pileData.openTimes.enabled}
         <div class="opening-hours flexcol">
           <span>Opening hours</span>
           <span style="font-style: italic;">{getOpenTimes()}</span>
@@ -78,7 +69,7 @@
       <div class="merchant-left-pane flexcol">
 
         <div class="merchant-img">
-          <img src="{ merchant.img }">
+          <img src="{ $merchantImg }">
         </div>
 
         <div class="flexcol item-piles-top-divider">
@@ -88,17 +79,48 @@
             { value: 'settings', label: 'Settings', hidden: !game.user.isGM },
           ]}" bind:activeTab={activeSidebarTab}/>
 
-          <section class="tab-body item-piles-sections flexcol" style="padding:0.25rem;margin-top:0.5rem;">
+          <section class="tab-body item-piles-sections">
 
             {#if activeSidebarTab === 'description'}
-              <div class="tab flex item-piles-grow">
-                AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+              <div class="tab merchant-description">
+                <div>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                  dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                  aliquip
+                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+                  eu
+                  fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+                  deserunt mollit anim id est laborum.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                  dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                  aliquip
+                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+                  eu
+                  fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+                  deserunt mollit anim id est laborum.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                  dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                  aliquip
+                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+                  eu
+                  fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+                  deserunt mollit anim id est laborum.
+                </div>
               </div>
             {/if}
 
             {#if activeSidebarTab === 'settings'}
-              <div class="tab flex item-piles-grow">
-                WHATUP
+              <div class="tab merchant-settings">
+                <div class="setting-container">
+                  <div class="form-group">
+                    <label>Price Modifier:</label>
+                    <SliderInput bind:value={$pileDataStore.priceModifier}/>
+                  </div>
+                </div>
+
+                <button type="button" class="update-button" on:click={() => { store.update(); }}>
+                  <i class="fas fa-download"></i> Update
+                </button>
               </div>
             {/if}
 
@@ -109,88 +131,48 @@
       </div>
 
       <div class="merchant-right-pane">
-
         <h2 style="flex: 0; border:0;">For sale</h2>
-
         <input type="text" bind:value={$searchStore}>
 
         {#each $categoryStore as category, index (category.type)}
-
-          {#if $itemStore.filter(item => item.type === category.type && item.visible).length}
-
-            <div transition:fade={{duration: 150}}>
-
-              <h3 class="merchant-item-group-type flexrow">
-                <div>
-                  {localize(category.label)}
-                </div>
-                <div style="flex: 0 1 250px; padding-right:10px; justify-content: center; display: flex;">
-                  {#if editPrices}
-                    <SliderInput bind:value={$priceDataPerCategory[category.type].priceModifier}/>
-                  {:else if index === 0}
-                    <small>Prices</small>
-                  {/if}
-                </div>
-                <div style="flex: 0 1 18px;">
-                  {#if index === 0}
-                    <i class="fas item-piles-clickable-link" class:fa-edit={!editPrices} class:fa-check={editPrices}
-                       on:click={() => { editPrices = !editPrices; }}></i>
-                  {/if}
-                </div>
-              </h3>
-
-              <div class="item-piles-items-list">
-
-                {#each $itemStore.filter(item => item.type === category.type) as item (item.id)}
-
-                  {#if item.visible}
-
-                    <div class="flexrow item-piles-item-row item-piles-odd-color" transition:fade={{duration: 250}}
-                         style="flex: 1 0 auto;">
-
-                      <div class="item-piles-img-container"><img class="item-piles-img" src="{item.img}"/></div>
-
-                      <div class="item-piles-name item-piles-text">
-                        <div class="item-piles-name-container">
-                          {#if merchantData.canInspectItems || game.user.isGM}
-                            <a class="item-piles-clickable" on:click={previewItem(item)}>{item.name}</a>
-                          {:else}
-                            {item.name}
-                          {/if}
-                        </div>
-                      </div>
-
-                      {#if item.prices.length === 1}
-                        <div class="flexrow" style="flex-direction:row; flex: 0 1 100px; align-items: center;">
-                          <img src="{item.prices[0].img}" title="{localize(item.prices[0].name)}"
-                               style=" border-radius: 4px; max-height:20px; max-width: 20px; margin-right: 5px;">
-                          <small>{item.prices[0].cost}</small>
-                        </div>
-                      {/if}
-
-                      <div class="flexrow" style="flex: 0 1 50px; align-items: center;">
-                        <a class="item-piles-buy-button" on:click={buyItem(item)}><i class="fas fa-shopping-cart"></i>
-                          Buy</a>
-                      </div>
-
-                    </div>
-
-                  {/if}
-
-                {/each}
-
+          <div transition:fade={{duration: 150}}>
+            <h3 class="merchant-item-group-type flexrow">
+              <div>
+                {localize(category.label)}
               </div>
+              <div class="price-header">
+                {#if editPrices}
+                  {#if $priceModifiersPerType[category.type]}
+                    Override:
+                    <input type="checkbox" bind:checked={$priceModifiersPerType[category.type].override}>
+                    <SliderInput bind:value={$priceModifiersPerType[category.type].priceModifier}/>
+                  {/if}
+                {:else if index === 0}
+                  <small>Prices</small>
+                {/if}
+              </div>
+              <div style="flex: 0 1 auto">
+                {#if editPrices}
+                  {#if $priceModifiersPerType[category.type]}
+                    <i class="fas fa-times item-piles-clickable-red"
+                       on:click={() => { store.removeOverrideTypePrice(category.type) }}></i>
+                  {:else}
+                    <i class="fas fa-plus item-piles-clickable-green"
+                       on:click={() => { store.addOverrideTypePrice(category.type) }}></i>
+                  {/if}
+                {/if}
+              </div>
+            </h3>
 
+            <div class="item-piles-items-list">
+              {#each $itemsPerCategoryStore[category.type] as item (item.id)}
+                <MerchantItemEntry {store} {item}/>
+              {/each}
             </div>
-
-          {/if}
-
+          </div>
         {/each}
-
       </div>
-
     </div>
-
   </main>
 </ApplicationShell>
 
@@ -230,13 +212,18 @@
       .merchant-left-pane {
 
         flex: 0 1 35%;
-        padding-right: 10px;
-        margin-right: 10px;
+        padding-right: 0.25rem;
+        margin-right: 0.25rem;
         border-right: 1px solid rgba(0, 0, 0, 0.5);
         max-height: 100%;
         max-width: 300px;
         min-width: 250px;
         overflow-y: scroll;
+
+        section {
+          padding: 0.25rem;
+          margin-top: 0.5rem;
+        }
 
         .merchant-img {
           flex: 0 1 auto;
@@ -252,18 +239,35 @@
         }
 
         .merchant-description {
-          overflow-y: scroll;
-          padding: 5px 10px 5px 5px;
-          border-radius: 3px;
-          border: 1px solid rgba(0, 0, 0, 0.25);
-          margin-bottom: 5px;
+          position: relative;
+          height: 100%;
+          padding: 0.25rem;
+
+          div {
+            overflow: hidden auto;
+            top: 0;
+            bottom: 0;
+            position: absolute;
+            word-break: break-word;
+          }
         }
 
-        .merchant-details {
-          padding: 5px;
-          border-radius: 3px;
-          border: 1px solid rgba(0, 0, 0, 0.25);
-          flex: 0;
+        .merchant-settings {
+          position: relative;
+          height: 100%;
+
+          .setting-container {
+            overflow: hidden auto;
+            top: 0;
+            bottom: 37px;
+            position: absolute;
+          }
+
+          .update-button {
+            position: absolute;
+            bottom: 0;
+          }
+
         }
 
       }
@@ -278,53 +282,23 @@
           border-bottom: 1px solid rgba(0, 0, 0, 0.2);
           margin-top: 10px;
           padding-right: 10px;
+
+          .price-header {
+            flex: 0 1 250px;
+            padding-right: 10px;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+
+            input[type="checkbox"]{
+              height:15px;
+            }
+          }
         }
 
         .item-piles-items-list {
           overflow: auto;
           padding-right: 10px;
-
-          .item-piles-item-row {
-
-            margin: 0;
-
-            .item-piles-text {
-              font-size: inherit;
-              padding-left: 0.25rem;
-            }
-
-            .item-piles-img-container {
-              min-height: 20px;
-              max-width: 20px;
-              max-height: 20px;
-              margin: 2px;
-
-              overflow: hidden;
-              border-radius: 4px;
-              border: 1px solid black;
-              align-self: center;
-
-              .item-piles-img {
-                border: 0;
-                width: auto;
-                height: 100%;
-                transition: transform 150ms;
-
-                &:hover {
-                  transform: scale(1.125, 1.125);
-                }
-              }
-            }
-
-            .item-piles-name-container {
-              line-height: 1.6;
-            }
-
-            .item-piles-disabled {
-              background-color: var(--color-bg-btn-minor-inactive, #c9c7b8)
-            }
-
-          }
         }
       }
     }

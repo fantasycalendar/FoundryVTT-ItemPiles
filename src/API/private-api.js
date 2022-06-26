@@ -10,7 +10,7 @@ import { hotkeyState } from "../hotkeys.js";
 import DropItemDialog from "../applications/drop-item-dialog/drop-item-dialog.js";
 import { ItemPileInventoryApp } from "../applications/item-pile-inventory-app/item-pile-inventory-app.js";
 import Transaction from "../helpers/transaction.js";
-import ItemPileStore from "../stores/item-store.js";
+import ItemPileStore from "../stores/item-pile-store.js";
 
 const preloadedFiles = new Set();
 
@@ -1144,12 +1144,12 @@ export default class PrivateAPI {
 
       if (pileData.locked && !game.user.isGM) {
         Helpers.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
-        return this.rattleItemPile(pileDocument, interactingActor);
+        return game.itempiles.rattleItemPile(pileDocument, interactingActor);
       }
 
       if (pileData.closed) {
         Helpers.debug(`Opened item pile with UUID ${pileDocument.uuid}`);
-        await this.openItemPile(pileDocument, interactingActor);
+        await game.itempiles.openItemPile(pileDocument, interactingActor);
       }
 
     }
@@ -1277,6 +1277,10 @@ export default class PrivateAPI {
       inspectingTarget = inspectingTargetUuid ? Utilities.fromUuidFast(inspectingTargetUuid) : false;
     }
 
+    const isContainer = PileUtilities.isItemPileContainer(target);
+    if(isContainer){
+
+    }
     // const merchant = PileUtilities.isItemPileMerchant(target);
     // Todo: Utilize merchant UI
 

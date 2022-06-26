@@ -16,7 +16,6 @@ export class ItemPileInventoryApp extends SvelteApplication {
    * @param dialogData
    */
   constructor(source, recipient, overrides = {}, options = {}, dialogData = {}) {
-    
     super({
       id: `item-pile-inventory-${source.id}`,
       title: source.name,
@@ -32,10 +31,11 @@ export class ItemPileInventoryApp extends SvelteApplication {
       },
       ...options
     }, dialogData);
-    
+
     this.source = source;
-    
-    Helpers.hooks.callAll(HOOKS.PILE.OPEN_INVENTORY, this, this.source, recipient, overrides);
+    this.recipient = recipient;
+
+    Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, source, recipient, overrides);
     
   }
   
@@ -56,6 +56,8 @@ export class ItemPileInventoryApp extends SvelteApplication {
   static async show(source, recipient = false, overrides = {}, options = {}, dialogData = {}) {
     source = Utilities.getActor(source)
     recipient = Utilities.getActor(recipient);
+    const result = Helpers.hooks.call(HOOKS.PRE_OPEN_INTERFACE, source, recipient, overrides);
+    if(result === false) return;
     const apps = this.getActiveApps(source.id);
     if (apps.length) {
       for (let app of apps) {
@@ -68,13 +70,12 @@ export class ItemPileInventoryApp extends SvelteApplication {
       new this(source, recipient, overrides, options, dialogData).render(true, { focus: true });
     })
   }
-  
-  refreshItems() {
-    //this.svelte.applicationShell.store.refreshItems();
-  }
-  
-  refreshDeletedPile() {
-    //this.svelte.applicationShell.deleted = true;
+
+  async close(options){
+    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.source, this.recipient);
+    if(result === false) return;
+    Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.source, this.recipient);
+    return super.close(options);
   }
   
   /* -------------------------------------------- */

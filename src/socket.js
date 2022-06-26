@@ -5,6 +5,7 @@ import PrivateAPI from "./API/private-api.js";
 import TradeAPI from "./API/trade-api.js";
 import ChatAPI from "./API/chat-api.js";
 import * as Helpers from "./helpers/helpers.js";
+import HOOKS from "./constants/hooks.js";
 
 export default class ItemPileSocket {
   
@@ -38,9 +39,9 @@ export default class ItemPileSocket {
      */
     RENDER_INTERFACE: "renderItemPileApplication",
     RERENDER_TOKEN_HUD: "rerenderTokenHud",
-    QUERY_PILE_INVENTORY_OPEN: "queryItemPileInventoryOpen",
-    RESPOND_PILE_INVENTORY_OPEN: "responseItemPileInventoryOpen",
-    
+    USER_OPENED_INTERFACE: "userOpenedInterface",
+    USER_CLOSED_INTERFACE: "userClosedInterface",
+
     /**
      * Item & attribute sockets
      */
@@ -119,18 +120,16 @@ export default class ItemPileSocket {
     [this.HANDLERS.SPLIT_CHAT_MESSAGE]: (...args) => ChatAPI._outputSplitToChat(...args),
     [this.HANDLERS.DISABLE_CHAT_TRADE_BUTTON]: (...args) => ChatAPI._disableTradingButton(...args),
     
-    [this.HANDLERS.RENDER_INTERFACE]: (...args) => {
-    },
-    [this.HANDLERS.RERENDER_TOKEN_HUD]: (...args) => PrivateAPI._updateTokenHud(),
-    [this.HANDLERS.QUERY_PILE_INVENTORY_OPEN]: (...args) => {
-    },
-    [this.HANDLERS.RESPOND_PILE_INVENTORY_OPEN]: (...args) => {
-    },
+    [this.HANDLERS.RENDER_INTERFACE]: (...args) => PrivateAPI._renderItemPileInterface(...args),
+    [this.HANDLERS.RERENDER_TOKEN_HUD]: (...args) => PrivateAPI._updateTokenHud(...args),
+    [this.HANDLERS.USER_OPENED_INTERFACE]: (...args) => InterfaceTracker.userOpened(...args),
+    [this.HANDLERS.USER_CLOSED_INTERFACE]: (...args) => InterfaceTracker.userClosed(...args),
   }
   
   static _socket;
   
   static initialize() {
+    InterfaceTracker.initialize();
     this._socket = socketlib.registerModule(CONSTANTS.MODULE_NAME);
     for (let [key, callback] of Object.entries(this.BINDINGS)) {
       this._socket.register(key, callback);
@@ -190,4 +189,41 @@ async function callHook(hook, ...args) {
     newArgs.push(arg);
   }
   return Hooks.callAll(hook, ...newArgs);
+}
+
+export const InterfaceTracker = {
+
+  users: {},
+
+  initialize(){
+    this.users = {};
+    Hooks.on("renderPlayerList", () => {
+      Array.from(game.users).forEach(user => {
+        if(!this.users[user.id] || !user.active){
+          this.users[user.id] = new Set();
+        }
+      });
+    });
+    Hooks.on(HOOKS.OPEN_INTERFACE, (app) => {
+      ItemPileSocket.executeForOthers(ItemPileSocket.HANDLERS.USER_OPENED_INTERFACE, game.user.id, app.id);
+    });
+    Hooks.on(HOOKS.CLOSE_INTERFACE, (app) => {
+      ItemPileSocket.executeForOthers(ItemPileSocket.HANDLERS.USER_CLOSED_INTERFACE, game.user.id, app.id);
+    });
+  },
+
+  userOpened(userId, id){
+    this.users[userId].add(id);
+  },
+
+  userClosed(userId, id){
+    this.users[userId].delete(id);
+  },
+
+  isOpened(id){
+    return Object.values(this.users).find(interfaceList => {
+      return interfaceList.has(id);
+    })
+  }
+
 }

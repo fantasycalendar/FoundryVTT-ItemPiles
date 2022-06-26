@@ -18,6 +18,8 @@ const CONSTANTS = {
   ITEM_DEFAULTS: {
     enabled: false,
     free: false,
+    forSale: true,
+    visible: true,
     prices: []
   },
   

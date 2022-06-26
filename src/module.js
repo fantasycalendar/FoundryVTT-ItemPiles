@@ -51,7 +51,7 @@ Hooks.once("ready", () => {
   
   ChatAPI.disablePastTradingButtons();
   
-  MerchantApp.show(game.actors.getName("Almighty Spark"))
+  MerchantApp.show(game.actors.get("XWczTeS4oJzsrOYY"))
   
 });
 

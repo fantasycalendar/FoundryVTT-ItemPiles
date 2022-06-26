@@ -10,7 +10,7 @@
 
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import PrivateAPI from "../../API/private-api.js";
-  import ItemPileStore from "../../stores/item-store.js";
+  import ItemPileStore from "../../stores/item-pile-store.js";
 
   const { application } = getContext('external');
 
@@ -19,7 +19,7 @@
   export let recipient;
   export let overrides;
 
-  export let store = new ItemPileStore(source, recipient);
+  export let store = new ItemPileStore(application, source, recipient);
 
   // Stores
   let searchStore = store.search;
@@ -64,7 +64,7 @@
 
   onDestroy(() => {
     store.onDestroy();
-  })
+  });
 
 </script>
 
@@ -127,26 +127,26 @@
         {/if}
 
         {#if $pileData.splitAllEnabled}
-          <button type="button" on:click={() => { store.splitAll() }}>
+          <button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty}">
             <i class="fas fa-handshake"></i>
             {#if $pileData.shareItemsEnabled && $pileData.shareCurrenciesEnabled}
-              {localize("ITEM-PILES.Inspect.SplitAll", { num_players: num_players })}
+              {localize("ITEM-PILES.Inspect.SplitAll", { num_players })}
             {:else if $pileData.shareItemsEnabled}
-              {localize("ITEM-PILES.Inspect.SplitAll", { num_players: num_players })}
+              {localize("ITEM-PILES.Inspect.SplitAll", { num_players })}
             {:else}
-              {localize("ITEM-PILES.Inspect.SplitCurrencies", { num_players: num_players })}
+              {localize("ITEM-PILES.Inspect.SplitCurrencies", { num_players })}
             {/if}
           </button>
         {/if}
 
         {#if store.recipient && $pileData.takeAllEnabled}
-          <button type="submit" on:click={() => { store.takeAll() }}>
+          <button type="submit" on:click={() => { store.takeAll() }} disabled="{isPileEmpty}">
             <i class="fas fa-fist-raised"></i> {localize("ITEM-PILES.Inspect.TakeAll")}
           </button>
         {/if}
 
         {#if $pileData.isContainer && !overrides.remote}
-          <button type="submit" on:click={() => { store.closeContainer() }}>
+          <button type="submit" on:click={() => { store.closeContainer(); application.close(); }}>
             <i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
           </button>
         {/if}

@@ -7,7 +7,9 @@
   export let store;
   export let entry;
 
-  const { quantityLeft, quantity, currentQuantity } = entry.data;
+  const quantityLeft = entry.quantityLeft;
+  const quantity = entry.quantity;
+  const currentQuantity = entry.currentQuantity;
 
   function previewItem() {
     if (!canPreview) return;
