@@ -126,7 +126,7 @@
       store.addItem(itemData, { quantity: item.quantity, currency: true })
     });
 
-    const currencies = PileUtilities.getFormattedActorCurrencies(store.leftTraderActor, { getAll: asGM });
+    const currencies = PileUtilities.getFormattedActorAttributes(store.leftTraderActor, { getAll: asGM });
     Object.entries(currenciesToAdd.attributes).forEach(([path, quantity]) => {
       const currency = currencies.find(currency => currency.path === path);
       store.addAttribute({

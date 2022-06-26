@@ -50,6 +50,7 @@ export function fromUuidFast(uuid) {
 }
 
 export function getUuid(target) {
+  if(stringIsUuid(target)) return target;
   const document = getDocument(target);
   return document?.uuid ?? false;
 }

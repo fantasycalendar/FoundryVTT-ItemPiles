@@ -6,6 +6,9 @@
 
   export let store;
   const currencies = store.currencies;
+  const numItems = store.numItems;
+  const numCurrencies = store.numCurrencies;
+  const editQuantities = store.editQuantities;
 
   async function addCurrency() {
     const result = await DropCurrencyDialog.show(store.recipient, store.source);
@@ -23,7 +26,9 @@
 <div>
 
   <div class="flexrow">
-    <h3>{localize("ITEM-PILES.Currencies")}:</h3>
+    {#if $numCurrencies > 0 || $numItems > 0}
+      <h3>{localize("ITEM-PILES.Currencies")}:</h3>
+    {/if}
     {#if store.recipient}
       <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
          on:click={addCurrency}>
@@ -31,10 +36,12 @@
       </a>
     {/if}
   </div>
-  <div>
-    {#each $currencies as currency, index (currency.identifier)}
-      <ListEntry {store} bind:entry={currency}/>
-    {/each}
-  </div>
+  {#if $numCurrencies > 0 || editQuantities}
+    <div>
+      {#each $currencies as currency, index (currency.identifier)}
+        <ListEntry {store} bind:entry={currency}/>
+      {/each}
+    </div>
+  {/if}
 
 </div>

@@ -12,7 +12,7 @@
 
   const targetCurrencyData = PileUtilities.getActorCurrencyData(targetActor);
 
-  let currencies = PileUtilities.getFormattedActorCurrencies(sourceActor, {
+  let currencies = PileUtilities.getFormattedActorAttributes(sourceActor, {
       currencyList: targetCurrencyData.currencies,
       getAll: settings?.unlimitedCurrencies
     })

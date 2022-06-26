@@ -148,12 +148,10 @@ export function getActorCurrencyAttributes(target) {
 
 export function getActorAttributes(target) {
   const targetActor = Utilities.getActor(target)
-  const attributes = getActorCurrencyAttributes(targetActor);
-  const items = getActorCurrencyItems(targetActor);
-  return { attributes, items };
+  return getActorCurrencyAttributes(targetActor);
 }
 
-export function getFormattedActorCurrencies(target, { currencyList = false, getAll = false } = {}) {
+export function getFormattedActorAttributes(target, { currencyList = false, getAll = false } = {}) {
   const targetActor = Utilities.getActor(target)
   const currencies = currencyList || getActorCurrencyAttributes(targetActor);
   return currencies.filter(currency => {
@@ -178,7 +176,7 @@ export function isItemPileEmpty(target) {
   if (!validItemPile) return false;
   
   const hasNoItems = getActorItems(targetActor).length === 0;
-  const hasNoCurrencies = getFormattedActorCurrencies(targetActor).length === 0;
+  const hasNoCurrencies = getFormattedActorAttributes(targetActor).length === 0;
   
   return validItemPile && hasNoItems && hasNoCurrencies;
   
@@ -201,7 +199,7 @@ export function getItemPileTokenImage(token, { data = false, items = false, curr
   if (!isValidItemPile(tokenDocument)) return originalImg;
   
   items = items || getActorItems(tokenDocument).map(item => item.toObject());
-  currencies = currencies || getFormattedActorCurrencies(tokenDocument);
+  currencies = currencies || getFormattedActorAttributes(tokenDocument);
   
   const numItems = items.length + currencies.length;
   
@@ -253,7 +251,7 @@ export function getItemPileTokenScale(target, { data = false, items = false, cur
   }
   
   items = items || getActorItems(pileDocument);
-  currencies = currencies || getFormattedActorCurrencies(pileDocument);
+  currencies = currencies || getFormattedActorAttributes(pileDocument);
   
   const numItems = items.length + currencies.length;
   
@@ -283,7 +281,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
   }
   
   items = items || getActorItems(pileDocument);
-  currencies = currencies || getFormattedActorCurrencies(pileDocument);
+  currencies = currencies || getFormattedActorAttributes(pileDocument);
   
   const numItems = items.length + currencies.length;
   
@@ -460,7 +458,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
   const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
   
   const targetItems = getActorItems(documentActor, { itemFilters: flagData.itemFilters });
-  const attributes = getFormattedActorCurrencies(documentActor, { currencyList: flagData.currencies });
+  const attributes = getFormattedActorAttributes(documentActor, { currencyList: flagData.currencies });
   
   const pileData = { data: flagData, items: targetItems, currencies: attributes };
   

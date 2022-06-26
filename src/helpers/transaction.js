@@ -13,10 +13,11 @@ export default class Transaction {
     this.actorUpdates = {};
     this.attributeDeltas = new Map();
     this.itemDeltas = new Map();
+    this.itemTypeMap = new Map();
     this.preCommitted = false;
   }
   
-  appendItemChanges(items, remove = false) {
+  appendItemChanges(items, { remove = false, type = "item" }={}) {
     for (let item of items) {
       item = item.item ?? item;
       const incomingQuantity = Math.abs(item.quantity ?? Utilities.getItemQuantity(item)) * (remove ? -1 : 1);
@@ -29,6 +30,7 @@ export default class Transaction {
         } else {
           const newQuantity = Utilities.getItemQuantity(actorExistingItem) + incomingQuantity;
           const update = Utilities.setItemQuantity({ _id: actorExistingItem.id }, newQuantity);
+          this.itemTypeMap.set(actorExistingItem.id, type)
           this.itemsToUpdate.push(update)
           this.itemDeltas.set(actorExistingItem.id,
             (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity
@@ -40,17 +42,18 @@ export default class Transaction {
           const newQuantity = Utilities.getItemQuantity(existingItemCreation) + incomingQuantity;
           Utilities.setItemQuantity(existingItemCreation, newQuantity);
         } else {
-          this.itemsToCreate.push(item)
+          setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, incomingQuantity);
+          this.itemsToCreate.push(item);
+          this.itemTypeMap.set(item._id, type)
         }
       }
     }
   }
   
-  appendActorChanges(attributes, remove = false) {
+  appendActorChanges(attributes, { remove = false }={}) {
     if (!Array.isArray(attributes)) {
       attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
     }
-    
     this.actorUpdates = attributes.reduce((acc, attribute) => {
       const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
       acc[attribute.path] = acc[attribute.path] ?? Number(getProperty(this.actor.data, attribute.path));
@@ -73,16 +76,20 @@ export default class Transaction {
     this.itemsToDelete = this.itemsToUpdate.filter(item => Utilities.getItemQuantity(item) <= 0).map(item => item._id);
     this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
       const item = this.actor.items.get(id).toObject();
-      return { item, quantity };
+      const type = this.itemTypeMap.get(id);
+      setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, quantity);
+      return { item, quantity, type };
     });
     this.itemsDeleted = Array.from(this.itemsDeleted).map(([id, quantity]) => {
       const item = this.actor.items.get(id).toObject();
-      return { item, quantity };
+      const type = this.itemTypeMap.get(id);
+      return { item, quantity, type };
     });
     this.itemsToUpdate = this.itemsToUpdate.filter(item => Utilities.getItemQuantity(item) > 0).filter(itemData => {
       const item = this.actor.items.get(itemData._id)
       return Utilities.getItemQuantity(item) !== Utilities.getItemQuantity(itemData);
     });
+    this.attributeDeltas = Object.fromEntries(this.attributeDeltas);
     this.preCommitted = true;
     return {
       actorUpdates: this.actorUpdates,
@@ -90,7 +97,7 @@ export default class Transaction {
       itemsToDelete: this.itemsToDelete,
       itemsToUpdate: this.itemsToUpdate,
       itemsDeleted: this.itemsDeleted,
-      attributeDeltas: Object.fromEntries(this.attributeDeltas),
+      attributeDeltas: this.attributeDeltas,
       itemDeltas: this.itemDeltas,
     }
   }
@@ -110,7 +117,7 @@ export default class Transaction {
     }
     
     return {
-      attributeDeltas: Object.fromEntries(this.attributeDeltas),
+      attributeDeltas: this.attributeDeltas,
       itemDeltas: this.itemDeltas.concat(itemsCreated.map(item => {
         return {
           item,

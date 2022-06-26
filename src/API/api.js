@@ -553,7 +553,7 @@ const API = {
     }
     
     if (instigator && !(instigator instanceof TokenDocument || instigator instanceof Actor)) {
-      throw Helpers.custom_error("SplitItemPileContents | splitter must be of type TokenDocument or Actor")
+      throw Helpers.custom_error("SplitItemPileContents | instigator must be of type TokenDocument or Actor")
     }
     
     const actorUuids = (targets || SharingUtilities.getPlayersForItemPile(itemPileActor).map(u => u.character)).map(actor => Utilities.getUuid(actor));

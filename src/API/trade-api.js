@@ -418,9 +418,9 @@ export default class TradeAPI {
     
     const transaction = new Transaction(updates.sourceActor);
     transaction.appendItemChanges(itemsToAdd);
-    transaction.appendItemChanges(itemsToRemove, true);
+    transaction.appendItemChanges(itemsToRemove, { remove: true });
     transaction.appendActorChanges(updates.add.attributes);
-    transaction.appendActorChanges(updates.remove.attributes, true);
+    transaction.appendActorChanges(updates.remove.attributes, { remove: true });
     await transaction.commit();
     
     if (trade.store.isPrivate) {

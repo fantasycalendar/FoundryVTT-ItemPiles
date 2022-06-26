@@ -5,6 +5,7 @@ import * as Utilities from "../helpers/utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import * as Helpers from "../helpers/helpers.js";
+import { getAttributeSharesLeftForActor } from "../helpers/sharing-utilities.js";
 
 const __STORES__ = {
     _data: new Map(),
@@ -37,29 +38,21 @@ export default class ItemPileStore {
 
         this.pileData = writable(PileUtilities.getActorFlagData(this.source));
         this.shareData = writable(SharingUtilities.getItemPileSharingData(this.source))
-
-        this.allItems = writable([]);
-        this.attributes = writable([]);
-        this.numItems = writable(0);
-        this.numCurrencies = writable(0);
         this.deleted = writable(false);
 
         this.search = writable("");
         this.editQuantities = !recipient;
 
-        this.document = new TJSDocument(this.source);
-        this.document.subscribe(() => {
-            const { data } = this.document.updateOptions;
-            if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
-                this.pileData.set(PileUtilities.getActorFlagData(this.source));
-            }
-            if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
-                this.shareData.set(SharingUtilities.getItemPileSharingData(this.source));
-            }
-        });
+        this.allItems = writable([]);
+        this.attributes = writable([]);
 
         this.items = writable([]);
         this.currencies = writable([]);
+
+        this.numItems = writable(0);
+        this.numCurrencies = writable(0);
+
+        this.document = new TJSDocument(this.source);
 
         const items = PileUtilities.getActorItems(this.source).map(item => {
             return new PileItem(this, item);
@@ -71,13 +64,33 @@ export default class ItemPileStore {
         });
         this.attributes.set(attributes);
 
-        this.attributes.subscribe(this.refreshItems.bind(this));
-        this.allItems.subscribe(this.refreshItems.bind(this));
+        this.allItems.subscribe((val) => {
+            if(!val) return;
+            this.refreshItems.bind(this)
+        });
+        this.attributes.subscribe((val) => {
+            if(!val) return;
+            this.refreshItems.bind(this)
+        });
 
         const filterDebounce = foundry.utils.debounce(() => {
             this.refreshItems();
         }, 300);
-        this.search.subscribe(() => { filterDebounce() })
+        this.search.subscribe((val) => {
+            if(!val) return;
+            filterDebounce()
+        })
+
+        this.document.subscribe(() => {
+            const { data } = this.document.updateOptions;
+            if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
+                this.pileData.set(PileUtilities.getActorFlagData(this.source));
+            }
+            if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
+                this.shareData.set(SharingUtilities.getItemPileSharingData(this.source));
+            }
+            this.refreshItems();
+        });
 
     }
 
@@ -126,6 +139,7 @@ export default class ItemPileStore {
             items.splice(items.indexOf(pileItem), 1);
             this.allItems.set(items);
         }else{
+            pileItem.id = null;
             pileItem.data.quantity.set(0);
             pileItem.data.quantityLeft.set(0);
         }
@@ -143,7 +157,7 @@ export default class ItemPileStore {
         const itemsToDelete = [];
         const attributesToUpdate = {};
 
-        const items = get(this.allItems);
+        const items = get(this.allItems).filter(item => item.id);
         for (let item of items) {
             const itemQuantity = get(item.data.quantity);
             if (itemQuantity === 0) {
@@ -197,6 +211,22 @@ export default class ItemPileStore {
 
         this.refreshItems();
 
+    }
+
+    takeAll() {
+        game.itempiles.transferEverything(
+            this.source,
+            this.recipient,
+            { interactionId: this.interactionId }
+        );
+    }
+
+    splitAll() {
+        return game.itempiles.splitItemPileContents(this.source, { instigator: this.recipient });
+    }
+
+    closeContainer() {
+        // TODO: close friggin container
     }
 
     onDestroy(){
@@ -256,8 +286,8 @@ class PileItem extends PileBaseItem {
 
         this.data.quantity.set(Utilities.getItemQuantity(this.item));
 
-        this.refreshShareData();
         this.setupProperties();
+        this.refreshShareData();
 
         this.data.currentQuantity.set(Math.min(get(this.data.currentQuantity), get(this.data.quantityLeft), get(this.data.quantity)));
 
@@ -284,21 +314,17 @@ class PileItem extends PileBaseItem {
         });
 
         this.subscribeTo(this.store.shareData, (val) => {
-            if (!val?.items?.length) return;
-            const foundItem = Utilities.findSimilarItem(val?.items, this.item);
-            if (!foundItem) return;
             this.refreshShareData();
         });
 
     }
 
     setupProperties() {
-        this.isValidItem = !PileUtilities.isItemInvalid(this.store.source, this.item);
         this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: this.store.source });
         this.similarities = Utilities.setSimilarityProperties({}, this.item);
         this.toShare = this.isCurrency
-            ? get(this.store.pileData).shareCurrenciesEnabled && this.store.recipientUuid
-            : get(this.store.pileData).shareItemsEnabled && this.store.recipientUuid;
+            ? get(this.store.pileData).shareCurrenciesEnabled && !!this.store.recipient
+            : get(this.store.pileData).shareItemsEnabled && !!this.store.recipient;
     }
 
     refreshShareData() {
@@ -308,27 +334,7 @@ class PileItem extends PileBaseItem {
             return;
         }
 
-        let currentQuantity = Utilities.getItemQuantity(this.item);
-        let totalShares = currentQuantity;
-        let previouslyTaken = 0;
-
-        const shareData = get(this.store.shareData);
-        if(shareData?.items?.length) {
-            const foundItem = Utilities.findSimilarItem(shareData.items, this.item);
-            if (foundItem) {
-                totalShares = foundItem.actors.reduce((acc, actor) => acc + actor.quantity, currentQuantity);
-                const quantityTakenBefore = foundItem.actors.find(actor => actor.uuid === this.store.recipientUuid);
-                previouslyTaken = quantityTakenBefore ? quantityTakenBefore.quantity : 0;
-            }
-        }
-
-        const players = SharingUtilities.getPlayersForItemPile(this.store.source);
-        let totalActorShare = totalShares / players.length;
-        if (!Number.isInteger(totalActorShare)) {
-            totalActorShare += 1;
-        }
-
-        const quantityLeft = Math.max(0, Math.min(currentQuantity, Math.floor(totalActorShare - previouslyTaken)));
+        const quantityLeft = SharingUtilities.getItemSharesLeftForActor(this.store.source, this.item, this.store.recipient);
 
         this.data.quantityLeft.set(quantityLeft);
 
@@ -378,8 +384,8 @@ class PileAttribute extends PileBaseItem {
         this.subscribeTo(this.data.quantity, this.filter.bind(this));
         this.subscribeTo(this.store.search, this.filter.bind(this));
 
-        this.refreshShareData();
         this.setupProperties();
+        this.refreshShareData();
 
         this.data.currentQuantity.set(Math.min(get(this.data.currentQuantity), get(this.data.quantityLeft), get(this.data.quantity)));
 
@@ -390,21 +396,17 @@ class PileAttribute extends PileBaseItem {
             if (hasProperty(data, this.path)) {
                 this.data.quantity.set(Number(getProperty(data, this.path) ?? 0));
                 this.data.currentQuantity.set(Math.min(get(this.data.currentQuantity), get(this.data.quantityLeft), get(this.data.quantity)));
-                this.refreshShareData();
             }
         });
 
         this.subscribeTo(this.store.shareData, (val) => {
-            if (!val?.attributes?.length) return;
-            const foundItem = Utilities.findSimilarItem(val?.items, this.item);
-            if (!foundItem) return;
             this.refreshShareData();
         });
 
     }
 
     setupProperties() {
-        this.toShare = get(this.store.pileData).shareCurrenciesEnabled && this.store.recipientUuid;
+        this.toShare = get(this.store.pileData).shareCurrenciesEnabled && !!this.store.recipient;
     }
 
     refreshShareData() {
@@ -414,28 +416,7 @@ class PileAttribute extends PileBaseItem {
             return;
         }
 
-        let currentQuantity = Number(getProperty(this.store.source.data, this.path) ?? 0);
-        let totalShares = currentQuantity;
-        let previouslyTaken = 0;
-
-        const shareData = get(this.store.shareData);
-        if(shareData?.attributes?.length) {
-            const existingCurrency = shareData.attributes.find(storedCurrency => storedCurrency.path === this.path);
-            if (existingCurrency) {
-                totalShares = existingCurrency.actors.reduce((acc, actor) => acc + actor.quantity, currentQuantity);
-
-                const quantityTakenBefore = existingCurrency?.actors?.find(actor => actor.uuid === this.store.recipientUuid);
-                previouslyTaken = quantityTakenBefore ? quantityTakenBefore.quantity : 0;
-            }
-        }
-
-        const players = SharingUtilities.getPlayersForItemPile(this.store.source);
-        let totalActorShare = totalShares / players.length;
-        if (!Number.isInteger(totalActorShare)) {
-            totalActorShare += 1;
-        }
-
-        const quantityLeft = Math.max(0, Math.min(currentQuantity, Math.floor(totalActorShare - previouslyTaken)));
+        const quantityLeft = SharingUtilities.getAttributeSharesLeftForActor(this.store.source, this.path, this.store.recipient);
 
         this.data.quantityLeft.set(quantityLeft);
 
