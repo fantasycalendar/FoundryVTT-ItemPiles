@@ -16,10 +16,11 @@ const CONSTANTS = {
   },
   
   ITEM_DEFAULTS: {
-    enabled: false,
     free: false,
-    forSale: true,
-    visible: true,
+    notForSale: false,
+    hidden: false,
+    infiniteQuantity: false,
+    displayQuantity: "default",
     prices: []
   },
   
@@ -63,8 +64,10 @@ const CONSTANTS = {
     
     // Merchant settings
     isMerchant: false,
-    priceModifier: 1,
-    sellModifier: 0.5,
+    infiniteQuantity: false,
+    displayQuantity: "yes",
+    buyPriceModifier: 1,
+    sellPriceModifier: 0.5,
     itemTypePriceModifiers: [],
     actorPriceModifiers: [],
     openTimes: {

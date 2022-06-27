@@ -7,6 +7,10 @@
       "ShowToPlayers": "Item Piles: Show pile to players",
       "RequestTrade": "Item Piles: Request Trade"
     },
+    "Notifications": {
+      "UpdateItemPileSuccess": "Item Pile successfully updated.",
+      "UpdateMerchantSuccess": "Merchant successfully updated."
+    },
     "Inspect": {
       "Title": "Inspecting Pile Contents",
       "AsActor": "You're inspecting this pile as {actorName}.",
@@ -140,7 +144,8 @@
         "Submit": "Submit Settings"
       },
       "CurrenciesEditor": {
-        "Title": "Currencies Editor",
+        "Title": "Item Piles Currencies Editor",
+        "TitleActor": "Item Piles Currencies Editor: {actor_name}",
         "AttributeTitle": "Attribute Based Currencies",
         "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies. In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\".",
         "ItemTitle": "Item Based Currencies",
@@ -153,12 +158,26 @@
         "Submit": "Submit currencies"
       },
       "ItemEditor": {
-        "Title": "Item Editor",
-        "Explanation": "hi there",
-        "Submit": "Submit"
+        "Title": "Item Piles Item Editor: {item_name}",
+        "NotForSale": "Item Is Not For Sale",
+        "NotForSaleExplanation": "When enabled, this item is not for sale and cannot be bought. It still shows up in the merchant's item list unless the item is also hidden.",
+        "Hidden": "Item Is Hidden",
+        "HiddenExplanation": "When enabled, this item does not show up in the merchant's item lists.",
+        "DisplayQuantity": "Item Quantity Visibility",
+        "DisplayQuantityExplanation": "This configures how the quantity this item in the store is shown, if at all.",
+        "DisplayQuantityDefault": "Default to merchant setting",
+        "DisplayQuantityYes": "Yes, always show quantity",
+        "DisplayQuantityNo": "No, always hide quantity",
+        "InfiniteQuantity": "Infinite Quantity",
+        "InfiniteQuantityExplanation": "When enabled, this item cannot run out of quantity when sold by a merchant.",
+
+        "PriceExplanation": "In this tab, you can configure the price of this item, including whether this item will cost other items to purchase.",
+        "Free": "Item Is Free",
+        "FreeExplanation": "When enabled, this item does not cost any money to purchase from the merchant."
       },
       "FilterEditor": {
-        "Title": "Item Filters Editor",
+        "Title": "Item Piles Filters Editor",
+        "TitleActor": "Item Piles Filters Editor: {actor_name}",
         "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
         "Filters": "Filters",
         "Path": "Attribute path",
@@ -166,7 +185,7 @@
         "Submit": "Submit filters"
       },
       "SimilaritiesEditor": {
-        "Title": "Item Similarities Editor",
+        "Title": "Item Piles Similarities Editor",
         "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
         "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
         "Path": "Attribute path",
@@ -175,25 +194,23 @@
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "Item Type Price Modifiers Editor",
+        "TitleActor": "Item Type Price Modifiers Editor: {actor_name}",
         "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific item types. The \"Override\" setting means that it overrides the merchant's normal price modifiers.",
         "ItemType": "Item Type",
         "Override": "Override",
-        "PriceModifier": "Price Modifier (%)",
-        "SellModifier": "Sell Price Modifier (%)",
         "Submit": "Submit price modifiers"
       },
       "PriceModifiersEditor": {
-        "Title": "Price Modifiers Editor",
+        "Title": "Item Piles Price Modifiers Editor",
+        "TitleActor": "Item Piles Price Modifiers Editor: {actor_name}",
         "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors. The \"Override\" setting means that it overrides the merchant's normal price modifiers, including item-type specific price modifiers.",
         "DragDrop": "Drag and drop an actor to add it to the list",
         "Actor": "Actor",
         "Override": "Override",
-        "PriceModifier": "Price Modifier (%)",
-        "SellModifier": "Sell Price Modifier (%)",
         "Submit": "Submit price modifiers"
       },
       "ItemPileConfig": {
-        "Title": "Item Pile Configuration",
+        "Title": "Item Pile Configuration: {actor_name}",
         "Configure": "Item Pile",
         "Update": "Update Item Pile",
         "Main": {
@@ -264,10 +281,20 @@
           "Title": "Merchant Settings",
           "Enabled": "Is Merchant",
           "EnabledExplanation": "Players cannot pick up items from merchants, but must instead purchase them",
+          "InfiniteQuantity": "Infinite Quantity",
+          "InfiniteQuantityExplanation": "When enabled, this merchant cannot run out of items.",
+          "DisplayQuantity": "Item Quantity Visibility",
+          "DisplayQuantityExplanation": "This configures how the quantity of items in the store is shown, if at all.",
+          "DisplayQuantityYes": "Yes, show quantity (unless item says otherwise)",
+          "DisplayQuantityNo": "No, hide quantity (unless item says otherwise)",
+          "DisplayQuantityYesAlways": "Yes, always show quantity",
+          "DisplayQuantityNoAlways": "No, always hide quantity",
           "OpenTimes": "Open Times",
           "OpenTimesExplanation": "When enabled, the merchant is can only be interacted by players at certain times of the day.",
-          "PriceModifier": "Price Modifier (%)",
-          "SellModifier": "Sell Price Modifier (%)",
+          "PriceModifierTitle": "Buy and Sell Price Modifiers",
+          "PriceModifierExplanation": "This configures the modifiers for the cost of every item in the shop. You can also configure modifiers per item type, and even for specific characters (such as silver-tongued bards). You are not limited to 200%, type into the field to go even higher.",
+          "BuyPriceModifier": "Buy Price Modifier (%)",
+          "SellPriceModifier": "Sell Price Modifier (%)",
           "ItemTypeModifier": "Item Type Price Modifiers",
           "ItemTypeModifiersExplanation": "In this dialog you can configure price modifiers for individual item types.",
           "ConfigureItemTypePriceModifiers": "Configure Item Type Price Modifiers.",

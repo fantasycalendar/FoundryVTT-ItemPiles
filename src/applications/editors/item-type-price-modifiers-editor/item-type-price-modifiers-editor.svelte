@@ -21,8 +21,8 @@
     itemTypePriceModifiers.push({
       type: unusedTypes[0],
       override: false,
-      priceModifier: 1,
-      sellModifier: 0.5
+      buyPriceModifier: 1,
+      sellPriceModifier: 0.5
     });
     itemTypePriceModifiers = itemTypePriceModifiers;
   }
@@ -55,8 +55,8 @@
       <tr>
         <th style="width:5%;">{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Override")}</th>
         <th style="width:20%;">{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.ItemType")}</th>
-        <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.PriceModifier")}</th>
-        <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.SellModifier")}</th>
+        <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</th>
+        <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
         <th style="width:5%;">
           <span on:click={add} class:item-piles-clickable-link={unusedTypes.length}>
             <i class="fas fa-plus"></i>
@@ -84,12 +84,12 @@
           </td>
           <td>
             <div class="flexrow" style="margin: 0 0.25rem">
-              <SliderInput style="flex:4;" bind:value={priceData.priceModifier}/>
+              <SliderInput style="flex:4;" bind:value={priceData.buyPriceModifier}/>
             </div>
           </td>
           <td>
             <div class="flexrow" style="margin: 0 0.25rem">
-              <SliderInput style="flex:4;" bind:value={priceData.sellModifier}/>
+              <SliderInput style="flex:4;" bind:value={priceData.sellPriceModifier}/>
             </div>
           </td>
           <td class="small">

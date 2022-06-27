@@ -60,34 +60,46 @@
 
   async function showCurrenciesEditor() {
     pileData.overrideCurrencies = pileData?.overrideCurrencies || game.itempiles.CURRENCIES;
-    return CurrenciesEditor.show(pileData.overrideCurrencies, { id: `currencies-item-pile-config-${pileActor.id}` })
-      .then((result) => {
-        pileData.overrideCurrencies = result;
-      });
+    return CurrenciesEditor.show(
+      pileData.overrideCurrencies,
+      { id: `currencies-item-pile-config-${pileActor.id}` },
+      { title: game.i18n.format("ITEM-PILES.Applications.CurrenciesEditor.TitleActor", { actor_name: pileActor.name }), }
+    ).then((result) => {
+      pileData.overrideCurrencies = result;
+    });
   }
 
   async function showItemFiltersEditor() {
     pileData.overrideItemFilters = pileData?.overrideItemFilters || game.itempiles.ITEM_FILTERS;
-    return ItemFiltersEditor.show(pileData.overrideItemFilters, { id: `item-filters-item-pile-config-${pileActor.id}` })
-      .then((result) => {
-        pileData.overrideItemFilters = result;
-      });
+    return ItemFiltersEditor.show(
+      pileData.overrideItemFilters,
+      { id: `item-filters-item-pile-config-${pileActor.id}` },
+      { title: game.i18n.format("ITEM-PILES.Applications.FilterEditor.TitleActor", { actor_name: pileActor.name }), }
+    ).then((result) => {
+      pileData.overrideItemFilters = result;
+    });
   }
 
   async function showItemTypePriceModifiers() {
     const data = pileData.itemTypePriceModifiers || [];
-    return ItemTypePriceModifiersEditor.show(data, { id: `item-type-price-modifier-item-pile-config-${pileActor.id}` })
-      .then((result) => {
-        pileData.itemTypePriceModifiers = result;
-      });
+    return ItemTypePriceModifiersEditor.show(
+      data,
+      { id: `item-type-price-modifier-item-pile-config-${pileActor.id}` },
+      { title: game.i18n.format("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
+    ).then((result) => {
+      pileData.itemTypePriceModifiers = result || [];
+    });
   }
 
   async function showActorPriceModifiers() {
     const data = pileData.actorPriceModifiers || [];
-    return PriceModifiersEditor.show(data, { id: `price-modifier-item-pile-config-${pileActor.id}` })
-      .then((result) => {
-        pileData.actorPriceModifiers = result;
-      });
+    return PriceModifiersEditor.show(
+      data,
+      { id: `price-modifier-item-pile-config-${pileActor.id}` },
+      { title: game.i18n.format("ITEM-PILES.Applications.PriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
+    ).then((result) => {
+      pileData.actorPriceModifiers = result || [];
+    });
   }
 
   async function resetSharingData() {
@@ -408,21 +420,58 @@
             {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.Enabled")}<br>
             <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.EnabledExplanation")}</p>
           </label>
-          <input type="checkbox" class="item-piles-config-merchant-enabled" bind:checked={pileData.isMerchant}/>
+          <input type="checkbox" bind:checked={pileData.isMerchant}/>
+        </div>
+
+        <div class="form-group">
+          <label>
+            {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantity")}<br>
+            <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantityExplanation")}</p>
+          </label>
+          <input type="checkbox" bind:checked={pileData.infiniteQuantity}/>
+        </div>
+
+        <div class="form-group">
+          <label>
+            {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantity")}<br>
+            <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityExplanation")}</p>
+          </label>
+          <div class="break"></div>
+          <select style="flex:4;" bind:value={pileData.displayQuantity}>
+            <option value="yes">
+              {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityYes")}
+            </option>
+            <option value="no">
+              {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityNo")}
+            </option>
+            <option value="alwaysyes">
+              {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityYesAlways")}
+            </option>
+            <option value="alwaysno">
+              {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityNoAlways")}
+            </option>
+          </select>
         </div>
 
         <div class="form-group slider-group">
           <label style="flex:3;">
-            {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifier")}<br>
+            {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifierTitle")}<br>
+            <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifierExplanation")}</p>
           </label>
-          <SliderInput style="flex:4;" bind:value={pileData.priceModifier}/>
         </div>
 
         <div class="form-group slider-group">
           <label style="flex:3;">
-            {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellModifier")}<br>
+            {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}<br>
           </label>
-          <SliderInput style="flex:4;" bind:value={pileData.sellModifier}/>
+          <SliderInput style="flex:4;" bind:value={pileData.buyPriceModifier}/>
+        </div>
+
+        <div class="form-group slider-group">
+          <label style="flex:3;">
+            {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}<br>
+          </label>
+          <SliderInput style="flex:4;" bind:value={pileData.sellPriceModifier}/>
         </div>
 
         <div class="form-group">
@@ -498,84 +547,3 @@
   </footer>
 
 </form>
-
-<style lang="scss">
-
-  form {
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    overflow: hidden;
-    height: calc(100%);
-    max-height: calc(100%);
-
-    nav {
-      margin-bottom: 0.25rem;
-      padding-bottom: 0.25rem;
-      border-bottom: 1px solid var(--color-border-light-primary, #b5b3a4);
-    }
-
-    .form-group {
-      border-radius: 5px;
-      margin: 0.2rem 0;
-    }
-
-    section {
-      padding: 0.25rem;
-      height: calc(100% - 70px);
-      max-height: calc(100% - 70px);
-      overflow-y: auto;
-    }
-
-    p {
-      flex: 0;
-      line-height: 14px;
-      font-size: var(--font-size-12);
-      color: var(--color-text-dark-secondary);
-      padding-right: 1rem;
-      margin-top: 0;
-      overflow-y: hidden;
-    }
-
-    footer {
-      margin-top: 0.5rem;
-      padding-top: 0.5rem;
-      border-top: 1px solid var(--color-border-light-primary, #b5b3a4);
-    }
-  }
-
-
-  .item-piles-collapsible {
-
-    &:not(:last-child) {
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--color-border-light-primary, #b5b3a4);
-    }
-
-    & > summary {
-      display: block;
-      font-weight: 900;
-
-      &::before {
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        content: "\f054";
-        margin-right: 0.5rem;
-      }
-    }
-
-    &[open] > summary {
-      margin-bottom: 0.5rem;
-
-      &::before {
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        content: "\f078";
-        margin-right: 0.275rem;
-      }
-    }
-  }
-
-</style>

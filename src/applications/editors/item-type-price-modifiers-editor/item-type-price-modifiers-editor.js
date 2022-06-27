@@ -6,7 +6,6 @@ export default class ItemTypePriceModifiersEditor extends TJSDialog {
   constructor(itemTypePriceModifiers, options, dialogData = {}) {
     
     super({
-      ...dialogData,
       title: "ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Title",
       content: {
         class: ItemTypePriceModifiersShell,
@@ -31,7 +30,8 @@ export default class ItemTypePriceModifiersEditor extends TJSDialog {
       },
       default: 'save',
       autoClose: false, // Don't automatically close on button onclick.
-      close: () => this.options.resolve?.(false)
+      close: () => this.options.resolve?.(false),
+      ...dialogData
     }, {
       width: 600,
       zIndex: 202,

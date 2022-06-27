@@ -12,7 +12,6 @@ export default class PriceModifiersEditor extends TJSDialog {
     }).filter(Boolean);
 
     super({
-      ...dialogData,
       title: "ITEM-PILES.Applications.PriceModifiersEditor.Title",
       content: {
         class: PriceModifiersShell,
@@ -37,7 +36,8 @@ export default class PriceModifiersEditor extends TJSDialog {
       },
       default: 'save',
       autoClose: false, // Don't automatically close on button onclick.
-      close: () => this.options.resolve?.(false)
+      close: () => this.options.resolve?.(false),
+      ...dialogData
     }, {
       width: 600,
       zIndex: 202,

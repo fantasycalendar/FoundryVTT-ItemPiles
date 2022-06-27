@@ -5,7 +5,6 @@ export default class ItemSimilaritiesEditor extends TJSDialog {
   
   constructor(options, dialogData = {}) {
     super({
-      ...dialogData,
       title: "ITEM-PILES.Applications.SimilaritiesEditor.Title",
       content: {
         class: ItemSimilaritiesShell,
@@ -26,7 +25,8 @@ export default class ItemSimilaritiesEditor extends TJSDialog {
       },
       default: 'save',
       autoClose: false, // Don't automatically close on button onclick.
-      close: () => this.options.resolve(null)
+      close: () => this.options.resolve(null),
+      ...dialogData
     }, {
       width: 400,
       zIndex: 202,

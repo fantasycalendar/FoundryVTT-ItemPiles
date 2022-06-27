@@ -112,10 +112,22 @@
             {#if activeSidebarTab === 'settings'}
               <div class="tab merchant-settings">
                 <div class="setting-container">
-                  <div class="form-group">
-                    <label>Price Modifier:</label>
-                    <SliderInput bind:value={$pileDataStore.priceModifier}/>
+
+                  <div class="form-group slider-group">
+                    <label style="flex:3;">
+                      {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}<br>
+                    </label>
+                    <SliderInput style="flex:4;" bind:value={$pileDataStore.buyPriceModifier}/>
                   </div>
+
+                  <div class="form-group slider-group">
+                    <label style="flex:3;">
+                      {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}<br>
+                    </label>
+                    <SliderInput style="flex:4;" bind:value={$pileDataStore.sellPriceModifier}/>
+                  </div>
+
+
                 </div>
 
                 <button type="button" class="update-button" on:click={() => { store.update(); }}>
@@ -145,7 +157,7 @@
                   {#if $priceModifiersPerType[category.type]}
                     Override:
                     <input type="checkbox" bind:checked={$priceModifiersPerType[category.type].override}>
-                    <SliderInput bind:value={$priceModifiersPerType[category.type].priceModifier}/>
+                    <SliderInput bind:value={$priceModifiersPerType[category.type].buyPriceModifier}/>
                   {/if}
                 {:else if index === 0}
                   <small>Prices</small>

@@ -47,8 +47,8 @@
 
     priceModifiers.push({
       actor: actor,
-      priceModifier: 1,
-      sellModifier: 0.5
+      buyPriceModifier: 1,
+      sellPriceModifier: 0.5
     });
 
     priceModifiers = priceModifiers;
@@ -73,8 +73,8 @@
       <table>
         <tr>
           <th style="width:25%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Actor")}</th>
-          <th style="width:35%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.PriceModifier")}</th>
-          <th style="width:35%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.SellModifier")}</th>
+          <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</th>
+          <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
           <th style="width:5%;"></th>
         </tr>
         {#each priceModifiers as priceData, index (index)}
@@ -85,12 +85,12 @@
             </td>
             <td>
               <div class="flexrow" style="margin: 0 0.25rem">
-                <SliderInput bind:value={priceData.priceModifier}/>
+                <SliderInput bind:value={priceData.buyPriceModifier}/>
               </div>
             </td>
             <td>
               <div class="flexrow" style="margin: 0 0.25rem">
-                <SliderInput bind:value={priceData.sellModifier}/>
+                <SliderInput bind:value={priceData.sellPriceModifier}/>
               </div>
             </td>
             <td class="small">

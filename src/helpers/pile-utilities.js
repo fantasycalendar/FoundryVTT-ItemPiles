@@ -297,132 +297,6 @@ export function getItemPileName(target, { data = false, items = false, currencie
   
 }
 
-export function getItemsToAdd(targetActor, items) {
-  
-  const targetActorItems = Array.from(targetActor.items);
-  
-  const itemsAdded = [];
-  const itemsToUpdate = [];
-  const itemsToCreate = [];
-  for (const itemData of items) {
-    
-    let item = itemData?.item ?? itemData;
-    delete item._id;
-    
-    const foundItem = Utilities.findSimilarItem(targetActorItems, item);
-    
-    const incomingQuantity = Number(itemData?.quantity ?? Utilities.getItemQuantity(itemData));
-    
-    if (foundItem) {
-      item = foundItem.toObject();
-      const currentQuantity = Utilities.getItemQuantity(item);
-      const newQuantity = currentQuantity + incomingQuantity;
-      itemsToUpdate.push({
-        "_id": item._id,
-        [game.itempiles.ITEM_QUANTITY_ATTRIBUTE]: newQuantity
-      });
-      
-      setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, newQuantity)
-      itemsAdded.push({
-        item: item,
-        quantity: incomingQuantity
-      });
-    } else {
-      setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, incomingQuantity)
-      itemsToCreate.push(item);
-    }
-    
-  }
-  
-  return { itemsAdded, itemsToUpdate, itemsToCreate };
-  
-}
-
-export function getItemsToRemove(targetActor, items) {
-  
-  const itemsRemoved = []
-  const itemsToUpdate = [];
-  const itemsToDelete = [];
-  for (const itemData of items) {
-    
-    let item = targetActor.items.get(itemData._id);
-    if (!item) continue;
-    
-    item = item.toObject();
-    
-    const currentQuantity = Utilities.getItemQuantity(item);
-    const quantityToRemove = itemData.quantity;
-    const newQuantity = Math.max(0, currentQuantity - quantityToRemove);
-    
-    if (newQuantity >= 1) {
-      itemsToUpdate.push({ _id: item._id, [game.itempiles.ITEM_QUANTITY_ATTRIBUTE]: newQuantity });
-      setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, quantityToRemove);
-      itemsRemoved.push({
-        item: item,
-        quantity: quantityToRemove,
-        deleted: false
-      });
-    } else {
-      itemsToDelete.push(item._id);
-      setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, currentQuantity);
-      itemsRemoved.push({
-        item: item,
-        quantity: currentQuantity,
-        deleted: true
-      });
-    }
-    
-  }
-  
-  return { itemsRemoved, itemsToUpdate, itemsToDelete };
-  
-}
-
-export function getAttributesToAdd(targetActor, attributes) {
-  
-  const updates = {};
-  const attributesAdded = {};
-  
-  for (const [attribute, quantityToAdd] of Object.entries(attributes)) {
-    
-    const currentQuantity = Number(getProperty(targetActor.data, attribute));
-    
-    updates[attribute] = currentQuantity + quantityToAdd;
-    attributesAdded[attribute] = quantityToAdd;
-    
-  }
-  
-  return { updates, attributesAdded }
-  
-}
-
-export function getAttributesToRemove(targetActor, attributes) {
-  
-  const updates = {};
-  const attributesRemoved = {};
-  
-  if (Array.isArray(attributes)) {
-    attributes = Object.fromEntries(attributes.map(attribute => {
-      return [attribute, Number(getProperty(targetActor.data, attribute))];
-    }));
-  }
-  
-  for (const [attribute, quantityToRemove] of Object.entries(attributes)) {
-    
-    const currentQuantity = Number(getProperty(targetActor.data, attribute));
-    const newQuantity = Math.max(0, currentQuantity - quantityToRemove);
-    
-    updates[attribute] = newQuantity;
-    
-    // if the target's quantity is above 1, we've removed the amount we expected, otherwise however many were left
-    attributesRemoved[attribute] = newQuantity ? quantityToRemove : currentQuantity;
-  }
-  
-  return { updates, attributesRemoved };
-  
-}
-
-
 function getRelevantTokensAndActor(target) {
   
   const relevantDocument = Utilities.getDocument(target);
@@ -484,13 +358,19 @@ export async function updateItemPileData(target, flagData, tokenData) {
   
 }
 
+export async function updateItemData(item, flagData){
+  return item.update({
+    [CONSTANTS.FLAGS.ITEM]: foundry.utils.mergeObject(getItemFlagData(item), flagData)
+  });
+}
+
 /* -------------------------- Merchant Methods ------------------------- */
 
 export function getItemPriceData(item, merchant = false, actor = false) {
   
   const currencyList = getActorCurrencyData(merchant);
-  const { priceModifier } = merchant ? getMerchantModifiersForActor(merchant, { item, actor }) : {
-    priceModifier: 1
+  const { buyPriceModifier } = merchant ? getMerchantModifiersForActor(merchant, { item, actor }) : {
+    buyPriceModifier: 1
   };
   
   const itemData = item instanceof Item ? item.toObject() : item;
@@ -501,7 +381,7 @@ export function getItemPriceData(item, merchant = false, actor = false) {
       return itemFlagData.prices.map(price => {
         price.originalCost = price.cost;
         if (!price.static) {
-          price.cost = Math.floor(price.cost * priceModifier);
+          price.cost = Math.floor(price.cost * buyPriceModifier);
         }
         return price;
       });
@@ -516,34 +396,34 @@ export function getItemPriceData(item, merchant = false, actor = false) {
   return [{
     ...primaryCurrency,
     originalCost: cost,
-    cost: Math.floor(cost * priceModifier)
+    cost: Math.floor(cost * buyPriceModifier)
   }];
   
 }
 
 export function getMerchantModifiersForActor(merchant, { item = false, actor = false } = {}) {
   const pileData = getActorFlagData(merchant);
-  let { priceModifier, sellModifier, itemTypePriceModifiers, actorPriceModifiers } = pileData;
+  let { buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, actorPriceModifiers } = pileData;
   
   if (item) {
     const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => priceData.type === item.type);
     if (itemTypePriceModifier) {
-      priceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.priceModifier : priceModifier * itemTypePriceModifier.priceModifier;
-      sellModifier = itemTypePriceModifier.override ? itemTypePriceModifier.sellModifier : sellModifier * itemTypePriceModifier.sellModifier;
+      buyPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.buyPriceModifier : buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
+      sellPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.sellPriceModifier : sellPriceModifier * itemTypePriceModifier.sellPriceModifier;
     }
   }
   
   if (actor) {
     const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor));
     if (actorSpecificModifiers) {
-      priceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.priceModifier : priceModifier * actorSpecificModifiers.priceModifier;
-      sellModifier = actorSpecificModifiers.override ? actorSpecificModifiers.sellModifier : sellModifier * actorSpecificModifiers.sellModifier;
+      buyPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.buyPriceModifier : buyPriceModifier * actorSpecificModifiers.buyPriceModifier;
+      sellPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.sellPriceModifier : sellPriceModifier * actorSpecificModifiers.sellPriceModifier;
     }
   }
   
   return {
-    priceModifier,
-    sellModifier
+    buyPriceModifier,
+    sellPriceModifier
   }
 }
 

@@ -3,20 +3,20 @@ import ItemEditorShell from './item-editor-shell.svelte';
 
 export default class ItemEditor extends TJSDialog {
   
-  constructor(data = false, options, dialogData = {}) {
+  constructor(item = false, options, dialogData = {}) {
     super({
       ...dialogData,
-      title: "ITEM-PILES.Applications.ItemEditor.Title",
+      title: game.i18n.format("ITEM-PILES.Applications.ItemEditor.Title", { item_name: item.name }),
       content: {
         class: ItemEditorShell,
         props: {
-          itemFilters: data
+          item
         }
       },
       buttons: {
         save: {
           icon: 'fas fa-save',
-          label: "ITEM-PILES.Applications.ItemEditor.Submit",
+          label: "Update",
           onclick: "requestSubmit"
         },
         no: {
@@ -39,10 +39,10 @@ export default class ItemEditor extends TJSDialog {
     });
   }
   
-  static async show(data = false, options = {}, dialogData = {}) {
+  static async show(item = false, options = {}, dialogData = {}) {
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(data, options, dialogData).render(true, { focus: true });
+      new this(item, options, dialogData).render(true, { focus: true });
     })
   }
 }

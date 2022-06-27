@@ -5,7 +5,6 @@ export default class ItemFiltersEditor extends TJSDialog {
   
   constructor(item, options, dialogData = {}) {
     super({
-      ...dialogData,
       title: "ITEM-PILES.Applications.FilterEditor.Title",
       content: {
         class: ItemFiltersShell,
@@ -30,7 +29,8 @@ export default class ItemFiltersEditor extends TJSDialog {
       },
       default: 'save',
       autoClose: false, // Don't automatically close on button onclick.
-      close: () => this.options.resolve(null)
+      close: () => this.options.resolve(null),
+      ...dialogData
     }, {
       width: 400,
       zIndex: 202,

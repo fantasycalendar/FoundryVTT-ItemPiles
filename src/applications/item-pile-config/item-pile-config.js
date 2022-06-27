@@ -12,8 +12,7 @@ export default class ItemPileConfig extends TJSDialog {
     const pileData = PileUtilities.getActorFlagData(pileActor);
     
     super({
-      ...dialogData,
-      title: `${game.i18n.localize("ITEM-PILES.Applications.ItemPileConfig.Title")}: ${pileActor.name}`,
+      title: game.i18n.format("ITEM-PILES.Applications.ItemPileConfig.Title", { actor_name: pileActor.name }),
       zIndex: 101,
       content: {
         class: ItemPileConfigShell,
@@ -23,7 +22,8 @@ export default class ItemPileConfig extends TJSDialog {
         }
       },
       autoClose: true, // Don't automatically close on button onclick.
-      close: () => this.options.resolve?.(null)
+      close: () => this.options.resolve?.(null),
+      ...dialogData
     }, {
       id: `item-pile-config-${pileActor.id}`,
       width: 430,

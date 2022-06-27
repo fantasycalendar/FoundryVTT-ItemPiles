@@ -50,8 +50,10 @@ Hooks.once("ready", () => {
   Hooks.callAll(HOOKS.READY);
   
   ChatAPI.disablePastTradingButtons();
-  
-  MerchantApp.show(game.actors.get("XWczTeS4oJzsrOYY"))
+
+  const source = game.actors.get("XWczTeS4oJzsrOYY");
+  const recipient = game.actors.getName("Inquisitive Player");
+  MerchantApp.show(source, recipient)
   
 });
 

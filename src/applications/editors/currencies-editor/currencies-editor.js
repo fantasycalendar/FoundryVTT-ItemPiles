@@ -3,9 +3,11 @@ import CurrenciesEditorShell from './currencies-editor-shell.svelte';
 
 export default class CurrenciesEditor extends TJSDialog {
 
-  constructor(data = false, options, dialogData = {}) {
+  constructor(data = false, options={}, dialogData = {}) {
+
+    console.log(dialogData)
+
     super({
-      ...dialogData,
       title: game.i18n.localize("ITEM-PILES.Applications.CurrenciesEditor.Title"),
       content: {
         class: CurrenciesEditorShell,
@@ -30,7 +32,8 @@ export default class CurrenciesEditor extends TJSDialog {
       },
       default: 'save',
       autoClose: false, // Don't automatically close on button onclick.
-      close: () => this.options.resolve?.(null)
+      close: () => this.options.resolve?.(null),
+      ...dialogData
     }, {
       width: 630,
       zIndex: 202,
