@@ -2,6 +2,8 @@
   export let value;
   export let type;
   export let placeholder;
+  export let showImage = false;
+  export let showInput = true;
 
   let filePicker = false;
 
@@ -12,6 +14,7 @@
         current: value,
         callback: path => {
           value = path;
+          filePicker = false;
         }
       });
     }
@@ -22,7 +25,14 @@
 </script>
 
 <div>
-  <input type="text" placeholder="{placeholder}" bind:value="{value}"/>
+  {#if showImage}
+    <div class="item-piles-img-container">
+      <img class="item-piles-img" src={value}/>
+    </div>
+  {/if}
+  {#if showInput}
+    <input type="text" placeholder="{placeholder}" bind:value="{value}"/>
+  {/if}
   <button on:click={handleClick} type="button"><i class="fas fa-file-import"></i></button>
 </div>
 

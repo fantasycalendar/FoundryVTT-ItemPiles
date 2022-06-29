@@ -16,11 +16,12 @@ const CONSTANTS = {
   },
   
   ITEM_DEFAULTS: {
-    free: false,
-    notForSale: false,
     hidden: false,
+    notForSale: false,
     infiniteQuantity: false,
     displayQuantity: "default",
+    free: false,
+    disableNormalCost: false,
     prices: []
   },
   
@@ -64,7 +65,9 @@ const CONSTANTS = {
     
     // Merchant settings
     isMerchant: false,
+    isClosed: false,
     infiniteQuantity: false,
+    infiniteCurrencies: true,
     displayQuantity: "yes",
     buyPriceModifier: 1,
     sellPriceModifier: 0.5,

@@ -58,16 +58,16 @@
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
 
-    item = item.toObject();
+    const itemData = item.toObject();
 
     const currentItems = get(itemStore);
-    const foundItem = Utilities.findSimilarItem(currentItems, item)
+    const foundItem = Utilities.findSimilarItem(currentItems.map(item => item.data), itemData)
     if (foundItem) return;
-    const itemData = Utilities.setSimilarityProperties({
+    itemStore.set([...currentItems, {
       primary: !get(store.primary),
-      exchange: 1
-    }, item);
-    itemStore.set([...currentItems, itemData]);
+      exchange: 1,
+      data: item
+    }]);
     store.primary.set(true);
   }
 

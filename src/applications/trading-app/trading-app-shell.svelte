@@ -68,7 +68,7 @@
     }
 
     const actorItemCurrencyList = PileUtilities.getActorCurrencyData(store.leftTraderActor).items;
-    const isCurrency = !!Utilities.findSimilarItem(actorItemCurrencyList, itemData);
+    const isCurrency = !!Utilities.findSimilarItem(actorItemCurrencyList.map(item => item.data), itemData);
 
     return store.addItem(itemData, { currency: isCurrency });
 

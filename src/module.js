@@ -12,6 +12,7 @@ import PrivateAPI from "./API/private-api.js";
 import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
 import MerchantApp from "./applications/merchant-app/merchant-app.js";
+import ItemEditor from "./applications/editors/item-editor/item-editor.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -54,6 +55,8 @@ Hooks.once("ready", () => {
   const source = game.actors.get("XWczTeS4oJzsrOYY");
   const recipient = game.actors.getName("Inquisitive Player");
   MerchantApp.show(source, recipient)
+
+  ItemEditor.show(source.items.getName("Antitoxin"));
   
 });
 

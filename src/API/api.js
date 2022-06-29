@@ -197,6 +197,14 @@ const API = {
     });
     return Helpers.setSetting(SETTINGS.ITEM_SIMILARITIES, inPaths);
   },
+
+  getPrimaryCurrency(actor) {
+    let currencies = this.CURRENCIES;
+    if(actor && actor instanceof Actor){
+      currencies = PileUtilities.getActorCurrencyData(actor);
+    }
+    return currencies.attributes.find(attribute => attribute.primary) ?? currencies.items.find(item => item.primary);
+  },
   
   /* ================= ITEM PILE METHODS ================= */
   

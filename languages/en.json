@@ -159,6 +159,9 @@
       },
       "ItemEditor": {
         "Title": "Item Piles Item Editor: {item_name}",
+        "General": "General Settings",
+        "Price": "Price Settings",
+
         "NotForSale": "Item Is Not For Sale",
         "NotForSaleExplanation": "When enabled, this item is not for sale and cannot be bought. It still shows up in the merchant's item list unless the item is also hidden.",
         "Hidden": "Item Is Hidden",
@@ -173,7 +176,12 @@
 
         "PriceExplanation": "In this tab, you can configure the price of this item, including whether this item will cost other items to purchase.",
         "Free": "Item Is Free",
-        "FreeExplanation": "When enabled, this item does not cost any money to purchase from the merchant."
+        "FreeExplanation": "When enabled, this item does not cost any money to purchase from the merchant.",
+        "DisableNormalCost": "Disable Normal Cost",
+        "DisableNormalCostExplanation": "When this is enabled, the item cannot be purchased with the primary currency and must be purchased with one of the price groups below.",
+        "PriceGroups": "Price Groups",
+        "PriceGroupsExplanation": "Here you can configure the alternate prices of this item.",
+        "AddPriceGroup": "Add Price Group"
       },
       "FilterEditor": {
         "Title": "Item Piles Filters Editor",
@@ -281,8 +289,11 @@
           "Title": "Merchant Settings",
           "Enabled": "Is Merchant",
           "EnabledExplanation": "Players cannot pick up items from merchants, but must instead purchase them",
+
           "InfiniteQuantity": "Infinite Quantity",
           "InfiniteQuantityExplanation": "When enabled, this merchant cannot run out of items.",
+          "InfiniteCurrency": "Infinite Currencies",
+          "InfiniteCurrencyExplanation": "When enabled, selling items to this merchant will not subtract from its currencies.",
           "DisplayQuantity": "Item Quantity Visibility",
           "DisplayQuantityExplanation": "This configures how the quantity of items in the store is shown, if at all.",
           "DisplayQuantityYes": "Yes, show quantity (unless item says otherwise)",

@@ -81,7 +81,7 @@ export function getActorItems(target, { itemFilters = false, itemCurrencies = tr
 export function getActorCurrencyItems(target, { currencyFilters = false } = {}) {
   const targetActor = Utilities.getActor(target)
   const targetItems = Array.from(targetActor.items);
-  const currencyItemList = currencyFilters || getActorCurrencyData(targetActor)?.items || [];
+  const currencyItemList = (currencyFilters || getActorCurrencyData(targetActor)?.items || []).map(item => item.data);
   return targetItems.filter(item => {
     return Utilities.findSimilarItem(currencyItemList, item);
   });
@@ -93,7 +93,7 @@ export function isItemCurrency(item, { currencyFilters = false, target = false }
   }
   if(target){
     const targetActor = Utilities.getActor(target);
-    currencyFilters = getActorCurrencyData(targetActor)?.items || [];
+    currencyFilters = (getActorCurrencyData(targetActor)?.items || []).map(item => item.data);
   }
   return !!Utilities.findSimilarItem(currencyFilters, item);
 }

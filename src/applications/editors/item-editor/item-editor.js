@@ -6,6 +6,7 @@ export default class ItemEditor extends TJSDialog {
   constructor(item = false, options, dialogData = {}) {
     super({
       ...dialogData,
+      id: `item-pile-item-editor-${item.id}`,
       title: game.i18n.format("ITEM-PILES.Applications.ItemEditor.Title", { item_name: item.name }),
       content: {
         class: ItemEditorShell,
@@ -32,14 +33,20 @@ export default class ItemEditor extends TJSDialog {
       autoClose: false, // Don't automatically close on button onclick.
       close: () => this.options.resolve(null)
     }, {
-      width: 400,
+      width: 500,
       zIndex: 202,
       height: "auto",
       ...options
     });
   }
-  
+
+  static getActiveApp(id) {
+    return Object.values(ui.windows).find(app => app.id === `item-pile-item-editor-${id}`)
+  }
+
   static async show(item = false, options = {}, dialogData = {}) {
+    const app = this.getActiveApp(item.id);
+    if (app) return app.render(false, { focus: true });
     return new Promise((resolve) => {
       options.resolve = resolve;
       new this(item, options, dialogData).render(true, { focus: true });

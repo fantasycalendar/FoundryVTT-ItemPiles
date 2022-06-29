@@ -170,10 +170,6 @@ class PileMerchantItem extends PileItem {
       }
     }
 
-    let currencyList = PileUtilities.getActorCurrencyData(this.store.source);
-    const primaryCurrency = currencyList.attributes.find(attribute => attribute.primary)
-      ?? currencyList.items.find(item => item.primary);
-
     if (itemFlagData.enabled) {
       if (itemFlagData.prices.length) {
         priceData = itemFlagData.prices.map(price => {
@@ -187,6 +183,7 @@ class PileMerchantItem extends PileItem {
         priceData = [];
       }
     }else{
+      const primaryCurrency = game.itempiles.getPrimaryCurrency(this.store.source);
       const cost = getProperty(this.item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
       priceData = [{
         ...primaryCurrency,

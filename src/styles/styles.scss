@@ -151,6 +151,7 @@
 
 .item-piles-img-container {
   min-height: 24px;
+  min-width: 24px;
   max-width: 24px;
   max-height: 24px;
   margin: 2px;
@@ -206,6 +207,7 @@
 .item-piles-item-row {
   padding: 0 2px 0 0;
   border-radius: 4px;
+  align-items: center;
 
   .item-piles-disabled {
     background-color: var(--color-bg-btn-minor-inactive, #c9c7b8)
@@ -345,16 +347,17 @@
   }
 
   .form-group {
-    border-radius: 5px;
-    margin: 0.2rem 0 0.5em 0;
     align-items: center;
   }
 
   section {
-    padding: 0.25rem;
     height: calc(100% - 70px);
     max-height: calc(100% - 70px);
     overflow-y: auto;
+
+    .tab {
+      padding: 0.25rem;
+    }
   }
 
   p {
@@ -441,12 +444,6 @@
 
 
 .item-piles-trading-sheet {
-
-  .item-piles-item-row {
-    padding: 0 2px 0 0;
-    border-radius: 4px;
-    align-items: center;
-  }
 
   .item-piles-confirm-quantity {
     justify-self: flex-end;
