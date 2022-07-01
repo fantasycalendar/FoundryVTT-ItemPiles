@@ -46,6 +46,7 @@ export default class PrivateAPI {
    * @private
    */
   static _onCreateItem(doc) {
+    if(!doc.parent) return;
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
     ItemPileStore.notifyChanges("createItem", doc.parent, doc);
     this._evaluateItemPileChange(doc.parent);
@@ -55,6 +56,7 @@ export default class PrivateAPI {
    * @private
    */
   static _onUpdateItem(doc) {
+    if(!doc.parent) return;
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
     this._evaluateItemPileChange(doc.parent);
   }
@@ -63,6 +65,7 @@ export default class PrivateAPI {
    * @private
    */
   static _onDeleteItem(doc) {
+    if(!doc.parent) return;
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
     ItemPileStore.notifyChanges("deleteItem", doc.parent, doc);
     this._evaluateItemPileChange(doc.parent);
@@ -103,7 +106,7 @@ export default class PrivateAPI {
     }
     const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
     const targetItems = PileUtilities.getActorItems(doc.actor);
-    const targetCurrencies = PileUtilities.getFormattedActorAttributes(doc.actor);
+    const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
     const data = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
     doc.data.update({
       "img": PileUtilities.getItemPileTokenImage(doc, data),
@@ -630,18 +633,16 @@ export default class PrivateAPI {
 
     const tokenUpdateGroups = {};
     const actorUpdateGroups = {};
-    const defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
     for (const targetUuid of targetUuids) {
 
       let target = Utilities.fromUuidFast(targetUuid);
 
-      const existingPileSettings = foundry.utils.mergeObject(defaults, PileUtilities.getActorFlagData(target));
-      pileSettings = foundry.utils.mergeObject(existingPileSettings, pileSettings);
+      pileSettings = foundry.utils.mergeObject(PileUtilities.getActorFlagData(target), pileSettings);
       pileSettings.enabled = true;
 
-      const targetItems = PileUtilities.getActorItems(target, pileSettings.overrideItemFilters);
-      const targetCurrencies = PileUtilities.getFormattedActorAttributes(target, pileSettings.overrideCurrencies);
+      const targetItems = PileUtilities.getActorItems(target, { itemFilters: pileSettings.overrideItemFilters });
+      const targetCurrencies = PileUtilities.getActorCurrencies(target, { currencyList: pileSettings.overrideCurrencies });
 
       const data = { data: pileSettings, items: targetItems, currencies: targetCurrencies };
 
@@ -692,13 +693,12 @@ export default class PrivateAPI {
 
     const actorUpdateGroups = {};
     const tokenUpdateGroups = {};
-    const defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
     for (const targetUuid of targetUuids) {
 
       let target = Utilities.fromUuidFast(targetUuid);
 
-      const pileSettings = foundry.utils.mergeObject(defaults, PileUtilities.getActorFlagData(target));
+      const pileSettings = PileUtilities.getActorFlagData(target);
       pileSettings.enabled = false;
 
       const sceneId = targetUuid.split('.')[1];
@@ -1162,9 +1162,8 @@ export default class PrivateAPI {
 
     const itemPileActor = Utilities.getActor(itemPileUuid);
 
-    const items = PileUtilities.getActorItems(itemPileActor, { itemCurrencies: false });
-    const currencyItems = PileUtilities.getActorCurrencyItems(itemPileActor);
-    const attributes = PileUtilities.getFormattedActorAttributes(itemPileActor);
+    const items = PileUtilities.getActorItems(itemPileActor);
+    const currencies = PileUtilities.getActorCurrencies(itemPileActor);
 
     const pileData = PileUtilities.getActorFlagData(itemPileActor);
     const shareData = SharingUtilities.getItemPileSharingData(itemPileActor);
@@ -1173,14 +1172,17 @@ export default class PrivateAPI {
 
     const transactionMap = actorUuids.map(uuid => {
       return [uuid, new Transaction(Utilities.getActor(uuid))];
-    })
+    });
 
     if (pileData.shareItemsEnabled) {
       pileTransaction.appendItemChanges(items, { remove: true });
     }
 
     if (pileData.shareCurrenciesEnabled) {
+      const currencyItems = currencies.filter(entry => entry.type === "item");
       pileTransaction.appendItemChanges(currencyItems, { remove: true, type: "currency" });
+
+      const attributes = currencies.filter(entry => entry.type === "attribute");
       pileTransaction.appendActorChanges(attributes, { remove: true });
     }
 

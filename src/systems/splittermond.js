@@ -1,4 +1,7 @@
 export default {
+
+  "VERSION": 1.0,
+
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "npc",
 
@@ -16,27 +19,42 @@ export default {
   // Item similarities determines how item piles detect similarities and differences in the system
   "ITEM_SIMILARITIES": ["name", "type", "data.sufferedDamage", "data.quality"],
 
-  "CURRENCIES": {
-    // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
-    "attributes": [
-      {
-        name: "Telare",
-        path: "data.currency.T",
-        img: "icons/commodities/currency/coins-assorted-mix-platinum.webp"
-      },
-      {
-        name: "Lunare",
-        path: "data.currency.L",
-        img: "icons/commodities/currency/coin-embossed-unicorn-silver.webp"
-      },
-      {
-        name: "Solare",
+  // Currencies in item piles is a versatile system that can accept actor attributes (a number field on the actor's sheet) or items (actual items in their inventory)
+  // In the case of attributes, the path is relative to the "actor.data"
+  // In the case of items, it is recommended you export the item with `.toObject()` and strip out any module data
+  "CURRENCIES": [
+    {
+      type: "attribute",
+      name: "Solare",
+      img: "icons/commodities/currency/coins-assorted-mix-copper.webp",
+      abbreviation: "{#}S",
+      data: {
         path: "data.currency.S",
-        img: "icons/commodities/currency/coins-assorted-mix-copper.webp"
-      }
-    ],
-
-    // While attribute currencies exist in character data, item currencies are items that act LIKE currencies
-    "items": []
-  }
+      },
+      primary: false,
+      exchangeRate: 10000
+    },
+    {
+      type: "attribute",
+      name: "Lunare",
+      img: "icons/commodities/currency/coin-embossed-unicorn-silver.webp",
+      abbreviation: "{#}L",
+      data: {
+        path: "data.currency.L",
+      },
+      primary: false,
+      exchangeRate: 100
+    },
+    {
+      type: "attribute",
+      name: "Telare",
+      img: "icons/commodities/currency/coins-assorted-mix-platinum.webp",
+      abbreviation: "{#}T",
+      data: {
+        path: "data.currency.T",
+      },
+      primary: true,
+      exchangeRate: 1
+    }
+  ]
 }

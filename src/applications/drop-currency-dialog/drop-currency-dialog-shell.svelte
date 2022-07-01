@@ -10,37 +10,36 @@
   export let targetActor;
   export let settings;
 
-  const targetCurrencyData = PileUtilities.getActorCurrencyData(targetActor);
+  const targetCurrencyData = PileUtilities.getActorCurrencyList(targetActor);
 
-  let currencies = PileUtilities.getFormattedActorAttributes(sourceActor, {
-      currencyList: targetCurrencyData.currencies,
-      getAll: settings?.unlimitedCurrencies
-    })
+  const currencies = PileUtilities.getActorCurrencies(sourceActor, {
+    currencyList: targetCurrencyData.currencies,
+    getAll: settings?.unlimitedCurrencies
+  });
+
+  let attributes = currencies.filter(entry => entry.type === "attribute")
     .map(currency => {
       currency.currentQuantity = 0;
       return currency;
     });
 
   if (settings?.existingCurrencies) {
-    currencies.forEach(currency => {
-      const existingCurrency = settings?.existingCurrencies.find(existingCurrency => existingCurrency.path === currency.path);
+    attributes.forEach(currency => {
+      const existingCurrency = settings?.existingCurrencies.find(existingCurrency => existingCurrency.id === currency.id);
       if (existingCurrency) {
         currency.currentQuantity = existingCurrency.quantity;
       }
     });
   }
 
-  let itemCurrencies = PileUtilities.getActorCurrencyItems(sourceActor, { currencyList: targetCurrencyData.items })
-    .map(item => ({
-      id: item.id,
-      name: item.name,
-      img: item.img,
-      quantity: Utilities.getItemQuantity(item),
-      currentQuantity: 0,
-    }));
+  let items = currencies.filter(entry => entry.type === "attribute")
+    .map(currency => {
+      currency.currentQuantity = 0;
+      return currency;
+    });
 
   if (settings?.existingCurrencies) {
-    itemCurrencies.forEach(currency => {
+    items.forEach(currency => {
       const existingCurrency = settings?.existingCurrencies.find(existingCurrency => existingCurrency.id === currency.id);
       if (existingCurrency) {
         currency.currentQuantity = existingCurrency.quantity;
@@ -56,11 +55,11 @@
 
   function submit() {
     application.options.resolve({
-      attributes: Object.fromEntries(currencies
-        .filter(currency => currency.currentQuantity)
-        .map(currency => [currency.path, currency.currentQuantity])
+      attributes: Object.fromEntries(attributes
+        .filter(attribute => attribute.currentQuantity)
+        .map(attribute => [attribute.path, attribute.currentQuantity])
       ),
-      items: itemCurrencies
+      items: items
         .filter(item => item.currentQuantity)
         .map(item => ({ _id: item.id, quantity: item.currentQuantity }))
     });
@@ -74,38 +73,38 @@
 <form class="flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
       autocomplete="off">
 
-  {#if currencies.length || itemCurrencies.length}
+  {#if attributes.length || items.length}
 
     <p style="text-align: center;" class="item-piles-bottom-divider">
       {settings?.content ?? localize("ITEM-PILES.DropCurrencies.Player")}
     </p>
 
-    {#each currencies as currency, index (currency.path)}
+    {#each attributes as attribute, index (attribute.path)}
       <div class="form-group item-piles-slider-group item-piles-odd-color">
         <div class="item-piles-img-container">
-          <img class="item-piles-img" src="{currency.img}">
+          <img class="item-piles-img" src="{attribute.img}">
         </div>
         <div class="item-piles-name item-piles-text">
-          <div>{currency.name}</div>
+          <div>{attribute.name}</div>
         </div>
 
         {#if settings?.unlimitedCurrencies}
           <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
-                 bind:value={currency.currentQuantity}/>
+                 bind:value={attribute.currentQuantity}/>
         {:else}
-          <input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{currency.quantity}"
-                 bind:value={currency.currentQuantity}/>
+          <input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{attribute.quantity}"
+                 bind:value={attribute.currentQuantity}/>
           <input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
-                 bind:value={currency.currentQuantity}
+                 bind:value={attribute.currentQuantity}
                  on:click={() => {
-                      currency.currentQuantity = Math.max(0, Math.min(currency.quantity, currency.currentQuantity));
+                      attribute.currentQuantity = Math.max(0, Math.min(attribute.quantity, attribute.currentQuantity));
                  }}/>
-          <div style="flex:0 1 50px; margin: 0 5px;">/ {currency.quantity}</div>
+          <div style="flex:0 1 50px; margin: 0 5px;">/ {attribute.quantity}</div>
         {/if}
       </div>
     {/each}
 
-    {#each itemCurrencies as item, index (item.id)}
+    {#each items as item, index (item.id)}
       <div class="form-group item-piles-slider-group item-piles-odd-color">
         <div class="item-piles-img-container">
           <img class="item-piles-img" src="{item.img}">
@@ -139,7 +138,7 @@
   {/if}
 
   <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
-    {#if currencies.length || itemCurrencies.length}
+    {#if attributes.length || items.length}
       <button type="button" on:click|once={requestSubmit}>
         <i class="fas fa-download"></i>
         {settings?.button ?? localize("ITEM-PILES.DropCurrencies.AddToPile")}

@@ -1,4 +1,7 @@
 export default {
+
+  "VERSION": 1.0,
+
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "npc2",
 
@@ -17,21 +20,31 @@ export default {
   "ITEM_SIMILARITIES": ["name", "type"],
 
   "CURRENCIES": {
-    // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
-    "attributes": [
+    "Credits": [
       {
+        type: "attribute",
         name: "SFRPG.Currencies.Credits",
-        path: "data.currency.credit",
-        img: "systems/sfrpg/icons/equipment/goods/credstick.jpg"
-      },
-      {
-        name: "SFRPG.Currencies.UPBs",
-        path: "data.currency.upb",
-        img: "systems/sfrpg/icons/equipment/goods/upb.jpg"
+        img: "systems/sfrpg/icons/equipment/goods/credstick.jpg",
+        abbreviation: "{#}C",
+        data: {
+          path: "data.currency.credit",
+        },
+        primary: true,
+        exchangeRate: 1
       }
     ],
-
-    // While attribute currencies exist in character data, item currencies are items that act LIKE currencies
-    "items": []
+    "Universal Polymer Base": [
+      {
+        type: "attribute",
+        name: "SFRPG.Currencies.UPBs",
+        img: "systems/sfrpg/icons/equipment/goods/upb.jpg",
+        abbreviation: "{#} UBP",
+        data: {
+          path: "data.currency.upb",
+        },
+        primary: false,
+        exchangeRate: 1
+      }
+    ]
   }
 }

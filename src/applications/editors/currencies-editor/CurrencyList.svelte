@@ -1,47 +1,45 @@
 <script>
   import { get } from 'svelte/store';
-
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-
   import FilePicker from "../../components/FilePicker.svelte";
 
   export let store;
 
-  const attributesStore = store.attributes;
+  const currenciesStore = store.currencies;
 
   let hovering = null;
   let dragging = null;
 
   function add() {
-    const currentAttributes = get(attributesStore);
-    attributesStore.set([...currentAttributes, {
-      primary: !get(store.primary),
+    const currencies = get(currenciesStore);
+    currenciesStore.set([...currencies, {
+      primary: !currencies.length,
       name: "",
+      img: "",
+      abbreviation: "{#}",
       exchange: 1,
-      path: "",
-      img: ""
+      data: { path: "" },
     }]);
-    store.primary.set(true);
   }
 
-  function attributeRemove(index) {
-    const newAttributes = get(attributesStore);
+  function removeEntry(index) {
+    const newAttributes = get(currenciesStore);
     newAttributes.splice(index, 1)
-    attributesStore.set(newAttributes);
+    currenciesStore.set(newAttributes);
   }
 
-  function attributeDragStart(event, i) {
+  function dragStart(event, i) {
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.dropEffect = 'move';
     event.dataTransfer.setData('text/plain', i);
     dragging = i;
   }
 
-  function attributeDrop(event, target) {
+  function drop(event, target) {
     event.dataTransfer.dropEffect = 'move';
 
     const start = parseInt(event.dataTransfer.getData("text/plain"));
-    const newCurrencies = get(attributesStore);
+    const newCurrencies = get(currenciesStore);
 
     if (start < target) {
       newCurrencies.splice(target + 1, 0, newCurrencies[start]);
@@ -51,7 +49,7 @@
       newCurrencies.splice(start + 1, 1);
     }
 
-    attributesStore.set(newCurrencies);
+    currenciesStore.set(newCurrencies);
 
     hovering = null;
     dragging = null;
@@ -64,23 +62,24 @@
   <tr>
     <th class="small">Primary</th>
     <th>{localize("ITEM-PILES.Applications.CurrenciesEditor.Name")}</th>
-    <th>Exchange</th>
-    <th>{localize("ITEM-PILES.Applications.CurrenciesEditor.Path")}</th>
+    <th>{localize("ITEM-PILES.Applications.CurrenciesEditor.Exchange")}</th>
     <th>{localize("ITEM-PILES.Applications.CurrenciesEditor.Icon")}</th>
-    <th class="small"><a on:click={add} class="item-piles-clickable item-piles-add-new-currency"><i
-        class="fas fa-plus"></i></a></th>
+    <th>{localize("ITEM-PILES.Applications.CurrenciesEditor.Path")}</th>
+    <th class="small">
+      <a on:click={add}><i class="fas fa-plus"></i></a>
+    </th>
   </tr>
-  {#each $attributesStore as { id, primary, name, exchange, path, img }, index (index)}
+  {#each $currenciesStore as { id, primary, name, exchange, path, img }, index (index)}
     <tr
         class:is-active={hovering === index && dragging !== null}
         class:is-dragging={dragging === index}
         on:dragenter={() => { if(dragging !== null) hovering = index; }}
-        on:drop|preventDefault={event => { attributeDrop(event, index) }}
+        on:drop|preventDefault={event => { drop(event, index) }}
     >
       <td class="small">
         <a class="item-piles-moveable"
            draggable="true"
-           on:dragstart={event => { attributeDragStart(event, index) }}
+           on:dragstart={event => { dragStart(event, index) }}
            ondragover="return false"
         ><i class="fas fa-bars"></i></a>
         <input type="radio" required name="primaryCurrency" checked={primary}
@@ -88,12 +87,10 @@
       </td>
       <td><input type="text" required placeholder="Gold Pieces" bind:value="{name}"/></td>
       <td class="small"><input type="number" required step="0.0000000001" bind:value="{exchange}"/></td>
+      <td><FilePicker bind:value="{img}" type="imagevideo" placeholder="images/image.png"/></td>
       <td><input type="text" required placeholder="data.currency.gp" bind:value="{path}"/></td>
-      <td>
-        <FilePicker bind:value="{img}" type="imagevideo" placeholder="images/image.png"/>
-      </td>
       <td class="small">
-        <button type="button" on:click={attributeRemove(index)}><i class="fas fa-times"></i></button>
+        <button type="button" on:click={removeEntry(index)}><i class="fas fa-times"></i></button>
       </td>
     </tr>
   {/each}

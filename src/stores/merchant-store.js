@@ -8,7 +8,7 @@ import * as Helpers from "../helpers/helpers.js";
 
 export default class MerchantStore extends ItemPileStore {
 
-  setupStores(){
+  setupStores() {
     super.setupStores();
     this.editPrices = writable(false);
     this.itemsPerCategory = writable({});
@@ -17,11 +17,11 @@ export default class MerchantStore extends ItemPileStore {
     this.priceModifiersForActor = writable({});
   }
 
-  get ItemClass(){
+  get ItemClass() {
     return PileMerchantItem;
   }
 
-  setupSubscriptions(){
+  setupSubscriptions() {
     super.setupSubscriptions();
     this.pileData.subscribe((val) => {
       this.updatePriceModifiers();
@@ -35,7 +35,7 @@ export default class MerchantStore extends ItemPileStore {
       return game.user.isGM || !get(item.itemFlagData).hidden;
     });
     const itemsPerCategory = items.reduce((acc, item) => {
-      if(!acc[item.type]){
+      if (!acc[item.type]) {
         acc[item.type] = [];
       }
       acc[item.type].push(item);
@@ -51,13 +51,13 @@ export default class MerchantStore extends ItemPileStore {
     }));
   }
 
-  updatePriceModifiers(){
+  updatePriceModifiers() {
     const pileData = get(this.pileData);
     this.priceModifiersPerType.set(pileData.itemTypePriceModifiers.reduce((acc, priceData) => {
       acc[priceData.type] = priceData;
       return acc;
     }, {}));
-    if(this.recipient) {
+    if (this.recipient) {
       const actorSpecificModifiers = pileData.actorPriceModifiers?.find(data => data.actorUuid === this.recipientUuid);
       if (actorSpecificModifiers) {
         this.priceModifiersForActor.set(actorSpecificModifiers);
@@ -65,7 +65,7 @@ export default class MerchantStore extends ItemPileStore {
     }
   }
 
-  addOverrideTypePrice(type){
+  addOverrideTypePrice(type) {
     const pileData = get(this.pileData);
     pileData.itemTypePriceModifiers.push({
       type: type,
@@ -76,7 +76,7 @@ export default class MerchantStore extends ItemPileStore {
     this.pileData.set(pileData);
   }
 
-  removeOverrideTypePrice(type){
+  removeOverrideTypePrice(type) {
     const pileData = get(this.pileData);
     const priceMods = pileData.itemTypePriceModifiers;
     const typeEntry = priceMods.find(entry => entry.type === type);
@@ -84,7 +84,7 @@ export default class MerchantStore extends ItemPileStore {
     this.pileData.set(pileData);
   }
 
-  async update(){
+  async update() {
     const pileData = get(this.pileData);
     const priceModPerType = get(this.priceModifiersPerType);
     pileData.itemTypePriceModifiers = Object.values(priceModPerType);
@@ -106,32 +106,32 @@ class PileMerchantItem extends PileItem {
   setupSubscriptions() {
     super.setupSubscriptions();
     this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
-    this.subscribeTo(this.store.pileData,() => {
+    this.subscribeTo(this.store.pileData, () => {
       this.refreshPriceData();
       this.refreshDisplayQuantity();
     });
-    this.subscribeTo(this.store.priceModifiersPerType,() => {
+    this.subscribeTo(this.store.priceModifiersPerType, () => {
       this.refreshPriceData();
     });
-    this.subscribeTo(this.itemDocument,() => {
+    this.subscribeTo(this.itemDocument, () => {
       const { data } = this.itemDocument.updateOptions;
-      if(hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
+      if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
         this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
         this.refreshDisplayQuantity();
       }
-      if(hasProperty(data, CONSTANTS.FLAGS.ITEM+".prices")) {
+      if (hasProperty(data, CONSTANTS.FLAGS.ITEM + ".prices")) {
         this.refreshPriceData();
       }
     });
   }
 
-  refreshDisplayQuantity(){
+  refreshDisplayQuantity() {
 
     const merchantDisplayQuantity = get(this.store.pileData).displayQuantity;
 
     const itemFlagDataQuantity = get(this.itemFlagData).displayQuantity;
 
-    if(itemFlagDataQuantity === "always"){
+    if (itemFlagDataQuantity === "always") {
       return this.displayQuantity.set(true);
     }
 
@@ -141,14 +141,14 @@ class PileMerchantItem extends PileItem {
       "no": false
     }[itemFlagDataQuantity ?? "default"];
 
-    if(merchantDisplayQuantity.startsWith("always")){
+    if (merchantDisplayQuantity.startsWith("always")) {
       return this.displayQuantity.set(merchantDisplayQuantity.endsWith("yes"));
     }
 
     this.displayQuantity.set(itemDisplayQuantity)
   }
 
-  refreshPriceData(){
+  refreshPriceData() {
 
     let priceData = [];
     const pileData = get(this.store.pileData);
@@ -170,32 +170,30 @@ class PileMerchantItem extends PileItem {
       }
     }
 
-    if (itemFlagData.enabled) {
-      if (itemFlagData.prices.length) {
-        priceData = itemFlagData.prices.map(price => {
-          price.originalCost = price.cost;
-          if (!price.static) {
-            price.cost = Math.round(price.cost * buyPriceModifier);
-          }
+    if (itemFlagData.free) {
+      priceData = [];
+    } else if (itemFlagData.prices.length) {
+      priceData = itemFlagData.prices.map(priceGroup => {
+        return priceGroup.map(price => {
+          price.modifiedCost = Math.round(price.cost * buyPriceModifier);
           return price;
         });
-      } else if (itemFlagData.free) {
-        priceData = [];
-      }
-    }else{
+      });
+    }
+
+    if (!itemFlagData.disableNormalCost && !itemFlagData.free) {
       const primaryCurrency = game.itempiles.getPrimaryCurrency(this.store.source);
       const cost = getProperty(this.item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
-      priceData = [{
+      priceData = [[{
         ...primaryCurrency,
-        originalCost: cost,
-        cost: Math.round(cost * buyPriceModifier)
-      }];
+        modifiedCost: Math.round(cost * buyPriceModifier)
+      }]];
     }
 
     this.prices.set(priceData);
   }
 
-  async updateItemFlagData(){
+  async updateItemFlagData() {
     const itemFlagData = get(this.itemFlagData);
     await PileUtilities.updateItemData(this.item, itemFlagData);
   }

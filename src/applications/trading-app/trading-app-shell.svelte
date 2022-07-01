@@ -67,7 +67,7 @@
       }
     }
 
-    const actorItemCurrencyList = PileUtilities.getActorCurrencyData(store.leftTraderActor).items;
+    const actorItemCurrencyList = PileUtilities.getActorCurrencyList(store.leftTraderActor).items;
     const isCurrency = !!Utilities.findSimilarItem(actorItemCurrencyList.map(item => item.data), itemData);
 
     return store.addItem(itemData, { currency: isCurrency });
@@ -126,7 +126,9 @@
       store.addItem(itemData, { quantity: item.quantity, currency: true })
     });
 
-    const currencies = PileUtilities.getFormattedActorAttributes(store.leftTraderActor, { getAll: asGM });
+    const currencies = PileUtilities.getActorCurrencies(store.leftTraderActor, { getAll: asGM })
+      .filter(currency => currency.type === "attribute");
+
     Object.entries(currenciesToAdd.attributes).forEach(([path, quantity]) => {
       const currency = currencies.find(currency => currency.path === path);
       store.addAttribute({
@@ -141,9 +143,7 @@
     });
   }
 
-
 </script>
-
 
 <svelte:options accessors={true}/>
 

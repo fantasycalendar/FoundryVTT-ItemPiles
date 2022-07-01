@@ -1,6 +1,5 @@
 import { writable, get } from 'svelte/store';
 import * as Utilities from "../../helpers/utilities.js";
-import { getFormattedActorAttributes } from "../../helpers/pile-utilities.js";
 
 export default class TradeStore {
   

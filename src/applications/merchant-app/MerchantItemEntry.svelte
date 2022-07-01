@@ -56,12 +56,12 @@
     {#if itemFlagData.free}
       <small>Free</small>
     {:else}
-      <img src="{$prices[0].img}" title="{localize($prices[0].name)}"
-           style=" border-radius: 4px; max-height:20px; max-width: 20px; margin-right: 5px;">
+      <img src="{$prices[0][0].img}" title="{localize($prices[0][0].name)}"
+           style="border-radius: 4px; max-height:20px; max-width: 20px; margin-right: 5px;">
       {#if $prices.length > 1}
-        <small><a>{$prices[0].cost}*</a></small>
+        <small><a>{$prices[0][0].modifiedCost}*</a></small>
       {:else}
-        <small><a>{$prices[0].cost}</a></small>
+        <small><a>{$prices[0][0].modifiedCost}</a></small>
       {/if}
     {/if}
   </div>

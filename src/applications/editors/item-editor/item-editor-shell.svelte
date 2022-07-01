@@ -7,6 +7,7 @@
   import FilePicker from "../../components/FilePicker.svelte";
   import DropZone from "../../components/DropZone.svelte";
   import * as Helpers from "../../../helpers/helpers.js";
+  import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 
   const { application } = getContext('external');
 
@@ -48,7 +49,7 @@
       type: "attribute",
       name: "Custom Attribute",
       img: "icons/svg/cowled.svg",
-      quantity: 1,
+      cost: 1,
       data: ""
     }]
   }
@@ -69,9 +70,30 @@
       type: "item",
       name: itemData.name,
       img: itemData.img,
-      quantity: 1,
+      cost: 1,
       data: itemData
     }]
+
+  }
+
+  async function editItem(groupIndex, index){
+
+    const itemData = itemFlagData.prices[groupIndex][index].data;
+
+    const tempItem = await Item.implementation.create(itemData, { temporary: true });
+    const doc = new TJSDocument(tempItem);
+
+    doc.subscribe((...args) => {
+      console.log(args)
+      // if(changes.action !== "subscribe"){
+      //   const data = tempItem.toObject();
+      //   itemFlagData.prices[groupIndex][index].name = data.name;
+      //   itemFlagData.prices[groupIndex][index].img = data.img;
+      //   itemFlagData.prices[groupIndex][index].data = data;
+      // }
+    });
+
+    tempItem.sheet.render(true)
 
   }
 
@@ -242,7 +264,7 @@
                 <th><i class="fas fa-times item-piles-clickable-link" on:click={() => { removeGroup(groupIndex) }}></i>
                 </th>
                 <th>Name</th>
-                <th>Quantity</th>
+                <th>Cost</th>
                 <th>Icon</th>
                 <th>Path</th>
                 <th><i class="fas fa-plus item-piles-clickable-link" on:click={() => { addAttribute(groupIndex) }}></i>
@@ -265,7 +287,7 @@
                     <input type="text" required bind:value={price.name}/>
                   </td>
                   <td class="small">
-                    <input type="number" required bind:value={price.quantity}/>
+                    <input type="number" required bind:value={price.cost}/>
                   </td>
                   <td>
                     <FilePicker type="imagevideo" showImage={true} showInput={false} bind:value={price.img}/>
@@ -274,7 +296,7 @@
                     {#if price.type === "attribute"}
                       <input type="text" required bind:value={price.data}/>
                     {:else}
-                      <a><i class="fas fa-edit"></i> Edit item</a>
+                      <a on:click={() => { editItem(groupIndex, index)}}><i class="fas fa-edit"></i> Edit item</a>
                     {/if}
                   </td>
                   <td class="small">

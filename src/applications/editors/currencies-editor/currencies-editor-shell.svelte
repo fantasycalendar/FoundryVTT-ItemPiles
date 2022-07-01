@@ -2,33 +2,21 @@
 
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-
-  import AttributeCurrencyList from "./AttributeCurrencyList.svelte";
-  import ItemCurrencyList from "./ItemCurrencyList.svelte";
-
-  import { getSetting, setSetting } from "../../../helpers/helpers.js";
+  import { getSetting } from "../../../helpers/helpers.js";
   import SETTINGS from "../../../constants/settings.js";
-
+  import CurrencyList from "./CurrencyList.svelte";
   import CurrencyStore from "./currency-store.js"
-
-  const store = new CurrencyStore();
 
   const { application } = getContext('external');
 
   export let data;
-  data = data || getSetting(SETTINGS.CURRENCIES);
 
-  store.items.set([...data.items]);
-  store.attributes.set([...data.attributes]);
-
-  const primary = data.attributes.find(attr => attr.primary) ?? data.items.find(item => item.primary) ?? false;
-  store.primary.set(primary)
+  const store = new CurrencyStore(data || getSetting(SETTINGS.CURRENCIES));
 
   let form;
 
   async function updateSettings() {
-    const newData = store.export();
-    application.options.resolve(newData);
+    application.options.resolve(store.export());
     application.close();
   }
 
@@ -40,17 +28,13 @@
 
 <svelte:options accessors={true}/>
 
-<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-pile-currencies-editor">
-
-  <h1>Attribute based currencies:</h1>
+<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-pile-currencies-editor">]
 
   <p>{localize("ITEM-PILES.Applications.CurrenciesEditor.Explanation")}</p>
-  <AttributeCurrencyList {store}/>
 
-  <h1>Item based currencies:</h1>
+  <p class="small">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmall")}</p>
 
-  <p>{localize("ITEM-PILES.Applications.CurrenciesEditor.ItemExplanation")}</p>
-  <ItemCurrencyList {store}/>
+  <CurrencyList {store}/>
 
 </form>
 

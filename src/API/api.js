@@ -201,7 +201,7 @@ const API = {
   getPrimaryCurrency(actor) {
     let currencies = this.CURRENCIES;
     if(actor && actor instanceof Actor){
-      currencies = PileUtilities.getActorCurrencyData(actor);
+      currencies = PileUtilities.getActorCurrencyList(actor);
     }
     return currencies.attributes.find(attribute => attribute.primary) ?? currencies.items.find(item => item.primary);
   },

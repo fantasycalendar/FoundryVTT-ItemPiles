@@ -1,4 +1,7 @@
 export default {
+
+  "VERSION": 1.0,
+
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
 
@@ -23,47 +26,64 @@ export default {
   // Item similarities determines how item piles detect similarities and differences in the system
   "ITEM_SIMILARITIES": ["name", "type"],
 
-  "CURRENCIES": {
-    // Currencies in item piles are a list of names, attribute paths, and images - the attribute path is relative to the actor.data
-    "attributes": [
-      {
-        name: "DND5E.CurrencyPP",
-        path: "data.currency.pp",
-        img: "icons/commodities/currency/coin-inset-snail-silver.webp",
-        primary: false,
-        exchange: 10
+  // Currencies in item piles is a versatile system that can accept actor attributes (a number field on the actor's sheet) or items (actual items in their inventory)
+  // In the case of attributes, the path is relative to the "actor.data"
+  // In the case of items, it is recommended you export the item with `.toObject()` and strip out any module data
+  "CURRENCIES": [
+    {
+      type: "attribute",
+      name: "DND5E.CurrencyPP",
+      img: "icons/commodities/currency/coin-inset-snail-silver.webp",
+      abbreviation: "{#}PP",
+      data: {
+        path: "data.currency.pp"
       },
-      {
-        name: "DND5E.CurrencyGP",
+      primary: false,
+      exchangeRate: 10
+    },
+    {
+      type: "attribute",
+      name: "DND5E.CurrencyGP",
+      img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
+      abbreviation: "{#}GP",
+      data: {
         path: "data.currency.gp",
-        img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
-        primary: true,
-        exchange: 1
       },
-      {
-        name: "DND5E.CurrencyEP",
+      primary: true,
+      exchangeRate: 1
+    },
+    {
+      type: "attribute",
+      name: "DND5E.CurrencyEP",
+      img: "icons/commodities/currency/coin-inset-copper-axe.webp",
+      abbreviation: "{#}EP",
+      data: {
         path: "data.currency.ep",
-        img: "icons/commodities/currency/coin-inset-copper-axe.webp",
-        primary: false,
-        exchange: 0.5
       },
-      {
-        name: "DND5E.CurrencySP",
+      primary: false,
+      exchangeRate: 0.5
+    },
+    {
+      type: "attribute",
+      name: "DND5E.CurrencySP",
+      img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
+      abbreviation: "{#}SP",
+      data: {
         path: "data.currency.sp",
-        img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
-        primary: false,
-        exchange: 0.1
       },
-      {
-        name: "DND5E.CurrencyCP",
+      primary: false,
+      exchangeRate: 0.1
+    },
+    {
+      type: "attribute",
+      name: "DND5E.CurrencyCP",
+      img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
+      abbreviation: "{#}CP",
+      data: {
         path: "data.currency.cp",
-        img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
-        primary: false,
-        exchange: 0.01
-      }
-    ],
-
-    // While attribute currencies exist in character data, item currencies are items that act LIKE currencies
-    "items": []
-  }
+      },
+      primary: false,
+      exchangeRate: 0.01
+    }
+  ]
 }
