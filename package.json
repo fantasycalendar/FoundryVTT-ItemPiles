@@ -17,15 +17,19 @@
     "devDependencies": {
         "@babel/core": "^7",
         "@babel/preset-env": "^7",
+        "@league-of-foundry-developers/foundry-vtt-types": "^9.238.1",
         "@rollup/plugin-babel": "^5",
         "@typhonjs-config/eslint-config": "^0.3.0",
         "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
         "eslint": "^8",
         "rollup": "^2",
-        "svelte-preprocess": "^4.10.0",
-        "@league-of-foundry-developers/foundry-vtt-types": "^9.238.1"
+        "svelte-dnd-action": "^0.9.18",
+        "svelte-preprocess": "^4.10.0"
     },
-    "browserslist": [">5%", "not IE 11"],
+    "browserslist": [
+        ">5%",
+        "not IE 11"
+    ],
     "scripts": {
         "build": "rollup --config",
         "build-watch": "rollup --watch --config",

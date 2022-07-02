@@ -30,11 +30,11 @@ export default class ItemEditor extends TJSDialog {
         }
       },
       default: 'save',
+      zIndex: 202,
       autoClose: false, // Don't automatically close on button onclick.
       close: () => this.options.resolve(null)
     }, {
       width: 500,
-      zIndex: 202,
       height: "auto",
       ...options
     });

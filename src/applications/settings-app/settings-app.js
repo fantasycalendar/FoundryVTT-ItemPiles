@@ -7,12 +7,12 @@ class SettingsApp extends SvelteApplication {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: `item-piles-application-system-settings`,
       title: "Item Piles Module Configuration",
-      zIndex: 100,
       width: 600,
       svelte: {
         class: SettingsShell,
         target: document.body
       },
+      zIndex: 100,
     });
   }
 

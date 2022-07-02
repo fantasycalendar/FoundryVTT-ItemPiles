@@ -19,7 +19,6 @@ export class ItemPileInventoryApp extends SvelteApplication {
     super({
       id: `item-pile-inventory-${source.id}`,
       title: source.name,
-      zIndex: 100,
       svelte: {
         class: ItemPileInventoryShell,
         target: document.body,
@@ -29,6 +28,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
           overrides
         }
       },
+      zIndex: 100,
       ...options
     }, dialogData);
 

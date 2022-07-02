@@ -22,7 +22,7 @@ const API = {
   /**
    * The currencies used in this system
    *
-   * @returns {Array<{name: String, currency: String, img: String}>}
+   * @returns {Array<{primary: Boolean, name: String, data: Object, img: String, abbreviation: String, exchange: Number}>}
    */
   get CURRENCIES() {
     return Helpers.getSetting(SETTINGS.CURRENCIES);
@@ -80,53 +80,35 @@ const API = {
   /**
    * Sets the currencies used in this system
    *
-   * @param {Object<{attributes: Array, items: Array}>} inCurrencies
+   * @param {Array<Object>} inCurrencies
    * @returns {Promise}
    */
   setCurrencies(inCurrencies) {
-    if (!Array.isArray(inCurrencies.attributes) || Array.isArray(inCurrencies.items)) {
-      throw Helpers.custom_error("setCurrencies | inCurrencies must be an object with the 'attributes' and 'items' keys, and both must be arrays");
+    if (!Array.isArray(inCurrencies)) {
+      throw Helpers.custom_error("setCurrencies | inCurrencies must be an array");
     }
     
-    inCurrencies.attributes.forEach(attribute => {
-      if (typeof attribute !== "object") {
-        throw Helpers.custom_error("setCurrencies | each entry in the inCurrencies array must be of type object");
+    inCurrencies.forEach(currency => {
+      if (typeof currency !== "object") {
+        throw Helpers.custom_error("setCurrencies | each entry in inCurrencies must be of type object");
       }
-      if (typeof attribute.primary !== "boolean") {
-        throw Helpers.custom_error("setCurrencies | attribute.primary must be of type boolean");
+      if (typeof currency.primary !== "boolean") {
+        throw Helpers.custom_error("setCurrencies | currency.primary must be of type boolean");
       }
-      if (typeof attribute.name !== "string") {
-        throw Helpers.custom_error("setCurrencies | attribute.name must be of type string");
+      if (typeof currency.name !== "string") {
+        throw Helpers.custom_error("setCurrencies | currency.name must be of type string");
       }
-      if (typeof attribute.exchange !== "number") {
-        throw Helpers.custom_error("setCurrencies | attribute.exchange must be of type number");
+      if (typeof currency.abbreviation !== "string") {
+        throw Helpers.custom_error("setCurrencies | currency.abbreviation must be of type string");
       }
-      if (typeof attribute.path !== "string") {
-        throw Helpers.custom_error("setCurrencies | attribute.path must be of type string");
+      if (typeof currency.exchange !== "number") {
+        throw Helpers.custom_error("setCurrencies | currency.exchange must be of type number");
       }
-      if (attribute.img && typeof attribute.img !== "string") {
-        throw Helpers.custom_error("setCurrencies | attribute.img must be of type string");
+      if (typeof currency.data !== "object") {
+        throw Helpers.custom_error("setCurrencies | currency.data must be of type object");
       }
-    });
-    
-    inCurrencies.items.forEach(item => {
-      if (typeof item !== "object") {
-        throw Helpers.custom_error("setCurrencies | each entry in the inCurrencies array must be of type object");
-      }
-      if (typeof item.primary !== "boolean") {
-        throw Helpers.custom_error("setCurrencies | item.primary must be of type boolean");
-      }
-      if (typeof item.name !== "string") {
-        throw Helpers.custom_error("setCurrencies | item.name must be of type string");
-      }
-      if (typeof item.type !== "string") {
-        throw Helpers.custom_error("setCurrencies | item.type must be of type string");
-      }
-      if (typeof item.exchange !== "number") {
-        throw Helpers.custom_error("setCurrencies | item.exchange must be of type number");
-      }
-      if (item.img && typeof item.img !== "string") {
-        throw Helpers.custom_error("setCurrencies | item.img must be of type string");
+      if (currency.img && typeof currency.img !== "string") {
+        throw Helpers.custom_error("setCurrencies | currency.img must be of type string");
       }
     });
     
@@ -198,12 +180,11 @@ const API = {
     return Helpers.setSetting(SETTINGS.ITEM_SIMILARITIES, inPaths);
   },
 
-  getPrimaryCurrency(actor) {
-    let currencies = this.CURRENCIES;
+  getPrimaryCurrency(actor = false) {
     if(actor && actor instanceof Actor){
-      currencies = PileUtilities.getActorCurrencyList(actor);
+      return PileUtilities.getActorPrimaryCurrency(actor);
     }
-    return currencies.attributes.find(attribute => attribute.primary) ?? currencies.items.find(item => item.primary);
+    return this.CURRENCIES.find(currency => currency.primary);
   },
   
   /* ================= ITEM PILE METHODS ================= */

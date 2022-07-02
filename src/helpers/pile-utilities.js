@@ -114,7 +114,7 @@ export function getActorCurrencies(target, { currencyList = false, getAll = fals
     }
   });
   if (!getAll) {
-    currencies = currencies.map(currency => !currency.quantity);
+    currencies = currencies.filter(currency => !currency.quantity);
   }
   return currencies;
 }

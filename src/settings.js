@@ -19,8 +19,6 @@ export default function registerSettings() {
     game.settings.register(CONSTANTS.MODULE_NAME, name, data);
   }
   
-  checkSystem();
-  
 }
 
 async function applyDefaultSettings() {
@@ -31,8 +29,6 @@ async function applyDefaultSettings() {
 }
 
 export async function checkSystem() {
-  
-  await Helpers.wait(1000);
   
   if (Helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
   

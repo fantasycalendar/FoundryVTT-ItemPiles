@@ -91,14 +91,23 @@ export default class ItemPileStore {
       }
     });
 
-    const items = PileUtilities.getActorItems(this.source).map(item => {
-      return new this.ItemClass(this, item);
-    });
-    this.allItems.set(items);
+    const items = [];
+    const attributes = [];
 
-    const attributes = PileUtilities.getActorCurrencyAttributes(this.source).map(attribute => {
-      return new this.AttributeClass(this, attribute);
+    PileUtilities.getActorItems(this.source).map(item => {
+      items.push(new this.ItemClass(this, item));
     });
+
+    PileUtilities.getActorCurrencies(this.source).forEach(currency => {
+      if(currency.type === "item"){
+        if(!currency.item) return;
+        items.push(new this.ItemClass(this, currency.item ?? currency.data));
+      }else {
+        attributes.push(new this.AttributeClass(this, currency));
+      }
+    });
+
+    this.allItems.set(items);
     this.attributes.set(attributes);
 
     this.allItems.subscribe((val) => {

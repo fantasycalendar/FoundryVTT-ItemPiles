@@ -1,4 +1,6 @@
 import { writable, get } from 'svelte/store';
+import * as Utilities from "../../../helpers/utilities.js";
+import CONSTANTS from "../../../constants/constants.js";
 
 export default class CurrencyStore {
   
@@ -6,9 +8,11 @@ export default class CurrencyStore {
     this.currencies = writable(data.map((entry, index) => {
       return {
         ...entry,
-        index
+        index,
+        id: entry.data?.path ?? entry.data?._id ?? randomID()
       }
     }));
+    console.log(get(this.currencies))
   }
   
   setPrimary(index) {
@@ -17,6 +21,28 @@ export default class CurrencyStore {
       entry.primary = entryIndex === index;
     });
     this.currencies.set(currencies);
+  }
+
+  sortCurrencies(){
+    const currencies = get(this.currencies);
+    currencies.sort((a, b) => {
+      return b.exchangeRate - a.exchangeRate;
+    });
+    this.currencies.set(currencies);
+  }
+
+  async editItem(index){
+    const currencies = get(this.currencies);
+    const itemData = currencies[index].data;
+    if(itemData._id) delete itemData._id;
+    if(itemData.permission) delete itemData._id;
+    const items = Array.from(game.items);
+    let item = Utilities.findSimilarItem(items, itemData);
+    if(!item) {
+      setProperty(itemData, CONSTANTS.FLAGS.TEMPORARY_ITEM, true);
+      item = await Item.implementation.create(itemData);
+    }
+    item.sheet.render(true);
   }
   
   export() {

@@ -35,12 +35,12 @@ export default class PriceModifiersEditor extends TJSDialog {
         }
       },
       default: 'save',
+      zIndex: 202,
       autoClose: false, // Don't automatically close on button onclick.
       close: () => this.options.resolve?.(false),
       ...dialogData
     }, {
       width: 600,
-      zIndex: 202,
       height: "auto",
       ...options
     });

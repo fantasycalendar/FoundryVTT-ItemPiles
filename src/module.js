@@ -2,7 +2,7 @@ import "./styles/styles.scss";
 
 import registerUIOverrides from "./foundry-ui-overrides.js";
 import registerLibwrappers from "./libwrapper.js";
-import registerSettings from "./settings.js";
+import registerSettings, { checkSystem } from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import Socket from "./socket.js";
 import API from "./API/api.js";
@@ -13,6 +13,7 @@ import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
 import MerchantApp from "./applications/merchant-app/merchant-app.js";
 import ItemEditor from "./applications/editors/item-editor/item-editor.js";
+import CurrenciesEditor from "./applications/editors/currencies-editor/currencies-editor.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -46,17 +47,20 @@ Hooks.once("ready", () => {
   if (!Helpers.isGMConnected()) {
     Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
   }
-  
+
+  checkSystem();
   registerHotkeysPost();
   Hooks.callAll(HOOKS.READY);
   
   ChatAPI.disablePastTradingButtons();
 
-  const source = game.actors.get("XWczTeS4oJzsrOYY");
-  const recipient = game.actors.getName("Inquisitive Player");
-  MerchantApp.show(source, recipient)
+  // const source = game.actors.get("XWczTeS4oJzsrOYY");
+  // const recipient = game.actors.getName("Inquisitive Player");
+  // MerchantApp.show(source, recipient)
+  //
+  // ItemEditor.show(source.items.getName("Antitoxin"));
 
-  ItemEditor.show(source.items.getName("Antitoxin"));
+  CurrenciesEditor.show()
   
 });
 

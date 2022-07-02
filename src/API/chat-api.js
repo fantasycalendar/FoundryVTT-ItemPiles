@@ -204,11 +204,11 @@ export default class ChatAPI {
    * @returns {Array}
    */
   static _formatCurrencyData(itemPile, currencies) {
-    const currencyList = PileUtilities.getActorCurrencyAttributes(itemPile);
+    const currencyList = PileUtilities.getActorCurrencies(itemPile);
     return Object.entries(currencies).map(entry => {
-      const currency = currencyList.find(currency => currency.path === entry[0]);
+      const currency = currencyList.find(currency => currency.id === entry[0]);
       return {
-        name: game.i18n.localize(currency.name),
+        name: currency.name,
         img: currency.img ?? "",
         quantity: entry[1],
         index: currencyList.indexOf(currency)

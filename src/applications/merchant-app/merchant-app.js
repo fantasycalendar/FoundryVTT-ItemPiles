@@ -16,6 +16,7 @@ export default class MerchantApp extends SvelteApplication {
           buyer
         }
       },
+      zIndex: 100,
       ...options
     }, dialogData);
     this.merchant = merchant;

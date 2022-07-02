@@ -24,12 +24,12 @@ export default class ItemSimilaritiesEditor extends TJSDialog {
         }
       },
       default: 'save',
+      zIndex: 202,
       autoClose: false, // Don't automatically close on button onclick.
       close: () => this.options.resolve(null),
       ...dialogData
     }, {
       width: 400,
-      zIndex: 202,
       height: "auto",
       ...options
     });

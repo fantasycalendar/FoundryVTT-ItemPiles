@@ -13,7 +13,6 @@ export default class ItemPileConfig extends TJSDialog {
     
     super({
       title: game.i18n.format("ITEM-PILES.Applications.ItemPileConfig.Title", { actor_name: pileActor.name }),
-      zIndex: 101,
       content: {
         class: ItemPileConfigShell,
         props: {
@@ -22,6 +21,7 @@ export default class ItemPileConfig extends TJSDialog {
         }
       },
       autoClose: true, // Don't automatically close on button onclick.
+      zIndex: 101,
       close: () => this.options.resolve?.(null),
       ...dialogData
     }, {

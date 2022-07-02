@@ -8,7 +8,6 @@ export class TradePromptDialog extends TJSDialog {
     super({
       ...dialogData,
       title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-      zIndex: 101,
       content: {
         class: TradeDialogPrompt,
         props: {
@@ -16,6 +15,7 @@ export class TradePromptDialog extends TJSDialog {
         }
       },
       autoClose: true, // Don't automatically close on button onclick.
+      zIndex: 101,
       close: () => this.options.resolve?.(null)
     }, {
       width: 400,
