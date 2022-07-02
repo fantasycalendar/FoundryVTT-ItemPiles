@@ -10,7 +10,7 @@ export default function registerUIOverrides() {
   Hooks.on("getActorDirectoryEntryContext", insertActorContextMenuItems);
   Hooks.on("getActorSheetHeaderButtons", insertActorHeaderButtons);
   Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
-  Hooks.on("changeSidebarTab", hideTemporaryItems);
+  Hooks.on("renderSidebarTab", hideTemporaryItems);
 }
 
 function hideTemporaryItems(sidebar) {

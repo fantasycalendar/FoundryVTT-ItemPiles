@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": 1.0,
+  "VERSION": "1.0.0",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -84,54 +84,6 @@ export default {
       },
       primary: false,
       exchangeRate: 0.01
-    },
-    {
-      type: "item",
-      name: "Ration",
-      img: "icons/consumables/meat/hock-leg-pink-brown.webp",
-      abbreviation: "{#} Rations",
-      data: {
-        "name": "Rations",
-        "type": "consumable",
-        "img": "icons/consumables/meat/hock-leg-pink-brown.webp",
-        "data": {
-          "description": {
-            "value": "<p>Rations consist of dry foods suitable for extended travel, including jerky, dried fruit, hardtack, and nuts.</p>",
-            "chat": "",
-            "unidentified": ""
-          },
-          "source": "PHB pg. 153",
-          "quantity": 1,
-          "weight": 2,
-          "price": 0.5,
-          "attunement": 0,
-          "equipped": false,
-          "rarity": "common",
-          "identified": true,
-          "activation": { "type": "action", "cost": 1, "condition": "" },
-          "duration": { "value": 0, "units": "" },
-          "target": { "value": 1, "width": null, "units": "", "type": "creature" },
-          "range": { "value": null, "long": null, "units": "touch" },
-          "uses": { "value": 1, "max": "1", "per": "charges", "autoDestroy": true, "autoUse": true },
-          "consume": { "type": "", "target": "", "amount": null },
-          "ability": "",
-          "actionType": "util",
-          "attackBonus": 0,
-          "chatFlavor": "",
-          "critical": { "threshold": null, "damage": "" },
-          "damage": { "parts": [], "versatile": "" },
-          "formula": "",
-          "save": { "ability": "", "dc": null, "scaling": "spell" },
-          "consumableType": "food"
-        },
-        "effects": [],
-        "folder": null,
-        "sort": 200000,
-        "permission": { "default": 0 },
-        "flags": { "core": { "sourceId": "Compendium.dnd5e.items.f4w4GxBi0nYXmhX4" } }
-      },
-      primary: false,
-      exchangeRate: 0.01
-    },
+    }
   ]
 }

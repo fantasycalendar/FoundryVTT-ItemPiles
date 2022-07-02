@@ -119,6 +119,11 @@
         "Content": "This system was previously not supported, but in an recent update it was added as a supported system!<br><br>Do you want to load this system's default Item Pile settings?",
         "Confirm": "Apply System Defaults"
       },
+      "NewSystemVersion": {
+        "Title": "New System Version",
+        "Content": "The default settings for the system you're using was updated, would you like to override your module settings with the updated ones?",
+        "Confirm": "Update settings"
+      },
       "ResetSharingData": {
         "Title": "Reset Sharing Data",
         "Content": "This will reset all of the history of players having taken their share from this pile.<br><br>Are you sure you want to do this?",
@@ -147,7 +152,8 @@
         "Title": "Item Piles Currencies Editor",
         "TitleActor": "Item Piles Currencies Editor: {actor_name}",
         "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies.",
-        "ExplanationSmall": " In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\". In other systems, they may be actual items on the actor - in this case, you can drag and drop items onto this list to add it to the currencies.",
+        "ExplanationSmallAttributes": "In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\". Add one by clicking the plus in the header.",
+        "ExplanationSmallItems": "In other systems, they may be actual items on the actor - in this case, you can drag and drop items onto this list to add it to the currencies.",
         "DragDrop": "Drag and drop an item to add it to the list",
         "Name": "Currency name",
         "Exchange": "Exchange",

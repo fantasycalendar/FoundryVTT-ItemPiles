@@ -31,7 +31,8 @@ const SETTINGS = {
   SYSTEM_FOUND: "systemFound",
   SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
   PRECONFIGURED_SYSTEM: "preconfiguredSystem",
-  
+  SYSTEM_VERSION: "systemVersion",
+
   GET_DEFAULT() {
     return foundry.utils.deepClone(SETTINGS.DEFAULTS())
   },
@@ -110,6 +111,13 @@ const SETTINGS = {
       config: false,
       system: true,
       default: SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE,
+      type: String
+    },
+
+    [SETTINGS.SYSTEM_VERSION]: {
+      scope: "world",
+      config: false,
+      default: "0.0.0",
       type: String
     },
     

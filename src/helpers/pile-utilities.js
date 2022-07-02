@@ -164,10 +164,10 @@ export function isItemInvalid(targetActor, item, itemFilters = false) {
 
 export function isItemCurrency(item, { target = false } = {}) {
   const actor = Utilities.getActor(target ? target : item.parent);
-  const currencyFilters = getActorCurrencies(actor, { getAll: true })
+  const currencies = getActorCurrencies(actor, { getAll: true })
     .filter(currency => currency.type === "item")
-    .map(item => item.data);
-  return !!Utilities.findSimilarItem(currencyFilters, item);
+    .map(item => item.data.itemData);
+  return !!Utilities.findSimilarItem(currencies, item);
 }
 
 

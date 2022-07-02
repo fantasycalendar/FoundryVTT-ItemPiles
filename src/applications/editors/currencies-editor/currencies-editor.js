@@ -7,7 +7,7 @@ export default class CurrenciesEditor extends SvelteApplication {
     super({
       svelte: {
         class: CurrenciesEditorShell,
-        selectorElement: document.body,
+        target: document.body,
         props: {
           data
         }

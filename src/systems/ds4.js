@@ -2,7 +2,7 @@
 
 export default {
 
-  "VERSION": 1.0,
+  "VERSION": "1.0.0",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
