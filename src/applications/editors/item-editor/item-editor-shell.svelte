@@ -2,12 +2,9 @@
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import * as PileUtilities from "../../../helpers/pile-utilities.js";
-  import ItemPriceStore from "./PriceGroupStore.js";
+  import ItemPriceStore from "./ItemPriceStore.js";
   import Tabs from "../../components/Tabs.svelte";
-  import FilePicker from "../../components/FilePicker.svelte";
-  import DropZone from "../../components/DropZone.svelte";
-  import * as Helpers from "../../../helpers/helpers.js";
-  import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
+  import PriceList from "./PriceList.svelte";
 
   const { application } = getContext('external');
 
@@ -31,133 +28,14 @@
     form.requestSubmit();
   }
 
-  let dragging = null;
-  let hovering = null;
-
-  function addGroup() {
-    itemFlagData.prices = [...itemFlagData.prices, []];
+  function addGroup(){
+    itemFlagData.prices = [
+      ...itemFlagData.prices,
+      []
+    ]
   }
 
-  function removeGroup(groupIndex) {
-    const prices = itemFlagData.prices;
-    prices.splice(groupIndex, 1);
-    itemFlagData.prices = prices;
-  }
-
-  function addAttribute(groupIndex) {
-    itemFlagData.prices[groupIndex] = [...itemFlagData.prices[groupIndex], {
-      type: "attribute",
-      name: "Custom Attribute",
-      img: "icons/svg/cowled.svg",
-      cost: 1,
-      data: ""
-    }]
-  }
-
-  async function addItem(groupIndex, data) {
-
-    if (data.type !== "Item") return;
-
-    let item = await Item.implementation.fromDropData(data);
-    let itemData = item.toObject();
-
-    if (!itemData) {
-      console.error(data);
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
-    }
-
-    itemFlagData.prices[groupIndex] = [...itemFlagData.prices[groupIndex], {
-      type: "item",
-      name: itemData.name,
-      img: itemData.img,
-      cost: 1,
-      data: itemData
-    }]
-
-  }
-
-  async function editItem(groupIndex, index){
-
-    const itemData = itemFlagData.prices[groupIndex][index].data;
-
-    const tempItem = await Item.implementation.create(itemData, { temporary: true });
-    const doc = new TJSDocument(tempItem);
-
-    doc.subscribe((...args) => {
-      console.log(args)
-      // if(changes.action !== "subscribe"){
-      //   const data = tempItem.toObject();
-      //   itemFlagData.prices[groupIndex][index].name = data.name;
-      //   itemFlagData.prices[groupIndex][index].img = data.img;
-      //   itemFlagData.prices[groupIndex][index].data = data;
-      // }
-    });
-
-    tempItem.sheet.render(true)
-
-  }
-
-  function removeGroupItem(groupIndex, index) {
-    const groups = itemFlagData.prices[groupIndex];
-    groups.splice(index, 1);
-    itemFlagData.prices[groupIndex] = groups;
-  }
-
-  function dragStart(event, groupIndex, index) {
-    dragging = groupIndex + "-" + index;
-    event.dataTransfer.setData('text/plain', JSON.stringify({ type: "move", groupIndex, index }));
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.dropEffect = 'move';
-  }
-
-  function drop(event, dropGroupIndex) {
-
-    let data;
-    try {
-      data = JSON.parse(event.dataTransfer.getData('text/plain'));
-    } catch (err) {
-      return false;
-    }
-
-    if (data.type !== "move") {
-      return addItem(dropGroupIndex, data);
-    }
-
-    if(!hovering) return;
-
-    let dropIndex = Number(hovering.split("-")[1]);
-
-    dragging = null;
-    hovering = null;
-
-    event.dataTransfer.dropEffect = 'move';
-
-    const { groupIndex, index } = data;
-
-    if (dropGroupIndex === groupIndex && dropIndex === index) return;
-
-    const group = itemFlagData.prices[groupIndex];
-    const dataToMove = itemFlagData.prices[groupIndex].splice(index, 1)[0];
-
-    if (dropGroupIndex !== groupIndex) {
-      const dropGroup = itemFlagData.prices[dropGroupIndex];
-      dropGroup.splice(dropIndex + 1, 0, dataToMove);
-      itemFlagData.prices[dropGroupIndex] = dropGroup;
-    } else {
-      if (dropIndex === index - 1) {
-        group.splice(dropIndex, 0, dataToMove);
-      } else if (dropIndex === index + 1) {
-        group.splice(dropIndex + 1, 0, dataToMove);
-      } else {
-        group.splice(dropIndex > index ? dropIndex : dropIndex + 1, 0, dataToMove);
-      }
-    }
-
-    itemFlagData.prices[groupIndex] = group;
-
-  }
-
-  let activeTab = "general";
+  let activeTab = "price";
 
 </script>
 
@@ -256,73 +134,10 @@
 
         {#if itemFlagData.prices.length}
 
-          {#each itemFlagData.prices as group, groupIndex (groupIndex)}
-            <table
-                on:drop={event => drop(event, groupIndex)}
-            >
-              <tr>
-                <th><i class="fas fa-times item-piles-clickable-link" on:click={() => { removeGroup(groupIndex) }}></i>
-                </th>
-                <th>Name</th>
-                <th>Cost</th>
-                <th>Icon</th>
-                <th>Path</th>
-                <th><i class="fas fa-plus item-piles-clickable-link" on:click={() => { addAttribute(groupIndex) }}></i>
-                </th>
-              </tr>
-              {#each group as price, index (index)}
-                <tr
-                    class:is-active={hovering === groupIndex + "-" + index && dragging !== null}
-                    class:is-dragging={dragging === groupIndex + "-" + index}
-                    on:dragenter={() => { if(dragging !== null) hovering = groupIndex + "-" + index; }}
-                    on:dragover|preventDefault
-                >
-                  <td class="small">
-                    <a class="item-piles-moveable"
-                       draggable="true"
-                       on:dragstart={event => dragStart(event, groupIndex, index)}
-                    ><i class="fas fa-bars"></i></a>
-                  </td>
-                  <td>
-                    <input type="text" required bind:value={price.name}/>
-                  </td>
-                  <td class="small">
-                    <input type="number" required bind:value={price.cost}/>
-                  </td>
-                  <td>
-                    <FilePicker type="imagevideo" showImage={true} showInput={false} bind:value={price.img}/>
-                  </td>
-                  <td>
-                    {#if price.type === "attribute"}
-                      <input type="text" required bind:value={price.data}/>
-                    {:else}
-                      <a on:click={() => { editItem(groupIndex, index)}}><i class="fas fa-edit"></i> Edit item</a>
-                    {/if}
-                  </td>
-                  <td class="small">
-                    <button type="button" on:click={() => { removeGroupItem(groupIndex, index) }}>
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </td>
-                </tr>
-              {/each}
-              {#if !group.length}
-                <tr
-                    class:is-active={hovering === groupIndex + "-" + 0 && dragging !== null}
-                    class:is-dragging={dragging === groupIndex + "-" + 0}
-                    on:dragenter={() => { if(dragging !== null) hovering = groupIndex + "-" + 0; }}
-                    on:dragover|preventDefault
-                >
-                  <td colspan="6">
-                    <span>Click on the plus to add an attribute price, or drag and drop an item to add it.</span>
-                  </td>
-                </tr>
-              {/if}
-            </table>
+          {#each itemFlagData.prices as prices, groupIndex (groupIndex)}
 
-            {#if itemFlagData.prices.length > 1 && groupIndex !== itemFlagData.prices.length - 1}
-              <span style="padding: 1rem 0; font-size: 1.25rem;">OR THEY CAN PAY</span>
-            {/if}
+            <PriceList bind:prices={prices} remove={() => { store.removeGroup(groupIndex) }}/>
+
           {/each}
 
         {/if}

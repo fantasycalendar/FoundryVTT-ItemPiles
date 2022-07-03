@@ -19,7 +19,17 @@ export default class ItemPriceStore {
     this.item = item;
     this.itemDoc = new TJSDocument(this.item);
 
-    this.data = writable(PileUtilities.getItemFlagData(this.item));
+    const data = PileUtilities.getItemFlagData(this.item);
+
+    data.prices.forEach(group => {
+      group.forEach(price => {
+        if(!price.id){
+          price.id = randomID();
+        }
+      });
+    });
+
+    this.data = writable(data);
 
     this.itemDoc.subscribe((item, changes) => {
       const { data } = changes;
@@ -30,6 +40,12 @@ export default class ItemPriceStore {
       }
     });
 
+  }
+
+  removeGroup(groupIndex){
+    const data = get(this.data);
+    data.prices.splice(groupIndex, 1);
+    this.data.set(data);
   }
 
   export() {

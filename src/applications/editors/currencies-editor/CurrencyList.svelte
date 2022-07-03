@@ -57,7 +57,7 @@
         </div>
         <div>
           {#if item.type === "attribute"}
-            <input type="text" bind:value={item.data.path}/>
+            <input type="text" bind:value={item.data.path} placeholder="data.attributes.hp.value"/>
           {:else}
             <button type="button" on:click={() => store.editItem(index)}>
               <i class="fas fa-eye"></i> View item
