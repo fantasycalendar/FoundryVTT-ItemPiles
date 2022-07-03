@@ -5,6 +5,7 @@ import { PileItem } from "./pile-item.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
+import { getItemFinalPrice } from "../helpers/pile-utilities.js";
 
 export default class MerchantStore extends ItemPileStore {
 
@@ -150,45 +151,30 @@ class PileMerchantItem extends PileItem {
 
   refreshPriceData() {
 
-    let priceData = [];
     const pileData = get(this.store.pileData);
     const itemFlagData = get(this.itemFlagData);
 
-    let { buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, actorPriceModifiers } = pileData;
+    if (itemFlagData.free) {
+      this.prices.set([]);
+      return;
+    }
+
+    let { buyPriceModifier, itemTypePriceModifiers, actorPriceModifiers } = pileData;
 
     const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => priceData.type === this.type);
     if (itemTypePriceModifier) {
       buyPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.buyPriceModifier : buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
-      sellPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.sellPriceModifier : sellPriceModifier * itemTypePriceModifier.sellPriceModifier;
     }
 
     if (this.store.recipient) {
       const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === this.store.recipientUuid);
       if (actorSpecificModifiers) {
         buyPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.buyPriceModifier : buyPriceModifier * actorSpecificModifiers.buyPriceModifier;
-        sellPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.sellPriceModifier : sellPriceModifier * actorSpecificModifiers.sellPriceModifier;
       }
     }
 
-    if (itemFlagData.free) {
-      priceData = [];
-    } else if (itemFlagData.prices.length) {
-      priceData = itemFlagData.prices.map(priceGroup => {
-        return priceGroup.map(price => {
-          price.modifiedCost = Math.round(price.cost * buyPriceModifier);
-          return price;
-        });
-      });
-    }
-
-    if (!itemFlagData.disableNormalCost && !itemFlagData.free) {
-      const primaryCurrency = game.itempiles.getPrimaryCurrency(this.store.source);
-      const cost = getProperty(this.item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
-      priceData = [[{
-        ...primaryCurrency,
-        modifiedCost: Math.round(cost * buyPriceModifier)
-      }]];
-    }
+    const currencies = PileUtilities.getActorCurrencies(this.store.source);
+    const priceData = PileUtilities.getItemFinalPrice(itemFlagData, buyPriceModifier, currencies)
 
     this.prices.set(priceData);
   }

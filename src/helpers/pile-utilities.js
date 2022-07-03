@@ -375,7 +375,7 @@ export function getItemPriceData(item, merchant = false, actor = false) {
     }
   }
 
-  const primaryCurrency = currencyList.attributes.find(attribute => attribute.primary) ?? currencyList.items.find(item => item.primary);
+  const primaryCurrency = currencyList.find(attribute => attribute.primary);
   const cost = getProperty(item.data, game.itempiles.ITEM_PRICE_ATTRIBUTE);
 
   return [{
@@ -412,23 +412,66 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
   }
 }
 
-export function getMerchantItemsForActor(merchant, actor = false) {
+function roundToDecimals(num, decimals){
+  return Number(num.toFixed(decimals));
+}
 
-  const pileItems = getActorItems(merchant, { itemCurrencies: false });
+export function getItemFinalPrice(itemFlagData, modifier, currencies){
 
-  return pileItems.map(item => {
-    const quantity = Utilities.getItemQuantity(item);
-    return {
-      id: item.id,
-      name: item.name,
-      type: item.type,
-      img: item.data?.img ?? "",
-      quantity: quantity,
-      currentQuantity: quantity,
-      prices: getItemPriceData(item, merchant, actor),
-      visible: true,
-      item
+  const actualCurrencies = currencies.slice(currencies.findIndex(currency => currency.primary));
+  const smallestExchangeRate = Math.min(...actualCurrencies.map(currency => currency.exchangeRate));
+  const decimals = smallestExchangeRate.toString().split(".")[1].length+1;
+
+  let priceData;
+
+  if (!itemFlagData.disableNormalCost) {
+
+    const cost = getProperty(this.item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
+    let modifiedCost = roundToDecimals(cost * modifier, decimals)
+
+    let fraction = null;
+    let finalCosts = [];
+    for(const currency of actualCurrencies){
+
+      modifiedCost = (fraction ?? modifiedCost) / currency.exchangeRate;
+      fraction = roundToDecimals(modifiedCost % 1, decimals);
+      const cost = Math.round(modifiedCost - fraction);
+
+      finalCosts.push({
+        ...currency,
+        cost,
+        string: currency.abbreviation.replace('{#}', cost)
+      })
+
+      if(!fraction) break;
+
     }
-  });
 
+    priceData = [[{
+      finalCosts,
+      string: finalCosts.map(cost => cost.string).join(' ')
+    }]];
+  }
+
+  if (itemFlagData.prices.length) {
+    priceData = priceData.concat(itemFlagData.prices.map(priceGroup => {
+      const finalCosts = priceGroup.map(price => {
+        const cost = Math.round(price.cost * modifier);
+        return {
+          ...price,
+          cost,
+          string: price.abbreviation.replace('{#}', cost)
+        };
+      });
+
+      return {
+        finalCosts,
+        string: finalCosts.map(cost => cost.string).join(" ")
+      }
+    }));
+  }
+
+  return priceData;
+
+  
 }

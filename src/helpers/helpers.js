@@ -118,3 +118,7 @@ export function isResponsibleGM() {
 export function isGMConnected() {
   return !!Array.from(game.users).find(user => user.isGM && user.active);
 }
+
+export function roundToDecimals(num, decimals){
+  return Number(num.toFixed(decimals));
+}
