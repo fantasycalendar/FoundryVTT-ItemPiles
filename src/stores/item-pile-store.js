@@ -26,57 +26,57 @@ const __STORES__ = {
 };
 
 export default class ItemPileStore {
-
+  
   constructor(application, source, recipient = false) {
-
+    
     this.interactionId = randomID();
     this.uuid = Utilities.getUuid(source);
     this.application = application;
     this.source = Utilities.getActor(source);
     this.recipientUuid = recipient ? Utilities.getUuid(recipient) : false;
     this.recipient = recipient ? Utilities.getActor(recipient) : false;
-
+    
     this.document = new TJSDocument(this.source);
-
+    
     __STORES__.add(this);
-
+    
     this.setupStores();
     this.setupSubscriptions();
   }
-
+  
   get ItemClass() {
     return PileItem;
   };
-
+  
   get AttributeClass() {
     return PileAttribute;
   };
-
+  
   setupStores() {
-
+    
     this.pileData = writable(PileUtilities.getActorFlagData(this.source));
     this.shareData = writable(SharingUtilities.getItemPileSharingData(this.source))
     this.deleted = writable(false);
-
+    
     this.search = writable("");
     this.editQuantities = !this.recipient;
-
+    
     this.allItems = writable([]);
     this.attributes = writable([]);
-
+    
     this.items = writable([]);
     this.currencies = writable([]);
-
+    
     this.numItems = writable(0);
     this.numCurrencies = writable(0);
-
+    
     this.name = writable("");
     this.img = writable("");
-
+    
   }
-
+  
   setupSubscriptions() {
-
+    
     this.document.subscribe(() => {
       const { data } = this.document.updateOptions;
       this.name.set(this.source.name);
@@ -90,26 +90,26 @@ export default class ItemPileStore {
         this.refreshItems();
       }
     });
-
+    
     const items = [];
     const attributes = [];
-
+    
     PileUtilities.getActorItems(this.source).map(item => {
       items.push(new this.ItemClass(this, item));
     });
-
+    
     PileUtilities.getActorCurrencies(this.source).forEach(currency => {
-      if(currency.type === "item"){
-        if(!currency.item) return;
+      if (currency.type === "item") {
+        if (!currency.item) return;
         items.push(new this.ItemClass(this, currency.item ?? currency.data));
-      }else {
+      } else {
         attributes.push(new this.AttributeClass(this, currency));
       }
     });
-
+    
     this.allItems.set(items);
     this.attributes.set(attributes);
-
+    
     this.allItems.subscribe((val) => {
       if (!val) return;
       this.refreshItems();
@@ -118,7 +118,7 @@ export default class ItemPileStore {
       if (!val) return;
       this.refreshItems();
     });
-
+    
     const filterDebounce = foundry.utils.debounce(() => {
       this.refreshItems();
     }, 300);
@@ -126,47 +126,50 @@ export default class ItemPileStore {
       if (!val) return;
       filterDebounce()
     })
-
+    
   }
-
+  
   static notifyChanges(event, actor, ...args) {
     const uuid = Utilities.getUuid(actor);
     for (const store of __STORES__.get(uuid)) {
       store[event](...args);
     }
   }
-
+  
   refreshItems() {
     const allItems = get(this.allItems);
-
+    
     const items = allItems.filter(entry => !entry.isCurrency);
     const itemCurrencies = allItems.filter(entry => entry.isCurrency);
-
+    
     this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
     this.items.set(items.filter(entry => !get(entry.filtered)));
-
+    
     const attributes = get(this.attributes).filter(currency => get(currency.visible));
     const currencies = attributes.concat(itemCurrencies);
-
+    
     this.numCurrencies.set(currencies.filter(entry => get(entry.quantity) > 0).length);
     this.currencies.set(currencies.filter(entry => !get(entry.filtered)));
   }
-
+  
   createItem(item) {
     const items = get(this.allItems);
-    const similarItem = Utilities.findSimilarItem(items.map(item => ({
-      pileItem: item,
-      ...item.similarities
-    })), item);
-    if (similarItem) {
-      similarItem.pileItem.setup(item);
+    const deletedItems = items
+      .filter(item => item.id === null)
+      .map(item => ({
+        pileItem: item,
+        ...item.similarities
+      }));
+    const previouslyDeletedItem = Utilities.findSimilarItem(deletedItems, item);
+    if (previouslyDeletedItem) {
+      previouslyDeletedItem.pileItem.setup(item);
     } else {
       items.push(new PileItem(this, item));
     }
     this.allItems.set(items);
     this.refreshItems();
   }
-
+  
   deleteItem(item) {
     const items = get(this.allItems);
     const pileItem = items.find(pileItem => pileItem.id === item.id);
@@ -181,17 +184,17 @@ export default class ItemPileStore {
     pileItem.unsubscribe();
     this.refreshItems();
   }
-
+  
   delete() {
     this.deleted.set(true);
   }
-
+  
   async update() {
-
+    
     const itemsToUpdate = [];
     const itemsToDelete = [];
     const attributesToUpdate = {};
-
+    
     const items = get(this.allItems).filter(item => item.id);
     for (let item of items) {
       const itemQuantity = get(item.quantity);
@@ -204,14 +207,14 @@ export default class ItemPileStore {
         })
       }
     }
-
+    
     const attributes = get(this.attributes);
     for (let attribute of attributes) {
       attributesToUpdate[attribute.path] = get(attribute.quantity);
     }
-
+    
     const pileSharingData = SharingUtilities.getItemPileSharingData(this.source);
-
+    
     await this.source.update(attributesToUpdate);
     if (pileSharingData?.currencies) {
       pileSharingData.currencies = pileSharingData.currencies.map(currency => {
@@ -224,7 +227,7 @@ export default class ItemPileStore {
         return currency;
       })
     }
-
+    
     await this.source.updateEmbeddedDocuments("Item", itemsToUpdate);
     await this.source.deleteEmbeddedDocuments("Item", itemsToDelete);
     if (pileSharingData?.items) {
@@ -239,15 +242,15 @@ export default class ItemPileStore {
         return item;
       })
     }
-
+    
     await SharingUtilities.updateItemPileSharingData(this.source, pileSharingData);
-
+    
     Helpers.custom_notify("Item Pile successfully updated.");
-
+    
     this.refreshItems();
-
+    
   }
-
+  
   takeAll() {
     game.itempiles.transferEverything(
       this.source,
@@ -255,17 +258,17 @@ export default class ItemPileStore {
       { interactionId: this.interactionId }
     );
   }
-
+  
   splitAll() {
     return game.itempiles.splitItemPileContents(this.source, { instigator: this.recipient });
   }
-
+  
   closeContainer() {
     if (!InterfaceTracker.isOpened(this.application.id)) {
       return game.itempiles.closeItemPile(this.source);
     }
   }
-
+  
   onDestroy() {
     __STORES__.remove(this);
   }

@@ -28,7 +28,7 @@
     form.requestSubmit();
   }
 
-  function addGroup(){
+  function addGroup() {
     itemFlagData.prices = [
       ...itemFlagData.prices,
       []
@@ -122,13 +122,13 @@
 
         <div class="form-group">
           <label style="flex:4;">
-            {localize("ITEM-PILES.Applications.ItemEditor.PriceGroups")}<br>
-            <p>{localize("ITEM-PILES.Applications.ItemEditor.PriceGroupsExplanation")}</p>
+            {localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptions")}<br>
+            <p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsExplanation")}</p>
           </label>
 
           <button type="button" on:click={() => { addGroup() }}>
             <i class="fas fa-plus"></i>
-            {localize("ITEM-PILES.Applications.ItemEditor.AddPriceGroup")}
+            {localize("ITEM-PILES.Applications.ItemEditor.AddPurchaseOption")}
           </button>
         </div>
 

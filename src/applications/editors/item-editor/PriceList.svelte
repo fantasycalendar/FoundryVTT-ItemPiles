@@ -90,7 +90,7 @@
     if (data.uuid) {
       item = await fromUuid(data.uuid);
     } else {
-      let itemData = data.itemData;
+      let itemData = data.item;
       if (itemData._id) delete itemData._id;
       if (itemData.permission) delete itemData._id;
       const items = Array.from(game.items);
@@ -138,13 +138,13 @@
 <DropZone callback={dropData} bind:isHovering={isHovering}>
   <div class="table-container item-piles-top-divider">
     <div class="item-piles-sortable-list-columns header">
-      <div><a class="item-piles-clickable-red" on:click={() => remove()}><i class="fas fa-times"></i></a></div>
+      <div></div>
       <div>Name</div>
       <div>Cost</div>
       <div>Short</div>
       <div>Icon</div>
       <div>Data</div>
-      <div><a on:click={() => addAttribute()}><i class="fas fa-plus"></i></a></div>
+      <div><a class="item-piles-clickable-red" on:click={() => remove()}><i class="fas fa-times"></i></a></div>
     </div>
     <section
         use:dndzone="{{ items: prices, dragDisabled, flipDurationMs }}"
@@ -153,13 +153,6 @@
     >
       {#if isHovering}
         <div class="drop-to-add">Drop to add</div>
-      {/if}
-      {#if !prices.length}
-        <div class="item-piles-sortable-list-columns">
-          <div class="full-span" class:invisible={isHovering}>
-            Drop an item or click the plus button to get started!
-          </div>
-        </div>
       {/if}
       {#each prices as price, index (price.id)}
         <div class="item-piles-sortable-list-columns item-piles-sortable-list-entry item-piles-even-color"
@@ -179,7 +172,7 @@
           </div>
           <div>
             {#if price.type === "attribute"}
-              <input type="text" bind:value={price.dataa.path} placeholder="data.attributes.hp.value"/>
+              <input type="text" bind:value={price.data.path} placeholder="data.attributes.hp.value"/>
             {:else}
               <button type="button" on:click={() => editItem(index)}>
                 <i class="fas fa-eye"></i> View item
@@ -191,6 +184,13 @@
           </div>
         </div>
       {/each}
+      <div class="item-piles-sortable-list-columns">
+        <div class="full-span">
+          <a on:click={() => addAttribute()} class:invisible={isHovering}>
+            {localize("ITEM-PILES.Applications.ItemEditor.DropMeClickMe")}
+          </a>
+        </div>
+      </div>
     </section>
   </div>
 </DropZone>
@@ -198,7 +198,7 @@
 <style lang="scss">
 
   .item-piles-sortable-list-columns {
-    grid-template-columns: 28px 1.25fr 60px 0.5fr 60px 1fr 28px;
+    grid-template-columns: 28px 1.25fr 35px 0.5fr 60px 1fr 28px;
     min-height: 30px;
   }
 

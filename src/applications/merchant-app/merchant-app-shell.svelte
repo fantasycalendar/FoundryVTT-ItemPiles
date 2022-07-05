@@ -159,8 +159,6 @@
                     <input type="checkbox" bind:checked={$priceModifiersPerType[category.type].override}>
                     <SliderInput bind:value={$priceModifiersPerType[category.type].buyPriceModifier}/>
                   {/if}
-                {:else if index === 0}
-                  <small>Prices</small>
                 {/if}
               </div>
               <div style="flex: 0 1 auto">
@@ -302,14 +300,14 @@
             display: flex;
             align-items: center;
 
-            input[type="checkbox"]{
-              height:15px;
+            input[type="checkbox"] {
+              height: 15px;
             }
           }
         }
 
         .item-piles-items-list {
-          overflow: auto;
+          overflow: visible;
           padding-right: 10px;
         }
       }

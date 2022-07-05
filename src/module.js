@@ -46,8 +46,8 @@ Hooks.once("ready", async () => {
   if (!Helpers.isGMConnected()) {
     Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
   }
-
-  if(game.user.isGM) {
+  
+  if (game.user.isGM) {
     patchCurrencySettings();
     checkSystem();
   }
@@ -55,14 +55,14 @@ Hooks.once("ready", async () => {
   Hooks.callAll(HOOKS.READY);
   
   ChatAPI.disablePastTradingButtons();
-
-  const source = game.actors.get("XWczTeS4oJzsrOYY");
-  const recipient = game.actors.getName("Inquisitive Player");
-
-  // MerchantApp.show(source, recipient)
-
-  ItemEditor.show(source.items.getName("Antitoxin"));
-
+  
+  const source = game.actors.get("4jh4e6K5TobGeoni");
+  const recipient = game.actors.getName("Player Token");
+  
+  game.itempiles.renderItemPileInterface(source, { inspectingTarget: recipient });
+  
+  //ItemEditor.show(source.items.getName("Antitoxin"));
+  
 });
 
 Hooks.once("socketlib.ready", () => {

@@ -179,9 +179,9 @@ const API = {
     });
     return Helpers.setSetting(SETTINGS.ITEM_SIMILARITIES, inPaths);
   },
-
+  
   getPrimaryCurrency(actor = false) {
-    if(actor && actor instanceof Actor){
+    if (actor && actor instanceof Actor) {
       return PileUtilities.getActorPrimaryCurrency(actor);
     }
     return this.CURRENCIES.find(currency => currency.primary);
@@ -951,7 +951,7 @@ const API = {
   },
   
   renderItemPileInterface(target, {
-    userIds = false, inspectingTarget = false, useDefaultCharacter = true
+    userIds = null, inspectingTarget = null, useDefaultCharacter = null
   } = {}) {
     
     const targetDocument = Utilities.getDocument(target);
@@ -960,6 +960,10 @@ const API = {
     
     if (!PileUtilities.isValidItemPile(targetDocument)) {
       throw Helpers.custom_error("renderItemPileInterface | This target is not a valid item pile")
+    }
+    
+    if (!inspectingTarget && !useDefaultCharacter) {
+      useDefaultCharacter = true;
     }
     
     if (inspectingTarget && useDefaultCharacter) {
@@ -1003,6 +1007,10 @@ const API = {
       remote: true
     });
     
+  },
+  
+  buyItemFromMerchant(item, merchant, recipient) {
+  
   }
   
 }

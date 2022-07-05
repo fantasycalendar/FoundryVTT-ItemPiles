@@ -1,5 +1,4 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
   import ItemEditor from "../editors/item-editor/item-editor.js";
 
@@ -7,9 +6,11 @@
   export let item;
 
   const pileData = store.pileData;
+  const priceSelector = store.priceSelector;
   const prices = item.prices;
   const displayQuantity = item.displayQuantity;
   const quantity = item.quantity;
+  const selectedPriceGroup = item.selectedPriceGroup;
   const itemFlagDataStore = item.itemFlagData;
 
   $: itemFlagData = $itemFlagDataStore;
@@ -29,12 +30,14 @@
 
 </script>
 
+<svelte:window on:click={() => { $priceSelector = ""; }}/>
+
 <div class="flexrow item-piles-item-row item-piles-odd-color"
      class:merchant-item-hidden={itemFlagData.hidden}
      transition:fade={{duration: 250}}
      style="flex: 1 0 auto;">
 
-  <div class="item-piles-img-container" class:not-for-sale={itemFlagData.notForSale}>
+  <div class="item-piles-img-container" class:not-for-sale={itemFlagData.notForSale || !$quantity}>
     <img class="item-piles-img" src="{item.img}"/>
   </div>
 
@@ -45,27 +48,54 @@
       {:else}
         {item.name}
       {/if}
-      {#if $displayQuantity}
-        <span class="item-piles-small-text">(x{$quantity})</span>
+      {#if $displayQuantity && $quantity}
+        <span class="item-piles-small-text">
+          {#if itemFlagData.infiniteQuantity}
+            (∞)
+          {:else}
+            (x{$quantity})
+          {/if}
+        </span>
       {/if}
     </div>
   </div>
 
-
-  <div class="flexrow price-container">
+  <div class="flexrow price-container" on:click|stopPropagation>
     {#if itemFlagData.free}
       <small>Free</small>
     {:else}
-      {#if $prices.length > 1}
-        <small><a>{$prices[0].string}*</a></small>
-      {:else}
-        {#if $prices[0].length > 1}
-          <small><a>{$prices[0].string}</a></small>
-        {:else}
-          <img src="{$prices[0][0].img}" title="{localize($prices[0][0].name)}"
-               style="border-radius: 4px; max-height:20px; max-width: 20px; margin-right: 5px;">
-          <small><a>{$prices[0][0].name}</a></small>
-        {/if}
+      <small
+          class:item-piles-clickable-link={$prices.length > 1}
+          class:multiple-prices={$prices.length > 1}
+          class:cant-afford={!$prices[$selectedPriceGroup].canAfford}
+          on:click={() => { $priceSelector = $priceSelector === item.id ? "" : item.id; }}
+      >
+        {$prices[$selectedPriceGroup].string}
+      </small>
+      {#if $priceSelector === item.id}
+        <div class="price-list">
+          {#each $prices as priceGroup, index (index)}
+            <div class="price-group" class:selected={$selectedPriceGroup === index}>
+              {#each priceGroup.prices as price}
+                <div class="price-group-container"
+                     on:click={() => {
+                       if(priceGroup.canAfford){
+                         $selectedPriceGroup = index;
+                         $priceSelector = "";
+                       }
+                     }}
+                     class:cant-afford={!priceGroup.canAfford}>
+                  <div class="item-piles-img-container" class:not-for-sale={!priceGroup.canAfford}>
+                    <img class="item-piles-img" src="{price.img}"/>
+                  </div>
+                  <div class="item-piles-name item-piles-text">
+                    {price.cost} {price.name}
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {/each}
+        </div>
       {/if}
     {/if}
   </div>
@@ -104,6 +134,7 @@
 
   .item-piles-item-row {
     margin: 0;
+    overflow: visible;
 
     .sidebar-buttons {
       flex: 0 1 auto;
@@ -130,6 +161,27 @@
     .price-container {
       flex: 0 1 100px;
       align-items: center;
+      position: relative;
+
+      .cant-afford {
+        opacity: 0.5;
+      }
+    }
+
+    .multiple-prices::before,
+    .multiple-prices::after {
+      content: '';
+      position: absolute;
+      top: -0.5rem;
+      left: -0.65rem;
+      border-color: transparent;
+      border-style: solid;
+    }
+
+    .multiple-prices::after {
+      border-width: 0.4rem;
+      border-right-color: #cf5234;
+      transform: rotate(45deg);
     }
 
     &.merchant-item-hidden {
@@ -139,7 +191,6 @@
 
     .item-piles-text {
       font-size: inherit;
-      padding-left: 0.25rem;
     }
 
     .item-piles-img-container {
@@ -171,23 +222,66 @@
           transform: rotate(-45deg);
         }
       }
-
-      .item-piles-img {
-        border: 0;
-        width: auto;
-        height: 100%;
-        transition: transform 150ms;
-
-        &:hover {
-          transform: scale(1.125, 1.125);
-        }
-      }
     }
 
     .item-piles-name-container {
       line-height: 1.6;
     }
 
+  }
+
+  .price-list {
+    top: 25px;
+    left: -5px;
+    position: absolute;
+    z-index: 900;
+    font-size: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #e6e6d5;
+    box-shadow: 0 6px 9px -1px rgba(0, 0, 0, 0.5);
+
+    .price-group {
+
+      cursor: pointer;
+      user-select: none;
+
+      &.selected {
+        background-color: #f2f2e1;
+      }
+
+      &:hover {
+        background-color: #ffffed;
+      }
+
+      .price-group-container {
+        display: flex;
+        align-items: center;
+
+        padding: 0 4px 0 2px;
+
+        &:first-child {
+          padding-top: 2px;
+        }
+
+        &:last-child {
+          padding-bottom: 2px;
+        }
+
+        .item-piles-img-container {
+          min-height: 18px;
+          min-width: 18px;
+          max-width: 18px;
+          max-height: 18px;
+          margin: 1px;
+        }
+      }
+
+      &:not(:last-child) {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+      }
+    }
   }
 
 </style>
