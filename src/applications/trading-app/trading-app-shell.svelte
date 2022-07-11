@@ -9,7 +9,7 @@
   import { hotkeyState } from "../../hotkeys.js";
   import ItemPileSocket from "../../socket.js";
   import TradeEntry from "./TradeEntry.svelte";
-  import DropCurrencyDialog from "../drop-currency-dialog/drop-currency-dialog.js";
+  import DropCurrencyDialog from "../dialogs/drop-currency-dialog/drop-currency-dialog.js";
   import * as Utilities from "../../helpers/utilities.js";
 
   export let elementRoot;

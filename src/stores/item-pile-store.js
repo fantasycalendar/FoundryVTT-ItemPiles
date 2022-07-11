@@ -8,37 +8,28 @@ import * as Helpers from "../helpers/helpers.js";
 import { InterfaceTracker } from "../socket.js";
 import { PileAttribute, PileItem } from "./pile-item.js";
 
-const __STORES__ = {
-  _data: new Map(),
-  add(store) {
-    const id = store.uuid + "-" + store.interactionId
-    this._data.set(id, store);
-  },
-  remove(store) {
-    const id = store.uuid + "-" + store.interactionId
-    this._data.delete(id);
-  },
-  get(uuid) {
-    return Array.from(this._data)
-      .filter(entry => entry[0].startsWith(uuid))
-      .map(entry => entry[1]);
-  }
-};
+const __STORES__ = new Map();
 
 export default class ItemPileStore {
   
   constructor(application, source, recipient = false) {
     
     this.interactionId = randomID();
-    this.uuid = Utilities.getUuid(source);
     this.application = application;
+    
+    this.uuid = Utilities.getUuid(source);
     this.source = Utilities.getActor(source);
+    
     this.recipientUuid = recipient ? Utilities.getUuid(recipient) : false;
     this.recipient = recipient ? Utilities.getActor(recipient) : false;
     
     this.document = new TJSDocument(this.source);
+    this.recipientDocument = recipient ? new TJSDocument(this.recipient) : false;
     
-    __STORES__.add(this);
+    __STORES__.set(this.uuid, this);
+    if (this.recipient) {
+      __STORES__.set(this.recipientUuid, this);
+    }
     
     this.setupStores();
     this.setupSubscriptions();
@@ -129,9 +120,14 @@ export default class ItemPileStore {
     
   }
   
-  static notifyChanges(event, actor, ...args) {
+  static getStore(actor) {
     const uuid = Utilities.getUuid(actor);
-    for (const store of __STORES__.get(uuid)) {
+    return __STORES__.get(uuid);
+  }
+  
+  static notifyChanges(event, actor, ...args) {
+    const store = this.getStore(actor);
+    if (store) {
       store[event](...args);
     }
   }
@@ -153,6 +149,7 @@ export default class ItemPileStore {
   }
   
   createItem(item) {
+    if (PileUtilities.isItemInvalid(this.source, item)) return;
     const items = get(this.allItems);
     const deletedItems = items
       .filter(item => item.id === null)
@@ -171,6 +168,7 @@ export default class ItemPileStore {
   }
   
   deleteItem(item) {
+    if (PileUtilities.isItemInvalid(this.source, item)) return;
     const items = get(this.allItems);
     const pileItem = items.find(pileItem => pileItem.id === item.id);
     if (this.editQuantities) {
@@ -270,6 +268,9 @@ export default class ItemPileStore {
   }
   
   onDestroy() {
-    __STORES__.remove(this);
+    __STORES__.delete(this.uuid);
+    if (this.recipient) {
+      __STORES__.delete(this.recipientUuid);
+    }
   }
 }

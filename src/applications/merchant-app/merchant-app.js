@@ -5,6 +5,7 @@ import MerchantAppShell from "./merchant-app-shell.svelte";
 export default class MerchantApp extends SvelteApplication {
   
   constructor(merchant, buyer = false, options = {}, dialogData = {}) {
+    let merchantInteractionID = randomID();
     super({
       title: `Merchant: ${merchant.name}`,
       id: `item-pile-merchant-${merchant.id}`,
@@ -77,6 +78,15 @@ export default class MerchantApp extends SvelteApplication {
       ].concat(buttons);
     }
     return buttons
+  }
+  
+  async close(options) {
+    for (const app of Object.values(ui.windows)) {
+      if (app !== this && this.svelte.applicationShell.store === app?.svelte.applicationShell.store) {
+        app.close();
+      }
+    }
+    return super.close(options);
   }
   
 }

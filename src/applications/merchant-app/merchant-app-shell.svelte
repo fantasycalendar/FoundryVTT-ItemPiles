@@ -7,6 +7,11 @@
   import SliderInput from "../components/SliderInput.svelte";
   import MerchantStore from "../../stores/merchant-store.js";
   import MerchantItemEntry from "./MerchantItemEntry.svelte";
+  import * as Helpers from "../../helpers/helpers.js";
+  import * as PileUtilities from "../../helpers/pile-utilities.js";
+  import { hotkeyState } from "../../hotkeys.js";
+  import DropZone from "../components/DropZone.svelte";
+  import PrivateAPI from "../../API/private-api.js";
 
   const { application } = getContext('external');
 
@@ -19,7 +24,7 @@
 
   onDestroy(() => {
     store.onDestroy();
-  })
+  });
 
   let searchStore = store.search;
   let itemsPerCategoryStore = store.itemsPerCategory;
@@ -41,8 +46,37 @@
     return `${open} - ${close}`;
   }
 
-  function buyItem(item) {
-    console.log(item)
+  async function dropData(data) {
+
+    if (!data.type) {
+      throw Helpers.custom_error("Something went wrong when dropping this item!")
+    }
+
+    if (data.type !== "Item") {
+      throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
+    }
+
+    let item = await Item.implementation.fromDropData(data);
+
+    const disallowedType = PileUtilities.isItemInvalid(merchant, item);
+    if (disallowedType) {
+      if (!game.user.isGM) {
+        return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemSell", { type: disallowedType }), true)
+      }
+      if (!hotkeyState.shiftDown) {
+        const force = await Dialog.confirm({
+          title: game.i18n.localize("ITEM-PILES.Dialogs.SellTypeWarning.Title"),
+          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.SellTypeWarning.Content", { type: disallowedType })}</p>`,
+          defaultYes: false
+        });
+        if (!force) {
+          return false;
+        }
+      }
+    }
+
+    PrivateAPI._sellItem(item, merchant, buyer ?? false);
+
   }
 
   let activeSidebarTab = "description";
@@ -52,8 +86,7 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-  <main>
-
+  <DropZone callback={dropData} style="display: flex; flex-direction: column; height: 100%;">
     <div class="flexrow merchant-top-bar item-piles-bottom-divider">
       <div class="merchant-name">{ $merchantName }</div>
       {#if pileData.openTimes.enabled}
@@ -84,24 +117,30 @@
             {#if activeSidebarTab === 'description'}
               <div class="tab merchant-description">
                 <div>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                  et
                   dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
                   aliquip
-                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                  dolore
                   eu
                   fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
                   deserunt mollit anim id est laborum.
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                  et
                   dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
                   aliquip
-                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                  dolore
                   eu
                   fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
                   deserunt mollit anim id est laborum.
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                  et
                   dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
                   aliquip
-                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore
+                  ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                  dolore
                   eu
                   fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
                   deserunt mollit anim id est laborum.
@@ -145,7 +184,6 @@
       <div class="merchant-right-pane">
         <h2 style="flex: 0; border:0;">For sale</h2>
         <input type="text" bind:value={$searchStore}>
-
         {#each $categoryStore as category, index (category.type)}
           <div transition:fade={{duration: 150}}>
             <h3 class="merchant-item-group-type flexrow">
@@ -183,7 +221,7 @@
         {/each}
       </div>
     </div>
-  </main>
+  </DropZone>
 </ApplicationShell>
 
 
@@ -193,123 +231,116 @@
     display: none;
   }
 
-  main {
+  .merchant-top-bar {
 
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    flex: 0 1 auto;
 
-    .merchant-top-bar {
-
+    .opening-hours {
+      text-align: right;
       flex: 0 1 auto;
+    }
 
-      .opening-hours {
-        text-align: right;
-        flex: 0 1 auto;
+    .merchant-name {
+      font-size: 2em;
+    }
+
+  }
+
+  .item-pile-merchant-content {
+
+    flex: 1;
+    max-height: calc(100% - 53px);
+
+    .merchant-left-pane {
+
+      flex: 0 1 35%;
+      padding-right: 0.25rem;
+      margin-right: 0.25rem;
+      border-right: 1px solid rgba(0, 0, 0, 0.5);
+      max-height: 100%;
+      max-width: 300px;
+      min-width: 250px;
+      overflow-y: scroll;
+
+      section {
+        padding: 0.25rem;
+        margin-top: 0.5rem;
       }
 
-      .merchant-name {
-        font-size: 2em;
+      .merchant-img {
+        flex: 0 1 auto;
+        border-radius: 5px;
+        margin-bottom: 5px;
+
+        img {
+          width: 100%;
+          height: auto;
+          border: 0;
+          border-radius: 3px;
+        }
+      }
+
+      .merchant-description {
+        position: relative;
+        height: 100%;
+        padding: 0.25rem;
+
+        div {
+          overflow: hidden auto;
+          top: 0;
+          bottom: 0;
+          position: absolute;
+          word-break: break-word;
+        }
+      }
+
+      .merchant-settings {
+        position: relative;
+        height: 100%;
+
+        .setting-container {
+          overflow: hidden auto;
+          top: 0;
+          bottom: 37px;
+          position: absolute;
+        }
+
+        .update-button {
+          position: absolute;
+          bottom: 0;
+        }
+
       }
 
     }
 
-    .item-pile-merchant-content {
-
+    .merchant-right-pane {
       flex: 1;
-      max-height: calc(100% - 53px);
+      max-height: 100%;
 
-      .merchant-left-pane {
+      overflow-y: scroll;
 
-        flex: 0 1 35%;
-        padding-right: 0.25rem;
-        margin-right: 0.25rem;
-        border-right: 1px solid rgba(0, 0, 0, 0.5);
-        max-height: 100%;
-        max-width: 300px;
-        min-width: 250px;
-        overflow-y: scroll;
+      .merchant-item-group-type {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        margin-top: 10px;
+        padding-right: 10px;
 
-        section {
-          padding: 0.25rem;
-          margin-top: 0.5rem;
-        }
+        .price-header {
+          flex: 0 1 250px;
+          padding-right: 10px;
+          justify-content: center;
+          display: flex;
+          align-items: center;
 
-        .merchant-img {
-          flex: 0 1 auto;
-          border-radius: 5px;
-          margin-bottom: 5px;
-
-          img {
-            width: 100%;
-            height: auto;
-            border: 0;
-            border-radius: 3px;
+          input[type="checkbox"] {
+            height: 15px;
           }
         }
-
-        .merchant-description {
-          position: relative;
-          height: 100%;
-          padding: 0.25rem;
-
-          div {
-            overflow: hidden auto;
-            top: 0;
-            bottom: 0;
-            position: absolute;
-            word-break: break-word;
-          }
-        }
-
-        .merchant-settings {
-          position: relative;
-          height: 100%;
-
-          .setting-container {
-            overflow: hidden auto;
-            top: 0;
-            bottom: 37px;
-            position: absolute;
-          }
-
-          .update-button {
-            position: absolute;
-            bottom: 0;
-          }
-
-        }
-
       }
 
-      .merchant-right-pane {
-        flex: 1;
-        max-height: 100%;
-
-        overflow-y: scroll;
-
-        .merchant-item-group-type {
-          border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-          margin-top: 10px;
-          padding-right: 10px;
-
-          .price-header {
-            flex: 0 1 250px;
-            padding-right: 10px;
-            justify-content: center;
-            display: flex;
-            align-items: center;
-
-            input[type="checkbox"] {
-              height: 15px;
-            }
-          }
-        }
-
-        .item-piles-items-list {
-          overflow: visible;
-          padding-right: 10px;
-        }
+      .item-piles-items-list {
+        overflow: visible;
+        padding-right: 10px;
       }
     }
   }

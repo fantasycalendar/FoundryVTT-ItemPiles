@@ -1,56 +1,43 @@
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import PriceModifiersShell from './price-modifiers-editor.svelte';
+import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 
-export default class PriceModifiersEditor extends TJSDialog {
-
-  constructor(priceModifiers, options, dialogData = {}) {
-
+export default class PriceModifiersEditor extends SvelteApplication {
+  
+  constructor(priceModifiers, options) {
+    
     priceModifiers = priceModifiers.map(data => {
       data.actor = game.actors.get(data.actor);
       if (!data.actor) return false;
       return data;
     }).filter(Boolean);
-
+    
     super({
-      title: "ITEM-PILES.Applications.PriceModifiersEditor.Title",
-      content: {
+      svelte: {
         class: PriceModifiersShell,
+        target: document.body,
         props: {
           priceModifiers
         }
       },
-      buttons: {
-        save: {
-          icon: 'fas fa-save',
-          label: "ITEM-PILES.Applications.PriceModifiersEditor.Submit",
-          onclick: "requestSubmit"
-        },
-        no: {
-          icon: 'fas fa-times',
-          label: 'Cancel',
-          onclick: () => {
-            this.options.resolve?.(false);
-            this.close();
-          }
-        }
-      },
-      default: 'save',
-      zIndex: 202,
-      autoClose: false, // Don't automatically close on button onclick.
       close: () => this.options.resolve?.(false),
-      ...dialogData
-    }, {
-      width: 600,
-      height: "auto",
       ...options
     });
   }
-
-  static async show(data = false, options = {}, dialogData = {}) {
-    return new Promise((resolve) => {
-      options.resolve = resolve;
-      new this(data, options, dialogData).render(true, { focus: true });
+  
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      title: game.i18n.localize("ITEM-PILES.Applications.PriceModifiersEditor.Title"),
+      width: 600,
+      height: "auto",
+      classes: ["item-piles-app"]
     })
   }
-
+  
+  static async show(data = false, options = {}) {
+    return new Promise((resolve) => {
+      options.resolve = resolve;
+      new this(data, options).render(true, { focus: true });
+    })
+  }
+  
 }

@@ -87,6 +87,7 @@
     "Errors": {
       "DisallowedItemDrop": "You cannot drop \"{type}\" items",
       "DisallowedItemTrade": "You cannot trade \"{type}\" items",
+      "DisallowedItemSell": "You cannot sell \"{type}\" items",
       "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM.",
       "PileTooFar": "You're too far away to interact with this pile.",
       "PileLocked": "This item pile is locked and cannot be opened - you can't drop items in it.",
@@ -100,6 +101,10 @@
       "TradeTypeWarning": {
         "Title": "Item Type Warning",
         "Content": "You're attempting to trade an item that is of a type (\"{type}\") that is normally not allowed to be traded. Are you sure you want to do this?"
+      },
+      "SellTypeWarning": {
+        "Title": "Item Type Warning",
+        "Content": "You're attempting to sell an item that is of a type (\"{type}\") that is normally not allowed to be sold. Are you sure you want to do this?"
       },
       "ResetSettings": {
         "Title": "Reset Item Piles Module Settings",
@@ -134,10 +139,28 @@
         "Header": "Are you sure?",
         "Content1": "Are you sure you want to switch currency type?",
         "Content2": "This will reset the existing currency setup."
-      },
-      "Cancel": "Cancel"
+      }
     },
     "Applications": {
+      "DropItem": {
+        "Title": "Dropping Item",
+        "Dropping": "You're dropping",
+        "ExistingPiles": "You're adding this item to the item pile \"{item_pile_name}\".",
+        "QuantityToDrop": "You have {quantity} of this item, how many do you want to drop?",
+        "AddToPile": "Add to pile",
+        "NewPile": "Create new pile"
+      },
+      "DropCurrencies": {
+        "Title": "Dropping Currencies",
+        "Player": "You can drop the following currencies into this item pile:",
+        "GM": "As a GM, you can add currencies to this item pile:",
+        "NoCurrency": "{actor_name} has no valid currencies...",
+        "AddToPile": "Add to pile"
+      },
+      "BuyItem": {
+        "Title": "Buying Item: {item_name}",
+        "BuyItem": "Buy Item"
+      },
       "Settings": {
         "Title": "Item Piles Module Configuration",
         "Local": "Local Settings",
@@ -164,6 +187,7 @@
       },
       "ItemEditor": {
         "Title": "Item Piles Item Editor: {item_name}",
+        "Update": "Update Item",
         "General": "General Settings",
         "Price": "Price Settings",
         "NotForSale": "Item Is Not For Sale",
@@ -178,6 +202,8 @@
         "InfiniteQuantity": "Infinite Quantity",
         "InfiniteQuantityExplanation": "When enabled, this item cannot run out of quantity when sold by a merchant.",
         "PriceExplanation": "In this tab, you can configure the price of this item, including whether this item will cost other items to purchase.",
+        "BasePrice": "Base Price",
+        "BasePriceExplanation": "This configures the normal price of this item.",
         "Free": "Item Is Free",
         "FreeExplanation": "When enabled, this item does not cost any money to purchase from the merchant.",
         "DisableNormalCost": "Disable Normal Cost",
@@ -185,7 +211,7 @@
         "PurchaseOptions": "Purchase Options",
         "PurchaseOptionsExplanation": "Here you can configure the alternate ways to purchase this item. Each group represents a different way that a character can buy this item from other",
         "AddPurchaseOption": "Add Purchase Option",
-        "DropMeClickMe": "Drop an item or click to add an attribute"
+        "DropMeClickMe": "Click to add an attribute or drag & drop an item to add"
       },
       "FilterEditor": {
         "Title": "Item Piles Filters Editor",
@@ -322,23 +348,6 @@
       "ToggleLocked": "Toggle Locked",
       "ToggleClosed": "Toggle Closed",
       "Configure": "Configure Pile"
-    },
-    "DropItem": {
-      "Title": "Dropping Item",
-      "Dropping": "You're dropping",
-      "ExistingPiles": "You're adding this item to the item pile \"{item_pile_name}\".",
-      "QuantityToDrop": "You have {quantity} of this item, how many do you want to drop?",
-      "AddToPile": "Add to pile",
-      "NewPile": "Create new pile",
-      "Cancel": "Cancel"
-    },
-    "DropCurrencies": {
-      "Title": "Dropping Currencies",
-      "Player": "You can drop the following currencies into this item pile:",
-      "GM": "As a GM, you can add currencies to this item pile:",
-      "NoCurrency": "{actor_name} has no valid currencies...",
-      "Cancel": "Cancel",
-      "AddToPile": "Add to pile"
     },
     "Chat": {
       "Pickup": "{name} picked up the following items:",

@@ -7,11 +7,12 @@ import ItemPileSocket from "../socket.js";
 import SETTINGS from "../constants/settings.js";
 import CONSTANTS from "../constants/constants.js";
 import { hotkeyState } from "../hotkeys.js";
-import DropItemDialog from "../applications/drop-item-dialog/drop-item-dialog.js";
+import DropItemDialog from "../applications/dialogs/drop-item-dialog/drop-item-dialog.js";
 import { ItemPileInventoryApp } from "../applications/item-pile-inventory-app/item-pile-inventory-app.js";
 import Transaction from "../helpers/transaction.js";
 import ItemPileStore from "../stores/item-pile-store.js";
 import MerchantApp from "../applications/merchant-app/merchant-app.js";
+import { getItemCosts, getMerchantModifiersForActor } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -1281,4 +1282,127 @@ export default class PrivateAPI {
     return ItemPileInventoryApp.show(target, inspectingTarget, { remote });
     
   }
+  
+  static async _buyItem(item, merchant, buyer, { priceData = null, paymentOptions = 0 } = {}) {
+    
+    const pileFlagData = PileUtilities.getActorFlagData(merchant);
+    const itemFlagData = PileUtilities.getItemFlagData(item);
+    const currencyList = PileUtilities.getActorCurrencyList(merchant);
+    
+    if (priceData === null) {
+      
+      const smallestExchangeRate = Math.min(...currencyList.map(currency => currency.exchangeRate));
+      const decimals = smallestExchangeRate.toString().split(".")[1].length;
+      
+      const { buyPriceModifier } = PileUtilities.getMerchantModifiersForActor(merchant, { item, actor: buyer });
+      priceData = PileUtilities.getItemCosts(item, itemFlagData, buyPriceModifier, currencyList, quantity)[paymentOptions];
+      
+      const merchantTransaction = new Transaction(merchant);
+      const buyerTransaction = new Transaction(buyer);
+      
+      buyerTransaction.appendItemChanges([{ item: item.toObject(), quantity }]);
+      if (!pileFlagData.infiniteQuantity) {
+        merchantTransaction.appendItemChanges([{ _id: item.id, quantity }], { remove: true });
+      }
+      
+      let carry = 0;
+      let change = 0;
+      
+      priceData.prices.reverse();
+      priceData.prices.forEach((price, index) => {
+        
+        let cost = price.cost;
+        
+        if (carry) {
+          cost = Helpers.roundToDecimals(cost + (carry / price.exchangeRate), decimals);
+          carry = 0;
+        }
+        
+        if (cost === 0) return;
+        
+        if (price.type === "attribute") {
+          
+          const buyerCurrencyQuantity = getProperty(buyer.data, price.data.path);
+          
+          if (buyerCurrencyQuantity >= cost) {
+            let fraction = Helpers.roundToDecimals(cost % 1, decimals);
+            change += 1 - fraction;
+            buyerTransaction.appendActorChanges({ [price.data.path]: Math.ceil(cost) }, { remove: true });
+            if (!pileFlagData.infiniteCurrencies) {
+              merchantTransaction.appendActorChanges({ [price.data.path]: Math.ceil(cost) });
+            }
+          } else {
+            if (!price.exchangeRate) {
+              throw new Error("Should never get here");
+            }
+            if (buyerCurrencyQuantity > 0) {
+              buyerTransaction.appendActorChanges({ [price.data.path]: buyerCurrencyQuantity }, { remove: true });
+              if (!pileFlagData.infiniteCurrencies) {
+                merchantTransaction.appendActorChanges({ [price.data.path]: buyerCurrencyQuantity });
+              }
+            }
+            carry = Helpers.roundToDecimals((cost - buyerCurrencyQuantity) * price.exchangeRate, decimals);
+          }
+        } else {
+        
+        
+        }
+        
+      });
+      
+      if (change) {
+        
+        for (const currency of currencyList) {
+          
+          const numCurrency = Math.floor(Helpers.roundToDecimals(change / currency.exchangeRate, decimals));
+          change = Helpers.roundToDecimals(change - (numCurrency * currency.exchangeRate), decimals);
+          
+          if (currency.type === "attribute") {
+            if (numCurrency) {
+              buyerTransaction.appendActorChanges({ [currency.data.path]: numCurrency });
+              if (!pileFlagData.infiniteCurrencies) {
+                merchantTransaction.appendActorChanges({ [currency.data.path]: numCurrency }, { remove: true });
+              }
+            }
+          } else {
+          
+          }
+          
+        }
+        
+      }
+      
+      console.log(merchantTransaction.prepare());
+      console.log(buyerTransaction.prepare());
+      
+    }
+    
+  }
+  
+  static async _sellItem(item, merchant, seller, { quantity = 1, paymentOptions = false } = {}) {
+    
+    const itemFlagData = PileUtilities.getItemFlagData(item);
+    const currencyList = PileUtilities.getActorCurrencyList(merchant);
+    const sellerCurrencies = PileUtilities.getActorCurrencies(seller, { currencyList });
+    
+    const { sellPriceModifier } = PileUtilities.getMerchantModifiersForActor(merchant, { item, actor: seller });
+    const priceData = PileUtilities.getItemCosts(item, itemFlagData, sellPriceModifier, currencyList, quantity);
+    
+    let costTotal = priceData[0].totalCost;
+    
+    let cost = { [priceData[0].prices[0].data.path]: costTotal };
+    
+    const merchantTransaction = new Transaction(merchant);
+    merchantTransaction.appendItemChanges([{ item: item.toObject(), quantity }]);
+    merchantTransaction.appendActorChanges(cost, { remove: true });
+    
+    const sellerTransaction = new Transaction(seller);
+    sellerTransaction.appendItemChanges([{ _id: item.id, quantity }], { remove: true });
+    sellerTransaction.appendActorChanges(cost);
+    
+    await merchantTransaction.commit();
+    await sellerTransaction.commit();
+    
+  }
+  
 }

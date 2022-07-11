@@ -1,28 +1,30 @@
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import TradeDialogPrompt from './trade-dialog-prompt.svelte';
 import TradeDialogRequest from './trade-dialog-request.svelte';
 
-export class TradePromptDialog extends TJSDialog {
+export class TradePromptDialog extends SvelteApplication {
   
-  constructor(tradeOptions, options = {}, dialogData = {}) {
+  constructor(tradeOptions, options = {}) {
     super({
-      ...dialogData,
-      title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-      content: {
+      svelte: {
         class: TradeDialogPrompt,
+        target: document.body,
         props: {
           ...tradeOptions
         }
       },
-      autoClose: true, // Don't automatically close on button onclick.
-      zIndex: 101,
-      close: () => this.options.resolve?.(null)
-    }, {
+      close: () => this.options.resolve?.(null),
+      ...options
+    });
+  }
+  
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      title: game.i18n.localize("ITEM-PILES.Trade.Title"),
       width: 400,
       height: "auto",
       classes: ["dialog"],
-      ...options
-    });
+    })
   }
   
   static show(tradeOptions, options = {}, dialogData = {}) {
@@ -33,35 +35,37 @@ export class TradePromptDialog extends TJSDialog {
   }
 }
 
-export class TradeRequestDialog extends TJSDialog {
+export class TradeRequestDialog extends SvelteApplication {
   
-  constructor(tradeOptions, options = {}, dialogData = {}) {
+  constructor(tradeOptions, options = {}) {
     
     super({
-      ...dialogData,
-      title: game.i18n.localize("ITEM-PILES.Trade.Title"),
-      zIndex: 101,
-      content: {
+      svelte: {
         class: TradeDialogRequest,
+        target: document.body,
         props: {
           ...tradeOptions
         }
       },
-      autoClose: true, // Don't automatically close on button onclick.
-      close: () => this.options.resolve?.(null)
-    }, {
-      width: 400,
-      height: "auto",
-      classes: ["dialog"],
+      close: () => this.options.resolve?.(null),
       ...options
     });
     this.tradeId = tradeOptions.tradeId;
   }
   
-  static show(tradeOptions, options = {}, dialogData = {}) {
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      title: game.i18n.localize("ITEM-PILES.Trade.Title"),
+      width: 400,
+      height: "auto",
+      classes: ["dialog"],
+    })
+  }
+  
+  static show(tradeOptions, options = {}) {
     return new Promise(resolve => {
       options.resolve = resolve;
-      new this(tradeOptions, options, dialogData).render(true);
+      new this(tradeOptions, options).render(true);
     })
   }
   

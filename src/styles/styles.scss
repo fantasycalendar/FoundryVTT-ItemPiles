@@ -158,6 +158,13 @@
 
 }
 
+.item-piles-app {
+
+  footer {
+    display: flex;
+  }
+}
+
 .align-center {
   &-col {
     display: flex;
@@ -195,6 +202,25 @@
     border: 0;
     width: auto;
     height: 100%;
+  }
+
+  &.not-for-sale {
+    position: relative;
+
+    &::before {
+      position: absolute;
+      content: "";
+      left: -10px;
+      top: calc(50% - 2px);
+      right: -10px;
+      border-top: 4px solid red;
+
+      -webkit-transform: rotate(-45deg);
+      -moz-transform: rotate(-45deg);
+      -ms-transform: rotate(-45deg);
+      -o-transform: rotate(-45deg);
+      transform: rotate(-45deg);
+    }
   }
 }
 

@@ -17,7 +17,7 @@
 
 <div class="slider-group" style={$$props.style}>
   <input type="range" {min} {step} {max} bind:value="{displayValue}"/>
-  <input type="number" {min} {step} {maxInput} required bind:value="{displayValue}"/>
+  <input type="number" {min} {step} max={maxInput} required bind:value="{displayValue}"/>
 </div>
 
 <style lang="scss">

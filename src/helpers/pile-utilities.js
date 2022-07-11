@@ -94,7 +94,6 @@ export function getActorCurrencies(target, { currencyList = false, getAll = fals
   const actorItems = Array.from(actor.items);
   currencyList = currencyList || getActorCurrencyList(actor);
   let currencies = currencyList.map((currency, index) => {
-    currency.name = game.i18n.localize(currency.name);
     if (currency.type === "attribute") {
       return {
         ...currency,
@@ -127,7 +126,10 @@ export function getActorPrimaryCurrency(target) {
 export function getActorCurrencyList(target) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor);
-  return (pileData.overrideCurrencies || game.itempiles.CURRENCIES);
+  return (pileData.overrideCurrencies || game.itempiles.CURRENCIES).map(currency => {
+    currency.name = game.i18n.localize(currency.name);
+    return currency;
+  });
 }
 
 
@@ -343,48 +345,16 @@ export async function updateItemPileData(target, flagData, tokenData) {
   
 }
 
-export async function updateItemData(item, flagData) {
+export async function updateItemData(item, update) {
+  debugger;
+  const flagData = foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {});
   return item.update({
-    [CONSTANTS.FLAGS.ITEM]: foundry.utils.mergeObject(getItemFlagData(item), flagData)
+    ...update?.data ?? {},
+    [CONSTANTS.FLAGS.ITEM]: flagData
   });
 }
 
 /* -------------------------- Merchant Methods ------------------------- */
-
-export function getItemPriceData(item, merchant = false, actor = false) {
-  
-  const currencyList = getActorCurrencyList(merchant);
-  const { buyPriceModifier } = merchant ? getMerchantModifiersForActor(merchant, { item, actor }) : {
-    buyPriceModifier: 1
-  };
-  
-  const itemData = item instanceof Item ? item.toObject() : item;
-  const itemFlagData = getItemFlagData(itemData);
-  
-  if (itemFlagData.enabled) {
-    if (itemFlagData.prices.length) {
-      return itemFlagData.prices.map(price => {
-        price.originalCost = price.cost;
-        if (!price.static) {
-          price.cost = Math.floor(price.cost * buyPriceModifier);
-        }
-        return price;
-      });
-    } else if (itemFlagData.free) {
-      return [];
-    }
-  }
-  
-  const primaryCurrency = currencyList.find(attribute => attribute.primary);
-  const cost = getProperty(item.data, game.itempiles.ITEM_PRICE_ATTRIBUTE);
-  
-  return [{
-    ...primaryCurrency,
-    originalCost: cost,
-    cost: Math.floor(cost * buyPriceModifier)
-  }];
-  
-}
 
 export function getMerchantModifiersForActor(merchant, { item = false, actor = false } = {}) {
   const pileData = getActorFlagData(merchant);
@@ -412,80 +382,274 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
   }
 }
 
-function roundToDecimals(num, decimals) {
-  return Number(num.toFixed(decimals));
+function getPriceArray(totalCost, currencies) {
+  
+  const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
+  const decimals = smallestExchangeRate.toString().split(".")[1].length;
+  
+  let fraction = Helpers.roundToDecimals(totalCost % 1, decimals);
+  let cost = Math.round(totalCost - fraction);
+  
+  const prices = [];
+  
+  const primaryCurrency = currencies.find(currency => currency.primary)
+  if (cost) {
+    prices.push({
+      ...primaryCurrency,
+      cost: cost,
+      baseCost: cost,
+      maxCurrencyCost: totalCost,
+      string: primaryCurrency.abbreviation.replace('{#}', cost)
+    });
+  }
+  
+  for (const currency of currencies) {
+    
+    if (currency === primaryCurrency) continue;
+    
+    const numCurrency = Math.floor(Helpers.roundToDecimals(fraction / currency.exchangeRate, decimals));
+    
+    fraction = Helpers.roundToDecimals(fraction - (numCurrency * currency.exchangeRate), decimals);
+    
+    prices.push({
+      ...currency,
+      cost: Math.round(numCurrency),
+      baseCost: Math.round(numCurrency),
+      maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
+      string: currency.abbreviation.replace("{#}", numCurrency)
+    });
+  }
+  
+  prices.sort((a, b) => b.exchangeRate - a.exchangeRate);
+  
+  return prices;
 }
 
-export function getItemCosts(item, itemFlagData, modifier, currencies, quantity = 1) {
-  
-  const actualCurrencies = currencies.slice(currencies.findIndex(currency => currency.primary));
-  const smallestExchangeRate = Math.min(...actualCurrencies.map(currency => currency.exchangeRate));
-  const decimals = smallestExchangeRate.toString().split(".")[1].length + 1;
+export function getItemCosts(item, owner, buyer, {
+  itemFlagData = false,
+  pileFlagData = false,
+  quantity = 1
+} = {}) {
   
   let priceData = [];
   
+  if (itemFlagData.free) {
+    return priceData;
+  }
+  
+  pileFlagData = pileFlagData || getActorFlagData(owner);
+  
+  let { buyPriceModifier, itemTypePriceModifiers, actorPriceModifiers } = pileFlagData;
+  
+  const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => priceData.type === this.type);
+  if (itemTypePriceModifier) {
+    buyPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.buyPriceModifier : buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
+  }
+  
+  if (buyer && actorPriceModifiers) {
+    const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(buyer));
+    if (actorSpecificModifiers) {
+      buyPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.buyPriceModifier : buyPriceModifier * actorSpecificModifiers.buyPriceModifier;
+    }
+  }
+  
+  const currencyList = getActorCurrencyList(owner);
+  const currencies = getActorCurrencies(owner, { currencyList, getAll: true });
+  itemFlagData = itemFlagData || getItemFlagData(item);
+  
+  const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
+  const decimals = smallestExchangeRate.toString().split(".")[1].length;
+  
   if (!itemFlagData.disableNormalCost) {
     
-    let prices = [];
-    
     const overallCost = getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
-    let totalCost = roundToDecimals(overallCost * modifier * quantity, decimals);
-    let fraction = roundToDecimals(totalCost % 1, decimals);
-    let primaryCost = Math.round(totalCost - fraction);
+    let totalCost = Helpers.roundToDecimals(overallCost * buyPriceModifier * quantity, decimals);
+    let baseCost = Helpers.roundToDecimals(overallCost * buyPriceModifier, decimals);
     
-    if (primaryCost) {
-      prices.push({
-        ...actualCurrencies[0],
-        cost: primaryCost,
-        string: actualCurrencies[0].abbreviation.replace('{#}', primaryCost)
-      });
-    }
+    let prices = getPriceArray(totalCost, currencies);
+    let basePrices = getPriceArray(baseCost, currencies);
     
-    if (fraction) {
-      
-      for (const currency of actualCurrencies.slice(1)) {
-        
-        if (fraction <= 0) break;
-        
-        const numCurrency = Math.floor(roundToDecimals(fraction / currency.exchangeRate, decimals));
-        
-        if (!numCurrency) continue;
-        
-        fraction = roundToDecimals(fraction - (numCurrency * currency.exchangeRate), decimals);
-        
-        currency.name = game.i18n.localize(currency.name);
-        prices.push({
-          ...currency,
-          cost: numCurrency,
-          string: currency.abbreviation.replace('{#}', numCurrency)
-        });
-      }
-    }
-    
-    priceData = [{
+    priceData.push({
+      basePrices,
+      basePriceString: basePrices.filter(price => price.cost).map(price => price.string).join(" "),
       prices,
+      priceString: prices.filter(price => price.cost).map(price => price.string).join(" "),
       totalCost,
-      string: prices.map(cost => cost.string).join(' ')
-    }];
+      baseCost,
+      primary: true,
+      actualCost: [],
+      changeBack: [],
+      maxPurchase: 0
+    });
   }
   
   if (itemFlagData.prices.length) {
+    
     priceData = priceData.concat(itemFlagData.prices.map(priceGroup => {
       const prices = priceGroup.map(price => {
-        const cost = Math.round(price.quantity * modifier);
+        const cost = Math.round(price.quantity * buyPriceModifier * quantity);
+        const baseCost = Math.round(price.quantity * buyPriceModifier);
         price.name = game.i18n.localize(price.name);
         return {
           ...price,
           cost,
-          string: price.abbreviation.replace('{#}', cost)
+          baseCost,
+          priceString: cost ? price.abbreviation.replace("{#}", cost) : "",
+          basePriceString: baseCost ? price.abbreviation.replace("{#}", baseCost) : ""
         };
       });
       
       return {
         prices,
-        string: prices.map(cost => cost.string).join(" ")
+        priceString: prices.filter(price => price.priceString).map(price => price.priceString).join(" "),
+        basePriceString: prices.filter(price => price.basePriceString).map(price => price.basePriceString).join(" "),
+        actualCost: [],
+        changeBack: [],
+        maxPurchase: 0
       }
     }));
+  }
+  
+  if (buyer) {
+    
+    const recipientCurrencies = getActorCurrencies(buyer, { currencyList });
+    const totalCurrencies = recipientCurrencies.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
+    
+    for (const priceGroup of priceData) {
+      priceGroup.maxPurchase = Infinity;
+      if (priceGroup.baseCost !== undefined) {
+        priceGroup.maxPurchase = Math.floor(totalCurrencies / priceGroup.baseCost);
+      } else {
+        for (const price of priceGroup.prices) {
+          if (price.type === "attribute") {
+            const attributeQuantity = Number(getProperty(buyer.data, price.data.path));
+            priceGroup.maxPurchase = Math.min(priceGroup.maxPurchase, Math.floor(attributeQuantity / price.baseCost))
+          } else {
+            const foundItem = Utilities.findSimilarItem(buyer.items, price.data.item);
+            if (foundItem) {
+              const itemQuantity = Utilities.getItemQuantity(foundItem);
+              priceGroup.maxPurchase = Math.min(priceGroup.maxPurchase, Math.floor(itemQuantity / price.baseCost));
+            }
+          }
+          if (!priceGroup.maxPurchase) {
+            break;
+          }
+        }
+      }
+      
+      if (!priceGroup.primary) {
+        
+        for (const price of priceGroup.prices) {
+          
+          priceGroup.actualCost.push({
+            ...price,
+            quantity: price.cost,
+            buyerQuantity: 0
+          });
+          
+        }
+        
+      } else {
+        
+        let priceLeft = priceGroup.totalCost;
+        
+        for (let index = priceGroup.prices.length - 1; index >= 0; index--) {
+          
+          const price = priceGroup.prices[index];
+          
+          const buyerPrice = {
+            ...price,
+            quantity: 0,
+            buyerQuantity: 0
+          }
+          
+          if (price.type === "attribute") {
+            
+            const buyerCurrencyQuantity = getProperty(buyer.data, price.data.path);
+            
+            buyerPrice.buyerQuantity = buyerCurrencyQuantity;
+            
+            if (priceLeft <= 0 || !price.cost) {
+              priceGroup.actualCost.push(buyerPrice);
+              continue;
+            }
+            
+            if (buyerCurrencyQuantity < price.cost) {
+              buyerPrice.quantity = buyerCurrencyQuantity;
+            } else {
+              buyerPrice.quantity = price.cost;
+            }
+            
+            const totalCurrencyValue = Helpers.roundToDecimals(buyerCurrencyQuantity * price.exchangeRate, decimals);
+            if (price.primary && totalCurrencyValue > priceLeft) {
+              buyerPrice.quantity = Math.ceil(priceLeft);
+            }
+            priceGroup.actualCost.push(buyerPrice);
+            
+          } else {
+          
+          }
+          
+          priceLeft = Helpers.roundToDecimals(priceLeft - (buyerPrice.quantity * price.exchangeRate), decimals);
+          
+        }
+        
+        priceGroup.actualCost.reverse();
+        
+        if (priceLeft > 0) {
+          
+          for (const buyerPrice of priceGroup.actualCost) {
+            
+            if (buyerPrice.type === "attribute") {
+              
+              const buyerCurrencyQuantity = buyerPrice.buyerQuantity - buyerPrice.quantity;
+              
+              if (!buyerCurrencyQuantity) continue;
+              
+              const newQuantity = Math.ceil(Math.min(buyerCurrencyQuantity, priceLeft / buyerPrice.exchangeRate));
+              priceLeft = Helpers.roundToDecimals(priceLeft - (newQuantity * buyerPrice.exchangeRate), decimals);
+              buyerPrice.quantity += newQuantity;
+              
+            } else {
+            
+            }
+            
+            if (priceLeft <= 0) break;
+            
+          }
+          
+        }
+        
+        priceLeft = Math.abs(priceLeft);
+        
+        for (const currency of currencyList) {
+          
+          if (!priceLeft) break;
+          
+          let numCurrency = Math.floor(Helpers.roundToDecimals(priceLeft / currency.exchangeRate, decimals));
+          priceLeft = Helpers.roundToDecimals(priceLeft - (numCurrency * currency.exchangeRate), decimals);
+          
+          if (currency.type === "attribute") {
+            if (numCurrency) {
+              const paymentIndex = priceGroup.actualCost.findIndex(payment => payment.id === currency.id);
+              if ((priceGroup.actualCost[paymentIndex].quantity - numCurrency) < 0) {
+                priceGroup.changeBack.push({
+                  ...currency,
+                  quantity: numCurrency - priceGroup.actualCost[paymentIndex].quantity
+                });
+                priceGroup.actualCost[paymentIndex].quantity = 0;
+              } else {
+                priceGroup.actualCost[paymentIndex].quantity -= numCurrency;
+              }
+            }
+          } else {
+          
+          }
+        }
+        
+        
+      }
+    }
   }
   
   return priceData;

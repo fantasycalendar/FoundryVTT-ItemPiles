@@ -7,6 +7,8 @@ import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
 import { canActorAffordItem, getItemCosts } from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
+import PrivateAPI from "../API/private-api.js";
+import BuyItemDialog from "../applications/dialogs/buy-item-dialog/buy-item-dialog.js";
 
 export default class MerchantStore extends ItemPileStore {
   
@@ -20,6 +22,17 @@ export default class MerchantStore extends ItemPileStore {
     this.priceSelector = writable("");
   }
   
+  static notifyChanges(event, actor, ...args) {
+    const store = this.getStore(actor);
+    if (store) {
+      if (actor === store.recipient) {
+        store['refreshItemPrices']();
+      } else {
+        store[event](...args);
+      }
+    }
+  }
+  
   get ItemClass() {
     return PileMerchantItem;
   }
@@ -29,6 +42,11 @@ export default class MerchantStore extends ItemPileStore {
     this.pileData.subscribe(() => {
       this.updatePriceModifiers();
     });
+    if (this.recipientDocument) {
+      this.recipientDocument.subscribe(() => {
+        this.refreshItemPrices();
+      });
+    }
   }
   
   refreshItems() {
@@ -53,7 +71,24 @@ export default class MerchantStore extends ItemPileStore {
     }));
   }
   
+  refreshItemPrices() {
+    get(this.allItems).forEach(item => {
+      item.refreshPriceData();
+    });
+  }
+  
+  createItem(item) {
+    if (PileUtilities.isItemInvalid(this.source, item)) return;
+    const items = get(this.allItems);
+    const itemClass = new this.ItemClass(this, item);
+    itemClass.refreshPriceData();
+    items.push(itemClass);
+    this.allItems.set(items);
+    this.refreshItems();
+  }
+  
   deleteItem(item) {
+    if (PileUtilities.isItemInvalid(this.source, item)) return;
     const items = get(this.allItems);
     const pileItem = items.find(pileItem => pileItem.id === item.id);
     pileItem.unsubscribe();
@@ -103,6 +138,11 @@ export default class MerchantStore extends ItemPileStore {
     Helpers.custom_notify(localize("ITEM-PILES.Notifications.UpdateMerchantSuccess"));
   }
   
+  buyItem(pileItem) {
+    BuyItemDialog.show(pileItem, this.source, this.recipient);
+    //PrivateAPI._buyItem(pileItem.item, this.source, this.recipient, { paymentOptions: priceGroup });
+  }
+  
 }
 
 class PileMerchantItem extends PileItem {
@@ -110,22 +150,31 @@ class PileMerchantItem extends PileItem {
   setupStores(item) {
     super.setupStores(item);
     this.itemFlagData = writable({});
-    this.prices = writable([]);
+    this.prices = writable({});
     this.displayQuantity = writable(false);
     this.selectedPriceGroup = writable(-1);
+    this.quantityToBuy = writable(1);
   }
   
   setupSubscriptions() {
+    let setup = false;
     super.setupSubscriptions();
     this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
     this.subscribeTo(this.store.pileData, () => {
+      if (!setup) return;
       this.refreshPriceData();
       this.refreshDisplayQuantity();
     });
     this.subscribeTo(this.store.priceModifiersPerType, () => {
+      if (!setup) return;
+      this.refreshPriceData();
+    });
+    this.subscribeTo(this.quantityToBuy, () => {
+      if (!setup) return;
       this.refreshPriceData();
     });
     this.subscribeTo(this.itemDocument, () => {
+      if (!setup) return;
       const { data } = this.itemDocument.updateOptions;
       if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
         this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
@@ -135,6 +184,7 @@ class PileMerchantItem extends PileItem {
         this.refreshPriceData();
       }
     });
+    setup = true;
   }
   
   refreshDisplayQuantity() {
@@ -162,63 +212,21 @@ class PileMerchantItem extends PileItem {
   
   refreshPriceData() {
     
-    let selectedPriceGroup = get(this.selectedPriceGroup);
-    const pileData = get(this.store.pileData);
+    const quantityToBuy = get(this.quantityToBuy);
     const itemFlagData = get(this.itemFlagData);
+    const pileFlagData = get(this.store.pileData);
+    const priceData = PileUtilities.getItemCosts(this.item, this.store.source, this.store.recipient, {
+      pileFlagData,
+      itemFlagData,
+      quantity: quantityToBuy
+    });
     
-    if (itemFlagData.free) {
-      this.prices.set([]);
-      return;
+    let selectedPriceGroup = get(this.selectedPriceGroup);
+    if (selectedPriceGroup === -1) {
+      selectedPriceGroup = Math.max(0, priceData.findIndex(price => price.maxPurchase));
+      this.selectedPriceGroup.set(selectedPriceGroup)
     }
     
-    let { buyPriceModifier, itemTypePriceModifiers, actorPriceModifiers } = pileData;
-    
-    const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => priceData.type === this.type);
-    if (itemTypePriceModifier) {
-      buyPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.buyPriceModifier : buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
-    }
-    
-    if (this.store.recipient && actorPriceModifiers) {
-      const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === this.store.recipientUuid);
-      if (actorSpecificModifiers) {
-        buyPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.buyPriceModifier : buyPriceModifier * actorSpecificModifiers.buyPriceModifier;
-      }
-    }
-    
-    const currencyList = PileUtilities.getActorCurrencyList(this.store.source);
-    const currencies = PileUtilities.getActorCurrencies(this.store.source, { currencyList, getAll: true });
-    const priceData = PileUtilities.getItemCosts(this.item, itemFlagData, buyPriceModifier, currencies);
-    
-    if (this.store.recipient) {
-      
-      const recipientCurrencies = PileUtilities.getActorCurrencies(this.store.recipient, { currencyList });
-      const totalCurrencies = recipientCurrencies.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
-      
-      for (const priceGroup of priceData) {
-        if (priceGroup.totalCost !== undefined && totalCurrencies >= priceGroup.totalCost) {
-          priceGroup.canAfford = true;
-        } else {
-          priceGroup.canAfford = priceGroup.prices.filter(price => {
-            if (price.type === "attribute") {
-              const attributeQuantity = Number(getProperty(this.store.recipient.data, price.data.path));
-              if (!attributeQuantity || attributeQuantity < price.cost) {
-                return false;
-              }
-            } else {
-              const foundItem = Utilities.findSimilarItem(this.store.recipient.items, price.data.item);
-              if (!foundItem || Utilities.getItemQuantity(foundItem) < price.cost) {
-                return false;
-              }
-            }
-            return true;
-          }).length === priceGroup.prices.length;
-        }
-      }
-    }
-    
-    const affordIndex = Math.max(0, priceData.findIndex(priceGroup => priceGroup.canAfford));
-    selectedPriceGroup = selectedPriceGroup !== -1 ? selectedPriceGroup : affordIndex;
-    this.selectedPriceGroup.set(selectedPriceGroup > priceData.length ? affordIndex : selectedPriceGroup);
     this.prices.set(priceData);
     
   }

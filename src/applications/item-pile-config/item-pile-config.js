@@ -1,37 +1,32 @@
-import CONSTANTS from "../../constants/constants.js";
 import * as Utilities from "../../helpers/utilities.js";
-import * as PileUtilities from "../../helpers/pile-utilities.js";
-
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import ItemPileConfigShell from './item-pile-config.svelte';
 
-export default class ItemPileConfig extends TJSDialog {
+export default class ItemPileConfig extends SvelteApplication {
   
-  constructor(pileActor, options = {}, dialogData = {}) {
-    
-    const pileData = PileUtilities.getActorFlagData(pileActor);
+  constructor(pileActor, options = {}) {
     
     super({
+      id: `item-pile-config-${pileActor.id}`,
       title: game.i18n.format("ITEM-PILES.Applications.ItemPileConfig.Title", { actor_name: pileActor.name }),
-      content: {
+      svelte: {
         class: ItemPileConfigShell,
+        target: document.body,
         props: {
-          pileActor,
-          pileData
+          pileActor
         }
       },
-      autoClose: true, // Don't automatically close on button onclick.
-      zIndex: 101,
       close: () => this.options.resolve?.(null),
-      ...dialogData
-    }, {
-      id: `item-pile-config-${pileActor.id}`,
-      width: 430,
-      height: 617,
-      classes: ["sheet", "item-piles-config"],
       ...options
     });
-    this.pileActor = pileActor;
+  }
+  
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      width: 430,
+      height: 617,
+      classes: ["item-piles-config"],
+    })
   }
   
   static getActiveApp(id) {
@@ -49,11 +44,11 @@ export default class ItemPileConfig extends TJSDialog {
   }
   
   async close(options) {
-    super.close(options);
     Object.values(ui.windows).forEach(app => {
-      if (app !== this && app.rendered && app.id.endsWith(`item-pile-config-${this.pileActor.id}`)) {
+      if (app !== this && app.rendered && app.options?.parentApp === this) {
         app.close();
       }
     })
+    return super.close(options);
   }
 }

@@ -6,9 +6,11 @@
   import { linear } from 'svelte/easing';
   import * as Helpers from "../../helpers/helpers.js";
   import ActorDropSelect from "./ActorDropSelect.svelte";
+  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
   const { application } = getContext('external');
 
+  export let elementRoot;
   export let isPrivate;
   export let tradingActor;
   export let tradingUser;
@@ -79,60 +81,63 @@
 
 </script>
 
-<div class="flexcol trade-dialog">
+<ApplicationShell bind:elementRoot>
 
-  <p><i class="item-piles-header-icon fas fa-handshake"></i></p>
+  <div class="flexcol trade-dialog">
 
-  <p style="margin-bottom: 1rem">
-    <strong style="font-size:1.2rem;">
-      { localize("ITEM-PILES.Trade.Request.Title") }
-    </strong>
-  </p>
+    <p><i class="item-piles-header-icon fas fa-handshake"></i></p>
 
-  <div class="item-piles-bottom-divider">
-    {#if isPrivate}
-      <p>{@html localize("ITEM-PILES.Trade.Request.PrivateContent", {
-        trading_user_name: tradingUser.name,
-        trading_actor_name: tradingActor.name
-      })}</p>
+    <p style="margin-bottom: 1rem">
+      <strong style="font-size:1.2rem;">
+        { localize("ITEM-PILES.Trade.Request.Title") }
+      </strong>
+    </p>
+
+    <div class="item-piles-bottom-divider">
+      {#if isPrivate}
+        <p>{@html localize("ITEM-PILES.Trade.Request.PrivateContent", {
+          trading_user_name: tradingUser.name,
+          trading_actor_name: tradingActor.name
+        })}</p>
+      {:else}
+        <p>{localize("ITEM-PILES.Trade.Request.Content", {
+          trading_user_name: tradingUser.name,
+          trading_actor_name: tradingActor.name
+        })}</p>
+      {/if}
+      <p>{localize("ITEM-PILES.Trade.Request.AcceptQuery")}</p>
+    </div>
+
+    {#if actor}
+      <p>{localize("ITEM-PILES.Trade.Prompt.PickedActor")}</p>
     {:else}
-      <p>{localize("ITEM-PILES.Trade.Request.Content", {
-        trading_user_name: tradingUser.name,
-        trading_actor_name: tradingActor.name
-      })}</p>
+      <p>{localize("ITEM-PILES.Trade.Prompt.PickActor")}</p>
     {/if}
-    <p>{localize("ITEM-PILES.Trade.Request.AcceptQuery")}</p>
+
+    <ActorDropSelect bind:actor={actor} {actors}/>
+
+    <footer class="sheet-footer flexrow">
+      <button type="button" on:click|once={accept} disabled={!actor}>
+        <i class="fas fa-check"></i> {localize("ITEM-PILES.Trade.Accept")}
+      </button>
+      <button type="button" on:click|once={decline}>
+        <i class="fas fa-times"></i> {localize("ITEM-PILES.Trade.Decline")}
+      </button>
+      <button type="button" on:click|once={mute}>
+        <i class="fas fa-comment-slash"></i> {localize("ITEM-PILES.Trade.Mute")}
+      </button>
+    </footer>
+
+    <div class="item-piles-progress" style="flex: 1 0 auto;" class:active={actualProgress > 0}>
+      <span class="progress-bar" style="width: {actualProgress}%;"></span>
+    </div>
   </div>
 
-  {#if actor}
-    <p>{localize("ITEM-PILES.Trade.Prompt.PickedActor")}</p>
-  {:else}
-    <p>{localize("ITEM-PILES.Trade.Prompt.PickActor")}</p>
-  {/if}
-
-  <ActorDropSelect bind:actor={actor} {actors}/>
-
-  <footer class="sheet-footer flexrow">
-    <button type="button" on:click|once={accept} disabled={!actor}>
-      <i class="fas fa-check"></i> {localize("ITEM-PILES.Trade.Accept")}
-    </button>
-    <button type="button" on:click|once={decline}>
-      <i class="fas fa-times"></i> {localize("ITEM-PILES.Trade.Decline")}
-    </button>
-    <button type="button" on:click|once={mute}>
-      <i class="fas fa-comment-slash"></i> {localize("ITEM-PILES.Trade.Mute")}
-    </button>
-  </footer>
-
-  <div class="item-piles-progress" style="flex: 1 0 auto;" class:active={actualProgress > 0}>
-    <span class="progress-bar" style="width: {actualProgress}%;"></span>
-  </div>
-</div>
-
+</ApplicationShell>
 
 <style lang="scss">
 
-  .trade-dialog{
+  .trade-dialog {
     text-align: center;
   }
 
@@ -150,7 +155,7 @@
     display: none;
 
     &.active {
-      display:block;
+      display: block;
     }
 
     .progress-bar {

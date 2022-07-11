@@ -1,49 +1,36 @@
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import ItemTypePriceModifiersShell from './item-type-price-modifiers-editor.svelte';
 
-export default class ItemTypePriceModifiersEditor extends TJSDialog {
+export default class ItemTypePriceModifiersEditor extends SvelteApplication {
   
-  constructor(itemTypePriceModifiers, options, dialogData = {}) {
+  constructor(itemTypePriceModifiers, options) {
     
     super({
-      title: "ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Title",
-      content: {
+      svelte: {
         class: ItemTypePriceModifiersShell,
+        target: document.body,
         props: {
           itemTypePriceModifiers
         }
       },
-      buttons: {
-        save: {
-          icon: 'fas fa-save',
-          label: "ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Submit",
-          onclick: "requestSubmit"
-        },
-        no: {
-          icon: 'fas fa-times',
-          label: 'Cancel',
-          onclick: () => {
-            this.options.resolve?.(false);
-            this.close();
-          }
-        }
-      },
-      default: 'save',
-      zIndex: 202,
-      autoClose: false, // Don't automatically close on button onclick.
       close: () => this.options.resolve?.(false),
-      ...dialogData
-    }, {
-      width: 600,
-      height: "auto",
       ...options
     });
   }
   
-  static async show(data = false, options = {}, dialogData = {}) {
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      title: game.i18n.localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Title"),
+      width: 600,
+      height: "auto",
+      classes: ["item-piles-app"]
+    })
+  }
+  
+  static async show(data = false, options = {}) {
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(data, options, dialogData).render(true, { focus: true });
+      new this(data, options).render(true, { focus: true });
     })
   }
   

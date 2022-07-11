@@ -1,48 +1,36 @@
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
 import ItemFiltersShell from './item-filters-editor.svelte';
+import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 
-export default class ItemFiltersEditor extends TJSDialog {
+export default class ItemFiltersEditor extends SvelteApplication {
   
-  constructor(item, options, dialogData = {}) {
+  constructor(item, options) {
     super({
       title: "ITEM-PILES.Applications.FilterEditor.Title",
-      content: {
+      svelte: {
         class: ItemFiltersShell,
+        target: document.body,
         props: {
           item
         }
       },
-      buttons: {
-        save: {
-          icon: 'fas fa-save',
-          label: "ITEM-PILES.Applications.FilterEditor.Submit",
-          onclick: "requestSubmit"
-        },
-        no: {
-          icon: 'fas fa-times',
-          label: 'Cancel',
-          onclick: () => {
-            this.options.resolve(false);
-            this.close();
-          }
-        }
-      },
-      default: 'save',
-      zIndex: 202,
-      autoClose: false, // Don't automatically close on button onclick.
       close: () => this.options.resolve(null),
-      ...dialogData
-    }, {
-      width: 400,
-      height: "auto",
       ...options
     });
   }
   
-  static async show(item, options = {}, dialogData = {}) {
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      title: game.i18n.localize("ITEM-PILES.Applications.FilterEditor.Title"),
+      width: 400,
+      height: "auto",
+      classes: ["item-piles-app"]
+    })
+  }
+  
+  static async show(item, options = {}) {
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(item, options, dialogData).render(true, { focus: true });
+      new this(item, options).render(true, { focus: true });
     })
   }
 }
