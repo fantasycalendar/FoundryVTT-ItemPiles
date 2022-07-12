@@ -19,7 +19,8 @@
     <small
         class:item-piles-clickable-link={$prices.length > 1}
         class:multiple-prices={$prices.length > 1 && !standalone}
-        class:cant-afford={!$prices[$selectedPriceGroup].maxPurchase && item.store.recipient}
+        class:cant-afford-multiple-prices={$prices.length > 1 && !standalone && !$prices.filter(group => group.maxPurchase).length}
+        class:cant-afford={!$prices[$selectedPriceGroup].maxPurchase && item.store.recipient && !standalone}
         on:click={() => {
           $priceSelector = $priceSelector === item.id ? "" : item.id;
         }}
@@ -80,8 +81,12 @@
 
     .multiple-prices::after {
       border-width: 0.4rem;
-      border-right-color: #cf5234;
+      border-right-color: #3ead2c;
       transform: rotate(45deg);
+    }
+
+    .cant-afford-multiple-prices::after {
+      border-right-color: #cf5234;
     }
 
     .price-list {

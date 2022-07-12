@@ -15,7 +15,7 @@ export default class CurrencyStore {
       }
     }));
   }
-
+  
   setPrimary(index) {
     const currencies = get(this.currencies);
     currencies.forEach((entry, entryIndex) => {
@@ -23,16 +23,16 @@ export default class CurrencyStore {
     });
     this.currencies.set(currencies);
   }
-
-  sortCurrencies(){
+  
+  sortCurrencies() {
     const currencies = get(this.currencies);
     currencies.sort((a, b) => {
       return b.exchangeRate - a.exchangeRate;
     });
     this.currencies.set(currencies);
   }
-
-  addAttribute(){
+  
+  addAttribute() {
     const currencies = get(this.currencies);
     this.currencies.set([...currencies, {
       type: "attribute",
@@ -47,36 +47,37 @@ export default class CurrencyStore {
     }]);
     this.sortCurrencies();
   }
-
-  async addItem(data){
-
+  
+  async addItem(data) {
+    
     let uuid = false;
-    if(data.pack){
+    if (data.pack) {
       uuid = "Compendium" + data.pack + "." + data.id;
     }
-
+    
     let item = await Item.implementation.fromDropData(data);
     let itemData = item.toObject();
-
+    
     if (!itemData) {
       console.error(data);
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
-
+    
     let currencies = get(this.currencies);
-
+    
     const itemCurrencies = currencies.map(entry => entry.data?.item ?? {});
     const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
-
-    if(foundItem) {
+    
+    if (foundItem) {
       const index = itemCurrencies.indexOf(foundItem);
       currencies[index].data = {
         uuid,
         item: itemData
       }
       Helpers.custom_notify(`Updated item data for ${localize(currencies[index].name)} (item name ${itemData.name})`)
-    }else {
+    } else {
       currencies = [...currencies, {
+        id: randomID(),
         type: "item",
         name: itemData.name,
         img: itemData.img,
@@ -89,16 +90,16 @@ export default class CurrencyStore {
         exchangeRate: 1
       }];
     }
-
+    console.log(currencies);
     this.currencies.set(currencies);
     this.sortCurrencies();
   }
-
-  async editItem(index){
+  
+  async editItem(index) {
     const currencies = get(this.currencies);
     const data = currencies[index].data;
     let item;
-    if(data.uuid){
+    if (data.uuid) {
       item = await fromUuid(data.uuid);
     } else {
       let itemData = data.itemData;
@@ -114,8 +115,8 @@ export default class CurrencyStore {
     }
     item.sheet.render(true);
   }
-
-  removeEntry(index){
+  
+  removeEntry(index) {
     const currencies = get(this.currencies);
     currencies.splice(index, 1);
     this.currencies.set(currencies);

@@ -8,17 +8,13 @@
 
   const pileData = store.pileData;
   const priceSelector = store.priceSelector;
-  const prices = item.prices;
-  const displayQuantity = item.displayQuantity;
-  const quantity = item.quantity;
-  const selectedPriceGroup = item.selectedPriceGroup;
+  const displayQuantityStore = item.displayQuantity;
+  const quantityStore = item.quantity;
   const itemFlagDataStore = item.itemFlagData;
 
   $: itemFlagData = $itemFlagDataStore;
-
-  if (item.name === "Alms Box") {
-    store.buyItem(item)
-  }
+  $: displayQuantity = $displayQuantityStore;
+  $: quantity = $quantityStore;
 
   const displayControlButtons = store.source.isOwner;
   const displayBuyButton = !!store.recipient;
@@ -42,7 +38,7 @@
      transition:fade={{duration: 250}}
      style="flex: 1 0 auto;">
 
-  <div class="item-piles-img-container" class:not-for-sale={itemFlagData.notForSale || !$quantity}>
+  <div class="item-piles-img-container" class:not-for-sale={itemFlagData.notForSale || !quantity}>
     <img class="item-piles-img" src="{item.img}"/>
   </div>
 
@@ -53,12 +49,12 @@
       {:else}
         {item.name}
       {/if}
-      {#if $displayQuantity && $quantity}
+      {#if displayQuantity && quantity}
         <span class="item-piles-small-text">
           {#if itemFlagData.infiniteQuantity}
             (∞)
           {:else}
-            (x{$quantity})
+            (x{quantity})
           {/if}
         </span>
       {/if}

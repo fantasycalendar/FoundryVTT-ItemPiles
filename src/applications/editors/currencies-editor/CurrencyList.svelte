@@ -19,6 +19,7 @@
     if (data.type !== "Item") {
       throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
     }
+
     store.addItem(data);
 
   }
@@ -84,7 +85,7 @@
       grid-column: 1/-1;
       font-size: 1.5rem;
       border-radius: 5px;
-      border: 2px dashed rgba(0,0,0,0.35);
+      border: 2px dashed rgba(0, 0, 0, 0.35);
     }
   }
 

@@ -12,15 +12,17 @@ export default class Transaction {
     this.itemsDeleted = new Map();
     this.actorUpdates = {};
     this.attributeDeltas = new Map();
+    this.attributeTypeMap = new Map();
     this.itemDeltas = new Map();
     this.itemTypeMap = new Map();
     this.preCommitted = false;
   }
   
-  appendItemChanges(items, { remove = false, type = "item" }={}) {
-    for (let item of items) {
-      item = item.item ?? item;
-      const incomingQuantity = Math.abs(item.quantity ?? Utilities.getItemQuantity(item)) * (remove ? -1 : 1);
+  appendItemChanges(items, { remove = false, type = "item" } = {}) {
+    for (let data of items) {
+      let item = data.item ?? data;
+      item = item instanceof Item ? item.toObject() : item;
+      const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(item)) * (remove ? -1 : 1);
       const actorExistingItem = Utilities.findSimilarItem(this.actor.items, item);
       if (actorExistingItem) {
         const existingItemUpdate = Utilities.findSimilarItem(this.itemsToUpdate, item);
@@ -50,7 +52,7 @@ export default class Transaction {
     }
   }
   
-  appendActorChanges(attributes, { remove = false }={}) {
+  appendActorChanges(attributes, { remove = false, type = "attribute" } = {}) {
     if (!Array.isArray(attributes)) {
       attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
     }
@@ -61,6 +63,7 @@ export default class Transaction {
       this.attributeDeltas.set(attribute.path,
         (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity
       );
+      this.attributeTypeMap.set(attribute.path, type)
       return acc;
     }, this.actorUpdates);
   }
@@ -72,8 +75,12 @@ export default class Transaction {
       }
       return Number(getProperty(this.actor.data, entry[0])) !== entry[1];
     }))
-    this.itemsToCreate = this.itemsToCreate.filter(item => Utilities.getItemQuantity(item) > 0);
-    this.itemsToDelete = this.itemsToUpdate.filter(item => Utilities.getItemQuantity(item) <= 0).map(item => item._id);
+    this.itemsToCreate = this.itemsToCreate.filter(item => {
+      return Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
+    });
+    this.itemsToDelete = this.itemsToUpdate.filter(item => {
+      return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
+    }).map(item => item._id);
     this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
       const item = this.actor.items.get(id).toObject();
       const type = this.itemTypeMap.get(id);

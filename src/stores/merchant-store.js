@@ -5,9 +5,6 @@ import { PileItem } from "./pile-item.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
-import { canActorAffordItem, getItemCosts } from "../helpers/pile-utilities.js";
-import * as Utilities from "../helpers/utilities.js";
-import PrivateAPI from "../API/private-api.js";
 import BuyItemDialog from "../applications/dialogs/buy-item-dialog/buy-item-dialog.js";
 
 export default class MerchantStore extends ItemPileStore {
@@ -39,11 +36,11 @@ export default class MerchantStore extends ItemPileStore {
   
   setupSubscriptions() {
     super.setupSubscriptions();
-    this.pileData.subscribe(() => {
+    this.subscribeTo(this.pileData, () => {
       this.updatePriceModifiers();
     });
     if (this.recipientDocument) {
-      this.recipientDocument.subscribe(() => {
+      this.subscribeTo(this.recipientDocument, () => {
         this.refreshItemPrices();
       });
     }
@@ -185,6 +182,7 @@ class PileMerchantItem extends PileItem {
       }
     });
     setup = true;
+    this.refreshDisplayQuantity();
   }
   
   refreshDisplayQuantity() {
@@ -215,7 +213,9 @@ class PileMerchantItem extends PileItem {
     const quantityToBuy = get(this.quantityToBuy);
     const itemFlagData = get(this.itemFlagData);
     const pileFlagData = get(this.store.pileData);
-    const priceData = PileUtilities.getItemCosts(this.item, this.store.source, this.store.recipient, {
+    const priceData = PileUtilities.getItemPrices(this.item, {
+      owner: this.store.source,
+      buyer: this.store.recipient,
       pileFlagData,
       itemFlagData,
       quantity: quantityToBuy
@@ -238,7 +238,7 @@ class PileMerchantItem extends PileItem {
   
   async updateItemFlagData() {
     const itemFlagData = get(this.itemFlagData);
-    await PileUtilities.updateItemData(this.item, itemFlagData);
+    await PileUtilities.updateItemData(this.item, { flags: itemFlagData });
   }
   
 }

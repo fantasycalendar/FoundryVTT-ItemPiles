@@ -5,6 +5,7 @@ export const debounceManager = {
   debounces: {},
   
   setDebounce(id, method) {
+    console.log(id);
     if (this.debounces[id]) {
       return this.debounces[id];
     }
@@ -18,6 +19,7 @@ export const debounceManager = {
 
 export const hooks = {
   run: true,
+  _hooks: {},
   
   async runWithout(callback) {
     this.run = false;
@@ -33,6 +35,13 @@ export const hooks = {
   callAll(hook, ...args) {
     if (!this.run) return;
     return Hooks.callAll(hook, ...args);
+  },
+  
+  on(hook, callback) {
+    Hooks.on(hook, (...args) => {
+      if (!this.run) return;
+      callback(...args);
+    });
   }
 }
 
@@ -119,6 +128,6 @@ export function isGMConnected() {
   return !!Array.from(game.users).find(user => user.isGM && user.active);
 }
 
-export function roundToDecimals(num, decimals){
+export function roundToDecimals(num, decimals) {
   return Number(num.toFixed(decimals));
 }

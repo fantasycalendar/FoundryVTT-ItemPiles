@@ -41,7 +41,7 @@ export default class ItemPileSocket {
     RERENDER_TOKEN_HUD: "rerenderTokenHud",
     USER_OPENED_INTERFACE: "userOpenedInterface",
     USER_CLOSED_INTERFACE: "userClosedInterface",
-
+    
     /**
      * Item & attribute sockets
      */
@@ -74,6 +74,11 @@ export default class ItemPileSocket {
     PRIVATE_TRADE_STATE: "privateTradeAcceptedState",
     EXECUTE_TRADE: "executeTrade",
     TRADE_COMPLETED: "tradeCompleted",
+    
+    /**
+     * Merchant sockets
+     */
+    BUY_ITEM: "buyItem"
   }
   
   static BINDINGS = {
@@ -124,6 +129,8 @@ export default class ItemPileSocket {
     [this.HANDLERS.RERENDER_TOKEN_HUD]: (...args) => PrivateAPI._updateTokenHud(...args),
     [this.HANDLERS.USER_OPENED_INTERFACE]: (...args) => InterfaceTracker.userOpened(...args),
     [this.HANDLERS.USER_CLOSED_INTERFACE]: (...args) => InterfaceTracker.userClosed(...args),
+    
+    [this.HANDLERS.BUY_ITEM]: (...args) => PrivateAPI._buyItem(...args),
   }
   
   static _socket;
@@ -192,14 +199,14 @@ async function callHook(hook, ...args) {
 }
 
 export const InterfaceTracker = {
-
+  
   users: {},
-
-  initialize(){
+  
+  initialize() {
     this.users = {};
     Hooks.on("renderPlayerList", () => {
       Array.from(game.users).forEach(user => {
-        if(!this.users[user.id] || !user.active){
+        if (!this.users[user.id] || !user.active) {
           this.users[user.id] = new Set();
         }
       });
@@ -211,19 +218,19 @@ export const InterfaceTracker = {
       ItemPileSocket.executeForOthers(ItemPileSocket.HANDLERS.USER_CLOSED_INTERFACE, game.user.id, app.id);
     });
   },
-
-  userOpened(userId, id){
+  
+  userOpened(userId, id) {
     this.users[userId].add(id);
   },
-
-  userClosed(userId, id){
+  
+  userClosed(userId, id) {
     this.users[userId].delete(id);
   },
-
-  isOpened(id){
+  
+  isOpened(id) {
     return Object.values(this.users).find(interfaceList => {
       return interfaceList.has(id);
     })
   }
-
+  
 }

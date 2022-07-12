@@ -82,7 +82,7 @@ export default class MerchantApp extends SvelteApplication {
   
   async close(options) {
     for (const app of Object.values(ui.windows)) {
-      if (app !== this && this.svelte.applicationShell.store === app?.svelte.applicationShell.store) {
+      if (app !== this && this.svelte.applicationShell.store === app?.svelte?.applicationShell?.store) {
         app.close();
       }
     }

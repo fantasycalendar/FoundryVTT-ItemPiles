@@ -14,6 +14,8 @@ export default class ItemPileStore {
   
   constructor(application, source, recipient = false) {
     
+    this.subscriptions = [];
+    
     this.interactionId = randomID();
     this.application = application;
     
@@ -68,7 +70,7 @@ export default class ItemPileStore {
   
   setupSubscriptions() {
     
-    this.document.subscribe(() => {
+    this.subscribeTo(this.document, () => {
       const { data } = this.document.updateOptions;
       this.name.set(this.source.name);
       this.img.set(this.source.img);
@@ -101,11 +103,11 @@ export default class ItemPileStore {
     this.allItems.set(items);
     this.attributes.set(attributes);
     
-    this.allItems.subscribe((val) => {
+    this.subscribeTo(this.allItems, (val) => {
       if (!val) return;
       this.refreshItems();
     });
-    this.attributes.subscribe((val) => {
+    this.subscribeTo(this.attributes, (val) => {
       if (!val) return;
       this.refreshItems();
     });
@@ -113,10 +115,10 @@ export default class ItemPileStore {
     const filterDebounce = foundry.utils.debounce(() => {
       this.refreshItems();
     }, 300);
-    this.search.subscribe((val) => {
+    this.subscribeTo(this.search, (val) => {
       if (!val) return;
       filterDebounce()
-    })
+    });
     
   }
   
@@ -267,7 +269,17 @@ export default class ItemPileStore {
     }
   }
   
+  subscribeTo(target, callback) {
+    this.subscriptions.push(target.subscribe(callback));
+  }
+  
+  unsubscribe() {
+    this.subscriptions.forEach(unsubscribe => unsubscribe());
+    this.subscriptions = [];
+  }
+  
   onDestroy() {
+    this.unsubscribe();
     __STORES__.delete(this.uuid);
     if (this.recipient) {
       __STORES__.delete(this.recipientUuid);

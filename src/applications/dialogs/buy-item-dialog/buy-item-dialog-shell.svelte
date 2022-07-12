@@ -24,11 +24,9 @@
   const itemMaxQuantityStore = item.quantity;
   const prices = item.prices;
 
-  const priceSelector = item.priceSelector;
-  const selectedPriceGroup = item.selectedPriceGroup;
-
   const pileData = PileUtilities.getActorFlagData(merchant);
 
+  const selectedPriceGroup = item.selectedPriceGroup;
   let currentQuantityToBuy;
   $: {
     $selectedPriceGroup;
@@ -41,11 +39,12 @@
   $: maxItemQuantity = selectedPrice.maxPurchase;
   $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxMerchantItemQuantity);
 
-  setTimeout(() => {
-    console.log(selectedPrice);
-  }, 10)
-
   function submit() {
+    game.itempiles.buyItem(item.item, merchant, buyer, {
+      paymentIndex: get(selectedPriceGroup),
+      quantity: get(quantityToBuy),
+      interactionId: store.interactionId
+    });
     application.options.resolve();
     application.close();
   }
@@ -64,37 +63,22 @@
         </div>
         <span>{itemName}</span>
       </div>
+
       <div
           style="display:flex; justify-content:flex-end; align-items: center; grid-row: 1 / span 2; text-align: right;">
         {#if !maxItemQuantity}
           <label>You cannot afford this</label>
         {:else}
-          {#if !pileData.infiniteQuantity}
-            {#if maxItemQuantity > 1}
-              <div style="display: flex; flex-direction: column; align-items: flex-end; margin-right: 0.5rem;">
-                <label style="font-size:0.85rem;">Quantity</label>
-                <label
-                    style="font-size:0.65rem; font-style:italic;">(Max {maxItemPurchaseQuantity}
-                  )</label>
-              </div>
-              <input style="max-width: 40px;" type="number" bind:value={currentQuantityToBuy} on:change={(evt) => {
-              $quantityToBuy = Math.max(1, Math.min(currentQuantityToBuy, maxItemPurchaseQuantity));
-              currentQuantityToBuy = $quantityToBuy;
-            }}/>
-            {:else}
-              {#if pileData.displayQuantity && maxMerchantItemQuantity === 1}
-                <label>Merchant only has <strong>one</strong> left</label>
-              {:else}
-                <label>You can only afford <strong>one</strong></label>
-              {/if}
-            {/if}
-          {:else}
-            <label style="font-size:0.85rem;">Quantity</label>
-            <input style="max-width: 40px;" type="number" bind:value={currentQuantityToBuy} on:change={() => {
-              $quantityToBuy = Math.max(1, Math.min(currentQuantityToBuy, maxItemQuantity));
-              currentQuantityToBuy = $quantityToBuy;
-            }}/>
-          {/if}
+          <div style="display: flex; flex-direction: column; align-items: flex-end; margin-right: 0.5rem;">
+            <small>Quantity</small>
+            <small style="font-style:italic;">
+              (Max {maxItemPurchaseQuantity})
+            </small>
+          </div>
+          <input style="max-width: 40px;" type="number" bind:value={currentQuantityToBuy} on:change={(evt) => {
+            $quantityToBuy = Math.max(1, Math.min(currentQuantityToBuy, maxItemPurchaseQuantity));
+            currentQuantityToBuy = $quantityToBuy;
+          }}/>
         {/if}
       </div>
       <div style="margin-left: 0.25rem; margin-top: 0.25rem;">
@@ -114,7 +98,7 @@
       </strong>
 
       <div>
-        {#each selectedPrice.actualCost as price}
+        {#each selectedPrice.finalPrices as price}
           {#if price.quantity}
             <div style="display:flex; align-items: center;">
               <div class="item-piles-img-container" style="margin-right: 0.25rem;">
@@ -153,7 +137,7 @@
     </div>
 
     <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
-      <button type="button" on:click|once={ () => { submit() } }>
+      <button type="button" disabled={!maxItemPurchaseQuantity} on:click|once={ () => { submit() } }>
         <i class="fas fa-shopping-cart"></i>
         {settings?.button ?? localize("ITEM-PILES.Applications.BuyItem.BuyItem")}
       </button>
