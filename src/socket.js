@@ -78,7 +78,8 @@ export default class ItemPileSocket {
     /**
      * Merchant sockets
      */
-    BUY_ITEM: "buyItem"
+    BUY_ITEM: "buyItem",
+    SELL_ITEM: "sellItem"
   }
   
   static BINDINGS = {
@@ -131,6 +132,7 @@ export default class ItemPileSocket {
     [this.HANDLERS.USER_CLOSED_INTERFACE]: (...args) => InterfaceTracker.userClosed(...args),
     
     [this.HANDLERS.BUY_ITEM]: (...args) => PrivateAPI._buyItem(...args),
+    [this.HANDLERS.SELL_ITEM]: (...args) => PrivateAPI._sellItem(...args),
   }
   
   static _socket;

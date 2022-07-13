@@ -5,7 +5,6 @@ export const debounceManager = {
   debounces: {},
   
   setDebounce(id, method) {
-    console.log(id);
     if (this.debounces[id]) {
       return this.debounces[id];
     }

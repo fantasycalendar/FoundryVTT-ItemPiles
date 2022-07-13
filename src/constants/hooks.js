@@ -61,6 +61,8 @@ const HOOKS = {
   MERCHANT: {
     PRE_BUY: module`preBuyItem`,
     BUY: module`buyItem`,
+    PRE_SELL: module`preSellItem`,
+    SELL: module`sellItem`,
   },
   TRADE: {
     STARTED: module`tradeStarted`,

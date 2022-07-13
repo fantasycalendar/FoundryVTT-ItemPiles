@@ -13,6 +13,7 @@ import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
 import MerchantApp from "./applications/merchant-app/merchant-app.js";
 import ItemEditor from "./applications/editors/item-editor/item-editor.js";
+import { getItemPrices } from "./helpers/pile-utilities.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -56,12 +57,14 @@ Hooks.once("ready", async () => {
   
   ChatAPI.disablePastTradingButtons();
   
-  const source = game.actors.get("4jh4e6K5TobGeoni");
-  const recipient = game.actors.getName("Player Token");
+  const merchant = game.actors.get("4jh4e6K5TobGeoni");
+  const actor = game.actors.getName("Player Token");
   
-  game.itempiles.renderItemPileInterface(source, { inspectingTarget: recipient });
+  game.itempiles.sellItem(actor.items.getName("Alms Box"), merchant, actor);
   
-  //ItemEditor.show(source.items.getName("Antitoxin"));
+  // game.itempiles.renderItemPileInterface(source, { inspectingTarget: recipient });
+  
+  // ItemEditor.show(source.items.getName("Antitoxin"));
   
 });
 

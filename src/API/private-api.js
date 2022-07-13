@@ -1291,7 +1291,7 @@ export default class PrivateAPI {
     const buyingActor = Utilities.getActor(buyerUuid);
     const item = merchantActor.items.get(itemId);
     
-    const itemPrices = PileUtilities.getItemPrices(item, { owner: merchantActor, buyer: buyingActor, quantity });
+    const itemPrices = PileUtilities.getItemPrices(item, { merchant: merchantActor, actor: buyingActor, quantity });
     const selectedPrice = itemPrices[paymentIndex];
     
     const merchantTransaction = new Transaction(merchantActor);
@@ -1334,7 +1334,7 @@ export default class PrivateAPI {
       }
     }
     
-    for (const payment of selectedPrice.merchantsPay) {
+    for (const payment of selectedPrice.sellerPay) {
       if (!payment.quantity) continue;
       if (payment.type === "attribute") {
         merchantTransaction.appendActorChanges([{
@@ -1364,9 +1364,90 @@ export default class PrivateAPI {
     
   }
   
-  static async _sellItem(item, merchant, seller, { quantity = 1, paymentOptions = false } = {}) {
+  static async _sellItem(itemId, merchantUuid, sellerUuid, paymentIndex = 0, quantity = 1, userId, {
+    interactionId = false
+  } = {}) {
     
-  
+    const merchantActor = Utilities.getActor(merchantUuid);
+    const sellingActor = Utilities.getActor(sellerUuid);
+    const item = sellingActor.items.get(itemId);
+    
+    const itemPrices = PileUtilities.getItemPrices(item, {
+      merchant: merchantActor,
+      actor: sellingActor,
+      quantity,
+      selling: true
+    });
+    const selectedPrice = itemPrices[paymentIndex];
+    
+    const merchantTransaction = new Transaction(merchantActor);
+    const sellerTransaction = new Transaction(sellingActor);
+    
+    merchantTransaction.appendItemChanges([{ item, quantity }]);
+    sellerTransaction.appendItemChanges([{ item, quantity }], { remove: true });
+    
+    const merchantFlagData = PileUtilities.getActorFlagData(merchantActor);
+    
+    if ((selectedPrice.primary && !merchantFlagData.infiniteCurrencies) || (!selectedPrice.primary && !merchantFlagData.infiniteQuantity)) {
+      for (const price of selectedPrice.finalPrices) {
+        if (!price.quantity) continue;
+        if (price.type === "attribute") {
+          merchantTransaction.appendActorChanges([{
+            path: price.data.path,
+            quantity: price.quantity
+          }], { remove: true, type: selectedPrice.primary ? "currency" : price.type });
+        } else {
+          merchantTransaction.appendItemChanges([{
+            item: price.item,
+            quantity: price.quantity
+          }], { remove: true, type: selectedPrice.primary ? "currency" : price.type });
+        }
+      }
+      
+      for (const change of selectedPrice.changeBack) {
+        if (!change.quantity) continue;
+        if (change.type === "attribute") {
+          merchantTransaction.appendActorChanges([{
+            path: change.data.path,
+            quantity: change.quantity
+          }], { type: selectedPrice.primary ? "currency" : change.type });
+        } else {
+          merchantTransaction.appendItemChanges([{
+            item: change.item,
+            quantity: change.quantity
+          }], { type: selectedPrice.primary ? "currency" : change.type });
+        }
+      }
+    }
+    
+    for (const payment of selectedPrice.sellerPay) {
+      if (!payment.quantity) continue;
+      if (payment.type === "attribute") {
+        sellerTransaction.appendActorChanges([{
+          path: payment.data.path,
+          quantity: payment.quantity
+        }], { type: selectedPrice.primary ? "currency" : payment.type });
+      } else {
+        sellerTransaction.appendItemChanges([{
+          item: payment.item,
+          quantity: payment.quantity
+        }], { type: selectedPrice.primary ? "currency" : payment.type });
+      }
+    }
+    
+    const sellerUpdates = sellerTransaction.prepare();
+    const merchantUpdates = merchantTransaction.prepare();
+    
+    const hookResult = Helpers.hooks.call(HOOKS.MERCHANT.PRE_SELL, sellingActor, sellerUpdates, merchantActor, merchantUpdates, userId);
+    if (hookResult === false) return false;
+    
+    await merchantTransaction.commit();
+    const { itemDeltas, attributeDeltas } = await sellerTransaction.commit();
+    
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.MERCHANT.SELL, sellerUuid, merchantUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    
+    return { itemDeltas, attributeDeltas, price: selectedPrice };
+    
   }
   
 }

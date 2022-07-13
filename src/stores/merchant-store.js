@@ -214,8 +214,8 @@ class PileMerchantItem extends PileItem {
     const itemFlagData = get(this.itemFlagData);
     const pileFlagData = get(this.store.pileData);
     const priceData = PileUtilities.getItemPrices(this.item, {
-      owner: this.store.source,
-      buyer: this.store.recipient,
+      merchant: this.store.source,
+      actor: this.store.recipient,
       pileFlagData,
       itemFlagData,
       quantity: quantityToBuy

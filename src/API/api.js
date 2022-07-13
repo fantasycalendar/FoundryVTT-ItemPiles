@@ -1010,7 +1010,7 @@ const API = {
     
   },
   
-  getPricesForItem(item, { merchant = false, buyer = false, quantity = 1 } = {}) {
+  getPricesForItem(item, { merchant = false, actor = false, quantity = 1, selling = false } = {}) {
     
     if (!(item instanceof Item)) {
       throw Helpers.custom_error("getPricesForItem | The given item must be of type Item");
@@ -1031,56 +1031,56 @@ const API = {
       merchant = Utilities.getActor(item.parent);
     }
     
-    if (buyer) {
-      buyer = Utilities.getActor(buyer);
-      if (!buyer) {
-        throw Helpers.custom_error("getPricesForItem | Could not determine actor for the given buyer");
+    if (actor) {
+      actor = Utilities.getActor(actor);
+      if (!actor) {
+        throw Helpers.custom_error(`getPricesForItem | Could not determine the ${selling ? "selling" : "buying"} actor`);
       }
     }
     
-    return PileUtilities.getItemPrices(item, { owner: merchant, buyer, quantity });
+    return PileUtilities.getItemPrices(item, { merchant, actor, quantity, selling });
     
   },
   
   /**
    * Buys a single item from a merchant
    *
-   * @param {Item} item                               The item to be traded
+   * @param {Item/String} item                        The item or the id of the item to be sold
+   * @param {Actor/Token/TokenDocument} buyer         The actor that is buying the item
    * @param {Actor/Token/TokenDocument} merchant      The merchant actor to buy them item from
-   * @param {Actor/Token/TokenDocument} buyer         The actor that is buying the item from the merchant
    * @param {Number} [paymentIndex=0]                 The index of the payment information
    * @param {Number} [quantity=1]                     The quantity of this item to buy
    * @param {String/Boolean} [interactionId=false]    The ID of this interaction
    *
    * @returns {Promise<Object>}                       The items that were created and the attributes that were changed
    */
-  buyItem(item, merchant, buyer, { paymentIndex = 0, quantity = 1, interactionId = false } = {}) {
+  buyItem(item, buyer, merchant, { paymentIndex = 0, quantity = 1, interactionId = false } = {}) {
     
     const merchantActor = Utilities.getActor(merchant);
     const merchantUuid = Utilities.getUuid(merchantActor);
     if (!merchantUuid) {
-      throw Helpers.custom_error(`buyItemFromMerchant | Could not determine the UUID of the merchant, please provide a valid actor or token`);
+      throw Helpers.custom_error(`buyItem | Could not determine the UUID of the merchant, please provide a valid actor or token`);
     }
     if (!PileUtilities.isItemPileMerchant(merchantActor)) {
-      throw Helpers.custom_error("buyItemFromMerchant | The given merchant is not a valid item pile merchant");
+      throw Helpers.custom_error("buyItem | The given merchant is not a valid item pile merchant");
     }
     
     const buyerActor = Utilities.getActor(buyer);
     const buyerUuid = Utilities.getUuid(buyer);
     if (!buyerUuid) {
-      throw Helpers.custom_error(`buyItemFromMerchant | Could not determine the UUID of the buyer, please provide a valid actor or token`, true);
+      throw Helpers.custom_error(`buyItem | Could not determine the UUID of the buyer, please provide a valid actor or token`, true);
     }
     
     let actorItem;
     if (typeof item === "string") {
       actorItem = merchantActor.items.get(item) || merchantActor.items.getName(item);
       if (!actorItem) {
-        throw Helpers.custom_error(`buyItemFromMerchant | Could not find item on merchant with identifier "${item}"`);
+        throw Helpers.custom_error(`buyItem | Could not find item on merchant with identifier "${item}"`);
       }
     } else {
       actorItem = merchantActor.items.get(item instanceof Item ? item.id : item._id);
       if (!actorItem) {
-        throw Helpers.custom_error(`buyItemFromMerchant | Could not find provided item on merchant`);
+        throw Helpers.custom_error(`buyItem | Could not find provided item on merchant`);
       }
     }
     
@@ -1088,21 +1088,90 @@ const API = {
     
     const merchantFlagData = PileUtilities.getActorFlagData(merchantActor);
     if (!merchantFlagData.infiniteQuantity && quantity > itemQuantity) {
-      throw Helpers.custom_error(`buyItemFromMerchant | Merchant does not have enough of the given item to sell`);
+      throw Helpers.custom_error(`buyItem | Merchant does not have enough of the given item to sell`);
     }
     
-    const itemPrices = PileUtilities.getItemPrices(actorItem, { owner: merchantActor, buyer: buyerActor, quantity });
+    const itemPrices = PileUtilities.getItemPrices(actorItem, { merchant: merchantActor, actor: buyerActor, quantity });
     if (paymentIndex > itemPrices.length - 1) {
-      throw Helpers.custom_error(`buyItemFromMerchant | That payment index does not exist`, true);
+      throw Helpers.custom_error(`buyItem | That payment index does not exist`, true);
     }
     
-    const selectedItemPrice = itemPrices[paymentIndex];
+    const selectedPrice = itemPrices[paymentIndex];
     
-    if (quantity > selectedItemPrice.maxPurchase) {
-      throw Helpers.custom_error(`buyItemFromMerchant | The buyer actor cannot afford ${quantity} of this item (max ${selectedItemPrice.maxPurchase})`, true);
+    if (quantity > selectedPrice.maxPurchase) {
+      throw Helpers.custom_error(`buyItem | The buyer actor cannot afford ${quantity} of this item (max ${selectedPrice.maxPurchase})`, true);
     }
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.BUY_ITEM, item.id, merchantUuid, buyerUuid, paymentIndex, quantity, game.user.id, { interactionId });
+    
+  },
+  
+  /**
+   * Buys a single item from a merchant
+   *
+   * @param {Item/String} item                        The item or the id of the item to be sold
+   * @param {Actor/Token/TokenDocument} seller        The actor that is selling the item
+   * @param {Actor/Token/TokenDocument} merchant      The merchant actor to buy them item from
+   * @param {Number} [paymentIndex=0]                 The index of the payment information
+   * @param {Number} [quantity=1]                     The quantity of this item to buy
+   * @param {String/Boolean} [interactionId=false]    The ID of this interaction
+   *
+   * @returns {Promise<Object>}                       The items that were created and the attributes that were changed
+   */
+  sellItem(item, seller, merchant, { paymentIndex = 0, quantity = 1, interactionId = false } = {}) {
+    
+    const merchantActor = Utilities.getActor(merchant);
+    const merchantUuid = Utilities.getUuid(merchantActor);
+    if (!merchantUuid) {
+      throw Helpers.custom_error(`sellItem | Could not determine the UUID of the merchant, please provide a valid actor or token`);
+    }
+    if (!PileUtilities.isItemPileMerchant(merchantActor)) {
+      throw Helpers.custom_error("sellItem | The given merchant is not a valid item pile merchant");
+    }
+    
+    const sellerActor = Utilities.getActor(seller);
+    const sellerUuid = Utilities.getUuid(seller);
+    if (!sellerUuid) {
+      throw Helpers.custom_error(`sellItem | Could not determine the UUID of the seller, please provide a valid actor or token`, true);
+    }
+    
+    let actorItem;
+    if (typeof item === "string") {
+      actorItem = sellerActor.items.get(item) || sellerActor.items.getName(item);
+      if (!actorItem) {
+        throw Helpers.custom_error(`sellItem | Could not find item on the seller with identifier "${item}"`);
+      }
+    } else {
+      actorItem = sellerActor.items.get(item instanceof Item ? item.id : item._id);
+      if (!actorItem) {
+        throw Helpers.custom_error(`sellItem | Could not find provided item on the seller`);
+      }
+    }
+    
+    const itemQuantity = Utilities.getItemQuantity(actorItem);
+    if (quantity > itemQuantity) {
+      throw Helpers.custom_error(`sellItem | Seller does not have enough of the given item to sell`);
+    }
+    
+    const itemPrices = PileUtilities.getItemPrices(actorItem, {
+      merchant: merchantActor,
+      actor: sellerActor,
+      quantity,
+      selling: true
+    });
+    if (paymentIndex > itemPrices.length - 1) {
+      throw Helpers.custom_error(`sellItem | That payment index does not exist`, true);
+    }
+    
+    const selectedPrice = itemPrices[paymentIndex];
+    const merchantFlagData = PileUtilities.getActorFlagData(merchantActor);
+    if ((selectedPrice.primary && !merchantFlagData.infiniteCurrencies) || (!selectedPrice.primary && !merchantFlagData.infiniteQuantity)) {
+      if (quantity > selectedPrice.maxPurchase) {
+        throw Helpers.custom_error(`sellItem | The merchant cannot afford ${quantity} of this item (max ${selectedPrice.maxPurchase})`, true);
+      }
+    }
+    
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SELL_ITEM, item.id, merchantUuid, sellerUuid, paymentIndex, quantity, game.user.id, { interactionId });
     
   }
   

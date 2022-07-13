@@ -12,7 +12,6 @@
     if (editor) {
       editor.show().then((result) => {
         if (result) {
-          debugger;
           data.value = result;
         }
       });
