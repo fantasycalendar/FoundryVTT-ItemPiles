@@ -47,6 +47,8 @@ const HOOKS = {
     REMOVE: module`removeItems`,
     PRE_TRANSFER_ALL: module`preTransferAllItems`,
     TRANSFER_ALL: module`transferAllItems`,
+    PRE_TRADE: module`preTradeItem`,
+    TRADE: module`tradeItem`,
   },
   ATTRIBUTE: {
     PRE_TRANSFER: module`preTransferAttributes`,
@@ -57,12 +59,6 @@ const HOOKS = {
     REMOVE: module`removeAttributes`,
     PRE_TRANSFER_ALL: module`preTransferAllAttributes`,
     TRANSFER_ALL: module`transferAllAttributes`,
-  },
-  MERCHANT: {
-    PRE_BUY: module`preBuyItem`,
-    BUY: module`buyItem`,
-    PRE_SELL: module`preSellItem`,
-    SELL: module`sellItem`,
   },
   TRADE: {
     STARTED: module`tradeStarted`,

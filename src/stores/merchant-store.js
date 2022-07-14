@@ -214,8 +214,8 @@ class PileMerchantItem extends PileItem {
     const itemFlagData = get(this.itemFlagData);
     const pileFlagData = get(this.store.pileData);
     const priceData = PileUtilities.getItemPrices(this.item, {
-      merchant: this.store.source,
-      actor: this.store.recipient,
+      seller: this.store.source,
+      buyer: this.store.recipient,
       pileFlagData,
       itemFlagData,
       quantity: quantityToBuy
@@ -223,7 +223,7 @@ class PileMerchantItem extends PileItem {
     
     let selectedPriceGroup = get(this.selectedPriceGroup);
     if (selectedPriceGroup === -1) {
-      selectedPriceGroup = Math.max(0, priceData.findIndex(price => price.maxPurchase));
+      selectedPriceGroup = Math.max(0, priceData.findIndex(price => price.maxQuantity));
       this.selectedPriceGroup.set(selectedPriceGroup)
     }
     

@@ -430,30 +430,61 @@ function getPriceArray(totalCost, currencies) {
 }
 
 export function getItemPrices(item, {
-  merchant = false,
-  actor = false,
+  seller = false,
+  buyer = false,
+  sellerFlagData = false,
+  buyerFlagData = false,
   itemFlagData = false,
-  pileFlagData = false,
-  quantity = 1,
-  selling = false
+  quantity = 1
 } = {}) {
   
   let priceData = [];
   
   // If no owner was given, make it implicit based on the item's parent (not sure when this would be used)
-  if (!merchant) {
+  if (!seller) {
     const actor = Utilities.getActor(item.parent);
     if (!(actor instanceof Actor)) {
       return [];
     }
-    merchant = actor;
+    seller = actor;
   }
   
   itemFlagData = itemFlagData || getItemFlagData(item);
-  pileFlagData = pileFlagData || getActorFlagData(merchant);
+  
+  buyerFlagData = buyerFlagData || getActorFlagData(buyer);
+  if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
+    buyerFlagData = false;
+  }
+  
+  sellerFlagData = sellerFlagData || getActorFlagData(seller);
+  if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
+    sellerFlagData = false;
+  }
   
   if (itemFlagData?.free) {
     return priceData;
+  }
+  
+  let merchant = sellerFlagData ? seller : buyer;
+  
+  // Retrieve the item price modifiers
+  let modifier = 1;
+  if (sellerFlagData) {
+    
+    modifier = getMerchantModifiersForActor(seller, {
+      item,
+      buyer,
+      sellerFlagData
+    }).buyPriceModifier;
+    
+  } else if (buyerFlagData) {
+    
+    modifier = getMerchantModifiersForActor(buyer, {
+      item,
+      seller,
+      buyerFlagData
+    }).sellPriceModifier;
+    
   }
   
   const currencyList = getActorCurrencyList(merchant);
@@ -464,21 +495,14 @@ export function getItemPrices(item, {
   const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
   const decimals = smallestExchangeRate.toString().split(".")[1].length;
   
-  // Retrieve the item price modifiers
-  let modifier = getMerchantModifiersForActor(merchant, {
-    item,
-    actor,
-    pileFlagData
-  })[selling ? "sellPriceModifier" : "buyPriceModifier"];
-  
   // If the item does include its normal cost, we calculate that here
   if (!itemFlagData.disableNormalCost) {
     
     const overallCost = getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
     
     // Base prices is the displayed price, without quantity taken into account
-    let baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
-    let basePrices = getPriceArray(baseCost, currencies);
+    const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
+    const basePrices = getPriceArray(baseCost, currencies);
     
     // Prices is the cost with the amount of quantity taken into account, which may change the number of the different
     // types of currencies it costs (eg, an item wouldn't cost 1 gold and 100 silver, it would cost 11 gold
@@ -496,7 +520,7 @@ export function getItemPrices(item, {
       finalPrices: [],
       changeBack: [],
       sellerPay: [],
-      maxPurchase: 0
+      maxQuantity: 0
     });
   }
   
@@ -505,8 +529,9 @@ export function getItemPrices(item, {
     
     priceData = priceData.concat(itemFlagData.prices.map(priceGroup => {
       const prices = priceGroup.map(price => {
-        const cost = Math.round(price.quantity * modifier * quantity);
-        const baseCost = Math.round(price.quantity * modifier);
+        const itemModifier = price.fixed ? 1 : modifier;
+        const cost = Math.round(price.quantity * itemModifier * quantity);
+        const baseCost = Math.round(price.quantity * itemModifier);
         price.name = game.i18n.localize(price.name);
         return {
           ...price,
@@ -524,50 +549,47 @@ export function getItemPrices(item, {
         finalPrices: [],
         changeBack: [],
         sellerPay: [],
-        maxPurchase: 0
+        maxQuantity: 0
       }
     }));
   }
   
-  const seller = selling ? actor : merchant;
-  const buyer = selling ? merchant : actor;
+  const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
+  const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
   
-  const buyerInfiniteCurrencies = buyer === merchant && pileFlagData.infiniteCurrencies;
-  const buyerInfiniteQuantity = buyer === merchant && pileFlagData.infiniteQuantity;
-  
-  // If there's a seller and a buyer, we also calculate how many of the item the buyer can afford
-  if (!seller || !buyer) return priceData;
+  // If there's a buyer, we also calculate how many of the item the buyer can afford
+  if (!buyer) return priceData;
   
   const recipientCurrencies = getActorCurrencies(buyer, { currencyList });
   const totalCurrencies = recipientCurrencies.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
   
   // For each price group, check for properties and items and make sure that the actor can afford it
   for (const priceGroup of priceData) {
-    priceGroup.maxPurchase = Infinity;
+    priceGroup.maxQuantity = Infinity;
     if (priceGroup.baseCost !== undefined) {
       if (buyerInfiniteCurrencies) continue;
-      priceGroup.maxPurchase = Math.floor(totalCurrencies / priceGroup.baseCost);
+      priceGroup.maxQuantity = Math.floor(totalCurrencies / priceGroup.baseCost);
     } else {
       if (buyerInfiniteQuantity) continue;
       for (const price of priceGroup.prices) {
         if (price.type === "attribute") {
           const attributeQuantity = Number(getProperty(buyer.data, price.data.path));
-          priceGroup.maxPurchase = Math.min(priceGroup.maxPurchase, Math.floor(attributeQuantity / price.baseCost))
+          priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(attributeQuantity / price.baseCost))
         } else {
           const foundItem = Utilities.findSimilarItem(buyer.items, price.data.item);
           if (foundItem) {
             const itemQuantity = Utilities.getItemQuantity(foundItem);
-            priceGroup.maxPurchase = Math.min(priceGroup.maxPurchase, Math.floor(itemQuantity / price.baseCost));
+            priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(itemQuantity / price.baseCost));
           }
         }
-        if (!priceGroup.maxPurchase) {
+        if (!priceGroup.maxQuantity) {
           break;
         }
       }
     }
     
     // If they cannot afford any of the item, we don't populate the actual final price specific for the actor
-    if (!priceGroup.maxPurchase) continue;
+    if (!priceGroup.maxQuantity) continue;
     
     // If this is not the primary (normal currency) price group, we just populate it straight from the custom price
     if (!priceGroup.primary) {

@@ -19,8 +19,8 @@
     <small
         class:item-piles-clickable-link={$prices.length > 1}
         class:multiple-prices={$prices.length > 1 && !standalone}
-        class:cant-afford-multiple-prices={$prices.length > 1 && !standalone && !$prices.filter(group => group.maxPurchase).length}
-        class:cant-afford={!$prices[$selectedPriceGroup].maxPurchase && item.store.recipient && !standalone}
+        class:cant-afford-multiple-prices={$prices.length > 1 && !standalone && !$prices.filter(group => group.maxQuantity).length}
+        class:cant-afford={!$prices[$selectedPriceGroup].maxQuantity && item.store.recipient && !standalone}
         on:click={() => {
           $priceSelector = $priceSelector === item.id ? "" : item.id;
         }}
@@ -40,9 +40,9 @@
                      $selectedPriceGroup = index;
                      $priceSelector = "";
                    }}
-                   class:cant-afford={!priceGroup.maxPurchase && item.store.recipient}>
+                   class:cant-afford={!priceGroup.maxQuantity && item.store.recipient}>
                 <div class="item-piles-img-container"
-                     class:not-for-sale={!priceGroup.maxPurchase && item.store.recipient}>
+                     class:not-for-sale={!priceGroup.maxQuantity && item.store.recipient}>
                   <img class="item-piles-img" src="{price.img}"/>
                 </div>
                 <div class="item-piles-name item-piles-text">

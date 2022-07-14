@@ -90,7 +90,6 @@ export default class CurrencyStore {
         exchangeRate: 1
       }];
     }
-    console.log(currencies);
     this.currencies.set(currencies);
     this.sortCurrencies();
   }

@@ -36,11 +36,11 @@
 
   $: selectedPrice = $prices[$selectedPriceGroup];
   $: maxMerchantItemQuantity = pileData.infiniteQuantity ? Infinity : $itemMaxQuantityStore;
-  $: maxItemQuantity = selectedPrice.maxPurchase;
+  $: maxItemQuantity = selectedPrice.maxQuantity;
   $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxMerchantItemQuantity);
 
   function submit() {
-    game.itempiles.buyItem(item.item, buyer, merchant, {
+    game.itempiles.tradeItem(item.item, merchant, buyer, {
       paymentIndex: get(selectedPriceGroup),
       quantity: get(quantityToBuy),
       interactionId: store.interactionId

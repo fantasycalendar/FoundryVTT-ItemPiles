@@ -31,7 +31,8 @@
       data: {
         path: ""
       },
-      quantity: 1
+      quantity: 1,
+      fixed: true
     }];
   }
 
@@ -79,7 +80,8 @@
           uuid,
           item: itemData
         },
-        quantity: 1
+        quantity: 1,
+        fixed: true
       }];
     }
   }
@@ -141,6 +143,7 @@
       <div></div>
       <div>Name</div>
       <div>Cost</div>
+      <div>Fixed</div>
       <div>Short</div>
       <div>Icon</div>
       <div>Data</div>
@@ -166,6 +169,7 @@
           ><i class="fas fa-bars"></i></div>
           <div><input type="text" bind:value={price.name}/></div>
           <div><input type="number" bind:value={price.quantity}/></div>
+          <div><input type="checkbox" bind:checked={price.fixed}/></div>
           <div><input type="text" bind:value={price.abbreviation}/></div>
           <div>
             <FilePicker type="imagevideo" showImage={true} showInput={false} bind:value={price.img}/>
@@ -198,7 +202,7 @@
 <style lang="scss">
 
   .item-piles-sortable-list-columns {
-    grid-template-columns: 28px 1.25fr 35px 0.5fr 60px 1fr 28px;
+    grid-template-columns: 28px 1.25fr 28px 35px 0.5fr 60px 1fr 28px;
     min-height: 30px;
   }
 

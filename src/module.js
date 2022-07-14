@@ -60,9 +60,9 @@ Hooks.once("ready", async () => {
   const merchant = game.actors.get("4jh4e6K5TobGeoni");
   const actor = game.actors.getName("Player Token");
   
-  game.itempiles.sellItem(actor.items.getName("Alms Box"), merchant, actor);
+  // game.itempiles.tradeItem(actor.items.getName("Alms Box"), actor, merchant);
   
-  // game.itempiles.renderItemPileInterface(source, { inspectingTarget: recipient });
+  game.itempiles.renderItemPileInterface(merchant, { inspectingTarget: actor });
   
   // ItemEditor.show(source.items.getName("Antitoxin"));
   
