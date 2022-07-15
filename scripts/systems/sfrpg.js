@@ -21,12 +21,12 @@ export default {
         {
             name: "SFRPG.Currencies.Credits",
             path: "data.currency.credit",
-            img: "systems/sfrpg/icons/equipment/goods/credstick.jpg"
+            img: "systems/sfrpg/icons/equipment/goods/credstick.webp"
         },
         {
             name: "SFRPG.Currencies.UPBs",
             path: "data.currency.upb",
-            img: "systems/sfrpg/icons/equipment/goods/upb.jpg"
+            img: "systems/sfrpg/icons/equipment/goods/upb.webp"
         }
     ]
 }
