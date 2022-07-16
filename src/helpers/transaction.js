@@ -1,6 +1,7 @@
 import * as Utilities from "./utilities.js";
 import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
+import { SYSTEMS } from "../systems.js";
 
 export default class Transaction {
   
@@ -18,14 +19,17 @@ export default class Transaction {
     this.preCommitted = false;
   }
   
-  appendItemChanges(items, { remove = false, type = "item" } = {}) {
+  async appendItemChanges(items, { remove = false, type = "item" } = {}) {
     for (let data of items) {
       let item = data.item ?? data;
-      item = item instanceof Item ? item.toObject() : item;
-      const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(item)) * (remove ? -1 : 1);
-      const actorExistingItem = Utilities.findSimilarItem(this.actor.items, item);
+      let itemData = item instanceof Item ? item.toObject() : item;
+      if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+        itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
+      }
+      const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
+      const actorExistingItem = Utilities.findSimilarItem(this.actor.items, itemData);
       if (actorExistingItem) {
-        const existingItemUpdate = Utilities.findSimilarItem(this.itemsToUpdate, item);
+        const existingItemUpdate = Utilities.findSimilarItem(this.itemsToUpdate, itemData);
         if (existingItemUpdate) {
           const newQuantity = Utilities.getItemQuantity(existingItemUpdate) + incomingQuantity;
           Utilities.setItemQuantity(existingItemUpdate, newQuantity);
@@ -39,20 +43,20 @@ export default class Transaction {
           );
         }
       } else {
-        const existingItemCreation = Utilities.findSimilarItem(this.itemsToCreate, item);
+        const existingItemCreation = Utilities.findSimilarItem(this.itemsToCreate, itemData);
         if (existingItemCreation) {
           const newQuantity = Utilities.getItemQuantity(existingItemCreation) + incomingQuantity;
           Utilities.setItemQuantity(existingItemCreation, newQuantity);
         } else {
-          setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, incomingQuantity);
-          this.itemsToCreate.push(item);
-          this.itemTypeMap.set(item._id, type)
+          setProperty(itemData, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, incomingQuantity);
+          this.itemsToCreate.push(itemData);
+          this.itemTypeMap.set(itemData._id, type)
         }
       }
     }
   }
   
-  appendActorChanges(attributes, { remove = false, type = "attribute" } = {}) {
+  async appendActorChanges(attributes, { remove = false, type = "attribute" } = {}) {
     if (!Array.isArray(attributes)) {
       attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
     }

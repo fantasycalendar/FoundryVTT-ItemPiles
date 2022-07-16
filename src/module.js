@@ -14,6 +14,7 @@ import * as Helpers from "./helpers/helpers.js";
 import MerchantApp from "./applications/merchant-app/merchant-app.js";
 import ItemEditor from "./applications/editors/item-editor/item-editor.js";
 import { getItemPrices } from "./helpers/pile-utilities.js";
+import { SYSTEMS } from "./systems.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -61,6 +62,8 @@ Hooks.once("ready", async () => {
   const actor = game.actors.getName("Player Token");
   
   // game.itempiles.tradeItem(actor.items.getName("Alms Box"), actor, merchant);
+  
+  console.log(SYSTEMS.DATA.ITEM_TRANSFORMER)
   
   game.itempiles.renderItemPileInterface(merchant, { inspectingTarget: actor });
   

@@ -8,7 +8,7 @@
   const prices = item.prices;
   const itemFlagData = item.itemFlagData;
   const selectedPriceGroup = item.selectedPriceGroup;
-  const priceSelector = standalone ? item.store.priceSelector : writable("");
+  const priceSelector = standalone ? writable("") : item.store.priceSelector;
 
 </script>
 

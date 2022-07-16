@@ -7,7 +7,6 @@
   export let item;
 
   const pileData = store.pileData;
-  const priceSelector = store.priceSelector;
   const displayQuantityStore = item.displayQuantity;
   const quantityStore = item.quantity;
   const itemFlagDataStore = item.itemFlagData;
@@ -30,8 +29,6 @@
   }
 
 </script>
-
-<svelte:window on:click={() => { $priceSelector = ""; }}/>
 
 <div class="flexrow item-piles-item-row item-piles-odd-color"
      class:merchant-item-hidden={itemFlagData.hidden}

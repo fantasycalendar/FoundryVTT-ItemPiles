@@ -23,6 +23,7 @@ const CONSTANTS = {
     displayQuantity: "default",
     free: false,
     disableNormalCost: false,
+    junk: false,
     prices: []
   },
   

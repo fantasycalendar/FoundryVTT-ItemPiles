@@ -1056,36 +1056,40 @@ const API = {
     const sellerActor = Utilities.getActor(seller);
     const sellerUuid = Utilities.getUuid(sellerActor);
     if (!sellerUuid) {
-      throw Helpers.custom_error(`buyItem | Could not determine the UUID of the seller, please provide a valid actor or token`);
+      throw Helpers.custom_error(`tradeItem | Could not determine the UUID of the seller, please provide a valid actor or token`);
     }
     
     const buyerActor = Utilities.getActor(buyer);
     const buyerUuid = Utilities.getUuid(buyer);
     if (!buyerUuid) {
-      throw Helpers.custom_error(`buyItem | Could not determine the UUID of the buyer, please provide a valid actor or token`, true);
+      throw Helpers.custom_error(`tradeItem | Could not determine the UUID of the buyer, please provide a valid actor or token`, true);
+    }
+    
+    if (!item) {
+      throw Helpers.custom_error(`tradeItem | You must provide a valid item or item ID`);
     }
     
     let actorItem;
     if (typeof item === "string") {
       actorItem = sellerActor.items.get(item) || sellerActor.items.getName(item);
       if (!actorItem) {
-        throw Helpers.custom_error(`buyItem | Could not find item on seller with identifier "${item}"`);
+        throw Helpers.custom_error(`tradeItem | Could not find item on seller with identifier "${item}"`);
       }
     } else {
       actorItem = sellerActor.items.get(item instanceof Item ? item.id : item._id) || sellerActor.items.getName(item.name);
       if (!actorItem) {
-        throw Helpers.custom_error(`buyItem | Could not find provided item on seller`);
+        throw Helpers.custom_error(`tradeItem | Could not find provided item on seller`);
       }
     }
     
     const itemPrices = PileUtilities.getItemPrices(actorItem, { seller: sellerActor, buyer: buyerActor, quantity });
     if (paymentIndex > itemPrices.length - 1) {
-      throw Helpers.custom_error(`buyItem | That payment index does not exist`, true);
+      throw Helpers.custom_error(`tradeItem | That payment index does not exist`, true);
     }
     
     const selectedPrice = itemPrices[paymentIndex];
     if (quantity > selectedPrice.maxQuantity) {
-      throw Helpers.custom_error(`buyItem | The buyer actor cannot afford ${quantity} of this item (max ${selectedPrice.maxQuantity})`, true);
+      throw Helpers.custom_error(`tradeItem | The buyer actor cannot afford ${quantity} of this item (max ${selectedPrice.maxQuantity})`, true);
     }
     
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEM, item.id, sellerUuid, buyerUuid, paymentIndex, quantity, game.user.id, { interactionId });

@@ -12,6 +12,7 @@
   import { hotkeyState } from "../../hotkeys.js";
   import DropZone from "../components/DropZone.svelte";
   import PrivateAPI from "../../API/private-api.js";
+  import { SYSTEMS } from "../../systems.js";
 
   const { application } = getContext('external');
 
@@ -30,6 +31,7 @@
   let itemsPerCategoryStore = store.itemsPerCategory;
   let categoryStore = store.categories;
   let priceModifiersPerType = store.priceModifiersPerType;
+  let priceSelector = store.priceSelector;
   let editPrices = !buyer;
   const pileDataStore = store.pileData;
 
@@ -57,6 +59,11 @@
     }
 
     let item = await Item.implementation.fromDropData(data);
+    let itemData = item.toObject();
+
+    if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+      itemData = SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
+    }
 
     const disallowedType = PileUtilities.isItemInvalid(merchant, item);
     if (disallowedType) {
@@ -75,7 +82,20 @@
       }
     }
 
-    PrivateAPI._sellItem(item, merchant, buyer ?? false);
+    if (data.actorId) {
+
+      return
+
+    } else if (!game.user.isGM) {
+      return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
+    }
+
+    debugger;
+
+    return game.itempiles.addItems(merchant, [{
+      item: itemData,
+      quantity: 1
+    }]);
 
   }
 
@@ -84,6 +104,8 @@
 </script>
 
 <svelte:options accessors={true}/>
+
+<svelte:window on:click={() => { $priceSelector = ""; }}/>
 
 <ApplicationShell bind:elementRoot>
   <DropZone callback={dropData} style="display: flex; flex-direction: column; height: 100%;">
