@@ -32,7 +32,7 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-  <form class="flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
+  <form class="item-piles-flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
         autocomplete="off">
 
     <h3 style="text-align: center;">{localize("ITEM-PILES.Applications.DropItem.Dropping")}: {droppedItem.name}</h3>
@@ -60,7 +60,7 @@
       <input type="hidden" name="quantity" value="1"/>
     {/if}
 
-    <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+    <footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
       {#if itemPile}
         <button type="button" on:click|once={requestSubmit}>
           <i class="fas fa-download"></i>

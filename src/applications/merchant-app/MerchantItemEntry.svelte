@@ -30,9 +30,9 @@
 
 </script>
 
-<div class="flexrow item-piles-item-row item-piles-odd-color"
+<div class="item-piles-flexrow item-piles-item-row item-piles-odd-color"
      class:merchant-item-hidden={itemFlagData.hidden}
-     transition:fade={{duration: 250}}
+     transition:fade|local={{duration: 250}}
      style="flex: 1 0 auto;">
 
   <div class="item-piles-img-container" class:not-for-sale={itemFlagData.notForSale || !quantity}>
@@ -60,7 +60,7 @@
 
   <PriceSelector {item}/>
 
-  <div class="flexrow sidebar-buttons">
+  <div class="item-piles-flexrow sidebar-buttons">
     {#if displayControlButtons}
       {#if game.user.isGM}
         <span class="item-piles-clickable-link" on:click={() => { ItemEditor.show(item.item); }}>

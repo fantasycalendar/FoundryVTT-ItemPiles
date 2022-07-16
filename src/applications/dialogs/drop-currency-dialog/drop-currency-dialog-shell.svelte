@@ -73,7 +73,7 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form class="flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
+  <form class="item-piles-flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
         autocomplete="off">
 
     {#if attributes.length || items.length}
@@ -140,7 +140,7 @@
 
     {/if}
 
-    <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+    <footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
       {#if attributes.length || items.length}
         <button type="button" on:click|once={requestSubmit}>
           <i class="fas fa-download"></i>

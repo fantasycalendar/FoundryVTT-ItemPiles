@@ -958,10 +958,6 @@ export default class PrivateAPI {
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
     
-    if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-      itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
-    }
-    
     const dropData = {
       source: false, target: target, itemData: {
         item: itemData, quantity: 1
@@ -1038,20 +1034,31 @@ export default class PrivateAPI {
       }
     }
     
-    const disallowedType = PileUtilities.isItemInvalid(droppableDocuments?.[0], itemData);
+    const disallowedType = PileUtilities.isItemInvalid(droppableDocuments?.[0], dropData.itemData.item);
     if (disallowedType) {
       if (!game.user.isGM) {
         return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
       }
-      if (!hotkeyState.shiftDown) {
+      
+      if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+        dropData.itemData.item = await SYSTEMS.DATA.ITEM_TRANSFORMER(dropData.itemData.item);
+      }
+      
+      const newDisallowedType = PileUtilities.isItemInvalid(droppableDocuments?.[0], dropData.itemData.item);
+      
+      if (newDisallowedType && !hotkeyState.shiftDown) {
         const force = await Dialog.confirm({
           title: game.i18n.localize("ITEM-PILES.Dialogs.TypeWarning.Title"),
-          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.TypeWarning.DropContent", { type: disallowedType })}</p>`,
+          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.TypeWarning.DropContent", { type: newDisallowedType })}</p>`,
           defaultYes: false
         });
         if (!force) {
           return false;
         }
+      }
+    } else {
+      if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+        dropData.itemData.item = await SYSTEMS.DATA.ITEM_TRANSFORMER(dropData.itemData.item);
       }
     }
     

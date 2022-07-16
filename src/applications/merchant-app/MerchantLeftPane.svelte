@@ -13,13 +13,13 @@
 
 </script>
 
-<div class="merchant-left-pane flexcol">
+<div class="merchant-left-pane item-piles-flexcol">
 
   <div class="merchant-img">
     <img src="{ $merchantImg }">
   </div>
 
-  <div class="flexcol item-piles-top-divider">
+  <div class="item-piles-flexcol item-piles-top-divider">
 
     <Tabs style="flex: 0 1 auto;" tabs="{[
       { value: 'description', label: 'Description' },
@@ -105,11 +105,10 @@
     max-height: 100%;
     max-width: 300px;
     min-width: 250px;
-    overflow-y: scroll;
+    overflow-y: hidden;
 
     section {
       padding: 0.25rem;
-      margin-top: 0.5rem;
     }
 
     .merchant-img {

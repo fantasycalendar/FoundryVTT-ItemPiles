@@ -86,7 +86,7 @@
         <ActorPicker {store}/>
 
         {#if showSearchBar}
-          <div class="form-group flexrow item-piles-top-divider item-piles-bottom-divider"
+          <div class="form-group item-piles-flexrow item-piles-top-divider item-piles-bottom-divider"
                style="margin-bottom: 0.5rem; align-items: center;" transition:fade={{duration: 250}}>
             <label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
             <input type="text" bind:value={$searchStore}>
@@ -119,7 +119,7 @@
 
       {/if}
 
-      <footer class="sheet-footer flexrow item-piles-top-divider">
+      <footer class="sheet-footer item-piles-flexrow item-piles-top-divider">
         {#if editQuantities}
           <button type="button" on:click={() => { store.update() }}>
             <i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}

@@ -85,12 +85,12 @@
               </div>
             </td>
             <td>
-              <div class="flexrow" style="margin: 0 0.25rem">
+              <div class="item-piles-flexrow" style="margin: 0 0.25rem">
                 <SliderInput style="flex:4;" bind:value={priceData.buyPriceModifier}/>
               </div>
             </td>
             <td>
-              <div class="flexrow" style="margin: 0 0.25rem">
+              <div class="item-piles-flexrow" style="margin: 0 0.25rem">
                 <SliderInput style="flex:4;" bind:value={priceData.sellPriceModifier}/>
               </div>
             </td>

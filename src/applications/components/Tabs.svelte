@@ -11,10 +11,10 @@
 <nav class="tabs" data-group="primary" style={$$props.style}>
   {#each tabs.filter(tab => !tab.hidden) as tab, index (tab.value)}
     {#if separateElements && index > 0}
-      <div style="border-right: 1px solid rgba(0,0,0,0.5); margin: 0 5px;"></div>
+      <div style="border-right: 1px solid rgba(0,0,0,0.5); margin: 0 10px;"></div>
     {/if}
     <div on:click={() => { activeTab = tab.value}}
-         class="item flexrow item-piles-clickable-link"
+         class="item item-piles-flexrow item-piles-clickable-link"
          class:underscore={underscore}
          class:active={activeTab === tab.value}
          data-tab="rest">

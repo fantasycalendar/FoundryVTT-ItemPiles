@@ -136,8 +136,8 @@ export default class MerchantStore extends ItemPileStore {
   }
   
   buyItem(pileItem) {
+    if (get(pileItem.itemFlagData).notForSale && !game.user.isGM) return;
     BuyItemDialog.show(pileItem, this.source, this.recipient);
-    //PrivateAPI._buyItem(pileItem.item, this.source, this.recipient, { paymentOptions: priceGroup });
   }
   
 }

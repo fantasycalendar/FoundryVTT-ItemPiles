@@ -97,7 +97,7 @@ export function getActorCurrencies(target, { currencyList = false, getAll = fals
     if (currency.type === "attribute") {
       return {
         ...currency,
-        quantity: getProperty(actor.data, currency.data.path),
+        quantity: getProperty(actor.data, currency.data.path) ?? 0,
         path: currency.data.path,
         id: currency.data.path,
         index
@@ -630,6 +630,7 @@ export function getPricesForItems(itemsToBuy, {
       if (priceGroup.primary) {
         
         priceData.totalCurrencyCost = Helpers.roundToDecimals(priceData.totalCurrencyCost + priceGroup.totalCost, decimals);
+        priceData.primary = true;
         
       } else {
         
@@ -661,7 +662,8 @@ export function getPricesForItems(itemsToBuy, {
         name: priceGroup.item.name,
         img: priceGroup.item.img,
         quantity: priceGroup.quantity,
-        item: priceGroup.item
+        item: priceGroup.item,
+        
       });
       
       return priceData;
@@ -669,7 +671,7 @@ export function getPricesForItems(itemsToBuy, {
     }, {
       totalCurrencyCost: 0,
       canBuy: true,
-      
+      primary: false,
       finalPrices: [],
       otherPrices: [],
       

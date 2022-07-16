@@ -4,7 +4,7 @@
   export let data;
 </script>
 
-<div class="setting form-scope flexrow">
+<div class="setting form-scope item-piles-flexrow">
 
   <div class="label-side">
     <label>{localize(data.name)} <a><i title="Reset data" class="fas fa-undo reset-setting"

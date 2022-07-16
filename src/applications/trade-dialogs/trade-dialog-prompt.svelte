@@ -34,7 +34,7 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <div class="flexcol trade-dialog">
+  <div class="item-piles-flexcol trade-dialog">
 
     <p><i class="item-piles-header-icon fas fa-handshake"></i></p>
 
@@ -73,7 +73,7 @@
 
     <ActorDropSelect bind:actor={actor} {actors}/>
 
-    <footer class="sheet-footer flexrow">
+    <footer class="sheet-footer item-piles-flexrow">
       <button type="button" on:click|once={requestTrade} disabled={!actor}>
         <i class="fas fa-check"></i> {localize("ITEM-PILES.Trade.Prompt.Label")}
       </button>

@@ -82,7 +82,7 @@
 <ApplicationShell bind:elementRoot>
   <DropZone callback={dropData} style="display: flex; flex-direction: column; height: 100%;">
     <MerchantTopBar {store}/>
-    <div class="flexrow item-pile-merchant-content">
+    <div class="item-piles-flexrow item-pile-merchant-content">
       <MerchantLeftPane {store}/>
       <MerchantRightPane {store}/>
     </div>

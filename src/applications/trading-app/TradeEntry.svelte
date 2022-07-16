@@ -38,7 +38,7 @@
 
 </script>
 
-<div class="flexrow item-piles-item-row item-piles-even-color">
+<div class="item-piles-flexrow item-piles-item-row item-piles-even-color">
 
   {#if editable}
     <div style="flex: 0 1 auto; margin: 0 6px;">

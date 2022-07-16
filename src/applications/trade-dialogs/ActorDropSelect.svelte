@@ -84,7 +84,7 @@
     {/if}
   </div>
   {#if hasUnlinkedTokenOwnership}
-    <div class="flexrow">
+    <div class="item-piles-flexrow">
       <button type="button" on:click={setActorFromSelectedToken}>
         <i class="fas fa-expand"></i>
         {localize("ITEM-PILES.Trade.Prompt.PickToken")}

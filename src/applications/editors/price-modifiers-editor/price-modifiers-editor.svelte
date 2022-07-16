@@ -88,12 +88,12 @@
                    on:click={(priceData.actor.sheet.render(true))}>{priceData.actor.name}</a>
               </td>
               <td>
-                <div class="flexrow" style="margin: 0 0.25rem">
+                <div class="item-piles-flexrow" style="margin: 0 0.25rem">
                   <SliderInput bind:value={priceData.buyPriceModifier}/>
                 </div>
               </td>
               <td>
-                <div class="flexrow" style="margin: 0 0.25rem">
+                <div class="item-piles-flexrow" style="margin: 0 0.25rem">
                   <SliderInput bind:value={priceData.sellPriceModifier}/>
                 </div>
               </td>

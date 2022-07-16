@@ -160,11 +160,11 @@
 
   <DropZone callback={dropItem}>
 
-    <div class="flexcol">
+    <div class="item-piles-flexcol">
 
-      <div class="flexrow">
+      <div class="item-piles-flexrow">
 
-        <div class="col flexcol">
+        <div class="col item-piles-flexcol">
 
           <div class="character-header item-piles-bottom-divider">
             <img src="{store.leftTraderActor.img}">
@@ -181,12 +181,12 @@
             </div>
           </div>
 
-          <div class="flexcol">
+          <div class="item-piles-flexcol">
 
             <div class="row item-piles-items-list">
 
               {#if !$leftItems.length}
-                <div class="flexcol">
+                <div class="item-piles-flexcol">
                   <h3 class="item-piles-text-center">{localize("ITEM-PILES.Trade.DragDrop")}</h3>
                 </div>
               {/if}
@@ -202,7 +202,7 @@
               <div class="row item-piles-items-list item-piles-currency-list item-piles-top-divider">
 
                 {#if !spectator}
-                  <div class="flexrow">
+                  <div class="item-piles-flexrow">
                     {#if isGM}
                       <a on:click={() => { addCurrency(true) }}
                          class="item-piles-text-right item-piles-small-text item-piles-middle item-piles-gm-add-currency">
@@ -245,7 +245,7 @@
 
         </div>
 
-        <div class="col flexcol">
+        <div class="col item-piles-flexcol">
 
           <div class="character-header trader item-piles-bottom-divider">
             <div>
@@ -262,7 +262,7 @@
             <img src="{store.rightTraderActor.img}">
           </div>
 
-          <div class="flexcol">
+          <div class="item-piles-flexcol">
 
             <div class="row item-piles-items-list">
 

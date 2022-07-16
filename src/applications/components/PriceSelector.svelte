@@ -15,7 +15,7 @@
 
 </script>
 
-<div class="flexrow price-container" on:click|stopPropagation>
+<div class="item-piles-flexrow price-container" on:click|stopPropagation>
   {#if itemFlagData.free || $prices.length === 0}
     <small>Free</small>
   {:else}

@@ -27,7 +27,7 @@ export default {
     ["equipped", "proficient", "prepared"].forEach(key => delete itemData.data[key]);
     itemData.data.attunement = Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData.data.attunement);
     if (itemData.type === "spell") {
-      const scroll = await Item5e.createScrollFromSpell(itemData);
+      const scroll = await Item.implementation.createScrollFromSpell(itemData);
       itemData = scroll.data;
     }
     return itemData;

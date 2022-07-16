@@ -14,7 +14,7 @@
   function previewItem() {
     if (!canPreview) return;
     const item = store.source.items.get(entry.id);
-    if(!item) return;
+    if (!item) return;
     if (game.user.isGM || item.entry.permission[game.user.id] === 3) {
       return item.sheet.render(true);
     }
@@ -29,7 +29,7 @@
 
 </script>
 
-<div class="flexrow item-piles-item-row item-piles-even-color" transition:fade={{duration: 250}}
+<div class="item-piles-flexrow item-piles-item-row item-piles-even-color" transition:fade={{duration: 250}}
      class:item-piles-disabled={!editQuantities && !$quantityLeft}>
 
   <div class="item-piles-img-container">

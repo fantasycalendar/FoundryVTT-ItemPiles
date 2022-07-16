@@ -25,7 +25,7 @@
 
 <div>
 
-  <div class="flexrow">
+  <div class="item-piles-flexrow">
     {#if $numCurrencies > 0 || $numItems > 0}
       <h3>{localize("ITEM-PILES.Currencies")}:</h3>
     {/if}

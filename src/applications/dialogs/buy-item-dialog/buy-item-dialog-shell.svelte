@@ -96,7 +96,7 @@
       </div>
       <div style="margin-right: 0.25rem; text-align: right;">
         {#if maxItemQuantity}
-          {#if $quantityToBuy > 1}
+          {#if $quantityToBuy > 1 && paymentData.primary}
             <small>{paymentData.basePriceString}</small>
           {/if}
         {:else}
@@ -117,7 +117,7 @@
       </strong>
 
       <div>
-        {#each paymentData.sellerReceive as price}
+        {#each paymentData.finalPrices as price}
           {#if price.quantity}
             <div style="display:flex; align-items: center;">
               <div class="item-piles-img-container" style="margin-right: 0.25rem;">
@@ -155,7 +155,7 @@
 
     </div>
 
-    <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+    <footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
       <button type="button" disabled={!maxItemPurchaseQuantity} on:click|once={ () => { submit() } }>
         <i class="fas fa-shopping-cart"></i>
         {settings?.button ?? localize("ITEM-PILES.Applications.BuyItem.BuyItem")}

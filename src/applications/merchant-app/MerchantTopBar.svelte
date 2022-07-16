@@ -17,10 +17,10 @@
 
 </script>
 
-<div class="flexrow merchant-top-bar item-piles-bottom-divider">
+<div class="item-piles-flexrow merchant-top-bar item-piles-bottom-divider">
   <div class="merchant-name">{$merchantName}</div>
   {#if $pileDataStore.openTimes.enabled}
-    <div class="opening-hours flexcol">
+    <div class="opening-hours item-piles-flexcol">
       <span>Opening hours</span>
       <span style="font-style: italic;">{openTimeText}</span>
     </div>

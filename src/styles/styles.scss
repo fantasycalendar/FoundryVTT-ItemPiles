@@ -6,6 +6,28 @@
 
 .item-piles {
 
+  &-flexrow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+
+    & > * {
+      flex: 1;
+    }
+  }
+
+  &-flexcol {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+
+    & > * {
+      flex: 1;
+    }
+  }
+
   &-player-list-trade-button {
     line-height: inherit;
     font-size: 0.85rem;

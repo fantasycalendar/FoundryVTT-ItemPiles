@@ -159,7 +159,7 @@
               <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EnabledPileExplanation")}</p>
             </label>
 
-            <span class="flexrow" style="max-width: 100px; justify-content: flex-end; align-items:center;">
+            <span class="item-piles-flexrow" style="max-width: 100px; justify-content: flex-end; align-items:center;">
           {#if !pileData.enabled}
             <div style="flex:0 1 auto; margin-right: 1rem;" class="blob"><i class="fas fa-exclamation"></i></div>
           {/if}
@@ -508,7 +508,7 @@
             </div>
 
             <div class="form-group">
-              <div class="flexcol">
+              <div class="item-piles-flexcol">
                 <label>
                   <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifier")}</span>
                   <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifiersExplanation")}</p>
@@ -520,7 +520,7 @@
             </div>
 
             <div class="form-group">
-              <div class="flexcol">
+              <div class="item-piles-flexcol">
                 <label>
                   <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiers")}</span>
                   <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiersExplanation")}</p>
@@ -541,11 +541,11 @@
 
             <div class="form-group item-piles-open-times-container"
                  class:item-piles-disabled={!pileData.openTimes.enabled}>
-              <div class="flexcol" style="margin-right:1rem">
+              <div class="item-piles-flexcol" style="margin-right:1rem">
                 <label class="item-piles-text-center">
                   Open Time:
                 </label>
-                <div class="flexrow">
+                <div class="item-piles-flexrow">
                   <input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}"
                          bind:value="{pileData.openTimes.open.hour}"/>
                   <span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
@@ -553,11 +553,11 @@
                          bind:value="{pileData.openTimes.open.minute}"/>
                 </div>
               </div>
-              <div class="flexcol">
+              <div class="item-piles-flexcol">
                 <label class="item-piles-text-center">
                   Close Time:
                 </label>
-                <div class="flexrow">
+                <div class="item-piles-flexrow">
                   <input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}"
                          bind:value="{pileData.openTimes.close.hour}"/>
                   <span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>

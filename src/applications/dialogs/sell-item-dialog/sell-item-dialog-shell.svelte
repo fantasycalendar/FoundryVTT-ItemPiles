@@ -136,7 +136,7 @@
 
     </div>
 
-    <footer class="sheet-footer flexrow" style="margin-top: 1rem;">
+    <footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
       <button type="button" disabled={!maxItemPurchaseQuantity} on:click|once={ () => { submit() } }>
         <i class="fas fa-shopping-cart"></i>
         {settings?.button ?? localize("ITEM-PILES.Applications.BuyItem.BuyItem")}
