@@ -1,6 +1,6 @@
 <script>
 
-  import { writable } from "svelte/store";
+  import { get, writable } from "svelte/store";
 
   export let item;
   export let standalone = false;
@@ -10,22 +10,26 @@
   const selectedPriceGroup = item.selectedPriceGroup;
   const priceSelector = standalone ? writable("") : item.store.priceSelector;
 
+  $: cantAfford = !$prices[$selectedPriceGroup].maxQuantity && item.store.recipient && !standalone;
+  $: cantAffordMultiplePrices = cantAfford && !$prices.filter(group => group.maxQuantity).length;
+
 </script>
 
 <div class="flexrow price-container" on:click|stopPropagation>
-  {#if itemFlagData.free}
+  {#if itemFlagData.free || $prices.length === 0}
     <small>Free</small>
   {:else}
     <small
         class:item-piles-clickable-link={$prices.length > 1}
         class:multiple-prices={$prices.length > 1 && !standalone}
-        class:cant-afford-multiple-prices={$prices.length > 1 && !standalone && !$prices.filter(group => group.maxQuantity).length}
-        class:cant-afford={!$prices[$selectedPriceGroup].maxQuantity && item.store.recipient && !standalone}
+        class:cant-afford={cantAfford}
+        class:cant-afford-multiple-prices={cantAffordMultiplePrices}
         on:click={() => {
+          if($prices.length <= 1) return;
           $priceSelector = $priceSelector === item.id ? "" : item.id;
         }}
     >
-      {#if standalone}
+      {#if standalone && $prices.length > 1}
         <i class="fas fa-edit"></i>
       {/if}
       {$prices[$selectedPriceGroup].basePriceString}

@@ -13,7 +13,7 @@ import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
 import MerchantApp from "./applications/merchant-app/merchant-app.js";
 import ItemEditor from "./applications/editors/item-editor/item-editor.js";
-import { getItemPrices } from "./helpers/pile-utilities.js";
+import { getItemPrices, getPricesForItems } from "./helpers/pile-utilities.js";
 import { SYSTEMS } from "./systems.js";
 
 Hooks.once("init", async () => {
@@ -61,9 +61,18 @@ Hooks.once("ready", async () => {
   const merchant = game.actors.get("4jh4e6K5TobGeoni");
   const actor = game.actors.getName("Player Token");
   
-  // game.itempiles.tradeItem(actor.items.getName("Alms Box"), actor, merchant);
+  // game.itempiles.tradeItems(actor, merchant, [{
+  //   item: actor.items.getName("Scimitar")
+  // }]);
   
-  console.log(SYSTEMS.DATA.ITEM_TRANSFORMER)
+  // console.log(getPricesForItems([{
+  //   item: actor.items.getName("Alms Box"),
+  //   quantity: 1,
+  //   paymentIndex: 0
+  // }], {
+  //   seller: actor,
+  //   buyer: merchant
+  // }))
   
   game.itempiles.renderItemPileInterface(merchant, { inspectingTarget: actor });
   

@@ -23,7 +23,6 @@ const CONSTANTS = {
     displayQuantity: "default",
     free: false,
     disableNormalCost: false,
-    junk: false,
     prices: []
   },
   
@@ -70,6 +69,8 @@ const CONSTANTS = {
     isClosed: false,
     infiniteQuantity: false,
     infiniteCurrencies: true,
+    purchaseOnly: false,
+    hideNewItems: false,
     displayQuantity: "yes",
     buyPriceModifier: 1,
     sellPriceModifier: 0.5,

@@ -1045,8 +1045,8 @@ export default class PrivateAPI {
       }
       if (!hotkeyState.shiftDown) {
         const force = await Dialog.confirm({
-          title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
-          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
+          title: game.i18n.localize("ITEM-PILES.Dialogs.TypeWarning.Title"),
+          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.TypeWarning.DropContent", { type: disallowedType })}</p>`,
           defaultYes: false
         });
         if (!force) {
@@ -1302,73 +1302,110 @@ export default class PrivateAPI {
     
   }
   
-  static async _tradeItem(itemId, sellerUuid, buyerUuid, paymentIndex = 0, quantity = 1, userId, {
+  static async _tradeItems(sellerUuid, buyerUuid, items, userId, {
     interactionId = false
   } = {}) {
     
     const sellingActor = Utilities.getActor(sellerUuid);
     const buyingActor = Utilities.getActor(buyerUuid);
-    const item = sellingActor.items.get(itemId);
     
-    const itemPrices = PileUtilities.getItemPrices(item, { seller: sellingActor, buyer: buyingActor, quantity });
-    const selectedPrice = itemPrices[paymentIndex];
+    const itemPrices = PileUtilities.getPricesForItems(items.map(data => ({
+      ...data,
+      item: sellingActor.items.get(data.id)
+    })), { seller: sellingActor, buyer: buyingActor });
     
-    const buyerTransaction = new Transaction(buyingActor);
-    
-    await buyerTransaction.appendItemChanges([{ item, quantity }]);
-    
-    const buyerFlagData = PileUtilities.getActorFlagData(sellingActor);
-    if (!buyerFlagData.enabled || !buyerFlagData.merchant || !buyerFlagData.infiniteQuantity) {
-      for (const price of selectedPrice.finalPrices) {
-        if (!price.quantity) continue;
-        if (price.type === "attribute") {
-          await buyerTransaction.appendActorChanges([{
-            path: price.data.path,
-            quantity: price.quantity
-          }], { remove: true, type: selectedPrice.primary ? "currency" : price.type });
-        } else {
-          await buyerTransaction.appendItemChanges([{
-            item: price.item,
-            quantity: price.quantity
-          }], { remove: true, type: selectedPrice.primary ? "currency" : price.type });
-        }
-      }
-      
-      for (const change of selectedPrice.changeBack) {
-        if (!change.quantity) continue;
-        if (change.type === "attribute") {
-          await buyerTransaction.appendActorChanges([{
-            path: change.data.path,
-            quantity: change.quantity
-          }], { type: selectedPrice.primary ? "currency" : change.type });
-        } else {
-          await buyerTransaction.appendItemChanges([{
-            item: change.item,
-            quantity: change.quantity
-          }], { type: selectedPrice.primary ? "currency" : change.type });
-        }
-      }
-    }
+    const preCalcHookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId);
+    if (preCalcHookResult === false) return false;
     
     const sellerTransaction = new Transaction(sellingActor);
+    const sellerFlagData = PileUtilities.getActorFlagData(sellerTransaction);
+    const sellerInfiniteQuantity = sellerFlagData.enabled && sellerFlagData.merchant && sellerFlagData.infiniteQuantity;
     
-    const sellerFlagData = PileUtilities.getActorFlagData(sellingActor);
-    if (!sellerFlagData.enabled || !sellerFlagData.merchant || !sellerFlagData.infiniteQuantity) {
-      await sellerTransaction.appendItemChanges([{ item, quantity }], { remove: true });
-    }
-    
-    for (const payment of selectedPrice.sellerPay) {
+    for (const payment of itemPrices.sellerReceive) {
       if (!payment.quantity) continue;
       if (payment.type === "attribute") {
         await sellerTransaction.appendActorChanges([{
           path: payment.data.path,
           quantity: payment.quantity
-        }], { type: selectedPrice.primary ? "currency" : payment.type });
+        }], { type: payment.isCurrency ? "currency" : payment.type });
       } else {
         await sellerTransaction.appendItemChanges([{
           item: payment.item,
           quantity: payment.quantity
-        }], { type: selectedPrice.primary ? "currency" : payment.type });
+        }], { type: payment.isCurrency ? "currency" : payment.type });
+      }
+    }
+    
+    for (const entry of itemPrices.buyerReceive) {
+      if (!entry.quantity || sellerInfiniteQuantity) continue;
+      if (entry.type === "attribute") {
+        await sellerTransaction.appendActorChanges([{
+          path: entry.data.path,
+          quantity: entry.quantity
+        }], { remove: true, type: entry.isCurrency ? "currency" : entry.type });
+      } else {
+        await sellerTransaction.appendItemChanges([{
+          item: entry.item,
+          quantity: entry.quantity
+        }], { remove: true, type: entry.isCurrency ? "currency" : entry.type });
+      }
+    }
+    
+    const buyerTransaction = new Transaction(buyingActor);
+    const buyerFlagData = PileUtilities.getActorFlagData(buyingActor);
+    const buyerIsMerchant = buyerFlagData.enabled && buyerFlagData.isMerchant;
+    const buyerInfiniteCurrencies = buyerIsMerchant && buyerFlagData.infiniteCurrencies;
+    const buyerInfiniteQuantity = buyerIsMerchant && buyerFlagData.infiniteQuantity;
+    const buyerHidesNewItems = buyerIsMerchant && buyerFlagData.hideNewItems;
+    
+    for (const price of itemPrices.finalPrices) {
+      if (!price.quantity || (buyerInfiniteCurrencies && price.isCurrency) || (buyerInfiniteQuantity && !price.isCurrency)) {
+        continue;
+      }
+      if (price.type === "attribute") {
+        await buyerTransaction.appendActorChanges([{
+          path: price.data.path,
+          quantity: price.quantity
+        }], { remove: true, type: price.isCurrency ? "currency" : price.type });
+      } else {
+        await buyerTransaction.appendItemChanges([{
+          item: price.item,
+          quantity: price.quantity
+        }], { remove: true, type: price.isCurrency ? "currency" : price.type });
+      }
+    }
+    
+    for (const entry of itemPrices.buyerReceive) {
+      if (!entry.quantity) continue;
+      if (entry.type === "attribute") {
+        await buyerTransaction.appendActorChanges([{
+          path: entry.data.path,
+          quantity: entry.quantity
+        }], { type: entry.type });
+      } else {
+        const item = entry.item.toObject();
+        if (buyerHidesNewItems) {
+          setProperty(item, CONSTANTS.FLAGS.ITEM + '.hidden', true);
+        }
+        await buyerTransaction.appendItemChanges([{
+          item: item,
+          quantity: entry.quantity
+        }], { type: entry.type });
+      }
+    }
+    
+    for (const change of itemPrices.buyerChange) {
+      if (!change.quantity) continue;
+      if (change.type === "attribute") {
+        await buyerTransaction.appendActorChanges([{
+          path: change.data.path,
+          quantity: change.quantity
+        }], { type: "currency" });
+      } else {
+        await buyerTransaction.appendItemChanges([{
+          item: change.item,
+          quantity: change.quantity
+        }], { type: "currency" });
       }
     }
     
@@ -1381,9 +1418,9 @@ export default class PrivateAPI {
     await sellerTransaction.commit();
     const { itemDeltas, attributeDeltas } = await buyerTransaction.commit();
     
-    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, item.id, sellerUuid, buyerUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemDeltas, attributeDeltas, userId, interactionId);
     
-    return { itemDeltas, attributeDeltas, price: selectedPrice };
+    return { itemDeltas, attributeDeltas, itemPrices };
     
   }
   

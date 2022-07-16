@@ -87,24 +87,18 @@
     "Errors": {
       "DisallowedItemDrop": "You cannot drop \"{type}\" items",
       "DisallowedItemTrade": "You cannot trade \"{type}\" items",
-      "DisallowedItemSell": "You cannot sell \"{type}\" items",
+      "DisallowedItemSell": "This merchant does not accept \"{type}\" items",
       "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM.",
       "PileTooFar": "You're too far away to interact with this pile.",
       "PileLocked": "This item pile is locked and cannot be opened - you can't drop items in it.",
       "DropNoToken": "You don't have a token on this scene, so you can't drop any items here."
     },
     "Dialogs": {
-      "DropTypeWarning": {
+      "TypeWarning": {
         "Title": "Item Type Warning",
-        "Content": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?"
-      },
-      "TradeTypeWarning": {
-        "Title": "Item Type Warning",
-        "Content": "You're attempting to trade an item that is of a type (\"{type}\") that is normally not allowed to be traded. Are you sure you want to do this?"
-      },
-      "SellTypeWarning": {
-        "Title": "Item Type Warning",
-        "Content": "You're attempting to sell an item that is of a type (\"{type}\") that is normally not allowed to be sold. Are you sure you want to do this?"
+        "DropContent": "You're dropping an item that is of a type (\"{type}\") that is normally not allowed to be dropped. Are you sure you want to do this?",
+        "TradeContent": "You're attempting to trade an item that is of a type (\"{type}\") that is normally not allowed to be traded. Are you sure you want to do this?",
+        "SellContent": "You're attempting to sell item of type (\"{type}\") that the merchant normally doesn't accept. Are you sure you want to do this?"
       },
       "ResetSettings": {
         "Title": "Reset Item Piles Module Settings",
@@ -329,6 +323,10 @@
           "DisplayQuantityNo": "No, hide quantity (unless item says otherwise)",
           "DisplayQuantityYesAlways": "Yes, always show quantity",
           "DisplayQuantityNoAlways": "No, always hide quantity",
+          "PurchaseOnly": "Purchase Only",
+          "PurchaseOnlyExplanation": "When enabled, characters cannot sell items to this merchant.",
+          "HideNewItems": "Hide New Items",
+          "HideNewItemsExplanation": "When enabled, any items sold to this merchant will be hidden.",
           "OpenTimes": "Open Times",
           "OpenTimesExplanation": "When enabled, the merchant is can only be interacted by players at certain times of the day.",
           "PriceModifierTitle": "Buy and Sell Price Modifiers",

@@ -440,17 +440,6 @@ export function getItemPrices(item, {
   
   let priceData = [];
   
-  // If no owner was given, make it implicit based on the item's parent (not sure when this would be used)
-  if (!seller) {
-    const actor = Utilities.getActor(item.parent);
-    if (!(actor instanceof Actor)) {
-      return [];
-    }
-    seller = actor;
-  }
-  
-  itemFlagData = itemFlagData || getItemFlagData(item);
-  
   buyerFlagData = buyerFlagData || getActorFlagData(buyer);
   if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
     buyerFlagData = false;
@@ -460,6 +449,8 @@ export function getItemPrices(item, {
   if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
     sellerFlagData = false;
   }
+  
+  itemFlagData = itemFlagData || getItemFlagData(item);
   
   if (itemFlagData?.free) {
     return priceData;
@@ -473,18 +464,22 @@ export function getItemPrices(item, {
     
     modifier = getMerchantModifiersForActor(seller, {
       item,
-      buyer,
-      sellerFlagData
+      actor: buyer,
+      pileFlagData: sellerFlagData
     }).buyPriceModifier;
     
   } else if (buyerFlagData) {
     
     modifier = getMerchantModifiersForActor(buyer, {
       item,
-      seller,
-      buyerFlagData
+      actor: seller,
+      pileFlagData: buyerFlagData
     }).sellPriceModifier;
     
+  }
+  
+  if (!modifier) {
+    return priceData;
   }
   
   const currencyList = getActorCurrencyList(merchant);
@@ -509,19 +504,21 @@ export function getItemPrices(item, {
     let totalCost = Helpers.roundToDecimals(overallCost * modifier * quantity, decimals);
     let prices = getPriceArray(totalCost, currencies);
     
-    priceData.push({
-      basePrices,
-      basePriceString: basePrices.filter(price => price.cost).map(price => price.string).join(" "),
-      prices,
-      priceString: prices.filter(price => price.cost).map(price => price.string).join(" "),
-      totalCost,
-      baseCost,
-      primary: true,
-      finalPrices: [],
-      changeBack: [],
-      sellerPay: [],
-      maxQuantity: 0
-    });
+    if (baseCost) {
+      
+      priceData.push({
+        basePrices,
+        basePriceString: basePrices.filter(price => price.cost).map(price => price.string).join(" "),
+        prices,
+        priceString: prices.filter(price => price.cost).map(price => price.string).join(" "),
+        totalCost,
+        baseCost,
+        primary: true,
+        maxQuantity: 0,
+        quantity
+      });
+      
+    }
   }
   
   // If the item has custom prices, we include them here
@@ -546,10 +543,8 @@ export function getItemPrices(item, {
         prices,
         priceString: prices.filter(price => price.priceString).map(price => price.priceString).join(" "),
         basePriceString: prices.filter(price => price.basePriceString).map(price => price.basePriceString).join(" "),
-        finalPrices: [],
-        changeBack: [],
-        sellerPay: [],
-        maxQuantity: 0
+        maxQuantity: 0,
+        quantity
       }
     }));
   }
@@ -574,184 +569,247 @@ export function getItemPrices(item, {
       for (const price of priceGroup.prices) {
         if (price.type === "attribute") {
           const attributeQuantity = Number(getProperty(buyer.data, price.data.path));
+          price.buyerQuantity = attributeQuantity;
           priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(attributeQuantity / price.baseCost))
         } else {
           const foundItem = Utilities.findSimilarItem(buyer.items, price.data.item);
-          if (foundItem) {
-            const itemQuantity = Utilities.getItemQuantity(foundItem);
-            priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(itemQuantity / price.baseCost));
+          const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
+          price.buyerQuantity = itemQuantity;
+          priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(itemQuantity / price.baseCost));
+        }
+      }
+    }
+  }
+  
+  return priceData;
+}
+
+export function getPricesForItems(itemsToBuy, {
+  seller = false,
+  buyer = false,
+  sellerFlagData = false,
+  buyerFlagData = false
+} = {}) {
+  
+  sellerFlagData = sellerFlagData || getActorFlagData(seller);
+  if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
+    sellerFlagData = false;
+  }
+  
+  buyerFlagData = buyerFlagData || getActorFlagData(buyer);
+  if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
+    buyerFlagData = false;
+  }
+  
+  const merchant = sellerFlagData ? seller : buyer;
+  const currencyList = getActorCurrencyList(merchant);
+  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
+  const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
+  const decimals = smallestExchangeRate.toString().split(".")[1].length;
+  
+  const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
+  
+  const paymentData = itemsToBuy.map(data => {
+      const prices = getItemPrices(data.item, {
+        seller,
+        buyer,
+        sellerFlagData,
+        buyerFlagData,
+        itemFlagData: data.itemFlagData,
+        quantity: data.quantity || 1
+      })[data.paymentIndex || 0];
+      return {
+        ...prices,
+        item: data.item
+      };
+    })
+    .reduce((priceData, priceGroup) => {
+      
+      if (!priceGroup.maxQuantity) return priceData;
+      
+      if (priceGroup.primary) {
+        
+        priceData.totalCurrencyCost = Helpers.roundToDecimals(priceData.totalCurrencyCost + priceGroup.totalCost, decimals);
+        
+      } else {
+        
+        for (const price of priceGroup.prices) {
+          
+          let existingPrice = priceData.otherPrices.find(otherPrice => {
+            return otherPrice.id === price.id || (otherPrice.name === price.name && otherPrice.img === price.img && otherPrice.type === price.type);
+          });
+          
+          if (existingPrice) {
+            existingPrice.cost += price.cost;
+          } else {
+            const index = priceData.otherPrices.push(price);
+            existingPrice = priceData.otherPrices[index - 1];
+            existingPrice.quantity = 0;
+          }
+          
+          existingPrice.quantity += price.cost;
+          existingPrice.buyerQuantity -= price.cost;
+          
+          if (existingPrice.buyerQuantity < 0) {
+            priceData.canBuy = false;
           }
         }
-        if (!priceGroup.maxQuantity) {
-          break;
+      }
+      
+      priceData.buyerReceive.push({
+        type: "item",
+        name: priceGroup.item.name,
+        img: priceGroup.item.img,
+        quantity: priceGroup.quantity,
+        item: priceGroup.item
+      });
+      
+      return priceData;
+      
+    }, {
+      totalCurrencyCost: 0,
+      canBuy: true,
+      
+      finalPrices: [],
+      otherPrices: [],
+      
+      buyerReceive: [],
+      buyerChange: [],
+      sellerReceive: []
+    });
+  
+  if (paymentData.totalCurrencyCost) {
+    
+    // The price array that we need to fill
+    const prices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies);
+    
+    // This is the target price amount we need to hit
+    let priceLeft = paymentData.totalCurrencyCost;
+    
+    // Starting from the smallest currency increment in the price
+    for (let i = prices.length - 1; i >= 0; i--) {
+      
+      const price = prices[i];
+      
+      const buyerPrice = {
+        ...price,
+        buyerQuantity: price.quantity,
+        quantity: 0,
+        isCurrency: true
+      }
+      
+      if (price.type === "item") {
+        buyerPrice.item = price.data.item;
+      }
+      
+      // If we have met the price target (or exceeded it, eg, we need change), populate empty entry
+      if (priceLeft <= 0 || !price.cost) {
+        paymentData.finalPrices.push(buyerPrice);
+        continue;
+      }
+      
+      // If the buyer does not have enough to cover the cost, put what we can into it, otherwise all of it
+      buyerPrice.quantity = buyerPrice.buyerQuantity < price.cost ? buyerPrice.buyerQuantity : price.cost;
+      
+      // If it's the primary currency
+      if (price.primary) {
+        // And the buyer has enough of the primary currency to cover the rest of the price, use that
+        const totalCurrencyValue = Helpers.roundToDecimals(buyerPrice.buyerQuantity * price.exchangeRate, decimals);
+        if (totalCurrencyValue > priceLeft) {
+          buyerPrice.quantity = Math.ceil(priceLeft);
+        }
+      }
+      
+      paymentData.finalPrices.push(buyerPrice);
+      
+      // Then adjust the remaining price - if this goes below zero, we will need change back
+      priceLeft = Helpers.roundToDecimals(priceLeft - (buyerPrice.quantity * price.exchangeRate), decimals);
+      
+    }
+    
+    paymentData.finalPrices.reverse();
+    
+    // If there's STILL some remaining price (eg, we haven't been able to scrounge up enough currency to pay for it)
+    // we can start using the larger currencies, such as platinum in D&D 5e
+    if (priceLeft > 0) {
+      
+      // We then need to loop through each price, and check if we have any more left over
+      for (const buyerPrice of paymentData.finalPrices) {
+        
+        // If we don't, look for the next one
+        let buyerCurrencyQuantity = buyerPrice.buyerQuantity - buyerPrice.quantity;
+        if (!buyerCurrencyQuantity) continue;
+        
+        // Otherwise, add enough to cover the remaining cost
+        const newQuantity = Math.ceil(Math.min(buyerCurrencyQuantity, priceLeft / buyerPrice.exchangeRate));
+        buyerPrice.quantity += newQuantity;
+        priceLeft = Helpers.roundToDecimals(priceLeft - (newQuantity * buyerPrice.exchangeRate), decimals);
+        
+        if (priceLeft <= 0) break;
+        
+      }
+    }
+    
+    // Since the change will be negative, we'll need to flip it, since this is what we'll get back
+    let change = Math.abs(priceLeft);
+    for (const currency of currencies) {
+      
+      if (!change) break;
+      
+      // Get the remaining price, and normalize it to this currency
+      let numCurrency = Math.floor(Helpers.roundToDecimals(change / currency.exchangeRate, decimals));
+      change = Helpers.roundToDecimals(change - (numCurrency * currency.exchangeRate), decimals);
+      
+      // If there's some currencies to be gotten back
+      if (numCurrency) {
+        // We check if we've paid with this currency
+        const payment = paymentData.finalPrices.find(payment => {
+          return payment.id === currency.id || (payment.name === currency.name && payment.img === currency.img && payment.type === currency.type);
+        });
+        if (!payment) continue;
+        
+        // If we have paid with this currency, and we're getting some back, we can do one of two things:
+        if ((payment.quantity - numCurrency) >= 0) {
+          // Either just subtract it from the total paid if some of our payment will still remain
+          // IE, the change we got back didn't cancel out the payment
+          payment.quantity -= numCurrency;
+        } else {
+          // Or if it does cancel out our payment, we add that to the change we'll get back and remove the payment entirely
+          paymentData.buyerChange.push({
+            ...currency,
+            isCurrency: true,
+            quantity: numCurrency - payment.quantity
+          });
+          payment.quantity = 0;
         }
       }
     }
     
-    // If they cannot afford any of the item, we don't populate the actual final price specific for the actor
-    if (!priceGroup.maxQuantity) continue;
+    // Copy the final currencies that the seller will get
+    paymentData.sellerReceive = paymentData.finalPrices.map(price => {
+      return { ...price };
+    });
     
-    // If this is not the primary (normal currency) price group, we just populate it straight from the custom price
-    if (!priceGroup.primary) {
-      
-      for (const price of priceGroup.prices) {
-        
-        let buyerPrice = {
-          ...price,
-          quantity: price.cost,
-          buyerQuantity: 0
-        };
-        
-        if (price.type === "item") {
-          buyerPrice.item = Utilities.findSimilarItem(recipientCurrencies, price.data.item) || price.data.item;
-        }
-        
-        priceGroup.finalPrices.push(buyerPrice);
-        
-      }
-      
-      // Copy the final prices, so that the recipient will know what they will receive
-      priceGroup.sellerPay = priceGroup.finalPrices.map(price => {
-        return { ...price };
+    // But, we'll need to make sure they have enough change to _give_ to the buyer
+    // We collate the total amount of change needed
+    let changeNeeded = paymentData.buyerChange.reduce((acc, change) => {
+      const currency = currencies.find(currency => {
+        return change.id === currency.id || (change.name === currency.name && change.img === currency.img && change.type === currency.type);
       });
-      
-      // Otherwise we have to do something a lot more complex (warning, here be dragons)
-    } else {
-      
-      // This is the target price amount we need to hit
-      let priceLeft = priceGroup.totalCost;
-      
-      // Starting from the smallest currency increment in the price
-      for (let index = priceGroup.prices.length - 1; index >= 0; index--) {
-        
-        const price = priceGroup.prices[index];
-        
-        const buyerPrice = {
-          ...price,
-          quantity: 0,
-          buyerQuantity: 0
-        }
-        
-        // We get the quantity of the currency that the buyer has
-        let buyerCurrencyQuantity;
-        if (price.type === "attribute") {
-          buyerCurrencyQuantity = getProperty(buyer.data, price.data.path);
-        } else {
-          const foundItem = Utilities.findSimilarItem(recipientCurrencies, price.data.item);
-          buyerCurrencyQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
-          buyerPrice.item = foundItem || price.data.item;
-        }
-        
-        buyerPrice.buyerQuantity = buyerCurrencyQuantity;
-        
-        // If we have met the price target (or exceeded it, eg, we need change), populate empty entry
-        if (priceLeft <= 0 || !price.cost) {
-          priceGroup.finalPrices.push(buyerPrice);
-          continue;
-        }
-        
-        // If the buyer does not have enough to cover the cost, put what we can into it, otherwise all of it
-        buyerPrice.quantity = buyerCurrencyQuantity < price.cost ? buyerCurrencyQuantity : price.cost;
-        
-        // If it's the primary currency
-        if (price.primary) {
-          // And the buyer has enough of the primary currency to cover the rest of the price, use that
-          const totalCurrencyValue = Helpers.roundToDecimals(buyerCurrencyQuantity * price.exchangeRate, decimals);
-          if (totalCurrencyValue > priceLeft) {
-            buyerPrice.quantity = Math.ceil(priceLeft);
-          }
-        }
-        priceGroup.finalPrices.push(buyerPrice);
-        
-        // Then adjust the remaining price - if this goes below zero, we will need change back
-        priceLeft = Helpers.roundToDecimals(priceLeft - (buyerPrice.quantity * price.exchangeRate), decimals);
-        
-      }
-      
-      priceGroup.finalPrices.reverse();
-      
-      // If there's STILL some remaining price (eg, we haven't been able to scrounge up enough currency to pay for it)
-      // we can start using the larger currencies, such as platinum in D&D 5e
-      if (priceLeft > 0) {
-        
-        // We then need to loop through each price, and check if we have any more left over
-        for (const buyerPrice of priceGroup.finalPrices) {
-          
-          // If we don't, look for the next one
-          let buyerCurrencyQuantity = buyerPrice.buyerQuantity - buyerPrice.quantity;
-          if (!buyerCurrencyQuantity) continue;
-          
-          // Otherwise, add enough to cover the remaining cost
-          const newQuantity = Math.ceil(Math.min(buyerCurrencyQuantity, priceLeft / buyerPrice.exchangeRate));
-          buyerPrice.quantity += newQuantity;
-          priceLeft = Helpers.roundToDecimals(priceLeft - (newQuantity * buyerPrice.exchangeRate), decimals);
-          
-          if (priceLeft <= 0) break;
-          
-        }
-        
-      }
-      
-      // Since the change will be negative, we'll need to flip it, since this is what we'll get back
-      let change = Math.abs(priceLeft);
-      for (const currency of currencies) {
-        
-        if (!change) break;
-        
-        // Get the remaining price, and normalize it to this currency
-        let numCurrency = Math.floor(Helpers.roundToDecimals(change / currency.exchangeRate, decimals));
-        change = Helpers.roundToDecimals(change - (numCurrency * currency.exchangeRate), decimals);
-        
-        // If there's some currencies to be gotten back
-        if (numCurrency) {
-          // We check if we've paid with this currency
-          const payment = priceGroup.finalPrices.find(payment => {
-            return payment.id === currency.id || (payment.name === currency.name && payment.img === currency.img && payment.type === currency.type);
-          });
-          if (!payment) continue;
-          
-          // If we have paid with this currency, and we're getting some back, we can do one of two things:
-          if ((payment.quantity - numCurrency) >= 0) {
-            // Either just subtract it from the total paid if some of our payment will still remain
-            // IE, the change we got back didn't cancel out the payment
-            payment.quantity -= numCurrency;
-          } else {
-            // Or if it does cancel out our payment, we add that to the change we'll get back and remove the payment entirely
-            priceGroup.changeBack.push({
-              ...currency,
-              quantity: numCurrency - payment.quantity
-            });
-            payment.quantity = 0;
-          }
-        }
-      }
-      
-      // Copy the final currencies that the seller will get
-      priceGroup.sellerPay = priceGroup.finalPrices.map(price => {
-        return { ...price };
-      });
-      
-      // But, we'll need to make sure they have enough change to _give_ to the buyer
-      // We collate the total amount of change needed
-      let changeNeeded = priceGroup.changeBack.reduce((acc, change) => {
-        const currency = currencies.find(currency => {
-          return change.id === currency.id || (change.name === currency.name && change.img === currency.img && change.type === currency.type);
-        });
-        return acc + currency.quantity >= change.quantity ? 0 : (change.quantity - currency.quantity) * change.exchangeRate;
-      }, 0);
-      
-      // If no change is needed to be given, great! Exit early.
-      if (!changeNeeded) continue;
-      // But if the seller needs give the buyer some change, we'll modify the payment they'll get to cover for it
+      return acc + currency.quantity >= change.quantity ? 0 : (change.quantity - currency.quantity) * change.exchangeRate;
+    }, 0);
+    
+    // If the seller needs give the buyer some change, we'll modify the payment they'll get to cover for it
+    if (changeNeeded) {
       
       // If the seller is being given enough of the primary currency to cover for the cost, we use that
-      const primaryCurrency = priceGroup.sellerPay.find(price => price.primary && (price.quantity * price.exchangeRate) > changeNeeded);
+      const primaryCurrency = paymentData.sellerReceive.find(price => price.primary && (price.quantity * price.exchangeRate) > changeNeeded);
       if (primaryCurrency) {
         primaryCurrency.quantity--;
         changeNeeded -= 1 * primaryCurrency.exchangeRate;
       } else {
         // Otherwise, we'll use the biggest currency we can find to cover for it
-        const biggestCurrency = priceGroup.sellerPay.find(price => price.quantity && (price.quantity * price.exchangeRate) > changeNeeded);
+        const biggestCurrency = paymentData.sellerReceive.find(price => price.quantity && (price.quantity * price.exchangeRate) > changeNeeded);
         biggestCurrency.quantity--;
         changeNeeded -= 1 * biggestCurrency.exchangeRate;
       }
@@ -759,7 +817,7 @@ export function getItemPrices(item, {
       changeNeeded = Math.abs(changeNeeded);
       
       // Then loop through each currency and add enough currency so that the total adds up
-      for (const currency of priceGroup.sellerPay) {
+      for (const currency of paymentData.sellerReceive) {
         if (!changeNeeded) break;
         let numCurrency = Math.floor(Helpers.roundToDecimals(changeNeeded / currency.exchangeRate, decimals));
         changeNeeded = Helpers.roundToDecimals(changeNeeded - (numCurrency * currency.exchangeRate), decimals);
@@ -768,6 +826,17 @@ export function getItemPrices(item, {
     }
   }
   
-  return priceData;
+  paymentData.finalPrices = paymentData.finalPrices.concat(paymentData.otherPrices);
+  paymentData.sellerReceive = paymentData.sellerReceive.concat(paymentData.otherPrices);
+  
+  paymentData.basePriceString = paymentData.finalPrices
+    .filter(price => price.cost)
+    .map(price => {
+      return price.abbreviation.replace("{#}", price.cost)
+    }).join(" ");
+  
+  delete paymentData.otherPrices;
+  
+  return paymentData;
   
 }

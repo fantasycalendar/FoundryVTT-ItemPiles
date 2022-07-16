@@ -1035,64 +1035,86 @@ const API = {
       }
     }
     
-    return PileUtilities.getItemPrices(item, { seller, actor, quantity, selling });
+    return PileUtilities.getItemPrices(item, { seller, buyer, quantity });
     
   },
   
   /**
    * Trades a single item between one actor to another, and currencies and/or change is exchanged between them
    *
-   * @param {Item/String} item                        The item or the id of the item to be sold
-   * @param {Actor/Token/TokenDocument} seller        The actor that is selling the item
-   * @param {Actor/Token/TokenDocument} buyer         The actor that is buying the item
-   * @param {Number} [paymentIndex=0]                 The index of the payment information
-   * @param {Number} [quantity=1]                     The quantity of this item to buy
-   * @param {String/Boolean} [interactionId=false]    The ID of this interaction
+   * @param {Actor/Token/TokenDocument} seller                                                    The actor that is selling the item
+   * @param {Actor/Token/TokenDocument} buyer                                                     The actor that is buying the item
+   * @param {Array<Object<{ item: Item/String, quantity: Number, paymentIndex: Number }>>} items  An array of objects containing the item or the id of the
+   *                                                                                              item to be sold, the quantity to be sold, and the payment
+   *                                                                                              index to be used
+   * @param {String/Boolean} [interactionId=false]                                                The ID of this interaction
    *
    * @returns {Promise<Object>}                       The items that were created and the attributes that were changed
    */
-  tradeItem(item, seller, buyer, { paymentIndex = 0, quantity = 1, interactionId = false } = {}) {
+  tradeItems(seller, buyer, items, { interactionId = false } = {}) {
     
     const sellerActor = Utilities.getActor(seller);
     const sellerUuid = Utilities.getUuid(sellerActor);
     if (!sellerUuid) {
-      throw Helpers.custom_error(`tradeItem | Could not determine the UUID of the seller, please provide a valid actor or token`);
+      throw Helpers.custom_error(`tradeItems | Could not determine the UUID of the seller, please provide a valid actor or token`, true);
     }
     
     const buyerActor = Utilities.getActor(buyer);
     const buyerUuid = Utilities.getUuid(buyer);
     if (!buyerUuid) {
-      throw Helpers.custom_error(`tradeItem | Could not determine the UUID of the buyer, please provide a valid actor or token`, true);
+      throw Helpers.custom_error(`tradeItems | Could not determine the UUID of the buyer, please provide a valid actor or token`, true);
     }
     
-    if (!item) {
-      throw Helpers.custom_error(`tradeItem | You must provide a valid item or item ID`);
-    }
-    
-    let actorItem;
-    if (typeof item === "string") {
-      actorItem = sellerActor.items.get(item) || sellerActor.items.getName(item);
-      if (!actorItem) {
-        throw Helpers.custom_error(`tradeItem | Could not find item on seller with identifier "${item}"`);
+    const itemsToSell = items.map(data => {
+      
+      data = foundry.utils.mergeObject({
+        item: "",
+        quantity: 1,
+        paymentIndex: 0
+      }, data);
+      
+      if (!data.item) {
+        throw Helpers.custom_error(`tradeItems | You must provide an item!`, true);
       }
-    } else {
-      actorItem = sellerActor.items.get(item instanceof Item ? item.id : item._id) || sellerActor.items.getName(item.name);
-      if (!actorItem) {
-        throw Helpers.custom_error(`tradeItem | Could not find provided item on seller`);
+      
+      let actorItem;
+      if (typeof data.item === "string") {
+        actorItem = sellerActor.items.get(data.item) || sellerActor.items.getName(data.item);
+        if (!actorItem) {
+          throw Helpers.custom_error(`tradeItems | Could not find item on seller with identifier "${data.item}"`);
+        }
+      } else {
+        actorItem = sellerActor.items.get(data.item instanceof Item ? data.item.id : data.item._id) || sellerActor.items.getName(data.item.name);
+        if (!actorItem) {
+          throw Helpers.custom_error(`tradeItems | Could not find provided item on seller`);
+        }
       }
-    }
+      
+      const itemPrices = PileUtilities.getItemPrices(actorItem, {
+        seller: sellerActor,
+        buyer: buyerActor,
+        quantity: data.quantity
+      });
+      if (itemPrices.length) {
+        if (data.paymentIndex >= itemPrices.length || data.paymentIndex < 0) {
+          throw Helpers.custom_error(`tradeItems | That payment index does not exist on ${actorItem.name}`, true);
+        }
+        
+        const selectedPrice = itemPrices[data.paymentIndex];
+        if (data.quantity > selectedPrice.maxQuantity) {
+          throw Helpers.custom_error(`tradeItems | The buyer actor cannot afford ${data.quantity} of ${actorItem.name} (max ${selectedPrice.maxQuantity})`, true);
+        }
+      }
+      
+      return {
+        id: actorItem.id,
+        quantity: data.quantity,
+        paymentIndex: data.paymentIndex
+      };
+      
+    });
     
-    const itemPrices = PileUtilities.getItemPrices(actorItem, { seller: sellerActor, buyer: buyerActor, quantity });
-    if (paymentIndex > itemPrices.length - 1) {
-      throw Helpers.custom_error(`tradeItem | That payment index does not exist`, true);
-    }
-    
-    const selectedPrice = itemPrices[paymentIndex];
-    if (quantity > selectedPrice.maxQuantity) {
-      throw Helpers.custom_error(`tradeItem | The buyer actor cannot afford ${quantity} of this item (max ${selectedPrice.maxQuantity})`, true);
-    }
-    
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEM, item.id, sellerUuid, buyerUuid, paymentIndex, quantity, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEMS, sellerUuid, buyerUuid, itemsToSell, game.user.id, { interactionId });
     
   },
   

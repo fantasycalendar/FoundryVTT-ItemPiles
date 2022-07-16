@@ -53,12 +53,12 @@
     const disallowedType = PileUtilities.isItemInvalid(store.rightTraderActor, item);
     if (disallowedType) {
       if (!game.user.isGM) {
-        return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true);
+        return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemTrade", { type: disallowedType }), true);
       }
       if (!hotkeyState.shiftDown) {
         const force = await Dialog.confirm({
-          title: game.i18n.localize("ITEM-PILES.Dialogs.DropTypeWarning.Title"),
-          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.DropTypeWarning.Content", { type: disallowedType })}</p>`,
+          title: game.i18n.localize("ITEM-PILES.Dialogs.TypeWarning.Title"),
+          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.TypeWarning.TradeContent", { type: disallowedType })}</p>`,
           defaultYes: false
         });
         if (!force) {

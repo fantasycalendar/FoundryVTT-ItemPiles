@@ -23,26 +23,38 @@
   const quantityToBuy = item.quantityToBuy;
   const itemMaxQuantityStore = item.quantity;
   const prices = item.prices;
+  const pileDataStore = store.pileData;
 
-  const pileData = PileUtilities.getActorFlagData(merchant);
+  let maxItemPurchaseQuantity;
+  let currentQuantityToBuy;
 
   const selectedPriceGroup = item.selectedPriceGroup;
-  let currentQuantityToBuy;
   $: {
     $selectedPriceGroup;
     currentQuantityToBuy = 1;
     $quantityToBuy = 1;
   }
 
-  $: selectedPrice = $prices[$selectedPriceGroup];
-  $: maxMerchantItemQuantity = pileData.infiniteQuantity ? Infinity : $itemMaxQuantityStore;
-  $: maxItemQuantity = selectedPrice.maxQuantity;
+  $: paymentData = PileUtilities.getPricesForItems([{
+    item: item.item,
+    quantity: $quantityToBuy,
+    paymentIndex: $selectedPriceGroup
+  }], {
+    seller: merchant,
+    buyer: buyer,
+    sellerFlagData: $pileDataStore
+  });
+
+  $: maxMerchantItemQuantity = $pileDataStore.infiniteQuantity ? Infinity : $itemMaxQuantityStore;
+  $: maxItemQuantity = $prices[$selectedPriceGroup].maxQuantity;
   $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxMerchantItemQuantity);
 
   function submit() {
-    game.itempiles.tradeItem(item.item, merchant, buyer, {
+    game.itempiles.tradeItems(merchant, buyer, [{
+      item: item.item,
       paymentIndex: get(selectedPriceGroup),
       quantity: get(quantityToBuy),
+    }], {
       interactionId: store.interactionId
     });
     application.options.resolve();
@@ -65,17 +77,15 @@
       </div>
 
       <div
-          style="display:flex; justify-content:flex-end; align-items: center; grid-row: 1 / span 2; text-align: right;">
-        {#if !maxItemQuantity}
-          <label>You cannot afford this</label>
-        {:else}
+          style="display:flex; justify-content:flex-end; align-items: center; text-align: right;">
+        {#if maxItemQuantity}
           <div style="display: flex; flex-direction: column; align-items: flex-end; margin-right: 0.5rem;">
             <small>Quantity</small>
             <small style="font-style:italic;">
               (Max {maxItemPurchaseQuantity})
             </small>
           </div>
-          <input style="max-width: 40px;" type="number" bind:value={currentQuantityToBuy} on:change={(evt) => {
+          <input style="max-width: 40px; max-height: 24px;" type="number" bind:value={currentQuantityToBuy} on:change={(evt) => {
             $quantityToBuy = Math.max(1, Math.min(currentQuantityToBuy, maxItemPurchaseQuantity));
             currentQuantityToBuy = $quantityToBuy;
           }}/>
@@ -83,6 +93,15 @@
       </div>
       <div style="margin-left: 0.25rem; margin-top: 0.25rem;">
         <PriceSelector {item} standalone/>
+      </div>
+      <div style="margin-right: 0.25rem; text-align: right;">
+        {#if maxItemQuantity}
+          {#if $quantityToBuy > 1}
+            <small>{paymentData.basePriceString}</small>
+          {/if}
+        {:else}
+          <small>You cannot afford this price</small>
+        {/if}
       </div>
     </div>
 
@@ -98,7 +117,7 @@
       </strong>
 
       <div>
-        {#each selectedPrice.finalPrices as price}
+        {#each paymentData.sellerReceive as price}
           {#if price.quantity}
             <div style="display:flex; align-items: center;">
               <div class="item-piles-img-container" style="margin-right: 0.25rem;">
@@ -117,11 +136,11 @@
             <img class="item-piles-img" src={itemImg}/>
           </div>
         </div>
-        {#if selectedPrice.changeBack.length}
+        {#if paymentData.buyerChange.length}
           <span class="item-piles-small-text item-piles-text-right" style="margin-right: 0.25rem; margin-top: 0.5rem;">
             Change:
           </span>
-          {#each selectedPrice.changeBack as change}
+          {#each paymentData.buyerChange as change}
             {#if change.quantity}
               <div style="display:flex; align-items: center;">
                 <span>{change.quantity} {change.name}</span>

@@ -216,7 +216,7 @@ class PileMerchantItem extends PileItem {
     const priceData = PileUtilities.getItemPrices(this.item, {
       seller: this.store.source,
       buyer: this.store.recipient,
-      pileFlagData,
+      sellerFlagData: pileFlagData,
       itemFlagData,
       quantity: quantityToBuy
     });

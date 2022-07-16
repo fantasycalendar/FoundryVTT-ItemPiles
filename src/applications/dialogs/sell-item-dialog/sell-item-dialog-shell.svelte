@@ -40,7 +40,7 @@
   $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxMerchantItemQuantity);
 
   function submit() {
-    game.itempiles.tradeItem(item.item, seller, merchant, {
+    game.itempiles.tradeItems(item.item, seller, merchant, {
       paymentIndex: get(selectedPriceGroup),
       quantity: get(quantityToBuy),
       interactionId: store.interactionId

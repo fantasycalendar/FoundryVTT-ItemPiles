@@ -470,6 +470,22 @@
               </select>
             </div>
 
+            <div class="form-group">
+              <label>
+                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
+                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
+              </label>
+              <input type="checkbox" bind:checked={pileData.purchaseOnly}/>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
+                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
+              </label>
+              <input type="checkbox" bind:checked={pileData.hideNewItems}/>
+            </div>
+
             <div class="form-group slider-group">
               <label style="flex:3;">
                 <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifierTitle")}</span>
