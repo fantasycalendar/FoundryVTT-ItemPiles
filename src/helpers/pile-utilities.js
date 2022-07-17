@@ -564,6 +564,9 @@ export function getItemPrices(item, {
     if (priceGroup.baseCost !== undefined) {
       if (buyerInfiniteCurrencies) continue;
       priceGroup.maxQuantity = Math.floor(totalCurrencies / priceGroup.baseCost);
+      priceGroup.prices.forEach(price => {
+        price.maxQuantity = priceGroup.maxQuantity;
+      });
     } else {
       if (buyerInfiniteQuantity) continue;
       for (const price of priceGroup.prices) {
@@ -571,11 +574,13 @@ export function getItemPrices(item, {
           const attributeQuantity = Number(getProperty(buyer.data, price.data.path));
           price.buyerQuantity = attributeQuantity;
           priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(attributeQuantity / price.baseCost))
+          price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
         } else {
           const foundItem = Utilities.findSimilarItem(buyer.items, price.data.item);
           const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
           price.buyerQuantity = itemQuantity;
           priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(itemQuantity / price.baseCost));
+          price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
         }
       }
     }

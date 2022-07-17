@@ -91,7 +91,7 @@
           }}/>
         {/if}
       </div>
-      <div style="margin-left: 0.25rem; margin-top: 0.25rem;">
+      <div style="margin-top: 0.25rem;">
         <PriceSelector {item} standalone/>
       </div>
       <div style="margin-right: 0.25rem; text-align: right;">

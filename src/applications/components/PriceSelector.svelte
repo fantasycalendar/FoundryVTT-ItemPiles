@@ -1,9 +1,14 @@
 <script>
 
-  import { get, writable } from "svelte/store";
+  import { writable } from "svelte/store";
+  import { TJSMenu, TJSToggleLabel } from '@typhonjs-fvtt/svelte-standard/component';
 
   export let item;
   export let standalone = false;
+
+  const label = {
+    text: ''
+  };
 
   const prices = item.prices;
   const itemFlagData = item.itemFlagData;
@@ -12,62 +17,68 @@
 
   $: cantAfford = !$prices[$selectedPriceGroup].maxQuantity && item.store.recipient && !standalone;
   $: cantAffordMultiplePrices = cantAfford && !$prices.filter(group => group.maxQuantity).length;
+  $: label.text = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "") + $prices[$selectedPriceGroup].basePriceString;
 
 </script>
 
-<div class="item-piles-flexrow price-container" on:click|stopPropagation>
-  {#if itemFlagData.free || $prices.length === 0}
-    <small>Free</small>
-  {:else}
-    <small
-        class:item-piles-clickable-link={$prices.length > 1}
-        class:multiple-prices={$prices.length > 1 && !standalone}
-        class:cant-afford={cantAfford}
-        class:cant-afford-multiple-prices={cantAffordMultiplePrices}
-        on:click={() => {
-          if($prices.length <= 1) return;
-          $priceSelector = $priceSelector === item.id ? "" : item.id;
-        }}
-    >
-      {#if standalone && $prices.length > 1}
-        <i class="fas fa-edit"></i>
-      {/if}
-      {$prices[$selectedPriceGroup].basePriceString}
-    </small>
-    {#if $priceSelector === item.id}
-      <div class="price-list">
-        {#each $prices as priceGroup, index (index)}
-          <div class="price-group" class:selected={$selectedPriceGroup === index}>
-            {#each priceGroup.prices.filter(price => price.cost) as price (price.id)}
-              <div class="price-group-container"
-                   on:click={() => {
-                     $selectedPriceGroup = index;
-                     $priceSelector = "";
-                   }}
-                   class:cant-afford={!priceGroup.maxQuantity && item.store.recipient}>
-                <div class="item-piles-img-container"
-                     class:not-for-sale={!priceGroup.maxQuantity && item.store.recipient}>
-                  <img class="item-piles-img" src="{price.img}"/>
-                </div>
-                <div class="item-piles-name item-piles-text">
-                  {price.baseCost} {price.name}
-                </div>
-              </div>
-            {/each}
-          </div>
-        {/each}
+<div class="price-container">
+  {#if $prices.length > 1}
+    <TJSToggleLabel {label}>
+      <div slot=left
+           class:multiple-prices={$prices.length > 1 && !standalone}
+           class:cant-afford={cantAfford}
+           class:cant-afford-multiple-prices={cantAffordMultiplePrices}>
       </div>
-    {/if}
+      <TJSMenu offset={{y: 4}}>
+        <div class="price-list">
+          {#each $prices as priceGroup, index (index)}
+            <div class="price-group" class:selected={$selectedPriceGroup === index}>
+              {#each priceGroup.prices.filter(price => price.cost) as price (price.id)}
+                <div class="price-group-container"
+                     on:click={() => {
+                         $selectedPriceGroup = index;
+                         $priceSelector = "";
+                       }}
+                     class:cant-afford={!priceGroup.maxQuantity && item.store.recipient}>
+                  <div class="item-piles-img-container"
+                       class:not-for-sale={!price.maxQuantity && item.store.recipient}>
+                    <img class="item-piles-img" src="{price.img}"/>
+                  </div>
+                  <div class="item-piles-name item-piles-text">
+                    {price.baseCost} {price.name}
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {/each}
+        </div>
+      </TJSMenu>
+    </TJSToggleLabel>
+  {:else}
+    <small class:cant-afford={cantAfford}>{ label.text }</small>
   {/if}
 </div>
 
 <style lang="scss">
 
-
   .price-container {
     flex: 0 1 100px;
     align-items: center;
     position: relative;
+    --tjs-label-justify-content: flex-start;
+    --tjs-label-font-size: smaller;
+    --tjs-label-overflow: visible;
+    --tjs-menu-color: black;
+    --tjs-menu-border: 1px solid #444;
+    --tjs-menu-box-shadow: 0 6px 9px -1px rgba(0, 0, 0, 0.5);
+
+    small {
+      padding-left: 2px;
+    }
+
+    span {
+      justify-content: flex-start;
+    }
 
     .cant-afford {
       opacity: 0.5;
@@ -77,14 +88,14 @@
     .multiple-prices::after {
       content: '';
       position: absolute;
-      top: -0.5rem;
-      left: -0.65rem;
+      top: -0.4rem;
+      left: -0.55rem;
       border-color: transparent;
       border-style: solid;
     }
 
     .multiple-prices::after {
-      border-width: 0.4rem;
+      border-width: 0.3rem;
       border-right-color: #3ead2c;
       transform: rotate(45deg);
     }
@@ -94,16 +105,11 @@
     }
 
     .price-list {
-      top: 25px;
-      left: -5px;
-      position: absolute;
       z-index: 900;
       font-size: 0.75rem;
-      border: 1px solid rgba(0, 0, 0, 0.5);
       border-radius: 5px;
       overflow: hidden;
-      background-color: #e6e6d5;
-      box-shadow: 0 6px 9px -1px rgba(0, 0, 0, 0.5);
+      background-color: #ccccbe;
 
       .price-group {
 
@@ -111,7 +117,7 @@
         user-select: none;
 
         &.selected {
-          background-color: #f2f2e1;
+          background-color: #e6e6d5;
         }
 
         &:hover {
@@ -147,5 +153,4 @@
       }
     }
   }
-
 </style>
