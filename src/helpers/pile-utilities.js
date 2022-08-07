@@ -2,9 +2,9 @@ import * as Utilities from "./utilities.js"
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "./helpers.js";
 
-function getFlagData(inDocument, flag, defaults) {
+function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
-  const flags = getProperty(inDocument.data, flag) ?? {};
+  const flags = existing || (getProperty(inDocument.data, flag) ?? {});
   const data = foundry.utils.duplicate(flags);
   return foundry.utils.mergeObject(defaultFlags, data);
 }
@@ -13,38 +13,38 @@ export function getItemFlagData(item) {
   return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, CONSTANTS.ITEM_DEFAULTS);
 }
 
-export function getActorFlagData(target) {
-  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, CONSTANTS.PILE_DEFAULTS);
+export function getActorFlagData(target, data = false) {
+  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, CONSTANTS.PILE_DEFAULTS, data);
 }
 
 export function isValidItemPile(target, data = false) {
   const targetActor = Utilities.getActor(target);
-  const pileData = data || getActorFlagData(targetActor);
+  const pileData = getActorFlagData(targetActor, data);
   return targetActor && pileData?.enabled;
 }
 
-export function isItemPileContainer(target) {
+export function isItemPileContainer(target, data = false) {
   const targetActor = Utilities.getActor(target);
-  const pileData = getActorFlagData(targetActor);
+  const pileData = getActorFlagData(targetActor, data);
   return pileData?.enabled && pileData?.isContainer;
 }
 
-export function isItemPileMerchant(target) {
+export function isItemPileMerchant(target, data = false) {
   const targetActor = Utilities.getActor(target);
-  const pileData = getActorFlagData(targetActor);
+  const pileData = getActorFlagData(targetActor, data);
   return pileData?.enabled && pileData?.isMerchant;
 }
 
-export function isItemPileClosed(target) {
+export function isItemPileClosed(target, data = false) {
   const targetActor = Utilities.getActor(target);
-  const pileData = getActorFlagData(targetActor);
+  const pileData = getActorFlagData(targetActor, data);
   if (!pileData?.enabled || !pileData?.isContainer) return false;
   return pileData.closed;
 }
 
-export function isItemPileLocked(target) {
+export function isItemPileLocked(target, data = false) {
   const targetActor = Utilities.getActor(target);
-  const pileData = getActorFlagData(targetActor);
+  const pileData = getActorFlagData(targetActor, data);
   if (!pileData?.enabled || !pileData?.isContainer) return false;
   return pileData.locked;
 }
@@ -75,9 +75,7 @@ export function shouldItemPileBeDeleted(targetUuid) {
   const pileData = getActorFlagData(target);
   
   return {
-    "default": Helpers.getSetting("deleteEmptyPiles"),
-    "true": true,
-    "false": false
+    "default": Helpers.getSetting("deleteEmptyPiles"), "true": true, "false": false
   }[pileData?.deleteWhenEmpty ?? "default"];
   
 }
@@ -105,11 +103,7 @@ export function getActorCurrencies(target, { currencyList = false, getAll = fals
     }
     const item = Utilities.findSimilarItem(actorItems, currency.data.item);
     return {
-      ...currency,
-      quantity: item ? Utilities.getItemQuantity(item) : 0,
-      id: item?.id || null,
-      item,
-      index
+      ...currency, quantity: item ? Utilities.getItemQuantity(item) : 0, id: item?.id || null, item, index
     }
   });
   if (!getAll) {
@@ -123,9 +117,9 @@ export function getActorPrimaryCurrency(target) {
   return getActorCurrencies(actor).find(currency => currency.primary);
 }
 
-export function getActorCurrencyList(target) {
+export function getActorCurrencyList(target, pileData = false) {
   const targetActor = Utilities.getActor(target);
-  const pileData = getActorFlagData(targetActor);
+  pileData = getActorFlagData(targetActor, pileData);
   return (pileData.overrideCurrencies || game.itempiles.CURRENCIES).map(currency => {
     currency.name = game.i18n.localize(currency.name);
     return currency;
@@ -133,13 +127,11 @@ export function getActorCurrencyList(target) {
 }
 
 
-export function getActorItemFilters(target) {
+export function getActorItemFilters(target, pileData = false) {
   if (!target) return cleanItemFilters(game.itempiles.ITEM_FILTERS);
   const targetActor = Utilities.getActor(target);
-  const pileData = getActorFlagData(targetActor);
-  return isValidItemPile(targetActor) && pileData?.overrideItemFilters
-    ? cleanItemFilters(pileData.overrideItemFilters)
-    : cleanItemFilters(game.itempiles.ITEM_FILTERS);
+  pileData = getActorFlagData(targetActor, pileData);
+  return isValidItemPile(targetActor, pileData) && pileData?.overrideItemFilters ? cleanItemFilters(pileData.overrideItemFilters) : cleanItemFilters(game.itempiles.ITEM_FILTERS);
 }
 
 export function cleanItemFilters(itemFilters) {
@@ -177,7 +169,7 @@ export function getItemPileTokenImage(token, { data = false, items = false, curr
   
   const tokenDocument = Utilities.getDocument(token);
   
-  const itemPileData = data || getActorFlagData(tokenDocument);
+  const itemPileData = getActorFlagData(tokenDocument, data);
   
   let originalImg;
   if (tokenDocument instanceof TokenDocument) {
@@ -196,9 +188,7 @@ export function getItemPileTokenImage(token, { data = false, items = false, curr
   let img;
   
   if (itemPileData.displayOne && numItems === 1) {
-    img = items.length > 0
-      ? items[0].img
-      : currencies[0].img;
+    img = items.length > 0 ? items[0].img : currencies[0].img;
   } else if (itemPileData.displayOne && numItems > 1) {
     img = (tokenDocument.actor ?? tokenDocument).data.token.img;
   }
@@ -227,7 +217,7 @@ export function getItemPileTokenScale(target, { data = false, items = false, cur
   
   const pileDocument = Utilities.getDocument(target);
   
-  let itemPileData = data || getActorFlagData(pileDocument);
+  let itemPileData = getActorFlagData(pileDocument, data);
   
   let baseScale;
   if (pileDocument instanceof TokenDocument) {
@@ -257,11 +247,9 @@ export function getItemPileName(target, { data = false, items = false, currencie
   
   const pileDocument = Utilities.getDocument(target);
   
-  const itemPileData = data || getActorFlagData(pileDocument);
+  const itemPileData = getActorFlagData(pileDocument, data);
   
-  let name = pileDocument instanceof TokenDocument
-    ? pileDocument.data.name
-    : pileDocument.data.token.name;
+  let name = pileDocument instanceof TokenDocument ? pileDocument.data.name : pileDocument.data.token.name;
   
   if (!isValidItemPile(pileDocument, itemPileData)) {
     return name;
@@ -276,9 +264,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
     return name;
   }
   
-  const item = items.length > 0
-    ? items[0]
-    : currencies[0];
+  const item = items.length > 0 ? items[0] : currencies[0];
   
   return item.name;
   
@@ -329,27 +315,30 @@ export async function updateItemPileData(target, flagData, tokenData) {
       "scale": getItemPileTokenScale(tokenDocument, pileData),
       "name": getItemPileName(tokenDocument, pileData),
     });
-    return {
-      "_id": tokenDocument.id,
-      ...newTokenData,
-      [CONSTANTS.FLAGS.PILE]: flagData
+    const data = {
+      "_id": tokenDocument.id, ...newTokenData
+    };
+    if (!foundry.utils.isObjectEmpty(flagData)) {
+      data[CONSTANTS.FLAGS.PILE] = flagData;
     }
+    return data
   });
   
   await canvas.scene.updateEmbeddedDocuments("Token", updates);
   
-  return documentActor.update({
-    [CONSTANTS.FLAGS.PILE]: flagData,
-    [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
-  });
+  if (!foundry.utils.isObjectEmpty(flagData)) {
+    await documentActor.update({
+      [CONSTANTS.FLAGS.PILE]: flagData, [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
+    });
+  }
   
+  return true;
 }
 
 export async function updateItemData(item, update) {
   const flagData = foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {});
   return item.update({
-    ...update?.data ?? {},
-    [CONSTANTS.FLAGS.ITEM]: flagData
+    ...update?.data ?? {}, [CONSTANTS.FLAGS.ITEM]: flagData
   });
 }
 
@@ -358,11 +347,8 @@ export async function updateItemData(item, update) {
 export function getMerchantModifiersForActor(merchant, { item = false, actor = false, pileFlagData = false } = {}) {
   
   let {
-    buyPriceModifier,
-    sellPriceModifier,
-    itemTypePriceModifiers,
-    actorPriceModifiers
-  } = pileFlagData || getActorFlagData(merchant);
+    buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, actorPriceModifiers
+  } = getActorFlagData(merchant, pileFlagData);
   
   if (item) {
     const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => priceData.type === item.type);
@@ -381,8 +367,7 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
   }
   
   return {
-    buyPriceModifier,
-    sellPriceModifier
+    buyPriceModifier, sellPriceModifier
   }
 }
 
@@ -396,8 +381,10 @@ function getPriceArray(totalCost, currencies) {
   
   const prices = [];
   
+  let skipPrimary = false;
   const primaryCurrency = currencies.find(currency => currency.primary)
   if (cost) {
+    skipPrimary = true;
     prices.push({
       ...primaryCurrency,
       cost: cost,
@@ -409,7 +396,7 @@ function getPriceArray(totalCost, currencies) {
   
   for (const currency of currencies) {
     
-    if (currency === primaryCurrency) continue;
+    if (currency === primaryCurrency && skipPrimary) continue;
     
     const numCurrency = Math.floor(Helpers.roundToDecimals(fraction / currency.exchangeRate, decimals));
     
@@ -430,22 +417,17 @@ function getPriceArray(totalCost, currencies) {
 }
 
 export function getItemPrices(item, {
-  seller = false,
-  buyer = false,
-  sellerFlagData = false,
-  buyerFlagData = false,
-  itemFlagData = false,
-  quantity = 1
+  seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false, itemFlagData = false, quantity = 1
 } = {}) {
   
   let priceData = [];
   
-  buyerFlagData = buyerFlagData || getActorFlagData(buyer);
+  buyerFlagData = getActorFlagData(buyer, buyerFlagData);
   if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
     buyerFlagData = false;
   }
   
-  sellerFlagData = sellerFlagData || getActorFlagData(seller);
+  sellerFlagData = getActorFlagData(seller, sellerFlagData);
   if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
     sellerFlagData = false;
   }
@@ -463,17 +445,13 @@ export function getItemPrices(item, {
   if (sellerFlagData) {
     
     modifier = getMerchantModifiersForActor(seller, {
-      item,
-      actor: buyer,
-      pileFlagData: sellerFlagData
+      item, actor: buyer, pileFlagData: sellerFlagData
     }).buyPriceModifier;
     
   } else if (buyerFlagData) {
     
     modifier = getMerchantModifiersForActor(buyer, {
-      item,
-      actor: seller,
-      pileFlagData: buyerFlagData
+      item, actor: seller, pileFlagData: buyerFlagData
     }).sellPriceModifier;
     
   }
@@ -573,14 +551,14 @@ export function getItemPrices(item, {
         if (price.type === "attribute") {
           const attributeQuantity = Number(getProperty(buyer.data, price.data.path));
           price.buyerQuantity = attributeQuantity;
-          priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(attributeQuantity / price.baseCost))
           price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
+          priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
         } else {
           const foundItem = Utilities.findSimilarItem(buyer.items, price.data.item);
           const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
           price.buyerQuantity = itemQuantity;
-          priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, Math.floor(itemQuantity / price.baseCost));
           price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
+          priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity);
         }
       }
     }
@@ -590,18 +568,15 @@ export function getItemPrices(item, {
 }
 
 export function getPricesForItems(itemsToBuy, {
-  seller = false,
-  buyer = false,
-  sellerFlagData = false,
-  buyerFlagData = false
+  seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false
 } = {}) {
   
-  sellerFlagData = sellerFlagData || getActorFlagData(seller);
+  sellerFlagData = getActorFlagData(seller, sellerFlagData);
   if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
     sellerFlagData = false;
   }
   
-  buyerFlagData = buyerFlagData || getActorFlagData(buyer);
+  buyerFlagData = getActorFlagData(buyer, buyerFlagData);
   if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
     buyerFlagData = false;
   }
@@ -614,18 +589,14 @@ export function getPricesForItems(itemsToBuy, {
   
   const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
   
+  const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
+  
   const paymentData = itemsToBuy.map(data => {
       const prices = getItemPrices(data.item, {
-        seller,
-        buyer,
-        sellerFlagData,
-        buyerFlagData,
-        itemFlagData: data.itemFlagData,
-        quantity: data.quantity || 1
+        seller, buyer, sellerFlagData, buyerFlagData, itemFlagData: data.itemFlagData, quantity: data.quantity || 1
       })[data.paymentIndex || 0];
       return {
-        ...prices,
-        item: data.item
+        ...prices, item: data.item
       };
     })
     .reduce((priceData, priceGroup) => {
@@ -674,15 +645,9 @@ export function getPricesForItems(itemsToBuy, {
       return priceData;
       
     }, {
-      totalCurrencyCost: 0,
-      canBuy: true,
-      primary: false,
-      finalPrices: [],
-      otherPrices: [],
+      totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [],
       
-      buyerReceive: [],
-      buyerChange: [],
-      sellerReceive: []
+      buyerReceive: [], buyerChange: [], sellerReceive: []
     });
   
   if (paymentData.totalCurrencyCost) {
@@ -699,10 +664,7 @@ export function getPricesForItems(itemsToBuy, {
       const price = prices[i];
       
       const buyerPrice = {
-        ...price,
-        buyerQuantity: price.quantity,
-        quantity: 0,
-        isCurrency: true
+        ...price, buyerQuantity: buyerInfiniteCurrencies ? Infinity : price.quantity, quantity: 0, isCurrency: true
       }
       
       if (price.type === "item") {
@@ -734,11 +696,9 @@ export function getPricesForItems(itemsToBuy, {
       
     }
     
-    paymentData.finalPrices.reverse();
-    
     // If there's STILL some remaining price (eg, we haven't been able to scrounge up enough currency to pay for it)
     // we can start using the larger currencies, such as platinum in D&D 5e
-    if (priceLeft > 0) {
+    while (priceLeft > 0) {
       
       // We then need to loop through each price, and check if we have any more left over
       for (const buyerPrice of paymentData.finalPrices) {
@@ -755,7 +715,15 @@ export function getPricesForItems(itemsToBuy, {
         if (priceLeft <= 0) break;
         
       }
+      
+      if (priceLeft > 0) {
+        paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
+      } else {
+        break;
+      }
     }
+    
+    paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
     
     // Since the change will be negative, we'll need to flip it, since this is what we'll get back
     let change = Math.abs(priceLeft);
@@ -783,9 +751,7 @@ export function getPricesForItems(itemsToBuy, {
         } else {
           // Or if it does cancel out our payment, we add that to the change we'll get back and remove the payment entirely
           paymentData.buyerChange.push({
-            ...currency,
-            isCurrency: true,
-            quantity: numCurrency - payment.quantity
+            ...currency, isCurrency: true, quantity: numCurrency - payment.quantity
           });
           payment.quantity = 0;
         }

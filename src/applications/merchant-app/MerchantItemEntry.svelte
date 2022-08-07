@@ -5,6 +5,10 @@
 
   export let store;
   export let item;
+  export let selling = false;
+
+  const itemName = item.name;
+  const itemImage = item.img;
 
   const pileData = store.pileData;
   const displayQuantityStore = item.displayQuantity;
@@ -15,11 +19,11 @@
   $: displayQuantity = $displayQuantityStore;
   $: quantity = $quantityStore;
 
-  const displayControlButtons = store.source.isOwner;
+  const displayControlButtons = store.actor.isOwner && !selling;
   const displayBuyButton = !!store.recipient;
 
   function previewItem(item) {
-    item = store.source.items.get(item.id);
+    item = store.actor.items.get(item.id);
     if (game.user.isGM || item.data.permission[game.user.id] === 3) {
       return item.sheet.render(true);
     }
@@ -27,7 +31,6 @@
     const sheet = new cls(item, { editable: false })
     return sheet._render(true);
   }
-
 
 </script>
 
@@ -37,15 +40,15 @@
      style="flex: 1 0 auto;">
 
   <div class="item-piles-img-container" class:not-for-sale={itemFlagData.notForSale || !quantity}>
-    <img class="item-piles-img" src="{item.img}"/>
+    <img class="item-piles-img" src="{$itemImage}"/>
   </div>
 
   <div class="item-piles-name item-piles-text">
     <div class="item-piles-name-container">
       {#if $pileData.canInspectItems || game.user.isGM}
-        <a class="item-piles-clickable" on:click={previewItem(item)}>{item.name}</a>
+        <a class="item-piles-clickable" on:click={previewItem(item)}>{$itemName}</a>
       {:else}
-        {item.name}
+        {$itemName}
       {/if}
       {#if displayQuantity && quantity}
         <span class="item-piles-small-text">
@@ -81,9 +84,11 @@
       <span class:item-piles-clickable-link={!itemFlagData.notForSale || game.user.isGM}
             class:item-piles-clickable-link-disabled={itemFlagData.notForSale && !game.user.isGM}
             class:buy-button={displayControlButtons}
-            on:click={() => { store.buyItem(item) }}>
-        <i class="fas fa-shopping-cart"></i>
-        {#if !displayControlButtons} Buy{/if}
+            on:click={() => {
+              store.tradeItem(item, selling)
+            }}>
+        <i class="fas" class:fa-shopping-cart={!selling} class:fa-hand-holding-usd={selling}></i>
+        {#if !displayControlButtons} {!selling ? "Buy" : "Sell"}{/if}
       </span>
     {/if}
   </div>

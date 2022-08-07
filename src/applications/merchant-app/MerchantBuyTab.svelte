@@ -11,6 +11,8 @@
   const itemsPerCategoryStore = store.itemsPerCategory;
   const categoryStore = store.categories;
   const priceModifiersPerType = store.priceModifiersPerType;
+  const itemCategoriesStore = store.itemCategories;
+  const typeFilterStore = store.typeFilter;
 
   $: editPrices = false && !!store.recipient;
 
@@ -18,7 +20,15 @@
 
 <div>
 
-  <input type="text" bind:value={$searchStore} placeholder="Type to search...">
+  <div class="item-piles-flexrow">
+    <input type="text" bind:value={$searchStore} placeholder="Type to search...">
+    <select style="flex:0 1 auto; margin-left: 0.4rem; height: 26px;" bind:value={$typeFilterStore}>
+      <option value="all">{localize("All")}</option>
+      {#each $itemCategoriesStore as category (category.type)}
+        <option value={category.type}>{category.label}</option>
+      {/each}
+    </select>
+  </div>
 
   {#each $categoryStore as category, index (category.type)}
     <div transition:fade|local={{duration: 150}}>

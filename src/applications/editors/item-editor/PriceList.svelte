@@ -1,138 +1,137 @@
 <script>
-  import { get } from 'svelte/store';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import FilePicker from "../../components/FilePicker.svelte";
-  import { flip } from "svelte/animate";
-  import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
-  import DropZone from "../../components/DropZone.svelte";
-  import * as Helpers from "../../../helpers/helpers.js";
-  import * as Utilities from "../../../helpers/utilities.js";
-  import CONSTANTS from "../../../constants/constants.js";
+    import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+    import FilePicker from "../../components/FilePicker.svelte";
+    import { flip } from "svelte/animate";
+    import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
+    import DropZone from "../../components/DropZone.svelte";
+    import * as Helpers from "../../../helpers/helpers.js";
+    import * as Utilities from "../../../helpers/utilities.js";
+    import CONSTANTS from "../../../constants/constants.js";
 
-  export let prices;
-  export let remove;
+    export let prices;
+    export let remove;
 
-  let isHovering = false;
-  let flipDurationMs = 200;
-  let dragDisabled = true;
+    let isHovering = false;
+    let flipDurationMs = 200;
+    let dragDisabled = true;
 
-  function removeEntry(index) {
-    prices.splice(index, 1);
-    prices = prices;
-  }
-
-  function addAttribute() {
-    prices = [...prices, {
-      id: randomID(),
-      type: "attribute",
-      name: "New Attribute",
-      img: "",
-      abbreviation: "{#}N",
-      data: {
-        path: ""
-      },
-      quantity: 1,
-      fixed: true
-    }];
-  }
-
-  async function dropData(data) {
-
-    if (!data.type) {
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
+    function removeEntry(index) {
+        prices.splice(index, 1);
+        prices = prices;
     }
 
-    if (data.type !== "Item") {
-      throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
+    function addAttribute() {
+        prices = [...prices, {
+            id: randomID(),
+            type: "attribute",
+            name: "New Attribute",
+            img: "",
+            abbreviation: "{#}N",
+            data: {
+                path: ""
+            },
+            quantity: 1,
+            fixed: true
+        }];
     }
 
-    let uuid = false;
-    if (data.pack) {
-      uuid = "Compendium" + data.pack + "." + data.id;
+    async function dropData(data) {
+
+        if (!data.type) {
+            throw Helpers.custom_error("Something went wrong when dropping this item!")
+        }
+
+        if (data.type !== "Item") {
+            throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
+        }
+
+        let uuid = false;
+        if (data.pack) {
+            uuid = "Compendium" + data.pack + "." + data.id;
+        }
+
+        let item = await Item.implementation.fromDropData(data);
+        let itemData = item.toObject();
+
+        if (!itemData) {
+            console.error(data);
+            throw Helpers.custom_error("Something went wrong when dropping this item!")
+        }
+
+        const itemCurrencies = prices.map(entry => entry.data?.item ?? {});
+        const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
+
+        if (foundItem) {
+            const index = itemCurrencies.indexOf(foundItem);
+            prices[index].data = {
+                uuid,
+                item: itemData
+            }
+            Helpers.custom_notify(`Updated item data for ${localize(prices[index].name)} (item name ${itemData.name})`)
+        } else {
+            prices = [...prices, {
+                id: randomID(),
+                type: "item",
+                name: itemData.name,
+                img: itemData.img,
+                abbreviation: "{#} " + itemData.name,
+                data: {
+                    uuid,
+                    item: itemData
+                },
+                quantity: 1,
+                fixed: true
+            }];
+        }
     }
 
-    let item = await Item.implementation.fromDropData(data);
-    let itemData = item.toObject();
-
-    if (!itemData) {
-      console.error(data);
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
+    async function editItem(index) {
+        const data = prices[index].data;
+        let item;
+        if (data.uuid) {
+            item = await fromUuid(data.uuid);
+        } else {
+            let itemData = data.item;
+            if (itemData._id) delete itemData._id;
+            if (itemData.permission) delete itemData._id;
+            const items = Array.from(game.items);
+            item = Utilities.findSimilarItem(items, itemData);
+            if (!item) {
+                setProperty(itemData, CONSTANTS.FLAGS.TEMPORARY_ITEM, true);
+                item = await Item.implementation.create(itemData);
+                Helpers.custom_notify(`An item has been created for ${item.name} - drag and drop it into the list to update the stored item data`)
+            }
+        }
+        item.sheet.render(true);
     }
 
-    const itemCurrencies = prices.map(entry => entry.data?.item ?? {});
-    const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
-
-    if (foundItem) {
-      const index = itemCurrencies.indexOf(foundItem);
-      prices[index].data = {
-        uuid,
-        item: itemData
-      }
-      Helpers.custom_notify(`Updated item data for ${localize(prices[index].name)} (item name ${itemData.name})`)
-    } else {
-      prices = [...prices, {
-        id: randomID(),
-        type: "item",
-        name: itemData.name,
-        img: itemData.img,
-        abbreviation: "{#} " + itemData.name,
-        data: {
-          uuid,
-          item: itemData
-        },
-        quantity: 1,
-        fixed: true
-      }];
+    function handleConsider(e) {
+        const { items: newItems, info: { source, trigger } } = e.detail;
+        prices = newItems;
+        // Ensure dragging is stopped on drag finish via keyboard
+        if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
+            dragDisabled = true;
+        }
     }
-  }
 
-  async function editItem(index) {
-    const data = prices[index].data;
-    let item;
-    if (data.uuid) {
-      item = await fromUuid(data.uuid);
-    } else {
-      let itemData = data.item;
-      if (itemData._id) delete itemData._id;
-      if (itemData.permission) delete itemData._id;
-      const items = Array.from(game.items);
-      item = Utilities.findSimilarItem(items, itemData);
-      if (!item) {
-        setProperty(itemData, CONSTANTS.FLAGS.TEMPORARY_ITEM, true);
-        item = await Item.implementation.create(itemData);
-        Helpers.custom_notify(`An item has been created for ${item.name} - drag and drop it into the list to update the stored item data`)
-      }
+    function handleFinalize(e) {
+        const { items: newItems, info: { source } } = e.detail;
+        prices = newItems;
+        // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
+        if (source === SOURCES.POINTER) {
+            dragDisabled = true;
+        }
     }
-    item.sheet.render(true);
-  }
 
-  function handleConsider(e) {
-    const { items: newItems, info: { source, trigger } } = e.detail;
-    prices = newItems;
-    // Ensure dragging is stopped on drag finish via keyboard
-    if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
-      dragDisabled = true;
+    function startDrag(e) {
+        // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
+        e.preventDefault();
+        dragDisabled = false;
     }
-  }
 
-  function handleFinalize(e) {
-    const { items: newItems, info: { source } } = e.detail;
-    prices = newItems;
-    // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
-    if (source === SOURCES.POINTER) {
-      dragDisabled = true;
+    function handleKeyDown(e) {
+        if ((e.key === "Enter" || e.key === " ") && dragDisabled) dragDisabled = false;
     }
-  }
-
-  function startDrag(e) {
-    // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
-    e.preventDefault();
-    dragDisabled = false;
-  }
-
-  function handleKeyDown(e) {
-    if ((e.key === "Enter" || e.key === " ") && dragDisabled) dragDisabled = false;
-  }
 
 </script>
 

@@ -1,26 +1,27 @@
-import BuyItemDialogShell from "./buy-item-dialog-shell.svelte";
+import TradeMerchantItemDialogShell from "./trade-merchant-item-dialog-shell.svelte";
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { get } from "svelte/store";
 
-export default class BuyItemDialog extends SvelteApplication {
+export default class TradeMerchantItemDialog extends SvelteApplication {
   
   /**
    *
    * @param item
-   * @param merchant
+   * @param seller
    * @param buyer
    * @param settings
    * @param options
    */
-  constructor(item, merchant, buyer, settings = {}, options = {}) {
+  constructor(item, seller, buyer, settings = {}, options = {}) {
     super({
-      id: `item-pile-buy-item-dialog-${item.id}-${merchant.id}-${buyer.id}`,
-      title: game.i18n.format("ITEM-PILES.Applications.BuyItem.Title", { item_name: item.name }),
+      id: `item-pile-buy-item-dialog-${item.id}-${seller.id}-${buyer.id}`,
+      title: game.i18n.format("ITEM-PILES.Applications.TradeMerchantItem.Title", { item_name: get(item.name) }),
       svelte: {
-        class: BuyItemDialogShell,
+        class: TradeMerchantItemDialogShell,
         target: document.body,
         props: {
           item,
-          merchant,
+          seller,
           buyer,
           settings
         }
@@ -42,8 +43,8 @@ export default class BuyItemDialog extends SvelteApplication {
     return Object.values(ui.windows).filter(app => app.id === `item-pile-buy-item-dialog-${id}`);
   }
   
-  static async show(item, merchant, buyer, settings = {}, options = {}) {
-    const apps = this.getActiveApps(item.id + "-" + merchant.id + "-" + buyer.id);
+  static async show(item, seller, buyer, settings = {}, options = {}) {
+    const apps = this.getActiveApps(item.id + "-" + seller.id + "-" + buyer.id);
     if (apps.length) {
       for (let app of apps) {
         app.render(false, { focus: true });
@@ -52,7 +53,7 @@ export default class BuyItemDialog extends SvelteApplication {
     }
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(item, merchant, buyer, settings, options).render(true, { focus: true });
+      new this(item, seller, buyer, settings, options).render(true, { focus: true });
     })
   }
   

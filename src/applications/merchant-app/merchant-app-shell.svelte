@@ -10,15 +10,17 @@
   import MerchantLeftPane from "./MerchantLeftPane.svelte";
   import MerchantRightPane from "./MerchantRightPane.svelte";
   import MerchantTopBar from "./MerchantTopBar.svelte";
+  import { get } from "svelte/store";
 
   const { application } = getContext('external');
 
   export let elementRoot;
 
   export let merchant;
-  export let buyer;
+  export let recipient;
 
-  export let store = new MerchantStore(application, merchant, buyer);
+  export let store = new MerchantStore(application, merchant, recipient);
+  export let recipientStore = recipient ? new MerchantStore(application, recipient, merchant, { recipientPileData: store.pileData }) : false;
 
   onDestroy(() => {
     store.onDestroy();
@@ -84,7 +86,7 @@
     <MerchantTopBar {store}/>
     <div class="item-piles-flexrow item-pile-merchant-content">
       <MerchantLeftPane {store}/>
-      <MerchantRightPane {store}/>
+      <MerchantRightPane {store} {recipientStore}/>
     </div>
   </DropZone>
 </ApplicationShell>

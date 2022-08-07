@@ -49,8 +49,8 @@ export default class PrivateAPI {
    */
   static _onCreateItem(doc) {
     if (!doc.parent) return;
-    if (!PileUtilities.isValidItemPile(doc.parent)) return;
     ItemPileStore.notifyChanges("createItem", doc.parent, doc);
+    if (!PileUtilities.isValidItemPile(doc.parent)) return;
     this._evaluateItemPileChange(doc.parent);
   }
   
@@ -68,8 +68,8 @@ export default class PrivateAPI {
    */
   static _onDeleteItem(doc) {
     if (!doc.parent) return;
-    if (!PileUtilities.isValidItemPile(doc.parent)) return;
     ItemPileStore.notifyChanges("deleteItem", doc.parent, doc);
+    if (!PileUtilities.isValidItemPile(doc.parent)) return;
     this._evaluateItemPileChange(doc.parent);
   }
   
@@ -85,9 +85,9 @@ export default class PrivateAPI {
    * @private
    */
   static _onDeleteToken(doc) {
+    ItemPileStore.notifyChanges("delete", doc.actor)
     if (!PileUtilities.isValidItemPile(doc)) return;
     Helpers.hooks.callAll(HOOKS.PILE.DELETE, doc);
-    ItemPileStore.notifyChanges("delete", doc.actor)
   }
   
   /**

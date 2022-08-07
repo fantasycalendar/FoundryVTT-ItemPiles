@@ -99,7 +99,7 @@
         </div>
 
         <div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
-          <Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}"/>
+          <Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}" options={game.system.template.Actor.types}/>
           <Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
           <Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
           <SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>

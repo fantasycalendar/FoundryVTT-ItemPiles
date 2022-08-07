@@ -15,11 +15,11 @@
   const { application } = getContext('external');
 
   export let elementRoot;
-  export let source;
+  export let actor;
   export let recipient;
   export let overrides;
 
-  export let store = new ItemPileStore(application, source, recipient);
+  export let store = new ItemPileStore(application, actor, recipient);
 
   // Stores
   let searchStore = store.search;
@@ -34,7 +34,7 @@
   $: hasItems = $numItems > 0;
   $: showSearchBar = ($numItems + $numCurrencies) >= 3;
 
-  let num_players = SharingUtilities.getPlayersForItemPile(source).length;
+  let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 
   function dropData(event) {
 
@@ -47,7 +47,7 @@
       return false;
     }
 
-    return PrivateAPI._dropData(canvas, data, { target: store.source });
+    return PrivateAPI._dropData(canvas, data, { target: store.actor });
 
   }
 

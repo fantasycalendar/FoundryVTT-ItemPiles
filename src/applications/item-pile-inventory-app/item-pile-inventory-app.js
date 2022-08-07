@@ -9,21 +9,21 @@ export class ItemPileInventoryApp extends SvelteApplication {
   
   /**
    *
-   * @param source
+   * @param actor
    * @param recipient
    * @param overrides
    * @param options
    * @param dialogData
    */
-  constructor(source, recipient, overrides = {}, options = {}, dialogData = {}) {
+  constructor(actor, recipient, overrides = {}, options = {}, dialogData = {}) {
     super({
-      id: `item-pile-inventory-${source.id}`,
-      title: source.name,
+      id: `item-pile-inventory-${actor.id}`,
+      title: actor.name,
       svelte: {
         class: ItemPileInventoryShell,
         target: document.body,
         props: {
-          source,
+          actor,
           recipient,
           overrides
         }
@@ -31,11 +31,11 @@ export class ItemPileInventoryApp extends SvelteApplication {
       zIndex: 100,
       ...options
     }, dialogData);
-
-    this.source = source;
+    
+    this.actor = actor;
     this.recipient = recipient;
-
-    Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, source, recipient, overrides);
+    
+    Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, actor, recipient, overrides);
     
   }
   
@@ -57,7 +57,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
     source = Utilities.getActor(source)
     recipient = Utilities.getActor(recipient);
     const result = Helpers.hooks.call(HOOKS.PRE_OPEN_INTERFACE, source, recipient, overrides);
-    if(result === false) return;
+    if (result === false) return;
     const apps = this.getActiveApps(source.id);
     if (apps.length) {
       for (let app of apps) {
@@ -70,11 +70,11 @@ export class ItemPileInventoryApp extends SvelteApplication {
       new this(source, recipient, overrides, options, dialogData).render(true, { focus: true });
     })
   }
-
-  async close(options){
-    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.source, this.recipient);
-    if(result === false) return;
-    Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.source, this.recipient);
+  
+  async close(options) {
+    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.actor, this.recipient);
+    if (result === false) return;
+    Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.actor, this.recipient);
     return super.close(options);
   }
   
@@ -91,7 +91,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
           class: "item-piles-open-actor-sheet",
           icon: "fas fa-user",
           onclick: () => {
-            this.source.sheet.render(true, { focus: true });
+            this.actor.sheet.render(true, { focus: true });
           }
         },
         {
@@ -99,7 +99,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
           class: "item-piles-configure-pile",
           icon: "fas fa-box-open",
           onclick: () => {
-            ItemPileConfig.show(this.source);
+            ItemPileConfig.show(this.actor);
           }
         },
       ].concat(buttons);

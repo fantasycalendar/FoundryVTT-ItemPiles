@@ -1,56 +1,56 @@
 {
-    "name": "item-piles",
-    "title": "Item Piles",
-    "description": "This module adds the ability for items to be dropped onto the ground, and then picked up.",
-    "version": "100.0.0",
-    "library": "false",
-    "manifestPlusVersion": "1.0.0",
-    "minimumCoreVersion": "0.8.9",
-    "compatibleCoreVersion": "9",
-    "authors": [
-        {
-            "name": "Wasp",
-            "url": "https://github.com/Haxxer",
-            "discord": "Wasp#2005"
-        }
-    ],
-    "esmodules": [
-        "/dist/module.js"
-    ],
-    "styles": [
-        "/dist/module.css"
-    ],
-    "languages": [
-        {
-            "lang": "en",
-            "name": "English",
-            "path": "languages/en.json"
-        },
-        {
-            "lang": "fr",
-            "name": "French",
-            "path": "languages/fr.json"
-        },
-        {
-            "lang": "ja",
-            "name": "日本語",
-            "path": "languages/ja.json"
-        }
-    ],
-    "dependencies": [
-        {
-            "name": "socketlib",
-            "type": "module"
-        },
-        {
-            "name": "lib-wrapper",
-            "type": "module"
-        }
-    ],
-    "socket": true,
-    "url": "This is auto replaced",
-    "manifest": "This is auto replaced",
-    "download": "This is auto replaced",
-    "bugs": "This is auto replaced",
-    "allowBugReporter": true
+  "name": "item-piles",
+  "title": "Item Piles",
+  "description": "This module adds the ability for items to be dropped onto the ground, and then picked up.",
+  "version": "100.0.0",
+  "library": "false",
+  "manifestPlusVersion": "1.0.0",
+  "minimumCoreVersion": "0.8.9",
+  "compatibleCoreVersion": "9",
+  "authors": [
+    {
+      "name": "Wasp",
+      "url": "https://github.com/Haxxer",
+      "discord": "Wasp#2005"
+    }
+  ],
+  "esmodules": [
+    "module.js"
+  ],
+  "styles": [
+    "style.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "French",
+      "path": "languages/fr.json"
+    },
+    {
+      "lang": "ja",
+      "name": "日本語",
+      "path": "languages/ja.json"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "socketlib",
+      "type": "module"
+    },
+    {
+      "name": "lib-wrapper",
+      "type": "module"
+    }
+  ],
+  "socket": true,
+  "url": "This is auto replaced",
+  "manifest": "This is auto replaced",
+  "download": "This is auto replaced",
+  "bugs": "This is auto replaced",
+  "allowBugReporter": true
 }

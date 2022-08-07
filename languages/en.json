@@ -151,9 +151,10 @@
         "NoCurrency": "{actor_name} has no valid currencies...",
         "AddToPile": "Add to pile"
       },
-      "BuyItem": {
-        "Title": "Buying Item: {item_name}",
-        "BuyItem": "Buy Item"
+      "TradeMerchantItem": {
+        "Title": "Trading Item: {item_name}",
+        "BuyItem": "Buy Item",
+        "SellItem": "Sell Item"
       },
       "Settings": {
         "Title": "Item Piles Module Configuration",

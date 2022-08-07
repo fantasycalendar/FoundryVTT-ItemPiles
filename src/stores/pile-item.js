@@ -49,6 +49,11 @@ export class PileItem extends PileBaseItem {
     this.presentFromTheStart.set(Utilities.getItemQuantity(this.item) > 0);
     this.quantity.set(Utilities.getItemQuantity(this.item));
     this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
+    this.id = this.item.id;
+    this.type = this.item.type;
+    this.name = writable(this.item.name);
+    this.img = writable(this.item.img);
+    this.identifier = this.id;
   }
   
   setupSubscriptions() {
@@ -59,17 +64,14 @@ export class PileItem extends PileBaseItem {
         this.quantityLeft.set(get(this.quantity));
         return;
       }
-      const quantityLeft = SharingUtilities.getItemSharesLeftForActor(this.store.source, this.item, this.store.recipient);
+      const quantityLeft = SharingUtilities.getItemSharesLeftForActor(this.store.actor, this.item, this.store.recipient);
       this.quantityLeft.set(quantityLeft);
     });
     
     this.subscribeTo(this.itemDocument, () => {
       const { data } = this.itemDocument.updateOptions;
-      this.id = this.item.id;
-      this.name = this.item.name;
-      this.img = this.item.img;
-      this.type = this.item.type;
-      this.identifier = this.item.name + "-" + this.item.type;
+      this.name.set(this.item.name);
+      this.img.set(this.item.img);
       this.similarities = Utilities.setSimilarityProperties({}, this.item);
       if (hasProperty(data, game.itempiles.ITEM_QUANTITY_ATTRIBUTE)) {
         this.quantity.set(Utilities.getItemQuantity(data));
@@ -84,7 +86,7 @@ export class PileItem extends PileBaseItem {
   }
   
   setupProperties() {
-    this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: this.store.source });
+    this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: this.store.actor });
     this.similarities = Utilities.setSimilarityProperties({}, this.item);
     this.toShare = this.isCurrency
       ? get(this.store.pileData).shareCurrenciesEnabled && !!this.store.recipient
@@ -108,7 +110,7 @@ export class PileItem extends PileBaseItem {
   take() {
     const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft));
     return game.itempiles.transferItems(
-      this.store.source,
+      this.store.actor,
       this.store.recipient,
       [{ _id: this.id, quantity }],
       { interactionId: this.store.interactionId }
@@ -122,11 +124,11 @@ export class PileAttribute extends PileBaseItem {
     super.setupStores();
     this.attribute = attribute;
     this.path = this.attribute.path;
-    this.name = this.attribute.name;
-    this.img = this.attribute.img;
+    this.name = writable(this.attribute.name);
+    this.img = writable(this.attribute.img);
     this.identifier = this.attribute.path;
-    this.presentFromTheStart.set(Number(getProperty(this.store.source.data, this.attribute.path) ?? 0) > 0);
-    this.quantity.set(Number(getProperty(this.store.source.data, this.path) ?? 0));
+    this.presentFromTheStart.set(Number(getProperty(this.store.actor.data, this.attribute.path) ?? 0) > 0);
+    this.quantity.set(Number(getProperty(this.store.actor.data, this.path) ?? 0));
     this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
   }
   
@@ -138,16 +140,15 @@ export class PileAttribute extends PileBaseItem {
         this.quantityLeft.set(get(this.quantity));
         return;
       }
-      const quantityLeft = SharingUtilities.getAttributeSharesLeftForActor(this.store.source, this.path, this.store.recipient);
+      const quantityLeft = SharingUtilities.getAttributeSharesLeftForActor(this.store.actor, this.path, this.store.recipient);
       this.quantityLeft.set(quantityLeft);
     });
     
     this.subscribeTo(this.store.document, () => {
       const { data } = this.store.document.updateOptions;
       this.path = this.attribute.path;
-      this.name = this.attribute.name;
-      this.img = this.attribute.img;
-      this.identifier = this.attribute.path;
+      this.name.set(this.attribute.name);
+      this.img.set(this.attribute.img);
       if (hasProperty(data, this.path)) {
         this.quantity.set(Number(getProperty(data, this.path) ?? 0));
         this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -164,13 +165,14 @@ export class PileAttribute extends PileBaseItem {
   }
   
   filter() {
+    const name = get(this.name);
     const search = get(this.store.search);
     const presentFromTheSTart = get(this.presentFromTheStart);
     const quantity = get(this.quantity);
     if (quantity === 0 && !presentFromTheSTart && !this.store.editQuantities) {
       this.filtered.set(true);
     } else if (search) {
-      this.filtered.set(!this.name.toLowerCase().includes(search.toLowerCase()));
+      this.filtered.set(!name.toLowerCase().includes(search.toLowerCase()));
     } else {
       this.filtered.set(!presentFromTheSTart && quantity === 0 && !this.store.editQuantities);
     }
@@ -179,7 +181,7 @@ export class PileAttribute extends PileBaseItem {
   take() {
     const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft));
     return game.itempiles.transferAttributes(
-      this.store.source,
+      this.store.actor,
       this.store.recipient,
       { [this.path]: quantity },
       { interactionId: this.interactionId }

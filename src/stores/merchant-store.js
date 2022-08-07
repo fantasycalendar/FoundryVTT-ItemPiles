@@ -5,7 +5,7 @@ import { PileItem } from "./pile-item.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
-import BuyItemDialog from "../applications/dialogs/buy-item-dialog/buy-item-dialog.js";
+import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
 
 export default class MerchantStore extends ItemPileStore {
   
@@ -14,20 +14,11 @@ export default class MerchantStore extends ItemPileStore {
     this.editPrices = writable(false);
     this.itemsPerCategory = writable({});
     this.categories = writable([]);
+    this.itemCategories = writable([]);
+    this.typeFilter = writable("all")
     this.priceModifiersPerType = writable({});
     this.priceModifiersForActor = writable({});
     this.priceSelector = writable("");
-  }
-  
-  static notifyChanges(event, actor, ...args) {
-    const store = this.getStore(actor);
-    if (store) {
-      if (actor === store.recipient) {
-        store['refreshItemPrices']();
-      } else {
-        store[event](...args);
-      }
-    }
   }
   
   get ItemClass() {
@@ -40,10 +31,16 @@ export default class MerchantStore extends ItemPileStore {
       this.updatePriceModifiers();
     });
     if (this.recipientDocument) {
+      this.subscribeTo(this.recipientPileData, () => {
+        this.updatePriceModifiers();
+      });
       this.subscribeTo(this.recipientDocument, () => {
         this.refreshItemPrices();
-      });
+      })
     }
+    this.subscribeTo(this.typeFilter, () => {
+      this.refreshItems();
+    })
   }
   
   refreshItems() {
@@ -51,6 +48,9 @@ export default class MerchantStore extends ItemPileStore {
     const items = get(this.items).filter(item => {
       return game.user.isGM || !get(item.itemFlagData).hidden;
     });
+    this.itemCategories.set(Array.from(new Set(get(this.allItems).filter(entry => !entry.isCurrency).map(item => item.type))).map(type => ({
+      label: localize(CONFIG.Item.typeLabels[type]), type
+    })));
     const itemsPerCategory = items.reduce((acc, item) => {
       if (!acc[item.type]) {
         acc[item.type] = [];
@@ -75,19 +75,21 @@ export default class MerchantStore extends ItemPileStore {
   }
   
   createItem(item) {
-    if (PileUtilities.isItemInvalid(this.source, item)) return;
+    if (PileUtilities.isItemInvalid(this.actor, item)) return;
     const items = get(this.allItems);
     const itemClass = new this.ItemClass(this, item);
     itemClass.refreshPriceData();
     items.push(itemClass);
     this.allItems.set(items);
     this.refreshItems();
+    Helpers.custom_notify("ITEM FUCKIN CREATED YOOOO");
   }
   
   deleteItem(item) {
-    if (PileUtilities.isItemInvalid(this.source, item)) return;
+    if (PileUtilities.isItemInvalid(this.actor, item)) return;
     const items = get(this.allItems);
     const pileItem = items.find(pileItem => pileItem.id === item.id);
+    if (!pileItem) return;
     pileItem.unsubscribe();
     items.splice(items.indexOf(pileItem), 1);
     this.allItems.set(items);
@@ -95,7 +97,7 @@ export default class MerchantStore extends ItemPileStore {
   }
   
   updatePriceModifiers() {
-    const pileData = get(this.pileData);
+    let pileData = get(this.pileData);
     this.priceModifiersPerType.set(pileData.itemTypePriceModifiers.reduce((acc, priceData) => {
       acc[priceData.type] = priceData;
       return acc;
@@ -131,13 +133,18 @@ export default class MerchantStore extends ItemPileStore {
     const pileData = get(this.pileData);
     const priceModPerType = get(this.priceModifiersPerType);
     pileData.itemTypePriceModifiers = Object.values(priceModPerType);
-    await PileUtilities.updateItemPileData(this.source, pileData);
+    await PileUtilities.updateItemPileData(this.actor, pileData);
     Helpers.custom_notify(localize("ITEM-PILES.Notifications.UpdateMerchantSuccess"));
   }
   
-  buyItem(pileItem) {
+  tradeItem(pileItem, selling) {
     if (get(pileItem.itemFlagData).notForSale && !game.user.isGM) return;
-    BuyItemDialog.show(pileItem, this.source, this.recipient);
+    TradeMerchantItemDialog.show(
+      pileItem,
+      this.actor,
+      this.recipient,
+      { selling }
+    );
   }
   
 }
@@ -162,6 +169,13 @@ class PileMerchantItem extends PileItem {
       this.refreshPriceData();
       this.refreshDisplayQuantity();
     });
+    if (this.store.recipient) {
+      this.subscribeTo(this.store.recipientPileData, () => {
+        if (!setup) return
+        this.refreshPriceData();
+        this.refreshDisplayQuantity();
+      });
+    }
     this.subscribeTo(this.store.priceModifiersPerType, () => {
       if (!setup) return;
       this.refreshPriceData();
@@ -180,9 +194,13 @@ class PileMerchantItem extends PileItem {
       if (hasProperty(data, CONSTANTS.FLAGS.ITEM + ".prices")) {
         this.refreshPriceData();
       }
+      if (hasProperty(data, game.itempiles.ITEM_PRICE_ATTRIBUTE)) {
+        this.refreshPriceData();
+      }
     });
     setup = true;
     this.refreshDisplayQuantity();
+    this.subscribeTo(this.store.typeFilter, this.filter.bind(this));
   }
   
   refreshDisplayQuantity() {
@@ -212,11 +230,13 @@ class PileMerchantItem extends PileItem {
     
     const quantityToBuy = get(this.quantityToBuy);
     const itemFlagData = get(this.itemFlagData);
-    const pileFlagData = get(this.store.pileData);
+    const sellerFlagData = get(this.store.pileData);
+    const buyerFlagData = get(this.store.recipientPileData);
     const priceData = PileUtilities.getItemPrices(this.item, {
-      seller: this.store.source,
+      seller: this.store.actor,
       buyer: this.store.recipient,
-      sellerFlagData: pileFlagData,
+      sellerFlagData,
+      buyerFlagData,
       itemFlagData,
       quantity: quantityToBuy
     });
@@ -232,8 +252,12 @@ class PileMerchantItem extends PileItem {
   }
   
   filter() {
+    const name = get(this.name);
     const search = get(this.store.search);
-    this.filtered.set(!this.name.toLowerCase().includes(search.toLowerCase()));
+    const searchFiltered = !name.toLowerCase().includes(search.toLowerCase());
+    const typeFilter = get(this.store.typeFilter);
+    const typeFiltered = typeFilter !== "all" && typeFilter.toLowerCase() !== this.type.toLowerCase();
+    this.filtered.set(searchFiltered || typeFiltered);
   }
   
   async updateItemFlagData() {

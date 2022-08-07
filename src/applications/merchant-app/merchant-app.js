@@ -4,8 +4,7 @@ import MerchantAppShell from "./merchant-app-shell.svelte";
 
 export default class MerchantApp extends SvelteApplication {
   
-  constructor(merchant, buyer = false, options = {}, dialogData = {}) {
-    let merchantInteractionID = randomID();
+  constructor(merchant, recipient = false, options = {}, dialogData = {}) {
     super({
       title: `Merchant: ${merchant.name}`,
       id: `item-pile-merchant-${merchant.id}`,
@@ -14,7 +13,7 @@ export default class MerchantApp extends SvelteApplication {
         target: document.body,
         props: {
           merchant,
-          buyer
+          recipient
         }
       },
       zIndex: 100,
@@ -38,14 +37,14 @@ export default class MerchantApp extends SvelteApplication {
     return Object.values(ui.windows).find(app => app.id === `item-pile-merchant-${id}`);
   }
   
-  static async show(merchant, buyer = false, options = {}, dialogData = {}) {
+  static async show(merchant, recipient = false, options = {}, dialogData = {}) {
     merchant = merchant?.actor ?? merchant;
-    buyer = buyer?.actor ?? buyer
+    recipient = recipient?.actor ?? recipient
     const app = this.getActiveApp(merchant.id);
     if (app) return app.render(false, { focus: true });
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(merchant, buyer, options, dialogData).render(true, { focus: true });
+      new this(merchant, recipient, options, dialogData).render(true, { focus: true });
     })
   }
   

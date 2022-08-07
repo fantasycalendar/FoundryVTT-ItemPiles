@@ -11,8 +11,8 @@
   const { application } = getContext('external');
 
   export let item;
-  export let merchant;
   export let seller;
+  export let buyer;
   export let settings;
   export let elementRoot;
   export let store = item.store;
@@ -24,25 +24,47 @@
   const itemMaxQuantityStore = item.quantity;
   const prices = item.prices;
 
-  const pileData = PileUtilities.getActorFlagData(merchant);
+  const sellerPileData = store.pileData;
+  const buyerPileData = store.recipientPileData;
+
+  let maxItemPurchaseQuantity;
+  let currentQuantityToBuy;
 
   const selectedPriceGroup = item.selectedPriceGroup;
-  let currentQuantityToBuy;
   $: {
     $selectedPriceGroup;
     currentQuantityToBuy = 1;
     $quantityToBuy = 1;
   }
 
-  $: selectedPrice = $prices[$selectedPriceGroup];
-  $: maxMerchantItemQuantity = pileData.infiniteQuantity ? Infinity : $itemMaxQuantityStore;
-  $: maxItemQuantity = selectedPrice.maxQuantity;
+  let paymentData = {};
+  $: {
+    const data = PileUtilities.getPricesForItems([{
+      item: item.item,
+      quantity: $quantityToBuy,
+      paymentIndex: $selectedPriceGroup
+    }], {
+      seller,
+      buyer,
+      sellerFlagData: $sellerPileData,
+      buyerFlagData: $buyerPileData,
+    });
+    if (settings.selling) {
+
+    }
+    paymentData = data;
+  }
+
+  $: maxMerchantItemQuantity = $sellerPileData.infiniteQuantity ? Infinity : $itemMaxQuantityStore;
+  $: maxItemQuantity = $prices[$selectedPriceGroup].maxQuantity;
   $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxMerchantItemQuantity);
 
   function submit() {
-    game.itempiles.tradeItems(item.item, seller, merchant, {
+    game.itempiles.tradeItems(seller, buyer, [{
+      item: item.item,
       paymentIndex: get(selectedPriceGroup),
       quantity: get(quantityToBuy),
+    }], {
       interactionId: store.interactionId
     });
     application.options.resolve();
@@ -59,46 +81,61 @@
     <div style="display: grid; grid-template-columns: 1fr 0.75fr; margin-bottom: 0.5rem;">
       <div style="display:flex; align-items: center; font-size:1rem; grid-row: 1;">
         <div class="item-piles-img-container" style="margin-right: 0.25rem;">
-          <img class="item-piles-img" src={itemImg}/>
+          <img class="item-piles-img" src={$itemImg}/>
         </div>
-        <span>{itemName}</span>
+        <span>{$itemName}</span>
       </div>
 
       <div
-          style="display:flex; justify-content:flex-end; align-items: center; grid-row: 1 / span 2; text-align: right;">
-        {#if !maxItemQuantity}
-          <label>You cannot afford this</label>
-        {:else}
+          style="display:flex; justify-content:flex-end; align-items: center; text-align: right;">
+        {#if maxItemQuantity}
           <div style="display: flex; flex-direction: column; align-items: flex-end; margin-right: 0.5rem;">
             <small>Quantity</small>
             <small style="font-style:italic;">
               (Max {maxItemPurchaseQuantity})
             </small>
           </div>
-          <input style="max-width: 40px;" type="number" bind:value={currentQuantityToBuy} on:change={(evt) => {
+          <input style="max-width: 40px; max-height: 24px;" type="number" bind:value={currentQuantityToBuy} on:change={(evt) => {
             $quantityToBuy = Math.max(1, Math.min(currentQuantityToBuy, maxItemPurchaseQuantity));
             currentQuantityToBuy = $quantityToBuy;
           }}/>
         {/if}
       </div>
-      <div style="margin-left: 0.25rem; margin-top: 0.25rem;">
+      <div style="margin-top: 0.25rem;">
         <PriceSelector {item} standalone/>
+      </div>
+      <div style="margin-right: 0.25rem; text-align: right;">
+        {#if maxItemQuantity}
+          {#if $quantityToBuy > 1 && paymentData.primary}
+            <small>{paymentData.basePriceString}</small>
+          {/if}
+        {:else}
+          <small>You cannot afford this price</small>
+        {/if}
       </div>
     </div>
 
     <div style="display: grid; grid-template-columns: auto auto;" class="item-piles-bottom-divider">
 
       <strong class="item-piles-bottom-divider" style="margin-bottom:0.25rem; padding-bottom:0.25rem;">
-        You pay:
+        {#if settings.selling}
+          You receive:
+        {:else}
+          You pay:
+        {/if}
       </strong>
 
       <strong class="item-piles-bottom-divider item-piles-text-right"
               style="margin-bottom:0.25rem; padding-bottom:0.25rem;">
-        You receive:
+        {#if settings.selling}
+          They receive:
+        {:else}
+          You pay:
+        {/if}
       </strong>
 
       <div>
-        {#each selectedPrice.finalPrices as price}
+        {#each paymentData.finalPrices as price}
           {#if price.quantity}
             <div style="display:flex; align-items: center;">
               <div class="item-piles-img-container" style="margin-right: 0.25rem;">
@@ -112,16 +149,16 @@
 
       <div style="display:flex; flex-direction: column; align-items: flex-end;">
         <div style="display:flex; align-items: center;">
-          <span>{$quantityToBuy > 1 ? $quantityToBuy + " " : ""}{itemName}</span>
+          <span>{$quantityToBuy > 1 ? $quantityToBuy + " " : ""}{$itemName}</span>
           <div class="item-piles-img-container" style="margin-left: 0.25rem;">
-            <img class="item-piles-img" src={itemImg}/>
+            <img class="item-piles-img" src={$itemImg}/>
           </div>
         </div>
-        {#if selectedPrice.changeBack.length}
+        {#if paymentData.buyerChange.length}
           <span class="item-piles-small-text item-piles-text-right" style="margin-right: 0.25rem; margin-top: 0.5rem;">
             Change:
           </span>
-          {#each selectedPrice.changeBack as change}
+          {#each paymentData.buyerChange as change}
             {#if change.quantity}
               <div style="display:flex; align-items: center;">
                 <span>{change.quantity} {change.name}</span>
@@ -138,8 +175,11 @@
 
     <footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
       <button type="button" disabled={!maxItemPurchaseQuantity} on:click|once={ () => { submit() } }>
-        <i class="fas fa-shopping-cart"></i>
-        {settings?.button ?? localize("ITEM-PILES.Applications.BuyItem.BuyItem")}
+        {#if settings.selling}
+          <i class="fas fa-hand-holding-usd"></i> {localize("ITEM-PILES.Applications.TradeMerchantItem.SellItem")}
+        {:else}
+          <i class="fas fa-shopping-cart"></i> {localize("ITEM-PILES.Applications.TradeMerchantItem.BuyItem")}
+        {/if}
       </button>
 
       <button type="button" on:click|once={() => { application.close() }}>

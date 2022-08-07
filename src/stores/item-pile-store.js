@@ -10,9 +10,11 @@ import { PileAttribute, PileItem } from "./pile-item.js";
 
 const __STORES__ = new Map();
 
+const __PILEDATA_STORES__ = new Map();
+
 export default class ItemPileStore {
   
-  constructor(application, source, recipient = false) {
+  constructor(application, source, recipient = false, { recipientPileData = false } = {}) {
     
     this.subscriptions = [];
     
@@ -20,18 +22,15 @@ export default class ItemPileStore {
     this.application = application;
     
     this.uuid = Utilities.getUuid(source);
-    this.source = Utilities.getActor(source);
+    this.actor = Utilities.getActor(source);
     
-    this.recipientUuid = recipient ? Utilities.getUuid(recipient) : false;
     this.recipient = recipient ? Utilities.getActor(recipient) : false;
     
-    this.document = new TJSDocument(this.source);
+    this.document = new TJSDocument(this.actor);
     this.recipientDocument = recipient ? new TJSDocument(this.recipient) : false;
+    this.recipientPileData = recipientPileData;
     
     __STORES__.set(this.uuid, this);
-    if (this.recipient) {
-      __STORES__.set(this.recipientUuid, this);
-    }
     
     this.setupStores();
     this.setupSubscriptions();
@@ -47,8 +46,12 @@ export default class ItemPileStore {
   
   setupStores() {
     
-    this.pileData = writable(PileUtilities.getActorFlagData(this.source));
-    this.shareData = writable(SharingUtilities.getItemPileSharingData(this.source))
+    this.pileData = writable(PileUtilities.getActorFlagData(this.actor));
+    this.shareData = writable(SharingUtilities.getItemPileSharingData(this.actor));
+    
+    this.recipientPileData = this.recipientPileData || writable(this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {});
+    this.recipientShareData = writable(this.recipient ? SharingUtilities.getItemPileSharingData(this.recipient) : {});
+    
     this.deleted = writable(false);
     
     this.search = writable("");
@@ -72,26 +75,40 @@ export default class ItemPileStore {
     
     this.subscribeTo(this.document, () => {
       const { data } = this.document.updateOptions;
-      this.name.set(this.source.name);
-      this.img.set(this.source.img);
+      this.name.set(this.actor.name);
+      this.img.set(this.actor.img);
       if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
-        this.shareData.set(SharingUtilities.getItemPileSharingData(this.source));
+        this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
         this.refreshItems();
       }
       if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
-        this.pileData.set(PileUtilities.getActorFlagData(this.source));
+        this.pileData.set(PileUtilities.getActorFlagData(this.actor));
         this.refreshItems();
       }
     });
+    
+    if (this.recipientDocument) {
+      this.subscribeTo(this.recipientDocument, () => {
+        const { data } = this.document.updateOptions;
+        if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
+          this.recipientShareData.set(SharingUtilities.getItemPileSharingData(this.recipient));
+          this.refreshItems();
+        }
+        if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
+          this.recipientPileData.set(PileUtilities.getActorFlagData(this.recipient));
+          this.refreshItems();
+        }
+      });
+    }
     
     const items = [];
     const attributes = [];
     
-    PileUtilities.getActorItems(this.source).map(item => {
+    PileUtilities.getActorItems(this.actor).map(item => {
       items.push(new this.ItemClass(this, item));
     });
     
-    PileUtilities.getActorCurrencies(this.source).forEach(currency => {
+    PileUtilities.getActorCurrencies(this.actor).forEach(currency => {
       if (currency.type === "item") {
         if (!currency.item) return;
         items.push(new this.ItemClass(this, currency.item ?? currency.data));
@@ -151,7 +168,7 @@ export default class ItemPileStore {
   }
   
   createItem(item) {
-    if (PileUtilities.isItemInvalid(this.source, item)) return;
+    if (PileUtilities.isItemInvalid(this.actor, item)) return;
     const items = get(this.allItems);
     const deletedItems = items
       .filter(item => item.id === null)
@@ -170,9 +187,10 @@ export default class ItemPileStore {
   }
   
   deleteItem(item) {
-    if (PileUtilities.isItemInvalid(this.source, item)) return;
+    if (PileUtilities.isItemInvalid(this.actor, item)) return;
     const items = get(this.allItems);
     const pileItem = items.find(pileItem => pileItem.id === item.id);
+    if (!pileItem) return;
     if (this.editQuantities) {
       items.splice(items.indexOf(pileItem), 1);
       this.allItems.set(items);
@@ -213,9 +231,9 @@ export default class ItemPileStore {
       attributesToUpdate[attribute.path] = get(attribute.quantity);
     }
     
-    const pileSharingData = SharingUtilities.getItemPileSharingData(this.source);
+    const pileSharingData = SharingUtilities.getItemPileSharingData(this.actor);
     
-    await this.source.update(attributesToUpdate);
+    await this.actor.update(attributesToUpdate);
     if (pileSharingData?.currencies) {
       pileSharingData.currencies = pileSharingData.currencies.map(currency => {
         if (attributesToUpdate[currency.path] !== undefined) {
@@ -228,8 +246,8 @@ export default class ItemPileStore {
       })
     }
     
-    await this.source.updateEmbeddedDocuments("Item", itemsToUpdate);
-    await this.source.deleteEmbeddedDocuments("Item", itemsToDelete);
+    await this.actor.updateEmbeddedDocuments("Item", itemsToUpdate);
+    await this.actor.deleteEmbeddedDocuments("Item", itemsToDelete);
     if (pileSharingData?.items) {
       pileSharingData.items = pileSharingData.items.map(item => {
         const sharingItem = itemsToUpdate.find(item => item._id === item.id);
@@ -243,7 +261,7 @@ export default class ItemPileStore {
       })
     }
     
-    await SharingUtilities.updateItemPileSharingData(this.source, pileSharingData);
+    await SharingUtilities.updateItemPileSharingData(this.actor, pileSharingData);
     
     Helpers.custom_notify("Item Pile successfully updated.");
     
@@ -253,19 +271,19 @@ export default class ItemPileStore {
   
   takeAll() {
     game.itempiles.transferEverything(
-      this.source,
+      this.actor,
       this.recipient,
       { interactionId: this.interactionId }
     );
   }
   
   splitAll() {
-    return game.itempiles.splitItemPileContents(this.source, { instigator: this.recipient });
+    return game.itempiles.splitItemPileContents(this.actor, { instigator: this.recipient });
   }
   
   closeContainer() {
     if (!InterfaceTracker.isOpened(this.application.id)) {
-      return game.itempiles.closeItemPile(this.source);
+      return game.itempiles.closeItemPile(this.actor);
     }
   }
   
@@ -281,8 +299,5 @@ export default class ItemPileStore {
   onDestroy() {
     this.unsubscribe();
     __STORES__.delete(this.uuid);
-    if (this.recipient) {
-      __STORES__.delete(this.recipientUuid);
-    }
   }
 }
