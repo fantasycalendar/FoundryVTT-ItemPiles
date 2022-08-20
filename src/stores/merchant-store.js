@@ -82,7 +82,6 @@ export default class MerchantStore extends ItemPileStore {
     items.push(itemClass);
     this.allItems.set(items);
     this.refreshItems();
-    Helpers.custom_notify("ITEM FUCKIN CREATED YOOOO");
   }
   
   deleteItem(item) {

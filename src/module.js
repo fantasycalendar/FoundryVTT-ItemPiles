@@ -58,8 +58,8 @@ Hooks.once("ready", async () => {
   
   ChatAPI.disablePastTradingButtons();
   
-  const merchant = game.actors.get("4jh4e6K5TobGeoni");
-  const actor = game.actors.getName("Player Token");
+  // const merchant = game.actors.get("4jh4e6K5TobGeoni");
+  // const actor = game.actors.getName("Player Token");
   
   // game.itempiles.tradeItems(actor, merchant, [{
   //   item: actor.items.getName("Scimitar")
@@ -74,7 +74,7 @@ Hooks.once("ready", async () => {
   //   buyer: merchant
   // }))
   
-  game.itempiles.renderItemPileInterface(merchant, { inspectingTarget: actor });
+  // game.itempiles.renderItemPileInterface(merchant, { inspectingTarget: actor });
   
   // ItemEditor.show(source.items.getName("Antitoxin"));
   

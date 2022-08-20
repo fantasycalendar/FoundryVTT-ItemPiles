@@ -19,7 +19,7 @@
 <div>
 
   {#each $categoryStore as category, index (category.type)}
-    <div transition:fade|local={{duration: 150}}>
+    <div in:fade|local={{duration: 150}}>
       <h3 class="merchant-item-group-type item-piles-flexrow">
         <div>
           {localize(category.label)}

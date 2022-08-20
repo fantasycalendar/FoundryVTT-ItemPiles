@@ -62,6 +62,7 @@ export default class ItemPileStore {
     
     this.items = writable([]);
     this.currencies = writable([]);
+    this.allCurrencies = writable([]);
     
     this.numItems = writable(0);
     this.numCurrencies = writable(0);
@@ -108,7 +109,7 @@ export default class ItemPileStore {
       items.push(new this.ItemClass(this, item));
     });
     
-    PileUtilities.getActorCurrencies(this.actor).forEach(currency => {
+    PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
       if (currency.type === "item") {
         if (!currency.item) return;
         items.push(new this.ItemClass(this, currency.item ?? currency.data));
@@ -160,11 +161,10 @@ export default class ItemPileStore {
     this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
     this.items.set(items.filter(entry => !get(entry.filtered)));
     
-    const attributes = get(this.attributes).filter(currency => get(currency.visible));
-    const currencies = attributes.concat(itemCurrencies);
-    
+    const currencies = get(this.attributes).concat(itemCurrencies);
     this.numCurrencies.set(currencies.filter(entry => get(entry.quantity) > 0).length);
     this.currencies.set(currencies.filter(entry => !get(entry.filtered)));
+    this.allCurrencies.set(currencies);
   }
   
   createItem(item) {

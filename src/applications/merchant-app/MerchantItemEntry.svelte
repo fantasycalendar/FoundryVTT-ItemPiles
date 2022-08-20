@@ -18,6 +18,8 @@
   $: itemFlagData = $itemFlagDataStore;
   $: displayQuantity = $displayQuantityStore;
   $: quantity = $quantityStore;
+  $: editQuantity = $quantityStore;
+  let showEditQuantity = false;
 
   const displayControlButtons = store.actor.isOwner && !selling;
   const displayBuyButton = !!store.recipient;
@@ -50,14 +52,22 @@
       {:else}
         {$itemName}
       {/if}
-      {#if displayQuantity && quantity}
-        <span class="item-piles-small-text">
-          {#if itemFlagData.infiniteQuantity}
-            (∞)
-          {:else}
-            (x{quantity})
-          {/if}
-        </span>
+      {#if displayQuantity}
+        {#if itemFlagData.infiniteQuantity}
+          <span class="item-piles-small-text">(∞)</span>
+        {:else if !showEditQuantity}
+          <span class="item-piles-small-text" class:item-piles-clickable-link={game.user.isGM}
+                on:click={() => { if(game.user.isGM) showEditQuantity = true; }}>(x{quantity})</span>
+        {/if}
+      {/if}
+      {#if showEditQuantity}
+        <div class="item-piles-quantity-container" style="flex:0 1 50px;">
+          <div class="item-piles-quantity-input-container">
+            <input class="item-piles-quantity" type="text" bind:value="{editQuantity}" autofocus
+                   on:change={() => { showEditQuantity = false; item.updateQuantity(editQuantity); }}
+                   on:keydown={(evt) => { if(evt.key === "Enter") showEditQuantity = false; }}/>
+          </div>
+        </div>
       {/if}
     </div>
   </div>
@@ -82,9 +92,10 @@
     {/if}
     {#if displayBuyButton}
       <span class:item-piles-clickable-link={!itemFlagData.notForSale || game.user.isGM}
-            class:item-piles-clickable-link-disabled={itemFlagData.notForSale && !game.user.isGM}
+            class:item-piles-clickable-link-disabled={quantity <= 0 || (itemFlagData.notForSale && !game.user.isGM)}
             class:buy-button={displayControlButtons}
             on:click={() => {
+              if(quantity <= 0 || (itemFlagData.notForSale && !game.user.isGM)) return;
               store.tradeItem(item, selling)
             }}>
         <i class="fas" class:fa-shopping-cart={!selling} class:fa-hand-holding-usd={selling}></i>

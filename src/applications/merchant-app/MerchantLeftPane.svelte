@@ -31,51 +31,42 @@
       {#if activeSidebarTab === 'description'}
         <div class="tab merchant-description">
           <div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-            et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip
-            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-            dolore
-            eu
-            fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-            deserunt mollit anim id est laborum.
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-            et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip
-            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-            dolore
-            eu
-            fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-            deserunt mollit anim id est laborum.
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-            et
-            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip
-            ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-            dolore
-            eu
-            fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-            deserunt mollit anim id est laborum.
+
           </div>
         </div>
       {/if}
 
       {#if activeSidebarTab === 'settings'}
-        <div class="tab merchant-settings">
-          <div class="setting-container">
+        <div class="tab merchant-settings ">
 
-            <div class="form-group slider-group">
+          <div class="setting-container item-piles-config-container">
+
+            <div class="form-group">
               <label style="flex:3;">
-                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}<br>
+                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
+                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
               </label>
-              <SliderInput style="flex:4;" bind:value={$pileDataStore.buyPriceModifier}/>
+              <input type="checkbox" bind:checked={$pileDataStore.purchaseOnly}/>
             </div>
 
-            <div class="form-group slider-group">
+            <div class="form-group">
               <label style="flex:3;">
-                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}<br>
+                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
+                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
+              </label>
+              <input type="checkbox" bind:checked={$pileDataStore.hideNewItems}/>
+            </div>
+
+            <div class="form-group slider-group item-piles-flexcol">
+              <label>
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}
+              </label>
+              <SliderInput bind:value={$pileDataStore.buyPriceModifier}/>
+            </div>
+
+            <div class="form-group slider-group item-piles-flexcol">
+              <label>
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}
               </label>
               <SliderInput style="flex:4;" bind:value={$pileDataStore.sellPriceModifier}/>
             </div>
@@ -147,6 +138,17 @@
         top: 0;
         bottom: 37px;
         position: absolute;
+
+        .form-group {
+          clear: both;
+          display: flex;
+          flex-wrap: wrap;
+          margin: 3px 0;
+
+          &.item-piles-flexcol {
+            align-items: flex-start;
+          }
+        }
       }
 
       .update-button {

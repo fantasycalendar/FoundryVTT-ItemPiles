@@ -53,6 +53,7 @@ export class PileItem extends PileBaseItem {
     this.type = this.item.type;
     this.name = writable(this.item.name);
     this.img = writable(this.item.img);
+    this.abbreviation = this.item.abbreviation;
     this.identifier = this.id;
   }
   
@@ -116,6 +117,14 @@ export class PileItem extends PileBaseItem {
       { interactionId: this.store.interactionId }
     );
   }
+  
+  updateQuantity(quantity) {
+    const roll = new Roll(quantity).evaluate({ async: false });
+    this.quantity.set(roll.total);
+    return this.item.update({
+      [game.itempiles.ITEM_QUANTITY_ATTRIBUTE]: roll.total
+    });
+  }
 }
 
 export class PileAttribute extends PileBaseItem {
@@ -126,6 +135,7 @@ export class PileAttribute extends PileBaseItem {
     this.path = this.attribute.path;
     this.name = writable(this.attribute.name);
     this.img = writable(this.attribute.img);
+    this.abbreviation = this.attribute.abbreviation;
     this.identifier = this.attribute.path;
     this.presentFromTheStart.set(Number(getProperty(this.store.actor.data, this.attribute.path) ?? 0) > 0);
     this.quantity.set(Number(getProperty(this.store.actor.data, this.path) ?? 0));
@@ -186,6 +196,12 @@ export class PileAttribute extends PileBaseItem {
       { [this.path]: quantity },
       { interactionId: this.interactionId }
     );
+  }
+  
+  updateQuantity() {
+    return this.store.actor.update({
+      [this.path]: get(this.quantity)
+    });
   }
   
 }

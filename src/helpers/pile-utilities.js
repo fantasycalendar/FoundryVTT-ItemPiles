@@ -87,10 +87,10 @@ export function getActorItems(target, { itemFilters = false } = {}) {
   return actor.items.filter(item => currencies.indexOf(item.id) === -1 && !isItemInvalid(actor, item, actorItemFilters));
 }
 
-export function getActorCurrencies(target, { currencyList = false, getAll = false } = {}) {
+export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorItems = Array.from(actor.items);
-  currencyList = currencyList || getActorCurrencyList(actor);
+  currencyList = currencyList || getActorCurrencyList(forActor || actor);
   let currencies = currencyList.map((currency, index) => {
     if (currency.type === "attribute") {
       return {

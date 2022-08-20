@@ -30,12 +30,12 @@ async function applyDefaultSettings() {
   await patchCurrencySettings();
 }
 
-export async function patchCurrencySettings(){
+export async function patchCurrencySettings() {
   const currencies = Helpers.getSetting(SETTINGS.CURRENCIES);
-  for(let currency of currencies){
-    if(currency.type !== "item" || !currency.data.uuid || currency.data.item) continue;
+  for (let currency of currencies) {
+    if (currency.type !== "item" || !currency.data.uuid || currency.data.item) continue;
     const item = await fromUuid(currency.data.uuid);
-    if(!item) continue;
+    if (!item) continue;
     currency.data.item = item.toObject();
   }
   await Helpers.setSetting(SETTINGS.CURRENCIES, currencies);
@@ -44,7 +44,7 @@ export async function patchCurrencySettings(){
 export async function checkSystem() {
   
   if (Helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
-
+  
   if (!SYSTEMS.HAS_SYSTEM_SUPPORT) {
     
     if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) return;
@@ -56,21 +56,21 @@ export async function checkSystem() {
     
     if (settingsValid) return;
     
-    await Helpers.setSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN, true);
-    
-    return Dialog.prompt({
+    Dialog.prompt({
       title: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Title"),
-      content: dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content") }),
+      content: Helpers.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content") }),
       callback: () => {
       }
     });
     
+    return Helpers.setSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN, true);
+    
   }
   
-  if (Helpers.getSetting(SETTINGS.SYSTEM_FOUND)){
+  if (Helpers.getSetting(SETTINGS.SYSTEM_FOUND)) {
     const currentVersion = Helpers.getSetting(SETTINGS.SYSTEM_VERSION);
     const newVersion = SYSTEMS.DATA.VERSION;
-    if(isNewerVersion(newVersion, currentVersion)){
+    if (isNewerVersion(newVersion, currentVersion)) {
       return new Dialog({
         title: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Title"),
         content: Helpers.dialogLayout({
