@@ -4,18 +4,18 @@
   import MerchantBuyTab from "./MerchantBuyTab.svelte";
   import MerchantSellTab from "./MerchantSellTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
-  import { get } from "svelte/store";
+  import { get, writable } from "svelte/store";
 
   export let store;
   export let recipientStore;
 
-  const currencies = recipientStore.allCurrencies;
+  const currencies = recipientStore?.allCurrencies || writable([]);
 
   const merchantFlags = store.pileData;
 
   let sellHidden;
   let tabs;
-  let activeTab;
+  let activeTab = "buy"
   $: {
     sellHidden = $merchantFlags.purchaseOnly;
     tabs = [
@@ -23,8 +23,6 @@
       { value: 'sell', label: 'Sell Items', hidden: !recipientStore || sellHidden },
       { value: 'tables', label: 'Populate Items', hidden: !game.user.isGM },
     ];
-
-    activeTab = activeTab || tabs[0].value;
   }
 
 </script>
@@ -38,7 +36,7 @@
         underscore
   />
 
-  <div class="merchant-tabbed-center" style="flex:1;">
+  <div class="merchant-tabbed-center" style="flex:1; calc(100% - {recipientStore ? '36px' : '0px'})">
 
     {#if activeTab === "buy"}
       <MerchantBuyTab {store}/>
@@ -50,31 +48,36 @@
 
   </div>
 
-  <div class="item-piles-flexrow item-piles-currency-list">
 
-    {#each $currencies as currency (currency.identifier)}
+  {#if recipientStore}
 
-      <div class="item-piles-flexrow item-piles-item-row" style="flex:0 1 auto; margin: 0.5rem 0.25rem;">
+    <div class="item-piles-flexrow item-piles-currency-list">
 
-        <div class="item-piles-img-container">
-          <img class="item-piles-img" src="{get(currency.img)}"/>
-        </div>
+      {#each $currencies as currency (currency.identifier)}
 
-        <div class="item-piles-name item-piles-text" style="flex:0 1 auto;">
-          <div class="item-piles-name-container">
-            {#if currency.abbreviation}
-              {currency.abbreviation.replace("{#}", get(currency.quantity))}
-            {:else}
-              {get(currency.name)} (x{get(currency.quantity)})
-            {/if}
+        <div class="item-piles-flexrow item-piles-item-row" style="flex:0 1 auto; margin: 0.5rem 0.25rem;">
+
+          <div class="item-piles-img-container">
+            <img class="item-piles-img" src="{get(currency.img)}"/>
           </div>
+
+          <div class="item-piles-name item-piles-text" style="flex:0 1 auto;">
+            <div class="item-piles-name-container">
+              {#if currency.abbreviation}
+                {currency.abbreviation.replace("{#}", get(currency.quantity))}
+              {:else}
+                {get(currency.name)} (x{get(currency.quantity)})
+              {/if}
+            </div>
+          </div>
+
         </div>
 
-      </div>
+      {/each}
 
-    {/each}
+    </div>
 
-  </div>
+  {/if}
 
 </div>
 
@@ -89,7 +92,6 @@
   }
 
   .merchant-tabbed-center {
-    max-height: calc(100% - 36px);
     overflow-y: scroll;
     overflow-x: hidden;
   }
