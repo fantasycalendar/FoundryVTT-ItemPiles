@@ -524,7 +524,11 @@ export default class PrivateAPI {
       if (targetUuid) {
         itemsDropped = await this._transferItems(sourceUuid, targetUuid, itemsToTransfer, userId);
       } else {
-        itemsDropped = await this._removeItems(sourceUuid, itemsToTransfer, userId);
+        itemsDropped = (await this._removeItems(sourceUuid, itemsToTransfer, userId)).map(item => {
+          item.quantity = Math.abs(item.quantity)
+          setProperty(item.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, Math.abs(item.quantity))
+          return item;
+        });
         targetUuid = await this._createItemPile(sceneId, position, { items: itemsDropped });
       }
       
@@ -553,7 +557,7 @@ export default class PrivateAPI {
     
     if (!pileActorName) {
       
-      pileActor = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
+      pileActor = game.actors.get(Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID));
       
       if (!pileActor) {
         
@@ -614,8 +618,7 @@ export default class PrivateAPI {
       }
       
       items = items ? items.map(item => {
-        let itemData = item.item ?? item;
-        return itemData;
+        return item.item ?? item;
       }) : [];
       
       overrideData['actorData'] = {
@@ -1062,26 +1065,26 @@ export default class PrivateAPI {
       }
     }
     
+    if (droppableDocuments.length) {
+      action = "addToPile";
+    }
+    
     if (hotkeyState.altDown) {
-      
-      if (droppableDocuments.length) {
-        action = "addToPile";
-      }
       
       setProperty(dropData.itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, 1);
       dropData.itemData.quantity = 1;
       
     } else {
       
-      const quantity = getProperty(dropData.itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE);
+      const quantity = Utilities.getItemQuantity(dropData.itemData.item);
       
       let result = { action: "addToPile", quantity: 1 }
       if (quantity > 1) {
         result = await DropItemDialog.show(item, droppableDocuments[0]);
         if (!result) return false;
+        action = result.action;
       }
       
-      action = result.action;
       setProperty(dropData.itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
       dropData.itemData.quantity = Number(result.quantity);
       

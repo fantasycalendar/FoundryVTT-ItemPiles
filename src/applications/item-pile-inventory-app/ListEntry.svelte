@@ -7,6 +7,8 @@
   export let store;
   export let entry;
 
+  const name = entry.name;
+  const img = entry.img;
   const quantityLeft = entry.quantityLeft;
   const quantity = entry.quantity;
   const currentQuantity = entry.currentQuantity;
@@ -38,12 +40,12 @@
          on:mouseenter={mouseEnterImage}
          on:mouseleave={mouseLeaveImage}
     />-->
-    <img class="item-piles-img" src="{entry.img}"/>
+    <img class="item-piles-img" src="{$img}"/>
   </div>
 
   <div class="item-piles-name">
     <div class="item-piles-name-container">
-      <p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{entry.name}</p>
+      <p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{$name}</p>
       {#if !editQuantities}
         <span class="item-piles-small-text">(x{$quantity})</span>
       {/if}

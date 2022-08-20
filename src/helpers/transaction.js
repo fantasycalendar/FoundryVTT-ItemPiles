@@ -23,7 +23,7 @@ export default class Transaction {
     for (let data of items) {
       let item = data.item ?? data;
       let itemData = item instanceof Item ? item.toObject() : item;
-      if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+      if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
         itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
       }
       const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
