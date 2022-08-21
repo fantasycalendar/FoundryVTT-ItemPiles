@@ -4,7 +4,7 @@
   export let store;
 
   let tables = Array.from(game.tables);
-  let selectedTable = tables?.[0].id;
+  let selectedTable = tables?.[0]?.id;
   let timesToRoll = "1d10";
   let timesRolled = "";
   let keepRolled = false;
@@ -29,6 +29,7 @@
 
   async function rollItems() {
     const table = game.tables.get(selectedTable);
+    if (!table) return;
     const roll = new Roll(timesToRoll ?? 1).evaluate({ async: false });
     if (!keepRolled) {
       itemsRolled.set([]);
@@ -109,10 +110,13 @@
       {#each tables as table (table.id)}
         <option value={table.id}>{table.name}</option>
       {/each}
+      {#if !tables.length}
+        <option value="">No roll tables exist, create one to get started</option>
+      {/if}
     </select>
 
     <input type="text" bind:value={timesToRoll} placeholder="2d6+4"
-           style="height: 30px; padding: 0 0.5rem; flex:0.5; margin-left:0.5rem;"/>
+           style="height: 30px; padding: 0 0.5rem; flex:0.5; min-width: 50px; margin-left:0.5rem;"/>
 
     <button style="flex:0; padding: 0 1rem; margin-left:0.5rem;" on:click={rollItems}>
       Roll
@@ -208,7 +212,7 @@
     align-items: center;
   }
 
-  .item-piles-keep-rolled{
+  .item-piles-keep-rolled {
     align-items: center;
     justify-content: flex-end;
     font-size: 0.75rem;
@@ -216,7 +220,7 @@
     flex: 0 1 auto;
 
     input {
-      height:14px;
+      height: 14px;
     }
   }
 

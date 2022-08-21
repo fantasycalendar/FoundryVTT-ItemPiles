@@ -5,6 +5,7 @@
   import MerchantSellTab from "./MerchantSellTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
   import { get, writable } from "svelte/store";
+  import MerchantCurrencyColumn from "./MerchantCurrencyColumn.svelte";
 
   export let store;
   export let recipientStore;
@@ -55,23 +56,7 @@
 
       {#each $currencies as currency (currency.identifier)}
 
-        <div class="item-piles-flexrow item-piles-item-row" style="flex:0 1 auto; margin: 0.5rem 0.25rem;">
-
-          <div class="item-piles-img-container">
-            <img class="item-piles-img" src="{get(currency.img)}"/>
-          </div>
-
-          <div class="item-piles-name item-piles-text" style="flex:0 1 auto;">
-            <div class="item-piles-name-container">
-              {#if currency.abbreviation}
-                {currency.abbreviation.replace("{#}", get(currency.quantity))}
-              {:else}
-                {get(currency.name)} (x{get(currency.quantity)})
-              {/if}
-            </div>
-          </div>
-
-        </div>
+        <MerchantCurrencyColumn {currency}/>
 
       {/each}
 
