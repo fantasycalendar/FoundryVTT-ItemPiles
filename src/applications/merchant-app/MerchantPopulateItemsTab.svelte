@@ -1,10 +1,12 @@
 <script>
+  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { get, writable } from "svelte/store";
 
   export let store;
 
-  let tables = Array.from(game.tables);
-  let selectedTable = tables?.[0]?.id;
+  let tables = writable(Array.from(game.tables).map(table => ({ name: table.name, id: table.id })));
+  let selectedTable = writable(tables?.[0]?.id ?? "");
+
   let timesToRoll = "1d10";
   let timesRolled = "";
   let keepRolled = false;
@@ -25,10 +27,15 @@
     });
   }
 
+  $: {
+    const tableExists = game.tables.get($selectedTable ?? "");
+    $selectedTable = tableExists ?? $tables?.[0]?.id ?? "";
+  }
+
   let itemsRolled = writable([]);
 
   async function rollItems() {
-    const table = game.tables.get(selectedTable);
+    const table = game.tables.get(get(selectedTable));
     if (!table) return;
     const roll = new Roll(timesToRoll ?? 1).evaluate({ async: false });
     if (!keepRolled) {
@@ -100,26 +107,33 @@
     itemsRolled.set([]);
   }
 
+  Hooks.on("createRollTable", () => {
+    tables.set(Array.from(game.tables).map(table => ({ name: table.name, id: table.id })));
+  });
+  Hooks.on("deleteRollTable", () => {
+    tables.set(Array.from(game.tables).map(table => ({ name: table.name, id: table.id })));
+  });
+
 </script>
 
 <div>
 
-  <div class="item-piles-flexrow" style="margin-bottom: 1rem;">
+  <div class="item-piles-flexrow" style="margin-bottom: 1rem; padding:0.25rem;">
 
-    <select bind:value={selectedTable} style="flex: 3; height:30px;">
-      {#each tables as table (table.id)}
+    <select bind:value={$selectedTable} style="flex: 3; height:30px;">
+      {#each $tables as table (table.id)}
         <option value={table.id}>{table.name}</option>
       {/each}
-      {#if !tables.length}
-        <option value="">No roll tables exist, create one to get started</option>
+      {#if !$tables.length}
+        <option value="">{localize("ITEM-PILES.Merchant.NoRollTables")}</option>
       {/if}
     </select>
 
     <input type="text" bind:value={timesToRoll} placeholder="2d6+4"
            style="height: 30px; padding: 0 0.5rem; flex:0.5; min-width: 50px; margin-left:0.5rem;"/>
 
-    <button style="flex:0; padding: 0 1rem; margin-left:0.5rem;" on:click={rollItems}>
-      Roll
+    <button style="flex:0; padding: 0 1rem; margin-left:0.5rem;" on:click={rollItems} disabled={!$tables.length}>
+      {localize("Roll")}
     </button>
 
   </div>
@@ -129,7 +143,7 @@
     <div style="margin-right:0.5rem;">
 
       <div style="margin-bottom:0.5rem;">
-        {currentItems.length ? "Current items:" : "Merchant has no items"}
+        {localize(currentItems.length ? "ITEM-PILES.Merchant.CurrentItems" : "ITEM-PILES.Merchant.BuyNoItems")}
       </div>
 
       {#each currentItems as item (item.id)}
@@ -150,15 +164,13 @@
 
       <div class="item-piles-flexrow item-piles-roll-header">
         <label>
-          {#if timesRolled && $itemsRolled.length}
-            Rolled {timesRolled} times:
-          {:else}
-            Click roll to start
-          {/if}
+          {localize(timesRolled && $itemsRolled.length
+            ? "ITEM-PILES.Merchant.RolledTimes"
+            : "ITEM-PILES.Merchant.ClickRoll", { rolls: timesRolled })}
         </label>
 
         <div class="item-piles-flexrow item-piles-keep-rolled">
-          <label>Keep rolled:</label>
+          <label>{localize("ITEM-PILES.Merchant.KeepRolled")}</label>
           <input type="checkbox" bind:checked={keepRolled}>
         </div>
       </div>
@@ -194,7 +206,7 @@
         {/each}
 
         <button class="item-piles-add-button" on:click={() => addAllItems()}>
-          Add all <i class="fas fa-arrow-left"></i>
+          {localize("ITEM-PILES.Merchant.AddAll")} <i class="fas fa-arrow-left"></i>
         </button>
 
       {/if}

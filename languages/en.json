@@ -84,6 +84,16 @@
       "UserActiveCharacterWarning": "You picked the actor \"{actor_name}\" which is the assigned character of the player \"{player_name}\", who is <strong>active</strong>.<br><br>Are you sure you want to do this?",
       "ActorOwnerWarning": "You do not own this actor, so you cannot trade with it."
     },
+    "Merchant": {
+      "BuyNoItems": "Merchant has no items",
+      "SellNoItems": "You have no items to sell to this merchant",
+      "CurrentItems": "Current items",
+      "NoRollTables": "No roll tables exist, create one to get started",
+      "ClickRoll": "Click roll to start",
+      "RolledTimes": "Rolled {rolls} times",
+      "KeepRolled": "Keep rolled",
+      "AddAll": "Add All Items"
+    },
     "Errors": {
       "DisallowedItemDrop": "You cannot drop \"{type}\" items",
       "DisallowedItemTrade": "You cannot trade \"{type}\" items",
