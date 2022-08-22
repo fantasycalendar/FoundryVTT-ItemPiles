@@ -1,4 +1,5 @@
 <script>
+  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
   import ItemEditor from "../editors/item-editor/item-editor.js";
   import PriceSelector from "../components/PriceSelector.svelte";
@@ -99,7 +100,7 @@
               store.tradeItem(item, selling)
             }}>
         <i class="fas" class:fa-shopping-cart={!selling} class:fa-hand-holding-usd={selling}></i>
-        {#if !displayControlButtons} {!selling ? "Buy" : "Sell"}{/if}
+        {#if !displayControlButtons} {localize("ITEM-PILES.Merchant." + (!selling ? "Buy" : "Sell"))}{/if}
       </span>
     {/if}
   </div>

@@ -13,8 +13,7 @@
   const priceModifiersPerType = store.priceModifiersPerType;
   const itemCategoriesStore = store.itemCategories;
   const typeFilterStore = store.typeFilter;
-
-  $: editPrices = false && !!store.recipient;
+  const editPrices = store.editPrices;
 
 </script>
 
@@ -23,7 +22,7 @@
   <div class="item-piles-flexrow">
     <input type="text" bind:value={$searchStore} placeholder="Type to search...">
     <select style="flex:0 1 auto; margin-left: 0.4rem; height: 26px;" bind:value={$typeFilterStore}>
-      <option value="all">{localize("All")}</option>
+      <option value="all">{localize("ITEM-PILES.Merchant.AllTypes")}</option>
       {#each $itemCategoriesStore as category (category.type)}
         <option value={category.type}>{category.label}</option>
       {/each}
@@ -36,17 +35,17 @@
         <div>
           {localize(category.label)}
         </div>
-        <div class="price-header">
-          {#if editPrices}
+        <div class="price-header" style="font-size: 0.75rem;">
+          {#if $editPrices}
             {#if $priceModifiersPerType[category.type]}
-              Override:
+              {localize("ITEM-PILES.Merchant.Override")}:
               <input type="checkbox" bind:checked={$priceModifiersPerType[category.type].override}>
               <SliderInput bind:value={$priceModifiersPerType[category.type].buyPriceModifier}/>
             {/if}
           {/if}
         </div>
         <div style="flex: 0 1 auto">
-          {#if editPrices}
+          {#if $editPrices}
             {#if $priceModifiersPerType[category.type]}
               <i class="fas fa-times item-piles-clickable-red"
                  on:click={() => { store.removeOverrideTypePrice(category.type) }}></i>
@@ -74,6 +73,8 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     margin-top: 10px;
     padding-right: 10px;
+    height: 1.5rem;
+    align-items: center;
 
     .price-header {
       flex: 0 1 250px;

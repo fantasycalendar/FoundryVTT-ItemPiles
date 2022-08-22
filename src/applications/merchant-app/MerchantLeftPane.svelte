@@ -8,6 +8,9 @@
 
   const merchantImg = store.img;
   const pileDataStore = store.pileData;
+  let editPrices = store.editPrices;
+
+  console.log(editPrices);
 
   let activeSidebarTab = "description";
 
@@ -22,8 +25,8 @@
   <div class="item-piles-flexcol item-piles-top-divider">
 
     <Tabs style="flex: 0 1 auto;" tabs="{[
-      { value: 'description', label: 'Description' },
-      { value: 'settings', label: 'Settings', hidden: !game.user.isGM },
+      { value: 'description', label: 'ITEM-PILES.Merchant.Description' },
+      { value: 'settings', label: 'ITEM-PILES.Merchant.Settings', hidden: !game.user.isGM },
     ]}" bind:activeTab={activeSidebarTab}/>
 
     <section class="tab-body item-piles-sections">
@@ -37,9 +40,17 @@
       {/if}
 
       {#if activeSidebarTab === 'settings'}
-        <div class="tab merchant-settings ">
+        <div class="tab merchant-settings">
 
           <div class="setting-container item-piles-config-container">
+
+            <div class="form-group">
+              <label style="flex:3;">
+                <span>{localize("ITEM-PILES.Merchant.EditTypePrices")}</span>
+                <p>{localize("ITEM-PILES.Merchant.EditTypePricesExplanation")}</p>
+              </label>
+              <input type="checkbox" bind:checked={$editPrices}/>
+            </div>
 
             <div class="form-group">
               <label style="flex:3;">
@@ -131,13 +142,15 @@
 
     .merchant-settings {
       position: relative;
-      height: 100%;
+      height: calc(100% - 37px);
+
 
       .setting-container {
         overflow: hidden auto;
         top: 0;
         bottom: 37px;
         position: absolute;
+        padding: 0 0.25rem;
 
         .form-group {
           clear: both;
@@ -153,7 +166,7 @@
 
       .update-button {
         position: absolute;
-        bottom: 0;
+        bottom: -37px;
       }
 
     }

@@ -85,6 +85,14 @@
       "ActorOwnerWarning": "You do not own this actor, so you cannot trade with it."
     },
     "Merchant": {
+      "AllTypes": "All types",
+      "Buy": "Buy",
+      "Sell": "Sell",
+      "Description": "Description",
+      "Settings": "Settings",
+      "Override": "Override",
+      "EditTypePrices": "Edit Per-Type Cost Modifiers",
+      "EditTypePricesExplanation": "Toggle the visibility of per-type sliders in the Buy Items tab",
       "BuyNoItems": "Merchant has no items",
       "SellNoItems": "You have no items to sell to this merchant",
       "CurrentItems": "Current items",
