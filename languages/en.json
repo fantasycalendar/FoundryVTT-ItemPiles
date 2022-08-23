@@ -178,7 +178,15 @@
       "TradeMerchantItem": {
         "Title": "Trading Item: {item_name}",
         "BuyItem": "Buy Item",
-        "SellItem": "Sell Item"
+        "SellItem": "Sell Item",
+        "YouPay": "You pay",
+        "YouReceive": "You receive",
+        "TheyReceive": "They receive",
+        "Quantity": "Quantity",
+        "Change": "Change",
+        "CantAfford": "You cannot afford this price",
+        "TheyCantAfford": "They cannot afford this price",
+        "MaxQuantity": "Max {quantity}"
       },
       "Settings": {
         "Title": "Item Piles Module Configuration",

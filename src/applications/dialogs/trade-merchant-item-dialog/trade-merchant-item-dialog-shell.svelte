@@ -2,10 +2,8 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { getContext } from "svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { get, writable } from "svelte/store";
-  import SliderInput from "../../components/SliderInput.svelte";
+  import { get } from "svelte/store";
   import * as PileUtilities from "../../../helpers/pile-utilities.js";
-  import * as Helpers from "../../../helpers/helpers.js";
   import PriceSelector from "../../components/PriceSelector.svelte";
 
   const { application } = getContext('external');
@@ -39,7 +37,7 @@
 
   let paymentData = {};
   $: {
-    const data = PileUtilities.getPricesForItems([{
+    paymentData = PileUtilities.getPricesForItems([{
       item: item.item,
       quantity: $quantityToBuy,
       paymentIndex: $selectedPriceGroup
@@ -49,10 +47,6 @@
       sellerFlagData: $sellerPileData,
       buyerFlagData: $buyerPileData,
     });
-    if (settings.selling) {
-
-    }
-    paymentData = data;
   }
 
   $: maxMerchantItemQuantity = $sellerPileData.infiniteQuantity ? Infinity : $itemMaxQuantityStore;
@@ -83,16 +77,18 @@
         <div class="item-piles-img-container" style="margin-right: 0.25rem;">
           <img class="item-piles-img" src={$itemImg}/>
         </div>
-        <span>{$itemName}</span>
+        <span>{localize($itemName)}</span>
       </div>
 
       <div
           style="display:flex; justify-content:flex-end; align-items: center; text-align: right;">
         {#if maxItemQuantity}
           <div style="display: flex; flex-direction: column; align-items: flex-end; margin-right: 0.5rem;">
-            <small>Quantity</small>
+            <small>{localize("ITEM-PILES.Applications.TradeMerchantItem.Quantity")}</small>
             <small style="font-style:italic;">
-              (Max {maxItemPurchaseQuantity})
+              ({localize("ITEM-PILES.Applications.TradeMerchantItem.MaxQuantity", {
+              quantity: maxItemPurchaseQuantity
+            })})
             </small>
           </div>
           <input style="max-width: 40px; max-height: 24px;" type="number" bind:value={currentQuantityToBuy} on:change={(evt) => {
@@ -110,7 +106,7 @@
             <small>{paymentData.basePriceString}</small>
           {/if}
         {:else}
-          <small>You cannot afford this price</small>
+          <small>{localize(`ITEM-PILES.Applications.TradeMerchantItem.${settings.selling ? "They" : "You"}CantAfford`)}</small>
         {/if}
       </div>
     </div>
@@ -118,20 +114,12 @@
     <div style="display: grid; grid-template-columns: auto auto;" class="item-piles-bottom-divider">
 
       <strong class="item-piles-bottom-divider" style="margin-bottom:0.25rem; padding-bottom:0.25rem;">
-        {#if settings.selling}
-          You receive:
-        {:else}
-          You pay:
-        {/if}
+        {localize("ITEM-PILES.Applications.TradeMerchantItem." + (settings.selling ? "YouReceive" : "YouPay"))}:
       </strong>
 
       <strong class="item-piles-bottom-divider item-piles-text-right"
               style="margin-bottom:0.25rem; padding-bottom:0.25rem;">
-        {#if settings.selling}
-          They receive:
-        {:else}
-          You pay:
-        {/if}
+        {localize("ITEM-PILES.Applications.TradeMerchantItem." + (settings.selling ? "TheyReceive" : "YouReceive"))}:
       </strong>
 
       <div>
@@ -141,7 +129,7 @@
               <div class="item-piles-img-container" style="margin-right: 0.25rem;">
                 <img class="item-piles-img" src={price.img}/>
               </div>
-              <span>{price.quantity} {price.name}</span>
+              <span>{price.quantity} {localize(price.name)}</span>
             </div>
           {/if}
         {/each}
@@ -156,12 +144,12 @@
         </div>
         {#if paymentData.buyerChange.length}
           <span class="item-piles-small-text item-piles-text-right" style="margin-right: 0.25rem; margin-top: 0.5rem;">
-            Change:
+            {localize("ITEM-PILES.Applications.TradeMerchantItem.Change")}:
           </span>
           {#each paymentData.buyerChange as change}
             {#if change.quantity}
               <div style="display:flex; align-items: center;">
-                <span>{change.quantity} {change.name}</span>
+                <span>{change.quantity} {localize(change.name)}</span>
                 <div class="item-piles-img-container" style="margin-left: 0.25rem;">
                   <img class="item-piles-img" src={change.img}/>
                 </div>
