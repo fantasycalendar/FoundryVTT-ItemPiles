@@ -24,8 +24,9 @@ export default class ItemPileConfig extends SvelteApplication {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       width: 430,
-      height: 617,
+      height: 627,
       classes: ["item-piles-config"],
+      resizable: true
     })
   }
   

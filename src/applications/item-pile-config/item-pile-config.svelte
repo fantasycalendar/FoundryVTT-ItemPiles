@@ -131,6 +131,12 @@
     form.requestSubmit();
   }
 
+  let tabs = [
+    { value: "mainsettings", label: "ITEM-PILES.Applications.ItemPileConfig.Main.Title", highlight: !pileData.enabled },
+    { value: "merchant", label: "ITEM-PILES.Applications.ItemPileConfig.Merchant.Title" },
+    { value: "othersettings", label: "ITEM-PILES.Applications.ItemPileConfig.Other.Title" },
+  ];
+
   let activeTab = "mainsettings";
 
 </script>
@@ -142,10 +148,7 @@
   <form bind:this={form} on:submit|once|preventDefault={updateSettings} autocomplete=off
         class="item-piles-config-container">
 
-    <Tabs bind:activeTab tabs={[
-    { value: "mainsettings", label: localize("ITEM-PILES.Applications.ItemPileConfig.Main.Title"), highlight: !pileData.enabled },
-    { value: "othersettings", label: localize("ITEM-PILES.Applications.ItemPileConfig.Other.Title") },
-  ]}/>
+    <Tabs bind:activeTab bind:tabs/>
 
     <section class="tab-body">
 
@@ -200,12 +203,14 @@
 
           <div class="form-group">
             <label style="flex:4;">
-              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.Macro")}</span>
-              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.MacroExplanation")}</p>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescriptionExplanation")}</p>
             </label>
-            <input style="flex:4;" type="text"
-                   placeholder={localize("ITEM-PILES.Applications.ItemPileConfig.Main.MacroPlaceholder")}
-                   bind:value="{pileData.macro}"/>
+          </div>
+          <div class="form-group">
+            <button type="button" style="flex:4;">
+              {localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}
+            </button>
           </div>
 
           <div class="form-group">
@@ -239,6 +244,156 @@
           </div>
 
         </div>
+      {/if}
+
+      {#if activeTab === "merchant"}
+
+        <div class="tab flex">
+
+          <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.Enabled")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.EnabledExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={pileData.isMerchant}/>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantity")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantityExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={pileData.infiniteQuantity}/>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteCurrency")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteCurrencyExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={pileData.infiniteCurrencies}/>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantity")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityExplanation")}</p>
+            </label>
+            <div class="break"></div>
+            <select style="flex:4;" bind:value={pileData.displayQuantity}>
+              <option value="yes">
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityYes")}
+              </option>
+              <option value="no">
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityNo")}
+              </option>
+              <option value="alwaysyes">
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityYesAlways")}
+              </option>
+              <option value="alwaysno">
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityNoAlways")}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={pileData.purchaseOnly}/>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={pileData.hideNewItems}/>
+          </div>
+
+          <div class="form-group slider-group">
+            <label style="flex:3;">
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifierTitle")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifierExplanation")}</p>
+            </label>
+          </div>
+
+          <div class="form-group slider-group">
+            <label style="flex:3;">
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</span>
+            </label>
+            <SliderInput style="flex:4;" bind:value={pileData.buyPriceModifier}/>
+          </div>
+
+          <div class="form-group slider-group">
+            <label style="flex:3;">
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</span>
+            </label>
+            <SliderInput style="flex:4;" bind:value={pileData.sellPriceModifier}/>
+          </div>
+
+          <div class="form-group">
+            <div class="item-piles-flexcol">
+              <label>
+                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifier")}</span>
+                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifiersExplanation")}</p>
+              </label>
+              <button type="button" on:click={() => { showItemTypePriceModifiers() }}>
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureItemTypePriceModifiers")}
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="item-piles-flexcol">
+              <label>
+                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiers")}</span>
+                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiersExplanation")}</p>
+              </label>
+              <button type="button" on:click={() => { showActorPriceModifiers() }}>
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureActorPriceModifiers")}
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenTimes")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenTimesExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={pileData.openTimes.enabled}/>
+          </div>
+
+          <div class="form-group item-piles-open-times-container"
+               class:item-piles-disabled={!pileData.openTimes.enabled}>
+            <div class="item-piles-flexcol" style="margin-right:1rem">
+              <label class="item-piles-text-center">
+                Open Time:
+              </label>
+              <div class="item-piles-flexrow">
+                <input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}"
+                       bind:value="{pileData.openTimes.open.hour}"/>
+                <span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
+                <input type="number" disabled="{!pileData.openTimes.enabled}"
+                       bind:value="{pileData.openTimes.open.minute}"/>
+              </div>
+            </div>
+            <div class="item-piles-flexcol">
+              <label class="item-piles-text-center">
+                Close Time:
+              </label>
+              <div class="item-piles-flexrow">
+                <input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}"
+                       bind:value="{pileData.openTimes.close.hour}"/>
+                <span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
+                <input type="number" disabled="{!pileData.openTimes.enabled}"
+                       bind:value="{pileData.openTimes.close.minute}"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
       {/if}
 
       {#if activeTab === 'othersettings'}
@@ -416,155 +571,6 @@
             <div class="form-group">
               <button type="button" class="item-piles-config-reset-sharing-data" style="flex:4;"
                       on:click={() => { resetSharingData() }}>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingData")}</button>
-            </div>
-
-          </details>
-
-          <details class="item-piles-collapsible item-piles-clickable">
-
-            <summary>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.Title")}</summary>
-
-            <div class="form-group">
-              <label>
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.Enabled")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.EnabledExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={pileData.isMerchant}/>
-            </div>
-
-            <div class="form-group">
-              <label>
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantity")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantityExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={pileData.infiniteQuantity}/>
-            </div>
-
-            <div class="form-group">
-              <label>
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteCurrency")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteCurrencyExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={pileData.infiniteCurrencies}/>
-            </div>
-
-            <div class="form-group">
-              <label>
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantity")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityExplanation")}</p>
-              </label>
-              <div class="break"></div>
-              <select style="flex:4;" bind:value={pileData.displayQuantity}>
-                <option value="yes">
-                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityYes")}
-                </option>
-                <option value="no">
-                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityNo")}
-                </option>
-                <option value="alwaysyes">
-                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityYesAlways")}
-                </option>
-                <option value="alwaysno">
-                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityNoAlways")}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={pileData.purchaseOnly}/>
-            </div>
-
-            <div class="form-group">
-              <label>
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={pileData.hideNewItems}/>
-            </div>
-
-            <div class="form-group slider-group">
-              <label style="flex:3;">
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifierTitle")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PriceModifierExplanation")}</p>
-              </label>
-            </div>
-
-            <div class="form-group slider-group">
-              <label style="flex:3;">
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</span>
-              </label>
-              <SliderInput style="flex:4;" bind:value={pileData.buyPriceModifier}/>
-            </div>
-
-            <div class="form-group slider-group">
-              <label style="flex:3;">
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</span>
-              </label>
-              <SliderInput style="flex:4;" bind:value={pileData.sellPriceModifier}/>
-            </div>
-
-            <div class="form-group">
-              <div class="item-piles-flexcol">
-                <label>
-                  <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifier")}</span>
-                  <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifiersExplanation")}</p>
-                </label>
-                <button type="button" on:click={() => { showItemTypePriceModifiers() }}>
-                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureItemTypePriceModifiers")}
-                </button>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <div class="item-piles-flexcol">
-                <label>
-                  <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiers")}</span>
-                  <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiersExplanation")}</p>
-                </label>
-                <button type="button" on:click={() => { showActorPriceModifiers() }}>
-                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureActorPriceModifiers")}
-                </button>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenTimes")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenTimesExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={pileData.openTimes.enabled}/>
-            </div>
-
-            <div class="form-group item-piles-open-times-container"
-                 class:item-piles-disabled={!pileData.openTimes.enabled}>
-              <div class="item-piles-flexcol" style="margin-right:1rem">
-                <label class="item-piles-text-center">
-                  Open Time:
-                </label>
-                <div class="item-piles-flexrow">
-                  <input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}"
-                         bind:value="{pileData.openTimes.open.hour}"/>
-                  <span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
-                  <input type="number" disabled="{!pileData.openTimes.enabled}"
-                         bind:value="{pileData.openTimes.open.minute}"/>
-                </div>
-              </div>
-              <div class="item-piles-flexcol">
-                <label class="item-piles-text-center">
-                  Close Time:
-                </label>
-                <div class="item-piles-flexrow">
-                  <input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}"
-                         bind:value="{pileData.openTimes.close.hour}"/>
-                  <span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
-                  <input type="number" disabled="{!pileData.openTimes.enabled}"
-                         bind:value="{pileData.openTimes.close.minute}"/>
-                </div>
-              </div>
             </div>
 
           </details>

@@ -8,11 +8,18 @@
 
   const merchantImg = store.img;
   const pileDataStore = store.pileData;
-  let editPrices = store.editPrices;
+  const editPrices = store.editPrices;
 
-  console.log(editPrices);
+  const tabs = [
+    {
+      value: 'description',
+      label: 'ITEM-PILES.Merchant.Description',
+      hidden: !game.user.isGM && !pileDataStore.description
+    },
+    { value: 'settings', label: 'ITEM-PILES.Merchant.Settings', hidden: !game.user.isGM },
+  ];
 
-  let activeSidebarTab = "description";
+  let activeSidebarTab = tabs.find(tab => !tab.hidden)?.value;
 
 </script>
 
@@ -22,77 +29,80 @@
     <img src="{ $merchantImg }">
   </div>
 
-  <div class="item-piles-flexcol item-piles-top-divider">
+  {#if activeSidebarTab}
 
-    <Tabs style="flex: 0 1 auto;" tabs="{[
-      { value: 'description', label: 'ITEM-PILES.Merchant.Description' },
-      { value: 'settings', label: 'ITEM-PILES.Merchant.Settings', hidden: !game.user.isGM },
-    ]}" bind:activeTab={activeSidebarTab}/>
+    <div class="item-piles-flexcol item-piles-top-divider">
 
-    <section class="tab-body item-piles-sections">
+      <Tabs style="flex: 0 1 auto;" {tabs} bind:activeTab={activeSidebarTab}/>
 
-      {#if activeSidebarTab === 'description'}
-        <div class="tab merchant-description">
-          <div>
+      <section class="tab-body item-piles-sections">
 
+        {#if activeSidebarTab === 'description'}
+          <div class="tab merchant-description">
+            {@html pileDataStore.description || ""}
+            {#if !pileDataStore.description}
+              <button type="button"
+                      style="flex:1;">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}</button>
+            {/if}
           </div>
-        </div>
-      {/if}
+        {/if}
 
-      {#if activeSidebarTab === 'settings'}
-        <div class="tab merchant-settings">
+        {#if activeSidebarTab === 'settings'}
+          <div class="tab merchant-settings">
 
-          <div class="setting-container item-piles-config-container">
+            <div class="setting-container item-piles-config-container">
 
-            <div class="form-group">
-              <label style="flex:3;">
-                <span>{localize("ITEM-PILES.Merchant.EditTypePrices")}</span>
-                <p>{localize("ITEM-PILES.Merchant.EditTypePricesExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={$editPrices}/>
+              <div class="form-group">
+                <label style="flex:3;">
+                  <span>{localize("ITEM-PILES.Merchant.EditTypePrices")}</span>
+                  <p>{localize("ITEM-PILES.Merchant.EditTypePricesExplanation")}</p>
+                </label>
+                <input type="checkbox" bind:checked={$editPrices}/>
+              </div>
+
+              <div class="form-group">
+                <label style="flex:3;">
+                  <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
+                  <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
+                </label>
+                <input type="checkbox" bind:checked={$pileDataStore.purchaseOnly}/>
+              </div>
+
+              <div class="form-group">
+                <label style="flex:3;">
+                  <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
+                  <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
+                </label>
+                <input type="checkbox" bind:checked={$pileDataStore.hideNewItems}/>
+              </div>
+
+              <div class="form-group slider-group item-piles-flexcol">
+                <label>
+                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}
+                </label>
+                <SliderInput bind:value={$pileDataStore.buyPriceModifier}/>
+              </div>
+
+              <div class="form-group slider-group item-piles-flexcol">
+                <label>
+                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}
+                </label>
+                <SliderInput style="flex:4;" bind:value={$pileDataStore.sellPriceModifier}/>
+              </div>
+
             </div>
 
-            <div class="form-group">
-              <label style="flex:3;">
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={$pileDataStore.purchaseOnly}/>
-            </div>
-
-            <div class="form-group">
-              <label style="flex:3;">
-                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
-                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
-              </label>
-              <input type="checkbox" bind:checked={$pileDataStore.hideNewItems}/>
-            </div>
-
-            <div class="form-group slider-group item-piles-flexcol">
-              <label>
-                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}
-              </label>
-              <SliderInput bind:value={$pileDataStore.buyPriceModifier}/>
-            </div>
-
-            <div class="form-group slider-group item-piles-flexcol">
-              <label>
-                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}
-              </label>
-              <SliderInput style="flex:4;" bind:value={$pileDataStore.sellPriceModifier}/>
-            </div>
-
+            <button type="button" class="update-button" on:click={() => { store.update(); }}>
+              <i class="fas fa-download"></i> Update
+            </button>
           </div>
+        {/if}
 
-          <button type="button" class="update-button" on:click={() => { store.update(); }}>
-            <i class="fas fa-download"></i> Update
-          </button>
-        </div>
-      {/if}
+      </section>
 
-    </section>
+    </div>
 
-  </div>
+  {/if}
 
 </div>
 

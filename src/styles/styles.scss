@@ -369,9 +369,15 @@
 
 /* ----------------------- CONFIG ----------------------- */
 
-.item-piles-config .dialog-content {
-  height: 100%;
-  overflow: hidden;
+
+.item-piles-config {
+  min-width: 430px;
+  min-height: 627px;
+
+  .dialog-content {
+    height: 100%;
+    overflow: hidden;
+  }
 }
 
 .item-piles-collapsible {

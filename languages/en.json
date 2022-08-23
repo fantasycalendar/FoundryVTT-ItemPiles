@@ -275,6 +275,8 @@
           "Macro": "On Interact Macro",
           "MacroExplanation": "Name of macro to execute when this pile is interacted with.",
           "MacroPlaceholder": "Insert macro name",
+          "EditDescription": "Edit Description",
+          "EditDescriptionExplanation": "This description is shown in relevant interfaces when the item pile is viewed",
           "DeleteWhenEmpty": "Delete when empty",
           "DeleteWhenEmptyExplanation": "Causes this item pile to auto-delete itself once it's empty.",
           "DeleteWhenEmptyDefault": "Default module setting",
