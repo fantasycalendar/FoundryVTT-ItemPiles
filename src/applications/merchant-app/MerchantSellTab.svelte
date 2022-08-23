@@ -2,7 +2,6 @@
 
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import { fade } from 'svelte/transition';
-  import SliderInput from "../components/SliderInput.svelte";
   import MerchantItemEntry from "./MerchantItemEntry.svelte";
 
   export let store;
@@ -16,25 +15,33 @@
 
 </script>
 
-<div>
-
-  {#each $categoryStore as category, index (category.type)}
-    <div in:fade|local={{duration: 150}}>
-      <h3 class="merchant-item-group-type item-piles-flexrow">
-        <div>
-          {localize(category.label)}
-        </div>
-      </h3>
-
-      <div class="item-piles-items-list">
-        {#each $itemsPerCategoryStore[category.type] as item (item.id)}
-          <MerchantItemEntry {store} {item} selling/>
-        {/each}
+{#each $categoryStore as category, index (category.type)}
+  <div in:fade|local={{duration: 150}}>
+    <h3 class="merchant-item-group-type item-piles-flexrow">
+      <div>
+        {localize(category.label)}
       </div>
-    </div>
-  {/each}
+    </h3>
 
-</div>
+    <div class="item-piles-items-list">
+      {#each $itemsPerCategoryStore[category.type] as item (item.id)}
+        <MerchantItemEntry {store} {item} selling/>
+      {/each}
+    </div>
+  </div>
+{/each}
+
+{#if !$categoryStore.length}
+
+  <div style="height: 100%;" class="item-piles-flexcol align-center-col">
+
+    <span class="align-center-row" style="font-size:1.25rem; opacity: 0.8; text-align: center;">
+      {localize("ITEM-PILES.Merchant.NoItemsToSell")}
+    </span>
+
+  </div>
+
+{/if}
 
 <style lang="scss">
 

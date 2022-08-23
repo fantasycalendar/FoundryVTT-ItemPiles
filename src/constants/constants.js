@@ -67,6 +67,7 @@ const CONSTANTS = {
     
     // Merchant settings
     isMerchant: false,
+    merchantImage: "",
     isClosed: false,
     infiniteQuantity: false,
     infiniteCurrencies: true,

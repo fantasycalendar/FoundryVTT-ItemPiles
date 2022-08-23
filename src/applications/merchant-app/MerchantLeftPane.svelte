@@ -124,16 +124,18 @@
     }
 
     .merchant-img {
+      position: relative;
       flex: 0 1 auto;
       border-radius: 5px;
-      margin-bottom: 5px;
 
       img {
         width: 100%;
         height: auto;
         border: 0;
         border-radius: 3px;
+        z-index: 1;
       }
+
     }
 
     .merchant-description {

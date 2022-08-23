@@ -27,8 +27,11 @@ export default class MerchantStore extends ItemPileStore {
   
   setupSubscriptions() {
     super.setupSubscriptions();
-    this.subscribeTo(this.pileData, () => {
+    this.subscribeTo(this.pileData, (pileData) => {
       this.updatePriceModifiers();
+      if (pileData.merchantImage) {
+        this.img.set(pileData.merchantImage);
+      }
     });
     if (this.recipientDocument) {
       this.subscribeTo(this.recipientPileData, () => {

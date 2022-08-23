@@ -4,7 +4,7 @@
   import MerchantBuyTab from "./MerchantBuyTab.svelte";
   import MerchantSellTab from "./MerchantSellTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
-  import { get, writable } from "svelte/store";
+  import { writable } from "svelte/store";
   import MerchantCurrencyColumn from "./MerchantCurrencyColumn.svelte";
 
   export let store;
@@ -37,7 +37,8 @@
         underscore
   />
 
-  <div class="merchant-tabbed-center" style="flex:1; calc(100% - {recipientStore ? '36px' : '0px'})">
+  <div class="merchant-tabbed-center"
+       style="flex:1; calc(100% - {recipientStore && $currencies.length ? '36px' : '0px'})">
 
     {#if activeTab === "buy"}
       <MerchantBuyTab {store}/>
@@ -50,18 +51,12 @@
   </div>
 
 
-  {#if recipientStore}
-
+  {#if recipientStore && $currencies.length}
     <div class="item-piles-flexrow item-piles-currency-list">
-
       {#each $currencies as currency (currency.identifier)}
-
         <MerchantCurrencyColumn {currency}/>
-
       {/each}
-
     </div>
-
   {/if}
 
 </div>

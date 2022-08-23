@@ -1,5 +1,7 @@
 <script>
 
+  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+
   export let store;
 
   const pileDataStore = store.pileData;
@@ -21,7 +23,7 @@
   <div class="merchant-name">{$merchantName}</div>
   {#if $pileDataStore.openTimes.enabled}
     <div class="opening-hours item-piles-flexcol">
-      <span>Opening hours</span>
+      <span>{localize("ITEM-PILES.Merchant.OpenTimes")}</span>
       <span style="font-style: italic;">{openTimeText}</span>
     </div>
   {/if}

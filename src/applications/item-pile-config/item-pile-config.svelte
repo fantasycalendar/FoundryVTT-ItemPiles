@@ -260,6 +260,16 @@
 
           <div class="form-group">
             <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.MerchantImage")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.MerchantImageExplanation")}</p>
+            </label>
+            <div class="form-fields">
+              <FilePicker type="imagevideo" bind:value={pileData.merchantImage} placeholder="path/image.png"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
               <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantity")}</span>
               <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantityExplanation")}</p>
             </label>
