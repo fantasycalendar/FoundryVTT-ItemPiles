@@ -10,8 +10,6 @@ import { PileAttribute, PileItem } from "./pile-item.js";
 
 const __STORES__ = new Map();
 
-const __PILEDATA_STORES__ = new Map();
-
 export default class ItemPileStore {
   
   constructor(application, source, recipient = false, { recipientPileData = false } = {}) {
