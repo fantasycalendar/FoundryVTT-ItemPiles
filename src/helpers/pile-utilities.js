@@ -435,6 +435,18 @@ export function getItemPrices(item, {
   itemFlagData = itemFlagData || getItemFlagData(item);
   
   if (itemFlagData?.free) {
+    priceData.push({
+      free: true,
+      basePrices: [],
+      basePriceString: "",
+      prices: [],
+      priceString: "",
+      totalCost: 0,
+      baseCost: 0,
+      primary: true,
+      maxQuantity: Infinity,
+      quantity
+    })
     return priceData;
   }
   
@@ -639,7 +651,6 @@ export function getPricesForItems(itemsToBuy, {
         img: priceGroup.item.img,
         quantity: priceGroup.quantity,
         item: priceGroup.item,
-        
       });
       
       return priceData;

@@ -14,7 +14,9 @@
   {#if icon}
     <p class="header-icon"><i class="{icon}"></i></p>
   {/if}
-  <p class="header"><strong>{header}</strong></p>
+  {#if header}
+    <p class="header"><strong>{header}</strong></p>
+  {/if}
   {#if Array.isArray(content)}
     {#each content as part}
       <p>{@html part}</p>

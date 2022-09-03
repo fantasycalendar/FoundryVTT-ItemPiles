@@ -25,13 +25,15 @@ export default class MerchantStore extends ItemPileStore {
     return PileMerchantItem;
   }
   
+  getActorImage() {
+    const pileData = get(this.pileData);
+    return pileData?.merchantImage || this.actor.img;
+  }
+  
   setupSubscriptions() {
     super.setupSubscriptions();
     this.subscribeTo(this.pileData, (pileData) => {
       this.updatePriceModifiers();
-      if (pileData.merchantImage) {
-        this.img.set(pileData.merchantImage);
-      }
     });
     if (this.recipientDocument) {
       this.subscribeTo(this.recipientPileData, () => {

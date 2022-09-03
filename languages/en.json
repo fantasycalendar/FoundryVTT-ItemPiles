@@ -106,7 +106,8 @@
       "ClickRoll": "Click roll to start",
       "RolledTimes": "Rolled {rolls} times",
       "KeepRolled": "Keep rolled",
-      "AddAll": "Add All Items"
+      "AddAll": "Add All Items",
+      "ClearAllItems": "Clear All Actor Items"
     },
     "Errors": {
       "DisallowedItemDrop": "You cannot drop \"{type}\" items",
@@ -152,11 +153,9 @@
         "Content": "This will reset all of the history of players having taken their share from this pile.<br><br>Are you sure you want to do this?",
         "Confirm": "Reset Sharing Data"
       },
-      "SwitchCurrencyType": {
-        "Title": "Switching Currency Type",
-        "Header": "Are you sure?",
-        "Content1": "Are you sure you want to switch currency type?",
-        "Content2": "This will reset the existing currency setup."
+      "ClearAllItems": {
+        "Title": "Clear All Actor Items",
+        "Content": "This will clear all of the actor's items, are you sure you want to do this?"
       }
     },
     "Applications": {

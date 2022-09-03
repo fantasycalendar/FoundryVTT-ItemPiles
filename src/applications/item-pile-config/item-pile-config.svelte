@@ -3,9 +3,12 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import FilePicker from "../components/FilePicker.svelte";
 
+  import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
   import CONSTANTS from "../../constants/constants.js";
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import * as Helpers from "../../helpers/helpers.js";
+
+  import TextEditorDialogShell from "../dialogs/text-editor-dialog/text-editor-dialog-shell.svelte";
 
   import PriceModifiersEditor from "../editors/price-modifiers-editor/price-modifiers-editor.js";
   import CurrenciesEditor from "../editors/currencies-editor/currencies-editor.js";
@@ -19,6 +22,8 @@
     from "../editors/item-type-price-modifiers-editor/item-type-price-modifiers-editor.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+  import { writable } from "svelte/store";
+  import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
 
   const { application } = getContext('external');
 
@@ -29,6 +34,10 @@
 
   let pileData = PileUtilities.getActorFlagData(pileActor);
   let deleteWhenEmptySetting = localize(Helpers.getSetting(SETTINGS.DELETE_EMPTY_PILES) ? "Yes" : "No");
+
+  let pileEnabled = writable(pileData.enabled);
+
+  $: pileData.enabled = $pileEnabled;
 
   let hasOverrideCurrencies = typeof pileData?.overrideCurrencies === "object";
   let hasOverrideItemFilters = typeof pileData?.overrideItemFilters === "object";
@@ -127,15 +136,28 @@
     }).render(true);
   }
 
+  async function showDescriptionDialog() {
+    return TextEditorDialog.show(pileData.description, { id: "item-pile-text-editor-" + pileActor.id }).then((result) => {
+      pileData.description = result || "";
+    });
+  }
+
   function requestSubmit() {
     form.requestSubmit();
   }
 
-  let tabs = [
-    { value: "mainsettings", label: "ITEM-PILES.Applications.ItemPileConfig.Main.Title", highlight: !pileData.enabled },
-    { value: "merchant", label: "ITEM-PILES.Applications.ItemPileConfig.Merchant.Title" },
-    { value: "othersettings", label: "ITEM-PILES.Applications.ItemPileConfig.Other.Title" },
-  ];
+  let tabs = [];
+  $: {
+    tabs = [
+      {
+        value: "mainsettings",
+        label: "ITEM-PILES.Applications.ItemPileConfig.Main.Title",
+        highlight: !$pileEnabled
+      },
+      { value: "merchant", label: "ITEM-PILES.Applications.ItemPileConfig.Merchant.Title" },
+      { value: "othersettings", label: "ITEM-PILES.Applications.ItemPileConfig.Other.Title" }
+    ]
+  }
 
   let activeTab = "mainsettings";
 
@@ -163,10 +185,10 @@
             </label>
 
             <span class="item-piles-flexrow" style="max-width: 100px; justify-content: flex-end; align-items:center;">
-          {#if !pileData.enabled}
+          {#if !$pileEnabled}
             <div style="flex:0 1 auto; margin-right: 1rem;" class="blob"><i class="fas fa-exclamation"></i></div>
           {/if}
-              <span style="flex:0 1 auto;"><input type="checkbox" bind:checked={pileData.enabled}/></span>
+              <span style="flex:0 1 auto;"><input type="checkbox" bind:checked={$pileEnabled}/></span>
         </span>
           </div>
 
@@ -193,7 +215,7 @@
             </label>
             <select style="flex:4;" bind:value={pileData.deleteWhenEmpty}>
               <option
-                  value="default">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyDefault")}
+                value="default">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyDefault")}
                 ({localize(deleteWhenEmptySetting)})
               </option>
               <option value="true">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyYes")}</option>
@@ -208,7 +230,7 @@
             </label>
           </div>
           <div class="form-group">
-            <button type="button" style="flex:4;">
+            <button type="button" style="flex:4;" on:click={() => { showDescriptionDialog() }}>
               {localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}
             </button>
           </div>

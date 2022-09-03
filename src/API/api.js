@@ -939,6 +939,14 @@ const API = {
     
   },
   
+  getActorItems(actor) {
+    return PileUtilities.getActorItems(actor);
+  },
+  
+  getActorCurrencies(actor) {
+    return PileUtilities.getActorCurrencies(actor);
+  },
+  
   updateTokenHud() {
     return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.RERENDER_TOKEN_HUD);
   },

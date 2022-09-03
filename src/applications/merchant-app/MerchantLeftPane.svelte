@@ -10,16 +10,22 @@
   const pileDataStore = store.pileData;
   const editPrices = store.editPrices;
 
-  const tabs = [
-    {
-      value: 'description',
-      label: 'ITEM-PILES.Merchant.Description',
-      hidden: !game.user.isGM && !pileDataStore.description
-    },
-    { value: 'settings', label: 'ITEM-PILES.Merchant.Settings', hidden: !game.user.isGM },
-  ];
+  let tabs = [];
+  let description = "";
+  let activeSidebarTab = false;
+  $: {
+    description = $pileDataStore.description;
+    tabs = [
+      {
+        value: 'description',
+        label: 'ITEM-PILES.Merchant.Description',
+        hidden: !game.user.isGM && description
+      },
+      { value: 'settings', label: 'ITEM-PILES.Merchant.Settings', hidden: !game.user.isGM },
+    ];
+    activeSidebarTab = activeSidebarTab || tabs.find(tab => !tab.hidden)?.value;
+  }
 
-  let activeSidebarTab = tabs.find(tab => !tab.hidden)?.value;
 
 </script>
 
@@ -39,8 +45,8 @@
 
         {#if activeSidebarTab === 'description'}
           <div class="tab merchant-description">
-            {@html pileDataStore.description || ""}
-            {#if !pileDataStore.description}
+            {@html description || ""}
+            {#if !description}
               <button type="button"
                       style="flex:1;">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}</button>
             {/if}

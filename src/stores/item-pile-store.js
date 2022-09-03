@@ -70,12 +70,14 @@ export default class ItemPileStore {
     
   }
   
+  getActorImage() {
+    return this.actor.img;
+  }
+  
   setupSubscriptions() {
     
     this.subscribeTo(this.document, () => {
       const { data } = this.document.updateOptions;
-      this.name.set(this.actor.name);
-      this.img.set(this.actor.img);
       if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
         this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
         this.refreshItems();
@@ -84,6 +86,8 @@ export default class ItemPileStore {
         this.pileData.set(PileUtilities.getActorFlagData(this.actor));
         this.refreshItems();
       }
+      this.name.set(this.actor.name);
+      this.img.set(this.getActorImage());
     });
     
     if (this.recipientDocument) {

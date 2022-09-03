@@ -1,6 +1,9 @@
 <script>
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { get, writable } from "svelte/store";
+  import { onDestroy } from 'svelte';
+  import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+  import CustomDialog from "../components/CustomDialog.svelte";
 
   export let store;
 
@@ -28,8 +31,9 @@
   }
 
   $: {
-    const tableExists = game.tables.get($selectedTable ?? "");
-    $selectedTable = tableExists ?? $tables?.[0]?.id ?? "";
+    const tableExists = game.tables.get($selectedTable ?? localStorage.getItem(store.actor.id) ?? "");
+    $selectedTable = tableExists?.id ?? localStorage.getItem(store.actor.id) ?? $tables?.[0]?.id ?? "";
+    localStorage.setItem(store.actor.id, $selectedTable);
   }
 
   let itemsRolled = writable([]);
@@ -107,11 +111,38 @@
     itemsRolled.set([]);
   }
 
-  Hooks.on("createRollTable", () => {
+  async function clearAllItems() {
+    const doContinue = await TJSDialog.confirm({
+      title: localize("ITEM-PILES.Dialogs.ClearAllItems.Title"),
+      content: {
+        class: CustomDialog,
+        props: {
+          icon: "fas fa-exclamation-triangle",
+          content: localize("ITEM-PILES.Dialogs.ClearAllItems.Content")
+        }
+      },
+      modal: true,
+      draggable: false,
+      options: {
+        height: "auto",
+        headerButtonNoClose: true
+      }
+    })
+    if (!doContinue) return false;
+    const items = game.itempiles.getActorItems(store.actor);
+    await game.itempiles.removeItems(store.actor, items);
+  }
+
+  let createId = Hooks.on("createRollTable", () => {
     tables.set(Array.from(game.tables).map(table => ({ name: table.name, id: table.id })));
   });
-  Hooks.on("deleteRollTable", () => {
+  let deleteId = Hooks.on("deleteRollTable", () => {
     tables.set(Array.from(game.tables).map(table => ({ name: table.name, id: table.id })));
+  });
+
+  onDestroy(() => {
+    Hooks.off("createRollTable", createId);
+    Hooks.off("deleteRollTable", deleteId);
   });
 
 </script>
@@ -158,6 +189,13 @@
           </div>
         </div>
       {/each}
+
+      {#if currentItems.length}
+        <button class="item-piles-button" on:click={() => clearAllItems()}>
+          {localize("ITEM-PILES.Merchant.ClearAllItems")} <i class="fas fa-times"></i>
+        </button>
+      {/if}
+
     </div>
 
     <div>
@@ -205,7 +243,7 @@
           </div>
         {/each}
 
-        <button class="item-piles-add-button" on:click={() => addAllItems()}>
+        <button class="item-piles-button" on:click={() => addAllItems()}>
           {localize("ITEM-PILES.Merchant.AddAll")} <i class="fas fa-arrow-left"></i>
         </button>
 
@@ -244,7 +282,7 @@
     flex: 0 1 50px;
   }
 
-  .item-piles-add-button {
+  .item-piles-button {
     height: 27px;
     line-height: inherit;
     margin-top: 0.5rem;

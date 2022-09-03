@@ -50,7 +50,7 @@ export function fromUuidFast(uuid) {
 }
 
 export function getUuid(target) {
-  if(stringIsUuid(target)) return target;
+  if (stringIsUuid(target)) return target;
   const document = getDocument(target);
   return document?.uuid ?? false;
 }
@@ -76,7 +76,7 @@ export function findSimilarItem(items, findItem) {
     
     const itemData = item instanceof Item ? item.toObject() : item;
     for (const path of itemSimilarities) {
-      if (getProperty(itemData, path) !== getProperty(findItem, path)) {
+      if (!hasProperty(itemData, path) || !hasProperty(findItem, path) || getProperty(itemData, path) !== getProperty(findItem, path)) {
         return false;
       }
     }
@@ -85,7 +85,7 @@ export function findSimilarItem(items, findItem) {
   });
 }
 
-export function setSimilarityProperties(obj, item){
+export function setSimilarityProperties(obj, item) {
   const itemData = item instanceof Item ? item.toObject() : item;
   setProperty(obj, "_id", itemData._id);
   game.itempiles.ITEM_SIMILARITIES.forEach(prop => {

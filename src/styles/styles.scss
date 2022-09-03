@@ -616,4 +616,13 @@
   }
 }
 
-/* ---------------------- MERCHANT UI ---------------------- */
+.item-piles-text-editor {
+
+  .editor {
+    height: calc(100% - 32px) !important;
+  }
+
+  .tox.tox-tinymce {
+    height: calc(100%) !important;
+  }
+}

@@ -50,7 +50,7 @@
   }
 
   $: maxMerchantItemQuantity = $sellerPileData.infiniteQuantity ? Infinity : $itemMaxQuantityStore;
-  $: maxItemQuantity = $prices[$selectedPriceGroup].maxQuantity;
+  $: maxItemQuantity = $prices[$selectedPriceGroup]?.maxQuantity ?? Infinity;
   $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxMerchantItemQuantity);
 
   function submit() {
@@ -81,7 +81,7 @@
       </div>
 
       <div
-          style="display:flex; justify-content:flex-end; align-items: center; text-align: right;">
+        style="display:flex; justify-content:flex-end; align-items: center; text-align: right;">
         {#if maxItemQuantity}
           <div style="display: flex; flex-direction: column; align-items: flex-end; margin-right: 0.5rem;">
             <small>{localize("ITEM-PILES.Applications.TradeMerchantItem.Quantity")}</small>
