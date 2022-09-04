@@ -237,7 +237,9 @@
         "PurchaseOptions": "Purchase Options",
         "PurchaseOptionsExplanation": "Here you can configure the alternate ways to purchase this item. Each group represents a different way that a character can buy this item from other",
         "AddPurchaseOption": "Add Purchase Option",
-        "DropMeClickMe": "Click to add an attribute or drag & drop an item to add"
+        "DropMeClickMe": "Click to add an attribute or drag & drop an item to add",
+        "PricePreset": "Or select an exiting price preset:",
+        "SelectPreset": "Select price preset"
       },
       "FilterEditor": {
         "Title": "Item Piles Filters Editor",
@@ -376,6 +378,11 @@
           "ActorPriceModifiersExplanation": "Here you can configure if certain specific actors should have different price modifiers than the price modifiers above.",
           "ConfigureActorPriceModifiers": "Configure Actor Price Modifiers."
         }
+      },
+      "PricePresetEditor": {
+        "Title": "Price Presets Editor",
+        "Update": "Update Presets",
+        "Explanation": "Here you can create multiple preset prices that can then be easily used in items' custom prices."
       }
     },
     "HUD": {
@@ -431,6 +438,11 @@
         "Title": "Item Similarities",
         "Label": "Configure Item Similarities",
         "Hint": "Here you can configure what how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
+      },
+      "PricePresets": {
+        "Title": "Price Presets",
+        "Label": "Configure Price Presets",
+        "Hint": "Here you can configure custom preset prices that you can then easily import onto items."
       },
       "EnableDroppingItems": {
         "Title": "Enable Dropping Items",

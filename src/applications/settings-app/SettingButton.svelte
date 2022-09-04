@@ -10,7 +10,7 @@
 
   function showEditor() {
     if (editor) {
-      editor.show().then((result) => {
+      editor.show(data.value).then((result) => {
         if (result) {
           data.value = result;
         }

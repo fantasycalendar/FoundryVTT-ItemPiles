@@ -105,6 +105,7 @@
           <SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
+          <SettingButton bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
         </div>
       {/if}
 
@@ -112,7 +113,7 @@
 
     <footer>
       <button type="button" on:click|once={requestSubmit}><i
-          class="far fa-save"></i> {localize("ITEM-PILES.Applications.Settings.Submit")}</button>
+        class="far fa-save"></i> {localize("ITEM-PILES.Applications.Settings.Submit")}</button>
     </footer>
   </form>
 </ApplicationShell>

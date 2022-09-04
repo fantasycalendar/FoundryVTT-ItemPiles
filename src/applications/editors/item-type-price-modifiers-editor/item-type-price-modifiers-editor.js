@@ -27,10 +27,10 @@ export default class ItemTypePriceModifiersEditor extends SvelteApplication {
     })
   }
   
-  static async show(data = false, options = {}) {
+  static async show(itemTypePriceModifiers, options = {}) {
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(data, options).render(true, { focus: true });
+      new this(itemTypePriceModifiers, options).render(true, { focus: true });
     })
   }
   

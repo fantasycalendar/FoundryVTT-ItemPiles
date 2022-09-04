@@ -10,7 +10,7 @@
   let form;
 
   export let elementRoot;
-  let itemSimilarities = getSetting(SETTINGS.ITEM_SIMILARITIES);
+  export let itemSimilarities;
 
   function add() {
     itemSimilarities = [...itemSimilarities, ""];

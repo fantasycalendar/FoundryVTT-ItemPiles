@@ -24,6 +24,7 @@ const SETTINGS = {
   ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
   ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
   ITEM_SIMILARITIES: "itemSimilarities",
+  PRICE_PRESETS: "pricePresets",
   
   // Hidden settings
   DEFAULT_ITEM_PILE_JOURNAL_ID: "defaultItemPileJournalID",
@@ -32,7 +33,7 @@ const SETTINGS = {
   SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
   PRECONFIGURED_SYSTEM: "preconfiguredSystem",
   SYSTEM_VERSION: "systemVersion",
-
+  
   GET_DEFAULT() {
     return foundry.utils.deepClone(SETTINGS.DEFAULTS())
   },
@@ -84,6 +85,19 @@ const SETTINGS = {
       type: Array
     },
     
+    [SETTINGS.PRICE_PRESETS]: {
+      name: "ITEM-PILES.Settings.PricePresets.Title",
+      label: "ITEM-PILES.Settings.PricePresets.Label",
+      hint: "ITEM-PILES.Settings.PricePresets.Hint",
+      scope: "world",
+      icon: "fa fa-tags",
+      application: "price-presets",
+      config: false,
+      system: true,
+      default: [],
+      type: Array
+    },
+    
     [SETTINGS.ACTOR_CLASS_TYPE]: {
       name: "ITEM-PILES.Settings.ActorClass.Title",
       hint: "ITEM-PILES.Settings.ActorClass.Hint",
@@ -113,7 +127,7 @@ const SETTINGS = {
       default: SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE,
       type: String
     },
-
+    
     [SETTINGS.SYSTEM_VERSION]: {
       scope: "world",
       config: false,

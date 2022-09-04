@@ -3,11 +3,14 @@ import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 
 export default class ItemSimilaritiesEditor extends SvelteApplication {
   
-  constructor(options) {
+  constructor(itemSimilarities, options) {
     super({
       svelte: {
         class: ItemSimilaritiesShell,
-        target: document.body
+        target: document.body,
+        props: {
+          itemSimilarities
+        }
       },
       close: () => this.options.resolve(null),
       ...options
@@ -23,10 +26,10 @@ export default class ItemSimilaritiesEditor extends SvelteApplication {
     })
   }
   
-  static async show(options = {}) {
+  static async show(itemSimilarities, options = {}) {
     return new Promise(resolve => {
       options.resolve = resolve;
-      return new this(options).render(true, { focus: true });
+      return new this(itemSimilarities, options).render(true, { focus: true });
     });
   }
 }

@@ -3,14 +3,14 @@ import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 
 export default class ItemFiltersEditor extends SvelteApplication {
   
-  constructor(item, options) {
+  constructor(itemFilters, options) {
     super({
       title: "ITEM-PILES.Applications.FilterEditor.Title",
       svelte: {
         class: ItemFiltersShell,
         target: document.body,
         props: {
-          item
+          itemFilters
         }
       },
       close: () => this.options.resolve(null),
@@ -27,10 +27,10 @@ export default class ItemFiltersEditor extends SvelteApplication {
     })
   }
   
-  static async show(item, options = {}) {
+  static async show(itemFilters, options = {}) {
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(item, options).render(true, { focus: true });
+      new this(itemFilters, options).render(true, { focus: true });
     })
   }
 }

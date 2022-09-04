@@ -4,7 +4,7 @@
   import * as PileUtilities from "../../../helpers/pile-utilities.js";
   import ItemPriceStore from "./ItemPriceStore.js";
   import Tabs from "../../components/Tabs.svelte";
-  import PriceList from "./PriceList.svelte";
+  import PriceList from "../../components/PriceList.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
   const { application } = getContext('external');

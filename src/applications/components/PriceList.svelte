@@ -1,19 +1,25 @@
 <script>
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import FilePicker from "../../components/FilePicker.svelte";
+  import FilePicker from "./FilePicker.svelte";
   import { flip } from "svelte/animate";
   import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
-  import DropZone from "../../components/DropZone.svelte";
-  import * as Helpers from "../../../helpers/helpers.js";
-  import * as Utilities from "../../../helpers/utilities.js";
-  import CONSTANTS from "../../../constants/constants.js";
+  import DropZone from "./DropZone.svelte";
+  import * as Helpers from "../../helpers/helpers.js";
+  import * as Utilities from "../../helpers/utilities.js";
+  import CONSTANTS from "../../constants/constants.js";
+  import { getSetting } from "../../helpers/helpers.js";
+  import SETTINGS from "../../constants/settings.js";
 
   export let prices;
-  export let remove;
+  export let remove = false;
+  export let presets = true;
+
+  let presetPrices = getSetting(SETTINGS.PRICE_PRESETS);
 
   let isHovering = false;
   let flipDurationMs = 200;
   let dragDisabled = true;
+  let selectedPreset = "";
 
   function removeEntry(index) {
     prices.splice(index, 1);
@@ -32,8 +38,14 @@
       },
       quantity: 1,
       fixed: true,
-      percent: true
+      percent: false
     }];
+  }
+
+  function addPreset(index) {
+    const preset = foundry.utils.duplicate(presetPrices[index]);
+    preset.id = randomID();
+    prices = [...prices, preset];
   }
 
   async function dropData(data) {
@@ -149,7 +161,11 @@
       <div>Short</div>
       <div>Icon</div>
       <div>Data</div>
-      <div><a class="item-piles-clickable-red" on:click={() => remove()}><i class="fas fa-times"></i></a></div>
+      <div>
+        {#if remove}
+          <a class="item-piles-clickable-red" on:click={() => remove()}><i class="fas fa-times"></i></a>
+        {/if}
+      </div>
     </div>
     <section
       use:dndzone="{{ items: prices, dragDisabled, flipDurationMs }}"
@@ -192,18 +208,35 @@
           </div>
         </div>
       {/each}
-      <div class="item-piles-sortable-list-columns">
+      <div class="item-piles-sortable-list-columns" style="margin-top: 0.5rem;">
         <div class="full-span">
           <a on:click={() => addAttribute()} class:invisible={isHovering}>
             {localize("ITEM-PILES.Applications.ItemEditor.DropMeClickMe")}
           </a>
         </div>
+        {#if presetPrices.length && presets}
+          <div class="full-span" style="margin-top:0.5rem;">
+            <span style="margin-right:0.25rem;">{localize("ITEM-PILES.Applications.ItemEditor.PricePreset")}</span>
+            <select class="price-preset-selector" bind:value={selectedPreset}
+                    on:change={() => { addPreset(selectedPreset); selectedPreset = ""; }}>
+              <option value="">{localize("ITEM-PILES.Applications.ItemEditor.SelectPreset")}</option>
+              {#each presetPrices as price, index (index)}
+                <option value={index}>{price.name}</option>
+              {/each}
+            </select>
+          </div>
+        {/if}
       </div>
     </section>
   </div>
 </DropZone>
 
 <style lang="scss">
+
+  .price-preset-selector {
+    height: 20px;
+    font-size: 0.8rem;
+  }
 
   .item-piles-sortable-list-columns {
     grid-template-columns: 28px 1.1fr 35px 28px 28px 0.5fr 60px 1fr 28px;
