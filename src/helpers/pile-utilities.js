@@ -434,9 +434,10 @@ export function getItemPrices(item, {
   
   itemFlagData = itemFlagData || getItemFlagData(item);
   
-  const overallCost = getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
+  const overallCost = Number(getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE));
+  const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.prices.length).length > 0;
   
-  if (itemFlagData?.free || (!itemFlagData.disableNormalCost && overallCost === 0 && itemFlagData.prices.length === 0)) {
+  if (itemFlagData?.free || (!itemFlagData.disableNormalCost && overallCost === 0 && !hasOtherPrices)) {
     priceData.push({
       free: true,
       basePrices: [],
