@@ -434,7 +434,9 @@ export function getItemPrices(item, {
   
   itemFlagData = itemFlagData || getItemFlagData(item);
   
-  if (itemFlagData?.free) {
+  const overallCost = getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
+  
+  if (itemFlagData?.free || (!itemFlagData.disableNormalCost && overallCost === 0 && itemFlagData.prices.length === 0)) {
     priceData.push({
       free: true,
       basePrices: [],
@@ -483,8 +485,6 @@ export function getItemPrices(item, {
   // If the item does include its normal cost, we calculate that here
   if (!itemFlagData.disableNormalCost) {
     
-    const overallCost = getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE);
-    
     // Base prices is the displayed price, without quantity taken into account
     const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
     const basePrices = getPriceArray(baseCost, currencies);
@@ -524,6 +524,7 @@ export function getItemPrices(item, {
           ...price,
           cost,
           baseCost,
+          modifier: itemModifier,
           priceString: cost ? price.abbreviation.replace("{#}", cost) : "",
           basePriceString: baseCost ? price.abbreviation.replace("{#}", baseCost) : ""
         };
@@ -563,13 +564,36 @@ export function getItemPrices(item, {
         if (price.type === "attribute") {
           const attributeQuantity = Number(getProperty(buyer.data, price.data.path));
           price.buyerQuantity = attributeQuantity;
-          price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
+          
+          if (price.percent) {
+            const percent = Math.min(1, price.baseCost / 100);
+            const percentQuantity = Math.max(1, Math.floor(attributeQuantity * percent));
+            price.maxQuantity = Math.floor(attributeQuantity / percentQuantity);
+            price.baseCost = !buyer ? price.baseCost : percentQuantity;
+            price.cost = !buyer ? price.cost : percentQuantity * quantity;
+            price.quantity = !buyer ? price.quantity : percentQuantity;
+          } else {
+            price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
+          }
+          
           priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
+          
         } else {
           const foundItem = Utilities.findSimilarItem(buyer.items, price.data.item);
           const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
           price.buyerQuantity = itemQuantity;
-          price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
+          
+          if (price.percent) {
+            const percent = Math.min(1, price.baseCost / 100);
+            const percentQuantity = Math.max(1, Math.floor(itemQuantity * percent));
+            price.maxQuantity = Math.floor(itemQuantity / percentQuantity);
+            price.baseCost = !buyer ? price.baseCost : percentQuantity;
+            price.cost = !buyer ? price.cost : percentQuantity * quantity;
+            price.quantity = !buyer ? price.quantity : percentQuantity;
+          } else {
+            price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
+          }
+          
           priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity);
         }
       }

@@ -45,7 +45,7 @@
                     <img class="item-piles-img" src="{price.img}"/>
                   </div>
                   <div class="item-piles-name item-piles-text">
-                    {price.baseCost} {price.name}
+                    {price.baseCost + (priceGroup.prices.length === 0 && price.percent ? "%" : "")} {price.name}
                   </div>
                 </div>
               {/each}
