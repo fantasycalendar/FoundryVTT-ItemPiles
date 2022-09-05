@@ -302,7 +302,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
   if (!flagData) flagData = getActorFlagData(target);
   if (!tokenData) tokenData = {};
   
-  const [documentActor, documentTokens] = getRelevantTokensAndActor(target);
+  let [documentActor, documentTokens] = getRelevantTokensAndActor(target);
   
   const items = getActorItems(documentActor, { itemFilters: flagData.overrideItemFilters });
   const currencies = getActorCurrencies(documentActor, { currencyList: flagData.overrideCurrencies });
@@ -321,12 +321,18 @@ export async function updateItemPileData(target, flagData, tokenData) {
     if (!foundry.utils.isObjectEmpty(flagData)) {
       data[CONSTANTS.FLAGS.PILE] = flagData;
     }
-    return data
+    if (!tokenDocument.data.actorLink) {
+      data["actorData." + CONSTANTS.FLAGS.PILE] = flagData;
+      if (tokenDocument.actor === documentActor) {
+        documentActor = false;
+      }
+    }
+    return data;
   });
   
   await canvas.scene.updateEmbeddedDocuments("Token", updates);
   
-  if (!foundry.utils.isObjectEmpty(flagData)) {
+  if (!foundry.utils.isObjectEmpty(flagData) && documentActor) {
     await documentActor.update({
       [CONSTANTS.FLAGS.PILE]: flagData, [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
     });
