@@ -1359,7 +1359,7 @@ export default class PrivateAPI {
         }], { type: payment.isCurrency ? "currency" : payment.type });
       } else {
         await sellerTransaction.appendItemChanges([{
-          item: payment.item,
+          item: payment.data.item,
           quantity: payment.quantity
         }], { type: payment.isCurrency ? "currency" : payment.type });
       }
@@ -1398,7 +1398,7 @@ export default class PrivateAPI {
         }], { remove: true, type: price.isCurrency ? "currency" : price.type });
       } else {
         await buyerTransaction.appendItemChanges([{
-          item: price.item,
+          item: price.data.item,
           quantity: price.quantity
         }], { remove: true, type: price.isCurrency ? "currency" : price.type });
       }
@@ -1447,7 +1447,7 @@ export default class PrivateAPI {
     await sellerTransaction.commit();
     const { itemDeltas, attributeDeltas } = await buyerTransaction.commit();
     
-    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
     
     return { itemDeltas, attributeDeltas, itemPrices };
     

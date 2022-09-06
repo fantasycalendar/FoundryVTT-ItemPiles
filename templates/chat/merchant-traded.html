@@ -1,0 +1,25 @@
+<div class="item-piles-chat-card" data-actor-id="{{actor.id}}">
+
+  <div class="item-piles-chat-card-title">
+    <p>
+      <img src="{{merchant.img}}" title="{{merchant.name}}" height="32"/>
+      <i class="fas fa-handshake"></i> <img src="{{actor.data.img}}" title="{{actor.name}}" height="32"/>
+    </p>
+    <p>{{message}}</p>
+  </div>
+
+  <ul>
+    {{#each priceInformation as |entry id|}}
+    <li>
+      <img src="{{entry.item.img}}" title="{{entry.item.name}}" height="16"/>
+      <label>{{entry.item.name}} <small>(x{{entry.item.quantity}})</small></label>
+      <small style="flex: 0 1 auto;">
+        {{#each entry.finalPrices as |price id|}}
+        <span>{{price.text}}</span>
+        {{/each}}
+      </small>
+    </li>
+    {{/each}}
+  </ul>
+
+</div>

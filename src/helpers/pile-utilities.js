@@ -490,7 +490,7 @@ export function getItemPrices(item, {
   }
   
   // If the item does include its normal cost, we calculate that here
-  if (!itemFlagData.disableNormalCost) {
+  if (!itemFlagData.disableNormalCost && overallCost >= smallestExchangeRate) {
     
     // Base prices is the displayed price, without quantity taken into account
     const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
@@ -574,7 +574,7 @@ export function getItemPrices(item, {
           
           if (price.percent) {
             const percent = Math.min(1, price.baseCost / 100);
-            const percentQuantity = Math.max(1, Math.floor(attributeQuantity * percent));
+            const percentQuantity = Math.max(0, Math.floor(attributeQuantity * percent));
             price.maxQuantity = Math.floor(attributeQuantity / percentQuantity);
             price.baseCost = !buyer ? price.baseCost : percentQuantity;
             price.cost = !buyer ? price.cost : percentQuantity * quantity;
@@ -592,7 +592,7 @@ export function getItemPrices(item, {
           
           if (price.percent) {
             const percent = Math.min(1, price.baseCost / 100);
-            const percentQuantity = Math.max(1, Math.floor(itemQuantity * percent));
+            const percentQuantity = Math.max(0, Math.floor(itemQuantity * percent));
             price.maxQuantity = Math.floor(itemQuantity / percentQuantity);
             price.baseCost = !buyer ? price.baseCost : percentQuantity;
             price.cost = !buyer ? price.cost : percentQuantity * quantity;
@@ -847,7 +847,11 @@ export function getPricesForItems(itemsToBuy, {
   paymentData.basePriceString = paymentData.finalPrices
     .filter(price => price.cost)
     .map(price => {
-      return price.abbreviation.replace("{#}", price.cost)
+      let abbreviation = price.abbreviation;
+      if (price.percent && abbreviation.includes("%")) {
+        abbreviation = abbreviation.replaceAll("%", "")
+      }
+      return abbreviation.replace("{#}", price.cost)
     }).join(" ");
   
   delete paymentData.otherPrices;

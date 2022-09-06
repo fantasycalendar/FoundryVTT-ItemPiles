@@ -7,7 +7,10 @@
   export let standalone = false;
 
   const label = {
-    text: ''
+    text: '',
+    styles: !standalone ? {} : {
+      "margin-left": "0.25rem"
+    }
   };
 
   const prices = item.prices;
@@ -17,7 +20,7 @@
 
   $: cantAfford = $prices.length > 0 && !$prices[$selectedPriceGroup]?.maxQuantity && item.store.recipient && !standalone;
   $: cantAffordMultiplePrices = cantAfford && !$prices.filter(group => group.maxQuantity).length;
-  $: label.text = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "") + ($prices[$selectedPriceGroup]?.free ? "Free" : $prices[$selectedPriceGroup]?.basePriceString);
+  $: label.text = $prices[$selectedPriceGroup]?.free ? "Free" : $prices[$selectedPriceGroup]?.basePriceString;
 
 </script>
 
@@ -25,9 +28,10 @@
   {#if $prices.length > 1}
     <TJSToggleLabel {label}>
       <div slot=left
-           class:multiple-prices={$prices.length > 1 && !standalone}
+           class:multiple-prices={$prices.length > 1}
            class:cant-afford={cantAfford}
-           class:cant-afford-multiple-prices={cantAffordMultiplePrices}>
+           class:cant-afford-multiple-prices={cantAffordMultiplePrices}
+           class:standalone-moved={standalone}>
       </div>
       <TJSMenu offset={{y: 4}}>
         <div class="price-list">
@@ -104,53 +108,5 @@
       border-right-color: #cf5234;
     }
 
-    .price-list {
-      z-index: 900;
-      font-size: 0.75rem;
-      border-radius: 5px;
-      overflow: hidden;
-      background-color: #ccccbe;
-
-      .price-group {
-
-        cursor: pointer;
-        user-select: none;
-
-        &.selected {
-          background-color: #e6e6d5;
-        }
-
-        &:hover {
-          background-color: #ffffed;
-        }
-
-        .price-group-container {
-          display: flex;
-          align-items: center;
-
-          padding: 0 4px 0 2px;
-
-          &:first-child {
-            padding-top: 2px;
-          }
-
-          &:last-child {
-            padding-bottom: 2px;
-          }
-
-          .item-piles-img-container {
-            min-height: 18px;
-            min-width: 18px;
-            max-width: 18px;
-            max-height: 18px;
-            margin: 1px;
-          }
-        }
-
-        &:not(:last-child) {
-          border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-        }
-      }
-    }
   }
 </style>

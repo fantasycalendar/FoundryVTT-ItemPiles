@@ -19,6 +19,7 @@ export default class ChatAPI {
     Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, this._outputSplitItemPileInventory.bind(this));
     Hooks.on(HOOKS.TRADE.STARTED, this._outputTradeStarted.bind(this));
     Hooks.on(HOOKS.TRADE.COMPLETE, this._outputTradeComplete.bind(this));
+    Hooks.on(HOOKS.ITEM.TRADE, this._outputMerchantTradeComplete.bind(this));
     
     $(document).on("click", ".item-piles-chat-card .item-piles-collapsible", async function () {
       if ($(this).attr("open")) return;
@@ -177,6 +178,13 @@ export default class ChatAPI {
     return this._outputTradeCompleteToChat(party_1, party_2, publicTradeId, isPrivate);
   }
   
+  static async _outputMerchantTradeComplete(source, target, priceInformation, userId, interactionId) {
+    if (!Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
+    if (!PileUtilities.isItemPileMerchant(source)) return;
+    if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.MERCHANT_TRADE_CHAT_MESSAGE, source.uuid, target.uuid, priceInformation, userId, interactionId);
+  }
+  
   /**
    * Formats item data to a chat friendly structure
    *
@@ -208,7 +216,7 @@ export default class ChatAPI {
     return Object.entries(currencies).map(entry => {
       const currency = currencyList.find(currency => currency.id === entry[0]);
       return {
-        name: currency.name,
+        name: game.i18n.localize(currency.name),
         img: currency.img ?? "",
         quantity: entry[1],
         index: currencyList.indexOf(currency)
@@ -402,6 +410,92 @@ export default class ChatAPI {
       flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
       speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
       whisper: isPrivate ? [party_2.user] : []
+    });
+    
+  }
+  
+  static async _outputMerchantTradeToChat(sourceUuid, targetUuid, priceInformation, userId, interactionId) {
+    
+    const sourceActor = Utilities.getActor(sourceUuid);
+    const targetActor = Utilities.getActor(targetUuid);
+    
+    priceInformation.item = priceInformation.buyerReceive[0];
+    priceInformation.finalPrices = priceInformation.finalPrices
+      .filter(price => price.quantity)
+      .map(price => {
+        price.text = price.baseCost + " " + price.name;
+        return price;
+      });
+    
+    const now = (+new Date());
+    
+    // Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
+    const messages = Array.from(game.messages).filter(message => (now - message.data.timestamp) <= (10800000)).slice(-10);
+    messages.reverse()
+    
+    for (let [index, message] of messages.entries()) {
+      const flags = getProperty(message.data, CONSTANTS.FLAGS.PILE);
+      if (flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
+        return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
+      }
+    }
+    
+    const pileData = PileUtilities.getActorFlagData(sourceActor);
+    
+    const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/merchant-traded.html", {
+      message: game.i18n.format("ITEM-PILES.Chat.MerchantTraded", {
+        name: targetActor.name,
+        merchant: sourceActor.name
+      }),
+      merchant: {
+        name: sourceActor.name,
+        img: pileData.merchantImage || sourceActor.img
+      },
+      actor: targetActor,
+      priceInformation: [priceInformation]
+    });
+    
+    return this._createNewChatMessage(userId, {
+      user: game.user.id,
+      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+      content: chatCardHtml,
+      flavor: "Item Piles",
+      speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
+      [CONSTANTS.FLAGS.PILE]: {
+        source: sourceUuid,
+        target: targetUuid,
+        priceInformation: [priceInformation],
+        interactionId: interactionId
+      }
+    })
+    
+  }
+  
+  static async _updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId) {
+    
+    const flags = getProperty(message.data, CONSTANTS.FLAGS.PILE);
+    
+    const newPriceInformation = flags.priceInformation.concat(priceInformation);
+    
+    const pileData = PileUtilities.getActorFlagData(sourceActor);
+    
+    const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/merchant-traded.html", {
+      message: game.i18n.format("ITEM-PILES.Chat.MerchantTraded", {
+        name: targetActor.name,
+        merchant: sourceActor.name
+      }),
+      merchant: {
+        name: sourceActor.name,
+        img: pileData.merchantImage || sourceActor.img
+      },
+      actor: targetActor,
+      priceInformation: newPriceInformation
+    });
+    
+    return message.update({
+      content: chatCardHtml,
+      [`${CONSTANTS.FLAGS.PILE}.interactionId`]: interactionId,
+      [`${CONSTANTS.FLAGS.PILE}.priceInformation`]: newPriceInformation
     });
     
   }

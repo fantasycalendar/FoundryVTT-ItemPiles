@@ -20,6 +20,7 @@ export default class ItemPileSocket {
      */
     PICKUP_CHAT_MESSAGE: "pickupChatMessage",
     SPLIT_CHAT_MESSAGE: "splitChatMessage",
+    MERCHANT_TRADE_CHAT_MESSAGE: "merchantTradeChatMessage",
     DISABLE_CHAT_TRADE_BUTTON: "disableChatTradeButton",
     
     /**
@@ -123,6 +124,7 @@ export default class ItemPileSocket {
     
     [this.HANDLERS.PICKUP_CHAT_MESSAGE]: (...args) => ChatAPI._outputPickupToChat(...args),
     [this.HANDLERS.SPLIT_CHAT_MESSAGE]: (...args) => ChatAPI._outputSplitToChat(...args),
+    [this.HANDLERS.MERCHANT_TRADE_CHAT_MESSAGE]: (...args) => ChatAPI._outputMerchantTradeToChat(...args),
     [this.HANDLERS.DISABLE_CHAT_TRADE_BUTTON]: (...args) => ChatAPI._disableTradingButton(...args),
     
     [this.HANDLERS.RENDER_INTERFACE]: (...args) => PrivateAPI._renderItemPileInterface(...args),

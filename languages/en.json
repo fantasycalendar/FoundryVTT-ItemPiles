@@ -183,7 +183,7 @@
         "TheyReceive": "They receive",
         "Quantity": "Quantity",
         "Change": "Change",
-        "CantAfford": "You cannot afford this price",
+        "YouCantAfford": "You cannot afford this price",
         "TheyCantAfford": "They cannot afford this price",
         "MaxQuantity": "Max {quantity}"
       },
@@ -399,7 +399,8 @@
       "TradeSpectate": "Spectate Trade",
       "SpectateDisabled": "Trade Concluded",
       "PrivateTrade": "Private Trade",
-      "ExpandTrade": "View full trade details"
+      "ExpandTrade": "View full trade details",
+      "MerchantTraded": "{name} bought the following things from {merchant}:"
     },
     "Settings": {
       "Configure": {
