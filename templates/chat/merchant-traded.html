@@ -14,9 +14,7 @@
       <img src="{{entry.item.img}}" title="{{entry.item.name}}" height="16"/>
       <label>{{entry.item.name}} <small>(x{{entry.item.quantity}})</small></label>
       <small style="flex: 0 1 auto;">
-        {{#each entry.finalPrices as |price id|}}
-        <span>{{price.text}}</span>
-        {{/each}}
+        {{entry.basePriceString}}
       </small>
     </li>
     {{/each}}

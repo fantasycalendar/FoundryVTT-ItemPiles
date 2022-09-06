@@ -420,12 +420,6 @@ export default class ChatAPI {
     const targetActor = Utilities.getActor(targetUuid);
     
     priceInformation.item = priceInformation.buyerReceive[0];
-    priceInformation.finalPrices = priceInformation.finalPrices
-      .filter(price => price.quantity)
-      .map(price => {
-        price.text = price.baseCost + " " + price.name;
-        return price;
-      });
     
     const now = (+new Date());
     
