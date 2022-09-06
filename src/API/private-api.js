@@ -107,6 +107,22 @@ export default class PrivateAPI {
       });
     }
     const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
+    if (itemPileConfig.closedImage.includes("*")) {
+      itemPileConfig.closedImage = Helpers.random_array_element(itemPileConfig.closedImages);
+      itemPileConfig.closedImages = [];
+    }
+    if (itemPileConfig.emptyImage.includes("*")) {
+      itemPileConfig.emptyImage = Helpers.random_array_element(itemPileConfig.emptyImages);
+      itemPileConfig.emptyImages = [];
+    }
+    if (itemPileConfig.openedImage.includes("*")) {
+      itemPileConfig.openedImage = Helpers.random_array_element(itemPileConfig.openedImages);
+      itemPileConfig.openedImages = [];
+    }
+    if (itemPileConfig.lockedImage.includes("*")) {
+      itemPileConfig.lockedImage = Helpers.random_array_element(itemPileConfig.lockedImages);
+      itemPileConfig.lockedImages = [];
+    }
     const targetItems = PileUtilities.getActorItems(doc.actor);
     const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
     const data = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
@@ -114,7 +130,8 @@ export default class PrivateAPI {
       "img": PileUtilities.getItemPileTokenImage(doc, data),
       "scale": PileUtilities.getItemPileTokenScale(doc, data),
       "name": PileUtilities.getItemPileName(doc, data),
-      [CONSTANTS.FLAGS.PILE]: itemPileConfig
+      [CONSTANTS.FLAGS.PILE]: itemPileConfig,
+      ["actorData." + CONSTANTS.FLAGS.PILE]: itemPileConfig
     });
   }
   
@@ -878,11 +895,13 @@ export default class PrivateAPI {
       await Promise.allSettled(Object.entries(pileData).map(entry => {
         return new Promise(async (resolve) => {
           const [property, filePath] = entry;
+          if (Array.isArray(filePath)) {
+            return resolve();
+          }
           const isImage = property.toLowerCase().includes("image");
           const isSound = property.toLowerCase().includes("sound");
           if ((!isImage && !isSound) || (!filePath || preloadedFiles.has(filePath))) return resolve();
           preloadedFiles.add(filePath);
-          
           if (isImage) {
             await loadTexture(filePath);
             Helpers.debug(`Preloaded image: ${filePath}`);

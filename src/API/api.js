@@ -7,7 +7,6 @@ import ItemPileSocket from "../socket.js";
 import HOOKS from "../constants/hooks.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
-import { isItemPileMerchant } from "../helpers/pile-utilities.js";
 
 const API = {
   
@@ -282,22 +281,26 @@ const API = {
   openItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-    const data = PileUtilities.getActorFlagData(targetActor);
-    if (!data?.enabled || !data?.isContainer) return false;
-    const wasLocked = data.locked;
-    const wasClosed = data.closed;
-    data.closed = false;
-    data.locked = false;
+    const pileData = PileUtilities.getActorFlagData(targetActor);
+    if (!pileData?.enabled || !pileData?.isContainer) return false;
+    const wasLocked = pileData.locked;
+    const wasClosed = pileData.closed;
+    pileData.closed = false;
+    pileData.locked = false;
     if (wasLocked) {
-      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, data, interactingTokenDocument);
+      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
       if (hookResult === false) return false;
     }
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_OPEN, targetActor, data, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_OPEN, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
-    if (wasClosed && data.openSound) {
-      AudioHelper.play({ src: data.openSound }, true)
+    if (wasClosed && pileData.openSound) {
+      let sound = pileData.openSound;
+      if (pileData.openSound.includes("*")) {
+        sound = Helpers.random_array_element(pileData.openSounds)
+      }
+      AudioHelper.play({ src: sound }, true)
     }
-    return this.updateItemPile(targetActor, data, { interactingToken: interactingTokenDocument });
+    return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
   },
   
   /**
@@ -321,7 +324,11 @@ const API = {
     if (hookResult === false) return false;
     
     if (wasOpen && pileData.closeSound) {
-      AudioHelper.play({ src: pileData.closeSound }, true)
+      let sound = pileData.closeSound;
+      if (pileData.closeSound.includes("*")) {
+        sound = Helpers.random_array_element(pileData.closeSounds)
+      }
+      AudioHelper.play({ src: sound }, true)
     }
     
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
@@ -371,7 +378,11 @@ const API = {
     const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_LOCK, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
     if (!wasClosed && pileData.closeSound) {
-      AudioHelper.play({ src: pileData.closeSound }, true)
+      let sound = pileData.closeSound;
+      if (pileData.closeSound.includes("*")) {
+        sound = Helpers.random_array_element(pileData.closeSounds)
+      }
+      AudioHelper.play({ src: sound }, true)
     }
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
   },
@@ -432,7 +443,11 @@ const API = {
     Helpers.hooks.call(HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
     
     if (pileData.lockedSound) {
-      AudioHelper.play({ src: pileData.lockedSound }, true)
+      let sound = pileData.lockedSound;
+      if (pileData.lockedSound.includes("*")) {
+        sound = Helpers.random_array_element(pileData.lockedSounds)
+      }
+      AudioHelper.play({ src: sound }, true);
     }
     
     return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, Utilities.getUuid(targetActor), pileData, Utilities.getUuid(interactingTokenDocument));

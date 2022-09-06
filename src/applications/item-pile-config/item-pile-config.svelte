@@ -2,13 +2,9 @@
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import FilePicker from "../components/FilePicker.svelte";
-
-  import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
   import CONSTANTS from "../../constants/constants.js";
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import * as Helpers from "../../helpers/helpers.js";
-
-  import TextEditorDialogShell from "../dialogs/text-editor-dialog/text-editor-dialog-shell.svelte";
 
   import PriceModifiersEditor from "../editors/price-modifiers-editor/price-modifiers-editor.js";
   import CurrenciesEditor from "../editors/currencies-editor/currencies-editor.js";
@@ -57,7 +53,28 @@
 
     let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
+    const types = [
+      "closedImage",
+      "emptyImage",
+      "openedImage",
+      "lockedImage",
+      "closeSound",
+      "openSound",
+      "lockedSound",
+      "unlockedSound",
+    ];
+
+    for (let type of types) {
+      if (pileData[type].includes("*")) {
+        console.log(type)
+        pileData[type + "s"] = await Helpers.getFiles(pileData[type], { applyWildCard: true, softFail: true });
+        pileData[type + "s"] = pileData[type + "s"] || [];
+      }
+    }
+
     const data = foundry.utils.mergeObject(defaults, pileData);
+
+    console.log(data)
 
     data.deleteWhenEmpty = {
       "default": "default",
@@ -68,6 +85,7 @@
     PileAPI.updateItemPile(pileActor, data);
 
     application.close();
+
   }
 
   async function showCurrenciesEditor() {
@@ -469,9 +487,9 @@
                 <label style="flex:3;">
                   <span>{localize("ITEM-PILES.Applications.ItemPileConfig.SingleItem.Scale")}</span>
                 </label>
-                <input style="flex:3;" type="range" min="0.2" step="0.1" max="3" class="item-piles-scaleRange"
+                <input style="flex:3;" type="range" min="0.2" step="0.01" max="3" class="item-piles-scaleRange"
                        disabled="{!pileData.overrideSingleItemScale}" bind:value="{pileData.singleItemScale}"/>
-                <input style="flex:0.5; margin-left:1rem;" type="number" step="0.1" class="item-piles-scaleInput"
+                <input style="flex:0.5; margin-left:1rem;" type="number" step="0.01" class="item-piles-scaleInput"
                        disabled="{!pileData.overrideSingleItemScale}" bind:value="{pileData.singleItemScale}"/>
               </div>
 
