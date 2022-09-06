@@ -1,34 +1,56 @@
 # Item Piles Changelog
 
+## Version 2.0.0
+
+- Added merchant functionality
+    - Per item type and per actor price modifiers (give that chatty bard a discount)
+    - Infinite currencies & infinite item quantities
+    - Roll table support
+- Reworked the way currencies work to support item-based currencies
+- Reworked the settings menu
+- Rewrote the entire module from scratch for long term viability
+- Added support for the TwoDSix system (Traveler)
+- Tweaked existing systems to work with the new currency system
+- Tweaked D&D 5e system implementation
+    - Dropping spells onto item piles will now convert them into scrolls
+    - Taking and dropping items from piles will now clear attunement and proficiency
+
 ## Version 1.4.8
+
 - Updated German localization (Thank you, gsterling on GitHub)
 - Added Starfinder system support (Thank you, dizko on GitHub)
 - Updated Tormenta20 system configuration (Thank you, mclemente on GitHub)
 - Fixed hidden item piles being able to be opened
 
 ## Version 1.4.7
+
 - Fixed issue in latest PF2 update which changed the attribute path for quantities
 
 ## Version 1.4.6
-- Adjusted API to use native foundry `Item#fromDropData` instead of my own implementation (Thank you, TheGiddyLimit on GitHub!)
-- Fixed issue relating to some systems not generating a new ID for items, which caused false-positives when trying to find similar items on actors that were the source of said items
-- Fixed issue where systems would override core functions on items that modify names and other data, Item Piles will now always call the system's Item specific functions 
-  - Fixes issue with PF1 items sometimes showing up as identified when they were unidentified
-- Added support for the Warhammer Fantasy Roleplay 4th Ed system 
-- Added support for the Splittermond system 
+
+- Adjusted API to use native foundry `Item#fromDropData` instead of my own implementation (Thank you, TheGiddyLimit on
+  GitHub!)
+- Fixed issue relating to some systems not generating a new ID for items, which caused false-positives when trying to
+  find similar items on actors that were the source of said items
+- Fixed issue where systems would override core functions on items that modify names and other data, Item Piles will now
+  always call the system's Item specific functions
+    - Fixes issue with PF1 items sometimes showing up as identified when they were unidentified
+- Added support for the Warhammer Fantasy Roleplay 4th Ed system
+- Added support for the Splittermond system
 
 ## Version 1.4.5
 
-- Fixed Item Piles inventory UI in GM mode making item quantity inputs look disabled when an item had 0 quantity  
+- Fixed Item Piles inventory UI in GM mode making item quantity inputs look disabled when an item had 0 quantity
 
 ## Version 1.4.4
 
 - Added a right click context menu to the item pile inventory UI, with an option to show an item's image to everyone
 - Improved Request Trade button in the player list when the Minimal UI module is active
-- Improved splitting API functions to improve performance when playing on Forge 
+- Improved splitting API functions to improve performance when playing on Forge
 - Improved documentation to better describe what each API method requires
 - Tweaked `Split n ways` button to disable itself instead of becoming hidden
-- Tweaked system recognition to allow systems to set the required settings through the API, which suppresses the system incompatibility warning
+- Tweaked system recognition to allow systems to set the required settings through the API, which suppresses the system
+  incompatibility warning
 - Fixed various bugs surrounding splitting item piles
 - Fixed issue with the `Split n ways` button not working sometimes
 
@@ -120,7 +142,7 @@
 - Added `Item Filters` setting - now you can more accurately filter items you do not want to show up in item piles, such
   as natural weapons
 - Updated all supported systems to support the above and added migrations to convert existing settings to the new system
-  - reset your Item Piles module settings to ensure you have the latest system configurations
+    - reset your Item Piles module settings to ensure you have the latest system configurations
 - Removed `Item Type Attribute` and `Item Type Filters` as the above feature covers these cases
 - Added debounce to the token image refresh so that it doesn't try to change its image too often
 - Further fixes to `ItemPiles.API.addItems`
