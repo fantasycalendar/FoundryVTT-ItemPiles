@@ -440,25 +440,6 @@ export function getItemPrices(item, {
   
   itemFlagData = itemFlagData || getItemFlagData(item);
   
-  const overallCost = Number(getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE));
-  const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
-  
-  if (itemFlagData?.free || (!itemFlagData.disableNormalCost && overallCost === 0 && !hasOtherPrices)) {
-    priceData.push({
-      free: true,
-      basePrices: [],
-      basePriceString: "",
-      prices: [],
-      priceString: "",
-      totalCost: 0,
-      baseCost: 0,
-      primary: true,
-      maxQuantity: Infinity,
-      quantity
-    })
-    return priceData;
-  }
-  
   let merchant = sellerFlagData ? seller : buyer;
   
   // Retrieve the item price modifiers
@@ -481,6 +462,9 @@ export function getItemPrices(item, {
     return priceData;
   }
   
+  const overallCost = Number(getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE));
+  const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
+  
   const currencyList = getActorCurrencyList(merchant);
   const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
   
@@ -488,6 +472,22 @@ export function getItemPrices(item, {
   // to it, in order have a stable form of exchange calculation
   const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
   const decimals = smallestExchangeRate.toString().split(".")[1].length;
+  
+  if (itemFlagData?.free || (!itemFlagData.disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices)) {
+    priceData.push({
+      free: true,
+      basePrices: [],
+      basePriceString: "",
+      prices: [],
+      priceString: "",
+      totalCost: 0,
+      baseCost: 0,
+      primary: true,
+      maxQuantity: Infinity,
+      quantity
+    })
+    return priceData;
+  }
   
   // If the item does include its normal cost, we calculate that here
   if (!itemFlagData.disableNormalCost) {
