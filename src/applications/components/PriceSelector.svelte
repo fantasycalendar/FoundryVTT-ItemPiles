@@ -6,12 +6,7 @@
   export let item;
   export let standalone = false;
 
-  const label = {
-    text: '',
-    styles: !standalone ? {} : {
-      "margin-left": "0.25rem"
-    }
-  };
+  let labelText = "";
 
   const prices = item.prices;
   const itemFlagData = item.itemFlagData;
@@ -20,18 +15,19 @@
 
   $: cantAfford = $prices.length > 0 && !$prices[$selectedPriceGroup]?.maxQuantity && item.store.recipient && !standalone;
   $: cantAffordMultiplePrices = cantAfford && !$prices.filter(group => group.maxQuantity).length;
-  $: label.text = $prices[$selectedPriceGroup]?.free ? "Free" : $prices[$selectedPriceGroup]?.basePriceString;
+  $: labelText = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "") + ($prices[$selectedPriceGroup]?.free ? "Free" : $prices[$selectedPriceGroup]?.basePriceString);
 
 </script>
 
 <div class="price-container">
   {#if $prices.length > 1}
-    <TJSToggleLabel {label}>
+    <TJSToggleLabel>
       <div slot=left
-           class:multiple-prices={$prices.length > 1}
+           class:multiple-prices={$prices.length > 1 && !standalone}
            class:cant-afford={cantAfford}
            class:cant-afford-multiple-prices={cantAffordMultiplePrices}
-           class:standalone-moved={standalone}>
+           class:item-piles-clickable-link={$prices.length > 1}>
+        {@html labelText}
       </div>
       <TJSMenu offset={{y: 4}}>
         <div class="price-list">
@@ -59,7 +55,7 @@
       </TJSMenu>
     </TJSToggleLabel>
   {:else}
-    <small class:cant-afford={cantAfford}>{ label.text }</small>
+    <small class:cant-afford={cantAfford}>{@html labelText }</small>
   {/if}
 </div>
 
