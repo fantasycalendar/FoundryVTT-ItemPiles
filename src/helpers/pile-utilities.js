@@ -442,6 +442,22 @@ export function getItemPrices(item, {
   
   let merchant = sellerFlagData ? seller : buyer;
   
+  if (merchant === buyer && itemFlagData.cantBeSoldToMerchants) {
+    priceData.push({
+      free: false,
+      basePrices: [],
+      basePriceString: "",
+      prices: [],
+      priceString: "",
+      totalCost: 0,
+      baseCost: 0,
+      primary: true,
+      maxQuantity: 0,
+      quantity
+    })
+    return priceData;
+  }
+  
   // Retrieve the item price modifiers
   let modifier = 1;
   if (sellerFlagData) {
@@ -463,6 +479,7 @@ export function getItemPrices(item, {
   }
   
   const overallCost = Number(getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE));
+  const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
   const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
   
   const currencyList = getActorCurrencyList(merchant);
@@ -473,7 +490,7 @@ export function getItemPrices(item, {
   const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
   const decimals = smallestExchangeRate.toString().split(".")[1].length;
   
-  if (itemFlagData?.free || (!itemFlagData.disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices)) {
+  if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices)) {
     priceData.push({
       free: true,
       basePrices: [],
@@ -519,7 +536,7 @@ export function getItemPrices(item, {
   }
   
   // If the item has custom prices, we include them here
-  if (itemFlagData.prices.length) {
+  if (itemFlagData.prices.length && !sellerFlagData.onlyAcceptBasePrice) {
     
     priceData = priceData.concat(itemFlagData.prices.map(priceGroup => {
       const prices = priceGroup.map(price => {

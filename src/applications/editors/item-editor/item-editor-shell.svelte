@@ -77,6 +77,14 @@
 
           <div class="form-group">
             <label style="flex:4;">
+              {localize("ITEM-PILES.Applications.ItemEditor.CantBeSoldToMerchants")}<br>
+              <p>{localize("ITEM-PILES.Applications.ItemEditor.CantBeSoldToMerchantsExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={itemFlagData.cantBeSoldToMerchants}/>
+          </div>
+
+          <div class="form-group">
+            <label style="flex:4;">
               {localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantity")}<br>
               <p>{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityExplanation")}</p>
             </label>

@@ -1,13 +1,11 @@
 <script>
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
-  import ItemEditor from "../editors/item-editor/item-editor.js";
   import PriceSelector from "../components/PriceSelector.svelte";
 
-  export let store;
   export let item;
-  export let selling = false;
 
+  const store = item.store;
   const itemName = item.name;
   const itemImage = item.img;
 
@@ -22,7 +20,6 @@
   $: editQuantity = $quantityStore;
   let showEditQuantity = false;
 
-  const displayControlButtons = store.actor.isOwner && !selling;
   const displayBuyButton = !!store.recipient;
 
   function previewItem(item) {
@@ -42,7 +39,8 @@
      transition:fade|local={{duration: 250}}
      style="flex: 1 0 auto;">
 
-  <div class="item-piles-img-container" class:not-for-sale={itemFlagData.notForSale || !quantity}>
+  <div class="item-piles-img-container"
+       class:not-for-sale={!quantity || itemFlagData.cantBeSoldToMerchants}>
     <img class="item-piles-img" src="{$itemImage}"/>
   </div>
 
@@ -76,31 +74,16 @@
   <PriceSelector {item}/>
 
   <div class="item-piles-flexrow sidebar-buttons">
-    {#if displayControlButtons}
-      {#if game.user.isGM}
-        <span class="item-piles-clickable-link" on:click={() => { ItemEditor.show(item.item); }}>
-          <i class="fas fa-cog"></i>
-        </span>
-      {/if}
-      <span class="item-piles-clickable-link"
-            on:click={() => { itemFlagData.hidden = !itemFlagData.hidden; item.updateItemFlagData(); }}>
-        <i class="fas" class:fa-eye={!itemFlagData.hidden} class:fa-eye-slash={itemFlagData.hidden}></i>
-      </span>
-      <span class="item-piles-clickable-link"
-            on:click={() => { itemFlagData.notForSale = !itemFlagData.notForSale; item.updateItemFlagData(); }}>
-        <i class="fas" class:fa-store={!itemFlagData.notForSale} class:fa-store-slash={itemFlagData.notForSale}></i>
-      </span>
-    {/if}
     {#if displayBuyButton}
-      <span class:item-piles-clickable-link={!itemFlagData.notForSale || game.user.isGM}
-            class:item-piles-clickable-link-disabled={quantity <= 0 || (itemFlagData.notForSale && !game.user.isGM)}
-            class:buy-button={displayControlButtons}
-            on:click={() => {
-              if(quantity <= 0 || (itemFlagData.notForSale && !game.user.isGM)) return;
-              store.tradeItem(item, selling)
+      <span
+        class:item-piles-clickable-link={quantity > 0 && !itemFlagData.cantBeSoldToMerchants}
+        class:item-piles-clickable-link-disabled={quantity <= 0 || itemFlagData.cantBeSoldToMerchants}
+        on:click={() => {
+              if((quantity <= 0 || itemFlagData.cantBeSoldToMerchants)) return;
+              store.tradeItem(item, true)
             }}>
-        <i class="fas" class:fa-shopping-cart={!selling} class:fa-hand-holding-usd={selling}></i>
-        {#if !displayControlButtons} {localize("ITEM-PILES.Merchant." + (!selling ? "Buy" : "Sell"))}{/if}
+        <i class="fas fa-hand-holding-usd"></i>
+        {localize("ITEM-PILES.Merchant.Sell")}
       </span>
     {/if}
   </div>

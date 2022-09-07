@@ -1349,6 +1349,7 @@ export default class PrivateAPI {
     const sellerTransaction = new Transaction(sellingActor);
     const sellerFlagData = PileUtilities.getActorFlagData(sellerTransaction);
     const sellerInfiniteQuantity = sellerFlagData.enabled && sellerFlagData.merchant && sellerFlagData.infiniteQuantity;
+    const sellerInfiniteCurrencies = sellerFlagData.enabled && sellerFlagData.merchant && sellerFlagData.infiniteCurrencies;
     
     for (const payment of itemPrices.sellerReceive) {
       if (!payment.quantity) continue;
@@ -1366,7 +1367,9 @@ export default class PrivateAPI {
     }
     
     for (const entry of itemPrices.buyerReceive) {
-      if (!entry.quantity || sellerInfiniteQuantity) continue;
+      if (!entry.quantity || (sellerInfiniteCurrencies && entry.isCurrency) || (sellerInfiniteQuantity && !entry.isCurrency)) {
+        continue;
+      }
       if (entry.type === "attribute") {
         await sellerTransaction.appendActorChanges([{
           path: entry.data.path,

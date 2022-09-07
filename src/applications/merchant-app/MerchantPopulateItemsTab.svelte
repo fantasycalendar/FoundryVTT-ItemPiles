@@ -4,6 +4,7 @@
   import { onDestroy } from 'svelte';
   import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
   import CustomDialog from "../components/CustomDialog.svelte";
+  import ItemEntry from "./ItemEntry.svelte";
 
   export let store;
 
@@ -19,12 +20,7 @@
   let currentItems = [];
 
   $: {
-    currentItems = $itemStore.map(item => ({
-      id: item.item.id,
-      name: item.item.name,
-      quantity: get(item.quantity),
-      img: item.item.img
-    }));
+    currentItems = $itemStore;
     currentItems.sort((a, b) => {
       return a.name < b.name ? -1 : 1;
     });
@@ -179,14 +175,7 @@
 
       {#each currentItems as item (item.id)}
         <div class="item-piles-flexrow item-piles-item-row item-piles-even-color">
-          <div class="item-piles-img-container">
-            <img class="item-piles-img" src="{item.img}"/>
-          </div>
-          <div class="item-piles-name">
-            <div class="item-piles-name-container">
-              {item.name} x{item.quantity}
-            </div>
-          </div>
+          <ItemEntry {item}/>
         </div>
       {/each}
 

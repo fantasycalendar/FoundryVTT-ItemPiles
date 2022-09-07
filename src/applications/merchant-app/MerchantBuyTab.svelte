@@ -3,7 +3,7 @@
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import { fade } from 'svelte/transition';
   import SliderInput from "../components/SliderInput.svelte";
-  import MerchantItemEntry from "./MerchantItemEntry.svelte";
+  import MerchantItemBuyEntry from "./MerchantItemBuyEntry.svelte";
 
   export let store;
 
@@ -58,7 +58,7 @@
 
     <div class="item-piles-items-list">
       {#each $itemsPerCategoryStore[category.type] as item (item.id)}
-        <MerchantItemEntry {store} {item}/>
+        <MerchantItemBuyEntry {item}/>
       {/each}
     </div>
   </div>
