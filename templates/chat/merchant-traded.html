@@ -9,13 +9,11 @@
   </div>
 
   <ul>
-    {{#each priceInformation as |entry id|}}
+    {{#each items as |item id|}}
     <li>
-      <img src="{{entry.item.img}}" title="{{entry.item.name}}" height="16"/>
-      <label>{{entry.item.name}} <small>(x{{entry.item.quantity}})</small></label>
-      <small style="flex: 0 1 auto;">
-        {{entry.basePriceString}}
-      </small>
+      <img src="{{item.img}}" title="{{item.name}}" height="16"/>
+      <label>{{item.name}}</label>
+      <small>{{item.quantity}}</small>
     </li>
     {{/each}}
   </ul>

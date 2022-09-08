@@ -419,7 +419,7 @@ export default class ChatAPI {
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
     
-    priceInformation.item = priceInformation.buyerReceive[0];
+    const newItems = priceInformation.buyerReceive;
     
     const now = (+new Date());
     
@@ -430,7 +430,7 @@ export default class ChatAPI {
     for (let [index, message] of messages.entries()) {
       const flags = getProperty(message.data, CONSTANTS.FLAGS.PILE);
       if (flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
-        return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
+        return this._updateExistingMerchantMessage(message, sourceActor, targetActor, newItems, interactionId)
       }
     }
     
@@ -446,7 +446,7 @@ export default class ChatAPI {
         img: pileData.merchantImage || sourceActor.img
       },
       actor: targetActor,
-      priceInformation: [priceInformation]
+      items: newItems
     });
     
     return this._createNewChatMessage(userId, {
@@ -458,18 +458,18 @@ export default class ChatAPI {
       [CONSTANTS.FLAGS.PILE]: {
         source: sourceUuid,
         target: targetUuid,
-        priceInformation: [priceInformation],
+        items: newItems,
         interactionId: interactionId
       }
     })
     
   }
   
-  static async _updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId) {
+  static async _updateExistingMerchantMessage(message, sourceActor, targetActor, newItems, interactionId) {
     
     const flags = getProperty(message.data, CONSTANTS.FLAGS.PILE);
     
-    const newPriceInformation = flags.priceInformation.concat(priceInformation);
+    const mergedItems = this._matchEntries(flags.items, newItems);
     
     const pileData = PileUtilities.getActorFlagData(sourceActor);
     
@@ -483,13 +483,13 @@ export default class ChatAPI {
         img: pileData.merchantImage || sourceActor.img
       },
       actor: targetActor,
-      priceInformation: newPriceInformation
+      items: mergedItems
     });
     
     return message.update({
       content: chatCardHtml,
       [`${CONSTANTS.FLAGS.PILE}.interactionId`]: interactionId,
-      [`${CONSTANTS.FLAGS.PILE}.priceInformation`]: newPriceInformation
+      [`${CONSTANTS.FLAGS.PILE}.items`]: mergedItems
     });
     
   }

@@ -9,7 +9,7 @@ export function getActor(target) {
 
 export function getToken(documentUuid) {
   const document = fromUuidFast(documentUuid);
-  return document?.token || false;
+  return document instanceof TokenDocument ? document.object : document;
 }
 
 export function getDocument(target) {

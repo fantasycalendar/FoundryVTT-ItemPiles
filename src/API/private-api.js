@@ -851,7 +851,7 @@ export default class PrivateAPI {
     if (!target) return false;
     const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_DELETE, target);
     if (hookResult === false) return false;
-    return target.delete();
+    return target.document.delete();
   }
   
   /* -------- PRIVATE ITEM PILE METHODS -------- */
@@ -1084,9 +1084,7 @@ export default class PrivateAPI {
       }
     }
     
-    if (droppableDocuments.length) {
-      action = "addToPile";
-    }
+    let newPile = !!droppableDocuments.length;
     
     if (hotkeyState.altDown) {
       
@@ -1097,11 +1095,11 @@ export default class PrivateAPI {
       
       const quantity = Utilities.getItemQuantity(dropData.itemData.item);
       
-      let result = { action: "addToPile", quantity: 1 }
+      let result = { newPile, quantity: 1 }
       if (quantity > 1) {
         result = await DropItemDialog.show(item, droppableDocuments[0]);
         if (!result) return false;
-        action = result.action;
+        newPile = result.newPile;
       }
       
       setProperty(dropData.itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
@@ -1109,10 +1107,12 @@ export default class PrivateAPI {
       
     }
     
-    if (action === "addToPile") {
-      dropData.target = droppableDocuments[0];
-    } else {
+    debugger;
+    
+    if (newPile) {
       dropData.position = { x, y };
+    } else {
+      dropData.target = droppableDocuments[0];
     }
     
     const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
