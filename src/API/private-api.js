@@ -1107,8 +1107,6 @@ export default class PrivateAPI {
       
     }
     
-    debugger;
-    
     if (newPile) {
       dropData.position = { x, y };
     } else {
