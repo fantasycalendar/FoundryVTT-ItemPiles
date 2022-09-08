@@ -2,12 +2,12 @@
 
 ## Version 2.0.0
 
-- Added merchant functionality
+- Added fully-featured merchant functionality
     - Per item type and per actor price modifiers (give that chatty bard a discount)
     - Infinite currencies & infinite item quantities
-    - Roll table support
+    - Custom item price support - you can configure items to cost other items to buy. Crafting merchants anyone?
+    - Roll table support to generate the listing on merchants
 - Reworked the way currencies work to support item-based currencies
-- Reworked the settings menu
 - Rewrote the entire module from scratch for long term viability
 - Added support for the TwoDSix system (Traveler)
 - Tweaked existing systems to work with the new currency system

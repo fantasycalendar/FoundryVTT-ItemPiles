@@ -38,7 +38,7 @@
     ]
   }
 
-  let activeTab = "price";
+  let activeTab = "general";
 
 </script>
 
