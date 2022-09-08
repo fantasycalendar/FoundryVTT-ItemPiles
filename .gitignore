@@ -1,2 +1,6 @@
 .idea/*
 node_modules/*
+dist/*
+.vite-cache/*
+module.js
+style.css
