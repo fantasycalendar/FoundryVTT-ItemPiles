@@ -506,8 +506,10 @@ export function getItemPrices(item, {
     return priceData;
   }
   
+  // !(itemFlagData.disableNormalCost || (merchant === buyer && sellerFlagData.onlyAcceptBasePrice)) &&
+  
   // If the item does include its normal cost, we calculate that here
-  if (!itemFlagData.disableNormalCost && overallCost >= smallestExchangeRate) {
+  if (overallCost >= smallestExchangeRate && (!itemFlagData.disableNormalCost || (merchant === buyer && buyerFlagData.onlyAcceptBasePrice))) {
     
     // Base prices is the displayed price, without quantity taken into account
     const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
@@ -536,7 +538,7 @@ export function getItemPrices(item, {
   }
   
   // If the item has custom prices, we include them here
-  if (itemFlagData.prices.length && !sellerFlagData.onlyAcceptBasePrice) {
+  if (itemFlagData.prices.length && !(merchant === buyer && buyerFlagData.onlyAcceptBasePrice)) {
     
     priceData = priceData.concat(itemFlagData.prices.map(priceGroup => {
       const prices = priceGroup.map(price => {
