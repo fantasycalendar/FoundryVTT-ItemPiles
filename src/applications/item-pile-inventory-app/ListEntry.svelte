@@ -15,7 +15,7 @@
 
   function previewItem() {
     if (!canPreview) return;
-    const item = store.source.items.get(entry.id);
+    const item = store.actor.items.get(entry.id);
     if (!item) return;
     if (game.user.isGM || item.entry.permission[game.user.id] === 3) {
       return item.sheet.render(true);
@@ -83,10 +83,10 @@
   {#if !editQuantities}
 
     <button
-        on:click={() => { entry.take() }}
-        class="item-piles-item-take-button"
-        type="button"
-        disabled={!$quantityLeft}>
+      on:click={() => { entry.take() }}
+      class="item-piles-item-take-button"
+      type="button"
+      disabled={!$quantityLeft}>
       {localize("ITEM-PILES.Inspect.Take")}
     </button>
 
