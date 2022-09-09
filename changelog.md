@@ -2,7 +2,7 @@
 
 ## Version 2.0.1
 
-- Fixed default settings for PF1e system was broken
+- Fixed broken default settings for PF1e system
 - Fixed issue with previewing items on item piles
 - Fixed issue when dropping items with only one quantity ending up at the very top left of the scene
 - Fixed unsupported systems throwing errors when trying to configure them
