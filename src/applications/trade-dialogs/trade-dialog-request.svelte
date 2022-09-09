@@ -81,6 +81,8 @@
 
 </script>
 
+<svelte:options accessors={true}/>
+
 <ApplicationShell bind:elementRoot>
 
   <div class="item-piles-flexcol trade-dialog">

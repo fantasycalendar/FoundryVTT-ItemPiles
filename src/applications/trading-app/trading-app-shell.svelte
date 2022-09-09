@@ -26,8 +26,7 @@
   const rightTraderAccepted = store.rightTraderAccepted;
 
   let isGM = game.user.isGM;
-  let systemHasCurrencies = game.itempiles.CURRENCIES.items.length > 0
-    && game.itempiles.CURRENCIES.attributes.length > 0;
+  let systemHasCurrencies = game.itempiles.CURRENCIES.length > 0;
   let spectator = game.user !== store.leftTraderUser && game.user !== store.rightTraderUser;
 
   async function dropItem(data) {
@@ -67,7 +66,7 @@
       }
     }
 
-    const actorItemCurrencyList = PileUtilities.getActorCurrencyList(store.leftTraderActor).items;
+    const actorItemCurrencyList = PileUtilities.getActorCurrencyList(store.leftTraderActor).filter(entry => entry.type !== "attribute");
     const isCurrency = !!Utilities.findSimilarItem(actorItemCurrencyList.map(item => item.data), itemData);
 
     return store.addItem(itemData, { currency: isCurrency });
@@ -173,10 +172,10 @@
             </h2>
             <div>
               <i
-                  class:accepted={$leftTraderAccepted}
-                  class:fa-user-check={$leftTraderAccepted}
-                  class:fa-user-times={!$leftTraderAccepted}
-                  class="fas accepted-icon"
+                class:accepted={$leftTraderAccepted}
+                class:fa-user-check={$leftTraderAccepted}
+                class:fa-user-times={!$leftTraderAccepted}
+                class="fas accepted-icon"
               ></i>
             </div>
           </div>
@@ -250,10 +249,10 @@
           <div class="character-header trader item-piles-bottom-divider">
             <div>
               <i
-                  class:accepted={$rightTraderAccepted}
-                  class:fa-user-check={$rightTraderAccepted}
-                  class:fa-user-times={!$rightTraderAccepted}
-                  class="fas accepted-icon"
+                class:accepted={$rightTraderAccepted}
+                class:fa-user-check={$rightTraderAccepted}
+                class:fa-user-times={!$rightTraderAccepted}
+                class="fas accepted-icon"
               ></i>
             </div>
             <h2 class="character-name">

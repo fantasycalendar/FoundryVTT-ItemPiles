@@ -3,6 +3,8 @@
   import Tabs from "../components/Tabs.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import SliderInput from "../components/SliderInput.svelte";
+  import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
+  import { get } from "svelte/store";
 
   export let store;
 
@@ -11,10 +13,10 @@
   const editPrices = store.editPrices;
 
   let tabs = [];
-  let description = "";
+  let description;
   let activeSidebarTab = false;
+  $: description = $pileDataStore.description;
   $: {
-    description = $pileDataStore.description;
     tabs = [
       {
         value: 'description',
@@ -26,6 +28,12 @@
     activeSidebarTab = activeSidebarTab || tabs.find(tab => !tab.hidden)?.value;
   }
 
+  function showDescriptionEditor() {
+    return TextEditorDialog.show(description, { id: "item-pile-text-editor-" + store.actor.id }).then((result) => {
+      description = result || "";
+      store.update();
+    });
+  }
 
 </script>
 
@@ -48,7 +56,9 @@
             {@html description || ""}
             {#if !description}
               <button type="button"
-                      style="flex:1;">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}</button>
+                      style="flex:1;"
+                      on:click={() => { showDescriptionEditor() }}
+              >{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}</button>
             {/if}
           </div>
         {/if}

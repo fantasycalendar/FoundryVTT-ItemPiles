@@ -33,7 +33,7 @@
     });
   }
 
-  let items = currencies.filter(entry => entry.type === "attribute")
+  let items = currencies.filter(entry => entry.type !== "attribute")
     .map(currency => {
       currency.currentQuantity = 0;
       return currency;

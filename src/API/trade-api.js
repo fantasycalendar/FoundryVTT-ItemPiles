@@ -8,9 +8,7 @@ import * as Utilities from "../helpers/utilities.js";
 import HOOKS from "../constants/hooks.js";
 import TradeStore from "../applications/trading-app/trade-store.js";
 import TradingApp from "../applications/trading-app/trading-app.js";
-import PrivateAPI from "./private-api.js";
 import Transaction from "../helpers/transaction.js";
-import { isGMConnected } from "../helpers/helpers.js";
 
 const mutedUsers = new Set();
 const ongoingTrades = new Map();
@@ -417,10 +415,10 @@ export default class TradeAPI {
     });
     
     const transaction = new Transaction(updates.sourceActor);
-    transaction.appendItemChanges(itemsToAdd);
-    transaction.appendItemChanges(itemsToRemove, { remove: true });
-    transaction.appendActorChanges(updates.add.attributes);
-    transaction.appendActorChanges(updates.remove.attributes, { remove: true });
+    await transaction.appendItemChanges(itemsToAdd);
+    await transaction.appendItemChanges(itemsToRemove, { remove: true });
+    await transaction.appendActorChanges(updates.add.attributes);
+    await transaction.appendActorChanges(updates.remove.attributes, { remove: true });
     await transaction.commit();
     
     if (trade.store.isPrivate) {
