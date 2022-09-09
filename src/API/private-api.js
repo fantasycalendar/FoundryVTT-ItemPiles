@@ -1004,6 +1004,8 @@ export default class PrivateAPI {
     let x;
     let y;
     
+    debugger;
+    
     if (dropData.target) {
       
       droppableDocuments.push(dropData.target);
@@ -1084,7 +1086,7 @@ export default class PrivateAPI {
       }
     }
     
-    let newPile = !!droppableDocuments.length;
+    let newPile = !droppableDocuments.length;
     
     if (hotkeyState.altDown) {
       

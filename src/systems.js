@@ -41,10 +41,7 @@ export const SYSTEMS = {
     ITEM_PRICE_ATTRIBUTE: "",
     ITEM_FILTERS: [],
     ITEM_SIMILARITIES: [],
-    CURRENCIES: {
-      "itemBased": false,
-      "list": []
-    }
+    CURRENCIES: []
   },
   
   get HAS_SYSTEM_SUPPORT() {
