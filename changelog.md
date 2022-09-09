@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.0.2
+
+- Fixed user-to-user trading application not working properly
+
 ## Version 2.0.1
 
 - Fixed broken default settings for PF1e system
