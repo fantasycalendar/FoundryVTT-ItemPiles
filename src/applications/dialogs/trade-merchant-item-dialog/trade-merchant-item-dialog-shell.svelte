@@ -54,7 +54,7 @@
   $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxMerchantItemQuantity);
 
   function submit() {
-    game.itempiles.tradeItems(seller, buyer, [{
+    game.itempiles.API.tradeItems(seller, buyer, [{
       item: item.item,
       paymentIndex: get(selectedPriceGroup),
       quantity: get(quantityToBuy),

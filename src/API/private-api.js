@@ -543,7 +543,7 @@ export default class PrivateAPI {
       } else {
         itemsDropped = (await this._removeItems(sourceUuid, itemsToTransfer, userId)).map(item => {
           item.quantity = Math.abs(item.quantity)
-          setProperty(item.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, Math.abs(item.quantity))
+          setProperty(item.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Math.abs(item.quantity))
           return item;
         });
         targetUuid = await this._createItemPile(sceneId, position, { items: itemsDropped });
@@ -1049,7 +1049,7 @@ export default class PrivateAPI {
         }
       }
       
-      droppableDocuments = droppableDocuments.filter(token => !game.itempiles.isItemPileLocked(token));
+      droppableDocuments = droppableDocuments.filter(token => !game.itempiles.API.isItemPileLocked(token));
       
       if (!droppableDocuments.length) {
         Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
@@ -1089,7 +1089,7 @@ export default class PrivateAPI {
     
     if (hotkeyState.altDown) {
       
-      setProperty(dropData.itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, 1);
+      setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, 1);
       dropData.itemData.quantity = 1;
       
     } else {
@@ -1103,7 +1103,7 @@ export default class PrivateAPI {
         newPile = result.newPile;
       }
       
-      setProperty(dropData.itemData.item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
+      setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
       dropData.itemData.quantity = Number(result.quantity);
       
     }
@@ -1186,12 +1186,12 @@ export default class PrivateAPI {
       
       if (pileData.locked && !game.user.isGM) {
         Helpers.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
-        return game.itempiles.rattleItemPile(pileDocument, interactingActor);
+        return game.itempiles.API.rattleItemPile(pileDocument, interactingActor);
       }
       
       if (pileData.closed) {
         Helpers.debug(`Opened item pile with UUID ${pileDocument.uuid}`);
-        await game.itempiles.openItemPile(pileDocument, interactingActor);
+        await game.itempiles.API.openItemPile(pileDocument, interactingActor);
       }
       
     }

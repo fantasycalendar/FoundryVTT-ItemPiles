@@ -120,7 +120,7 @@ export function getActorPrimaryCurrency(target) {
 export function getActorCurrencyList(target, pileData = false) {
   const targetActor = Utilities.getActor(target);
   pileData = getActorFlagData(targetActor, pileData);
-  return (pileData.overrideCurrencies || game.itempiles.CURRENCIES).map(currency => {
+  return (pileData.overrideCurrencies || game.itempiles.API.CURRENCIES).map(currency => {
     currency.name = game.i18n.localize(currency.name);
     return currency;
   });
@@ -128,10 +128,10 @@ export function getActorCurrencyList(target, pileData = false) {
 
 
 export function getActorItemFilters(target, pileData = false) {
-  if (!target) return cleanItemFilters(game.itempiles.ITEM_FILTERS);
+  if (!target) return cleanItemFilters(game.itempiles.API.ITEM_FILTERS);
   const targetActor = Utilities.getActor(target);
   pileData = getActorFlagData(targetActor, pileData);
-  return isValidItemPile(targetActor, pileData) && pileData?.overrideItemFilters ? cleanItemFilters(pileData.overrideItemFilters) : cleanItemFilters(game.itempiles.ITEM_FILTERS);
+  return isValidItemPile(targetActor, pileData) && pileData?.overrideItemFilters ? cleanItemFilters(pileData.overrideItemFilters) : cleanItemFilters(game.itempiles.API.ITEM_FILTERS);
 }
 
 export function cleanItemFilters(itemFilters) {
@@ -478,7 +478,7 @@ export function getItemPrices(item, {
     return priceData;
   }
   
-  const overallCost = Number(getProperty(item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE));
+  const overallCost = Number(getProperty(item.toObject(), game.itempiles.API.ITEM_PRICE_ATTRIBUTE));
   const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
   const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
   

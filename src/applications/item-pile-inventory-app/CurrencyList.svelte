@@ -14,10 +14,10 @@
     const result = await DropCurrencyDialog.show(store.recipient, store.actor);
     if (!result) return;
     if (!foundry.utils.isObjectEmpty(result.attributes)) {
-      await game.itempiles.transferAttributes(store.recipient, store.actor, result.attributes, { interactionId: store.interactionId })
+      await game.itempiles.API.transferAttributes(store.recipient, store.actor, result.attributes, { interactionId: store.interactionId })
     }
     if (result.items.length) {
-      await game.itempiles.transferItems(store.recipient, store.actor, result.items, { interactionId: store.interactionId })
+      await game.itempiles.API.transferItems(store.recipient, store.actor, result.items, { interactionId: store.interactionId })
     }
   }
 

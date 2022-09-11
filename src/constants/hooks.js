@@ -5,6 +5,7 @@ const module = prefix(CONSTANTS.MODULE_NAME);
 
 const HOOKS = {
   READY: module`ready`,
+  RESET_SETTINGS: module`resetSettings`,
   PRE_TRANSFER_EVERYTHING: module`preTransferEverything`,
   TRANSFER_EVERYTHING: module`transferEverything`,
   PRE_OPEN_INTERFACE: module`preOpenInterface`,

@@ -86,7 +86,7 @@
   }
 
   async function showCurrenciesEditor() {
-    pileData.overrideCurrencies = pileData?.overrideCurrencies || game.itempiles.CURRENCIES;
+    pileData.overrideCurrencies = pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES;
     return CurrenciesEditor.show(
       pileData.overrideCurrencies,
       { id: `currencies-item-pile-config-${pileActor.id}` },
@@ -97,7 +97,7 @@
   }
 
   async function showItemFiltersEditor() {
-    pileData.overrideItemFilters = pileData?.overrideItemFilters || game.itempiles.ITEM_FILTERS;
+    pileData.overrideItemFilters = pileData?.overrideItemFilters || game.itempiles.API.ITEM_FILTERS;
     return ItemFiltersEditor.show(
       pileData.overrideItemFilters,
       { id: `item-filters-item-pile-config-${pileActor.id}` },

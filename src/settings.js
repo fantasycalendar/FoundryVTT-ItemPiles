@@ -45,6 +45,8 @@ export async function patchCurrencySettings() {
 
 export async function checkSystem() {
   
+  if (Helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
+  
   if (!SYSTEMS.HAS_SYSTEM_SUPPORT) {
     
     if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) return;
@@ -61,8 +63,7 @@ export async function checkSystem() {
       content: {
         class: CustomDialog,
         props: {
-          content: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content"),
-          icon: "fas fa-exclamation-triangle",
+          content: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content")
         }
       }
     });
@@ -75,13 +76,14 @@ export async function checkSystem() {
     const currentVersion = Helpers.getSetting(SETTINGS.SYSTEM_VERSION);
     const newVersion = SYSTEMS.DATA.VERSION;
     if (isNewerVersion(newVersion, currentVersion)) {
+      const ignoredSystemVersion = Helpers.getSetting(SETTINGS.IGNORED_SYSTEM_VERSION);
+      if (!isNewerVersion(newVersion, ignoredSystemVersion)) return;
       const doThing = await TJSDialog.confirm({
         title: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Title"),
         content: {
           class: CustomDialog,
           props: {
-            content: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content"),
-            icon: "fas fa-exclamation-triangle",
+            content: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content")
           }
         },
         buttons: {
@@ -102,15 +104,13 @@ export async function checkSystem() {
           height: "auto"
         }
       });
-      if (doThing) {
-        await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
-        return applyDefaultSettings();
+      if (!doThing) {
+        return Helpers.setSetting(SETTINGS.IGNORED_SYSTEM_VERSION, SYSTEMS.DATA.VERSION);
       }
-      return;
+      return applyDefaultSettings();
     }
+    return;
   }
-  
-  if (Helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
   
   await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
   
@@ -120,8 +120,7 @@ export async function checkSystem() {
       content: {
         class: CustomDialog,
         props: {
-          content: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"),
-          icon: "fas fa-exclamation-triangle",
+          content: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content")
         }
       },
       buttons: {
@@ -147,6 +146,5 @@ export async function checkSystem() {
     }
   }
   
-  await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
   return applyDefaultSettings();
 }

@@ -74,7 +74,11 @@ const API = {
     if (typeof inClassType !== "string") {
       throw Helpers.custom_error("setActorTypeClass | inClassType must be of type string");
     }
-    return Helpers.setSetting(SETTINGS.ACTOR_CLASS_TYPE, inClassType);
+    return new Promise(async (resolve) => {
+      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
+      await Helpers.setSetting(SETTINGS.ACTOR_CLASS_TYPE, inClassType);
+      resolve();
+    });
   },
   
   /**
@@ -87,7 +91,6 @@ const API = {
     if (!Array.isArray(inCurrencies)) {
       throw Helpers.custom_error("setCurrencies | inCurrencies must be an array");
     }
-    
     inCurrencies.forEach(currency => {
       if (typeof currency !== "object") {
         throw Helpers.custom_error("setCurrencies | each entry in inCurrencies must be of type object");
@@ -107,25 +110,18 @@ const API = {
       if (typeof currency.data !== "object") {
         throw Helpers.custom_error("setCurrencies | currency.data must be of type object");
       }
+      if (typeof currency.data.path !== "string" || typeof currency.data.uuid !== "string" || typeof currency.data.item !== "object") {
+        throw Helpers.custom_error("setCurrencies | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
+      }
       if (currency.img && typeof currency.img !== "string") {
         throw Helpers.custom_error("setCurrencies | currency.img must be of type string");
       }
     });
-    
-    return Helpers.setSetting(SETTINGS.CURRENCIES, inCurrencies);
-  },
-  
-  /**
-   * Sets the attribute used to track the price of items in this system
-   *
-   * @param {string} inAttribute
-   * @returns {Promise}
-   */
-  setItemPriceAttribute(inAttribute) {
-    if (typeof inAttribute !== "string") {
-      throw Helpers.custom_error("setItemPriceAttribute | inAttribute must be of type string");
-    }
-    return Helpers.setSetting(SETTINGS.ITEM_PRICE_ATTRIBUTE, inAttribute);
+    return new Promise(async (resolve) => {
+      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
+      await Helpers.setSetting(SETTINGS.CURRENCIES, inCurrencies);
+      resolve();
+    });
   },
   
   /**
@@ -138,7 +134,28 @@ const API = {
     if (typeof inAttribute !== "string") {
       throw Helpers.custom_error("setItemQuantityAttribute | inAttribute must be of type string");
     }
-    return Helpers.setSetting(SETTINGS.ITEM_QUANTITY_ATTRIBUTE, inAttribute);
+    return new Promise(async (resolve) => {
+      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
+      await Helpers.setSetting(SETTINGS.ITEM_QUANTITY_ATTRIBUTE, inAttribute);
+      resolve();
+    });
+  },
+  
+  /**
+   * Sets the attribute used to track the price of items in this system
+   *
+   * @param {string} inAttribute
+   * @returns {Promise}
+   */
+  setItemPriceAttribute(inAttribute) {
+    if (typeof inAttribute !== "string") {
+      throw Helpers.custom_error("setItemPriceAttribute | inAttribute must be of type string");
+    }
+    return new Promise(async (resolve) => {
+      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
+      await Helpers.setSetting(SETTINGS.ITEM_PRICE_ATTRIBUTE, inAttribute);
+      resolve();
+    });
   },
   
   /**
@@ -159,7 +176,11 @@ const API = {
         throw Helpers.custom_error("setItemFilters | each entry in inFilters must have a \"filters\" property with a value that is of type string");
       }
     });
-    return Helpers.setSetting(SETTINGS.ITEM_FILTERS, inFilters);
+    return new Promise(async (resolve) => {
+      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
+      await Helpers.setSetting(SETTINGS.ITEM_FILTERS, inFilters);
+      resolve();
+    });
   },
   
   /**
@@ -177,7 +198,11 @@ const API = {
         throw Helpers.custom_error("setItemSimilarities | each entry in inPaths must be of type string");
       }
     });
-    return Helpers.setSetting(SETTINGS.ITEM_SIMILARITIES, inPaths);
+    return new Promise(async (resolve) => {
+      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
+      await Helpers.setSetting(SETTINGS.ITEM_SIMILARITIES, inPaths);
+      resolve();
+    });
   },
   
   getPrimaryCurrency(actor = false) {
@@ -596,12 +621,12 @@ const API = {
       }
       
       if (itemData?.quantity !== undefined) {
-        setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity)
+        setProperty(item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity)
       }
       
       const existingItems = mergeSimilarItems ? Utilities.findSimilarItem(itemsToAdd, item) : false;
       if (existingItems) {
-        setProperty(existingItems, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item))
+        setProperty(existingItems, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item))
       } else {
         itemsToAdd.push(item);
       }
@@ -629,7 +654,7 @@ const API = {
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
     
-    const targetActorItems = game.itempiles.getActorItems(target);
+    const targetActorItems = game.itempiles.API.getActorItems(target);
     
     items = items.map(itemData => {
       

@@ -20,7 +20,7 @@ export default function registerLibwrappers() {
     const document = this.constructor.collection.get(documentId);
     
     if (PileUtilities.isValidItemPile(document) && hotkeyActionState.openPileInventory) {
-      return game.itempiles.renderItemPileInterface(document, { useDefaultCharacter: true });
+      return game.itempiles.API.renderItemPileInterface(document, { useDefaultCharacter: true });
     }
     return wrapped(event);
   }, "MIXED");

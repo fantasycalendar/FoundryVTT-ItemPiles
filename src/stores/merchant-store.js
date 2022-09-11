@@ -198,7 +198,7 @@ class PileMerchantItem extends PileItem {
       if (hasProperty(data, CONSTANTS.FLAGS.ITEM + ".prices")) {
         this.refreshPriceData();
       }
-      if (hasProperty(data, game.itempiles.ITEM_PRICE_ATTRIBUTE)) {
+      if (hasProperty(data, game.itempiles.API.ITEM_PRICE_ATTRIBUTE)) {
         this.refreshPriceData();
       }
     });

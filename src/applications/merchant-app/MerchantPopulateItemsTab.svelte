@@ -83,7 +83,7 @@
   async function addItem(itemToAdd) {
     let item = await getItem(itemToAdd);
     if (item) {
-      await game.itempiles.addItems(store.actor, [{ item, quantity: itemToAdd.quantity }]);
+      await game.itempiles.API.addItems(store.actor, [{ item, quantity: itemToAdd.quantity }]);
     }
     removeItem(itemToAdd);
   }
@@ -103,7 +103,7 @@
       let item = await getItem(itemToAdd);
       items.push({ item, quantity: itemToAdd.quantity });
     }
-    await game.itempiles.addItems(store.actor, items);
+    await game.itempiles.API.addItems(store.actor, items);
     itemsRolled.set([]);
   }
 
@@ -125,8 +125,8 @@
       }
     })
     if (!doContinue) return false;
-    const items = game.itempiles.getActorItems(store.actor);
-    await game.itempiles.removeItems(store.actor, items);
+    const items = game.itempiles.API.getActorItems(store.actor);
+    await game.itempiles.API.removeItems(store.actor, items);
   }
 
   let createId = Hooks.on("createRollTable", () => {

@@ -23,7 +23,10 @@ Hooks.once("init", async () => {
   TradeAPI.initialize();
   ChatAPI.initialize();
   
-  game.itempiles = API;
+  game.itempiles = {
+    API,
+    hooks: HOOKS
+  };
   window.ItemPiles = {
     API: API
   };
@@ -39,8 +42,7 @@ Hooks.once("ready", async () => {
         class: CustomDialog,
         props: {
           title: "Item Piles: Foundry v10 not Supported",
-          content: "Item Piles is not yet v10 supported, and will not be for at least a month or two. Please do not use Item Piles in v10, and do not report bugs relating to v10 issues.",
-          icon: "fas fa-exclamation-triangle",
+          content: "Item Piles is not yet v10 supported, and will not be for at least a month or two. Please do not use Item Piles in v10, and do not report bugs relating to v10 issues."
         }
       },
       modal: true
@@ -63,7 +65,6 @@ Hooks.once("ready", async () => {
   }
   
   if (game.user.isGM) {
-    patchCurrencySettings();
     checkSystem();
   }
   registerHotkeysPost();
@@ -77,8 +78,15 @@ Hooks.once("socketlib.ready", () => {
   Socket.initialize();
 });
 
-Hooks.on("reset-item-pile-settings", async () => {
+Hooks.once(HOOKS.READY, () => {
+  setTimeout(() => {
+    patchCurrencySettings();
+  }, 100);
+})
+
+Hooks.on(HOOKS.RESET_SETTINGS, async () => {
   for (let setting of game.settings.storage.get("world").filter(setting => setting.data.key.includes('item-piles'))) {
     await setting.delete();
   }
-})
+  checkSystem();
+});

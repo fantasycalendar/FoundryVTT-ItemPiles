@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.0.6
+
+- Improved dialogs to actually show that Item Piles is their origin
+- Improved API when configuring settings
+
 ## Version 2.0.5 Hotfix
 
 - Fixed supported systems constantly resetting to default settings

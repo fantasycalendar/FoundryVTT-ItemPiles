@@ -40,7 +40,7 @@ export default class ItemPriceStore {
         const oldData = get(this.data);
         this.data.set(foundry.utils.mergeObject(oldData, newData));
       }
-      this.price.set(getProperty(this.item.toObject(), game.itempiles.ITEM_PRICE_ATTRIBUTE));
+      this.price.set(getProperty(this.item.toObject(), game.itempiles.API.ITEM_PRICE_ATTRIBUTE));
     });
     
   }
@@ -54,7 +54,7 @@ export default class ItemPriceStore {
   export() {
     return {
       data: {
-        [game.itempiles.ITEM_PRICE_ATTRIBUTE]: get(this.price),
+        [game.itempiles.API.ITEM_PRICE_ATTRIBUTE]: get(this.price),
       },
       flags: get(this.data)
     };

@@ -68,7 +68,7 @@
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true);
     }
 
-    return game.itempiles.addItems(merchant, [{
+    return game.itempiles.API.addItems(merchant, [{
       item: itemData,
       quantity: 1
     }]);

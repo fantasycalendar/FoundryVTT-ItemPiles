@@ -33,6 +33,7 @@ const SETTINGS = {
   SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
   PRECONFIGURED_SYSTEM: "preconfiguredSystem",
   SYSTEM_VERSION: "systemVersion",
+  IGNORED_SYSTEM_VERSION: "ignoredSystemVersion",
   V10_WARNING_SHOWN: "v10WarningShown",
   
   GET_DEFAULT() {
@@ -130,6 +131,13 @@ const SETTINGS = {
     },
     
     [SETTINGS.SYSTEM_VERSION]: {
+      scope: "world",
+      config: false,
+      default: "0.0.0",
+      type: String
+    },
+    
+    [SETTINGS.IGNORED_SYSTEM_VERSION]: {
       scope: "world",
       config: false,
       default: "0.0.0",

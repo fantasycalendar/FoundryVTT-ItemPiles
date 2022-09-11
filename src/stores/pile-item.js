@@ -76,7 +76,7 @@ export class PileItem extends PileBaseItem {
       this.name.set(this.item.name);
       this.img.set(this.item.img);
       this.similarities = Utilities.setSimilarityProperties({}, this.item);
-      if (hasProperty(data, game.itempiles.ITEM_QUANTITY_ATTRIBUTE)) {
+      if (hasProperty(data, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE)) {
         this.quantity.set(Utilities.getItemQuantity(data));
         const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
         this.currentQuantity.set(quantity);
@@ -112,7 +112,7 @@ export class PileItem extends PileBaseItem {
   take() {
     const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft));
     if (!quantity) return;
-    return game.itempiles.transferItems(
+    return game.itempiles.API.transferItems(
       this.store.actor,
       this.store.recipient,
       [{ _id: this.id, quantity }],
@@ -124,7 +124,7 @@ export class PileItem extends PileBaseItem {
     const roll = new Roll(quantity).evaluate({ async: false });
     this.quantity.set(roll.total);
     return this.item.update({
-      [game.itempiles.ITEM_QUANTITY_ATTRIBUTE]: roll.total
+      [game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE]: roll.total
     });
   }
 }
@@ -193,7 +193,7 @@ export class PileAttribute extends PileBaseItem {
   
   take() {
     const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft));
-    return game.itempiles.transferAttributes(
+    return game.itempiles.API.transferAttributes(
       this.store.actor,
       this.store.recipient,
       { [this.path]: quantity },

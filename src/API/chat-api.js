@@ -40,7 +40,7 @@ export default class ChatAPI {
     
     if (args[0] === "trade") {
       setTimeout(() => {
-        game.itempiles.requestTrade();
+        game.itempiles.API.requestTrade();
       });
     }
     
@@ -50,7 +50,7 @@ export default class ChatAPI {
   
   static _renderChatMessage(app, html) {
     html.find(".item-piles-specate-trade").click(function () {
-      game.itempiles.spectateTrade($(this).data());
+      game.itempiles.API.spectateTrade($(this).data());
     });
   }
   

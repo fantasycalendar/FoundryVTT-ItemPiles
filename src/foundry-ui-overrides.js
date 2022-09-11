@@ -38,7 +38,7 @@ function addTradeButton(app, html) {
   const button = $(`<button type="button" class="${classes}"><i class="fas fa-handshake"></i>${text}</button>`)
   
   button.click(() => {
-    game.itempiles.requestTrade();
+    game.itempiles.API.requestTrade();
   });
   html.append(button);
 }
@@ -52,7 +52,7 @@ function insertActorContextMenuItems(html, menuItems) {
       const actorId = html[0].dataset.documentId;
       const actor = game.actors.get(actorId);
       const users = Array.from(game.users).filter(u => u.active).map(u => u.id);
-      return game.itempiles.renderItemPileInterface(actor, { userIds: users, useDefaultCharacter: true });
+      return game.itempiles.API.renderItemPileInterface(actor, { userIds: users, useDefaultCharacter: true });
     },
     condition: (html) => {
       const actorId = html[0].dataset.documentId;
@@ -66,7 +66,7 @@ function insertActorContextMenuItems(html, menuItems) {
       const actorId = html[0].dataset.documentId;
       const actor = game.actors.get(actorId);
       const user = Array.from(game.users).find(u => u.character === actor && u.active);
-      return game.itempiles.requestTrade(user);
+      return game.itempiles.API.requestTrade(user);
     },
     condition: (html) => {
       const actorId = html[0].dataset.documentId;
@@ -126,14 +126,14 @@ function renderPileHUD(app, html) {
     const lock_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pileData.locked ? "" : "-open"}"></i></div>`);
     lock_button.click(async function () {
       $(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
-      await game.itempiles.toggleItemPileLocked(document);
+      await game.itempiles.API.toggleItemPileLocked(document);
     });
     container.append(lock_button);
     
     const open_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${pileData.closed ? "" : "-open"}"></i></div>`);
     open_button.click(async function () {
       $(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
-      await game.itempiles.toggleItemPileClosed(document);
+      await game.itempiles.API.toggleItemPileClosed(document);
     });
     container.append(open_button);
   }

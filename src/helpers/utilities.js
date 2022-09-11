@@ -64,7 +64,7 @@ export function getUuid(target) {
  */
 export function findSimilarItem(items, findItem) {
   
-  const itemSimilarities = game.itempiles.ITEM_SIMILARITIES;
+  const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
   
   const findItemId = findItem instanceof Item ? findItem.id : findItem._id;
   
@@ -88,7 +88,7 @@ export function findSimilarItem(items, findItem) {
 export function setSimilarityProperties(obj, item) {
   const itemData = item instanceof Item ? item.toObject() : item;
   setProperty(obj, "_id", itemData._id);
-  game.itempiles.ITEM_SIMILARITIES.forEach(prop => {
+  game.itempiles.API.ITEM_SIMILARITIES.forEach(prop => {
     setProperty(obj, prop, getProperty(itemData, prop));
   })
   return obj;
@@ -102,7 +102,7 @@ export function setSimilarityProperties(obj, item) {
  */
 export function getItemQuantity(item) {
   const itemData = item instanceof Item ? item.toObject() : item;
-  return Number(getProperty(itemData, game.itempiles.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+  return Number(getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
 }
 
 /**
@@ -113,7 +113,7 @@ export function getItemQuantity(item) {
  * @returns {Object}
  */
 export function setItemQuantity(itemData, quantity) {
-  setProperty(itemData, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, quantity)
+  setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity)
   return itemData;
 }
 

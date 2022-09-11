@@ -48,7 +48,7 @@ export default class Transaction {
           const newQuantity = Utilities.getItemQuantity(existingItemCreation) + incomingQuantity;
           Utilities.setItemQuantity(existingItemCreation, newQuantity);
         } else {
-          setProperty(itemData, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, incomingQuantity);
+          setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, incomingQuantity);
           this.itemsToCreate.push(itemData);
           this.itemTypeMap.set(itemData._id, type)
         }
@@ -88,7 +88,7 @@ export default class Transaction {
     this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
       const item = this.actor.items.get(id).toObject();
       const type = this.itemTypeMap.get(id);
-      setProperty(item, game.itempiles.ITEM_QUANTITY_ATTRIBUTE, quantity);
+      setProperty(item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity);
       return { item, quantity, type };
     });
     this.itemsDeleted = Array.from(this.itemsDeleted).map(([id, quantity]) => {
