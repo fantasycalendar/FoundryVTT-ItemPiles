@@ -3,4 +3,5 @@ node_modules/*
 dist/*
 .vite-cache/*
 module.js
+module.js.map
 style.css
