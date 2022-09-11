@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.0.5 Hotfix
+
+- Fixed supported systems constantly resetting to default settings
+
 ## Version 2.0.4
 
 - Fixed token HUD not showing up on item pile tokens
