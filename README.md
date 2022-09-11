@@ -109,6 +109,10 @@ module settings to configure that.
 - [Warhammer Fantasy Roleplay 4th Ed](https://foundryvtt.com/packages/wfrp4e)
 - [Splittermond](https://foundryvtt.com/packages/splittermond)
 - [Starfinder](https://foundryvtt.com/packages/sfrpg)
+- [Star Wars FFG](https://foundryvtt.com/packages/starwarsffg)
+- [Index Card RPG](https://foundryvtt.com/packages/icrpg)
+- [Forbidden Lands](https://foundryvtt.com/packages/forbidden-lands)
+- [Fallout 2d20](https://foundryvtt.com/packages/fallout)
 
 ## Semi-supported systems
 

@@ -1,8 +1,23 @@
 # Item Piles Changelog
 
+## Version 2.0.3
+
+- Added warning about Foundry v10 compatibility
+- Fixed actor context menu option "Item Piles: Show pile to players" not actually showing the UI to players
+- Fixed the add currencies UI failing to open
+- Fixed per-character share of items and currencies not working as intended
+- Tweaked the dialogs that show up when a supported system is detected
+- Updated systems to include the item cost attribute and currencies
+- Added support for the following systems:
+    - Star Wars: Saga Edition
+    - Index Card RPG
+    - Forbidden Lands
+    - Fallout
+
 ## Version 2.0.2
 
 - Fixed user-to-user trading application not working properly
+- Fixed edit description button in Merchant UI not working
 
 ## Version 2.0.1
 

@@ -1017,6 +1017,7 @@ const API = {
     for (const userId of userIds) {
       const user = game.users.get(userId);
       if (!user) throw Helpers.custom_error(`renderItemPileInterface | No user with ID "${userId}" exists`);
+      if (user.isGM) continue;
       if (useDefaultCharacter) {
         if (!user.character) {
           Helpers.custom_warning(`renderItemPileInterface | User "${user.name}" has no default character`, true);

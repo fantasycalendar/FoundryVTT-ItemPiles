@@ -66,15 +66,12 @@
 
     for (let type of types) {
       if (pileData[type].includes("*")) {
-        console.log(type)
         pileData[type + "s"] = await Helpers.getFiles(pileData[type], { applyWildCard: true, softFail: true });
         pileData[type + "s"] = pileData[type + "s"] || [];
       }
     }
 
     const data = foundry.utils.mergeObject(defaults, pileData);
-
-    console.log(data)
 
     data.deleteWhenEmpty = {
       "default": "default",

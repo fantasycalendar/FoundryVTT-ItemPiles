@@ -54,7 +54,7 @@
         {#if activeSidebarTab === 'description'}
           <div class="tab merchant-description">
             {@html description || ""}
-            {#if !description}
+            {#if description || (!description && game.user.isGM)}
               <button type="button"
                       style="flex:1;"
                       on:click={() => { showDescriptionEditor() }}

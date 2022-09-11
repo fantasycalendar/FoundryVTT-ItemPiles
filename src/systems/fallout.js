@@ -1,21 +1,21 @@
 export default {
   
-  "VERSION": "1.0.1",
+  "VERSION": "1.0.0",
   
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
   
   // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
-  "ITEM_QUANTITY_ATTRIBUTE": "data.quantity.value",
+  "ITEM_QUANTITY_ATTRIBUTE": "data.physical.quantity",
   
   // The item price attribute is the path to the attribute on each item that determine how much it costs
-  "ITEM_PRICE_ATTRIBUTE": "data.price.gc",
+  "ITEM_PRICE_ATTRIBUTE": "data.physical.cost",
   
   // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "career,container,critical,disease,injury,mutation,prayer,psychology,talent,skill,spell,trait,extendedTest,vehicleMod,cargo"
+      "filters": "skill,perk,special_ability"
     }
   ],
   
@@ -27,36 +27,15 @@ export default {
   // In the case of items, it is recommended you export the item with `.toObject()` and strip out any module data
   "CURRENCIES": [
     {
-      type: "item",
-      name: "Gold Crown",
-      img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
-      abbreviation: "{#}GP",
+      type: "attribute",
+      name: "FALLOUT.UI.CAPS",
+      img: "icons/commodities/currency/coins-engraved-copper.webp",
+      abbreviation: "{#}C",
       data: {
-        uuid: "Compendium.wfrp4e.basic.UHArNq3Vuu7Mj5AB"
+        path: "data.currency.caps",
       },
       primary: true,
       exchangeRate: 1
-    },
-    {
-      type: "item",
-      name: "Silver Pieces",
-      img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
-      abbreviation: "{#}SP",
-      data: {
-        uuid: "Compendium.wfrp4e.basic.AtRuawWCHjgQxzdn"
-      },
-      primary: false,
-      exchangeRate: 0.1
-    },
-    {
-      type: "item",
-      name: "Brass Penny",
-      img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
-      abbreviation: "{#}CP",
-      data: {
-        uuid: "Compendium.wfrp4e.basic.1BdNwUF0SfiCotWB"
-      },
-      primary: false,
-      exchangeRate: 0.01
-    }]
+    }
+  ]
 }

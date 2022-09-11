@@ -11,10 +11,7 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
-import MerchantApp from "./applications/merchant-app/merchant-app.js";
-import ItemEditor from "./applications/editors/item-editor/item-editor.js";
-import { getItemPrices, getPricesForItems } from "./helpers/pile-utilities.js";
-import { SYSTEMS } from "./systems.js";
+import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -33,6 +30,22 @@ Hooks.once("init", async () => {
 });
 
 Hooks.once("ready", async () => {
+  
+  if (isNewerVersion(game.version, "9.999") && !Helpers.getSetting("v10WarningShown")) {
+    await Helpers.setSetting("v10WarningShown", true);
+    TJSDialog.prompt({
+      title: "Foundry v10 not Supported",
+      content: {
+        class: CustomDialog,
+        props: {
+          title: "Item Piles: Foundry v10 not Supported",
+          content: "Item Piles is not yet v10 supported, and will not be for at least a month or two. Please do not use Item Piles in v10, and do not report bugs relating to v10 issues.",
+          icon: "fas fa-exclamation-triangle",
+        }
+      },
+      modal: true
+    });
+  }
   
   if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
     let word = "install and activate";
@@ -57,26 +70,6 @@ Hooks.once("ready", async () => {
   Hooks.callAll(HOOKS.READY);
   
   ChatAPI.disablePastTradingButtons();
-  
-  // const merchant = game.actors.get("4jh4e6K5TobGeoni");
-  // const actor = game.actors.getName("Player Token");
-  
-  // game.itempiles.tradeItems(actor, merchant, [{
-  //   item: actor.items.getName("Scimitar")
-  // }]);
-  
-  // console.log(getPricesForItems([{
-  //   item: actor.items.getName("Alms Box"),
-  //   quantity: 1,
-  //   paymentIndex: 0
-  // }], {
-  //   seller: actor,
-  //   buyer: merchant
-  // }))
-  
-  // game.itempiles.renderItemPileInterface(merchant, { inspectingTarget: actor });
-  
-  // ItemEditor.show(source.items.getName("Antitoxin"));
   
 });
 

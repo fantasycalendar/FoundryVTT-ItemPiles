@@ -3,6 +3,8 @@ import SETTINGS from "./constants/settings.js";
 import * as Helpers from "./helpers/helpers.js";
 import { SYSTEMS } from "./systems.js";
 import SettingsShim from "./applications/settings-app/settings-app.js";
+import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+import CustomDialog from "./applications/components/CustomDialog.svelte";
 
 export function registerSettings() {
   
@@ -56,10 +58,14 @@ export async function checkSystem() {
     
     if (settingsValid) return;
     
-    Dialog.prompt({
+    TJSDialog.prompt({
       title: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Title"),
-      content: Helpers.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content") }),
-      callback: () => {
+      content: {
+        class: CustomDialog,
+        props: {
+          content: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Content"),
+          icon: "fas fa-exclamation-triangle",
+        }
       }
     });
     
@@ -71,56 +77,75 @@ export async function checkSystem() {
     const currentVersion = Helpers.getSetting(SETTINGS.SYSTEM_VERSION);
     const newVersion = SYSTEMS.DATA.VERSION;
     if (isNewerVersion(newVersion, currentVersion)) {
-      return new Dialog({
+      const doThing = await TJSDialog.confirm({
         title: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Title"),
-        content: Helpers.dialogLayout({
-          message: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content"),
-        }),
+        content: {
+          class: CustomDialog,
+          props: {
+            content: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content"),
+            icon: "fas fa-exclamation-triangle",
+          }
+        },
         buttons: {
-          confirm: {
+          yes: {
             icon: '<i class="fas fa-check"></i>',
-            label: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Confirm"),
-            callback: () => {
-              applyDefaultSettings();
-            }
+            label: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Confirm")
           },
-          cancel: {
+          no: {
             icon: '<i class="fas fa-times"></i>',
             label: game.i18n.localize("No")
           }
         },
-        default: "cancel"
-      }).render(true);
+        modal: true,
+        draggable: false,
+        rejectClose: false,
+        defaultYes: true,
+        options: {
+          height: "auto"
+        }
+      });
+      if (doThing) {
+        return applyDefaultSettings();
+      }
+      return;
     }
-    return;
   }
   
   await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
   
   if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
-    
-    return new Dialog({
+    const doThing = await TJSDialog.confirm({
       title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
-      content: Helpers.dialogLayout({
-        message: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"),
-        icon: "fas fa-search"
-      }),
+      content: {
+        class: CustomDialog,
+        props: {
+          content: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content"),
+          icon: "fas fa-exclamation-triangle",
+        }
+      },
       buttons: {
-        confirm: {
+        yes: {
           icon: '<i class="fas fa-check"></i>',
-          label: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Confirm"),
-          callback: () => {
-            applyDefaultSettings();
-          }
+          label: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Confirm")
         },
-        cancel: {
+        no: {
           icon: '<i class="fas fa-times"></i>',
           label: game.i18n.localize("No")
         }
       },
-      default: "cancel"
-    }).render(true);
-    
+      modal: true,
+      draggable: false,
+      rejectClose: false,
+      defaultYes: true,
+      options: {
+        height: "auto"
+      }
+    });
+    if (doThing) {
+      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
+      return applyDefaultSettings();
+    }
+    return;
   }
   
   return applyDefaultSettings();

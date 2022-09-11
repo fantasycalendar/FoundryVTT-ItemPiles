@@ -589,7 +589,7 @@ export default class PrivateAPI {
         pileDataDefaults.overrideSingleItemScale = true;
         pileDataDefaults.singleItemScale = 0.75;
         
-        pileActor = await Actor.create({
+        pileActor = await Actor.implementation.create({
           name: "Default Item Pile",
           type: Helpers.getSetting("actorClassType"),
           img: "icons/svg/item-bag.svg",
@@ -870,6 +870,7 @@ export default class PrivateAPI {
     if (!PileUtilities.isValidItemPile(target)) return;
     const targetUuid = target.uuid;
     return Helpers.debounceManager.setDebounce(targetUuid, async (uuid) => {
+      if (!Utilities.getDocument(uuid)) return;
       const deleted = PileUtilities.shouldItemPileBeDeleted(uuid);
       if (deleted) return;
       await Helpers.hooks.runWithout(async () => {
@@ -1003,8 +1004,6 @@ export default class PrivateAPI {
     let droppableDocuments = [];
     let x;
     let y;
-    
-    debugger;
     
     if (dropData.target) {
       

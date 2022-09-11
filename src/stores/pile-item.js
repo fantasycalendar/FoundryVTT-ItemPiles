@@ -58,7 +58,9 @@ export class PileItem extends PileBaseItem {
   }
   
   setupSubscriptions() {
-    super.setupSubscriptions();
+    super.setupSubscriptions()
+    
+    this.subscribeTo(this.store.pileData, this.setupProperties.bind(this));
     
     this.subscribeTo(this.store.shareData, () => {
       if (!this.toShare) {
@@ -83,7 +85,6 @@ export class PileItem extends PileBaseItem {
     
     this.subscribeTo(this.quantity, this.filter.bind(this));
     this.subscribeTo(this.store.search, this.filter.bind(this));
-    this.subscribeTo(this.store.pileData, this.setupProperties.bind(this));
   }
   
   setupProperties() {
@@ -146,6 +147,8 @@ export class PileAttribute extends PileBaseItem {
   setupSubscriptions() {
     super.setupSubscriptions();
     
+    this.subscribeTo(this.store.pileData, this.setupProperties.bind(this));
+    
     this.subscribeTo(this.store.shareData, (val) => {
       if (!this.toShare) {
         this.quantityLeft.set(get(this.quantity));
@@ -168,7 +171,6 @@ export class PileAttribute extends PileBaseItem {
     
     this.subscribeTo(this.quantity, this.filter.bind(this));
     this.subscribeTo(this.store.search, this.filter.bind(this));
-    this.subscribeTo(this.store.pileData, this.setupProperties.bind(this));
   }
   
   setupProperties() {

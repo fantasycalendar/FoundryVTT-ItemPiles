@@ -30,12 +30,12 @@ function hideTemporaryItems(sidebar) {
 
 function addTradeButton(app, html) {
   if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING) || !Helpers.getSetting(SETTINGS.SHOW_TRADE_BUTTON)) return;
-
+  
   const minimalUI = game.modules.get('minimal-ui')?.active;
   const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "")
   const text = !minimalUI ? " Request Trade" : ""
   const button = $(`<button type="button" class="${classes}"><i class="fas fa-handshake"></i>${text}</button>`)
-
+  
   button.click(() => {
     game.itempiles.requestTrade();
   });
@@ -43,7 +43,7 @@ function addTradeButton(app, html) {
 }
 
 function insertActorContextMenuItems(html, menuItems) {
-
+  
   menuItems.push({
     name: "ITEM-PILES.ContextMenu.ShowToPlayers",
     icon: `<i class="fas fa-eye"></i>`,
@@ -51,7 +51,7 @@ function insertActorContextMenuItems(html, menuItems) {
       const actorId = html[0].dataset.documentId;
       const actor = game.actors.get(actorId);
       const users = Array.from(game.users).filter(u => u.active).map(u => u.id);
-      return game.itempiles.renderItemPileInterface(actor, { users, useDefaultCharacter: true });
+      return game.itempiles.renderItemPileInterface(actor, { userIds: users, useDefaultCharacter: true });
     },
     condition: (html) => {
       const actorId = html[0].dataset.documentId;
@@ -77,11 +77,11 @@ function insertActorContextMenuItems(html, menuItems) {
 }
 
 function insertActorHeaderButtons(actorSheet, buttons) {
-
+  
   if (!game.user.isGM) return;
-
+  
   let obj = actorSheet.object;
-
+  
   buttons.unshift({
     label: Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "" : "Configure",
     icon: "fas fa-box-open",
@@ -93,11 +93,11 @@ function insertActorHeaderButtons(actorSheet, buttons) {
 }
 
 function insertItemHeaderButtons(itemSheet, buttons) {
-
+  
   if (!game.user.isGM) return;
-
+  
   let obj = itemSheet.object;
-
+  
   buttons.unshift({
     label: Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "" : "Configure",
     icon: "fas fa-box-open",

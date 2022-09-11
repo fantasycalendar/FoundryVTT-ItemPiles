@@ -11,6 +11,10 @@ import tormenta20 from "./systems/tormenta20.js";
 import wfrp4e from "./systems/wfrp4e.js"
 import splittermond from "./systems/splittermond.js"
 import twodsix from "./systems/twodsix.js";
+import forbiddenLands from "./systems/forbidden-lands.js";
+import icrpg from "./systems/icrpg.js";
+import swse from "./systems/swse.js";
+import fallout from "./systems/fallout.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -31,7 +35,11 @@ export const SYSTEMS = {
     tormenta20,
     wfrp4e,
     splittermond,
-    twodsix
+    twodsix,
+    "forbidden-lands": forbiddenLands,
+    icrpg,
+    swse,
+    fallout
     // ↑ ADD SYSTEMS HERE ↑
   },
   

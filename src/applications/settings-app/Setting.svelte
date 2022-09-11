@@ -34,12 +34,12 @@
 
     {:else if data.type === Number}
 
-      <input type="number" required bind:value={data.value} class:invalid={!data.value && data.value !== 0}>
+      <input type="number" bind:value={data.value} class:invalid={!data.value && data.value !== 0}>
 
     {:else}
 
       <div class="setting-container">
-        <input type="text" required bind:value={data.value}>
+        <input type="text" bind:value={data.value}>
         {#if data.localize}
           <input type="text" disabled value={localize(data.value)}>
         {/if}

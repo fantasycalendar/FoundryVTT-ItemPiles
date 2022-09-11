@@ -33,6 +33,7 @@ const SETTINGS = {
   SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
   PRECONFIGURED_SYSTEM: "preconfiguredSystem",
   SYSTEM_VERSION: "systemVersion",
+  V10_WARNING_SHOWN: "v10WarningShown",
   
   GET_DEFAULT() {
     return foundry.utils.deepClone(SETTINGS.DEFAULTS())
@@ -164,6 +165,13 @@ const SETTINGS = {
     },
     
     [SETTINGS.PRECONFIGURED_SYSTEM]: {
+      scope: "world",
+      config: false,
+      default: false,
+      type: Boolean
+    },
+    
+    [SETTINGS.V10_WARNING_SHOWN]: {
       scope: "world",
       config: false,
       default: false,
