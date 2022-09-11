@@ -22,9 +22,12 @@
 
   const displayBuyButton = !!store.recipient;
 
+  $: canInspectItems = $pileData.canInspectItems || game.user.isGM;
+
   function previewItem(item) {
+    if (!canInspectItems) return;
     item = store.actor.items.get(item.id);
-    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+    if (game.user.isGM || item.permission[game.user.id] === 3) {
       return item.sheet.render(true);
     }
     const cls = item._getSheetClass()
@@ -46,11 +49,7 @@
 
   <div class="item-piles-name item-piles-text">
     <div class="item-piles-name-container">
-      {#if $pileData.canInspectItems || game.user.isGM}
-        <a class="item-piles-clickable" on:click={previewItem(item)}>{$itemName}</a>
-      {:else}
-        {$itemName}
-      {/if}
+      <a class:item-piles-clickable={canInspectItems} on:click={previewItem(item)}>{$itemName}</a>
       {#if displayQuantity}
         {#if itemFlagData.infiniteQuantity}
           <span class="item-piles-small-text">(∞)</span>

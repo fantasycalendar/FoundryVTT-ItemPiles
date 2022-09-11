@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.0.4
+
+- Fixed token HUD not showing up on item pile tokens
+- Fixed players being unable to inspect items when setting was enabled
+
 ## Version 2.0.3
 
 - Added warning about Foundry v10 compatibility

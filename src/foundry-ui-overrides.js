@@ -11,6 +11,7 @@ export default function registerUIOverrides() {
   Hooks.on("getActorSheetHeaderButtons", insertActorHeaderButtons);
   Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
   Hooks.on("renderSidebarTab", hideTemporaryItems);
+  Hooks.on("renderTokenHUD", renderPileHUD);
 }
 
 function hideTemporaryItems(sidebar) {
@@ -106,4 +107,43 @@ function insertItemHeaderButtons(itemSheet, buttons) {
       ItemEditor.show(obj);
     }
   })
+}
+
+function renderPileHUD(app, html) {
+  
+  const document = app?.object?.document;
+  
+  if (!document) return;
+  
+  if (!PileUtilities.isValidItemPile(document)) return;
+  
+  const pileData = PileUtilities.getActorFlagData(document);
+  
+  const container = $(`<div class="col right" style="right:-130px;"></div>`);
+  
+  if (pileData.isContainer) {
+    
+    const lock_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pileData.locked ? "" : "-open"}"></i></div>`);
+    lock_button.click(async function () {
+      $(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
+      await game.itempiles.toggleItemPileLocked(document);
+    });
+    container.append(lock_button);
+    
+    const open_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${pileData.closed ? "" : "-open"}"></i></div>`);
+    open_button.click(async function () {
+      $(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
+      await game.itempiles.toggleItemPileClosed(document);
+    });
+    container.append(open_button);
+  }
+  
+  const configure_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i class="fas fa-toolbox"></i></div>`);
+  configure_button.click(async function () {
+    ItemPileConfig.show(document);
+  });
+  container.append(configure_button);
+  
+  html.append(container)
+  
 }

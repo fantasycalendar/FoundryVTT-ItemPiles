@@ -12,12 +12,15 @@
   const quantityLeft = entry.quantityLeft;
   const quantity = entry.quantity;
   const currentQuantity = entry.currentQuantity;
+  const pileData = store.pileData;
+
+  $: canInspectItems = entry.id && $pileData.canInspectItems;
 
   function previewItem() {
-    if (!canPreview) return;
+    if (!canInspectItems) return;
     const item = store.actor.items.get(entry.id);
     if (!item) return;
-    if (game.user.isGM || item.entry.permission[game.user.id] === 3) {
+    if (game.user.isGM || item.permission[game.user.id] === 3) {
       return item.sheet.render(true);
     }
     const cls = item._getSheetClass()
@@ -27,25 +30,18 @@
 
   const editQuantities = store.editQuantities;
 
-  const canPreview = entry.id && get(store.pileData).canInspectItems;
-
 </script>
 
 <div class="item-piles-flexrow item-piles-item-row item-piles-even-color" transition:fade={{duration: 250}}
      class:item-piles-disabled={!editQuantities && !$quantityLeft}>
 
   <div class="item-piles-img-container">
-    <!--<img class="item-piles-img"
-         src="{entry.img}"
-         on:mouseenter={mouseEnterImage}
-         on:mouseleave={mouseLeaveImage}
-    />-->
     <img class="item-piles-img" src="{$img}"/>
   </div>
 
   <div class="item-piles-name">
     <div class="item-piles-name-container">
-      <p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{$name}</p>
+      <p class:item-piles-clickable-link="{canInspectItems}" on:click={previewItem}>{$name}</p>
       {#if !editQuantities}
         <span class="item-piles-small-text">(x{$quantity})</span>
       {/if}
