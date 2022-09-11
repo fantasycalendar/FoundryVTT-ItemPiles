@@ -45,8 +45,6 @@ export async function patchCurrencySettings() {
 
 export async function checkSystem() {
   
-  if (Helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
-  
   if (!SYSTEMS.HAS_SYSTEM_SUPPORT) {
     
     if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) return;
@@ -105,11 +103,14 @@ export async function checkSystem() {
         }
       });
       if (doThing) {
+        await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
         return applyDefaultSettings();
       }
       return;
     }
   }
+  
+  if (Helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
   
   await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
   
@@ -141,12 +142,11 @@ export async function checkSystem() {
         height: "auto"
       }
     });
-    if (doThing) {
-      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
-      return applyDefaultSettings();
+    if (!doThing) {
+      return;
     }
-    return;
   }
   
+  await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
   return applyDefaultSettings();
 }
