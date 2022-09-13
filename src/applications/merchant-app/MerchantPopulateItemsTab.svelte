@@ -45,6 +45,8 @@
   async function rollItems() {
     const table = game.tables.get(get(selectedTable));
     if (!table) return;
+    await table.reset(); // if table is already "dirty", the roll will be affected by it.
+    // if the table has no available items, the function will be returned before the next reset.
     const roll = new Roll(timesToRoll ?? 1).evaluate({ async: false });
     if (!keepRolled) {
       itemsRolled.set([]);
@@ -54,6 +56,8 @@
       return;
     }
     await table.reset();
+    // If table was created by hand it can has empty formula. Unfortunately, error notification isnt clear
+    // TODO: autofix formula as 1d$count
     const tableDraw = await table.drawMany(timesRolled, { displayChat: false });
     itemsRolled.update((items) => {
       tableDraw.results.forEach((result) => {
@@ -143,6 +147,10 @@
     await game.itempiles.API.removeItems(store.actor, items);
   }
 
+  function previewItem(item) {
+    globalThis.game.items.get(item.resultId)?.sheet?.render(true);
+  }
+
   let createId = Hooks.on("createRollTable", () => {
     tables.set(
       Array.from(game.tables).map((table) => ({
@@ -195,7 +203,7 @@
 
   <div class="item-piles-flexrow" style="margin-top:1rem;">
     <div style="margin-right:0.5rem;">
-      <div style="margin-bottom:0.5rem;">
+      <div style="margin-bottom:0.5rem" class="fix-height-checkbox">
         {localize(
           currentItems.length
             ? "ITEM-PILES.Merchant.CurrentItems"
@@ -254,7 +262,9 @@
 
             <div class="item-piles-name">
               <div class="item-piles-name-container">
-                <p>{item.text}</p>
+                <a class="item-piles-clickable" on:click={previewItem(item)}
+                  >{item.text}</a
+                >
               </div>
             </div>
 
@@ -332,6 +342,11 @@
     i {
       margin: 0;
     }
+  }
+
+  .fix-height-checkbox {
+    height: 20px; /* Foundry checkbox are 20px.
+    This div should be the same length to match list items with another column */
   }
 </style>
 
