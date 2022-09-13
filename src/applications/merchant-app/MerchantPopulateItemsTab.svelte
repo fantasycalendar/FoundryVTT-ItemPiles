@@ -252,6 +252,7 @@
             <button
               class="item-piles-rolled-item-button"
               on:click={() => addItem(item)}
+              title={localize("ITEM-PILES.Merchant.AddItem")}
             >
               <i class="fas fa-arrow-left" />
             </button>
@@ -283,6 +284,7 @@
               class="item-piles-rolled-item-button"
               style="color:red;"
               on:click={() => removeItem(item)}
+              title={localize("ITEM-PILES.Merchant.RemoveItem")}
             >
               <i class="fas fa-times" />
             </button>

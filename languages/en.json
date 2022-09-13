@@ -107,7 +107,9 @@
       "RolledTimes": "Rolled {rolls} times",
       "KeepRolled": "Keep rolled",
       "AddAll": "Add All Items",
-      "ClearAllItems": "Clear All Actor Items"
+      "ClearAllItems": "Clear All Actor Items",
+      "AddItem": "Add",
+      "RemoveItem": "Remove"
     },
     "Errors": {
       "DisallowedItemDrop": "You cannot drop \"{type}\" items",
