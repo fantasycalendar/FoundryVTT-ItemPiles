@@ -45,8 +45,8 @@
   async function rollItems() {
     const table = game.tables.get(get(selectedTable));
     if (!table) return;
-    await table.reset(); // if table is already "dirty", the roll will be affected by it.
-    // if the table has no available items, the function will be returned before the next reset.
+    await table.reset();
+    await table.normalize();
     const roll = new Roll(timesToRoll ?? 1).evaluate({ async: false });
     if (!keepRolled) {
       itemsRolled.set([]);
@@ -56,8 +56,7 @@
       return;
     }
     await table.reset();
-    // If table was created by hand it can has empty formula. Unfortunately, error notification isnt clear
-    // TODO: autofix formula as 1d$count
+    // empty formula fixed by "normalize"
     const tableDraw = await table.drawMany(timesRolled, { displayChat: false });
     itemsRolled.update((items) => {
       tableDraw.results.forEach((result) => {
@@ -77,6 +76,16 @@
       items.sort((a, b) => {
         return a.text < b.text ? -1 : 1;
       });
+      setTimeout(async () => {
+        for (const i of items) {
+          const item = await getItem(i);
+          const prices = game.itempiles.API.getPricesForItem(item, {
+            seller: store.actor,
+          });
+          i.price = prices[0]?.priceString;
+        }
+        itemsRolled.set(items);
+      }, 0);
       return items;
     });
   }
@@ -147,8 +156,12 @@
     await game.itempiles.API.removeItems(store.actor, items);
   }
 
-  function previewItem(item) {
-    globalThis.game.items.get(item.resultId)?.sheet?.render(true);
+  async function previewItem(item) {
+    (await getItem(item))?.sheet?.render(true);
+  }
+
+  async function removeAddedItem(itemToRemove) {
+    await game.itempiles.API.removeItems(store.actor, [itemToRemove.item]);
   }
 
   let createId = Hooks.on("createRollTable", () => {
@@ -215,7 +228,17 @@
         <div
           class="item-piles-flexrow item-piles-item-row item-piles-even-color"
         >
-          <ItemEntry {item} />
+          <ItemEntry {item}>
+            <button
+              slot="right"
+              class="item-piles-rolled-item-button"
+              style="color:red;"
+              on:click={() => removeAddedItem(item)}
+              title={localize("ITEM-PILES.Merchant.RemoveItem")}
+            >
+              <i class="fas fa-times" />
+            </button>
+          </ItemEntry>
         </div>
       {/each}
 
@@ -270,6 +293,13 @@
             </div>
 
             <div class="item-piles-quantity-container">
+              {#if item.price}
+                <small style="white-space: nowrap;">{item.price}</small>
+                <i
+                  class="fas fa-times"
+                  style="color: #555; font-size: 0.75rem"
+                />
+              {/if}
               <div class="item-piles-quantity-input-container">
                 <input
                   class="item-piles-quantity"
@@ -324,12 +354,20 @@
 
   .item-piles-quantity-container {
     flex: 0 1 50px;
+    gap: 4px;
   }
 
   .item-piles-button {
     height: 27px;
     line-height: inherit;
     margin-top: 0.5rem;
+
+    /* alignt icons */
+    flex-direction: row;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
   }
 
   .item-piles-rolled-item-button {
