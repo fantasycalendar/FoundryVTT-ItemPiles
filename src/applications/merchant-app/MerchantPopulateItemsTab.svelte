@@ -1,19 +1,36 @@
 <script>
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import { get, writable } from "svelte/store";
-  import { onDestroy } from "svelte";
+  import { onDestroy, tick } from "svelte";
   import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
   import CustomDialog from "../components/CustomDialog.svelte";
   import ItemEntry from "./ItemEntry.svelte";
+  import * as PileUtilities from "../../helpers/pile-utilities.js";
+  import { getSetting } from "../../helpers/helpers";
+  import SETTINGS from "../../constants/settings";
 
   export let store;
 
-  let tables = writable(
-    Array.from(game.tables).map((table) => ({ name: table.name, id: table.id }))
-  );
-  let selectedTable = writable(tables?.[0]?.id ?? "");
+  function getTables() {
+    let tables = Array.from(game.tables);
+    const folderTitle = getSetting(SETTINGS.POPULATION_TABLES_FOLDER);
+    if (
+      game.folders.find((f) => f.type == "RollTable" && f.name == folderTitle)
+    ) {
+      tables = tables.filter((t) => t.folder?.name == folderTitle);
+    }
 
+    return tables.map((table) => ({ name: table.name, id: table.id }));
+  }
+
+  let tables = writable(getTables());
   let timesToRoll = "1d10";
+  let selectedTables = writable(
+    get(store.pileData).tablesForPopulate ?? [
+      { id: tables?.[0]?.id ?? 0, timesToRoll },
+    ]
+  );
+
   let timesRolled = "";
   let keepRolled = false;
 
@@ -29,21 +46,17 @@
   }
 
   $: {
-    const tableExists = game.tables.get(
-      $selectedTable ?? localStorage.getItem(store.actor.id) ?? ""
+    const pileData = get(store.pileData);
+    pileData.tablesForPopulate = $selectedTables.filter((t) =>
+      game.tables.get(t.id)
     );
-    $selectedTable =
-      tableExists?.id ??
-      localStorage.getItem(store.actor.id) ??
-      $tables?.[0]?.id ??
-      "";
-    localStorage.setItem(store.actor.id, $selectedTable);
+    PileUtilities.updateItemPileData(store.actor, pileData);
   }
 
   let itemsRolled = writable([]);
 
-  async function rollItems() {
-    const table = game.tables.get(get(selectedTable));
+  async function rollItems(tableId, timesToRoll) {
+    const table = game.tables.get(tableId);
     if (!table) return;
     await table.reset();
     await table.normalize();
@@ -76,7 +89,7 @@
       items.sort((a, b) => {
         return a.text < b.text ? -1 : 1;
       });
-      setTimeout(async () => {
+      tick().then(async () => {
         for (const i of items) {
           const item = await getItem(i);
           const prices = game.itempiles.API.getPricesForItem(item, {
@@ -88,6 +101,21 @@
       }, 0);
       return items;
     });
+  }
+
+  async function rollAll() {
+    const tkr = keepRolled;
+    if (!keepRolled) {
+      itemsRolled.set([]);
+    }
+    keepRolled = true;
+    for (const table of $selectedTables) {
+      await rollItems(table.id, table.timesToRoll);
+    }
+    timesRolled = $itemsRolled.reduce((total, item) => {
+      return (total += item.quantity);
+    }, 0);
+    keepRolled = tkr;
   }
 
   async function getItem(itemToGet) {
@@ -164,21 +192,24 @@
     await game.itempiles.API.removeItems(store.actor, [itemToRemove.item]);
   }
 
+  function addTable() {
+    selectedTables.update((tabs) => {
+      tabs.push({ id: tables?.[0]?.id ?? tabs.length, timesToRoll });
+      return tabs;
+    });
+  }
+
+  function removeTable(tableId) {
+    selectedTables.update((tabs) => {
+      return tabs.filter((t) => t.id != tableId);
+    });
+  }
+
   let createId = Hooks.on("createRollTable", () => {
-    tables.set(
-      Array.from(game.tables).map((table) => ({
-        name: table.name,
-        id: table.id,
-      }))
-    );
+    tables.set(getTables());
   });
   let deleteId = Hooks.on("deleteRollTable", () => {
-    tables.set(
-      Array.from(game.tables).map((table) => ({
-        name: table.name,
-        id: table.id,
-      }))
-    );
+    tables.set(getTables());
   });
 
   onDestroy(() => {
@@ -188,30 +219,68 @@
 </script>
 
 <div>
-  <div class="item-piles-flexrow" style="margin-bottom: 1rem; padding:0.25rem;">
-    <select bind:value={$selectedTable} style="flex: 3; height:30px;">
-      {#each $tables as table (table.id)}
-        <option value={table.id}>{table.name}</option>
-      {/each}
-      {#if !$tables.length}
-        <option value="">{localize("ITEM-PILES.Merchant.NoRollTables")}</option>
+  <div
+    class="item-piles-flexcol"
+    style="margin-bottom: 1rem; padding:0.25rem; gap: 0.25rem"
+  >
+    {#each $selectedTables as selectedTable (selectedTable.id)}
+      <div class="item-piles-flexrow">
+        <select bind:value={selectedTable.id} style="flex: 3; height:30px;">
+          {#each $tables.filter((table) => !get(selectedTables)
+                .map((t) => t.id)
+                .includes(table.id) || selectedTable.id == table.id) as table (table.id)}
+            <option value={table.id}>{table.name}</option>
+          {/each}
+          {#if !$tables.length}
+            <option value=""
+              >{localize("ITEM-PILES.Merchant.NoRollTables")}</option
+            >
+          {/if}
+        </select>
+
+        <input
+          type="text"
+          bind:value={selectedTable.timesToRoll}
+          placeholder="2d6+4"
+          style="height: 30px; padding: 0 0.5rem; flex:0.5; min-width: 50px; margin-left:0.5rem;"
+        />
+
+        <button
+          style="flex:0; padding: 0 1rem; margin-left:0.5rem;"
+          on:click={(_) =>
+            rollItems(selectedTable.id, selectedTable.timesToRoll)}
+          disabled={!$tables.length}
+        >
+          {localize("Roll")}
+        </button>
+
+        {#if $selectedTables.length > 1}
+          <button
+            class="item-piles-rolled-item-button item-piles-remove-button"
+            on:click={() => removeTable(selectedTable.id)}
+            title={localize("ITEM-PILES.Merchant.RemoveItem")}
+            disabled={$selectedTables.length <= 1}
+          >
+            <i class="fas fa-times" />
+          </button>
+        {/if}
+      </div>
+    {/each}
+
+    <div class="item-piles-flexrow">
+      <small>
+        <a class="item-piles-clickable" on:click={addTable}>add table</a>
+      </small>
+      {#if $selectedTables.length > 1}
+        <button
+          style="flex:0; padding: 0 1rem; margin-left:0.5rem; white-space: nowrap;"
+          on:click={rollAll}
+          disabled={!$tables.length}
+        >
+          {localize("Roll all")}
+        </button>
       {/if}
-    </select>
-
-    <input
-      type="text"
-      bind:value={timesToRoll}
-      placeholder="2d6+4"
-      style="height: 30px; padding: 0 0.5rem; flex:0.5; min-width: 50px; margin-left:0.5rem;"
-    />
-
-    <button
-      style="flex:0; padding: 0 1rem; margin-left:0.5rem;"
-      on:click={rollItems}
-      disabled={!$tables.length}
-    >
-      {localize("Roll")}
-    </button>
+    </div>
   </div>
 
   <div class="item-piles-flexrow" style="margin-top:1rem;">
@@ -286,8 +355,9 @@
 
             <div class="item-piles-name">
               <div class="item-piles-name-container">
-                <a class="item-piles-clickable" on:click={previewItem(item)}
-                  >{item.text}</a
+                <a
+                  class="item-piles-clickable"
+                  on:click={(_) => previewItem(item)}>{item.text}</a
                 >
               </div>
             </div>
@@ -387,6 +457,12 @@
   .fix-height-checkbox {
     height: 20px; /* Foundry checkbox are 20px.
     This div should be the same length to match list items with another column */
+  }
+  .item-piles-remove-button {
+    color: red;
+    &[disabled] {
+      color: gray;
+    }
   }
 </style>
 

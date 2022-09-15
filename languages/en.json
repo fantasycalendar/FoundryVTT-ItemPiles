@@ -498,6 +498,10 @@
       "DebugHooks": {
         "Title": "Enable debugging of hooks",
         "Hint": "Prints the item pile hooks and their contents to the console"
+      },
+      "PopulationTablesFolder": {
+        "Title": "RollTables folder for \"Populate Items\"",
+        "Hint": "Folder title for filtering rolltables in merchant's \"Populate Items\" tab."
       }
     }
   }
