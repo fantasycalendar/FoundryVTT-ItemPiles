@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 2.0.7
+
+- Improved the "Populate Items" tab on merchants (Thanks to Averrin#0374)
+    - Added hover tooltips to buttons
+    - Added ability to preview rolled items
+    - Fixed tables not resetting between rolls
+- Fixed copy-pasting tokens not replicating their Item Piles settings
+
 ## Version 2.0.6
 
 - Improved dialogs to actually show that Item Piles is their origin
