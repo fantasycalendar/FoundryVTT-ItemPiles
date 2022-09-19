@@ -137,7 +137,13 @@
         "Title": "Nouvelle version du système"
       },
       "TypeWarning": {
-        "SellContent": "Vous tentez de vendre un article de type (\"{type}\") que le marchand n'accepte pas normalement. Êtes-vous sûr de vouloir faire cela ?"
+        "SellContent": "Vous tentez de vendre un article de type (\"{type}\") que le marchand n'accepte pas normalement. Êtes-vous sûr de vouloir faire cela ?",
+        "DropContent": "Vous déposez un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être déposé. Êtes-vous sûr de vouloir faire cela ?",
+        "TradeContent": "Vous tentez d'échanger un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être échangé. Êtes-vous sûr de vouloir faire cela ?"
+      },
+      "ClearAllItems": {
+        "Content": "Cela va effacer tous les objets de l'acteur, êtes-vous sûr de vouloir faire cela ?",
+        "Title": "Effacer tous les articles de l'acteur"
       }
     },
     "CurrenciesEditor": {
@@ -359,7 +365,9 @@
       "EditTypePricesExplanation": "Activez la visibilité des curseurs par type dans l'onglet \"Acheter des articles\"",
       "NoRollTables": "Aucune table aléatoire n'existe, créez-en une pour commencer",
       "KeepRolled": "Garder le jet",
-      "AddItem": "Ajouter"
+      "AddItem": "Ajouter",
+      "CurrentItems": "Articles actuels",
+      "ClearAllItems": "Effacer tous les articles de l'acteur"
     },
     "Applications": {
       "DropItem": {
@@ -386,11 +394,33 @@
       },
       "CurrenciesEditor": {
         "Submit": "Soumettre les devises",
-        "AddNew": "Ajouter une nouvelle devise"
+        "AddNew": "Ajouter une nouvelle devise",
+        "Title": "Éditeur de devises d'Item Piles",
+        "TitleActor": "Éditeur de devises d'Item Piles : {actor_name}",
+        "Explanation": "Ici, vous pouvez définir les devises sur les personnages qui peuvent être ramassés à partir des piles d'objets, comme les devises.",
+        "ExplanationSmallAttributes": "Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"data.currency.gp\". Ajoutez-en une en cliquant sur le plus dans l'en-tête.",
+        "DragDrop": "Faites glisser et déposez un élément pour l'ajouter à la liste",
+        "ExplanationSmallItems": "Dans d'autres systèmes, il peut s'agir d'éléments réels sur l'acteur - dans ce cas, vous pouvez glisser et déposer des éléments sur cette liste pour les ajouter aux devises."
       },
       "ItemEditor": {
         "General": "Paramètres généraux",
-        "DisplayQuantityYes": "Oui, toujours montrer la quantité"
+        "DisplayQuantityYes": "Oui, toujours montrer la quantité",
+        "NotForSaleExplanation": "Lorsque activé, cet objet n'est pas à vendre et ne peut pas être acheté. Il apparaît toujours dans la liste des articles du marchand, à moins qu'il ne soit également caché.",
+        "Hidden": "L'article est caché",
+        "DisplayQuantityExplanation": "Cette option permet de configurer la manière dont la quantité de cet article dans le magasin est affichée, le cas échéant."
+      },
+      "TradeMerchantItem": {
+        "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
+        "Title": "Échange de l'objet : {item_name}",
+        "BuyItem": "Acheter l'article",
+        "SellItem": "Vendre l'article",
+        "YouPay": "Vous payez",
+        "YouReceive": "Vous recevez",
+        "TheyReceive": "Ils reçoivent",
+        "Quantity": "Quantité",
+        "Change": "Change",
+        "MaxQuantity": "Maximum {quantity}",
+        "YouCantAfford": "Vous ne pouvez pas vous permettre ce prix"
       }
     },
     "Settings": {
