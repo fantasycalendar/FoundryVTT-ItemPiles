@@ -37,6 +37,7 @@
 
   let hasOverrideCurrencies = typeof pileData?.overrideCurrencies === "object";
   let hasOverrideItemFilters = typeof pileData?.overrideItemFilters === "object";
+  let simpleCalendarActive = game.modules.get('foundryvtt-simple-calendar')?.active;
 
   $: {
     if (!hasOverrideCurrencies) {
@@ -191,7 +192,7 @@
 
       {#if activeTab === 'mainsettings'}
 
-        <div class="tab flex">
+        <div class="tab item-piles-flexcol">
 
           <div class="form-group">
             <label>
@@ -410,6 +411,27 @@
                 {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureActorPriceModifiers")}
               </button>
             </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenStatus")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenStatusExplanation")}</p>
+            </label>
+            <div class="break"></div>
+            <select style="flex:4;" bind:value={pileData.openTimes.status}>
+              <option value="open">
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenStatusOpen")}
+              </option>
+              <option value="closed">
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenStatusClosed")}
+              </option>
+              {#if simpleCalendarActive && pileData.openTimes.enabled}
+                <option value="auto">
+                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenStatusAuto")}
+                </option>
+              {/if}
+            </select>
           </div>
 
           <div class="form-group">

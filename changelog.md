@@ -1,12 +1,19 @@
 # Item Piles Changelog
 
-## Version 2.0.7
+## Version 2.0.7 (not released yet)
 
+- Implemented Simple Calendar integration for open/close times
+- Added Open/Close button in the top right of the merchants window for ease of access
 - Improved the "Populate Items" tab on merchants (Thanks to Averrin#0374)
     - Added hover tooltips to buttons
     - Added ability to preview rolled items
+    - Added prices to rolled items
+    - Added the ability to roll multiple tables
     - Fixed tables not resetting between rolls
+- Added "Reset To System Defaults" button to the module settings
 - Fixed copy-pasting tokens not replicating their Item Piles settings
+- Fixed `Split x ways` not splitting items properly
+- Added Cyberpunk Red system support
 
 ## Version 2.0.6
 

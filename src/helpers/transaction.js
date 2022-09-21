@@ -22,7 +22,7 @@ export default class Transaction {
   async appendItemChanges(items, { remove = false, type = "item" } = {}) {
     for (let data of items) {
       let item = data.item ?? data;
-      let itemData = item instanceof Item ? item.toObject() : item;
+      let itemData = item instanceof Item ? item.toObject() : foundry.utils.duplicate(item);
       if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
         itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
       }

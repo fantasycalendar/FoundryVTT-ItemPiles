@@ -23,7 +23,7 @@ export function registerSettings() {
   
 }
 
-async function applyDefaultSettings() {
+export async function applyDefaultSettings() {
   const settings = SETTINGS.GET_SYSTEM_DEFAULTS();
   for (const [name, data] of Object.entries(settings)) {
     await Helpers.setSetting(name, data.default);

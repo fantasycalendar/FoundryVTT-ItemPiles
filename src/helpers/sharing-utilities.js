@@ -234,7 +234,7 @@ export function getItemSharesLeftForActor(pile, item, recipient, {
   }
   let previouslyTaken = 0;
   let recipientUuid = Utilities.getUuid(recipient);
-  currentQuantity = currentQuantity ?? Utilities.getItemQuantity(item);
+  currentQuantity = currentQuantity ?? Math.abs(Utilities.getItemQuantity(item));
   let totalShares = currentQuantity;
   
   shareData = shareData ?? getItemPileSharingData(pile);
@@ -287,5 +287,5 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
   }
   
   return Math.max(0, Math.min(currentQuantity, Math.floor(totalActorShare - previouslyTaken)));
-
+  
 }

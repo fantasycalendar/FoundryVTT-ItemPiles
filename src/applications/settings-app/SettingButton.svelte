@@ -6,7 +6,15 @@
   const { application } = getContext('external');
 
   export let data;
-  let editor = editors[data.application];
+  export let callback = false;
+
+  let editor = false;
+  if (!callback) {
+    editor = editors[data.application];
+    callback = () => {
+      showEditor();
+    }
+  }
 
   function showEditor() {
     if (editor) {
@@ -24,14 +32,21 @@
 <div class="setting form-scope item-piles-flexrow">
 
   <div class="label-side">
-    <label>{localize(data.name)} <a><i title="Reset data" class="fas fa-undo reset-setting"
-                                       on:click={() => { data.value = data.default; }}></i></a></label>
+    <label>
+      {localize(data.name)}
+      {#if !data.hideResetButton}
+        <a>
+          <i title="Reset data" class="fas fa-undo reset-setting"
+             on:click={() => { data.value = data.default; }}></i>
+        </a>
+      {/if}
+    </label>
     <p class="notes">{localize(data.hint)}</p>
   </div>
 
   <div class="form-fields input-side">
     <div class="button-container">
-      <button type="button" on:click={showEditor}>
+      <button type="button" on:click={() => { callback(); }}>
         <i class="{data.icon}"></i>
         {localize(data.label)}
       </button>

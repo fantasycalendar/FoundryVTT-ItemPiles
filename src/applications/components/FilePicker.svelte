@@ -1,7 +1,7 @@
 <script>
   export let value;
   export let type;
-  export let placeholder;
+  export let placeholder = "";
   export let showImage = false;
   export let showInput = true;
 

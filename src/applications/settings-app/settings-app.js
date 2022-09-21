@@ -2,7 +2,7 @@ import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import SettingsShell from './settings-shell.svelte';
 
 class SettingsApp extends SvelteApplication {
-
+  
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: `item-piles-application-system-settings`,
@@ -15,11 +15,11 @@ class SettingsApp extends SvelteApplication {
       zIndex: 100,
     });
   }
-
+  
   static getActiveApp() {
     return Object.values(ui.windows).find(app => app.id === "item-piles-application-system-settings");
   }
-
+  
   static async show(options = {}, dialogData = {}) {
     const app = this.getActiveApp()
     if (app) return app.render(false, { focus: true });
@@ -31,7 +31,7 @@ class SettingsApp extends SvelteApplication {
 }
 
 export default class SettingsShim extends FormApplication {
-
+  
   /**
    * @inheritDoc
    */
@@ -39,12 +39,12 @@ export default class SettingsShim extends FormApplication {
     super({});
     SettingsApp.show();
   }
-
+  
   async _updateObject(event, formData) {
   }
-
+  
   render() {
     this.close();
   }
-
+  
 }

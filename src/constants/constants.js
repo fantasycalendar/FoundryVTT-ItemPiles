@@ -24,7 +24,8 @@ const CONSTANTS = {
     free: false,
     disableNormalCost: false,
     cantBeSoldToMerchants: false,
-    prices: []
+    prices: [],
+    perUnit: 1
   },
   
   PILE_DEFAULTS: {
@@ -90,6 +91,12 @@ const CONSTANTS = {
     actorPriceModifiers: [],
     openTimes: {
       enabled: false,
+      status: "open",
+      /*
+      auto = rely on simple calendar
+      open = always open
+      closed = always closed
+       */
       open: {
         hour: 9,
         minute: 0

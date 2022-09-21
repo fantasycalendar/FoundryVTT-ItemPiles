@@ -6,6 +6,7 @@
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
   import { writable } from "svelte/store";
   import MerchantCurrencyColumn from "./MerchantCurrencyColumn.svelte";
+  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
   export let store;
   export let recipientStore;
@@ -13,6 +14,7 @@
   const currencies = recipientStore?.allCurrencies || writable([]);
 
   const merchantFlags = store.pileData;
+  let closed = store.closed;
 
   let sellHidden;
   let tabs;
@@ -40,7 +42,11 @@
   <div class="merchant-tabbed-center"
        style="flex:1; calc(100% - {recipientStore && $currencies.length ? '36px' : '0px'})">
 
-    {#if activeTab === "buy"}
+    {#if $closed && !game.user.isGM}
+      <div style="display: grid; place-items: center; height:100%;">
+        <span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
+      </div>
+    {:else if activeTab === "buy"}
       <MerchantBuyTab {store}/>
     {:else if activeTab === "sell"}
       <MerchantSellTab store={recipientStore}/>

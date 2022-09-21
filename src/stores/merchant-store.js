@@ -6,6 +6,7 @@ import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
 import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
+import { isResponsibleGM } from "../helpers/helpers.js";
 
 export default class MerchantStore extends ItemPileStore {
   
@@ -19,6 +20,9 @@ export default class MerchantStore extends ItemPileStore {
     this.priceModifiersPerType = writable({});
     this.priceModifiersForActor = writable({});
     this.priceSelector = writable("");
+    this.closed = writable(false);
+    this.listenToDateChange = true;
+    this.activateHooks();
   }
   
   get ItemClass() {
@@ -30,10 +34,23 @@ export default class MerchantStore extends ItemPileStore {
     return pileData?.merchantImage || this.actor.img;
   }
   
+  activateHooks() {
+    if (game.modules.get('foundryvtt-simple-calendar')?.active) {
+      this.simpleCalendar();
+    }
+  }
+  
+  simpleCalendar() {
+    Hooks.on(window.SimpleCalendar.Hooks.DateTimeChange, () => {
+      this.updateClosedStatus();
+    });
+  }
+  
   setupSubscriptions() {
     super.setupSubscriptions();
     this.subscribeTo(this.pileData, (pileData) => {
       this.updatePriceModifiers();
+      this.updateClosedStatus();
     });
     if (this.recipientDocument) {
       this.subscribeTo(this.recipientPileData, () => {
@@ -43,9 +60,14 @@ export default class MerchantStore extends ItemPileStore {
         this.refreshItemPrices();
       })
     }
-    this.subscribeTo(this.typeFilter, () => {
+    
+    const filterDebounce = foundry.utils.debounce(() => {
       this.refreshItems();
-    })
+    }, 100);
+    this.subscribeTo(this.typeFilter, (val) => {
+      if (!val) return;
+      filterDebounce()
+    });
   }
   
   refreshItems() {
@@ -149,6 +171,35 @@ export default class MerchantStore extends ItemPileStore {
       this.recipient,
       { selling }
     );
+  }
+  
+  async updateClosedStatus() {
+    if (!this.listenToDateChange) return;
+    const pileData = get(this.pileData);
+    if (pileData.openTimes.status === "auto") {
+      if (game.modules.get('foundryvtt-simple-calendar')?.active && pileData.openTimes.enabled) {
+        const openTimes = pileData.openTimes.open;
+        const closeTimes = pileData.openTimes.close;
+        const timestamp = window.SimpleCalendar.api.timestampToDate(window.SimpleCalendar.api.timestamp());
+        const afterOpeningTime = timestamp.hour > openTimes.hour || (timestamp.hour === openTimes.hour && timestamp.minute >= openTimes.minute);
+        const beforeClosingTime = timestamp.hour < closeTimes.hour || (timestamp.hour === closeTimes.hour && timestamp.minute <= closeTimes.minute);
+        this.closed.set(!afterOpeningTime || !beforeClosingTime);
+      } else if (isResponsibleGM()) {
+        pileData.openTimes.status = "open";
+        await PileUtilities.updateItemPileData(this.actor, pileData);
+      }
+      
+    } else if (!pileData.openTimes.status.startsWith("auto")) {
+      
+      this.closed.set(pileData.openTimes.status === "closed");
+      
+    }
+  }
+  
+  async setOpenStatus(status) {
+    const pileData = get(this.pileData);
+    pileData.openTimes.status = status;
+    await PileUtilities.updateItemPileData(this.actor, pileData);
   }
   
 }

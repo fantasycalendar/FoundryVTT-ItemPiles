@@ -90,9 +90,12 @@
       "NoItemsForSale": "Merchant has nothing for sale",
       "NoItemsToSell": "You have nothing to sell to this merchant",
       "OpenTimes": "Open Times",
-      "Closed": "Merchant is closed, reopens in {}",
+      "OpenCloseAuto": "Automatic",
+      "Open": "Open",
+      "Closed": "Closed",
       "Hours": "Hours",
       "Minutes": "Minutes",
+      "MerchantClosed": "Merchant is closed, check back later.",
       "Sell": "Sell",
       "Description": "Description",
       "Settings": "Settings",
@@ -373,6 +376,11 @@
           "OnyAcceptBasePriceExplanation": "When enabled, all items sold to this merchant must use the base price, and not any custom prices.",
           "OpenTimes": "Open Times",
           "OpenTimesExplanation": "When enabled, the merchant is can only be interacted by players at certain times of the day.",
+          "OpenStatus": "Open Status",
+          "OpenStatusExplanation": "This configures the current state of the merchant's open status. If Open Times (below) is enabled, and the Simple Calendar module is enabled, you can configure this to be automatic.",
+          "OpenStatusOpen": "Open",
+          "OpenStatusClosed": "Closed",
+          "OpenStatusAuto": "Automatic (Simple Calendar)",
           "PriceModifierTitle": "Buy and Sell Price Modifiers",
           "PriceModifierExplanation": "This configures the modifiers for the cost of every item in the shop. You can also configure modifiers per item type, and even for specific characters (such as silver-tongued bards). You are not limited to 200%, type into the field to go even higher.",
           "BuyPriceModifier": "Buy Price Modifier (%)",
@@ -415,8 +423,8 @@
         "Hint": "You can configure Item Piles in this dialog."
       },
       "Reset": {
-        "Title": "Reset settings to default",
-        "Label": "Reset Item Piles Settings To Default",
+        "Title": "Reset System Specific Settings To Default",
+        "Label": "Reset Settings",
         "Hint": "This will reset all of the settings of Item Piles back to the active game system's default."
       },
       "ActorClass": {

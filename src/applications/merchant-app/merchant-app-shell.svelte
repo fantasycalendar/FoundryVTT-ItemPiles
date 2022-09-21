@@ -10,7 +10,6 @@
   import MerchantLeftPane from "./MerchantLeftPane.svelte";
   import MerchantRightPane from "./MerchantRightPane.svelte";
   import MerchantTopBar from "./MerchantTopBar.svelte";
-  import { get } from "svelte/store";
 
   const { application } = getContext('external');
 
@@ -21,6 +20,9 @@
 
   export let store = new MerchantStore(application, merchant, recipient);
   export let recipientStore = recipient ? new MerchantStore(application, recipient, merchant, { recipientPileData: store.pileData }) : false;
+
+  let pileData = store.pileData;
+  let closedStore = store.closed;
 
   onDestroy(() => {
     store.onDestroy();

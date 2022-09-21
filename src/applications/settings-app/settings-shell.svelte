@@ -6,10 +6,13 @@
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
 
   import * as helpers from "../../helpers/helpers.js"
+  import { applyDefaultSettings } from "../../settings.js";
 
   import Setting from "./Setting.svelte";
   import SettingButton from "./SettingButton.svelte";
   import Tabs from "../components/Tabs.svelte";
+  import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+  import CustomDialog from "../components/CustomDialog.svelte";
 
   const { application } = getContext('external');
 
@@ -33,6 +36,40 @@
       await helpers.setSetting(key, setting.value);
     }
     application.close();
+  }
+
+  async function resetSettings() {
+
+    const doThing = await TJSDialog.confirm({
+      title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
+      content: {
+        class: CustomDialog,
+        props: {
+          content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Content")
+        }
+      },
+      buttons: {
+        yes: {
+          icon: '<i class="fas fa-check"></i>',
+          label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Confirm")
+        },
+        no: {
+          icon: '<i class="fas fa-times"></i>',
+          label: game.i18n.localize("No")
+        }
+      },
+      modal: true,
+      draggable: false,
+      rejectClose: false,
+      defaultYes: true,
+      options: {
+        height: "auto"
+      }
+    });
+
+    if (!doThing) return;
+
+    return applyDefaultSettings();
   }
 
   let tabs = [
@@ -99,6 +136,13 @@
         </div>
 
         <div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
+          <SettingButton data={{
+            name: "ITEM-PILES.Settings.Reset.Title",
+            hint: "ITEM-PILES.Settings.Reset.Hint",
+            label: "ITEM-PILES.Settings.Reset.Label",
+            icon: "fas fa-undo",
+            hideResetButton: true
+          }} callback={() => { resetSettings() }}/>
           <Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}" options={game.system.template.Actor.types}/>
           <Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
           <Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
@@ -180,8 +224,8 @@
   }
 
   .tab-body {
-    max-height: 660px;
-    min-height: 660px;
+    max-height: 715px;
+    min-height: 715px;
     overflow-y: scroll;
     padding: 5px;
   }

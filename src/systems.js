@@ -15,6 +15,7 @@ import forbiddenLands from "./systems/forbidden-lands.js";
 import icrpg from "./systems/icrpg.js";
 import swse from "./systems/swse.js";
 import fallout from "./systems/fallout.js";
+import cyberpunkRedCore from "./systems/cyberpunk-red-core.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -24,22 +25,23 @@ import fallout from "./systems/fallout.js";
 export const SYSTEMS = {
   
   SUPPORTED_SYSTEMS: {
-    dnd5e,
     // ↓ ADD SYSTEMS HERE ↓
-    pf1,
-    pf2e,
-    ds4,
-    d35e,
-    sfrpg,
-    swade,
-    tormenta20,
-    wfrp4e,
-    splittermond,
-    twodsix,
+    "dnd5e": dnd5e,
+    "pf1": pf1,
+    "pf2e": pf2e,
+    "ds4": ds4,
+    "d35e": d35e,
+    "sfrpg": sfrpg,
+    "swade": swade,
+    "tormenta20": tormenta20,
+    "wfrp4e": wfrp4e,
+    "splittermond": splittermond,
+    "twodsix": twodsix,
     "forbidden-lands": forbiddenLands,
-    icrpg,
-    swse,
-    fallout
+    "icrpg": icrpg,
+    "swse": swse,
+    "fallout": fallout,
+    "cyberpunk-red-core": cyberpunkRedCore
     // ↑ ADD SYSTEMS HERE ↑
   },
   
