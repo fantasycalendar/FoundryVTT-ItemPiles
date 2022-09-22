@@ -3,7 +3,7 @@ name: System request
 about: Request a new supported system
 title: "[SYSTEM] - Write the system's name here"
 labels: enhancement
-assignees: Haxxer
+assignees: ''
 
 ---
 

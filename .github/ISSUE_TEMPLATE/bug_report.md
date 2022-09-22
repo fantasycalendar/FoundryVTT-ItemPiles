@@ -3,7 +3,7 @@ name: Bug report
 about: Create a report to help us improve
 title: "[BUG] - Describe bug here"
 labels: bug
-assignees: Haxxer
+assignees: ''
 
 ---
 

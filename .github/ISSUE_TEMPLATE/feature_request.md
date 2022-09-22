@@ -3,7 +3,7 @@ name: Feature request
 about: Suggest an idea for this project
 title: "[REQUEST] - Descriptive request description"
 labels: enhancement
-assignees: Haxxer
+assignees: ''
 
 ---
 
