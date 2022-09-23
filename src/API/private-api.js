@@ -1064,6 +1064,8 @@ export default class PrivateAPI {
   
   static async _dropGiveItem(dropData) {
     
+    if (dropData.source === dropData.target) return;
+    
     const user = Array.from(game.users).find(user => user?.character === dropData.target.actor);
     
     if (user && !user?.active && !game.user.isGM) {
@@ -1118,6 +1120,8 @@ export default class PrivateAPI {
   }
   
   static async _dropItemOnPile(dropData) {
+    
+    if (dropData.source === dropData.target) return;
     
     if (dropData.target && !dropData.position && !game.user.isGM) {
       

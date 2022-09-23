@@ -1,9 +1,11 @@
 # Item Piles Changelog
 
-## Version 2.0.7 (not released yet)
+## Version 2.1.0 (not released yet)
 
 - Implemented Simple Calendar integration for open/close times
 - Added Open/Close button in the top right of the merchants window for ease of access
+- Added "Give Item" functionality - any token can now drop items onto adjacent tokens to give them that item. This can
+  be turned off in the settings.
 - Improved the "Populate Items" tab on merchants (Thanks to Averrin#0374)
     - Added hover tooltips to buttons
     - Added ability to preview rolled items
