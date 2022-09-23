@@ -121,10 +121,10 @@ export default class Transaction {
     
     let itemsCreated;
     const actorUuid = Utilities.getUuid(this.actor);
-    if (!this.actor.owner) {
-      itemsCreated = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, actorUuid, this.actorUpdates, this.itemsToUpdate, this.itemsToDelete, this.itemsToCreate);
-    } else {
+    if (this.actor.isOwner) {
       itemsCreated = await PrivateAPI._commitActorChanges(actorUuid, this.actorUpdates, this.itemsToUpdate, this.itemsToDelete, this.itemsToCreate)
+    } else {
+      itemsCreated = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, actorUuid, this.actorUpdates, this.itemsToUpdate, this.itemsToDelete, this.itemsToCreate);
     }
     
     return {

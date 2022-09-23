@@ -83,7 +83,10 @@ export async function checkSystem() {
         content: {
           class: CustomDialog,
           props: {
-            content: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content")
+            content: [
+              game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content"),
+              "<strong>" + game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content2") + "</strong>",
+            ]
           }
         },
         buttons: {

@@ -15,7 +15,11 @@
 
   $: cantAfford = $prices.length > 0 && !$prices[$selectedPriceGroup]?.maxQuantity && item.store.recipient && !standalone;
   $: cantAffordMultiplePrices = cantAfford && !$prices.filter(group => group.maxQuantity).length;
-  $: labelText = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "") + ($prices[$selectedPriceGroup]?.free ? "Free" : $prices[$selectedPriceGroup]?.basePriceString);
+  $: labelText = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "")
+    + ($prices[$selectedPriceGroup]?.free
+        ? localize("ITEM-PILES.Merchant.ItemFree")
+        : $prices[$selectedPriceGroup]?.basePriceString
+    );
 
 </script>
 

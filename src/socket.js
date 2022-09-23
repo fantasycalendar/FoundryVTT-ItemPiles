@@ -46,6 +46,8 @@ export default class ItemPileSocket {
     /**
      * Item & attribute sockets
      */
+    GIVE_ITEMS: "giveItems",
+    GIVE_ITEMS_RESPONSE: "giveItemsResponse",
     DROP_ITEMS: "dropItems",
     ADD_ITEMS: "addItems",
     REMOVE_ITEMS: "removeItems",
@@ -86,6 +88,8 @@ export default class ItemPileSocket {
     [this.HANDLERS.CALL_HOOK]: (hook, response, ...args) => callHook(hook, response, ...args),
     
     [this.HANDLERS.DROP_ITEMS]: (args) => PrivateAPI._dropItems(args),
+    [this.HANDLERS.GIVE_ITEMS]: (...args) => PrivateAPI._giveItems(...args),
+    [this.HANDLERS.GIVE_ITEMS_RESPONSE]: (...args) => PrivateAPI._giveItemsResponse(...args),
     [this.HANDLERS.ADD_ITEMS]: (...args) => PrivateAPI._addItems(...args),
     [this.HANDLERS.REMOVE_ITEMS]: (...args) => PrivateAPI._removeItems(...args),
     [this.HANDLERS.TRANSFER_ITEMS]: (...args) => PrivateAPI._transferItems(...args),
@@ -133,6 +137,7 @@ export default class ItemPileSocket {
     [this.HANDLERS.USER_CLOSED_INTERFACE]: (...args) => InterfaceTracker.userClosed(...args),
     
     [this.HANDLERS.TRADE_ITEMS]: (...args) => PrivateAPI._tradeItems(...args),
+    
   }
   
   static _socket;

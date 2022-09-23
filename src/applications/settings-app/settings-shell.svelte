@@ -128,11 +128,12 @@
       {#if userIsGM}
         <div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
           <Setting bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
-          <Setting bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
-          <Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
+          <Setting bind:data="{settings[SETTINGS.ENABLE_GIVING_ITEMS]}"/>
           <Setting bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>
           <Setting bind:data="{settings[SETTINGS.SHOW_TRADE_BUTTON]}"/>
           <Setting bind:data="{settings[SETTINGS.INSPECT_ITEMS_IN_TRADE]}"/>
+          <Setting bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
+          <Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
           <Setting bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
         </div>
 

@@ -11,18 +11,6 @@
 
   export let store;
 
-  function getTables() {
-    let tables = Array.from(game.tables);
-    const folderTitle = getSetting(SETTINGS.POPULATION_TABLES_FOLDER);
-    if (
-      game.folders.find((f) => f.type == "RollTable" && f.name == folderTitle)
-    ) {
-      tables = tables.filter((t) => t.folder?.name == folderTitle);
-    }
-
-    return tables.map((table) => ({ name: table.name, id: table.id }));
-  }
-
   let tables = writable(getTables());
   let timesToRoll = "1d10";
   let selectedTables = writable(
@@ -54,6 +42,18 @@
   }
 
   let itemsRolled = writable([]);
+
+  function getTables() {
+    let tables = Array.from(game.tables);
+    const folderId = getSetting(SETTINGS.POPULATION_TABLES_FOLDER);
+    if (
+      folderId !== "root" && game.folders.find((f) => f.type === "RollTable" && f.id === folderId)
+    ) {
+      tables = tables.filter((t) => t.folder?.id === folderId);
+    }
+
+    return tables.map((table) => ({ name: table.name, id: table.id }));
+  }
 
   async function rollItems(tableId, timesToRoll) {
     const table = game.tables.get(tableId);
@@ -95,7 +95,7 @@
           const prices = game.itempiles.API.getPricesForItem(item, {
             seller: store.actor,
           });
-          i.price = prices[0]?.priceString;
+          i.price = prices[0]?.free ? localize("ITEM-PILES.Merchant.ItemFree") : prices[0]?.priceString;
         }
         itemsRolled.set(items);
       }, 0);
@@ -223,18 +223,37 @@
     class="item-piles-flexcol"
     style="margin-bottom: 1rem; padding:0.25rem; gap: 0.25rem"
   >
+
+    <div class="item-piles-grid">
+
+      <div>
+        Table Name
+      </div>
+
+      <div>
+        Times to roll
+      </div>
+
+      <div>
+        <small>
+          <a class="item-piles-clickable" on:click={addTable}>Add Table</a>
+        </small>
+      </div>
+
+    </div>
+
     {#each $selectedTables as selectedTable (selectedTable.id)}
-      <div class="item-piles-flexrow">
-        <select bind:value={selectedTable.id} style="flex: 3; height:30px;">
+      <div class="item-piles-grid">
+        <select bind:value={selectedTable.id} style="height:30px;">
           {#each $tables.filter((table) => !get(selectedTables)
-                .map((t) => t.id)
-                .includes(table.id) || selectedTable.id == table.id) as table (table.id)}
+            .map((t) => t.id)
+            .includes(table.id) || selectedTable.id == table.id) as table (table.id)}
             <option value={table.id}>{table.name}</option>
           {/each}
           {#if !$tables.length}
-            <option value=""
-              >{localize("ITEM-PILES.Merchant.NoRollTables")}</option
-            >
+            <option value="">
+              {localize("ITEM-PILES.Merchant.NoRollTables")}
+            </option>
           {/if}
         </select>
 
@@ -242,11 +261,11 @@
           type="text"
           bind:value={selectedTable.timesToRoll}
           placeholder="2d6+4"
-          style="height: 30px; padding: 0 0.5rem; flex:0.5; min-width: 50px; margin-left:0.5rem;"
+          style="height: 30px; padding: 0 0.5rem; width:100%;"
         />
 
         <button
-          style="flex:0; padding: 0 1rem; margin-left:0.5rem;"
+          class="item-piles-header-button"
           on:click={(_) =>
             rollItems(selectedTable.id, selectedTable.timesToRoll)}
           disabled={!$tables.length}
@@ -256,31 +275,31 @@
 
         {#if $selectedTables.length > 1}
           <button
-            class="item-piles-rolled-item-button item-piles-remove-button"
+            style="padding: 0; text-align: center;"
+            class="item-piles-rolled-item-button item-piles-header-button item-piles-remove-button"
             on:click={() => removeTable(selectedTable.id)}
             title={localize("ITEM-PILES.Merchant.RemoveItem")}
             disabled={$selectedTables.length <= 1}
           >
-            <i class="fas fa-times" />
+            <i class="fas fa-trash"/>
           </button>
         {/if}
       </div>
     {/each}
 
-    <div class="item-piles-flexrow">
-      <small>
-        <a class="item-piles-clickable" on:click={addTable}>add table</a>
-      </small>
-      {#if $selectedTables.length > 1}
-        <button
-          style="flex:0; padding: 0 1rem; margin-left:0.5rem; white-space: nowrap;"
-          on:click={rollAll}
-          disabled={!$tables.length}
-        >
-          {localize("Roll all")}
-        </button>
-      {/if}
-    </div>
+    {#if $selectedTables.length > 1}
+      <div class="item-piles-flexrow">
+        <div style="flex:1; display: flex; justify-content: flex-end;">
+          <button
+            style="padding: 0 1rem; width:84px;"
+            on:click={rollAll}
+            disabled={!$tables.length}
+          >
+            {localize("Roll all")}
+          </button>
+        </div>
+      </div>
+    {/if}
   </div>
 
   <div class="item-piles-flexrow" style="margin-top:1rem;">
@@ -305,7 +324,7 @@
               on:click={() => removeAddedItem(item)}
               title={localize("ITEM-PILES.Merchant.RemoveItem")}
             >
-              <i class="fas fa-times" />
+              <i class="fas fa-trash"/>
             </button>
           </ItemEntry>
         </div>
@@ -313,8 +332,8 @@
 
       {#if currentItems.length}
         <button class="item-piles-button" on:click={() => clearAllItems()}>
+          <i class="fas fa-trash"/>
           {localize("ITEM-PILES.Merchant.ClearAllItems")}
-          <i class="fas fa-times" />
         </button>
       {/if}
     </div>
@@ -332,7 +351,7 @@
 
         <div class="item-piles-flexrow item-piles-keep-rolled">
           <label>{localize("ITEM-PILES.Merchant.KeepRolled")}</label>
-          <input type="checkbox" bind:checked={keepRolled} />
+          <input type="checkbox" bind:checked={keepRolled}/>
         </div>
       </div>
 
@@ -346,11 +365,11 @@
               on:click={() => addItem(item)}
               title={localize("ITEM-PILES.Merchant.AddItem")}
             >
-              <i class="fas fa-arrow-left" />
+              <i class="fas fa-arrow-left"/>
             </button>
 
             <div class="item-piles-img-container">
-              <img class="item-piles-img" src={item.img} />
+              <img class="item-piles-img" src={item.img}/>
             </div>
 
             <div class="item-piles-name">
@@ -367,7 +386,7 @@
                 <small style="white-space: nowrap;">{item.price}</small>
                 <i
                   class="fas fa-times"
-                  style="color: #555; font-size: 0.75rem"
+                  style="color: #555; font-size: 0.75rem; opacity: 0.75;"
                 />
               {/if}
               <div class="item-piles-quantity-input-container">
@@ -386,14 +405,14 @@
               on:click={() => removeItem(item)}
               title={localize("ITEM-PILES.Merchant.RemoveItem")}
             >
-              <i class="fas fa-times" />
+              <i class="fas fa-trash"/>
             </button>
           </div>
         {/each}
 
         <button class="item-piles-button" on:click={() => addAllItems()}>
           {localize("ITEM-PILES.Merchant.AddAll")}
-          <i class="fas fa-arrow-left" />
+          <i class="fas fa-arrow-left"/>
         </button>
       {/if}
     </div>
@@ -401,6 +420,13 @@
 </div>
 
 <style lang="scss">
+
+  .item-piles-grid {
+    display: grid;
+    grid-template-columns: 1fr 100px 50px min-content;
+    column-gap: 5px;
+  }
+
   .item-piles-roll-header {
     margin-bottom: 0.5rem;
     align-items: center;
@@ -455,14 +481,34 @@
   }
 
   .fix-height-checkbox {
-    height: 20px; /* Foundry checkbox are 20px.
-    This div should be the same length to match list items with another column */
+    height: 20px;
   }
+
+  .item-piles-header-button {
+    min-width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+  }
+
   .item-piles-remove-button {
+    font-size: 0.75rem;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
     color: red;
+
     &[disabled] {
       color: gray;
     }
+  }
+
+  .item-piles-quantity-input-container {
+    min-width: 40px;
   }
 </style>
 

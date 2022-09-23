@@ -9,7 +9,22 @@
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile successfully updated.",
-      "UpdateMerchantSuccess": "Merchant successfully updated."
+      "UpdateMerchantSuccess": "Merchant successfully updated.",
+      "ItemTransferred": "{source_actor_name}'s {item_name} was given to {target_actor_name}.",
+      "GiveItemAccepted": "{user_name} accepted your item offer."
+    },
+    "Errors": {
+      "DisallowedItemDrop": "You cannot drop \"{type}\" items",
+      "DisallowedItemTrade": "You cannot trade \"{type}\" items",
+      "DisallowedItemSell": "This merchant does not accept \"{type}\" items",
+      "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM.",
+      "PileTooFar": "You're too far away to interact with this pile.",
+      "PileLocked": "This container is locked and cannot be opened - you can't drop items in it.",
+      "DropNoToken": "You don't have a token on this scene, so you can't drop any items here."
+    },
+    "Warnings": {
+      "GiveItemNoGM": "There is no GM active to receive you giving this item.",
+      "GiveItemDeclined": "{user_name} declined your item offer."
     },
     "Inspect": {
       "Title": "Inspecting Pile Contents",
@@ -112,16 +127,8 @@
       "AddAll": "Add All Items",
       "ClearAllItems": "Clear All Actor Items",
       "AddItem": "Add",
-      "RemoveItem": "Remove"
-    },
-    "Errors": {
-      "DisallowedItemDrop": "You cannot drop \"{type}\" items",
-      "DisallowedItemTrade": "You cannot trade \"{type}\" items",
-      "DisallowedItemSell": "This merchant does not accept \"{type}\" items",
-      "NoSourceDrop": "You cannot drop items from the item bar unless you are a GM.",
-      "PileTooFar": "You're too far away to interact with this pile.",
-      "PileLocked": "This item pile is locked and cannot be opened - you can't drop items in it.",
-      "DropNoToken": "You don't have a token on this scene, so you can't drop any items here."
+      "RemoveItem": "Remove",
+      "ItemFree": "Free"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -150,7 +157,8 @@
       },
       "NewSystemVersion": {
         "Title": "New System Version",
-        "Content": "The default settings for the system you're using was updated, would you like to override your module settings with the updated ones?",
+        "Content": "The default settings for the system you're using with Item Piles was updated, would you like to override your system specific settings with the updated ones?",
+        "Content2": "Not doing this may break Item Piles - you reset the module's system specific settings to fix it.",
         "Confirm": "Update settings"
       },
       "ResetSharingData": {
@@ -161,16 +169,34 @@
       "ClearAllItems": {
         "Title": "Clear All Actor Items",
         "Content": "This will clear all of the actor's items, are you sure you want to do this?"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "Giving Item",
+        "Content": "\"{actor_name}\" is owned by the player \"{user_name}\" but they are not active, so you cannot give them this item."
+      },
+      "ReceiveItem": {
+        "Title": "Receiving Item",
+        "Header": "Item Piles: Receiving Item",
+        "ContentOne": "{source_actor_name} wants to give the item \"{item_name}\" to {target_actor_name}, do you accept?",
+        "ContentMany": "{source_actor_name} wants to give the items \"{item_name}\" ({quantity}) to {target_actor_name}, do you accept?",
+        "Ignore": "Ignore User"
       }
     },
     "Applications": {
       "DropItem": {
         "Title": "Dropping Item",
-        "Dropping": "You're dropping",
-        "ExistingPiles": "You're adding this item to the item pile \"{item_pile_name}\".",
+        "Dropping": "You're dropping: {item_name}",
+        "ExistingPiles": "You're adding this item to the item pile \"{target_name}\".",
         "QuantityToDrop": "You have {quantity} of this item, how many do you want to drop?",
         "AddToPile": "Add to pile",
         "NewPile": "Create new pile"
+      },
+      "GiveItem": {
+        "Title": "Giving Item",
+        "Giving": "You're giving: {item_name}",
+        "TargetActor": "Do you want to give this item to \"{target_name}\"?",
+        "QuantityToGive": "You have {quantity} of this item, how many do you want to give away?",
+        "Give": "Give"
       },
       "DropCurrencies": {
         "Title": "Dropping Currencies",
@@ -463,6 +489,10 @@
         "Title": "Enable Dropping Items",
         "Hint": "This enables users being able to drop items on the ground to create their own item piles - with this disabled, users cannot create new piles, nor add items to existing piles."
       },
+      "EnableGivingItems": {
+        "Title": "Enable Giving Items",
+        "Hint": "This enables users to be able to drop items onto other tokens to give it to them - with this disabled, users cannot give other users items."
+      },
       "EnableTrading": {
         "Title": "Enable Trading",
         "Hint": "This enables trading - with this disabled, no one can initiate any trade."
@@ -509,7 +539,8 @@
       },
       "PopulationTablesFolder": {
         "Title": "RollTables folder for \"Populate Items\"",
-        "Hint": "Folder title for filtering rolltables in merchant's \"Populate Items\" tab."
+        "Hint": "Folder title for filtering rolltables in merchant's \"Populate Items\" tab.",
+        "AllTables": "All Tables"
       }
     }
   }
