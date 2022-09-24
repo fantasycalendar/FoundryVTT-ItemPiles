@@ -16,6 +16,7 @@
 - Added "Reset To System Defaults" button to the module settings
 - Fixed copy-pasting tokens not replicating their Item Piles settings
 - Fixed `Split x ways` not splitting items properly
+- Updated some French and German localization
 
 ## Version 2.0.6
 
