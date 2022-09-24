@@ -1062,9 +1062,45 @@ export default class PrivateAPI {
     
   }
   
+  static async _checkItemType(dropData) {
+    
+    const disallowedType = PileUtilities.isItemInvalid(dropData.target, dropData.itemData.item);
+    if (disallowedType) {
+      if (!game.user.isGM) {
+        return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
+      }
+      
+      if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+        dropData.itemData.item = await SYSTEMS.DATA.ITEM_TRANSFORMER(dropData.itemData.item);
+      }
+      
+      const newDisallowedType = PileUtilities.isItemInvalid(dropData.target, dropData.itemData.item);
+      
+      if (newDisallowedType && !hotkeyState.shiftDown) {
+        const force = await Dialog.confirm({
+          title: game.i18n.localize("ITEM-PILES.Dialogs.TypeWarning.Title"),
+          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.TypeWarning.DropContent", { type: newDisallowedType })}</p>`,
+          defaultYes: false
+        });
+        if (!force) {
+          return false;
+        }
+      }
+    } else {
+      if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+        dropData.itemData.item = await SYSTEMS.DATA.ITEM_TRANSFORMER(dropData.itemData.item);
+      }
+    }
+    
+    return dropData;
+    
+  }
+  
   static async _dropGiveItem(dropData) {
     
     if (dropData.source === dropData.target) return;
+    
+    if (!(await this._checkItemType(dropData))) return;
     
     const user = Array.from(game.users).find(user => user?.character === dropData.target.actor);
     
@@ -1125,6 +1161,8 @@ export default class PrivateAPI {
     
     if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;
     
+    if (!(await this._checkItemType(dropData))) return;
+    
     if (dropData.target && !dropData.position && !game.user.isGM) {
       
       if (!(dropData.target instanceof Actor && dropData.source instanceof Actor)) {
@@ -1149,34 +1187,6 @@ export default class PrivateAPI {
       if (!game.itempiles.API.isItemPileLocked(dropData.target)) {
         Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
         return false;
-      }
-    }
-    
-    const disallowedType = PileUtilities.isItemInvalid(dropData.target, dropData.itemData.item);
-    if (disallowedType) {
-      if (!game.user.isGM) {
-        return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
-      }
-      
-      if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-        dropData.itemData.item = await SYSTEMS.DATA.ITEM_TRANSFORMER(dropData.itemData.item);
-      }
-      
-      const newDisallowedType = PileUtilities.isItemInvalid(dropData.target, dropData.itemData.item);
-      
-      if (newDisallowedType && !hotkeyState.shiftDown) {
-        const force = await Dialog.confirm({
-          title: game.i18n.localize("ITEM-PILES.Dialogs.TypeWarning.Title"),
-          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.TypeWarning.DropContent", { type: newDisallowedType })}</p>`,
-          defaultYes: false
-        });
-        if (!force) {
-          return false;
-        }
-      }
-    } else {
-      if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-        dropData.itemData.item = await SYSTEMS.DATA.ITEM_TRANSFORMER(dropData.itemData.item);
       }
     }
     
