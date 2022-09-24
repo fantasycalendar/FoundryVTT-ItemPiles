@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.1.1
+
+- Fixed users being able to give away items to other users that are of types that are not allowed to be given (such as
+  spells, features, etc)
+- Fixed containers being considered locked when it is in fact unlocked
+
 ## Version 2.1.0
 
 - Implemented Simple Calendar integration for open/close times
