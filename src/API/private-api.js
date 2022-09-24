@@ -1184,7 +1184,7 @@ export default class PrivateAPI {
         }
       }
       
-      if (!game.itempiles.API.isItemPileLocked(dropData.target)) {
+      if (game.itempiles.API.isItemPileLocked(dropData.target)) {
         Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
         return false;
       }
