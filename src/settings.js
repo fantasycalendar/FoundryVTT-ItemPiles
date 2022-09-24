@@ -17,7 +17,7 @@ export function registerSettings() {
     restricted: false
   });
   
-  for (let [name, data] of Object.entries(SETTINGS.GET_DEFAULT())) {
+  for (let [name, data] of Object.entries(SETTINGS.GET_DEFAULT()).filter(setting => !setting[1].post)) {
     game.settings.register(CONSTANTS.MODULE_NAME, name, data);
   }
   
@@ -25,6 +25,7 @@ export function registerSettings() {
 
 export async function applyDefaultSettings() {
   const settings = SETTINGS.GET_SYSTEM_DEFAULTS();
+  debugger;
   for (const [name, data] of Object.entries(settings)) {
     await Helpers.setSetting(name, data.default);
   }
@@ -83,7 +84,10 @@ export async function checkSystem() {
         content: {
           class: CustomDialog,
           props: {
-            content: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content")
+            content: [
+              game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content"),
+              "<strong>" + game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content2") + "</strong>",
+            ]
           }
         },
         buttons: {

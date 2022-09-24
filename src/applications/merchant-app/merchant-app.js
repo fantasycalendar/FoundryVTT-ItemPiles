@@ -1,6 +1,7 @@
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import ItemPileConfig from "../item-pile-config/item-pile-config";
 import MerchantAppShell from "./merchant-app-shell.svelte";
+import * as Helpers from "../../helpers/helpers.js";
 
 export default class MerchantApp extends SvelteApplication {
   
@@ -64,6 +65,22 @@ export default class MerchantApp extends SvelteApplication {
           icon: "fas fa-user",
           onclick: () => {
             this.merchant.sheet.render(true, { focus: true });
+          }
+        },
+        {
+          label: "ITEM-PILES.ContextMenu.ShowToPlayers",
+          class: "item-piles-show-to-players",
+          icon: "fas fa-eye",
+          onclick: () => {
+            const users = Array.from(game.users).filter(u => u.active && u !== game.user).map(u => u.id);
+            if (!users.length) {
+              return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoPlayersActive"), true);
+            }
+            Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ShownToPlayers", { actor_name: this.merchant.name }))
+            return game.itempiles.API.renderItemPileInterface(this.merchant, {
+              userIds: users,
+              useDefaultCharacter: true
+            });
           }
         },
         {

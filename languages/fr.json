@@ -4,7 +4,7 @@
     "Currencies": "Devises",
     "Currency": "Devise",
     "ContextMenu": {
-      "ShowToPlayers": "Item Piles : Montrer la pile aux joueurs",
+      "ShowToPlayers": "Montrer la pile aux joueurs",
       "RequestTrade": "Item Piles : Demande d'échange"
     },
     "Inspect": {
@@ -248,7 +248,7 @@
     "DropItem": {
       "Title": "Objet Lâché",
       "Dropping": "Vous laissez tomber",
-      "ExistingPiles": "Vous ajoutez cet objet à la pile d'objets \"{item_pile_name}\".",
+      "ExistingPiles": "Vous ajoutez cet objet à la pile d'objets \"{target_name}\".",
       "QuantityToDrop": "Vous en possédez {quantity}, combien voulez-vous en déposer ?",
       "AddToPile": "Ajouter à la pile",
       "NewPile": "Créer une nouvelle pile",

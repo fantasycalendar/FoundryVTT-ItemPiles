@@ -10,6 +10,8 @@
   import MerchantLeftPane from "./MerchantLeftPane.svelte";
   import MerchantRightPane from "./MerchantRightPane.svelte";
   import MerchantTopBar from "./MerchantTopBar.svelte";
+  import Tabs from "../components/Tabs.svelte";
+  import { writable } from "svelte/store";
 
   const { application } = getContext('external');
 
@@ -44,7 +46,7 @@
     let itemData = item.toObject();
 
     if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-      itemData = SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
+      itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
     }
 
     const disallowedType = PileUtilities.isItemInvalid(merchant, item);
@@ -77,6 +79,19 @@
 
   }
 
+  const activeTab = writable("buy");
+
+  let sellHidden;
+  let tabs;
+  $: {
+    sellHidden = $pileData.purchaseOnly;
+    tabs = [
+      { value: 'buy', label: 'Buy Items' },
+      { value: 'sell', label: 'Sell Items', hidden: !recipientStore || sellHidden },
+      { value: 'tables', label: 'Populate Items', hidden: !game.user.isGM },
+    ];
+  }
+
 </script>
 
 <svelte:options accessors={true}/>
@@ -86,9 +101,17 @@
 <ApplicationShell bind:elementRoot>
   <DropZone callback={dropData} style="display: flex; flex-direction: column; height: 100%;">
     <MerchantTopBar {store}/>
+    <Tabs style="flex: 0 1 auto; font-size: 1.1rem; justify-content: flex-start;"
+          bind:tabs="{tabs}"
+          bind:activeTab={$activeTab}
+          separateElements
+          underscore
+    />
     <div class="item-piles-flexrow item-pile-merchant-content">
-      <MerchantLeftPane {store}/>
-      <MerchantRightPane {store} {recipientStore}/>
+      {#if $activeTab !== "tables"}
+        <MerchantLeftPane {store}/>
+      {/if}
+      <MerchantRightPane {store} {recipientStore} {activeTab}/>
     </div>
   </DropZone>
 </ApplicationShell>

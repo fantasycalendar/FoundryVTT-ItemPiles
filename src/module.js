@@ -15,10 +15,13 @@ import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index
 import SettingsShim from "./applications/settings-app/settings-app.js";
 
 Hooks.once("init", async () => {
-  registerSettings();
   registerHotkeysPre();
-  registerUIOverrides();
   registerLibwrappers();
+  registerSettings();
+  registerUIOverrides();
+});
+
+Hooks.once("ready", async () => {
   
   PrivateAPI.initialize();
   TradeAPI.initialize();
@@ -31,9 +34,6 @@ Hooks.once("init", async () => {
   window.ItemPiles = {
     API: API
   };
-});
-
-Hooks.once("ready", async () => {
   
   if (isNewerVersion(game.version, "9.999") && !Helpers.getSetting("v10WarningShown")) {
     await Helpers.setSetting("v10WarningShown", true);
@@ -73,15 +73,15 @@ Hooks.once("ready", async () => {
   
   ChatAPI.disablePastTradingButtons();
   
-  // new SettingsShim().render(true)
+  //new SettingsShim().render(true)
   
 });
 
 Hooks.once("socketlib.ready", () => {
-  Socket.initialize();
 });
 
 Hooks.once(HOOKS.READY, () => {
+  Socket.initialize();
   setTimeout(() => {
     patchCurrencySettings();
   }, 100);

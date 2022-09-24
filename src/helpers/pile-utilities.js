@@ -478,19 +478,7 @@ export function getItemPrices(item, {
     return priceData;
   }
   
-  let overallCost = getProperty(item.toObject(), game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
-  
-  if (game.system.id === "pf2e") {
-    overallCost = {
-      per: overallCost.per ?? 1,
-      totalCost: 0
-    }
-  } else {
-    overallCost = {
-      per: itemFlagData?.perUnit ?? 1,
-      totalCost: overallCost
-    }
-  }
+  const overallCost = getProperty(item.toObject(), game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
   
   const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
   const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;

@@ -95,6 +95,22 @@ export class ItemPileInventoryApp extends SvelteApplication {
           }
         },
         {
+          label: "ITEM-PILES.ContextMenu.ShowToPlayers",
+          class: "item-piles-show-to-players",
+          icon: "fas fa-eye",
+          onclick: () => {
+            const users = Array.from(game.users).filter(u => u.active && u !== game.user).map(u => u.id);
+            if (!users.length) {
+              return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoPlayersActive"), true);
+            }
+            Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ShownToPlayers", { actor_name: this.actor.name }))
+            return game.itempiles.API.renderItemPileInterface(this.actor, {
+              userIds: users,
+              useDefaultCharacter: true
+            });
+          }
+        },
+        {
           label: "ITEM-PILES.HUD.Configure",
           class: "item-piles-configure-pile",
           icon: "fas fa-box-open",

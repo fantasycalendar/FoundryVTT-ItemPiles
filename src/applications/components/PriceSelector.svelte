@@ -1,6 +1,7 @@
 <script>
 
   import { writable } from "svelte/store";
+  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { TJSMenu, TJSToggleLabel } from '@typhonjs-fvtt/svelte-standard/component';
 
   export let item;
@@ -15,7 +16,11 @@
 
   $: cantAfford = $prices.length > 0 && !$prices[$selectedPriceGroup]?.maxQuantity && item.store.recipient && !standalone;
   $: cantAffordMultiplePrices = cantAfford && !$prices.filter(group => group.maxQuantity).length;
-  $: labelText = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "") + ($prices[$selectedPriceGroup]?.free ? "Free" : $prices[$selectedPriceGroup]?.basePriceString);
+  $: labelText = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "")
+    + ($prices[$selectedPriceGroup]?.free
+        ? localize("ITEM-PILES.Merchant.ItemFree")
+        : $prices[$selectedPriceGroup]?.basePriceString
+    );
 
 </script>
 

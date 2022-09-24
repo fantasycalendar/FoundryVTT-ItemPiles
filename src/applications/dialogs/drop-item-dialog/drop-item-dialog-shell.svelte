@@ -1,29 +1,30 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import * as Utilities from "../../../helpers/utilities.js";
   import { getContext } from "svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+  import { isValidItemPile } from "../../../helpers/pile-utilities.js";
+  import * as Utilities from "../../../helpers/utilities.js";
+  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+  import SliderInput from "../../components/SliderInput.svelte";
 
   const { application } = getContext('external');
 
-  export let droppedItem;
-  export let itemPile;
+  export let item;
   export let elementRoot;
+  export let target = false;
 
   let form;
-
-  let itemQuantity = Utilities.getItemQuantity(droppedItem);
   let sliderValue = 1;
+
+  const isItemPile = !target || isValidItemPile(target);
+
+  const itemQuantity = Utilities.getItemQuantity(item);
 
   function requestSubmit() {
     form.requestSubmit();
   }
 
   function submit() {
-    application.options.resolve({
-      newPile: !itemPile,
-      quantity: sliderValue
-    });
+    application.options.resolve(sliderValue);
     application.close();
   }
 
@@ -35,36 +36,39 @@
   <form class="item-piles-flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
         autocomplete="off">
 
-    <h3 style="text-align: center;">{localize("ITEM-PILES.Applications.DropItem.Dropping")}: {droppedItem.name}</h3>
+    <h3 style="text-align: center;">
+      {localize(`ITEM-PILES.Applications.${isItemPile ? "DropItem.Dropping" : "GiveItem.Giving"}`, {
+        item_name: item.name
+      })}
+    </h3>
 
-    {#if itemPile}
+    {#if target}
 
-      <p class="item-piles-text-center">{localize("ITEM-PILES.Applications.DropItem.ExistingPiles", { item_pile_name: itemPile.name })}</p>
+      <p class="item-piles-text-center">
+        {localize(`ITEM-PILES.Applications.${isItemPile ? "DropItem.ExistingPiles" : "GiveItem.TargetActor"}`, {
+          target_name: target.name
+        })}
+      </p>
 
     {/if}
 
     {#if itemQuantity > 1}
 
       <div class="form-group item-piles-text-center">
-        <label>{localize("ITEM-PILES.Applications.DropItem.QuantityToDrop", {
+        <label>{localize(`ITEM-PILES.Applications.${isItemPile ? "DropItem.QuantityToDrop" : "GiveItem.QuantityToGive"}`, {
           quantity: itemQuantity,
-          itemName: droppedItem.name
+          itemName: item.name
         })}</label>
       </div>
-      <div class="form-group">
-        <input style="flex: 6;" type="range" name="quantity" min="1" max="{itemQuantity}" bind:value={sliderValue}/>
-        <input style="flex: 1; margin-left:1rem;" type="number" bind:value={sliderValue}>
-      </div>
+      <SliderInput min={1} max={itemQuantity} maxInput={itemQuantity} divideBy={1} bind:value={sliderValue}/>
 
-    {:else}
-      <input type="hidden" name="quantity" value="1"/>
     {/if}
 
     <footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
-      {#if itemPile}
+      {#if target}
         <button type="button" on:click|once={requestSubmit}>
           <i class="fas fa-download"></i>
-          {localize("ITEM-PILES.Applications.DropItem.AddToPile")}
+          {localize(`ITEM-PILES.Applications.${isItemPile ? "DropItem.AddToPile" : "GiveItem.Give"}`)}
         </button>
       {:else}
         <button type="button" on:click|once={requestSubmit}>

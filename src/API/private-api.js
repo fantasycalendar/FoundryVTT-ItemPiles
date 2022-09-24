@@ -14,6 +14,8 @@ import ItemPileStore from "../stores/item-pile-store.js";
 import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
 import { getPlayersForItemPile } from "../helpers/sharing-utilities.js";
+import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+import CustomDialog from "../applications/components/CustomDialog.svelte";
 
 const preloadedFiles = new Set();
 
@@ -1012,7 +1014,6 @@ export default class PrivateAPI {
     const pre_drop_determined_hook = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.position, dropData.itemData);
     if (pre_drop_determined_hook === false) return false;
     
-    let action;
     let droppableDocuments = [];
     let x;
     let y;
@@ -1028,31 +1029,115 @@ export default class PrivateAPI {
       y = position[1];
       
       droppableDocuments = Utilities.getTokensAtLocation({ x, y })
-        .map(token => Utilities.getDocument(token))
-        .filter(token => PileUtilities.isValidItemPile(token));
+        .map(token => Utilities.getDocument(token));
       
+      if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get("midi-qol", "DragDropTarget")) {
+        Helpers.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items");
+        return false;
+      }
+      
+      if (!droppableDocuments.length) {
+        dropData.position = { x, y };
+      }
     }
     
-    if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get("midi-qol", "DragDropTarget")) {
-      Helpers.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items")
-      return false;
+    const canGiveItems = Helpers.getSetting(SETTINGS.ENABLE_GIVING_ITEMS) || game.user.isGM;
+    const canDropItems = Helpers.getSetting(SETTINGS.ENABLE_DROPPING_ITEMS) || game.user.isGM;
+    
+    const droppableItemPiles = droppableDocuments.filter(token => PileUtilities.isValidItemPile(token));
+    const droppableNormalTokens = droppableDocuments.filter(token => !PileUtilities.isValidItemPile(token));
+    
+    const droppingItem = canDropItems && (droppableItemPiles.length || (dropData.position && !droppableNormalTokens.length));
+    const givingItem = canGiveItems && droppableNormalTokens.length && !droppableItemPiles.length;
+    
+    if (droppingItem) {
+      dropData.target = droppableItemPiles[0];
+      return this._dropItemOnPile(dropData);
+    } else if (givingItem) {
+      dropData.target = droppableNormalTokens[0];
+      return this._dropGiveItem(dropData);
     }
     
-    if (droppableDocuments.length > 0 && !game.user.isGM) {
+    return false;
+    
+  }
+  
+  static async _dropGiveItem(dropData) {
+    
+    if (dropData.source === dropData.target) return;
+    
+    const user = Array.from(game.users).find(user => user?.character === dropData.target.actor);
+    
+    if (user && !user?.active && !game.user.isGM) {
+      return TJSDialog.prompt({
+        title: game.i18n.localize("ITEM-PILES.Dialogs.GiveItemUserNotActive.Title"),
+        content: {
+          class: CustomDialog,
+          props: {
+            content: game.i18n.format("ITEM-PILES.Dialogs.GiveItemUserNotActive.Content", {
+              actor_name: dropData.target.actor.name,
+              user_name: user.name
+            })
+          }
+        }
+      });
+    }
+    
+    const gms = Helpers.getActiveGMs().map(user => user.id);
+    
+    if (user?.active || gms.length || game.user.isGM) {
       
-      if (!(droppableDocuments[0] instanceof Actor && dropData.source instanceof Actor)) {
+      const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+      const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
+      
+      setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity);
+      dropData.itemData.quantity = quantity;
+      
+      const sourceUuid = Utilities.getUuid(dropData.source);
+      const targetUuid = Utilities.getUuid(dropData.target);
+      
+      if ((!user || !user?.active) && game.user.isGM) {
+        Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
+          source_actor_name: dropData.source.name,
+          target_actor_name: dropData.target.name,
+          item_name: item.name
+        }));
+        return this._transferItems(
+          sourceUuid,
+          targetUuid,
+          [dropData.itemData.item],
+          game.user.id
+        )
+      }
+      
+      return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS, [user ? user.id : gms[0]], {
+        userId: game.user.id,
+        sourceUuid,
+        targetUuid,
+        itemData: dropData.itemData
+      });
+    }
+  }
+  
+  static async _dropItemOnPile(dropData) {
+    
+    if (dropData.source === dropData.target) return;
+    
+    if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;
+    
+    if (dropData.target && !dropData.position && !game.user.isGM) {
+      
+      if (!(dropData.target instanceof Actor && dropData.source instanceof Actor)) {
         
         const sourceToken = canvas.tokens.placeables.find(token => token.actor === dropData.source);
         
         if (sourceToken) {
           
-          const targetToken = droppableDocuments[0];
+          const distance = Math.floor(Utilities.distance_between_rect(sourceToken, dropData.target.object) / canvas.grid.size) + 1
           
-          const distance = Math.floor(Utilities.distance_between_rect(sourceToken, targetToken.object) / canvas.grid.size) + 1
+          const pileData = PileUtilities.getActorFlagData(dropData.target);
           
-          const pileData = PileUtilities.getActorFlagData(targetToken);
-          
-          const maxDistance = pileData.distance ? pileData.distance : Infinity;
+          const maxDistance = pileData?.distance ? pileData?.distance : Infinity;
           
           if (distance > maxDistance) {
             Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
@@ -1061,15 +1146,13 @@ export default class PrivateAPI {
         }
       }
       
-      droppableDocuments = droppableDocuments.filter(token => !game.itempiles.API.isItemPileLocked(token));
-      
-      if (!droppableDocuments.length) {
+      if (!game.itempiles.API.isItemPileLocked(dropData.target)) {
         Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
         return false;
       }
     }
     
-    const disallowedType = PileUtilities.isItemInvalid(droppableDocuments?.[0], dropData.itemData.item);
+    const disallowedType = PileUtilities.isItemInvalid(dropData.target, dropData.itemData.item);
     if (disallowedType) {
       if (!game.user.isGM) {
         return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemDrop", { type: disallowedType }), true)
@@ -1079,7 +1162,7 @@ export default class PrivateAPI {
         dropData.itemData.item = await SYSTEMS.DATA.ITEM_TRANSFORMER(dropData.itemData.item);
       }
       
-      const newDisallowedType = PileUtilities.isItemInvalid(droppableDocuments?.[0], dropData.itemData.item);
+      const newDisallowedType = PileUtilities.isItemInvalid(dropData.target, dropData.itemData.item);
       
       if (newDisallowedType && !hotkeyState.shiftDown) {
         const force = await Dialog.confirm({
@@ -1097,8 +1180,6 @@ export default class PrivateAPI {
       }
     }
     
-    let newPile = !droppableDocuments.length;
-    
     if (hotkeyState.altDown) {
       
       setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, 1);
@@ -1106,24 +1187,16 @@ export default class PrivateAPI {
       
     } else {
       
-      const quantity = Utilities.getItemQuantity(dropData.itemData.item);
+      let quantity = Utilities.getItemQuantity(dropData.itemData.item);
       
-      let result = { newPile, quantity: 1 }
       if (quantity > 1) {
-        result = await DropItemDialog.show(item, droppableDocuments[0]);
-        if (!result) return false;
-        newPile = result.newPile;
+        const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+        quantity = await DropItemDialog.show(item, dropData.target);
       }
       
-      setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Number(result.quantity))
-      dropData.itemData.quantity = Number(result.quantity);
+      setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Number(quantity))
+      dropData.itemData.quantity = Number(quantity);
       
-    }
-    
-    if (newPile) {
-      dropData.position = { x, y };
-    } else {
-      dropData.target = droppableDocuments[0];
     }
     
     const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
@@ -1138,6 +1211,54 @@ export default class PrivateAPI {
       itemData: dropData.itemData
     });
     
+  }
+  
+  static async _giveItems({ userId, sourceUuid, targetUuid, itemData } = {}) {
+    
+    const sourceActor = Utilities.getActor(sourceUuid);
+    const targetActor = Utilities.getActor(targetUuid);
+    
+    const contentString = "ITEM-PILES.Dialogs.ReceiveItem." + (itemData.quantity > 1 ? "ContentMany" : "ContentOne");
+    
+    const item = await Item.implementation.create(itemData.item, { temporary: true });
+    
+    const accepted = await TJSDialog.confirm({
+      title: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"),
+      content: {
+        class: CustomDialog,
+        props: {
+          content: game.i18n.format(contentString, {
+            source_actor_name: sourceActor.name,
+            target_actor_name: targetActor.name,
+            quantity: itemData.quantity,
+            item_name: item.name
+          }),
+          icon: "fas fa-handshake",
+          header: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Header")
+        }
+      }
+    });
+    
+    if (accepted) {
+      await PrivateAPI._addItems(targetUuid, [itemData], game.user.id);
+    }
+    
+    return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS_RESPONSE, [userId], {
+      userId: game.user.id,
+      accepted,
+      sourceUuid,
+      itemData
+    });
+    
+  }
+  
+  static async _giveItemsResponse({ userId, accepted, sourceUuid, itemData } = {}) {
+    const user = game.users.get(userId);
+    if (accepted) {
+      await PrivateAPI._removeItems(sourceUuid, [itemData], game.user.id);
+      return Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.GiveItemAccepted", { user_name: user.name }));
+    }
+    return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.GiveItemDeclined", { user_name: user.name }), true);
   }
   
   static async _itemPileClicked(pileDocument) {

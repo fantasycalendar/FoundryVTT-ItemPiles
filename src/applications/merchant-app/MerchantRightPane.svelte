@@ -1,6 +1,5 @@
 <script>
 
-  import Tabs from "../components/Tabs.svelte";
   import MerchantBuyTab from "./MerchantBuyTab.svelte";
   import MerchantSellTab from "./MerchantSellTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
@@ -10,34 +9,15 @@
 
   export let store;
   export let recipientStore;
+  export let activeTab;
 
   const currencies = recipientStore?.allCurrencies || writable([]);
 
-  const merchantFlags = store.pileData;
   let closed = store.closed;
-
-  let sellHidden;
-  let tabs;
-  let activeTab = "buy"
-  $: {
-    sellHidden = $merchantFlags.purchaseOnly;
-    tabs = [
-      { value: 'buy', label: 'Buy Items' },
-      { value: 'sell', label: 'Sell Items', hidden: !recipientStore || sellHidden },
-      { value: 'tables', label: 'Populate Items', hidden: !game.user.isGM },
-    ];
-  }
 
 </script>
 
 <div class="merchant-right-pane item-piles-flexcol">
-
-  <Tabs style="flex: 0 1 auto; font-size: 1.1rem; justify-content: flex-start;"
-        bind:tabs="{tabs}"
-        bind:activeTab={activeTab}
-        separateElements
-        underscore
-  />
 
   <div class="merchant-tabbed-center"
        style="flex:1; calc(100% - {recipientStore && $currencies.length ? '36px' : '0px'})">
@@ -46,11 +26,11 @@
       <div style="display: grid; place-items: center; height:100%;">
         <span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
       </div>
-    {:else if activeTab === "buy"}
+    {:else if $activeTab === "buy"}
       <MerchantBuyTab {store}/>
-    {:else if activeTab === "sell"}
+    {:else if $activeTab === "sell"}
       <MerchantSellTab store={recipientStore}/>
-    {:else if activeTab === "tables"}
+    {:else if $activeTab === "tables"}
       <MerchantPopulateItemsTab {store}/>
     {/if}
 

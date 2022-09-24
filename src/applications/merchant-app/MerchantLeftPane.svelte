@@ -7,6 +7,7 @@
   import { get } from "svelte/store";
 
   export let store;
+  export let activeTab;
 
   const merchantImg = store.img;
   const pileDataStore = store.pileData;
