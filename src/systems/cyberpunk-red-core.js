@@ -28,7 +28,7 @@ export default {
   "CURRENCIES": [
     {
       type: "attribute",
-      name: "CPR.actorSheets.characterSheet.eurobucks.eurobucks",
+      name: "CPR.characterSheet.rightPane.eurobucks.eurobucks",
       img: "",
       abbreviation: "{#}€$",
       data: {

@@ -17,12 +17,11 @@ import SettingsShim from "./applications/settings-app/settings-app.js";
 Hooks.once("init", async () => {
   registerHotkeysPre();
   registerLibwrappers();
+  registerSettings();
+  registerUIOverrides();
 });
 
 Hooks.once("ready", async () => {
-  
-  registerSettings();
-  registerUIOverrides();
   
   PrivateAPI.initialize();
   TradeAPI.initialize();

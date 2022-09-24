@@ -1123,6 +1123,8 @@ export default class PrivateAPI {
     
     if (dropData.source === dropData.target) return;
     
+    if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;
+    
     if (dropData.target && !dropData.position && !game.user.isGM) {
       
       if (!(dropData.target instanceof Actor && dropData.source instanceof Actor)) {

@@ -1,6 +1,7 @@
 <script>
 
   import { writable } from "svelte/store";
+  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { TJSMenu, TJSToggleLabel } from '@typhonjs-fvtt/svelte-standard/component';
 
   export let item;

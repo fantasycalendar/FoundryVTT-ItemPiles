@@ -41,7 +41,7 @@ export const SYSTEMS = {
     "icrpg": icrpg,
     "swse": swse,
     "fallout": fallout,
-    "cyberpunk-red-core": cyberpunkRedCore
+    //"cyberpunk-red-core": cyberpunkRedCore
     // ↑ ADD SYSTEMS HERE ↑
   },
   

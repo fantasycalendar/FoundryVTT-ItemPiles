@@ -19,12 +19,26 @@
   export let elementRoot;
   let form;
 
-  let settings = Object.fromEntries(Object.entries(SETTINGS.GET_DEFAULT()).map(entry => {
-    entry[1].value = helpers.getSetting(entry[0]);
-    return entry;
-  }));
-
+  let settings = {};
   let userIsGM = game.user.isGM;
+
+  getSettings();
+
+  function getSettings() {
+    settings = Object.fromEntries(Object.entries(SETTINGS.GET_DEFAULT()).map(entry => {
+      entry[1].value = helpers.getSetting(entry[0]);
+      return entry;
+    }));
+
+    settings[SETTINGS.POPULATION_TABLES_FOLDER].choices = {
+      "root": "ITEM-PILES.Settings.PopulationTablesFolder.AllTables",
+      ...Object.fromEntries(
+        game.folders
+          .filter(f => f.type === "RollTable")
+          .map(f => [f.id, f.name])
+      )
+    }
+  }
 
   function requestSubmit() {
     form.requestSubmit();
@@ -144,7 +158,10 @@
             label: "ITEM-PILES.Settings.Reset.Label",
             icon: "fas fa-undo",
             hideResetButton: true
-          }} callback={() => { resetSettings() }}/>
+          }} callback={async () => {
+            await resetSettings()
+            getSettings();
+          }}/>
           <Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}" options={game.system.template.Actor.types}/>
           <Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
           <Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>

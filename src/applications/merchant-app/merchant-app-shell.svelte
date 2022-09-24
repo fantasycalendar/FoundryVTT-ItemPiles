@@ -46,7 +46,7 @@
     let itemData = item.toObject();
 
     if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-      itemData = SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
+      itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
     }
 
     const disallowedType = PileUtilities.isItemInvalid(merchant, item);

@@ -4,14 +4,18 @@
     "Currencies": "Currencies",
     "Currency": "Currency",
     "ContextMenu": {
-      "ShowToPlayers": "Item Piles: Show To Players",
-      "RequestTrade": "Item Piles: Request Trade"
+      "ShowToPlayers": "Show To Players",
+      "RequestTrade": "Request Trade"
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "Show To Players"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile successfully updated.",
       "UpdateMerchantSuccess": "Merchant successfully updated.",
       "ItemTransferred": "{source_actor_name}'s {item_name} was given to {target_actor_name}.",
-      "GiveItemAccepted": "{user_name} accepted your item offer."
+      "GiveItemAccepted": "{user_name} accepted your item offer.",
+      "ShownToPlayers": "Showing {actor_name} to players"
     },
     "Errors": {
       "DisallowedItemDrop": "You cannot drop \"{type}\" items",
@@ -24,7 +28,8 @@
     },
     "Warnings": {
       "GiveItemNoGM": "There is no GM active to receive you giving this item.",
-      "GiveItemDeclined": "{user_name} declined your item offer."
+      "GiveItemDeclined": "{user_name} declined your item offer.",
+      "NoPlayersActive": "No players are active to do this action"
     },
     "Inspect": {
       "Title": "Inspecting Pile Contents",

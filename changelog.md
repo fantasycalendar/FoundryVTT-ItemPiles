@@ -6,16 +6,16 @@
 - Added Open/Close button in the top right of the merchants window for ease of access
 - Added "Give Item" functionality - any token can now drop items onto adjacent tokens to give them that item. This can
   be turned off in the settings.
+- Added `Show To Players` header button to Item Piles & Merchants
 - Improved the "Populate Items" tab on merchants (Thanks to Averrin#0374)
     - Added hover tooltips to buttons
     - Added ability to preview rolled items
-    - Added prices to rolled items
     - Added the ability to roll multiple tables
+    - Rolled items now show their prices
     - Fixed tables not resetting between rolls
 - Added "Reset To System Defaults" button to the module settings
 - Fixed copy-pasting tokens not replicating their Item Piles settings
 - Fixed `Split x ways` not splitting items properly
-- Added Cyberpunk Red system support
 
 ## Version 2.0.6
 

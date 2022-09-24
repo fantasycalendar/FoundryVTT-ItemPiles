@@ -46,12 +46,16 @@ function addTradeButton(app, html) {
 function insertActorContextMenuItems(html, menuItems) {
   
   menuItems.push({
-    name: "ITEM-PILES.ContextMenu.ShowToPlayers",
+    name: "Item Piles: " + game.i18n.localize("ITEM-PILES.ContextMenu.ShowToPlayers"),
     icon: `<i class="fas fa-eye"></i>`,
     callback: (html) => {
       const actorId = html[0].dataset.documentId;
       const actor = game.actors.get(actorId);
-      const users = Array.from(game.users).filter(u => u.active).map(u => u.id);
+      const users = Array.from(game.users).filter(u => u.active && u !== game.user).map(u => u.id);
+      if (!users.length) {
+        return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoPlayersActive"), true);
+      }
+      Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ShownToPlayers", { actor_name: actor.name }))
       return game.itempiles.API.renderItemPileInterface(actor, { userIds: users, useDefaultCharacter: true });
     },
     condition: (html) => {
@@ -60,7 +64,7 @@ function insertActorContextMenuItems(html, menuItems) {
       return game.user.isGM && PileUtilities.isValidItemPile(actor);
     }
   }, {
-    name: "ITEM-PILES.ContextMenu.RequestTrade",
+    name: "Item Piles: " + game.i18n.localize("ITEM-PILES.ContextMenu.RequestTrade"),
     icon: `<i class="fas fa-handshake"></i>`,
     callback: (html) => {
       const actorId = html[0].dataset.documentId;

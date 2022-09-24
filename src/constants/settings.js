@@ -218,15 +218,7 @@ const SETTINGS = {
       scope: "world",
       config: false,
       default: "root",
-      type: String,
-      choices: {
-        "root": "ITEM-PILES.Settings.PopulationTablesFolder.AllTables",
-        ...Object.fromEntries(
-          game.folders
-            .filter(f => f.type === "RollTable")
-            .map(f => [f.id, f.name])
-        )
-      }
+      type: String
     },
     
     [SETTINGS.DELETE_EMPTY_PILES]: {
