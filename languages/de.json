@@ -9,7 +9,7 @@
     },
     "Inspect": {
       "Title": "Untersuche Gegenstandstapel",
-      "AsActor": "Du untersuchst diesen Stapel als {actorName}",
+      "AsActor": "Du untersuchst diesen Stapel als {actorName}.",
       "Owner": "Als Besitzer dieses Gegestandsstapels kannst du den Inhalt verändern.",
       "Empty": "Dieser Stapel ist leer.",
       "Destroyed": "Dieser Stapel existiert nicht mehr und liegt brach.",
@@ -249,7 +249,6 @@
       "Split": "Der Gegenstandsstapel wurde zwischen {num_players} Spielern aufgeteilt und jeder hat folgende Dinge erhalten:",
       "TradeComplete": "{party_1} und {party_2} haben einen Handel abgeschlossen.",
       "TradeStarted": "{party_1} und {party_2} haben einen Handel begonnen.",
-      "TradeStartedButton": "Click the button below to spectate:",
       "TradeStartedButton": "Drücke den untenstehenden Knopf um als Beobachter teilzunehmen:",
       "TradeSpectate": "Handel beobachten",
       "SpectateDisabled": "Handel beendet",
@@ -335,6 +334,19 @@
       "AddNew": "Neues Attribut zufügen",
       "Submit": "Attribut übermitteln"
     },
-    "AttributePath": "Attributspfad"
+    "AttributePath": "Attributspfad",
+    "Merchant": {
+      "Sell": "Verkaufen",
+      "Description": "Beschreibung",
+      "Buy": "Kaufen",
+      "Hours": "Stunden",
+      "Minutes": "Minuten",
+      "Settings": "Einstellungen",
+      "Override": "Überschreiben"
+    },
+    "Notifications": {
+      "UpdateItemPileSuccess": "Item Pile erfolgreich aktualisiert.",
+      "UpdateMerchantSuccess": "Händler erfolgreich aktualisiert."
+    }
   }
 }

@@ -4,7 +4,7 @@
     "Currencies": "Devises",
     "Currency": "Devise",
     "ContextMenu": {
-      "ShowToPlayers": "Item Piles: Montrer la pile aux joueurs",
+      "ShowToPlayers": "Montrer la pile aux joueurs",
       "RequestTrade": "Item Piles : Demande d'échange"
     },
     "Inspect": {
@@ -21,40 +21,49 @@
       "NoneLeft": "Il n'y a plus rien...",
       "OpenSheet": "Ouvrir la feuille",
       "AddCurrency": "Ajouter une devise",
-      "SplitAll": "Diviser en {num_players} part.",
-      "SplitItems": "Diviser les objets en {num_players} part.",
+      "SplitAll": "Diviser en {num_players} part",
+      "SplitItems": "Diviser les objets en {num_players} part",
       "SplitCurrencies": "Partage les devises en {num_players} part"
     },
     "Trade": {
-      "Title": "Item Piles: Échange",
+      "Title": "Item Piles : Échange",
       "Accept": "Accepter",
       "Decline": "Refuser",
       "Mute": "Sourdine",
       "AutoDecline": "Vous n'avez pas répondu à la demande d'échange assez rapidement, elle a donc été rejetée automatiquement.",
       "Declined": "L'autre utilisateur a refusé la demande d'échange.",
       "Private": "Rendre cet échange privée",
-      "PrivateExplanation": "Aucune carte de chat n'est affichée, et personne ne peut être spectateur.",
+      "PrivateExplanation": "Aucune carte de chat n'est affichée, et personne ne peut en être spectateur",
       "Over": "Cet échange n'est plus actif.",
       "Between": "Échange entre {actor_1} et {actor_2}",
       "DragDrop": "Faites glisser et déposez les objets pour commencer l'échange",
       "Request": {
-        "Title": "Item Piles: Envoyer une demande d'échange",
+        "Title": "Item Piles : Envoyer une demande d'échange",
         "User": "Sélectionnez l'utilisateur avec lequel vous voulez échanger :",
         "PickActor": "Sélectionnez l'acteur que vous représenterez dans l'échange :",
         "PickedActor": "L'acteur que vous allez représenter dans l'échange :",
         "PickToken": "Choisir le token sélectionné",
         "DropActor": "Glissez-déposez l'acteur ici",
-        "Label": "Envoyer une demande d'échange"
+        "Label": "Envoyer une demande d'échange",
+        "PrivateContent": "{trading_actor_name} (user {trading_user_name}) veut échanger en <strong>privately</strong> avec vous.",
+        "AcceptQuery": "Acceptez-vous ?",
+        "Content": "{trading_actor_name} (user {trading_user_name}) veut échanger avec vous."
       },
       "NoActiveUsers": {
         "Title": "Item Piles : Aucun utilisateur actif",
         "Content": "Aucun joueur n'est actif, vous n'avez donc personne avec qui échanger."
       },
       "Prompt": {
-        "Title": "Item Piles: Demande d'échange",
+        "Title": "Item Piles : Demande d'échange",
         "Content": "{trading_actor_name} (utilisateur {trading_user_name}) veut commercer avec vous.",
         "PrivateContent": "{trading_actor_name} (utilisateur {trading_user_name}) souhaite procéder à un échange <strong>privé</strong>.",
-        "AcceptQuery": "Acceptez-vous ?"
+        "AcceptQuery": "Acceptez-vous ?",
+        "PickActor": "Sélectionnez l'acteur que vous représenterez dans l'échange :",
+        "PickToken": "Choisir le token sélectionné",
+        "DropActor": "Glissez et déposez l'acteur ici",
+        "Label": "Envoyer une demande d'échange",
+        "User": "Sélectionnez l'utilisateur avec lequel vous voulez échanger :",
+        "PickedActor": "L'acteur que vous allez représenter dans l'échange :"
       },
       "OngoingRequest": {
         "Content": "En attente de la réponse de {user_name} ...",
@@ -81,12 +90,13 @@
       "ActorOwnerWarning": "Vous ne possédez pas cet acteur, vous ne pouvez donc pas faire de commerce avec lui."
     },
     "Errors": {
-      "DisallowedItemDrop": "Vous ne pouvez pas déposer des objets de type \"{type}\".",
-      "DisallowedItemTrade": "Vous ne pouvez pas échanger des objets de type \"{type}\".",
+      "DisallowedItemDrop": "Vous ne pouvez pas déposer des objets de type \"{type}\"",
+      "DisallowedItemTrade": "Vous ne pouvez pas échanger des objets de type \"{type}\"",
       "NoSourceDrop": "Vous ne pouvez pas déposer d'objets de la barre d'objets, sauf si vous êtes un MJ.",
       "PileTooFar": "Vous êtes trop loin pour interagir avec cette pile.",
       "PileLocked": "Ce tas d'objets est verrouillé et ne peut pas être ouvert - vous ne pouvez pas y déposer d'objets.",
-      "DropNoToken": "Vous n'avez pas de token sur cette scène, donc vous ne pouvez pas déposer d'objets ici."
+      "DropNoToken": "Vous n'avez pas de token sur cette scène, donc vous ne pouvez pas déposer d'objets ici.",
+      "DisallowedItemSell": "Ce marchand n'accepte pas les \"{type}\""
     },
     "Dialogs": {
       "DropTypeWarning": {
@@ -120,7 +130,21 @@
         "Content": "Cela réinitialisera tout l'historique des joueurs ayant pris leur part de cette pile.<br><br>Etes-vous sûr de vouloir faire cela ?",
         "Confirm": "Réinitialiser les paramètres de partage"
       },
-      "Cancel": "Annuler"
+      "Cancel": "Annuler",
+      "NewSystemVersion": {
+        "Confirm": "Mettre à jour les paramètres",
+        "Content": "Les paramètres par défaut du système que vous utilisez ont été mis à jour, voulez-vous remplacer les paramètres de votre module par ceux mis à jour ?",
+        "Title": "Nouvelle version du système"
+      },
+      "TypeWarning": {
+        "SellContent": "Vous tentez de vendre un article de type (\"{type}\") que le marchand n'accepte pas normalement. Êtes-vous sûr de vouloir faire cela ?",
+        "DropContent": "Vous déposez un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être déposé. Êtes-vous sûr de vouloir faire cela ?",
+        "TradeContent": "Vous tentez d'échanger un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être échangé. Êtes-vous sûr de vouloir faire cela ?"
+      },
+      "ClearAllItems": {
+        "Content": "Cela va effacer tous les objets de l'acteur, êtes-vous sûr de vouloir faire cela ?",
+        "Title": "Effacer tous les articles de l'acteur"
+      }
     },
     "CurrenciesEditor": {
       "Title": "Éditeur de devises",
@@ -245,7 +269,7 @@
       "TradeStarted": "{party_1} et {party_2} ont commencé un échange.",
       "TradeStartedButton": "Cliquez sur le bouton ci-dessous pour regarder :",
       "TradeSpectate": "Observer l'échange",
-      "SpectateDisabled": "Échange réalisé.",
+      "SpectateDisabled": "Échange réalisé",
       "PrivateTrade": "Échange privé",
       "ExpandTrade": "Voir tous les détails de l'échange"
     },
@@ -313,6 +337,97 @@
       "Debug": {
         "Title": "Activer le débogage",
         "Label": "Imprime les messages de débogage sur la console"
+      }
+    },
+    "Notifications": {
+      "UpdateMerchantSuccess": "Le marchand a été mis à jour avec succès.",
+      "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès."
+    },
+    "Merchant": {
+      "AllTypes": "Tous les types",
+      "Buy": "Acheter",
+      "NoItemsForSale": "Le marchand n'a rien à vendre",
+      "NoItemsToSell": "Vous n'avez rien à vendre à ce marchand",
+      "OpenTimes": "Heures d'ouverture",
+      "Hours": "Heures",
+      "Minutes": "Minutes",
+      "Sell": "Vendre",
+      "Description": "Description",
+      "Settings": "Paramètres",
+      "EditTypePrices": "Modifier les modificateurs de coûts par type",
+      "BuyNoItems": "Le marchand n'a pas d'articles",
+      "SellNoItems": "Vous n'avez aucun article à vendre à ce marchand",
+      "ClickRoll": "Cliquez sur jet pour commencer",
+      "AddAll": "Ajouter tous les articles",
+      "RemoveItem": "Retirer",
+      "Closed": "Le marchand est fermé, il rouvre dans {}",
+      "Override": "Remplacer",
+      "EditTypePricesExplanation": "Activez la visibilité des curseurs par type dans l'onglet \"Acheter des articles\"",
+      "NoRollTables": "Aucune table aléatoire n'existe, créez-en une pour commencer",
+      "KeepRolled": "Garder le jet",
+      "AddItem": "Ajouter",
+      "CurrentItems": "Articles actuels",
+      "ClearAllItems": "Effacer tous les articles de l'acteur"
+    },
+    "Applications": {
+      "DropItem": {
+        "QuantityToDrop": "Vous avez {quantity} de cet objet, combien voulez-vous en déposer ?",
+        "AddToPile": "Ajouter à la pile",
+        "NewPile": "Créer une nouvelle pile",
+        "ExistingPiles": "Vous ajoutez cet élément à la pile d'objet \"{item_pile_name}\"."
+      },
+      "DropCurrencies": {
+        "GM": "En tant que MJ, vous pouvez ajouter des devises à cette pile d'objets :",
+        "NoCurrency": "{actor_name} n'a pas de devises valides...",
+        "AddToPile": "Ajouter à la pile",
+        "Player": "Vous pouvez déposer les devises suivantes dans cette pile d'objet :"
+      },
+      "Settings": {
+        "Title": "Configuration du module Item Piles",
+        "Local": "Paramètres locaux",
+        "System": "Paramètres spécifiques au système",
+        "Donate": "Si vous aimez ce module, pensez à faire un don pour le maintenir en activité !",
+        "Request": "Demandez de nouvelles fonctionnalités ici.",
+        "Submit": "Soumettre les paramètres",
+        "Module": "Paramètres du module",
+        "MoreToCome": "Et avec plus d'options de configuration à venir..."
+      },
+      "CurrenciesEditor": {
+        "Submit": "Soumettre les devises",
+        "AddNew": "Ajouter une nouvelle devise",
+        "Title": "Éditeur de devises d'Item Piles",
+        "TitleActor": "Éditeur de devises d'Item Piles : {actor_name}",
+        "Explanation": "Ici, vous pouvez définir les devises sur les personnages qui peuvent être ramassés à partir des piles d'objets, comme les devises.",
+        "ExplanationSmallAttributes": "Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"data.currency.gp\". Ajoutez-en une en cliquant sur le plus dans l'en-tête.",
+        "DragDrop": "Faites glisser et déposez un élément pour l'ajouter à la liste",
+        "ExplanationSmallItems": "Dans d'autres systèmes, il peut s'agir d'éléments réels sur l'acteur - dans ce cas, vous pouvez glisser et déposer des éléments sur cette liste pour les ajouter aux devises."
+      },
+      "ItemEditor": {
+        "General": "Paramètres généraux",
+        "DisplayQuantityYes": "Oui, toujours montrer la quantité",
+        "NotForSaleExplanation": "Lorsque activé, cet objet n'est pas à vendre et ne peut pas être acheté. Il apparaît toujours dans la liste des articles du marchand, à moins qu'il ne soit également caché.",
+        "Hidden": "L'article est caché",
+        "DisplayQuantityExplanation": "Cette option permet de configurer la manière dont la quantité de cet article dans le magasin est affichée, le cas échéant."
+      },
+      "TradeMerchantItem": {
+        "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
+        "Title": "Échange de l'objet : {item_name}",
+        "BuyItem": "Acheter l'article",
+        "SellItem": "Vendre l'article",
+        "YouPay": "Vous payez",
+        "YouReceive": "Vous recevez",
+        "TheyReceive": "Ils reçoivent",
+        "Quantity": "Quantité",
+        "Change": "Change",
+        "MaxQuantity": "Maximum {quantity}",
+        "YouCantAfford": "Vous ne pouvez pas vous permettre ce prix"
+      }
+    },
+    "Settings": {
+      "OutputToChat": {
+        "Public": "Public - tout le monde peut voir les messages",
+        "Off": "Off - désactiver les messages",
+        "SelfGM": "Privé - seuls les MJs et les utilisateurs peuvent voir les messages"
       }
     }
   }
