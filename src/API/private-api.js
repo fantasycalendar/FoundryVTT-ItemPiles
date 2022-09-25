@@ -1611,12 +1611,36 @@ export default class PrivateAPI {
     const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRADE, sellingActor, sellerUpdates, buyingActor, buyerUpdates, userId);
     if (hookResult === false) return false;
     
-    await sellerTransaction.commit();
-    const { itemDeltas, attributeDeltas } = await buyerTransaction.commit();
+    const sellerTransactionData = await sellerTransaction.commit();
+    const buyerTransactionData = await buyerTransaction.commit();
+    
+    await this._executeItemPileMacro(sellerUuid, {
+      action: "tradeItems",
+      source: sellerUuid,
+      target: buyerUuid,
+      items: sellerTransactionData.itemDeltas,
+      attributes: sellerTransactionData.attributeDeltas,
+      userId: userId,
+      interactionId: interactionId
+    });
+    
+    await this._executeItemPileMacro(buyerUuid, {
+      action: "tradeItems",
+      source: sellerUuid,
+      target: buyerUuid,
+      items: buyerTransactionData.itemDeltas,
+      attributes: buyerTransactionData.attributeDeltas,
+      userId: userId,
+      interactionId: interactionId
+    });
     
     await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
     
-    return { itemDeltas, attributeDeltas, itemPrices };
+    return {
+      itemDeltas: buyerTransactionData.itemDeltas,
+      attributeDeltas: buyerTransactionData.attributeDeltas,
+      itemPrices
+    };
     
   }
   
