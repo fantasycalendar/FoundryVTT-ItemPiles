@@ -126,7 +126,7 @@
   .item-pile-merchant-content {
 
     flex: 1;
-    max-height: calc(100% - 53px);
+    max-height: calc(100% - 84px);
 
   }
 

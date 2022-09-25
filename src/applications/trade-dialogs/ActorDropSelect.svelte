@@ -7,7 +7,7 @@
 
   let changingActor = false;
   let multipleActors = actors.length > 1 && !game.user.isGM;
-  let hasUnlinkedTokenOwnership = actors.filter(a => !a.data.token.actorLink).length > 0;
+  let hasUnlinkedTokenOwnership = actors.filter(a => !a.prototypeToken.actorLink).length > 0;
 
   function setActorFromSelectedToken() {
     if (canvas.tokens.controlled.length === 0) return;
@@ -54,8 +54,8 @@
   >
     {#if actor}
       <div class="align-center-col">
-        {#if actor.data.img}
-          <img src="{actor.data.img}">
+        {#if actor.img}
+          <img src="{actor.img}">
         {/if}
 
         {#if multipleActors}

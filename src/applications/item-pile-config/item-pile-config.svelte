@@ -5,6 +5,7 @@
   import CONSTANTS from "../../constants/constants.js";
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import * as Helpers from "../../helpers/helpers.js";
+  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 
   import PriceModifiersEditor from "../editors/price-modifiers-editor/price-modifiers-editor.js";
   import CurrenciesEditor from "../editors/currencies-editor/currencies-editor.js";
@@ -20,6 +21,7 @@
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { writable } from "svelte/store";
   import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
+  import CustomDialog from "../components/CustomDialog.svelte";
 
   const { application } = getContext('external');
 
@@ -35,17 +37,17 @@
 
   $: pileData.enabled = $pileEnabled;
 
-  let hasOverrideCurrencies = typeof pileData?.overrideCurrencies === "object";
-  let hasOverrideItemFilters = typeof pileData?.overrideItemFilters === "object";
+  let hasOverrideCurrencies = writable(typeof pileData?.overrideCurrencies === "object");
+  let hasOverrideItemFilters = writable(typeof pileData?.overrideItemFilters === "object");
   let simpleCalendarActive = game.modules.get('foundryvtt-simple-calendar')?.active;
 
   $: {
-    if (!hasOverrideCurrencies) {
+    if (!$hasOverrideCurrencies) {
       pileData.overrideCurrencies = false;
     }
   }
   $: {
-    if (!hasOverrideItemFilters) {
+    if (!$hasOverrideItemFilters) {
       pileData.overrideItemFilters = false;
     }
   }
@@ -131,25 +133,26 @@
   }
 
   async function resetSharingData() {
-    return new Dialog({
+    const doThing = await TJSDialog.confirm({
       id: `sharing-dialog-item-pile-config-${pileActor.id}`,
       title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
-      content: Helpers.dialogLayout({ message: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content") }),
+      content: {
+        class: CustomDialog,
+        props: {
+          header: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
+          content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content")
+        },
+      },
       buttons: {
-        confirm: {
+        yes: {
           icon: '<i class="fas fa-check"></i>',
           label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Confirm"),
-          callback: () => {
-            SharingUtilities.clearItemPileSharingData(pileActor);
-          }
-        },
-        cancel: {
-          icon: '<i class="fas fa-times"></i>',
-          label: game.i18n.localize("No")
         }
       },
-      default: "cancel"
-    }).render(true);
+      modal: true
+    });
+    if (!doThing) return;
+    return SharingUtilities.clearItemPileSharingData(pileActor);
   }
 
   async function showDescriptionDialog() {
@@ -256,12 +259,12 @@
               <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideCurrencies")}</span>
               <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideCurrenciesExplanation")}</p>
             </label>
-            <input type="checkbox" bind:checked={hasOverrideCurrencies}/>
+            <input type="checkbox" bind:checked={$hasOverrideCurrencies}/>
           </div>
 
           <div class="form-group">
             <button type="button" on:click={() => { showCurrenciesEditor() }}
-                    disabled={!hasOverrideCurrencies} style="flex:4;">
+                    disabled={!$hasOverrideCurrencies} style="flex:4;">
               {localize("ITEM-PILES.Applications.ItemPileConfig.Main.ConfigureOverrideCurrencies")}
             </button>
           </div>
@@ -271,12 +274,12 @@
               <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideItemFilters")}</span>
               <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideItemFiltersExplanation")}</p>
             </label>
-            <input type="checkbox" bind:checked={hasOverrideItemFilters}/>
+            <input type="checkbox" bind:checked={$hasOverrideItemFilters}/>
           </div>
 
           <div class="form-group">
             <button type="button" on:click={() => { showItemFiltersEditor() }}
-                    disabled={!hasOverrideItemFilters} style="flex:4;">
+                    disabled={!$hasOverrideItemFilters} style="flex:4;">
               {localize("ITEM-PILES.Applications.ItemPileConfig.Main.ConfigureOverrideItemFilters")}
             </button>
           </div>

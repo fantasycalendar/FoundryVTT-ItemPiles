@@ -221,10 +221,7 @@ export default class ItemPileStore {
       if (itemQuantity === 0) {
         itemsToDelete.push(item.id);
       } else {
-        itemsToUpdate.push({
-          _id: item.id,
-          [game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE]: itemQuantity
-        })
+        itemsToUpdate.push(Utilities.setItemQuantity({ _id: item.id }, itemQuantity));
       }
     }
     

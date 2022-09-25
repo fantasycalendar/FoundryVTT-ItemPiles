@@ -20,7 +20,7 @@
 <div class="merchant-right-pane item-piles-flexcol">
 
   <div class="merchant-tabbed-center"
-       style="flex:1; calc(100% - {recipientStore && $currencies.length ? '36px' : '0px'})">
+       style="flex: 1; max-height: calc(100% - {recipientStore && $currencies.length ? '46px' : '0px'})">
 
     {#if $closed && !game.user.isGM}
       <div style="display: grid; place-items: center; height:100%;">

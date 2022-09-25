@@ -13,7 +13,7 @@
     if (!canPreview || !data.id) return;
     const item = store.leftTraderActor.items.get(data.id) ?? store.rightTraderActor.items.get(data.id);
     if (!item) return;
-    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+    if (game.user.isGM || item.permission[game.user.id] === 3) {
       return item.sheet.render(true);
     }
     const cls = item._getSheetClass()
@@ -72,10 +72,10 @@
         {#if data.editing}
           <div class="item-piles-quantity-input-container">
             <input
-                class="item-piles-quantity"
-                type="number"
-                bind:value={data.newQuantity}
-                on:keydown={onKeyDown}
+              class="item-piles-quantity"
+              type="number"
+              bind:value={data.newQuantity}
+              on:keydown={onKeyDown}
             />
           </div>
         {:else}

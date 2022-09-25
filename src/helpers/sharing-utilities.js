@@ -24,7 +24,7 @@ export function getPlayersForItemPile(target) {
  */
 export function getItemPileSharingData(target) {
   const targetActor = Utilities.getActor(target);
-  return foundry.utils.duplicate(getProperty(targetActor.data, CONSTANTS.FLAGS.SHARING) ?? {});
+  return foundry.utils.duplicate(getProperty(targetActor, CONSTANTS.FLAGS.SHARING) ?? {});
 }
 
 /**
@@ -77,7 +77,7 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
   
   if (items.length) {
     items = items.map(itemData => {
-      setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Math.abs(itemData.quantity));
+      Utilities.setItemQuantity(itemData.item, Math.abs(itemData.quantity));
       return itemData.item;
     })
   }
@@ -209,7 +209,7 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
 export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [], attributes = [] } = {}) {
   
   items = items.map(item => {
-    setProperty(item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Utilities.getItemQuantity(item) * -1)
+    Utilities.setItemQuantity(item, Utilities.getItemQuantity(item) * -1)
     return item;
   });
   
@@ -266,7 +266,7 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
   
   let previouslyTaken = 0;
   let recipientUuid = Utilities.getUuid(recipient);
-  currentQuantity = currentQuantity ?? Number(getProperty(pile.data, path) ?? 0);
+  currentQuantity = currentQuantity ?? Number(getProperty(pile, path) ?? 0);
   let totalShares = currentQuantity;
   
   shareData = shareData ?? getItemPileSharingData(pile);

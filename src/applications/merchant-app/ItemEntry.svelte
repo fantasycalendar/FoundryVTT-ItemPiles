@@ -21,7 +21,7 @@
 
   function previewItem(item) {
     item = store.actor.items.get(item.id);
-    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+    if (game.user.isGM || item.permission[game.user.id] === 3) {
       return item.sheet.render(true);
     }
     const cls = item._getSheetClass();
@@ -34,14 +34,14 @@
   class="item-piles-img-container"
   class:not-for-sale={itemFlagData.notForSale || !quantity}
 >
-  <img class="item-piles-img" src={$itemImage} />
+  <img class="item-piles-img" src={$itemImage}/>
 </div>
 
 <div class="item-piles-name item-piles-text">
   <div class="item-piles-name-container">
     {#if $pileData.canInspectItems || game.user.isGM}
       <a class="item-piles-clickable" on:click={previewItem(item)}
-        >{$itemName}</a
+      >{$itemName}</a
       >
     {:else}
       {$itemName}
@@ -81,5 +81,5 @@
   </div>
 </div>
 
-<slot name="right" />
+<slot name="right"/>
 

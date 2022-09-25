@@ -3,7 +3,7 @@ import SETTINGS from "./constants/settings.js";
 import * as Helpers from "./helpers/helpers.js";
 import { SYSTEMS } from "./systems.js";
 import SettingsShim from "./applications/settings-app/settings-app.js";
-import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "./applications/components/CustomDialog.svelte";
 
 export function registerSettings() {
@@ -25,7 +25,6 @@ export function registerSettings() {
 
 export async function applyDefaultSettings() {
   const settings = SETTINGS.GET_SYSTEM_DEFAULTS();
-  debugger;
   for (const [name, data] of Object.entries(settings)) {
     await Helpers.setSetting(name, data.default);
   }

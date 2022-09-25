@@ -43,7 +43,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       closeOnSubmit: false,
-      classes: ["app window-app sheet item-pile-inventory"],
+      classes: ["app window-app sheet item-pile-inventory item-piles"],
       width: 550,
       height: "auto",
     });

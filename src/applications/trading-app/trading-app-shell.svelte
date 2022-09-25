@@ -118,7 +118,7 @@
       }
     );
 
-    if (!currenciesToAdd || (foundry.utils.isObjectEmpty(currenciesToAdd.attributes) && !currenciesToAdd.items.length)) return;
+    if (!currenciesToAdd || (foundry.utils.isEmpty(currenciesToAdd.attributes) && !currenciesToAdd.items.length)) return;
 
     currenciesToAdd.items.forEach(item => {
       const itemData = store.leftTraderActor.items.get(item._id).toObject();

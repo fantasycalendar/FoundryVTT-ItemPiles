@@ -13,7 +13,7 @@
   async function addCurrency() {
     const result = await DropCurrencyDialog.show(store.recipient, store.actor);
     if (!result) return;
-    if (!foundry.utils.isObjectEmpty(result.attributes)) {
+    if (!foundry.utils.isEmpty(result.attributes)) {
       await game.itempiles.API.transferAttributes(store.recipient, store.actor, result.attributes, { interactionId: store.interactionId })
     }
     if (result.items.length) {

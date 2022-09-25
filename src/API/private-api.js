@@ -14,7 +14,7 @@ import ItemPileStore from "../stores/item-pile-store.js";
 import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
 import { getPlayersForItemPile } from "../helpers/sharing-utilities.js";
-import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 
 const preloadedFiles = new Set();
@@ -107,7 +107,7 @@ export default class PrivateAPI {
     const itemPileConfig = getProperty(data, CONSTANTS.FLAGS.PILE);
     if (!itemPileConfig?.enabled) return;
     if (!doc.isLinked) {
-      doc.data.update({
+      doc.updateSource({
         [`actorData.flags.${CONSTANTS.MODULE_NAME}.-=sharing`]: null,
       });
     }
@@ -127,14 +127,14 @@ export default class PrivateAPI {
       itemPileConfig.lockedImage = Helpers.random_array_element(itemPileConfig.lockedImages);
       itemPileConfig.lockedImages = [];
     }
-    doc.data.update({
+    doc.updateSource({
       [CONSTANTS.FLAGS.PILE]: itemPileConfig,
       ["actorData." + CONSTANTS.FLAGS.PILE]: itemPileConfig
     });
     const targetItems = PileUtilities.getActorItems(doc.actor);
     const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
     const pileData = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
-    doc.data.update({
+    doc.updateSource({
       "img": PileUtilities.getItemPileTokenImage(doc, pileData),
       "scale": PileUtilities.getItemPileTokenScale(doc, pileData),
       "name": PileUtilities.getItemPileName(doc, pileData)
@@ -417,7 +417,7 @@ export default class PrivateAPI {
     
     const sourceAttributes = PileUtilities.getActorCurrencies(sourceActor).filter(entry => entry.type === "attribute");
     const attributesToTransfer = sourceAttributes.filter(attribute => {
-      return hasProperty(targetActor.data, attribute.data.path);
+      return hasProperty(targetActor.system, attribute.data.path);
     }).map(attribute => attribute.data.path);
     
     const sourceTransaction = new Transaction(sourceActor);
@@ -466,7 +466,7 @@ export default class PrivateAPI {
     
     const sourceAttributes = PileUtilities.getActorCurrencies(sourceActor).filter(entry => entry.type === "attribute");
     const attributesToTransfer = sourceAttributes.filter(attribute => {
-      return hasProperty(targetActor.data, attribute.data.path);
+      return hasProperty(targetActor.system, attribute.data.path);
     }).map(attribute => attribute.data.path);
     
     const sourceTransaction = new Transaction(sourceActor);
@@ -557,7 +557,7 @@ export default class PrivateAPI {
       } else {
         itemsDropped = (await this._removeItems(sourceUuid, itemsToTransfer, userId)).map(item => {
           item.quantity = Math.abs(item.quantity)
-          setProperty(item.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Math.abs(item.quantity))
+          Utilities.setItemQuantity(item.item, Math.abs(item.quantity));
           return item;
         });
         targetUuid = await this._createItemPile(sceneId, position, { items: itemsDropped });
@@ -611,7 +611,7 @@ export default class PrivateAPI {
         });
         
         await pileActor.update({
-          "token": {
+          prototypeToken: {
             name: "Item Pile",
             actorLink: false,
             bar1: { attribute: "" },
@@ -629,13 +629,17 @@ export default class PrivateAPI {
       
       pileActor = game.actors.getName(pileActorName);
       
+      if (!pileActor) {
+        throw Helpers.custom_error("Could not find actor with name: " + pileActorName, true);
+      }
+      
     }
     
     let overrideData = { ...position };
     
     const pileData = PileUtilities.getActorFlagData(pileActor);
     
-    if (!pileActor.data.token.actorLink) {
+    if (!pileActor.prototypeToken.actorLink) {
       
       if (items) {
         for (let i = 0; i < items.length; i++) {
@@ -666,7 +670,7 @@ export default class PrivateAPI {
       
     }
     
-    const tokenData = await pileActor.getTokenData(overrideData);
+    const tokenData = await pileActor.getTokenDocument(overrideData);
     
     const scene = game.scenes.get(sceneId);
     
@@ -838,7 +842,7 @@ export default class PrivateAPI {
     
     const interactingToken = interactingTokenUuid ? Utilities.fromUuidFast(interactingTokenUuid) : false;
     
-    if (foundry.utils.isObjectEmpty(diffData)) return false;
+    if (foundry.utils.isEmpty(diffData)) return false;
     
     const data = PileUtilities.getActorFlagData(target);
     
@@ -1005,6 +1009,8 @@ export default class PrivateAPI {
       dropData.source = canvas.tokens.get(data.tokenId).actor;
     } else if (data.actorId) {
       dropData.source = game.actors.get(data.actorId);
+    } else if (data.uuid) {
+      dropData.source = item.parent;
     }
     
     if (!dropData.source && !game.user.isGM) {
@@ -1052,10 +1058,10 @@ export default class PrivateAPI {
     
     if (droppingItem) {
       dropData.target = droppableItemPiles[0];
-      return this._dropItemOnPile(dropData);
+      return this._dropItem(dropData);
     } else if (givingItem) {
       dropData.target = droppableNormalTokens[0];
-      return this._dropGiveItem(dropData);
+      return this._giveItem(dropData);
     }
     
     return false;
@@ -1096,7 +1102,7 @@ export default class PrivateAPI {
     
   }
   
-  static async _dropGiveItem(dropData) {
+  static async _giveItem(dropData) {
     
     if (dropData.source === dropData.target) return;
     
@@ -1126,7 +1132,7 @@ export default class PrivateAPI {
       const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
       const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
       
-      setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity);
+      Utilities.setItemQuantity(dropData.itemData.item, quantity);
       dropData.itemData.quantity = quantity;
       
       const sourceUuid = Utilities.getUuid(dropData.source);
@@ -1155,7 +1161,7 @@ export default class PrivateAPI {
     }
   }
   
-  static async _dropItemOnPile(dropData) {
+  static async _dropItem(dropData) {
     
     if (dropData.source === dropData.target) return;
     
@@ -1192,7 +1198,7 @@ export default class PrivateAPI {
     
     if (hotkeyState.altDown) {
       
-      setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, 1);
+      Utilities.setItemQuantity(dropData.itemData.item, 1);
       dropData.itemData.quantity = 1;
       
     } else {
@@ -1202,9 +1208,10 @@ export default class PrivateAPI {
       if (quantity > 1) {
         const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
         quantity = await DropItemDialog.show(item, dropData.target);
+        if (!quantity) return;
       }
       
-      setProperty(dropData.itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Number(quantity))
+      Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
       dropData.itemData.quantity = Number(quantity);
       
     }

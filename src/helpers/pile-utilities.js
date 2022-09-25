@@ -4,7 +4,7 @@ import * as Helpers from "./helpers.js";
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
-  const flags = existing || (getProperty(inDocument.data, flag) ?? {});
+  const flags = existing || (getProperty(inDocument, flag) ?? {});
   const data = foundry.utils.duplicate(flags);
   return foundry.utils.mergeObject(defaultFlags, data);
 }
@@ -95,7 +95,7 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
     if (currency.type === "attribute") {
       return {
         ...currency,
-        quantity: getProperty(actor.data, currency.data.path) ?? 0,
+        quantity: getProperty(actor.system, currency.data.path) ?? 0,
         path: currency.data.path,
         id: currency.data.path,
         index
@@ -167,21 +167,21 @@ export function isItemCurrency(item, { target = false } = {}) {
 
 export function getItemPileTokenImage(token, { data = false, items = false, currencies = false } = {}) {
   
-  const tokenDocument = Utilities.getDocument(token);
+  const pileDocument = Utilities.getDocument(token);
   
-  const itemPileData = getActorFlagData(tokenDocument, data);
+  const itemPileData = getActorFlagData(pileDocument, data);
   
   let originalImg;
-  if (tokenDocument instanceof TokenDocument) {
-    originalImg = tokenDocument.data.img;
+  if (pileDocument instanceof TokenDocument) {
+    originalImg = pileDocument.texture.src;
   } else {
-    originalImg = tokenDocument.data.token.img;
+    originalImg = pileDocument.prototypeToken.texture.src;
   }
   
-  if (!isValidItemPile(tokenDocument)) return originalImg;
+  if (!isValidItemPile(pileDocument)) return originalImg;
   
-  items = items || getActorItems(tokenDocument).map(item => item.toObject());
-  currencies = currencies || getActorCurrencies(tokenDocument);
+  items = items || getActorItems(pileDocument).map(item => item.toObject());
+  currencies = currencies || getActorCurrencies(pileDocument);
   
   const numItems = items.length + currencies.length;
   
@@ -190,7 +190,7 @@ export function getItemPileTokenImage(token, { data = false, items = false, curr
   if (itemPileData.displayOne && numItems === 1) {
     img = items.length > 0 ? items[0].img : currencies[0].img;
   } else if (itemPileData.displayOne && numItems > 1) {
-    img = (tokenDocument.actor ?? tokenDocument).data.token.img;
+    img = (pileDocument.actor ?? pileDocument).prototypeToken.texture.src;
   }
   
   if (itemPileData.isContainer) {
@@ -201,7 +201,7 @@ export function getItemPileTokenImage(token, { data = false, items = false, curr
       img = itemPileData.lockedImage;
     } else if (itemPileData.closed && itemPileData.closedImage) {
       img = itemPileData.closedImage;
-    } else if (itemPileData.emptyImage && isItemPileEmpty(tokenDocument)) {
+    } else if (itemPileData.emptyImage && isItemPileEmpty(pileDocument)) {
       img = itemPileData.emptyImage;
     } else if (itemPileData.openedImage) {
       img = itemPileData.openedImage;
@@ -221,9 +221,9 @@ export function getItemPileTokenScale(target, { data = false, items = false, cur
   
   let baseScale;
   if (pileDocument instanceof TokenDocument) {
-    baseScale = pileDocument.data.scale;
+    baseScale = pileDocument.texture.scaleX;
   } else {
-    baseScale = pileDocument.data.token.scale;
+    baseScale = pileDocument.prototypeToken.texture.scaleX;
   }
   
   if (!isValidItemPile(pileDocument, itemPileData)) {
@@ -249,7 +249,9 @@ export function getItemPileName(target, { data = false, items = false, currencie
   
   const itemPileData = getActorFlagData(pileDocument, data);
   
-  let name = pileDocument instanceof TokenDocument ? pileDocument.data.name : pileDocument.data.token.name;
+  let name = pileDocument instanceof TokenDocument
+    ? pileDocument.name
+    : pileDocument.prototypeToken.name;
   
   if (!isValidItemPile(pileDocument, itemPileData)) {
     return name;
@@ -318,10 +320,10 @@ export async function updateItemPileData(target, flagData, tokenData) {
     const data = {
       "_id": tokenDocument.id, ...newTokenData
     };
-    if (!foundry.utils.isObjectEmpty(flagData)) {
+    if (!foundry.utils.isEmpty(flagData)) {
       data[CONSTANTS.FLAGS.PILE] = flagData;
     }
-    if (!tokenDocument.data.actorLink) {
+    if (!tokenDocument.actorLink) {
       data["actorData." + CONSTANTS.FLAGS.PILE] = flagData;
       if (tokenDocument.actor === documentActor) {
         documentActor = false;
@@ -332,7 +334,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
   
   await canvas.scene.updateEmbeddedDocuments("Token", updates);
   
-  if (!foundry.utils.isObjectEmpty(flagData) && documentActor) {
+  if (!foundry.utils.isEmpty(flagData) && documentActor) {
     await documentActor.update({
       [CONSTANTS.FLAGS.PILE]: flagData, [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
     });
@@ -589,7 +591,7 @@ export function getItemPrices(item, {
       if (buyerInfiniteQuantity) continue;
       for (const price of priceGroup.prices) {
         if (price.type === "attribute") {
-          const attributeQuantity = Number(getProperty(buyer.data, price.data.path));
+          const attributeQuantity = Number(getProperty(buyer.system, price.data.path));
           price.buyerQuantity = attributeQuantity;
           
           if (price.percent) {
