@@ -67,7 +67,7 @@
     }
 
     if (data.actorId) {
-      return
+      return;
     } else if (!game.user.isGM) {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true);
     }
