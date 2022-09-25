@@ -95,7 +95,7 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
     if (currency.type === "attribute") {
       return {
         ...currency,
-        quantity: getProperty(actor.system, currency.data.path) ?? 0,
+        quantity: getProperty(actor, currency.data.path) ?? 0,
         path: currency.data.path,
         id: currency.data.path,
         index
@@ -591,7 +591,7 @@ export function getItemPrices(item, {
       if (buyerInfiniteQuantity) continue;
       for (const price of priceGroup.prices) {
         if (price.type === "attribute") {
-          const attributeQuantity = Number(getProperty(buyer.system, price.data.path));
+          const attributeQuantity = Number(getProperty(buyer, price.data.path));
           price.buyerQuantity = attributeQuantity;
           
           if (price.percent) {
@@ -713,6 +713,8 @@ export function getPricesForItems(itemsToBuy, {
       
       buyerReceive: [], buyerChange: [], sellerReceive: []
     });
+  
+  debugger;
   
   if (paymentData.totalCurrencyCost) {
     

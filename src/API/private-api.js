@@ -417,7 +417,7 @@ export default class PrivateAPI {
     
     const sourceAttributes = PileUtilities.getActorCurrencies(sourceActor).filter(entry => entry.type === "attribute");
     const attributesToTransfer = sourceAttributes.filter(attribute => {
-      return hasProperty(targetActor.system, attribute.data.path);
+      return hasProperty(targetActor, attribute.data.path);
     }).map(attribute => attribute.data.path);
     
     const sourceTransaction = new Transaction(sourceActor);
@@ -466,7 +466,7 @@ export default class PrivateAPI {
     
     const sourceAttributes = PileUtilities.getActorCurrencies(sourceActor).filter(entry => entry.type === "attribute");
     const attributesToTransfer = sourceAttributes.filter(attribute => {
-      return hasProperty(targetActor.system, attribute.data.path);
+      return hasProperty(targetActor, attribute.data.path);
     }).map(attribute => attribute.data.path);
     
     const sourceTransaction = new Transaction(sourceActor);
