@@ -1,1 +1,124 @@
-{}
+{
+  "ITEM-PILES": {
+    "Items": "Itens",
+    "Trade": {
+      "AddCurrency": {
+        "Title": "Adicionar moedas",
+        "Content": "Adicionar moedas à negociação ativa com {trader_actor_name}",
+        "Label": "Atualizar moedas"
+      },
+      "Title": "Item Piles: Negociação",
+      "Accept": "Aceitar",
+      "Decline": "Recusar",
+      "Mute": "Mutar",
+      "AutoDecline": "Você não respondeu a solicitação de negociação rápido o suficiente, então ela foi recusada automaticamente.",
+      "Declined": "O outro jogador recusou sua solicitação.",
+      "Private": "Tornar esta negociação privada",
+      "PrivateExplanation": "Nenhuma mensagem é enviada para o chat e ninguém pode assistir a negociação",
+      "Over": "Esta negociação não está mais ativa.",
+      "Between": "Negociação entre {actor_1} e {actor_2}",
+      "DragDrop": "Arraste e solte itens para começar a negociação",
+      "Prompt": {
+        "Title": "Item Piles: Solicitação de negociação"
+      },
+      "NoActiveUsers": {
+        "Title": "Item Piles: Sem jogadores ativos",
+        "Content": "Sem jogadores ativos, então você não tem com quem negociar."
+      },
+      "Request": {
+        "Title": "Item Piles: Enviar solicitação de negociação"
+      },
+      "OngoingRequest": {
+        "Content": "Esperando a resposta de <strong>{user_name}</strong>...",
+        "Label": "Cancelar solicitação de negociação"
+      },
+      "CancelledRequest": {
+        "Content": "A solicitação de negociação foi cancelada por {user_name}."
+      },
+      "GMAddCurrency": "Adicionar moedas (modo GM)",
+      "Closed": {
+        "Title": "Negociação fechada",
+        "You": "Você fechou a janela de negociação, então ela foi cancelada.",
+        "Them": "O jogador {user_name} fechou a janela de negociação, então ela foi cancelada.",
+        "Someone": "Um dos jogadores fechou a janela de negociação, então ela foi cancelada."
+      },
+      "Disconnected": "Um dos jogadores foi desconectados, então a negociação foi cancelada.",
+      "UserCharacterWarning": "Você selecionou o ator <strong>{actor_name}</strong>, que está atribuído como personagem do jogador <strong>{player_name}</strong>.<br><br>Você está certo de que quer fazer isso?",
+      "UserActiveCharacterWarning": "Você selecionou o ator <strong>{actor_name}</strong> , que está atribuído como personagem do jogador <strong>{player_name}</strong>, que está <strong>ativo</strong>.<br><br>Você está certo de que quer fazer isso?",
+      "ActorOwnerWarning": "Você não é dono deste ator, então você não pode negociar com ele."
+    },
+    "Dialogs": {
+      "ResetSettings": {
+        "Title": "Redefinir configurações de módulo Item Piles",
+        "Content": "Você tem certeza de que quer redefinir todas as configurações do módulo Item Piles para o padrão do sistema atual? <strong>ISTO NÃO PODE SER DESFEITO!</strong>",
+        "Confirm": "Reedefinir configurações do módulo"
+      },
+      "LinkedActorWarning": {
+        "Title": "Item Piles e atores vinculados",
+        "Content": "Você tem certeza de que quer transformar este <strong>ator vinculado</strong> em uma pilha de itens? Este ator está vinculado e todos os demais tokens dele vão compartilhar seu inventário e moedas."
+      },
+      "NoSystemFound": {
+        "Title": "Sistema não reconhecido",
+        "Content": "Este sistema não é completamente suportado atualmente. Isto significa que o Item Piles não sabe a melhor maneira de lidar com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você pode configurar o módulo por si mesmo, mas isto requer um pouco de conhecimento técnico.<br><br>Se você tiver alguma dúvida, procure por Wasp#2005 no servidor de Discord do Foundry."
+      },
+      "SystemFound": {
+        "Title": "Sistema reconhecido",
+        "Content": "Este sistema não era suportado anteriormente, mas em uma atualização recente foi adicionado aos sistemas suportados!<br><br>Você quer carregar as configurações padrão do Item Pile para este sistema?",
+        "Confirm": "Aplicar configurações padrões"
+      },
+      "ResetSharingData": {
+        "Title": "Redefinir informações de partilhamento",
+        "Content": "Isto vai redefinir todo o histórico de partilhamento dos jogadores com esta pilha de itens.<br><br>Você está certo de que quer fazer isso?",
+        "Confirm": "Redefinir informações"
+      }
+    },
+    "Currencies": "Moedas",
+    "Currency": "Moeda",
+    "ContextMenu": {
+      "ShowToPlayers": "Item Piles: Mostrar pilha para os jogadores",
+      "RequestTrade": "Item Piles: Solicitar negociação"
+    },
+    "Errors": {
+      "DisallowedItemDrop": "Você não pode selecionar {type}",
+      "DisallowedItemTrade": "Você não pode negociar {type}",
+      "NoSourceDrop": "Você não pode selecionar itens das barra dee itens, a menos que seja um GM.",
+      "PileTooFar": "Você está muito distante para interagir com esta pilha de itens.",
+      "PileLocked": "Esta pilha de itens está trancada ou não pode ser aberta - você não pode soltar itens nela.",
+      "DropNoToken": "Você não tem um token nesta cena, então não pode soltar itens aqui."
+    },
+    "Inspect": {
+      "Title": "Inspecionar conteúdo da pilha",
+      "AsActor": "Você está inspecionando esta pilha de itens como <strong><a class='item-piles-change-actor item-piles-highlight'>{actorName}</a></strong>",
+      "Owner": "Como dono desta pilha de itens, você pode editar seu conteúdo.",
+      "SplitCurrencies": "Dividir moedas em {num_players}",
+      "Empty": "Esta pilha de itens está vazia.",
+      "Destroyed": "Esta pilha de itens não existe mais.",
+      "TakeAll": "Pegar todos os itens",
+      "Take": "Pegar",
+      "Close": "Fechar",
+      "Leave": "Sair",
+      "NoShareLeft": "Pegou sua parte...",
+      "NoneLeft": "Nada restou...",
+      "OpenSheet": "Abrir ficha",
+      "AddCurrency": "Adicionar moedas",
+      "SplitAll": "Dividir em {num_players}",
+      "SplitItems": "Dividir itens em {num_players}"
+    },
+    "HUD": {
+      "ToggleLocked": "Alternar trancamento",
+      "ToggleClosed": "Alternar abertura",
+      "Configure": "Configurar pilha de itens"
+    },
+    "Chat": {
+      "Pickup": "{name} pegou os seguintes itens:",
+      "Split": "O conteúdo de uma pilha de itens foi dividido entre {num_players} jogadores, e cada um recebeu:",
+      "TradeComplete": "{party_1} e {party_2} completaram uma negociação.",
+      "TradeStarted": "{party_1} e {party_2} começaram uma negociação.",
+      "TradeStartedButton": "Clique no botão abaixo para assistir:",
+      "TradeSpectate": "Assistir negociação",
+      "SpectateDisabled": "Negociação completa",
+      "PrivateTrade": "Negociação privada",
+      "ExpandTrade": "Veja detalhes da negociação"
+    }
+  }
+}
