@@ -967,7 +967,7 @@ export default class PrivateAPI {
     
     const targetActor = macroData.target instanceof TokenDocument ? macroData.target.actor : macroData.target;
     
-    if (macroData.item) {
+    if (macroData.items) {
       macroData.items = macroData.items.map(item => targetActor.items.get(item._id));
     }
     
