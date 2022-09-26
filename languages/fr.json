@@ -139,11 +139,23 @@
       "TypeWarning": {
         "SellContent": "Vous tentez de vendre un article de type (\"{type}\") que le marchand n'accepte pas normalement. Êtes-vous sûr de vouloir faire cela ?",
         "DropContent": "Vous déposez un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être déposé. Êtes-vous sûr de vouloir faire cela ?",
-        "TradeContent": "Vous tentez d'échanger un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être échangé. Êtes-vous sûr de vouloir faire cela ?"
+        "TradeContent": "Vous tentez d'échanger un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être échangé. Êtes-vous sûr de vouloir faire cela ?",
+        "Title": "Avertissement sur Type d'Objet"
       },
       "ClearAllItems": {
         "Content": "Cela va effacer tous les objets de l'acteur, êtes-vous sûr de vouloir faire cela ?",
         "Title": "Effacer tous les articles de l'acteur"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "Donner un Objet",
+        "Content": "\"{actor_name}\" est affecté à \"{user_name}\" qui n'est pas actif/ve. Vous ne pouvez pas lui donner cet objet."
+      },
+      "ReceiveItem": {
+        "Title": "Recevoir un Objet",
+        "Header": "Item Piles : Recevoir un Objet",
+        "ContentOne": "{source_actor_name} veut donner \"{item_name}\" à {target_actor_name}. Acceptez-vous ?",
+        "ContentMany": "{source_actor_name} veut donner {quantity} \"{item_name}\" à {target_actor_name}. Acceptez-vous ?",
+        "Ignore": "Ignorer l'Utilisateur"
       }
     },
     "CurrenciesEditor": {
@@ -341,7 +353,10 @@
     },
     "Notifications": {
       "UpdateMerchantSuccess": "Le marchand a été mis à jour avec succès.",
-      "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès."
+      "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès.",
+      "ItemTransferred": "{source_actor_name} a donné {item_name} à {target_actor_name}.",
+      "GiveItemAccepted": "{user_name} a accepté votre offre.",
+      "ShownToPlayers": "Montre {actor_name} aux joueurs"
     },
     "Merchant": {
       "AllTypes": "Tous les types",
@@ -367,20 +382,28 @@
       "KeepRolled": "Garder le jet",
       "AddItem": "Ajouter",
       "CurrentItems": "Articles actuels",
-      "ClearAllItems": "Effacer tous les articles de l'acteur"
+      "ClearAllItems": "Effacer tous les articles de l'acteur",
+      "ItemFree": "Gratuit",
+      "OpenCloseAuto": "Automatique",
+      "Open": "Ouvert",
+      "MerchantClosed": "Ce marchand est fermé. Revenez plus tard.",
+      "RolledTimes": "Lancé {rolls} fois"
     },
     "Applications": {
       "DropItem": {
         "QuantityToDrop": "Vous avez {quantity} de cet objet, combien voulez-vous en déposer ?",
         "AddToPile": "Ajouter à la pile",
         "NewPile": "Créer une nouvelle pile",
-        "ExistingPiles": "Vous ajoutez cet élément à la pile d'objet \"{item_pile_name}\"."
+        "ExistingPiles": "Vous ajoutez cet élément à la pile d'objet \"{item_pile_name}\".",
+        "Title": "Lâcher un Objet",
+        "Dropping": "Vous lâchez : {item_name}"
       },
       "DropCurrencies": {
         "GM": "En tant que MJ, vous pouvez ajouter des devises à cette pile d'objets :",
         "NoCurrency": "{actor_name} n'a pas de devises valides...",
         "AddToPile": "Ajouter à la pile",
-        "Player": "Vous pouvez déposer les devises suivantes dans cette pile d'objet :"
+        "Player": "Vous pouvez déposer les devises suivantes dans cette pile d'objet :",
+        "Title": "Lâcher des Devises"
       },
       "Settings": {
         "Title": "Configuration du module Item Piles",
@@ -400,14 +423,41 @@
         "Explanation": "Ici, vous pouvez définir les devises sur les personnages qui peuvent être ramassés à partir des piles d'objets, comme les devises.",
         "ExplanationSmallAttributes": "Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"data.currency.gp\". Ajoutez-en une en cliquant sur le plus dans l'en-tête.",
         "DragDrop": "Faites glisser et déposez un élément pour l'ajouter à la liste",
-        "ExplanationSmallItems": "Dans d'autres systèmes, il peut s'agir d'éléments réels sur l'acteur - dans ce cas, vous pouvez glisser et déposer des éléments sur cette liste pour les ajouter aux devises."
+        "ExplanationSmallItems": "Dans d'autres systèmes, il peut s'agir d'éléments réels sur l'acteur - dans ce cas, vous pouvez glisser et déposer des éléments sur cette liste pour les ajouter aux devises.",
+        "Name": "Nom de la devise",
+        "Exchange": "Echanger",
+        "Data": "Données",
+        "Icon": "Icône"
       },
       "ItemEditor": {
         "General": "Paramètres généraux",
         "DisplayQuantityYes": "Oui, toujours montrer la quantité",
         "NotForSaleExplanation": "Lorsque activé, cet objet n'est pas à vendre et ne peut pas être acheté. Il apparaît toujours dans la liste des articles du marchand, à moins qu'il ne soit également caché.",
         "Hidden": "L'article est caché",
-        "DisplayQuantityExplanation": "Cette option permet de configurer la manière dont la quantité de cet article dans le magasin est affichée, le cas échéant."
+        "DisplayQuantityExplanation": "Cette option permet de configurer la manière dont la quantité de cet article dans le magasin est affichée, le cas échéant.",
+        "CantBeSoldToMerchants": "Ne peut être vendu à un Marchand",
+        "Title": "Editeur d'Objets d'Item Piles : {item_name}",
+        "Price": "Fixer les Prix",
+        "NotForSale": "Cet Objet n'est pas à Vendre",
+        "HiddenExplanation": "Si activé, cet objet n'apparaît pas dans la liste des objets du marchand.",
+        "PriceExplanation": "Dans cet onglet, vous pouvez configurer le prix d'un objet et si le coût de cet objet inclue d'autres objets.",
+        "PurchaseOptionsExplanation": "Ici, vous pouvez configurer des coûts alternatifs pour cet objet. Chaque groupe représente une façon différente pour un PJ de se procurer l'objet",
+        "CantBeSoldToMerchantsExplanation": "Si activé, cet objet ne peut être revendu à un marchand, seulement acheté.",
+        "Update": "Mettre à jour l'Objet",
+        "DisplayQuantity": "Afficher les Quantités des Objets",
+        "DisplayQuantityNo": "Non, toujours masquer les quantités",
+        "InfiniteQuantity": "Quantité infinie",
+        "InfiniteQuantityExplanation": "Si activé, cet objet ne peut pas être en rupture chez un marchand.",
+        "BasePrice": "Prix de Base",
+        "BasePriceExplanation": "Configure le prix normal de cet objet.",
+        "Free": "L'Objet est Gratuit",
+        "FreeExplanation": "Si activé, cet objet ne coûte rien à acheter auprès du marchand.",
+        "DisableNormalCostExplanation": "Si activé, cet objet ne peut pas être acheté avec des devises et doit être acheté avec une des options d'achat ci-dessous.",
+        "PurchaseOptions": "Options d'Achat",
+        "AddPurchaseOption": "Ajouter une Option d'Achat",
+        "SelectPreset": "Sélectionnez un prix prédéfini",
+        "DisableNormalCost": "Désactiver le Coût Normal",
+        "DropMeClickMe": "Cliquer pour ajouter un attribut ou glisser/déposer un objet pour l'ajouter"
       },
       "TradeMerchantItem": {
         "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
@@ -421,6 +471,67 @@
         "Change": "Change",
         "MaxQuantity": "Maximum {quantity}",
         "YouCantAfford": "Vous ne pouvez pas vous permettre ce prix"
+      },
+      "SimilaritiesEditor": {
+        "Path": "Chemin d'attribut",
+        "AddNew": "Ajouter un nouveau chemin d'attribut"
+      },
+      "ItemPileConfig": {
+        "Main": {
+          "Distance": "Distance d'interaction",
+          "MacroExplanation": "Nom de la macro à exécuter lors de l'interaction avec cette pile.",
+          "DeleteWhenEmptyNo": "Non, ne pas supprimer quand c'est vide",
+          "Title": "Paramètres Principaux",
+          "EnabledPile": "Activé",
+          "GridUnits": "Unités de grille (laissez vide infini)",
+          "MacroPlaceholder": "Insérer le nom de la macro",
+          "EditDescription": "Modifier la description",
+          "DeleteWhenEmpty": "Supprimer quand vide",
+          "DeleteWhenEmptyExplanation": "Cette pile d'objets s'efface automatiquement lorsqu'elle est vide.",
+          "DeleteWhenEmptyDefault": "Réglage par défaut du module",
+          "DeleteWhenEmptyYes": "Oui, supprimer quand c'est vide",
+          "OverrideCurrencies": "Remplacer les devises"
+        },
+        "Other": {
+          "Title": "Autres paramètres"
+        },
+        "SingleItem": {
+          "DisplayOneContainerWarning": "Attention ! Vous avez activé à la fois \"Afficher l'image d'un élément unique\" et \"Est un conteneur\". Dans ce cas, l'image du conteneur est prioritaire.",
+          "ItemName": "Utiliser le nom de l'objet",
+          "ItemNameExplanation": "Fait en sorte que la Pile d'Objets soit nommée d'après l'élément unique qu'elle contient."
+        },
+        "Update": "Mettre à jour la Pile d'Objets",
+        "Title": "Configuration d'Item Pile : {actor_name}",
+        "Container": {
+          "Title": "Paramètres du conteneur"
+        }
+      },
+      "GiveItem": {
+        "TargetActor": "Voulez-vous donner cet objet à \"{target_name}\" ?",
+        "Title": "Donner un Objet",
+        "Giving": "Vous donnez : {item_name}",
+        "QuantityToGive": "Vous possédez cet objet {quantity} fois. Combien voulez-vous en donner ?",
+        "Give": "Donner"
+      },
+      "FilterEditor": {
+        "Explanation": "Ici, vous pouvez définir différents types de filtres qui excluront certains types d'objets. En fonction du chemin d'attribut donné, Item Piles peut trouver le \"type\" d'un objet et en fonction des filtres, il cachera ces objets dans l'interface d'inventaire.",
+        "Title": "Editeur de Filtres d'Item Piles",
+        "TitleActor": "Editeur de Filtres d'Item Piles : {actor_name}",
+        "Filters": "Filtres",
+        "Path": "Chemin d'Attribut",
+        "AddNew": "Ajouter un nouveau filtre",
+        "Submit": "Soumettre les filtres"
+      },
+      "ItemTypePriceModifiersEditor": {
+        "ItemType": "Type d'Objet",
+        "Override": "Surcharger",
+        "Submit": "Soumettre les modificateurs de prix"
+      },
+      "PriceModifiersEditor": {
+        "DragDrop": "Glissez/Déplacez un acteur pour l'ajouter à la liste",
+        "Actor": "Acteur",
+        "Override": "Surcharger",
+        "Submit": "Soumettre les modificateurs de prix"
       }
     },
     "Settings": {
@@ -429,6 +540,11 @@
         "Off": "Off - désactiver les messages",
         "SelfGM": "Privé - seuls les MJs et les utilisateurs peuvent voir les messages"
       }
+    },
+    "Warnings": {
+      "GiveItemNoGM": "Il n'y a pas de MJ actif pour recevoir votre objet",
+      "GiveItemDeclined": "{user_name} a décliné votre offre.",
+      "NoPlayersActive": "Aucun joueur actif pour effectuer cette action"
     }
   }
 }
