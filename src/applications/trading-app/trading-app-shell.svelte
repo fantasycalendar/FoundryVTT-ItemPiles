@@ -35,11 +35,10 @@
 
     let item = await Item.implementation.fromDropData(data);
 
-    if (!data.actorId) {
-      data.actorId = item.parent.id;
-      if (!data.actorId) {
-        if (!game.user.isGM) return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
-      }
+    data.actorId = item.parent?.id;
+
+    if (!data.actorId && !game.user.isGM) {
+      return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
     }
 
     if (!game.user.isGM && data.actorId && data.actorId !== store.leftTraderActor.id) {

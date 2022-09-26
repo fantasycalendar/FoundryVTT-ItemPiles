@@ -714,8 +714,6 @@ export function getPricesForItems(itemsToBuy, {
       buyerReceive: [], buyerChange: [], sellerReceive: []
     });
   
-  debugger;
-  
   if (paymentData.totalCurrencyCost) {
     
     // The price array that we need to fill

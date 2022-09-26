@@ -66,7 +66,7 @@
       }
     }
 
-    if (data.actorId) {
+    if (item.parent) {
       return;
     } else if (!game.user.isGM) {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true);
@@ -86,9 +86,20 @@
   $: {
     sellHidden = $pileData.purchaseOnly;
     tabs = [
-      { value: 'buy', label: 'Buy Items' },
-      { value: 'sell', label: 'Sell Items', hidden: !recipientStore || sellHidden },
-      { value: 'tables', label: 'Populate Items', hidden: !game.user.isGM },
+      {
+        value: 'buy',
+        label: game.i18n.localize('ITEM-PILES.Merchant.BuyItems')
+      },
+      {
+        value: 'sell',
+        label: game.i18n.localize('ITEM-PILES.Merchant.SellItems'),
+        hidden: !recipientStore || sellHidden
+      },
+      {
+        value: 'tables',
+        label: game.i18n.localize('ITEM-PILES.Merchant.PopulateItems'),
+        hidden: !game.user.isGM
+      },
     ];
   }
 
