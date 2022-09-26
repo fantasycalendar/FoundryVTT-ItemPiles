@@ -109,7 +109,6 @@ export class PileItem extends PileBaseItem {
     }
   }
   
-  
   take() {
     const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft));
     if (!quantity) return;

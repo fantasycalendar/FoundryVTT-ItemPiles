@@ -51,6 +51,7 @@ export default class PrivateAPI {
    * @private
    */
   static _onCreateItem(doc) {
+    //debugger;
     if (!doc.parent) return;
     ItemPileStore.notifyChanges("createItem", doc.parent, doc);
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
@@ -61,6 +62,7 @@ export default class PrivateAPI {
    * @private
    */
   static _onUpdateItem(doc) {
+    //debugger;
     if (!doc.parent) return;
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
     this._evaluateItemPileChange(doc.parent);
@@ -70,6 +72,7 @@ export default class PrivateAPI {
    * @private
    */
   static _onDeleteItem(doc) {
+    //debugger;
     if (!doc.parent) return;
     ItemPileStore.notifyChanges("deleteItem", doc.parent, doc);
     if (!PileUtilities.isValidItemPile(doc.parent)) return;

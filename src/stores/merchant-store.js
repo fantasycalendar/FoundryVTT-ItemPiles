@@ -63,7 +63,7 @@ export default class MerchantStore extends ItemPileStore {
     
     const filterDebounce = foundry.utils.debounce(() => {
       this.refreshItems();
-    }, 100);
+    }, 200);
     this.subscribeTo(this.typeFilter, (val) => {
       if (!val) return;
       filterDebounce()
@@ -245,6 +245,7 @@ class PileMerchantItem extends PileItem {
       if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
         this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
         this.refreshDisplayQuantity();
+        this.store.refreshItems();
       }
       if (hasProperty(data, CONSTANTS.FLAGS.ITEM + ".prices") || hasProperty(data, game.itempiles.API.ITEM_PRICE_ATTRIBUTE)) {
         this.refreshPriceData();
