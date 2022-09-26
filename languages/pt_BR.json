@@ -21,14 +21,21 @@
       "Prompt": {
         "Title": "Item Piles: Solicitação de negociação",
         "User": "Selecione com qual usuário você deseja negociar:",
-        "PickActor": "Selecione qual ator você representará na negociação:"
+        "PickActor": "Selecione qual ator você representará na negociação:",
+        "PickedActor": "O ator que você representará na negociação:",
+        "PickToken": "Escolha o token selecionado",
+        "DropActor": "Arraste e solte o ator aqui",
+        "Label": "Enviar solicitação de negociação"
       },
       "NoActiveUsers": {
         "Title": "Item Piles: Sem jogadores ativos",
         "Content": "Sem jogadores ativos, então você não tem com quem negociar."
       },
       "Request": {
-        "Title": "Item Piles: Enviar solicitação de negociação"
+        "Title": "Item Piles: Enviar solicitação de negociação",
+        "Content": "{trading_actor_name} (usuário {trading_user_name}) deseja negociar com você.",
+        "PrivateContent": "{trading_actor_name} (usuário {trading_user_name}) deseja negociar <strong>particularmente</strong> com você.",
+        "AcceptQuery": "Você aceita?"
       },
       "OngoingRequest": {
         "Content": "Esperando a resposta de <strong>{user_name}</strong>...",
@@ -72,6 +79,33 @@
         "Title": "Redefinir informações de partilhamento",
         "Content": "Isto vai redefinir todo o histórico de partilhamento dos jogadores com esta pilha de itens.<br><br>Você está certo de que quer fazer isso?",
         "Confirm": "Redefinir informações"
+      },
+      "TypeWarning": {
+        "Title": "Aviso de tipo de item",
+        "TradeContent": "Você está tentando negociar um item que é de um tipo (\"{type}\") que normalmente não tem permissão para ser negociado. Você tem certeza de que quer fazer isso?",
+        "SellContent": "Você está tentando vender um item do tipo (\"{type}\") que o comerciante normalmente não aceita. Você tem certeza de que quer fazer isso?",
+        "DropContent": "Você está descartando um item que é de um tipo (\"{type}\") que normalmente não pode ser descartado. Você tem certeza de que quer fazer isso?"
+      },
+      "NewSystemVersion": {
+        "Confirm": "Atualizar configurações",
+        "Title": "Nova versão do sistema",
+        "Content": "As configurações padrão do sistema que você está usando com as pilhas de itens foram atualizadas. Você gostaria de substituir as configurações específicas do seu sistema pelas atualizadas?",
+        "Content2": "Não fazer isso pode quebrar o Item Piles - você redefine as configurações específicas do sistema do módulo para corrigi-lo."
+      },
+      "ClearAllItems": {
+        "Title": "Limpar todos os itens do ator",
+        "Content": "Isso limpará todos os itens do ator. Tem certeza de que deseja fazer isso?"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "Dando item",
+        "Content": "\"{actor_name}\" pertence ao jogador \"{user_name}\", mas eles não estão ativos, então você não pode dar a eles este item."
+      },
+      "ReceiveItem": {
+        "Title": "Recebendo Item",
+        "Header": "Item Piles: Recebendo Item",
+        "ContentOne": "{source_actor_name} quer dar o item \"{item_name}\" para {target_actor_name}, você aceita?",
+        "Ignore": "Ignorar usuário",
+        "ContentMany": "{source_actor_name} quer dar os itens \"{item_name}\" ({quantity}) para {target_actor_name}, você aceita?"
       }
     },
     "Currencies": "Moedas",
@@ -137,6 +171,54 @@
       "GiveItemNoGM": "Não há GM ativo para receber você dando este item.",
       "GiveItemDeclined": "{user_name} recusou sua oferta de item.",
       "NoPlayersActive": "Nenhum jogador está ativo para fazer esta ação"
+    },
+    "Merchant": {
+      "AllTypes": "Todos tipos",
+      "Buy": "Comprar",
+      "NoItemsForSale": "O comerciante não tem nada para vender",
+      "NoItemsToSell": "Você não tem nada para vender a este comerciante",
+      "OpenTimes": "Horários abertos",
+      "OpenCloseAuto": "Automático",
+      "Open": "Aberto",
+      "Hours": "Horas",
+      "Minutes": "Minutos",
+      "Sell": "Vender",
+      "Description": "Descrição",
+      "Settings": "Configurações",
+      "Override": "Sobrepor",
+      "EditTypePrices": "Editar modificadores de custo por tipo",
+      "EditTypePricesExplanation": "Alterne a visibilidade dos controles deslizantes por tipo na guia Comprar itens",
+      "BuyNoItems": "O comerciante não tem itens",
+      "CurrentItems": "Itens atuais",
+      "NoRollTables": "Não existem tabelas de rolagem, crie uma para começar",
+      "ClickRoll": "Clique em rolar para começar",
+      "RolledTimes": "Rolou {rolls} vezes",
+      "KeepRolled": "Manter rolado",
+      "AddAll": "Adicionar todos os itens",
+      "AddItem": "Adicionar",
+      "RemoveItem": "Remover",
+      "ItemFree": "Grátis",
+      "Closed": "Fechado",
+      "MerchantClosed": "O comerciante está fechado, volte mais tarde.",
+      "SellNoItems": "Você não tem itens para vender a este comerciante",
+      "ClearAllItems": "Limpar todos os itens do ator"
+    },
+    "Applications": {
+      "DropItem": {
+        "Title": "Descartando item",
+        "Dropping": "Você está descartando: {item_name}",
+        "QuantityToDrop": "Você tem {quantity} deste item, quantos você quer descartar?",
+        "AddToPile": "Adicionar à pilha",
+        "NewPile": "Criar nova pilha",
+        "ExistingPiles": "Você está adicionando este item ao item pile \"{target_name}\"."
+      },
+      "GiveItem": {
+        "Title": "Dando item",
+        "Giving": "Você está dando: {item_name}",
+        "TargetActor": "Deseja dar este item para \"{target_name}\"?",
+        "Give": "Dar",
+        "QuantityToGive": "Você tem {quantity} deste item, quantos você quer dar?"
+      }
     }
   }
 }
