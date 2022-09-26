@@ -5,7 +5,7 @@
     "Currency": "Devise",
     "ContextMenu": {
       "ShowToPlayers": "Montrer la pile aux joueurs",
-      "RequestTrade": "Item Piles : Demande d'échange"
+      "RequestTrade": "Demande d'échange"
     },
     "Inspect": {
       "Title": "Inspection de la pile",
@@ -739,6 +739,9 @@
       "GiveItemNoGM": "Il n'y a pas de MJ actif pour recevoir votre objet",
       "GiveItemDeclined": "{user_name} a décliné votre offre.",
       "NoPlayersActive": "Aucun joueur actif pour effectuer cette action"
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "Montrer aux joueurs"
     }
   }
 }
