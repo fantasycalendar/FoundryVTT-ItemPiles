@@ -1,64 +1,64 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import SliderInput from "../../components/SliderInput.svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+    import { getContext } from 'svelte';
+    import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+    import SliderInput from "../../components/SliderInput.svelte";
+    import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('external');
+    const { application } = getContext('external');
 
-  let form;
+    let form;
 
-  export let priceModifiers;
-  export let elementRoot;
+    export let priceModifiers;
+    export let elementRoot;
 
-  function remove(index) {
-    priceModifiers.splice(index, 1)
-    priceModifiers = priceModifiers;
-  }
-
-  async function updateSettings() {
-    priceModifiers.forEach(data => {
-      data.actor = data.actor.id;
-    })
-    application.options.resolve?.(priceModifiers);
-    application.close();
-  }
-
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
-
-  function dropData(event) {
-
-    event.preventDefault();
-
-    let data;
-    try {
-      data = JSON.parse(event.dataTransfer.getData('text/plain'));
-    } catch (err) {
-      return false;
+    function remove(index) {
+        priceModifiers.splice(index, 1)
+        priceModifiers = priceModifiers;
     }
 
-    if (data.type !== "Actor") return;
+    async function updateSettings() {
+        priceModifiers.forEach(data => {
+            data.actor = data.actor.id;
+        })
+        application.options.resolve?.(priceModifiers);
+        application.close();
+    }
 
-    const actor = game.actors.get(data.id);
+    export function requestSubmit() {
+        form.requestSubmit();
+    }
 
-    if (!actor) return;
+    async function dropData(event) {
 
-    if (priceModifiers.find(data => data.actor === actor)) return;
+        event.preventDefault();
 
-    priceModifiers.push({
-      actor: actor,
-      buyPriceModifier: 1,
-      sellPriceModifier: 0.5
-    });
+        let data;
+        try {
+            data = JSON.parse(event.dataTransfer.getData('text/plain'));
+        } catch (err) {
+            return false;
+        }
 
-    priceModifiers = priceModifiers;
-  }
+        if (data.type !== "Actor") return;
 
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+        const actor = await fromUuid(data.uuid);
+
+        if (!actor) return;
+
+        if (priceModifiers.find(data => data.actor === actor)) return;
+
+        priceModifiers.push({
+            actor: actor,
+            buyPriceModifier: 1,
+            sellPriceModifier: 0.5
+        });
+
+        priceModifiers = priceModifiers;
+    }
+
+    function preventDefault(event) {
+        event.preventDefault();
+    }
 
 </script>
 
