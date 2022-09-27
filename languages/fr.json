@@ -679,7 +679,7 @@
         "Title": "Activer l'inspection des objets pendant les échanges"
       },
       "InvertSheetOpen": {
-        "Hint": "Normalement, vous devez maintenir le contrôle lorsque vous voulez ouvrir la feuille d'acteur d'une pile d'objets. En activant cette option, la fiche d'acteur de la pile d'objets s'ouvre par défaut, et en maintenant le contrôle, vous ouvrez l'interface d'inventaire de la pile d'objets.",
+        "Hint": "Normalement, vous devez maintenir contrôle lorsque vous voulez ouvrir la feuille d'acteur d'une pile d'objets. En activant cette option, la fiche d'acteur de la pile d'objets s'ouvre par défaut, et en maintenant le contrôle, vous ouvrez l'interface d'inventaire de la pile d'objets.",
         "Title": "Inverser Ctrl + Double clic Ouvrir"
       },
       "PreloadFiles": {
