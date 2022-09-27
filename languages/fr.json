@@ -133,7 +133,7 @@
       "Cancel": "Annuler",
       "NewSystemVersion": {
         "Confirm": "Mettre à jour les paramètres",
-        "Content": "Les paramètres par défaut du système que vous utilisez ont été mis à jour, voulez-vous remplacer les paramètres de votre module par ceux mis à jour ?",
+        "Content": "Les paramètres par défaut du système que vous utilisez avec la pile d'objets ont été mis à jour, voulez-vous remplacer les paramètres de votre système spécifique par ceux mis à jour ?",
         "Title": "Nouvelle version du système",
         "Content2": "Ne pas le faire peut casser les piles d'objets - vous réinitialisez les paramètres spécifiques au système du module pour le réparer."
       },
@@ -141,7 +141,7 @@
         "SellContent": "Vous tentez de vendre un article de type (\"{type}\") que le marchand n'accepte pas normalement. Êtes-vous sûr de vouloir faire cela ?",
         "DropContent": "Vous déposez un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être déposé. Êtes-vous sûr de vouloir faire cela ?",
         "TradeContent": "Vous tentez d'échanger un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être échangé. Êtes-vous sûr de vouloir faire cela ?",
-        "Title": "Avertissement sur Type d'Objet"
+        "Title": "Avertissement sur type d'objet"
       },
       "ClearAllItems": {
         "Content": "Cela va effacer tous les objets de l'acteur, êtes-vous sûr de vouloir faire cela ?",
@@ -149,7 +149,7 @@
       },
       "GiveItemUserNotActive": {
         "Title": "Donner un Objet",
-        "Content": "\"{actor_name}\" est affecté à \"{user_name}\" qui n'est pas actif/ve. Vous ne pouvez pas lui donner cet objet."
+        "Content": "\"{actor_name}\" est affecté à \"{user_name}\" qui n'est pas actif/ve, vous ne pouvez pas lui donner cet objet."
       },
       "ReceiveItem": {
         "Title": "Recevoir un Objet",
@@ -355,7 +355,7 @@
     },
     "Notifications": {
       "UpdateMerchantSuccess": "Le marchand a été mis à jour avec succès.",
-      "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès.",
+      "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès",
       "ItemTransferred": "{source_actor_name} a donné {item_name} à {target_actor_name}.",
       "GiveItemAccepted": "{user_name} a accepté votre offre.",
       "ShownToPlayers": "Montre {actor_name} aux joueurs"
@@ -388,7 +388,7 @@
       "ItemFree": "Gratuit",
       "OpenCloseAuto": "Automatique",
       "Open": "Ouvert",
-      "MerchantClosed": "Ce marchand est fermé. Revenez plus tard.",
+      "MerchantClosed": "Ce marchand est fermé, revenez plus tard.",
       "RolledTimes": "Lancé {rolls} fois"
     },
     "Applications": {
@@ -396,7 +396,7 @@
         "QuantityToDrop": "Vous avez {quantity} de cet objet, combien voulez-vous en déposer ?",
         "AddToPile": "Ajouter à la pile",
         "NewPile": "Créer une nouvelle pile",
-        "ExistingPiles": "Vous ajoutez cet élément à la pile d'objet \"{item_pile_name}\".",
+        "ExistingPiles": "Vous ajoutez cet élément à la pile d'objet \"{target_name}\".",
         "Title": "Lâcher un Objet",
         "Dropping": "Vous lâchez : {item_name}"
       },
@@ -405,7 +405,7 @@
         "NoCurrency": "{actor_name} n'a pas de devises valides...",
         "AddToPile": "Ajouter à la pile",
         "Player": "Vous pouvez déposer les devises suivantes dans cette pile d'objet :",
-        "Title": "Lâcher des Devises"
+        "Title": "Lâcher des devises"
       },
       "Settings": {
         "Title": "Configuration du module Item Piles",
@@ -420,7 +420,7 @@
       "CurrenciesEditor": {
         "Submit": "Soumettre les devises",
         "AddNew": "Ajouter une nouvelle devise",
-        "Title": "Éditeur de devises d'Item Piles",
+        "Title": "Éditeur de devises de pile d'objets",
         "TitleActor": "Éditeur de devises d'Item Piles : {actor_name}",
         "Explanation": "Ici, vous pouvez définir les devises sur les personnages qui peuvent être ramassés à partir des piles d'objets, comme les devises.",
         "ExplanationSmallAttributes": "Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"data.currency.gp\". Ajoutez-en une en cliquant sur le plus dans l'en-tête.",
@@ -442,11 +442,11 @@
         "Price": "Fixer les Prix",
         "NotForSale": "Cet Objet n'est pas à Vendre",
         "HiddenExplanation": "Si activé, cet objet n'apparaît pas dans la liste des objets du marchand.",
-        "PriceExplanation": "Dans cet onglet, vous pouvez configurer le prix d'un objet et si le coût de cet objet inclue d'autres objets.",
+        "PriceExplanation": "Dans cet onglet, vous pouvez configurer le prix de cet objet, y compris si cet article coûtera d'autres objets à acheter.",
         "PurchaseOptionsExplanation": "Ici, vous pouvez configurer des coûts alternatifs pour cet objet. Chaque groupe représente une façon différente pour un PJ de se procurer l'objet",
         "CantBeSoldToMerchantsExplanation": "Si activé, cet objet ne peut être revendu à un marchand, seulement acheté.",
         "Update": "Mettre à jour l'Objet",
-        "DisplayQuantity": "Afficher les Quantités des Objets",
+        "DisplayQuantity": "Afficher les quantités des objets",
         "DisplayQuantityNo": "Non, toujours masquer les quantités",
         "InfiniteQuantity": "Quantité infinie",
         "InfiniteQuantityExplanation": "Si activé, cet objet ne peut pas être en rupture chez un marchand.",
@@ -472,7 +472,7 @@
         "YouReceive": "Vous recevez",
         "TheyReceive": "Ils reçoivent",
         "Quantity": "Quantité",
-        "Change": "Change",
+        "Change": "Changer",
         "MaxQuantity": "Maximum {quantity}",
         "YouCantAfford": "Vous ne pouvez pas vous permettre ce prix"
       },
@@ -492,7 +492,7 @@
           "Title": "Paramètres Principaux",
           "EnabledPile": "Activé",
           "GridUnits": "Unités de grille (laissez vide infini)",
-          "MacroPlaceholder": "Insérer le nom de la macro",
+          "MacroPlaceholder": "Insérez le nom de la macro",
           "EditDescription": "Modifier la description",
           "DeleteWhenEmpty": "Supprimer quand vide",
           "DeleteWhenEmptyExplanation": "Cette pile d'objets s'efface automatiquement lorsqu'elle est vide.",
@@ -523,8 +523,8 @@
           "OverrideScale": "Remplacer l'échelle des jetons d'un seul objet",
           "Scale": "Échelle de jetons pour un seul objet"
         },
-        "Update": "Mettre à jour la Pile d'Objets",
-        "Title": "Configuration d'Item Pile : {actor_name}",
+        "Update": "Mettre à jour la pile d'objets",
+        "Title": "Configuration de la pile d'objets : {actor_name}",
         "Container": {
           "Title": "Paramètres du conteneur",
           "IsContainer": "Est un conteneur",
@@ -603,11 +603,11 @@
         "Give": "Donner"
       },
       "FilterEditor": {
-        "Explanation": "Ici, vous pouvez définir différents types de filtres qui excluront certains types d'objets. En fonction du chemin d'attribut donné, Item Piles peut trouver le \"type\" d'un objet et en fonction des filtres, il cachera ces objets dans l'interface d'inventaire.",
+        "Explanation": "Ici, vous pouvez définir différents types de filtres qui excluront certains types d'objets. En fonction du chemin d'attribut donné, la pile d'objets peut trouver le \"type\" d'un objet et en fonction des filtres, il cachera ces objets dans l'interface d'inventaire.",
         "Title": "Editeur de Filtres d'Item Piles",
         "TitleActor": "Editeur de Filtres d'Item Piles : {actor_name}",
         "Filters": "Filtres",
-        "Path": "Chemin d'Attribut",
+        "Path": "Chemin d'attribut",
         "AddNew": "Ajouter un nouveau filtre",
         "Submit": "Soumettre les filtres"
       },
