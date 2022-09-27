@@ -355,7 +355,7 @@
     },
     "Notifications": {
       "UpdateMerchantSuccess": "Le marchand a été mis à jour avec succès.",
-      "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès",
+      "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès.",
       "ItemTransferred": "{source_actor_name} a donné {item_name} à {target_actor_name}.",
       "GiveItemAccepted": "{user_name} a accepté votre offre.",
       "ShownToPlayers": "Montre {actor_name} aux joueurs"
@@ -639,9 +639,9 @@
         "Public": "Public - tout le monde peut voir les messages",
         "Off": "Off - désactiver les messages",
         "SelfGM": "Privé - seuls les MJs et les utilisateurs peuvent voir les messages",
-        "Title": "Sortie pour discuter",
+        "Title": "Envoyer vers le tchat",
         "Hint": "Chaque fois qu'un joueur ramasse des objets d'une pile d'objets, il envoie un message indiquant ce qui a été ramassé.",
-        "Blind": "Aveugle - seuls les GMs peuvent voir les messages"
+        "Blind": "Aveugle - seuls les MJs peuvent voir les messages"
       },
       "Price": {
         "Hint": "Ici, vous pouvez configurer le chemin de l'attribut pour le prix de chaque élément. Par exemple, dans le système de D&D5e, la quantité de chaque objet est stockée dans l'attribut \"item.data.data.price\" de l'objet, vous devez donc mettre \"data.price\" dans ce paramètre.",
@@ -667,11 +667,11 @@
         "Label": "Configurer les similarités des objets"
       },
       "EnableDroppingItems": {
-        "Hint": "Cela permet aux utilisateurs de déposer des objets sur le sol pour créer leurs propres piles d'objets. Si cette fonction est désactivée, les utilisateurs ne peuvent pas créer de nouvelles piles, ni ajouter des objets aux piles existantes.",
+        "Hint": "Cette option permet aux utilisateurs de déposer des objets sur le sol pour créer leurs propres piles d'objets. Si cette fonction est désactivée, les utilisateurs ne peuvent pas créer de nouvelles piles, ni ajouter des objets aux piles existantes.",
         "Title": "Activer le dépôt d'objets"
       },
       "EnableGivingItems": {
-        "Hint": "Cela permet aux utilisateurs de déposer des objets sur d'autres jetons pour les leur donner. Si cette fonction est désactivée, les utilisateurs ne peuvent pas donner d'objets à d'autres utilisateurs.",
+        "Hint": "Cette option permet aux utilisateurs de déposer des objets sur d'autres token pour les leur donner. Si cette fonction est désactivée, les utilisateurs ne peuvent pas donner d'objets à d'autres utilisateurs.",
         "Title": "Permettre le don d'objets"
       },
       "InspectItemsTrade": {
@@ -683,12 +683,12 @@
         "Title": "Inverser Ctrl + Double clic Ouvrir"
       },
       "PreloadFiles": {
-        "Hint": "Permet de précharger les fichiers (images et audio) des piles, ce qui se traduit par une expérience sans faille.",
+        "Hint": "Permet de précharger les fichiers (images et audio) des piles, ce qui se traduit par une expérience plus fluide.",
         "Title": "Précharger les fichiers"
       },
       "PopulationTablesFolder": {
-        "Title": "Dossier \"RollTables\" pour \"Populate Items\"",
-        "Hint": "Titre du dossier pour filtrer les tableaux roulants dans l'onglet \"Populate Items\" du marchand.",
+        "Title": "Dossier des tables aléatoires pour \"Populate Items\"",
+        "Hint": "Titre du dossier pour filtrer les tables aléatoires dans l'onglet \"Populate Items\" du marchand.",
         "AllTables": "Toutes les tables"
       },
       "Configure": {
@@ -711,8 +711,8 @@
         "Hint": "Vous pouvez y configurer des prix prédéfinis personnalisés que vous pouvez ensuite facilement importer sur des objets."
       },
       "EnableTrading": {
-        "Title": "Activer le commerce",
-        "Hint": "Cela permet le commerce - avec cette désactivation, personne ne peut initier de commerce."
+        "Title": "Activer les échanges",
+        "Hint": "Cette option active les échanges - désactivée, personne ne peut initier d'échange."
       },
       "ShowTradeButton": {
         "Title": "Afficher le bouton d'échange",
@@ -724,7 +724,7 @@
       },
       "DeleteEmptyPiles": {
         "Title": "Suppression automatique des piles vides",
-        "Hint": "Ainsi, les piles d'objets s'effacent d'elles-mêmes lorsqu'elles n'ont plus d'objets. Cette option peut être modifiée pour chaque pile d'objets."
+        "Hint": "Avec cette option, les piles d'objets s'effacent d'elles-mêmes lorsqu'elles n'ont plus d'objets. Cette option peut être modifiée pour chaque pile d'objets."
       },
       "Debug": {
         "Title": "Activer le débogage",
@@ -736,7 +736,7 @@
       }
     },
     "Warnings": {
-      "GiveItemNoGM": "Il n'y a pas de MJ actif pour recevoir votre objet",
+      "GiveItemNoGM": "Il n'y a pas de MJ actif pour recevoir votre objet.",
       "GiveItemDeclined": "{user_name} a décliné votre offre.",
       "NoPlayersActive": "Aucun joueur actif pour effectuer cette action"
     },
