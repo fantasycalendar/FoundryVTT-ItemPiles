@@ -255,7 +255,25 @@
         "DisplayQuantity": "Visibilidade da quantidade do item",
         "DisplayQuantityExplanation": "Isso configura como a quantidade deste item na loja é mostrada, se for o caso.",
         "DisplayQuantityDefault": "Padrão para configuração do comerciante",
-        "DisplayQuantityYes": "Sim, sempre mostrar a quantidade"
+        "DisplayQuantityYes": "Sim, sempre mostrar a quantidade",
+        "DisplayQuantityNo": "Não, sempre ocultar a quantidade",
+        "InfiniteQuantity": "Quantidade infinita",
+        "InfiniteQuantityExplanation": "Quando ativado, este item não pode ficar sem quantidade quando vendido por um comerciante.",
+        "PriceExplanation": "Nesta guia, você pode configurar o preço deste item, incluindo se este item custará outros itens para comprar.",
+        "BasePrice": "Preço base",
+        "BasePriceExplanation": "Isso configura o preço normal deste item.",
+        "Free": "O item é gratuito",
+        "FreeExplanation": "Quando ativado, este item não custa dinheiro para comprar do comerciante.",
+        "DisableNormalCost": "Desativar custo normal",
+        "DisableNormalCostExplanation": "Quando ativado, o item não pode ser comprado com a moeda principal e deve ser comprado com uma das opções de compra abaixo.",
+        "PurchaseOptions": "Opções de compra",
+        "PurchaseOptionsExplanation": "Aqui você pode configurar as formas alternativas de compra deste item. Cada grupo representa uma maneira diferente que um personagem pode comprar este item de outros",
+        "CantBeSoldToMerchants": "Não pode ser vendido para comerciantes",
+        "CantBeSoldToMerchantsExplanation": "Quando ativado, este item não pode ser vendido de volta a comerciantes, apenas comprado.",
+        "AddPurchaseOption": "Adicionar opção de compra",
+        "DropMeClickMe": "Clique para adicionar um atributo ou arraste e solte um item para adicionar",
+        "PricePreset": "Ou selecione uma predefinição de preço de saída:",
+        "SelectPreset": "Selecione a predefinição de preço"
       },
       "DropCurrencies": {
         "Title": "Descartando moedas",
@@ -276,6 +294,36 @@
         "YouCantAfford": "Você não pode pagar esse preço",
         "TheyCantAfford": "Eles não podem pagar esse preço",
         "MaxQuantity": "Máximo {quantidade}"
+      },
+      "FilterEditor": {
+        "Title": "Editor de Filtros do Item Piles",
+        "TitleActor": "Editor de filtros do Item Piles: {actor_name}",
+        "Explanation": "Aqui você pode definir vários tipos de filtros que excluirão determinados tipos de itens. Com base no caminho do atributo fornecido, a pilha de itens pode encontrar o \"tipo\" de um item e, com base nos filtros, oculta esses itens na interface do usuário do inventário do item pile.",
+        "Filters": "Filtros",
+        "Path": "Caminho do atributo",
+        "AddNew": "Adicionar novo filtro",
+        "Submit": "Enviar filtros"
+      },
+      "SimilaritiesEditor": {
+        "Title": "Editor de semelhanças do Item Piles",
+        "Explanation_P1": "Aqui você pode definir vários tipos de identificadores que ajudam o Item Piles a diferenciar entre itens semelhantes. Em quase todos os sistemas, os itens podem ser diferenciados com seu \"nome\" e \"tipo\".",
+        "Path": "Caminho do atributo",
+        "AddNew": "Adicionar novo caminho de atributo",
+        "Submit": "Enviar semelhanças de itens",
+        "Explanation_P2": "Mas em alguns casos, como no Pathfinder 2nd Edition, itens temporários podem ser compartilhados com itens permanentes. Portanto, ao adicionar \"data.temporary.value\", seus itens temporários são considerados \"únicos\" e separados dos permanentes."
+      },
+      "ItemTypePriceModifiersEditor": {
+        "Title": "Editor de modificadores de preço de tipo de item",
+        "TitleActor": "Editor de modificadores de preço do tipo de item: {actor_name}",
+        "Explanation": "Aqui você pode definir o preço e os modificadores de preço de venda para este comerciante em relação a tipos de itens específicos. A configuração \"Substituir\" significa que ela substitui os modificadores de preço normais do comerciante.",
+        "ItemType": "Tipo de item",
+        "Override": "Sobrepor",
+        "Submit": "Enviar modificadores de preço"
+      },
+      "PriceModifiersEditor": {
+        "Title": "Editor de Modificadores de Preço do Item Piles",
+        "TitleActor": "Editor de modificadores de preço do Item Piles: {actor_name}",
+        "Explanation": "Aqui você pode definir o preço e os modificadores de preço de venda para este comerciante em relação a atores específicos. A configuração \"Substituir\" significa que ela substitui os modificadores de preço normais do comerciante, incluindo modificadores de preço específicos do tipo de item."
       }
     }
   }
