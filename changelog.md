@@ -3,6 +3,9 @@
 ## Version 2.2.0 (V10 only)
 
 - Foundry v10 support - no more v9 updates unless critical bugs are discovered
+- Updated French and Portuguese (Brazilian) localization (thank you to Padhiver & eunaumtenhoid, respectively!)
+- Localization can be easily done through weblate:
+  <https://weblate.foundryvtt-hub.com/>
 
 ## Version 2.1.1 (V9 only)
 
