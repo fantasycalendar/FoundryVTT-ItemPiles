@@ -27,7 +27,7 @@
 
   function previewItem(item) {
     item = store.actor.items.get(item.id);
-    if (game.user.isGM || item.data.permission[game.user.id] === 3) {
+    if (game.user.isGM || item.permission[game.user.id] === 3) {
       return item.sheet.render(true);
     }
     const cls = item._getSheetClass()

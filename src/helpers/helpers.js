@@ -48,6 +48,10 @@ export function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * @param key
+ * @returns {*}
+ */
 export function getSetting(key) {
   return game.settings.get(CONSTANTS.MODULE_NAME, key);
 }
@@ -65,14 +69,14 @@ export function debug(msg, args = "") {
 
 export function custom_notify(message) {
   message = `Item Piles | ${message}`;
-  ui.notifications.notify(message);
+  ui.notifications.notify(message, { console: false });
   console.log(message.replace("<br>", "\n"));
 }
 
 export function custom_warning(warning, notify = false) {
   warning = `Item Piles | ${warning}`;
   if (notify) {
-    ui.notifications.warn(warning);
+    ui.notifications.warn(warning, { console: false });
   }
   console.warn(warning.replace("<br>", "\n"));
 }
@@ -80,25 +84,9 @@ export function custom_warning(warning, notify = false) {
 export function custom_error(error, notify = true) {
   error = `Item Piles | ${error}`;
   if (notify) {
-    ui.notifications.error(error);
+    ui.notifications.error(error, { console: false });
   }
   return new Error(error.replace("<br>", "\n"));
-}
-
-export function dialogLayout({
-                               title = "Item Piles",
-                               message,
-                               icon = "fas fa-exclamation-triangle",
-                               extraHtml = ""
-                             } = {}) {
-  return `
-    <div class="item-piles-dialog">
-        <p><i style="font-size:3rem;" class="${icon}"></i></p>
-        <p style="margin-bottom: 1rem"><strong style="font-size:1.2rem;">${title}</strong></p>
-        <p>${message}</p>
-        ${extraHtml}
-    </div>
-    `;
 }
 
 
@@ -120,7 +108,7 @@ export function isResponsibleGM() {
   if (!game.user.isGM) {
     return false;
   }
-  return !getActiveGMs().some(other => other.data._id < game.user.data._id);
+  return !getActiveGMs().some(other => other.id < game.user.id);
 }
 
 export function isGMConnected() {

@@ -1,6 +1,10 @@
 # Item Piles Changelog
 
-## Version 2.1.1
+## Version 2.2.0 (V10 only)
+
+- Foundry v10 support - no more v9 updates unless critical bugs are discovered
+
+## Version 2.1.1 (V9 only)
 
 - Fixed users being able to give away items to other users that are of types that are not allowed to be given (such as
   spells, features, etc)

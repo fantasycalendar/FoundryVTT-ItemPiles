@@ -6,6 +6,10 @@
 
 .item-piles {
 
+  h3 {
+    border: 0;
+  }
+
   &-flexrow {
     display: flex;
     flex-direction: row;

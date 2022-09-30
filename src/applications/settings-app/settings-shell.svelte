@@ -11,7 +11,7 @@
   import Setting from "./Setting.svelte";
   import SettingButton from "./SettingButton.svelte";
   import Tabs from "../components/Tabs.svelte";
-  import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
   import CustomDialog from "../components/CustomDialog.svelte";
 
   const { application } = getContext('external');

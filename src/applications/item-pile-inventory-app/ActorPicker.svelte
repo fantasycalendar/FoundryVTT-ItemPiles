@@ -8,7 +8,7 @@
   let editQuantities = store.editQuantities;
 
   let changingActor = false;
-  let playerActors = game.actors.filter(actor => actor.isOwner && actor !== store.pileActor && actor.data.token.actorLink);
+  let playerActors = game.actors.filter(actor => actor.isOwner && actor !== store.pileActor && actor.prototypeToken.actorLink);
   let recipientUuid = Utilities.getUuid(store.recipient);
 
   function changeRecipientActor() {
@@ -32,11 +32,11 @@
             actor.</a>
         {:else}
           <select
-              class="item-piles-change-actor-select"
-              bind:value={recipientUuid}
-              on:change={changeRecipientActor}
-              class:active={changingActor}
-              style="height:auto;"
+            class="item-piles-change-actor-select"
+            bind:value={recipientUuid}
+            on:change={changeRecipientActor}
+            class:active={changingActor}
+            style="height:auto;"
           >
             {#each playerActors as actor, index (index)}
               <option value="{Utilities.getUuid(actor.uuid)}">{actor.name}</option>

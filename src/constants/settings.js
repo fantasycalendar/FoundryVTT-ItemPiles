@@ -36,7 +36,7 @@ const SETTINGS = {
   PRECONFIGURED_SYSTEM: "preconfiguredSystem",
   SYSTEM_VERSION: "systemVersion",
   IGNORED_SYSTEM_VERSION: "ignoredSystemVersion",
-  V10_WARNING_SHOWN: "v10WarningShown",
+  MIGRATION_VERSION: "migrationVersion",
   
   GET_DEFAULT() {
     return foundry.utils.deepClone(SETTINGS.DEFAULTS())
@@ -181,11 +181,11 @@ const SETTINGS = {
       type: Boolean
     },
     
-    [SETTINGS.V10_WARNING_SHOWN]: {
+    [SETTINGS.MIGRATION_VERSION]: {
       scope: "world",
       config: false,
-      default: false,
-      type: Boolean
+      default: "0.0.0",
+      type: String
     },
     
     [SETTINGS.OUTPUT_TO_CHAT]: {

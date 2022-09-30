@@ -26,7 +26,7 @@ export default class MerchantApp extends SvelteApplication {
   /** @inheritdoc */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["app window-app sheet", "item-piles-merchant-sheet"],
+      classes: ["app window-app sheet", "item-piles-merchant-sheet", "item-piles"],
       width: 800,
       height: 700,
       closeOnSubmit: false,
@@ -74,7 +74,8 @@ export default class MerchantApp extends SvelteApplication {
           onclick: () => {
             const users = Array.from(game.users).filter(u => u.active && u !== game.user).map(u => u.id);
             if (!users.length) {
-              return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoPlayersActive"), true);
+              Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoPlayersActive"), true);
+              return;
             }
             Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ShownToPlayers", { actor_name: this.merchant.name }))
             return game.itempiles.API.renderItemPileInterface(this.merchant, {

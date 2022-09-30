@@ -16,22 +16,31 @@
   let tabs = [];
   let description;
   let activeSidebarTab = false;
-  $: description = $pileDataStore.description;
+  $: {
+    description = $pileDataStore.description;
+  }
   $: {
     tabs = [
       {
         value: 'description',
-        label: 'ITEM-PILES.Merchant.Description',
-        hidden: !game.user.isGM && description
+        label: `ITEM-PILES.Merchant.Description`,
+        hidden: !game.user.isGM && !description
       },
-      { value: 'settings', label: 'ITEM-PILES.Merchant.Settings', hidden: !game.user.isGM },
+      {
+        value: 'settings',
+        label: `ITEM-PILES.Merchant.Settings`,
+        hidden: !game.user.isGM
+      },
     ];
     activeSidebarTab = activeSidebarTab || tabs.find(tab => !tab.hidden)?.value;
   }
 
   function showDescriptionEditor() {
     return TextEditorDialog.show(description, { id: "item-pile-text-editor-" + store.actor.id }).then((result) => {
-      description = result || "";
+      store.pileData.update((pileData) => {
+        pileData.description = result || "";
+        return pileData;
+      });
       store.update();
     });
   }
@@ -55,7 +64,7 @@
         {#if activeSidebarTab === 'description'}
           <div class="tab merchant-description">
             {@html description || ""}
-            {#if description || (!description && game.user.isGM)}
+            {#if game.user.isGM}
               <button type="button"
                       style="flex:1;"
                       on:click={() => { showDescriptionEditor() }}

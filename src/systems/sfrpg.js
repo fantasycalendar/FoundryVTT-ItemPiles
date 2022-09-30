@@ -1,15 +1,15 @@
 export default {
   
-  "VERSION": "1.0.1",
+  "VERSION": "1.0.2",
   
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "npc2",
   
   // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
-  "ITEM_QUANTITY_ATTRIBUTE": "data.quantity",
+  "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
   
   // The item price attribute is the path to the attribute on each item that determine how much it costs
-  "ITEM_PRICE_ATTRIBUTE": "data.price",
+  "ITEM_PRICE_ATTRIBUTE": "system.price",
   
   // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
   "ITEM_FILTERS": [
@@ -29,7 +29,7 @@ export default {
       img: "systems/sfrpg/icons/equipment/goods/credstick.webp",
       abbreviation: "{#}C",
       data: {
-        path: "data.currency.credit",
+        path: "system.currency.credit",
       },
       primary: true,
       exchangeRate: 1
@@ -40,7 +40,7 @@ export default {
       img: "systems/sfrpg/icons/equipment/goods/upb.webp",
       abbreviation: "{#} UBP",
       data: {
-        path: "data.currency.upb",
+        path: "system.currency.upb",
       },
       primary: false,
       exchangeRate: 1

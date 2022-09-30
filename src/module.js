@@ -11,7 +11,6 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
-import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
 import SettingsShim from "./applications/settings-app/settings-app.js";
 
 Hooks.once("init", async () => {
@@ -34,21 +33,6 @@ Hooks.once("ready", async () => {
   window.ItemPiles = {
     API: API
   };
-  
-  if (isNewerVersion(game.version, "9.999") && !Helpers.getSetting("v10WarningShown")) {
-    await Helpers.setSetting("v10WarningShown", true);
-    TJSDialog.prompt({
-      title: "Foundry v10 not Supported",
-      content: {
-        class: CustomDialog,
-        props: {
-          title: "Item Piles: Foundry v10 not Supported",
-          content: "Item Piles is not yet v10 supported, and will not be for at least a month or two. Please do not use Item Piles in v10, and do not report bugs relating to v10 issues."
-        }
-      },
-      modal: true
-    });
-  }
   
   if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
     let word = "install and activate";
@@ -88,7 +72,7 @@ Hooks.once(HOOKS.READY, () => {
 })
 
 Hooks.on(HOOKS.RESET_SETTINGS, async () => {
-  for (let setting of game.settings.storage.get("world").filter(setting => setting.data.key.includes('item-piles'))) {
+  for (let setting of game.settings.storage.get("world").filter(setting => setting.key.includes('item-piles'))) {
     await setting.delete();
   }
   checkSystem();

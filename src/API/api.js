@@ -621,12 +621,12 @@ const API = {
       }
       
       if (itemData?.quantity !== undefined) {
-        setProperty(item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity)
+        Utilities.setItemQuantity(item, itemData.quantity);
       }
       
       const existingItems = mergeSimilarItems ? Utilities.findSimilarItem(itemsToAdd, item) : false;
       if (existingItems) {
-        setProperty(existingItems, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item))
+        Utilities.setItemQuantity(existingItems, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item));
       } else {
         itemsToAdd.push(item);
       }
@@ -802,7 +802,7 @@ const API = {
     
     Object.entries(attributes).forEach(entry => {
       const [attribute, quantity] = entry;
-      if (!hasProperty(targetActor.data, attribute)) {
+      if (!hasProperty(targetActor, attribute)) {
         throw Helpers.custom_error(`AddAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
       }
       if (!Helpers.isRealNumber(quantity) && quantity > 0) {
@@ -839,17 +839,17 @@ const API = {
         if (typeof attribute !== "string") {
           throw Helpers.custom_error(`RemoveAttributes | Each attribute in the array must be of type string`, true)
         }
-        if (!hasProperty(targetActor.data, attribute)) {
+        if (!hasProperty(targetActor, attribute)) {
           throw Helpers.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
         }
       });
     } else {
       Object.entries(attributes).forEach(entry => {
         const [attribute, quantity] = entry;
-        if (!hasProperty(targetActor.data, attribute)) {
+        if (!hasProperty(targetActor, attribute)) {
           throw Helpers.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
         }
-        if (!is_real_number(quantity) && quantity > 0) {
+        if (!Helpers.isRealNumber(quantity) && quantity > 0) {
           throw Helpers.custom_error(`RemoveAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
         }
       });
@@ -888,20 +888,20 @@ const API = {
         if (typeof attribute !== "string") {
           throw Helpers.custom_error(`TransferAttributes | Each attribute in the array must be of type string`, true)
         }
-        if (!hasProperty(sourceActor.data, attribute)) {
+        if (!hasProperty(sourceActor, attribute)) {
           throw Helpers.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
         }
-        if (!hasProperty(targetActor.data, attribute)) {
+        if (!hasProperty(targetActor, attribute)) {
           throw Helpers.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
         }
       });
     } else {
       Object.entries(attributes).forEach(entry => {
         const [attribute, quantity] = entry;
-        if (!hasProperty(sourceActor.data, attribute)) {
+        if (!hasProperty(sourceActor, attribute)) {
           throw Helpers.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
         }
-        if (!hasProperty(targetActor.data, attribute)) {
+        if (!hasProperty(targetActor, attribute)) {
           throw Helpers.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
         }
         if (!Helpers.isRealNumber(quantity) && quantity > 0) {

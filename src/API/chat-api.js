@@ -32,7 +32,7 @@ export default class ChatAPI {
     
     if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING)) return;
     
-    const content = chatMessage.data.content.toLowerCase();
+    const content = chatMessage.content.toLowerCase();
     
     if (!(content.startsWith("!itempiles") || content.startsWith("!ip"))) return;
     
@@ -56,7 +56,7 @@ export default class ChatAPI {
   
   static _disableTradingButton(publicTradeId) {
     const message = Array.from(game.messages).find(message => {
-      return getProperty(message.data, CONSTANTS.FLAGS.PUBLIC_TRADE_ID) === publicTradeId;
+      return getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID) === publicTradeId;
     });
     if (!message) return;
     const update = this._replaceChatContent(message);
@@ -67,15 +67,15 @@ export default class ChatAPI {
     if (!game.user.isGM) return;
     
     const messages = Array.from(game.messages).filter(message => {
-      return getProperty(message.data, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+      return getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
     });
     
     if (!messages.length) return;
     const updates = [];
     for (let message of messages) {
       const update = this._replaceChatContent(message);
-      const tradeId = getProperty(message.data, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
-      const tradeUsers = getProperty(message.data, CONSTANTS.FLAGS.TRADE_USERS);
+      const tradeId = getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+      const tradeUsers = getProperty(message, CONSTANTS.FLAGS.TRADE_USERS);
       const bothUsersActive = tradeUsers.filter(userId => game.users.get(userId).active).length === tradeUsers.length;
       if (!bothUsersActive) {
         updates.push(update);
@@ -95,9 +95,9 @@ export default class ChatAPI {
   }
   
   static _replaceChatContent(message) {
-    const tradeId = getProperty(message.data, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+    const tradeId = getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
     const stringToFind = `data-trade-id="${tradeId}"`;
-    let content = message.data.content;
+    let content = message.content;
     content = content.replace(stringToFind, "");
     content = content.replace(stringToFind, "disabled");
     content = content.replace(game.i18n.localize("ITEM-PILES.Chat.TradeSpectate"), game.i18n.localize("ITEM-PILES.Chat.SpectateDisabled"));
@@ -243,11 +243,11 @@ export default class ChatAPI {
     const now = (+new Date());
     
     // Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
-    const messages = Array.from(game.messages).filter(message => (now - message.data.timestamp) <= (10800000)).slice(-10);
+    const messages = Array.from(game.messages).filter(message => (now - message.timestamp) <= (10800000)).slice(-10);
     messages.reverse()
     
     for (let [index, message] of messages.entries()) {
-      const flags = getProperty(message.data, CONSTANTS.FLAGS.PILE);
+      const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
       if (flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
         return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
       }
@@ -297,7 +297,7 @@ export default class ChatAPI {
   
   static async _updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId) {
     
-    const flags = getProperty(message.data, CONSTANTS.FLAGS.PILE);
+    const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
     
     const newItems = this._matchEntries(flags.items, items);
     const newCurrencies = this._matchEntries(flags.currencies, currencies);
@@ -424,11 +424,11 @@ export default class ChatAPI {
     const now = (+new Date());
     
     // Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
-    const messages = Array.from(game.messages).filter(message => (now - message.data.timestamp) <= (10800000)).slice(-10);
+    const messages = Array.from(game.messages).filter(message => (now - message.timestamp) <= (10800000)).slice(-10);
     messages.reverse()
     
     for (let [index, message] of messages.entries()) {
-      const flags = getProperty(message.data, CONSTANTS.FLAGS.PILE);
+      const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
       if (flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
         return this._updateExistingMerchantMessage(message, sourceActor, targetActor, newItems, interactionId)
       }
@@ -467,7 +467,7 @@ export default class ChatAPI {
   
   static async _updateExistingMerchantMessage(message, sourceActor, targetActor, newItems, interactionId) {
     
-    const flags = getProperty(message.data, CONSTANTS.FLAGS.PILE);
+    const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
     
     const mergedItems = this._matchEntries(flags.items, newItems);
     

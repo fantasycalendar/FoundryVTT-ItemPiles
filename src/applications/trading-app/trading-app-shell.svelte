@@ -33,17 +33,19 @@
 
     if (data.type !== "Item") return;
 
-    if (!data.actorId) {
-      if (!game.user.isGM) return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
+    let item = await Item.implementation.fromDropData(data);
+
+    data.actorId = item.parent?.id;
+
+    if (!data.actorId && !game.user.isGM) {
+      return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
     }
 
     if (!game.user.isGM && data.actorId && data.actorId !== store.leftTraderActor.id) {
       throw Helpers.custom_error(`You cannot drop items into the trade UI from a different actor than ${store.leftTraderActor.name}!`)
     }
 
-    let item = await Item.implementation.fromDropData(data);
     let itemData = item.toObject();
-
     if (!itemData) {
       console.error(data);
       throw Helpers.custom_error("Something went wrong when dropping this item!")
@@ -118,7 +120,7 @@
       }
     );
 
-    if (!currenciesToAdd || (foundry.utils.isObjectEmpty(currenciesToAdd.attributes) && !currenciesToAdd.items.length)) return;
+    if (!currenciesToAdd || (foundry.utils.isEmpty(currenciesToAdd.attributes) && !currenciesToAdd.items.length)) return;
 
     currenciesToAdd.items.forEach(item => {
       const itemData = store.leftTraderActor.items.get(item._id).toObject();

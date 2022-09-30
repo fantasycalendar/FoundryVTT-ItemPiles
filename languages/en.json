@@ -105,6 +105,10 @@
       "ActorOwnerWarning": "You do not own this actor, so you cannot trade with it."
     },
     "Merchant": {
+      "Title": "Merchant: {actor_name}",
+      "BuyItems": "Buy Items",
+      "SellItems": "Sell Items",
+      "PopulateItems": "Populate Items",
       "AllTypes": "All types",
       "Buy": "Buy",
       "NoItemsForSale": "Merchant has nothing for sale",
@@ -123,7 +127,6 @@
       "EditTypePrices": "Edit Per-Type Cost Modifiers",
       "EditTypePricesExplanation": "Toggle the visibility of per-type sliders in the Buy Items tab",
       "BuyNoItems": "Merchant has no items",
-      "SellNoItems": "You have no items to sell to this merchant",
       "CurrentItems": "Current items",
       "NoRollTables": "No roll tables exist, create one to get started",
       "ClickRoll": "Click roll to start",
@@ -185,6 +188,9 @@
         "ContentOne": "{source_actor_name} wants to give the item \"{item_name}\" to {target_actor_name}, do you accept?",
         "ContentMany": "{source_actor_name} wants to give the items \"{item_name}\" ({quantity}) to {target_actor_name}, do you accept?",
         "Ignore": "Ignore User"
+      },
+      "TextEditor": {
+        "Title": "Text Editor"
       }
     },
     "Applications": {

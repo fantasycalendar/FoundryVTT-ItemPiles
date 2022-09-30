@@ -73,9 +73,9 @@
     const tableDraw = await table.drawMany(timesRolled, { displayChat: false });
     itemsRolled.update((items) => {
       tableDraw.results.forEach((result) => {
-        const rollData = result.data;
+        const rollData = result;
         const existingItem = items.find(
-          (item) => item.resultId === rollData.resultId
+          (item) => item.documentId === result.documentId
         );
         if (existingItem) {
           existingItem.quantity++;
@@ -120,12 +120,12 @@
 
   async function getItem(itemToGet) {
     let item;
-    if (itemToGet.collection === "Item") {
-      item = game.items.get(itemToGet.resultId);
+    if (itemToGet.documentCollection === "Item") {
+      item = game.items.get(itemToGet.documentId);
     } else {
-      const compendium = game.packs.get(itemToGet.collection);
+      const compendium = game.packs.get(itemToGet.documentCollection);
       if (compendium) {
-        item = await compendium.getDocument(itemToGet.resultId);
+        item = await compendium.getDocument(itemToGet.documentId);
       }
     }
     return item;
@@ -144,7 +144,7 @@
   function removeItem(itemToRemove) {
     itemsRolled.update((items) => {
       const existingItemIndex = items.findIndex(
-        (item) => item.resultId === itemToRemove.resultId
+        (item) => item.documentId === itemToRemove.documentId
       );
       items.splice(existingItemIndex, 1);
       return items;
@@ -356,7 +356,7 @@
       </div>
 
       {#if $itemsRolled.length}
-        {#each $itemsRolled as item (item.resultId)}
+        {#each $itemsRolled as item (item.documentId)}
           <div
             class="item-piles-flexrow item-piles-item-row item-piles-even-color"
           >

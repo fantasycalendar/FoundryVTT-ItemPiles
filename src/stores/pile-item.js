@@ -3,6 +3,7 @@ import * as Utilities from "../helpers/utilities.js";
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
+import { hasItemQuantity } from "../helpers/utilities.js";
 
 class PileBaseItem {
   
@@ -76,7 +77,7 @@ export class PileItem extends PileBaseItem {
       this.name.set(this.item.name);
       this.img.set(this.item.img);
       this.similarities = Utilities.setSimilarityProperties({}, this.item);
-      if (hasProperty(data, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE)) {
+      if (Utilities.hasItemQuantity(data)) {
         this.quantity.set(Utilities.getItemQuantity(data));
         const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
         this.currentQuantity.set(quantity);
@@ -108,7 +109,6 @@ export class PileItem extends PileBaseItem {
     }
   }
   
-  
   take() {
     const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft));
     if (!quantity) return;
@@ -123,9 +123,7 @@ export class PileItem extends PileBaseItem {
   updateQuantity(quantity) {
     const roll = new Roll(quantity).evaluate({ async: false });
     this.quantity.set(roll.total);
-    return this.item.update({
-      [game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE]: roll.total
-    });
+    return this.item.update(Utilities.setItemQuantity({}, roll.total));
   }
 }
 
@@ -139,8 +137,9 @@ export class PileAttribute extends PileBaseItem {
     this.img = writable(this.attribute.img);
     this.abbreviation = this.attribute.abbreviation;
     this.identifier = this.attribute.path;
-    this.presentFromTheStart.set(Number(getProperty(this.store.actor.data, this.attribute.path) ?? 0) > 0);
-    this.quantity.set(Number(getProperty(this.store.actor.data, this.path) ?? 0));
+    const startingQuantity = Number(getProperty(this.store.actor, this.path) ?? 0);
+    this.presentFromTheStart.set(startingQuantity > 0);
+    this.quantity.set(startingQuantity);
     this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
   }
   

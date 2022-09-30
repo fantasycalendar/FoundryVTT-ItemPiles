@@ -1,42 +1,35 @@
-import CONSTANTS from "../../../constants/constants.js";
+import { SvelteApplication } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+import TextEditorDialogShell from "./text-editor-dialog-shell.svelte";
 
-export default class TextEditorDialog extends FormApplication {
+export default class TextEditorDialog extends SvelteApplication {
   
   constructor(text, options) {
-    super();
-    this.text = text;
-    this.resolve = options.resolve;
+    super({
+      title: game.i18n.localize("ITEM-PILES.Dialogs.TextEditor.Title"),
+      id: "item-piles-text-editor",
+      svelte: {
+        class: TextEditorDialogShell,
+        target: document.body,
+        props: {
+          text
+        }
+      },
+      close: () => this.options.resolve?.(null),
+      ...options
+    });
   }
   
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      title: game.i18n.localize("ITEM-PILES.Applications.DropItem.Title"),
-      template: `${CONSTANTS.PATH}templates/text-editor.html`,
-      width: 430,
-      height: 350,
+      width: 550,
+      height: 450,
       classes: ["item-piles-app"],
       resizable: true
     })
   }
   
-  async getData(options) {
-    const data = super.getData(options);
-    data.text = this.text;
-    return data;
-  }
-  
   static getActiveApps(id) {
     return Object.values(ui.windows).filter(app => app.id === `item-pile-text-editor-${id}`);
-  }
-  
-  async _updateObject(event, formData) {
-    this.resolve(formData.text);
-    return this.close();
-  }
-  
-  async close(options) {
-    this.resolve(null);
-    return super.close(options);
   }
   
   static async show(text, options = {}) {

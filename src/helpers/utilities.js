@@ -105,6 +105,18 @@ export function getItemQuantity(item) {
   return Number(getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
 }
 
+
+/**
+ * Returns whether an item has the quantity property
+ *
+ * @param {Item/Object} item
+ * @returns {number}
+ */
+export function hasItemQuantity(item) {
+  const itemData = item instanceof Item ? item.toObject() : item;
+  return hasProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE);
+}
+
 /**
  * Returns a given item's quantity
  *
@@ -124,10 +136,10 @@ export function setItemQuantity(itemData, quantity) {
  * @returns {Array<Token>}
  */
 export function getTokensAtLocation(position) {
-  const tokens = [...canvas.tokens.placeables].filter(token => token.visible);
+  const tokens = [...canvas.tokens.placeables].filter(token => token.mesh.visible);
   return tokens.filter(token => {
-    return position.x >= token.x && position.x < (token.x + (token.data.width * canvas.grid.size))
-      && position.y >= token.y && position.y < (token.y + (token.data.height * canvas.grid.size));
+    return position.x >= token.x && position.x < (token.x + (token.document.width * canvas.grid.size))
+      && position.y >= token.y && position.y < (token.y + (token.document.height * canvas.grid.size));
   });
 }
 
