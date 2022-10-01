@@ -249,9 +249,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
     const itemPileData = getActorFlagData(pileDocument, data);
 
-    let name = pileDocument instanceof TokenDocument
-        ? pileDocument.name
-        : pileDocument.prototypeToken.name;
+    let name = pileDocument instanceof TokenDocument ? pileDocument.name : pileDocument.prototypeToken.name;
 
     if (!isValidItemPile(pileDocument, itemPileData)) {
         return name;
@@ -381,10 +379,14 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
     }
 }
 
+function getExchangeRateDecimals(smallestExchangeRate) {
+    return smallestExchangeRate.toString().includes(".") ? smallestExchangeRate.toString().split(".")[1].length : 0;
+}
+
 function getPriceArray(totalCost, currencies) {
 
     const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
-    const decimals = smallestExchangeRate.toString().split(".")?.[1]?.length ?? 0;
+    const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
     let fraction = Helpers.roundToDecimals(totalCost % 1, decimals);
     let cost = Math.round(totalCost - fraction);
@@ -493,7 +495,7 @@ export function getItemPrices(item, {
     // In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
     // to it, in order have a stable form of exchange calculation
     const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
-    const decimals = smallestExchangeRate.toString().split(".")?.[1].length ?? 0;
+    const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
     if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices)) {
         priceData.push({
@@ -652,7 +654,7 @@ export function getPricesForItems(itemsToBuy, {
     const currencyList = getActorCurrencyList(merchant);
     const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
     const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
-    const decimals = smallestExchangeRate.toString().split(".")?.[1]?.length ?? 0;
+    const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
     const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
 
