@@ -2,6 +2,8 @@
 
 ## Version 2.2.1
 
+- Added the ability to drag and drop items between item pile interfaces
+- Fixed not being able to have multiple item pile interfaces open at the same time
 - Fixed per-actor price modifiers not working
 
 ## Version 2.2.0 (V10 only)

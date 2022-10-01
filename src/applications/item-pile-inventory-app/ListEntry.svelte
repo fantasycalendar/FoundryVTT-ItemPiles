@@ -30,9 +30,19 @@
 
   const editQuantities = store.editQuantities;
 
+  function dragStart(event) {
+    event.dataTransfer.setData('text/plain', JSON.stringify({
+      type: "Item",
+      uuid: entry.item.uuid
+    }));
+  }
+
 </script>
 
-<div class="item-piles-flexrow item-piles-item-row item-piles-even-color" transition:fade={{duration: 250}}
+<div class="item-piles-flexrow item-piles-item-row item-piles-even-color"
+     transition:fade={{duration: 250}}
+     draggable={!!entry.id}
+     on:dragstart={(event) => { dragStart(event) }}
      class:item-piles-disabled={!editQuantities && !$quantityLeft}>
 
   <div class="item-piles-img-container">

@@ -6,7 +6,7 @@ import HOOKS from "../../constants/hooks.js";
 import * as Helpers from "../../helpers/helpers.js";
 
 export class ItemPileInventoryApp extends SvelteApplication {
-  
+
   /**
    *
    * @param actor
@@ -17,7 +17,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
    */
   constructor(actor, recipient, overrides = {}, options = {}, dialogData = {}) {
     super({
-      id: `item-pile-inventory-${actor.id}`,
+      id: `item-pile-inventory-${actor?.token?.id ?? actor.id}`,
       title: actor.name,
       svelte: {
         class: ItemPileInventoryShell,
@@ -31,14 +31,14 @@ export class ItemPileInventoryApp extends SvelteApplication {
       zIndex: 100,
       ...options
     }, dialogData);
-    
+
     this.actor = actor;
     this.recipient = recipient;
-    
+
     Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, actor, recipient, overrides);
-    
+
   }
-  
+
   /** @inheritdoc */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -48,38 +48,38 @@ export class ItemPileInventoryApp extends SvelteApplication {
       height: "auto",
     });
   }
-  
+
   static getActiveApps(id) {
     return Object.values(ui.windows).filter(app => app.id === `item-pile-inventory-${id}`);
   }
-  
+
   static async show(source, recipient = false, overrides = {}, options = {}, dialogData = {}) {
-    source = Utilities.getActor(source)
+    source = Utilities.getActor(source);
     recipient = Utilities.getActor(recipient);
     const result = Helpers.hooks.call(HOOKS.PRE_OPEN_INTERFACE, source, recipient, overrides);
     if (result === false) return;
-    const apps = this.getActiveApps(source.id);
+    const apps = this.getActiveApps(source?.token?.id ?? source.id);
     if (apps.length) {
       for (let app of apps) {
         app.render(false, { focus: true });
       }
-      return
+      return;
     }
     return new Promise((resolve) => {
       options.resolve = resolve;
       new this(source, recipient, overrides, options, dialogData).render(true, { focus: true });
     })
   }
-  
+
   async close(options) {
     const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.actor, this.recipient);
     if (result === false) return;
     Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.actor, this.recipient);
     return super.close(options);
   }
-  
+
   /* -------------------------------------------- */
-  
+
   /** @override */
   _getHeaderButtons() {
     let buttons = super._getHeaderButtons();
@@ -122,5 +122,5 @@ export class ItemPileInventoryApp extends SvelteApplication {
     }
     return buttons
   }
-  
+
 }

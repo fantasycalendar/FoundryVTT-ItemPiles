@@ -51,6 +51,11 @@
 
   }
 
+  function preventDefaultGM(event) {
+    if (game.user.isGM) return;
+    event.preventDefault();
+  }
+
   function preventDefault(event) {
     event.preventDefault();
   }
@@ -74,7 +79,7 @@
 
   <main in:fade={{duration: 500}}>
 
-    <div class="item-piles-item-drop-container" on:dragstart={preventDefault} on:drop={dropData}
+    <div class="item-piles-item-drop-container" on:dragstart={preventDefaultGM} on:drop={dropData}
          on:dragover={preventDefault}>
 
       {#if $deleted}
