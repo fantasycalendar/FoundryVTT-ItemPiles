@@ -3,6 +3,7 @@
     import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
     import SliderInput from "../../components/SliderInput.svelte";
     import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+    import { getUuid } from "../../../helpers/utilities.js";
 
     const { application } = getContext('external');
 
@@ -18,7 +19,7 @@
 
     async function updateSettings() {
         priceModifiers.forEach(data => {
-            data.actor = data.actor.id;
+            data.actorUuid = getUuid(data.actor);
         })
         application.options.resolve?.(priceModifiers);
         application.close();

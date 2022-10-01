@@ -369,7 +369,7 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
     }
 
     if (actor && actorPriceModifiers) {
-        const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor));
+        const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor) || data.actor === actor.id);
         if (actorSpecificModifiers) {
             buyPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.buyPriceModifier : buyPriceModifier * actorSpecificModifiers.buyPriceModifier;
             sellPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.sellPriceModifier : sellPriceModifier * actorSpecificModifiers.sellPriceModifier;
