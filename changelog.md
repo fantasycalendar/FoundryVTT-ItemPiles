@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.2.2
+
+- Fixed users disconnecting causing trades between other users to be cancelled
+- Fixed dragging and dropping an actor into the trade actor selector not working
+
 ## Version 2.2.1
 
 - Added the ability to drag and drop items between item pile interfaces

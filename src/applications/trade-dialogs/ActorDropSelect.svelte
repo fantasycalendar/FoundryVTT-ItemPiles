@@ -14,7 +14,7 @@
     actor = canvas.tokens.controlled[0].actor;
   }
 
-  function dropData(event) {
+  async function dropData(event) {
     counter = 0;
     let data;
     try {
@@ -23,7 +23,7 @@
       return false;
     }
     if (data.type !== "Actor") return;
-    actor = game.actors.get(data.id);
+    actor = await fromUuid(data.uuid);
   }
 
   let counter = 0;
