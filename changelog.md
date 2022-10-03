@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 2.2.3
+
+- Updated Portuguese (Brazilian) localization (thank you, eunaumtenhoid!)
+- Fixed merchant description not being enriched, and now displays Foundry document links properly
+- Fixed merchant items not being alphabetically sorted by default
+- Fixed dropping spells in certain interfaces would not turn them into spell scrolls (DnD5e)
+- Fixed mystified items not staying mystified in the trading interface (PF2e)
+
 ## Version 2.2.2
 
 - Fixed users disconnecting causing trades between other users to be cancelled

@@ -34,6 +34,8 @@
 
   async function dropData(data) {
 
+    if (!game.user.isGM) return;
+
     if (!data.type) {
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
@@ -42,38 +44,16 @@
       throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
     }
 
-    let item = await Item.implementation.fromDropData(data);
-    let itemData = item.toObject();
-
-    if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-      itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
-    }
-
-    const disallowedType = PileUtilities.isItemInvalid(merchant, item);
-    if (disallowedType) {
-      if (!game.user.isGM) {
-        return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemSell", { type: disallowedType }), true)
-      }
-      if (!hotkeyState.shiftDown) {
-        const force = await Dialog.confirm({
-          title: game.i18n.localize("ITEM-PILES.Dialogs.TypeWarning.Title"),
-          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.TypeWarning.SellContent", { type: disallowedType })}</p>`,
-          defaultYes: false
-        });
-        if (!force) {
-          return false;
-        }
-      }
-    }
-
-    if (item.parent) {
-      return;
-    } else if (!game.user.isGM) {
-      return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true);
-    }
+    const item = await Item.implementation.fromDropData(data);
+    const validItem = await PileUtilities.checkItemType(merchant, item, {
+      errorText: "ITEM-PILES.Errors.DisallowedItemTrade",
+      warningTitle: "ITEM-PILES.Dialogs.TypeWarning.Title",
+      warningContent: "ITEM-PILES.Dialogs.TypeWarning.TradeContent"
+    });
+    if (!validItem) return;
 
     return game.itempiles.API.addItems(merchant, [{
-      item: itemData,
+      item: validItem.toObject(),
       quantity: 1
     }]);
 

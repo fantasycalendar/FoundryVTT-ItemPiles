@@ -11,6 +11,7 @@
   import TradeEntry from "./TradeEntry.svelte";
   import DropCurrencyDialog from "../dialogs/drop-currency-dialog/drop-currency-dialog.js";
   import * as Utilities from "../../helpers/utilities.js";
+  import { checkItemType } from "../../helpers/pile-utilities.js";
 
   export let elementRoot;
   export let store;
@@ -45,33 +46,21 @@
       throw Helpers.custom_error(`You cannot drop items into the trade UI from a different actor than ${store.leftTraderActor.name}!`)
     }
 
-    let itemData = item.toObject();
-    if (!itemData) {
-      console.error(data);
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
-    }
-
-    const disallowedType = PileUtilities.isItemInvalid(store.rightTraderActor, item);
-    if (disallowedType) {
-      if (!game.user.isGM) {
-        return Helpers.custom_warning(game.i18n.format("ITEM-PILES.Errors.DisallowedItemTrade", { type: disallowedType }), true);
-      }
-      if (!hotkeyState.shiftDown) {
-        const force = await Dialog.confirm({
-          title: game.i18n.localize("ITEM-PILES.Dialogs.TypeWarning.Title"),
-          content: `<p class="item-piles-dialog">${game.i18n.format("ITEM-PILES.Dialogs.TypeWarning.TradeContent", { type: disallowedType })}</p>`,
-          defaultYes: false
-        });
-        if (!force) {
-          return false;
-        }
-      }
-    }
+    const validItem = await PileUtilities.checkItemType(store.rightTraderActor, item, {
+      errorText: "ITEM-PILES.Errors.DisallowedItemTrade",
+      warningTitle: "ITEM-PILES.Dialogs.TypeWarning.Title",
+      warningContent: "ITEM-PILES.Dialogs.TypeWarning.TradeContent"
+    });
+    if (!validItem) return;
 
     const actorItemCurrencyList = PileUtilities.getActorCurrencyList(store.leftTraderActor).filter(entry => entry.type !== "attribute");
-    const isCurrency = !!Utilities.findSimilarItem(actorItemCurrencyList.map(item => item.data), itemData);
+    const isCurrency = !!Utilities.findSimilarItem(actorItemCurrencyList.map(item => item.data), validItem);
 
-    return store.addItem(itemData, { currency: isCurrency });
+    if (!validItem.id) {
+      validItem.id = item.id;
+    }
+
+    return store.addItem(validItem, { currency: isCurrency });
 
   }
 

@@ -5,6 +5,7 @@
   import SliderInput from "../components/SliderInput.svelte";
   import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
   import { get } from "svelte/store";
+  import { TJSProseMirror } from "@typhonjs-fvtt/svelte-standard/component";
 
   export let store;
   export let activeTab;
@@ -63,8 +64,8 @@
 
         {#if activeSidebarTab === 'description'}
           <div class="tab merchant-description">
-            {@html description || ""}
-            {#if game.user.isGM}
+            <TJSProseMirror content={description} options={{ editable: false }}/>
+            {#if game.user.isGM && !description}
               <button type="button"
                       style="flex:1;"
                       on:click={() => { showDescriptionEditor() }}

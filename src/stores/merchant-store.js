@@ -9,7 +9,7 @@ import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item
 import { isResponsibleGM } from "../helpers/helpers.js";
 
 export default class MerchantStore extends ItemPileStore {
-  
+
   setupStores() {
     super.setupStores();
     this.editPrices = writable(false);
@@ -24,28 +24,28 @@ export default class MerchantStore extends ItemPileStore {
     this.listenToDateChange = true;
     this.activateHooks();
   }
-  
+
   get ItemClass() {
     return PileMerchantItem;
   }
-  
+
   getActorImage() {
     const pileData = get(this.pileData);
     return pileData?.merchantImage || this.actor.img;
   }
-  
+
   activateHooks() {
     if (game.modules.get('foundryvtt-simple-calendar')?.active) {
       this.simpleCalendar();
     }
   }
-  
+
   simpleCalendar() {
     Hooks.on(window.SimpleCalendar.Hooks.DateTimeChange, () => {
       this.updateClosedStatus();
     });
   }
-  
+
   setupSubscriptions() {
     super.setupSubscriptions();
     this.subscribeTo(this.pileData, (pileData) => {
@@ -60,7 +60,7 @@ export default class MerchantStore extends ItemPileStore {
         this.refreshItemPrices();
       })
     }
-    
+
     const filterDebounce = foundry.utils.debounce(() => {
       this.refreshItems();
     }, 200);
@@ -69,7 +69,7 @@ export default class MerchantStore extends ItemPileStore {
       filterDebounce()
     });
   }
-  
+
   refreshItems() {
     super.refreshItems();
     const items = get(this.items).filter(item => {
@@ -85,6 +85,9 @@ export default class MerchantStore extends ItemPileStore {
       acc[item.type].push(item);
       return acc;
     }, {});
+    Object.values(itemsPerCategory).forEach(items => items.sort((a, b) => {
+      return a.item.name < b.item.name ? -1 : 1;
+    }));
     this.itemsPerCategory.set(itemsPerCategory);
     let categories = Object.keys(itemsPerCategory);
     categories.sort()
@@ -94,13 +97,13 @@ export default class MerchantStore extends ItemPileStore {
       }
     }));
   }
-  
+
   refreshItemPrices() {
     get(this.allItems).forEach(item => {
       item.refreshPriceData();
     });
   }
-  
+
   createItem(item) {
     if (PileUtilities.isItemInvalid(this.actor, item)) return;
     const items = get(this.allItems);
@@ -110,7 +113,7 @@ export default class MerchantStore extends ItemPileStore {
     this.allItems.set(items);
     this.refreshItems();
   }
-  
+
   deleteItem(item) {
     if (PileUtilities.isItemInvalid(this.actor, item)) return;
     const items = get(this.allItems);
@@ -121,7 +124,7 @@ export default class MerchantStore extends ItemPileStore {
     this.allItems.set(items);
     this.refreshItems();
   }
-  
+
   updatePriceModifiers() {
     let pileData = get(this.pileData);
     this.priceModifiersPerType.set(pileData.itemTypePriceModifiers.reduce((acc, priceData) => {
@@ -135,7 +138,7 @@ export default class MerchantStore extends ItemPileStore {
       }
     }
   }
-  
+
   addOverrideTypePrice(type) {
     const pileData = get(this.pileData);
     pileData.itemTypePriceModifiers.push({
@@ -146,7 +149,7 @@ export default class MerchantStore extends ItemPileStore {
     })
     this.pileData.set(pileData);
   }
-  
+
   removeOverrideTypePrice(type) {
     const pileData = get(this.pileData);
     const priceMods = pileData.itemTypePriceModifiers;
@@ -154,7 +157,7 @@ export default class MerchantStore extends ItemPileStore {
     priceMods.splice(priceMods.indexOf(typeEntry), 1);
     this.pileData.set(pileData);
   }
-  
+
   async update() {
     const pileData = get(this.pileData);
     const priceModPerType = get(this.priceModifiersPerType);
@@ -162,7 +165,7 @@ export default class MerchantStore extends ItemPileStore {
     await PileUtilities.updateItemPileData(this.actor, pileData);
     Helpers.custom_notify(localize("ITEM-PILES.Notifications.UpdateMerchantSuccess"));
   }
-  
+
   tradeItem(pileItem, selling) {
     if (get(pileItem.itemFlagData).notForSale && !game.user.isGM) return;
     TradeMerchantItemDialog.show(
@@ -172,7 +175,7 @@ export default class MerchantStore extends ItemPileStore {
       { selling }
     );
   }
-  
+
   async updateClosedStatus() {
     if (!this.listenToDateChange) return;
     const pileData = get(this.pileData);
@@ -188,24 +191,24 @@ export default class MerchantStore extends ItemPileStore {
         pileData.openTimes.status = "open";
         await PileUtilities.updateItemPileData(this.actor, pileData);
       }
-      
+
     } else if (!pileData.openTimes.status.startsWith("auto")) {
-      
+
       this.closed.set(pileData.openTimes.status === "closed");
-      
+
     }
   }
-  
+
   async setOpenStatus(status) {
     const pileData = get(this.pileData);
     pileData.openTimes.status = status;
     await PileUtilities.updateItemPileData(this.actor, pileData);
   }
-  
+
 }
 
 class PileMerchantItem extends PileItem {
-  
+
   setupStores(item) {
     super.setupStores(item);
     this.itemFlagData = writable({});
@@ -214,7 +217,7 @@ class PileMerchantItem extends PileItem {
     this.selectedPriceGroup = writable(-1);
     this.quantityToBuy = writable(1);
   }
-  
+
   setupSubscriptions() {
     let setup = false;
     super.setupSubscriptions();
@@ -255,32 +258,32 @@ class PileMerchantItem extends PileItem {
     this.refreshDisplayQuantity();
     this.subscribeTo(this.store.typeFilter, this.filter.bind(this));
   }
-  
+
   refreshDisplayQuantity() {
-    
+
     const merchantDisplayQuantity = get(this.store.pileData).displayQuantity;
-    
+
     const itemFlagDataQuantity = get(this.itemFlagData).displayQuantity;
-    
+
     if (itemFlagDataQuantity === "always") {
       return this.displayQuantity.set(true);
     }
-    
+
     const itemDisplayQuantity = {
       "default": merchantDisplayQuantity === "yes",
       "yes": true,
       "no": false
     }[itemFlagDataQuantity ?? "default"];
-    
+
     if (merchantDisplayQuantity.startsWith("always")) {
       return this.displayQuantity.set(merchantDisplayQuantity.endsWith("yes"));
     }
-    
+
     this.displayQuantity.set(itemDisplayQuantity)
   }
-  
+
   refreshPriceData() {
-    
+
     const quantityToBuy = get(this.quantityToBuy);
     const itemFlagData = get(this.itemFlagData);
     const sellerFlagData = get(this.store.pileData);
@@ -293,17 +296,17 @@ class PileMerchantItem extends PileItem {
       itemFlagData,
       quantity: quantityToBuy
     });
-    
+
     let selectedPriceGroup = get(this.selectedPriceGroup);
     if (selectedPriceGroup === -1) {
       selectedPriceGroup = Math.max(0, priceData.findIndex(price => price.maxQuantity));
       this.selectedPriceGroup.set(selectedPriceGroup)
     }
-    
+
     this.prices.set(priceData);
-    
+
   }
-  
+
   filter() {
     const name = get(this.name);
     const search = get(this.store.search);
@@ -312,10 +315,10 @@ class PileMerchantItem extends PileItem {
     const typeFiltered = typeFilter !== "all" && typeFilter.toLowerCase() !== this.type.toLowerCase();
     this.filtered.set(searchFiltered || typeFiltered);
   }
-  
+
   async updateItemFlagData() {
     const itemFlagData = get(this.itemFlagData);
     await PileUtilities.updateItemData(this.item, { flags: itemFlagData });
   }
-  
+
 }

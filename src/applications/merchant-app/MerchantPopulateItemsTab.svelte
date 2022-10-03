@@ -24,14 +24,9 @@
 
   let itemStore = store.items;
 
-  let currentItems = [];
-
-  $: {
-    currentItems = $itemStore;
-    currentItems.sort((a, b) => {
-      return a.name < b.name ? -1 : 1;
-    });
-  }
+  $: currentItems = $itemStore.sort((a, b) => {
+    return a.item.name < b.item.name ? -1 : 1;
+  });
 
   $: {
     const pileData = get(store.pileData);
@@ -113,7 +108,7 @@
       await rollItems(table.id, table.timesToRoll);
     }
     timesRolled = $itemsRolled.reduce((total, item) => {
-      return (total += item.quantity);
+      return total + item.quantity;
     }, 0);
     keepRolled = tkr;
   }
