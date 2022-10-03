@@ -7,6 +7,7 @@
 - Fixed merchant items not being alphabetically sorted by default
 - Fixed dropping spells in certain interfaces would not turn them into spell scrolls (DnD5e)
 - Fixed mystified items not staying mystified in the trading interface (PF2e)
+- Fixed currencies not showing up in loot chat cards
 
 ## Version 2.2.2
 
