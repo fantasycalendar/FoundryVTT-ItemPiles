@@ -1,18 +1,15 @@
 # Item Piles Changelog
 
-## Version 2.2.3
+## Version 2.2.2
 
 - Updated Portuguese (Brazilian) localization (thank you, eunaumtenhoid!)
+- Fixed users disconnecting causing trades between other users to be cancelled
+- Fixed dragging and dropping an actor into the trade actor selector not working
 - Fixed merchant description not being enriched, and now displays Foundry document links properly
 - Fixed merchant items not being alphabetically sorted by default
 - Fixed dropping spells in certain interfaces would not turn them into spell scrolls (DnD5e)
 - Fixed mystified items not staying mystified in the trading interface (PF2e)
 - Fixed currencies not showing up in loot chat cards
-
-## Version 2.2.2
-
-- Fixed users disconnecting causing trades between other users to be cancelled
-- Fixed dragging and dropping an actor into the trade actor selector not working
 
 ## Version 2.2.1
 
