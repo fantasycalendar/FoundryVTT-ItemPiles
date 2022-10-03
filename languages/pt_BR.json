@@ -106,6 +106,9 @@
         "ContentOne": "{source_actor_name} quer dar o item \"{item_name}\" para {target_actor_name}, você aceita?",
         "Ignore": "Ignorar usuário",
         "ContentMany": "{source_actor_name} quer dar os itens \"{item_name}\" ({quantity}) para {target_actor_name}, você aceita?"
+      },
+      "TextEditor": {
+        "Title": "Editor de texto"
       }
     },
     "Currencies": "Moedas",
@@ -155,7 +158,8 @@
       "TradeSpectate": "Assistir negociação",
       "SpectateDisabled": "Negociação completa",
       "PrivateTrade": "Negociação privada",
-      "ExpandTrade": "Veja detalhes da negociação"
+      "ExpandTrade": "Veja detalhes da negociação",
+      "MerchantTraded": "{name} comprou os seguintes itens de {merchant}:"
     },
     "HeaderButtons": {
       "ShowToPlayers": "Mostrar aos Jogadores"
@@ -201,7 +205,11 @@
       "Closed": "Fechado",
       "MerchantClosed": "O comerciante está fechado, volte mais tarde.",
       "SellNoItems": "Você não tem itens para vender a este comerciante",
-      "ClearAllItems": "Limpar todos os itens do ator"
+      "ClearAllItems": "Limpar todos os itens do ator",
+      "Title": "Comerciante: {actor_name}",
+      "PopulateItems": "Itens Populares",
+      "BuyItems": "Comprar itens",
+      "SellItems": "Vender itens"
     },
     "Applications": {
       "DropItem": {
@@ -323,7 +331,228 @@
       "PriceModifiersEditor": {
         "Title": "Editor de Modificadores de Preço do Item Piles",
         "TitleActor": "Editor de modificadores de preço do Item Piles: {actor_name}",
-        "Explanation": "Aqui você pode definir o preço e os modificadores de preço de venda para este comerciante em relação a atores específicos. A configuração \"Substituir\" significa que ela substitui os modificadores de preço normais do comerciante, incluindo modificadores de preço específicos do tipo de item."
+        "Explanation": "Aqui você pode definir o preço e os modificadores de preço de venda para este comerciante em relação a atores específicos. A configuração \"Substituir\" significa que ela substitui os modificadores de preço normais do comerciante, incluindo modificadores de preço específicos do tipo de item.",
+        "DragDrop": "Arraste e solte um ator para adicioná-lo à lista",
+        "Actor": "Ator",
+        "Override": "Sobrepor",
+        "Submit": "Enviar modificadores de preço"
+      },
+      "ItemPileConfig": {
+        "Main": {
+          "Macro": "Na Macro do Interact",
+          "MacroExplanation": "Nome da macro a ser executada quando esta pilha for interagida.",
+          "MacroPlaceholder": "Inserir nome da macro",
+          "EditDescription": "Editar Descrição",
+          "OverrideCurrenciesExplanation": "Configure se esta pilha deve ser capaz de transferir outras moedas além do padrão.",
+          "OverrideItemFiltersExplanation": "Configure se esta pilha deve ser capaz de transferir itens de outros tipos que não o padrão.",
+          "Title": "Configurações principais",
+          "EnabledPile": "Ativado",
+          "EnabledPileExplanation": "Se isso deve funcionar como uma pilha de itens.",
+          "InspectItems": "Ativar inspeção de itens",
+          "InspectItemsExplanation": "Clicar nos nomes dos itens abrirá a planilha do item.",
+          "Distance": "Distância de interação",
+          "GridUnits": "Unidades de grade (deixe em branco para infinito)",
+          "EditDescriptionExplanation": "Esta descrição é mostrada nas interfaces relevantes quando a pilha de itens é visualizada",
+          "DeleteWhenEmpty": "Excluir quando vazio",
+          "DeleteWhenEmptyExplanation": "Faz com que esta pilha de itens se exclua automaticamente quando estiver vazia.",
+          "DeleteWhenEmptyDefault": "Configuração padrão do módulo",
+          "DeleteWhenEmptyYes": "Sim, excluir quando estiver vazio",
+          "DeleteWhenEmptyNo": "Não, não exclua quando estiver vazio",
+          "OverrideCurrencies": "Substituir moedas",
+          "ConfigureOverrideCurrencies": "Configurar moedas de substituição",
+          "OverrideItemFilters": "Substituir filtros de itens",
+          "ConfigureOverrideItemFilters": "Configurar filtros de itens de substituição"
+        },
+        "SingleItem": {
+          "DisplayOneContainerWarning": "Aviso! Você tem \"Exibir imagem de item único\" e \"É contêiner\" ativados. Nesse caso, as imagens do contêiner têm prioridade.",
+          "Title": "Configurações de item único",
+          "DisplayOne": "Exibir imagem de item único",
+          "DisplayOneExplanation": "Se a pilha for composta por um único item, isso configura a imagem do token da pilha para ser a imagem do item.",
+          "OverrideScale": "Substituir escala de token de item único",
+          "Scale": "Escala de token de item único",
+          "ItemName": "Usar nome do item",
+          "ItemNameExplanation": "Faz com que a pilha de itens tenha o nome do item único que ela contém."
+        },
+        "Sharing": {
+          "Title": "Configurações de compartilhamento",
+          "ShareItemsEnabledExplanation": "Quando isso está ativado, os jogadores só podem levar sua parte das quantidades de itens. Desativado significa que eles podem tomar o quanto quiserem.",
+          "TakeAllEnabledExplanation": "Ativa o botão \"Pegar tudo\" ao saquear esta pilha de itens. Requer que ambas as configurações de compartilhamento acima sejam desativadas.",
+          "ResetSharingDataExplanation": "Se o conteúdo do Item Pile foi alterado manualmente enquanto as pessoas estavam saqueando, os dados de compartilhamento podem ficar fora de sincronia com os compartilhamentos reais dos jogadores. Pressionar este botão irá redefinir a parte de todos nesta pilha.",
+          "ShareItemsEnabled": "Compartilhamento ativado: itens",
+          "ShareCurrenciesEnabled": "Compartilhamento ativado: moedas",
+          "ShareCurrenciesEnabledExplanation": "Quando isso está ativado, os jogadores só podem levar sua parte das quantidades de moedas. Desativado significa que eles podem tomar o quanto quiserem.",
+          "TakeAllEnabled": "Ativar o botão \"Pegar tudo\"",
+          "SplitAllEnabled": "Botão Ativar Divisão com Jogadores",
+          "SplitAllEnabledExplanation": "Ativa o botão \"Dividir [número] maneiras\" ao saquear esta pilha de itens. Pressionar este botão faz com que todos os jogadores (ou apenas os jogadores ativos, veja abaixo) recebam sua parte da pilha de itens.",
+          "InactivePlayers": "Dividir apenas com jogadores ativos",
+          "InactivePlayersExplanation": "Apenas os jogadores que estiverem ativos quando esta pilha de itens for saqueada receberão sua parte da pilha.",
+          "ResetSharingData": "Redefinir dados de compartilhamento"
+        },
+        "Merchant": {
+          "EnabledExplanation": "Os jogadores não podem pegar itens de comerciantes, mas devem comprá-los",
+          "OnyAcceptBasePriceExplanation": "Quando ativado, todos os itens vendidos a este comerciante devem usar o preço base, e não os preços personalizados.",
+          "OpenTimesExplanation": "Quando ativado, o comerciante só pode interagir com os jogadores em determinados horários do dia.",
+          "OpenStatusExplanation": "Isso configura o estado atual do status aberto do comerciante. Se Open Times (abaixo) estiver habilitado e o módulo Simple Calendar estiver habilitado, você pode configurar isso para ser automático.",
+          "ActorPriceModifiers": "Modificadores de preço de substituição por ator",
+          "ActorPriceModifiersExplanation": "Aqui você pode configurar se determinados atores específicos devem ter modificadores de preço diferentes dos modificadores de preço acima.",
+          "Title": "Configurações do comerciante",
+          "PurchaseOnlyExplanation": "Quando ativado, os personagens não podem vender itens para este comerciante.",
+          "HideNewItems": "Ocultar novos itens",
+          "HideNewItemsExplanation": "Quando ativado, todos os itens vendidos a este comerciante ficarão ocultos.",
+          "MerchantImage": "Imagem do comerciante",
+          "MerchantImageExplanation": "Esta é a imagem que será exibida na interface do lojista",
+          "InfiniteQuantity": "Quantidade infinita",
+          "InfiniteQuantityExplanation": "Quando ativado, este comerciante não pode ficar sem itens.",
+          "InfiniteCurrency": "Moedas infinitas",
+          "InfiniteCurrencyExplanation": "Quando ativado, a venda de itens para este comerciante não será subtraída de suas moedas.",
+          "DisplayQuantity": "Visibilidade da quantidade do item",
+          "DisplayQuantityExplanation": "Isso configura como a quantidade de itens na loja é mostrada, se for o caso.",
+          "DisplayQuantityYes": "Sim, mostre a quantidade (a menos que o item diga o contrário)",
+          "DisplayQuantityNo": "Não, oculte a quantidade (a menos que o item diga o contrário)",
+          "DisplayQuantityYesAlways": "Sim, sempre mostrar a quantidade",
+          "DisplayQuantityNoAlways": "Não, sempre ocultar a quantidade",
+          "PurchaseOnly": "Somente compra",
+          "OnyAcceptBasePrice": "Aceitar apenas preço base",
+          "Enabled": "É Comerciante",
+          "OpenTimes": "Horários abertos",
+          "OpenStatus": "Status aberto",
+          "OpenStatusClosed": "Fechado",
+          "OpenStatusOpen": "Aberto",
+          "OpenStatusAuto": "Automático (Simple Calendar)",
+          "PriceModifierTitle": "Modificadores de preço de compra e venda",
+          "PriceModifierExplanation": "Isso configura os modificadores para o custo de cada item na loja. Você também pode configurar modificadores por tipo de item e até mesmo para personagens específicos (como bardos de língua prateada). Você não está limitado a 200%, digite no campo para ir ainda mais alto.",
+          "BuyPriceModifier": "Modificador de preço de compra (%)",
+          "SellPriceModifier": "Modificador de preço de venda (%)",
+          "ItemTypeModifier": "Modificadores de preço do tipo de item",
+          "ItemTypeModifiersExplanation": "Nesta caixa de diálogo, você pode configurar modificadores de preço para tipos de itens individuais.",
+          "ConfigureItemTypePriceModifiers": "Configurar modificadores de preço de tipo de item.",
+          "ConfigureActorPriceModifiers": "Configurar modificadores de preço de ator."
+        },
+        "Title": "Configuração do Item Pile: {actor_name}",
+        "Configure": "Item Pile",
+        "Update": "Atualizar Item Pile",
+        "Container": {
+          "Closed": "Está fechado",
+          "ClosedImagePath": "Caminho da imagem fechada",
+          "EmptyImagePath": "Caminho de imagem vazio",
+          "OpenedImagePath": "Caminho da imagem aberta",
+          "Title": "Configurações do contêiner",
+          "IsContainer": "É Contêiner",
+          "Locked": "Está bloqueado",
+          "LockedImagePath": "Caminho de imagem bloqueado",
+          "CloseSoundPath": "Fechando o Caminho do Som",
+          "OpenSoundPath": "Abrindo caminho de som",
+          "LockedSoundPath": "Caminho de som bloqueado"
+        },
+        "Other": {
+          "Title": "Outros ajustes"
+        }
+      },
+      "PricePresetEditor": {
+        "Title": "Editor de predefinições de preço",
+        "Update": "Atualizar predefinições",
+        "Explanation": "Aqui você pode criar vários preços predefinidos que podem ser facilmente usados nos preços personalizados dos itens."
+      }
+    },
+    "Settings": {
+      "Reset": {
+        "Hint": "Isso redefinirá todas as configurações do Item Piles de volta ao padrão do sistema de jogo ativo.",
+        "Title": "Redefinir as configurações específicas do sistema para o padrão",
+        "Label": "Redefinir as configurações"
+      },
+      "Quantity": {
+        "Hint": "Aqui você pode configurar qual é o caminho do atributo para a quantidade de cada item. Por exemplo, no sistema D&D5e, a quantidade de cada item é armazenada no atributo \"item.data.data.quantity\" do item, então você deve colocar \"data.quantity\" nesta configuração.",
+        "Title": "Atributo de quantidade do item"
+      },
+      "ItemSimilarities": {
+        "Hint": "Aqui você pode configurar como os itens são detectados para serem os mesmos neste sistema. Alguns sistemas podem ter dados que distinguem itens de forma diferente de outros, como itens temporários.",
+        "Title": "Semelhanças de itens",
+        "Label": "Configurar semelhanças de itens"
+      },
+      "EnableDroppingItems": {
+        "Hint": "Isso permite que os usuários possam soltar itens no chão para criar suas próprias pilhas de itens - com isso desativado, os usuários não podem criar novas pilhas nem adicionar itens às pilhas existentes.",
+        "Title": "Ativar descarte de itens"
+      },
+      "ShowTradeButton": {
+        "Hint": "Ativar isso exibirá um botão de troca logo abaixo da lista de jogadores no canto inferior direito.",
+        "Title": "Mostrar Botão de Negociação"
+      },
+      "OutputToChat": {
+        "Hint": "Sempre que qualquer jogador pegar itens de uma pilha de itens, isso enviará uma mensagem mostrando o que foi coletado.",
+        "Title": "Saída para chat",
+        "Off": "Desligado - desliga as mensagens",
+        "Public": "Público - todos podem ver as mensagens",
+        "SelfGM": "Privado - apenas GMs e usuários podem ver as mensagens",
+        "Blind": "Cega - apenas GMs podem ver as mensagens"
+      },
+      "InvertSheetOpen": {
+        "Hint": "Normalmente, você precisa manter o controle quando deseja abrir a folha de ator de uma pilha de itens. ativar isso faz com que a folha do ator da pilha de itens seja aberta por padrão e manter o controle aberto abre a interface de usuário do inventário do item pile.",
+        "Title": "Inverter Ctrl + Duplo Clique Abrir"
+      },
+      "PopulationTablesFolder": {
+        "Hint": "Título da pasta para filtrar tabelas de rolagem na guia \"Itens Populares\" do comerciante.",
+        "AllTables": "Todas as tabelas",
+        "Title": "Pasta tabelas de rolagem para \"Itens Populares\""
+      },
+      "Configure": {
+        "Title": "Configuração do módulo",
+        "Label": "Configurar módulo",
+        "Hint": "Você pode configurar o Item Piles nesta caixa de diálogo."
+      },
+      "ActorClass": {
+        "Hint": "Essa configuração define o tipo de ator que será usado para o ator do item pile padrão que é criado no primeiro lançamento de item. No caso de D&D5e, isso é \"personagem\", pois não possui um tipo de ator de saque dedicado.",
+        "Title": "Tipo de classe de ator"
+      },
+      "Price": {
+        "Title": "Atributo de preço do item",
+        "Hint": "Aqui você pode configurar qual é o caminho do atributo para o preço de cada item. Por exemplo, no sistema D&D5e, a quantidade de cada item é armazenada no atributo \"item.data.data.price\" do item, então você deve colocar \"data.price\" nesta configuração."
+      },
+      "Currencies": {
+        "Title": "Moedas",
+        "Label": "Configurar moedas",
+        "Hint": "Esta configuração define as moedas que são elegíveis para retirada, que podem não ser itens reais, mas entradas numéricas na ficha de personagem."
+      },
+      "EnableTrading": {
+        "Title": "Ativar negociação",
+        "Hint": "Isso permite a negociação - com isso desativado, ninguém pode iniciar nenhuma negociação."
+      },
+      "HideActorHeaderText": {
+        "Title": "Ocultar o texto do cabeçalho do ator",
+        "Hint": "Oculta o texto \"Item Piles\" no cabeçalho do ator - útil se você tiver muitos módulos e o cabeçalho estiver ficando lotado."
+      },
+      "ItemFilters": {
+        "Title": "Filtros de itens",
+        "Label": "Configurar filtros de itens",
+        "Hint": "Aqui você pode configurar quais itens são ignorados e não listados nas caixas de diálogo do item pile."
+      },
+      "PricePresets": {
+        "Title": "Predefinições de preço",
+        "Label": "Configurar predefinições de preço",
+        "Hint": "Aqui você pode configurar preços predefinidos personalizados que podem ser facilmente importados para os itens."
+      },
+      "EnableGivingItems": {
+        "Title": "Ativar doação de itens",
+        "Hint": "Isso permite que os usuários possam soltar itens em outros tokens para entregá-los a eles - com isso desativado, os usuários não podem fornecer itens a outros usuários."
+      },
+      "InspectItemsTrade": {
+        "Title": "Ativar a inspeção de itens durante as negociações",
+        "Hint": "Ativar isso faz com que os usuários possam clicar em itens que estão sendo negociados e abrir a planilha do item para visualizá-los."
+      },
+      "DeleteEmptyPiles": {
+        "Title": "Excluir pilhas vazias automaticamente",
+        "Hint": "Isso faz com que as pilhas de itens se excluam assim que ficarem sem itens. Isso pode ser substituído em pilhas de itens individuais."
+      },
+      "PreloadFiles": {
+        "Title": "Pré-carregar arquivos",
+        "Hint": "Faz com que os arquivos (imagens e áudio) das pilhas sejam pré-carregados, resultando em uma experiência perfeita."
+      },
+      "Debug": {
+        "Title": "Ativar depuração",
+        "Hint": "Imprime mensagens de depuração no console"
+      },
+      "DebugHooks": {
+        "Title": "Ativar depuração de ganchos",
+        "Hint": "Imprime os ganchos do item pile e seu conteúdo no console"
       }
     }
   }
