@@ -71,6 +71,11 @@
       "lang": "pt-BR",
       "name": "Português (Brasil)",
       "path": "languages/pt_BR.json"
+    },
+    {
+      "lang": "pl",
+      "name": "polski",
+      "path": "languages/pl.json"
     }
   ],
   "relationships": {
