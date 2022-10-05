@@ -15,7 +15,7 @@
   let store = ItemPriceStore.make(item);
 
   const flagDataStore = store.data;
-  let price = store.price
+  let price = store.price;
 
   $: itemFlagData = $flagDataStore;
 
@@ -117,15 +117,17 @@
 
         <div class="tab flex">
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.BasePrice")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.BasePriceExplanation")}</p>
-            </label>
-            <input type="text" bind:value={$price} on:change={() => {
-              $price = Math.max(0, Number($price)).toString();
-            }}/>
-          </div>
+          {#if game.system.id !== "pf2e"}
+            <div class="form-group">
+              <label style="flex:4;">
+                {localize("ITEM-PILES.Applications.ItemEditor.BasePrice")}<br>
+                <p>{localize("ITEM-PILES.Applications.ItemEditor.BasePriceExplanation")}</p>
+              </label>
+              <input type="text" bind:value={$price} on:change={() => {
+                $price = Math.max(0, Number($price));
+              }}/>
+            </div>
+          {/if}
 
           <div class="form-group">
             <label style="flex:4;">

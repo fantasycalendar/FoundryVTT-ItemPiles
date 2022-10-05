@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.2.3
+
+- Added full merchant support in the Pathfinder 2e system
+
 ## Version 2.2.2
 
 - Updated Portuguese (Brazilian) localization (thank you, eunaumtenhoid!)
@@ -24,6 +28,10 @@
 - Updated French and Portuguese (Brazilian) localization (thank you to Padhiver & eunaumtenhoid, respectively!)
 - Localization can be easily done through weblate:
   <https://weblate.foundryvtt-hub.com/>
+
+## Version 2.1.2 (V9 only)
+
+- Fixed handling systems with currencies that lack decimals
 
 ## Version 2.1.1 (V9 only)
 

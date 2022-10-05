@@ -3,6 +3,7 @@ import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "./helpers.js";
 import { SYSTEMS } from "../systems.js";
 import { hotkeyState } from "../hotkeys.js";
+import { getItemCost } from "./utilities.js";
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
@@ -521,12 +522,6 @@ export function getItemPrices(item, {
 
   }
 
-  if (!modifier) {
-    return priceData;
-  }
-
-  const overallCost = getProperty(item.toObject(), game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
-
   const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
   const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
 
@@ -538,7 +533,13 @@ export function getItemPrices(item, {
   const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
-  if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices)) {
+  let overallCost = Utilities.getItemCost(item);
+  if (game.system.id === "pf2e") {
+    const { copperValue } = new game.pf2e.Coins(overallCost.value);
+    overallCost = copperValue / 100 / (overallCost.per ?? 1);
+  }
+
+  if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices) || modifier <= 0) {
     priceData.push({
       free: true,
       basePrices: [],

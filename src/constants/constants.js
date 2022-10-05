@@ -3,10 +3,10 @@ const module_path = `modules/${module_name}/`;
 const baseFlag = `flags.${module_name}.`
 
 const CONSTANTS = {
-  
+
   MODULE_NAME: module_name,
   PATH: module_path,
-  
+
   FLAGS: {
     PILE: baseFlag + "data",
     SHARING: baseFlag + "sharing",
@@ -15,7 +15,7 @@ const CONSTANTS = {
     TRADE_USERS: baseFlag + "tradeUsers",
     TEMPORARY_ITEM: baseFlag + "temporary_item"
   },
-  
+
   ITEM_DEFAULTS: {
     hidden: false,
     notForSale: false,
@@ -24,10 +24,9 @@ const CONSTANTS = {
     free: false,
     disableNormalCost: false,
     cantBeSoldToMerchants: false,
-    prices: [],
-    perUnit: 1
+    prices: []
   },
-  
+
   PILE_DEFAULTS: {
     // Core settings
     enabled: false,
@@ -36,24 +35,24 @@ const CONSTANTS = {
     deleteWhenEmpty: "default",
     canInspectItems: true,
     description: "",
-    
+
     // Overrides
     overrideItemFilters: false,
     overrideCurrencies: false,
-    
+
     // Token settings
     displayOne: false,
     showItemName: false,
     overrideSingleItemScale: false,
     singleItemScale: 1.0,
-    
+
     // Sharing settings
     shareItemsEnabled: false,
     shareCurrenciesEnabled: true,
     takeAllEnabled: false,
     splitAllEnabled: true,
     activePlayers: false,
-    
+
     // Container settings
     isContainer: false,
     closed: false,
@@ -74,7 +73,7 @@ const CONSTANTS = {
     lockedSounds: [],
     unlockedSound: "",
     unlockedSounds: [],
-    
+
     // Merchant settings
     isMerchant: false,
     merchantImage: "",

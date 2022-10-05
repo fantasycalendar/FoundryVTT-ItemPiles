@@ -34,12 +34,12 @@ export function stringIsUuid(inId) {
 export function fromUuidFast(uuid) {
   let parts = uuid.split(".");
   let doc;
-  
+
   const [docName, docId] = parts.slice(0, 2);
   parts = parts.slice(2);
   const collection = CONFIG[docName].collection.instance;
   doc = collection.get(docId);
-  
+
   // Embedded Documents
   while (doc && (parts.length > 1)) {
     const [embeddedName, embeddedId] = parts.slice(0, 2);
@@ -63,24 +63,24 @@ export function getUuid(target) {
  * @returns {*}
  */
 export function findSimilarItem(items, findItem) {
-  
+
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
-  
+
   const findItemId = findItem instanceof Item ? findItem.id : findItem._id;
-  
+
   return items.find(item => {
     const itemId = item instanceof Item ? item.id : item._id;
     if (itemId && findItemId && itemId === findItemId) {
       return true;
     }
-    
+
     const itemData = item instanceof Item ? item.toObject() : item;
     for (const path of itemSimilarities) {
-      if (!hasProperty(itemData, path) || !hasProperty(findItem, path) || getProperty(itemData, path) !== getProperty(findItem, path)) {
+      if (getProperty(itemData, path) !== getProperty(findItem, path) || (!hasProperty(itemData, path) ^ !hasProperty(findItem, path))) {
         return false;
       }
     }
-    
+
     return true;
   });
 }
@@ -129,6 +129,12 @@ export function setItemQuantity(itemData, quantity) {
   return itemData;
 }
 
+
+export function getItemCost(item) {
+  const itemData = item instanceof Item ? item.toObject() : item;
+  return getProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE) ?? 0;
+}
+
 /**
  * Retrieves all visible tokens on a given location
  *
@@ -144,22 +150,22 @@ export function getTokensAtLocation(position) {
 }
 
 export function distance_between_rect(p1, p2) {
-  
+
   const x1 = p1.x;
   const y1 = p1.y;
   const x1b = p1.x + p1.w;
   const y1b = p1.y + p1.h;
-  
+
   const x2 = p2.x;
   const y2 = p2.y;
   const x2b = p2.x + p2.w;
   const y2b = p2.y + p2.h;
-  
+
   const left = x2b < x1;
   const right = x1b < x2;
   const bottom = y2b < y1;
   const top = y1b < y2;
-  
+
   if (top && left) {
     return distance_between({ x: x1, y: y1b }, { x: x2b, y: y2 });
   } else if (left && bottom) {
@@ -177,9 +183,9 @@ export function distance_between_rect(p1, p2) {
   } else if (top) {
     return y2 - y1b;
   }
-  
+
   return 0;
-  
+
 }
 
 export function distance_between(a, b) {
