@@ -50,34 +50,34 @@ export function isItemPileLocked(target, data = false) {
 }
 
 export function isItemPileEmpty(target) {
-  
+
   const targetActor = Utilities.getActor(target);
   if (!targetActor) return false;
-  
+
   const validItemPile = isValidItemPile(targetActor);
   if (!validItemPile) return false;
-  
+
   const hasNoItems = getActorItems(targetActor).length === 0;
   const hasNoAttributes = getActorCurrencies(targetActor).length === 0;
-  
+
   return validItemPile && hasNoItems && hasNoAttributes;
-  
+
 }
 
 export function shouldItemPileBeDeleted(targetUuid) {
-  
+
   const target = Utilities.fromUuidFast(targetUuid);
-  
+
   if (!(target instanceof TokenDocument)) return false;
-  
+
   if (!isItemPileEmpty(target)) return false;
-  
+
   const pileData = getActorFlagData(target);
-  
+
   return {
     "default": Helpers.getSetting("deleteEmptyPiles"), "true": true, "false": false
   }[pileData?.deleteWhenEmpty ?? "default"];
-  
+
 }
 
 export function getActorItems(target, { itemFilters = false } = {}) {
@@ -166,37 +166,37 @@ export function isItemCurrency(item, { target = false } = {}) {
 
 
 export function getItemPileTokenImage(token, { data = false, items = false, currencies = false } = {}) {
-  
+
   const tokenDocument = Utilities.getDocument(token);
-  
+
   const itemPileData = getActorFlagData(tokenDocument, data);
-  
+
   let originalImg;
   if (tokenDocument instanceof TokenDocument) {
     originalImg = tokenDocument.data.img;
   } else {
     originalImg = tokenDocument.data.token.img;
   }
-  
+
   if (!isValidItemPile(tokenDocument)) return originalImg;
-  
+
   items = items || getActorItems(tokenDocument).map(item => item.toObject());
   currencies = currencies || getActorCurrencies(tokenDocument);
-  
+
   const numItems = items.length + currencies.length;
-  
+
   let img;
-  
+
   if (itemPileData.displayOne && numItems === 1) {
     img = items.length > 0 ? items[0].img : currencies[0].img;
   } else if (itemPileData.displayOne && numItems > 1) {
     img = (tokenDocument.actor ?? tokenDocument).data.token.img;
   }
-  
+
   if (itemPileData.isContainer) {
-    
+
     img = itemPileData.lockedImage || itemPileData.closedImage || itemPileData.openedImage || itemPileData.emptyImage;
-    
+
     if (itemPileData.locked && itemPileData.lockedImage) {
       img = itemPileData.lockedImage;
     } else if (itemPileData.closed && itemPileData.closedImage) {
@@ -206,77 +206,77 @@ export function getItemPileTokenImage(token, { data = false, items = false, curr
     } else if (itemPileData.openedImage) {
       img = itemPileData.openedImage;
     }
-    
+
   }
-  
+
   return img || originalImg;
-  
+
 }
 
 export function getItemPileTokenScale(target, { data = false, items = false, currencies = false } = {}) {
-  
+
   const pileDocument = Utilities.getDocument(target);
-  
+
   let itemPileData = getActorFlagData(pileDocument, data);
-  
+
   let baseScale;
   if (pileDocument instanceof TokenDocument) {
     baseScale = pileDocument.data.scale;
   } else {
     baseScale = pileDocument.data.token.scale;
   }
-  
+
   if (!isValidItemPile(pileDocument, itemPileData)) {
     return baseScale;
   }
-  
+
   items = items || getActorItems(pileDocument);
   currencies = currencies || getActorCurrencies(pileDocument);
-  
+
   const numItems = items.length + currencies.length;
-  
+
   if (itemPileData.isContainer || !itemPileData.displayOne || !itemPileData.overrideSingleItemScale || numItems > 1 || numItems === 0) {
     return baseScale;
   }
-  
+
   return itemPileData.singleItemScale;
-  
+
 }
 
 export function getItemPileName(target, { data = false, items = false, currencies = false } = {}) {
-  
+
   const pileDocument = Utilities.getDocument(target);
-  
+
   const itemPileData = getActorFlagData(pileDocument, data);
-  
+
   let name = pileDocument instanceof TokenDocument ? pileDocument.data.name : pileDocument.data.token.name;
-  
+
   if (!isValidItemPile(pileDocument, itemPileData)) {
     return name;
   }
-  
+
   items = items || getActorItems(pileDocument);
   currencies = currencies || getActorCurrencies(pileDocument);
-  
+
   const numItems = items.length + currencies.length;
-  
+
   if (itemPileData.isContainer || !itemPileData.displayOne || !itemPileData.showItemName || numItems > 1 || numItems === 0) {
     return name;
   }
-  
+
   const item = items.length > 0 ? items[0] : currencies[0];
-  
+
   return item.name;
-  
+
 }
 
 function getRelevantTokensAndActor(target) {
-  
+
   const relevantDocument = Utilities.getDocument(target);
-  
+
   let documentActor;
   let documentTokens = [];
-  
+
   if (relevantDocument instanceof Actor) {
     documentActor = relevantDocument;
     if (relevantDocument.token) {
@@ -292,23 +292,23 @@ function getRelevantTokensAndActor(target) {
       documentTokens.push(relevantDocument);
     }
   }
-  
+
   return [documentActor, documentTokens]
-  
+
 }
 
 export async function updateItemPileData(target, flagData, tokenData) {
-  
+
   if (!flagData) flagData = getActorFlagData(target);
   if (!tokenData) tokenData = {};
-  
+
   let [documentActor, documentTokens] = getRelevantTokensAndActor(target);
-  
+
   const items = getActorItems(documentActor, { itemFilters: flagData.overrideItemFilters });
   const currencies = getActorCurrencies(documentActor, { currencyList: flagData.overrideCurrencies });
-  
+
   const pileData = { data: flagData, items, currencies };
-  
+
   const updates = documentTokens.map(tokenDocument => {
     const newTokenData = foundry.utils.mergeObject(tokenData, {
       "img": getItemPileTokenImage(tokenDocument, pileData),
@@ -329,15 +329,15 @@ export async function updateItemPileData(target, flagData, tokenData) {
     }
     return data;
   });
-  
+
   await canvas.scene.updateEmbeddedDocuments("Token", updates);
-  
+
   if (!foundry.utils.isObjectEmpty(flagData) && documentActor) {
     await documentActor.update({
       [CONSTANTS.FLAGS.PILE]: flagData, [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
     });
   }
-  
+
   return true;
 }
 
@@ -351,11 +351,11 @@ export async function updateItemData(item, update) {
 /* -------------------------- Merchant Methods ------------------------- */
 
 export function getMerchantModifiersForActor(merchant, { item = false, actor = false, pileFlagData = false } = {}) {
-  
+
   let {
     buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, actorPriceModifiers
   } = getActorFlagData(merchant, pileFlagData);
-  
+
   if (item) {
     const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => priceData.type === item.type);
     if (itemTypePriceModifier) {
@@ -363,7 +363,7 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
       sellPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.sellPriceModifier : sellPriceModifier * itemTypePriceModifier.sellPriceModifier;
     }
   }
-  
+
   if (actor && actorPriceModifiers) {
     const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor));
     if (actorSpecificModifiers) {
@@ -371,22 +371,26 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
       sellPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.sellPriceModifier : sellPriceModifier * actorSpecificModifiers.sellPriceModifier;
     }
   }
-  
+
   return {
     buyPriceModifier, sellPriceModifier
   }
 }
 
+function getExchangeRateDecimals(smallestExchangeRate) {
+  return smallestExchangeRate.toString().includes(".") ? smallestExchangeRate.toString().split(".")[1].length : 0;
+}
+
 function getPriceArray(totalCost, currencies) {
-  
+
   const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
-  const decimals = smallestExchangeRate.toString().split(".")[1].length;
-  
+  const decimals = getExchangeRateDecimals(smallestExchangeRate);
+
   let fraction = Helpers.roundToDecimals(totalCost % 1, decimals);
   let cost = Math.round(totalCost - fraction);
-  
+
   const prices = [];
-  
+
   let skipPrimary = false;
   const primaryCurrency = currencies.find(currency => currency.primary)
   if (cost) {
@@ -399,15 +403,15 @@ function getPriceArray(totalCost, currencies) {
       string: primaryCurrency.abbreviation.replace('{#}', cost)
     });
   }
-  
+
   for (const currency of currencies) {
-    
+
     if (currency === primaryCurrency && skipPrimary) continue;
-    
+
     const numCurrency = Math.floor(Helpers.roundToDecimals(fraction / currency.exchangeRate, decimals));
-    
+
     fraction = Helpers.roundToDecimals(fraction - (numCurrency * currency.exchangeRate), decimals);
-    
+
     prices.push({
       ...currency,
       cost: Math.round(numCurrency),
@@ -416,32 +420,32 @@ function getPriceArray(totalCost, currencies) {
       string: currency.abbreviation.replace("{#}", numCurrency)
     });
   }
-  
+
   prices.sort((a, b) => b.exchangeRate - a.exchangeRate);
-  
+
   return prices;
 }
 
 export function getItemPrices(item, {
   seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false, itemFlagData = false, quantity = 1
 } = {}) {
-  
+
   let priceData = [];
-  
+
   buyerFlagData = getActorFlagData(buyer, buyerFlagData);
   if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
     buyerFlagData = false;
   }
-  
+
   sellerFlagData = getActorFlagData(seller, sellerFlagData);
   if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
     sellerFlagData = false;
   }
-  
+
   itemFlagData = itemFlagData || getItemFlagData(item);
-  
+
   let merchant = sellerFlagData ? seller : buyer;
-  
+
   if (merchant === buyer && itemFlagData.cantBeSoldToMerchants) {
     priceData.push({
       free: false,
@@ -457,40 +461,40 @@ export function getItemPrices(item, {
     })
     return priceData;
   }
-  
+
   // Retrieve the item price modifiers
   let modifier = 1;
   if (sellerFlagData) {
-    
+
     modifier = getMerchantModifiersForActor(seller, {
       item, actor: buyer, pileFlagData: sellerFlagData
     }).buyPriceModifier;
-    
+
   } else if (buyerFlagData) {
-    
+
     modifier = getMerchantModifiersForActor(buyer, {
       item, actor: seller, pileFlagData: buyerFlagData
     }).sellPriceModifier;
-    
+
   }
-  
+
   if (!modifier) {
     return priceData;
   }
-  
+
   const overallCost = getProperty(item.toObject(), game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
-  
+
   const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
   const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
-  
+
   const currencyList = getActorCurrencyList(merchant);
   const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
-  
+
   // In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
   // to it, in order have a stable form of exchange calculation
   const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
-  const decimals = smallestExchangeRate.toString().split(".")[1].length;
-  
+  const decimals = getExchangeRateDecimals(smallestExchangeRate);
+
   if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices)) {
     priceData.push({
       free: true,
@@ -506,23 +510,23 @@ export function getItemPrices(item, {
     })
     return priceData;
   }
-  
+
   // !(itemFlagData.disableNormalCost || (merchant === buyer && sellerFlagData.onlyAcceptBasePrice)) &&
-  
+
   // If the item does include its normal cost, we calculate that here
   if (overallCost >= smallestExchangeRate && (!itemFlagData.disableNormalCost || (merchant === buyer && buyerFlagData.onlyAcceptBasePrice))) {
-    
+
     // Base prices is the displayed price, without quantity taken into account
     const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
     const basePrices = getPriceArray(baseCost, currencies);
-    
+
     // Prices is the cost with the amount of quantity taken into account, which may change the number of the different
     // types of currencies it costs (eg, an item wouldn't cost 1 gold and 100 silver, it would cost 11 gold
     let totalCost = Helpers.roundToDecimals(overallCost * modifier * quantity, decimals);
     let prices = getPriceArray(totalCost, currencies);
-    
+
     if (baseCost) {
-      
+
       priceData.push({
         basePrices,
         basePriceString: basePrices.filter(price => price.cost).map(price => price.string).join(" "),
@@ -534,13 +538,13 @@ export function getItemPrices(item, {
         maxQuantity: 0,
         quantity
       });
-      
+
     }
   }
-  
+
   // If the item has custom prices, we include them here
   if (itemFlagData.prices.length && !(merchant === buyer && buyerFlagData.onlyAcceptBasePrice)) {
-    
+
     priceData = priceData.concat(itemFlagData.prices.map(priceGroup => {
       const prices = priceGroup.map(price => {
         const itemModifier = price.fixed ? 1 : modifier;
@@ -556,7 +560,7 @@ export function getItemPrices(item, {
           basePriceString: baseCost ? price.abbreviation.replace("{#}", baseCost) : ""
         };
       });
-      
+
       return {
         prices,
         priceString: prices.filter(price => price.priceString).map(price => price.priceString).join(" "),
@@ -566,16 +570,16 @@ export function getItemPrices(item, {
       }
     }));
   }
-  
+
   const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
   const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
-  
+
   // If there's a buyer, we also calculate how many of the item the buyer can afford
   if (!buyer) return priceData;
-  
+
   const recipientCurrencies = getActorCurrencies(buyer, { currencyList });
   const totalCurrencies = recipientCurrencies.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
-  
+
   // For each price group, check for properties and items and make sure that the actor can afford it
   for (const priceGroup of priceData) {
     priceGroup.maxQuantity = Infinity;
@@ -591,7 +595,7 @@ export function getItemPrices(item, {
         if (price.type === "attribute") {
           const attributeQuantity = Number(getProperty(buyer.data, price.data.path));
           price.buyerQuantity = attributeQuantity;
-          
+
           if (price.percent) {
             const percent = Math.min(1, price.baseCost / 100);
             const percentQuantity = Math.max(0, Math.floor(attributeQuantity * percent));
@@ -602,14 +606,14 @@ export function getItemPrices(item, {
           } else {
             price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
           }
-          
+
           priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
-          
+
         } else {
           const foundItem = Utilities.findSimilarItem(buyer.items, price.data.item);
           const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
           price.buyerQuantity = itemQuantity;
-          
+
           if (price.percent) {
             const percent = Math.min(1, price.baseCost / 100);
             const percentQuantity = Math.max(0, Math.floor(itemQuantity * percent));
@@ -620,40 +624,40 @@ export function getItemPrices(item, {
           } else {
             price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
           }
-          
+
           priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity);
         }
       }
     }
   }
-  
+
   return priceData;
 }
 
 export function getPricesForItems(itemsToBuy, {
   seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false
 } = {}) {
-  
+
   sellerFlagData = getActorFlagData(seller, sellerFlagData);
   if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
     sellerFlagData = false;
   }
-  
+
   buyerFlagData = getActorFlagData(buyer, buyerFlagData);
   if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
     buyerFlagData = false;
   }
-  
+
   const merchant = sellerFlagData ? seller : buyer;
   const currencyList = getActorCurrencyList(merchant);
   const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
   const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
-  const decimals = smallestExchangeRate.toString().split(".")[1].length;
-  
+  const decimals = getExchangeRateDecimals(smallestExchangeRate);
+
   const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
-  
+
   const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
-  
+
   const paymentData = itemsToBuy.map(data => {
       const prices = getItemPrices(data.item, {
         seller, buyer, sellerFlagData, buyerFlagData, itemFlagData: data.itemFlagData, quantity: data.quantity || 1
@@ -663,22 +667,22 @@ export function getPricesForItems(itemsToBuy, {
       };
     })
     .reduce((priceData, priceGroup) => {
-      
+
       if (!priceGroup.maxQuantity) return priceData;
-      
+
       if (priceGroup.primary) {
-        
+
         priceData.totalCurrencyCost = Helpers.roundToDecimals(priceData.totalCurrencyCost + priceGroup.totalCost, decimals);
         priceData.primary = true;
-        
+
       } else {
-        
+
         for (const price of priceGroup.prices) {
-          
+
           let existingPrice = priceData.otherPrices.find(otherPrice => {
             return otherPrice.id === price.id || (otherPrice.name === price.name && otherPrice.img === price.img && otherPrice.type === price.type);
           });
-          
+
           if (existingPrice) {
             existingPrice.cost += price.cost;
           } else {
@@ -686,16 +690,16 @@ export function getPricesForItems(itemsToBuy, {
             existingPrice = priceData.otherPrices[index - 1];
             existingPrice.quantity = 0;
           }
-          
+
           existingPrice.quantity += price.cost;
           existingPrice.buyerQuantity -= price.cost;
-          
+
           if (existingPrice.buyerQuantity < 0) {
             priceData.canBuy = false;
           }
         }
       }
-      
+
       priceData.buyerReceive.push({
         type: "item",
         name: priceGroup.item.name,
@@ -703,48 +707,48 @@ export function getPricesForItems(itemsToBuy, {
         quantity: priceGroup.quantity,
         item: priceGroup.item,
       });
-      
+
       return priceData;
-      
+
     }, {
       totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [],
-      
+
       buyerReceive: [], buyerChange: [], sellerReceive: []
     });
-  
+
   if (paymentData.totalCurrencyCost) {
-    
+
     // The price array that we need to fill
     const prices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies);
-    
+
     // This is the target price amount we need to hit
     let priceLeft = paymentData.totalCurrencyCost;
-    
+
     // Starting from the smallest currency increment in the price
     for (let i = prices.length - 1; i >= 0; i--) {
-      
+
       const price = prices[i];
-      
+
       const buyerPrice = {
         ...price,
         buyerQuantity: buyerInfiniteCurrencies ? Infinity : price.quantity,
         quantity: 0,
         isCurrency: true
       }
-      
+
       if (price.type === "item") {
         buyerPrice.item = price.data.item;
       }
-      
+
       // If we have met the price target (or exceeded it, eg, we need change), populate empty entry
       if (priceLeft <= 0 || !price.cost) {
         paymentData.finalPrices.push(buyerPrice);
         continue;
       }
-      
+
       // If the buyer does not have enough to cover the cost, put what we can into it, otherwise all of it
       buyerPrice.quantity = buyerPrice.buyerQuantity < price.cost ? buyerPrice.buyerQuantity : price.cost;
-      
+
       // If it's the primary currency
       if (price.primary) {
         // And the buyer has enough of the primary currency to cover the rest of the price, use that
@@ -753,53 +757,53 @@ export function getPricesForItems(itemsToBuy, {
           buyerPrice.quantity = Math.ceil(priceLeft);
         }
       }
-      
+
       paymentData.finalPrices.push(buyerPrice);
-      
+
       // Then adjust the remaining price - if this goes below zero, we will need change back
       priceLeft = Helpers.roundToDecimals(priceLeft - (buyerPrice.quantity * price.exchangeRate), decimals);
-      
+
     }
-    
+
     // If there's STILL some remaining price (eg, we haven't been able to scrounge up enough currency to pay for it)
     // we can start using the larger currencies, such as platinum in D&D 5e
     while (priceLeft > 0) {
-      
+
       // We then need to loop through each price, and check if we have any more left over
       for (const buyerPrice of paymentData.finalPrices) {
-        
+
         // If we don't, look for the next one
         let buyerCurrencyQuantity = buyerPrice.buyerQuantity - buyerPrice.quantity;
         if (!buyerCurrencyQuantity) continue;
-        
+
         // Otherwise, add enough to cover the remaining cost
         const newQuantity = Math.ceil(Math.min(buyerCurrencyQuantity, priceLeft / buyerPrice.exchangeRate));
         buyerPrice.quantity += newQuantity;
         priceLeft = Helpers.roundToDecimals(priceLeft - (newQuantity * buyerPrice.exchangeRate), decimals);
-        
+
         if (priceLeft <= 0) break;
-        
+
       }
-      
+
       if (priceLeft > 0) {
         paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
       } else {
         break;
       }
     }
-    
+
     paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
-    
+
     // Since the change will be negative, we'll need to flip it, since this is what we'll get back
     let change = Math.abs(priceLeft);
     for (const currency of currencies) {
-      
+
       if (!change) break;
-      
+
       // Get the remaining price, and normalize it to this currency
       let numCurrency = Math.floor(Helpers.roundToDecimals(change / currency.exchangeRate, decimals));
       change = Helpers.roundToDecimals(change - (numCurrency * currency.exchangeRate), decimals);
-      
+
       // If there's some currencies to be gotten back
       if (numCurrency) {
         // We check if we've paid with this currency
@@ -807,7 +811,7 @@ export function getPricesForItems(itemsToBuy, {
           return payment.id === currency.id || (payment.name === currency.name && payment.img === currency.img && payment.type === currency.type);
         });
         if (!payment) continue;
-        
+
         // If we have paid with this currency, and we're getting some back, we can do one of two things:
         if ((payment.quantity - numCurrency) >= 0) {
           // Either just subtract it from the total paid if some of our payment will still remain
@@ -822,12 +826,12 @@ export function getPricesForItems(itemsToBuy, {
         }
       }
     }
-    
+
     // Copy the final currencies that the seller will get
     paymentData.sellerReceive = paymentData.finalPrices.map(price => {
       return { ...price };
     });
-    
+
     // But, we'll need to make sure they have enough change to _give_ to the buyer
     // We collate the total amount of change needed
     let changeNeeded = paymentData.buyerChange.reduce((acc, change) => {
@@ -836,10 +840,10 @@ export function getPricesForItems(itemsToBuy, {
       });
       return acc + currency.quantity >= change.quantity ? 0 : (change.quantity - currency.quantity) * change.exchangeRate;
     }, 0);
-    
+
     // If the seller needs give the buyer some change, we'll modify the payment they'll get to cover for it
     if (changeNeeded) {
-      
+
       // If the seller is being given enough of the primary currency to cover for the cost, we use that
       const primaryCurrency = paymentData.sellerReceive.find(price => price.primary && (price.quantity * price.exchangeRate) > changeNeeded);
       if (primaryCurrency) {
@@ -851,9 +855,9 @@ export function getPricesForItems(itemsToBuy, {
         biggestCurrency.quantity--;
         changeNeeded -= 1 * biggestCurrency.exchangeRate;
       }
-      
+
       changeNeeded = Math.abs(changeNeeded);
-      
+
       // Then loop through each currency and add enough currency so that the total adds up
       for (const currency of paymentData.sellerReceive) {
         if (!changeNeeded) break;
@@ -863,10 +867,10 @@ export function getPricesForItems(itemsToBuy, {
       }
     }
   }
-  
+
   paymentData.finalPrices = paymentData.finalPrices.concat(paymentData.otherPrices);
   paymentData.sellerReceive = paymentData.sellerReceive.concat(paymentData.otherPrices);
-  
+
   paymentData.basePriceString = paymentData.finalPrices
     .filter(price => price.cost)
     .map(price => {
@@ -876,9 +880,9 @@ export function getPricesForItems(itemsToBuy, {
       }
       return abbreviation.replace("{#}", price.cost)
     }).join(" ");
-  
+
   delete paymentData.otherPrices;
-  
+
   return paymentData;
-  
+
 }
