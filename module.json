@@ -76,6 +76,11 @@
       "lang": "pl",
       "name": "polski",
       "path": "languages/pl.json"
+    },
+    {
+      "lang": "es",
+      "name": "Español",
+      "path": "languages/es.json"
     }
   ],
   "relationships": {
