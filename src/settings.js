@@ -7,7 +7,7 @@ import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index
 import CustomDialog from "./applications/components/CustomDialog.svelte";
 
 export function registerSettings() {
-  
+
   game.settings.registerMenu(CONSTANTS.MODULE_NAME, "configure-settings", {
     name: "ITEM-PILES.Settings.Configure.Title",
     label: "ITEM-PILES.Settings.Configure.Label",
@@ -16,16 +16,15 @@ export function registerSettings() {
     type: SettingsShim,
     restricted: false
   });
-  
+
   for (let [name, data] of Object.entries(SETTINGS.GET_DEFAULT()).filter(setting => !setting[1].post)) {
     game.settings.register(CONSTANTS.MODULE_NAME, name, data);
   }
-  
+
 }
 
 export async function applyDefaultSettings() {
   const settings = SETTINGS.GET_SYSTEM_DEFAULTS();
-  debugger;
   for (const [name, data] of Object.entries(settings)) {
     await Helpers.setSetting(name, data.default);
   }
@@ -45,20 +44,20 @@ export async function patchCurrencySettings() {
 }
 
 export async function checkSystem() {
-  
+
   if (Helpers.getSetting(SETTINGS.PRECONFIGURED_SYSTEM)) return;
-  
+
   if (!SYSTEMS.HAS_SYSTEM_SUPPORT) {
-    
+
     if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) return;
-    
+
     let settingsValid = true;
     for (const [name, data] of Object.entries(SETTINGS.GET_DEFAULT())) {
       settingsValid = settingsValid && Helpers.getSetting(name).length !== (new data.type).length
     }
-    
+
     if (settingsValid) return;
-    
+
     TJSDialog.prompt({
       title: game.i18n.localize("ITEM-PILES.Dialogs.NoSystemFound.Title"),
       content: {
@@ -68,11 +67,11 @@ export async function checkSystem() {
         }
       }
     });
-    
+
     return Helpers.setSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN, true);
-    
+
   }
-  
+
   if (Helpers.getSetting(SETTINGS.SYSTEM_FOUND)) {
     const currentVersion = Helpers.getSetting(SETTINGS.SYSTEM_VERSION);
     const newVersion = SYSTEMS.DATA.VERSION;
@@ -115,9 +114,9 @@ export async function checkSystem() {
     }
     return;
   }
-  
+
   await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
-  
+
   if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
     const doThing = await TJSDialog.confirm({
       title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
@@ -149,6 +148,6 @@ export async function checkSystem() {
       return;
     }
   }
-  
+
   return applyDefaultSettings();
 }
