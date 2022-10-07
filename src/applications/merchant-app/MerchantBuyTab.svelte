@@ -6,6 +6,7 @@
   import MerchantItemBuyEntry from "./MerchantItemBuyEntry.svelte";
 
   export let store;
+  export let categoryFilter;
 
   const searchStore = store.search;
   const itemsPerCategoryStore = store.itemsPerCategory;
@@ -15,25 +16,26 @@
   const typeFilterStore = store.typeFilter;
   const editPrices = store.editPrices;
 
+  $: categoryDropDown = $itemCategoriesStore.filter(category => categoryFilter(category));
+  $: categories = $categoryStore.filter(category => categoryFilter(category));
+
 </script>
-
-
 <div class="item-piles-flexrow">
   <input type="text" bind:value={$searchStore} placeholder="Type to search...">
-  <select style="flex:0 1 auto; margin-left: 0.4rem; height: 26px;" bind:value={$typeFilterStore}>
-    <option value="all">{localize("ITEM-PILES.Merchant.AllTypes")}</option>
-    {#each $itemCategoriesStore as category (category.type)}
-      <option value={category.type}>{category.label}</option>
-    {/each}
-  </select>
+  {#if categoryDropDown.length > 1}
+    <select style="flex:0 1 auto; margin-left: 0.4rem; height: 26px;" bind:value={$typeFilterStore}>
+      <option value="all">{localize("ITEM-PILES.Merchant.AllTypes")}</option>
+      {#each categoryDropDown as category (category.type)}
+        <option value={category.type}>{localize(category.label)}</option>
+      {/each}
+    </select>
+  {/if}
 </div>
 
-{#each $categoryStore as category, index (category.type)}
+{#each categories as category, index (category.type)}
   <div in:fade|local={{duration: 150}}>
     <h3 class="merchant-item-group-type item-piles-flexrow">
-      <div>
-        {localize(category.label)}
-      </div>
+      <div>{localize(category.label)}</div>
       <div class="price-header" style="font-size: 0.75rem;">
         {#if $editPrices}
           {#if $priceModifiersPerType[category.type]}

@@ -32,7 +32,6 @@
     })
 
     if (macro.startsWith("Compendium.") && allResults.length === 1) {
-      console.log(allResults)
       allResults = Array.from(game.packs.get(allResults[0].id).index).map(m => {
         return {
           id: allResults[0].id + "." + m._id,

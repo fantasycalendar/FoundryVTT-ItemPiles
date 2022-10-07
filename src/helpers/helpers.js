@@ -1,9 +1,9 @@
 import CONSTANTS from "../constants/constants.js";
 
 export const debounceManager = {
-  
+
   debounces: {},
-  
+
   setDebounce(id, method) {
     if (this.debounces[id]) {
       return this.debounces[id];
@@ -19,23 +19,23 @@ export const debounceManager = {
 export const hooks = {
   run: true,
   _hooks: {},
-  
+
   async runWithout(callback) {
     this.run = false;
     await callback();
     this.run = true;
   },
-  
+
   call(hook, ...args) {
     if (!this.run) return;
     return Hooks.call(hook, ...args);
   },
-  
+
   callAll(hook, ...args) {
     if (!this.run) return;
     return Hooks.callAll(hook, ...args);
   },
-  
+
   on(hook, callback) {
     Hooks.on(hook, (...args) => {
       if (!this.run) return;
@@ -89,6 +89,9 @@ export function custom_error(error, notify = true) {
   return new Error(error.replace("<br>", "\n"));
 }
 
+export function capitalizeFirstLetter(str) {
+  return str.slice(0, 1).toUpperCase() + str.slice(1);
+}
 
 export function isRealNumber(inNumber) {
   return !isNaN(inNumber)
@@ -127,10 +130,10 @@ export function roundToDecimals(num, decimals) {
  * @return {array|boolean}              Interpolated value
  */
 export async function getFiles(inFile, { applyWildCard = false, softFail = false } = {}) {
-  
+
   let source = 'data';
   const browseOptions = { wildcard: applyWildCard };
-  
+
   if (/\.s3\./.test(inFile)) {
     source = 's3'
     const { bucket, keyPrefix } = FilePicker.parseS3URL(inFile);
@@ -139,7 +142,7 @@ export async function getFiles(inFile, { applyWildCard = false, softFail = false
       inFile = keyPrefix;
     }
   }
-  
+
   try {
     return (await FilePicker.browse(source, inFile, browseOptions)).files;
   } catch (err) {

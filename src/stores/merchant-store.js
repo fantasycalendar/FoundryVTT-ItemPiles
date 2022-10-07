@@ -76,9 +76,17 @@ export default class MerchantStore extends ItemPileStore {
     const items = get(this.items).filter(item => {
       return game.user.isGM || !get(item.itemFlagData).hidden;
     });
-    this.itemCategories.set(Array.from(new Set(get(this.allItems).filter(entry => !entry.isCurrency).map(item => item.type))).map(type => ({
-      label: localize(CONFIG.Item.typeLabels[type]), type
-    })));
+    const itemCategories = Array.from(
+      new Set(get(this.allItems)
+        .filter(entry => !entry.isCurrency)
+        .map(item => item.type))
+    ).map(type => {
+      return {
+        label: CONFIG.Item.typeLabels[type] ?? "ITEM-PILES.Merchant.OtherTypes." + type,
+        type
+      }
+    }).sort((a, b) => a.label < b.label ? -1 : 1);
+    this.itemCategories.set(itemCategories);
     const itemsPerCategory = items.reduce((acc, item) => {
       if (!acc[item.type]) {
         acc[item.type] = [];
@@ -90,13 +98,12 @@ export default class MerchantStore extends ItemPileStore {
       return a.item.name < b.item.name ? -1 : 1;
     }));
     this.itemsPerCategory.set(itemsPerCategory);
-    let categories = Object.keys(itemsPerCategory);
-    categories.sort()
-    this.categories.set(categories.map(type => {
+    this.categories.set(Object.keys(itemsPerCategory).map(type => {
       return {
-        label: localize(CONFIG.Item.typeLabels[type]), type
+        label: CONFIG.Item.typeLabels[type] ?? "ITEM-PILES.Merchant.OtherTypes." + type,
+        type
       }
-    }));
+    }).sort((a, b) => a.label < b.label ? -1 : 1))
   }
 
   refreshItemPrices() {
@@ -218,6 +225,7 @@ class PileMerchantItem extends PileItem {
     this.selectedPriceGroup = writable(-1);
     this.quantityToBuy = writable(1);
     this.infiniteQuantity = writable(false);
+    this.isService = false;
   }
 
   setupSubscriptions() {
@@ -259,6 +267,11 @@ class PileMerchantItem extends PileItem {
     setup = true;
     this.refreshDisplayQuantity();
     this.subscribeTo(this.store.typeFilter, this.filter.bind(this));
+    this.subscribeTo(this.itemFlagData, (itemFlagData) => {
+      if (itemFlagData.isService) {
+        this.type = "item-piles-service";
+      }
+    })
   }
 
   refreshDisplayQuantity() {

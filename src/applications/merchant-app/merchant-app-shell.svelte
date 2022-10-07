@@ -31,6 +31,7 @@
   });
 
   let priceSelector = store.priceSelector;
+  let categories = store.categories;
 
   async function dropData(data) {
 
@@ -71,6 +72,11 @@
         label: game.i18n.localize('ITEM-PILES.Merchant.BuyItems')
       },
       {
+        value: 'services',
+        label: game.i18n.localize('ITEM-PILES.Merchant.BuyServices'),
+        hidden: !$categories.some(category => category.type === "item-piles-service")
+      },
+      {
         value: 'sell',
         label: game.i18n.localize('ITEM-PILES.Merchant.SellItems'),
         hidden: !recipientStore || sellHidden
@@ -81,6 +87,9 @@
         hidden: !game.user.isGM
       },
     ];
+    if (tabs.find(tab => tab.value === $activeTab).hidden) {
+      $activeTab = tabs[0].value;
+    }
   }
 
 </script>

@@ -107,6 +107,7 @@
     "Merchant": {
       "Title": "Merchant: {actor_name}",
       "BuyItems": "Buy Items",
+      "BuyServices": "Buy Services",
       "SellItems": "Sell Items",
       "PopulateItems": "Populate Items",
       "AllTypes": "All types",
@@ -136,7 +137,10 @@
       "ClearAllItems": "Clear All Actor Items",
       "AddItem": "Add",
       "RemoveItem": "Remove",
-      "ItemFree": "Free"
+      "ItemFree": "Free",
+      "OtherTypes": {
+        "item-piles-service": "Service"
+      }
     },
     "Dialogs": {
       "TypeWarning": {

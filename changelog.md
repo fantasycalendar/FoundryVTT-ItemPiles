@@ -2,16 +2,19 @@
 
 ## Version 2.2.4
 
-- Added macro execution option to items when purchased
 - Added "Service" type items
-    - Items sold by merchants can now be configured to subtract its cost, but not add any items to the buyer's inventory
+    - Items sold by merchants can now be configured not add any items to the buyer's inventory
+    - The cost of buying the item is still applied to the buyer
     - If the merchant runs out of this service "item", its quantity is set to 0 but not removed from the merchant, just
       set to "not for sale"
     - Combined with the item purchase macro feature, you could create a "Cure Wounds" service item & macro that heals
-      people when bought
-- Improved macro selector input by suggesting
+      people when bought (see below)
+- Added macro execution option to items when purchased
+- Added DnD5e compendium of merchant roll tables
+- Improved macro selector input by suggesting potential macros and compendiums of macros
 - Fixed merchants with infinite quantity of items would still lose quantity of items when selling items
 - Fixed missing macro input on the item pile config interface
+- Fixed searching in item piles and then clearing input would not refresh items
 
 ## Version 2.2.3
 

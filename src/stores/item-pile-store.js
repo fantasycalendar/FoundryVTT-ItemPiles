@@ -136,7 +136,6 @@ export default class ItemPileStore {
       this.refreshItems();
     }, 300);
     this.subscribeTo(this.search, (val) => {
-      if (!val) return;
       filterDebounce()
     });
 

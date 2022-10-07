@@ -12,6 +12,7 @@
   export let activeTab;
 
   const currencies = recipientStore?.allCurrencies || writable([]);
+  let categories = store.categories;
 
   let closed = store.closed;
 
@@ -27,7 +28,9 @@
         <span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
       </div>
     {:else if $activeTab === "buy"}
-      <MerchantBuyTab {store}/>
+      <MerchantBuyTab {store} categoryFilter={(category) => { return !category.type.startsWith("item-piles-") }}/>
+    {:else if $activeTab === "services" }
+      <MerchantBuyTab {store} categoryFilter={(category) => { return category.type === "item-piles-service" }}/>
     {:else if $activeTab === "sell"}
       <MerchantSellTab store={recipientStore}/>
     {:else if $activeTab === "tables"}
