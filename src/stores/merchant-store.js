@@ -7,6 +7,7 @@ import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
 import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
 import { isResponsibleGM } from "../helpers/helpers.js";
+import * as Utilities from "../helpers/utilities.js";
 
 export default class MerchantStore extends ItemPileStore {
 
@@ -36,11 +37,11 @@ export default class MerchantStore extends ItemPileStore {
 
   activateHooks() {
     if (game.modules.get('foundryvtt-simple-calendar')?.active) {
-      this.simpleCalendar();
+      this.setupSimpleCalendar();
     }
   }
 
-  simpleCalendar() {
+  setupSimpleCalendar() {
     Hooks.on(window.SimpleCalendar.Hooks.DateTimeChange, () => {
       this.updateClosedStatus();
     });
@@ -216,6 +217,7 @@ class PileMerchantItem extends PileItem {
     this.displayQuantity = writable(false);
     this.selectedPriceGroup = writable(-1);
     this.quantityToBuy = writable(1);
+    this.infiniteQuantity = writable(false);
   }
 
   setupSubscriptions() {
@@ -261,9 +263,11 @@ class PileMerchantItem extends PileItem {
 
   refreshDisplayQuantity() {
 
-    const merchantDisplayQuantity = get(this.store.pileData).displayQuantity;
+    const pileData = get(this.store.pileData);
+    const itemFlagData = get(this.itemFlagData);
 
-    const itemFlagDataQuantity = get(this.itemFlagData).displayQuantity;
+    const merchantDisplayQuantity = pileData.displayQuantity;
+    const itemFlagDataQuantity = itemFlagData.displayQuantity;
 
     if (itemFlagDataQuantity === "always") {
       return this.displayQuantity.set(true);
@@ -279,7 +283,9 @@ class PileMerchantItem extends PileItem {
       return this.displayQuantity.set(merchantDisplayQuantity.endsWith("yes"));
     }
 
-    this.displayQuantity.set(itemDisplayQuantity)
+    this.displayQuantity.set(itemDisplayQuantity);
+    this.infiniteQuantity.set(pileData.infiniteQuantity || itemFlagData.infiniteQuantity)
+
   }
 
   refreshPriceData() {
@@ -319,6 +325,17 @@ class PileMerchantItem extends PileItem {
   async updateItemFlagData() {
     const itemFlagData = get(this.itemFlagData);
     await PileUtilities.updateItemData(this.item, { flags: itemFlagData });
+  }
+
+  updateQuantity(quantity) {
+    const itemFlagData = get(this.itemFlagData);
+    const roll = new Roll(quantity).evaluate({ async: false });
+    this.quantity.set(roll.total);
+    const baseData = {};
+    if (itemFlagData.isService) {
+      baseData[CONSTANTS.FLAGS.ITEM + ".notForSale"] = roll.total <= 0;
+    }
+    return this.item.update(Utilities.setItemQuantity(baseData, roll.total));
   }
 
 }

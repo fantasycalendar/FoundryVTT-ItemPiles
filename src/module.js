@@ -12,6 +12,7 @@ import PrivateAPI from "./API/private-api.js";
 import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
 import SettingsShim from "./applications/settings-app/settings-app.js";
+import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -21,11 +22,11 @@ Hooks.once("init", async () => {
 });
 
 Hooks.once("ready", async () => {
-  
+
   PrivateAPI.initialize();
   TradeAPI.initialize();
   ChatAPI.initialize();
-  
+
   game.itempiles = {
     API,
     hooks: HOOKS
@@ -33,7 +34,7 @@ Hooks.once("ready", async () => {
   window.ItemPiles = {
     API: API
   };
-  
+
   if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
     let word = "install and activate";
     if (game.modules.get('lib-wrapper')) word = "activate";
@@ -44,21 +45,21 @@ Hooks.once("ready", async () => {
     if (game.modules.get('socketlib')) word = "activate";
     throw Helpers.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
   }
-  
+
   if (!Helpers.isGMConnected()) {
     Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
   }
-  
+
   if (game.user.isGM) {
     checkSystem();
   }
   registerHotkeysPost();
   Hooks.callAll(HOOKS.READY);
-  
+
   ChatAPI.disablePastTradingButtons();
-  
+
   //new SettingsShim().render(true)
-  
+
 });
 
 Hooks.once("socketlib.ready", () => {

@@ -6,6 +6,7 @@
   import Tabs from "../../components/Tabs.svelte";
   import PriceList from "../../components/PriceList.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+  import MacroSelector from "../../components/MacroSelector.svelte";
 
   const { application } = getContext('external');
 
@@ -107,6 +108,24 @@
                 {localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityNo")}
               </option>
             </select>
+          </div>
+
+          <div class="form-group">
+            <label style="flex:4;">
+              {localize("ITEM-PILES.Applications.ItemEditor.Service")}<br>
+              <p>{localize("ITEM-PILES.Applications.ItemEditor.ServiceExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={itemFlagData.isService}/>
+          </div>
+
+          <div class="form-group">
+            <label style="flex:4;">
+              <span>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseMacro")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseMacroExplanation")}</p>
+            </label>
+          </div>
+          <div class="form-group">
+            <MacroSelector bind:macro={itemFlagData.macro}/>
           </div>
 
         </div>

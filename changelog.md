@@ -1,5 +1,18 @@
 # Item Piles Changelog
 
+## Version 2.2.4
+
+- Added macro execution option to items when purchased
+- Added "Service" type items
+    - Items sold by merchants can now be configured to subtract its cost, but not add any items to the buyer's inventory
+    - If the merchant runs out of this service "item", its quantity is set to 0 but not removed from the merchant, just
+      set to "not for sale"
+    - Combined with the item purchase macro feature, you could create a "Cure Wounds" service item & macro that heals
+      people when bought
+- Improved macro selector input by suggesting
+- Fixed merchants with infinite quantity of items would still lose quantity of items when selling items
+- Fixed missing macro input on the item pile config interface
+
 ## Version 2.2.3
 
 - Added full merchant support in the Pathfinder 2e system

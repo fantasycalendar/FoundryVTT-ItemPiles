@@ -24,6 +24,8 @@ const CONSTANTS = {
     free: false,
     disableNormalCost: false,
     cantBeSoldToMerchants: false,
+    isService: false,
+    macro: "",
     prices: []
   },
 

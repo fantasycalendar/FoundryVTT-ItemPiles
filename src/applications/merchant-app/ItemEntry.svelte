@@ -7,11 +7,13 @@
   const store = item.store;
   const pileData = store.pileData;
   const displayQuantityStore = item.displayQuantity;
+  const infiniteQuantityStore = item.infiniteQuantity;
   const quantityStore = item.quantity;
   const itemFlagDataStore = item.itemFlagData;
 
   $: itemFlagData = $itemFlagDataStore;
   $: displayQuantity = $displayQuantityStore;
+  $: infiniteQuantity = $infiniteQuantityStore;
   $: quantity = $quantityStore;
   $: editQuantity = $quantityStore;
   let showEditQuantity = false;
@@ -47,7 +49,7 @@
       {$itemName}
     {/if}
     {#if displayQuantity}
-      {#if itemFlagData.infiniteQuantity}
+      {#if infiniteQuantity}
         <span class="item-piles-small-text">(∞)</span>
       {:else if !showEditQuantity}
         <span

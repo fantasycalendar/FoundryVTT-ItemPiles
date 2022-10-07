@@ -13,7 +13,6 @@ import Transaction from "../helpers/transaction.js";
 import ItemPileStore from "../stores/item-pile-store.js";
 import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
-import { getPlayersForItemPile } from "../helpers/sharing-utilities.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 
@@ -944,21 +943,11 @@ export default class PrivateAPI {
    * @param {Object} macroData
    * @return {Promise/Boolean}
    */
-  static _executeItemPileMacro(targetUuid, macroData) {
+  static async _executeItemPileMacro(targetUuid, macroData) {
 
     const target = Utilities.getToken(targetUuid);
 
     if (!PileUtilities.isValidItemPile(target)) return false;
-
-    const pileData = PileUtilities.getActorFlagData(target);
-
-    if (!pileData.macro) return false;
-
-    const macro = game.macros.getName(pileData.macro);
-
-    if (!macro) {
-      throw Helpers.custom_error(`Could not find macro with name "${pileData.macro}" on target with UUID ${target.uuid}`);
-    }
 
     // Reformat macro data to contain useful information
     if (macroData.source) {
@@ -975,7 +964,11 @@ export default class PrivateAPI {
       macroData.items = macroData.items.map(item => targetActor.items.get(item._id));
     }
 
-    return macro.execute([macroData]);
+    const pileData = PileUtilities.getActorFlagData(target);
+
+    if (!pileData.macro) return false;
+
+    return Utilities.runMacro(pileData.macro, macroData)
 
   }
 
@@ -1473,18 +1466,22 @@ export default class PrivateAPI {
     const sellingActor = Utilities.getActor(sellerUuid);
     const buyingActor = Utilities.getActor(buyerUuid);
 
-    const itemPrices = PileUtilities.getPricesForItems(items.map(data => ({
-      ...data,
-      item: sellingActor.items.get(data.id)
-    })), { seller: sellingActor, buyer: buyingActor });
+    const itemPrices = PileUtilities.getPricesForItems(items.map(data => {
+      const item = sellingActor.items.get(data.id);
+      return {
+        ...data,
+        item
+      }
+    }), { seller: sellingActor, buyer: buyingActor });
 
     const preCalcHookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId);
     if (preCalcHookResult === false) return false;
 
     const sellerTransaction = new Transaction(sellingActor);
     const sellerFlagData = PileUtilities.getActorFlagData(sellerTransaction);
-    const sellerInfiniteQuantity = sellerFlagData.enabled && sellerFlagData.merchant && sellerFlagData.infiniteQuantity;
-    const sellerInfiniteCurrencies = sellerFlagData.enabled && sellerFlagData.merchant && sellerFlagData.infiniteCurrencies;
+    const sellerIsMerchant = sellerFlagData.enabled && sellerFlagData.isMerchant;
+    const sellerInfiniteQuantity = sellerIsMerchant && sellerFlagData.infiniteQuantity;
+    const sellerInfiniteCurrencies = sellerIsMerchant && sellerFlagData.infiniteCurrencies;
 
     for (const payment of itemPrices.sellerReceive) {
       if (!payment.quantity) continue;
@@ -1509,12 +1506,20 @@ export default class PrivateAPI {
         await sellerTransaction.appendActorChanges([{
           path: entry.data.path,
           quantity: entry.quantity
-        }], { remove: true, type: entry.isCurrency ? "currency" : entry.type });
+        }], {
+          remove: true,
+          type: entry.isCurrency ? "currency" : entry.type
+        });
       } else {
+        const itemFlagData = PileUtilities.getItemFlagData(entry.item);
         await sellerTransaction.appendItemChanges([{
           item: entry.item,
           quantity: entry.quantity
-        }], { remove: true, type: entry.isCurrency ? "currency" : entry.type });
+        }], {
+          remove: true,
+          type: entry.isCurrency ? "currency" : entry.type,
+          removeIfZero: !itemFlagData.isService
+        });
       }
     }
 
@@ -1550,6 +1555,8 @@ export default class PrivateAPI {
           quantity: entry.quantity
         }], { type: entry.type });
       } else {
+        const itemFlagData = PileUtilities.getItemFlagData(entry.item);
+        if (itemFlagData.isService) continue;
         const item = entry.item.toObject();
         if (buyerHidesNewItems) {
           setProperty(item, CONSTANTS.FLAGS.ITEM + '.hidden', true);
@@ -1604,6 +1611,19 @@ export default class PrivateAPI {
       userId: userId,
       interactionId: interactionId
     });
+
+    if (sellerIsMerchant) {
+      for (let entry of itemPrices.buyerReceive) {
+        const itemFlagData = PileUtilities.getItemFlagData(entry.item);
+        if (!itemFlagData.macro) continue;
+        await Utilities.runMacro(itemFlagData.macro, {
+          seller: sellingActor,
+          buyer: buyingActor,
+          item: entry.item,
+          quantity: entry.quantity
+        });
+      }
+    }
 
     await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
 

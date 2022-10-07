@@ -22,6 +22,7 @@
   import { writable } from "svelte/store";
   import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
   import CustomDialog from "../components/CustomDialog.svelte";
+  import MacroSelector from "../components/MacroSelector.svelte";
 
   const { application } = getContext('external');
 
@@ -225,6 +226,16 @@
               <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.InspectItemsExplanation")}</p>
             </label>
             <input type="checkbox" bind:checked={pileData.canInspectItems}/>
+          </div>
+
+          <div class="form-group">
+            <label style="flex:4;">
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.Macro")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.MacroExplanation")}</p>
+            </label>
+          </div>
+          <div class="form-group">
+            <MacroSelector bind:macro={pileData.macro}/>
           </div>
 
           <div class="form-group">

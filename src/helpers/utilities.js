@@ -1,3 +1,5 @@
+import * as Helpers from "./helpers.js";
+
 export function getActor(target) {
   if (target instanceof Actor) return target;
   if (stringIsUuid(target)) {
@@ -208,4 +210,38 @@ export function refreshAppsWithDocument(doc, callback) {
       app[callback]();
     }
   }
+}
+
+export async function runMacro(macroId, macroData) {
+
+  // Credit to Otigon, Zhell, Gazkhan and MrVauxs for the code in this section
+  let macro;
+  if (macroId.startsWith("Compendium")) {
+    let packArray = macroId.split(".");
+    let compendium = game.packs.get(`${packArray[1]}.${packArray[2]}`);
+    if (!compendium) {
+      throw Helpers.custom_error(`Compendium ${packArray[1]}.${packArray[2]} was not found`);
+    }
+    let findMacro = (await compendium.getDocuments()).find(m => m.name === packArray[3] || m.id === packArray[3])
+    if (!findMacro) {
+      throw Helpers.custom_error(`The "${packArray[3]}" macro was not found in Compendium ${packArray[1]}.${packArray[2]}`);
+    }
+    macro = new Macro(findMacro?.toObject());
+    macro.ownership.default = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+  } else {
+    macro = game.macros.getName(macroId);
+    if (!macro) {
+      throw Helpers.custom_error(`Could not find macro with name "${macroId}"`);
+    }
+  }
+
+  let result = false;
+  try {
+    result = await macro.execute(macroData);
+  } catch (err) {
+    Helpers.custom_warning(`Error when executing macro ${macroId}!\n${err}`, true);
+  }
+
+  return result;
+
 }
