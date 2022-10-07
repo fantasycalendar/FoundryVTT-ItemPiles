@@ -56,6 +56,7 @@
       "Mute": "Mute",
       "AutoDecline": "You did not respond to the trade request quickly enough, so it was auto-declined.",
       "Declined": "The other user declined the trade request.",
+      "SameActor": "Both users cannot pick the same character - you can't trade to AND from the same character. Stop it.",
       "Private": "Make this trade private",
       "PrivateExplanation": "No chat card are posted, and no one can spectate",
       "Over": "This trade is no longer active.",

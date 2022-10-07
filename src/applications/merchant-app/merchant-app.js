@@ -2,9 +2,10 @@ import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import ItemPileConfig from "../item-pile-config/item-pile-config";
 import MerchantAppShell from "./merchant-app-shell.svelte";
 import * as Helpers from "../../helpers/helpers.js";
+import HOOKS from "../../constants/hooks.js";
 
 export default class MerchantApp extends SvelteApplication {
-  
+
   constructor(merchant, recipient = false, options = {}, dialogData = {}) {
     super({
       title: `Merchant: ${merchant.name}`,
@@ -21,8 +22,10 @@ export default class MerchantApp extends SvelteApplication {
       ...options
     }, dialogData);
     this.merchant = merchant;
+    this.recipient = recipient;
+    Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, merchant, recipient, options, dialogData);
   }
-  
+
   /** @inheritdoc */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -33,14 +36,16 @@ export default class MerchantApp extends SvelteApplication {
       resizable: true
     });
   }
-  
+
   static getActiveApp(id) {
     return Object.values(ui.windows).find(app => app.id === `item-pile-merchant-${id}`);
   }
-  
+
   static async show(merchant, recipient = false, options = {}, dialogData = {}) {
     merchant = merchant?.actor ?? merchant;
     recipient = recipient?.actor ?? recipient
+    const result = Helpers.hooks.call(HOOKS.PRE_OPEN_INTERFACE, merchant, recipient, options, dialogData);
+    if (result === false) return;
     const app = this.getActiveApp(merchant.id);
     if (app) return app.render(false, { focus: true });
     return new Promise((resolve) => {
@@ -48,11 +53,11 @@ export default class MerchantApp extends SvelteApplication {
       new this(merchant, recipient, options, dialogData).render(true, { focus: true });
     })
   }
-  
+
   refreshItems() {
     this.svelte.applicationShell.store.refreshItems();
   }
-  
+
   /** @override */
   _getHeaderButtons() {
     let buttons = super._getHeaderButtons();
@@ -96,14 +101,17 @@ export default class MerchantApp extends SvelteApplication {
     }
     return buttons
   }
-  
+
   async close(options) {
+    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.actor, this.recipient);
+    if (result === false) return;
     for (const app of Object.values(ui.windows)) {
       if (app !== this && this.svelte.applicationShell.store === app?.svelte?.applicationShell?.store) {
         app.close();
       }
     }
+    Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.merchant, this.recipient);
     return super.close(options);
   }
-  
+
 }

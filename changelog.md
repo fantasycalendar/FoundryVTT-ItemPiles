@@ -2,6 +2,7 @@
 
 ## Version 2.2.4
 
+- Added Spanish and partial Polish localization (thanks bext1a and MrVauxs!)
 - Added "Service" type items
     - Items sold by merchants can now be configured not add any items to the buyer's inventory
     - The cost of buying the item is still applied to the buyer
@@ -15,7 +16,8 @@
 - Fixed merchants with infinite quantity of items would still lose quantity of items when selling items
 - Fixed missing macro input on the item pile config interface
 - Fixed searching in item piles and then clearing input would not refresh items
-- Added Spanish and partial Polish localization (thanks bext1a and MrVauxs!)
+- Fixed two users being able to pick the same actor to trade with - let's not enter the twilight zone just yet
+- Fixed rare issue with GMs not being able to keep track of active users (???)
 
 ## Version 2.2.3
 

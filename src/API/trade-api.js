@@ -114,12 +114,20 @@ export default class TradeAPI {
         if (data === "cancelled") return;
         cancelDialog.close();
 
+        if (data === "same-actor") {
+          return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.SameActor"), true);
+        }
+
         // If they declined, show warning
         if (!data || !data.fullPrivateTradeId.includes(privateTradeId)) {
           return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Declined"), true);
         }
 
         const traderActor = Utilities.getActor(data.actorUuid);
+
+        if (traderActor === actor) {
+          return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.SameActor"), true);
+        }
 
         const store = new TradeStore({
           user: game.user, actor
@@ -185,6 +193,11 @@ export default class TradeAPI {
     }
 
     const actor = result.actor ?? result;
+
+    if (actor === tradingActor) {
+      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.SameActor"), true);
+      return "same-actor";
+    }
 
     const store = new TradeStore({ user: game.user, actor }, {
       user: tradingUser, actor: tradingActor
