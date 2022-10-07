@@ -15,6 +15,7 @@
 - Fixed merchants with infinite quantity of items would still lose quantity of items when selling items
 - Fixed missing macro input on the item pile config interface
 - Fixed searching in item piles and then clearing input would not refresh items
+- Added Spanish and partial Polish localization (thanks bext1a and MrVauxs!)
 
 ## Version 2.2.3
 

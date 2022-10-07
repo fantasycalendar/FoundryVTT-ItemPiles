@@ -46,7 +46,7 @@ jobs:
       - run: npm run build
 
       # Create a zip file with all files required by the module to add to the release
-      - run: zip -r ./module.zip module.json LICENSE templates/ languages/ module.js module.js.map style.css
+      - run: zip -r ./module.zip module.json LICENSE module.js module.js.map style.css templates/ languages/ packs/
 
       # Create a release for this specific version
       - name: Update Release with Files
