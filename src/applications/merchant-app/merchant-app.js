@@ -103,7 +103,7 @@ export default class MerchantApp extends SvelteApplication {
   }
 
   async close(options) {
-    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.actor, this.recipient);
+    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.merchant, this.recipient);
     if (result === false) return;
     for (const app of Object.values(ui.windows)) {
       if (app !== this && this.svelte.applicationShell.store === app?.svelte?.applicationShell?.store) {
