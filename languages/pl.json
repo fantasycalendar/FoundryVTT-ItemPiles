@@ -1,0 +1,158 @@
+{
+  "ITEM-PILES": {
+    "Currencies": "Waluty",
+    "Currency": "Waluta",
+    "ContextMenu": {
+      "ShowToPlayers": "Pokaż Graczom",
+      "RequestTrade": "Poproś Wymianę"
+    },
+    "Notifications": {
+      "UpdateItemPileSuccess": "Stos Przedmiotów zaktualizowany pomyślnie.",
+      "UpdateMerchantSuccess": "Kupca zaktualizowany pomyślnie.",
+      "ShownToPlayers": "Pokazuję {actor_name} graczom",
+      "ItemTransferred": "{target_actor_name} dostał {item_name} od {source_actor_name}.",
+      "GiveItemAccepted": "{user_name} zaakceptował twoją ofertę."
+    },
+    "Errors": {
+      "DisallowedItemDrop": "Nie możesz upuścić przedmioty typu \"{type}\"",
+      "DisallowedItemTrade": "Nie możesz wymieniać się przedmiotami typu \"{type}\"",
+      "DisallowedItemSell": "Ten kupca nie akceptuje przedmioty typu \"{type}\"",
+      "PileTooFar": "Jesteś za daleko aby otworzyć ten stos.",
+      "DropNoToken": "Nie masz token'a na tej scenie, więc nie możesz upuścić żadnych przedmiotów tutaj.",
+      "NoSourceDrop": "Nie możesz upuszczać przedmioty z katalogu przedmiotów jeżeli nie jesteś GM'em.",
+      "PileLocked": "Ten pojemnik jest zamknięty i nie można go otworzyć - nie możesz upuszczać przedmioty do niego."
+    },
+    "Warnings": {
+      "GiveItemDeclined": "{user_name} odrzucił twoją ofertę.",
+      "NoPlayersActive": "Nie ma żadnych aktywnych graczy aby dokonać tej akcji",
+      "GiveItemNoGM": "Nie ma żadnego aktywnego GM'a który mógłby dostać twój przedmiot."
+    },
+    "Inspect": {
+      "Title": "Przeglądanie Zawartości Stosu",
+      "AsActor": "Przeglądasz ten stos jako {actorName}.",
+      "Empty": "Ten stos jest pusty.",
+      "Destroyed": "Ten stos już nie istnieje i leży jałowo.",
+      "TakeAll": "Weź Wszystkie Przedmioty",
+      "Take": "Weź",
+      "Close": "Zamknij Przykrywkę",
+      "Leave": "Wyjdź",
+      "NoShareLeft": "Nie ma już wolnych podziałów...",
+      "NoneLeft": "Nic zostało...",
+      "OpenSheet": "Otwórz Kartę",
+      "AddCurrency": "Dodaj walutę",
+      "SplitCurrencies": "Podziel walutę na {num_players} graczy",
+      "SplitAll": "Podziel na {num_players} graczy",
+      "Owner": "Jako właściciel tego Stosu Przedmiotów, możesz modyfikować jego zawartość.",
+      "SplitItems": "Podziel przedmioty na {num_players} graczy"
+    },
+    "Trade": {
+      "Title": "Stosy Przedmiotów: Wymiany",
+      "Accept": "Akceptuj",
+      "Decline": "Odrzuć",
+      "Mute": "Wycisz",
+      "Private": "Zrób tą wymianę prywatną",
+      "PrivateExplanation": "Żadne wiadomości zostaną wysłane, i nikt nie będzie mógł widzieć waszej wymiany",
+      "Over": "Ta wymiana nie jest już aktywna.",
+      "Between": "Wymień pomiędzy {actor_1} a {actor_2}",
+      "Prompt": {
+        "Title": "Stosy Przedmiotów: Wyślij Ofertę Wymiany",
+        "User": "Wybierz z kim chcesz się wymienić:",
+        "PickActor": "Wybierz który aktor ciebie reprezentuję:",
+        "PickToken": "Wybierz zaznaczony token",
+        "DropActor": "Przeciągnij i upuść aktora tutaj",
+        "Label": "Wyślij ofertę wymiany",
+        "PickedActor": "Twój reprezentujący aktor w wymianie to:"
+      },
+      "Declined": "Twój odbiorca odrzucił ofertę wymiany.",
+      "NoActiveUsers": {
+        "Title": "Stosy Przedmiotów: Brak Aktywnych Graczy",
+        "Content": "Żadni gracze są aktywni, więc nie możesz się z nikim wymienić."
+      },
+      "Request": {
+        "Title": "Stosy Przedmiotów: Oferta Wymiany",
+        "Content": "{trading_actor_name} (gracz {trading_user_name}) chce się z tobą wymienić.",
+        "PrivateContent": "{trading_actor_name} (gracz {trading_user_name}) chce się z tobą <strong>prywatnie</strong> wymienić.",
+        "AcceptQuery": "Czy akceptujesz?"
+      },
+      "OngoingRequest": {
+        "Content": "Czekaj na odpowiedź od {user_name}...",
+        "Label": "Anuluj ofertę wymiany"
+      },
+      "CancelledRequest": {
+        "Content": "Oferta wymiany była anulowana przez {user_name}."
+      },
+      "AddCurrency": {
+        "Title": "Dodaj Waluty",
+        "Label": "Zaktualizuj Waluty",
+        "Content": "Dodaj waluty do aktywnej wymiany z {trader_actor_name}"
+      },
+      "GMAddCurrency": "Dodaj Waluty (Tryb GM'a)",
+      "Closed": {
+        "Title": "Wymiana Zamknięta",
+        "You": "Zamknąłeś/ełaś okno wymiany, więc wymiana została anulowana.",
+        "Someone": "Jeden z graczy zamknął/eła okno wymiany, więc wymiana była anulowana.",
+        "Them": "Gracz \"{user_name}\" zamknął okno wymiany, więc wymiana była anulowana."
+      },
+      "Disconnected": "Jeden z graczy rozłączył się, więc wymiana była anulowana.",
+      "UserActiveCharacterWarning": "Wybrałeś/aś aktor \"{actor_name}\" który jest przypisany do gracza \"{player_name}\", który jest <strong>aktywny</strong>.<br><br>Czy jesteś pewny/a że chcesz to zrobić?",
+      "ActorOwnerWarning": "Nie posiadasz tego aktora, więc nie możesz wymieniać się nim.",
+      "AutoDecline": "Nie wystarczająco szybko odpowiedziałeś/aś na ofertę wymiany, więc została automatycznie odrzucona.",
+      "DragDrop": "Przeciągnij i upuść przedmioty aby zacząć wymianę",
+      "UserCharacterWarning": "Wybrałeś/aś aktor \"{actor_name}\" który jest przypisany do gracza \"{player_name}\".<br><br>Czy jesteś pewny/a że chcesz to zrobić?"
+    },
+    "Merchant": {
+      "Title": "Kupca: {actor_name}",
+      "BuyItems": "Kup Przedmioty",
+      "SellItems": "Sprzedaj Przedmioty",
+      "PopulateItems": "Załaduj Przedmioty",
+      "AllTypes": "Wszystkie typy",
+      "Buy": "Kup",
+      "NoItemsForSale": "Kupca nie ma nic na sprzedaż",
+      "NoItemsToSell": "Nie masz nic do sprzedania temu kupcu",
+      "OpenTimes": "Czas Otwarcia",
+      "OpenCloseAuto": "Automatyczne",
+      "Open": "Otwarte",
+      "Hours": "Godziny",
+      "Minutes": "Minuty",
+      "MerchantClosed": "Kupca jest zamknięty, sprawdź ponownie później.",
+      "Sell": "Sprzedaj",
+      "Description": "Opis",
+      "Settings": "Ustawienia",
+      "Override": "Nadpisz",
+      "EditTypePricesExplanation": "Przełącz widoczność przeliczników na-typ w zakładce Kup Przedmioty",
+      "BuyNoItems": "Kupca nie ma przedmiotów",
+      "CurrentItems": "Bieżące przedmioty",
+      "NoRollTables": "Nie ma żadnych tablic, stwórz jedną aby zacząć",
+      "ClickRoll": "Kliknij wylosuj aby zacząć",
+      "KeepRolled": "Zostaw wylosowane",
+      "AddAll": "Dodaj Wszystkie Przedmioty",
+      "ClearAllItems": "Wyczyść Wszystkie Przedmioty Aktora",
+      "AddItem": "Dodaj",
+      "RemoveItem": "Usuń",
+      "ItemFree": "Darmowe",
+      "Closed": "Zamknięte",
+      "EditTypePrices": "Edytuj Przelicznik Kosztów Na-Typ",
+      "RolledTimes": "Wylosowano {rolls} razy"
+    },
+    "Dialogs": {
+      "TypeWarning": {
+        "Title": "Uwaga Typu Przedmiotu",
+        "DropContent": "Upuszczasz przedmiot nie dozwolonego do upuszczenia typu (\"{type}\"). Czy jesteś pewny/a że chcesz to zrobić?",
+        "SellContent": "Chcesz sprzedać przedmiot nie dozwolonego do sprzedaży typu (\"{type}\"). Czy jesteś pewny/a że chcesz to zrobić?",
+        "TradeContent": "Chcesz wymienić przedmiot nie dozwolonego do wymiany typu (\"{type}\"). Czy jesteś pewny/a że chcesz to zrobić?"
+      },
+      "ResetSettings": {
+        "Title": "Zresetuj Ustawienia Modułu Stosu Przedmiotów",
+        "Content": "Czy na pewno chcesz zresetować wszystkie ustawienia modułu Stosu Przedmiotów do bieżących ustawień domyślnych systemu? <strong>NIE MOŻNA TEGO COFNĄĆ!</strong>",
+        "Confirm": "Zresetuj Ustawienia Modułu"
+      },
+      "LinkedActorWarning": {
+        "Title": "Stos Przedmiotów i Powiązany Aktor"
+      }
+    },
+    "Items": "Przedmioty",
+    "HeaderButtons": {
+      "ShowToPlayers": "Pokaż Graczom"
+    }
+  }
+}

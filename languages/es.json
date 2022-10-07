@@ -1,0 +1,558 @@
+{
+  "ITEM-PILES": {
+    "Currency": "Moneda",
+    "ContextMenu": {
+      "ShowToPlayers": "Mostrar a los Jugadores",
+      "RequestTrade": "Solicitud de comercio"
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "Mostrar a los Jugadores"
+    },
+    "Notifications": {
+      "ItemTransferred": "{item_name} de {source_actor_name} se entregó a {target_actor_name}.",
+      "GiveItemAccepted": "{user_name} aceptó tu oferta.",
+      "ShownToPlayers": "Mostrando {actor_name} a los jugadores",
+      "UpdateMerchantSuccess": "Mercader actualizado con éxtito.",
+      "UpdateItemPileSuccess": "Item Pile actualizado exitosamente."
+    },
+    "Errors": {
+      "DisallowedItemTrade": "No puedes intercambiar objetos de \"{tipo}\"",
+      "DisallowedItemSell": "Este comerciante no acepta artículos de \"{type}\"",
+      "NoSourceDrop": "No puedes soltar objetos del inventario a menos que seas un DM.",
+      "PileLocked": "El botín está bloqueado y no se puede abrir; no puedes añadir objetos.",
+      "DropNoToken": "No tienes ningún token en esta escena, por lo que no puedes soltar objetos.",
+      "DisallowedItemDrop": "No puedes soltar objetos de \"{tipo}\"",
+      "PileTooFar": "Estás demasiado lejos como para interactuar con el botín."
+    },
+    "Warnings": {
+      "GiveItemDeclined": "{user_name} rechaza tu oferta.",
+      "NoPlayersActive": "No hay ningún jugador activo para hacer esto",
+      "GiveItemNoGM": "No hay DM activo para darte este objeto."
+    },
+    "Inspect": {
+      "Title": "Examinando Contenido del Botín",
+      "AsActor": "Estás examinando el botín como {actorName}.",
+      "Empty": "El botín está vacío.",
+      "Destroyed": "El botín ya no existe y está inerte.",
+      "TakeAll": "Coger Todos los Objetos",
+      "Take": "Coger",
+      "Close": "Cerrar la Tapa",
+      "Leave": "Abandonar",
+      "NoneLeft": "No queda nada...",
+      "AddCurrency": "Añadir dinero",
+      "SplitAll": "Dividir en {num_players} partes",
+      "SplitCurrencies": "Dividir el dinero en {num_players} partes",
+      "Owner": "Como propietario del Botín, puedes modificar su contenido.",
+      "NoShareLeft": "No queda nada...",
+      "OpenSheet": "Abrir Hoja",
+      "SplitItems": "Dividir los objetos en {num_players} partes"
+    },
+    "Trade": {
+      "Title": "Item Piles: Comercio",
+      "Accept": "Aceptar",
+      "Decline": "Rechazar",
+      "Mute": "Silenciar",
+      "Declined": "El otro usuario ha rechazado o la petición de comercio.",
+      "Private": "Hacer privado este comercio",
+      "PrivateExplanation": "Ninguna tarjeta de chat ha sido publicada, y nadie puede observar",
+      "Over": "Este comercio ya no está activo.",
+      "Between": "Comercio entre {actor_1} y {actor_2}",
+      "DragDrop": "Arrastra y suelta los objetos para comenzar el comercio",
+      "Prompt": {
+        "Title": "Item Piles: Enviar Petición de Comercio",
+        "PickActor": "Selecciona a qué actor representarás en este comercio:",
+        "PickedActor": "El actor que representarás en el comercio:",
+        "PickToken": "Elija el token seleccionado",
+        "DropActor": "Arrastra y suelta el actor aquí",
+        "Label": "Enviar petición de comercio",
+        "User": "Selecciona con qué usuario deseas comerciar:"
+      },
+      "NoActiveUsers": {
+        "Content": "No hay jugadores activos, por lo que no tienes con quién comerciar.",
+        "Title": "Item Piles: No hay Usuarios Activos"
+      },
+      "Request": {
+        "Title": "Item Piles: Petición de Comercio",
+        "PrivateContent": "{trading_actor_name} ({trading_user_name}) quiere comerciar de forma <strong>privada</strong> contigo.",
+        "AcceptQuery": "¿Aceptas?",
+        "Content": "{trading_actor_name} ({trading_user_name}) quiere comerciar contigo."
+      },
+      "CancelledRequest": {
+        "Content": "La petición de comercio fué cancelada por {user_name}."
+      },
+      "AddCurrency": {
+        "Title": "Añadir Dinero",
+        "Content": "Añade monedas para activar el comercio con {trader_actor_name}",
+        "Label": "Actualiza Dinero"
+      },
+      "GMAddCurrency": "Añadir Dinero (modo DM)",
+      "Closed": {
+        "You": "Cerraste la ventana de comercio, por lo que se ha cancelado la operación.",
+        "Someone": "Uno de los usuarios ha cerrado la ventana de comercio, por lo que se ha cancelado la operación.",
+        "Title": "Comercio Cerrado",
+        "Them": "\"{user_name}\" ha cerrado la ventana de comercio, por lo que se ha cancelado la operación."
+      },
+      "Disconnected": "Uno de los usuarios se ha desconectado, por lo que se ha cancelado el intercambio.",
+      "UserActiveCharacterWarning": "Elegiste al actor \"{actor_name}\", éste es el personaje asignado del jugador \"{player_name}\", y está <strong>activo</strong>.<br><br>¿Estás seguro de que quieres hacer esto?",
+      "ActorOwnerWarning": "No eres el propietario de este actor, así que no puedes comerciar con él.",
+      "AutoDecline": "No has respondido a tiempo a la solicitud de comercio, por lo que se ha rechazado automáticamente.",
+      "OngoingRequest": {
+        "Content": "Espera la respuesta de {user_name}...",
+        "Label": "Cancelar petición de comercio"
+      },
+      "UserCharacterWarning": "Elegiste al actor \"{actor_name}\", que es el personaje asignado del jugador \"{player_name}\".<br><br>¿Estás seguro de que quieres hacer esto?"
+    },
+    "Merchant": {
+      "Title": "Mercader: {actor_name}",
+      "BuyItems": "Comprar Objetos",
+      "SellItems": "Vender Objetos",
+      "AllTypes": "Todos los tipos",
+      "Buy": "Comprar",
+      "OpenTimes": "Horario de Apertura",
+      "OpenCloseAuto": "Automático",
+      "Open": "Abierto",
+      "Closed": "Cerrado",
+      "Hours": "Horas",
+      "Minutes": "Minutos",
+      "MerchantClosed": "El mercader ha cerrado, vuelve más tarde.",
+      "NoItemsForSale": "El mercader no tiene nada en venta",
+      "Sell": "Vender",
+      "Settings": "Ajustes",
+      "Override": "Anular",
+      "EditTypePrices": "Editar Modificadores de Coste Por-Tipo",
+      "BuyNoItems": "El mercader no tiene artículos",
+      "CurrentItems": "Objetos actuales",
+      "NoRollTables": "No hay tabla de tiradas, crea una para comenzar",
+      "ClickRoll": "Haz clic en tirar para empezar",
+      "RolledTimes": "Se ha tirado {rollos} veces",
+      "KeepRolled": "Mantener tirada",
+      "AddAll": "Agregar todos los artículos",
+      "AddItem": "Añadir",
+      "RemoveItem": "Quitar",
+      "PopulateItems": "Rellenar Objetos",
+      "NoItemsToSell": "No tienes nada para vender a este mercader",
+      "Description": "Descripción",
+      "EditTypePricesExplanation": "Alterna la visibilidad de los controles deslizantes por-tipo en la pestaña Comprar de Objetos",
+      "ClearAllItems": "Borrar Todos los Objetos del Actor",
+      "ItemFree": "Gratis"
+    },
+    "Dialogs": {
+      "TypeWarning": {
+        "SellContent": "Estás intentando vender un artículo del tipo (\"{tipo}\") y el comerciante normalmente no lo aceptaría. ¿Seguro que quieres hacer esto?",
+        "Title": "Advertencia de Tipo Objeto",
+        "DropContent": "Estás soltando un objeto que es del tipo (\"{tipo}\") y normalmente no se permite. ¿Seguro que quieres hacer esto?",
+        "TradeContent": "Estás intentando comerciar con un artículo que es del tipo (\"{tipo}\") y normalmente no se permite. ¿Seguro que quieres hacer esto?"
+      },
+      "ResetSettings": {
+        "Title": "Restablecer la Configuración del Módulo Item Piles",
+        "Content": "¿Estás seguro que quieres restablecer todas las configuraciones del módulo Item Piles a los valores predeterminados del sistema? <strong>¡NO SE PUEDE DESHACER!</strong>",
+        "Confirm": "Restablecer Configuración del Módulo"
+      },
+      "LinkedActorWarning": {
+        "Title": "Item Piles y Actor Vinculado",
+        "Content": "¿Seguro que quieres convertir este <strong>actor vinculado</strong> en botín? El token de este actor está vinculado y todos los tokens de este actor compartirán su inventario y dinero."
+      },
+      "NoSystemFound": {
+        "Title": "Sistema No Reconocido",
+        "Content": "Este sistema no es totalmente compatible ahora mismo. Esto significa que el módulo no sabe cómo manejar mejor los elementos del sistema, pero puede operar de manera limitada.<br><br>Puedes configurar los ajustes del módulo tu mismo, pero necesitaras un poco de conocimiento técnico. <br><br>Si tienes alguna pregunta, hazle ping a <strong>Wasp#2005</strong> en el Discord de FoundryVTT."
+      },
+      "SystemFound": {
+        "Confirm": "Aplicar Valores Predeterminados del Sistema",
+        "Title": "Sistema Reconocido",
+        "Content": "Anteriormente, este sistema no era compatible, pero en una actualización reciente se agregó como compatible.<br><br>¿Desea cargar la configuración predeterminada de Item Piles?"
+      },
+      "NewSystemVersion": {
+        "Title": "Nueva Versión del Sistema",
+        "Content2": "No hacer esto puede causar un error en Item Piles: para solucionarlo, restablece la configuración específica del módulo.",
+        "Confirm": "Ajustes de actualización",
+        "Content": "Se ha actualizado la configuración predeterminada para el sistema que está utilizando Item Piles, ¿te gustaría sobreescribir la configuración específica de tu sistema con la actualizada?"
+      },
+      "ResetSharingData": {
+        "Title": "Restablecer los Datos Compartidos",
+        "Content": "Esto reiniciará el historial de jugadores que han participado en este botín.<br><br>¿Estás seguro de que quieres hacer esto?",
+        "Confirm": "Restablecer los Datos Compartidos"
+      },
+      "ClearAllItems": {
+        "Title": "Limpiar Todos los Objetos del Actor",
+        "Content": "Esto borrará todos los objetos del actor, ¿estás seguro que quieres hacer esto?"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "Dar Objeto",
+        "Content": "\"{actor_name}\" es propiedad del jugador \"{user_name}\", pero no está activo, por lo que no puedes darle este objeto."
+      },
+      "ReceiveItem": {
+        "Title": "Recibiendo Objeto",
+        "Header": "Item Piles: Recibiendo Objeto",
+        "Ignore": "Ignorar Usuario",
+        "ContentOne": "{source_actor_name} quiere dar \"{item_name}\" a {target_actor_name}, ¿aceptas?",
+        "ContentMany": "{source_actor_name} quiere dar \"{item_name}\" ({quantity}) a {target_actor_name}, ¿aceptas?"
+      },
+      "TextEditor": {
+        "Title": "Editor de Texto"
+      }
+    },
+    "Applications": {
+      "DropItem": {
+        "Title": "Soltar Objeto",
+        "Dropping": "Estás soltando: {item_name}",
+        "ExistingPiles": "Estás agregando este artículo al botín \"{target_name}\".",
+        "QuantityToDrop": "Tienes {cantidad} de este objeto, ¿cuántos quieres dejar?",
+        "AddToPile": "Añadir al botín",
+        "NewPile": "Crear un nuevo botín"
+      },
+      "GiveItem": {
+        "Title": "Dar Objeto",
+        "Giving": "Estas dando: {item_name}",
+        "TargetActor": "¿Quieres darle ese objeto a \"{target_name}\"?",
+        "Give": "Dar",
+        "QuantityToGive": "Tienes {cantidad} de este objeto, ¿cuántos quieres regalar?"
+      },
+      "DropCurrencies": {
+        "Title": "Soltar Monedas",
+        "Player": "Puedes meter las siguientes monedas en el botín:",
+        "NoCurrency": "{actor_name} no tiene monedas válidas...",
+        "AddToPile": "Añadir al botín",
+        "GM": "Como DM, puedes añadir dinero al botín:"
+      },
+      "TradeMerchantItem": {
+        "BuyItem": "Comprar Objeto",
+        "SellItem": "Vender Objeto",
+        "YouPay": "Pagar",
+        "YouReceive": "Recibir",
+        "TheyReceive": "Ellos reciben",
+        "Quantity": "Cantidad",
+        "Change": "Cambio",
+        "YouCantAfford": "No puedes permitirte ese precio",
+        "MaxQuantity": "Máximo {quantity}",
+        "Title": "Comerciando objeto: {item_name}",
+        "TheyCantAfford": "Ellos no se pueden permitir ese precio"
+      },
+      "Settings": {
+        "Title": "Configuración de Módulo de Item Piles",
+        "Local": "Ajustes Locales",
+        "Module": "Ajustes del Módulo",
+        "System": "Configuración Específica del Sistema",
+        "MoreToCome": "Y muchas más opciones de configuración están por venir...",
+        "Request": "Solicita nuevas características aquí.",
+        "Submit": "Enviar Configuración",
+        "Donate": "Si te gusta el módulo, ¡considera hacer una donación para que siga funcionando!"
+      },
+      "CurrenciesEditor": {
+        "Title": "Editor de Dinero de Item Piles",
+        "Explanation": "Aquí puedes definir qué tipo de moneda pueden usar los personajes en Item Piles, así como el dinero.",
+        "ExplanationSmallItems": "En otros sistemas, pueden ser objetos reales en el actor; en ese caso, puede arrastrar y soltar objetos en esta lista para agregarlos a las monedas.",
+        "Icon": "Icono",
+        "AddNew": "Añadir nueva moneda",
+        "Submit": "Aceptar",
+        "TitleActor": "Editor de Dinero Item Piles: {actor_name}",
+        "ExplanationSmallAttributes": "En Dungeons & Dragons, el dinero de los actores está la ruta de atributo \"actor.data.data.currency.gp\", por lo que agregaría la suya propia con el nombre \"Piezas de oro\" y la ruta de atributo \"data.currency.gp\". Añade una haciendo clic en el signo + del encabezado.",
+        "DragDrop": "Arrastra y suelta un objeto para añadirlo a la lista",
+        "Name": "Nombre de la moneda",
+        "Exchange": "Cambio",
+        "Data": "Atributo"
+      },
+      "ItemEditor": {
+        "Title": "Editor de Objetos Item Piles: {item_name}",
+        "Update": "Actualizar Objeto",
+        "General": "Ajustes Generales",
+        "Price": "Ajuste de Precios",
+        "Hidden": "Objeto Oculto",
+        "HiddenExplanation": "Cuando está habilitado, el artículo no aparece en las listas de artículos del mercader.",
+        "DisplayQuantity": "Visibilidad de la Cantidad de Artículos",
+        "DisplayQuantityExplanation": "Configura cómo se muestra la cantidad del artículo en la tienda, si es que se muestra.",
+        "DisplayQuantityDefault": "Configuración predeterminada del mercader",
+        "DisplayQuantityYes": "Sí, mostrar siempre la cantidad",
+        "DisplayQuantityNo": "No, ocultar siempre la cantidad",
+        "InfiniteQuantityExplanation": "Cuando está habilitado, el artículo no puede quedarse sin cantidad si lo vende un mercader.",
+        "PriceExplanation": "En esta pestaña, puedes configurar el precio del artículo, incluso si el artículo costara otros artículos.",
+        "BasePrice": "Precio Base",
+        "BasePriceExplanation": "Esto configura el precio normal de este artículo.",
+        "Free": "El Artículo es Gratis",
+        "FreeExplanation": "Cuando está habilitado, el artículo no cuesta dinero.",
+        "DisableNormalCost": "Deshabilitar Coste Normal",
+        "DisableNormalCostExplanation": "Cuando está habilitado, el artículo no se puede comprar con la moneda principal y se debe comprar con una de las opciones de compra siguientes.",
+        "PurchaseOptions": "Opciones de Compra",
+        "PurchaseOptionsExplanation": "Aquí puedes configurar las formas alternativas de comprar el artículo. Cada grupo representa una forma diferente en la que un personaje puede comprar este artículo de otros",
+        "CantBeSoldToMerchants": "No se Puede Vender a Mercaderes",
+        "CantBeSoldToMerchantsExplanation": "Cuando está habilitado, el artículo no se puede volver a vender a los mercaderes, solo se puede comprar.",
+        "AddPurchaseOption": "Agregar Opción de Compra",
+        "DropMeClickMe": "Haga clic para agregar un atributo o arrastre y suelte un objeto para agregar",
+        "PricePreset": "O seleccione un preajuste de precio existente:",
+        "SelectPreset": "Seleccionar precio preestablecido",
+        "NotForSale": "El Objeto No Está a la Venta",
+        "NotForSaleExplanation": "Cuando está habilitado, el artículo no está a la venta y no se puede comprar. Aún así aparece en la lista de artículos del mercader, a menos que el artículo esté oculto.",
+        "InfiniteQuantity": "Cantidad Infinita"
+      },
+      "FilterEditor": {
+        "Title": "Editor de filtros de Item Piles",
+        "TitleActor": "Editor de filtros de Item Piles: {actor_name}",
+        "Explanation": "Aquí puedes definir múltiples tipos de filtros que excluyen ciertos tipos de artículos. Según la ruta de atributo dada, el botín podría encontrar el \"tipo\" de un artículo y, según los filtros, oculta esos artículos en la interfaz de usuario del inventario de Item Pile.",
+        "Filters": "Filtros",
+        "AddNew": "Añadir nuevo filtro",
+        "Path": "Ruta de atributos",
+        "Submit": "Enviar los filtros"
+      },
+      "SimilaritiesEditor": {
+        "Title": "Editor de Similitudes de Item Piles",
+        "Explanation_P1": "Aquí puedes definir múltiples tipos de identificadores que ayudan a Item Piles a diferenciar entre artículos similares. En casi todos los sistemas, los artículos se pueden diferenciar por su \"nombre\" y \"tipo\".",
+        "Explanation_P2": "Pero en algunos casos, como en Pathfinder 2ª Edición, los artículos temporales pueden compartir los artículos permanentes. Entonces, al agregar \"data.temporary.value\", sus artículos temporales se consideran \"únicos\" y separados de los permanentes.",
+        "Path": "Ruta de atributo",
+        "AddNew": "Agregar nueva ruta de atributo",
+        "Submit": "Enviar similitudes de artículos"
+      },
+      "ItemTypePriceModifiersEditor": {
+        "Title": "Editor de Modificadores de Precio del Tipo del Artículo",
+        "TitleActor": "Editor de Modificadores de Precio del Tipo del Artículo: {actor_name}",
+        "ItemType": "Tipo de Artículo",
+        "Override": "Sobreescribir",
+        "Submit": "Enviar modificadores de precio",
+        "Explanation": "Aquí puedes definir el precio y los modificadores del precio de venta para este mercader en relación con los tipos de artículos específicos. La configuración \"Sobreescribir\" significa que sobreescribe los modificadores de precio normales del comerciante."
+      },
+      "PriceModifiersEditor": {
+        "Title": "Editor de Modificadores de Precio de Item Piles",
+        "TitleActor": "Editor de Modificadores de Precio de Item Piles: {actor_name}",
+        "DragDrop": "Arrastra y suelta un actor para agregarlo a la lista",
+        "Override": "Sobreescribir",
+        "Submit": "Enviar modificadores de precio",
+        "Actor": "Personaje",
+        "Explanation": "Aquí puedes definir el precio y los modificadores del precio de venta para este mercader en relación con actores específicos. La configuración \"Sobreescribir\" significa que sobreescribe los modificadores de precio normales del mercader, incluidos los modificadores de precio específicos del tipo de artículo."
+      },
+      "ItemPileConfig": {
+        "Title": "Configuración de Item Piles: {actor_name}",
+        "Update": "Actualiza Item Pile",
+        "Main": {
+          "Title": "Ajustes Principales",
+          "EnabledPile": "Habilitado",
+          "EnabledPileExplanation": "Si esto debería actuar como un botín.",
+          "InspectItems": "Habilitar Inspección de Artículos",
+          "Distance": "Distancia de Interacción",
+          "Macro": "En Macro de Interacción",
+          "MacroExplanation": "Nombre de la macro a ejecutar cuando se interactúa con este botín.",
+          "MacroPlaceholder": "Insertar nombre de macro",
+          "EditDescription": "Editar Descripción",
+          "DeleteWhenEmpty": "Eliminar cuando esté vacío",
+          "DeleteWhenEmptyExplanation": "Hace que este botín se elimine automáticamente una vez quede vacío.",
+          "DeleteWhenEmptyDefault": "Configuración del módulo por defecto",
+          "DeleteWhenEmptyYes": "Sí, eliminar cuando esté vacío",
+          "DeleteWhenEmptyNo": "No, no eliminar cuando esté vacío",
+          "OverrideCurrencies": "Sobreescribir Dinero",
+          "ConfigureOverrideCurrencies": "Configurar Sobreescribir Dinero",
+          "OverrideItemFilters": "Sobreescribir Filtros de Objetos",
+          "OverrideItemFiltersExplanation": "Configura si el botín debería poder transferir otros tipos de artículos que no sean los predeterminados.",
+          "ConfigureOverrideItemFilters": "Configurar Sobreescribir Filtros de Objetos",
+          "InspectItemsExplanation": "Al hacer clic en el nombre del artículo, se abrirá la hoja del artículo.",
+          "GridUnits": "Unidades de Cuadrícula (dejar vacía para ♾️)",
+          "EditDescriptionExplanation": "Esta descripción se muestra en las interfaces relevantes cuando se visualiza el botín",
+          "OverrideCurrenciesExplanation": "Configura si el botín debería poder transferir monedas además de la predeterminada."
+        },
+        "Configure": "\"Item Pile\"",
+        "SingleItem": {
+          "DisplayOne": "Mostrar Imagen de Un Solo Artículo",
+          "DisplayOneExplanation": "Si el botín se compone de un solo artículo, esto establece que la imagen del token sea la imagen del artículo.",
+          "OverrideScale": "Sobreescribe la escala de token de un solo artículo",
+          "Scale": "Escala de token de un solo artículo",
+          "ItemName": "Usar el Nombre del Artículo",
+          "ItemNameExplanation": "Hace que el botín reciba el nombre del único artículo que contiene.",
+          "Title": "Configuración de Un Solo Objeto",
+          "DisplayOneContainerWarning": "¡Advertencia! Tiene habilitados tanto \"Mostrar imagen de artículo individual\" como \"Es un contenedor\". En este caso, las imágenes del contenedor tienen prioridad."
+        },
+        "Container": {
+          "Title": "Ajustes del Contenedor",
+          "IsContainer": "Es Contenedor",
+          "Locked": "Esta Bloqueado",
+          "Closed": "Está Cerrado",
+          "ClosedImagePath": "Ruta de la Imagen Cerrado",
+          "EmptyImagePath": "Ruta de la Imagen Vacío",
+          "LockedImagePath": "Ruta de la Imagen Bloqueado",
+          "CloseSoundPath": "Ruta del Sonido Cerrar",
+          "OpenSoundPath": "Ruta del Sonido Abrir",
+          "LockedSoundPath": "Ruta del Sonido Bloqueado",
+          "OpenedImagePath": "Ruta de la Imagen Abierto"
+        },
+        "Sharing": {
+          "Title": "Ajustes Compartidos",
+          "ShareCurrenciesEnabled": "Compartir Habilitado: Dinero",
+          "ShareCurrenciesEnabledExplanation": "Cuando esto está habilitado, los jugadores solo pueden comerciar con dinero. Deshabilitar significa que pueden coger todo lo que quieran.",
+          "TakeAllEnabled": "Habilitar el Botón Coger Todo",
+          "SplitAllEnabled": "Habilitar el Botón Repartir con Jugadores",
+          "ResetSharingData": "Restablecer Datos Compartidos",
+          "ShareItemsEnabled": "Compartir Habilitado: Artículos",
+          "ShareItemsEnabledExplanation": "Cuando esto está habilitado, los jugadores solo pueden comerciar con artículos. Deshabilitar significa que pueden coger todo lo que quieran.",
+          "TakeAllEnabledExplanation": "Habilita el botón \"Coger Todo\" al saquear el botín. Requiere que las dos configuraciones de uso compartido anteriores estén deshabilitadas.",
+          "SplitAllEnabledExplanation": "Habilita el botón \"Repartir [número] partes\" al saquear el botín. Al presionar este botón, todos los jugadores (o solo los jugadores activos, ver más abajo) reciben su parte del botín.",
+          "InactivePlayers": "Sólo Repartir Entre Jugadores Activos",
+          "InactivePlayersExplanation": "Solo los jugadores que estén activos cuando se saquee el botín recibirán su parte.",
+          "ResetSharingDataExplanation": "Si el contenido de la pila de artículos se cambió manualmente mientras la gente lo saqueaba, los datos compartidos pueden no estar sincronizados con los recursos compartidos reales de los jugadores. Al presionar este botón, se restablecerá la participación de todos en este botín."
+        },
+        "Merchant": {
+          "Title": "Ajustes del Mercader",
+          "Enabled": "Es Mercader",
+          "EnabledExplanation": "Los jugadores no pueden recoger artículos de los comerciantes, sino que deben comprarlos",
+          "MerchantImage": "Imagen del Mercader",
+          "MerchantImageExplanation": "Esta es la imagen que se mostrará en la interfaz del mercader",
+          "InfiniteQuantity": "Cantidad Infinita",
+          "InfiniteQuantityExplanation": "Cuando está habilitado, este mercader no puede quedarse sin artículos.",
+          "InfiniteCurrency": "Dinero Infinito",
+          "InfiniteCurrencyExplanation": "Cuando está habilitado, la venta de artículos a este comerciante no se restará de su dinero.",
+          "DisplayQuantity": "Visibilidad de la Cantidad de Artículos",
+          "DisplayQuantityExplanation": "Esto configura cómo se muestra la cantidad de artículos en la tienda, si es que se muestra.",
+          "DisplayQuantityYes": "Sí, muestra la cantidad (a menos que el artículo diga lo contrario)",
+          "DisplayQuantityNo": "No, ocultar cantidad (a menos que el artículo diga lo contrario)",
+          "DisplayQuantityYesAlways": "Sí, mostrar siempre la cantidad",
+          "PurchaseOnly": "Solo Compra",
+          "PurchaseOnlyExplanation": "Cuando está habilitado, los personajes no pueden vender artículos a este mercader.",
+          "HideNewItems": "Ocultar Nuevos Artículos",
+          "OnyAcceptBasePrice": "Solo Acepta Precio Base",
+          "OpenTimes": "Horario de Apertura",
+          "OpenTimesExplanation": "Cuando está habilitado, los jugadores solo pueden interactuar con el comerciante en ciertos momentos del día.",
+          "OpenStatus": "Estado Abierto",
+          "OpenStatusExplanation": "Esto configura el estado actual del estado abierto del mercader. Si el Horario de Apertura (a continuación) está habilitado y el módulo Calendario simple está habilitado, puede configurarlo para que sea automático.",
+          "OpenStatusClosed": "Cerrado",
+          "OpenStatusAuto": "Automático (Simple Calendar)",
+          "PriceModifierTitle": "Modificadores de Precio de Compra y Venta",
+          "BuyPriceModifier": "Modificador de Precio de Compra (%)",
+          "SellPriceModifier": "Modificador de Precio de Venta (%)",
+          "ItemTypeModifier": "Modificadores de Precio de Tipo de Artículo",
+          "ItemTypeModifiersExplanation": "En este cuadro de diálogo puede configurar modificadores de precio para tipos de artículos individuales.",
+          "ConfigureItemTypePriceModifiers": "Configurar Modificadores de Precio de Tipo de Artículo.",
+          "ActorPriceModifiers": "Modificadores de Precio Sobreescritura Por-Actor",
+          "ConfigureActorPriceModifiers": "Configurar Modificadores de Precio de Actor.",
+          "DisplayQuantityNoAlways": "No, ocultar siempre la cantidad",
+          "HideNewItemsExplanation": "Cuando está habilitado, se ocultarán todos los artículos vendidos a este comerciante.",
+          "OnyAcceptBasePriceExplanation": "Cuando está habilitado, todos los artículos vendidos a este comerciante deben usar el precio base y no precios personalizados.",
+          "OpenStatusOpen": "Abierto",
+          "PriceModifierExplanation": "Esto configura los modificadores para el costo de cada artículo en la tienda. También puedes configurar modificadores por tipo de artículo, e incluso para personajes específicos (como los bardos lengua-plateada). No está limitado al 200%, escriba en el campo para ir aún.",
+          "ActorPriceModifiersExplanation": "Aquí puede configurar si ciertos actores deben tener modificadores de precio diferentes a los modificadores de precio anteriores."
+        },
+        "Other": {
+          "Title": "Otros Ajustes"
+        }
+      },
+      "PricePresetEditor": {
+        "Title": "Editor de Preajustes de Precios",
+        "Update": "Actualizar Preajustes",
+        "Explanation": "Aquí puedes crear precios preestablecidos que luego se pueden usar fácilmente en los precios personalizados de los artículos."
+      }
+    },
+    "HUD": {
+      "ToggleLocked": "Alternar Bloqueado",
+      "ToggleClosed": "Alternar Cerrado",
+      "Configure": "Configurar Botín"
+    },
+    "Chat": {
+      "Pickup": "{name} cogió los siguientes artículos:",
+      "TradeComplete": "{party_1} y {party_2} completaron el comercio.",
+      "TradeStarted": "{party_1} y {party_2} iniciaron un comercio.",
+      "TradeSpectate": "Observar Comercio",
+      "TradeStartedButton": "Haz clic en el botón de abajo para observar:",
+      "PrivateTrade": "Comercio Privado",
+      "ExpandTrade": "Ver detalles comerciales completos",
+      "Split": "El contenido del botín se dividió entre los {num_players} jugadores y cada uno recibió:",
+      "SpectateDisabled": "Comercio Concluido",
+      "MerchantTraded": "{name} compró los siguientes artículos de {merchant}:"
+    },
+    "Settings": {
+      "Configure": {
+        "Title": "Configuración del Módulo",
+        "Label": "Configurar el Módulo",
+        "Hint": "Puede configurar Item Piles en este cuadro de diálogo."
+      },
+      "Reset": {
+        "Title": "Restablecer la Configuración Específica del Sistema a los Valores Predeterminados",
+        "Label": "Restablecer Ajustes",
+        "Hint": "Esto restablecerá todas las configuraciones de Item Piles a los valores predeterminados del sistema de juego activo."
+      },
+      "ActorClass": {
+        "Title": "Tipo de clase de actor",
+        "Hint": "Esta configuración define el tipo de actor que se usará el actor de botín predeterminado que se crea en el primer lanzamiento de artículos. En el caso de D&D5e, se trata de \"personaje\", ya que no tiene un tipo de actor de botín dedicado."
+      },
+      "Quantity": {
+        "Title": "Atributo de cantidad de artículo",
+        "Hint": "Aquí puedes configurar cuál es la ruta del atributo para la cantidad de cada artículo. Por ejemplo, en el sistema D&D5e, la cantidad de cada artículo se almacena en el atributo \"item.data.data.quantity\" del artículo, por lo que colocaría \"data.quantity\" en esta configuración."
+      },
+      "Price": {
+        "Title": "Atributo de precio del artículo",
+        "Hint": "Aquí puedes configurar cuál es la ruta del atributo para el precio de cada artículo. Por ejemplo, en el sistema D&D5e, la cantidad de cada artículo se almacena en el atributo \"item.data.data.price\" del artículo, por lo que colocaría \"data.price\" en esta configuración."
+      },
+      "Currencies": {
+        "Label": "Configura Monedas",
+        "Title": "Monedas",
+        "Hint": "Esta configuración define las monedas que son elegibles para la recolección, que pueden no ser artículos reales sino entradas numéricas en la hoja de personaje."
+      },
+      "ItemFilters": {
+        "Title": "Filtros de artículos",
+        "Label": "Configurar Filtros de Artículos",
+        "Hint": "Aquí puedes configurar qué artículos se ignoran y no se enumeran en los cuadros de diálogo dedel botín."
+      },
+      "ItemSimilarities": {
+        "Title": "Similitudes de Artículos",
+        "Label": "Configuración de Similitudes de los Artículos",
+        "Hint": "Aquí puede configurar cómo se detectan los artículos para que sean iguales en este sistema. Algunos sistemas pueden tener datos que distinguen artículos de manera diferente a otros, como artículos temporales."
+      },
+      "PricePresets": {
+        "Title": "Preajustes de Precios",
+        "Label": "Configura los Preajustes de Precios",
+        "Hint": "Aquí puedes configurar los precios preestablecidos personalizados que luego puede importar fácilmente a los artículos."
+      },
+      "EnableDroppingItems": {
+        "Title": "Habilitar la Eliminación de Artículos",
+        "Hint": "Esto permite a los usuarios dejar artículos en el suelo para crear su propio botín; con esto deshabilitado, los usuarios no pueden crear botines ni agregar artículos a botines existentes."
+      },
+      "EnableGivingItems": {
+        "Title": "Habilitar Dar Artículos",
+        "Hint": "Esto permite a los usuarios colocar artículos en otros tokens para dárselos; con esto deshabilitado, los usuarios no pueden dar artículos a otros usuarios."
+      },
+      "EnableTrading": {
+        "Title": "Habilitar Comercio",
+        "Hint": "Esto habilita el comercio: con esto deshabilitado, nadie puede iniciar ningún comercio."
+      },
+      "ShowTradeButton": {
+        "Title": "Mostrar Botón Comerciar",
+        "Hint": "Habilitar esto mostrará un botón de comercio justo debajo de la lista de jugadores en la parte inferior derecha."
+      },
+      "InspectItemsTrade": {
+        "Title": "Habilitar la Inspección de Artículos Durante las Transacciones",
+        "Hint": "Al habilitar esto, los usuarios pueden hacer clic en los artículos que se intercambian y abrir la hoja del artículo para obtener una vista previa."
+      },
+      "OutputToChat": {
+        "Title": "Mostrar en el chat",
+        "Off": "Desactivar: desactiva los mensajes",
+        "Public": "Público - todos pueden ver los mensajes",
+        "SelfGM": "Privado - solo los DMs y el usuario pueden ver los mensajes",
+        "Blind": "Ciego - solo los DMs pueden ver los mensajes",
+        "Hint": "Siempre que un jugador recoja artículos de un botín, se enviará un mensaje que muestra lo que recogió."
+      },
+      "InvertSheetOpen": {
+        "Title": "Invertir Ctrl + Doble Clic Abrir",
+        "Hint": "Normalmente, debe mantener pulsado el control cuando desea abrir la hoja del actor de un botín. Habilitar esto hace que la hoja del actor del botín se abra de forma predeterminada, y mantener el control abre la interfaz de usuario del inventario del botín."
+      },
+      "HideActorHeaderText": {
+        "Title": "Ocultar el texto del encabezado del actor",
+        "Hint": "Oculta el texto \"Item Piles\" en el encabezado del actor; es útil si tiene demasiados módulos y el encabezado se llena."
+      },
+      "DeleteEmptyPiles": {
+        "Title": "Eliminar automáticamente el botín vacío",
+        "Hint": "Esto hace que el botín se eliminen una vez que se quede sin artículos. Esto se puede sobreescribir en el botín de artículos individuales."
+      },
+      "PreloadFiles": {
+        "Title": "Precargar Archivos",
+        "Hint": "Hace que los archivos (imágenes y audio) de los botines se carguen previamente, lo que da como resultado una experiencia perfecta."
+      },
+      "Debug": {
+        "Title": "Habilitar depuración",
+        "Hint": "Imprime mensajes de depuración en la consola"
+      },
+      "DebugHooks": {
+        "Title": "Habilitar la depuración de Hooks",
+        "Hint": "Imprime en la consola los Hooks de botín y su contenido"
+      },
+      "PopulationTablesFolder": {
+        "Title": "Carpeta de Tablas para \"Rellenar Artículos\"",
+        "Hint": "Título de la carpeta para filtrar tablas desplegables en la pestaña \"Rellenar Artículos\" del mercader.",
+        "AllTables": "Todas las Tablas"
+      }
+    },
+    "Items": "Objetos",
+    "Currencies": "Monedas"
+  }
+}
