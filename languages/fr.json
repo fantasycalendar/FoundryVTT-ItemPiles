@@ -87,7 +87,8 @@
       "Disconnected": "L'un des utilisateurs a été déconnecté, l'échange a donc été annulée.",
       "UserCharacterWarning": "Vous avez choisi l'acteur \"{actor_name}\" qui est le personnage assigné du joueur \"{player_name}\".<br><br>Êtes-vous sûr de vouloir faire cela ?",
       "UserActiveCharacterWarning": "Vous avez choisi l'acteur \"{actor_name}\" qui est le personnage attribué au joueur \"{player_name}\", actuellement <strong>actif</strong>. <br><br>Êtes-vous sûr de vouloir faire cela ?",
-      "ActorOwnerWarning": "Vous ne possédez pas cet acteur, vous ne pouvez donc pas faire de commerce avec lui."
+      "ActorOwnerWarning": "Vous ne possédez pas cet acteur, vous ne pouvez donc pas faire de commerce avec lui.",
+      "SameActor": "Deux utilisateurs ne peuvent choisir le même personnage - Vous ne pouvez pas échanger de ET vers le même personnage. Cessez."
     },
     "Errors": {
       "DisallowedItemDrop": "Vous ne pouvez pas déposer des objets de type \"{type}\"",
@@ -157,6 +158,9 @@
         "ContentOne": "{source_actor_name} veut donner \"{item_name}\" à {target_actor_name}. Acceptez-vous ?",
         "ContentMany": "{source_actor_name} veut donner {quantity} \"{item_name}\" à {target_actor_name}. Acceptez-vous ?",
         "Ignore": "Ignorer l'Utilisateur"
+      },
+      "TextEditor": {
+        "Title": "Éditeur de texte"
       }
     },
     "CurrenciesEditor": {
@@ -389,7 +393,15 @@
       "OpenCloseAuto": "Automatique",
       "Open": "Ouvert",
       "MerchantClosed": "Ce marchand est fermé, revenez plus tard.",
-      "RolledTimes": "Lancé {rolls} fois"
+      "RolledTimes": "Lancé {rolls} fois",
+      "Title": "MArchand : {actor_name}",
+      "BuyItems": "Acheter des objets",
+      "SellItems": "Vendre des objets",
+      "PopulateItems": "Remplir les objets",
+      "BuyServices": "Acheter des services",
+      "OtherTypes": {
+        "item-piles-service": "Service"
+      }
     },
     "Applications": {
       "DropItem": {
@@ -461,7 +473,11 @@
         "DisableNormalCost": "Désactiver le Coût Normal",
         "DropMeClickMe": "Cliquer pour ajouter un attribut ou glisser/déposer un objet pour l'ajouter",
         "DisplayQuantityDefault": "Paramètre marchand par défaut",
-        "PricePreset": "Ou sélectionnez un préréglage de prix existant :"
+        "PricePreset": "Ou sélectionnez un préréglage de prix existant :",
+        "PurchaseMacro": "Acheter une macro",
+        "PurchaseMacroExplanation": "Nom de la macro à exécuter lorsque l'objet est acheté.",
+        "Service": "L'objet est un service",
+        "ServiceExplanation": "Cela n'ajoute pas d'objet à l'inventaire de l'acheteur. Cet \"objet\" service peut toujours avoir une quantité, mais si vous l'épuisez, il ne sera pas effacé du marchand, mais marqué comme plus à vendre à la place."
       },
       "TradeMerchantItem": {
         "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
