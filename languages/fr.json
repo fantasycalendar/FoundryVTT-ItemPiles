@@ -360,7 +360,7 @@
     "Notifications": {
       "UpdateMerchantSuccess": "Le marchand a été mis à jour avec succès.",
       "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès.",
-      "ItemTransferred": "{source_actor_name} a donné {item_name} à {target_actor_name}.",
+      "ItemTransferred": "{item_name} a été donné à {target_actor_name} par {source_actor_name}.",
       "GiveItemAccepted": "{user_name} a accepté votre offre.",
       "ShownToPlayers": "Montre {actor_name} aux joueurs"
     },
