@@ -56,78 +56,78 @@
 
   {#if activeSidebarTab}
 
-    <div class="item-piles-flexcol item-piles-top-divider">
+    <Tabs style="flex: 0 1 auto;" {tabs} bind:activeTab={activeSidebarTab}/>
 
-      <Tabs style="flex: 0 1 auto;" {tabs} bind:activeTab={activeSidebarTab}/>
+    <section class="tab-body item-piles-sections" style="overflow-y:auto;">
 
-      <section class="tab-body item-piles-sections">
+      {#if activeSidebarTab === 'description'}
+        <div class="tab merchant-description">
+          <TJSProseMirror
+            content={description}
+            options={{ editable: false }}
+            style={{"display": "block"}}
+          />
+          {#if game.user.isGM && !description}
+            <button type="button"
+                    style="flex:1;"
+                    on:click={() => { showDescriptionEditor() }}
+            >{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}</button>
+          {/if}
+        </div>
+      {/if}
 
-        {#if activeSidebarTab === 'description'}
-          <div class="tab merchant-description">
-            <TJSProseMirror content={description} options={{ editable: false }}/>
-            {#if game.user.isGM && !description}
-              <button type="button"
-                      style="flex:1;"
-                      on:click={() => { showDescriptionEditor() }}
-              >{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}</button>
-            {/if}
-          </div>
-        {/if}
+      {#if activeSidebarTab === 'settings'}
+        <div class="tab merchant-settings">
 
-        {#if activeSidebarTab === 'settings'}
-          <div class="tab merchant-settings">
+          <div class="setting-container item-piles-config-container">
 
-            <div class="setting-container item-piles-config-container">
-
-              <div class="form-group">
-                <label style="flex:3;">
-                  <span>{localize("ITEM-PILES.Merchant.EditTypePrices")}</span>
-                  <p>{localize("ITEM-PILES.Merchant.EditTypePricesExplanation")}</p>
-                </label>
-                <input type="checkbox" bind:checked={$editPrices}/>
-              </div>
-
-              <div class="form-group">
-                <label style="flex:3;">
-                  <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
-                  <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
-                </label>
-                <input type="checkbox" bind:checked={$pileDataStore.purchaseOnly}/>
-              </div>
-
-              <div class="form-group">
-                <label style="flex:3;">
-                  <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
-                  <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
-                </label>
-                <input type="checkbox" bind:checked={$pileDataStore.hideNewItems}/>
-              </div>
-
-              <div class="form-group slider-group item-piles-flexcol">
-                <label>
-                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}
-                </label>
-                <SliderInput bind:value={$pileDataStore.buyPriceModifier}/>
-              </div>
-
-              <div class="form-group slider-group item-piles-flexcol">
-                <label>
-                  {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}
-                </label>
-                <SliderInput style="flex:4;" bind:value={$pileDataStore.sellPriceModifier}/>
-              </div>
-
+            <div class="form-group">
+              <label style="flex:3;">
+                <span>{localize("ITEM-PILES.Merchant.EditTypePrices")}</span>
+                <p>{localize("ITEM-PILES.Merchant.EditTypePricesExplanation")}</p>
+              </label>
+              <input type="checkbox" bind:checked={$editPrices}/>
             </div>
 
-            <button type="button" class="update-button" on:click={() => { store.update(); }}>
-              <i class="fas fa-download"></i> Update
-            </button>
+            <div class="form-group">
+              <label style="flex:3;">
+                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
+                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
+              </label>
+              <input type="checkbox" bind:checked={$pileDataStore.purchaseOnly}/>
+            </div>
+
+            <div class="form-group">
+              <label style="flex:3;">
+                <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
+                <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
+              </label>
+              <input type="checkbox" bind:checked={$pileDataStore.hideNewItems}/>
+            </div>
+
+            <div class="form-group slider-group item-piles-flexcol">
+              <label>
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}
+              </label>
+              <SliderInput bind:value={$pileDataStore.buyPriceModifier}/>
+            </div>
+
+            <div class="form-group slider-group item-piles-flexcol">
+              <label>
+                {localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}
+              </label>
+              <SliderInput style="flex:4;" bind:value={$pileDataStore.sellPriceModifier}/>
+            </div>
+
           </div>
-        {/if}
 
-      </section>
+          <button type="button" class="update-button" on:click={() => { store.update(); }}>
+            <i class="fas fa-download"></i> Update
+          </button>
+        </div>
+      {/if}
 
-    </div>
+    </section>
 
   {/if}
 
@@ -170,12 +170,8 @@
       height: 100%;
       padding: 0.25rem;
 
-      div {
-        overflow: hidden auto;
-        top: 0;
-        bottom: 0;
-        position: absolute;
-        word-break: break-word;
+      .prosemirror {
+        display: block;
       }
     }
 
