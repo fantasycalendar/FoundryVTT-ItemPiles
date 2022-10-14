@@ -54,7 +54,8 @@
       "Disconnected": "Um dos jogadores foi desconectados, então a negociação foi cancelada.",
       "UserCharacterWarning": "Você selecionou o ator <strong>{actor_name}</strong>, que está atribuído como personagem do jogador <strong>{player_name}</strong>.<br><br>Você está certo de que quer fazer isso?",
       "UserActiveCharacterWarning": "Você selecionou o ator <strong>{actor_name}</strong> , que está atribuído como personagem do jogador <strong>{player_name}</strong>, que está <strong>ativo</strong>.<br><br>Você está certo de que quer fazer isso?",
-      "ActorOwnerWarning": "Você não é dono deste ator, então você não pode negociar com ele."
+      "ActorOwnerWarning": "Você não é dono deste ator, então você não pode negociar com ele.",
+      "SameActor": "Ambos os usuários não podem escolher o mesmo personagem - você não pode trocar para E do mesmo personagem. Pare com isso."
     },
     "Dialogs": {
       "ResetSettings": {
@@ -209,7 +210,11 @@
       "Title": "Comerciante: {actor_name}",
       "PopulateItems": "Itens Populares",
       "BuyItems": "Comprar itens",
-      "SellItems": "Vender itens"
+      "SellItems": "Vender itens",
+      "BuyServices": "Comprar serviços",
+      "OtherTypes": {
+        "item-piles-service": "Serviço"
+      }
     },
     "Applications": {
       "DropItem": {
@@ -281,7 +286,11 @@
         "AddPurchaseOption": "Adicionar opção de compra",
         "DropMeClickMe": "Clique para adicionar um atributo ou arraste e solte um item para adicionar",
         "PricePreset": "Ou selecione uma predefinição de preço de saída:",
-        "SelectPreset": "Selecione a predefinição de preço"
+        "SelectPreset": "Selecione a predefinição de preço",
+        "PurchaseMacro": "Comprar Macro",
+        "PurchaseMacroExplanation": "Nome da macro a ser executada quando o item for comprado.",
+        "Service": "O item é serviço",
+        "ServiceExplanation": "Isso faz com que este item não adicione nenhum item ao inventário do comprador. O \"item\" de serviço ainda pode ter quantidade, mas se acabar, não será excluído do comerciante, mas definido como não à venda."
       },
       "DropCurrencies": {
         "Title": "Descartando moedas",
