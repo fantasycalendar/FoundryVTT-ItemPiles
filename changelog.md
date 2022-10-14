@@ -2,8 +2,9 @@
 
 ## Version 2.2.5
 
+- Updated French and Portuguese (Brazilian) localization (thanks to rectulo, davidR1974, and eunaumtenhoid!)
 - Fixed error when using the search bar in item piles
-- Fixed individual items marked as having infinite quantity actually having infinite quantity when sold by merchants
+- Fixed individual items marked as having infinite quantity not having infinite quantity when sold by merchants
 - Fixed merchants with overnight open times would not stay open properly past midnight
 
 ## Version 2.2.4
