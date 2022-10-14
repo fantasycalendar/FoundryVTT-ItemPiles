@@ -192,9 +192,21 @@ export default class MerchantStore extends ItemPileStore {
         const openTimes = pileData.openTimes.open;
         const closeTimes = pileData.openTimes.close;
         const timestamp = window.SimpleCalendar.api.timestampToDate(window.SimpleCalendar.api.timestamp());
-        const afterOpeningTime = timestamp.hour > openTimes.hour || (timestamp.hour === openTimes.hour && timestamp.minute >= openTimes.minute);
-        const beforeClosingTime = timestamp.hour < closeTimes.hour || (timestamp.hour === closeTimes.hour && timestamp.minute <= closeTimes.minute);
-        this.closed.set(!afterOpeningTime || !beforeClosingTime);
+
+        let isOpen;
+
+        const openingTime = Number(openTimes.hour.toString() + "." + openTimes.minute.toString());
+        const closingTime = Number(closeTimes.hour.toString() + "." + closeTimes.minute.toString());
+        const currentTime = Number(timestamp.hour.toString() + "." + timestamp.minute.toString());
+
+        if (openingTime > closingTime) {
+          isOpen = currentTime >= openingTime || currentTime <= closingTime;
+        } else {
+          isOpen = currentTime >= openingTime && currentTime <= closingTime;
+        }
+
+        this.closed.set(!isOpen);
+
       } else if (isResponsibleGM()) {
         pileData.openTimes.status = "open";
         await PileUtilities.updateItemPileData(this.actor, pileData);
@@ -327,10 +339,10 @@ class PileMerchantItem extends PileItem {
   }
 
   filter() {
-    const name = get(this.name);
-    const search = get(this.store.search);
-    const searchFiltered = !name.toLowerCase().includes(search.toLowerCase());
+    const name = get(this.name).trim();
+    const search = get(this.store.search).trim();
     const typeFilter = get(this.store.typeFilter);
+    const searchFiltered = !name.toLowerCase().includes(search.toLowerCase());
     const typeFiltered = typeFilter !== "all" && typeFilter.toLowerCase() !== this.type.toLowerCase();
     this.filtered.set(searchFiltered || typeFiltered);
   }

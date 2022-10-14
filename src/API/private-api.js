@@ -1512,6 +1512,7 @@ export default class PrivateAPI {
         });
       } else {
         const itemFlagData = PileUtilities.getItemFlagData(entry.item);
+        if (sellerIsMerchant && itemFlagData.infiniteQuantity) continue;
         await sellerTransaction.appendItemChanges([{
           item: entry.item,
           quantity: entry.quantity

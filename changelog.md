@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.2.5
+
+- Fixed error when using the search bar in item piles
+- Fixed individual items marked as having infinite quantity actually having infinite quantity when sold by merchants
+- Fixed merchants with overnight open times would not stay open properly past midnight
+
 ## Version 2.2.4
 
 - Added Spanish and partial Polish localization (thanks bext1a and MrVauxs!)

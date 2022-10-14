@@ -97,13 +97,14 @@ export class PileItem extends PileBaseItem {
   }
 
   filter() {
-    const search = get(this.store.search);
+    const name = get(this.name).trim();
+    const search = get(this.store.search).trim();
     const presentFromTheSTart = get(this.presentFromTheStart);
     const quantity = get(this.quantity);
     if (quantity === 0 && !presentFromTheSTart) {
       this.filtered.set(true);
     } else if (search) {
-      this.filtered.set(!this.name.toLowerCase().includes(search.toLowerCase()));
+      this.filtered.set(!name.toLowerCase().includes(search.toLowerCase()));
     } else {
       this.filtered.set(!presentFromTheSTart && quantity === 0);
     }
