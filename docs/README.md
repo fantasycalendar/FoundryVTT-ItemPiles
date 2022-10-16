@@ -38,6 +38,8 @@ To install this module manually:
 4. Click 'Install' and wait for installation to complete
 5. Don't forget to enable the module in game using the "Manage Module" button
 
+## [Changelog](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/blob/master/changelog.md)
+
 ## Required Modules
 
 ### socketlib
@@ -97,8 +99,6 @@ module settings to configure that.
 Any issues, bugs, or feature requests are always welcome to be reported directly to
 the [Issue Tracker](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues), or using
 the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
-
-## [Changelog](../changelog.md)
 
 ## License
 

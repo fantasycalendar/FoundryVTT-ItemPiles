@@ -54,7 +54,7 @@
     if (!validItem) return;
 
     return game.itempiles.API.addItems(merchant, [{
-      item: validItem.toObject(),
+      item: validItem,
       quantity: 1
     }]);
 

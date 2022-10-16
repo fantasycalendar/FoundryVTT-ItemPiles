@@ -2,6 +2,7 @@
 
 ## Version 2.2.6
 
+- Fixed dropping items in the merchant interface would fail to add the item to the merchant's inventory
 - Fixed per-actor price modifiers not loading actors properly when reopened
 - Fixed per-actor price modifiers not having an override checkbox
 - Fixed description area of merchants not having a scrollbar
