@@ -1,4 +1,4 @@
-# Basic Use
+# Creating item piles
 
 ## Getting started
 
@@ -46,3 +46,15 @@ will be added to that character's inventory.
 
 *Chest is
 from [Forgotten Adventures](https://www.forgotten-adventures.net/product/map-making/assets/table-clutter-pack-08/)*
+
+## Modifying default sharing behavior
+
+The default item pile has been set up to best suit common table rules, where items are relatively free for all, whilst
+currencies _must_ be split with the rest of the party. All of this can be configured through the item piles
+configuration interface. By clicking on the default item pile in the right-hand actor sidebar, you can then click on
+the **Configure** button in the header to configure its settings.
+
+The image below shows the various options available to change about the default behavior of item piles:
+
+![The sharing configuration for the default item pile](images/item-piles-sharing-config.png)
+

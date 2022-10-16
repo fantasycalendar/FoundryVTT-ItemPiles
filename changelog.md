@@ -6,7 +6,7 @@
 - Fixed per-actor price modifiers not having an override checkbox
 - Fixed description area of merchants not having a scrollbar
 - Created a new wiki for all of your item piles needs:
-    - http://fantasycomputer.works/FoundryVTT-ItemPiles/
+    - <http://fantasycomputer.works/FoundryVTT-ItemPiles/>
 
 ## Version 2.2.5
 

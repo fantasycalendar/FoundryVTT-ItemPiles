@@ -6,23 +6,18 @@
 
 Have you ever wished you could represent items in your scenes? A pile of items, something to interact with - or perhaps
 chests whose appearance changes depending on what happens to it, whether it's open, closed, full, or empty. Do you want
-an easy way to split loot between players?
+an easy way to split loot between players? Do you want easy to use merchants with great UIs?
 
 Then you need **Item Piles**!
 
-In short, this module enables dropping items onto the canvas, which then get represented as a pile of items. In order to
-work in all systems without breaking or messing too much with the core functionality of Foundry, this **creates an
-unlinked token & actor** to hold these items. When a player double-clicks on an item pile token, it opens a custom UI to
-show what the pile contains and players can then take items from it.
+This module features:
 
-Item Piles can also be configured to act as a container, where it can be open or closed, locked or unlocked, with the
-ability for the token that represents the pile to change image depending on its state.
-
-In addition, when an item pile is interacted with it can also play sounds for the action, such as opening, closing, or
-attempting to open a locked item pile. Sounds are only played for the user who attempted the action.
-
-Last but not least, the module features a robust and well documented API, where module and system creators can leverage
-Item Piles to enrich your looting experience.
+* Dropping items on the canvas to create piles of items
+* Item piles acting as containers with the ability to switch its token image depending on its open/closed/empty state,
+  and play sounds accordingly
+* Turn characters into fully featured merchants, with complex item pricing, item quantity management, and more
+* Robust player-to-player trading features
+* Incredibly intuitive API and documentation
 
 Chest sprites used on this page is from Forgotten Adventures*
 
@@ -103,7 +98,7 @@ Any issues, bugs, or feature requests are always welcome to be reported directly
 the [Issue Tracker](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues), or using
 the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
 
-## [Changelog](changelog.md)
+## [Changelog](../changelog.md)
 
 ## License
 

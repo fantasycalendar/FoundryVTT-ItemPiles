@@ -12,10 +12,11 @@
     * [License](README.md#license)
     * [Credits](README.md#credits)
 
-* [Basic Use](basic-use.md)
-    * [Getting Started](basic-use.md#getting-started)
-    * [Adding items to existing item piles](basic-use.md#adding-items-to-existing-item-piles)
-    * [Inspecting pile as character](basic-use.md#inspecting-pile-as-character)
+* [Creating item piles](creating-item-piles.md)
+    * [Getting Started](creating-item-piles.md#getting-started)
+    * [Adding items to existing item piles](creating-item-piles.md#adding-items-to-existing-item-piles)
+    * [Inspecting pile as character](creating-item-piles.md#inspecting-pile-as-character)
+    * [Modifying default sharing behavior](creating-item-piles.md#modifying-default-sharing-behavior)
 
 * [Merchants](merchant.md)
     * [Getting Started](merchant.md#getting-started)
@@ -23,6 +24,12 @@
     * [Buy & sell price modifiers](merchant.md#buy-and-sell-price-modifiers)
     * [Item configuration](merchant.md#item-configuration)
     * [Custom item prices](merchant.md#custom-item-prices)
+
+* [Trading](trading.md)
+    * [Basic Usage](trading.md#basic-usage)
+    * [Request a trade](trading.md#request-a-trade)
+    * [Trading interface](trading.md#trading-interface)
+    * [Quickly trading items](trading.md#quickly-trading-items)
 
 * [API](api.md)
     * [Setting members](api.md#setting-members)
