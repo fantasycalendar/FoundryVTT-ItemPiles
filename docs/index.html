@@ -12,8 +12,12 @@
 <div id="app"></div>
 <script>
     window.$docsify = {
-        loadSidebar: true,
-        basePath: "docs/"
+        loadSidebar: "_sidebar.md",
+        homepage: "README.md",
+        alias: {
+            "/docs/": "/",
+        },
+        basePath: "/docs/",
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>

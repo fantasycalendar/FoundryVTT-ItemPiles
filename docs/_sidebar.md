@@ -1,4 +1,4 @@
-<!-- docs/_sidebar.md -->
+<!-- _sidebar.md -->
 
 * [Home](/)
     * [What is Item Piles?](/README.md#what-is-item-piles)
