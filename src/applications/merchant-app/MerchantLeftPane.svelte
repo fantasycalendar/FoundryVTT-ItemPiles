@@ -50,8 +50,10 @@
 
 <div class="merchant-left-pane item-piles-flexcol">
 
-  <div class="merchant-img">
-    <img src="{ $merchantImg }">
+  <div class="item-piles-bottom-divider">
+    <div class="merchant-img">
+      <img src="{ $merchantImg }">
+    </div>
   </div>
 
   {#if activeSidebarTab}
@@ -61,7 +63,7 @@
     <section class="tab-body item-piles-sections" style="overflow-y:auto;">
 
       {#if activeSidebarTab === 'description'}
-        <div class="tab merchant-description">
+        <div class="tab merchant-description" style="padding:0;">
           <TJSProseMirror
             content={description}
             options={{ editable: false }}

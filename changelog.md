@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 2.2.6
+
+- Fixed per-actor price modifiers not loading actors properly when reopened
+- Fixed per-actor price modifiers not having an override checkbox
+- Fixed description area of merchants not having a scrollbar
+- Created a new wiki for all of your item piles needs:
+    - http://fantasycomputer.works/FoundryVTT-ItemPiles/
+
 ## Version 2.2.5
 
 - Updated French and Portuguese (Brazilian) localization (thanks to rectulo, davidR1974, and eunaumtenhoid!)

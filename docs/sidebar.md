@@ -20,6 +20,7 @@
 * [Merchants](merchant.md)
     * [Getting Started](merchant.md#getting-started)
     * [Merchant interface](merchant.md#merchant-interface)
+    * [Buy & sell price modifiers](merchant.md#buy-and-sell-price-modifiers)
     * [Item configuration](merchant.md#item-configuration)
     * [Custom item prices](merchant.md#custom-item-prices)
 
@@ -29,7 +30,7 @@
     * [Item Pile Functions](api.md#item-pile-functions)
     * [Item Functions](api.md#item-functions)
     * [Attribute Functions](api.md#attribute-functions)
-    * [Item & Attribute Functions](api.md#item-&-attribute-functions)
+    * [Item & Attribute Functions](api.md#item-and-attribute-functions)
     * [Utility Functions](api.md#utility-functions)
 
 * [Hooks](hooks.md)

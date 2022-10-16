@@ -30,6 +30,26 @@ not until they've helped the merchant with some quest, perhaps!
 You can click on the names of items to edit them, and you can quickly edit the item piles settings on items by clicking
 the cogwheel icon.
 
+## Buy and sell price modifiers
+
+Every merchant may have a different modifier for how much the base price of items are modified by. So an upscale
+leatherworker may sell their items are 120% normal price, because the quality of their goods are naturally better,
+whilst a dingy and eccentric gnome alchemist may charge only 75% the normal price for their potions, but they may have
+unintended consequences.
+
+In the configuration of the merchant, you can set the buy and sell price modifiers. The sliders go between 0% and 200%,
+but you can manually set the price modifier above the limit by typing in your desired number in the input next to the
+slider.
+
+Below the sliders, you have the item type price modifiers and per-actor price modifiers, which can configure the
+merchant's modifiers on an item type basis, and on an actor-to-actor basis. This means that you can give the loudmouth
+bard a discount at the frequented upscale tailor, but apply a markup at the quiet alchemists' shop.
+
+By default, the **modifiers act as a multiplier** on top of each other, but you can toggle whether it is an override or
+not in each of the editors.
+
+![Merchant price modifiers](images/price-modifiers.png)
+
 ## Item configuration
 
 As some items may need specialized prices or behavior, the module has added the ability to configure individual items.

@@ -14,10 +14,21 @@
   <style>
       :root {
           --theme-color: rgb(72, 187, 120);
+          --link-color: #44C7C5;
       }
 
       strong {
           color: rgb(39, 213, 112);
+      }
+
+      .sidebar {
+          font-size: 0.85rem;
+      }
+
+      .sidebar li:not(:first-of-type) p {
+          margin-bottom: 0;
+          padding-top: 0.5rem;
+          border-top: 1px solid var(--sidebar-border-color);
       }
   </style>
 
@@ -27,21 +38,21 @@
 
 <div id="app"></div>
 <script>
-    window.$docsify = {
-        loadSidebar: "my_custom_sidebar.md",
-        alias: {
-            '/.*/my_custom_sidebar.md': './docs/my_custom_sidebar.md'
-        },
-        search: {
-            noData: {
-                '/': 'No results!'
-            },
-            paths: 'auto',
-            placeholder: {
-                '/': 'Search'
-            }
-        },
-    }
+  window.$docsify = {
+    loadSidebar: "sidebar.md",
+    alias: {
+      '/.*/sidebar.md': './docs/sidebar.md'
+    },
+    search: {
+      noData: {
+        '/': 'No results!'
+      },
+      paths: 'auto',
+      placeholder: {
+        '/': 'Search'
+      }
+    },
+  }
 </script>
 
 <!-- Required -->

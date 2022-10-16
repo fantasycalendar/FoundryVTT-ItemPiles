@@ -129,6 +129,7 @@
       { id: `price-modifier-item-pile-config-${pileActor.id}` },
       { title: game.i18n.format("ITEM-PILES.Applications.PriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
     ).then((result) => {
+      debugger;
       pileData.actorPriceModifiers = result || [];
     });
   }

@@ -2,6 +2,10 @@
 
 .merchant-left-pane .prosemirror {
   display: block;
+
+  p:first-child {
+    margin-top: 0;
+  }
 }
 
 .break {

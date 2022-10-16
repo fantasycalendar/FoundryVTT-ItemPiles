@@ -49,6 +49,7 @@
         if (priceModifiers.find(data => data.actor === actor)) return;
 
         priceModifiers.push({
+            override: false,
             actor: actor,
             buyPriceModifier: 1,
             sellPriceModifier: 0.5
@@ -77,6 +78,7 @@
       {#if priceModifiers.length}
         <table>
           <tr>
+            <th style="width:5%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Override")}</th>
             <th style="width:25%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Actor")}</th>
             <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</th>
             <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
@@ -84,6 +86,11 @@
           </tr>
           {#each priceModifiers as priceData, index (index)}
             <tr>
+              <td>
+                <div class="form-group">
+                  <input type="checkbox" bind:checked={priceData.override}>
+                </div>
+              </td>
               <td>
                 <a class="item-piles-actor-name-clickable"
                    on:click={(priceData.actor.sheet.render(true))}>{priceData.actor.name}</a>
