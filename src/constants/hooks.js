@@ -48,8 +48,8 @@ const HOOKS = {
     REMOVE: module`removeItems`,
     PRE_TRANSFER_ALL: module`preTransferAllItems`,
     TRANSFER_ALL: module`transferAllItems`,
-    PRE_TRADE: module`preTradeItems`,
     PRE_CALC_TRADE: module`preCalculateTradeItems`,
+    PRE_TRADE: module`preTradeItems`,
     TRADE: module`tradeItems`,
   },
   ATTRIBUTE: {

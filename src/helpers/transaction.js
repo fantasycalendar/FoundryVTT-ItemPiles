@@ -31,7 +31,7 @@ export default class Transaction {
       const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
       const actorExistingItem = Utilities.findSimilarItem(this.actor.items, itemData);
       if (actorExistingItem) {
-        const existingItemUpdate = Utilities.findSimilarItem(this.itemsToUpdate, itemData);
+        const existingItemUpdate = remove ? this.itemsToUpdate.find(item => item._id === itemData._id) : Utilities.findSimilarItem(this.itemsToUpdate, itemData);
         if (!removeIfZero && type !== "currency") {
           this.itemsToNotDelete.add(item.id);
         }

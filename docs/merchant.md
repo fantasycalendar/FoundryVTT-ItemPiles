@@ -1,7 +1,5 @@
 # Merchants
 
-## Getting started
-
 As all piles created by Item Piles are actors, the module can show different UIs and behave differently depending on the
 configuration of the pile in question.
 

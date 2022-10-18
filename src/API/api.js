@@ -9,11 +9,14 @@ import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 
 class API {
+  /**
+   * @class API
+   */
 
   /**
    * The actor class type used for the original item pile actor in this system
    *
-   * @returns {String}
+   * @returns {string}
    */
   static get ACTOR_CLASS_TYPE() {
     return Helpers.getSetting(SETTINGS.ACTOR_CLASS_TYPE);
@@ -22,7 +25,7 @@ class API {
   /**
    * The currencies used in this system
    *
-   * @returns {Array<{primary: Boolean, name: String, data: Object, img: String, abbreviation: String, exchange: Number}>}
+   * @returns {Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>}
    */
   static get CURRENCIES() {
     return Helpers.getSetting(SETTINGS.CURRENCIES);
@@ -40,7 +43,7 @@ class API {
   /**
    * The attribute used to track the quantity of items in this system
    *
-   * @returns {String}
+   * @returns {string}
    */
   static get ITEM_QUANTITY_ATTRIBUTE() {
     return Helpers.getSetting(SETTINGS.ITEM_QUANTITY_ATTRIBUTE);
@@ -49,7 +52,7 @@ class API {
   /**
    * The filters for item types eligible for interaction within this system
    *
-   * @returns {Array<{name: String, filters: String}>}
+   * @returns {Array<{name: string, filters: string}>}
    */
   static get ITEM_FILTERS() {
     return Helpers.getSetting(SETTINGS.ITEM_FILTERS);
@@ -58,7 +61,7 @@ class API {
   /**
    * The attributes for detecting item similarities
    *
-   * @returns {Array<String>}
+   * @returns {Array<string>}
    */
   static get ITEM_SIMILARITIES() {
     return Helpers.getSetting(SETTINGS.ITEM_SIMILARITIES);
@@ -67,10 +70,10 @@ class API {
   /**
    * Sets the actor class type used for the original item pile actor in this system
    *
-   * @param {String} inClassType
-   * @returns {Promise|Boolean}
+   * @param {string} inClassType
+   * @returns {Promise}
    */
-  static setActorClassType(inClassType) {
+  static async setActorClassType(inClassType) {
     if (typeof inClassType !== "string") {
       throw Helpers.custom_error("setActorTypeClass | inClassType must be of type string");
     }
@@ -87,7 +90,7 @@ class API {
    * @param {Array<Object>} inCurrencies
    * @returns {Promise}
    */
-  static setCurrencies(inCurrencies) {
+  static async setCurrencies(inCurrencies) {
     if (!Array.isArray(inCurrencies)) {
       throw Helpers.custom_error("setCurrencies | inCurrencies must be an array");
     }
@@ -127,10 +130,10 @@ class API {
   /**
    * Sets the attribute used to track the quantity of items in this system
    *
-   * @param {String} inAttribute
+   * @param {string} inAttribute
    * @returns {Promise}
    */
-  static setItemQuantityAttribute(inAttribute) {
+  static async setItemQuantityAttribute(inAttribute) {
     if (typeof inAttribute !== "string") {
       throw Helpers.custom_error("setItemQuantityAttribute | inAttribute must be of type string");
     }
@@ -147,7 +150,7 @@ class API {
    * @param {string} inAttribute
    * @returns {Promise}
    */
-  static setItemPriceAttribute(inAttribute) {
+  static async setItemPriceAttribute(inAttribute) {
     if (typeof inAttribute !== "string") {
       throw Helpers.custom_error("setItemPriceAttribute | inAttribute must be of type string");
     }
@@ -161,10 +164,10 @@ class API {
   /**
    * Sets the items filters for interaction within this system
    *
-   * @param {Array<{path: String, filters: String}>} inFilters
+   * @param {Array<{path: string, filters: string}>} inFilters
    * @returns {Promise}
    */
-  static setItemFilters(inFilters) {
+  static async setItemFilters(inFilters) {
     if (!Array.isArray(inFilters)) {
       throw Helpers.custom_error("setItemFilters | inFilters must be of type array");
     }
@@ -186,10 +189,10 @@ class API {
   /**
    * Sets the attributes for detecting item similarities
    *
-   * @param {Array<String>} inPaths
+   * @param {Array<string>} inPaths
    * @returns {Promise}
    */
-  static setItemSimilarities(inPaths) {
+  static async setItemSimilarities(inPaths) {
     if (!Array.isArray(inPaths)) {
       throw Helpers.custom_error("setItemSimilarities | inPaths must be of type array");
     }
@@ -205,7 +208,7 @@ class API {
     });
   }
 
-  static getPrimaryCurrency(actor = false) {
+  static async getPrimaryCurrency(actor = false) {
     if (actor && actor instanceof Actor) {
       return PileUtilities.getActorPrimaryCurrency(actor);
     }
@@ -217,12 +220,13 @@ class API {
   /**
    * Creates the default item pile token at a location.
    *
-   * @param {Object} position                         The position to create the item pile at
-   * @param {String/Boolean} [sceneId=false]          Which scene to create the item pile on
-   * @param {Array/Boolean} [items=false]             Any items to create on the item pile
-   * @param {String/Boolean} [pileActorName=false]    Whether to use an existing item pile actor as the basis of this new token
+   * @param {object} position                               The position to create the item pile at
+   * @param {object} options                                Options to pass to the function
+   * @param {string/boolean} [options.sceneId=false]        Which scene to create the item pile on
+   * @param {Array/boolean} [options.items=false]           Any items to create on the item pile
+   * @param {string/boolean} [options.pileActorName=false]  Whether to use an existing item pile actor as the basis of this new token
    *
-   * @returns {Promise<String>}
+   * @returns {Promise<string>}
    */
   static createItemPile(position, {
     sceneId = game.user.viewedScene, items = false, pileActorName = false
@@ -250,8 +254,9 @@ class API {
    * Turns tokens and its actors into item piles
    *
    * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be turned into item piles
-   * @param {Object} pileSettings                                     Overriding settings to be put on the item piles' settings
-   * @param {Object} tokenSettings                                    Overriding settings that will update the tokens' settings
+   * @param {object} options                                          Options to pass to the function
+   * @param {object} options.pileSettings                             Overriding settings to be put on the item piles' settings
+   * @param {object} options.tokenSettings                            Overriding settings that will update the tokens' settings
    *
    * @return {Promise<Array>}                                         The uuids of the targets after they were turned into item piles
    */
@@ -275,7 +280,8 @@ class API {
    * Reverts tokens from an item pile into a normal token and actor
    *
    * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be reverted from item piles
-   * @param {Object} tokenSettings                                    Overriding settings that will update the tokens
+   * @param {object} options                                          Options to pass to the function
+   * @param {object} options.tokenSettings                            Overriding settings that will update the tokens
    *
    * @return {Promise<Array>}                                         The uuids of the targets after they were reverted from being item piles
    */
@@ -299,9 +305,9 @@ class API {
    * Opens a pile if it is enabled and a container
    *
    * @param {Token/TokenDocument} target
-   * @param {Token/TokenDocument/Boolean} [interactingToken=false]
+   * @param {Token/TokenDocument/boolean} [interactingToken=false]
    *
-   * @return {Promise/Boolean}
+   * @return {Promise/boolean}
    */
   static openItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
@@ -332,9 +338,9 @@ class API {
    * Closes a pile if it is enabled and a container
    *
    * @param {Token/TokenDocument} target          Target pile to close
-   * @param {Token/TokenDocument/Boolean} [interactingToken=false]
+   * @param {Token/TokenDocument/boolean} [interactingToken=false]
    *
-   * @return {Promise/Boolean}
+   * @return {Promise/boolean}
    */
   static closeItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
@@ -363,9 +369,9 @@ class API {
    * Toggles a pile's closed state if it is enabled and a container
    *
    * @param {Token/TokenDocument} target          Target pile to open or close
-   * @param {Token/TokenDocument/Boolean} [interactingToken=false]
+   * @param {Token/TokenDocument/boolean} [interactingToken=false]
    *
-   * @return {Promise/Boolean}
+   * @return {Promise/boolean}
    */
   static async toggleItemPileClosed(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
@@ -384,9 +390,9 @@ class API {
    * Locks a pile if it is enabled and a container
    *
    * @param {Token/TokenDocument} target          Target pile to lock
-   * @param {Token/TokenDocument/Boolean} [interactingToken=false]
+   * @param {Token/TokenDocument/boolean} [interactingToken=false]
    *
-   * @return {Promise/Boolean}
+   * @return {Promise/boolean}
    */
   static lockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
@@ -416,9 +422,9 @@ class API {
    * Unlocks a pile if it is enabled and a container
    *
    * @param {Token/TokenDocument} target          Target pile to unlock
-   * @param {Token/TokenDocument/Boolean} [interactingToken=false]
+   * @param {Token/TokenDocument/boolean} [interactingToken=false]
    *
-   * @return {Promise/Boolean}
+   * @return {Promise/boolean}
    */
   static unlockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
@@ -434,9 +440,9 @@ class API {
    * Toggles a pile's locked state if it is enabled and a container
    *
    * @param {Token/TokenDocument} target          Target pile to lock or unlock
-   * @param {Token/TokenDocument/Boolean} [interactingToken=false]
+   * @param {Token/TokenDocument/boolean} [interactingToken=false]
    *
-   * @return {Promise/Boolean}
+   * @return {Promise/boolean}
    */
   static toggleItemPileLocked(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
@@ -453,7 +459,7 @@ class API {
    * Causes the item pile to play a sound as it was attempted to be opened, but was locked
    *
    * @param {Token/TokenDocument} target
-   * @param {Token/TokenDocument/Boolean} [interactingToken=false]
+   * @param {Token/TokenDocument/boolean} [interactingToken=false]
    *
    * @return {Promise<boolean>}
    */
@@ -483,7 +489,7 @@ class API {
    *
    * @param {Token/TokenDocument} target
    *
-   * @return {Boolean}
+   * @return {boolean}
    */
   static isItemPileLocked(target) {
     return PileUtilities.isItemPileLocked(target);
@@ -494,7 +500,7 @@ class API {
    *
    * @param {Token/TokenDocument} target
    *
-   * @return {Boolean}
+   * @return {boolean}
    */
   static isItemPileClosed(target) {
     return PileUtilities.isItemPileClosed(target);
@@ -505,7 +511,7 @@ class API {
    *
    * @param {Token/TokenDocument} target
    *
-   * @return {Boolean}
+   * @return {boolean}
    */
   static isItemPileContainer(target) {
     return PileUtilities.isItemPileContainer(target);
@@ -514,12 +520,13 @@ class API {
   /**
    * Updates a pile with new data.
    *
-   * @param {Token/TokenDocument} target
-   * @param {Object} newData
-   * @param {Token/TokenDocument/Boolean} [interactingToken=false]
-   * @param {Object/Boolean} [tokenSettings=false]
+   * @param {Actor/TokenDocument} target                                      Target token or actor to update
+   * @param {object} newData                                                  New data to update the actor with
+   * @param {object} options                                                  Options to pass to the function
+   * @param {Token/TokenDocument/boolean} [options.interactingToken=false]    If an actor caused this update, you can pass one here to pass it along to macros that the item pile may run
+   * @param {Object/boolean} [options.tokenSettings=false]                    Updates to make to the target token
    *
-   * @return {Promise/Boolean}
+   * @return {Promise}
    */
   static updateItemPile(target, newData, { interactingToken = false, tokenSettings = false } = {}) {
 
@@ -539,7 +546,7 @@ class API {
    *
    * @param {Token/TokenDocument} target
    *
-   * @return {Promise/Boolean}
+   * @return {Promise}
    */
   static deleteItemPile(target) {
     if (!PileUtilities.isValidItemPile(target)) {
@@ -556,12 +563,14 @@ class API {
   /**
    * Splits an item pile's content between all players (or a specified set of target actors).
    *
-   * @param target {Token/TokenDocument/Actor}                                                The item pile to split
-   * @param targets {boolean/TokenDocument/Actor/Array<TokenDocument/Actor>} [targets=false]  The targets to receive the split contents
-   * @param instigator {boolean/TokenDocument/Actor} [instigator=false]                       Whether this was triggered by a specific actor
-   * @returns {Promise<object>|Boolean}
+   * @param target {Token/TokenDocument/Actor}                                                          The item pile to split
+   * @param {object} options                                                                            Options to pass to the function
+   * @param targets {boolean/TokenDocument/Actor/Array<TokenDocument/Actor>} [options.targets=false]    The targets to receive the split contents
+   * @param instigator {boolean/TokenDocument/Actor} [options.instigator=false]                         Whether this was triggered by a specific actor
+   *
+   * @returns {Promise<object/boolean>}
    */
-  static splitItemPileContents(target, { targets = false, instigator = false } = {}) {
+  static async splitItemPileContents(target, { targets = false, instigator = false } = {}) {
 
     if (!PileUtilities.isValidItemPile(target)) return false;
 
@@ -597,14 +606,20 @@ class API {
   /**
    * Adds item to an actor, increasing item quantities if matches were found
    *
-   * @param {Actor/TokenDocument/Token} target        The target to add an item to
-   * @param {Array} items                             An array of objects, with the key "item" being an item object or an Item class (the foundry class), with an optional key of "quantity" being the amount of the item to add
-   * @param {Boolean} [mergeSimilarItems=true]        Whether to merge similar items based on their name and type
-   * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
+   * @param {Actor/TokenDocument/Token} target                  The target to add an item to
+   * @param {Array} items                                       An array of objects, with the key "item" being an item object or an Item class (the foundry class), with an optional key of "quantity" being the amount of the item to add
+   * @param {object} options                                    Options to pass to the function
+   * @param {boolean} [options.mergeSimilarItems=true]          Whether to merge similar items based on their name and type
+   * @param {boolean} [options.removeExistingActorItems=false]  Whether to remove the actor's existing items before adding the new ones
+   * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
    *
-   * @returns {Promise<array>}                        An array of objects, each containing the item that was added or updated, and the quantity that was added
+   * @returns {Promise<array>}                                  An array of objects, each containing the item that was added or updated, and the quantity that was added
    */
-  static addItems(target, items, { mergeSimilarItems = true, interactionId = false } = {}) {
+  static addItems(target, items, {
+    mergeSimilarItems = true,
+    removeExistingActorItems = false,
+    interactionId = false
+  } = {}) {
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
 
@@ -637,24 +652,28 @@ class API {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`AddItems | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, {
+      removeExistingActorItems,
+      interactionId
+    });
   }
 
   /**
    * Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
    *
-   * @param {Actor/Token/TokenDocument} target        The target to remove a items from
-   * @param {Array} items                             An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of
-   * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
+   * @param {Actor/Token/TokenDocument} target                  The target to remove a items from
+   * @param {Array} items                                       An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of
+   * @param {object} options                                    Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
    *
-   * @returns {Promise<array>}                        An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted
+   * @returns {Promise<array>}                                  An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted
    */
   static removeItems(target, items, { interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
 
-    const targetActorItems = game.itempiles.API.getActorItems(target);
+    const targetActorItems = this.getActorItems(target);
 
     items = items.map(itemData => {
 
@@ -695,12 +714,13 @@ class API {
   /**
    * Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0
    *
-   * @param {Actor/Token/TokenDocument} source        The source to transfer the items from
-   * @param {Actor/Token/TokenDocument} target        The target to transfer the items to
-   * @param {Array} items                             An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity"), or Items (the foundry class) or strings of IDs to transfer all quantities of
-   * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
+   * @param {Actor/Token/TokenDocument} source              The source to transfer the items from
+   * @param {Actor/Token/TokenDocument} target              The target to transfer the items to
+   * @param {Array} items                                   An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity"), or Items (the foundry class) or strings of IDs to transfer all quantities of
+   * @param {object} options                                Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]  The interaction ID of this action
    *
-   * @returns {Promise<object>}                       An array of objects, each containing the item that was added or updated, and the quantity that was transferred
+   * @returns {Promise<object>}                             An array of objects, each containing the item that was added or updated, and the quantity that was transferred
    */
   static transferItems(source, target, items, { interactionId = false } = {}) {
 
@@ -751,12 +771,13 @@ class API {
   /**
    * Transfers all items between the source and the target.
    *
-   * @param {Actor/Token/TokenDocument} source        The actor to transfer all items from
-   * @param {Actor/Token/TokenDocument} target        The actor to receive all the items
-   * @param {Array/Boolean} [itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
-   * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
+   * @param {Actor/Token/TokenDocument} source                The actor to transfer all items from
+   * @param {Actor/Token/TokenDocument} target                The actor to receive all the items
+   * @param {object} options                                  Options to pass to the function
+   * @param {Array/boolean} [options.itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
+   * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
    *
-   * @returns {Promise<array>}                        An array containing all of the items that were transferred to the target
+   * @returns {Promise<array>}                                An array containing all the items that were transferred to the target
    */
   static transferAllItems(source, target, { itemFilters = false, interactionId = false } = {}) {
 
@@ -786,11 +807,12 @@ class API {
   /**
    * Adds attributes on an actor
    *
-   * @param {Actor/Token/TokenDocument} target        The target whose attribute will have a set quantity added to it
-   * @param {Object} attributes                       An object with each key being an attribute path, and its value being the quantity to add
-   * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
+   * @param {Actor/Token/TokenDocument} target                  The target whose attribute will have a set quantity added to it
+   * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to add
+   * @param {object} options                                    Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
    *
-   * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
+   * @returns {Promise<object>}                                 An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
    *
    */
   static addAttributes(target, attributes, { interactionId = false } = {}) {
@@ -821,11 +843,12 @@ class API {
   /**
    * Subtracts attributes on the target
    *
-   * @param {Token/TokenDocument} target              The target whose attributes will be subtracted from
-   * @param {Array/object} attributes                 This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
-   * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
+   * @param {Token/TokenDocument} target                      The target whose attributes will be subtracted from
+   * @param {Array/object} attributes                         This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
    *
-   * @returns {Promise<object>}                       An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
+   * @returns {Promise<object>}                               An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
    */
   static removeAttributes(target, attributes, { interactionId = false } = {}) {
 
@@ -866,12 +889,13 @@ class API {
   /**
    * Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target
    *
-   * @param {Actor/Token/TokenDocument} source        The source to transfer the attribute from
-   * @param {Actor/Token/TokenDocument} target        The target to transfer the attribute to
-   * @param {Array/object} attributes                 This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer
-   * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
+   * @param {Actor/Token/TokenDocument} source                The source to transfer the attribute from
+   * @param {Actor/Token/TokenDocument} target                The target to transfer the attribute to
+   * @param {Array/object} attributes                         This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
    *
-   * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
+   * @returns {Promise<object>}                               An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
    */
   static transferAttributes(source, target, attributes, { interactionId = false } = {}) {
 
@@ -921,11 +945,12 @@ class API {
   /**
    * Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target
    *
-   * @param {Actor/Token/TokenDocument} source        The source to transfer the attributes from
-   * @param {Actor/Token/TokenDocument} target        The target to transfer the attributes to
-   * @param {String/Boolean} [interactionId=false]    The interaction ID of this action
+   * @param {Actor/Token/TokenDocument} source                The source to transfer the attributes from
+   * @param {Actor/Token/TokenDocument} target                The target to transfer the attributes to
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
    *
-   * @returns {Promise<object>}                       An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
+   * @returns {Promise<object>}                               An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
    */
   static transferAllAttributes(source, target, { interactionId = false } = {}) {
 
@@ -946,12 +971,13 @@ class API {
   /**
    * Transfers all items and attributes between the source and the target.
    *
-   * @param {Actor/Token/TokenDocument} source        The actor to transfer all items and attributes from
-   * @param {Actor/Token/TokenDocument} target        The actor to receive all the items and attributes
-   * @param {Array/Boolean} [itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
-   * @param {String/Boolean} [interactionId=false]    The ID of this interaction
+   * @param {Actor/Token/TokenDocument} source                The actor to transfer all items and attributes from
+   * @param {Actor/Token/TokenDocument} target                The actor to receive all the items and attributes
+   * @param {object} options                                  Options to pass to the function
+   * @param {Array/boolean} [options.itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
+   * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
    *
-   * @returns {Promise<object>}                       An object containing all items and attributes transferred to the target
+   * @returns {Promise<object>}                               An object containing all items and attributes transferred to the target
    */
   static transferEverything(source, target, { itemFilters = false, interactionId = false } = {}) {
 
@@ -976,6 +1002,109 @@ class API {
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, {
       itemFilters, interactionId
     });
+
+  }
+
+  /**
+   * Rolls on a table of items and collates them to be able to be added to actors and such
+   *
+   * @param {string/RollTable} table                              The name, ID, UUID, or the table itself, or an array of such
+   * @param {object} options                                      Options to pass to the function
+   * @param {string/number} [options.timesToRoll="1"]             The number of times to roll on the tables, which can be a roll formula
+   * @param {object} [options.rollData={}]                        Data to inject into the roll formula
+   * @param {Actor/string/boolean} [options.targetActor=false]    The target actor to add the items to, or the UUID of an actor
+   * @param {boolean} [options.removeExistingActorItems=false]    Whether to clear the target actor's items before adding the ones rolled
+   *
+   * @returns {Promise<Array<Item>>}                              An array of object containing the item data and their quantity
+   */
+  static async rollItemTable(table, {
+    timesToRoll = "1",
+    rollData = {},
+    targetActor = false,
+    removeExistingActorItems = false
+  } = {}) {
+
+    if (typeof table === "string") {
+      let potentialTable = fromUuidSync(table);
+      if (!potentialTable) {
+        potentialTable = game.tables.get(table)
+      }
+      if (!potentialTable) {
+        potentialTable = game.tables.getName(table)
+      }
+      if (!potentialTable) {
+        throw Helpers.custom_error(`rollItemTable | could not find table with string "${table}"`);
+      }
+      table = potentialTable;
+    }
+
+    if (!(table instanceof RollTable)) {
+      throw Helpers.custom_error(`rollItemTable | table must be of type RollTable`);
+    }
+
+    if (!(typeof timesToRoll === "string" || typeof timesToRoll === "number")) {
+      throw Helpers.custom_error(`rollItemTable | timesToRoll of type string or number`);
+    }
+
+    if (typeof rollData !== "object") {
+      throw Helpers.custom_error(`rollItemTable | rollData of type object`);
+    }
+
+    if (typeof removeExistingActorItems !== "boolean") {
+      throw Helpers.custom_error(`rollItemTable | removeExistingActorItems of type boolean`);
+    }
+
+    if (targetActor) {
+      const actor = Utilities.getActor(targetActor);
+      if (!(actor instanceof Actor)) {
+        throw Helpers.custom_error(`rollItemTable | could not find the actor of the target actor`);
+      }
+    }
+
+    await table.reset();
+    await table.normalize();
+    const roll = new Roll(timesToRoll.tostring(), rollData).evaluate({ async: false });
+
+    if (roll.total <= 0) {
+      return [];
+    }
+
+    const tableDraw = await table.drawMany(roll.total, { displayChat: false, recursive: true });
+    const items = [];
+    for (const rollData of tableDraw.results) {
+      const existingItem = items.find(
+        (item) => item.documentId === rollData.documentId
+      );
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+
+        let item;
+        if (rollData.documentCollection === "Item") {
+          item = game.items.get(rollData.documentId);
+        } else {
+          const compendium = game.packs.get(rollData.documentCollection);
+          if (compendium) {
+            item = await compendium.getDocument(rollData.documentId);
+          }
+        }
+
+        if (item instanceof Item) {
+          items.push({
+            ...rollData,
+            item: item,
+            quantity: 1,
+          });
+        }
+      }
+    }
+
+    if (targetActor) {
+      const actor = Utilities.getActor(targetActor);
+      await this.addItems(actor, items, { removeExistingActorItems });
+    }
+
+    return items;
 
   }
 
@@ -1055,6 +1184,17 @@ class API {
 
   }
 
+  /**
+   *  Get the prices array for a given item
+   *
+   * @param {Item} item                             Item to get the price for
+   * @param {object} options                        Options to pass to the function
+   * @param {Actor/boolean} [options.seller=false]  Actor that is selling the item
+   * @param {Actor/boolean} [options.buyer=false]   Actor that is buying the item
+   * @param {number} [options.quantity=1]           Quantity of item to buy
+   *
+   * @returns {Array}                               Array containing all the different purchase options for this item
+   */
   static getPricesForItem(item, { seller = false, buyer = false, quantity = 1 } = {}) {
 
     if (!(item instanceof Item)) {
@@ -1089,10 +1229,10 @@ class API {
    *
    * @param {Actor/Token/TokenDocument} seller                                                    The actor that is selling the item
    * @param {Actor/Token/TokenDocument} buyer                                                     The actor that is buying the item
-   * @param {Array<Object<{ item: Item/String, quantity: Number, paymentIndex: Number }>>} items  An array of objects containing the item or the id of the
+   * @param {Array<Object<{ item: Item/string, quantity: number, paymentIndex: number }>>} items  An array of objects containing the item or the id of the
    *                                                                                              item to be sold, the quantity to be sold, and the payment
    *                                                                                              index to be used
-   * @param {String/Boolean} [interactionId=false]                                                The ID of this interaction
+   * @param {string/boolean} [interactionId=false]                                                The ID of this interaction
    *
    * @returns {Promise<Object>}                       The items that were created and the attributes that were changed
    */

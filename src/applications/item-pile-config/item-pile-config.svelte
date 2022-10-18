@@ -229,6 +229,14 @@
           </div>
 
           <div class="form-group">
+            <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DisplayItemTypes")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DisplayItemTypesExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={pileData.displayItemTypes}/>
+          </div>
+
+          <div class="form-group">
             <label style="flex:4;">
               <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.Macro")}</span>
               <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.MacroExplanation")}</p>

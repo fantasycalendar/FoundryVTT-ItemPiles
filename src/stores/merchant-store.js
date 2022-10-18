@@ -14,9 +14,6 @@ export default class MerchantStore extends ItemPileStore {
   setupStores() {
     super.setupStores();
     this.editPrices = writable(false);
-    this.itemsPerCategory = writable({});
-    this.categories = writable([]);
-    this.itemCategories = writable([]);
     this.typeFilter = writable("all")
     this.priceModifiersPerType = writable({});
     this.priceModifiersForActor = writable({});
@@ -69,41 +66,6 @@ export default class MerchantStore extends ItemPileStore {
       if (!val) return;
       filterDebounce()
     });
-  }
-
-  refreshItems() {
-    super.refreshItems();
-    const items = get(this.items).filter(item => {
-      return game.user.isGM || !get(item.itemFlagData).hidden;
-    });
-    const itemCategories = Array.from(
-      new Set(get(this.allItems)
-        .filter(entry => !entry.isCurrency)
-        .map(item => item.type))
-    ).map(type => {
-      return {
-        label: CONFIG.Item.typeLabels[type] ?? "ITEM-PILES.Merchant.OtherTypes." + type,
-        type
-      }
-    }).sort((a, b) => a.label < b.label ? -1 : 1);
-    this.itemCategories.set(itemCategories);
-    const itemsPerCategory = items.reduce((acc, item) => {
-      if (!acc[item.type]) {
-        acc[item.type] = [];
-      }
-      acc[item.type].push(item);
-      return acc;
-    }, {});
-    Object.values(itemsPerCategory).forEach(items => items.sort((a, b) => {
-      return a.item.name < b.item.name ? -1 : 1;
-    }));
-    this.itemsPerCategory.set(itemsPerCategory);
-    this.categories.set(Object.keys(itemsPerCategory).map(type => {
-      return {
-        label: CONFIG.Item.typeLabels[type] ?? "ITEM-PILES.Merchant.OtherTypes." + type,
-        type
-      }
-    }).sort((a, b) => a.label < b.label ? -1 : 1))
   }
 
   refreshItemPrices() {

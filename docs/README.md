@@ -1,5 +1,3 @@
-# Item Piles
-
 ![Item Piles in a nutshell](images/intro.jpg)
 
 ## What is Item Piles?

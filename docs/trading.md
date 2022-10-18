@@ -1,7 +1,5 @@
 # Trading
 
-## Basic Usage
-
 When two or more users are logged into the Foundry session, the players are able to trade with each other. There are
 multiple ways that they can go about this:
 

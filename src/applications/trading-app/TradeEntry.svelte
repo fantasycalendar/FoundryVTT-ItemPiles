@@ -38,6 +38,8 @@
 
 </script>
 
+<svelte:window on:click={updateQuantity}/>
+
 <div class="item-piles-flexrow item-piles-item-row item-piles-even-color">
 
   {#if editable}
@@ -66,7 +68,8 @@
     {/if}
   </div>
 
-  <div class="item-piles-text-right" class:item-piles-quantity-container={editable}>
+  <div class="item-piles-text-right" class:item-piles-quantity-container={editable}
+       on:click={(evt) => evt.stopPropagation()}>
     {#if editable}
       <div class="item-piles-quantity-container">
         {#if data.editing}

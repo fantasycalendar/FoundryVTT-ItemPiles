@@ -29,7 +29,7 @@ export default class TradeStore {
 
     const leftTrader = {
       user: game.users.get(leftTraderData.user),
-      actor: Utilities.fromUuidFast(leftTraderData.actorUiid),
+      actor: fromUuidSync(leftTraderData.actorUiid),
       items: leftTraderData.items,
       currencies: leftTraderData.currencies,
       itemCurrencies: leftTraderData.itemCurrencies,
@@ -38,7 +38,7 @@ export default class TradeStore {
 
     const rightTrader = {
       user: game.users.get(rightTraderData.user),
-      actor: Utilities.fromUuidFast(rightTraderData.actorUiid),
+      actor: fromUuidSync(rightTraderData.actorUiid),
       items: rightTraderData.items,
       currencies: rightTraderData.currencies,
       itemCurrencies: rightTraderData.itemCurrencies,

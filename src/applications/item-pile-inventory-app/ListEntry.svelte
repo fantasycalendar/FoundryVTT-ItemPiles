@@ -7,6 +7,8 @@
   export let store;
   export let entry;
 
+  console.log(entry);
+
   const name = entry.name;
   const img = entry.img;
   const quantityLeft = entry.quantityLeft;

@@ -55,7 +55,7 @@
     if (!table) return;
     await table.reset();
     await table.normalize();
-    const roll = new Roll(timesToRoll ?? 1).evaluate({ async: false });
+    const roll = new Roll((timesToRoll ?? 1).toString()).evaluate({ async: false });
     if (!keepRolled) {
       itemsRolled.set([]);
     }
@@ -63,37 +63,32 @@
     if (roll.total <= 0) {
       return;
     }
-    await table.reset();
-    // empty formula fixed by "normalize"
-    const tableDraw = await table.drawMany(timesRolled, { displayChat: false });
+
+    const newItems = (await game.itempiles.API.rollItemTable(table, { timesToRoll: timesRolled }))
+      .map(itemData => {
+        const prices = game.itempiles.API.getPricesForItem(itemData.item, {
+          seller: store.actor,
+        });
+        itemData.price = prices[0]?.free ? localize("ITEM-PILES.Merchant.ItemFree") : prices[0]?.priceString;
+        return itemData;
+      });
+
     itemsRolled.update((items) => {
-      tableDraw.results.forEach((result) => {
-        const rollData = result;
+      newItems.forEach((newItem) => {
         const existingItem = items.find(
-          (item) => item.documentId === result.documentId
+          (item) => item.documentId === newItem.documentId
         );
         if (existingItem) {
           existingItem.quantity++;
         } else {
           items.push({
-            ...rollData,
-            quantity: 1,
+            ...newItem
           });
         }
       });
       items.sort((a, b) => {
         return a.text < b.text ? -1 : 1;
       });
-      tick().then(async () => {
-        for (const i of items) {
-          const item = await getItem(i);
-          const prices = game.itempiles.API.getPricesForItem(item, {
-            seller: store.actor,
-          });
-          i.price = prices[0]?.free ? localize("ITEM-PILES.Merchant.ItemFree") : prices[0]?.priceString;
-        }
-        itemsRolled.set(items);
-      }, 0);
       return items;
     });
   }
@@ -127,12 +122,7 @@
   }
 
   async function addItem(itemToAdd) {
-    let item = await getItem(itemToAdd);
-    if (item) {
-      await game.itempiles.API.addItems(store.actor, [
-        { item, quantity: itemToAdd.quantity },
-      ]);
-    }
+    await game.itempiles.API.addItems(store.actor, [itemToAdd]);
     removeItem(itemToAdd);
   }
 
@@ -148,12 +138,7 @@
 
   async function addAllItems() {
     const itemsToAdd = get(itemsRolled);
-    const items = [];
-    for (const itemToAdd of itemsToAdd) {
-      let item = await getItem(itemToAdd);
-      items.push({ item, quantity: itemToAdd.quantity });
-    }
-    await game.itempiles.API.addItems(store.actor, items);
+    await game.itempiles.API.addItems(store.actor, itemsToAdd);
     itemsRolled.set([]);
   }
 
@@ -179,8 +164,8 @@
     await game.itempiles.API.removeItems(store.actor, items);
   }
 
-  async function previewItem(item) {
-    (await getItem(item))?.sheet?.render(true);
+  async function previewItem(itemData) {
+    itemData.item?.sheet?.render(true);
   }
 
   async function removeAddedItem(itemToRemove) {

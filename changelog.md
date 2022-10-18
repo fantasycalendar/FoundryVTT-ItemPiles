@@ -1,5 +1,15 @@
 # Item Piles Changelog
 
+## Version 2.2.7
+
+- Added "Split items by item types" setting to item piles, which will display items separated by type in normal item piles
+- Added `rollItemTable` to the API, which can be used to get items from a roll table
+    - Check out the wiki for example macros: <http://fantasycomputer.works/FoundryVTT-ItemPiles/#/sample-macros>
+- Tweaked trading UI so that users doesn't have to press enter after changing the quantity of an entry, clicking away will now change it
+- Fixed issue with the clear all items button in the merchant UI not working
+- Finally updated all the API documentation:
+    - Check out the wiki for all the information you need: <http://fantasycomputer.works/FoundryVTT-ItemPiles/#/API>
+
 ## Version 2.2.6
 
 - Fixed dropping items in the merchant interface would fail to add the item to the merchant's inventory
@@ -22,10 +32,8 @@
 - Added "Service" type items
     - Items sold by merchants can now be configured not add any items to the buyer's inventory
     - The cost of buying the item is still applied to the buyer
-    - If the merchant runs out of this service "item", its quantity is set to 0 but not removed from the merchant, just
-      set to "not for sale"
-    - Combined with the item purchase macro feature, you could create a "Cure Wounds" service item & macro that heals
-      people when bought (see below)
+    - If the merchant runs out of this service "item", its quantity is set to 0 but not removed from the merchant, just set to "not for sale"
+    - Combined with the item purchase macro feature, you could create a "Cure Wounds" service item & macro that heals people when bought (see below)
 - Added macro execution option to items when purchased
 - Added DnD5e compendium of merchant roll tables
 - Improved macro selector input by suggesting potential macros and compendiums of macros
@@ -70,16 +78,14 @@
 
 ## Version 2.1.1 (V9 only)
 
-- Fixed users being able to give away items to other users that are of types that are not allowed to be given (such as
-  spells, features, etc)
+- Fixed users being able to give away items to other users that are of types that are not allowed to be given (such as spells, features, etc)
 - Fixed containers being considered locked when it is in fact unlocked
 
 ## Version 2.1.0
 
 - Implemented Simple Calendar integration for open/close times
 - Added Open/Close button in the top right of the merchants window for ease of access
-- Added "Give Item" functionality - any token can now drop items onto adjacent tokens to give them that item. This can
-  be turned off in the settings.
+- Added "Give Item" functionality - any token can now drop items onto adjacent tokens to give them that item. This can be turned off in the settings.
 - Added `Show To Players` header button to Item Piles & Merchants
 - Improved the "Populate Items" tab on merchants (Thanks to Averrin#0374!)
     - Added hover tooltips to buttons
@@ -160,12 +166,9 @@
 
 ## Version 1.4.6
 
-- Adjusted API to use native foundry `Item#fromDropData` instead of my own implementation (Thank you, TheGiddyLimit on
-  GitHub!)
-- Fixed issue relating to some systems not generating a new ID for items, which caused false-positives when trying to
-  find similar items on actors that were the source of said items
-- Fixed issue where systems would override core functions on items that modify names and other data, Item Piles will now
-  always call the system's Item specific functions
+- Adjusted API to use native foundry `Item#fromDropData` instead of my own implementation (Thank you, TheGiddyLimit on GitHub!)
+- Fixed issue relating to some systems not generating a new ID for items, which caused false-positives when trying to find similar items on actors that were the source of said items
+- Fixed issue where systems would override core functions on items that modify names and other data, Item Piles will now always call the system's Item specific functions
     - Fixes issue with PF1 items sometimes showing up as identified when they were unidentified
 - Added support for the Warhammer Fantasy Roleplay 4th Ed system
 - Added support for the Splittermond system
@@ -181,8 +184,7 @@
 - Improved splitting API functions to improve performance when playing on Forge
 - Improved documentation to better describe what each API method requires
 - Tweaked `Split n ways` button to disable itself instead of becoming hidden
-- Tweaked system recognition to allow systems to set the required settings through the API, which suppresses the system
-  incompatibility warning
+- Tweaked system recognition to allow systems to set the required settings through the API, which suppresses the system incompatibility warning
 - Fixed various bugs surrounding splitting item piles
 - Fixed issue with the `Split n ways` button not working sometimes
 
@@ -195,7 +197,7 @@
 - Updated Japanese Localization (thanks to Brother Sharp#6921!)
 - Updated French Localization (thanks to Padhiver#1916!)
 - Fixed GMs having a character assigned to their user account would cause strangeness in some interfaces
-- Fixed `ItemPiles.API.addItems` failing to merge similar items
+- Fixed `game.itempiles.API.addItems` failing to merge similar items
 
 ## Version 1.4.1
 
@@ -226,9 +228,8 @@
 
 ## Version 1.3.4
 
-- Fixed an issue in v8 and in some systems that caused item piles to fail to get the correct item quantities - this does
-  not fix items that had already been put into item piles, you can fix this by editing the quantities of the items in
-  actor's inventory
+- Fixed an issue in v8 and in some systems that caused item piles to fail to get the correct item quantities
+    - This does not fix items that had already been put into item piles, you can fix this by editing the quantities of the items in actor's inventory
 - Fixed tokens not retaining their image when they were turned into item piles
 
 ## Version 1.3.3
@@ -241,7 +242,7 @@
 
 ## Version 1.3.1
 
-- Fixed `ItemPiles.API.turnTokensIntoItemPiles` failing to turn tokens into item piles
+- Fixed `game.itempiles.API.turnTokensIntoItemPiles` failing to turn tokens into item piles
 - Fixed module throwing errors in v8 regarding the actor sidebar
 - Fixed some Item Pile interfaces lacking styling elements in v8
 
@@ -250,7 +251,7 @@
 - Added item pile currency and/or item splitting capabilities
 - Added chat message when currency and/or items are split between players
 - Added API methods:
-    - `ItemPiles.API.splitItemPileContents` - Splits an item pile's content according to its settings
+    - `game.itempiles.API.splitItemPileContents` - Splits an item pile's content according to its settings
 - Added hooks:
     - `item-piles-preSplitItemPileContent` - Called before the content of an item pile is going to be split
     - `item-piles-splitItemPileContent` - Called after the content of an item pile has been split
@@ -271,13 +272,12 @@
 
 ## Version 1.2.6
 
-- Added `Item Filters` setting - now you can more accurately filter items you do not want to show up in item piles, such
-  as natural weapons
+- Added `Item Filters` setting - now you can more accurately filter items you do not want to show up in item piles, such as natural weapons
 - Updated all supported systems to support the above and added migrations to convert existing settings to the new system
-    - reset your Item Piles module settings to ensure you have the latest system configurations
+    - Reset your Item Piles module settings to ensure you have the latest system configurations
 - Removed `Item Type Attribute` and `Item Type Filters` as the above feature covers these cases
 - Added debounce to the token image refresh so that it doesn't try to change its image too often
-- Further fixes to `ItemPiles.API.addItems`
+- Further fixes to `game.itempiles.API.addItems`
 - Fixed unlinked item piles not retaining their setup when created from the actors directory
 
 ## Version 1.2.5
@@ -286,13 +286,13 @@
 
 ## Version 1.2.4 Hotfix
 
-- Fixed error in `ItemPiles.API.addItems` throwing errors
+- Fixed error in `game.itempiles.API.addItems` throwing errors
 - Fixed D&D 3.5e system not correctly implemented
 
 ## Version 1.2.3
 
 - Added API method:
-    - `ItemPiles.API.openItemPileInventory` - forces a given set of users to open an item pile's inventory UI
+    - `game.itempiles.API.openItemPileInventory` - forces a given set of users to open an item pile's inventory UI
 - Fixed API methods not accepting `Token` objects, will now properly cast to their `TokenDocument`
 - Fixed hooks and macros not being called on item pile interaction
 - Fixed various API methods being broken, oops
@@ -313,24 +313,24 @@
 - Added setting to hide the "Item Piles" text in the actor header - useful if you have too many modules, and the header
   is getting crowded
 - Added support for the Tormenta 20 system: <https://foundryvtt.com/packages/tormenta20>
-- Tweaked `ItemPiles.API.turnTokensIntoItemPiles` to turn tokens into item piles without having the "Display Single Item
+- Tweaked `game.itempiles.API.turnTokensIntoItemPiles` to turn tokens into item piles without having the "Display Single Item
   Image" setting turned on
 - API changes:
-    - Changed: `ItemPiles.API.addItems`
+    - Changed: `game.itempiles.API.addItems`
         - This method now expects an array of objects, with item data or Item (Foundry Item class) (key `item`), and an
           optional quantity attribute that determines how many of the item to add (key `quantity`)
         - It now returns an array of objects, with the item's data (key `item`) and the quantity added (key `quantity`)
-    - Changed: `ItemPiles.API.removeItems`
+    - Changed: `game.itempiles.API.removeItems`
         - This method now expects an array of objects each containing the item id (key `_id`) and the quantity to
           remove (key `quantity`), or Items (the Foundry Item class) or strings of IDs to remove all quantities of
         - It now returns an array of objects, each containing the item that was removed or updated (key `item`), the
           quantity that was removed (key `quantity`), and whether the item was deleted (key `deleted`)
-    - Changed: `ItemPiles.API.transferItems`
+    - Changed: `game.itempiles.API.transferItems`
         - This method now expects an array of objects each containing the item id (key `_id`) and the quantity to
           transfer (key `quantity`), or Items (the Foundry Item class) or strings of IDs to transfer all quantities of
         - It now returns an array of objects, each containing the item that was added or updated (key `item`), the
           quantity that was transferred (key `quantity`)
-- Fixed `ItemPiles.API.transferEverything` not transferring everything from non-item pile actors
+- Fixed `game.itempiles.API.transferEverything` not transferring everything from non-item pile actors
 - Fixed item and attribute transfer hooks incorrectly returning the target's final quantities, rather than the
   transferred quantities
 - Fixed users creating item piles would cause the pile to be spawned on the scene that the GM was viewing at that given
@@ -370,9 +370,9 @@
     - `item-piles-preOpenItemPileInventory` - Called locally before an item pile's inventory is opened
     - `item-piles-openItemPileInventory` - Called locally after an item pile's inventory has been opened
 - API changes:
-    - Changed `ItemPiles.API.turnTokenIntoItemPile` to `ItemPiles.API.turnTokensIntoItemPiles`, now can take array of
+    - Changed `game.itempiles.API.turnTokenIntoItemPile` to `game.itempiles.API.turnTokensIntoItemPiles`, now can take array of
       tokens to turn into piles
-    - Changed `ItemPiles.API.revertTokenFromItemPile` to `ItemPiles.API.revertTokensFromItemPiles`, now can take array
+    - Changed `game.itempiles.API.revertTokenFromItemPile` to `game.itempiles.API.revertTokensFromItemPiles`, now can take array
       of tokens to revert
 - Improved token detection when multiple owned tokens are interacting with item piles, it should now more reliably pick
   sane tokens.
@@ -398,12 +398,12 @@
 ## Version 1.0.6
 
 - Added API endpoints:
-    - `ItemPiles.API.getActorItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
-    - `ItemPiles.API.getActorItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and
+    - `game.itempiles.API.getActorItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
+    - `game.itempiles.API.getActorItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and
       can transfer
 - Updated japanese localization
 - Fixed item piles not respecting item type filters
-- Fixed issue with `ItemPiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile
+- Fixed issue with `game.itempiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile
 - Fixed issues with item pile tokens sometimes switching to their actors image when they were empty
 
 ## Version 1.0.5

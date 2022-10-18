@@ -1,7 +1,5 @@
 # Creating item piles
 
-## Getting started
-
 When you first drag and drop an item on the canvas, you will be prompted by a dialog whether you want to create a new
 item pile. Holding **Left Alt** before drag and dropping will immediately create the default item pile.
 

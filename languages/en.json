@@ -338,6 +338,8 @@
           "EnabledPileExplanation": "Whether this should act as an item pile.",
           "InspectItems": "Enable Item Inspect",
           "InspectItemsExplanation": "Clicking item names will open the item's sheet.",
+          "DisplayItemTypes": "Split items by item types",
+          "DisplayItemTypesExplanation": "Display each type of item separately in the item pile, sorted by their item type.",
           "Distance": "Interaction Distance",
           "GridUnits": "Grid Units (leave empty for infinite)",
           "Macro": "On Interact Macro",

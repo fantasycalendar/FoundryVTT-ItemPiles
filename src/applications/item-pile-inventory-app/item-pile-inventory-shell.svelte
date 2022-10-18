@@ -11,13 +11,13 @@
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import PrivateAPI from "../../API/private-api.js";
   import ItemPileStore from "../../stores/item-pile-store.js";
+  import CategorizedItemList from "./CategorizedItemList.svelte";
 
   const { application } = getContext('external');
 
   export let elementRoot;
   export let actor;
   export let recipient;
-  export let overrides;
 
   export let store = new ItemPileStore(application, actor, recipient);
 
@@ -112,7 +112,11 @@
             <div></div>
           {/if}
 
-          <ItemList {store}/>
+          {#if $pileData.displayItemTypes}
+            <CategorizedItemList {store}/>
+          {:else}
+            <ItemList {store}/>
+          {/if}
 
           {#if hasItems}
             <hr>
@@ -150,7 +154,7 @@
           </button>
         {/if}
 
-        {#if $pileData.isContainer && !overrides.remote}
+        {#if $pileData.isContainer && !application.options.remote}
           <button type="submit" on:click={() => { store.closeContainer(); application.close(); }}>
             <i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
           </button>

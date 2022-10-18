@@ -3,20 +3,20 @@ import * as Helpers from "./helpers.js";
 export function getActor(target) {
   if (target instanceof Actor) return target;
   if (stringIsUuid(target)) {
-    target = fromUuidFast(target);
+    target = fromUuidSync(target);
   }
   target = getDocument(target);
   return target?.actor ?? target;
 }
 
 export function getToken(documentUuid) {
-  const document = fromUuidFast(documentUuid);
+  const document = fromUuidSync(documentUuid);
   return document instanceof TokenDocument ? document.object : document;
 }
 
 export function getDocument(target) {
   if (stringIsUuid(target)) {
-    target = fromUuidFast(target);
+    target = fromUuidSync(target);
   }
   return target?.document ?? target;
 }
@@ -25,30 +25,6 @@ export function stringIsUuid(inId) {
   return typeof inId === "string"
     && (inId.match(/\./g) || []).length
     && !inId.endsWith(".");
-}
-
-/**
- *  Retrieves an object from the scene using its UUID, avoiding compendiums as they would have to be async'd
- *
- * @param uuid
- * @returns {null}
- */
-export function fromUuidFast(uuid) {
-  let parts = uuid.split(".");
-  let doc;
-
-  const [docName, docId] = parts.slice(0, 2);
-  parts = parts.slice(2);
-  const collection = CONFIG[docName].collection.instance;
-  doc = collection.get(docId);
-
-  // Embedded Documents
-  while (doc && (parts.length > 1)) {
-    const [embeddedName, embeddedId] = parts.slice(0, 2);
-    doc = doc.getEmbeddedDocument(embeddedName, embeddedId);
-    parts = parts.slice(2);
-  }
-  return doc || null;
 }
 
 export function getUuid(target) {

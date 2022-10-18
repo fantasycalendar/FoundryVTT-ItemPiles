@@ -150,17 +150,22 @@ export default class PrivateAPI {
     return this._preloadItemPileFiles(doc);
   }
 
-  static async _addItems(targetUuid, items, userId, { interactionId = false } = {}) {
+  static async _addItems(targetUuid, items, userId, { removeExistingActorItems = false, interactionId = false } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
 
     const transaction = new Transaction(targetActor);
 
+    if (removeExistingActorItems) {
+      const existingItems = PileUtilities.getActorItems(targetActor);
+      await transaction.appendItemChanges(existingItems, { remove: true });
+    }
+
     await transaction.appendItemChanges(items);
 
-    const { itemsToUpdate, itemsToCreate } = transaction.prepare(); // Prepare data
+    const { itemsToUpdate, itemsToCreate, itemsToDelete } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_ADD, targetActor, itemsToCreate, itemsToUpdate, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_ADD, targetActor, itemsToCreate, itemsToUpdate, itemsToDelete, userId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas } = await transaction.commit(); // Actually add the items to the actor
@@ -689,7 +694,7 @@ export default class PrivateAPI {
 
     for (const targetUuid of targetUuids) {
 
-      let target = Utilities.fromUuidFast(targetUuid);
+      let target = fromUuidSync(targetUuid);
 
       pileSettings = foundry.utils.mergeObject(PileUtilities.getActorFlagData(target), pileSettings);
       pileSettings.enabled = true;
@@ -749,7 +754,7 @@ export default class PrivateAPI {
 
     for (const targetUuid of targetUuids) {
 
-      let target = Utilities.fromUuidFast(targetUuid);
+      let target = fromUuidSync(targetUuid);
 
       const pileSettings = PileUtilities.getActorFlagData(target);
       pileSettings.enabled = false;
@@ -839,7 +844,7 @@ export default class PrivateAPI {
 
     const target = Utilities.getToken(targetUuid);
 
-    const interactingToken = interactingTokenUuid ? Utilities.fromUuidFast(interactingTokenUuid) : false;
+    const interactingToken = interactingTokenUuid ? fromUuidSync(interactingTokenUuid) : false;
 
     if (foundry.utils.isEmpty(diffData)) return false;
 
@@ -951,11 +956,11 @@ export default class PrivateAPI {
 
     // Reformat macro data to contain useful information
     if (macroData.source) {
-      macroData.source = Utilities.fromUuidFast(macroData.source);
+      macroData.source = fromUuidSync(macroData.source);
     }
 
     if (macroData.target) {
-      macroData.target = Utilities.fromUuidFast(macroData.target);
+      macroData.target = fromUuidSync(macroData.target);
     }
 
     const targetActor = macroData.target instanceof TokenDocument ? macroData.target.actor : macroData.target;
@@ -1004,7 +1009,7 @@ export default class PrivateAPI {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
     }
 
-    const pre_drop_determined_hook = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.position, dropData.itemData);
+    const pre_drop_determined_hook = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.itemData, dropData.position);
     if (pre_drop_determined_hook === false) return false;
 
     let droppableDocuments = [];
@@ -1447,7 +1452,7 @@ export default class PrivateAPI {
     if (useDefaultCharacter && !game.user.isGM) {
       inspectingTarget = game.user.character;
     } else {
-      inspectingTarget = inspectingTargetUuid ? Utilities.fromUuidFast(inspectingTargetUuid) : false;
+      inspectingTarget = inspectingTargetUuid ? fromUuidSync(inspectingTargetUuid) : false;
     }
 
     const merchant = PileUtilities.isItemPileMerchant(target);
@@ -1474,7 +1479,7 @@ export default class PrivateAPI {
       }
     }), { seller: sellingActor, buyer: buyingActor });
 
-    const preCalcHookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId);
+    const preCalcHookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
     if (preCalcHookResult === false) return false;
 
     const sellerTransaction = new Transaction(sellingActor);
@@ -1587,7 +1592,7 @@ export default class PrivateAPI {
     const sellerUpdates = sellerTransaction.prepare();
     const buyerUpdates = buyerTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRADE, sellingActor, sellerUpdates, buyingActor, buyerUpdates, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRADE, sellingActor, sellerUpdates, buyingActor, buyerUpdates, userId, interactionId);
     if (hookResult === false) return false;
 
     const sellerTransactionData = await sellerTransaction.commit();

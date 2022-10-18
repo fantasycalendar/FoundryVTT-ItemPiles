@@ -36,6 +36,7 @@ const CONSTANTS = {
     macro: "",
     deleteWhenEmpty: "default",
     canInspectItems: true,
+    displayItemTypes: false,
     description: "",
 
     // Overrides

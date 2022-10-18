@@ -62,6 +62,10 @@ export default class ItemPileStore {
     this.currencies = writable([]);
     this.allCurrencies = writable([]);
 
+    this.itemsPerCategory = writable({});
+    this.categories = writable([]);
+    this.itemCategories = writable([]);
+
     this.numItems = writable(0);
     this.numCurrencies = writable(0);
 
@@ -155,8 +159,9 @@ export default class ItemPileStore {
 
   refreshItems() {
     const allItems = get(this.allItems);
+    const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, get(this.pileData));
 
-    const items = allItems.filter(entry => !entry.isCurrency);
+    const items = allItems.filter(entry => !entry.isCurrency && (game.user.isGM || !get(entry.itemFlagData).hidden || !actorIsMerchant));
     const itemCurrencies = allItems.filter(entry => entry.isCurrency);
 
     this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
@@ -168,6 +173,36 @@ export default class ItemPileStore {
     this.numCurrencies.set(currencies.filter(entry => get(entry.quantity) > 0).length);
     this.currencies.set(currencies.filter(entry => !get(entry.filtered)));
     this.allCurrencies.set(currencies);
+
+    const itemCategories = Array.from(
+      new Set(get(this.allItems)
+        .filter(entry => !entry.isCurrency)
+        .map(item => item.type))
+    ).map(type => {
+      return {
+        label: CONFIG.Item.typeLabels[type] ?? "ITEM-PILES.Merchant.OtherTypes." + type,
+        type
+      }
+    }).sort((a, b) => a.label < b.label ? -1 : 1);
+    this.itemCategories.set(itemCategories);
+    const itemsPerCategory = items.reduce((acc, item) => {
+      if (!acc[item.type]) {
+        acc[item.type] = [];
+      }
+      acc[item.type].push(item);
+      return acc;
+    }, {});
+    Object.values(itemsPerCategory).forEach(items => items.sort((a, b) => {
+      return a.item.name < b.item.name ? -1 : 1;
+    }));
+    this.itemsPerCategory.set(itemsPerCategory);
+    this.categories.set(Object.keys(itemsPerCategory).map(type => {
+      return {
+        label: CONFIG.Item.typeLabels[type] ?? "ITEM-PILES.Merchant.OtherTypes." + type,
+        type
+      }
+    }).sort((a, b) => a.label < b.label ? -1 : 1))
+
   }
 
   createItem(item) {

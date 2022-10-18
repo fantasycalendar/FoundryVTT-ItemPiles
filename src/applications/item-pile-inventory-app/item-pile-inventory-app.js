@@ -15,7 +15,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
    * @param options
    * @param dialogData
    */
-  constructor(actor, recipient, overrides = {}, options = {}, dialogData = {}) {
+  constructor(actor, recipient, options = {}, dialogData = {}) {
     super({
       id: `item-pile-inventory-${actor?.token?.id ?? actor.id}`,
       title: actor.name,
@@ -24,8 +24,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
         target: document.body,
         props: {
           actor,
-          recipient,
-          overrides
+          recipient
         }
       },
       zIndex: 100,
@@ -35,7 +34,7 @@ export class ItemPileInventoryApp extends SvelteApplication {
     this.actor = actor;
     this.recipient = recipient;
 
-    Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, actor, recipient, overrides);
+    Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, actor, recipient, options, dialogData);
 
   }
 
@@ -53,10 +52,10 @@ export class ItemPileInventoryApp extends SvelteApplication {
     return Object.values(ui.windows).filter(app => app.id === `item-pile-inventory-${id}`);
   }
 
-  static async show(source, recipient = false, overrides = {}, options = {}, dialogData = {}) {
+  static async show(source, recipient = false, options = {}, dialogData = {}) {
     source = Utilities.getActor(source);
     recipient = Utilities.getActor(recipient);
-    const result = Helpers.hooks.call(HOOKS.PRE_OPEN_INTERFACE, source, recipient, overrides);
+    const result = Helpers.hooks.call(HOOKS.PRE_OPEN_INTERFACE, source, recipient, options, dialogData);
     if (result === false) return;
     const apps = this.getActiveApps(source?.token?.id ?? source.id);
     if (apps.length) {
@@ -67,14 +66,14 @@ export class ItemPileInventoryApp extends SvelteApplication {
     }
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(source, recipient, overrides, options, dialogData).render(true, { focus: true });
+      new this(source, recipient, options, dialogData).render(true, { focus: true });
     })
   }
 
   async close(options) {
-    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.actor, this.recipient);
+    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.actor, this.recipient, options);
     if (result === false) return;
-    Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.actor, this.recipient);
+    Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.actor, this.recipient, options);
     return super.close(options);
   }
 

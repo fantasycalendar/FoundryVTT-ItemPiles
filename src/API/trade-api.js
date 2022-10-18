@@ -173,7 +173,7 @@ export default class TradeAPI {
     const fullPublicTradeId = publicTradeId + randomID();
 
     const tradingUser = game.users.get(tradingUserId);
-    let tradingActor = Utilities.fromUuidFast(tradingActorUuid);
+    let tradingActor = fromUuidSync(tradingActorUuid);
 
     tradingActor = tradingActor?.actor ?? tradingActor;
 
