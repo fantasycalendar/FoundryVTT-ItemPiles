@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.2.9
+
+- Fixed minor typo in `rollItemTable`
+
 ## Version 2.2.8
 
 - Fixed regular item piles would error for players when they try to open them

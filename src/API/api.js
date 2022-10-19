@@ -1063,7 +1063,7 @@ class API {
 
     await table.reset();
     await table.normalize();
-    const roll = new Roll(timesToRoll.tostring(), rollData).evaluate({ async: false });
+    const roll = new Roll(timesToRoll.toString(), rollData).evaluate({ async: false });
 
     if (roll.total <= 0) {
       return [];
