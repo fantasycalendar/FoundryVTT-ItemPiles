@@ -63,14 +63,9 @@
       "path": "languages/ja.json"
     },
     {
-      "lang": "pt",
-      "name": "Português",
-      "path": "languages/pt.json"
-    },
-    {
       "lang": "pt-BR",
       "name": "Português (Brasil)",
-      "path": "languages/pt_BR.json"
+      "path": "languages/pt-BR.json"
     },
     {
       "lang": "pl",
