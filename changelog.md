@@ -3,6 +3,7 @@
 ## Version 2.2.8
 
 - Fixed regular item piles would error for players when they try to open them
+- Fixed some item prices would round incorrectly due to floating point errors (0.3g would become 2s 9cp instead of 3s)
 
 ## Version 2.2.7
 

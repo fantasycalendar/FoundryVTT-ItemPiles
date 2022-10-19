@@ -119,7 +119,7 @@ export function isGMConnected() {
 }
 
 export function roundToDecimals(num, decimals) {
-  return (Number(num) * Number(decimals)) / Number(decimals);
+  return Number(Math.round(num + 'e' + decimals) + 'e-' + decimals);
 }
 
 /**
