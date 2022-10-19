@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.2.8
+
+- Fixed regular item piles would error for players when they try to open them
+
 ## Version 2.2.7
 
 - Added "Split items by item types" setting to item piles, which will display items separated by type in normal item piles

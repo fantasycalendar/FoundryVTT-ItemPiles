@@ -161,7 +161,10 @@ export default class ItemPileStore {
     const allItems = get(this.allItems);
     const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, get(this.pileData));
 
-    const items = allItems.filter(entry => !entry.isCurrency && (game.user.isGM || !get(entry.itemFlagData).hidden || !actorIsMerchant));
+    const items = allItems.filter(entry => {
+      const itemFlagData = entry.itemFlagData ? get(entry.itemFlagData) : {};
+      return !entry.isCurrency && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden);
+    });
     const itemCurrencies = allItems.filter(entry => entry.isCurrency);
 
     this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
