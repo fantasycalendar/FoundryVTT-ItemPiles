@@ -38,7 +38,9 @@
 
 </script>
 
-<svelte:window on:click={updateQuantity}/>
+<svelte:window on:click={() => {
+  if(data.editing && editable) updateQuantity();
+}}/>
 
 <div class="item-piles-flexrow item-piles-item-row item-piles-even-color">
 
@@ -60,13 +62,15 @@
     </div>
   </div>
 
-  <div style="flex: 0 1 17px; margin: 0 5px;">
-    {#if data.editing}
-      <a class="item-piles-clickable-green item-piles-confirm-quantity" on:click="{updateQuantity}">
-        <i class="fas fa-check"></i>
-      </a>
-    {/if}
-  </div>
+  {#if editable}
+    <div style="flex: 0 1 17px; margin: 0 5px;">
+      {#if data.editing}
+        <a class="item-piles-clickable-green item-piles-confirm-quantity" on:click="{updateQuantity}">
+          <i class="fas fa-check"></i>
+        </a>
+      {/if}
+    </div>
+  {/if}
 
   <div class="item-piles-text-right" class:item-piles-quantity-container={editable}
        on:click={(evt) => evt.stopPropagation()}>
