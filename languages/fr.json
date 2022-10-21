@@ -524,7 +524,9 @@
           "OverrideCurrenciesExplanation": "Configurez si cette pile doit pouvoir transférer d'autres devises que la valeur par défaut.",
           "ConfigureOverrideCurrencies": "Configurer les devises de remplacement",
           "OverrideItemFilters": "Remplacer les filtres d'objets",
-          "ConfigureOverrideItemFilters": "Configurer les filtres d'objets de remplacement"
+          "ConfigureOverrideItemFilters": "Configurer les filtres d'objets de remplacement",
+          "DisplayItemTypes": "Diviser les objets par types d'objets",
+          "DisplayItemTypesExplanation": "Affichez chaque type d'objet séparément dans la pile d'objets, triés par leur type d'objets."
         },
         "Other": {
           "Title": "Autres paramètres"
