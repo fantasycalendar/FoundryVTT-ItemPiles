@@ -563,10 +563,10 @@ class API {
   /**
    * Splits an item pile's content between all players (or a specified set of target actors).
    *
-   * @param target {Token/TokenDocument/Actor}                                                          The item pile to split
-   * @param {object} options                                                                            Options to pass to the function
-   * @param targets {boolean/TokenDocument/Actor/Array<TokenDocument/Actor>} [options.targets=false]    The targets to receive the split contents
-   * @param instigator {boolean/TokenDocument/Actor} [options.instigator=false]                         Whether this was triggered by a specific actor
+   * @param target {Token/TokenDocument/Actor}                                                  The item pile to split
+   * @param {object} options                                                                    Options to pass to the function
+   * @param {boolean/TokenDocument/Actor/Array<TokenDocument/Actor>} [options.targets=false]    The targets to receive the split contents
+   * @param {boolean/TokenDocument/Actor} [options.instigator=false]                            Whether this was triggered by a specific actor
    *
    * @returns {Promise<object/boolean>}
    */

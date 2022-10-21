@@ -31,10 +31,10 @@
     * [isItemPileContainer](#isItemPileContainer)
     * [updateItemPile](#updateItemPile)
     * [deleteItemPile](#deleteItemPile)
+    * [splitItemPileContents](#splitItemPileContents)
 
 
 * [Item and attribute methods](#item-and-attribute-methods)
-    * [splitItemPileContents](#splitItemPileContents)
     * [addItems](#addItems)
     * [removeItems](#removeItems)
     * [transferItems](#transferItems)
@@ -380,22 +380,24 @@ Deletes a pile, calling the relevant hooks.
 
 ---
 
-## Item and attribute methods
-
 ### splitItemPileContents
 
-`game.itempiles.API.splitItemPileContents(target, options, targets, instigator)` ⇒ `Promise<object/boolean>`
+`game.itempiles.API.splitItemPileContents(target, options)` ⇒ `Promise<object/boolean>`
 
 Splits an item pile's content between all players (or a specified set of target actors).
 
-| Param | Type | Description |
-| --- | --- | --- |
-| target | `Token/TokenDocument/Actor` | The item pile to split |
-| options | `object` | Options to pass to the function |
-| targets | `boolean/TokenDocument/Actor/Array<TokenDocument/Actor>` | [options.targets=false]    The targets to receive the split contents |
-| instigator | `boolean/TokenDocument/Actor` | [options.instigator=false]                         Whether this was triggered by a specific actor |
+**Returns**: `Promise<object/boolean>` - An object containing the changes to the pile actor and each actor that received items and attributes. It returns `false` if the given actor was not an item pile.
+
+| Param                    | Type                                                     | Description                     |
+|--------------------------|----------------------------------------------------------|---------------------------------|
+| target                   | `Token/TokenDocument/Actor`                              | The item pile to split          |
+| options                  | `object`                                                 | Options to pass to the function |
+| [options.targets]    | `boolean/TokenDocument/Actor/Array<TokenDocument/Actor>` | `false`                         |    The targets to receive the split contents |
+| [options.instigator] | `boolean/TokenDocument/Actor` | `false`                          | Whether this was triggered by a specific actor        |
 
 ---
+
+## Item and attribute methods
 
 ### addItems
 
