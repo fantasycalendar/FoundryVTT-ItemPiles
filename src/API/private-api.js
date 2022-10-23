@@ -150,7 +150,10 @@ export default class PrivateAPI {
     return this._preloadItemPileFiles(doc);
   }
 
-  static async _addItems(targetUuid, items, userId, { removeExistingActorItems = false, interactionId = false } = {}) {
+  static async _addItems(targetUuid, items, userId, {
+    removeExistingActorItems = false,
+    interactionId = false
+  } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
 
@@ -303,6 +306,33 @@ export default class PrivateAPI {
     }
 
     return itemDeltas;
+  }
+
+  static async _setAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {
+
+    const targetActor = Utilities.getActor(targetUuid);
+
+    const transaction = new Transaction(targetActor);
+    await transaction.appendActorChanges(attributes);
+    const { actorUpdates } = transaction.prepare();
+
+    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_SET, targetActor, actorUpdates, interactionId);
+    if (hookResult === false) return false;
+
+    const { attributeDeltas } = await transaction.commit();
+
+    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.SET, targetUuid, attributeDeltas, userId, interactionId);
+
+    await this._executeItemPileMacro(targetUuid, {
+      action: "setAttributes",
+      target: targetUuid,
+      attributes: attributeDeltas,
+      userId: userId,
+      interactionId: interactionId
+    });
+
+    return attributeDeltas;
+
   }
 
   static async _addAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {

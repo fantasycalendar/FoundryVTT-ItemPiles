@@ -621,7 +621,7 @@ class API {
     interactionId = false
   } = {}) {
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`AddItems | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`addItems | Could not determine the UUID, please provide a valid target`, true)
 
     const itemsToAdd = []
     items.forEach(itemData => {
@@ -649,7 +649,7 @@ class API {
     });
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`AddItems | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, {
@@ -671,7 +671,7 @@ class API {
   static removeItems(target, items, { interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`RemoveItems | Could not determine the UUID, please provide a valid target`, true);
+    if (!targetUuid) throw Helpers.custom_error(`removeItems | Could not determine the UUID, please provide a valid target`, true);
 
     const targetActorItems = this.getActorItems(target);
 
@@ -682,7 +682,7 @@ class API {
         const itemId = typeof itemData === "string" ? itemData : itemData._id;
         item = targetActorItems.find(actorItem => actorItem.id === itemId);
         if (!item) {
-          throw Helpers.custom_error(`RemoveItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
+          throw Helpers.custom_error(`removeItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
         }
         item = item.toObject();
       } else {
@@ -695,7 +695,7 @@ class API {
         }
         let foundActorItem = targetActorItems.find(actorItem => actorItem.id === item._id);
         if (!foundActorItem) {
-          throw Helpers.custom_error(`RemoveItems | Could not find item with id "${item._id}" on target "${targetUuid}"`, true)
+          throw Helpers.custom_error(`removeItems | Could not find item with id "${item._id}" on target "${targetUuid}"`, true)
         }
       }
 
@@ -705,7 +705,7 @@ class API {
     });
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`RemoveItems | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`removeItems | interactionId must be of type string`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ITEMS, targetUuid, items, game.user.id, { interactionId });
@@ -725,7 +725,7 @@ class API {
   static transferItems(source, target, items, { interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`TransferItems | Could not determine the UUID, please provide a valid source`, true)
+    if (!sourceUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid source`, true)
 
     const sourceActorItems = PileUtilities.getActorItems(source);
 
@@ -736,7 +736,7 @@ class API {
         const itemId = typeof itemData === "string" ? itemData : itemData._id;
         item = sourceActorItems.find(actorItem => actorItem.id === itemId);
         if (!item) {
-          throw Helpers.custom_error(`TransferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`, true)
+          throw Helpers.custom_error(`transferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`, true)
         }
         item = item.toObject();
       } else if (itemData instanceof Item) {
@@ -749,7 +749,7 @@ class API {
 
       let foundActorItem = sourceActorItems.find(actorItem => actorItem.id === item._id);
       if (!foundActorItem) {
-        throw Helpers.custom_error(`TransferItems | Could not find item with id "${item._id}" on target "${sourceUuid}"`, true)
+        throw Helpers.custom_error(`transferItems | Could not find item with id "${item._id}" on target "${sourceUuid}"`, true)
       }
 
       return {
@@ -758,10 +758,10 @@ class API {
     });
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`TransferItems | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid target`, true)
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`TransferItems | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`transferItems | interactionId must be of type string`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ITEMS, sourceUuid, targetUuid, items, game.user.id, { interactionId });
@@ -782,26 +782,62 @@ class API {
   static transferAllItems(source, target, { itemFilters = false, interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid source`, true)
+    if (!sourceUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid source`, true)
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`TransferAllItems | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid target`, true)
 
     if (itemFilters) {
-      if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`TransferAllItems | itemFilters must be of type array`);
+      if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`transferAllItems | itemFilters must be of type array`);
       itemFilters.forEach(entry => {
-        if (typeof entry?.path !== "string") throw Helpers.custom_error(`TransferAllItems | each entry in the itemFilters must have a "path" property that is of type string`);
-        if (typeof entry?.filter !== "string") throw Helpers.custom_error(`TransferAllItems | each entry in the itemFilters must have a "filter" property that is of type string`);
+        if (typeof entry?.path !== "string") throw Helpers.custom_error(`transferAllItems | each entry in the itemFilters must have a "path" property that is of type string`);
+        if (typeof entry?.filter !== "string") throw Helpers.custom_error(`transferAllItems | each entry in the itemFilters must have a "filter" property that is of type string`);
       })
     }
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`TransferAllItems | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`transferAllItems | interactionId must be of type string`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, {
       itemFilters, interactionId
     });
+  }
+
+  /**
+   * Sets attributes on an actor
+   *
+   * @param {Actor/Token/TokenDocument} target                  The target whose attribute will have their quantity set
+   * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to add
+   * @param {object} options                                    Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
+   *
+   * @returns {Promise<object>}                                 An array containing a key value pair of the attribute path and the quantity of that attribute that was set
+   *
+   */
+  static setAttributes(target, attributes, { interactionId = false } = {}) {
+
+    const targetUuid = Utilities.getUuid(target);
+    if (!targetUuid) throw Helpers.custom_error(`setAttributes | Could not determine the UUID, please provide a valid target`, true)
+
+    const targetActor = Utilities.getActor(target);
+
+    Object.entries(attributes).forEach(entry => {
+      const [attribute, quantity] = entry;
+      if (!hasProperty(targetActor, attribute)) {
+        throw Helpers.custom_error(`setAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+      }
+      if (!Helpers.isRealNumber(quantity)) {
+        throw Helpers.custom_error(`setAttributes | Attribute "${attribute}" must be of type number`, true)
+      }
+    });
+
+    if (interactionId) {
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`setAttributes | interactionId must be of type string`);
+    }
+
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SET_ATTRIBUTES, targetUuid, attributes, game.user.id, { interactionId });
+
   }
 
   /**
@@ -812,31 +848,31 @@ class API {
    * @param {object} options                                    Options to pass to the function
    * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
    *
-   * @returns {Promise<object>}                                 An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
+   * @returns {Promise<object>}                                 An array containing a key value pair of the attribute path and the quantity of that attribute that was added
    *
    */
   static addAttributes(target, attributes, { interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`AddAttributes | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`addAttributes | Could not determine the UUID, please provide a valid target`, true)
 
     const targetActor = Utilities.getActor(target);
 
     Object.entries(attributes).forEach(entry => {
       const [attribute, quantity] = entry;
       if (!hasProperty(targetActor, attribute)) {
-        throw Helpers.custom_error(`AddAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+        throw Helpers.custom_error(`addAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
       }
       if (!Helpers.isRealNumber(quantity) && quantity > 0) {
-        throw Helpers.custom_error(`AddAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+        throw Helpers.custom_error(`addAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
       }
     });
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`AddAttributes | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`addAttributes | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ATTRIBUTE, targetUuid, attributes, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ATTRIBUTES, targetUuid, attributes, game.user.id, { interactionId });
 
   }
 
@@ -853,36 +889,39 @@ class API {
   static removeAttributes(target, attributes, { interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`RemoveAttributes | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`removeAttributes | Could not determine the UUID, please provide a valid target`, true)
 
     const targetActor = Utilities.getActor(target);
 
+    let attributesToSend = {};
     if (Array.isArray(attributes)) {
       attributes.forEach(attribute => {
         if (typeof attribute !== "string") {
-          throw Helpers.custom_error(`RemoveAttributes | Each attribute in the array must be of type string`, true)
+          throw Helpers.custom_error(`removeAttributes | Each attribute in the array must be of type string`, true)
         }
         if (!hasProperty(targetActor, attribute)) {
-          throw Helpers.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
         }
+        attributesToSend[attribute] = Number(getProperty(targetActor, attribute));
       });
     } else {
       Object.entries(attributes).forEach(entry => {
         const [attribute, quantity] = entry;
         if (!hasProperty(targetActor, attribute)) {
-          throw Helpers.custom_error(`RemoveAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
         }
         if (!Helpers.isRealNumber(quantity) && quantity > 0) {
-          throw Helpers.custom_error(`RemoveAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+          throw Helpers.custom_error(`removeAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
         }
       });
+      attributesToSend = attributes;
     }
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`RemoveAttributes | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`removeAttributes | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ATTRIBUTES, targetUuid, attributes, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ATTRIBUTES, targetUuid, attributesToSend, game.user.id, { interactionId });
 
   }
 
@@ -900,42 +939,42 @@ class API {
   static transferAttributes(source, target, attributes, { interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid source`, true)
+    if (!sourceUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid source`, true)
     const sourceActor = Utilities.getActor(source);
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`TransferAttributes | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid target`, true)
     const targetActor = Utilities.getActor(target);
 
     if (Array.isArray(attributes)) {
       attributes.forEach(attribute => {
         if (typeof attribute !== "string") {
-          throw Helpers.custom_error(`TransferAttributes | Each attribute in the array must be of type string`, true)
+          throw Helpers.custom_error(`transferAttributes | Each attribute in the array must be of type string`, true)
         }
         if (!hasProperty(sourceActor, attribute)) {
-          throw Helpers.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
         }
         if (!hasProperty(targetActor, attribute)) {
-          throw Helpers.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
         }
       });
     } else {
       Object.entries(attributes).forEach(entry => {
         const [attribute, quantity] = entry;
         if (!hasProperty(sourceActor, attribute)) {
-          throw Helpers.custom_error(`TransferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
         }
         if (!hasProperty(targetActor, attribute)) {
-          throw Helpers.custom_error(`TransferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
         }
         if (!Helpers.isRealNumber(quantity) && quantity > 0) {
-          throw Helpers.custom_error(`TransferAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+          throw Helpers.custom_error(`transferAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
         }
       });
     }
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`TransferAttributes | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`transferAttributes | interactionId must be of type string`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ATTRIBUTES, sourceUuid, targetUuid, attributes, game.user.id, { interactionId });
@@ -955,13 +994,13 @@ class API {
   static transferAllAttributes(source, target, { interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
+    if (!sourceUuid) throw Helpers.custom_error(`transferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`TransferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
+    if (!targetUuid) throw Helpers.custom_error(`transferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`TransferAllAttributes | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`transferAllAttributes | interactionId must be of type string`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ATTRIBUTES, sourceUuid, targetUuid, game.user.id, { interactionId });
@@ -982,21 +1021,21 @@ class API {
   static transferEverything(source, target, { itemFilters = false, interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid source`, true)
+    if (!sourceUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid source`, true)
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`TransferEverything | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid target`, true)
 
     if (itemFilters) {
-      if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`TransferEverything | itemFilters must be of type array`);
+      if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`transferEverything | itemFilters must be of type array`);
       itemFilters.forEach(entry => {
-        if (typeof entry?.path !== "string") throw Helpers.custom_error(`TransferEverything | each entry in the itemFilters must have a "path" property that is of type string`);
-        if (typeof entry?.filter !== "string") throw Helpers.custom_error(`TransferEverything | each entry in the itemFilters must have a "filter" property that is of type string`);
+        if (typeof entry?.path !== "string") throw Helpers.custom_error(`transferEverything | each entry in the itemFilters must have a "path" property that is of type string`);
+        if (typeof entry?.filter !== "string") throw Helpers.custom_error(`transferEverything | each entry in the itemFilters must have a "filter" property that is of type string`);
       })
     }
 
     if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`TransferEverything | interactionId must be of type string`);
+      if (typeof interactionId !== "string") throw Helpers.custom_error(`transferEverything | interactionId must be of type string`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, {
@@ -1011,6 +1050,8 @@ class API {
    * @param {string/RollTable} table                              The name, ID, UUID, or the table itself, or an array of such
    * @param {object} options                                      Options to pass to the function
    * @param {string/number} [options.timesToRoll="1"]             The number of times to roll on the tables, which can be a roll formula
+   * @param {boolean} [options.resetTable=true]                   Whether to reset the table before rolling it
+   * @param {boolean} [options.displayChat=false]                 Whether to display the rolls to the chat
    * @param {object} [options.rollData={}]                        Data to inject into the roll formula
    * @param {Actor/string/boolean} [options.targetActor=false]    The target actor to add the items to, or the UUID of an actor
    * @param {boolean} [options.removeExistingActorItems=false]    Whether to clear the target actor's items before adding the ones rolled
@@ -1019,6 +1060,8 @@ class API {
    */
   static async rollItemTable(table, {
     timesToRoll = "1",
+    resetTable = true,
+    displayChat = false,
     rollData = {},
     targetActor = false,
     removeExistingActorItems = false
@@ -1061,7 +1104,9 @@ class API {
       }
     }
 
-    await table.reset();
+    if (resetTable) {
+      await table.reset();
+    }
     await table.normalize();
     const roll = new Roll(timesToRoll.toString(), rollData).evaluate({ async: false });
 
@@ -1069,7 +1114,7 @@ class API {
       return [];
     }
 
-    const tableDraw = await table.drawMany(roll.total, { displayChat: false, recursive: true });
+    const tableDraw = await table.drawMany(roll.total, { displayChat, recursive: true });
     const items = [];
     for (const rollData of tableDraw.results) {
       const existingItem = items.find(

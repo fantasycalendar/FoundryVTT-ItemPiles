@@ -53,7 +53,8 @@ export default class ItemPileSocket {
     REMOVE_ITEMS: "removeItems",
     TRANSFER_ITEMS: "transferItems",
     TRANSFER_ALL_ITEMS: "transferAllItems",
-    ADD_ATTRIBUTE: "addAttributes",
+    SET_ATTRIBUTES: "setAttributes",
+    ADD_ATTRIBUTES: "addAttributes",
     REMOVE_ATTRIBUTES: "removeAttributes",
     TRANSFER_ATTRIBUTES: "transferAttributes",
     TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes",
@@ -94,7 +95,8 @@ export default class ItemPileSocket {
     [this.HANDLERS.REMOVE_ITEMS]: (...args) => PrivateAPI._removeItems(...args),
     [this.HANDLERS.TRANSFER_ITEMS]: (...args) => PrivateAPI._transferItems(...args),
     [this.HANDLERS.TRANSFER_ALL_ITEMS]: (...args) => PrivateAPI._transferAllItems(...args),
-    [this.HANDLERS.ADD_ATTRIBUTE]: (...args) => PrivateAPI._addAttributes(...args),
+    [this.HANDLERS.SET_ATTRIBUTES]: (...args) => PrivateAPI._setAttributes(...args),
+    [this.HANDLERS.ADD_ATTRIBUTES]: (...args) => PrivateAPI._addAttributes(...args),
     [this.HANDLERS.REMOVE_ATTRIBUTES]: (...args) => PrivateAPI._removeAttributes(...args),
     [this.HANDLERS.TRANSFER_ATTRIBUTES]: (...args) => PrivateAPI._transferAttributes(...args),
     [this.HANDLERS.TRANSFER_ALL_ATTRIBUTES]: (...args) => PrivateAPI._transferAllAttributes(...args),
@@ -149,6 +151,7 @@ export default class ItemPileSocket {
       this._socket.register(key, callback);
       debug(`Registered itemPileSocket: ${key}`);
     }
+    debug("Registered all Item Piles sockets")
   }
 
   static executeAsGM(handler, ...args) {

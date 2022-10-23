@@ -55,6 +55,8 @@ const HOOKS = {
   ATTRIBUTE: {
     PRE_TRANSFER: module`preTransferAttributes`,
     TRANSFER: module`transferAttributes`,
+    PRE_SET: module`preSetAttributes`,
+    SET: module`setAttributes`,
     PRE_ADD: module`preAddAttributes`,
     ADD: module`addAttributes`,
     PRE_REMOVE: module`preRemoveAttributes`,
