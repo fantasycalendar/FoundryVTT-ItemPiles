@@ -808,7 +808,7 @@ class API {
    * Sets attributes on an actor
    *
    * @param {Actor/Token/TokenDocument} target                  The target whose attribute will have their quantity set
-   * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to add
+   * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to set
    * @param {object} options                                    Options to pass to the function
    * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
    *

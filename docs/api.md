@@ -39,6 +39,7 @@
     * [removeItems](#removeItems)
     * [transferItems](#transferItems)
     * [transferAllItems](#transferAllItems)
+    * [setAttributes](#setAttributes)
     * [addAttributes](#addAttributes)
     * [removeAttributes](#removeAttributes)
     * [transferAttributes](#transferAttributes)
@@ -475,14 +476,30 @@ Transfers all items between the source and the target.
 
 ---
 
+### setAttributes
+
+`game.itempiles.API.setAttributes(target, attributes, options)` ⇒ `Promise<object>`
+
+Sets attributes on an actor
+
+**Returns**: `Promise<object>` - An array containing a key value pair of the attribute path and the quantity of that attribute that was set
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| target | `Actor/Token/TokenDocument` |  | The target whose attribute will have their quantity set |
+| attributes | `object` |  | An object with each key being an attribute path, and its value being the quantity to set |
+| options | `object` |  | Options to pass to the function |
+| [options.interactionId] | `string/boolean` | `false` | The interaction ID of this action |
+
+---
+
 ### addAttributes
 
 `game.itempiles.API.addAttributes(target, attributes, options)` ⇒ `Promise<object>`
 
 Adds attributes on an actor
 
-**Returns**: `Promise<object>` - An array containing a key value pair of the attribute path and the quantity of that
-attribute that was removed
+**Returns**: `Promise<object>` - An array containing a key value pair of the attribute path and the quantity of that attribute that was added
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -499,8 +516,7 @@ attribute that was removed
 
 Subtracts attributes on the target
 
-**Returns**: `Promise<object>` - An array containing a key value pair of the attribute path and the quantity of that
-attribute that was removed
+**Returns**: `Promise<object>` - An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -515,11 +531,9 @@ attribute that was removed
 
 `game.itempiles.API.transferAttributes(source, target, attributes, options)` ⇒ `Promise<object>`
 
-Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds
-it the target
+Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target
 
-**Returns**: `Promise<object>` - An object containing a key value pair of each attribute transferred, the key being the
-attribute path and its value being the quantity that was transferred
+**Returns**: `Promise<object>` - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -535,11 +549,9 @@ attribute path and its value being the quantity that was transferred
 
 `game.itempiles.API.transferAllAttributes(source, target, options)` ⇒ `Promise<object>`
 
-Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them
-to the target
+Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target
 
-**Returns**: `Promise<object>` - An object containing a key value pair of each attribute transferred, the key being the
-attribute path and its value being the quantity that was transferred
+**Returns**: `Promise<object>` - An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
