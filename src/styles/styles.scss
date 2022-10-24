@@ -14,6 +14,10 @@
 
 .item-piles {
 
+  input {
+    color: var(--item-piles-input-text-color);
+  }
+
   h3 {
     border: 0;
   }
@@ -134,11 +138,19 @@
   }
 
   &-even-color:nth-child(even) {
-    background-color: var(--color-text-light-highlight, #f0f0e0);
+    background-color: var(--item-piles-even-color, var(--color-text-light-highlight, #f0f0e0));
+  }
+
+  &-even-color:nth-child(odd) {
+    background-color: var(--item-piles-odd-color);
   }
 
   &-odd-color:nth-child(odd) {
-    background-color: var(--color-text-light-highlight, #f0f0e0);
+    background-color: var(--item-piles-odd-color, var(--color-text-light-highlight, #f0f0e0));
+  }
+
+  &-odd-color:nth-child(even) {
+    background-color: var(--item-piles-even-color);
   }
 
   &-bottom-divider {

@@ -3,14 +3,11 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
   import ListEntry from "./ListEntry.svelte";
-  import { get } from "svelte/store";
 
   export let store;
   const numItems = store.numItems;
   const categories = store.categories;
   const itemsPerCategory = store.itemsPerCategory;
-
-  console.log(get(itemsPerCategory));
 
 </script>
 

@@ -8,9 +8,10 @@
     - `displayChat` (default `false`) - whether to display the rolls to the chat
     - `rollData` (default `{}`) - data to add to the roll
 - Added `renderItemPileInterface` to the API documentation
+- Fixed merchants sometimes not working on systems that use currencies that are actual items
 - Fixed `turnTokensIntoItemPiles` not respecting `img`, `scale`, and `name` overrides in the optional `tokenSettings`
 - Fixed minor issues with documentation
-- Removed stray `console.log` (profesinul progrmr)
+- Removed stray `console.log`
 
 ## Version 2.2.9
 

@@ -919,7 +919,7 @@ export default class PrivateAPI {
   static _evaluateItemPileChange(doc, changes) {
     const target = doc?.token ?? doc;
     if (!Helpers.isResponsibleGM()) return;
-    if (!PileUtilities.isValidItemPile(target)) return;
+    if (!PileUtilities.shouldEvaluateChange(target, changes)) return;
     const targetUuid = target.uuid;
     return Helpers.debounceManager.setDebounce(targetUuid, async (uuid) => {
       if (!Utilities.getDocument(uuid)) return;

@@ -2,7 +2,7 @@ import "./styles/styles.scss";
 
 import registerUIOverrides from "./foundry-ui-overrides.js";
 import registerLibwrappers from "./libwrapper.js";
-import { registerSettings, checkSystem, patchCurrencySettings } from "./settings.js";
+import { registerSettings, checkSystem, patchCurrencySettings, applySystemSpecificStyles } from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import Socket from "./socket.js";
 import API from "./API/api.js";
@@ -54,22 +54,21 @@ Hooks.once("ready", async () => {
     checkSystem();
   }
   registerHotkeysPost();
-  Hooks.callAll(HOOKS.READY);
 
   ChatAPI.disablePastTradingButtons();
+
+  setTimeout(() => {
+    Hooks.callAll(HOOKS.READY);
+  }, 100);
 
   //new SettingsShim().render(true)
 
 });
 
-Hooks.once("socketlib.ready", () => {
-});
-
 Hooks.once(HOOKS.READY, () => {
   Socket.initialize();
-  setTimeout(() => {
-    patchCurrencySettings();
-  }, 100);
+  patchCurrencySettings();
+  applySystemSpecificStyles();
 })
 
 Hooks.on(HOOKS.RESET_SETTINGS, async () => {

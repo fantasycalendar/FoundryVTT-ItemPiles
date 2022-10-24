@@ -86,7 +86,7 @@ export function shouldItemPileBeDeleted(targetUuid) {
 export function getActorItems(target, { itemFilters = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorItemFilters = itemFilters ? cleanItemFilters(itemFilters) : getActorItemFilters(actor);
-  const currencies = getActorCurrencies(actor).map(entry => entry.id);
+  const currencies = getActorCurrencies(actor, { getAll: true }).map(entry => entry.id);
   return actor.items.filter(item => currencies.indexOf(item.id) === -1 && !isItemInvalid(actor, item, actorItemFilters));
 }
 
@@ -318,6 +318,13 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
 }
 
+export function shouldEvaluateChange(target, changes) {
+  const flags = getActorFlagData(target, getProperty(changes, CONSTANTS.FLAGS.PILE) ?? {});
+  if (!isValidItemPile(target, flags)) return false;
+  return (flags.isContainer && (flags.closedImage || flags.emptyImage || flags.openedImage || flags.lockedImage))
+    || flags.displayOne || flags.showItemName || flags.overrideSingleItemScale;
+}
+
 function getRelevantTokensAndActor(target) {
 
   const relevantDocument = Utilities.getDocument(target);
@@ -359,9 +366,9 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
   const updates = documentTokens.map(tokenDocument => {
     const newTokenData = foundry.utils.mergeObject(tokenData, {
-      "img": getItemPileTokenImage(tokenDocument, pileData),
-      "scale": getItemPileTokenScale(tokenDocument, pileData),
-      "name": getItemPileName(tokenDocument, pileData),
+      "img": getItemPileTokenImage(tokenDocument, pileData, tokenData?.img),
+      "scale": getItemPileTokenScale(tokenDocument, pileData, tokenData?.scale),
+      "name": getItemPileName(tokenDocument, pileData, tokenData?.name),
     });
     const data = {
       "_id": tokenDocument.id, ...newTokenData
@@ -427,13 +434,29 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
   }
 }
 
+function getSmallestExchangeRate(currencies) {
+  return currencies.length > 1 ? Math.min(...currencies.map(currency => currency.exchangeRate)) : 0.00001;
+}
+
 function getExchangeRateDecimals(smallestExchangeRate) {
   return smallestExchangeRate.toString().includes(".") ? smallestExchangeRate.toString().split(".")[1].length : 0;
 }
 
 function getPriceArray(totalCost, currencies) {
 
-  const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
+  const primaryCurrency = currencies.find(currency => currency.primary);
+
+  if (currencies.length === 1) {
+    return [{
+      ...primaryCurrency,
+      cost: totalCost,
+      baseCost: totalCost,
+      maxCurrencyCost: totalCost,
+      string: primaryCurrency.abbreviation.replace('{#}', totalCost)
+    }]
+  }
+
+  const smallestExchangeRate = getSmallestExchangeRate(currencies);
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
   let fraction = Helpers.roundToDecimals(totalCost % 1, decimals);
@@ -442,7 +465,6 @@ function getPriceArray(totalCost, currencies) {
   const prices = [];
 
   let skipPrimary = false;
-  const primaryCurrency = currencies.find(currency => currency.primary)
   if (cost) {
     skipPrimary = true;
     prices.push({
@@ -536,7 +558,7 @@ export function getItemPrices(item, {
 
   // In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
   // to it, in order have a stable form of exchange calculation
-  const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
+  const smallestExchangeRate = getSmallestExchangeRate(currencyList);
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
   let overallCost = Utilities.getItemCost(item);
@@ -701,7 +723,7 @@ export function getPricesForItems(itemsToBuy, {
   const merchant = sellerFlagData ? seller : buyer;
   const currencyList = getActorCurrencyList(merchant);
   const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
-  const smallestExchangeRate = Math.min(...currencies.map(currency => currency.exchangeRate));
+  const smallestExchangeRate = getSmallestExchangeRate(currencies)
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
   const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
@@ -791,7 +813,11 @@ export function getPricesForItems(itemsToBuy, {
       }
 
       // If we have met the price target (or exceeded it, eg, we need change), populate empty entry
-      if (priceLeft <= 0 || !price.cost) {
+      if (priceLeft <= 0 || !price.cost || currencies.length === 1) {
+        if (currencies.length === 1) {
+          buyerPrice.quantity = price.cost;
+          priceLeft = 0;
+        }
         paymentData.finalPrices.push(buyerPrice);
         continue;
       }
@@ -817,62 +843,64 @@ export function getPricesForItems(itemsToBuy, {
 
     // If there's STILL some remaining price (eg, we haven't been able to scrounge up enough currency to pay for it)
     // we can start using the larger currencies, such as platinum in D&D 5e
-    while (priceLeft > 0) {
+    if (currencies.length > 1) {
+      while (priceLeft > 0) {
 
-      // We then need to loop through each price, and check if we have any more left over
-      for (const buyerPrice of paymentData.finalPrices) {
+        // We then need to loop through each price, and check if we have any more left over
+        for (const buyerPrice of paymentData.finalPrices) {
 
-        // If we don't, look for the next one
-        let buyerCurrencyQuantity = buyerPrice.buyerQuantity - buyerPrice.quantity;
-        if (!buyerCurrencyQuantity) continue;
+          // If we don't, look for the next one
+          let buyerCurrencyQuantity = buyerPrice.buyerQuantity - buyerPrice.quantity;
+          if (!buyerCurrencyQuantity) continue;
 
-        // Otherwise, add enough to cover the remaining cost
-        const newQuantity = Math.ceil(Math.min(buyerCurrencyQuantity, priceLeft / buyerPrice.exchangeRate));
-        buyerPrice.quantity += newQuantity;
-        priceLeft = Helpers.roundToDecimals(priceLeft - (newQuantity * buyerPrice.exchangeRate), decimals);
+          // Otherwise, add enough to cover the remaining cost
+          const newQuantity = Math.ceil(Math.min(buyerCurrencyQuantity, priceLeft / buyerPrice.exchangeRate));
+          buyerPrice.quantity += newQuantity;
+          priceLeft = Helpers.roundToDecimals(priceLeft - (newQuantity * buyerPrice.exchangeRate), decimals);
 
-        if (priceLeft <= 0) break;
+          if (priceLeft <= 0) break;
 
-      }
+        }
 
-      if (priceLeft > 0) {
-        paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
-      } else {
-        break;
-      }
-    }
-
-    paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
-
-    // Since the change will be negative, we'll need to flip it, since this is what we'll get back
-    let change = Math.abs(priceLeft);
-    for (const currency of currencies) {
-
-      if (!change) break;
-
-      // Get the remaining price, and normalize it to this currency
-      let numCurrency = Math.floor(Helpers.roundToDecimals(change / currency.exchangeRate, decimals));
-      change = Helpers.roundToDecimals(change - (numCurrency * currency.exchangeRate), decimals);
-
-      // If there's some currencies to be gotten back
-      if (numCurrency) {
-        // We check if we've paid with this currency
-        const payment = paymentData.finalPrices.find(payment => {
-          return payment.id === currency.id || (payment.name === currency.name && payment.img === currency.img && payment.type === currency.type);
-        });
-        if (!payment) continue;
-
-        // If we have paid with this currency, and we're getting some back, we can do one of two things:
-        if ((payment.quantity - numCurrency) >= 0) {
-          // Either just subtract it from the total paid if some of our payment will still remain
-          // IE, the change we got back didn't cancel out the payment
-          payment.quantity -= numCurrency;
+        if (priceLeft > 0) {
+          paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
         } else {
-          // Or if it does cancel out our payment, we add that to the change we'll get back and remove the payment entirely
-          paymentData.buyerChange.push({
-            ...currency, isCurrency: true, quantity: numCurrency - payment.quantity
+          break;
+        }
+      }
+
+      paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
+
+      // Since the change will be negative, we'll need to flip it, since this is what we'll get back
+      let change = Math.abs(priceLeft);
+      for (const currency of currencies) {
+
+        if (!change) break;
+
+        // Get the remaining price, and normalize it to this currency
+        let numCurrency = Math.floor(Helpers.roundToDecimals(change / currency.exchangeRate, decimals));
+        change = Helpers.roundToDecimals(change - (numCurrency * currency.exchangeRate), decimals);
+
+        // If there's some currencies to be gotten back
+        if (numCurrency) {
+          // We check if we've paid with this currency
+          const payment = paymentData.finalPrices.find(payment => {
+            return payment.id === currency.id || (payment.name === currency.name && payment.img === currency.img && payment.type === currency.type);
           });
-          payment.quantity = 0;
+          if (!payment) continue;
+
+          // If we have paid with this currency, and we're getting some back, we can do one of two things:
+          if ((payment.quantity - numCurrency) >= 0) {
+            // Either just subtract it from the total paid if some of our payment will still remain
+            // IE, the change we got back didn't cancel out the payment
+            payment.quantity -= numCurrency;
+          } else {
+            // Or if it does cancel out our payment, we add that to the change we'll get back and remove the payment entirely
+            paymentData.buyerChange.push({
+              ...currency, isCurrency: true, quantity: numCurrency - payment.quantity
+            });
+            payment.quantity = 0;
+          }
         }
       }
     }
