@@ -610,13 +610,13 @@ Rolls on a table of items and collates them to be able to be added to actors and
 **Returns**: `Promise<Array<Item>>` - An array of object containing the item data and their quantity
 
 | Param | Type | Default | Description                                                             |
-| --- | --- | --- |-------------------------------------------------------------------------|
-| table | `string/RollTable` |  | The name, ID, UUID, or the table itself, or an array of such            |
-| options | `object` |  | Options to pass to the function                                         |
-| [options.timesToRoll] | `string/number` | `"1"` | The number of times to roll on the tables, which can be a roll formula  |
-| [options.resetTable] | `boolean` | `false` | Whether to reset the table before rolling it                                                                        |
+| --- | --- |---------|-------------------------------------------------------------------------|
+| table | `string/RollTable` |         | The name, ID, UUID, or the table itself, or an array of such            |
+| options | `object` |         | Options to pass to the function                                         |
+| [options.timesToRoll] | `string/number` | `"1"`   | The number of times to roll on the tables, which can be a roll formula  |
+| [options.resetTable] | `boolean` | `true`  | Whether to reset the table before rolling it                                                                        |
 | [options.displayChat] | `boolean` | `false` | Whether to display the rolls to the chat |
-| [options.rollData] | `object` | `{}` | Data to inject into the roll formula                                    |
+| [options.rollData] | `object` | `{}`    | Data to inject into the roll formula                                    |
 | [options.targetActor] | `Actor/string/boolean` | `false` | The target actor to add the items to, or the UUID of an actor           |
 | [options.removeExistingActorItems] | `boolean` | `false` | Whether to clear the target actor's items before adding the ones rolled |
 
