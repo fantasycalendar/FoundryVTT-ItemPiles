@@ -6,7 +6,6 @@
 - Added the following optional settings to `rollItemTable`:
     - `resetTable` (default `true`) - whether to reset the table between calls to this function
     - `displayChat` (default `false`) - whether to display the rolls to the chat
-    - `rollData` (default `{}`) - data to add to the roll
 - Added `renderItemPileInterface` to the API documentation
 - Fixed merchants sometimes not working on systems that use currencies that are actual items
 - Fixed `turnTokensIntoItemPiles` not respecting `img`, `scale`, and `name` overrides in the optional `tokenSettings`
