@@ -32,6 +32,7 @@
     * [updateItemPile](#updateItemPile)
     * [deleteItemPile](#deleteItemPile)
     * [splitItemPileContents](#splitItemPileContents)
+    * [renderItemPileInterface](#renderItemPileInterface)
 
 
 * [Item and attribute methods](#item-and-attribute-methods)
@@ -395,6 +396,24 @@ Splits an item pile's content between all players (or a specified set of target 
 | options                  | `object`                                                 | Options to pass to the function |
 | [options.targets]    | `boolean/TokenDocument/Actor/Array<TokenDocument/Actor>` | `false`                         |    The targets to receive the split contents |
 | [options.instigator] | `boolean/TokenDocument/Actor` | `false`                          | Whether this was triggered by a specific actor        |
+
+---
+
+### renderItemPileInterface
+
+`game.itempiles.API.renderItemPileInterface(target, options)` ⇒ `Promise`
+
+Renders the appropriate interface for a given actor.
+
+**Returns**: `Promise` - Returns a promise that resolves when the interface has been rendered.
+
+| Param                    | Type                                                     | Description                         |
+|--------------------------|----------------------------------------------------------|-------------------------------------|
+| target                   | `Actor/TokenDocument`                                    | The actor whose interface to render |
+| options                  | `object`                                                 | Options to pass to the function     |
+| [options.userIds]    | `Array<string>` | `false`                             |   An array of strings for each user to render the interface for (defaults to only self) |
+| [options.inspectingTarget] | `Actor/TokenDocument`                            | `false`                             | Sets what actor should be viewing the interface        |
+| [options.useDefaultCharacter] | `boolean`                                                | `false`                             | Whether other users should use their assigned character when rendering the interface        |
 
 ---
 

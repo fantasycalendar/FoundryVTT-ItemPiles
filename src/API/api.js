@@ -1157,8 +1157,8 @@ class API {
     return PileUtilities.getActorItems(actor);
   }
 
-  static getActorCurrencies(actor) {
-    return PileUtilities.getActorCurrencies(actor);
+  static getActorCurrencies(actor, { getAll = false } = {}) {
+    return PileUtilities.getActorCurrencies(actor, { getAll });
   }
 
   static updateTokenHud() {
@@ -1173,8 +1173,19 @@ class API {
     return TradeAPI._spectateTrade(tradeId);
   }
 
+  /**
+   * Renders the appropriate interface for a given actor
+   *
+   * @param {Actor/TokenDocument} target                    The actor whose interface to render
+   * @param {object} options                                An object containing the options for this method
+   * @param {Array<string>} options.userIds                 An array of strings for each user to render the interface for (defaults to only self)
+   * @param {Actor/TokenDocument} options.inspectingTarget  Sets what actor should be viewing the interface
+   * @param {boolean} options.useDefaultCharacter           Whether other users should use their assigned character when rendering the interface
+   *
+   * @returns {Promise}
+   */
   static renderItemPileInterface(target, {
-    userIds = null, inspectingTarget = null, useDefaultCharacter = null
+    userIds = null, inspectingTarget = false, useDefaultCharacter = false
   } = {}) {
 
     const targetDocument = Utilities.getDocument(target);
@@ -1196,7 +1207,13 @@ class API {
     const inspectingTargetUuid = inspectingTarget ? Utilities.getUuid(inspectingTarget) : false;
     if (inspectingTarget && !inspectingTargetUuid) throw Helpers.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid inspecting target`);
 
-    if (!Array.isArray(userIds)) userIds = [game.user.id];
+    if (!Array.isArray(userIds)) {
+      if (userIds === null) {
+        userIds = [game.user.id];
+      } else {
+        userIds = [userIds]
+      }
+    }
 
     if (!game.user.isGM) {
       if (userIds.length > 1 || !userIds.includes(game.user.id)) {

@@ -616,7 +616,7 @@ export default class PrivateAPI {
   }
 
 
-  static async _createItemPile(sceneId, position, { pileActorName = false, items = false } = {}) {
+  static async _createItemPile(sceneId, position, { pileActorName = false, items = false, tokenSettings = {} } = {}) {
 
     let pileActor;
 
@@ -669,7 +669,7 @@ export default class PrivateAPI {
 
     }
 
-    let overrideData = { ...position };
+    let overrideData = { ...position, ...tokenSettings };
 
     const pileData = PileUtilities.getActorFlagData(pileActor);
 
@@ -697,9 +697,9 @@ export default class PrivateAPI {
       const data = { data: pileData, items: items };
 
       overrideData = foundry.utils.mergeObject(overrideData, {
-        "img": PileUtilities.getItemPileTokenImage(pileActor, data),
-        "scale": PileUtilities.getItemPileTokenScale(pileActor, data),
-        "name": PileUtilities.getItemPileName(pileActor, data),
+        "img": PileUtilities.getItemPileTokenImage(pileActor, data, overrideData?.img),
+        "scale": PileUtilities.getItemPileTokenScale(pileActor, data, overrideData?.scale),
+        "name": PileUtilities.getItemPileName(pileActor, data, overrideData?.name),
       });
 
     }
@@ -735,9 +735,9 @@ export default class PrivateAPI {
       const data = { data: pileSettings, items: targetItems, currencies: targetCurrencies };
 
       tokenSettings = foundry.utils.mergeObject(tokenSettings, {
-        "img": PileUtilities.getItemPileTokenImage(target, data),
-        "scale": PileUtilities.getItemPileTokenScale(target, data),
-        "name": PileUtilities.getItemPileName(target, data)
+        "img": PileUtilities.getItemPileTokenImage(target, data, tokenSettings?.img),
+        "scale": PileUtilities.getItemPileTokenScale(target, data, tokenSettings?.scale),
+        "name": PileUtilities.getItemPileName(target, data, tokenSettings?.name)
       });
 
       const sceneId = targetUuid.split('.')[1];

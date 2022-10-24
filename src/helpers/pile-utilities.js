@@ -207,18 +207,20 @@ export function isItemCurrency(item, { target = false } = {}) {
 }
 
 
-export function getItemPileTokenImage(token, { data = false, items = false, currencies = false } = {}) {
+export function getItemPileTokenImage(token, {
+  data = false,
+  items = false,
+  currencies = false
+} = {}, overrideImage = null) {
 
   const pileDocument = Utilities.getDocument(token);
 
   const itemPileData = getActorFlagData(pileDocument, data);
 
-  let originalImg;
-  if (pileDocument instanceof TokenDocument) {
-    originalImg = pileDocument.texture.src;
-  } else {
-    originalImg = pileDocument.prototypeToken.texture.src;
-  }
+  const originalImg = overrideImage ?? (pileDocument instanceof TokenDocument
+      ? pileDocument.texture.src
+      : pileDocument.prototypeToken.texture.src
+  );
 
   if (!isValidItemPile(pileDocument)) return originalImg;
 
@@ -257,18 +259,20 @@ export function getItemPileTokenImage(token, { data = false, items = false, curr
 
 }
 
-export function getItemPileTokenScale(target, { data = false, items = false, currencies = false } = {}) {
+export function getItemPileTokenScale(target, {
+  data = false,
+  items = false,
+  currencies = false
+} = {}, overrideScale = null) {
 
   const pileDocument = Utilities.getDocument(target);
 
   let itemPileData = getActorFlagData(pileDocument, data);
 
-  let baseScale;
-  if (pileDocument instanceof TokenDocument) {
-    baseScale = pileDocument.texture.scaleX;
-  } else {
-    baseScale = pileDocument.prototypeToken.texture.scaleX;
-  }
+  const baseScale = overrideScale ?? (pileDocument instanceof TokenDocument
+      ? pileDocument.texture.scaleX
+      : pileDocument.prototypeToken.texture.scaleX
+  );
 
   if (!isValidItemPile(pileDocument, itemPileData)) {
     return baseScale;
@@ -287,13 +291,13 @@ export function getItemPileTokenScale(target, { data = false, items = false, cur
 
 }
 
-export function getItemPileName(target, { data = false, items = false, currencies = false } = {}) {
+export function getItemPileName(target, { data = false, items = false, currencies = false } = {}, overrideName = null) {
 
   const pileDocument = Utilities.getDocument(target);
 
   const itemPileData = getActorFlagData(pileDocument, data);
 
-  let name = pileDocument instanceof TokenDocument ? pileDocument.name : pileDocument.prototypeToken.name;
+  let name = overrideName ?? (pileDocument instanceof TokenDocument ? pileDocument.name : pileDocument.prototypeToken.name);
 
   if (!isValidItemPile(pileDocument, itemPileData)) {
     return name;
