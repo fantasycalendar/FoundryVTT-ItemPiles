@@ -165,6 +165,7 @@
           <Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}" options={game.system.template.Actor.types}/>
           <Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
           <Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
+          <Setting bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"/>
           <SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>

@@ -492,6 +492,10 @@
         "Label": "Configure Currencies",
         "Hint": "This setting define the currencies that are eligible for pickup, which may not be actual items but numerical inputs on the character sheet."
       },
+      "CurrencyDecimalDigits": {
+        "Title": "Currency Decimal Digits",
+        "Hint": "This setting defines the lowest decimal digit your currencies round to. For example in a modern setting with modern currencies, '0.01' allows for two decimal digits. In a setting without decimal digits, simply put a '1'."
+      },
       "ItemFilters": {
         "Title": "Item filters",
         "Label": "Configure Item Filters",

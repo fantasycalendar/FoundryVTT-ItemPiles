@@ -4,6 +4,7 @@ import * as Helpers from "./helpers.js";
 import { SYSTEMS } from "../systems.js";
 import { hotkeyState } from "../hotkeys.js";
 import { getItemCost } from "./utilities.js";
+import SETTINGS from "../constants/settings.js";
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
@@ -435,7 +436,7 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
 }
 
 function getSmallestExchangeRate(currencies) {
-  return currencies.length > 1 ? Math.min(...currencies.map(currency => currency.exchangeRate)) : 0.00001;
+  return currencies.length > 1 ? Math.min(...currencies.map(currency => currency.exchangeRate)) : Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS);
 }
 
 function getExchangeRateDecimals(smallestExchangeRate) {

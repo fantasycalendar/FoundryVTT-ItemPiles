@@ -21,6 +21,7 @@ const SETTINGS = {
   
   // System Settings
   CURRENCIES: "currencies",
+  CURRENCY_DECIMAL_DIGITS: "currencyDecimalDigits",
   ITEM_FILTERS: "itemFilters",
   ACTOR_CLASS_TYPE: "actorClassType",
   ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
@@ -61,6 +62,19 @@ const SETTINGS = {
       system: true,
       default: SYSTEMS.DATA.CURRENCIES,
       type: Object
+    },
+
+    [SETTINGS.CURRENCY_DECIMAL_DIGITS]: {
+      name: "ITEM-PILES.Settings.CurrencyDecimalDigits.Title",
+      hint: "ITEM-PILES.Settings.CurrencyDecimalDigits.Hint",
+      scope: "world",
+      config: false,
+      system: true,
+      default: 0.00001,
+      step: 0.00001,
+      min: 0,
+      max: 1,
+      type: Number
     },
     
     [SETTINGS.ITEM_FILTERS]: {
