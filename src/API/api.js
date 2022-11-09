@@ -218,36 +218,82 @@ class API {
   /* ================= ITEM PILE METHODS ================= */
 
   /**
-   * Creates the default item pile token at a location.
+   * Creates an item pile token at a location, or an item pile actor, or both at the same time.
    *
-   * @param {object} position                               The position to create the item pile at
-   * @param {object} options                                Options to pass to the function
-   * @param {string/boolean} [options.sceneId=false]        Which scene to create the item pile on
-   * @param {Array/boolean} [options.items=false]           Any items to create on the item pile
-   * @param {string/boolean} [options.pileActorName=false]  Whether to use an existing item pile actor as the basis of this new token
+   * @param {object} options                                          Options to pass to the function
+   * @param {object/boolean} [options.position=false]                 Where to create the item pile, with x and y coordinates
+   * @param {string/boolean} [options.sceneId=game.user.viewedScene]  Which scene to create the item pile on
+   * @param {object} [options.tokenOverrides={}]                      Token data to apply to the newly created token
+   * @param {object} [options.actorOverrides={}]                      Actor data to apply to the newly created actor (if unlinked)
+   * @param {object} [options.itemPileFlags={}]                       Item pile specific flags to apply to the token and actor
+   * @param {Array/boolean} [options.items=false]                     Any items to create on the item pile
+   * @param {boolean} [options.createActor=false]                     Whether to create a new item pile actor
+   * @param {string/boolean} [options.actor=false]                    The UUID, ID, or name of the actor to use when creating this item pile (not compatible with createActor)
    *
    * @returns {Promise<string>}
    */
-  static createItemPile(position, {
-    sceneId = game.user.viewedScene, items = false, pileActorName = false
+  static async createItemPile({
+    position = false,
+    sceneId = game.user.viewedScene,
+    tokenOverrides = {},
+    actorOverrides = {},
+    itemPileFlags = {},
+    items = false,
+    createActor = false,
+    actor = false,
   } = {}) {
 
-    if (pileActorName) {
-      const pileActor = game.actors.getName(pileActorName);
-      if (!pileActor) {
-        throw Helpers.custom_error(`There is no actor of the name "${pileActorName}"`, true);
-      } else if (!PileUtilities.isValidItemPile(pileActor)) {
-        throw Helpers.custom_error(`The actor of name "${pileActorName}" is not a valid item pile actor.`, true);
+    if (position) {
+      if (typeof position !== "object") {
+        throw Helpers.custom_error(`createItemPile | position must be of type object`);
+      } else if (!Helpers.isRealNumber(position.x) || !Helpers.isRealNumber(position.y)) {
+        throw Helpers.custom_error(`createItemPile | position.x and position.y must be of type numbers`);
       }
     }
 
+    if (actor && !createActor) {
+      if (typeof actor !== "string") {
+        throw Helpers.custom_error(`createItemPile | actor must be of type string`);
+      }
+      let pileActor = await fromUuid(actor);
+      if (!pileActor) {
+        pileActor = game.actors.getName(actor);
+      }
+      if (!pileActor) {
+        pileActor = game.actors.get(actor);
+      }
+      if (!pileActor) {
+        throw Helpers.custom_error(`createItemPile | Could not find actor with the identifier of "${actor}"`);
+      }
+      actor = pileActor.uuid;
+    }
+
+    if (typeof sceneId !== "string") {
+      throw Helpers.custom_error(`createItemPile | sceneId must be of type string`);
+    }
+
+    if (typeof tokenOverrides !== "object") {
+      throw Helpers.custom_error(`createItemPile | tokenOverrides must be of type object`);
+    }
+
+    if (typeof actorOverrides !== "object") {
+      throw Helpers.custom_error(`createItemPile | tokenOverrides must be of type object`);
+    }
+
+    if (typeof itemPileFlags !== "object") {
+      throw Helpers.custom_error(`createItemPile | tokenOverrides must be of type object`);
+    }
+
     if (items) {
+      if (!Array.isArray(items)) items = [items]
       items = items.map(item => {
         return item instanceof Item ? item.toObject() : item;
       })
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.CREATE_PILE, sceneId, position, { pileActorName, items });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.CREATE_PILE, {
+      sceneId, position, actor, createActor, items, tokenOverrides, actorOverrides, itemPileFlags
+    });
   }
 
   /**
@@ -1068,7 +1114,7 @@ class API {
   } = {}) {
 
     if (typeof table === "string") {
-      let potentialTable = fromUuidSync(table);
+      let potentialTable = await fromUuid(table);
       if (!potentialTable) {
         potentialTable = game.tables.get(table)
       }
@@ -1086,11 +1132,11 @@ class API {
     }
 
     if (!(typeof timesToRoll === "string" || typeof timesToRoll === "number")) {
-      throw Helpers.custom_error(`rollItemTable | timesToRoll of type string or number`);
+      throw Helpers.custom_error(`rollItemTable | timesToRoll must be of type string or number`);
     }
 
     if (typeof rollData !== "object") {
-      throw Helpers.custom_error(`rollItemTable | rollData of type object`);
+      throw Helpers.custom_error(`rollItemTable | rollData must be of type object`);
     }
 
     if (typeof removeExistingActorItems !== "boolean") {

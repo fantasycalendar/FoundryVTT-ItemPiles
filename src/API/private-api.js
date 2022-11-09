@@ -53,7 +53,7 @@ export default class PrivateAPI {
     if (!doc.parent) return;
     ItemPileStore.notifyChanges("createItem", doc.parent, doc);
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
-    this._evaluateItemPileChange(doc.parent);
+    this._evaluateItemPileChange(doc.parent, {}, true);
   }
 
   /**
@@ -62,7 +62,7 @@ export default class PrivateAPI {
   static _onUpdateItem(doc) {
     if (!doc.parent) return;
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
-    this._evaluateItemPileChange(doc.parent);
+    this._evaluateItemPileChange(doc.parent, {}, true);
   }
 
   /**
@@ -72,7 +72,7 @@ export default class PrivateAPI {
     if (!doc.parent) return;
     ItemPileStore.notifyChanges("deleteItem", doc.parent, doc);
     if (!PileUtilities.isValidItemPile(doc.parent)) return;
-    this._evaluateItemPileChange(doc.parent);
+    this._evaluateItemPileChange(doc.parent, {}, true);
   }
 
   /**
@@ -570,13 +570,13 @@ export default class PrivateAPI {
    * @returns {sourceUuid: string/boolean, targetUuid: string/boolean, position: object/boolean, itemsDropped: array }
    */
   static async _dropItems({
-                            userId,
-                            sceneId,
-                            sourceUuid = false,
-                            targetUuid = false,
-                            itemData = false,
-                            position = false
-                          } = {}) {
+    userId,
+    sceneId,
+    sourceUuid = false,
+    targetUuid = false,
+    itemData = false,
+    position = false
+  } = {}) {
 
     let itemsDropped;
 
@@ -594,7 +594,7 @@ export default class PrivateAPI {
           Utilities.setItemQuantity(item.item, Math.abs(item.quantity));
           return item;
         });
-        targetUuid = await this._createItemPile(sceneId, position, { items: itemsDropped });
+        targetUuid = await this._createItemPile({ sceneId, position, items: itemsDropped });
       }
 
       // If there's no source (it was dropped from the item bar)
@@ -604,7 +604,7 @@ export default class PrivateAPI {
       if (targetUuid) {
         itemsDropped = await this._addItems(targetUuid, [itemData], userId);
       } else {
-        targetUuid = await this._createItemPile(sceneId, position, { items: [itemData] });
+        targetUuid = await this._createItemPile({ sceneId, position, items: [itemData] });
       }
 
     }
@@ -616,11 +616,52 @@ export default class PrivateAPI {
   }
 
 
-  static async _createItemPile(sceneId, position, { pileActorName = false, items = false, tokenSettings = {} } = {}) {
+  static async _createItemPile({
+    sceneId = null,
+    position = false,
+    actor = false,
+    createActor = false,
+    items = false,
+    tokenOverrides = {},
+    actorOverrides = {},
+    itemPileFlags = {}
+  } = {}) {
+
+    let returns = {};
 
     let pileActor;
 
-    if (!pileActorName) {
+    if (createActor) {
+
+      let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+
+      pileDataDefaults.enabled = true;
+      pileDataDefaults.deleteWhenEmpty = "true";
+      pileDataDefaults.displayOne = true;
+      pileDataDefaults.showItemName = true;
+      pileDataDefaults.overrideSingleItemScale = true;
+      pileDataDefaults.singleItemScale = 0.75;
+
+      pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+
+      pileActor = await Actor.create({
+        name: actor || "New Item Pile",
+        type: Helpers.getSetting("actorClassType"),
+        img: "icons/svg/item-bag.svg",
+        [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+        prototypeToken: {
+          name: "Item Pile",
+          actorLink: false,
+          bar1: { attribute: "" },
+          vision: false,
+          displayName: 50,
+          [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+          ...tokenOverrides
+        },
+        ...actorOverrides
+      });
+
+    } else if (!actor) {
 
       pileActor = game.actors.get(Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID));
 
@@ -641,10 +682,7 @@ export default class PrivateAPI {
           name: "Default Item Pile",
           type: Helpers.getSetting("actorClassType"),
           img: "icons/svg/item-bag.svg",
-          [CONSTANTS.FLAGS.PILE]: pileDataDefaults
-        });
-
-        await pileActor.update({
+          [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
           prototypeToken: {
             name: "Item Pile",
             actorLink: false,
@@ -653,7 +691,7 @@ export default class PrivateAPI {
             displayName: 50,
             [CONSTANTS.FLAGS.PILE]: pileDataDefaults
           }
-        })
+        });
 
         await game.settings.set(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", pileActor.id);
 
@@ -661,59 +699,70 @@ export default class PrivateAPI {
 
     } else {
 
-      pileActor = game.actors.getName(pileActorName);
+      pileActor = await fromUuid(actor);
 
       if (!pileActor) {
-        throw Helpers.custom_error("Could not find actor with name: " + pileActorName, true);
+        throw Helpers.custom_error("Could not find actor with UUID " + actor);
       }
 
     }
 
-    let overrideData = { ...position, ...tokenSettings };
+    if (position && sceneId) {
 
-    const pileData = PileUtilities.getActorFlagData(pileActor);
+      let overrideData = { ...position, ...tokenOverrides };
 
-    if (!pileActor.prototypeToken.actorLink) {
+      let pileData = PileUtilities.getActorFlagData(pileActor);
+      pileData.enabled = true;
+      pileData = foundry.utils.mergeObject(pileData, itemPileFlags);
 
-      if (items) {
-        for (let i = 0; i < items.length; i++) {
-          const itemData = items[i]?.item ?? items[i];
-          if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-            items[i] = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
+      if (!pileActor.prototypeToken.actorLink) {
+
+        if (items) {
+          for (let i = 0; i < items.length; i++) {
+            const itemData = items[i]?.item ?? items[i];
+            if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+              items[i] = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
+            }
           }
+        } else {
+          items = []
         }
-      } else {
-        items = []
+
+        items = items ? items.map(item => {
+          return item.item ?? item;
+        }) : [];
+
+        overrideData['actorData'] = {
+          items: items,
+          ...actorOverrides
+        }
+
+        const data = { data: pileData, items: items };
+
+        overrideData = foundry.utils.mergeObject(overrideData, {
+          "img": PileUtilities.getItemPileTokenImage(pileActor, data, overrideData?.img),
+          "scale": PileUtilities.getItemPileTokenScale(pileActor, data, overrideData?.scale),
+          "name": PileUtilities.getItemPileName(pileActor, data, overrideData?.name),
+        });
+
       }
 
-      items = items ? items.map(item => {
-        return item.item ?? item;
-      }) : [];
+      const tokenData = await pileActor.getTokenDocument(overrideData);
 
-      overrideData['actorData'] = {
-        items: items
-      }
+      const scene = game.scenes.get(sceneId);
 
-      const data = { data: pileData, items: items };
+      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CREATE, tokenData);
+      if (hookResult === false) return false;
 
-      overrideData = foundry.utils.mergeObject(overrideData, {
-        "img": PileUtilities.getItemPileTokenImage(pileActor, data, overrideData?.img),
-        "scale": PileUtilities.getItemPileTokenScale(pileActor, data, overrideData?.scale),
-        "name": PileUtilities.getItemPileName(pileActor, data, overrideData?.name),
-      });
+      const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
+
+      returns["tokenUuid"] = Utilities.getUuid(tokenDocument);
 
     }
 
-    const tokenData = await pileActor.getTokenDocument(overrideData);
+    returns["actorUuid"] = pileActor.uuid;
 
-    const scene = game.scenes.get(sceneId);
-
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CREATE, tokenData);
-    if (hookResult === false) return false;
-
-    const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
-
-    return Utilities.getUuid(tokenDocument);
+    return returns;
 
   }
 
@@ -912,14 +961,15 @@ export default class PrivateAPI {
    * Checks whether a given item pile would need to update its images, text, and/or scale
    *
    * @param {foundry.abstract.Document} doc
-   * @param [changes]
+   * @param {object} changes
+   * @param {boolean} force
    * @returns {*}
    * @private
    */
-  static _evaluateItemPileChange(doc, changes) {
+  static _evaluateItemPileChange(doc, changes = {}, force = false) {
     const target = doc?.token ?? doc;
     if (!Helpers.isResponsibleGM()) return;
-    if (!PileUtilities.shouldEvaluateChange(target, changes)) return;
+    if (!force && !PileUtilities.shouldEvaluateChange(target, changes)) return;
     const targetUuid = target.uuid;
     return Helpers.debounceManager.setDebounce(targetUuid, async (uuid) => {
       if (!Utilities.getDocument(uuid)) return;
@@ -929,7 +979,6 @@ export default class PrivateAPI {
         await PileUtilities.updateItemPileData(uuid);
       });
     })(targetUuid);
-
   }
 
   /**

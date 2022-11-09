@@ -54,6 +54,9 @@ export default class Transaction {
           );
         }
       } else {
+        if (!itemData._id) {
+          itemData._id = randomID();
+        }
         const existingItemCreation = Utilities.findSimilarItem(this.itemsToCreate, itemData);
         if (existingItemCreation) {
           const newQuantity = Utilities.getItemQuantity(existingItemCreation) + incomingQuantity;

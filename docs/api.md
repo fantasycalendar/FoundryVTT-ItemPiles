@@ -180,17 +180,23 @@ Sets the attributes for detecting item similarities
 
 ### createItemPile
 
-`game.itempiles.API.createItemPile(position, options)` ⇒ `Promise<string>`
+`game.itempiles.API.createItemPile(options)` ⇒ `Promise<object>`
 
-Creates the default item pile token at a location.
+Creates an item pile token at a location, or an item pile actor, or both at the same time.
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| position | `object` |  | The position to create the item pile at |
-| options | `object` |  | Options to pass to the function |
-| [options.sceneId] | `string/boolean` | `false` | Which scene to create the item pile on |
-| [options.items] | `Array/boolean` | `false` | Any items to create on the item pile |
-| [options.pileActorName] | `string/boolean` | `false` | Whether to use an existing item pile actor as the basis of this new token |
+**Returns**: `Promise<object<{tokenUuid: string, actorUuid: string}>>` - The UUID of the token and/or actor that was just created.
+
+| Param                   | Type             | Default | Description                                                                                                |
+|-------------------------|------------------|---------|------------------------------------------------------------------------------------------------------------|
+| options                 | `object`         |         | Options to pass to the function                                                                            |
+| [options.position]      | `object/boolean` | `false` | Where to create the item pile, with x and y coordinates                                                    |
+| [options.sceneId]       | `string/boolean` | `false` | Which scene to create the item pile on                                                                     |
+| [options.tokenOverrides] | `object`         | `{}`    | Token data to apply onto the newly created token                                                           |
+| [options.actorOverrides] | `object`         | `{}`    | Actor data to apply to the newly created actor (if unlinked)                                               |
+| [options.itemPileFlags] | `object`         | `{}`    | Item pile specific flags to apply to the token and actor                                                   |
+| [options.items]         | `Array/boolean`  | `false` | Any items to create on the item pile                                                                       |
+| [options.createActor] | `boolean`        | `false` | Whether to create a new item pile actor                                                                    |
+| [options.pileActorName] | `string/boolean` | `false` | The UUID, ID, or name of the actor to use when creating this item pile (not compatible with `createActor`) |
 
 ---
 

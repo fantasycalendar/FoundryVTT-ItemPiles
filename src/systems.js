@@ -54,10 +54,10 @@ export const SYSTEMS = {
   },
 
   get HAS_SYSTEM_SUPPORT() {
-    return !!this.SUPPORTED_SYSTEMS?.[game.system.id];
+    return !!this.SUPPORTED_SYSTEMS?.[game.system.id.toLowerCase()];
   },
 
   get DATA() {
-    return this.SUPPORTED_SYSTEMS?.[game.system.id] ?? this.DEFAULT_SETTINGS;
+    return this.SUPPORTED_SYSTEMS?.[game.system.id.toLowerCase()] ?? this.DEFAULT_SETTINGS;
   }
 };

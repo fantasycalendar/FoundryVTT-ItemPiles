@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 2.2.11
+
+- **BREAKING:** Changed the functionality of `game.itempiles.API.createItemPile()`
+    - Please check the API for more information: <https://fantasycomputer.works/FoundryVTT-ItemPiles/#/api?id=createitempile>
+- The function `game.itempiles.API.rollItemTable()` now supports tables that exist in compendiums
+- Fixed issue where adding items to item piles would not properly update the token image or name
+- Fixed DND5e's item transformer making assumptions about the data it was given, which could cause errors
+
 ## Version 2.2.10
 
 - Added better support for systems with only one currency, fractional costs should no longer result in free items
