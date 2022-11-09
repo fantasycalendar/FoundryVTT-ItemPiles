@@ -9,7 +9,6 @@
 - The function `game.itempiles.API.rollItemTable()` now supports tables that exist in compendiums
 - Fixed issue where adding items to item piles would not properly update the token image or name
 - Fixed DND5e's item transformer making assumptions about the data it was given, which could cause errors
--
 
 ## Version 2.2.10
 
