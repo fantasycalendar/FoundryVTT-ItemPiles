@@ -34,7 +34,7 @@
 
     {:else if data.type === Number}
 
-      <input type="number" bind:value={data.value} class:invalid={!data.value && data.value !== 0}>
+      <input type="number" bind:value={data.value} step={data.step} min={data.min} max={data.max} class:invalid={!data.value && data.value !== 0}>
 
     {:else}
 
