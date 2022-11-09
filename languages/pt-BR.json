@@ -370,7 +370,9 @@
           "OverrideCurrencies": "Substituir moedas",
           "ConfigureOverrideCurrencies": "Configurar moedas de substituição",
           "OverrideItemFilters": "Substituir filtros de itens",
-          "ConfigureOverrideItemFilters": "Configurar filtros de itens de substituição"
+          "ConfigureOverrideItemFilters": "Configurar filtros de itens de substituição",
+          "DisplayItemTypes": "Dividir itens por tipos de itens",
+          "DisplayItemTypesExplanation": "Exiba cada tipo de item separadamente na pilha de itens, ordenados por tipo de item."
         },
         "SingleItem": {
           "DisplayOneContainerWarning": "Aviso! Você tem \"Exibir imagem de item único\" e \"É contêiner\" ativados. Nesse caso, as imagens do contêiner têm prioridade.",
