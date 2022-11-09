@@ -50,7 +50,8 @@ export const SYSTEMS = {
     ITEM_PRICE_ATTRIBUTE: "",
     ITEM_FILTERS: [],
     ITEM_SIMILARITIES: [],
-    CURRENCIES: []
+    CURRENCIES: [],
+    CURRENCY_DECIMAL_DIGITS: 0.00001
   },
 
   get HAS_SYSTEM_SUPPORT() {

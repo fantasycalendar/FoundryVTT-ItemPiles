@@ -149,6 +149,7 @@
           <Setting bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
           <Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
           <Setting bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
+          <SettingButton bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
         </div>
 
         <div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
@@ -165,11 +166,11 @@
           <Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}" options={game.system.template.Actor.types}/>
           <Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
           <Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
-          <Setting bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"/>
           <SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>
+          <Setting bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
+                   disabled="{!settings[SETTINGS.CURRENCIES].length}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
-          <SettingButton bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
         </div>
       {/if}
 

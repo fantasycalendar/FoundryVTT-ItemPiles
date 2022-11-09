@@ -3,12 +3,14 @@
 * [System settings methods](#system-settings-methods)
     * [ACTOR_CLASS_TYPE](#ACTOR_CLASS_TYPE)
     * [CURRENCIES](#CURRENCIES)
+    * [CURRENCY_DECIMAL_DIGITS](#CURRENCY_DECIMAL_DIGITS)
     * [ITEM_PRICE_ATTRIBUTE](#ITEM_PRICE_ATTRIBUTE)
     * [ITEM_QUANTITY_ATTRIBUTE](#ITEM_QUANTITY_ATTRIBUTE)
     * [ITEM_FILTERS](#ITEM_FILTERS)
     * [ITEM_SIMILARITIES](#ITEM_SIMILARITIES)
     * [setActorClassType](#setActorClassType)
     * [setCurrencies](#setCurrencies)
+    * [setCurrencyDecimalDigits](#setCurrencyDecimalDigits)
     * [setItemQuantityAttribute](#setItemQuantityAttribute)
     * [setItemPriceAttribute](#setItemPriceAttribute)
     * [setItemFilters](#setItemFilters)
@@ -65,10 +67,17 @@ The actor class type used for the original item pile actor in this system
 
 ### CURRENCIES
 
-`game.itempiles.API.CURRENCIES`
-⇒ `Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>`
+`game.itempiles.API.CURRENCIES` ⇒ `Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>`
 
 The currencies used in this system
+
+---
+
+### CURRENCY_DECIMAL_DIGITS
+
+`game.itempiles.API.CURRENCY_DECIMAL_DIGITS` ⇒ `Number`
+
+The smallest decimal digits shown for any fractional currency amounts. Only used when there is only one currency
 
 ---
 
@@ -125,6 +134,18 @@ Sets the currencies used in this system
 | Param | Type |
 | --- | --- |
 | inCurrencies | `Array<Object>` |
+
+---
+
+### setCurrencyDecimalDigits
+
+`game.itempiles.API.setCurrencyDecimalDigits(inDecimalDigits)` ⇒ `Promise`
+
+Set the smallest decimal digits shown for any fractional currency amounts. Only used when there is only one currency.
+
+| Param | Type     |
+| --- |----------|
+| inDecimalDigits | `Number` |
 
 ---
 

@@ -436,7 +436,7 @@ export function getMerchantModifiersForActor(merchant, { item = false, actor = f
 }
 
 function getSmallestExchangeRate(currencies) {
-  return currencies.length > 1 ? Math.min(...currencies.map(currency => currency.exchangeRate)) : Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS);
+  return currencies.length > 1 ? Math.min(...currencies.map(currency => currency.exchangeRate)) : (Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001);
 }
 
 function getExchangeRateDecimals(smallestExchangeRate) {

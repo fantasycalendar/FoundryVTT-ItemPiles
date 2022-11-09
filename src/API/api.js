@@ -32,6 +32,15 @@ class API {
   }
 
   /**
+   * The smallest decimal digits shown for any fractional currency amounts. Only used when there is only one currency.
+   *
+   * @returns {Number}
+   */
+  static get CURRENCY_DECIMAL_DIGITS() {
+    return Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS);
+  }
+
+  /**
    * The attribute used to track the price of items in this system
    *
    * @returns {string}
@@ -123,6 +132,23 @@ class API {
     return new Promise(async (resolve) => {
       await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
       await Helpers.setSetting(SETTINGS.CURRENCIES, inCurrencies);
+      resolve();
+    });
+  }
+
+  /**
+   * Set the smallest decimal digits shown for any fractional currency amounts. Only used when there is only one currency.
+   *
+   * @param {Number} inDecimalDigits
+   * @returns {Promise}
+   */
+  static setCurrencyDecimalDigits(inDecimalDigits) {
+    if (typeof inDecimalDigits !== "number") {
+      throw Helpers.custom_error("setCurrencyDecimalDigits | inDecimalDigits must be of type string");
+    }
+    return new Promise(async (resolve) => {
+      await Helpers.setSetting(SETTINGS.PRECONFIGURED_SYSTEM, true);
+      await Helpers.setSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, inDecimalDigits);
       resolve();
     });
   }
@@ -1113,6 +1139,7 @@ class API {
     removeExistingActorItems = false
   } = {}) {
 
+    let rollTable = false;
     if (typeof table === "string") {
       let potentialTable = await fromUuid(table);
       if (!potentialTable) {
@@ -1124,12 +1151,18 @@ class API {
       if (!potentialTable) {
         throw Helpers.custom_error(`rollItemTable | could not find table with string "${table}"`);
       }
-      table = potentialTable;
+      rollTable = potentialTable;
     }
 
-    if (!(table instanceof RollTable)) {
+    if (!(rollTable instanceof RollTable)) {
       throw Helpers.custom_error(`rollItemTable | table must be of type RollTable`);
     }
+
+    if (resetTable && table.startsWith("Compendium")) {
+      resetTable = false;
+    }
+
+    table = rollTable.uuid;
 
     if (!(typeof timesToRoll === "string" || typeof timesToRoll === "number")) {
       throw Helpers.custom_error(`rollItemTable | timesToRoll must be of type string or number`);
@@ -1148,54 +1181,12 @@ class API {
       if (!(actor instanceof Actor)) {
         throw Helpers.custom_error(`rollItemTable | could not find the actor of the target actor`);
       }
+      targetActor = Utilities.getUuid(actor);
     }
 
-    if (resetTable) {
-      await table.reset();
-    }
-    await table.normalize();
-    const roll = new Roll(timesToRoll.toString(), rollData).evaluate({ async: false });
-
-    if (roll.total <= 0) {
-      return [];
-    }
-
-    const tableDraw = await table.drawMany(roll.total, { displayChat, recursive: true });
-    const items = [];
-    for (const rollData of tableDraw.results) {
-      const existingItem = items.find(
-        (item) => item.documentId === rollData.documentId
-      );
-      if (existingItem) {
-        existingItem.quantity++;
-      } else {
-
-        let item;
-        if (rollData.documentCollection === "Item") {
-          item = game.items.get(rollData.documentId);
-        } else {
-          const compendium = game.packs.get(rollData.documentCollection);
-          if (compendium) {
-            item = await compendium.getDocument(rollData.documentId);
-          }
-        }
-
-        if (item instanceof Item) {
-          items.push({
-            ...rollData,
-            item: item,
-            quantity: 1,
-          });
-        }
-      }
-    }
-
-    if (targetActor) {
-      const actor = Utilities.getActor(targetActor);
-      await this.addItems(actor, items, { removeExistingActorItems });
-    }
-
-    return items;
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ROLL_ITEM_TABLE, {
+      table, timesToRoll, resetTable, displayChat, rollData, targetActor, removeExistingActorItems, userId: game.user.id
+    })
 
   }
 

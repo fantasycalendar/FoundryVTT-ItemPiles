@@ -2,6 +2,8 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
   export let data;
+  export let disabled = false;
+  
 </script>
 
 <div class="setting form-scope item-piles-flexrow">
@@ -16,12 +18,12 @@
 
     {#if data.type === Boolean}
 
-      <input type="checkbox" bind:checked={data.value}>
+      <input type="checkbox" bind:checked={data.value} disabled={disabled}/>
 
     {:else if data.choices}
 
       <div class="choice-container">
-        <select name={data.key} bind:value={data.value}>
+        <select name={data.key} bind:value={data.value} disabled={disabled}>
           {#each Object.entries(data.choices) as [key, choice], index (index)}
             {#if data.type === Number}
               <option value="{index}">{localize(choice)}</option>
@@ -34,14 +36,22 @@
 
     {:else if data.type === Number}
 
-      <input type="number" bind:value={data.value} step={data.step} min={data.min} max={data.max} class:invalid={!data.value && data.value !== 0}>
+      <input
+        type="number"
+        disabled={disabled}
+        bind:value={data.value}
+        class:invalid={!data.value && data.value !== 0}
+        step={data.step}
+        min={data.min}
+        max={data.max}
+      />
 
     {:else}
 
       <div class="setting-container">
-        <input type="text" bind:value={data.value}>
+        <input type="text" bind:value={data.value} disabled={disabled}/>
         {#if data.localize}
-          <input type="text" disabled value={localize(data.value)}>
+          <input type="text" disabled value={localize(data.value)}/>
         {/if}
       </div>
 

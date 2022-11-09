@@ -1720,4 +1720,67 @@ export default class PrivateAPI {
 
   }
 
+  static async _rollItemTable({
+    table = "",
+    timesToRoll = "1",
+    resetTable = true,
+    displayChat = false,
+    rollData = {},
+    targetActor = false,
+    removeExistingActorItems = false,
+    userId = false,
+  } = {}) {
+
+    const rollTable = await fromUuid(table);
+
+    if (!table.startsWith("Compendium")) {
+      if (resetTable) {
+        await rollTable.reset();
+      }
+      await rollTable.normalize();
+    }
+
+    const roll = new Roll(timesToRoll.toString(), rollData).evaluate({ async: false });
+    if (roll.total <= 0) {
+      return [];
+    }
+
+    const tableDraw = await rollTable.drawMany(roll.total, { displayChat, recursive: true });
+    const items = [];
+    for (const rollData of tableDraw.results) {
+      const existingItem = items.find(
+        (item) => item.documentId === rollData.documentId
+      );
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+
+        let item;
+        if (rollData.documentCollection === "Item") {
+          item = game.items.get(rollData.documentId);
+        } else {
+          const compendium = game.packs.get(rollData.documentCollection);
+          if (compendium) {
+            item = await compendium.getDocument(rollData.documentId);
+          }
+        }
+
+        if (item instanceof Item) {
+          items.push({
+            ...rollData,
+            item: item.toObject(),
+            quantity: 1,
+          });
+        }
+      }
+    }
+
+    if (targetActor) {
+      await this._addItems(targetActor, items, userId, { removeExistingActorItems });
+    }
+
+    return items;
+
+  }
+
 }

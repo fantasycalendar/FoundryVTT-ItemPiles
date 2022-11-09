@@ -4,10 +4,12 @@
 
 - **BREAKING:** Changed the functionality of `game.itempiles.API.createItemPile()`
     - Please check the API for more information: <https://fantasycomputer.works/FoundryVTT-ItemPiles/#/api?id=createitempile>
+- Added Currency Decimal Digits setting to better support control over how many decimals are displayed for item prices on systems with only one currency (Thanks loofou!)
+- Made `Start Trade` button in player list dark (thanks LukasPrism!)
 - The function `game.itempiles.API.rollItemTable()` now supports tables that exist in compendiums
 - Fixed issue where adding items to item piles would not properly update the token image or name
 - Fixed DND5e's item transformer making assumptions about the data it was given, which could cause errors
-- Made `Start Trade` button in player list dark (thanks LukasPrism!)
+-
 
 ## Version 2.2.10
 

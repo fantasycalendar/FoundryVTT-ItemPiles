@@ -61,7 +61,7 @@ Hooks.once("ready", async () => {
     Hooks.callAll(HOOKS.READY);
   }, 100);
 
-  //new SettingsShim().render(true)
+  // new SettingsShim().render(true)
 
 });
 

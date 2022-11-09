@@ -60,6 +60,7 @@ export default class ItemPileSocket {
     TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes",
     TRANSFER_EVERYTHING: "transferEverything",
     COMMIT_ACTOR_CHANGES: "commitActorChanges",
+    ROLL_ITEM_TABLE: "rollItemTable",
 
     /**
      * Trading sockets
@@ -102,6 +103,7 @@ export default class ItemPileSocket {
     [this.HANDLERS.TRANSFER_ALL_ATTRIBUTES]: (...args) => PrivateAPI._transferAllAttributes(...args),
     [this.HANDLERS.TRANSFER_EVERYTHING]: (...args) => PrivateAPI._transferEverything(...args),
     [this.HANDLERS.COMMIT_ACTOR_CHANGES]: (...args) => PrivateAPI._commitActorChanges(...args),
+    [this.HANDLERS.ROLL_ITEM_TABLE]: (...args) => PrivateAPI._rollItemTable(...args),
 
     [this.HANDLERS.CREATE_PILE]: (...args) => PrivateAPI._createItemPile(...args),
     [this.HANDLERS.UPDATE_PILE]: (...args) => PrivateAPI._updateItemPile(...args),
