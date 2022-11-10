@@ -751,6 +751,10 @@
       "DebugHooks": {
         "Title": "Activer le débogage des \"hooks\"",
         "Hint": "Imprime les \"hooks\" de la pile d'objets et leur contenu sur la console"
+      },
+      "CurrencyDecimalDigits": {
+        "Title": "Chiffres décimaux des devises",
+        "Hint": "Ce paramètre définit le chiffre décimal le plus bas auquel vos devises sont arrondies. Par exemple, dans un environnement moderne avec des devises modernes, \"0,01\" permet d'obtenir deux chiffres décimaux. Ce paramètre n'est pas utilisé si vous avez plus d'une devise."
       }
     },
     "Warnings": {
