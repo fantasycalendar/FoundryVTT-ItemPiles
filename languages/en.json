@@ -113,6 +113,7 @@
       "PopulateItems": "Populate Items",
       "AllTypes": "All types",
       "Buy": "Buy",
+      "NoMatchFound": "Nothing matches your search",
       "NoItemsForSale": "Merchant has nothing for sale",
       "NoItemsToSell": "You have nothing to sell to this merchant",
       "OpenTimes": "Open Times",

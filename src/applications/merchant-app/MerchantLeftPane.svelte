@@ -169,7 +169,6 @@
 
     .merchant-description {
       position: relative;
-      height: 100%;
       padding: 0.25rem;
 
       .prosemirror {

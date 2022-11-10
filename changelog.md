@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.2.12
+
+- Fixed search not working in merchants
+- Fixed searching for services would make the buy services tab disappear
+- Fixed populate items in merchants not working properly
+
 ## Version 2.2.11
 
 - **BREAKING:** Changed the functionality of `game.itempiles.API.createItemPile()`

@@ -1139,7 +1139,7 @@ class API {
     removeExistingActorItems = false
   } = {}) {
 
-    let rollTable = false;
+    let rollTable = table;
     if (typeof table === "string") {
       let potentialTable = await fromUuid(table);
       if (!potentialTable) {
@@ -1151,15 +1151,14 @@ class API {
       if (!potentialTable) {
         throw Helpers.custom_error(`rollItemTable | could not find table with string "${table}"`);
       }
+      if (resetTable && table.startsWith("Compendium")) {
+        resetTable = false;
+      }
       rollTable = potentialTable;
     }
 
     if (!(rollTable instanceof RollTable)) {
       throw Helpers.custom_error(`rollItemTable | table must be of type RollTable`);
-    }
-
-    if (resetTable && table.startsWith("Compendium")) {
-      resetTable = false;
     }
 
     table = rollTable.uuid;
@@ -1184,9 +1183,17 @@ class API {
       targetActor = Utilities.getUuid(actor);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ROLL_ITEM_TABLE, {
+    const items = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ROLL_ITEM_TABLE, {
       table, timesToRoll, resetTable, displayChat, rollData, targetActor, removeExistingActorItems, userId: game.user.id
-    })
+    });
+
+    if (items) {
+      for (const entry of items) {
+        entry.item = await Item.implementation.create(entry.item, { temporary: true });
+      }
+    }
+
+    return items;
 
   }
 

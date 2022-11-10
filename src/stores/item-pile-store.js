@@ -61,6 +61,7 @@ export default class ItemPileStore {
     this.items = writable([]);
     this.currencies = writable([]);
     this.allCurrencies = writable([]);
+    this.visibleItems = writable([]);
 
     this.itemsPerCategory = writable({});
     this.categories = writable([]);
@@ -161,14 +162,18 @@ export default class ItemPileStore {
     const allItems = get(this.allItems);
     const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, get(this.pileData));
 
-    const items = allItems.filter(entry => {
+    const visibleItems = allItems.filter(entry => {
       const itemFlagData = entry.itemFlagData ? get(entry.itemFlagData) : {};
       return !entry.isCurrency && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden);
     });
     const itemCurrencies = allItems.filter(entry => entry.isCurrency);
 
+    this.visibleItems.set(visibleItems);
+
+    const items = visibleItems.filter(entry => !get(entry.filtered));
+
     this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
-    this.items.set(items.filter(entry => !get(entry.filtered)).sort((a, b) => {
+    this.items.set(items.sort((a, b) => {
       return a.item.name < b.item.name ? -1 : 1;
     }));
 
@@ -178,7 +183,7 @@ export default class ItemPileStore {
     this.allCurrencies.set(currencies);
 
     const itemCategories = Array.from(
-      new Set(get(this.allItems)
+      new Set(visibleItems
         .filter(entry => !entry.isCurrency)
         .map(item => item.type))
     ).map(type => {

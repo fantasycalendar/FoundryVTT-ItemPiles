@@ -32,6 +32,7 @@
 
   let priceSelector = store.priceSelector;
   let categories = store.categories;
+  let visibleItems = store.visibleItems;
 
   async function dropData(data) {
 
@@ -74,7 +75,7 @@
       {
         value: 'services',
         label: game.i18n.localize('ITEM-PILES.Merchant.BuyServices'),
-        hidden: !$categories.some(category => category.type === "item-piles-service")
+        hidden: !$visibleItems.some(item => item.type === "item-piles-service")
       },
       {
         value: 'sell',

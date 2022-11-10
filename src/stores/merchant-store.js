@@ -61,7 +61,7 @@ export default class MerchantStore extends ItemPileStore {
 
     const filterDebounce = foundry.utils.debounce(() => {
       this.refreshItems();
-    }, 200);
+    }, 300);
     this.subscribeTo(this.typeFilter, (val) => {
       if (!val) return;
       filterDebounce()

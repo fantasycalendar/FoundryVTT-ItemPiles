@@ -9,6 +9,7 @@
   export let categoryFilter;
 
   const searchStore = store.search;
+  const visibleItemsStore = store.visibleItems;
   const itemsPerCategoryStore = store.itemsPerCategory;
   const categoryStore = store.categories;
   const priceModifiersPerType = store.priceModifiersPerType;
@@ -71,7 +72,11 @@
   <div style="height: calc(100% - 51px);" class="item-piles-flexcol align-center-col">
 
     <span class="align-center-row" style="font-size:1.25rem; opacity: 0.8;">
-      {localize("ITEM-PILES.Merchant.NoItemsForSale")}
+      {#if $visibleItemsStore.length}
+        {localize("ITEM-PILES.Merchant.NoMatchFound")}
+      {:else}
+        {localize("ITEM-PILES.Merchant.NoItemsForSale")}
+      {/if}
     </span>
 
   </div>
