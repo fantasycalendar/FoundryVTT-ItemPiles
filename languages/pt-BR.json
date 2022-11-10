@@ -214,7 +214,8 @@
       "BuyServices": "Comprar serviços",
       "OtherTypes": {
         "item-piles-service": "Serviço"
-      }
+      },
+      "NoMatchFound": "Nada corresponde à sua pesquisa"
     },
     "Applications": {
       "DropItem": {
@@ -564,6 +565,10 @@
       "DebugHooks": {
         "Title": "Ativar depuração de ganchos",
         "Hint": "Imprime os ganchos do item pile e seu conteúdo no console"
+      },
+      "CurrencyDecimalDigits": {
+        "Title": "Dígitos decimais de moeda",
+        "Hint": "Essa configuração define o dígito decimal mais baixo para o qual suas moedas arredondam. Por exemplo, em uma configuração moderna com moedas modernas, '0,01' permite dois dígitos decimais. Isso não é usado se você tiver mais de uma moeda."
       }
     }
   }
