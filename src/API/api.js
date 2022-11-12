@@ -1222,14 +1222,14 @@ class API {
    *
    * @param {Actor/TokenDocument} target                    The actor whose interface to render
    * @param {object} options                                An object containing the options for this method
-   * @param {Array<string>} options.userIds                 An array of strings for each user to render the interface for (defaults to only self)
+   * @param {Array<string/User>} options.userIds            An array of users or user ids for each user to render the interface for (defaults to only self)
    * @param {Actor/TokenDocument} options.inspectingTarget  Sets what actor should be viewing the interface
    * @param {boolean} options.useDefaultCharacter           Whether other users should use their assigned character when rendering the interface
    *
    * @returns {Promise}
    */
   static renderItemPileInterface(target, {
-    userIds = null, inspectingTarget = false, useDefaultCharacter = false
+    userIds = null, inspectingTarget = null, useDefaultCharacter = false
   } = {}) {
 
     const targetDocument = Utilities.getDocument(target);
@@ -1257,6 +1257,12 @@ class API {
       } else {
         userIds = [userIds]
       }
+    } else {
+      userIds = userIds.map(user => {
+        return user instanceof User
+          ? user.id
+          : user;
+      })
     }
 
     if (!game.user.isGM) {

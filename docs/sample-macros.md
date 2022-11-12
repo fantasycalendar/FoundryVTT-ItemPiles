@@ -2,6 +2,18 @@
 
 This page contains a few different macros that you may find useful in your game.
 
+### Show interface of Item Pile or Merchant for all active players
+
+Replace `ACTOR_NAME_HERE` with the actor name of the item pile or merchant you wish to show the interface for.
+
+Remove the `userIds` portion to only show the interface for yourself.
+
+```js
+game.itempiles.API.renderItemPileInterface(game.actors.getName("ACTOR_NAME_HERE"), {
+  userIds: game.users.map(user => user.id)
+});
+```
+
 ### Make tokens lootable
 
 Select tokens, run macro. They can now be looted.
