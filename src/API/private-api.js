@@ -647,7 +647,10 @@ export default class PrivateAPI {
       pileActor = await Actor.create({
         name: actor || "New Item Pile",
         type: Helpers.getSetting("actorClassType"),
-        img: "icons/svg/item-bag.svg",
+        img: "icons/svg/item-bag.svg"
+      });
+
+      await pileActor.update({
         [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
         prototypeToken: {
           name: "Item Pile",
@@ -659,7 +662,7 @@ export default class PrivateAPI {
           ...tokenOverrides
         },
         ...actorOverrides
-      });
+      })
 
     } else if (!actor) {
 
@@ -681,7 +684,10 @@ export default class PrivateAPI {
         pileActor = await Actor.create({
           name: "Default Item Pile",
           type: Helpers.getSetting("actorClassType"),
-          img: "icons/svg/item-bag.svg",
+          img: "icons/svg/item-bag.svg"
+        });
+
+        await pileActor.update({
           [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
           prototypeToken: {
             name: "Item Pile",
@@ -691,7 +697,7 @@ export default class PrivateAPI {
             displayName: 50,
             [CONSTANTS.FLAGS.PILE]: pileDataDefaults
           }
-        });
+        })
 
         await game.settings.set(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", pileActor.id);
 
@@ -1033,24 +1039,32 @@ export default class PrivateAPI {
 
     if (!PileUtilities.isValidItemPile(target)) return false;
 
+    const pileData = PileUtilities.getActorFlagData(target);
+
+    if (!pileData.macro) return false;
+
     // Reformat macro data to contain useful information
     if (macroData.source) {
       macroData.source = fromUuidSync(macroData.source);
     }
 
-    if (macroData.target) {
-      macroData.target = fromUuidSync(macroData.target);
+    if (Array.isArray(macroData.target)) {
+
+      macroData.target = macroData.target.map(target => fromUuidSync(target));
+
+    } else {
+
+      if (macroData.target) {
+        macroData.target = fromUuidSync(macroData.target);
+      }
+
+      const targetActor = macroData.target instanceof TokenDocument ? macroData.target.actor : macroData.target;
+
+      if (macroData.items) {
+        macroData.items = macroData.items.map(item => targetActor.items.get(item._id));
+      }
+
     }
-
-    const targetActor = macroData.target instanceof TokenDocument ? macroData.target.actor : macroData.target;
-
-    if (macroData.items) {
-      macroData.items = macroData.items.map(item => targetActor.items.get(item._id));
-    }
-
-    const pileData = PileUtilities.getActorFlagData(target);
-
-    if (!pileData.macro) return false;
 
     return Utilities.runMacro(pileData.macro, macroData)
 
@@ -1262,7 +1276,7 @@ export default class PrivateAPI {
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DROP_ITEMS, {
       userId: game.user.id,
-      sceneId: canvas.scene.id,
+      sceneId: canvas?.scene?.id ?? "",
       sourceUuid: Utilities.getUuid(dropData.source),
       targetUuid: Utilities.getUuid(dropData.target),
       position: dropData.position,
@@ -1445,7 +1459,7 @@ export default class PrivateAPI {
     for (const [uuid, transaction] of transactionMap) {
 
       if (pileData.shareItemsEnabled) {
-        await transaction.appendItemChanges(preparedData.itemDeltas.filter(delta => delta.type === "item").map(delta => {
+        await transaction.appendItemChanges(deepClone(preparedData).itemDeltas.filter(delta => delta.type === "item").map(delta => {
           delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
             players: numPlayers,
             shareData: shareData,
@@ -1456,7 +1470,7 @@ export default class PrivateAPI {
       }
 
       if (pileData.shareCurrenciesEnabled) {
-        await transaction.appendItemChanges(preparedData.itemDeltas.filter(delta => delta.type === "currency").map(delta => {
+        await transaction.appendItemChanges(deepClone(preparedData).itemDeltas.filter(delta => delta.type === "currency").map(delta => {
           delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
             players: numPlayers,
             shareData: shareData,
@@ -1465,7 +1479,7 @@ export default class PrivateAPI {
           return delta;
         }), { type: "currency" });
 
-        await transaction.appendActorChanges(Object.entries(preparedData.attributeDeltas).map(entry => {
+        await transaction.appendActorChanges(Object.entries(deepClone(preparedData).attributeDeltas).map(entry => {
           let [path] = entry;
           const quantity = SharingUtilities.getAttributeSharesLeftForActor(itemPileActor, path, transaction.actor, {
             players: numPlayers,

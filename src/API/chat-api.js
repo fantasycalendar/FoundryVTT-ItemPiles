@@ -162,10 +162,10 @@ export default class ChatAPI {
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, currencyData, userId, interactionId);
   }
 
-  static _outputSplitItemPileInventory(source, transferData, userId) {
+  static _outputSplitItemPileInventory(source, pileDeltas, actorDeltas, userId) {
     if (!PileUtilities.isValidItemPile(source)) return;
     if (game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_CHAT_MESSAGE, source.uuid, transferData, userId);
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_CHAT_MESSAGE, source.uuid, pileDeltas, actorDeltas, userId);
   }
 
   static async _outputTradeStarted(party_1, party_2, publicTradeId, isPrivate) {
@@ -189,16 +189,17 @@ export default class ChatAPI {
    * Formats item data to a chat friendly structure
    *
    * @param items
+   * @param divideBy
    * @returns {Promise<Array>}
    */
-  static async _formatItemData(items) {
+  static async _formatItemData(items, divideBy = 1) {
     const formattedItems = [];
     for (const itemData of items) {
       const tempItem = await Item.implementation.create(itemData.item, { temporary: true });
       formattedItems.push({
         name: game.i18n.localize(tempItem.name),
         img: itemData.item.img ?? "",
-        quantity: itemData.quantity
+        quantity: Math.abs(itemData.quantity) / divideBy
       });
     }
     return formattedItems;
@@ -209,16 +210,17 @@ export default class ChatAPI {
    *
    * @param itemPile
    * @param currencies
+   * @param divideBy
    * @returns {Array}
    */
-  static _formatCurrencyData(itemPile, currencies) {
+  static _formatCurrencyData(itemPile, currencies, divideBy = 1) {
     const currencyList = PileUtilities.getActorCurrencies(itemPile, { getAll: true });
     return Object.entries(currencies).map(entry => {
       const currency = currencyList.find(currency => currency.id === entry[0]);
       return {
         name: game.i18n.localize(currency.name),
         img: currency.img ?? "",
-        quantity: entry[1],
+        quantity: Math.abs(entry[1]) / divideBy,
         index: currencyList.indexOf(currency)
       }
     });
@@ -323,17 +325,22 @@ export default class ChatAPI {
 
   }
 
-  static async _outputSplitToChat(sourceUuid, transferData, userId) {
+  static async _outputSplitToChat(sourceUuid, pileDeltas, actorDeltas, userId) {
 
-    const source = await fromUuid(sourceUuid);
+    const source = fromUuidSync(sourceUuid);
 
     const sourceActor = source?.actor ?? source;
 
+    const divideBy = Object.values(actorDeltas).length;
+
+    const items = await this._formatItemData(pileDeltas.itemDeltas, divideBy);
+    const currencies = this._formatCurrencyData(sourceActor, pileDeltas.attributeDeltas, divideBy);
+
     const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/looted.html", {
-      message: game.i18n.format("ITEM-PILES.Chat.Split", { num_players: transferData.num_players }),
+      message: game.i18n.format("ITEM-PILES.Chat.Split", { num_players: divideBy }),
       itemPile: sourceActor,
-      items: transferData.items,
-      currencies: transferData.currencies
+      items: items,
+      currencies: currencies
     });
 
     return this._createNewChatMessage(userId, {
@@ -373,7 +380,7 @@ export default class ChatAPI {
 
     if (party_1.user !== game.user.id) return;
 
-    let party_1_actor = await fromUuid(party_1.actor);
+    let party_1_actor = fromUuidSync(party_1.actor);
     party_1_actor = party_1_actor?.actor ?? party_1_actor;
     const party_1_data = {
       actor: party_1_actor,
@@ -382,7 +389,7 @@ export default class ChatAPI {
     }
     party_1_data.got_nothing = !party_1_data.items.length && !party_1_data.currencies.length;
 
-    let party_2_actor = await fromUuid(party_2.actor);
+    let party_2_actor = fromUuidSync(party_2.actor);
     party_2_actor = party_2_actor?.actor ?? party_2_actor;
     const party_2_data = {
       actor: party_2_actor,
