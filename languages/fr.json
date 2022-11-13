@@ -401,7 +401,8 @@
       "BuyServices": "Acheter des services",
       "OtherTypes": {
         "item-piles-service": "Service"
-      }
+      },
+      "NoMatchFound": "Rien ne correspond à votre recherche"
     },
     "Applications": {
       "DropItem": {
