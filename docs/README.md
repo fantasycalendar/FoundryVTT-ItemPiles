@@ -89,8 +89,7 @@ module settings to configure that.
 
 ## Semi-supported systems
 
-- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - While Item Piles _works_ in this system, item piles is not
-  strictly needed as PF2e already has a robust loot actor & token system, and feature rich systems.
+- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - Major features for Item Piles does not work in this system, such as dropping items on scenes to create item piles, and dropping items on tokens to give it to them. Merchants and existing piles still work, but it is not a However, it is not strictly needed as PF2e already has a loot actor.
 
 ## Issues
 

@@ -1,14 +1,17 @@
 # Creating item piles
 
-When you first drag and drop an item on the canvas, you will be prompted by a dialog whether you want to create a new
-item pile. Holding **Left Alt** before drag and dropping will immediately create the default item pile.
+## How does Item Piles work?
 
-![Dropping an item in the scene](images/wiki-drop.jpg)
+When you first drag out an item onto the scene, the module will create the `Default Item Pile` actor in your sidebar.
+
+**Note:** This actor acts as the default behavior of the all item piles created by dragging and dropping items onto scenes.
 
 As a GM, you can configure the default item pile, but keep in mind that the default item pile is designed to be
 temporary and used by players, so modifying it comes with risks and unintended behavior. If you want to experiment with
 different item pile setups, duplicate the default item pile, and then configure it by opening the actor sheet and
 clicking on "Item Pile" in the sheet's the header bar.
+
+![Dropping an item in the scene](images/wiki-drop.jpg)
 
 ### Avoid changing the default item pile
 
