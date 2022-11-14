@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.2.13
+
+- Fixed dropping items onto the scene would create empty item pile
+- Fixed splitting item pile contents among players not working
+
 ## Version 2.2.12
 
 - Fixed search not working in merchants
