@@ -13,6 +13,7 @@
     * [Credits](README.md#credits)
 
 * [Creating item piles](creating-item-piles.md)
+    * [How does item piles work?](creating-item-piles.md#how-does-item-piles-work)
     * [Adding items to existing item piles](creating-item-piles.md#adding-items-to-existing-item-piles)
     * [Inspecting pile as character](creating-item-piles.md#inspecting-pile-as-character)
     * [Modifying default sharing behavior](creating-item-piles.md#modifying-default-sharing-behavior)
