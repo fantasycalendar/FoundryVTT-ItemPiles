@@ -19,6 +19,7 @@
     * [Modifying default sharing behavior](creating-item-piles.md#modifying-default-sharing-behavior)
 
 * [Sample Macros](sample-macros.md)
+    * [Show interface of Item Pile](sample-macros.md#show-interface-of-item-pile-or-merchant-for-all-active-players)
     * [Make tokens lootable](sample-macros.md#make-tokens-lootable)
     * [Revert tokens from being lootable](sample-macros.md#revert-tokens-from-being-lootable)
     * [Populate loot via table](sample-macros.md#populate-loot-via-table)
