@@ -63,6 +63,8 @@ Hooks.once("ready", async () => {
 
   // new SettingsShim().render(true)
 
+  game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"))
+
 });
 
 Hooks.once(HOOKS.READY, () => {

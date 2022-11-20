@@ -140,9 +140,11 @@
       "AddItem": "Add",
       "RemoveItem": "Remove",
       "ItemFree": "Free",
+      "RollableTables": "Rollable Tables",
       "OtherTypes": {
         "item-piles-service": "Service"
-      }
+      },
+      "AddTable": "Add Table"
     },
     "Dialogs": {
       "TypeWarning": {
