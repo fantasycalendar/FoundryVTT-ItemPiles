@@ -708,11 +708,11 @@ class API {
       }
 
       if (itemData?.quantity !== undefined) {
-        Utilities.setItemQuantity(item, itemData.quantity);
+        Utilities.setItemQuantity(item, itemData.quantity, true);
       }
 
       const existingItems = mergeSimilarItems ? Utilities.findSimilarItem(itemsToAdd, item) : false;
-      if (existingItems) {
+      if (existingItems && Utilities.hasItemQuantity(item)) {
         Utilities.setItemQuantity(existingItems, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item));
       } else {
         itemsToAdd.push(item);
@@ -720,9 +720,7 @@ class API {
 
     });
 
-    if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
-    }
+    if (interactionId && typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, {
       removeExistingActorItems,
@@ -745,7 +743,7 @@ class API {
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`removeItems | Could not determine the UUID, please provide a valid target`, true);
 
-    const targetActorItems = this.getActorItems(target);
+    const targetActorItems = PileUtilities.getActorItems(target, { getItemCurrencies: true });
 
     items = items.map(itemData => {
 
@@ -799,7 +797,7 @@ class API {
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid source`, true)
 
-    const sourceActorItems = PileUtilities.getActorItems(source);
+    const sourceActorItems = PileUtilities.getActorItems(source, { getItemCurrencies: true });
 
     items = items.map(itemData => {
 

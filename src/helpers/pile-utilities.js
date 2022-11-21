@@ -84,14 +84,15 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
 }
 
-export function getActorItems(target, { itemFilters = false } = {}) {
+export function getActorItems(target, { itemFilters = false, getItemCurrencies = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorItemFilters = itemFilters ? cleanItemFilters(itemFilters) : getActorItemFilters(actor);
   const currencies = getActorCurrencies(actor, { getAll: true }).map(entry => entry.id);
-  return actor.items.filter(item => currencies.indexOf(item.id) === -1 && !isItemInvalid(actor, item, actorItemFilters));
+  return actor.items.filter(item => (getItemCurrencies || currencies.indexOf(item.id) === -1) && !isItemInvalid(actor, item, actorItemFilters));
 }
 
 export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
+
   const actor = Utilities.getActor(target);
   const actorItems = Array.from(actor.items);
   currencyList = currencyList || getActorCurrencyList(forActor || actor);
@@ -107,7 +108,11 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
     }
     const item = Utilities.findSimilarItem(actorItems, currency.data.item);
     return {
-      ...currency, quantity: item ? Utilities.getItemQuantity(item) : 0, id: item?.id || null, item, index
+      ...currency,
+      quantity: item ? Utilities.getItemQuantity(item) : 0,
+      id: item?.id || null,
+      item,
+      index
     }
   });
   if (!getAll) {

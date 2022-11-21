@@ -11,8 +11,8 @@ export default class Transaction {
     this.itemsToCreate = [];
     this.itemsToUpdate = [];
     this.itemsToDelete = [];
+    this.itemsToForceDelete = new Set();
     this.itemsToNotDelete = new Set();
-    this.itemsDeleted = new Map();
     this.actorUpdates = {};
     this.attributeDeltas = new Map();
     this.attributeTypeMap = new Map();
@@ -23,6 +23,7 @@ export default class Transaction {
 
   async appendItemChanges(items, { remove = false, type = "item", removeIfZero = true } = {}) {
     for (let data of items) {
+
       let item = data.item ?? data;
       let itemData = item instanceof Item ? item.toObject() : foundry.utils.duplicate(item);
       if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
@@ -30,7 +31,24 @@ export default class Transaction {
       }
       const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
       const actorExistingItem = Utilities.findSimilarItem(this.actor.items, itemData);
-      if (actorExistingItem) {
+      const itemHasQuantity = hasProperty(actorExistingItem ?? itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE);
+
+      if (!itemHasQuantity) {
+
+        if (remove && actorExistingItem) {
+          this.itemTypeMap.set(actorExistingItem.id, type)
+          this.itemsToForceDelete.add(actorExistingItem.id);
+          this.itemDeltas.set(actorExistingItem.id, -1);
+        } else {
+          if (!itemData._id) {
+            itemData._id = randomID();
+          }
+          this.itemTypeMap.set(itemData._id, type)
+          this.itemsToCreate.push(itemData);
+        }
+
+      } else if (actorExistingItem) {
+
         const existingItemUpdate = remove ? this.itemsToUpdate.find(item => item._id === itemData._id) : Utilities.findSimilarItem(this.itemsToUpdate, itemData);
         if (!removeIfZero && type !== "currency") {
           this.itemsToNotDelete.add(item.id);
@@ -57,6 +75,7 @@ export default class Transaction {
         if (!itemData._id) {
           itemData._id = randomID();
         }
+
         const existingItemCreation = Utilities.findSimilarItem(this.itemsToCreate, itemData);
         if (existingItemCreation) {
           const newQuantity = Utilities.getItemQuantity(existingItemCreation) + incomingQuantity;
@@ -94,11 +113,11 @@ export default class Transaction {
       return Number(getProperty(this.actor, entry[0])) !== entry[1];
     }))
     this.itemsToCreate = this.itemsToCreate.filter(item => {
-      return Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
+      return !Utilities.hasItemQuantity(item) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
     });
     this.itemsToDelete = this.itemsToUpdate.filter(item => {
       return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
-    }).map(item => item._id);
+    }).map(item => item._id).concat(Array.from(this.itemsToForceDelete));
 
     for (const itemId of this.itemsToDelete) {
       if (this.itemsToNotDelete.has(itemId)) {
@@ -109,16 +128,12 @@ export default class Transaction {
     this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
       const item = this.actor.items.get(id).toObject();
       const type = this.itemTypeMap.get(id);
-      Utilities.setItemQuantity(item, quantity);
+      Utilities.setItemQuantity(item, quantity, true);
       return { item, quantity, type };
-    });
-    this.itemsDeleted = Array.from(this.itemsDeleted).map(([id, quantity]) => {
-      const item = this.actor.items.get(id).toObject();
-      const type = this.itemTypeMap.get(id);
-      return { item, quantity, type };
-    });
+    }).filter(delta => delta.quantity);
+
     this.itemsToUpdate = this.itemsToUpdate
-      .filter(item => Utilities.getItemQuantity(item) > 0 || this.itemsToNotDelete.has(item._id))
+      .filter(item => Utilities.getItemQuantity(item) > 0 || this.itemsToNotDelete.has(item._id) || this.itemTypeMap.get(item._id) === "currency")
       .filter(itemData => {
         const item = this.actor.items.get(itemData._id)
         return Utilities.getItemQuantity(item) !== Utilities.getItemQuantity(itemData);
@@ -130,7 +145,6 @@ export default class Transaction {
       itemsToCreate: this.itemsToCreate,
       itemsToDelete: this.itemsToDelete,
       itemsToUpdate: this.itemsToUpdate,
-      itemsDeleted: this.itemsDeleted,
       attributeDeltas: this.attributeDeltas,
       itemDeltas: this.itemDeltas,
     }
@@ -155,7 +169,7 @@ export default class Transaction {
       itemDeltas: this.itemDeltas.concat(itemsCreated.map(item => {
         return {
           item,
-          quantity: Utilities.getItemQuantity(item)
+          quantity: Utilities.hasItemQuantity(item) ? Utilities.getItemQuantity(item) : 1
         }
       }))
     }

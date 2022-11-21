@@ -44,6 +44,20 @@ export const hooks = {
   }
 }
 
+/**
+ *  This function determines if the given parameter is a callable function
+ *
+ * @param  {function}   inFunc    The function object to be tested
+ * @return {boolean}              A boolean whether the function is actually a function
+ */
+export function isFunction(inFunc) {
+  return inFunc && (
+    {}.toString.call(inFunc) === '[object Function]'
+    ||
+    {}.toString.call(inFunc) === '[object AsyncFunction]'
+  );
+}
+
 export function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }

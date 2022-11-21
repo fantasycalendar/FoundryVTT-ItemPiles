@@ -11,13 +11,25 @@
   const editQuantities = store.editQuantities;
 
   async function addCurrency() {
-    const result = await DropCurrencyDialog.show(store.recipient, store.actor);
+
+    const result = store.recipient
+      ? await DropCurrencyDialog.show(store.recipient, store.actor)
+      : await DropCurrencyDialog.show(store.actor, false, { unlimitedCurrencies: true });
+
     if (!result) return;
-    if (!foundry.utils.isEmpty(result.attributes)) {
-      await game.itempiles.API.transferAttributes(store.recipient, store.actor, result.attributes, { interactionId: store.interactionId })
-    }
-    if (result.items.length) {
-      await game.itempiles.API.transferItems(store.recipient, store.actor, result.items, { interactionId: store.interactionId })
+
+    if (!store.recipient) {
+
+      await game.itempiles.API.addItems(store.actor, result.items);
+
+    } else {
+
+      if (!foundry.utils.isEmpty(result.attributes)) {
+        await game.itempiles.API.transferAttributes(store.recipient, store.actor, result.attributes, { interactionId: store.interactionId })
+      }
+      if (result.items.length) {
+        await game.itempiles.API.transferItems(store.recipient, store.actor, result.items, { interactionId: store.interactionId })
+      }
     }
   }
 
@@ -29,12 +41,10 @@
     {#if $numCurrencies > 0 || $numItems > 0}
       <h3>{localize("ITEM-PILES.Currencies")}:</h3>
     {/if}
-    {#if store.recipient}
-      <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
-         on:click={addCurrency}>
-        <i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
-      </a>
-    {/if}
+    <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
+       on:click={addCurrency}>
+      <i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
+    </a>
   </div>
   {#if $numCurrencies > 0 || editQuantities}
     <div>

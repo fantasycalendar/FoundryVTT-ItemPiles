@@ -420,12 +420,12 @@ export default class TradeAPI {
 
     const itemsToAdd = updates.add.items.map(entry => {
       const itemData = updates.targetActor.items.get(entry.id).toObject();
-      return Utilities.setItemQuantity(itemData, entry.quantity);
+      return Utilities.setItemQuantity(itemData, entry.quantity, true);
     });
 
     const itemsToRemove = updates.remove.items.map(entry => {
       const itemData = updates.sourceActor.items.get(entry.id).toObject();
-      return Utilities.setItemQuantity(itemData, entry.quantity);
+      return Utilities.setItemQuantity(itemData, entry.quantity, true);
     });
 
     const transaction = new Transaction(updates.sourceActor);

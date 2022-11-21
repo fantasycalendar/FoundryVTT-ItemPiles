@@ -119,9 +119,9 @@ export default class ItemPileStore {
     PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
       if (currency.type === "item") {
         if (!currency.item) return;
-        items.push(new this.ItemClass(this, currency.item ?? currency.data));
+        items.push(new this.ItemClass(this, currency.item ?? currency.data, true));
       } else {
-        attributes.push(new this.AttributeClass(this, currency));
+        attributes.push(new this.AttributeClass(this, currency, true));
       }
     });
 
@@ -265,7 +265,9 @@ export default class ItemPileStore {
       if (itemQuantity === 0) {
         itemsToDelete.push(item.id);
       } else {
-        itemsToUpdate.push(Utilities.setItemQuantity({ _id: item.id }, itemQuantity));
+        if (Utilities.hasItemQuantity(item.item)) {
+          itemsToUpdate.push(Utilities.setItemQuantity({ _id: item.id }, itemQuantity));
+        }
       }
     }
 

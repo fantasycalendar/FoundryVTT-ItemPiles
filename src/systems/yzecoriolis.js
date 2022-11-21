@@ -3,23 +3,19 @@ export default {
   "VERSION": "1.0.0",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
-  "ACTOR_CLASS_TYPE": "character",
+  "ACTOR_CLASS_TYPE": "npc",
 
   // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
   "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
 
   // The item price attribute is the path to the attribute on each item that determine how much it costs
-  "ITEM_PRICE_ATTRIBUTE": "system.price.market",
+  "ITEM_PRICE_ATTRIBUTE": "system.cost",
 
-  // Item filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
+  // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "role,skill,criticalInjury"
-    },
-    {
-      "path": "system.type",
-      "filters": "cyberwareInternal,cyberwareExternal,fashionware"
+      "filters": "injury, shipProblem, shipCriticalDamage, shipLogbook"
     }
   ],
 
@@ -32,14 +28,16 @@ export default {
   "CURRENCIES": [
     {
       type: "attribute",
-      name: "CPR.characterSheet.rightPane.eurobucks.eurobucks",
-      img: "",
-      abbreviation: "{#}€$",
+      name: "YZECORIOLIS.Birr",
+      img: "icons/commodities/currency/coin-inset-insect-gold.webp",
+      abbreviation: "{#}B",
       data: {
-        path: "system.wealth.value"
+        path: "system.birr",
       },
       primary: true,
       exchangeRate: 1
     }
-  ]
+  ],
+
+  "CURRENCY_DECIMAL_DIGITS": 0.01
 }

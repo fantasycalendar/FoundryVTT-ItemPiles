@@ -52,39 +52,44 @@
   <div class="item-piles-name">
     <div class="item-piles-name-container">
       <p class:item-piles-clickable-link="{canInspectItems}" on:click={previewItem}>{$name}</p>
-      {#if !editQuantities}
+      {#if !editQuantities && entry.canStack}
         <span class="item-piles-small-text">(x{$quantity})</span>
       {/if}
     </div>
   </div>
 
-  <div class="item-piles-quantity-container" style="flex:2.5;">
+  {#if entry.canStack || !entry.id}
 
-    {#if editQuantities}
+    <div class="item-piles-quantity-container" style="flex:2.5;">
 
-      <div class="item-piles-quantity-input-container">
-        <input class="item-piles-quantity" type="number" min="0" bind:value="{$quantity}"/>
-      </div>
+      {#if editQuantities}
 
-    {:else}
-
-      {#if $quantityLeft}
         <div class="item-piles-quantity-input-container">
-          <input class="item-piles-quantity" type="number" min="1" bind:value="{$currentQuantity}"
-                 max="{$quantity}" disabled="{!$quantity}"/>
-
-          <span class="item-piles-input-divider" class:item-piles-text-right={!store.recipient}>
-             / {$quantityLeft}
-          </span>
+          <input class="item-piles-quantity" type="number" min="0" bind:value="{$quantity}"
+                 draggable="true" on:dragstart|stopPropagation|preventDefault/>
         </div>
-      {:else}
-        <span>
-          {localize(`ITEM-PILES.Inspect.${entry.toShare ? "NoShareLeft" : "NoneLeft"}`)}
-        </span>
-      {/if}
-    {/if}
 
-  </div>
+      {:else}
+
+        {#if $quantityLeft}
+          <div class="item-piles-quantity-input-container">
+            <input class="item-piles-quantity" type="number" min="1" bind:value="{$currentQuantity}"
+                   max="{$quantity}" disabled="{!$quantity}"/>
+
+            <span class="item-piles-input-divider" class:item-piles-text-right={!store.recipient}>
+               / {$quantityLeft}
+            </span>
+          </div>
+        {:else}
+          <span>
+            {localize(`ITEM-PILES.Inspect.${entry.toShare ? "NoShareLeft" : "NoneLeft"}`)}
+          </span>
+        {/if}
+      {/if}
+
+    </div>
+
+  {/if}
 
   {#if !editQuantities}
 
@@ -96,7 +101,18 @@
       {localize("ITEM-PILES.Inspect.Take")}
     </button>
 
+  {:else if !entry.canStack && !entry.isCurrency}
+
+    <button
+      on:click={() => { entry.remove() }}
+      class="item-piles-item-take-button"
+      type="button"
+      disabled={!$quantityLeft}>
+      {localize("Remove")}
+    </button>
+
   {/if}
+
 
 </div>
 

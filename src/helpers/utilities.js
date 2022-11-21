@@ -100,10 +100,13 @@ export function hasItemQuantity(item) {
  *
  * @param {Object} itemData
  * @param {Number} quantity
+ * @param {Boolean} requiresExistingQuantity
  * @returns {Object}
  */
-export function setItemQuantity(itemData, quantity) {
-  setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity)
+export function setItemQuantity(itemData, quantity, requiresExistingQuantity = false) {
+  if (!requiresExistingQuantity || hasItemQuantity(itemData)) {
+    setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity)
+  }
   return itemData;
 }
 

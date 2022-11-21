@@ -591,7 +591,7 @@ export default class PrivateAPI {
       } else {
         itemsDropped = (await this._removeItems(sourceUuid, itemsToTransfer, userId)).map(item => {
           item.quantity = Math.abs(item.quantity)
-          Utilities.setItemQuantity(item.item, Math.abs(item.quantity));
+          Utilities.setItemQuantity(item.item, Math.abs(item.quantity), true);
           return item;
         });
         targetUuid = await this._createItemPile({ sceneId, position, items: itemsDropped });
@@ -788,6 +788,10 @@ export default class PrivateAPI {
       const targetCurrencies = PileUtilities.getActorCurrencies(target, { currencyList: pileSettings.overrideCurrencies });
 
       const data = { data: pileSettings, items: targetItems, currencies: targetCurrencies };
+
+      if (Helpers.isFunction(tokenSettings)) {
+        tokenSettings = await tokenSettings(target);
+      }
 
       tokenSettings = foundry.utils.mergeObject(tokenSettings, {
         "img": PileUtilities.getItemPileTokenImage(target, data, tokenSettings?.img),
@@ -1183,10 +1187,14 @@ export default class PrivateAPI {
     if (user?.active || gms.length || game.user.isGM) {
 
       const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
-      const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
 
-      Utilities.setItemQuantity(dropData.itemData.item, quantity);
-      dropData.itemData.quantity = quantity;
+      if (Utilities.hasItemQuantity(dropData.itemData.item)) {
+        const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
+        Utilities.setItemQuantity(dropData.itemData.item, quantity);
+        dropData.itemData.quantity = quantity;
+      } else {
+        dropData.itemData.quantity = 1;
+      }
 
       const sourceUuid = Utilities.getUuid(dropData.source);
       const targetUuid = Utilities.getUuid(dropData.target);
@@ -1251,24 +1259,26 @@ export default class PrivateAPI {
       }
     }
 
-    if (hotkeyState.altDown) {
+    if (Utilities.hasItemQuantity(dropData.itemData.item)) {
+      if (hotkeyState.altDown) {
 
-      Utilities.setItemQuantity(dropData.itemData.item, 1);
-      dropData.itemData.quantity = 1;
+        Utilities.setItemQuantity(dropData.itemData.item, 1);
+        dropData.itemData.quantity = 1;
 
-    } else {
+      } else {
 
-      let quantity = Utilities.getItemQuantity(dropData.itemData.item);
+        let quantity = Utilities.getItemQuantity(dropData.itemData.item);
 
-      if (quantity > 1) {
-        const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
-        quantity = await DropItemDialog.show(item, dropData.target);
-        if (!quantity) return;
+        if (quantity > 1) {
+          const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+          quantity = await DropItemDialog.show(item, dropData.target);
+          if (!quantity) return;
+        }
+
+        Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
+        dropData.itemData.quantity = Number(quantity);
+
       }
-
-      Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
-      dropData.itemData.quantity = Number(quantity);
-
     }
 
     const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
@@ -1420,25 +1430,26 @@ export default class PrivateAPI {
     const numPlayers = actorUuids.length;
 
     if (pileData.shareItemsEnabled) {
-      await tempPileTransaction.appendItemChanges(items.map(item => {
+      const itemsToRemove = items.map(item => {
         const itemData = item.toObject();
         const quantity = Math.floor(Utilities.getItemQuantity(itemData) / numPlayers) * numPlayers;
         return {
           item: itemData,
           quantity
         }
-      }), { remove: true });
+      }).filter(entry => entry.quantity);
+      await tempPileTransaction.appendItemChanges(itemsToRemove, { remove: true });
     }
 
     if (pileData.shareCurrenciesEnabled) {
-      const currencyItems = currencies.filter(entry => entry.type === "item").map(item => {
-        const itemData = item.toObject();
+      const currencyItems = currencies.filter(entry => entry.type === "item").map(entry => {
+        const itemData = entry.item.toObject();
         const quantity = Math.floor(Utilities.getItemQuantity(itemData) / numPlayers) * numPlayers;
         return {
           item: itemData,
           quantity
         }
-      });
+      }).filter(entry => entry.quantity);
       await tempPileTransaction.appendItemChanges(currencyItems, { remove: true, type: "currency" });
 
       const attributes = currencies.filter(entry => entry.type === "attribute").map(attribute => {
