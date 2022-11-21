@@ -4,8 +4,8 @@
     "Currencies": "Währungen",
     "Currency": "Währung",
     "ContextMenu": {
-      "ShowToPlayers": "Item Piles: Zeige Stapel den Spielern",
-      "RequestTrade": "Item Piles: Handelsanfrage"
+      "ShowToPlayers": "Spielern anzeigen",
+      "RequestTrade": "Tausch anfragen"
     },
     "Inspect": {
       "Title": "Untersuche Gegenstandstapel",
@@ -45,7 +45,10 @@
         "PickedActor": "Der Akteur der in diesem Handel rerpäsentiert wird:",
         "PickToken": "Wähle den aktuell ausgewählten Token",
         "DropActor": "Akteur hierher ziehen",
-        "Label": "Handelsanfrage senden"
+        "Label": "Handelsanfrage senden",
+        "PrivateContent": "{trading_actor_name} (Spieler {trading_user_name}) möchte <strong>privat</strong> mit dir handeln.",
+        "AcceptQuery": "Akzeptieren?",
+        "Content": "{trading_actor_name} (Spieler {trading_user_name}) möchte mit dir handeln."
       },
       "NoActiveUsers": {
         "Title": "Item Piles: Keine aktiven Spieler",
@@ -55,7 +58,13 @@
         "Title": "Item Piles: Handelsanfrage",
         "Content": "{trading_actor_name} (user {trading_user_name}) möchte mit dir handeln.",
         "PrivateContent": "{trading_actor_name} (user {trading_user_name}) möchte <strong>privat</strong> mit dir handeln.",
-        "AcceptQuery": "Akzeptieren?"
+        "AcceptQuery": "Akzeptieren?",
+        "PickActor": "Wähle den Akteur aus, welchen du repräsentieren möchtest:",
+        "PickedActor": "Du wirst als der folgende Akteur handeln:",
+        "DropActor": "Ziehe einen Akteur hier hin",
+        "User": "Wähle den Spieler aus, mit dem du handeln möchtest:",
+        "PickToken": "Wähle einen der markierten Token aus",
+        "Label": "Sende Handelsanfrage"
       },
       "OngoingRequest": {
         "Content": "Warte auf Antwort von {user_name}...",
@@ -79,15 +88,17 @@
       "Disconnected": "Die Verbindung von einem der Spieler wurde unterbrochen und der Handel wurde abgebrochen.",
       "UserCharacterWarning": "Du hast den Akteur \"{actor_name}\" ausgewählt. Dieser gehört dem Spieler \"{player_name}\".<br><br>Möchtest du trotzdem fortfahren?",
       "UserActiveCharacterWarning": "Du hast den Akteur \"{actor_name}\" ausgewählt. Dieser gehört dem Spieler \"{player_name}\", welcher gerade <strong>aktiv</strong> ist.<br><br>Möchtest du trotzdem fortfahren?",
-      "ActorOwnerWarning": "Dieser Akteur gehört dir nicht. Du kannst ihn nicht für einen Handel benutzen."
+      "ActorOwnerWarning": "Dieser Akteur gehört dir nicht. Du kannst ihn nicht für einen Handel benutzen.",
+      "SameActor": "Beide Spieler haben denselben Charakter gewählt - du kannst nicht von UND zu demselben Charakter tauschen."
     },
     "Errors": {
-      "DisallowedItemDrop": "Du kannst keinen Gegenstand vom Typ \"{type}\" hier fallen lassen.",
+      "DisallowedItemDrop": "Du kannst keinen Gegenstand vom Typ \"{type}\" hier ablegen",
       "DisallowedItemTrade": "Du kannst keine \"{type}\"-Gegenstände handeln",
       "NoSourceDrop": "Du kannst keine Gegenstände aus der Gegenstandsleiste fallen lassen, es sei denn, du bist ein GM.",
-      "PileTooFar": "Du bist zu weit entfernt um mit dem Stapel zu interagieren",
-      "PileLocked": "Dieser Stapel ist gesperrt und verschlossen - du kannst keine Gegenstände hier fallen lassen.",
-      "DropNoToken": "Du hast kein Token in dieser Szene, daher kannst du hier keinen Gegenstand fallen lassen."
+      "PileTooFar": "Du bist zu weit entfernt, um mit dem Stapel zu interagieren.",
+      "PileLocked": "Dieser Stapel ist gesperrt und kann auch nicht geöffnet werden - du kannst keine Gegenstände ablegen.",
+      "DropNoToken": "Du hast kein Token in dieser Szene, daher kannst du hier keinen Gegenstand fallen lassen.",
+      "DisallowedItemSell": "Dieser Händler akzeptiert Gegenstände vom Typ \"{type}\" nicht"
     },
     "Dialogs": {
       "DropTypeWarning": {
@@ -105,7 +116,7 @@
       },
       "LinkedActorWarning": {
         "Title": "Gegenstandsstapel & verlinkter Akteur",
-        "Content": "Bist du sicher das du diesen <strong>verlinkten Akteuer</strong> in einen Gegenstandstapel ändern willst? Alle Akteur-Token bei verlinkten Akteueren teilen sich ein Inventar und Attribute"
+        "Content": "Bist du sicher, dass du diesen <strong>verlinkten Akteuer</strong> in einen Gegenstandsstapel ändern willst? Alle Token des verlinkten Akteuers teilen sich ein Inventar und Währungen."
       },
       "NoSystemFound": {
         "Title": "System nicht erkannt",
@@ -121,7 +132,33 @@
         "Content": "Hierdurch wird die Historie gelöscht, welche Spieler bereits welchen Anteil aus dem Stapel genommen haben. Bist du sicher, dass du das tun möchtest?",
         "Confirm": "Anteil-Daten löschen"
       },
-      "Cancel": "Abbrechen"
+      "Cancel": "Abbrechen",
+      "ReceiveItem": {
+        "ContentOne": "{source_actor_name} möchte den Gegenstand \"{item_name}\" {target_actor_name} übergeben. Stimmst du zu?",
+        "Title": "Gegenstand erhalten",
+        "Header": "Item Piles: Gegenstand erhalten",
+        "ContentMany": "{source_actor_name} möchte den Gegenstand \"{item_name}\" ({quantity}) {target_actor_name} geben. Stimmst du zu?"
+      },
+      "NewSystemVersion": {
+        "Content": "Die Standardeinstellungen, für das System das du benutzt, für Item Piles wurden aktualisiert. Möchtest du deine systemspezifischen Einstellungen überschreiben lassen?",
+        "Title": "Neue Systems-Version",
+        "Content2": "Wenn du das nicht tust, kann das Item Piles kaputt machen. Du kannst die modulspezifischen Einstellungen zurücksetzen um das zu beheben.",
+        "Confirm": "Einstellungen aktualisieren"
+      },
+      "ClearAllItems": {
+        "Content": "Das wird alle Gegenstände des Akteurs entfernen. Bist du dir sicher, dass du das tun möchtest?",
+        "Title": "Alle Gegenstände des Akteurs entfernen"
+      },
+      "GiveItemUserNotActive": {
+        "Content": "\"{actor_name}\" gehört dem Spieler \"{user_name}\". Dieser ist allerdings nicht aktiv, weshalb du ihm jetzt nichts geben kannst.",
+        "Title": "Gegenstand geben"
+      },
+      "TypeWarning": {
+        "Title": "Warnung zum Gegenstandstyp",
+        "TradeContent": "Du versuchst einen Gegenstand der Art \"{type}\" zu handeln. Das ist normalerweise nicht erlaubt. Bist du dir sicher, dass du das tun möchtest?",
+        "DropContent": "Du versuchst einen Gegenstand der Art \"{type}\" abzulegen. Das ist normalerweise nicht möglich. Bist du dir sicher, dass du das tun möchtest?",
+        "SellContent": "Du versuchst einen Gegenstand von der Art \"{type}\" zu verkaufen. Dieser Händler akzeptiert das normalerweise nicht. Bist du dir sicher, dass du das tun möchtest?"
+      }
     },
     "CurrenciesEditor": {
       "Title": "Währungseditor",
@@ -342,11 +379,52 @@
       "Hours": "Stunden",
       "Minutes": "Minuten",
       "Settings": "Einstellungen",
-      "Override": "Überschreiben"
+      "Override": "Überschreiben",
+      "NoItemsToSell": "Du besitzt nichts, was du dem Händler verkaufen könntest",
+      "OpenTimes": "Öffnungszeiten",
+      "Closed": "Geschlossen",
+      "ItemFree": "Kostenlos",
+      "Title": "Händler: {actor_name}",
+      "BuyItems": "Kaufe Gegenstände",
+      "SellItems": "Verkaufe Gegenstände",
+      "PopulateItems": "Gegenstände hinzufügen",
+      "AllTypes": "Alle Arten",
+      "OpenCloseAuto": "Automatisch",
+      "Open": "Offen",
+      "BuyServices": "Kaufe Leistungen",
+      "NoItemsForSale": "Der Händler hat nichts zu verkaufen",
+      "ClearAllItems": "Alle Gegenstände entfernen",
+      "EditTypePricesExplanation": "Stelle die Sichtbarkeit des pro Art-Reglers im Kaufe Gegenstände-Tab ein",
+      "NoMatchFound": "Nichts entspricht deiner Suchanfrage",
+      "MerchantClosed": "Der Händler hat geschlossen. Komm später wieder.",
+      "EditTypePrices": "Editiere Kostenmodifikator pro Art",
+      "BuyNoItems": "Der Händler hat keine Gegenstände",
+      "CurrentItems": "Aktuelle Gegenstände",
+      "NoRollTables": "Es existieren keine Würfeltabellen. Lege eine an, um loszulegen.",
+      "ClickRoll": "Klicke auf Würfeln um loszulegen",
+      "RolledTimes": "{rolls} Mal gewürfelt",
+      "KeepRolled": "Ergebnisse beibehalten",
+      "AddAll": "Alle Gegenstände hinzufügen",
+      "AddItem": "Hinzufügen",
+      "RemoveItem": "Entfernen",
+      "OtherTypes": {
+        "item-piles-service": "Service"
+      }
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile erfolgreich aktualisiert.",
-      "UpdateMerchantSuccess": "Händler erfolgreich aktualisiert."
+      "UpdateMerchantSuccess": "Händler erfolgreich aktualisiert.",
+      "GiveItemAccepted": "{user_name} hat deine Anfrage akzeptiert.",
+      "ShownToPlayers": "Spielern {actor_name} zeigen",
+      "ItemTransferred": "{source_actor_name}'s {item_name} wurde {target_actor_name} gegeben."
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "Spielern anzeigen"
+    },
+    "Warnings": {
+      "GiveItemDeclined": "{user_name} hat dein Angebot abgelehnt.",
+      "NoPlayersActive": "Es sind keine Spieler aktiv, mit denen du diese Aktion durchführen könntest",
+      "GiveItemNoGM": "Es ist kein SL online, der dir diesen Gegenstand geben kann."
     }
   }
 }

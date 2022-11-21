@@ -100,7 +100,8 @@
         "Content": "Espera la respuesta de {user_name}...",
         "Label": "Cancelar petición de comercio"
       },
-      "UserCharacterWarning": "Elegiste al actor \"{actor_name}\", que es el personaje asignado del jugador \"{player_name}\".<br><br>¿Estás seguro de que quieres hacer esto?"
+      "UserCharacterWarning": "Elegiste al actor \"{actor_name}\", que es el personaje asignado del jugador \"{player_name}\".<br><br>¿Estás seguro de que quieres hacer esto?",
+      "SameActor": "Ambos usuarios no pueden elegir el mismo personaje; no puede cambiar a Y desde el mismo personaje. Ya basta."
     },
     "Merchant": {
       "Title": "Mercader: {actor_name}",
@@ -134,7 +135,12 @@
       "Description": "Descripción",
       "EditTypePricesExplanation": "Alterna la visibilidad de los controles deslizantes por-tipo en la pestaña Comprar de Objetos",
       "ClearAllItems": "Borrar Todos los Objetos del Actor",
-      "ItemFree": "Gratis"
+      "ItemFree": "Gratis",
+      "NoMatchFound": "Nada concuerda con tu búsqueda",
+      "BuyServices": "Servicios de Compra",
+      "OtherTypes": {
+        "item-piles-service": "Servicio"
+      }
     },
     "Dialogs": {
       "TypeWarning": {
@@ -281,7 +287,11 @@
         "SelectPreset": "Seleccionar precio preestablecido",
         "NotForSale": "El Objeto No Está a la Venta",
         "NotForSaleExplanation": "Cuando está habilitado, el artículo no está a la venta y no se puede comprar. Aún así aparece en la lista de artículos del mercader, a menos que el artículo esté oculto.",
-        "InfiniteQuantity": "Cantidad Infinita"
+        "InfiniteQuantity": "Cantidad Infinita",
+        "ServiceExplanation": "Esto hace que este artículo no agregue ningún artículo al inventario del comprador. El \"artículo\" del servicio aún puede tener cantidad, pero si se agota, no se eliminará del comerciante, sino que se establecerá como no a la venta.",
+        "Service": "El artículo es servicio",
+        "PurchaseMacro": "Macro de Compra",
+        "PurchaseMacroExplanation": "Nombre de la macro que se ejecutara cuando este artículo sea comprado."
       },
       "FilterEditor": {
         "Title": "Editor de filtros de Item Piles",
@@ -343,7 +353,9 @@
           "InspectItemsExplanation": "Al hacer clic en el nombre del artículo, se abrirá la hoja del artículo.",
           "GridUnits": "Unidades de Cuadrícula (dejar vacía para ♾️)",
           "EditDescriptionExplanation": "Esta descripción se muestra en las interfaces relevantes cuando se visualiza el botín",
-          "OverrideCurrenciesExplanation": "Configura si el botín debería poder transferir monedas además de la predeterminada."
+          "OverrideCurrenciesExplanation": "Configura si el botín debería poder transferir monedas además de la predeterminada.",
+          "DisplayItemTypes": "Separar artículos por tipo de artículos",
+          "DisplayItemTypesExplanation": "Muestre cada tipo de artículo por separado en la pila de artículos, ordenados por su tipo de artículo."
         },
         "Configure": "\"Item Pile\"",
         "SingleItem": {
@@ -550,6 +562,10 @@
         "Title": "Carpeta de Tablas para \"Rellenar Artículos\"",
         "Hint": "Título de la carpeta para filtrar tablas desplegables en la pestaña \"Rellenar Artículos\" del mercader.",
         "AllTables": "Todas las Tablas"
+      },
+      "CurrencyDecimalDigits": {
+        "Title": "Dígitos Decimales de Moneda",
+        "Hint": "Esta configuración define el dígito decimal más bajo al que se redondean sus monedas. Por ejemplo, en un entorno moderno con monedas modernas, '0.01' permite dos dígitos decimales. Esto no se usa si tiene más de una moneda."
       }
     },
     "Items": "Objetos",
