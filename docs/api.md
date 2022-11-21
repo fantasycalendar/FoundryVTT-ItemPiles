@@ -1,59 +1,59 @@
 # API
 
 * [System settings methods](#system-settings-methods)
-    * [ACTOR_CLASS_TYPE](#ACTOR_CLASS_TYPE)
-    * [CURRENCIES](#CURRENCIES)
-    * [CURRENCY_DECIMAL_DIGITS](#CURRENCY_DECIMAL_DIGITS)
-    * [ITEM_PRICE_ATTRIBUTE](#ITEM_PRICE_ATTRIBUTE)
-    * [ITEM_QUANTITY_ATTRIBUTE](#ITEM_QUANTITY_ATTRIBUTE)
-    * [ITEM_FILTERS](#ITEM_FILTERS)
-    * [ITEM_SIMILARITIES](#ITEM_SIMILARITIES)
-    * [setActorClassType](#setActorClassType)
-    * [setCurrencies](#setCurrencies)
-    * [setCurrencyDecimalDigits](#setCurrencyDecimalDigits)
-    * [setItemQuantityAttribute](#setItemQuantityAttribute)
-    * [setItemPriceAttribute](#setItemPriceAttribute)
-    * [setItemFilters](#setItemFilters)
-    * [setItemSimilarities](#setItemSimilarities)
+  * [ACTOR_CLASS_TYPE](#ACTOR_CLASS_TYPE)
+  * [CURRENCIES](#CURRENCIES)
+  * [CURRENCY_DECIMAL_DIGITS](#CURRENCY_DECIMAL_DIGITS)
+  * [ITEM_PRICE_ATTRIBUTE](#ITEM_PRICE_ATTRIBUTE)
+  * [ITEM_QUANTITY_ATTRIBUTE](#ITEM_QUANTITY_ATTRIBUTE)
+  * [ITEM_FILTERS](#ITEM_FILTERS)
+  * [ITEM_SIMILARITIES](#ITEM_SIMILARITIES)
+  * [setActorClassType](#setActorClassType)
+  * [setCurrencies](#setCurrencies)
+  * [setCurrencyDecimalDigits](#setCurrencyDecimalDigits)
+  * [setItemQuantityAttribute](#setItemQuantityAttribute)
+  * [setItemPriceAttribute](#setItemPriceAttribute)
+  * [setItemFilters](#setItemFilters)
+  * [setItemSimilarities](#setItemSimilarities)
 
 
 * [Item piles methods](#item-piles-methods)
-    * [createItemPile](#createItemPile)
-    * [turnTokensIntoItemPiles](#turnTokensIntoItemPiles)
-    * [revertTokensFromItemPiles](#revertTokensFromItemPiles)
-    * [openItemPile](#openItemPile)
-    * [closeItemPile](#closeItemPile)
-    * [toggleItemPileClosed](#toggleItemPileClosed)
-    * [lockItemPile](#lockItemPile)
-    * [unlockItemPile](#unlockItemPile)
-    * [toggleItemPileLocked](#toggleItemPileLocked)
-    * [rattleItemPile](#rattleItemPile)
-    * [isItemPileLocked](#isItemPileLocked)
-    * [isItemPileClosed](#isItemPileClosed)
-    * [isItemPileContainer](#isItemPileContainer)
-    * [updateItemPile](#updateItemPile)
-    * [deleteItemPile](#deleteItemPile)
-    * [splitItemPileContents](#splitItemPileContents)
-    * [renderItemPileInterface](#renderItemPileInterface)
+  * [createItemPile](#createItemPile)
+  * [turnTokensIntoItemPiles](#turnTokensIntoItemPiles)
+  * [revertTokensFromItemPiles](#revertTokensFromItemPiles)
+  * [openItemPile](#openItemPile)
+  * [closeItemPile](#closeItemPile)
+  * [toggleItemPileClosed](#toggleItemPileClosed)
+  * [lockItemPile](#lockItemPile)
+  * [unlockItemPile](#unlockItemPile)
+  * [toggleItemPileLocked](#toggleItemPileLocked)
+  * [rattleItemPile](#rattleItemPile)
+  * [isItemPileLocked](#isItemPileLocked)
+  * [isItemPileClosed](#isItemPileClosed)
+  * [isItemPileContainer](#isItemPileContainer)
+  * [updateItemPile](#updateItemPile)
+  * [deleteItemPile](#deleteItemPile)
+  * [splitItemPileContents](#splitItemPileContents)
+  * [renderItemPileInterface](#renderItemPileInterface)
 
 
 * [Item and attribute methods](#item-and-attribute-methods)
-    * [addItems](#addItems)
-    * [removeItems](#removeItems)
-    * [transferItems](#transferItems)
-    * [transferAllItems](#transferAllItems)
-    * [setAttributes](#setAttributes)
-    * [addAttributes](#addAttributes)
-    * [removeAttributes](#removeAttributes)
-    * [transferAttributes](#transferAttributes)
-    * [transferAllAttributes](#transferAllAttributes)
-    * [transferEverything](#transferEverything)
+  * [addItems](#addItems)
+  * [removeItems](#removeItems)
+  * [transferItems](#transferItems)
+  * [transferAllItems](#transferAllItems)
+  * [setAttributes](#setAttributes)
+  * [addAttributes](#addAttributes)
+  * [removeAttributes](#removeAttributes)
+  * [transferAttributes](#transferAttributes)
+  * [transferAllAttributes](#transferAllAttributes)
+  * [transferEverything](#transferEverything)
 
 
 * [Misc methods](#misc-methods)
-    * [rollItemTable](#rollItemTable)
-    * [getPricesForItem](#getPricesForItem)
-    * [tradeItems](#tradeItems)
+  * [rollItemTable](#rollItemTable)
+  * [getPricesForItem](#getPricesForItem)
+  * [tradeItems](#tradeItems)
 
 ## System settings methods
 
@@ -229,12 +229,12 @@ Turns tokens and its actors into item piles
 
 **Returns**: `Promise<Array>` - The uuids of the targets after they were turned into item piles
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param | Type                                             | Description |
+| --- |--------------------------------------------------| --- |
 | targets | `Token/TokenDocument/Array<Token/TokenDocument>` | The targets to be turned into item piles |
-| options | `object` | Options to pass to the function |
-| options.pileSettings | `object` | Overriding settings to be put on the item piles' settings |
-| options.tokenSettings | `object` | Overriding settings that will update the tokens' settings |
+| options | `object`                                         | Options to pass to the function |
+| options.pileSettings | `object`                                         | Overriding settings to be put on the item piles' settings |
+| options.tokenSettings | `object/Function`                                | Overriding settings that will update the tokens' settings |
 
 ---
 
@@ -246,11 +246,11 @@ Reverts tokens from an item pile into a normal token and actor
 
 **Returns**: `Promise<Array>` - The uuids of the targets after they were reverted from being item piles
 
-| Param | Type | Description |
-| --- | --- | --- |
+| Param | Type                                             | Description |
+| --- |--------------------------------------------------| --- |
 | targets | `Token/TokenDocument/Array<Token/TokenDocument>` | The targets to be reverted from item piles |
-| options | `object` | Options to pass to the function |
-| options.tokenSettings | `object` | Overriding settings that will update the tokens |
+| options | `object`                                         | Options to pass to the function |
+| options.tokenSettings | `object/Function`                                | Overriding settings that will update the tokens |
 
 ---
 

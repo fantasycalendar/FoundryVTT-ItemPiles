@@ -10,6 +10,7 @@
 - Fixed splitting item pile contents in the PF2e system
 - Fixed handling of item-based currencies not tracking individual player shares properly
 - Fixed not being able to add currencies to item piles in the PF2e system (users and GMs)
+- Fixed `turnTokensToItemPiles` would make every token be updated to use the image of the last token passed to the function
 
 ## Version 2.2.13
 
