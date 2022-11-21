@@ -86,6 +86,9 @@ module settings to configure that.
 - [Index Card RPG](https://foundryvtt.com/packages/icrpg)
 - [Forbidden Lands](https://foundryvtt.com/packages/forbidden-lands)
 - [Fallout 2d20](https://foundryvtt.com/packages/fallout)
+- [Coriolis](https://foundryvtt.com/packages/yzecoriolis)
+- [KNAVE](https://foundryvtt.com/packages/knave/)
+- [Twilight: 2000 (4th Edition)](https://foundryvtt.com/packages/t2k4e-coreset)
 
 ## Semi-supported systems
 

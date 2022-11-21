@@ -33,7 +33,7 @@ export default {
     {
       type: "attribute",
       name: "CPR.characterSheet.rightPane.eurobucks.eurobucks",
-      img: "",
+      img: "icons/svg/coins.svg",
       abbreviation: "{#}€$",
       data: {
         path: "system.wealth.value"
@@ -41,5 +41,7 @@ export default {
       primary: true,
       exchangeRate: 1
     }
-  ]
+  ],
+
+  "CURRENCY_DECIMAL_DIGITS": 0.01
 }
