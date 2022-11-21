@@ -7,10 +7,12 @@
   - Twilight: 2000 (4th Edition)
   - KNAVE
   - Coriolis
+- Fixed Fallout 2d20 system not having the correct setup
 - Fixed splitting item pile contents in the PF2e system
 - Fixed handling of item-based currencies not tracking individual player shares properly
 - Fixed not being able to add currencies to item piles in the PF2e system (users and GMs)
 - Fixed `turnTokensToItemPiles` would make every token be updated to use the image of the last token passed to the function
+- Updated German localization (Thanks IrishWolf!)
 
 ## Version 2.2.13
 
