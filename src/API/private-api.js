@@ -777,7 +777,7 @@ export default class PrivateAPI {
       }
 
       const specificTokenSettings = foundry.utils.mergeObject(tokenSettings, {
-        "img": PileUtilities.getItemPileTokenImage(target, data, tokenSettings?.img),
+        "img": PileUtilities.getItemPileTokenImage(target, data, tokenSettings?.img ?? tokenSettings?.texture?.src),
         "scale": PileUtilities.getItemPileTokenScale(target, data, tokenSettings?.scale),
         "name": PileUtilities.getItemPileName(target, data, tokenSettings?.name)
       });
@@ -838,8 +838,13 @@ export default class PrivateAPI {
         tokenUpdateGroups[sceneId] = [];
       }
 
+      const specificTokenSettings = Helpers.isFunction(tokenSettings)
+        ? await tokenSettings(target)
+        : foundry.utils.deepClone(tokenSettings);
+
       tokenUpdateGroups[sceneId].push({
-        "_id": tokenId, ...tokenSettings,
+        "_id": tokenId,
+        ...specificTokenSettings,
         [CONSTANTS.FLAGS.PILE]: pileSettings,
         [`actorData.${CONSTANTS.FLAGS.PILE}`]: pileSettings
       });

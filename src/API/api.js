@@ -328,7 +328,7 @@ class API {
    * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be turned into item piles
    * @param {object} options                                          Options to pass to the function
    * @param {object} options.pileSettings                             Overriding settings to be put on the item piles' settings
-   * @param {object} options.tokenSettings                            Overriding settings that will update the tokens' settings
+   * @param {object/Function} options.tokenSettings                   Overriding settings that will update the tokens' settings
    *
    * @return {Promise<Array>}                                         The uuids of the targets after they were turned into item piles
    */
@@ -353,7 +353,7 @@ class API {
    *
    * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be reverted from item piles
    * @param {object} options                                          Options to pass to the function
-   * @param {object} options.tokenSettings                            Overriding settings that will update the tokens
+   * @param {object/Function} options.tokenSettings                   Overriding settings that will update the tokens
    *
    * @return {Promise<Array>}                                         The uuids of the targets after they were reverted from being item piles
    */
