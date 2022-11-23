@@ -2,18 +2,42 @@
     "id": "item-piles",
     "title": "Item Piles",
     "description": "This module adds the ability for items to be dropped onto the ground, and then picked up.",
-    "version": "2.1.!3",
+    "version": "2.3.!1",
     "library": "false",
     "minimumCoreVersion": "10",
     "compatibility": {
         "minimum": "10",
-        "verified": "10"
+        "verified": "10",
+        "maximum": "10"
     },
     "authors": [
         {
             "name": "Wasp",
             "url": "https://github.com/Haxxer",
             "discord": "Wasp#2005"
+        }
+    ],
+    "packs": [
+        {
+            "label": "Item Piles: Merchant Tables",
+            "name": "item-piles-merchant-tables",
+            "path": "./packs/item-piles-merchant-tables.db",
+            "system": "dnd5e",
+            "type": "RollTable"
+        },
+        {
+            "label": "Item Piles: Custom Items",
+            "name": "item-piles-custom-items",
+            "path": "./packs/item-piles-custom-items.db",
+            "system": "dnd5e",
+            "type": "Item"
+        },
+        {
+            "label": "Item Piles: Macros",
+            "name": "item-piles-macros",
+            "path": "./packs/item-piles-macros.db",
+            "system": "dnd5e",
+            "type": "Macro"
         }
     ],
     "esmodules": [
@@ -37,6 +61,21 @@
             "lang": "ja",
             "name": "日本語",
             "path": "languages/ja.json"
+        },
+        {
+            "lang": "pt-BR",
+            "name": "Português (Brasil)",
+            "path": "languages/pt-BR.json"
+        },
+        {
+            "lang": "pl",
+            "name": "polski",
+            "path": "languages/pl.json"
+        },
+        {
+            "lang": "es",
+            "name": "Español",
+            "path": "languages/es.json"
         }
     ],
     "relationships": {
@@ -54,7 +93,7 @@
     "socket": true,
     "url": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles",
     "manifest": "https://raw.githubusercontent.com/fantasycalendar/FoundryVTT-ItemPiles/next/module.json",
-    "download": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/releases/download/2.1.!3/module.zip",
+    "download": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/releases/download/2.3.!1/module.zip",
     "readme": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/blob/master/README.md",
     "bugs": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues",
     "allowBugReporter": true
