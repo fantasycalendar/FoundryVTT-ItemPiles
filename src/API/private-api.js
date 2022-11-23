@@ -764,22 +764,25 @@ export default class PrivateAPI {
 
       const target = fromUuidSync(targetUuid);
 
-      pileSettings = foundry.utils.mergeObject(PileUtilities.getActorFlagData(target), pileSettings);
-      pileSettings.enabled = true;
+      const specificPileSettings = foundry.utils.mergeObject(
+        PileUtilities.getActorFlagData(target),
+        pileSettings
+      );
+      specificPileSettings.enabled = true;
 
-      const targetItems = PileUtilities.getActorItems(target, { itemFilters: pileSettings.overrideItemFilters });
-      const targetCurrencies = PileUtilities.getActorCurrencies(target, { currencyList: pileSettings.overrideCurrencies });
+      const targetItems = PileUtilities.getActorItems(target, { itemFilters: specificPileSettings.overrideItemFilters });
+      const targetCurrencies = PileUtilities.getActorCurrencies(target, { currencyList: specificPileSettings.overrideCurrencies });
 
-      const data = { data: pileSettings, items: targetItems, currencies: targetCurrencies };
+      const data = { data: specificPileSettings, items: targetItems, currencies: targetCurrencies };
 
-      if (Helpers.isFunction(tokenSettings)) {
-        tokenSettings = await tokenSettings(target);
-      }
+      let specificTokenSettings = Helpers.isFunction(tokenSettings)
+        ? await tokenSettings(target)
+        : foundry.utils.deepClone(tokenSettings);
 
-      const specificTokenSettings = foundry.utils.mergeObject(tokenSettings, {
-        "img": PileUtilities.getItemPileTokenImage(target, data, tokenSettings?.img ?? tokenSettings?.texture?.src),
-        "scale": PileUtilities.getItemPileTokenScale(target, data, tokenSettings?.scale),
-        "name": PileUtilities.getItemPileName(target, data, tokenSettings?.name)
+      specificTokenSettings = foundry.utils.mergeObject(specificTokenSettings, {
+        "img": PileUtilities.getItemPileTokenImage(target, data, specificTokenSettings?.img),
+        "scale": PileUtilities.getItemPileTokenScale(target, data, specificTokenSettings?.scale),
+        "name": PileUtilities.getItemPileName(target, data, specificTokenSettings?.name)
       });
 
       const sceneId = targetUuid.split('.')[1];
@@ -791,14 +794,15 @@ export default class PrivateAPI {
 
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId, ...specificTokenSettings,
-        [CONSTANTS.FLAGS.PILE]: pileSettings,
-        [`actorData.${CONSTANTS.FLAGS.PILE}`]: pileSettings
+        [CONSTANTS.FLAGS.PILE]: specificPileSettings,
+        [`actorData.${CONSTANTS.FLAGS.PILE}`]: specificPileSettings
       });
 
       if (target.isLinked) {
         if (actorUpdateGroups[target.actor.id]) continue;
         actorUpdateGroups[target.actor.id] = {
-          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: pileSettings
+          "_id": target.actor.id,
+          [CONSTANTS.FLAGS.PILE]: specificPileSettings
         }
       }
     }
@@ -828,8 +832,8 @@ export default class PrivateAPI {
 
       let target = fromUuidSync(targetUuid);
 
-      const pileSettings = PileUtilities.getActorFlagData(target);
-      pileSettings.enabled = false;
+      const specificPileSettings = PileUtilities.getActorFlagData(target);
+      specificPileSettings.enabled = false;
 
       const sceneId = targetUuid.split('.')[1];
       const tokenId = targetUuid.split('.')[3];
@@ -845,14 +849,14 @@ export default class PrivateAPI {
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId,
         ...specificTokenSettings,
-        [CONSTANTS.FLAGS.PILE]: pileSettings,
-        [`actorData.${CONSTANTS.FLAGS.PILE}`]: pileSettings
+        [CONSTANTS.FLAGS.PILE]: specificPileSettings,
+        [`actorData.${CONSTANTS.FLAGS.PILE}`]: specificPileSettings
       });
 
       if (target.isLinked) {
         if (actorUpdateGroups[target.actor.id]) continue;
         actorUpdateGroups[target.actor.id] = {
-          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: pileSettings
+          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: specificPileSettings
         }
       }
     }
