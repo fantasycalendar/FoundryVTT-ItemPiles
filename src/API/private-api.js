@@ -1334,9 +1334,18 @@ export default class PrivateAPI {
 
     let validTokens = [];
 
+    let playerToken = false;
+    if (game.user.character) {
+      playerToken = canvas.tokens.placeables.find(token => token.actor === game.user.character && Utilities.tokens_close_enough(pileToken, token, maxDistance));
+    }
+
     if (canvas.tokens.controlled.length > 0) {
       validTokens = [...canvas.tokens.controlled];
       validTokens = validTokens.filter(token => token.document !== pileDocument);
+    } else if (game.user.character) {
+      if (playerToken) {
+        validTokens.push(playerToken);
+      }
     }
 
     if (!validTokens.length && !game.user.isGM) {
@@ -1359,14 +1368,14 @@ export default class PrivateAPI {
     if (validTokens.length) {
       if (validTokens.includes(_token)) {
         interactingActor = _token.actor;
+      } else if (validTokens.includes(playerToken)) {
+        interactingActor = playerToken.actor;
       } else {
         validTokens.sort((potentialTargetA, potentialTargetB) => {
           return Utilities.grids_between_tokens(pileToken, potentialTargetA) - Utilities.grids_between_tokens(pileToken, potentialTargetB);
-        })
+        });
         interactingActor = validTokens[0].actor;
       }
-    } else if (game.user.character && !game.user.isGM) {
-      interactingActor = game.user.character;
     }
 
     if (pileData.isContainer && interactingActor) {

@@ -3,7 +3,9 @@
 ## Version 2.3.1
 
 - Added support for systems that store prices in strings like "1L 50T" (Splittermond, as an example)
+- Adjusted token detection when double-clicking on an item pile actor to prioritize their user character
 - Improved detection of items without quantity
+- Updated Splittermond system settings
 
 ## Version 2.3.0
 

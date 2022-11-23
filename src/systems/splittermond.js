@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": "1.0.3",
+  "VERSION": "1.0.4",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "npc",
@@ -34,19 +34,19 @@ export default {
       data: {
         path: "system.currency.S",
       },
-      primary: false,
-      exchangeRate: 10000
+      primary: true,
+      exchangeRate: 1
     },
     {
       type: "attribute",
       name: "Lunare",
-      img: "icons/commodities/currency/coin-embossed-unicorn-silver.webp",
+      img: "icons/commodities/currency/coins-assorted-mix-silver.webp",
       abbreviation: "{#}L",
       data: {
         path: "system.currency.L",
       },
       primary: false,
-      exchangeRate: 100
+      exchangeRate: 0.01
     },
     {
       type: "attribute",
@@ -56,8 +56,8 @@ export default {
       data: {
         path: "system.currency.T",
       },
-      primary: true,
-      exchangeRate: 1
+      primary: false,
+      exchangeRate: 0.0001
     }
   ]
 }
