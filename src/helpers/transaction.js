@@ -3,7 +3,6 @@ import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
-import { canItemStack, getItemTypesWithQuantities } from "./utilities.js";
 
 export default class Transaction {
 
