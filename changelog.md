@@ -9,6 +9,7 @@
   - KNAVE
   - Coriolis
   - Kamigakari
+  - Cyberpunk RED
 - Fixed Fallout 2d20 system not having the correct setup
 - Fixed splitting item pile contents in the PF2e system
 - Fixed handling of item-based currencies not tracking individual player shares properly
