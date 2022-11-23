@@ -3,6 +3,7 @@ import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
+import { canItemStack, getItemTypesWithQuantities } from "./utilities.js";
 
 export default class Transaction {
 
@@ -31,9 +32,9 @@ export default class Transaction {
       }
       const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
       const actorExistingItem = Utilities.findSimilarItem(this.actor.items, itemData);
-      const itemHasQuantity = hasProperty(actorExistingItem ?? itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE);
+      const canItemStack = Utilities.canItemStack(actorExistingItem ?? itemData);
 
-      if (!itemHasQuantity) {
+      if (!canItemStack) {
 
         if (remove && actorExistingItem) {
           this.itemTypeMap.set(actorExistingItem.id, type)
@@ -113,7 +114,7 @@ export default class Transaction {
       return Number(getProperty(this.actor, entry[0])) !== entry[1];
     }))
     this.itemsToCreate = this.itemsToCreate.filter(item => {
-      return !Utilities.hasItemQuantity(item) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
+      return !Utilities.canItemStack(item) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
     });
     this.itemsToDelete = this.itemsToUpdate.filter(item => {
       return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
@@ -169,7 +170,7 @@ export default class Transaction {
       itemDeltas: this.itemDeltas.concat(itemsCreated.map(item => {
         return {
           item,
-          quantity: Utilities.hasItemQuantity(item) ? Utilities.getItemQuantity(item) : 1
+          quantity: Utilities.canItemStack(item) ? Utilities.getItemQuantity(item) : 1
         }
       }))
     }

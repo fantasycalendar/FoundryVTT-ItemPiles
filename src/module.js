@@ -53,9 +53,6 @@ Hooks.once("ready", () => {
       Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
     }
 
-    if (game.user.isGM) {
-      checkSystem();
-    }
     registerHotkeysPost();
 
     ChatAPI.disablePastTradingButtons();
@@ -70,8 +67,11 @@ Hooks.once("ready", () => {
 
 });
 
-Hooks.once(HOOKS.READY, () => {
-  patchCurrencySettings();
+Hooks.once(HOOKS.READY, async () => {
+  if (game.user.isGM) {
+    await checkSystem();
+    await patchCurrencySettings();
+  }
   applySystemSpecificStyles();
 })
 

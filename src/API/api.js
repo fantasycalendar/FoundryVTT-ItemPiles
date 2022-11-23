@@ -8,6 +8,7 @@ import HOOKS from "../constants/hooks.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 
+
 class API {
   /**
    * @class API
@@ -712,7 +713,7 @@ class API {
       }
 
       const existingItems = mergeSimilarItems ? Utilities.findSimilarItem(itemsToAdd, item) : false;
-      if (existingItems && Utilities.hasItemQuantity(item)) {
+      if (existingItems && Utilities.canItemStack(item)) {
         Utilities.setItemQuantity(existingItems, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item));
       } else {
         itemsToAdd.push(item);

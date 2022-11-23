@@ -3,7 +3,6 @@ import * as Utilities from "../helpers/utilities.js";
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
-import { hasItemQuantity } from "../helpers/utilities.js";
 
 class PileBaseItem {
 
@@ -48,7 +47,7 @@ export class PileItem extends PileBaseItem {
     super.setupStores();
     this.item = item;
     this.itemDocument = new TJSDocument(this.item);
-    this.canStack = Utilities.hasItemQuantity(this.item);
+    this.canStack = Utilities.canItemStack(this.item);
     this.presentFromTheStart.set(Utilities.getItemQuantity(this.item) > 0 || !this.canStack);
     this.quantity.set(this.canStack ? Utilities.getItemQuantity(this.item) : 1);
     this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -79,8 +78,8 @@ export class PileItem extends PileBaseItem {
       this.name.set(this.item.name);
       this.img.set(this.item.img);
       this.similarities = Utilities.setSimilarityProperties({}, this.item);
-      if (Utilities.hasItemQuantity(data)) {
-        this.quantity.set(this.canStack ? Utilities.getItemQuantity(data) : 1);
+      if (Utilities.canItemStack(this.item) && Utilities.hasItemQuantity(data)) {
+        this.quantity.set(Utilities.getItemQuantity(data));
         const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
         this.currentQuantity.set(quantity);
       }

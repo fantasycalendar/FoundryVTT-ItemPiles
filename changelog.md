@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.3.1
+
+- Added support for systems that store prices in strings like "1L 50T" (Splittermond, as an example)
+- Improved detection of items without quantity
+
 ## Version 2.3.0
 
 - Added core support for systems that have items without quantities

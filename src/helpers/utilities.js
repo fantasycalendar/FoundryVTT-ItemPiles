@@ -72,6 +72,23 @@ export function setSimilarityProperties(obj, item) {
   return obj;
 }
 
+let itemTypesWithQuantities = false;
+
+export function getItemTypesWithQuantities() {
+  if (!itemTypesWithQuantities) {
+    itemTypesWithQuantities = new Set(game.system.template.Item.types.filter(type => {
+      const itemTemplate = game.system.template.Item[type];
+      return hasItemQuantity(itemTemplate);
+    }));
+  }
+  return itemTypesWithQuantities;
+}
+
+export function canItemStack(item) {
+  const itemData = item instanceof Item ? item.toObject() : item;
+  return getItemTypesWithQuantities().has(itemData.type);
+}
+
 /**
  * Returns a given item's quantity
  *
@@ -104,7 +121,7 @@ export function hasItemQuantity(item) {
  * @returns {Object}
  */
 export function setItemQuantity(itemData, quantity, requiresExistingQuantity = false) {
-  if (!requiresExistingQuantity || hasItemQuantity(itemData)) {
+  if (!requiresExistingQuantity || getItemTypesWithQuantities().has(itemData.type)) {
     setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity)
   }
   return itemData;

@@ -1177,7 +1177,7 @@ export default class PrivateAPI {
 
       const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
 
-      if (Utilities.hasItemQuantity(dropData.itemData.item)) {
+      if (Utilities.canItemStack(dropData.itemData.item)) {
         const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
         Utilities.setItemQuantity(dropData.itemData.item, quantity);
         dropData.itemData.quantity = quantity;
@@ -1238,7 +1238,7 @@ export default class PrivateAPI {
       }
     }
 
-    if (Utilities.hasItemQuantity(dropData.itemData.item)) {
+    if (Utilities.canItemStack(dropData.itemData.item)) {
       if (hotkeyState.altDown) {
 
         Utilities.setItemQuantity(dropData.itemData.item, 1);

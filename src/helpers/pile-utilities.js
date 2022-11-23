@@ -571,6 +571,37 @@ export function getItemPrices(item, {
   if (game.system.id === "pf2e") {
     const { copperValue } = new game.pf2e.Coins(overallCost.value);
     overallCost = copperValue / 100 / (overallCost.per ?? 1);
+  } else if (typeof overallCost === "string" && isNaN(Number(overallCost))) {
+
+    // Get all the parts, split by number, remove empty strings, and spaces at the start/end of each part
+    const parts = overallCost.split(/([1-9]+\d*)/g)
+      .filter(Boolean)
+      .map(part => part.trim());
+
+    // If there's only one part (one number), use that to determine the cost (assume it's the primary currency)
+    overallCost = 0;
+    if (parts.length === 1) {
+      overallCost = Number(parts[0]);
+    } else {
+      // Otherwise, go through each part
+      for (let i = 0; i < parts.length; i += 2) {
+        // If the current part is not a number, then the next part is the cost
+        const cost = isNaN(Number(parts[i])) ? parts[i + 1] : Number(parts[i]);
+        // If the current part is not a number, then it is the currency shorthand
+        const potentialCurrency = (isNaN(Number(parts[i])) ? parts[i] : parts[i + 1]).toLowerCase();
+        // Try to find the currency in the currency list setup
+        const currency = currencyList.find(curr => {
+          const abbr = curr.abbreviation.toLowerCase();
+          return abbr.includes(potentialCurrency) || curr.name.toLowerCase().startsWith(potentialCurrency);
+        });
+        // If we didn't find it, give up
+        if (!currency) continue;
+        // Otherwise add it to the overall fractional cost
+        overallCost += currency.exchangeRate * Number(cost);
+      }
+    }
+  } else {
+    overallCost = Number(overallCost);
   }
 
   if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices) || modifier <= 0) {
