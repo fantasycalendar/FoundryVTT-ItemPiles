@@ -15,7 +15,7 @@ export default {
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "spell,strength,weakness,mastery,species,culture,ancestry,education,resource,npcfeature,moonsign,language,culturelore,statuseffect,spelleffect"
+      "filters": "spell,strength,weakness,mastery,species,culture,ancestry,education,resource,npcfeature,moonsign,language,culturelore,statuseffect,spelleffect,npcattack"
     }
   ],
 
