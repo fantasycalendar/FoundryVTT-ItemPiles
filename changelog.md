@@ -4,6 +4,7 @@
 
 - Added core support for systems that have items without quantities
 - Added support for the following systems:
+  - Cepheus & Traveller
   - Twilight: 2000 (4th Edition)
   - KNAVE
   - Coriolis
@@ -11,6 +12,9 @@
 - Fixed splitting item pile contents in the PF2e system
 - Fixed handling of item-based currencies not tracking individual player shares properly
 - Fixed not being able to add currencies to item piles in the PF2e system (users and GMs)
+- Fixed spectating users would cause the trade to be cancelled when closing the trade window
+- Fixed spectating users would not see newly added items in trades
+- Fixed users not being able to spectate trades after they reconnect
 - Fixed `turnTokensToItemPiles` would make every token be updated to use the image of the last token passed to the function
 - Updated German localization (Thanks IrishWolf!)
 

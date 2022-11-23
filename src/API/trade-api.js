@@ -263,9 +263,9 @@ export default class TradeAPI {
 
   static async _spectateTrade({ tradeId, tradeUser } = {}) {
 
-    const app = TradingApp.getActiveApp(tradeId);
-    if (app) {
-      return app.render(false, { focus: true });
+    const existingApp = TradingApp.getActiveApp(tradeId);
+    if (existingApp) {
+      return existingApp.render(false, { focus: true });
     }
 
     const ongoingTradeData = await this._requestTradeData({ tradeId, tradeUser });
@@ -277,7 +277,10 @@ export default class TradeAPI {
     }
 
     const store = TradeStore.import(...ongoingTradeData);
-    return new TradingApp(store).render(true);
+
+    const app = new TradingApp(store).render(true);
+
+    ongoingTrades.set(store.publicTradeId, { app, store });
 
   }
 

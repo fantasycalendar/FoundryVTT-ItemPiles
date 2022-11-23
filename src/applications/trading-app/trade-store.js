@@ -28,7 +28,7 @@ export default class TradeStore {
   static import(leftTraderData, rightTraderData, publicTradeId) {
 
     const leftTrader = {
-      user: game.users.get(leftTraderData.user),
+      user: game.users.get(leftTraderData.userId),
       actor: fromUuidSync(leftTraderData.actorUiid),
       items: leftTraderData.items,
       currencies: leftTraderData.currencies,
@@ -37,7 +37,7 @@ export default class TradeStore {
     };
 
     const rightTrader = {
-      user: game.users.get(rightTraderData.user),
+      user: game.users.get(rightTraderData.userId),
       actor: fromUuidSync(rightTraderData.actorUiid),
       items: rightTraderData.items,
       currencies: rightTraderData.currencies,
@@ -78,6 +78,10 @@ export default class TradeStore {
         attributes: get(this.rightTraderCurrencies)
       }
     };
+  }
+
+  get isUserParticipant() {
+    return game.user === this.leftTraderUser || game.user === this.rightTraderUser;
   }
 
   getExistingCurrencies() {

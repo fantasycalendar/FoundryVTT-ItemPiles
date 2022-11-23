@@ -47,7 +47,7 @@ export function findSimilarItem(items, findItem) {
   const findItemId = findItem instanceof Item ? findItem.id : findItem._id;
 
   return items.find(item => {
-    const itemId = item instanceof Item ? item.id : item._id;
+    const itemId = item instanceof Item ? item.id : item._id ?? item.id;
     if (itemId && findItemId && itemId === findItemId) {
       return true;
     }

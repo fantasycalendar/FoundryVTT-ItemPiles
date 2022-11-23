@@ -18,10 +18,10 @@ export default class TradingApp extends SvelteApplication {
       },
       ...options
     }, dialogData);
-    
+    this.store = store;
     this.publicTradeId = store.publicTradeId;
   }
-  
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       zIndex: 100,
@@ -31,14 +31,14 @@ export default class TradingApp extends SvelteApplication {
       closeOnSubmit: false
     });
   }
-  
+
   async close(options = {}) {
-    if (!options?.callback) {
+    if (!options?.callback && this.store.isUserParticipant) {
       await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_CLOSED, this.publicTradeId, game.user.id);
     }
     return super.close(options)
   }
-  
+
   static getActiveApp(publicTradeId) {
     for (const app of Object.values(ui.windows)) {
       if (app instanceof this && app?.publicTradeId === publicTradeId) {

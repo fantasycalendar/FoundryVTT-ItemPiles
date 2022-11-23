@@ -61,8 +61,7 @@ recommended.
 
 ## Requesting Support for System
 
-Item Piles works in any system, but requires setup. If you wish to request native support for a system, please create a
-new [system request here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here)
+Item Piles works in any system, but requires setup. If you wish to request native support for a system, please create a new [system request here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here)
 
 Fill in _all_ of the information, and ask in the system's discord channel if you don't know what something means.
 
@@ -70,8 +69,7 @@ Incomplete requests will be rejected.
 
 ## Natively Supported Systems
 
-Item Piles is designed to work in all systems, but may require some setup for it to fully function. Please refer to the
-module settings to configure that.
+Item Piles is designed to work in all systems, but may require some setup for it to fully function. Please refer to the module settings to configure that.
 
 - [Dungeons & Dragons 5e](https://foundryvtt.com/packages/dnd5e)
 - [Pathfinder 1e](https://foundryvtt.com/packages/pf1)
@@ -82,12 +80,14 @@ module settings to configure that.
 - [Warhammer Fantasy Roleplay 4th Ed](https://foundryvtt.com/packages/wfrp4e)
 - [Splittermond](https://foundryvtt.com/packages/splittermond)
 - [Starfinder](https://foundryvtt.com/packages/sfrpg)
-- [Star Wars FFG](https://foundryvtt.com/packages/starwarsffg)
+- [Star Wars: Saga Edition](https://github.com/kypvalanx/Foundry-VTT-StarWars-SagaEdition)
 - [Index Card RPG](https://foundryvtt.com/packages/icrpg)
 - [Forbidden Lands](https://foundryvtt.com/packages/forbidden-lands)
 - [Fallout 2d20](https://foundryvtt.com/packages/fallout)
+- [Cepheus & Traveller](https://foundryvtt.com/packages/twodsix)
+- [Cyberpunk RED](https://foundryvtt.com/packages/cyberpunk-red-core)
 - [Coriolis](https://foundryvtt.com/packages/yzecoriolis)
-- [KNAVE](https://foundryvtt.com/packages/knave/)
+- [KNAVE](https://foundryvtt.com/packages/knave)
 - [Twilight: 2000 (4th Edition)](https://foundryvtt.com/packages/t2k4e-coreset)
 
 ## Semi-supported systems
@@ -96,14 +96,11 @@ module settings to configure that.
 
 ## Issues
 
-Any issues, bugs, or feature requests are always welcome to be reported directly to
-the [Issue Tracker](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues), or using
-the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
+Any issues, bugs, or feature requests are always welcome to be reported directly to the [Issue Tracker](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues), or using the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
 
 ## License
 
-This package is under an [MIT](LICENSE) and
-the [Foundry Virtual Tabletop Limited License Agreement for module development](https://foundryvtt.com/article/license/)
+This package is under an [MIT](LICENSE) and the [Foundry Virtual Tabletop Limited License Agreement for module development](https://foundryvtt.com/article/license/)
 
 ## Credits
 

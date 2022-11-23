@@ -9,6 +9,8 @@ import HOOKS from "./constants/hooks.js";
 
 export default class ItemPileSocket {
 
+  static ready = false;
+
   static HANDLERS = {
     /**
      * Generic sockets
@@ -154,6 +156,7 @@ export default class ItemPileSocket {
       debug(`Registered itemPileSocket: ${key}`);
     }
     debug("Registered all Item Piles sockets")
+    this.ready = true;
   }
 
   static executeAsGM(handler, ...args) {
