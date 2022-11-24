@@ -91,9 +91,15 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Twilight: 2000 (4th Edition)](https://foundryvtt.com/packages/t2k4e-coreset)
 - [Kamigakari: God Hunter](https://foundryvtt.com/packages/kamigakari)
 
+## Externally support systems
+
+These systems have integrated their own support of Item Piles, rather than Item Piles managing the system's settings. If you have any bugs relating to these systems specifically, please contact their creators.
+
+- [Old-School Essentials](https://foundryvtt.com/packages/ose)
+
 ## Semi-supported systems
 
-- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - Major features for Item Piles does not work in this system, such as dropping items on scenes to create item piles, and dropping items on tokens to give it to them. Merchants and existing piles still work, but it is not a However, it is not strictly needed as PF2e already has a loot actor.
+- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - Major features for Item Piles does not work in this system, such as dropping items on scenes to create item piles, and dropping items on tokens to give it to them. Merchants and existing piles still work, but the module is not strictly needed as PF2e already has a loot actor.
 
 ## Issues
 
