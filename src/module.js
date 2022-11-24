@@ -57,9 +57,7 @@ Hooks.once("ready", () => {
 
     ChatAPI.disablePastTradingButtons();
 
-    setTimeout(() => {
-      Hooks.callAll(HOOKS.READY);
-    }, 100);
+    Hooks.callAll(HOOKS.READY);
 
   }, 100);
 
@@ -68,11 +66,13 @@ Hooks.once("ready", () => {
 });
 
 Hooks.once(HOOKS.READY, async () => {
-  if (game.user.isGM) {
-    await checkSystem();
-    await patchCurrencySettings();
-  }
-  applySystemSpecificStyles();
+  setTimeout(async () => {
+    if (game.user.isGM) {
+      await checkSystem();
+      await patchCurrencySettings();
+    }
+    applySystemSpecificStyles();
+  }, 100)
 })
 
 Hooks.on(HOOKS.RESET_SETTINGS, async () => {

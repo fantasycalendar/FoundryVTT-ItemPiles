@@ -77,7 +77,18 @@ let itemTypesWithQuantities = false;
 export function getItemTypesWithQuantities() {
   if (!itemTypesWithQuantities) {
     itemTypesWithQuantities = new Set(game.system.template.Item.types.filter(type => {
-      const itemTemplate = game.system.template.Item[type];
+      const itemTemplate = {
+        system: foundry.utils.deepClone(game.system.template.Item[type])
+      };
+      if (itemTemplate.system?.templates?.length) {
+        const templates = foundry.utils.duplicate(itemTemplate.system.templates);
+        for (let template of templates) {
+          itemTemplate.system = foundry.utils.mergeObject(
+            itemTemplate.system,
+            foundry.utils.duplicate(game.system.template.Item.templates[template])
+          );
+        }
+      }
       return hasItemQuantity(itemTemplate);
     }));
   }

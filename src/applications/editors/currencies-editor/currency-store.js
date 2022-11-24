@@ -101,7 +101,7 @@ export default class CurrencyStore {
     if (data.uuid) {
       item = await fromUuid(data.uuid);
     } else {
-      let itemData = data.itemData;
+      let itemData = data.item;
       if (itemData._id) delete itemData._id;
       if (itemData.permission) delete itemData._id;
       const items = Array.from(game.items);
