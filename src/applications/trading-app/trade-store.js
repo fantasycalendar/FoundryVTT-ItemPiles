@@ -28,7 +28,7 @@ export default class TradeStore {
   static import(leftTraderData, rightTraderData, publicTradeId) {
 
     const leftTrader = {
-      user: game.users.get(leftTraderData.user),
+      user: game.users.get(leftTraderData.userId),
       actor: fromUuidSync(leftTraderData.actorUiid),
       items: leftTraderData.items,
       currencies: leftTraderData.currencies,
@@ -37,7 +37,7 @@ export default class TradeStore {
     };
 
     const rightTrader = {
-      user: game.users.get(rightTraderData.user),
+      user: game.users.get(rightTraderData.userId),
       actor: fromUuidSync(rightTraderData.actorUiid),
       items: rightTraderData.items,
       currencies: rightTraderData.currencies,
@@ -78,6 +78,10 @@ export default class TradeStore {
         attributes: get(this.rightTraderCurrencies)
       }
     };
+  }
+
+  get isUserParticipant() {
+    return game.user === this.leftTraderUser || game.user === this.rightTraderUser;
   }
 
   getExistingCurrencies() {
@@ -140,28 +144,31 @@ export default class TradeStore {
 
   addItem(newItem, { quantity = false, currency = false } = {}) {
 
-    const items = !currency ? get(this.leftTraderItems) : get(this.leftTraderItemCurrencies);
+    const items = !currency
+      ? get(this.leftTraderItems)
+      : get(this.leftTraderItemCurrencies);
 
     const item = Utilities.findSimilarItem(items, newItem)
 
     const maxQuantity = game.user.isGM ? Infinity : Utilities.getItemQuantity(newItem);
 
-    if (!item) {
+    if (item && Utilities.canItemStack(item)) {
+      if (item.quantity >= maxQuantity) return;
+      item.quantity = Math.min(quantity ? quantity : item.quantity + 1, maxQuantity);
+      item.newQuantity = item.quantity;
+      item.maxQuantity = maxQuantity;
+    } else if (!item) {
       items.push({
         id: newItem.id,
         name: newItem.name,
         img: newItem?.img ?? "",
+        type: newItem?.type,
         currency: currency,
         quantity: quantity ? quantity : 1,
         newQuantity: quantity ? quantity : 1,
         maxQuantity: maxQuantity,
         data: newItem instanceof Item ? newItem.toObject() : newItem
       })
-    } else {
-      if (item.quantity >= maxQuantity) return;
-      item.quantity = Math.min(quantity ? quantity : item.quantity + 1, maxQuantity);
-      item.newQuantity = item.quantity;
-      item.maxQuantity = maxQuantity;
     }
 
     if (!currency) {

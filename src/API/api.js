@@ -8,6 +8,7 @@ import HOOKS from "../constants/hooks.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 
+
 class API {
   /**
    * @class API
@@ -328,7 +329,7 @@ class API {
    * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be turned into item piles
    * @param {object} options                                          Options to pass to the function
    * @param {object} options.pileSettings                             Overriding settings to be put on the item piles' settings
-   * @param {object} options.tokenSettings                            Overriding settings that will update the tokens' settings
+   * @param {object/Function} options.tokenSettings                   Overriding settings that will update the tokens' settings
    *
    * @return {Promise<Array>}                                         The uuids of the targets after they were turned into item piles
    */
@@ -353,7 +354,7 @@ class API {
    *
    * @param {Token/TokenDocument/Array<Token/TokenDocument>} targets  The targets to be reverted from item piles
    * @param {object} options                                          Options to pass to the function
-   * @param {object} options.tokenSettings                            Overriding settings that will update the tokens
+   * @param {object/Function} options.tokenSettings                   Overriding settings that will update the tokens
    *
    * @return {Promise<Array>}                                         The uuids of the targets after they were reverted from being item piles
    */
@@ -667,7 +668,9 @@ class API {
       throw Helpers.custom_error("SplitItemPileContents | instigator must be of type TokenDocument or Actor")
     }
 
-    const actorUuids = (targets || SharingUtilities.getPlayersForItemPile(itemPileActor).map(u => u.character)).map(actor => Utilities.getUuid(actor));
+    const actorUuids = (targets || SharingUtilities.getPlayersForItemPile(itemPileActor)
+      .map(u => u.character))
+      .map(actor => Utilities.getUuid(actor));
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_PILE, itemPileUuid, actorUuids, game.user.id, instigator);
 
@@ -708,11 +711,11 @@ class API {
       }
 
       if (itemData?.quantity !== undefined) {
-        Utilities.setItemQuantity(item, itemData.quantity);
+        Utilities.setItemQuantity(item, itemData.quantity, true);
       }
 
       const existingItems = mergeSimilarItems ? Utilities.findSimilarItem(itemsToAdd, item) : false;
-      if (existingItems) {
+      if (existingItems && Utilities.canItemStack(item)) {
         Utilities.setItemQuantity(existingItems, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item));
       } else {
         itemsToAdd.push(item);
@@ -720,9 +723,7 @@ class API {
 
     });
 
-    if (interactionId) {
-      if (typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
-    }
+    if (interactionId && typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, {
       removeExistingActorItems,
@@ -745,7 +746,7 @@ class API {
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`removeItems | Could not determine the UUID, please provide a valid target`, true);
 
-    const targetActorItems = this.getActorItems(target);
+    const targetActorItems = PileUtilities.getActorItems(target, { getItemCurrencies: true });
 
     items = items.map(itemData => {
 
@@ -799,7 +800,7 @@ class API {
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid source`, true)
 
-    const sourceActorItems = PileUtilities.getActorItems(source);
+    const sourceActorItems = PileUtilities.getActorItems(source, { getItemCurrencies: true });
 
     items = items.map(itemData => {
 

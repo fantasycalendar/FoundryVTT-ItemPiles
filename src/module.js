@@ -21,44 +21,44 @@ Hooks.once("init", async () => {
   registerUIOverrides();
 });
 
-Hooks.once("ready", async () => {
-
-  PrivateAPI.initialize();
-  TradeAPI.initialize();
-  ChatAPI.initialize();
-
-  game.itempiles = {
-    API,
-    hooks: HOOKS
-  };
-  window.ItemPiles = {
-    API: API
-  };
-
-  if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
-    let word = "install and activate";
-    if (game.modules.get('lib-wrapper')) word = "activate";
-    throw Helpers.custom_error(`Item Piles requires the 'libWrapper' module. Please ${word} it.`)
-  }
-  if (!game.modules.get('socketlib')?.active && game.user.isGM) {
-    let word = "install and activate";
-    if (game.modules.get('socketlib')) word = "activate";
-    throw Helpers.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
-  }
-
-  if (!Helpers.isGMConnected()) {
-    Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
-  }
-
-  if (game.user.isGM) {
-    checkSystem();
-  }
-  registerHotkeysPost();
-
-  ChatAPI.disablePastTradingButtons();
+Hooks.once("ready", () => {
 
   setTimeout(() => {
+
+    Socket.initialize();
+    PrivateAPI.initialize();
+    TradeAPI.initialize();
+    ChatAPI.initialize();
+
+    game.itempiles = {
+      API,
+      hooks: HOOKS
+    };
+    window.ItemPiles = {
+      API: API
+    };
+
+    if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
+      let word = "install and activate";
+      if (game.modules.get('lib-wrapper')) word = "activate";
+      throw Helpers.custom_error(`Item Piles requires the 'libWrapper' module. Please ${word} it.`)
+    }
+    if (!game.modules.get('socketlib')?.active && game.user.isGM) {
+      let word = "install and activate";
+      if (game.modules.get('socketlib')) word = "activate";
+      throw Helpers.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
+    }
+
+    if (!Helpers.isGMConnected()) {
+      Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
+    }
+
+    registerHotkeysPost();
+
+    ChatAPI.disablePastTradingButtons();
+
     Hooks.callAll(HOOKS.READY);
+
   }, 100);
 
   // new SettingsShim().render(true)
@@ -67,10 +67,14 @@ Hooks.once("ready", async () => {
 
 });
 
-Hooks.once(HOOKS.READY, () => {
-  Socket.initialize();
-  patchCurrencySettings();
-  applySystemSpecificStyles();
+Hooks.once(HOOKS.READY, async () => {
+  setTimeout(async () => {
+    if (game.user.isGM) {
+      await checkSystem();
+      await patchCurrencySettings();
+    }
+    applySystemSpecificStyles();
+  }, 100)
 })
 
 Hooks.on(HOOKS.RESET_SETTINGS, async () => {

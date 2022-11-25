@@ -3,13 +3,13 @@ import * as Utilities from "../helpers/utilities.js";
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
-import { hasItemQuantity } from "../helpers/utilities.js";
 
 class PileBaseItem {
 
-  constructor(store, data) {
+  constructor(store, data, isCurrency = false) {
     this.store = store;
     this.subscriptions = [];
+    this.isCurrency = isCurrency;
     this.setup(data);
   }
 
@@ -47,8 +47,9 @@ export class PileItem extends PileBaseItem {
     super.setupStores();
     this.item = item;
     this.itemDocument = new TJSDocument(this.item);
-    this.presentFromTheStart.set(Utilities.getItemQuantity(this.item) > 0);
-    this.quantity.set(Utilities.getItemQuantity(this.item));
+    this.canStack = Utilities.canItemStack(this.item);
+    this.presentFromTheStart.set(Utilities.getItemQuantity(this.item) > 0 || !this.canStack);
+    this.quantity.set(this.canStack ? Utilities.getItemQuantity(this.item) : 1);
     this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
     this.id = this.item.id;
     this.type = this.item.type;
@@ -77,7 +78,7 @@ export class PileItem extends PileBaseItem {
       this.name.set(this.item.name);
       this.img.set(this.item.img);
       this.similarities = Utilities.setSimilarityProperties({}, this.item);
-      if (Utilities.hasItemQuantity(data)) {
+      if (Utilities.canItemStack(this.item) && Utilities.hasItemQuantity(data)) {
         this.quantity.set(Utilities.getItemQuantity(data));
         const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
         this.currentQuantity.set(quantity);
@@ -119,6 +120,10 @@ export class PileItem extends PileBaseItem {
       [{ _id: this.id, quantity }],
       { interactionId: this.store.interactionId }
     );
+  }
+
+  async remove() {
+    return game.itempiles.API.removeItems(this.store.actor, [this.id]);
   }
 
   updateQuantity(quantity) {

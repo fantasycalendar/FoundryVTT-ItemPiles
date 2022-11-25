@@ -14,7 +14,7 @@
   const targetCurrencyData = PileUtilities.getActorCurrencyList(targetActor);
 
   const currencies = PileUtilities.getActorCurrencies(sourceActor, {
-    currencyList: targetCurrencyData.currencies,
+    currencyList: targetActor ? targetCurrencyData.currencies : false,
     getAll: settings?.unlimitedCurrencies
   });
 
@@ -35,6 +35,8 @@
 
   let items = currencies.filter(entry => entry.type !== "attribute")
     .map(currency => {
+      currency.create = !currency.id;
+      currency.id = currency.id ?? randomID();
       currency.currentQuantity = 0;
       return currency;
     });
@@ -55,14 +57,18 @@
   }
 
   function submit() {
+
+    const itemsToUpdate = items.filter(item => item.currentQuantity && !item.create)
+      .map(item => ({ _id: item.id, quantity: item.currentQuantity }))
+    const itemsToCreate = items.filter(item => item.currentQuantity && item.create)
+      .map(item => ({ item: item.data.item, quantity: item.currentQuantity }))
+
     application.options.resolve({
       attributes: Object.fromEntries(attributes
         .filter(attribute => attribute.currentQuantity)
         .map(attribute => [attribute.path, attribute.currentQuantity])
       ),
-      items: items
-        .filter(item => item.currentQuantity)
-        .map(item => ({ _id: item.id, quantity: item.currentQuantity }))
+      items: itemsToUpdate.concat(itemsToCreate)
     });
     application.close();
   }
@@ -79,7 +85,7 @@
     {#if attributes.length || items.length}
 
       <p style="text-align: center;" class="item-piles-bottom-divider">
-        {settings?.content ?? localize("ITEM-PILES.Applications.DropCurrencies.Player")}
+        {settings?.content ?? localize("ITEM-PILES.Applications.DropCurrencies." + (targetActor ? "Player" : "GM"))}
       </p>
 
       {#each attributes as attribute, index (attribute.path)}

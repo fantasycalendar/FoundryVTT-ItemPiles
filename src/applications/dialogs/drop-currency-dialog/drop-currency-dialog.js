@@ -2,18 +2,17 @@ import DropCurrencyDialogShell from "./drop-currency-dialog-shell.svelte";
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 
 export default class DropCurrencyDialog extends SvelteApplication {
-  
+
   /**
    *
    * @param sourceActor
    * @param targetActor
    * @param settings
    * @param options
-   * @param dialogData
    */
   constructor(sourceActor, targetActor, settings = {}, options = {}) {
     super({
-      id: `item-pile-drop-currency-${targetActor.id}-${targetActor.id}`,
+      id: `item-pile-drop-currency-${sourceActor.id + (targetActor ? "-" + targetActor.id : "")}`,
       title: settings?.title ?? game.i18n.localize("ITEM-PILES.Applications.DropCurrencies.Title"),
       svelte: {
         class: DropCurrencyDialogShell,
@@ -28,7 +27,7 @@ export default class DropCurrencyDialog extends SvelteApplication {
       ...options
     })
   }
-  
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       width: 430,
@@ -36,13 +35,13 @@ export default class DropCurrencyDialog extends SvelteApplication {
       classes: ["item-piles-app"]
     })
   }
-  
+
   static getActiveApps(id) {
     return Object.values(ui.windows).filter(app => app.id === `item-pile-drop-currency-${id}`);
   }
-  
+
   static async show(sourceActor, targetActor, settings = {}, options = {}) {
-    const apps = this.getActiveApps(sourceActor.id + "-" + targetActor.id);
+    const apps = this.getActiveApps(sourceActor ? sourceActor.id + "-" + targetActor.id : targetActor.id);
     if (apps.length) {
       for (let app of apps) {
         app.render(false, { focus: true });
@@ -54,5 +53,5 @@ export default class DropCurrencyDialog extends SvelteApplication {
       new this(sourceActor, targetActor, settings, options).render(true, { focus: true });
     })
   }
-  
+
 }

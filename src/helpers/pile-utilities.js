@@ -84,14 +84,15 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
 }
 
-export function getActorItems(target, { itemFilters = false } = {}) {
+export function getActorItems(target, { itemFilters = false, getItemCurrencies = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorItemFilters = itemFilters ? cleanItemFilters(itemFilters) : getActorItemFilters(actor);
   const currencies = getActorCurrencies(actor, { getAll: true }).map(entry => entry.id);
-  return actor.items.filter(item => currencies.indexOf(item.id) === -1 && !isItemInvalid(actor, item, actorItemFilters));
+  return actor.items.filter(item => (getItemCurrencies || currencies.indexOf(item.id) === -1) && !isItemInvalid(actor, item, actorItemFilters));
 }
 
 export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
+
   const actor = Utilities.getActor(target);
   const actorItems = Array.from(actor.items);
   currencyList = currencyList || getActorCurrencyList(forActor || actor);
@@ -107,7 +108,11 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
     }
     const item = Utilities.findSimilarItem(actorItems, currency.data.item);
     return {
-      ...currency, quantity: item ? Utilities.getItemQuantity(item) : 0, id: item?.id || null, item, index
+      ...currency,
+      quantity: item ? Utilities.getItemQuantity(item) : 0,
+      id: item?.id || null,
+      item,
+      index
     }
   });
   if (!getAll) {
@@ -566,6 +571,37 @@ export function getItemPrices(item, {
   if (game.system.id === "pf2e") {
     const { copperValue } = new game.pf2e.Coins(overallCost.value);
     overallCost = copperValue / 100 / (overallCost.per ?? 1);
+  } else if (typeof overallCost === "string" && isNaN(Number(overallCost))) {
+
+    // Get all the parts, split by number, remove empty strings, and spaces at the start/end of each part
+    const parts = overallCost.split(/([1-9]+\d*)/g)
+      .filter(Boolean)
+      .map(part => part.trim());
+
+    // If there's only one part (one number), use that to determine the cost (assume it's the primary currency)
+    overallCost = 0;
+    if (parts.length === 1) {
+      overallCost = Number(parts[0]);
+    } else {
+      // Otherwise, go through each part
+      for (let i = 0; i < parts.length; i += 2) {
+        // If the current part is not a number, then the next part is the cost
+        const cost = isNaN(Number(parts[i])) ? parts[i + 1] : Number(parts[i]);
+        // If the current part is not a number, then it is the currency shorthand
+        const potentialCurrency = (isNaN(Number(parts[i])) ? parts[i] : parts[i + 1]).toLowerCase();
+        // Try to find the currency in the currency list setup
+        const currency = currencyList.find(curr => {
+          const abbr = curr.abbreviation.toLowerCase();
+          return abbr.includes(potentialCurrency) || curr.name.toLowerCase().startsWith(potentialCurrency);
+        });
+        // If we didn't find it, give up
+        if (!currency) continue;
+        // Otherwise add it to the overall fractional cost
+        overallCost += currency.exchangeRate * Number(cost);
+      }
+    }
+  } else {
+    overallCost = Number(overallCost);
   }
 
   if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices) || modifier <= 0) {

@@ -1,9 +1,9 @@
 export default {
 
-  "VERSION": "1.0.3",
+  "VERSION": "1.0.0",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
-  "ACTOR_CLASS_TYPE": "character",
+  "ACTOR_CLASS_TYPE": "npc",
 
   // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
   "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
@@ -15,7 +15,7 @@ export default {
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "skill,perk,special_ability"
+      "filters": "injury, shipProblem, shipCriticalDamage, shipLogbook"
     }
   ],
 
@@ -28,11 +28,11 @@ export default {
   "CURRENCIES": [
     {
       type: "attribute",
-      name: "FALLOUT.UI.CAPS",
-      img: "icons/commodities/currency/coins-engraved-copper.webp",
-      abbreviation: "{#}C",
+      name: "YZECORIOLIS.Birr",
+      img: "icons/commodities/currency/coin-inset-insect-gold.webp",
+      abbreviation: "{#}B",
       data: {
-        path: "system.currency.caps",
+        path: "system.birr",
       },
       primary: true,
       exchangeRate: 1

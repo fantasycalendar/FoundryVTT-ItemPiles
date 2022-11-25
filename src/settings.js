@@ -40,7 +40,7 @@ export async function patchCurrencySettings() {
     if (!item) continue;
     currency.data.item = item.toObject();
   }
-  await Helpers.setSetting(SETTINGS.CURRENCIES, currencies);
+  return Helpers.setSetting(SETTINGS.CURRENCIES, currencies);
 }
 
 export function applySystemSpecificStyles() {

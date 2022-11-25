@@ -6,12 +6,10 @@
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import * as Helpers from "../../helpers/helpers.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import { hotkeyState } from "../../hotkeys.js";
   import ItemPileSocket from "../../socket.js";
   import TradeEntry from "./TradeEntry.svelte";
   import DropCurrencyDialog from "../dialogs/drop-currency-dialog/drop-currency-dialog.js";
   import * as Utilities from "../../helpers/utilities.js";
-  import { checkItemType } from "../../helpers/pile-utilities.js";
 
   export let elementRoot;
   export let store;
@@ -28,7 +26,6 @@
 
   let isGM = game.user.isGM;
   let systemHasCurrencies = game.itempiles.API.CURRENCIES.length > 0;
-  let spectator = game.user !== store.leftTraderUser && game.user !== store.rightTraderUser;
 
   async function dropItem(data) {
 
@@ -64,29 +61,31 @@
 
   }
 
-  const itemsUpdatedDebounce = debounce(async (items) => {
-    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
-    return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS, store.publicTradeId, game.user.id, items);
-  }, 20)
-  leftItems.subscribe(itemsUpdatedDebounce)
+  if (store.isUserParticipant) {
+    const itemsUpdatedDebounce = debounce(async (items) => {
+      await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
+      return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS, store.publicTradeId, game.user.id, items);
+    }, 20)
+    leftItems.subscribe(itemsUpdatedDebounce)
 
-  const itemCurrenciesUpdatedDebounce = debounce(async (items) => {
-    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEM_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
-    return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEM_CURRENCIES, store.publicTradeId, game.user.id, items);
-  }, 20)
-  leftItemCurrencies.subscribe(itemCurrenciesUpdatedDebounce)
+    const itemCurrenciesUpdatedDebounce = debounce(async (items) => {
+      await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEM_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
+      return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEM_CURRENCIES, store.publicTradeId, game.user.id, items);
+    }, 20)
+    leftItemCurrencies.subscribe(itemCurrenciesUpdatedDebounce)
 
-  const attributesUpdatedDebounce = debounce(async (attributes) => {
-    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, attributes);
-    return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_CURRENCIES, store.publicTradeId, game.user.id, attributes);
-  }, 40)
-  leftCurrencies.subscribe(attributesUpdatedDebounce)
+    const attributesUpdatedDebounce = debounce(async (attributes) => {
+      await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, attributes);
+      return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_CURRENCIES, store.publicTradeId, game.user.id, attributes);
+    }, 40)
+    leftCurrencies.subscribe(attributesUpdatedDebounce)
 
-  const acceptedDebounce = debounce(async (acceptedState) => {
-    await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_STATE, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, acceptedState);
-    return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_STATE, store.publicTradeId, game.user.id, acceptedState);
-  }, 10)
-  leftTraderAccepted.subscribe(acceptedDebounce)
+    const acceptedDebounce = debounce(async (acceptedState) => {
+      await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_STATE, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, acceptedState);
+      return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_STATE, store.publicTradeId, game.user.id, acceptedState);
+    }, 10)
+    leftTraderAccepted.subscribe(acceptedDebounce)
+  }
 
   async function executeSocketAction(socketHandler, ...args) {
     if (store.isPrivate) {
@@ -175,23 +174,24 @@
 
             <div class="row item-piles-items-list">
 
-              {#if !$leftItems.length}
+              {#if !$leftItems.length && store.isUserParticipant}
                 <div class="item-piles-flexcol">
                   <h3 class="item-piles-text-center">{localize("ITEM-PILES.Trade.DragDrop")}</h3>
                 </div>
               {/if}
 
               {#each $leftItems as item (item.id)}
-                <TradeEntry bind:data={item} {store} editable={!spectator}/>
+                <TradeEntry bind:data={item} {store} editable={store.isUserParticipant}/>
               {/each}
 
             </div>
 
             {#if systemHasCurrencies}
 
-              <div class="row item-piles-items-list item-piles-currency-list item-piles-top-divider">
+              <div class="row item-piles-items-list item-piles-currency-list"
+                   class:item-piles-top-divider={$leftCurrencies.length || $leftItemCurrencies.length}>
 
-                {#if !spectator}
+                {#if store.isUserParticipant}
                   <div class="item-piles-flexrow">
                     {#if isGM}
                       <a on:click={() => { addCurrency(true) }}
@@ -209,11 +209,11 @@
                 {/if}
 
                 {#each $leftCurrencies as currency (currency.path)}
-                  <TradeEntry bind:data={currency} {store} editable={!spectator}/>
+                  <TradeEntry bind:data={currency} {store} editable={store.isUserParticipant}/>
                 {/each}
 
                 {#each $leftItemCurrencies as item (item.path)}
-                  <TradeEntry bind:data={item} {store} editable={!spectator}/>
+                  <TradeEntry bind:data={item} {store} editable={store.isUserParticipant}/>
                 {/each}
 
               </div>
@@ -222,16 +222,20 @@
 
           </div>
 
-          <button type="button" style="flex:0 1 auto; margin-top: 0.25rem;"
-                  on:click={() => { store.toggleAccepted(store.leftTraderUser.id) }}>
-            {#if $leftTraderAccepted}
-              <i class="fas fa-times"></i>
-              {localize("Cancel")}
-            {:else}
-              <i class="fas fa-check"></i>
-              {localize("ITEM-PILES.Trade.Accept")}
-            {/if}
-          </button>
+          {#if store.isUserParticipant}
+
+            <button type="button" style="flex:0 1 auto; margin-top: 0.25rem;"
+                    on:click={() => { store.toggleAccepted(store.leftTraderUser.id) }}>
+              {#if $leftTraderAccepted}
+                <i class="fas fa-times"></i>
+                {localize("Cancel")}
+              {:else}
+                <i class="fas fa-check"></i>
+                {localize("ITEM-PILES.Trade.Accept")}
+              {/if}
+            </button>
+
+          {/if}
 
         </div>
 
@@ -264,11 +268,8 @@
 
             {#if systemHasCurrencies}
 
-              <div class="row item-piles-items-list item-piles-currency-list">
-
-                {#if $rightCurrencies.length }
-                  <div class="row item-piles-top-divider"></div>
-                {/if}
+              <div class="row item-piles-items-list item-piles-currency-list"
+                   class:item-piles-top-divider={$rightCurrencies.length || $rightItemCurrencies.length}>
 
                 {#each $rightCurrencies as currency (currency.path)}
                   <TradeEntry bind:data={currency} {store} editable={false}/>

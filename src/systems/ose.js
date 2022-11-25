@@ -1,12 +1,12 @@
 export default {
 
-  "VERSION": "1.0.3",
+  "VERSION": "1.0.0",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
 
   // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
-  "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
+  "ITEM_QUANTITY_ATTRIBUTE": "system.quantity.value",
 
   // The item price attribute is the path to the attribute on each item that determine how much it costs
   "ITEM_PRICE_ATTRIBUTE": "system.cost",
@@ -15,7 +15,7 @@ export default {
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "skill,perk,special_ability"
+      "filters": "spell,ability"
     }
   ],
 
@@ -27,17 +27,25 @@ export default {
   // In the case of items, it is recommended you export the item with `.toObject()` and strip out any module data
   "CURRENCIES": [
     {
-      type: "attribute",
-      name: "FALLOUT.UI.CAPS",
-      img: "icons/commodities/currency/coins-engraved-copper.webp",
-      abbreviation: "{#}C",
+      type: "item",
+      name: "OSE.items.gp.long",
+      img: "systems/ose/assets/gold.png",
+      abbreviation: "{#}GP",
       data: {
-        path: "system.currency.caps",
+        item: {
+          "name": "Cold Coins",
+          "type": "item",
+          "img": "systems/ose/assets/gold.png",
+          "system": {
+            "quantity": { "value": 1, "max": null },
+            "weight": 0.1,
+            "cost": 1,
+            "treasure": true,
+          }
+        }
       },
       primary: true,
       exchangeRate: 1
     }
-  ],
-
-  "CURRENCY_DECIMAL_DIGITS": 0.01
+  ]
 }

@@ -47,7 +47,7 @@ export function findSimilarItem(items, findItem) {
   const findItemId = findItem instanceof Item ? findItem.id : findItem._id;
 
   return items.find(item => {
-    const itemId = item instanceof Item ? item.id : item._id;
+    const itemId = item instanceof Item ? item.id : item._id ?? item.id;
     if (itemId && findItemId && itemId === findItemId) {
       return true;
     }
@@ -70,6 +70,34 @@ export function setSimilarityProperties(obj, item) {
     setProperty(obj, prop, getProperty(itemData, prop));
   })
   return obj;
+}
+
+let itemTypesWithQuantities = false;
+
+export function getItemTypesWithQuantities() {
+  if (!itemTypesWithQuantities) {
+    itemTypesWithQuantities = new Set(game.system.template.Item.types.filter(type => {
+      const itemTemplate = {
+        system: foundry.utils.deepClone(game.system.template.Item[type])
+      };
+      if (itemTemplate.system?.templates?.length) {
+        const templates = foundry.utils.duplicate(itemTemplate.system.templates);
+        for (let template of templates) {
+          itemTemplate.system = foundry.utils.mergeObject(
+            itemTemplate.system,
+            foundry.utils.duplicate(game.system.template.Item.templates[template])
+          );
+        }
+      }
+      return hasItemQuantity(itemTemplate);
+    }));
+  }
+  return itemTypesWithQuantities;
+}
+
+export function canItemStack(item) {
+  const itemData = item instanceof Item ? item.toObject() : item;
+  return getItemTypesWithQuantities().has(itemData.type);
 }
 
 /**
@@ -100,10 +128,13 @@ export function hasItemQuantity(item) {
  *
  * @param {Object} itemData
  * @param {Number} quantity
+ * @param {Boolean} requiresExistingQuantity
  * @returns {Object}
  */
-export function setItemQuantity(itemData, quantity) {
-  setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity)
+export function setItemQuantity(itemData, quantity, requiresExistingQuantity = false) {
+  if (!requiresExistingQuantity || getItemTypesWithQuantities().has(itemData.type)) {
+    setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity)
+  }
   return itemData;
 }
 

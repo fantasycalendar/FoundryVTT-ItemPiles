@@ -1,9 +1,9 @@
 export default {
 
-  "VERSION": "1.0.2",
+  "VERSION": "1.0.0",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
-  "ACTOR_CLASS_TYPE": "npc2",
+  "ACTOR_CLASS_TYPE": "character",
 
   // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
   "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
@@ -15,7 +15,7 @@ export default {
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "attack,buff,class,feat,race,spell"
+      "filters": "talent,attackOption,race,style,facade,bond"
     }
   ],
 
@@ -25,24 +25,13 @@ export default {
   "CURRENCIES": [
     {
       type: "attribute",
-      name: "SFRPG.Currencies.Credits",
-      img: "systems/sfrpg/icons/equipment/goods/credstick.webp",
-      abbreviation: "{#}C",
+      name: "KG.Money",
+      img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
+      abbreviation: "{#}G",
       data: {
-        path: "system.currency.credit",
+        path: "system.attributes.money",
       },
       primary: true,
-      exchangeRate: 1
-    },
-    {
-      type: "attribute",
-      name: "SFRPG.Currencies.UPBs",
-      img: "systems/sfrpg/icons/equipment/goods/upb.webp",
-      abbreviation: "{#} UBP",
-      data: {
-        path: "system.currency.upb",
-      },
-      primary: false,
       exchangeRate: 1
     }
   ],

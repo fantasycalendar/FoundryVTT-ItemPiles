@@ -127,8 +127,7 @@ export default class PrivateAPI {
       itemPileConfig.lockedImages = [];
     }
     doc.updateSource({
-      [CONSTANTS.FLAGS.PILE]: itemPileConfig,
-      ["actorData." + CONSTANTS.FLAGS.PILE]: itemPileConfig
+      [CONSTANTS.FLAGS.PILE]: itemPileConfig, ["actorData." + CONSTANTS.FLAGS.PILE]: itemPileConfig
     });
     const targetItems = PileUtilities.getActorItems(doc.actor);
     const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
@@ -151,8 +150,7 @@ export default class PrivateAPI {
   }
 
   static async _addItems(targetUuid, items, userId, {
-    removeExistingActorItems = false,
-    interactionId = false
+    removeExistingActorItems = false, interactionId = false
   } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
@@ -264,8 +262,7 @@ export default class PrivateAPI {
   }
 
   static async _transferAllItems(sourceUuid, targetUuid, userId, {
-    itemFilters = false,
-    interactionId = false
+    itemFilters = false, interactionId = false
   } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
@@ -570,12 +567,7 @@ export default class PrivateAPI {
    * @returns {sourceUuid: string/boolean, targetUuid: string/boolean, position: object/boolean, itemsDropped: array }
    */
   static async _dropItems({
-    userId,
-    sceneId,
-    sourceUuid = false,
-    targetUuid = false,
-    itemData = false,
-    position = false
+    userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false
   } = {}) {
 
     let itemsDropped;
@@ -591,7 +583,7 @@ export default class PrivateAPI {
       } else {
         itemsDropped = (await this._removeItems(sourceUuid, itemsToTransfer, userId)).map(item => {
           item.quantity = Math.abs(item.quantity)
-          Utilities.setItemQuantity(item.item, Math.abs(item.quantity));
+          Utilities.setItemQuantity(item.item, Math.abs(item.quantity), true);
           return item;
         });
         targetUuid = await this._createItemPile({ sceneId, position, items: itemsDropped });
@@ -645,23 +637,18 @@ export default class PrivateAPI {
       pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
 
       pileActor = await Actor.create({
-        name: actor || "New Item Pile",
-        type: Helpers.getSetting("actorClassType"),
-        img: "icons/svg/item-bag.svg"
+        name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
       });
 
       await pileActor.update({
-        [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-        prototypeToken: {
+        [CONSTANTS.FLAGS.PILE]: pileDataDefaults, prototypeToken: {
           name: "Item Pile",
           actorLink: false,
           bar1: { attribute: "" },
           vision: false,
           displayName: 50,
-          [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-          ...tokenOverrides
-        },
-        ...actorOverrides
+          [CONSTANTS.FLAGS.PILE]: pileDataDefaults, ...tokenOverrides
+        }, ...actorOverrides
       })
 
     } else if (!actor) {
@@ -682,14 +669,11 @@ export default class PrivateAPI {
         pileDataDefaults.singleItemScale = 0.75;
 
         pileActor = await Actor.create({
-          name: "Default Item Pile",
-          type: Helpers.getSetting("actorClassType"),
-          img: "icons/svg/item-bag.svg"
+          name: "Default Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
         });
 
         await pileActor.update({
-          [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-          prototypeToken: {
+          [CONSTANTS.FLAGS.PILE]: pileDataDefaults, prototypeToken: {
             name: "Item Pile",
             actorLink: false,
             bar1: { attribute: "" },
@@ -739,8 +723,7 @@ export default class PrivateAPI {
         }) : [];
 
         overrideData['actorData'] = {
-          items: items,
-          ...actorOverrides
+          items: items, ...actorOverrides
         }
 
         const data = { data: pileData, items: items };
@@ -779,20 +762,27 @@ export default class PrivateAPI {
 
     for (const targetUuid of targetUuids) {
 
-      let target = fromUuidSync(targetUuid);
+      const target = fromUuidSync(targetUuid);
 
-      pileSettings = foundry.utils.mergeObject(PileUtilities.getActorFlagData(target), pileSettings);
-      pileSettings.enabled = true;
+      const specificPileSettings = foundry.utils.mergeObject(
+        PileUtilities.getActorFlagData(target),
+        pileSettings
+      );
+      specificPileSettings.enabled = true;
 
-      const targetItems = PileUtilities.getActorItems(target, { itemFilters: pileSettings.overrideItemFilters });
-      const targetCurrencies = PileUtilities.getActorCurrencies(target, { currencyList: pileSettings.overrideCurrencies });
+      const targetItems = PileUtilities.getActorItems(target, { itemFilters: specificPileSettings.overrideItemFilters });
+      const targetCurrencies = PileUtilities.getActorCurrencies(target, { currencyList: specificPileSettings.overrideCurrencies });
 
-      const data = { data: pileSettings, items: targetItems, currencies: targetCurrencies };
+      const data = { data: specificPileSettings, items: targetItems, currencies: targetCurrencies };
 
-      tokenSettings = foundry.utils.mergeObject(tokenSettings, {
-        "img": PileUtilities.getItemPileTokenImage(target, data, tokenSettings?.img),
-        "scale": PileUtilities.getItemPileTokenScale(target, data, tokenSettings?.scale),
-        "name": PileUtilities.getItemPileName(target, data, tokenSettings?.name)
+      let specificTokenSettings = Helpers.isFunction(tokenSettings)
+        ? await tokenSettings(target)
+        : foundry.utils.deepClone(tokenSettings);
+
+      specificTokenSettings = foundry.utils.mergeObject(specificTokenSettings, {
+        "img": PileUtilities.getItemPileTokenImage(target, data, specificTokenSettings?.img),
+        "scale": PileUtilities.getItemPileTokenScale(target, data, specificTokenSettings?.scale),
+        "name": PileUtilities.getItemPileName(target, data, specificTokenSettings?.name)
       });
 
       const sceneId = targetUuid.split('.')[1];
@@ -803,15 +793,16 @@ export default class PrivateAPI {
       }
 
       tokenUpdateGroups[sceneId].push({
-        "_id": tokenId, ...tokenSettings,
-        [CONSTANTS.FLAGS.PILE]: pileSettings,
-        [`actorData.${CONSTANTS.FLAGS.PILE}`]: pileSettings
+        "_id": tokenId, ...specificTokenSettings,
+        [CONSTANTS.FLAGS.PILE]: specificPileSettings,
+        [`actorData.${CONSTANTS.FLAGS.PILE}`]: specificPileSettings
       });
 
       if (target.isLinked) {
         if (actorUpdateGroups[target.actor.id]) continue;
         actorUpdateGroups[target.actor.id] = {
-          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: pileSettings
+          "_id": target.actor.id,
+          [CONSTANTS.FLAGS.PILE]: specificPileSettings
         }
       }
     }
@@ -841,8 +832,8 @@ export default class PrivateAPI {
 
       let target = fromUuidSync(targetUuid);
 
-      const pileSettings = PileUtilities.getActorFlagData(target);
-      pileSettings.enabled = false;
+      const specificPileSettings = PileUtilities.getActorFlagData(target);
+      specificPileSettings.enabled = false;
 
       const sceneId = targetUuid.split('.')[1];
       const tokenId = targetUuid.split('.')[3];
@@ -851,16 +842,21 @@ export default class PrivateAPI {
         tokenUpdateGroups[sceneId] = [];
       }
 
+      const specificTokenSettings = Helpers.isFunction(tokenSettings)
+        ? await tokenSettings(target)
+        : foundry.utils.deepClone(tokenSettings);
+
       tokenUpdateGroups[sceneId].push({
-        "_id": tokenId, ...tokenSettings,
-        [CONSTANTS.FLAGS.PILE]: pileSettings,
-        [`actorData.${CONSTANTS.FLAGS.PILE}`]: pileSettings
+        "_id": tokenId,
+        ...specificTokenSettings,
+        [CONSTANTS.FLAGS.PILE]: specificPileSettings,
+        [`actorData.${CONSTANTS.FLAGS.PILE}`]: specificPileSettings
       });
 
       if (target.isLinked) {
         if (actorUpdateGroups[target.actor.id]) continue;
         actorUpdateGroups[target.actor.id] = {
-          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: pileSettings
+          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: specificPileSettings
         }
       }
     }
@@ -1165,13 +1161,10 @@ export default class PrivateAPI {
 
     if (user && !user?.active && !game.user.isGM) {
       return TJSDialog.prompt({
-        title: game.i18n.localize("ITEM-PILES.Dialogs.GiveItemUserNotActive.Title"),
-        content: {
-          class: CustomDialog,
-          props: {
+        title: game.i18n.localize("ITEM-PILES.Dialogs.GiveItemUserNotActive.Title"), content: {
+          class: CustomDialog, props: {
             content: game.i18n.format("ITEM-PILES.Dialogs.GiveItemUserNotActive.Content", {
-              actor_name: dropData.target.actor.name,
-              user_name: user.name
+              actor_name: dropData.target.actor.name, user_name: user.name
             })
           }
         }
@@ -1183,33 +1176,27 @@ export default class PrivateAPI {
     if (user?.active || gms.length || game.user.isGM) {
 
       const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
-      const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
 
-      Utilities.setItemQuantity(dropData.itemData.item, quantity);
-      dropData.itemData.quantity = quantity;
+      if (Utilities.canItemStack(dropData.itemData.item)) {
+        const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
+        Utilities.setItemQuantity(dropData.itemData.item, quantity);
+        dropData.itemData.quantity = quantity;
+      } else {
+        dropData.itemData.quantity = 1;
+      }
 
       const sourceUuid = Utilities.getUuid(dropData.source);
       const targetUuid = Utilities.getUuid(dropData.target);
 
       if ((!user || !user?.active) && game.user.isGM) {
         Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
-          source_actor_name: dropData.source.name,
-          target_actor_name: dropData.target.name,
-          item_name: item.name
+          source_actor_name: dropData.source.name, target_actor_name: dropData.target.name, item_name: item.name
         }));
-        return this._transferItems(
-          sourceUuid,
-          targetUuid,
-          [dropData.itemData.item],
-          game.user.id
-        )
+        return this._transferItems(sourceUuid, targetUuid, [dropData.itemData.item], game.user.id)
       }
 
       return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS, [user ? user.id : gms[0]], {
-        userId: game.user.id,
-        sourceUuid,
-        targetUuid,
-        itemData: dropData.itemData
+        userId: game.user.id, sourceUuid, targetUuid, itemData: dropData.itemData
       });
     }
   }
@@ -1251,24 +1238,26 @@ export default class PrivateAPI {
       }
     }
 
-    if (hotkeyState.altDown) {
+    if (Utilities.canItemStack(dropData.itemData.item)) {
+      if (hotkeyState.altDown) {
 
-      Utilities.setItemQuantity(dropData.itemData.item, 1);
-      dropData.itemData.quantity = 1;
+        Utilities.setItemQuantity(dropData.itemData.item, 1);
+        dropData.itemData.quantity = 1;
 
-    } else {
+      } else {
 
-      let quantity = Utilities.getItemQuantity(dropData.itemData.item);
+        let quantity = Utilities.getItemQuantity(dropData.itemData.item);
 
-      if (quantity > 1) {
-        const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
-        quantity = await DropItemDialog.show(item, dropData.target);
-        if (!quantity) return;
+        if (quantity > 1) {
+          const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+          quantity = await DropItemDialog.show(item, dropData.target);
+          if (!quantity) return;
+        }
+
+        Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
+        dropData.itemData.quantity = Number(quantity);
+
       }
-
-      Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
-      dropData.itemData.quantity = Number(quantity);
-
     }
 
     const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
@@ -1295,18 +1284,14 @@ export default class PrivateAPI {
     const item = await Item.implementation.create(itemData.item, { temporary: true });
 
     const accepted = await TJSDialog.confirm({
-      title: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"),
-      content: {
-        class: CustomDialog,
-        props: {
+      title: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"), content: {
+        class: CustomDialog, props: {
           content: game.i18n.format(contentString, {
             source_actor_name: sourceActor.name,
             target_actor_name: targetActor.name,
             quantity: itemData.quantity,
             item_name: item.name
-          }),
-          icon: "fas fa-handshake",
-          header: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Header")
+          }), icon: "fas fa-handshake", header: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Header")
         }
       }
     });
@@ -1316,10 +1301,7 @@ export default class PrivateAPI {
     }
 
     return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS_RESPONSE, [userId], {
-      userId: game.user.id,
-      accepted,
-      sourceUuid,
-      itemData
+      userId: game.user.id, accepted, sourceUuid, itemData
     });
 
   }
@@ -1352,9 +1334,18 @@ export default class PrivateAPI {
 
     let validTokens = [];
 
+    let playerToken = false;
+    if (game.user.character) {
+      playerToken = canvas.tokens.placeables.find(token => token.actor === game.user.character && Utilities.tokens_close_enough(pileToken, token, maxDistance));
+    }
+
     if (canvas.tokens.controlled.length > 0) {
       validTokens = [...canvas.tokens.controlled];
       validTokens = validTokens.filter(token => token.document !== pileDocument);
+    } else if (game.user.character) {
+      if (playerToken) {
+        validTokens.push(playerToken);
+      }
     }
 
     if (!validTokens.length && !game.user.isGM) {
@@ -1377,14 +1368,14 @@ export default class PrivateAPI {
     if (validTokens.length) {
       if (validTokens.includes(_token)) {
         interactingActor = _token.actor;
+      } else if (validTokens.includes(playerToken)) {
+        interactingActor = playerToken.actor;
       } else {
         validTokens.sort((potentialTargetA, potentialTargetB) => {
           return Utilities.grids_between_tokens(pileToken, potentialTargetA) - Utilities.grids_between_tokens(pileToken, potentialTargetB);
-        })
+        });
         interactingActor = validTokens[0].actor;
       }
-    } else if (game.user.character && !game.user.isGM) {
-      interactingActor = game.user.character;
     }
 
     if (pileData.isContainer && interactingActor) {
@@ -1420,35 +1411,31 @@ export default class PrivateAPI {
     const numPlayers = actorUuids.length;
 
     if (pileData.shareItemsEnabled) {
-      await tempPileTransaction.appendItemChanges(items.map(item => {
+      const itemsToRemove = items.map(item => {
         const itemData = item.toObject();
         const quantity = Math.floor(Utilities.getItemQuantity(itemData) / numPlayers) * numPlayers;
         return {
-          item: itemData,
-          quantity
+          item: itemData, quantity
         }
-      }), { remove: true });
+      }).filter(entry => entry.quantity);
+      await tempPileTransaction.appendItemChanges(itemsToRemove, { remove: true });
     }
 
-    if (pileData.shareCurrenciesEnabled) {
-      const currencyItems = currencies.filter(entry => entry.type === "item").map(item => {
-        const itemData = item.toObject();
-        const quantity = Math.floor(Utilities.getItemQuantity(itemData) / numPlayers) * numPlayers;
-        return {
-          item: itemData,
-          quantity
-        }
-      });
-      await tempPileTransaction.appendItemChanges(currencyItems, { remove: true, type: "currency" });
+    const currencyItems = currencies.filter(entry => entry.type === "item").map(entry => {
+      const itemData = entry.item.toObject();
+      const quantity = Math.floor(Utilities.getItemQuantity(itemData) / numPlayers) * numPlayers;
+      return {
+        item: itemData, quantity
+      }
+    }).filter(entry => entry.quantity);
+    await tempPileTransaction.appendItemChanges(currencyItems, { remove: true, type: "currency" });
 
-      const attributes = currencies.filter(entry => entry.type === "attribute").map(attribute => {
-        return {
-          ...attribute,
-          quantity: Math.floor(attribute.quantity / numPlayers) * numPlayers
-        }
-      });
-      await tempPileTransaction.appendActorChanges(attributes, { remove: true });
-    }
+    const attributes = currencies.filter(entry => entry.type === "attribute").map(attribute => {
+      return {
+        ...attribute, quantity: Math.floor(attribute.quantity / numPlayers) * numPlayers
+      }
+    });
+    await tempPileTransaction.appendActorChanges(attributes, { remove: true, type: "currency" });
 
     const preparedData = tempPileTransaction.prepare();
 
@@ -1461,9 +1448,7 @@ export default class PrivateAPI {
       if (pileData.shareItemsEnabled) {
         await transaction.appendItemChanges(deepClone(preparedData).itemDeltas.filter(delta => delta.type === "item").map(delta => {
           delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
-            players: numPlayers,
-            shareData: shareData,
-            floor: true
+            players: numPlayers, shareData: shareData, floor: true
           });
           return delta;
         }));
@@ -1472,9 +1457,7 @@ export default class PrivateAPI {
       if (pileData.shareCurrenciesEnabled) {
         await transaction.appendItemChanges(deepClone(preparedData).itemDeltas.filter(delta => delta.type === "currency").map(delta => {
           delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
-            players: numPlayers,
-            shareData: shareData,
-            floor: true
+            players: numPlayers, shareData: shareData, floor: true
           });
           return delta;
         }), { type: "currency" });
@@ -1482,9 +1465,7 @@ export default class PrivateAPI {
         await transaction.appendActorChanges(Object.entries(deepClone(preparedData).attributeDeltas).map(entry => {
           let [path] = entry;
           const quantity = SharingUtilities.getAttributeSharesLeftForActor(itemPileActor, path, transaction.actor, {
-            players: numPlayers,
-            shareData: shareData,
-            floor: true
+            players: numPlayers, shareData: shareData, floor: true
           });
           return { path, quantity };
         }));
@@ -1507,15 +1488,9 @@ export default class PrivateAPI {
     await ItemPileSocket.callHook(HOOKS.PILE.SPLIT_INVENTORY, itemPileUuid, pileDeltas, actorDeltas, userId, instigator);
 
     await this._executeItemPileMacro(itemPileUuid, {
-      action: "splitInventory",
-      source: itemPileUuid,
-      target: actorUuids,
-      transfers: {
-        pileDeltas,
-        actorDeltas
-      },
-      userId: userId,
-      instigator: instigator
+      action: "splitInventory", source: itemPileUuid, target: actorUuids, transfers: {
+        pileDeltas, actorDeltas
+      }, userId: userId, instigator: instigator
     });
 
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
@@ -1524,8 +1499,7 @@ export default class PrivateAPI {
     }
 
     return {
-      pileDeltas,
-      actorDeltas
+      pileDeltas, actorDeltas
     };
 
   }
@@ -1567,8 +1541,7 @@ export default class PrivateAPI {
     const itemPrices = PileUtilities.getPricesForItems(items.map(data => {
       const item = sellingActor.items.get(data.id);
       return {
-        ...data,
-        item
+        ...data, item
       }
     }), { seller: sellingActor, buyer: buyingActor });
 
@@ -1585,13 +1558,11 @@ export default class PrivateAPI {
       if (!payment.quantity) continue;
       if (payment.type === "attribute") {
         await sellerTransaction.appendActorChanges([{
-          path: payment.data.path,
-          quantity: payment.quantity
+          path: payment.data.path, quantity: payment.quantity
         }], { type: payment.isCurrency ? "currency" : payment.type });
       } else {
         await sellerTransaction.appendItemChanges([{
-          item: payment.data.item,
-          quantity: payment.quantity
+          item: payment.data.item, quantity: payment.quantity
         }], { type: payment.isCurrency ? "currency" : payment.type });
       }
     }
@@ -1602,22 +1573,17 @@ export default class PrivateAPI {
       }
       if (entry.type === "attribute") {
         await sellerTransaction.appendActorChanges([{
-          path: entry.data.path,
-          quantity: entry.quantity
+          path: entry.data.path, quantity: entry.quantity
         }], {
-          remove: true,
-          type: entry.isCurrency ? "currency" : entry.type
+          remove: true, type: entry.isCurrency ? "currency" : entry.type
         });
       } else {
         const itemFlagData = PileUtilities.getItemFlagData(entry.item);
         if (sellerIsMerchant && itemFlagData.infiniteQuantity) continue;
         await sellerTransaction.appendItemChanges([{
-          item: entry.item,
-          quantity: entry.quantity
+          item: entry.item, quantity: entry.quantity
         }], {
-          remove: true,
-          type: entry.isCurrency ? "currency" : entry.type,
-          removeIfZero: !itemFlagData.isService
+          remove: true, type: entry.isCurrency ? "currency" : entry.type, removeIfZero: !itemFlagData.isService
         });
       }
     }
@@ -1635,13 +1601,11 @@ export default class PrivateAPI {
       }
       if (price.type === "attribute") {
         await buyerTransaction.appendActorChanges([{
-          path: price.data.path,
-          quantity: price.quantity
+          path: price.data.path, quantity: price.quantity
         }], { remove: true, type: price.isCurrency ? "currency" : price.type });
       } else {
         await buyerTransaction.appendItemChanges([{
-          item: price.data.item,
-          quantity: price.quantity
+          item: price.data.item, quantity: price.quantity
         }], { remove: true, type: price.isCurrency ? "currency" : price.type });
       }
     }
@@ -1650,8 +1614,7 @@ export default class PrivateAPI {
       if (!entry.quantity) continue;
       if (entry.type === "attribute") {
         await buyerTransaction.appendActorChanges([{
-          path: entry.data.path,
-          quantity: entry.quantity
+          path: entry.data.path, quantity: entry.quantity
         }], { type: entry.type });
       } else {
         const itemFlagData = PileUtilities.getItemFlagData(entry.item);
@@ -1661,8 +1624,7 @@ export default class PrivateAPI {
           setProperty(item, CONSTANTS.FLAGS.ITEM + '.hidden', true);
         }
         await buyerTransaction.appendItemChanges([{
-          item: item,
-          quantity: entry.quantity
+          item: item, quantity: entry.quantity
         }], { type: entry.type });
       }
     }
@@ -1671,13 +1633,11 @@ export default class PrivateAPI {
       if (!change.quantity) continue;
       if (change.type === "attribute") {
         await buyerTransaction.appendActorChanges([{
-          path: change.data.path,
-          quantity: change.quantity
+          path: change.data.path, quantity: change.quantity
         }], { type: "currency" });
       } else {
         await buyerTransaction.appendItemChanges([{
-          item: change.item,
-          quantity: change.quantity
+          item: change.item, quantity: change.quantity
         }], { type: "currency" });
       }
     }
@@ -1716,10 +1676,7 @@ export default class PrivateAPI {
         const itemFlagData = PileUtilities.getItemFlagData(entry.item);
         if (!itemFlagData.macro) continue;
         await Utilities.runMacro(itemFlagData.macro, {
-          seller: sellingActor,
-          buyer: buyingActor,
-          item: entry.item,
-          quantity: entry.quantity
+          seller: sellingActor, buyer: buyingActor, item: entry.item, quantity: entry.quantity
         });
       }
     }
@@ -1727,9 +1684,7 @@ export default class PrivateAPI {
     await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
 
     return {
-      itemDeltas: buyerTransactionData.itemDeltas,
-      attributeDeltas: buyerTransactionData.attributeDeltas,
-      itemPrices
+      itemDeltas: buyerTransactionData.itemDeltas, attributeDeltas: buyerTransactionData.attributeDeltas, itemPrices
     };
 
   }
@@ -1762,9 +1717,7 @@ export default class PrivateAPI {
     const tableDraw = await rollTable.drawMany(roll.total, { displayChat, recursive: true });
     const items = [];
     for (const rollData of tableDraw.results) {
-      const existingItem = items.find(
-        (item) => item.documentId === rollData.documentId
-      );
+      const existingItem = items.find((item) => item.documentId === rollData.documentId);
       if (existingItem) {
         existingItem.quantity++;
       } else {
@@ -1781,9 +1734,7 @@ export default class PrivateAPI {
 
         if (item instanceof Item) {
           items.push({
-            ...rollData,
-            item: item.toObject(),
-            quantity: 1,
+            ...rollData, item: item.toObject(), quantity: 1,
           });
         }
       }

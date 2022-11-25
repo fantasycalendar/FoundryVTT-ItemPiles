@@ -168,7 +168,7 @@
           <Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
           <SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>
           <Setting bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
-                   disabled="{!settings[SETTINGS.CURRENCIES].length}"/>
+                   disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
         </div>

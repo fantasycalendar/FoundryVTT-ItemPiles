@@ -15,6 +15,11 @@ import icrpg from "./systems/icrpg.js";
 import swse from "./systems/swse.js";
 import fallout from "./systems/fallout.js";
 import cyberpunkRedCore from "./systems/cyberpunk-red-core.js";
+import knave from "./systems/knave.js";
+import t2k4e from "./systems/t2k4e.js";
+import yzecoriolis from "./systems/yzecoriolis.js";
+import kamigakari from "./systems/kamigakari.js";
+import ose from "./systems/ose.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -40,7 +45,12 @@ export const SYSTEMS = {
     "icrpg": icrpg,
     "swse": swse,
     "fallout": fallout,
-    // "cyberpunk-red-core": cyberpunkRedCore
+    "cyberpunk-red-core": cyberpunkRedCore,
+    "knave": knave,
+    "t2k4e": t2k4e,
+    "yzecoriolis": yzecoriolis,
+    "kamigakari": kamigakari,
+    //"ose": ose,
     // ↑ ADD SYSTEMS HERE ↑
   },
 
