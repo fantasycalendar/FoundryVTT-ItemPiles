@@ -668,7 +668,9 @@ class API {
       throw Helpers.custom_error("SplitItemPileContents | instigator must be of type TokenDocument or Actor")
     }
 
-    const actorUuids = (targets || SharingUtilities.getPlayersForItemPile(itemPileActor).map(u => u.character)).map(actor => Utilities.getUuid(actor));
+    const actorUuids = (targets || SharingUtilities.getPlayersForItemPile(itemPileActor)
+      .map(u => u.character))
+      .map(actor => Utilities.getUuid(actor));
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_PILE, itemPileUuid, actorUuids, game.user.id, instigator);
 

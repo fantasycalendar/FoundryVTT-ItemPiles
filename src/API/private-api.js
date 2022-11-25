@@ -1421,23 +1421,21 @@ export default class PrivateAPI {
       await tempPileTransaction.appendItemChanges(itemsToRemove, { remove: true });
     }
 
-    if (pileData.shareCurrenciesEnabled) {
-      const currencyItems = currencies.filter(entry => entry.type === "item").map(entry => {
-        const itemData = entry.item.toObject();
-        const quantity = Math.floor(Utilities.getItemQuantity(itemData) / numPlayers) * numPlayers;
-        return {
-          item: itemData, quantity
-        }
-      }).filter(entry => entry.quantity);
-      await tempPileTransaction.appendItemChanges(currencyItems, { remove: true, type: "currency" });
+    const currencyItems = currencies.filter(entry => entry.type === "item").map(entry => {
+      const itemData = entry.item.toObject();
+      const quantity = Math.floor(Utilities.getItemQuantity(itemData) / numPlayers) * numPlayers;
+      return {
+        item: itemData, quantity
+      }
+    }).filter(entry => entry.quantity);
+    await tempPileTransaction.appendItemChanges(currencyItems, { remove: true, type: "currency" });
 
-      const attributes = currencies.filter(entry => entry.type === "attribute").map(attribute => {
-        return {
-          ...attribute, quantity: Math.floor(attribute.quantity / numPlayers) * numPlayers
-        }
-      });
-      await tempPileTransaction.appendActorChanges(attributes, { remove: true });
-    }
+    const attributes = currencies.filter(entry => entry.type === "attribute").map(attribute => {
+      return {
+        ...attribute, quantity: Math.floor(attribute.quantity / numPlayers) * numPlayers
+      }
+    });
+    await tempPileTransaction.appendActorChanges(attributes, { remove: true, type: "currency" });
 
     const preparedData = tempPileTransaction.prepare();
 

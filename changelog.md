@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.3.3
+
+- Fixed `Split currency x ways` not working when "Sharing Enabled: Currencies" was disabled
+
 ## Version 2.3.2
 
 - Further improvements to detection of items without quantity

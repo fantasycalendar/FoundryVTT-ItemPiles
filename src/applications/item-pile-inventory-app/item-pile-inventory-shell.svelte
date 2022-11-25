@@ -138,9 +138,7 @@
         {#if $pileData.splitAllEnabled}
           <button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty}">
             <i class="fas fa-handshake"></i>
-            {#if $pileData.shareItemsEnabled && $pileData.shareCurrenciesEnabled}
-              {localize("ITEM-PILES.Inspect.SplitAll", { num_players })}
-            {:else if $pileData.shareItemsEnabled}
+            {#if $pileData.shareItemsEnabled}
               {localize("ITEM-PILES.Inspect.SplitAll", { num_players })}
             {:else}
               {localize("ITEM-PILES.Inspect.SplitCurrencies", { num_players })}
