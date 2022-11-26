@@ -1190,7 +1190,9 @@ class API {
 
     if (items) {
       for (const entry of items) {
-        entry.item = await Item.implementation.create(entry.item, { temporary: true });
+        entry.item = targetActor
+          ? targetActor.items.get(entry._id)
+          : await Item.implementation.create(entry.item, { temporary: true });
       }
     }
 

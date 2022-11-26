@@ -59,11 +59,11 @@ Hooks.once("ready", () => {
 
     Hooks.callAll(HOOKS.READY);
 
+    // game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"))
+
+    // new SettingsShim().render(true)
+
   }, 100);
-
-  // new SettingsShim().render(true)
-
-  game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"))
 
 });
 

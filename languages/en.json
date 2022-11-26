@@ -144,7 +144,12 @@
       "OtherTypes": {
         "item-piles-service": "Service"
       },
-      "AddTable": "Add Table"
+      "AddTable": "Add Table",
+      "RollAllTables": "Roll All Tables",
+      "ToolTipRemoveTable": "Remove Table",
+      "TooltipConfigureTable": "Configure Table",
+      "TooltipRollTable": "Roll Table",
+      "ToolTipRemoveAllRolledItems": "Remove All Rolled Items"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -189,6 +194,10 @@
       "GiveItemUserNotActive": {
         "Title": "Giving Item",
         "Content": "\"{actor_name}\" is owned by the player \"{user_name}\" but they are not active, so you cannot give them this item."
+      },
+      "RemoveMerchantTable": {
+        "Title": "Remove Merchant Table",
+        "Content": "Are you sure you want to remove the \"{table_name}\" table from this merchant? This is not undoable."
       },
       "ReceiveItem": {
         "Title": "Receiving Item",
