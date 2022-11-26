@@ -370,6 +370,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
   const pileData = { data: flagData, items, currencies };
 
+  flagData = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, flagData);
+
   const updates = documentTokens.map(tokenDocument => {
     const newTokenData = foundry.utils.mergeObject(tokenData, {
       "img": getItemPileTokenImage(tokenDocument, pileData, tokenData?.img),
@@ -397,7 +399,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
   if (!foundry.utils.isEmpty(flagData) && documentActor) {
     await documentActor.update({
-      [CONSTANTS.FLAGS.PILE]: flagData, [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
+      [CONSTANTS.FLAGS.PILE]: flagData,
+      [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
     });
   }
 
