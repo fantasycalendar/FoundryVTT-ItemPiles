@@ -360,6 +360,8 @@ function getRelevantTokensAndActor(target) {
 
 export async function updateItemPileData(target, flagData, tokenData) {
 
+  Helpers.debug("updateItemPileData on UUID: " + target.uuid);
+
   if (!flagData) flagData = getActorFlagData(target);
   if (!tokenData) tokenData = {};
 
@@ -408,9 +410,13 @@ export async function updateItemPileData(target, flagData, tokenData) {
 }
 
 export async function updateItemData(item, update) {
-  const flagData = foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {});
+  const flagData = foundry.utils.diffObject(
+    CONSTANTS.ITEM_DEFAULTS,
+    foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {})
+  );
   return item.update({
-    ...update?.data ?? {}, [CONSTANTS.FLAGS.ITEM]: flagData
+    ...update?.data ?? {},
+    [CONSTANTS.FLAGS.ITEM]: flagData
   });
 }
 
