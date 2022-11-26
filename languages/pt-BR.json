@@ -528,7 +528,7 @@
         "Title": "Ativar negociação",
         "Hint": "Isso permite a negociação - com isso desativado, ninguém pode iniciar nenhuma negociação."
       },
-      "HideActorHeaderText": {
+      "HideHeaderButtonText": {
         "Title": "Ocultar o texto do cabeçalho do ator",
         "Hint": "Oculta o texto \"Item Piles\" no cabeçalho do ator - útil se você tiver muitos módulos e o cabeçalho estiver ficando lotado."
       },

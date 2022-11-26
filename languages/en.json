@@ -208,6 +208,10 @@
       },
       "TextEditor": {
         "Title": "Text Editor"
+      },
+      "UserSelect": {
+        "Title": "Select Users",
+        "Content": "Show to which users?"
       }
     },
     "Applications": {
@@ -555,9 +559,13 @@
         "Title": "Invert Ctrl + Double Click Open",
         "Hint": "Normally, you have to hold control when you want to open an item pile's actor sheet. Enabling this makes the item pile actor sheet open by default, and holding control opens the item pile inventory UI."
       },
-      "HideActorHeaderText": {
-        "Title": "Hide actor header text",
-        "Hint": "Hides the \"Item Piles\" text in the actor header - useful if you have too many modules, and the header is getting crowded."
+      "HideHeaderButtonText": {
+        "Title": "Hide header button text",
+        "Hint": "Hides the \"Item Piles\" text in the actor and item headers - useful if you have too many modules, and the header is getting crowded."
+      },
+      "HideHeaderButton": {
+        "Title": "Hide header button",
+        "Hint": "Hides the \"Item Piles\" button in the actor and item headers. This will make it harder for you to configure new item piles and items."
       },
       "DeleteEmptyPiles": {
         "Title": "Auto-delete empty piles",

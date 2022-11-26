@@ -341,7 +341,7 @@
         "Title": "Invertiere die Funktion von Strg + Doppelklick um den Gegenstandsstapel zu öffnen",
         "Label": "Normalerweise muss man Strg gedrückt halten, wenn man den Akteurbogen eines Gegenstandsstapels direkt öffnen möchte. Diese Option macht das Öffnen des Charakterbogens zum Standard und Strg+Doppelklick öffnet das Gegenstandsstapelinventar."
       },
-      "HideActorHeaderText": {
+      "HideHeaderButtonText": {
         "Title": "Verstecke Kopftext des Akteurs",
         "Label": "Blendet den \"Gegenstandsstapel\" Text im Akteur Kopf aus - nützlich wenn du viele Module hast und der Kopftext bereits zu sehr befüllt wird."
       },

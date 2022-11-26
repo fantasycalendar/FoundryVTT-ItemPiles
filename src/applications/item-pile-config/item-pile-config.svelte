@@ -24,6 +24,9 @@
   import CustomDialog from "../components/CustomDialog.svelte";
   import MacroSelector from "../components/MacroSelector.svelte";
 
+  import MerchantApp from "../merchant-app/merchant-app.js";
+  import ItemPileInventoryApp from "../item-pile-inventory-app/item-pile-inventory-app.js";
+
   const { application } = getContext('external');
 
   export let elementRoot;
@@ -33,6 +36,10 @@
 
   let pileData = PileUtilities.getActorFlagData(pileActor);
   let deleteWhenEmptySetting = localize(Helpers.getSetting(SETTINGS.DELETE_EMPTY_PILES) ? "Yes" : "No");
+
+  if (typeof pileData?.deleteWhenEmpty === "boolean") {
+    pileData.deleteWhenEmpty = !!pileData?.deleteWhenEmpty;
+  }
 
   let pileEnabled = writable(pileData.enabled);
 
@@ -83,7 +90,40 @@
       "false": false
     }[data.deleteWhenEmpty];
 
-    PileAPI.updateItemPile(pileActor, data);
+    const currentData = PileUtilities.getActorFlagData(pileActor);
+    const diff = Object.keys(foundry.utils.diffObject(currentData, foundry.utils.deepClone(data)));
+
+    PileAPI.updateItemPile(pileActor, data).then(() => {
+      if (diff.includes("enabled") || diff.includes("isMerchant")) {
+
+        let closedApps = false;
+        if (currentData.isMerchant) {
+          if (MerchantApp.getActiveApp(pileActor.id)) {
+            closedApps = true;
+            MerchantApp.getActiveApp(pileActor.id).close();
+          }
+          if (MerchantApp.getActiveApp(pileActor?.token?.id)) {
+            closedApps = true;
+            MerchantApp.getActiveApp(pileActor?.token?.id).close();
+          }
+        } else {
+          const apps = ItemPileInventoryApp.getActiveApps(pileActor.id)
+            .concat(ItemPileInventoryApp.getActiveApps(pileActor?.token?.id));
+          for (let app of apps) {
+            closedApps = true;
+            app.close();
+          }
+        }
+        if (closedApps || pileActor?.sheet.rendered) {
+          if (data.enabled) {
+            pileActor?.sheet.close();
+            game.itempiles.API.renderItemPileInterface(pileActor);
+          } else if (!data.enabled) {
+            pileActor?.sheet.render(true);
+          }
+        }
+      }
+    });
 
     application.close();
 
@@ -256,8 +296,8 @@
                 value="default">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyDefault")}
                 ({localize(deleteWhenEmptySetting)})
               </option>
-              <option value="true">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyYes")}</option>
-              <option value="false">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyNo")}</option>
+              <option value={true}>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyYes")}</option>
+              <option value={false}>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyNo")}</option>
             </select>
           </div>
 

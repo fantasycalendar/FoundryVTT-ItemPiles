@@ -11,8 +11,6 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
-import SettingsShim from "./applications/settings-app/settings-app.js";
-import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -58,10 +56,6 @@ Hooks.once("ready", () => {
     ChatAPI.disablePastTradingButtons();
 
     Hooks.callAll(HOOKS.READY);
-
-    // game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"))
-
-    // new SettingsShim().render(true)
 
   }, 100);
 

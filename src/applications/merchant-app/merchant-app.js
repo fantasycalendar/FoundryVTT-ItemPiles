@@ -3,6 +3,8 @@ import ItemPileConfig from "../item-pile-config/item-pile-config";
 import MerchantAppShell from "./merchant-app-shell.svelte";
 import * as Helpers from "../../helpers/helpers.js";
 import HOOKS from "../../constants/hooks.js";
+import UserSelectDialog from "../dialogs/user-select-dialog/user-select-dialog.js";
+import SETTINGS from "../../constants/settings.js";
 
 export default class MerchantApp extends SvelteApplication {
 
@@ -65,7 +67,7 @@ export default class MerchantApp extends SvelteApplication {
     if (canConfigure) {
       buttons = [
         {
-          label: "ITEM-PILES.Inspect.OpenSheet",
+          label: !Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "ITEM-PILES.Inspect.OpenSheet" : "",
           class: "item-piles-open-actor-sheet",
           icon: "fas fa-user",
           onclick: () => {
@@ -73,15 +75,16 @@ export default class MerchantApp extends SvelteApplication {
           }
         },
         {
-          label: "ITEM-PILES.ContextMenu.ShowToPlayers",
+          label: !Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "ITEM-PILES.ContextMenu.ShowToPlayers" : "",
           class: "item-piles-show-to-players",
           icon: "fas fa-eye",
-          onclick: () => {
-            const users = Array.from(game.users).filter(u => u.active && u !== game.user).map(u => u.id);
-            if (!users.length) {
-              Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoPlayersActive"), true);
-              return;
+          onclick: async (event) => {
+            const activeUsers = Array.from(game.users).filter(u => u.active && u !== game.user).map(u => u.id);
+            if (!activeUsers.length) {
+              return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoPlayersActive"), true);
             }
+            const users = event.altKey ? activeUsers : await UserSelectDialog.show({ excludeSelf: true });
+            if (!users || !users.length) return;
             Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ShownToPlayers", { actor_name: this.merchant.name }))
             return game.itempiles.API.renderItemPileInterface(this.merchant, {
               userIds: users,
@@ -90,7 +93,7 @@ export default class MerchantApp extends SvelteApplication {
           }
         },
         {
-          label: "ITEM-PILES.HUD.Configure",
+          label: !Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "ITEM-PILES.HUD.Configure" : "",
           class: "item-piles-configure-pile",
           icon: "fas fa-box-open",
           onclick: () => {

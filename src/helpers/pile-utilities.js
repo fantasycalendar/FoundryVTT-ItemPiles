@@ -78,6 +78,10 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
   const pileData = getActorFlagData(target);
 
+  if (typeof pileData?.deleteWhenEmpty === "boolean") {
+    return pileData?.deleteWhenEmpty;
+  }
+
   return {
     "default": Helpers.getSetting("deleteEmptyPiles"), "true": true, "false": false
   }[pileData?.deleteWhenEmpty ?? "default"];
@@ -360,7 +364,7 @@ function getRelevantTokensAndActor(target) {
 
 export async function updateItemPileData(target, flagData, tokenData) {
 
-  Helpers.debug("updateItemPileData on UUID: " + target.uuid);
+  if (!target) return;
 
   if (!flagData) flagData = getActorFlagData(target);
   if (!tokenData) tokenData = {};
@@ -371,8 +375,6 @@ export async function updateItemPileData(target, flagData, tokenData) {
   const currencies = getActorCurrencies(documentActor, { currencyList: flagData.overrideCurrencies });
 
   const pileData = { data: flagData, items, currencies };
-
-  flagData = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, flagData);
 
   const updates = documentTokens.map(tokenDocument => {
     const newTokenData = foundry.utils.mergeObject(tokenData, {
@@ -410,10 +412,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
 }
 
 export async function updateItemData(item, update) {
-  const flagData = foundry.utils.diffObject(
-    CONSTANTS.ITEM_DEFAULTS,
-    foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {})
-  );
+  const flagData = foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {});
   return item.update({
     ...update?.data ?? {},
     [CONSTANTS.FLAGS.ITEM]: flagData

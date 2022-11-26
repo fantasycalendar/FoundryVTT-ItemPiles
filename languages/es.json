@@ -538,7 +538,7 @@
         "Title": "Invertir Ctrl + Doble Clic Abrir",
         "Hint": "Normalmente, debe mantener pulsado el control cuando desea abrir la hoja del actor de un botín. Habilitar esto hace que la hoja del actor del botín se abra de forma predeterminada, y mantener el control abre la interfaz de usuario del inventario del botín."
       },
-      "HideActorHeaderText": {
+      "HideHeaderButtonText": {
         "Title": "Ocultar el texto del encabezado del actor",
         "Hint": "Oculta el texto \"Item Piles\" en el encabezado del actor; es útil si tiene demasiados módulos y el encabezado se llena."
       },

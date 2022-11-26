@@ -111,6 +111,7 @@
 
         <Setting bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}"/>
         <Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}"/>
+        <Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_BUTTON]}"/>
         <Setting bind:data="{settings[SETTINGS.PRELOAD_FILES]}"/>
         <Setting bind:data="{settings[SETTINGS.DEBUG]}"/>
         <Setting bind:data="{settings[SETTINGS.DEBUG_HOOKS]}"/>

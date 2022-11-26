@@ -6,6 +6,7 @@ const SETTINGS = {
   OUTPUT_TO_CHAT: "outputToChat",
   INVERT_SHEET_OPEN: "invertSheetOpen",
   HIDE_ACTOR_HEADER_TEXT: "hideActorHeaderText",
+  HIDE_ACTOR_HEADER_BUTTON: "hideActorHeaderButton",
   PRELOAD_FILES: "preloadFiles",
   DEBUG: "debug",
   DEBUG_HOOKS: "debugHooks",
@@ -290,8 +291,17 @@ const SETTINGS = {
     },
 
     [SETTINGS.HIDE_ACTOR_HEADER_TEXT]: {
-      name: "ITEM-PILES.Settings.HideActorHeaderText.Title",
-      hint: "ITEM-PILES.Settings.HideActorHeaderText.Hint",
+      name: "ITEM-PILES.Settings.HideHeaderButtonText.Title",
+      hint: "ITEM-PILES.Settings.HideHeaderButtonText.Hint",
+      scope: "client",
+      config: false,
+      default: false,
+      type: Boolean
+    },
+
+    [SETTINGS.HIDE_ACTOR_HEADER_BUTTON]: {
+      name: "ITEM-PILES.Settings.HideHeaderButton.Title",
+      hint: "ITEM-PILES.Settings.HideHeaderButton.Hint",
       scope: "client",
       config: false,
       default: false,

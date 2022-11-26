@@ -3,7 +3,7 @@
 
   export let data;
   export let disabled = false;
-  
+
 </script>
 
 <div class="setting form-scope item-piles-flexrow">

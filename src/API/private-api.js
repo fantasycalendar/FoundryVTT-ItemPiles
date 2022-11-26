@@ -8,7 +8,7 @@ import SETTINGS from "../constants/settings.js";
 import CONSTANTS from "../constants/constants.js";
 import { hotkeyState } from "../hotkeys.js";
 import DropItemDialog from "../applications/dialogs/drop-item-dialog/drop-item-dialog.js";
-import { ItemPileInventoryApp } from "../applications/item-pile-inventory-app/item-pile-inventory-app.js";
+import ItemPileInventoryApp from "../applications/item-pile-inventory-app/item-pile-inventory-app.js";
 import Transaction from "../helpers/transaction.js";
 import ItemPileStore from "../stores/item-pile-store.js";
 import MerchantApp from "../applications/merchant-app/merchant-app.js";
@@ -127,7 +127,6 @@ export default class PrivateAPI {
       itemPileConfig.lockedImage = Helpers.random_array_element(itemPileConfig.lockedImages);
       itemPileConfig.lockedImages = [];
     }
-    itemPileConfig = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, itemPileConfig);
     doc.updateSource({
       [CONSTANTS.FLAGS.PILE]: itemPileConfig, ["actorData." + CONSTANTS.FLAGS.PILE]: itemPileConfig
     });
@@ -630,13 +629,11 @@ export default class PrivateAPI {
       let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
       pileDataDefaults.enabled = true;
-      pileDataDefaults.deleteWhenEmpty = "true";
+      pileDataDefaults.deleteWhenEmpty = true;
       pileDataDefaults.displayOne = true;
       pileDataDefaults.showItemName = true;
       pileDataDefaults.overrideSingleItemScale = true;
       pileDataDefaults.singleItemScale = 0.75;
-
-      pileDataDefaults = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, foundry.utils.mergeObject(pileDataDefaults, itemPileFlags));
 
       pileActor = await Actor.create({
         name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
@@ -664,13 +661,11 @@ export default class PrivateAPI {
         let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
         pileDataDefaults.enabled = true;
-        pileDataDefaults.deleteWhenEmpty = "true";
+        pileDataDefaults.deleteWhenEmpty = true;
         pileDataDefaults.displayOne = true;
         pileDataDefaults.showItemName = true;
         pileDataDefaults.overrideSingleItemScale = true;
         pileDataDefaults.singleItemScale = 0.75;
-
-        pileDataDefaults = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, pileDataDefaults);
 
         pileActor = await Actor.create({
           name: "Default Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
@@ -796,8 +791,6 @@ export default class PrivateAPI {
         tokenUpdateGroups[sceneId] = []
       }
 
-      specificPileSettings = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, specificPileSettings);
-
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId, ...specificTokenSettings,
         [CONSTANTS.FLAGS.PILE]: specificPileSettings,
@@ -851,8 +844,6 @@ export default class PrivateAPI {
       const specificTokenSettings = Helpers.isFunction(tokenSettings)
         ? await tokenSettings(target)
         : foundry.utils.deepClone(tokenSettings);
-
-      specificPileSettings = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, specificPileSettings);
 
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId,

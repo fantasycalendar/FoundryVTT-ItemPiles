@@ -340,7 +340,7 @@
         "Title": "Inverser Ctrl + Double clic Ouvrir",
         "Label": "Normalement, vous devez maintenir CTRL lorsque vous voulez ouvrir la feuille d'acteur d'une pile d'objets. En activant cette option, la fiche d'acteur de la pile d'objets s'ouvre par défaut, et en maintenant CTRL, vous ouvrez l'interface d'inventaire de la pile d'objets."
       },
-      "HideActorHeaderText": {
+      "HideHeaderButtonText": {
         "Title": "Cacher le texte de l'en-tête de l'acteur",
         "Label": "Masque le texte \"Item Piles\" dans l'en-tête de l'acteur - utile si vous avez trop de modules et que l'en-tête devient encombré."
       },
@@ -737,7 +737,7 @@
         "Title": "Afficher le bouton d'échange",
         "Hint": "Activer cette option affichera un bouton d'échange juste en dessous de la liste des joueurs en bas à droite."
       },
-      "HideActorHeaderText": {
+      "HideHeaderButtonText": {
         "Title": "Cacher le texte de l'en-tête de l'acteur",
         "Hint": "Masque le texte \"Piles d'objets\" dans l'en-tête de l'acteur - utile si vous avez trop de modules et que l'en-tête devient encombré."
       },

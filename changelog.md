@@ -2,8 +2,12 @@
 
 ## Version 2.3.3
 
-- Improved the `Populate Items` tab in merchants - you can now add all items on rollable tables to populate a merchant's inventory, rolling for the quantity of each item
+- Reworked the `Populate Items` tab in merchants - you can now add all items on rollable tables to populate a merchant's inventory, rolling for the quantity of each item
+- Added "Show To Which Players" dialog when "Show to players" is clicked on item piles and merchants
+- Added `Hide header button` client setting
 - Fixed `Split currency x ways` not working when "Sharing Enabled: Currencies" was disabled
+- Fixed `Hide header button text` client setting not working on item piles and merchants
+- Fixed switching item pile functionality (enabled/disabled, item pile/merchant) would break any active UI with them, now closes the active window and opens the appropriate one
 
 ## Version 2.3.2
 
