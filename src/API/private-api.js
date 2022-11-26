@@ -103,7 +103,8 @@ export default class PrivateAPI {
    * @private
    */
   static _onPreCreateToken(doc, data) {
-    const itemPileConfig = getProperty(data, CONSTANTS.FLAGS.PILE);
+    let itemPileConfig = foundry.utils.deepClone(getProperty(data, CONSTANTS.FLAGS.PILE));
+    itemPileConfig = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, itemPileConfig);
     if (!itemPileConfig?.enabled) return;
     if (!doc.isLinked) {
       doc.updateSource({
@@ -126,6 +127,7 @@ export default class PrivateAPI {
       itemPileConfig.lockedImage = Helpers.random_array_element(itemPileConfig.lockedImages);
       itemPileConfig.lockedImages = [];
     }
+    itemPileConfig = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, itemPileConfig);
     doc.updateSource({
       [CONSTANTS.FLAGS.PILE]: itemPileConfig, ["actorData." + CONSTANTS.FLAGS.PILE]: itemPileConfig
     });
@@ -634,7 +636,7 @@ export default class PrivateAPI {
       pileDataDefaults.overrideSingleItemScale = true;
       pileDataDefaults.singleItemScale = 0.75;
 
-      pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+      pileDataDefaults = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, foundry.utils.mergeObject(pileDataDefaults, itemPileFlags));
 
       pileActor = await Actor.create({
         name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
@@ -659,7 +661,7 @@ export default class PrivateAPI {
 
         Helpers.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
-        const pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+        let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
         pileDataDefaults.enabled = true;
         pileDataDefaults.deleteWhenEmpty = "true";
@@ -667,6 +669,8 @@ export default class PrivateAPI {
         pileDataDefaults.showItemName = true;
         pileDataDefaults.overrideSingleItemScale = true;
         pileDataDefaults.singleItemScale = 0.75;
+
+        pileDataDefaults = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, pileDataDefaults);
 
         pileActor = await Actor.create({
           name: "Default Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
@@ -764,7 +768,7 @@ export default class PrivateAPI {
 
       const target = fromUuidSync(targetUuid);
 
-      const specificPileSettings = foundry.utils.mergeObject(
+      let specificPileSettings = foundry.utils.mergeObject(
         PileUtilities.getActorFlagData(target),
         pileSettings
       );
@@ -791,6 +795,8 @@ export default class PrivateAPI {
       if (!tokenUpdateGroups[sceneId]) {
         tokenUpdateGroups[sceneId] = []
       }
+
+      specificPileSettings = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, specificPileSettings);
 
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId, ...specificTokenSettings,
@@ -832,7 +838,7 @@ export default class PrivateAPI {
 
       let target = fromUuidSync(targetUuid);
 
-      const specificPileSettings = PileUtilities.getActorFlagData(target);
+      let specificPileSettings = PileUtilities.getActorFlagData(target);
       specificPileSettings.enabled = false;
 
       const sceneId = targetUuid.split('.')[1];
@@ -846,6 +852,8 @@ export default class PrivateAPI {
         ? await tokenSettings(target)
         : foundry.utils.deepClone(tokenSettings);
 
+      specificPileSettings = foundry.utils.diffObject(CONSTANTS.PILE_DEFAULTS, specificPileSettings);
+
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId,
         ...specificTokenSettings,
@@ -856,7 +864,8 @@ export default class PrivateAPI {
       if (target.isLinked) {
         if (actorUpdateGroups[target.actor.id]) continue;
         actorUpdateGroups[target.actor.id] = {
-          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: specificPileSettings
+          "_id": target.actor.id,
+          [CONSTANTS.FLAGS.PILE]: specificPileSettings
         }
       }
     }
@@ -969,9 +978,10 @@ export default class PrivateAPI {
    * @private
    */
   static _evaluateItemPileChange(doc, changes = {}, force = false) {
+    const duplicatedChanges = foundry.utils.deepClone(changes);
     const target = doc?.token ?? doc;
     if (!Helpers.isResponsibleGM()) return;
-    if (!force && !PileUtilities.shouldEvaluateChange(target, changes)) return;
+    if (!force && !PileUtilities.shouldEvaluateChange(target, duplicatedChanges)) return;
     const targetUuid = target.uuid;
     return Helpers.debounceManager.setDebounce(targetUuid, async (uuid) => {
       if (!Utilities.getDocument(uuid)) return;

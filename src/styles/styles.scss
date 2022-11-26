@@ -15,7 +15,7 @@
 .item-piles {
 
   input {
-    color: var(--item-piles-input-text-color);
+    color: var(--item-piles-input-text-color, #000);
   }
 
   h3 {
@@ -145,7 +145,7 @@
   }
 
   &-even-color:nth-child(odd) {
-    background-color: var(--item-piles-odd-color);
+    background-color: var(--item-piles-odd-color, var(--color-bg-option, #dad8cc));
   }
 
   &-odd-color:nth-child(odd) {
@@ -153,7 +153,7 @@
   }
 
   &-odd-color:nth-child(even) {
-    background-color: var(--item-piles-even-color);
+    background-color: var(--item-piles-even-color, var(--color-bg-option, #dad8cc));
   }
 
   &-bottom-divider {

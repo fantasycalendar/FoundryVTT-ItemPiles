@@ -1190,7 +1190,9 @@ class API {
 
     if (items) {
       for (const entry of items) {
-        entry.item = await Item.implementation.create(entry.item, { temporary: true });
+        entry.item = targetActor
+          ? targetActor.items.get(entry._id)
+          : await Item.implementation.create(entry.item, { temporary: true });
       }
     }
 
@@ -1198,12 +1200,28 @@ class API {
 
   }
 
-  static getActorItems(actor) {
-    return PileUtilities.getActorItems(actor);
+  /**
+   * Gets all the valid items from a given actor or token, excluding items based on its item type filters
+   *
+   * @param {Actor/TokenDocument/Token} target      The target to get the items from
+   *
+   * @returns {Array<Item>}                         Array containing the target's valid items
+   */
+  static getActorItems(target) {
+    return PileUtilities.getActorItems(target);
   }
 
-  static getActorCurrencies(actor, { getAll = false } = {}) {
-    return PileUtilities.getActorCurrencies(actor, { getAll });
+  /**
+   * Gets the valid currencies from a given actor or token
+   *
+   * @param {Actor/TokenDocument/Token} target      The target to get the items from
+   * @param {object} [options]                      Object containing optional parameters
+   * @param {Boolean} [options.getAll]              Whether to get all the currencies, regardless of quantity
+   *
+   * @returns {Array<object>}                       An array of objects containing the data about each currency
+   */
+  static getActorCurrencies(target, { getAll = false } = {}) {
+    return PileUtilities.getActorCurrencies(target, { getAll });
   }
 
   static updateTokenHud() {
@@ -1221,11 +1239,11 @@ class API {
   /**
    * Renders the appropriate interface for a given actor
    *
-   * @param {Actor/TokenDocument} target                    The actor whose interface to render
-   * @param {object} options                                An object containing the options for this method
-   * @param {Array<string/User>} options.userIds            An array of users or user ids for each user to render the interface for (defaults to only self)
-   * @param {Actor/TokenDocument} options.inspectingTarget  Sets what actor should be viewing the interface
-   * @param {boolean} options.useDefaultCharacter           Whether other users should use their assigned character when rendering the interface
+   * @param {Actor/TokenDocument} target                      The actor whose interface to render
+   * @param {object} options                                  An object containing the options for this method
+   * @param {Array<string/User>} [options.userIds]            An array of users or user ids for each user to render the interface for (defaults to only self)
+   * @param {Actor/TokenDocument} [options.inspectingTarget]  Sets what actor should be viewing the interface
+   * @param {boolean} [options.useDefaultCharacter]           Whether other users should use their assigned character when rendering the interface
    *
    * @returns {Promise}
    */

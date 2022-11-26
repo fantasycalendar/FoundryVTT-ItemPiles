@@ -2,6 +2,7 @@
 
 ## Version 2.3.3
 
+- Improved the `Populate Items` tab in merchants - you can now add all items on rollable tables to populate a merchant's inventory, rolling for the quantity of each item
 - Fixed `Split currency x ways` not working when "Sharing Enabled: Currencies" was disabled
 
 ## Version 2.3.2
