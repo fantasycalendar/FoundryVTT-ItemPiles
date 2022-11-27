@@ -3,7 +3,6 @@ import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "./helpers.js";
 import { SYSTEMS } from "../systems.js";
 import { hotkeyState } from "../hotkeys.js";
-import { getItemCost } from "./utilities.js";
 import SETTINGS from "../constants/settings.js";
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
@@ -13,12 +12,12 @@ function getFlagData(inDocument, flag, defaults, existing = false) {
   return foundry.utils.mergeObject(defaultFlags, data);
 }
 
-export function getItemFlagData(item) {
-  return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, CONSTANTS.ITEM_DEFAULTS);
+export function getItemFlagData(item, data = false) {
+  return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, foundry.utils.deepClone(CONSTANTS.ITEM_DEFAULTS), data);
 }
 
 export function getActorFlagData(target, data = false) {
-  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, CONSTANTS.PILE_DEFAULTS, data);
+  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS), data);
 }
 
 export function isValidItemPile(target, data = false) {
