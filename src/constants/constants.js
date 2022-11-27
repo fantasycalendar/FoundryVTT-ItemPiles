@@ -111,4 +111,6 @@ const CONSTANTS = {
   }
 }
 
+Object.freeze(CONSTANTS);
+
 export default CONSTANTS;

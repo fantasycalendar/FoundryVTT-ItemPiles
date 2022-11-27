@@ -104,7 +104,10 @@ export default class PrivateAPI {
    */
   static _onPreCreateToken(doc, data) {
     let itemPileConfig = foundry.utils.deepClone(getProperty(data, CONSTANTS.FLAGS.PILE));
-    itemPileConfig = foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, itemPileConfig);
+    itemPileConfig = foundry.utils.mergeObject(
+      foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+      itemPileConfig
+    );
     if (!itemPileConfig?.enabled) return;
     if (!doc.isLinked) {
       doc.updateSource({

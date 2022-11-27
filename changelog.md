@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.3.4
+
+- Fixed creating a new item pile would make every token think it's an item pile - oops
+
 ## Version 2.3.3
 
 - Reworked the `Populate Items` tab in merchants - you can now add all items on rollable tables to populate a merchant's inventory, rolling for the quantity of each item
