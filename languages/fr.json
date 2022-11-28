@@ -161,6 +161,14 @@
       },
       "TextEditor": {
         "Title": "Éditeur de texte"
+      },
+      "UserSelect": {
+        "Content": "Montrer à quels utilisateurs ?",
+        "Title": "Choisir les utilisateurs"
+      },
+      "RemoveMerchantTable": {
+        "Title": "Retirer la table du marchand",
+        "Content": "Êtes-vous sûr de vouloir retirer la table \"{table_name}\" de ce marchand ? Ce sera définitif."
       }
     },
     "CurrenciesEditor": {
@@ -402,7 +410,14 @@
       "OtherTypes": {
         "item-piles-service": "Service"
       },
-      "NoMatchFound": "Rien ne correspond à votre recherche"
+      "NoMatchFound": "Rien ne correspond à votre recherche",
+      "RollableTables": "Tables aléatoires",
+      "AddTable": "Ajouter une table",
+      "RollAllTables": "Lancer toutes les tables",
+      "ToolTipRemoveTable": "Retirer une table",
+      "TooltipConfigureTable": "Configurer une table",
+      "TooltipRollTable": "Lancer une table",
+      "ToolTipRemoveAllRolledItems": "Retirer tous les objets tirés"
     },
     "Applications": {
       "DropItem": {
@@ -756,6 +771,10 @@
       "CurrencyDecimalDigits": {
         "Title": "Chiffres décimaux des devises",
         "Hint": "Ce paramètre définit le chiffre décimal le plus bas auquel vos devises sont arrondies. Par exemple, dans un environnement moderne avec des devises modernes, \"0,01\" permet d'obtenir deux chiffres décimaux. Ce paramètre n'est pas utilisé si vous avez plus d'une devise."
+      },
+      "HideHeaderButton": {
+        "Title": "Cacher le bouton du titre",
+        "Hint": "Cache le bouton \"Item Piles\" dans l'acteur et les titres des objets. Cela rendra plus difficile la configuration de nouvelles piles d'objets et d'objets."
       }
     },
     "Warnings": {
