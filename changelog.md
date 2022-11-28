@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.3.5
+
+- Fixed `game.itempiles.API.setCurrencies` requiring the wrong parameters
+
 ## Version 2.3.4
 
 - Fixed creating a new item pile would make every token think it's an item pile - oops

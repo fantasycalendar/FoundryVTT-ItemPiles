@@ -117,8 +117,8 @@ class API {
       if (typeof currency.abbreviation !== "string") {
         throw Helpers.custom_error("setCurrencies | currency.abbreviation must be of type string");
       }
-      if (typeof currency.exchange !== "number") {
-        throw Helpers.custom_error("setCurrencies | currency.exchange must be of type number");
+      if (typeof currency.exchangeRate !== "number") {
+        throw Helpers.custom_error("setCurrencies | currency.exchangeRate must be of type number");
       }
       if (typeof currency.data !== "object") {
         throw Helpers.custom_error("setCurrencies | currency.data must be of type object");
