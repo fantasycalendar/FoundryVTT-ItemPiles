@@ -123,7 +123,7 @@ class API {
       if (typeof currency.data !== "object") {
         throw Helpers.custom_error("setCurrencies | currency.data must be of type object");
       }
-      if (typeof currency.data.path !== "string" || typeof currency.data.uuid !== "string" || typeof currency.data.item !== "object") {
+      if (typeof currency.data.path !== "string" && typeof currency.data.uuid !== "string" && typeof currency.data.item !== "object") {
         throw Helpers.custom_error("setCurrencies | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
       }
       if (currency.img && typeof currency.img !== "string") {
