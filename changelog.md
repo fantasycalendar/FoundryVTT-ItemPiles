@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.3.6
+
+- Fixed closing an item pile container via the UI would not pass along the actor who closed it to macros and hooks
+
 ## Version 2.3.5
 
 - Fixed `game.itempiles.API.setCurrencies` requiring the wrong parameters
