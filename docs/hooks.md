@@ -1,74 +1,84 @@
 # Hooks
 
 - [Generic](#Generic)
-    - [item-piles-ready](#item-piles-ready)
-    - [item-piles-resetSettings](#item-piles-resetSettings)
+  - [item-piles-ready](#item-piles-ready)
+  - [item-piles-resetSettings](#item-piles-resetSettings)
 
 - [Specific](#Specific)
-    - [item-piles-preTransferEverything](#item-piles-preTransferEverything)
-    - [item-piles-transferEverything](#item-piles-transferEverything)
+  - [item-piles-preTransferEverything](#item-piles-preTransferEverything)
+  - [item-piles-transferEverything](#item-piles-transferEverything)
 
 - [Interfaces](#Interfaces)
-    - [item-piles-preOpenInterface](#item-piles-preOpenInterface)
-    - [item-piles-openInterface](#item-piles-openInterface)
-    - [item-piles-preCloseInterface](#item-piles-preCloseInterface)
-    - [item-piles-closeInterface](#item-piles-closeInterface)
+  - [item-piles-preOpenInterface](#item-piles-preOpenInterface)
+  - [item-piles-openInterface](#item-piles-openInterface)
+  - [item-piles-preCloseInterface](#item-piles-preCloseInterface)
+  - [item-piles-closeInterface](#item-piles-closeInterface)
 
 - [Item Piles](#Item-Piles)
-    - [item-piles-preCreateItemPile](#item-piles-preCreateItemPile)
-    - [item-piles-createItemPile](#item-piles-createItemPile)
-    - [item-piles-preUpdateItemPile](#item-piles-preUpdateItemPile)
-    - [item-piles-updateItemPile](#item-piles-updateItemPile)
-    - [item-piles-preDeleteItemPile](#item-piles-preDeleteItemPile)
-    - [item-piles-deleteItemPile](#item-piles-deleteItemPile)
-    - [item-piles-preCloseItemPile](#item-piles-preCloseItemPile)
-    - [item-piles-closeItemPile](#item-piles-closeItemPile)
-    - [item-piles-preOpenItemPile](#item-piles-preOpenItemPile)
-    - [item-piles-openItemPile](#item-piles-openItemPile)
-    - [item-piles-preLockItemPile](#item-piles-preLockItemPile)
-    - [item-piles-lockItemPile](#item-piles-lockItemPile)
-    - [item-piles-preUnlockItemPile](#item-piles-preUnlockItemPile)
-    - [item-piles-unlockItemPile](#item-piles-unlockItemPile)
-    - [item-piles-preRattleItemPile](#item-piles-preRattleItemPile)
-    - [item-piles-rattleItemPile](#item-piles-rattleItemPile)
-    - [item-piles-preTurnIntoItemPiles](#item-piles-preTurnIntoItemPiles)
-    - [item-piles-turnIntoItemPiles](#item-piles-turnIntoItemPiles)
-    - [item-piles-preRevertFromItemPiles](#item-piles-preRevertFromItemPiles)
-    - [item-piles-revertFromItemPiles](#item-piles-revertFromItemPiles)
-    - [item-piles-preOpenItemPileInventory](#item-piles-preOpenItemPileInventory)
-    - [item-piles-openItemPileInventory](#item-piles-openItemPileInventory)
-    - [item-piles-preSplitItemPileContent](#item-piles-preSplitItemPileContent)
-    - [item-piles-splitItemPileContent](#item-piles-splitItemPileContent)
+  - [item-piles-preCreateItemPile](#item-piles-preCreateItemPile)
+  - [item-piles-createItemPile](#item-piles-createItemPile)
+  - [item-piles-preUpdateItemPile](#item-piles-preUpdateItemPile)
+  - [item-piles-updateItemPile](#item-piles-updateItemPile)
+  - [item-piles-preDeleteItemPile](#item-piles-preDeleteItemPile)
+  - [item-piles-deleteItemPile](#item-piles-deleteItemPile)
+  - [item-piles-preCloseItemPile](#item-piles-preCloseItemPile)
+  - [item-piles-closeItemPile](#item-piles-closeItemPile)
+  - [item-piles-preOpenItemPile](#item-piles-preOpenItemPile)
+  - [item-piles-openItemPile](#item-piles-openItemPile)
+  - [item-piles-preLockItemPile](#item-piles-preLockItemPile)
+  - [item-piles-lockItemPile](#item-piles-lockItemPile)
+  - [item-piles-preUnlockItemPile](#item-piles-preUnlockItemPile)
+  - [item-piles-unlockItemPile](#item-piles-unlockItemPile)
+  - [item-piles-preRattleItemPile](#item-piles-preRattleItemPile)
+  - [item-piles-rattleItemPile](#item-piles-rattleItemPile)
+  - [item-piles-preTurnIntoItemPiles](#item-piles-preTurnIntoItemPiles)
+  - [item-piles-turnIntoItemPiles](#item-piles-turnIntoItemPiles)
+  - [item-piles-preRevertFromItemPiles](#item-piles-preRevertFromItemPiles)
+  - [item-piles-revertFromItemPiles](#item-piles-revertFromItemPiles)
+  - [item-piles-preOpenItemPileInventory](#item-piles-preOpenItemPileInventory)
+  - [item-piles-openItemPileInventory](#item-piles-openItemPileInventory)
+  - [item-piles-preSplitItemPileContent](#item-piles-preSplitItemPileContent)
+  - [item-piles-splitItemPileContent](#item-piles-splitItemPileContent)
 
 - [Items](#Items)
-    - [item-piles-preDropItemDetermined](#item-piles-preDropItemDetermined)
-    - [item-piles-preDropItem](#item-piles-preDropItem)
-    - [item-piles-dropItem](#item-piles-dropItem)
-    - [item-piles-preTransferItems](#item-piles-preTransferItems)
-    - [item-piles-transferItemss](#item-piles-transferItems)
-    - [item-piles-preAddItems](#item-piles-preAddItems)
-    - [item-piles-addItems](#item-piles-addItems)
-    - [item-piles-preRemoveItems](#item-piles-preRemoveItems)
-    - [item-piles-removeItems](#item-piles-removeItems)
-    - [item-piles-preTransferAllItems](#item-piles-preTransferAllItems)
-    - [item-piles-transferAllItems](#item-piles-transferAllItems)
-    - [item-piles-preCalculateTradeItems](#item-piles-preCalculateTradeItems)
-    - [item-piles-preTradeItems](#item-piles-preTradeItems)
-    - [item-piles-tradeItems](#item-piles-tradeItems)
+  - [item-piles-preDropItemDetermined](#item-piles-preDropItemDetermined)
+  - [item-piles-preDropItem](#item-piles-preDropItem)
+  - [item-piles-dropItem](#item-piles-dropItem)
+  - [item-piles-preAddItems](#item-piles-preAddItems)
+  - [item-piles-addItems](#item-piles-addItems)
+  - [item-piles-preRemoveItems](#item-piles-preRemoveItems)
+  - [item-piles-removeItems](#item-piles-removeItems)
+  - [item-piles-preTransferItems](#item-piles-preTransferItems)
+  - [item-piles-transferItems](#item-piles-transferItems)
+  - [item-piles-preTransferAllItems](#item-piles-preTransferAllItems)
+  - [item-piles-transferAllItems](#item-piles-transferAllItems)
+  - [item-piles-preCalculateTradeItems](#item-piles-preCalculateTradeItems)
+  - [item-piles-preTradeItems](#item-piles-preTradeItems)
+  - [item-piles-tradeItems](#item-piles-tradeItems)
 
 - [Attributes](#Attributes)
-    - [item-piles-preTransferAttributes](#item-piles-preTransferAttributes)
-    - [item-piles-transferAttributes](#item-piles-transferAttributess)
-    - [item-piles-preAddAttributes](#item-piles-preAddAttributes)
-    - [item-piles-addAttributes](#item-piles-addAttributes)
-    - [item-piles-preRemoveAttributes](#item-piles-preRemoveAttributes)
-    - [item-piles-removeAttributes](#item-piles-removeAttributes)
-    - [item-piles-preTransferAllAttributes](#item-piles-preTransferAllAttributes)
-    - [item-piles-transferAllAttributes](#item-piles-transferAllAttributes)
+  - [item-piles-preAddAttributes](#item-piles-preAddAttributes)
+  - [item-piles-addAttributes](#item-piles-addAttributes)
+  - [item-piles-preRemoveAttributes](#item-piles-preRemoveAttributes)
+  - [item-piles-removeAttributes](#item-piles-removeAttributes)
+  - [item-piles-preTransferAttributes](#item-piles-preTransferAttributes)
+  - [item-piles-transferAttributes](#item-piles-transferAttributes)
+  - [item-piles-preTransferAllAttributes](#item-piles-preTransferAllAttributes)
+  - [item-piles-transferAllAttributes](#item-piles-transferAllAttributes)
+
+- [Currencies][#Currencies]
+  - [item-piles-preTransferCurrencies](#item-piles-preTransferCurrencies)
+  - [item-piles-transferCurrencies](#item-piles-transferCurrencies)
+  - [item-piles-preAddCurrencies](#item-piles-preAddCurrencies)
+  - [item-piles-addCurrencies](#item-piles-addCurrencies)
+  - [item-piles-preRemoveCurrencies](#item-piles-preRemoveCurrencies)
+  - [item-piles-removeCurrencies](#item-piles-removeCurrencies)
+  - [item-piles-preTransferAllCurrencies](#item-piles-preTransferAllCurrencies)
+  - [item-piles-transferAllCurrencies](#item-piles-transferAllCurrencies)
 
 - [Trading](#Trade)
-    - [item-piles-tradeStarted](#item-piles-tradeStarted)
-    - [item-piles-tradeComplete](#item-piles-tradeComplete)
+  - [item-piles-tradeStarted](#item-piles-tradeStarted)
+  - [item-piles-tradeComplete](#item-piles-tradeComplete)
 
 ---
 
@@ -515,35 +525,6 @@ Called after an item has been dropped on the canvas.
 
 ---
 
-### item-piles-preTransferItems
-
-Called before items are transferred from the source to the target.
-
-| Param    | Type                                   | Description                                              |
-|----------|----------------------------------------|----------------------------------------------------------|
-| source   | <code>Actor/TokenDocument</code> | The source that is going to transfer the item            |
-| target   | <code>Actor/TokenDocument</code> | The target that is going to receive the item             |
-| items    | <code>array</code>                     | An array of objects each containing the item id (key "_id") and the quantity that it is going to be transferred (key "quantity") |
-| interactionId | <code>string/boolean</code>            | The ID of this interaction, to identify ongoing transfers |
-
-If the hook returns `false`, the action is interrupted.
-
----
-
-### item-piles-transferItems
-
-Called after an item has been transferred from the source to the target.
-
-| Param      | Type                             | Description                              |
-|------------|----------------------------------|------------------------------------------|
-| source | <code>Actor/TokenDocument</code> | The source that transferred the item     |
-| target | <code>Actor/TokenDocument</code> | The target that received the item        |
-| items      | <code>array</code>               | An array of objects, each containing the item that was added or updated, and the quantity that was transferred |
-| userId      | <code>string</code>              | The ID of the user that initiated this action |
-| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers |
-
----
-
 ### item-piles-preAddItems
 
 Called before an item is added to the target. This is not called in any transfers.
@@ -593,6 +574,35 @@ Called after an item has been removed from the target. This is not called in any
 |------------|----------------------------------|-------------------------------------------|
 | target | <code>Actor/TokenDocument</code> | The target that lost the item |
 | items      | <code>array</code>               | An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted |
+| userId      | <code>string</code>              | The ID of the user that initiated this action |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers |
+
+---
+
+### item-piles-preTransferItems
+
+Called before items are transferred from the source to the target.
+
+| Param    | Type                                   | Description                                              |
+|----------|----------------------------------------|----------------------------------------------------------|
+| source   | <code>Actor/TokenDocument</code> | The source that is going to transfer the item            |
+| target   | <code>Actor/TokenDocument</code> | The target that is going to receive the item             |
+| items    | <code>array</code>                     | An array of objects each containing the item id (key "_id") and the quantity that it is going to be transferred (key "quantity") |
+| interactionId | <code>string/boolean</code>            | The ID of this interaction, to identify ongoing transfers |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-transferItems
+
+Called after an item has been transferred from the source to the target.
+
+| Param      | Type                             | Description                              |
+|------------|----------------------------------|------------------------------------------|
+| source | <code>Actor/TokenDocument</code> | The source that transferred the item     |
+| target | <code>Actor/TokenDocument</code> | The target that received the item        |
+| items      | <code>array</code>               | An array of objects, each containing the item that was added or updated, and the quantity that was transferred |
 | userId      | <code>string</code>              | The ID of the user that initiated this action |
 | interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers |
 
@@ -781,6 +791,126 @@ Called after all attributes' values was transferred from the source to the targe
 | attributes | <code>object</code>              | An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred |
 | userId      | <code>string</code>              | The ID of the user that initiated this action |
 | interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers |
+
+---
+
+## Currencies
+
+### item-piles-preAddCurrencies
+
+Called before currencies are added to an actor. Not called in the case of a transfer.
+
+| Param     | Type                                   | Description                                                                                                                                                    |
+|-----------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| target    | <code>Actor/TokenDocument</code> | The target that will have currencies added to it                                                                                                               |
+| items    | <code>array</code>                     | An array of objects each containing the item id (key "_id") and the quantity that it is going to be added (key "quantity")                                     |
+| attributes | <code>array,object</code>              | An array of strings for each attribute to add, or an object containing key-value pairs where the keys are the attribute path, and the values the amount to add |
+| interactionId | <code>string/boolean</code>            | The ID of this interaction, to identify ongoing transfers                                                                                                      |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-addCurrencies
+
+Called after currencies were added to the target. Not called in the case of a transfer.
+
+| Param      | Type                             | Description                                                                                                    |
+|------------|----------------------------------|----------------------------------------------------------------------------------------------------------------|
+| target | <code>Actor/TokenDocument</code> | The target whose currencies were added to                                                                      |
+| items      | <code>array</code>               | An array of objects, each containing the item that was added or updated, and the quantity that was added       |
+| attributes | <code>object</code>              | An array containing a key value pair of the attribute path and the quantity of that attribute that was removed |
+| userId      | <code>string</code>              | The ID of the user that initiated this action                                                                  |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                      |
+
+---
+
+### item-piles-preRemoveCurrencies
+
+Called before currencies were removed from the target. Not called in the case of a transfer.
+
+| Param     | Type                                   | Description                                                                                                                                                                  |
+|-----------|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| target    | <code>Actor/TokenDocument</code> | The target that will have its currencies removed                                                                                                                             |
+| items      | <code>array</code>               | An array containing all of the items that was added to the target                                                                                                            |
+| attributes | <code>array,object</code>              | An array of strings for each attribute to subtracted, or an object containing key-value pairs where the keys are the attribute path, and the values the amount to subtracted |
+| interactionId | <code>string/boolean</code>            | The ID of this interaction, to identify ongoing transfers                                                                                                                    |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-removeCurrencies
+
+Called after currencies was removed from the target. Not called in the case of a transfer.
+
+| Param      | Type                             | Description                                                                                                                                |
+|------------|----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| target | <code>Actor/TokenDocument</code> | The target whose currencies were removed from                                                                                              |
+| items      | <code>array</code>               | An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted |
+| attributes | <code>object</code>              | An array containing a key value pair of the attribute path and the quantity of that attribute that was removed                             |
+| userId      | <code>string</code>              | The ID of the user that initiated this action                                                                                              |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                                  |
+
+---
+
+### item-piles-preTransferCurrencies
+
+Called before currencies are transferred from the source to the target.
+
+| Param     | Type                                   | Description                                                                                                                                                              |
+|-----------|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| source    | <code>Actor/TokenDocument</code> | The source that is going to transfer its currencies                                                                                                                      |
+| target    | <code>Actor/TokenDocument</code> | The target that is going to receive the currencies                                                                                                                       |
+| items    | <code>array</code>                     | An array of objects each containing the item id (key "_id") and the quantity that it is going to be transferred (key "quantity")                                         |
+| attributes | <code>array,object</code>              | An array of strings for each attribute to transfer, or an object containing key-value pairs where the keys are the attribute path, and the values the amount to transfer |
+| interactionId | <code>string/boolean</code>            | The ID of this interaction, to identify ongoing transfers                                                                                                                |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-transferCurrencies
+
+Called after currencies have been transferred from the source to the target.
+
+| Param      | Type                             | Description                                                                                                                                                 |
+|------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| source | <code>Actor/TokenDocument</code> | The source that transferred currencies                                                                                                                      |
+| target | <code>Actor/TokenDocument</code> | The target that received the currencies                                                                                                                     |
+| items      | <code>array</code>               | An array of objects, each containing the item that was added or updated, and the quantity that was transferred                                              |
+| attributes | <code>object</code>              | An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred |
+| userId      | <code>string</code>              | The ID of the user that initiated this action                                                                                                               |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                                                   |
+
+---
+
+### item-piles-preTransferAllCurrencies
+
+Called before all the source's currencies are transferred from the source to the target.
+
+| Param  | Type                                   | Description                                                |
+|--------|----------------------------------------|------------------------------------------------------------|
+| source | <code>Actor/TokenDocument</code> | The source that is going to transfer all of its currencies |
+| target | <code>Actor/TokenDocument</code> | The target that is going to receive all of the currencies  |
+| interactionId | <code>string/boolean</code>            | The ID of this interaction, to identify ongoing transfers  |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-transferAllCurrencies
+
+Called after all the source's currencies were transferred from the source to the target.
+
+| Param      | Type                             | Description                                                                                                                                                 |
+|------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| source | <code>Actor/TokenDocument</code> | The source that transferred all of its currencies                                                                                                           |
+| target | <code>Actor/TokenDocument</code> | The target that received all of the currencies                                                                                                              |
+| items             | <code>array</code>               | An array containing all of the items that were transferred to the target                                                                                    |
+| attributes | <code>object</code>              | An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred |
+| userId      | <code>string</code>              | The ID of the user that initiated this action                                                                                                               |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                                                   |
 
 ---
 

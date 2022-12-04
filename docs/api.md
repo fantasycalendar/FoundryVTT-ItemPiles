@@ -42,6 +42,10 @@
   * [removeItems](#removeItems)
   * [transferItems](#transferItems)
   * [transferAllItems](#transferAllItems)
+  * [addCurrencies](#addCurrencies)
+  * [removeCurrencies](#removeCurrencies)
+  * [transferCurrencies](#transferCurrencies)
+  * [transferAllCurrencies](#transferAllCurrencies)
   * [setAttributes](#setAttributes)
   * [addAttributes](#addAttributes)
   * [removeAttributes](#removeAttributes)
@@ -455,14 +459,14 @@ Adds item to an actor, increasing item quantities if matches were found
 **Returns**: `Promise<array>` - An array of objects, each containing the item that was added or updated, and the
 quantity that was added
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| target | `Actor/TokenDocument/Token` |  | The target to add an item to |
+| Param | Type | Default | Description                                                                                                                                                                |
+| --- | --- | --- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| target | `Actor/TokenDocument/Token` |  | The target to add items to                                                                                                                                                 |
 | items | `Array` |  | An array of objects, with the key "item" being an item object or an Item class (the foundry class), with an optional key of "quantity" being the amount of the item to add |
-| options | `object` |  | Options to pass to the function |
-| [options.mergeSimilarItems] | `boolean` | `true` | Whether to merge similar items based on their name and type |
-| [options.removeExistingActorItems] | `boolean` | `false` | Whether to remove the actor's existing items before adding the new ones |
-| [options.interactionId] | `string/boolean` | `false` | The interaction ID of this action |
+| options | `object` |  | Options to pass to the function                                                                                                                                            |
+| [options.mergeSimilarItems] | `boolean` | `true` | Whether to merge similar items based on their name and type                                                                                                                |
+| [options.removeExistingActorItems] | `boolean` | `false` | Whether to remove the actor's existing items before adding the new ones                                                                                                    |
+| [options.interactionId] | `string/boolean` | `false` | The interaction ID of this action                                                                                                                                          |
 
 ---
 
@@ -477,7 +481,7 @@ that was removed, and whether the item was deleted
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| target | `Actor/Token/TokenDocument` |  | The target to remove a items from |
+| target | `Actor/Token/TokenDocument` |  | The target to remove items from |
 | items | `Array` |  | An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of |
 | options | `object` |  | Options to pass to the function |
 | [options.interactionId] | `string/boolean` | `false` | The interaction ID of this action |
@@ -519,6 +523,75 @@ Transfers all items between the source and the target.
 | options | `object` |  | Options to pass to the function |
 | [options.itemFilters] | `Array/boolean` | `false` | Array of item types disallowed - will default to module settings if none provided |
 | [options.interactionId] | `string/boolean` | `false` | The interaction ID of this action |
+
+---
+
+### addCurrencies
+
+`game.itempiles.API.addCurrencies(target, currencies, options)` ⇒ `Promise<object>`
+
+Adds currencies to the target
+
+**Returns**: `Promise<object>` - An object containing the items and attributes added to the target
+
+| Param                                   | Type                        | Default | Description                                    |
+|-----------------------------------------|-----------------------------| --- |------------------------------------------------|
+| target                                  | `Actor/TokenDocument/Token` |  | The target to add the currencies to            |
+| currencies                              | `string`                    |  | A string of currencies to add (eg, "5gp 25sp") |
+| options                                 | `object`                    |  | Options to pass to the function                |
+| [options.interactionId]                 | `string/boolean`            | `false` | The interaction ID of this action              |
+
+---
+
+### removeCurrencies
+
+`game.itempiles.API.removeCurrencies(target, currencies, options)` ⇒ `Promise<object>`
+
+Removes currencies from the target
+
+**Returns**: `Promise<array>` - An object containing the items and attributes removed from the target
+
+| Param | Type                        | Default | Description                                       |
+| --- |-----------------------------| --- |---------------------------------------------------|
+| target | `Actor/Token/TokenDocument` |  | The target to remove currencies from              |
+| currencies | `string`                    |  | A string of currencies to remove (eg, "5gp 25sp") |
+| options | `object`                    |  | Options to pass to the function                   |
+| [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                 |
+
+---
+
+### transferCurrencies
+
+`game.itempiles.API.transferCurrencies(source, target, items, options)` ⇒ `Promise<object>`
+
+Transfers currencies between the source and the target.
+
+**Returns**: `Promise<object>` - An object containing the items and attributes transferred to the target
+
+| Param                   | Type                        | Default | Description                                         |
+|-------------------------|-----------------------------| --- |-----------------------------------------------------|
+| source                  | `Actor/Token/TokenDocument` |  | The source to transfer currencies from                        |
+| target                  | `Actor/Token/TokenDocument` |  | The target to transfer currencies to                          |
+| currencies              | `string`                    |  | A string of currencies to transfer (eg, "5gp 25sp") |
+| options                 | `object`                    |  | Options to pass to the function                     |
+| [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                   |
+
+---
+
+### transferAllCurrencies
+
+`game.itempiles.API.transferAllCurrencies(source, target, options)` ⇒ `Promise<object>`
+
+Transfers all currencies between the source and the target.
+
+**Returns**: `Promise<object>` - An object containing all items and attributes transferred to the target
+
+| Param | Type | Default | Description                               |
+| --- | --- | --- |-------------------------------------------|
+| source | `Actor/Token/TokenDocument` |  | The actor to transfer all currencies from |
+| target | `Actor/Token/TokenDocument` |  | The actor to receive all the currencies   |
+| options | `object` |  | Options to pass to the function           |
+| [options.interactionId] | `string/boolean` | `false` | The interaction ID of this action         |
 
 ---
 
