@@ -14,6 +14,7 @@
 - Fixed `game.itempiles.API.transferEverything` not transferring currencies correctly
 - Fixed DnD5e's system item filters not having `subclass` as an ignored item type
 - Fixed closing an item pile container via the UI would not pass along the actor who closed it to macros and hooks
+- Fixed documentation on hooks, as it was slightly out of date
 
 ## Version 2.3.5
 

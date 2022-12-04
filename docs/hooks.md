@@ -102,14 +102,15 @@ You can call this to reset all the Item Piles system specific settings.
 
 ### item-piles-preTransferEverything
 
-Called before all items and attributes are going to be transferred from the source to the target.
+Called before all items and currencies are going to be transferred from the source to the target.
 
-| Param           | Type                             | Description                                                                       |
-|-----------------|----------------------------------|-----------------------------------------------------------------------------------|
-| source          | <code>Actor/TokenDocument</code> | The Actor or Token that is going to have all its items and attributes transferred |
-| target          | <code>Actor/TokenDocument</code> | The Actor or Token that is going to receive all of the items and attributes       |
-| itemTypeFilters | <code>array,boolean</code>       | Array of item types to filter - will default to module settings if none provided  |
-| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers |
+| Param         | Type                             | Description                                                         |
+|---------------|----------------------------------|---------------------------------------------------------------------|
+| source        | <code>Actor/TokenDocument</code> | The source that is going to transfer all of its content             |
+| sourceUpdates | <code>object</code>              | An object containing the updated items and attributes on the source |
+| target        | <code>Actor/TokenDocument</code> | The target that is going to receive the content                     |
+| targetUpdates | <code>object</code>              | An object containing the updated items and attributes on the target |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers           |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -119,14 +120,14 @@ If the hook returns `false`, the action is interrupted.
 
 Called after all items and attributes have been transferred from the source to the target.
 
-| Param             | Type                             | Description                                                                 |
-|-------------------|----------------------------------|-----------------------------------------------------------------------------|
-| source        | <code>Actor/TokenDocument</code> | The source that had all of its items and attributes transferred    |
-| target        | <code>Actor/TokenDocument</code> | The target that received all of the items and attributes           |
-| items      | <code>array</code>               | An array containing all of the items that were transferred to the target                  |
-| attributes | <code>array</code>               | An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred                                   |
-| userId      | <code>string</code>              | The ID of the user that initiated this action |
-| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers |
+| Param           | Type                             | Description                                                                                                                   |
+|-----------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| source          | <code>Actor/TokenDocument</code> | The source that had all of its content transferred                                                                            |
+| target          | <code>Actor/TokenDocument</code> | The target that received all of the content                                                                                   |
+| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                               |
+| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed on the target |
+| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                 |
+| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                     |
 
 ---
 
@@ -191,7 +192,7 @@ Called before an item pile is going to be created.
 | Param         | Type                        | Description                                                                          |
 |---------------|-----------------------------|--------------------------------------------------------------------------------------|
 | position      | <code>object</code>         | The position where to create the item pile                                           |
-| items | <code>array,boolean</code>  | Any items to create on the item pile |
+| items         | <code>array,boolean</code>  | Any items to create on the item pile                                                 |
 | pileActorName | <code>string/boolean</code> | The actor name of the pile to create, if false, it defaults to the default item pile |
 
 If the hook returns `false`, the action is interrupted.
@@ -215,7 +216,7 @@ Called before an item pile is going to be updated (only through the API).
 
 | Param            | Type                               | Description                                                                              |
 |------------------|------------------------------------|------------------------------------------------------------------------------------------|
-| target           | <code>TokenDocument</code>   | The document of the item pile that is going to be updated                                |
+| target           | <code>TokenDocument</code>         | The document of the item pile that is going to be updated                                |
 | newData          | <code>object</code>                | The new data that is going to be modified on the item pile                               |
 | interactingToken | <code>TokenDocument,boolean</code> | If the update was caused by another token, this will be a TokenDocument, otherwise false |
 
@@ -239,9 +240,9 @@ Called after an item pile has been updated (only through the API).
 
 Called before an item pile is going to be deleted (only through the module's settings or its API).
 
-| Param   | Type                               | Description                                               |
-|---------|------------------------------------|-----------------------------------------------------------|
-| target  | <code>TokenDocument</code>   | The document of the item pile that is going to be deleted |
+| Param  | Type                       | Description                                               |
+|--------|----------------------------|-----------------------------------------------------------|
+| target | <code>TokenDocument</code> | The document of the item pile that is going to be deleted |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -251,9 +252,9 @@ If the hook returns `false`, the action is interrupted.
 
 Called after an item pile has been deleted.
 
-| Param   | Type                               | Description                                         |
-|---------|------------------------------------|-----------------------------------------------------|
-| target  | <code>TokenDocument</code>   | The document of the item pile that has been deleted |
+| Param  | Type                       | Description                                         |
+|--------|----------------------------|-----------------------------------------------------|
+| target | <code>TokenDocument</code> | The document of the item pile that has been deleted |
 
 ---
 
@@ -359,7 +360,7 @@ Called before a locked item pile is going to be attempted to be opened.
 
 | Param            | Type                               | Description                                                                        |
 |------------------|------------------------------------|------------------------------------------------------------------------------------|
-| target           | <code>TokenDocument</code>         | The document of the locked item pile is going to be attempted to be opened                              |
+| target           | <code>TokenDocument</code>         | The document of the locked item pile is going to be attempted to be opened         |
 | interactingToken | <code>TokenDocument,boolean</code> | If the action was caused by a token, this will be a TokenDocument, otherwise false |
 
 If the hook returns `false`, the action is interrupted.
@@ -372,7 +373,7 @@ Called after a locked item pile was attempted to be opened.
 
 | Param            | Type                               | Description                                                                        |
 |------------------|------------------------------------|------------------------------------------------------------------------------------|
-| target           | <code>TokenDocument</code>         | The document of the locked item pile that was attempted to be opened                                    |
+| target           | <code>TokenDocument</code>         | The document of the locked item pile that was attempted to be opened               |
 | interactingToken | <code>TokenDocument,boolean</code> | If the action was caused by a token, this will be a TokenDocument, otherwise false |
 
 ---
@@ -381,11 +382,11 @@ Called after a locked item pile was attempted to be opened.
 
 Called before a token is turned into an item pile.
 
-| Param          | Type                              | Description                                                         |
-|----------------|-----------------------------------|---------------------------------------------------------------------|
-| target         | <code>TokenDocument</code>  | The token that is going to be turned into an item pile              |
-| pileSettings   | <code>object</code>               | Any overriding item pile settings that the token and actor will get |
-| tokenSettings  | <code>object</code>               | Any overriding token settings that the token will get               |
+| Param         | Type                       | Description                                                         |
+|---------------|----------------------------|---------------------------------------------------------------------|
+| target        | <code>TokenDocument</code> | The token that is going to be turned into an item pile              |
+| pileSettings  | <code>object</code>        | Any overriding item pile settings that the token and actor will get |
+| tokenSettings | <code>object</code>        | Any overriding token settings that the token will get               |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -395,10 +396,10 @@ If the hook returns `false`, the action is interrupted.
 
 Called after a token has been turned into an item pile.
 
-| Param           | Type                | Description                                             |
-|-----------------|---------------------|---------------------------------------------------------|
-| target      | <code>string</code> | The token that was turned into an item pile |
-| newPileSettings | <code>object</code> | The resulting item pile's settings                      |
+| Param           | Type                | Description                                 |
+|-----------------|---------------------|---------------------------------------------|
+| target          | <code>string</code> | The token that was turned into an item pile |
+| newPileSettings | <code>object</code> | The resulting item pile's settings          |
 
 ---
 
@@ -406,10 +407,10 @@ Called after a token has been turned into an item pile.
 
 Called before a token is reverted from an item pile into a normal token.
 
-| Param          | Type                              | Description                                              |
-|----------------|-----------------------------------|----------------------------------------------------------|
-| target         | <code>TokenDocument</code>  | The token that is going to be reverted from an item pile |
-| tokenSettings  | <code>object</code>               | Any overriding token settings that the token will get    |
+| Param         | Type                       | Description                                              |
+|---------------|----------------------------|----------------------------------------------------------|
+| target        | <code>TokenDocument</code> | The token that is going to be reverted from an item pile |
+| tokenSettings | <code>object</code>        | Any overriding token settings that the token will get    |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -419,9 +420,9 @@ If the hook returns `false`, the action is interrupted.
 
 Called after a token has been reverted from an item pile into a normal token.
 
-| Param           | Type                             | Description                                               |
-|-----------------|----------------------------------|-----------------------------------------------------------|
-| target      | <code>Actor/TokenDocument</code> | The token that was reverted from an item pile |
+| Param  | Type                             | Description                                   |
+|--------|----------------------------------|-----------------------------------------------|
+| target | <code>Actor/TokenDocument</code> | The token that was reverted from an item pile |
 
 ---
 
@@ -429,10 +430,10 @@ Called after a token has been reverted from an item pile into a normal token.
 
 Called before an item pile's inventory UI is opened.
 
-| Param          | Type                              | Description                                              |
-|----------------|-----------------------------------|----------------------------------------------------------|
-| itemPileToken         | <code>TokenDocument</code>  | The item pile token whose inventory is going to be opened |
-| interactingToken  | <code>TokenDocument/boolean</code>               | The token that is going to be interacting with the item pile |
+| Param            | Type                               | Description                                                  |
+|------------------|------------------------------------|--------------------------------------------------------------|
+| itemPileToken    | <code>TokenDocument</code>         | The item pile token whose inventory is going to be opened    |
+| interactingToken | <code>TokenDocument/boolean</code> | The token that is going to be interacting with the item pile |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -442,11 +443,11 @@ If the hook returns `false`, the action is interrupted.
 
 Called after an item pile's inventory UI has been opened.
 
-| Param            | Type                | Description                                               |
-|------------------|---------------------|-----------------------------------------------------------|
-| app    | <code>FormApplication</code>  | The item pile's inventory formapplication |
-| itemPileToken    | <code>TokenDocument</code>  | The item pile whose inventory was opened |
-| interactingToken | <code>TokenDocument/boolean</code>               | The token that interacted with the item pile |
+| Param            | Type                               | Description                                  |
+|------------------|------------------------------------|----------------------------------------------|
+| app              | <code>FormApplication</code>       | The item pile's inventory formapplication    |
+| itemPileToken    | <code>TokenDocument</code>         | The item pile whose inventory was opened     |
+| interactingToken | <code>TokenDocument/boolean</code> | The token that interacted with the item pile |
 
 ---
 
@@ -454,12 +455,12 @@ Called after an item pile's inventory UI has been opened.
 
 Called before the content of an item pile is going to be split.
 
-| Param            | Type                | Description                                               |
-|------------------|---------------------|-----------------------------------------------------------|
-| target    | <code>TokenDocument/Actor</code>  | The item pile whose content that is going to be split |
-| targets    | <code>array<Actor></code>  | An array of actors who is going to be splitting the content |
-| userId | <code>string/boolean</code>               | The ID of the user that initiated this action |
-| instigator | <code>Actor</code>               | The actor that initiated this action |
+| Param      | Type                             | Description                                                 |
+|------------|----------------------------------|-------------------------------------------------------------|
+| target     | <code>TokenDocument/Actor</code> | The item pile whose content that is going to be split       |
+| targets    | <code>array<Actor></code>        | An array of actors who is going to be splitting the content |
+| userId     | <code>string/boolean</code>      | The ID of the user that initiated this action               |
+| instigator | <code>Actor</code>               | The actor that initiated this action                        |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -469,12 +470,12 @@ If the hook returns `false`, the action is interrupted.
 
 Called after the content of an item pile has been split.
 
-| Param            | Type                | Description                                               |
-|------------------|---------------------|-----------------------------------------------------------|
-| target    | <code>TokenDocument/Actor</code>  | The item pile whose content was just split |
-| transferData    | <code>object</code>  | The data of the items that were split, keyed by type and by actor UUID |
-| userId | <code>string/boolean</code>               | The ID of the user that initiated this action |
-| instigator | <code>Actor</code>               | The actor that initiated this action |
+| Param        | Type                             | Description                                                            |
+|--------------|----------------------------------|------------------------------------------------------------------------|
+| target       | <code>TokenDocument/Actor</code> | The item pile whose content was just split                             |
+| transferData | <code>object</code>              | The data of the items that were split, keyed by type and by actor UUID |
+| userId       | <code>string/boolean</code>      | The ID of the user that initiated this action                          |
+| instigator   | <code>Actor</code>               | The actor that initiated this action                                   |
 
 ---
 
@@ -515,13 +516,13 @@ If the hook returns `false`, the action is interrupted.
 
 Called after an item has been dropped on the canvas.
 
-| Param      | Type                             | Description                                                                                                                     |
-|------------|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| source | <code>Actor/TokenDocument</code> | The actor or token document that dropped the item                                                                   |
-| target | <code>Actor/TokenDocument</code> | The token document of the item pile that the item was dropped on, which may have been created as a part of the drop |
-| itemData   | <code>object</code>              | The data of the item that was dropped                                                                                           |
-| position   | <code>object/boolean</code>      | The position on the canvas where the item was dropped                                                                           |
-| quantity   | <code>number</code>              | The quantity of the item that was dropped                                                                                       |
+| Param    | Type                             | Description                                                                                                         |
+|----------|----------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| source   | <code>Actor/TokenDocument</code> | The actor or token document that dropped the item                                                                   |
+| target   | <code>Actor/TokenDocument</code> | The token document of the item pile that the item was dropped on, which may have been created as a part of the drop |
+| itemData | <code>object</code>              | The data of the item that was dropped                                                                               |
+| position | <code>object/boolean</code>      | The position on the canvas where the item was dropped                                                               |
+| quantity | <code>number</code>              | The quantity of the item that was dropped                                                                           |
 
 ---
 
@@ -606,7 +607,6 @@ Called after items have been transferred from the source to the target.
 | source          | <code>Actor/TokenDocument</code> | The source that transferred items                                                                                             |
 | target          | <code>Actor/TokenDocument</code> | The target that received the items                                                                                            |
 | itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                               |
-| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed on the target |
 | userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                 |
 | interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                     |
 

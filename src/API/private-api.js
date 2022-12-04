@@ -728,7 +728,7 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
