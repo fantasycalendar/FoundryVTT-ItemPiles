@@ -472,20 +472,18 @@ function getPriceArray(totalCost, currencies) {
   }
 
   const smallestExchangeRate = getSmallestExchangeRate(currencies);
-  const decimals = getExchangeRateDecimals(smallestExchangeRate);
-
-  let fraction = Helpers.roundToDecimals(totalCost % 1, decimals);
-  let cost = Math.round(totalCost - fraction);
 
   const prices = [];
 
   if (primaryCurrency.exchangeRate === smallestExchangeRate) {
 
+    let cost = totalCost;
+
     for (const currency of currencies) {
 
-      const numCurrency = Math.floor(Helpers.roundToDecimals(fraction / currency.exchangeRate, decimals));
+      const numCurrency = Math.floor(cost / currency.exchangeRate);
 
-      fraction = Helpers.roundToDecimals(fraction - (numCurrency * currency.exchangeRate), decimals);
+      cost = cost - (numCurrency * currency.exchangeRate);
 
       prices.push({
         ...currency,
@@ -500,6 +498,11 @@ function getPriceArray(totalCost, currencies) {
     return prices;
 
   }
+
+  const decimals = getExchangeRateDecimals(smallestExchangeRate);
+
+  let fraction = Helpers.roundToDecimals(totalCost % 1, decimals);
+  let cost = Math.round(totalCost - fraction);
 
   let skipPrimary = false;
   if (cost) {
@@ -547,13 +550,13 @@ export function getPriceFromString(str, currencyList = false) {
       return currency;
     });
 
-  const parts = str.split(" ");
+  const parts = str.trim().split(" ");
 
   let overallCost = 0;
   for (const part of parts) {
     for (const currency of currencies) {
 
-      const regexString = ` ?${currency.abbreviation.toLowerCase().replace("{#}", "(.*?)")} ?`
+      const regexString = `${currency.abbreviation.toLowerCase().replace("{#}", "(.*?)")}`
       const regex = new RegExp(regexString, "g");
 
       const results = [...part.toLowerCase().matchAll(regex)];
@@ -564,7 +567,7 @@ export function getPriceFromString(str, currencyList = false) {
         if (roll.total !== Number(result[1])) {
           currency.roll = roll;
         }
-        overallCost += roll.total / currency.exchangeRate;
+        overallCost += roll.total * currency.exchangeRate;
       }
     }
   }

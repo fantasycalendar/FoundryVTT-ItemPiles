@@ -143,7 +143,7 @@
                 <p>{localize("ITEM-PILES.Applications.ItemEditor.BasePriceExplanation")}</p>
               </label>
               <input type="text" bind:value={$price} on:change={() => {
-                $price = Math.max(0, Number($price));
+                $price = isNaN(Number($price)) ? $price : $price.max(0, Number($price));
               }}/>
             </div>
           {/if}
