@@ -11,7 +11,7 @@
 - Added hooks for the above methods
 - Improved support for systems with a primary currency that has the lowest exchange rate
 - Removed popup that asks you to update the item pile system settings and instead silently updates your settings
-- Fixed
+- Fixed item editor not supporting string-type item costs
 - Fixed `game.itempiles.API.transferEverything` not transferring currencies correctly
 - Fixed DnD5e's system item filters not having `subclass` as an ignored item type
 - Fixed closing an item pile container via the UI would not pass along the actor who closed it to macros and hooks
