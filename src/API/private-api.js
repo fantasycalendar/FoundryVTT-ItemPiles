@@ -15,6 +15,7 @@ import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
+import { getUserCharacter } from "../helpers/utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -1385,7 +1386,7 @@ export default class PrivateAPI {
     if (pileData.isContainer && interactingActor) {
 
       if (pileData.locked && !game.user.isGM) {
-        Helpers.debug(`Attempted to locked item pile with UUID ${pileDocument.uuid}`);
+        Helpers.debug(`Attempted to open locked item pile with UUID ${pileDocument.uuid}`);
         return game.itempiles.API.rattleItemPile(pileDocument, interactingActor);
       }
 
@@ -1520,8 +1521,8 @@ export default class PrivateAPI {
     const target = Utilities.getActor(targetUuid);
 
     let inspectingTarget;
-    if (useDefaultCharacter && !game.user.isGM) {
-      inspectingTarget = game.user.character;
+    if (useDefaultCharacter) {
+      inspectingTarget = Utilities.getUserCharacter();
     } else {
       inspectingTarget = inspectingTargetUuid ? fromUuidSync(inspectingTargetUuid) : false;
     }
