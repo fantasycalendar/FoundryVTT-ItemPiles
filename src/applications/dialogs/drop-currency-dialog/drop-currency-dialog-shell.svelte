@@ -11,7 +11,7 @@
   export let settings;
   export let elementRoot;
 
-  const targetCurrencyData = PileUtilities.getActorCurrencyList(targetActor);
+  const targetCurrencyData = PileUtilities.getCurrencyList(targetActor);
 
   const currencies = PileUtilities.getActorCurrencies(sourceActor, {
     currencyList: targetActor ? targetCurrencyData.currencies : false,

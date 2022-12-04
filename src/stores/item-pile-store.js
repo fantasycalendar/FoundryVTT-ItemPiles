@@ -328,7 +328,7 @@ export default class ItemPileStore {
 
   closeContainer() {
     if (!InterfaceTracker.isOpened(this.application.id)) {
-      return game.itempiles.API.closeItemPile(this.actor);
+      return game.itempiles.API.closeItemPile(this.actor, this.recipient);
     }
   }
 

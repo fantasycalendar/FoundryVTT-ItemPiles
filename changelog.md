@@ -1,5 +1,21 @@
 # Item Piles Changelog
 
+## Version 2.3.6
+
+- Added various currency-related methods to the API:
+  - `game.itempiles.API.getCurrenciesFromString`
+  - `game.itempiles.API.addCurrencies`
+  - `game.itempiles.API.removeCurrencies`
+  - `game.itempiles.API.transferCurrencies`
+  - `game.itempiles.API.transferAllCurrencies`
+- Added hooks for the above methods
+- Improved support for systems with a primary currency that has the lowest exchange rate
+- Removed popup that asks you to update the item pile system settings and instead silently updates your settings
+- Fixed `game.itempiles.API.transferEverything` not transferring currencies correctly
+- Fixed DnD5e's system item filters not having `subclass` as an ignored item type
+- Fixed closing an item pile container via the UI would not pass along the actor who closed it to macros and hooks
+- Fixed documentation on hooks, as it was slightly out of date
+
 ## Version 2.3.5
 
 - Fixed `game.itempiles.API.setCurrencies` requiring the wrong parameters

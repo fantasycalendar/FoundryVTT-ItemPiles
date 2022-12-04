@@ -252,3 +252,24 @@ export async function runMacro(macroId, macroData) {
   return result;
 
 }
+
+
+export function getUserCharacter() {
+
+  if (game.user.character) {
+    return game.user.character;
+  }
+
+  if (game.user.isGM) {
+    return false;
+  }
+
+  return game.actors.filter(actor => {
+      return actor.ownership?.[game.user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER
+        && actor.prototypeToken.actorLink;
+    })
+    .sort((a, b) => {
+      return b._stats.modifiedTime - a._stats.modifiedTime;
+    })?.[0] ?? false;
+
+}
