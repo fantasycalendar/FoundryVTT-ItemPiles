@@ -16,6 +16,7 @@ import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import { getUserCharacter } from "../helpers/utilities.js";
+import { getActorCurrencies } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -310,6 +311,208 @@ export default class PrivateAPI {
     return itemDeltas;
   }
 
+  static async _addCurrencies(targetUuid, currencies, userId, { interactionId = false } = {}) {
+
+    const targetActor = Utilities.getActor(targetUuid);
+
+    const transaction = new Transaction(targetActor);
+
+    const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
+      .filter(currency => currency.quantity);
+
+    const itemsToAdd = currenciesToAdd.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const attributesToAdd = currenciesToAdd.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+    await transaction.appendItemChanges(itemsToAdd, { type: "currency" });
+    await transaction.appendActorChanges(attributesToAdd, { type: "currency" });
+
+    const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
+
+    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_ADD, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, userId);
+    if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
+
+    const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually add the items to the actor
+
+    await ItemPileSocket.callHook(HOOKS.CURRENCY.ADD, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+
+    await this._executeItemPileMacro(targetUuid, {
+      action: "addCurrencies",
+      target: targetUuid,
+      items: itemDeltas,
+      attributes: attributeDeltas,
+      userId: userId,
+      interactionId: interactionId
+    });
+
+    return { itemDeltas, attributeDeltas };
+
+  }
+
+  static async _removeCurrencies(targetUuid, currencies, userId, { interactionId = false } = {}) {
+
+    const targetActor = Utilities.getActor(targetUuid);
+
+    const transaction = new Transaction(targetActor);
+
+    const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
+      .filter(currency => currency.quantity);
+
+    const itemsToRemove = currenciesToAdd.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const attributesToRemove = currenciesToAdd.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+    await transaction.appendItemChanges(itemsToRemove, { remove: true, removeIfZero: false, type: "currency" });
+    await transaction.appendActorChanges(attributesToRemove, { remove: true, type: "currency" });
+
+    const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
+
+    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_REMOVE, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, userId);
+    if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
+
+    const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually add the items to the actor
+
+    await ItemPileSocket.callHook(HOOKS.CURRENCY.REMOVE, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+
+    await this._executeItemPileMacro(targetUuid, {
+      action: "removeCurrencies",
+      target: targetUuid,
+      items: itemDeltas,
+      attributes,
+      attributeDeltas,
+      userId: userId,
+      interactionId: interactionId
+    });
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(targetUuid);
+    if (shouldBeDeleted) {
+      await this._deleteItemPile(targetUuid);
+    }
+
+    return { itemDeltas, attributeDeltas };
+
+  }
+
+  static async _transferCurrencies(sourceUuid, targetUuid, currencies, userId, { interactionId = false } = {}) {
+
+    const sourceActor = Utilities.getActor(sourceUuid);
+    const targetActor = Utilities.getActor(targetUuid);
+
+    const currenciesToTransfer = PileUtilities.getPriceFromString(currencies).currencies
+      .filter(currency => currency.quantity);
+
+    const itemsToTransfer = currenciesToTransfer.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const attributesToTransfer = currenciesToTransfer.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+    const sourceTransaction = new Transaction(sourceActor);
+    await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, removeIfZero: false, type: "currency" });
+    await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
+    const sourceUpdates = sourceTransaction.prepare();
+
+    const targetTransaction = new Transaction(targetActor);
+    await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas, { type: "currency" });
+    await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas, { type: "currency" });
+    const targetUpdates = targetTransaction.prepare();
+
+    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
+    if (hookResult === false) return false;
+
+    await sourceTransaction.commit();
+    const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
+
+    await ItemPileSocket.callHook(HOOKS.CURRENCY.TRANSFER, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+
+    const macroData = {
+      action: "transferCurrencies",
+      source: sourceUuid,
+      target: targetUuid,
+      items: itemDeltas,
+      attributes: attributeDeltas,
+      userId: userId,
+      interactionId: interactionId
+    };
+
+    await this._executeItemPileMacro(sourceUuid, macroData);
+    await this._executeItemPileMacro(targetUuid, macroData);
+
+    const itemPile = Utilities.getToken(sourceUuid);
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
+    if (shouldBeDeleted) {
+      await this._deleteItemPile(sourceUuid);
+    } else if (PileUtilities.isItemPileEmpty(itemPile)) {
+      await SharingUtilities.clearItemPileSharingData(itemPile);
+    } else {
+      await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+        items: itemDeltas,
+        attributes: attributeDeltas
+      });
+    }
+
+    return { itemDeltas, attributeDeltas };
+
+  }
+
+  static async _transferAllCurrencies(sourceUuid, targetUuid, userId, { interactionId = false } = {}) {
+
+    const sourceActor = Utilities.getActor(sourceUuid);
+    const targetActor = Utilities.getActor(targetUuid);
+
+    const currencyList = PileUtilities.getCurrencyList();
+    const sourceCurrencyList = PileUtilities.getActorCurrencies(sourceActor, { currencyList });
+
+    const itemsToTransfer = sourceCurrencyList.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const attributesToTransfer = sourceCurrencyList.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+    const sourceTransaction = new Transaction(sourceActor);
+    await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, removeIfZero: false, type: "currency" });
+    await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
+    const sourceUpdates = sourceTransaction.prepare();
+
+    const targetTransaction = new Transaction(targetActor);
+    await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
+    await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
+    const targetUpdates = targetTransaction.prepare();
+
+    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
+    if (hookResult === false) return false;
+
+    await sourceTransaction.commit();
+    const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
+
+    await ItemPileSocket.callHook(HOOKS.CURRENCY.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+
+    const macroData = {
+      action: "transferAllCurrencies",
+      source: sourceUuid,
+      target: targetUuid,
+      items: itemDeltas,
+      attributes: attributeDeltas,
+      userId: userId,
+      interactionId: interactionId
+    };
+    await this._executeItemPileMacro(sourceUuid, macroData);
+    await this._executeItemPileMacro(targetUuid, macroData);
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
+    if (shouldBeDeleted) {
+      await this._deleteItemPile(sourceUuid);
+    }
+
+    return { itemDeltas, attributeDeltas };
+
+  }
+
   static async _setAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
@@ -500,14 +703,24 @@ export default class PrivateAPI {
 
     const itemsToTransfer = PileUtilities.getActorItems(sourceActor, { itemFilters }).map(item => item.toObject());
 
-    const sourceAttributes = PileUtilities.getActorCurrencies(sourceActor).filter(entry => entry.type === "attribute");
-    const attributesToTransfer = sourceAttributes.filter(attribute => {
-      return hasProperty(targetActor, attribute.data.path);
-    }).map(attribute => attribute.data.path);
+    const sourceCurrencies = PileUtilities.getActorCurrencies(sourceActor);
+
+    const itemCurrenciesToTransfer = sourceCurrencies
+      .filter(currency => currency.type === "item")
+      .map(currency => ({ id: currency.id, quantity: currency.quantity }));
+
+    const attributesToTransfer = sourceCurrencies
+      .filter(entry => entry.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
     const sourceTransaction = new Transaction(sourceActor);
     await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true });
-    await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true });
+    await sourceTransaction.appendItemChanges(itemCurrenciesToTransfer, {
+      remove: true,
+      removeIfZero: false,
+      type: "currency"
+    });
+    await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
     const sourceUpdates = sourceTransaction.prepare();
 
     const targetTransaction = new Transaction(targetActor);

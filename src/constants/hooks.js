@@ -52,6 +52,16 @@ const HOOKS = {
     PRE_TRADE: module`preTradeItems`,
     TRADE: module`tradeItems`,
   },
+  CURRENCY: {
+    PRE_TRANSFER: module`preTransferCurrencies`,
+    TRANSFER: module`transferCurrencies`,
+    PRE_ADD: module`preAddCurrencies`,
+    ADD: module`addCurrencies`,
+    PRE_REMOVE: module`preRemoveCurrencies`,
+    REMOVE: module`removeCurrencies`,
+    PRE_TRANSFER_ALL: module`preTransferAllCurrencies`,
+    TRANSFER_ALL: module`transferAllCurrencies`,
+  },
   ATTRIBUTE: {
     PRE_TRANSFER: module`preTransferAttributes`,
     TRANSFER: module`transferAttributes`,

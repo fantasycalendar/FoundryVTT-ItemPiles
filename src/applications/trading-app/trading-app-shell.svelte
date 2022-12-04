@@ -50,7 +50,7 @@
     });
     if (!validItem) return;
 
-    const actorItemCurrencyList = PileUtilities.getActorCurrencyList(store.leftTraderActor).filter(entry => entry.type !== "attribute");
+    const actorItemCurrencyList = PileUtilities.getCurrencyList(store.leftTraderActor).filter(entry => entry.type !== "attribute");
     const isCurrency = !!Utilities.findSimilarItem(actorItemCurrencyList.map(item => item.data), validItem);
 
     if (!validItem.id) {

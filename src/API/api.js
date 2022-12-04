@@ -339,10 +339,10 @@ class API {
 
     const targetUuids = targets.map(target => {
       if (!(target instanceof Token || target instanceof TokenDocument)) {
-        throw Helpers.custom_error(`turnTokensIntoItemPiles | Target must be of type Token or TokenDocument`, true)
+        throw Helpers.custom_error(`turnTokensIntoItemPiles | Target must be of type Token or TokenDocument`)
       }
       const targetUuid = Utilities.getUuid(target);
-      if (!targetUuid) throw Helpers.custom_error(`turnTokensIntoItemPiles | Could not determine the UUID, please provide a valid target`, true)
+      if (!targetUuid) throw Helpers.custom_error(`turnTokensIntoItemPiles | Could not determine the UUID, please provide a valid target`)
       return targetUuid;
     })
 
@@ -364,10 +364,10 @@ class API {
 
     const targetUuids = targets.map(target => {
       if (!(target instanceof Token || target instanceof TokenDocument)) {
-        throw Helpers.custom_error(`revertTokensFromItemPiles | Target must be of type Token or TokenDocument`, true)
+        throw Helpers.custom_error(`revertTokensFromItemPiles | Target must be of type Token or TokenDocument`)
       }
       const targetUuid = Utilities.getUuid(target);
-      if (!targetUuid) throw Helpers.custom_error(`revertTokensFromItemPiles | Could not determine the UUID, please provide a valid target`, true)
+      if (!targetUuid) throw Helpers.custom_error(`revertTokensFromItemPiles | Could not determine the UUID, please provide a valid target`)
       return targetUuid;
     })
 
@@ -604,10 +604,10 @@ class API {
   static updateItemPile(target, newData, { interactingToken = false, tokenSettings = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
+    if (!targetUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`);
 
     const interactingTokenUuid = interactingToken ? Utilities.getUuid(interactingToken) : false;
-    if (interactingToken && !interactingTokenUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`, true);
+    if (interactingToken && !interactingTokenUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`);
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.UPDATE_PILE, targetUuid, newData, {
       interactingTokenUuid, tokenSettings
@@ -623,12 +623,12 @@ class API {
    */
   static deleteItemPile(target) {
     if (!PileUtilities.isValidItemPile(target)) {
-      throw Helpers.custom_error(`deleteItemPile | This is not an item pile, please provide a valid target`, true);
+      throw Helpers.custom_error(`deleteItemPile | This is not an item pile, please provide a valid target`);
     }
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`deleteItemPile | Could not determine the UUID, please provide a valid target`, true);
+    if (!targetUuid) throw Helpers.custom_error(`deleteItemPile | Could not determine the UUID, please provide a valid target`);
     if (!targetUuid.includes("Token")) {
-      throw Helpers.custom_error(`deleteItemPile | Please provide a Token or TokenDocument`, true);
+      throw Helpers.custom_error(`deleteItemPile | Please provide a Token or TokenDocument`);
     }
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DELETE_PILE, targetUuid);
   }
@@ -648,7 +648,7 @@ class API {
     if (!PileUtilities.isValidItemPile(target)) return false;
 
     const itemPileUuid = Utilities.getUuid(target);
-    if (!itemPileUuid) throw Helpers.custom_error(`SplitItemPileContents | Could not determine the UUID, please provide a valid item pile`, true)
+    if (!itemPileUuid) throw Helpers.custom_error(`SplitItemPileContents | Could not determine the UUID, please provide a valid item pile`)
 
     const itemPileActor = Utilities.getActor(target);
 
@@ -696,7 +696,7 @@ class API {
     interactionId = false
   } = {}) {
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`addItems | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`addItems | Could not determine the UUID, please provide a valid target`)
 
     const itemsToAdd = []
     items.forEach(itemData => {
@@ -744,7 +744,7 @@ class API {
   static removeItems(target, items, { interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`removeItems | Could not determine the UUID, please provide a valid target`, true);
+    if (!targetUuid) throw Helpers.custom_error(`removeItems | Could not determine the UUID, please provide a valid target`);
 
     const targetActorItems = PileUtilities.getActorItems(target, { getItemCurrencies: true });
 
@@ -755,7 +755,7 @@ class API {
         const itemId = typeof itemData === "string" ? itemData : itemData._id;
         item = targetActorItems.find(actorItem => actorItem.id === itemId);
         if (!item) {
-          throw Helpers.custom_error(`removeItems | Could not find item with id "${itemId}" on target "${targetUuid}"`, true)
+          throw Helpers.custom_error(`removeItems | Could not find item with id "${itemId}" on target "${targetUuid}"`)
         }
         item = item.toObject();
       } else {
@@ -768,7 +768,7 @@ class API {
         }
         let foundActorItem = targetActorItems.find(actorItem => actorItem.id === item._id);
         if (!foundActorItem) {
-          throw Helpers.custom_error(`removeItems | Could not find item with id "${item._id}" on target "${targetUuid}"`, true)
+          throw Helpers.custom_error(`removeItems | Could not find item with id "${item._id}" on target "${targetUuid}"`)
         }
       }
 
@@ -798,7 +798,7 @@ class API {
   static transferItems(source, target, items, { interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid source`, true)
+    if (!sourceUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid source`)
 
     const sourceActorItems = PileUtilities.getActorItems(source, { getItemCurrencies: true });
 
@@ -809,7 +809,7 @@ class API {
         const itemId = typeof itemData === "string" ? itemData : itemData._id;
         item = sourceActorItems.find(actorItem => actorItem.id === itemId);
         if (!item) {
-          throw Helpers.custom_error(`transferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`, true)
+          throw Helpers.custom_error(`transferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`)
         }
         item = item.toObject();
       } else if (itemData instanceof Item) {
@@ -822,7 +822,7 @@ class API {
 
       let foundActorItem = sourceActorItems.find(actorItem => actorItem.id === item._id);
       if (!foundActorItem) {
-        throw Helpers.custom_error(`transferItems | Could not find item with id "${item._id}" on target "${sourceUuid}"`, true)
+        throw Helpers.custom_error(`transferItems | Could not find item with id "${item._id}" on target "${sourceUuid}"`)
       }
 
       return {
@@ -831,7 +831,7 @@ class API {
     });
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid target`)
 
     if (interactionId) {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`transferItems | interactionId must be of type string`);
@@ -855,10 +855,10 @@ class API {
   static transferAllItems(source, target, { itemFilters = false, interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid source`, true)
+    if (!sourceUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid source`)
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid target`)
 
     if (itemFilters) {
       if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`transferAllItems | itemFilters must be of type array`);
@@ -891,17 +891,17 @@ class API {
   static setAttributes(target, attributes, { interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`setAttributes | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`setAttributes | Could not determine the UUID, please provide a valid target`);
 
     const targetActor = Utilities.getActor(target);
 
     Object.entries(attributes).forEach(entry => {
       const [attribute, quantity] = entry;
       if (!hasProperty(targetActor, attribute)) {
-        throw Helpers.custom_error(`setAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+        throw Helpers.custom_error(`setAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
       }
       if (!Helpers.isRealNumber(quantity)) {
-        throw Helpers.custom_error(`setAttributes | Attribute "${attribute}" must be of type number`, true)
+        throw Helpers.custom_error(`setAttributes | Attribute "${attribute}" must be of type number`);
       }
     });
 
@@ -927,17 +927,17 @@ class API {
   static addAttributes(target, attributes, { interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`addAttributes | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`addAttributes | Could not determine the UUID, please provide a valid target`);
 
     const targetActor = Utilities.getActor(target);
 
     Object.entries(attributes).forEach(entry => {
       const [attribute, quantity] = entry;
       if (!hasProperty(targetActor, attribute)) {
-        throw Helpers.custom_error(`addAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+        throw Helpers.custom_error(`addAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
       }
       if (!Helpers.isRealNumber(quantity) && quantity > 0) {
-        throw Helpers.custom_error(`addAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+        throw Helpers.custom_error(`addAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
       }
     });
 
@@ -962,7 +962,7 @@ class API {
   static removeAttributes(target, attributes, { interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`removeAttributes | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`removeAttributes | Could not determine the UUID, please provide a valid target`);
 
     const targetActor = Utilities.getActor(target);
 
@@ -970,10 +970,10 @@ class API {
     if (Array.isArray(attributes)) {
       attributes.forEach(attribute => {
         if (typeof attribute !== "string") {
-          throw Helpers.custom_error(`removeAttributes | Each attribute in the array must be of type string`, true)
+          throw Helpers.custom_error(`removeAttributes | Each attribute in the array must be of type string`);
         }
         if (!hasProperty(targetActor, attribute)) {
-          throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
         }
         attributesToSend[attribute] = Number(getProperty(targetActor, attribute));
       });
@@ -981,10 +981,10 @@ class API {
       Object.entries(attributes).forEach(entry => {
         const [attribute, quantity] = entry;
         if (!hasProperty(targetActor, attribute)) {
-          throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
         }
         if (!Helpers.isRealNumber(quantity) && quantity > 0) {
-          throw Helpers.custom_error(`removeAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+          throw Helpers.custom_error(`removeAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
         }
       });
       attributesToSend = attributes;
@@ -1012,36 +1012,36 @@ class API {
   static transferAttributes(source, target, attributes, { interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid source`, true)
+    if (!sourceUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid source`);
     const sourceActor = Utilities.getActor(source);
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid target`);
     const targetActor = Utilities.getActor(target);
 
     if (Array.isArray(attributes)) {
       attributes.forEach(attribute => {
         if (typeof attribute !== "string") {
-          throw Helpers.custom_error(`transferAttributes | Each attribute in the array must be of type string`, true)
+          throw Helpers.custom_error(`transferAttributes | Each attribute in the array must be of type string`);
         }
         if (!hasProperty(sourceActor, attribute)) {
-          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
         }
         if (!hasProperty(targetActor, attribute)) {
-          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
         }
       });
     } else {
       Object.entries(attributes).forEach(entry => {
         const [attribute, quantity] = entry;
         if (!hasProperty(sourceActor, attribute)) {
-          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
         }
         if (!hasProperty(targetActor, attribute)) {
-          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`, true)
+          throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
         }
         if (!Helpers.isRealNumber(quantity) && quantity > 0) {
-          throw Helpers.custom_error(`transferAttributes | Attribute "${attribute}" must be of type number and greater than 0`, true)
+          throw Helpers.custom_error(`transferAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
         }
       });
     }
@@ -1067,10 +1067,10 @@ class API {
   static transferAllAttributes(source, target, { interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`transferAllAttributes | Could not determine the UUID, please provide a valid source`, true);
+    if (!sourceUuid) throw Helpers.custom_error(`transferAllAttributes | Could not determine the UUID, please provide a valid source`);
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`transferAllAttributes | Could not determine the UUID, please provide a valid target`, true);
+    if (!targetUuid) throw Helpers.custom_error(`transferAllAttributes | Could not determine the UUID, please provide a valid target`);
 
     if (interactionId) {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`transferAllAttributes | interactionId must be of type string`);
@@ -1094,10 +1094,10 @@ class API {
   static transferEverything(source, target, { itemFilters = false, interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
-    if (!sourceUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid source`, true)
+    if (!sourceUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid source`);
 
     const targetUuid = Utilities.getUuid(target);
-    if (!targetUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid target`, true)
+    if (!targetUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid target`);
 
     if (itemFilters) {
       if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`transferEverything | itemFilters must be of type array`);
@@ -1114,6 +1114,136 @@ class API {
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, {
       itemFilters, interactionId
     });
+
+  }
+
+  /**
+   * Turns a string of currencies into an array containing the data and quantities for each currency
+   *
+   * @param {string} currencies                               A string of currencies to convert (eg, "5gp 25sp")
+   *
+   * @returns {Array<object>}                                 An array of object containing the data and quantity for each currency
+   */
+  static getCurrenciesFromString(currencies) {
+    if (typeof currencies !== "string") {
+      throw Helpers.custom_error(`getCurrenciesFromString | currencies must be of type string`)
+    }
+    return PileUtilities.getPriceFromString(currencies).currencies;
+  }
+
+  /**
+   * Adds currencies to the target
+   *
+   * @param {Actor/Token/TokenDocument} target                The actor to add the currencies to
+   * @param {string} currencies                               A string of currencies to add (eg, "5gp 25sp")
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
+   *
+   * @returns {Promise<object>}                               An object containing the items and attributes added to the target
+   */
+  static addCurrencies(target, currencies, { interactionId = false } = {}) {
+
+    const targetUuid = Utilities.getUuid(target);
+    if (!targetUuid) throw Helpers.custom_error(`addCurrency | Could not determine the UUID, please provide a valid target`);
+
+    if (typeof currencies !== "string") {
+      throw Helpers.custom_error(`addCurrency | currencies must be of type string`)
+    }
+
+    const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
+      .filter(currency => currency.quantity);
+
+    if (!currenciesToAdd.length) {
+      throw Helpers.custom_error(`addCurrency | Could not determine currencies to add with string "${currencies}"`);
+    }
+
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_CURRENCIES, targetUuid, currencies, game.user.id, { interactionId });
+
+  }
+
+  /**
+   * Removes currencies from the target
+   *
+   * @param {Actor/Token/TokenDocument} target                The actor to remove currencies from
+   * @param {string} currencies                               A string of currencies to remove (eg, "5gp 25sp")
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
+   *
+   * @returns {Promise<object>}                               An object containing the items and attributes removed from the target
+   */
+  static removeCurrencies(target, currencies, { interactionId = false } = {}) {
+
+    const targetUuid = Utilities.getUuid(target);
+    if (!targetUuid) throw Helpers.custom_error(`removeCurrencies | Could not determine the UUID, please provide a valid target`);
+
+    if (typeof currencies !== "string") {
+      throw Helpers.custom_error(`removeCurrencies | currencies must be of type string`)
+    }
+
+    const currenciesToRemove = PileUtilities.getPriceFromString(currencies).currencies
+      .filter(currency => currency.quantity);
+
+    if (!currenciesToRemove.length) {
+      throw Helpers.custom_error(`removeCurrencies | Could not determine currencies to remove with string "${currencies}"`);
+    }
+
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_CURRENCIES, targetUuid, currencies, game.user.id, { interactionId });
+
+  }
+
+  /**
+   * Transfers currencies between the source and the target.
+   *
+   * @param {Actor/Token/TokenDocument} source                The actor to transfer currencies from
+   * @param {Actor/Token/TokenDocument} target                The actor to receive the currencies
+   * @param {string} currencies                               A string of currencies to transfer (eg, "5gp 25sp")
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
+   *
+   * @returns {Promise<object>}                               An object containing the items and attributes transferred to the target
+   */
+  static transferCurrencies(source, target, currencies, { interactionId = false } = {}) {
+
+    const sourceUuid = Utilities.getUuid(source);
+    if (!sourceUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid source`);
+
+    const targetUuid = Utilities.getUuid(target);
+    if (!targetUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid target`);
+
+    if (typeof currencies !== "string") {
+      throw Helpers.custom_error(`transferCurrencies | currencies must be of type string`)
+    }
+
+    const currenciesToTransfer = PileUtilities.getPriceFromString(currencies).currencies
+      .filter(currency => currency.quantity);
+
+    if (!currenciesToTransfer.length) {
+      throw Helpers.custom_error(`transferCurrencies | Could not determine currencies to transfer with string "${currencies}"`);
+    }
+
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_CURRENCIES, sourceUuid, targetUuid, currencies, game.user.id, { interactionId });
+
+  }
+
+  /**
+   * Transfers all currencies between the source and the target.
+   *
+   * @param {Actor/Token/TokenDocument} source                The actor to transfer all currencies from
+   * @param {Actor/Token/TokenDocument} target                The actor to receive all the currencies
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
+   *
+   * @returns {Promise<object>}                               An object containing all items and attributes transferred to the target
+   */
+  static transferAllCurrencies(source, target, { interactionId = false } = {}) {
+
+    const sourceUuid = Utilities.getUuid(source);
+    if (!sourceUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid source`);
+
+    const targetUuid = Utilities.getUuid(target);
+    if (!targetUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid target`);
+
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_CURRENCIES, sourceUuid, targetUuid, game.user.id, { interactionId });
 
   }
 

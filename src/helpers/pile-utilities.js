@@ -98,7 +98,7 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
 
   const actor = Utilities.getActor(target);
   const actorItems = Array.from(actor.items);
-  currencyList = currencyList || getActorCurrencyList(forActor || actor);
+  currencyList = currencyList || getCurrencyList(forActor || actor);
   let currencies = currencyList.map((currency, index) => {
     if (currency.type === "attribute") {
       return {
@@ -129,9 +129,11 @@ export function getActorPrimaryCurrency(target) {
   return getActorCurrencies(actor).find(currency => currency.primary);
 }
 
-export function getActorCurrencyList(target, pileData = false) {
-  const targetActor = Utilities.getActor(target);
-  pileData = getActorFlagData(targetActor, pileData);
+export function getCurrencyList(target = false, pileData = false) {
+  if (target) {
+    const targetActor = Utilities.getActor(target);
+    pileData = getActorFlagData(targetActor, pileData);
+  }
   return (pileData.overrideCurrencies || game.itempiles.API.CURRENCIES).map(currency => {
     currency.name = game.i18n.localize(currency.name);
     return currency;
@@ -477,6 +479,28 @@ function getPriceArray(totalCost, currencies) {
 
   const prices = [];
 
+  if (primaryCurrency.exchangeRate === smallestExchangeRate) {
+
+    for (const currency of currencies) {
+
+      const numCurrency = Math.floor(Helpers.roundToDecimals(fraction / currency.exchangeRate, decimals));
+
+      fraction = Helpers.roundToDecimals(fraction - (numCurrency * currency.exchangeRate), decimals);
+
+      prices.push({
+        ...currency,
+        cost: Math.round(numCurrency),
+        baseCost: Math.round(numCurrency),
+        maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
+        string: currency.abbreviation.replace("{#}", numCurrency)
+      });
+
+    }
+
+    return prices;
+
+  }
+
   let skipPrimary = false;
   if (cost) {
     skipPrimary = true;
@@ -509,6 +533,56 @@ function getPriceArray(totalCost, currencies) {
   prices.sort((a, b) => b.exchangeRate - a.exchangeRate);
 
   return prices;
+}
+
+export function getPriceFromString(str, currencyList = false) {
+
+  if (!currencyList) {
+    currencyList = getCurrencyList();
+  }
+
+  const currencies = foundry.utils.duplicate(currencyList)
+    .map(currency => {
+      currency.quantity = 0
+      return currency;
+    });
+
+  const parts = str.split(" ");
+
+  let overallCost = 0;
+  for (const part of parts) {
+    for (const currency of currencies) {
+
+      const regexString = ` ?${currency.abbreviation.toLowerCase().replace("{#}", "(.*?)")} ?`
+      const regex = new RegExp(regexString, "g");
+
+      const results = [...part.toLowerCase().matchAll(regex)];
+
+      for (const result of results) {
+        const roll = new Roll(result[1]).evaluate({ async: false })
+        currency.quantity = roll.total;
+        if (roll.total !== Number(result[1])) {
+          currency.roll = roll;
+        }
+        overallCost += roll.total / currency.exchangeRate;
+      }
+    }
+  }
+
+  if (overallCost === 0) {
+    const roll = new Roll(str).evaluate({ async: false });
+    if (roll.total) {
+      const primaryCurrency = currencies.find(currency => currency.primary);
+      primaryCurrency.quantity = roll.total;
+      if (roll.total !== Number(str)) {
+        primaryCurrency.roll = roll;
+      }
+      overallCost = roll.total;
+    }
+  }
+
+  return { currencies, overallCost };
+
 }
 
 export function getItemPrices(item, {
@@ -566,7 +640,7 @@ export function getItemPrices(item, {
   const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
   const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
 
-  const currencyList = getActorCurrencyList(merchant);
+  const currencyList = getCurrencyList(merchant);
   const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
 
   // In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
@@ -579,34 +653,7 @@ export function getItemPrices(item, {
     const { copperValue } = new game.pf2e.Coins(overallCost.value);
     overallCost = copperValue / 100 / (overallCost.per ?? 1);
   } else if (typeof overallCost === "string" && isNaN(Number(overallCost))) {
-
-    // Get all the parts, split by number, remove empty strings, and spaces at the start/end of each part
-    const parts = overallCost.split(/([1-9]+\d*)/g)
-      .filter(Boolean)
-      .map(part => part.trim());
-
-    // If there's only one part (one number), use that to determine the cost (assume it's the primary currency)
-    overallCost = 0;
-    if (parts.length === 1) {
-      overallCost = Number(parts[0]);
-    } else {
-      // Otherwise, go through each part
-      for (let i = 0; i < parts.length; i += 2) {
-        // If the current part is not a number, then the next part is the cost
-        const cost = isNaN(Number(parts[i])) ? parts[i + 1] : Number(parts[i]);
-        // If the current part is not a number, then it is the currency shorthand
-        const potentialCurrency = (isNaN(Number(parts[i])) ? parts[i] : parts[i + 1]).toLowerCase();
-        // Try to find the currency in the currency list setup
-        const currency = currencyList.find(curr => {
-          const abbr = curr.abbreviation.toLowerCase();
-          return abbr.includes(potentialCurrency) || curr.name.toLowerCase().startsWith(potentialCurrency);
-        });
-        // If we didn't find it, give up
-        if (!currency) continue;
-        // Otherwise add it to the overall fractional cost
-        overallCost += currency.exchangeRate * Number(cost);
-      }
-    }
+    overallCost = getPriceFromString(overallCost, currencyList).overallCost;
   } else {
     overallCost = Number(overallCost);
   }
@@ -765,7 +812,7 @@ export function getPricesForItems(itemsToBuy, {
   }
 
   const merchant = sellerFlagData ? seller : buyer;
-  const currencyList = getActorCurrencyList(merchant);
+  const currencyList = getCurrencyList(merchant);
   const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
   const smallestExchangeRate = getSmallestExchangeRate(currencies)
   const decimals = getExchangeRateDecimals(smallestExchangeRate);

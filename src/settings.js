@@ -84,41 +84,7 @@ export async function checkSystem() {
     const currentVersion = Helpers.getSetting(SETTINGS.SYSTEM_VERSION);
     const newVersion = SYSTEMS.DATA.VERSION;
     if (isNewerVersion(newVersion, currentVersion)) {
-      const ignoredSystemVersion = Helpers.getSetting(SETTINGS.IGNORED_SYSTEM_VERSION);
-      if (!isNewerVersion(newVersion, ignoredSystemVersion)) return;
-      const doThing = await TJSDialog.confirm({
-        title: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Title"),
-        content: {
-          class: CustomDialog,
-          props: {
-            content: [
-              game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content"),
-              "<strong>" + game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Content2") + "</strong>",
-            ]
-          }
-        },
-        buttons: {
-          yes: {
-            icon: '<i class="fas fa-check"></i>',
-            label: game.i18n.localize("ITEM-PILES.Dialogs.NewSystemVersion.Confirm")
-          },
-          no: {
-            icon: '<i class="fas fa-times"></i>',
-            label: game.i18n.localize("No")
-          }
-        },
-        modal: true,
-        draggable: false,
-        rejectClose: false,
-        defaultYes: true,
-        options: {
-          height: "auto"
-        }
-      });
-      if (!doThing) {
-        return Helpers.setSetting(SETTINGS.IGNORED_SYSTEM_VERSION, SYSTEMS.DATA.VERSION);
-      }
-      return applyDefaultSettings();
+      await applyDefaultSettings();
     }
     return;
   }
