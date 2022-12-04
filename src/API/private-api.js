@@ -170,9 +170,9 @@ export default class PrivateAPI {
 
     await transaction.appendItemChanges(items);
 
-    const { itemsToUpdate, itemsToCreate, itemsToDelete } = transaction.prepare(); // Prepare data
+    const { itemsToUpdate, itemsToCreate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_ADD, targetActor, itemsToCreate, itemsToUpdate, itemsToDelete, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_ADD, targetActor, itemsToCreate, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas } = await transaction.commit(); // Actually add the items to the actor
@@ -197,7 +197,7 @@ export default class PrivateAPI {
 
     const { itemsToUpdate, itemsToDelete } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_REMOVE, targetActor, itemsToUpdate, itemsToDelete, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_REMOVE, targetActor, itemsToUpdate, itemsToDelete, interactionId);
     if (hookResult === false) return false;
 
     const { itemDeltas } = await transaction.commit();
@@ -230,7 +230,7 @@ export default class PrivateAPI {
     await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
@@ -331,7 +331,7 @@ export default class PrivateAPI {
 
     const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_ADD, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_ADD, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually add the items to the actor
@@ -369,9 +369,9 @@ export default class PrivateAPI {
     await transaction.appendItemChanges(itemsToRemove, { remove: true, removeIfZero: false, type: "currency" });
     await transaction.appendActorChanges(attributesToRemove, { remove: true, type: "currency" });
 
-    const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
+    const { actorUpdates, itemsToUpdate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_REMOVE, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_REMOVE, targetActor, actorUpdates, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually add the items to the actor
@@ -421,7 +421,7 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas, { type: "currency" });
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
@@ -484,7 +484,7 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
+    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
