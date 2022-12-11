@@ -39,7 +39,7 @@ from [Forgotten Adventures](https://www.forgotten-adventures.net/product/map-mak
 If you are a player, you can inspect piles by double-clicking on them. You need to have a token next to the item pile in
 order to inspect it, unless the item pile configured has a larger interaction distance (see documentation).
 
-As a GM, you can inspect any pile by first selecting a token on the scene, then holding **Left Control** and
+As a GM, you can inspect any pile by first selecting a token on the scene, then holding **Left Shift** and
 double-clicking on the item pile. This way you inspect **as** that token, which means any items you take from the pile
 will be added to that character's inventory.
 
