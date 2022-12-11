@@ -15,8 +15,6 @@ import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
-import { getUserCharacter } from "../helpers/utilities.js";
-import { getActorCurrencies } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -366,7 +364,7 @@ export default class PrivateAPI {
     const attributesToRemove = currenciesToAdd.filter(currency => currency.type === "attribute")
       .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
-    await transaction.appendItemChanges(itemsToRemove, { remove: true, removeIfZero: false, type: "currency" });
+    await transaction.appendItemChanges(itemsToRemove, { remove: true, type: "currency" });
     await transaction.appendActorChanges(attributesToRemove, { remove: true, type: "currency" });
 
     const { actorUpdates, itemsToUpdate } = transaction.prepare(); // Prepare data
@@ -412,7 +410,7 @@ export default class PrivateAPI {
       .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
     const sourceTransaction = new Transaction(sourceActor);
-    await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, removeIfZero: false, type: "currency" });
+    await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, type: "currency" });
     await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
     const sourceUpdates = sourceTransaction.prepare();
 
@@ -475,7 +473,7 @@ export default class PrivateAPI {
       .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
     const sourceTransaction = new Transaction(sourceActor);
-    await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, removeIfZero: false, type: "currency" });
+    await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, type: "currency" });
     await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
     const sourceUpdates = sourceTransaction.prepare();
 
@@ -717,7 +715,6 @@ export default class PrivateAPI {
     await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true });
     await sourceTransaction.appendItemChanges(itemCurrenciesToTransfer, {
       remove: true,
-      removeIfZero: false,
       type: "currency"
     });
     await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
@@ -1577,13 +1574,22 @@ export default class PrivateAPI {
       return Utilities.tokens_close_enough(pileToken, token, maxDistance) || game.user.isGM;
     });
 
-    if (!validTokens.length && !game.user.isGM && maxDistance !== Infinity) {
-      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
-      return false;
+    let interactingActor;
+
+    if (!validTokens.length && !game.user.isGM) {
+      if (maxDistance === Infinity) {
+        interactingActor = Utilities.getUserCharacter();
+      }
+      if (!interactingActor) {
+        Helpers.custom_warning(game.i18n.localize(maxDistance === Infinity
+          ? "ITEM-PILES.Errors.PileTooFar"
+          : "ITEM-PILES.Errors.NoTokenFound"
+        ), true);
+        return false;
+      }
     }
 
-    let interactingActor;
-    if (validTokens.length) {
+    if (!interactingActor && validTokens.length) {
       if (validTokens.includes(_token)) {
         interactingActor = _token.actor;
       } else if (validTokens.includes(playerToken)) {
@@ -1771,6 +1777,7 @@ export default class PrivateAPI {
     const sellerIsMerchant = sellerFlagData.enabled && sellerFlagData.isMerchant;
     const sellerInfiniteQuantity = sellerIsMerchant && sellerFlagData.infiniteQuantity;
     const sellerInfiniteCurrencies = sellerIsMerchant && sellerFlagData.infiniteCurrencies;
+    const sellerKeepZeroQuantity = sellerIsMerchant && sellerFlagData.keepZeroQuantity;
 
     for (const payment of itemPrices.sellerReceive) {
       if (!payment.quantity) continue;
@@ -1793,7 +1800,8 @@ export default class PrivateAPI {
         await sellerTransaction.appendActorChanges([{
           path: entry.data.path, quantity: entry.quantity
         }], {
-          remove: true, type: entry.isCurrency ? "currency" : entry.type
+          remove: true,
+          type: entry.isCurrency ? "currency" : entry.type
         });
       } else {
         const itemFlagData = PileUtilities.getItemFlagData(entry.item);
@@ -1801,7 +1809,9 @@ export default class PrivateAPI {
         await sellerTransaction.appendItemChanges([{
           item: entry.item, quantity: entry.quantity
         }], {
-          remove: true, type: entry.isCurrency ? "currency" : entry.type, removeIfZero: !itemFlagData.isService
+          remove: true,
+          type: entry.isCurrency ? "currency" : entry.type,
+          keepIfZero: itemFlagData.isService || sellerKeepZeroQuantity || itemFlagData.keepZeroQuantity
         });
       }
     }

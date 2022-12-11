@@ -315,11 +315,12 @@ class PileMerchantItem extends PileItem {
   }
 
   updateQuantity(quantity) {
+    const pileFlagData = get(this.store.pileData);
     const itemFlagData = get(this.itemFlagData);
     const roll = new Roll(quantity).evaluate({ async: false });
     this.quantity.set(roll.total);
     const baseData = {};
-    if (itemFlagData.isService) {
+    if (itemFlagData.isService || pileFlagData.keepZeroQuantity || itemFlagData.keepZeroQuantity) {
       baseData[CONSTANTS.FLAGS.ITEM + ".notForSale"] = roll.total <= 0;
     }
     return this.item.update(Utilities.setItemQuantity(baseData, roll.total));

@@ -386,6 +386,14 @@
 
           <div class="form-group">
             <label>
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.KeepZero")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.KeepZeroExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={pileData.keepZeroQuantity}/>
+          </div>
+
+          <div class="form-group">
+            <label>
               <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantity")}</span>
               <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityExplanation")}</p>
             </label>

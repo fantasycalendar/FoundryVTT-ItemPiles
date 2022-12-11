@@ -253,7 +253,6 @@ export async function runMacro(macroId, macroData) {
 
 }
 
-
 export function getUserCharacter() {
 
   if (game.user.character) {

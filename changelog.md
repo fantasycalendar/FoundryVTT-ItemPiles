@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.3.7
+
+- Added "Keep Zero Quantity" setting to merchants and items - any item that is bought up with this setting enabled will be kept in the merchant, but set to not for sale.
+- Fixed infinite distance merchant tokens could not be interacted with if player had no tokens on the canvas
+
 ## Version 2.3.6
 
 - Added various currency-related methods to the API:

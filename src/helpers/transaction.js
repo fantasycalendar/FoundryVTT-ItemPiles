@@ -21,7 +21,7 @@ export default class Transaction {
     this.preCommitted = false;
   }
 
-  async appendItemChanges(items, { remove = false, type = "item", removeIfZero = true } = {}) {
+  async appendItemChanges(items, { remove = false, type = "item", keepIfZero = false } = {}) {
     for (let data of items) {
 
       let item = data.item ?? data;
@@ -50,19 +50,19 @@ export default class Transaction {
       } else if (actorExistingItem) {
 
         const existingItemUpdate = remove ? this.itemsToUpdate.find(item => item._id === itemData._id) : Utilities.findSimilarItem(this.itemsToUpdate, itemData);
-        if (!removeIfZero && type !== "currency") {
+        if (keepIfZero || type === "currency") {
           this.itemsToNotDelete.add(item.id);
         }
         if (existingItemUpdate) {
           const newQuantity = Utilities.getItemQuantity(existingItemUpdate) + incomingQuantity;
           Utilities.setItemQuantity(existingItemUpdate, newQuantity);
-          if (!removeIfZero && type !== "currency") {
+          if (keepIfZero && type !== "currency") {
             setProperty(existingItemUpdate, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
           }
         } else {
           const newQuantity = Utilities.getItemQuantity(actorExistingItem) + incomingQuantity;
           const update = Utilities.setItemQuantity({ _id: actorExistingItem.id }, newQuantity);
-          if (!removeIfZero && type !== "currency") {
+          if (keepIfZero && type !== "currency") {
             setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
           }
           this.itemTypeMap.set(actorExistingItem.id, type)
