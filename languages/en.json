@@ -292,7 +292,7 @@
         "InfiniteQuantity": "Infinite Quantity",
         "InfiniteQuantityExplanation": "When enabled, this item cannot run out of quantity when sold by a merchant.",
         "KeepZero": "Keep Zero Quantity",
-        "KeepZeroExplanation": "When fully sold out, the merchant does not remove this item but instead sets it to not for sale instead.",
+        "KeepZeroExplanation": "When fully sold out, the merchant does not remove this item but sets it to not for sale instead.",
         "PriceExplanation": "In this tab, you can configure the price of this item, including whether this item will cost other items to purchase.",
         "BasePrice": "Base Price",
         "BasePriceExplanation": "This configures the normal price of this item.",
