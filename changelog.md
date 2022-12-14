@@ -8,6 +8,7 @@
 - Tweaked the `Buy Items` tab on merchants to become hidden if the merchant has services to sell, but no items to sell
 - Fixed error when calling `game.itempiles.API.rollItemTable` with a target actor receive the rolled items
 - Improvements to currency string detection and handling
+- Updates to the French localization (thanks rectulo!)
 
 ## Version 2.3.7
 
