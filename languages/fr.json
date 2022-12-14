@@ -611,7 +611,9 @@
           "ItemTypeModifiersExplanation": "Dans ce dialogue, vous pouvez configurer les modificateurs de prix pour des types d'objets individuels.",
           "ActorPriceModifiers": "Modificateurs de prix par acteur",
           "ActorPriceModifiersExplanation": "Ici, vous pouvez configurer si certains acteurs spécifiques doivent avoir des modificateurs de prix différents des modificateurs de prix ci-dessus.",
-          "ConfigureActorPriceModifiers": "Configurer les modificateurs de prix des acteurs."
+          "ConfigureActorPriceModifiers": "Configurer les modificateurs de prix des acteurs.",
+          "KeepZero": "Conserver une quantité nulle",
+          "KeepZeroExplanation": "Lorsque les articles sont totalement épuisés, ce commerçant ne les retire pas, mais les met plutôt à l'index."
         },
         "Sharing": {
           "Title": "Paramètres de partage",
