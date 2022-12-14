@@ -142,9 +142,7 @@
       "RemoveItem": "Remove",
       "ItemFree": "Free",
       "RollableTables": "Rollable Tables",
-      "OtherTypes": {
-        "item-piles-service": "Service"
-      },
+      "Service": "Service",
       "AddTable": "Add Table",
       "RollAllTables": "Roll All Tables",
       "ToolTipRemoveTable": "Remove Table",
@@ -282,6 +280,8 @@
         "Price": "Price Settings",
         "NotForSale": "Item Is Not For Sale",
         "NotForSaleExplanation": "When enabled, this item is not for sale and cannot be bought. It still shows up in the merchant's item list unless the item is also hidden.",
+        "CustomCategory": "Custom Item Category",
+        "CustomTypeExplanation": "When not blank, this item will be listed under a different type than what it is.",
         "Hidden": "Item Is Hidden",
         "HiddenExplanation": "When enabled, this item does not show up in the merchant's item lists.",
         "DisplayQuantity": "Item Quantity Visibility",

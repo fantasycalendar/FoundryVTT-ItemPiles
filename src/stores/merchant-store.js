@@ -13,6 +13,7 @@ export default class MerchantStore extends ItemPileStore {
 
   setupStores() {
     super.setupStores();
+    this.services = writable({});
     this.editPrices = writable(false);
     this.typeFilter = writable("all")
     this.priceModifiersPerType = writable({});
@@ -155,19 +156,15 @@ export default class MerchantStore extends ItemPileStore {
         const closeTimes = pileData.openTimes.close;
         const timestamp = window.SimpleCalendar.api.timestampToDate(window.SimpleCalendar.api.timestamp());
 
-        let isOpen;
-
         const openingTime = Number(openTimes.hour.toString() + "." + openTimes.minute.toString());
         const closingTime = Number(closeTimes.hour.toString() + "." + closeTimes.minute.toString());
         const currentTime = Number(timestamp.hour.toString() + "." + timestamp.minute.toString());
 
-        if (openingTime > closingTime) {
-          isOpen = currentTime >= openingTime || currentTime <= closingTime;
-        } else {
-          isOpen = currentTime >= openingTime && currentTime <= closingTime;
-        }
+        const isClosed = openingTime > closingTime
+          ? !(currentTime >= openingTime || currentTime <= closingTime)  // Is the store open over midnight?
+          : !(currentTime >= openingTime && currentTime <= closingTime); // or is the store open during normal daylight hours?
 
-        this.closed.set(!isOpen);
+        this.closed.set(isClosed);
 
       } else if (isResponsibleGM()) {
         pileData.openTimes.status = "open";
@@ -193,7 +190,6 @@ class PileMerchantItem extends PileItem {
 
   setupStores(item) {
     super.setupStores(item);
-    this.itemFlagData = writable({});
     this.prices = writable({});
     this.displayQuantity = writable(false);
     this.selectedPriceGroup = writable(-1);
@@ -205,7 +201,6 @@ class PileMerchantItem extends PileItem {
   setupSubscriptions() {
     let setup = false;
     super.setupSubscriptions();
-    this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
     this.subscribeTo(this.store.pileData, () => {
       if (!setup) return;
       this.refreshPriceData();
@@ -229,23 +224,17 @@ class PileMerchantItem extends PileItem {
     this.subscribeTo(this.itemDocument, () => {
       if (!setup) return;
       const { data } = this.itemDocument.updateOptions;
-      if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
-        this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
-        this.refreshDisplayQuantity();
-        this.store.refreshItems();
-      }
-      if (hasProperty(data, CONSTANTS.FLAGS.ITEM + ".prices") || hasProperty(data, game.itempiles.API.ITEM_PRICE_ATTRIBUTE)) {
+      if (hasProperty(data, game.itempiles.API.ITEM_PRICE_ATTRIBUTE)) {
         this.refreshPriceData();
       }
     });
-    setup = true;
     this.refreshDisplayQuantity();
     this.subscribeTo(this.store.typeFilter, this.filter.bind(this));
-    this.subscribeTo(this.itemFlagData, (itemFlagData) => {
-      if (itemFlagData.isService) {
-        this.type = "item-piles-service";
-      }
-    })
+    this.subscribeTo(this.itemFlagData, () => {
+      if (!setup) return;
+      this.refreshPriceData();
+    });
+    setup = true;
   }
 
   refreshDisplayQuantity() {
@@ -302,10 +291,11 @@ class PileMerchantItem extends PileItem {
 
   filter() {
     const name = get(this.name).trim();
+    const type = get(this.category).type;
     const search = get(this.store.search).trim();
     const typeFilter = get(this.store.typeFilter);
     const searchFiltered = !name.toLowerCase().includes(search.toLowerCase());
-    const typeFiltered = typeFilter !== "all" && typeFilter.toLowerCase() !== this.type.toLowerCase();
+    const typeFiltered = typeFilter !== "all" && typeFilter.toLowerCase() !== type.toLowerCase();
     this.filtered.set(searchFiltered || typeFiltered);
   }
 

@@ -1307,15 +1307,21 @@ class API {
     }
 
     if (targetActor) {
-      const actor = Utilities.getActor(targetActor);
-      if (!(actor instanceof Actor)) {
+      targetActor = Utilities.getActor(targetActor);
+      if (!(targetActor instanceof Actor)) {
         throw Helpers.custom_error(`rollItemTable | could not find the actor of the target actor`);
       }
-      targetActor = Utilities.getUuid(actor);
     }
 
     const items = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ROLL_ITEM_TABLE, {
-      table, timesToRoll, resetTable, displayChat, rollData, targetActor, removeExistingActorItems, userId: game.user.id
+      table,
+      timesToRoll,
+      resetTable,
+      displayChat,
+      rollData,
+      actor: Utilities.getUuid(targetActor),
+      removeExistingActorItems,
+      userId: game.user.id
     });
 
     if (items) {

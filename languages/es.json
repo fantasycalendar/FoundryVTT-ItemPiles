@@ -138,9 +138,7 @@
       "ItemFree": "Gratis",
       "NoMatchFound": "Nada concuerda con tu búsqueda",
       "BuyServices": "Servicios de Compra",
-      "OtherTypes": {
-        "item-piles-service": "Servicio"
-      }
+      "Service": "Servicio"
     },
     "Dialogs": {
       "TypeWarning": {

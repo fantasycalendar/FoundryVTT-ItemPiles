@@ -62,6 +62,14 @@
 
           <div class="form-group">
             <label style="flex:4;">
+              {localize("ITEM-PILES.Applications.ItemEditor.CustomCategory")}<br>
+              <p>{localize("ITEM-PILES.Applications.ItemEditor.CustomCategoryExplanation")}</p>
+            </label>
+            <input type="text" bind:value={itemFlagData.customCategory} placeholder={item.type}/>
+          </div>
+
+          <div class="form-group">
+            <label style="flex:4;">
               {localize("ITEM-PILES.Applications.ItemEditor.Hidden")}<br>
               <p>{localize("ITEM-PILES.Applications.ItemEditor.HiddenExplanation")}</p>
             </label>

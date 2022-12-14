@@ -28,9 +28,9 @@
         <span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
       </div>
     {:else if $activeTab === "buy"}
-      <MerchantBuyTab {store} categoryFilter={(category) => { return !category.type.startsWith("item-piles-") }}/>
+      <MerchantBuyTab {store} categoryFilter={(category) => { return !category.service }}/>
     {:else if $activeTab === "services" }
-      <MerchantBuyTab {store} categoryFilter={(category) => { return category.type === "item-piles-service" }}/>
+      <MerchantBuyTab {store} categoryFilter={(category) => { return category.service }}/>
     {:else if $activeTab === "sell"}
       <MerchantSellTab store={recipientStore}/>
     {:else if $activeTab === "tables"}

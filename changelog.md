@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 2.3.8
+
+- Added the ability to set custom categories on items
+- Added "Custom" type to per-item-type price modifiers to affect the aforementioned custom categories
+- Tweaked the `Buy Items` tab on merchants to become hidden if the merchant has services to sell, but no items to sell
+- Fixed error when calling `game.itempiles.API.rollItemTable` with a target actor receive the rolled items
+- Improvements to currency string detection and handling
+
 ## Version 2.3.7
 
 - Added "Keep Zero Quantity" setting to merchants and items - any item that is bought up with this setting enabled will be kept in the merchant, but set to not for sale.

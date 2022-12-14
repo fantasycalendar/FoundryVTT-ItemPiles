@@ -3,6 +3,7 @@ import * as Utilities from "../helpers/utilities.js";
 import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
+import CONSTANTS from "../constants/constants.js";
 
 class PileBaseItem {
 
@@ -14,6 +15,7 @@ class PileBaseItem {
   }
 
   setupStores() {
+    this.category = writable({ service: false, type: "", label: "" });
     this.quantity = writable(1);
     this.currentQuantity = writable(1);
     this.quantityLeft = writable(1);
@@ -57,6 +59,7 @@ export class PileItem extends PileBaseItem {
     this.img = writable(this.item.img);
     this.abbreviation = this.item.abbreviation;
     this.identifier = this.id;
+    this.itemFlagData = writable(PileUtilities.getItemFlagData(this.item));
   }
 
   setupSubscriptions() {
@@ -83,10 +86,18 @@ export class PileItem extends PileBaseItem {
         const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
         this.currentQuantity.set(quantity);
       }
+      if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
+        this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
+        this.updateCategory();
+        this.store.refreshItems();
+      }
     });
+
+    this.updateCategory();
 
     this.subscribeTo(this.quantity, this.filter.bind(this));
     this.subscribeTo(this.store.search, this.filter.bind(this));
+    this.subscribeTo(this.category, this.filter.bind(this));
   }
 
   setupProperties() {
@@ -95,6 +106,25 @@ export class PileItem extends PileBaseItem {
     this.toShare = this.isCurrency
       ? get(this.store.pileData).shareCurrenciesEnabled && !!this.store.recipient
       : get(this.store.pileData).shareItemsEnabled && !!this.store.recipient;
+  }
+
+  updateCategory() {
+    const pileData = get(this.store.pileData);
+    const itemFlagData = get(this.itemFlagData);
+    this.category.update(cat => {
+      cat.service = itemFlagData?.isService;
+      if (itemFlagData.customCategory) {
+        cat.type = itemFlagData.customCategory.toLowerCase();
+        cat.label = itemFlagData.customCategory;
+      } else if (cat.service && pileData.enabled && pileData.isMerchant) {
+        cat.type = "item-piles-service";
+        cat.label = "ITEM-PILES.Merchant.Service";
+      } else {
+        cat.type = this.type;
+        cat.label = CONFIG.Item.typeLabels[this.type];
+      }
+      return cat;
+    });
   }
 
   filter() {
@@ -147,6 +177,7 @@ export class PileAttribute extends PileBaseItem {
     this.presentFromTheStart.set(startingQuantity > 0);
     this.quantity.set(startingQuantity);
     this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
+    this.category.set({ type: "currency", label: "ITEM-PILES.Currency" });
   }
 
   setupSubscriptions() {

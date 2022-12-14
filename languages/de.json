@@ -407,9 +407,7 @@
       "AddAll": "Alle Gegenstände hinzufügen",
       "AddItem": "Hinzufügen",
       "RemoveItem": "Entfernen",
-      "OtherTypes": {
-        "item-piles-service": "Service"
-      }
+      "Service": "Service"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile erfolgreich aktualisiert.",

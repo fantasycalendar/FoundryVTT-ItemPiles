@@ -182,35 +182,42 @@ export default class ItemPileStore {
     this.currencies.set(currencies.filter(entry => !get(entry.filtered)));
     this.allCurrencies.set(currencies);
 
-    const itemCategories = Array.from(
-      new Set(visibleItems
-        .filter(entry => !entry.isCurrency)
-        .map(item => item.type))
-    ).map(type => {
-      return {
-        label: CONFIG.Item.typeLabels[type] ?? "ITEM-PILES.Merchant.OtherTypes." + type,
-        type
+    this.itemCategories.set(Object.values(visibleItems.reduce((acc, item) => {
+      const category = get(item.category);
+      if (!acc[category.type]) {
+        acc[category.type] = { ...category };
       }
-    }).sort((a, b) => a.label < b.label ? -1 : 1);
-    this.itemCategories.set(itemCategories);
-    const itemsPerCategory = items.reduce((acc, item) => {
-      if (!acc[item.type]) {
-        acc[item.type] = [];
-      }
-      acc[item.type].push(item);
       return acc;
-    }, {});
-    Object.values(itemsPerCategory).forEach(items => items.sort((a, b) => {
+    }, {})).sort((a, b) => a.label < b.label ? -1 : 1));
+
+    const itemsPerCategory = items
+      .reduce((acc, item) => {
+        const category = get(item.category);
+        if (!acc[category.type]) {
+          acc[category.type] = {
+            service: category.service,
+            type: category.type,
+            label: category.label,
+            items: []
+          };
+        }
+        acc[category.type].items.push(item);
+        return acc;
+      }, {})
+
+    Object.values(itemsPerCategory).forEach(category => category.items.sort((a, b) => {
       return a.item.name < b.item.name ? -1 : 1;
     }));
-    this.itemsPerCategory.set(itemsPerCategory);
-    this.categories.set(Object.keys(itemsPerCategory).map(type => {
-      return {
-        label: CONFIG.Item.typeLabels[type] ?? "ITEM-PILES.Merchant.OtherTypes." + type,
-        type
-      }
-    }).sort((a, b) => a.label < b.label ? -1 : 1))
 
+    this.itemsPerCategory.set(itemsPerCategory);
+
+    this.categories.set(Object.values(itemsPerCategory).map(category => {
+      return {
+        service: category.service,
+        label: category.label,
+        type: category.type
+      }
+    }).sort((a, b) => a.label < b.label ? -1 : 1));
   }
 
   createItem(item) {

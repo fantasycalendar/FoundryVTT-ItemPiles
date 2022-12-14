@@ -422,14 +422,26 @@ export async function updateItemData(item, update) {
 
 /* -------------------------- Merchant Methods ------------------------- */
 
-export function getMerchantModifiersForActor(merchant, { item = false, actor = false, pileFlagData = false } = {}) {
+export function getMerchantModifiersForActor(merchant, {
+  item = false,
+  actor = false,
+  pileFlagData = false,
+  itemFlagData = false
+} = {}) {
 
   let {
     buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, actorPriceModifiers
   } = getActorFlagData(merchant, pileFlagData);
 
   if (item) {
-    const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => priceData.type === item.type);
+    if (!itemFlagData) {
+      itemFlagData = getItemFlagData(item);
+    }
+    const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => {
+      return priceData.type === "custom"
+        ? priceData.category === itemFlagData.customCategory
+        : priceData.type === item.type;
+    });
     if (itemTypePriceModifier) {
       buyPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.buyPriceModifier : buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
       sellPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.sellPriceModifier : sellPriceModifier * itemTypePriceModifier.sellPriceModifier;
@@ -547,40 +559,46 @@ export function getPriceFromString(str, currencyList = false) {
   const currencies = foundry.utils.duplicate(currencyList)
     .map(currency => {
       currency.quantity = 0
+      currency.identifier = currency.abbreviation.toLowerCase().replace("{#}", "")
       return currency;
     });
 
-  const parts = str.trim().split(" ");
+  const splitBy = new RegExp("(.*?) *(" + currencies.map(currency => currency.identifier).join("|") + ")", "g");
+
+  const parts = [...str.trim().toLowerCase().matchAll(splitBy)];
 
   let overallCost = 0;
   for (const part of parts) {
     for (const currency of currencies) {
 
-      const regexString = `${currency.abbreviation.toLowerCase().replace("{#}", "(.*?)")}`
-      const regex = new RegExp(regexString, "g");
+      if (part[2] !== currency.identifier) continue;
 
-      const results = [...part.toLowerCase().matchAll(regex)];
-
-      for (const result of results) {
-        const roll = new Roll(result[1]).evaluate({ async: false })
+      try {
+        const roll = new Roll(part[1]).evaluate({ async: false })
         currency.quantity = roll.total;
-        if (roll.total !== Number(result[1])) {
+        if (roll.total !== Number(part[1])) {
           currency.roll = roll;
         }
         overallCost += roll.total * currency.exchangeRate;
+      } catch (err) {
+
       }
     }
   }
 
   if (overallCost === 0) {
-    const roll = new Roll(str).evaluate({ async: false });
-    if (roll.total) {
-      const primaryCurrency = currencies.find(currency => currency.primary);
-      primaryCurrency.quantity = roll.total;
-      if (roll.total !== Number(str)) {
-        primaryCurrency.roll = roll;
+    try {
+      const roll = new Roll(str).evaluate({ async: false });
+      if (roll.total) {
+        const primaryCurrency = currencies.find(currency => currency.primary);
+        primaryCurrency.quantity = roll.total;
+        if (roll.total !== Number(str)) {
+          primaryCurrency.roll = roll;
+        }
+        overallCost = roll.total;
       }
-      overallCost = roll.total;
+    } catch (err) {
+
     }
   }
 
@@ -620,7 +638,7 @@ export function getItemPrices(item, {
       primary: true,
       maxQuantity: 0,
       quantity
-    })
+    });
     return priceData;
   }
 
@@ -629,13 +647,13 @@ export function getItemPrices(item, {
   if (sellerFlagData) {
 
     modifier = getMerchantModifiersForActor(seller, {
-      item, actor: buyer, pileFlagData: sellerFlagData
+      item, actor: buyer, pileFlagData: sellerFlagData, itemFlagData
     }).buyPriceModifier;
 
   } else if (buyerFlagData) {
 
     modifier = getMerchantModifiersForActor(buyer, {
-      item, actor: seller, pileFlagData: buyerFlagData
+      item, actor: seller, pileFlagData: buyerFlagData, itemFlagData
     }).sellPriceModifier;
 
   }
@@ -676,8 +694,6 @@ export function getItemPrices(item, {
     })
     return priceData;
   }
-
-  // !(itemFlagData.disableNormalCost || (merchant === buyer && sellerFlagData.onlyAcceptBasePrice)) &&
 
   // If the item does include its normal cost, we calculate that here
   if (overallCost >= smallestExchangeRate && (!itemFlagData.disableNormalCost || (merchant === buyer && buyerFlagData.onlyAcceptBasePrice))) {

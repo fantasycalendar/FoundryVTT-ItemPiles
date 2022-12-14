@@ -27,6 +27,7 @@ const CONSTANTS = {
     cantBeSoldToMerchants: false,
     isService: false,
     macro: "",
+    customCategory: "",
     prices: []
   },
 

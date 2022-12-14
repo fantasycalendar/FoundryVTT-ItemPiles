@@ -24,7 +24,7 @@
     </h3>
 
     <div class="item-piles-items-list">
-      {#each $itemsPerCategoryStore[category.type] as item (item.id)}
+      {#each $itemsPerCategoryStore[category.type].items as item (item.id)}
         <MerchantItemSellEntry {item}/>
       {/each}
     </div>

@@ -407,9 +407,7 @@
       "SellItems": "Vendre des objets",
       "PopulateItems": "Remplir les objets",
       "BuyServices": "Acheter des services",
-      "OtherTypes": {
-        "item-piles-service": "Service"
-      },
+      "Service": "Service",
       "NoMatchFound": "Rien ne correspond à votre recherche",
       "RollableTables": "Tables aléatoires",
       "AddTable": "Ajouter une table",

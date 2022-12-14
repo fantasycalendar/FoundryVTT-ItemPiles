@@ -212,9 +212,7 @@
       "BuyItems": "Comprar itens",
       "SellItems": "Vender itens",
       "BuyServices": "Comprar serviços",
-      "OtherTypes": {
-        "item-piles-service": "Serviço"
-      },
+      "Service": "Serviço",
       "NoMatchFound": "Nada corresponde à sua pesquisa"
     },
     "Applications": {

@@ -12,15 +12,17 @@
   let form;
   let unusedTypes;
   let systemTypes = Object.entries(CONFIG.Item.typeLabels);
+  systemTypes.push(["custom", "Custom"])
 
   $: {
-    unusedTypes = Object.keys(CONFIG.Item.typeLabels).filter(type => !itemTypePriceModifiers.find(priceData => priceData.type === type));
+    unusedTypes = systemTypes.filter(([type]) => type === "custom" || !itemTypePriceModifiers.some(priceData => priceData.type === type)).map(([type]) => type);
   }
 
   function add() {
     if (!unusedTypes.length) return;
     itemTypePriceModifiers.push({
       type: unusedTypes[0],
+      category: "",
       override: false,
       buyPriceModifier: 1,
       sellPriceModifier: 0.5
@@ -74,14 +76,18 @@
             </td>
             <td>
               <div class="form-group">
-                <select bind:value={priceData.type}>
-                  {#each systemTypes as [itemType, label] (itemType)}
-                    <option value="{itemType}"
-                            disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
-                      {localize(label)}
-                    </option>
-                  {/each}
-                </select>
+                {#if priceData.type === "custom"}
+                  <input type="text" bind:value={priceData.category} placeholder="Custom Category">
+                {:else}
+                  <select bind:value={priceData.type}>
+                    {#each systemTypes as [itemType, label] (itemType)}
+                      <option value="{itemType}"
+                              disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
+                        {localize(label)}
+                      </option>
+                    {/each}
+                  </select>
+                {/if}
               </div>
             </td>
             <td>

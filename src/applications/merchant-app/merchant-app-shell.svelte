@@ -11,7 +11,7 @@
   import MerchantRightPane from "./MerchantRightPane.svelte";
   import MerchantTopBar from "./MerchantTopBar.svelte";
   import Tabs from "../components/Tabs.svelte";
-  import { writable } from "svelte/store";
+  import { get, writable } from "svelte/store";
 
   const { application } = getContext('external');
 
@@ -67,15 +67,18 @@
   let tabs;
   $: {
     sellHidden = $pileData.purchaseOnly;
+    let hasItems = $visibleItems.some(item => !get(item.category).service)
+    let hasServices = $visibleItems.some(item => get(item.category).service)
     tabs = [
       {
         value: 'buy',
-        label: game.i18n.localize('ITEM-PILES.Merchant.BuyItems')
+        label: game.i18n.localize('ITEM-PILES.Merchant.BuyItems'),
+        hidden: (hasServices && !hasItems) || !hasServices
       },
       {
         value: 'services',
         label: game.i18n.localize('ITEM-PILES.Merchant.BuyServices'),
-        hidden: !$visibleItems.some(item => item.type === "item-piles-service")
+        hidden: !hasServices
       },
       {
         value: 'sell',
@@ -89,7 +92,7 @@
       },
     ];
     if (tabs.find(tab => tab.value === $activeTab).hidden) {
-      $activeTab = tabs[0].value;
+      $activeTab = tabs.find(tab => !tab.hidden).value;
     }
   }
 
