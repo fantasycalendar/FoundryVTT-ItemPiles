@@ -20,6 +20,7 @@ import t2k4e from "./systems/t2k4e.js";
 import yzecoriolis from "./systems/yzecoriolis.js";
 import kamigakari from "./systems/kamigakari.js";
 import ose from "./systems/ose.js";
+import wwn from "./systems/wwn.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -50,6 +51,7 @@ export const SYSTEMS = {
     "t2k4e": t2k4e,
     "yzecoriolis": yzecoriolis,
     "kamigakari": kamigakari,
+    "wwn": wwn,
     //"ose": ose,
     // ↑ ADD SYSTEMS HERE ↑
   },

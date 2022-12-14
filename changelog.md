@@ -2,6 +2,7 @@
 
 ## Version 2.3.8
 
+- Added support for the Worlds Without Numbers system
 - Added the ability to set custom categories on items
 - Added "Custom" type to per-item-type price modifiers to affect the aforementioned custom categories
 - Tweaked the `Buy Items` tab on merchants to become hidden if the merchant has services to sell, but no items to sell
