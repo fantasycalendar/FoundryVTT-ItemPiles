@@ -73,7 +73,7 @@
       {
         value: 'buy',
         label: game.i18n.localize('ITEM-PILES.Merchant.BuyItems'),
-        hidden: (hasServices && !hasItems) || !hasServices
+        hidden: !hasItems && hasServices
       },
       {
         value: 'services',
