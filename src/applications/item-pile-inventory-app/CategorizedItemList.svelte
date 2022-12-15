@@ -22,7 +22,7 @@
       </div>
 
       <div class="item-piles-items-list">
-        {#each $itemsPerCategory[category.type] as item (item.id)}
+        {#each $itemsPerCategory[category.type].items as item (item.id)}
           <ListEntry {store} bind:entry={item}/>
         {/each}
       </div>

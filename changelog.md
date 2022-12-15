@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.3.10
+
+- Actually fixed `game.itempiles.API.rollItemTable` not adding items to the target actor
+- Fixed `Display Item Types` not working properly on item piles
+
 ## Version 2.3.9
 
 - Fixed `Buy Items` tab in merchants not being visible if the merchants had no services, oops

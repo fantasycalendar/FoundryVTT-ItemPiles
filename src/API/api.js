@@ -1319,7 +1319,7 @@ class API {
       resetTable,
       displayChat,
       rollData,
-      actor: Utilities.getUuid(targetActor),
+      targetActor: Utilities.getUuid(targetActor),
       removeExistingActorItems,
       userId: game.user.id
     });
@@ -1327,7 +1327,7 @@ class API {
     if (items) {
       for (const entry of items) {
         entry.item = targetActor
-          ? targetActor.items.get(entry._id)
+          ? targetActor.items.get(entry.item._id)
           : await Item.implementation.create(entry.item, { temporary: true });
       }
     }

@@ -1942,8 +1942,8 @@ export default class PrivateAPI {
       return [];
     }
 
+    let items = [];
     const tableDraw = await rollTable.drawMany(roll.total, { displayChat, recursive: true });
-    const items = [];
     for (const rollData of tableDraw.results) {
       const existingItem = items.find((item) => item.documentId === rollData.documentId);
       if (existingItem) {
@@ -1969,7 +1969,7 @@ export default class PrivateAPI {
     }
 
     if (targetActor) {
-      await this._addItems(targetActor, items, userId, { removeExistingActorItems });
+      items = await this._addItems(targetActor, items, userId, { removeExistingActorItems });
     }
 
     return items;
