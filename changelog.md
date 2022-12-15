@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.3.9
+
+- Fixed `Buy Items` tab in merchants not being visible if the merchants had no services, oops
+
 ## Version 2.3.8
 
 - Added support for the Worlds Without Numbers system
