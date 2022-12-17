@@ -68,7 +68,10 @@ Hooks.once(HOOKS.READY, async () => {
       await patchCurrencySettings();
     }
     applySystemSpecificStyles();
-  }, 100)
+  }, 100);
+
+  //game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"))
+
 })
 
 Hooks.on(HOOKS.RESET_SETTINGS, async () => {

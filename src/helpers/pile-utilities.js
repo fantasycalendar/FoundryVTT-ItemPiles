@@ -77,6 +77,10 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
   const pileData = getActorFlagData(target);
 
+  if (isItemPileMerchant(target, pileData)) {
+    return false;
+  }
+
   if (typeof pileData?.deleteWhenEmpty === "boolean") {
     return pileData?.deleteWhenEmpty;
   }

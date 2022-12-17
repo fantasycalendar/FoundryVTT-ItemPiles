@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.3.11
+
+- Fixed merchant tokens being deleted if they were set to be deleted when becoming empty. Disappearing merchants is mechanically cool and all, but probably not ideal.
+- Fixed minor localization issue in the item editor
+
 ## Version 2.3.10
 
 - Actually fixed `game.itempiles.API.rollItemTable` not adding items to the target actor
