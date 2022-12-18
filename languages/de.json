@@ -162,7 +162,7 @@
     },
     "CurrenciesEditor": {
       "Title": "Währungseditor",
-      "Explanation": "Hier kannst du definieren, welche Währungen ein Charakter aus Gegenstandsstapeln nehmen kann. In D&D5e existieren Währungen als Attribute eines Akteurs z.B. unter \"actor.data.data.currency.gp\", also würdest du deine eigene Währung mit dem Namen \"Goldmünzen\" und dem Attribut  \"data.currency.gp\" hinzufügen.",
+      "Explanation": "Hier kannst du definieren, welche Währungen ein Charakter aus Gegenstandsstapeln nehmen kann. In D&D5e existieren Währungen als Attribute eines Akteurs z.B. unter \"actor.system.currency.gp\", also würdest du deine eigene Währung mit dem Namen \"Goldmünzen\" und dem Attribut  \"system.currency.gp\" hinzufügen.",
       "Name": "Währungsname",
       "Path": "Währungspfad",
       "Icon": "Währungsymbol",
@@ -180,7 +180,7 @@
     "SimilaritiesEditor": {
       "Title": "Gegenstandsähnlichkeiten editieren",
       "Explanation_P1": "Hier kannst du verschiedene Idenfikatoren definieren, die Item Piles helfen zwischen Gegenständen der gleichen Art zu unterscheiden. So gut wie jedes Rollenspielsystem unterscheidet Gegenstände an ihrem Namen (name) und Typ (type).",
-      "Explanation_P2": "In manchen Fällen, wie z.B. Pathfinder 2nd Edition, gibt es temporäre Gegenstände, die den gleichen Namen wie permanente haben. Daher kann man mit dem hinzufügen von \"data.temporary.value\" sicherstellen, dass diese sich \"unterscheiden\".",
+      "Explanation_P2": "In manchen Fällen, wie z.B. Pathfinder 2nd Edition, gibt es temporäre Gegenstände, die den gleichen Namen wie permanente haben. Daher kann man mit dem hinzufügen von \"system.temporary.value\" sicherstellen, dass diese sich \"unterscheiden\".",
       "Path": "Attributspfad",
       "AddNew": "Neuen Attributspfad hinzufügen",
       "Submit": "Gegenstandsähnlichkeiten abschicken"
@@ -304,7 +304,7 @@
       },
       "Quantity": {
         "Title": "Gegenstand Attribut Artikelmenge",
-        "Label": "Hier können Sie den Attributspfad für die Menge der einzelnen Gegenstände konfigurieren. Im D&D5e-System zum Beispiel wird die Menge jedes Gegenstands im Attribut \"item.data.data.quantity\" gespeichert, so dass Sie hier \"data.quantity\" eingeben müssen."
+        "Label": "Hier können Sie den Attributspfad für die Menge der einzelnen Gegenstände konfigurieren. Im D&D5e-System zum Beispiel wird die Menge jedes Gegenstands im Attribut \"item.system.quantity\" gespeichert, so dass Sie hier \"system.quantity\" eingeben müssen."
       },
       "Currencies": {
         "Title": "Währungen",
@@ -365,7 +365,7 @@
     },
     "AttributeEditor": {
       "Title": "Dynamischer Attribute Editor",
-      "Explanation": "Hier kannst du festlegen, welche Attribute von Charakteren von Gegenstandsstapeln abgeholt werden können, z.B. Währungen. In D&D5e gibt es Währungen für Akteure mit dem Attributspfad \"actor.data.data.currency.gp\", also fügst du deine eigene mit dem Namen \"Goldmünzen\" und dem Attributspfad \"data.currency.gp\" hinzu.",
+      "Explanation": "Hier kannst du festlegen, welche Attribute von Charakteren von Gegenstandsstapeln abgeholt werden können, z.B. Währungen. In D&D5e gibt es Währungen für Akteure mit dem Attributspfad \"actor.system.currency.gp\", also fügst du deine eigene mit dem Namen \"Goldmünzen\" und dem Attributspfad \"system.currency.gp\" hinzu.",
       "Name": "Attributsname",
       "Icon": "Attribut Icon",
       "AddNew": "Neues Attribut zufügen",

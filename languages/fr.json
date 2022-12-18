@@ -174,7 +174,7 @@
     },
     "CurrenciesEditor": {
       "Title": "Éditeur de devises",
-      "Explanation": "Ici, vous pouvez définir quelles sont les monnaies sur les personnages qui peuvent être ramassées dans les piles d'objets. Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"data.currency.po\".",
+      "Explanation": "Ici, vous pouvez définir quelles sont les monnaies sur les personnages qui peuvent être ramassées dans les piles d'objets. Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.system.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"system.currency.po\".",
       "Name": "Nom de la devise",
       "Path": "Chemin d'accès",
       "Icon": "Icône de la devise",
@@ -192,7 +192,7 @@
     "SimilaritiesEditor": {
       "Title": "Éditeur de similarités d'objets",
       "Explanation_P1": "Vous pouvez définir ici plusieurs types d'identifiants qui aident Item Piles à différencier les objets similaires. Dans presque tous les systèmes, les éléments peuvent être différenciés par leur \"nom\" et leur \"type\".",
-      "Explanation_P2": "Mais dans certains cas, comme dans la 2e édition de Pathfinder, les objets temporaires peuvent les partager avec les objets permanents. Ainsi, en ajoutant \"data.temporary.value\", vos objets temporaires sont considérés comme \"uniques\".",
+      "Explanation_P2": "Mais dans certains cas, comme dans la 2e édition de Pathfinder, les objets temporaires peuvent les partager avec les objets permanents. Ainsi, en ajoutant \"system.temporary.value\", vos objets temporaires sont considérés comme \"uniques\".",
       "Path": "Chemin d'accès de l'attribut",
       "AddNew": "Ajouter un nouveau chemin d'accès aux attributs",
       "Submit": "Soumettre les similarités."
@@ -312,7 +312,7 @@
       },
       "Quantity": {
         "Title": "Attribut de quantité de l'objet",
-        "Label": "Ici, vous pouvez configurer le chemin de l'attribut pour la quantité de chaque objets. Par exemple, dans le système de D&D5e, la quantité de chaque objet est stockée dans l'attribut \"item.data.data.quantity\" de l'objet, donc vous mettez \"data.quantity\" dans ce paramètre."
+        "Label": "Ici, vous pouvez configurer le chemin de l'attribut pour la quantité de chaque objets. Par exemple, dans le système de D&D5e, la quantité de chaque objet est stockée dans l'attribut \"item.system.quantity\" de l'objet, donc vous mettez \"system.quantity\" dans ce paramètre."
       },
       "Currencies": {
         "Title": "Devises",
@@ -450,7 +450,7 @@
         "Title": "Éditeur de devises de pile d'objets",
         "TitleActor": "Éditeur de devises d'Item Piles : {actor_name}",
         "Explanation": "Ici, vous pouvez définir les devises sur les personnages qui peuvent être ramassés à partir des piles d'objets, comme les devises.",
-        "ExplanationSmallAttributes": "Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.data.data.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"data.currency.gp\". Ajoutez-en une en cliquant sur le plus dans l'en-tête.",
+        "ExplanationSmallAttributes": "Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.system.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"system.currency.gp\". Ajoutez-en une en cliquant sur le plus dans l'en-tête.",
         "DragDrop": "Faites glisser et déposez un élément pour l'ajouter à la liste",
         "ExplanationSmallItems": "Dans d'autres systèmes, il peut s'agir d'éléments réels sur l'acteur - dans ce cas, vous pouvez glisser et déposer des éléments sur cette liste pour les ajouter aux devises.",
         "Name": "Nom de la devise",
@@ -513,7 +513,7 @@
         "Path": "Chemin d'attribut",
         "AddNew": "Ajouter un nouveau chemin d'attribut",
         "Explanation_P1": "Ici, vous pouvez définir plusieurs types d'identifiants qui aident les piles d'objets à différencier les articles similaires. Dans presque tous les systèmes, les éléments peuvent être différenciés par leur \"nom\" et leur \"type\".",
-        "Explanation_P2": "Mais dans certains cas, comme dans Pathfinder 2nd Edition, les objets temporaires peuvent partager ceux avec des objets permanents. Ainsi, en ajoutant \"data.temporary.value\", vos éléments temporaires sont considérés comme \"uniques\" et distincts des éléments permanents.",
+        "Explanation_P2": "Mais dans certains cas, comme dans Pathfinder 2nd Edition, les objets temporaires peuvent partager ceux avec des objets permanents. Ainsi, en ajoutant \"system.temporary.value\", vos éléments temporaires sont considérés comme \"uniques\" et distincts des éléments permanents.",
         "Title": "Éditeur de similarités des piles d'objets",
         "Submit": "Soumettre des similitudes d'objets"
       },
@@ -681,7 +681,7 @@
         "Blind": "Aveugle - seuls les MJs peuvent voir les messages"
       },
       "Price": {
-        "Hint": "Ici, vous pouvez configurer le chemin de l'attribut pour le prix de chaque élément. Par exemple, dans le système de D&D5e, la quantité de chaque objet est stockée dans l'attribut \"item.data.data.price\" de l'objet, vous devez donc mettre \"data.price\" dans ce paramètre.",
+        "Hint": "Ici, vous pouvez configurer le chemin de l'attribut pour le prix de chaque élément. Par exemple, dans le système de D&D5e, la quantité de chaque objet est stockée dans l'attribut \"item.system.price\" de l'objet, vous devez donc mettre \"system.price\" dans ce paramètre.",
         "Title": "Attribut de prix de l'article"
       },
       "Reset": {
@@ -735,7 +735,7 @@
       },
       "Quantity": {
         "Title": "Attribut de quantité de l'article",
-        "Hint": "Ici, vous pouvez configurer le chemin de l'attribut pour la quantité de chaque élément. Par exemple, dans le système de D&D5e, la quantité de chaque objet est stockée dans l'attribut \"item.data.data.quantity\" de l'objet, donc vous mettez \"data.quantity\" dans ce paramètre."
+        "Hint": "Ici, vous pouvez configurer le chemin de l'attribut pour la quantité de chaque élément. Par exemple, dans le système de D&D5e, la quantité de chaque objet est stockée dans l'attribut \"item.system.quantity\" de l'objet, donc vous mettez \"system.quantity\" dans ce paramètre."
       },
       "ItemFilters": {
         "Title": "Filtres des objets",

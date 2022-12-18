@@ -244,7 +244,7 @@
       "CurrenciesEditor": {
         "Title": "Editor de moedas do Item Piles",
         "TitleActor": "Editor de moedas do Item Piles: {actor_name}",
-        "ExplanationSmallAttributes": "No D&D5e, as moedas existem em atores no caminho de atributo \"actor.data.data.currency.gp\", então você adicionaria o seu próprio com o nome \"Gold Coins\" e o caminho de atributo \"data.currency.gp\". Adicione um clicando no sinal de mais no cabeçalho.",
+        "ExplanationSmallAttributes": "No D&D5e, as moedas existem em atores no caminho de atributo \"actor.system.currency.gp\", então você adicionaria o seu próprio com o nome \"Gold Coins\" e o caminho de atributo \"system.currency.gp\". Adicione um clicando no sinal de mais no cabeçalho.",
         "Explanation": "Aqui você pode definir quais moedas em personagens que podem ser retiradas do item piles, como moedas.",
         "ExplanationSmallItems": "Em outros sistemas, eles podem ser itens reais no ator - nesse caso, você pode arrastar e soltar itens nesta lista para adicioná-los às moedas.",
         "DragDrop": "Arraste e solte um item para adicioná-lo à lista",
@@ -326,7 +326,7 @@
         "Path": "Caminho do atributo",
         "AddNew": "Adicionar novo caminho de atributo",
         "Submit": "Enviar semelhanças de itens",
-        "Explanation_P2": "Mas em alguns casos, como no Pathfinder 2nd Edition, itens temporários podem ser compartilhados com itens permanentes. Portanto, ao adicionar \"data.temporary.value\", seus itens temporários são considerados \"únicos\" e separados dos permanentes."
+        "Explanation_P2": "Mas em alguns casos, como no Pathfinder 2nd Edition, itens temporários podem ser compartilhados com itens permanentes. Portanto, ao adicionar \"system.temporary.value\", seus itens temporários são considerados \"únicos\" e separados dos permanentes."
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "Editor de modificadores de preço de tipo de item",
@@ -471,7 +471,7 @@
         "Label": "Redefinir as configurações"
       },
       "Quantity": {
-        "Hint": "Aqui você pode configurar qual é o caminho do atributo para a quantidade de cada item. Por exemplo, no sistema D&D5e, a quantidade de cada item é armazenada no atributo \"item.data.data.quantity\" do item, então você deve colocar \"data.quantity\" nesta configuração.",
+        "Hint": "Aqui você pode configurar qual é o caminho do atributo para a quantidade de cada item. Por exemplo, no sistema D&D5e, a quantidade de cada item é armazenada no atributo \"item.system.quantity\" do item, então você deve colocar \"system.quantity\" nesta configuração.",
         "Title": "Atributo de quantidade do item"
       },
       "ItemSimilarities": {
@@ -515,7 +515,7 @@
       },
       "Price": {
         "Title": "Atributo de preço do item",
-        "Hint": "Aqui você pode configurar qual é o caminho do atributo para o preço de cada item. Por exemplo, no sistema D&D5e, a quantidade de cada item é armazenada no atributo \"item.data.data.price\" do item, então você deve colocar \"data.price\" nesta configuração."
+        "Hint": "Aqui você pode configurar qual é o caminho do atributo para o preço de cada item. Por exemplo, no sistema D&D5e, a quantidade de cada item é armazenada no atributo \"item.system.price\" do item, então você deve colocar \"system.price\" nesta configuração."
       },
       "Currencies": {
         "Title": "Moedas",

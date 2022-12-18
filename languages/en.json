@@ -263,7 +263,7 @@
         "Title": "Item Piles Currencies Editor",
         "TitleActor": "Item Piles Currencies Editor: {actor_name}",
         "Explanation": "Here you can define which currencies on characters that can be picked up from item piles, such as currencies.",
-        "ExplanationSmallAttributes": "In D&D5e, currencies exist on actors on the attribute path \"actor.data.data.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"data.currency.gp\". Add one by clicking the plus in the header.",
+        "ExplanationSmallAttributes": "In D&D5e, currencies exist on actors on the attribute path \"actor.system.currency.gp\", so you'd add your own with the name \"Gold Coins\" and attribute path \"system.currency.gp\". Add one by clicking the plus in the header.",
         "ExplanationSmallItems": "In other systems, they may be actual items on the actor - in this case, you can drag and drop items onto this list to add it to the currencies.",
         "DragDrop": "Drag and drop an item to add it to the list",
         "Name": "Currency name",
@@ -325,7 +325,7 @@
       "SimilaritiesEditor": {
         "Title": "Item Piles Similarities Editor",
         "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
-        "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"data.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
+        "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"system.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
         "Path": "Attribute path",
         "AddNew": "Add new attribute path",
         "Submit": "Submit item similarities"
@@ -502,11 +502,11 @@
       },
       "Quantity": {
         "Title": "Item quantity attribute",
-        "Hint": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.quantity\" attribute, so you'd put \"data.quantity\" in this setting."
+        "Hint": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.system.quantity\" attribute, so you'd put \"system.quantity\" in this setting."
       },
       "Price": {
         "Title": "Item price attribute",
-        "Hint": "Here you can configure what the attribute path is for each item's price. For example, in D&D5e system, each item's quantity is stored in the item's \"item.data.data.price\" attribute, so you'd put \"data.price\" in this setting."
+        "Hint": "Here you can configure what the attribute path is for each item's price. For example, in D&D5e system, each item's quantity is stored in the item's \"item.system.price\" attribute, so you'd put \"system.price\" in this setting."
       },
       "Currencies": {
         "Title": "Currencies",

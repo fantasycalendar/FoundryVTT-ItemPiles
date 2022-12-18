@@ -249,7 +249,7 @@
         "AddNew": "Añadir nueva moneda",
         "Submit": "Aceptar",
         "TitleActor": "Editor de Dinero Item Piles: {actor_name}",
-        "ExplanationSmallAttributes": "En Dungeons & Dragons, el dinero de los actores está la ruta de atributo \"actor.data.data.currency.gp\", por lo que agregaría la suya propia con el nombre \"Piezas de oro\" y la ruta de atributo \"data.currency.gp\". Añade una haciendo clic en el signo + del encabezado.",
+        "ExplanationSmallAttributes": "En Dungeons & Dragons, el dinero de los actores está la ruta de atributo \"actor.system.currency.gp\", por lo que agregaría la suya propia con el nombre \"Piezas de oro\" y la ruta de atributo \"system.currency.gp\". Añade una haciendo clic en el signo + del encabezado.",
         "DragDrop": "Arrastra y suelta un objeto para añadirlo a la lista",
         "Name": "Nombre de la moneda",
         "Exchange": "Cambio",
@@ -303,7 +303,7 @@
       "SimilaritiesEditor": {
         "Title": "Editor de Similitudes de Item Piles",
         "Explanation_P1": "Aquí puedes definir múltiples tipos de identificadores que ayudan a Item Piles a diferenciar entre artículos similares. En casi todos los sistemas, los artículos se pueden diferenciar por su \"nombre\" y \"tipo\".",
-        "Explanation_P2": "Pero en algunos casos, como en Pathfinder 2ª Edición, los artículos temporales pueden compartir los artículos permanentes. Entonces, al agregar \"data.temporary.value\", sus artículos temporales se consideran \"únicos\" y separados de los permanentes.",
+        "Explanation_P2": "Pero en algunos casos, como en Pathfinder 2ª Edición, los artículos temporales pueden compartir los artículos permanentes. Entonces, al agregar \"system.temporary.value\", sus artículos temporales se consideran \"únicos\" y separados de los permanentes.",
         "Path": "Ruta de atributo",
         "AddNew": "Agregar nueva ruta de atributo",
         "Submit": "Enviar similitudes de artículos"
@@ -478,11 +478,11 @@
       },
       "Quantity": {
         "Title": "Atributo de cantidad de artículo",
-        "Hint": "Aquí puedes configurar cuál es la ruta del atributo para la cantidad de cada artículo. Por ejemplo, en el sistema D&D5e, la cantidad de cada artículo se almacena en el atributo \"item.data.data.quantity\" del artículo, por lo que colocaría \"data.quantity\" en esta configuración."
+        "Hint": "Aquí puedes configurar cuál es la ruta del atributo para la cantidad de cada artículo. Por ejemplo, en el sistema D&D5e, la cantidad de cada artículo se almacena en el atributo \"item.system.quantity\" del artículo, por lo que colocaría \"system.quantity\" en esta configuración."
       },
       "Price": {
         "Title": "Atributo de precio del artículo",
-        "Hint": "Aquí puedes configurar cuál es la ruta del atributo para el precio de cada artículo. Por ejemplo, en el sistema D&D5e, la cantidad de cada artículo se almacena en el atributo \"item.data.data.price\" del artículo, por lo que colocaría \"data.price\" en esta configuración."
+        "Hint": "Aquí puedes configurar cuál es la ruta del atributo para el precio de cada artículo. Por ejemplo, en el sistema D&D5e, la cantidad de cada artículo se almacena en el atributo \"item.system.price\" del artículo, por lo que colocaría \"system.price\" en esta configuración."
       },
       "Currencies": {
         "Label": "Configura Monedas",
