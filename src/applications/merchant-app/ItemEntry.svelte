@@ -48,7 +48,7 @@
     {:else}
       {$itemName}
     {/if}
-    {#if displayQuantity}
+    {#if displayQuantity && item.canStack}
       {#if infiniteQuantity}
         <span class="item-piles-small-text">(∞)</span>
       {:else if !showEditQuantity}

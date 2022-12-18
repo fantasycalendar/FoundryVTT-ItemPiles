@@ -90,6 +90,8 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [KNAVE](https://foundryvtt.com/packages/knave)
 - [Twilight: 2000 (4th Edition)](https://foundryvtt.com/packages/t2k4e-coreset)
 - [Kamigakari: God Hunter](https://foundryvtt.com/packages/kamigakari)
+- [Words Without Number](https://foundryvtt.com/packages/wwn)
+- [Symbaroum](https://foundryvtt.com/packages/symbaroum)
 
 ## Externally support systems
 

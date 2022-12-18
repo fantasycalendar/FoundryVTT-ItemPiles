@@ -2,8 +2,10 @@
 
 ## Version 2.3.11
 
-- Fixed merchant tokens being deleted if they were set to be deleted when becoming empty. Disappearing merchants is mechanically cool and all, but probably not ideal.
+- Added support for the Symbaroum system
+- Fixed Merchants' items having a quantity counter visible on items that cannot stack
 - Fixed minor localization issue in the item editor
+- Fixed merchant tokens being deleted if they were set to be deleted when becoming empty. Disappearing merchants is mechanically cool and all, but probably not ideal.
 
 ## Version 2.3.10
 
