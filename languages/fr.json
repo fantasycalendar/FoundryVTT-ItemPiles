@@ -496,7 +496,8 @@
         "KeepZero": "Conserver une quantité nulle",
         "KeepZeroExplanation": "Lorsqu'il est vendu en totalité, la marchant ne retire pas cet objet mais indique à la place qu'il n'est plus à vendre.",
         "CustomCategory": "Catégorie d'objets personnalisée",
-        "CustomTypeExplanation": "Cet objet sera répertorié sous un type différent de ce qu'il est à l'origine."
+        "CustomTypeExplanation": "Cet objet sera répertorié sous un type différent de ce qu'il est à l'origine.",
+        "CustomCategoryExplanation": "Lorsqu'il n'est pas laissé vide, cet objet sera listé sous un type différent de ce qu'il est."
       },
       "TradeMerchantItem": {
         "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
