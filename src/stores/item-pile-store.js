@@ -233,10 +233,9 @@ export default class ItemPileStore {
     if (previouslyDeletedItem) {
       previouslyDeletedItem.pileItem.setup(item);
     } else {
-      items.push(new PileItem(this, item));
+      items.push(new this.ItemClass(this, item));
     }
     this.allItems.set(items);
-    this.refreshItems();
   }
 
   deleteItem(item) {
@@ -253,7 +252,6 @@ export default class ItemPileStore {
       pileItem.quantityLeft.set(0);
     }
     pileItem.unsubscribe();
-    this.refreshItems();
   }
 
   delete() {

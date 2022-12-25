@@ -1,7 +1,7 @@
 <script>
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
-  import ItemEditor from "../editors/item-editor/item-editor.js";
+  import ItemEditor from "../item-editor/item-editor.js";
   import PriceSelector from "../components/PriceSelector.svelte";
   import ItemEntry from "./ItemEntry.svelte";
 

@@ -116,7 +116,7 @@ export class PileItem extends PileBaseItem {
       if (itemFlagData.customCategory) {
         cat.type = itemFlagData.customCategory.toLowerCase();
         cat.label = itemFlagData.customCategory;
-      } else if (cat.service && pileData.enabled && pileData.isMerchant) {
+      } else if (cat.service && pileData.enabled && pileData.type === CONSTANTS.PILE_TYPES.MERCHANT) {
         cat.type = "item-piles-service";
         cat.label = "ITEM-PILES.Merchant.Service";
       } else {

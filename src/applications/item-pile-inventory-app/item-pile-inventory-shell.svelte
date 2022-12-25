@@ -9,6 +9,7 @@
   import ActorPicker from "./ActorPicker.svelte";
 
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
+  import * as PileUtilities from "../../helpers/pile-utilities.js";
   import PrivateAPI from "../../API/private-api.js";
   import ItemPileStore from "../../stores/item-pile-store.js";
   import CategorizedItemList from "./CategorizedItemList.svelte";
@@ -33,6 +34,7 @@
   $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
   $: hasItems = $numItems > 0;
   $: showSearchBar = ($numItems + $numCurrencies) >= 3;
+  $: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
 
   let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 
@@ -152,7 +154,7 @@
           </button>
         {/if}
 
-        {#if $pileData.isContainer && !application.options.remote}
+        {#if isContainer && !application.options.remote}
           <button type="submit" on:click={() => { store.closeContainer(); application.close(); }}>
             <i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
           </button>

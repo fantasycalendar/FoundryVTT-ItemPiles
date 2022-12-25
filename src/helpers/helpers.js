@@ -136,6 +136,10 @@ export function roundToDecimals(num, decimals) {
   return Number(Math.round(num + 'e' + decimals) + 'e-' + decimals);
 }
 
+export function clamp(num, min, max) {
+	return Math.max(Math.min(num, max), min);
+}
+
 /**
  *  This function linearly interpolates between p1 and p2 based on a normalized value of t
  *

@@ -28,12 +28,22 @@ const CONSTANTS = {
     isService: false,
     macro: "",
     customCategory: "",
-    prices: []
+    prices: [],
+    x: null,
+    y: null
+  },
+
+  PILE_TYPES: {
+    PILE: "pile",
+    CONTAINER: "container",
+    MERCHANT: "merchant",
+    VAULT: "vault"
   },
 
   PILE_DEFAULTS: {
     // Core settings
     enabled: false,
+    type: "pile",
     distance: 1,
     macro: "",
     deleteWhenEmpty: "default",
@@ -59,7 +69,6 @@ const CONSTANTS = {
     activePlayers: false,
 
     // Container settings
-    isContainer: false,
     closed: false,
     locked: false,
     closedImage: "",
@@ -80,9 +89,7 @@ const CONSTANTS = {
     unlockedSounds: [],
 
     // Merchant settings
-    isMerchant: false,
     merchantImage: "",
-    isClosed: false,
     infiniteQuantity: false,
     infiniteCurrencies: true,
     purchaseOnly: false,
@@ -110,7 +117,15 @@ const CONSTANTS = {
         hour: 18,
         minute: 0
       }
-    }
+    },
+
+    // Vault settings
+    columns: 7,
+    rows: 7,
+    enabledColumns: 5,
+    enabledRows: 7,
+    gridSize: 40,
+    grid: [],
   }
 }
 

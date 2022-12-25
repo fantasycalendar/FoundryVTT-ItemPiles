@@ -1,12 +1,12 @@
 <script>
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import * as PileUtilities from "../../../helpers/pile-utilities.js";
+  import * as PileUtilities from "../../helpers/pile-utilities.js";
   import ItemPriceStore from "./ItemPriceStore.js";
-  import Tabs from "../../components/Tabs.svelte";
-  import PriceList from "../../components/PriceList.svelte";
+  import Tabs from "../components/Tabs.svelte";
+  import PriceList from "../components/PriceList.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import MacroSelector from "../../components/MacroSelector.svelte";
+  import MacroSelector from "../components/MacroSelector.svelte";
 
   const { application } = getContext('external');
 
@@ -142,6 +142,20 @@
           </div>
           <div class="form-group">
             <MacroSelector bind:macro={itemFlagData.macro}/>
+          </div>
+
+          <div class="form-group">
+            <label style="flex:4;">
+              Width<br>
+            </label>
+            <input type="number" bind:value={itemFlagData.width}/>
+          </div>
+
+          <div class="form-group">
+            <label style="flex:4;">
+              Height<br>
+            </label>
+            <input type="number" bind:value={itemFlagData.height}/>
           </div>
 
         </div>

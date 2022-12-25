@@ -3,8 +3,8 @@
   import MerchantBuyTab from "./MerchantBuyTab.svelte";
   import MerchantSellTab from "./MerchantSellTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
+  import CurrencyList from "../components/CurrencyList.svelte";
   import { writable } from "svelte/store";
-  import MerchantCurrencyColumn from "./MerchantCurrencyColumn.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
   export let store;
@@ -41,11 +41,7 @@
 
 
   {#if recipientStore && $currencies.length}
-    <div class="item-piles-flexrow item-piles-currency-list">
-      {#each $currencies as currency (currency.identifier)}
-        <MerchantCurrencyColumn {currency}/>
-      {/each}
-    </div>
+    <CurrencyList {currencies}/>
   {/if}
 
 </div>

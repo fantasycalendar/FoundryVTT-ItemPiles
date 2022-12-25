@@ -384,9 +384,9 @@ class API {
    */
   static openItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     const wasLocked = pileData.locked;
     const wasClosed = pileData.closed;
     pileData.closed = false;
@@ -417,9 +417,9 @@ class API {
    */
   static closeItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
 
     const wasOpen = !pileData.closed;
     pileData.closed = true;
@@ -448,9 +448,9 @@ class API {
    */
   static async toggleItemPileClosed(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     if (pileData.closed) {
       await this.openItemPile(targetActor, interactingTokenDocument);
     } else {
@@ -469,9 +469,9 @@ class API {
    */
   static lockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     const wasClosed = pileData.closed;
     pileData.closed = true;
     pileData.locked = true;
@@ -501,9 +501,9 @@ class API {
    */
   static unlockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     pileData.locked = false;
     Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
@@ -519,9 +519,9 @@ class API {
    */
   static toggleItemPileLocked(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     if (pileData.locked) {
       return this.unlockItemPile(targetActor, interactingTokenDocument);
     }
@@ -538,11 +538,9 @@ class API {
    */
   static rattleItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-
     const pileData = PileUtilities.getActorFlagData(targetActor);
-
-    if (!pileData?.enabled || !pileData?.isContainer || !pileData?.locked) return false;
 
     Helpers.hooks.call(HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
 

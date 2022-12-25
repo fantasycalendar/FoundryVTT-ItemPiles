@@ -10,6 +10,12 @@
     "HeaderButtons": {
       "ShowToPlayers": "Show To Players"
     },
+    "Types": {
+      "pile": "Item Pile",
+      "container": "Container",
+      "merchant": "Merchant",
+      "vault": "Bank Vault"
+    },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile successfully updated.",
       "UpdateMerchantSuccess": "Merchant successfully updated.",
@@ -379,7 +385,9 @@
           "ConfigureOverrideItemFilters": "Configure Override Item Filters"
         },
         "Other": {
-          "Title": "Other Settings"
+          "Title": "Other Settings",
+          "Type": "Item Pile Type",
+          "TypeExplanation": "This configures the way this item pile will be displayed."
         },
         "SingleItem": {
           "Title": "Single Item Settings",

@@ -2,7 +2,7 @@ import SETTINGS from "./constants/settings.js";
 import * as Helpers from "./helpers/helpers.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
-import ItemEditor from "./applications/editors/item-editor/item-editor.js";
+import ItemEditor from "./applications/item-editor/item-editor.js";
 import CONSTANTS from "./constants/constants.js";
 import UserSelectDialog from "./applications/dialogs/user-select-dialog/user-select-dialog.js";
 
@@ -128,7 +128,7 @@ function renderPileHUD(app, html) {
 
   const container = $(`<div class="col right" style="right:-130px;"></div>`);
 
-  if (pileData.isContainer) {
+  if (PileUtilities.isItemPileContainer(target)) {
 
     const lock_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pileData.locked ? "" : "-open"}"></i></div>`);
     lock_button.click(async function () {

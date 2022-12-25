@@ -8,8 +8,31 @@ import SETTINGS from "../constants/settings.js";
 function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
   const flags = existing || (getProperty(inDocument, flag) ?? {});
-  const data = foundry.utils.duplicate(flags);
+  let data = foundry.utils.deepClone(flags);
+  if(flag === CONSTANTS.FLAGS.PILE){
+    data = migrateFlagData(inDocument, data);
+  }
   return foundry.utils.mergeObject(defaultFlags, data);
+}
+
+export function migrateFlagData(document, data = false){
+
+  let flags = data || getProperty(document, CONSTANTS.FLAGS.PILE);
+
+  if(flags.type){
+    return flags;
+  }
+
+  if(flags.isMerchant){
+    flags.type = CONSTANTS.PILE_TYPES.MERCHANT;
+  }else if(flags.isContainer){
+    flags.type = CONSTANTS.PILE_TYPES.CONTAINER;
+  }else{
+    flags.type = CONSTANTS.PILE_TYPES.PILE;
+  }
+
+  return flags;
+
 }
 
 export function getItemFlagData(item, data = false) {
@@ -29,26 +52,32 @@ export function isValidItemPile(target, data = false) {
 export function isItemPileContainer(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
-  return pileData?.enabled && pileData?.isContainer;
+  return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER;
+}
+
+export function isItemPileVault(target, data = false) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor, data);
+  return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.VAULT;
 }
 
 export function isItemPileMerchant(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
-  return pileData?.enabled && pileData?.isMerchant;
+  return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.MERCHANT;
 }
 
 export function isItemPileClosed(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
-  if (!pileData?.enabled || !pileData?.isContainer) return false;
+  if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
   return pileData.closed;
 }
 
 export function isItemPileLocked(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
-  if (!pileData?.enabled || !pileData?.isContainer) return false;
+  if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
   return pileData.locked;
 }
 
@@ -246,7 +275,7 @@ export function getItemPileTokenImage(token, {
 
   let img = originalImg;
 
-  if (itemPileData.isContainer) {
+  if (itemPileData.type === CONSTANTS.PILE_TYPES.CONTAINER) {
 
     img = itemPileData.lockedImage || itemPileData.closedImage || itemPileData.openedImage || itemPileData.emptyImage;
 
@@ -298,7 +327,7 @@ export function getItemPileTokenScale(target, {
 
   const numItems = items.length + currencies.length;
 
-  if (itemPileData.isContainer || !itemPileData.displayOne || !itemPileData.overrideSingleItemScale || numItems > 1 || numItems === 0) {
+  if (itemPileData?.type === CONSTANTS.PILE_TYPES.CONTAINER || !itemPileData.displayOne || !itemPileData.overrideSingleItemScale || numItems > 1 || numItems === 0) {
     return baseScale;
   }
 
@@ -323,7 +352,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
   const numItems = items.length + currencies.length;
 
-  if (itemPileData.isContainer || !itemPileData.displayOne || !itemPileData.showItemName || numItems > 1 || numItems === 0) {
+  if (itemPileData?.type === CONSTANTS.PILE_TYPES.CONTAINER || !itemPileData.displayOne || !itemPileData.showItemName || numItems > 1 || numItems === 0) {
     return name;
   }
 
@@ -336,7 +365,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 export function shouldEvaluateChange(target, changes) {
   const flags = getActorFlagData(target, getProperty(changes, CONSTANTS.FLAGS.PILE) ?? {});
   if (!isValidItemPile(target, flags)) return false;
-  return (flags.isContainer && (flags.closedImage || flags.emptyImage || flags.openedImage || flags.lockedImage))
+  return (flags.type === CONSTANTS.PILE_TYPES.CONTAINER && (flags.closedImage || flags.emptyImage || flags.openedImage || flags.lockedImage))
     || flags.displayOne || flags.showItemName || flags.overrideSingleItemScale;
 }
 
@@ -381,6 +410,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
   const pileData = { data: flagData, items, currencies };
 
+  flagData = cleanFlagData(flagData);
+
   const updates = documentTokens.map(tokenDocument => {
     const newTokenData = foundry.utils.mergeObject(tokenData, {
       "img": getItemPileTokenImage(tokenDocument, pileData, tokenData?.img),
@@ -414,6 +445,19 @@ export async function updateItemPileData(target, flagData, tokenData) {
   }
 
   return true;
+}
+
+export function cleanFlagData(flagData){
+  const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, CONSTANTS.PILE_DEFAULTS)));
+  const toRemove = new Set(Object.keys(CONSTANTS.PILE_DEFAULTS).filter(key => !difference.has(key)));
+  if(flagData.enabled){
+    toRemove.delete("type")
+  }
+  for(const key of toRemove){
+    delete flagData[key];
+    flagData["-=" + key] = null;
+  }
+  return flagData;
 }
 
 export async function updateItemData(item, update) {
@@ -617,12 +661,12 @@ export function getItemPrices(item, {
   let priceData = [];
 
   buyerFlagData = getActorFlagData(buyer, buyerFlagData);
-  if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
+  if (!isItemPileMerchant(buyer, buyerFlagData)) {
     buyerFlagData = false;
   }
 
   sellerFlagData = getActorFlagData(seller, sellerFlagData);
-  if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
+  if (!isItemPileMerchant(seller, sellerFlagData)) {
     sellerFlagData = false;
   }
 
@@ -824,14 +868,14 @@ export function getPricesForItems(itemsToBuy, {
   seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false
 } = {}) {
 
-  sellerFlagData = getActorFlagData(seller, sellerFlagData);
-  if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
-    sellerFlagData = false;
+  buyerFlagData = getActorFlagData(buyer, buyerFlagData);
+  if (!isItemPileMerchant(buyer, buyerFlagData)) {
+    buyerFlagData = false;
   }
 
-  buyerFlagData = getActorFlagData(buyer, buyerFlagData);
-  if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
-    buyerFlagData = false;
+  sellerFlagData = getActorFlagData(seller, sellerFlagData);
+  if (!isItemPileMerchant(seller, sellerFlagData)) {
+    sellerFlagData = false;
   }
 
   const merchant = sellerFlagData ? seller : buyer;

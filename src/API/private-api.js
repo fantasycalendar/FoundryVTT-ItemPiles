@@ -15,6 +15,7 @@ import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
+import BankVaultApp from "../applications/vault-app/vault-app.js";
 
 const preloadedFiles = new Set();
 
@@ -1109,7 +1110,7 @@ export default class PrivateAPI {
 
     await PileUtilities.updateItemPileData(targetActor, data, tokenSettings);
 
-    if (data.enabled && data.isContainer) {
+    if (PileUtilities.isItemPileContainer(targetActor, data)) {
       if (diff?.closed === true) {
         await this._executeItemPileMacro(targetUuid, {
           action: "closeItemPile", source: interactingTokenUuid, target: targetUuid
@@ -1147,7 +1148,7 @@ export default class PrivateAPI {
 
     Helpers.hooks.callAll(HOOKS.PILE.UPDATE, target, diffData, interactingToken)
 
-    if (data.enabled && data.isContainer) {
+    if (PileUtilities.isItemPileContainer(target, data)) {
       if (diffData?.closed === true) {
         Helpers.hooks.callAll(HOOKS.PILE.CLOSE, target, interactingToken)
       }
@@ -1602,7 +1603,7 @@ export default class PrivateAPI {
       }
     }
 
-    if (pileData.isContainer && interactingActor) {
+    if (PileUtilities.isItemPileContainer(pileDocument) && interactingActor) {
 
       if (pileData.locked && !game.user.isGM) {
         Helpers.debug(`Attempted to open locked item pile with UUID ${pileDocument.uuid}`);
@@ -1746,8 +1747,11 @@ export default class PrivateAPI {
       inspectingTarget = inspectingTargetUuid ? fromUuidSync(inspectingTargetUuid) : false;
     }
 
-    const merchant = PileUtilities.isItemPileMerchant(target);
-    if (merchant) {
+    if (PileUtilities.isItemPileVault(target)) {
+      return BankVaultApp.show(target, inspectingTarget)
+    }
+
+    if (PileUtilities.isItemPileMerchant(target)) {
       return MerchantApp.show(target, inspectingTarget)
     }
 
@@ -1774,7 +1778,7 @@ export default class PrivateAPI {
 
     const sellerTransaction = new Transaction(sellingActor);
     const sellerFlagData = PileUtilities.getActorFlagData(sellerTransaction);
-    const sellerIsMerchant = sellerFlagData.enabled && sellerFlagData.isMerchant;
+    const sellerIsMerchant = PileUtilities.isItemPileMerchant(sellingActor, sellerFlagData);
     const sellerInfiniteQuantity = sellerIsMerchant && sellerFlagData.infiniteQuantity;
     const sellerInfiniteCurrencies = sellerIsMerchant && sellerFlagData.infiniteCurrencies;
     const sellerKeepZeroQuantity = sellerIsMerchant && sellerFlagData.keepZeroQuantity;
@@ -1818,7 +1822,7 @@ export default class PrivateAPI {
 
     const buyerTransaction = new Transaction(buyingActor);
     const buyerFlagData = PileUtilities.getActorFlagData(buyingActor);
-    const buyerIsMerchant = buyerFlagData.enabled && buyerFlagData.isMerchant;
+    const buyerIsMerchant = PileUtilities.isItemPileMerchant(buyingActor, buyerFlagData);
     const buyerInfiniteCurrencies = buyerIsMerchant && buyerFlagData.infiniteCurrencies;
     const buyerInfiniteQuantity = buyerIsMerchant && buyerFlagData.infiniteQuantity;
     const buyerHidesNewItems = buyerIsMerchant && buyerFlagData.hideNewItems;

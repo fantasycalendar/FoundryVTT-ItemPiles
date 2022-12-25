@@ -11,6 +11,7 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import HOOKS from "./constants/hooks.js";
 import * as Helpers from "./helpers/helpers.js";
+import runMigrations from "./migrations.js"
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -66,11 +67,12 @@ Hooks.once(HOOKS.READY, async () => {
     if (game.user.isGM) {
       await checkSystem();
       await patchCurrencySettings();
+      await runMigrations();
     }
     applySystemSpecificStyles();
   }, 100);
 
-  //game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"))
+  game.itempiles.API.renderItemPileInterface(game.actors.getName("Item Pile"))
 
 })
 

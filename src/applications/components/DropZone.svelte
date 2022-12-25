@@ -13,7 +13,7 @@
     } catch (err) {
       return false;
     }
-    callback(data);
+    callback(data, event);
   }
 
   let counter = 0;
