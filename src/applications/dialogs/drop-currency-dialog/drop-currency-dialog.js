@@ -1,5 +1,6 @@
 import DropCurrencyDialogShell from "./drop-currency-dialog-shell.svelte";
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { getActiveApps } from "../../../helpers/helpers";
 
 export default class DropCurrencyDialog extends SvelteApplication {
 
@@ -12,7 +13,7 @@ export default class DropCurrencyDialog extends SvelteApplication {
    */
   constructor(sourceActor, targetActor, settings = {}, options = {}) {
     super({
-      id: `item-pile-drop-currency-${sourceActor.id + (targetActor ? "-" + targetActor.id : "")}`,
+      id: `item-pile-drop-currency-${sourceActor.id + (targetActor ? "-" + targetActor.id : "")}-${randomID()}`,
       title: settings?.title ?? game.i18n.localize("ITEM-PILES.Applications.DropCurrencies.Title"),
       svelte: {
         class: DropCurrencyDialogShell,
@@ -37,7 +38,7 @@ export default class DropCurrencyDialog extends SvelteApplication {
   }
 
   static getActiveApps(id) {
-    return Object.values(ui.windows).filter(app => app.id === `item-pile-drop-currency-${id}`);
+    return getActiveApps(`item-pile-drop-currency-${id}`);
   }
 
   static async show(sourceActor, targetActor, settings = {}, options = {}) {

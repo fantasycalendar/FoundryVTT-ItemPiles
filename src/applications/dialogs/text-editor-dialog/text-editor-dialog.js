@@ -1,4 +1,5 @@
 import { SvelteApplication } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+import { getActiveApps } from "../../../helpers/helpers";
 import TextEditorDialogShell from "./text-editor-dialog-shell.svelte";
 
 export default class TextEditorDialog extends SvelteApplication {
@@ -6,7 +7,7 @@ export default class TextEditorDialog extends SvelteApplication {
   constructor(text, options) {
     super({
       title: game.i18n.localize("ITEM-PILES.Dialogs.TextEditor.Title"),
-      id: "item-piles-text-editor",
+      id: `item-piles-text-editor${options?.id ? "-" + options.id : ""}-${randomID()}`,
       svelte: {
         class: TextEditorDialogShell,
         target: document.body,
@@ -29,7 +30,7 @@ export default class TextEditorDialog extends SvelteApplication {
   }
   
   static getActiveApps(id) {
-    return Object.values(ui.windows).filter(app => app.id === `item-pile-text-editor-${id}`);
+    return getActiveApps(`item-pile-text-editor-${id}`);
   }
   
   static async show(text, options = {}) {

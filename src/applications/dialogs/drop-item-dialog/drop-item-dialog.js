@@ -1,5 +1,6 @@
 import DropItemDialogShell from "./drop-item-dialog-shell.svelte";
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { getActiveApps } from "../../../helpers/helpers";
 
 export default class DropItemDialog extends SvelteApplication {
   
@@ -14,7 +15,7 @@ export default class DropItemDialog extends SvelteApplication {
       title: options.giving
         ? game.i18n.localize("ITEM-PILES.Applications.GiveItem.Title")
         : game.i18n.localize("ITEM-PILES.Applications.DropItem.Title"),
-      id: `item-pile-drop-item-${item.id}${target ? "-" + target.id : ""}`,
+      id: `item-pile-drop-item-${item.id}${target ? "-" + target.id : ""}-${randomID()}`,
       svelte: {
         class: DropItemDialogShell,
         target: document.body,
@@ -39,7 +40,7 @@ export default class DropItemDialog extends SvelteApplication {
   }
   
   static getActiveApps(id) {
-    return Object.values(ui.windows).filter(app => app.id === `item-pile-drop-item-${id}`);
+    return getActiveApps(`item-pile-drop-item-${id}`);
   }
   
   static async show(item, target, options = {}) {

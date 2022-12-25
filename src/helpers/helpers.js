@@ -140,6 +140,14 @@ export function clamp(num, min, max) {
 	return Math.max(Math.min(num, max), min);
 }
 
+export function getActiveApps(id, single = false){
+  const apps = Object.values(ui.windows).filter(app => app.id.startsWith(id) && app._state > Application.RENDER_STATES.CLOSED);
+  if(single){
+    return apps?.[0] ?? false;
+  }
+  return apps;
+}
+
 /**
  *  This function linearly interpolates between p1 and p2 based on a normalized value of t
  *

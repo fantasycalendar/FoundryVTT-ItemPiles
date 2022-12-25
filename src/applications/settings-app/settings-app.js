@@ -1,11 +1,12 @@
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { getActiveApps } from '../../helpers/helpers';
 import SettingsShell from './settings-shell.svelte';
 
 class SettingsApp extends SvelteApplication {
   
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      id: `item-piles-application-system-settings`,
+      id: `item-piles-application-system-settings-${randomID()}`,
       title: "Item Piles Module Configuration",
       width: 600,
       svelte: {
@@ -17,7 +18,7 @@ class SettingsApp extends SvelteApplication {
   }
   
   static getActiveApp() {
-    return Object.values(ui.windows).find(app => app.id === "item-piles-application-system-settings");
+    return getActiveApps("item-piles-application-system-settings", true);
   }
   
   static async show(options = {}, dialogData = {}) {

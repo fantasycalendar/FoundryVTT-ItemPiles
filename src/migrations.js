@@ -54,7 +54,7 @@ const migrations = {
     const tokensOnScenes = Array.from(game.scenes)
       .map(scene => ([
         scene.id,
-        Array.from(scene.tokens).filter(t => getProperty(a, CONSTANTS.FLAGS.PILE))
+        Array.from(scene.tokens).filter(t => getProperty(t, CONSTANTS.FLAGS.PILE))
       ]))
       .filter(scene => scene[1].length)
     

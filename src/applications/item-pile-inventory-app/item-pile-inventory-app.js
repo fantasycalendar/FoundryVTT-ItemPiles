@@ -19,7 +19,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
    */
   constructor(actor, recipient, options = {}, dialogData = {}) {
     super({
-      id: `item-pile-inventory-${actor?.token?.id ?? actor.id}`,
+      id: `item-pile-inventory-${actor?.token?.id ?? actor.id}-${randomID()}`,
       title: actor.name,
       svelte: {
         class: ItemPileInventoryShell,
@@ -51,7 +51,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
   }
 
   static getActiveApps(id) {
-    return Object.values(ui.windows).filter(app => app.id === `item-pile-inventory-${id}`);
+    return Helpers.getActiveApps(`item-pile-inventory-${id}`);
   }
 
   static async show(source, recipient = false, options = {}, dialogData = {}) {

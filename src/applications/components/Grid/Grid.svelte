@@ -1,8 +1,8 @@
 <script>
 
 	import { createEventDispatcher, onMount } from 'svelte';
-    import { writable } from 'svelte/store';
-    import { calcPosition } from './grid-utils';
+  import { writable } from 'svelte/store';
+  import { calcPosition } from './grid-utils';
 	import GridItem from './GridItem.svelte';
 
   export let items = [];
@@ -42,15 +42,13 @@
     "height": $containerHeight + "px",
   }).map(entry => entry[0] + ': ' + entry[1] + ";").join("");
 
-  
   let backgroundGridStyle = "";
   $: backgroundGridStyle = Object.entries({
-    "grid-columns": options.cols,
-    "grid-rows": options.rows,
-    "grid-half-gap": `${options.gap/2}px`,
-    "grid-size-full": `${options.gridSize + options.gap}px`,
-    "grid-size-full-half-gap": `${options.gridSize + (options.gap/2)}px`,
-  }).map(entry => `--${entry[0]}:${entry[1]};`).join("")
+    "grid-template-columns": `repeat(${options.cols}, ${options.gridSize + options.gap/2}px)`,
+    "grid-template-rows": `repeat(${options.rows}, ${options.gridSize + options.gap/2}px)`,
+    "gap": `${options.gap/2}px`,
+    "top": `${options.gap/2}px`
+  }).map(entry => `${entry[0]}: ${entry[1]};`).join(" ")
   
 </script>
 
@@ -89,7 +87,8 @@
     <div class="item-piles-inner-grid" style={backgroundGridStyle}>
       {#each Array(options.rows) as _, rowIndex (rowIndex)}
         {#each Array(options.cols) as _, colIndex (colIndex)}
-          <div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}></div>
+          <div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
+            style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}"/>
         {/each}
       {/each}
     </div>
@@ -113,14 +112,9 @@
     display: grid;
     border-radius: 0.25rem;
     position:absolute;
-    top: var(--grid-half-gap);
     margin: 1px;
-    grid-template-columns: repeat(var(--grid-columns), var(--grid-size-full));
-    grid-template-rows: repeat(var(--grid-rows), var(--grid-size-full));
     z-index: -1;
     > div {
-      width: var(--grid-size-full-half-gap);
-      height: var(--grid-size-full-half-gap);
       border-radius: 0.25rem;
       border: 1px solid rgba(0,0,0,0.25);
 

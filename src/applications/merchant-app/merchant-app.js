@@ -11,7 +11,7 @@ export default class MerchantApp extends SvelteApplication {
   constructor(merchant, recipient = false, options = {}, dialogData = {}) {
     super({
       title: `Merchant: ${merchant.name}`,
-      id: `item-pile-merchant-${merchant.id}`,
+      id: `item-pile-merchant-${merchant.id}-${randomID()}`,
       svelte: {
         class: MerchantAppShell,
         target: document.body,
@@ -40,7 +40,7 @@ export default class MerchantApp extends SvelteApplication {
   }
 
   static getActiveApp(id) {
-    return Object.values(ui.windows).find(app => app.id === `item-pile-merchant-${id}`);
+    return Helpers.getActiveApps(`item-pile-merchant-${id}`, true);
   }
 
   static async show(merchant, recipient = false, options = {}, dialogData = {}) {

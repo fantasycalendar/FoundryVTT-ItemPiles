@@ -12,30 +12,35 @@
 	let active = false;
 
   let itemRef = HTMLElement;
-	let left = writable(0);
-	let top = writable(0);
-	let width = writable(0);
-	let height = writable(0);
+  let transform = writable({});
+  let oldTransform = writable({});
 
 	$: if (!active) {
-		const newPosition = calcPosition(item, {
-			gridSize: options.gridSize,
-			gap: options.gap
-		});
-		left.set(newPosition.left);
-		top.set(newPosition.top);
-		width.set(newPosition.width);
-		height.set(newPosition.height);
+    transform.set(calcPosition(item, options));
 	}
 
   let style = "";
   $: style = Object.entries({
     "position": "absolute",
-    "left": $left + "px",
-    "top": $top + "px",
-    "width": $width + "px",
-    "height": $height + "px",
+    "left": $transform.left + "px",
+    "top": $transform.top + "px",
+    "width": $transform.width + "px",
+    "height": $transform.height + "px",
     "cursor": movable ? 'move' : 'auto',
+    "touch-action": "none",
+    "user-select": "none",
+  }).map(entry => `${entry[0]}: ${entry[1]};`).join(" ");
+
+  let oldStyle = "";
+  $: oldStyle = Object.entries({
+    "position": "absolute",
+    "left": $oldTransform.left + "px",
+    "top": $oldTransform.top + "px",
+    "width": $oldTransform.width + "px",
+    "height": $oldTransform.height + "px",
+    "cursor": movable ? 'move' : 'auto',
+    "background-color": colliding ? "rgb(33, 202, 33)" : "transparent",
+    "opacity": "0.75",
     "touch-action": "none",
     "user-select": "none",
   }).map(entry => `${entry[0]}: ${entry[1]};`).join(" ");
@@ -45,7 +50,7 @@
 	// INTERACTION LOGIC
 
   let preview = false;
-  let collisionPreview = false;
+  let colliding = false;
 	let pointerShift = { left: 0, top: 0 };
 
 	// MOVE ITEM LOGIC
@@ -55,8 +60,10 @@
 	function moveStart(event) {
 		if (!movable) return;
 		if (event.button !== 0) return;
+    const _oldTransform = get(transform);
+    oldTransform.set(_oldTransform);
 		active = true;
-		pointerShift = { left: event.clientX - get(left), top: event.clientY - get(top) };
+		pointerShift = { left: event.clientX - _oldTransform.left, top: event.clientY - _oldTransform.top };
 		itemRef.setPointerCapture(event.pointerId);
 		window.addEventListener('pointermove', move);
 		window.addEventListener('pointerup', moveEnd);
@@ -66,13 +73,14 @@
 		let _left = event.pageX - pointerShift.left;
 		let _top = event.pageY - pointerShift.top;
 
+    let _transform = get(transform);
 		if (options.bounds) {
 			const parentRect = options.gridContainer.getBoundingClientRect();
       const relativeRect = {
         left: (parentRect.left - parentRect.x),
         top: (parentRect.top - parentRect.y),
-        bottom: (parentRect.bottom),
-        right: (parentRect.right),
+        right: (parentRect.right - parentRect.x),
+        bottom: (parentRect.bottom - parentRect.y),
       }
 			if (_left < relativeRect.left) {
 				_left = relativeRect.left;
@@ -80,39 +88,32 @@
 			if (_top < relativeRect.top) {
 				_top = relativeRect.top;
 			}
-			if (_left + get(width) > relativeRect.right) {
-				_left = relativeRect.right - get(width);
+			if ((_left + _transform.width) > relativeRect.right) {
+				_left = relativeRect.right - _transform.width;
 			}
-			if (_top + get(height) > relativeRect.bottom) {
-				_top = relativeRect.bottom - get(height);
+			if ((_top + _transform.height) > relativeRect.bottom) {
+				_top = relativeRect.bottom - _transform.height;
 			}
 		}
 
-		left.set(_left);
-		top.set(_top);
+    transform.set({
+      ..._transform,
+      left: _left,
+      top: _top
+    });
 
     const { x, y } = snapOnMove(_left, _top, previewItem, options);
     const collisions = getCollisions({ ...previewItem, x, y }, options.items);
     
     previewItem = { ...previewItem, x, y };
-    preview = calcPosition(previewItem, {
-      gridSize: options.gridSize,
-      gap: options.gap
-    })
+    preview = calcPosition(previewItem, options)
 
-    if (collisions.length) {
-      collisionPreview = calcPosition(item, {
-        gridSize: options.gridSize,
-        gap: options.gap
-      });
-    }else{
-      collisionPreview = false;
-    }
+    colliding = !!collisions.length;
 	}
 
 	function moveEnd() {
 		active = false;
-    collisionPreview = false;
+    colliding = false;
 		pointerShift = { left: 0, top: 0 };
 		window.removeEventListener('pointermove', move);
 		window.removeEventListener('pointerup', moveEnd);
@@ -123,6 +124,7 @@
     }
 		item.x = previewItem.x;
 		item.y = previewItem.y;
+    preview = calcPosition(item, options)
 		dispatch('itemchange', { items: [item].concat(collisionItem.length ? collisionItem : []) });
 	}
 
@@ -138,18 +140,16 @@
 </div>
 
 {#if active}
-  {#if preview}
-    <div
-      style={`position: absolute; left:${preview.left}px; top:${preview.top}px;  
-      width: ${preview.width}px; height: ${preview.height}px; z-index: 3;`}
-      class={collisionPreview ? options.collisionClass : options.previewClass}
-    />
-  {/if}
-  {#if collisionPreview}
-    <div
-      style={`position: absolute; left:${collisionPreview.left}px; top:${collisionPreview.top}px;  
-      width: ${collisionPreview.width}px; height: ${collisionPreview.height}px; z-index: -10;`}
-      class={options.collisionClass}
-    />
-  {/if}
+  <div
+    on:pointerdown={moveStart}
+    style={oldStyle}
+  >
+    <slot />
+  </div>
+
+  <div
+    style={`position: absolute; left:${preview.left}px; top:${preview.top}px;  
+    width: ${preview.width}px; height: ${preview.height}px; z-index: 10;`}
+    class={colliding ? options.collisionClass : options.previewClass}
+  />
 {/if}

@@ -63,16 +63,14 @@
 
     setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
 
-    console.log(flags);
-
     await game.itempiles.API.addItems(store.actor, [itemData]);
 
   }
 
   async function onDragOver(event) {
     dragPosition.set({
-      x: Math.min(Math.floor(event.offsetX/(pileData.gridSize+gap)), pileData.enabledColumns),
-      y: Math.min(Math.floor(event.offsetY/(pileData.gridSize+gap)), pileData.enabledRows),
+      x: Math.min(Math.floor(event.offsetX/(pileData.gridSize+gap)), pileData.enabledColumns-1),
+      y: Math.min(Math.floor(event.offsetY/(pileData.gridSize+gap)), pileData.enabledRows-1),
       w: 1,
       h: 1,
       active: true

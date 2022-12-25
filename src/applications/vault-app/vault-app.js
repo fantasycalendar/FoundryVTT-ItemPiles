@@ -51,8 +51,8 @@ export default class BankVaultApp extends SvelteApplication {
     });
   }
 
-  static getActiveApps(id) {
-    return Object.values(ui.windows).filter(app => app.id.startsWith(`item-pile-vault-${id}`));
+  static getActiveApps(id = "") {
+    return Helpers.getActiveApps(`item-pile-vault-${id}`);
   }
 
   static async show(source, recipient = false, options = {}, dialogData = {}) {
