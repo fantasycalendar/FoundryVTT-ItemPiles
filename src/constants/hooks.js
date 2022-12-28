@@ -77,6 +77,10 @@ const HOOKS = {
   TRADE: {
     STARTED: module`tradeStarted`,
     COMPLETE: module`tradeComplete`
+  },
+  GENERIC: {
+    ITEM_DRAG_START: module`itemDragStart`,
+    ITEM_DROP: module`itemDrop`,
   }
 }
 

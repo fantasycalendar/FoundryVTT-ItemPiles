@@ -41,14 +41,14 @@ export function size2coordinate(size, cellSize, gap) {
 }
 
 export function snapOnMove(left, top, item, options) {
-	const { gridSize, gap } = options;
+	const { gridSize, gap, cols, enabledCols, rows, enabledRows } = options;
 	const { w, h } = item;
 
 	let x = position2coordinate(left, gridSize, gap);
 	let y = position2coordinate(top, gridSize, gap);
 
-	x = clamp(x, 0, Math.min(options.cols, options.enabledCols) - w);
-	y = clamp(y, 0, Math.min(options.rows, options.enabledRows) - h);
+	x = clamp(x, 0, Math.min(cols, enabledCols) - w);
+	y = clamp(y, 0, Math.min(rows, enabledRows) - h);
 
 	return { x, y };
 }

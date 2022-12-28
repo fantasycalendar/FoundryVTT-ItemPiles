@@ -37,15 +37,22 @@ Hooks.once("ready", () => {
       API: API
     };
 
-    if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
-      let word = "install and activate";
-      if (game.modules.get('lib-wrapper')) word = "activate";
-      throw Helpers.custom_error(`Item Piles requires the 'libWrapper' module. Please ${word} it.`)
-    }
-    if (!game.modules.get('socketlib')?.active && game.user.isGM) {
-      let word = "install and activate";
-      if (game.modules.get('socketlib')) word = "activate";
-      throw Helpers.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
+    if(game.user.isGM){
+      if (!game.modules.get('lib-wrapper')?.active) {
+        let word = "install and activate";
+        if (game.modules.get('lib-wrapper')) word = "activate";
+        throw Helpers.custom_error(`Item Piles requires the 'libWrapper' module. Please ${word} it.`)
+      }
+
+      if (!game.modules.get('socketlib')?.active) {
+        let word = "install and activate";
+        if (game.modules.get('socketlib')) word = "activate";
+        throw Helpers.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
+      }
+
+      if(game.modules.get('foundryvtt-simple-calendar')?.active && game.modules.get("foundryvtt-simple-calendar").version === "v1.3.75"){
+        throw Helpers.custom_error(`Simple Calendar version 1.3.75 is installed, but Item Piles requires version 2.0.0 or above. The author made a mistake, and you will need to reinstall the Simple Calendar module.`)
+      }
     }
 
     if (!Helpers.isGMConnected()) {
@@ -72,7 +79,12 @@ Hooks.once(HOOKS.READY, async () => {
     applySystemSpecificStyles();
   }, 100);
 
-  game.itempiles.API.renderItemPileInterface(game.actors.getName("Item Pile"))
+  game.itempiles.API.renderItemPileInterface(game.actors.getName("Item Pile"));
+
+  $(".items-sidebar .directory-item").on("dragstart", function(){
+    const item = game.items.get($(this).data("document-id"));
+    Hooks.call(HOOKS.GENERIC.ITEM_DRAG_START, item);
+  });
 
 })
 

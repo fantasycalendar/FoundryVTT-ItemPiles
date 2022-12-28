@@ -216,3 +216,8 @@ export function random_array_element(inArray, { recurse = false } = {}) {
   }
   return choice;
 }
+
+
+export function styleFromObject(obj, vars = false){
+  return Object.entries(obj).map(entry => (vars ? "--" : "") + entry[0] + ': ' + entry[1] + ";").join("");
+}

@@ -1,5 +1,5 @@
 <script>
-  import { getContext, onDestroy } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
@@ -15,6 +15,9 @@
   import CurrencyList from '../components/CurrencyList.svelte';
   import DropZone from '../components/DropZone.svelte';
   import CONSTANTS from '../../constants/constants.js';
+    import { snapOnMove } from '../components/Grid/grid-utils';
+    import { hooks } from '../../helpers/helpers';
+    import HOOKS from '../../constants/hooks';
 
   const { application } = getContext('external');
 
@@ -26,13 +29,14 @@
 
   const currencies = store.currencies;
   const pileDataStore = store.pileData;
-  const gridStore = store.grid;
+  const items = store.grid;
 
   const gap = 4;
 
   $: pileData = $pileDataStore;
 
   const dragPosition = writable({});
+  let itemBeingDragged = false;
 
   async function onDropData(data, event) {
 
@@ -50,13 +54,7 @@
 
     const { x, y } = get(dragPosition);
 
-    dragPosition.set({
-      x: 0,
-      y: 0,
-      w: 1,
-      h: 1,
-      active: false,
-    });
+    dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false,});
 
     setProperty(flags, "x", x);
     setProperty(flags, "y", y);
@@ -68,14 +66,23 @@
   }
 
   async function onDragOver(event) {
+    if(!itemBeingDragged) return;
+    const { width, height } = itemBeingDragged;
     dragPosition.set({
-      x: Math.min(Math.floor(event.offsetX/(pileData.gridSize+gap)), pileData.enabledColumns-1),
-      y: Math.min(Math.floor(event.offsetY/(pileData.gridSize+gap)), pileData.enabledRows-1),
-      w: 1,
-      h: 1,
+      ...snapOnMove(event.offsetX, event.offsetY, { w: width, h: height }, { ...pileData, gap }),
+      w: width,
+      h: height,
       active: true
     })
+    console.log(get(dragPosition))
   }
+
+  let hookId;
+  onMount(() => {
+    Hooks.on(HOOKS.GENERIC.ITEM_DRAG_START, (item) => {
+      itemBeingDragged = PileUtilities.getItemFlagData(item);
+    });
+  })
 
   onDestroy(() => {
     store.onDestroy();
@@ -91,13 +98,9 @@
     
     <DropZone callback={onDropData} on:dragover={onDragOver}>
 
-      <Grid bind:items={$gridStore}
+      <Grid bind:items={$items}
             options={{
-              gridSize: pileData.gridSize,
-              cols: pileData.columns,
-              rows: pileData.rows,
-              enabledCols: pileData.enabledColumns,
-              enabledRows: pileData.enabledRows,
+              ...pileData,
               bounds: true,
               gap,
               class: "item-piles-grid-background",

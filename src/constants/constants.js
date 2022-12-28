@@ -30,7 +30,9 @@ const CONSTANTS = {
     customCategory: "",
     prices: [],
     x: null,
-    y: null
+    y: null,
+    width: 2,
+    height: 2
   },
 
   PILE_TYPES: {
@@ -120,9 +122,9 @@ const CONSTANTS = {
     },
 
     // Vault settings
-    columns: 7,
+    cols: 7,
     rows: 7,
-    enabledColumns: 5,
+    enabledCols: 5,
     enabledRows: 7,
     gridSize: 40,
     grid: [],

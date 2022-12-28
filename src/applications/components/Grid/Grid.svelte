@@ -1,7 +1,8 @@
 <script>
 
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher, getContext, onMount, setContext } from 'svelte';
   import { writable } from 'svelte/store';
+    import { styleFromObject } from '../../../helpers/helpers';
   import { calcPosition } from './grid-utils';
 	import GridItem from './GridItem.svelte';
 
@@ -27,6 +28,9 @@
   let containerHeight = writable(0);
   let containerWidth = writable(0);
 
+  setContext("gridOptions", options);
+  setContext("items", items);
+
   const dispatch = createEventDispatcher();
 
 	function itemChangeEvent(event) {
@@ -34,21 +38,25 @@
 		items = [...items];
 	}
 
+	function itemHoverEvent(event) {
+		dispatch('hover', { item: event.detail.item });
+	}
+
 	$: $containerWidth = options.cols * (options.gridSize + options.gap);
 	$: $containerHeight = options.rows * (options.gridSize + options.gap);
 
-  $: containerStyle = Object.entries({
+  $: containerStyle = styleFromObject({
     "width": $containerWidth + "px",
     "height": $containerHeight + "px",
-  }).map(entry => entry[0] + ': ' + entry[1] + ";").join("");
+  });
 
   let backgroundGridStyle = "";
-  $: backgroundGridStyle = Object.entries({
+  $: backgroundGridStyle = styleFromObject({
     "grid-template-columns": `repeat(${options.cols}, ${options.gridSize + options.gap/2}px)`,
     "grid-template-rows": `repeat(${options.rows}, ${options.gridSize + options.gap/2}px)`,
     "gap": `${options.gap/2}px`,
     "top": `${options.gap/2}px`
-  }).map(entry => `${entry[0]}: ${entry[1]};`).join(" ")
+  });
   
 </script>
 
@@ -60,16 +68,8 @@
     style={containerStyle}
   >
     {#each items as item (item.id)}
-      <GridItem
-        {item}
-        options={{
-          ...options,
-          gridContainer,
-          items
-        }}
-        on:itemchange={itemChangeEvent}
-      >
-        <slot {item} />
+      <GridItem {item} {gridContainer} on:itemchange={itemChangeEvent} on:itemhover={itemHoverEvent}>
+        <slot {item}/>
       </GridItem>
     {/each}
     {#if dropGhost && dropGhost?.active}

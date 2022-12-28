@@ -57,7 +57,7 @@ export class VaultStore extends ItemPileStore {
 
   placeItemsOnGrid(){
     const pileData = get(this.pileData);
-    const columns = Math.min(pileData.columns, pileData.enabledColumns);
+    const columns = Math.min(pileData.cols, pileData.enabledCols);
     const rows = Math.min(pileData.rows, pileData.enabledRows);
     const allItems = [...get(this.allItems)];
     const existingItems = [];
@@ -70,7 +70,7 @@ export class VaultStore extends ItemPileStore {
         if(item){
           allItems.splice(allItems.indexOf(item), 1);
           existingItems.push({
-            id: item.id, x, y, w: 1, h: 1, resizable: false, item
+            id: item.id, x, y, w: 1, h: 1, item
           })
         }
         return item?.id ?? null;
@@ -84,7 +84,7 @@ export class VaultStore extends ItemPileStore {
             if(!grid[x][y]){
               grid[x][y] = item.id;
               return {
-                id: item.id, x, y, w: 1, h: 1, resizable: false, item
+                id: item.id, x, y, w: 1, h: 1, item
               };
             }
           }
