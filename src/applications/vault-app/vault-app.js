@@ -45,9 +45,9 @@ export default class BankVaultApp extends SvelteApplication {
     return foundry.utils.mergeObject(super.defaultOptions, {
       closeOnSubmit: false,
       classes: ["app window-app sheet item-pile-vault item-piles"],
-      width: "550",
-      height: "550",
-      resizable: true
+      width: "auto",
+      height: "auto",
+      resizable: false
     });
   }
 

@@ -23,6 +23,7 @@
     activeClass: "",
     previewClass: "",
     collisionClass: "",
+    hoverClass: "",
   }
 
   let containerHeight = writable(0);
@@ -35,8 +36,16 @@
 		items = [...items];
 	}
 
-	$: $containerWidth = options.cols * (options.gridSize + options.gap);
-	$: $containerHeight = options.rows * (options.gridSize + options.gap);
+  function itemHoverEvent(event){
+    dispatch('hover', { item: event.detail.item });
+  }
+
+  function itemHoverLeaveEvent(event){
+    dispatch('leave', { item: event.detail.item });
+  }
+
+	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
+	$: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
 
   $: containerStyle = styleFromObject({
     "width": $containerWidth + "px",
@@ -63,7 +72,15 @@
     style={containerStyle}
   >
     {#each items as item (item.id)}
-      <GridItem bind:item={item} bind:items={items} bind:options={options} {gridContainer} on:itemchange={itemChangeEvent}>
+      <GridItem
+        bind:item={item}
+        bind:items={items}
+        bind:options={options}
+        {gridContainer}
+        on:itemchange={itemChangeEvent}
+        on:itemhover={itemHoverEvent}
+        on:itemhoverleave={itemHoverLeaveEvent}
+      >
         <slot {item}/>
       </GridItem>
     {/each}

@@ -7,12 +7,15 @@
   const name = item.name;
   const img = item.img;
   const quantity = item.quantity;
+  const canStack = item.canStack;
 
 </script>
 
 <div class="grid-item">
   <img title={$name} src={$img} alt={$name}/>
-  <span>{$quantity}</span>
+  {#if canStack && $quantity > 1}
+    <span>{$quantity}</span>
+  {/if}
 </div>
 
 <style lang="scss">

@@ -35,6 +35,7 @@
   $: pileData = $pileDataStore;
 
   const dragPosition = writable({});
+  let hoveredItem = "";
   let element;
 
   async function onDropData(data) {
@@ -83,6 +84,17 @@
     dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
   }
 
+  let showItemName = false;
+
+  function hoverOverItem(event) {
+    showItemName = true;
+    hoveredItem = get(event.detail.item.item.name);
+  }
+
+  function hoverLeaveItem(event) {
+    showItemName = false;
+  }
+
   onDestroy(() => {
     store.onDestroy();
   });
@@ -95,7 +107,14 @@
 
   <main in:fade={{duration: 500}}>
 
-    <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave} style="z-index:20;">
+    <div class="item-piles-flexrow" style="margin-bottom: 0.25rem; align-items: center;">
+      <span style="font-size:1.25rem;">Vault</span>
+      {#if showItemName}
+        <span style="text-align: right;" transition:fade={{duration:100}}>{hoveredItem}</span>
+      {/if}
+    </div>
+
+    <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}>
 
       <Grid bind:items={$items}
             bind:gridContainer={element}
@@ -107,10 +126,13 @@
               activeClass: "item-piles-grid-item-active",
               previewClass: "item-piles-grid-item-preview",
               collisionClass: "item-piles-grid-item-collision",
+              hoverClass: "item-piles-grid-item-hover",
               backgroundGrid: true
             }}
             dropGhost={$dragPosition}
             on:change={(event) => store.updateGrid(event.detail.items)}
+            on:hover={hoverOverItem}
+            on:leave={hoverLeaveItem}
             let:item
       >
         <VaultItemEntry entry={item}/>

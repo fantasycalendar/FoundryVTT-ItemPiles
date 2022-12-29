@@ -152,13 +152,24 @@
 
   }
 
+  function hoverOver() {
+    dispatch("itemhover", { item });
+  }
+
+  function hoverLeave() {
+    dispatch("itemhoverleave", { item });
+  }
+
 </script>
 
 <div
   bind:this={itemRef}
   on:pointerdown={moveStart}
+  on:pointerover={hoverOver}
+  on:pointerleave={hoverLeave}
   on:dragover|preventDefault
   style={style}
+  class={options.hoverClass}
 >
   <slot/>
 </div>
