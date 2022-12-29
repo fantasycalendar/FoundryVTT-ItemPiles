@@ -7,7 +7,7 @@
   --item-piles-border-dark-primary: #191813;
   --item-piles-border-light-primary: #b5b3a4;
   --item-piles-text-light-highlight: #f0f0e0;
-  --item-piles-text-important: ff6400;
+  --item-piles-text-important: #ff6400;
 }
 
 /* ----------------------- Generic ----------------------- */
@@ -18,6 +18,19 @@
   p:first-child {
     margin-top: 0;
   }
+}
+
+.merchant-right-pane {
+
+
+  .item-piles-currency-list {
+    flex: 1;
+    justify-content: flex-start;
+    padding-right: 1rem;
+    align-self: center;
+    align-content: flex-end;
+  }
+
 }
 
 .break {
@@ -32,6 +45,14 @@
 
   h3 {
     border: 0;
+  }
+
+  &-small-button {
+    flex: 0 1 auto !important;
+    width: auto;
+    height: 20px;
+    line-height: inherit;
+    font-size: 0.75rem;
   }
 
   &-flexrow {

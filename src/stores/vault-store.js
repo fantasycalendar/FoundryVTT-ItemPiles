@@ -12,6 +12,8 @@ export class VaultStore extends ItemPileStore {
   setupStores() {
     super.setupStores();
     this.grid = writable([]);
+    this.gridItems = writable([]);
+    this.freeSpaces = Infinity;
     this.refreshGridDebounce = foundry.utils.debounce(() => {
       this.refreshGrid();
     }, 150);
@@ -20,6 +22,20 @@ export class VaultStore extends ItemPileStore {
   setupSubscriptions() {
     super.setupSubscriptions();
     this.refreshGrid();
+    this.subscribeTo(this.pileData, () => {
+      this.refreshFreeSpaces();
+    });
+    this.subscribeTo(this.items, () => {
+      this.refreshFreeSpaces();
+    });
+  }
+
+  refreshFreeSpaces() {
+    const pileData = get(this.pileData);
+    const items = get(this.items);
+    const cols = Math.min(pileData.cols, pileData.enabledCols);
+    const rows = Math.min(pileData.rows, pileData.enabledRows);
+    this.freeSpaces = (cols * rows) - items.length;
   }
 
   updateGrid(items) {
@@ -36,6 +52,10 @@ export class VaultStore extends ItemPileStore {
 
   refreshItems() {
     super.refreshItems();
+    this.gridItems.set(get(this.items).filter(item => {
+      const itemFlagData = get(item.itemFlagData);
+      return !itemFlagData.vaultBag;
+    }));
     this.refreshGridDebounce();
   }
 
@@ -57,7 +77,7 @@ export class VaultStore extends ItemPileStore {
     const pileData = get(this.pileData);
     const columns = Math.min(pileData.cols, pileData.enabledCols);
     const rows = Math.min(pileData.rows, pileData.enabledRows);
-    const allItems = [...get(this.allItems)];
+    const allItems = [...get(this.gridItems)];
     const existingItems = [];
 
     const grid = Array.from(Array(columns).keys()).map((_, x) => {

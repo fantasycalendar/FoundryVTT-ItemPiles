@@ -44,6 +44,10 @@
     dispatch('leave', { item: event.detail.item });
   }
 
+  function itemRightClickEvent(event){
+    dispatch('rightclick', { ...event.detail });
+  }
+
 	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
 	$: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
 
@@ -80,6 +84,7 @@
         on:itemchange={itemChangeEvent}
         on:itemhover={itemHoverEvent}
         on:itemhoverleave={itemHoverLeaveEvent}
+        on:itemrightclick={itemRightClickEvent}
       >
         <slot {item}/>
       </GridItem>

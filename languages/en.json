@@ -154,7 +154,8 @@
       "ToolTipRemoveTable": "Remove Table",
       "TooltipConfigureTable": "Configure Table",
       "TooltipRollTable": "Roll Table",
-      "ToolTipRemoveAllRolledItems": "Remove All Rolled Items"
+      "ToolTipRemoveAllRolledItems": "Remove All Rolled Items",
+      "ShoppingAs": "Shopping as {actorName}"
     },
     "Dialogs": {
       "TypeWarning": {

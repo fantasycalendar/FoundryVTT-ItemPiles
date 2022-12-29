@@ -1,5 +1,7 @@
 <script>
 
+  import { TJSMenu } from "@typhonjs-fvtt/svelte-standard/component";
+
   export let entry;
 
   const item = entry.item;

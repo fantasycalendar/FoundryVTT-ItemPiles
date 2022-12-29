@@ -1,13 +1,9 @@
 <script>
-  import { getContext, onDestroy, onMount } from 'svelte';
+  import { getContext, onDestroy } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
   import Grid from '../components/Grid/Grid.svelte';
-
-  import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import PrivateAPI from "../../API/private-api.js";
   import { VaultStore } from "../../stores/vault-store.js";
   import VaultItemEntry from './VaultItemEntry.svelte';
   import { get, writable } from 'svelte/store';
@@ -17,6 +13,7 @@
   import CONSTANTS from '../../constants/constants.js';
   import { snapOnMove } from '../components/Grid/grid-utils';
   import * as Helpers from "../../helpers/helpers.js";
+  import { TJSContextMenu } from "@typhonjs-fvtt/svelte-standard/application";
 
   const { application } = getContext('external');
 
@@ -42,6 +39,11 @@
 
     if (data.type !== "Item") {
       Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`)
+      return false;
+    }
+
+    if (!store.freeSpaces) {
+      Helpers.custom_warning(`This vault is full!`)
       return false;
     }
 
@@ -99,6 +101,29 @@
     store.onDestroy();
   });
 
+  function rightClickItem(event) {
+    setTimeout(() => {
+      TJSContextMenu.create({
+        x: event.detail.x,
+        y: event.detail.y,
+        zIndex: 1000000000000,
+        items: [
+          {
+            icon: 'fas fa-hand', label: "Take", onclick: () => {
+              console.log('wat');
+            }
+          },
+          {
+            icon: 'fas fa-eye', label: "Inspect", onclick: () => {
+              event.detail.item.item.preview();
+            }
+          }
+        ],
+        transitionOptions: { duration: 0 }
+      })
+    })
+  }
+
 </script>
 
 <svelte:options accessors={true}/>
@@ -131,6 +156,7 @@
             }}
             dropGhost={$dragPosition}
             on:change={(event) => store.updateGrid(event.detail.items)}
+            on:rightclick={rightClickItem}
             on:hover={hoverOverItem}
             on:leave={hoverLeaveItem}
             let:item
@@ -140,11 +166,15 @@
 
     </DropZone>
 
-    <CurrencyList {currencies} options={{ reverse: true, abbreviation: false }}>
-      <a class="item-piles-flexrow item-piles-item-row" style="flex: 0 1 20px;">
-        <i class="fas fa-hand-holding-usd"></i>
-      </a>
-    </CurrencyList>
+    <div class="item-piles-flexrow" style="margin-top: 0.5rem;">
+
+      <button type="button" class="item-piles-small-button">Withdraw</button>
+
+      <button type="button" class="item-piles-small-button">Deposit</button>
+
+      <CurrencyList {currencies} options={{ reverse: true, abbreviation: false, imgSize: 18 }}/>
+
+    </div>
 
   </main>
 

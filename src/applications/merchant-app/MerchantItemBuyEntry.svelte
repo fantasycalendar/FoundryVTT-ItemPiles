@@ -25,16 +25,6 @@
   const displayControlButtons = store.actor.isOwner;
   const displayBuyButton = !!store.recipient;
 
-  function previewItem(item) {
-    item = store.actor.items.get(item.id);
-    if (game.user.isGM || item.permission[game.user.id] === 3) {
-      return item.sheet.render(true);
-    }
-    const cls = item._getSheetClass()
-    const sheet = new cls(item, { editable: false })
-    return sheet._render(true);
-  }
-
 </script>
 
 <div class="item-piles-flexrow item-piles-item-row item-piles-odd-color"

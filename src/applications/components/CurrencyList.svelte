@@ -10,7 +10,7 @@
 
 </script>
 
-<div class="item-piles-flexrow{options.reverse ? '-reverse' : ''} item-piles-currency-list">
+<div class="item-piles-flexrow{options.reverse ? '-reverse' : ''} item-piles-currency-list" style={$$props.style}>
 
   {#each $currencies as currency (currency.identifier)}
     <CurrencyListEntry {currency} {options}/>

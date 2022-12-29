@@ -17,6 +17,7 @@ const CONSTANTS = {
   },
 
   ITEM_DEFAULTS: {
+    // Merchants
     hidden: false,
     notForSale: false,
     infiniteQuantity: false,
@@ -29,6 +30,9 @@ const CONSTANTS = {
     macro: "",
     customCategory: "",
     prices: [],
+
+    // Vaults
+    vaultBag: false,
     x: null,
     y: null,
     width: 1,

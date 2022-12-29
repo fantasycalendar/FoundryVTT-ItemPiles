@@ -60,6 +60,11 @@
   let pointerOffset = { left: 0, top: 0 };
 
   function moveStart(event) {
+
+    if (event.button === 2) {
+      return rightClick(event);
+    }
+
     // If not left mouse, skip
     if (event.button !== 0) return;
 
@@ -123,6 +128,9 @@
     window.removeEventListener('pointerup', moveEnd);
 
     const finalTransform = get(previewTransform);
+
+    if (foundry.utils.isEmpty(finalTransform)) return;
+
     if (collisions.length) {
       const offset = collisions.reduce((acc, item) => {
         const trans = get(item.transform);
@@ -158,6 +166,10 @@
 
   function hoverLeave() {
     dispatch("itemhoverleave", { item });
+  }
+
+  function rightClick(event) {
+    dispatch("itemrightclick", { item, x: event.pageX, y: event.pageY });
   }
 
 </script>
