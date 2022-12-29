@@ -42,12 +42,18 @@ export class VaultStore extends ItemPileStore {
           const itemFlagData = get(item.itemFlagData);
           return itemFlagData.vaultExpander;
         });
-        enabledCols = bags.reduce((acc, item) => {
-          return acc + get(item.itemFlagData).addsCols * get(item.quantity);
-        }, pileData.baseExpansionCols ?? 0);
-        enabledRows = bags.reduce((acc, item) => {
-          return acc + get(item.itemFlagData).addsRows * get(item.quantity);
-        }, pileData.baseExpansionRows ?? 0);
+
+        const expansions = bags.reduce((acc, item) => {
+          acc.cols += get(item.itemFlagData).addsCols * get(item.quantity);
+          acc.rows += get(item.itemFlagData).addsRows * get(item.quantity);
+          return acc;
+        }, {
+          cols: pileData.baseExpansionCols ?? 0,
+          rows: pileData.baseExpansionRows ?? 0
+        });
+
+        enabledCols = expansions.cols;
+        enabledRows = expansions.rows;
       }
 
       enabledCols = Math.min(enabledCols, pileData.cols);

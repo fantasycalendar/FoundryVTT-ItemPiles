@@ -979,10 +979,16 @@ export default class PrivateAPI {
 
       const target = fromUuidSync(targetUuid);
 
-      let specificPileSettings = foundry.utils.mergeObject(
-        PileUtilities.getActorFlagData(target),
-        pileSettings
-      );
+      let targetItemPileSettings = PileUtilities.getActorFlagData(target);
+
+      const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
+      const defaultItemPileActor = game.actors.get(defaultItemPileId);
+      if (defaultItemPileActor) {
+        const defaultItemPileSettings = PileUtilities.getActorFlagData(defaultItemPileActor);
+        targetItemPileSettings = foundry.utils.mergeObject(targetItemPileSettings, defaultItemPileSettings);
+      }
+
+      let specificPileSettings = foundry.utils.mergeObject(targetItemPileSettings, pileSettings);
       specificPileSettings.enabled = true;
 
       const targetItems = PileUtilities.getActorItems(target, { itemFilters: specificPileSettings.overrideItemFilters });
