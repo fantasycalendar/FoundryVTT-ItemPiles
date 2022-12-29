@@ -2,10 +2,10 @@ import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import VaultShell from "./vault-shell.svelte";
 import * as Utilities from "../../helpers/utilities.js";
 import ItemPileConfig from "../item-pile-config/item-pile-config.js";
-import HOOKS from "../../constants/hooks.js";
 import * as Helpers from "../../helpers/helpers.js";
 import UserSelectDialog from "../dialogs/user-select-dialog/user-select-dialog.js";
 import SETTINGS from "../../constants/settings.js";
+import CONSTANTS from "../../constants/constants.js";
 
 export default class BankVaultApp extends SvelteApplication {
 
@@ -36,7 +36,7 @@ export default class BankVaultApp extends SvelteApplication {
     this.actor = actor;
     this.recipient = recipient;
 
-    Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, actor, recipient, options, dialogData);
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.OPEN_INTERFACE, this, actor, recipient, options, dialogData);
 
   }
 
@@ -58,7 +58,7 @@ export default class BankVaultApp extends SvelteApplication {
   static async show(source, recipient = false, options = {}, dialogData = {}) {
     source = Utilities.getActor(source);
     recipient = Utilities.getActor(recipient);
-    const result = Helpers.hooks.call(HOOKS.PRE_OPEN_INTERFACE, source, recipient, options, dialogData);
+    const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, source, recipient, options, dialogData);
     if (result === false) return;
     const apps = this.getActiveApps(source?.token?.id ?? source.id);
     if (apps.length) {
@@ -74,9 +74,9 @@ export default class BankVaultApp extends SvelteApplication {
   }
 
   async close(options) {
-    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.actor, this.recipient, options);
+    const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_CLOSE_INTERFACE, this, this.actor, this.recipient, options);
     if (result === false) return;
-    Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.actor, this.recipient, options);
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.CLOSE_INTERFACE, this, this.actor, this.recipient, options);
     return super.close(options);
   }
 

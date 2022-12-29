@@ -161,6 +161,12 @@ export class PileItem extends PileBaseItem {
     this.quantity.set(roll.total);
     return this.item.update(Utilities.setItemQuantity({}, roll.total));
   }
+
+  async updateFlags() {
+    await this.item.update({
+      [CONSTANTS.FLAGS.ITEM]: get(this.itemFlagData)
+    })
+  }
 }
 
 export class PileAttribute extends PileBaseItem {

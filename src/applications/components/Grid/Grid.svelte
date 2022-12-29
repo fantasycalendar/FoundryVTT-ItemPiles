@@ -6,6 +6,7 @@
   import { calcPosition } from './grid-utils';
 	import GridItem from './GridItem.svelte';
 
+  export let gridContainer = HTMLDivElement;
   export let items = [];
   export let dropGhost = false;
   export let options = {
@@ -24,22 +25,14 @@
     collisionClass: "",
   }
 
-  let gridContainer = HTMLDivElement;
   let containerHeight = writable(0);
   let containerWidth = writable(0);
-
-  setContext("gridOptions", options);
-  setContext("items", items);
 
   const dispatch = createEventDispatcher();
 
 	function itemChangeEvent(event) {
 		dispatch('change', { items: event.detail.items });
 		items = [...items];
-	}
-
-	function itemHoverEvent(event) {
-		dispatch('hover', { item: event.detail.item });
 	}
 
 	$: $containerWidth = options.cols * (options.gridSize + options.gap);
@@ -60,6 +53,8 @@
   
 </script>
 
+<svelte:options accessors={true}/>
+
 <div class=item-piles-grid-container>
 
   <div
@@ -68,7 +63,7 @@
     style={containerStyle}
   >
     {#each items as item (item.id)}
-      <GridItem {item} {gridContainer} on:itemchange={itemChangeEvent} on:itemhover={itemHoverEvent}>
+      <GridItem bind:item={item} bind:items={items} bind:options={options} {gridContainer} on:itemchange={itemChangeEvent}>
         <slot {item}/>
       </GridItem>
     {/each}
@@ -88,7 +83,7 @@
       {#each Array(options.rows) as _, rowIndex (rowIndex)}
         {#each Array(options.cols) as _, colIndex (colIndex)}
           <div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
-            style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}"/>
+               style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}"></div>
         {/each}
       {/each}
     </div>
@@ -113,7 +108,7 @@
     border-radius: 0.25rem;
     position:absolute;
     margin: 1px;
-    z-index: -1;
+    pointer-events: none;
     > div {
       border-radius: 0.25rem;
       border: 1px solid rgba(0,0,0,0.25);

@@ -1,157 +1,176 @@
 <script>
 
-	import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { get, writable } from 'svelte/store';
   import { styleFromObject } from '../../../helpers/helpers.js';
-	import { calcPosition, snapOnMove, getCollisions } from './grid-utils.js';
+  import { calcPosition, getCollisions, snapOnMove } from './grid-utils.js';
 
-	export let item;
-	export let gridContainer;
-
-  const options = getContext('gridOptions');
-  const items = getContext('items');
+  export let item;
+  export let options;
+  export let items;
+  export let gridContainer;
 
   const dispatch = createEventDispatcher();
-  let previewItem = item;
-	let active = false;
 
   let itemRef = HTMLElement;
-  let transform = writable({});
-  let oldTransform = writable({});
+  const transformStore = item.transform;
+  const previewTransform = writable({});
 
-	$: if (!active) {
-    transform.set(calcPosition(item, options));
-	}
+  $: transform = $transformStore;
+  $: gridTransform = calcPosition(transform, options);
+  $: snappedGridTransform = calcPosition({
+    ...snapOnMove($previewTransform.left, $previewTransform.top, transform, options),
+    w: transform.w,
+    h: transform.h,
+  }, options);
 
-  let style = "";
   $: style = styleFromObject({
     "position": "absolute",
-    "left": $transform.left + "px",
-    "top": $transform.top + "px",
-    "width": $transform.width + "px",
-    "height": $transform.height + "px",
-    "cursor": movable ? 'move' : 'auto',
-    "touch-action": "none",
-    "user-select": "none",
+    "left": gridTransform.left + "px",
+    "top": gridTransform.top + "px",
+    "width": gridTransform.width + "px",
+    "height": gridTransform.height + "px",
+    "cursor": 'move'
   });
 
-  let oldStyle = "";
-  $: oldStyle = styleFromObject({
+  $: previewStyle = styleFromObject({
     "position": "absolute",
-    "left": $oldTransform.left + "px",
-    "top": $oldTransform.top + "px",
-    "width": $oldTransform.width + "px",
-    "height": $oldTransform.height + "px",
-    "cursor": movable ? 'move' : 'auto',
-    "background-color": colliding ? "rgb(33, 202, 33)" : "transparent",
+    "left": ($previewTransform.left ?? 0) + "px",
+    "top": ($previewTransform.top ?? 0) + "px",
+    "width": ($previewTransform.width ?? 0) + "px",
+    "height": ($previewTransform.height ?? 0) + "px",
     "opacity": "0.75",
     "touch-action": "none",
     "user-select": "none",
+    "z-index": "10"
   });
 
-	$: previewItem, dispatch('previewchange', { item: previewItem });
-	$: movable = !options.readOnly && item.movable === undefined && item.movable !== false;
+  $: ghostStyle = styleFromObject({
+    "position": "absolute",
+    "left": snappedGridTransform.left + "px",
+    "top": snappedGridTransform.top + "px",
+    "width": snappedGridTransform.width + "px",
+    "height": snappedGridTransform.height + "px",
+    "opacity": "0.75",
+    "z-index": "5"
+  });
 
-  let preview = false;
-  let colliding = false;
-	let pointerShift = { left: 0, top: 0 };
+  let active = false;
+  let collisions = [];
+  let pointerOffset = { left: 0, top: 0 };
 
-	function moveStart(event) {
-		if (!movable) return;
-		if (event.button !== 0) return;
+  function moveStart(event) {
+    // If not left mouse, skip
+    if (event.button !== 0) return;
 
-    const prevTransform = get(transform);
-    oldTransform.set(prevTransform);
+    // Get offset for pointer within the grid item
+    pointerOffset = {
+      left: event.clientX - gridTransform.left,
+      top: event.clientY - gridTransform.top
+    };
+    itemRef.setPointerCapture(event.pointerId);
 
-		pointerShift = { left: event.clientX - prevTransform.left, top: event.clientY - prevTransform.top };
+    // Setup events for when item is moved and dropped
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', moveEnd);
+  }
 
-		itemRef.setPointerCapture(event.pointerId);
+  function move(event) {
+    active = true;
+    const { left, top } = constrainToContainer(
+      event.pageX - pointerOffset.left,
+      event.pageY - pointerOffset.top
+    );
+    previewTransform.set({
+      ...transform,
+      ...gridTransform,
+      ...snapOnMove(left, top, transform, options),
+      left,
+      top,
+    });
+    collisions = getCollisions({ id: item.id, transform: previewTransform }, items);
+  }
 
-		window.addEventListener('pointermove', move);
-		window.addEventListener('pointerup', moveEnd);
+  function constrainToContainer(left, top) {
 
-		active = true;
-	}
+    const parentRect = gridContainer.getBoundingClientRect();
+    const relativeRect = {
+      left: (parentRect.left - parentRect.x),
+      top: (parentRect.top - parentRect.y),
+      right: (parentRect.right - parentRect.x),
+      bottom: (parentRect.bottom - parentRect.y),
+    }
+    if (left < relativeRect.left) {
+      left = relativeRect.left;
+    }
+    if (top < relativeRect.top) {
+      top = relativeRect.top;
+    }
+    if ((left + gridTransform.width) > relativeRect.right) {
+      left = relativeRect.right - gridTransform.width;
+    }
+    if ((top + gridTransform.height) > relativeRect.bottom) {
+      top = relativeRect.bottom - gridTransform.height;
+    }
 
-	function move(event) {
-		let _left = event.pageX - pointerShift.left;
-		let _top = event.pageY - pointerShift.top;
-    let _transform = get(transform);
+    return { left, top };
 
-		if (options.bounds) {
-			const parentRect = gridContainer.getBoundingClientRect();
-      const relativeRect = {
-        left: (parentRect.left - parentRect.x),
-        top: (parentRect.top - parentRect.y),
-        right: (parentRect.right - parentRect.x),
-        bottom: (parentRect.bottom - parentRect.y),
+  }
+
+  function moveEnd() {
+    active = false;
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', moveEnd);
+
+    const finalTransform = get(previewTransform);
+    if (collisions.length) {
+      const offset = collisions.reduce((acc, item) => {
+        const trans = get(item.transform);
+        if (trans.x < acc.x) acc.x = trans.x;
+        if (trans.y < acc.y) acc.y = trans.y;
+        return acc;
+      }, { x: finalTransform.x, y: finalTransform.y });
+      for (const collision of collisions) {
+        collision.transform.update(trans => {
+          trans.x = transform.x + (trans.x - offset.x);
+          trans.y = transform.y + (trans.y - offset.y);
+          return trans;
+        });
       }
-			if (_left < relativeRect.left) {
-				_left = relativeRect.left;
-			}
-			if (_top < relativeRect.top) {
-				_top = relativeRect.top;
-			}
-			if ((_left + _transform.width) > relativeRect.right) {
-				_left = relativeRect.right - _transform.width;
-			}
-			if ((_top + _transform.height) > relativeRect.bottom) {
-				_top = relativeRect.bottom - _transform.height;
-			}
-		}
 
-    transform.set({
-      ..._transform,
-      left: _left,
-      top: _top
+    }
+
+    transformStore.update(trans => {
+      trans.x = finalTransform.x;
+      trans.y = finalTransform.y;
+      return trans;
     });
 
-    const { x, y } = snapOnMove(_left, _top, previewItem, options);
-    const collisions = getCollisions({ ...previewItem, x, y }, items);
-    
-    previewItem = { ...previewItem, x, y };
-    preview = calcPosition(previewItem, options)
+    previewTransform.set(transform)
 
-    colliding = !!collisions.length;
-	}
+    dispatch("itemchange", { items: collisions.concat(item) })
 
-	function moveEnd() {
-		active = false;
-    colliding = false;
-		pointerShift = { left: 0, top: 0 };
-		window.removeEventListener('pointermove', move);
-		window.removeEventListener('pointerup', moveEnd);
-    const collisionItem = getCollisions(previewItem, items);
-    if(collisionItem.length){
-      collisionItem[0].x = item.x;
-      collisionItem[0].y = item.y;
-    }
-		item.x = previewItem.x;
-		item.y = previewItem.y;
-    preview = calcPosition(item, options)
-		dispatch('itemchange', { items: [item].concat(collisionItem.length ? collisionItem : []) });
-	}
+  }
 
 </script>
 
 <div
   bind:this={itemRef}
-	on:pointerdown={moveStart}
-  on:hover={() => { dispatch('itemhover', { item }); }}
-  class={active ? options.activeClass : ''}
-	{style}
+  on:pointerdown={moveStart}
+  on:dragover|preventDefault
+  style={style}
 >
-	<slot/>
+  <slot/>
 </div>
 
 {#if active}
-  <div style={oldStyle}>
+  <div style={previewStyle} class={options.activeClass}>
     <slot/>
   </div>
 
-  <div
-    style={`position: absolute; left:${preview.left}px; top:${preview.top}px;  
-    width: ${preview.width}px; height: ${preview.height}px; z-index: 10;`}
-    class={colliding ? options.collisionClass : options.previewClass}
-  />
+  <div style={ghostStyle} class={collisions.length ? options.collisionClass : options.previewClass}/>
+
+  {#if collisions.length}
+    <div style={style} class={collisions.length ? options.collisionClass : options.previewClass}/>
+  {/if}
 {/if}

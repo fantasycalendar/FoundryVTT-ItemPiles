@@ -2,9 +2,9 @@ import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import ItemPileConfig from "../item-pile-config/item-pile-config";
 import MerchantAppShell from "./merchant-app-shell.svelte";
 import * as Helpers from "../../helpers/helpers.js";
-import HOOKS from "../../constants/hooks.js";
 import UserSelectDialog from "../dialogs/user-select-dialog/user-select-dialog.js";
 import SETTINGS from "../../constants/settings.js";
+import CONSTANTS from "../../constants/constants.js";
 
 export default class MerchantApp extends SvelteApplication {
 
@@ -25,7 +25,7 @@ export default class MerchantApp extends SvelteApplication {
     }, dialogData);
     this.merchant = merchant;
     this.recipient = recipient;
-    Helpers.hooks.callAll(HOOKS.OPEN_INTERFACE, this, merchant, recipient, options, dialogData);
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.OPEN_INTERFACE, this, merchant, recipient, options, dialogData);
   }
 
   /** @inheritdoc */
@@ -46,7 +46,7 @@ export default class MerchantApp extends SvelteApplication {
   static async show(merchant, recipient = false, options = {}, dialogData = {}) {
     merchant = merchant?.actor ?? merchant;
     recipient = recipient?.actor ?? recipient
-    const result = Helpers.hooks.call(HOOKS.PRE_OPEN_INTERFACE, merchant, recipient, options, dialogData);
+    const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, merchant, recipient, options, dialogData);
     if (result === false) return;
     const app = this.getActiveApp(merchant.id);
     if (app) return app.render(false, { focus: true });
@@ -106,14 +106,14 @@ export default class MerchantApp extends SvelteApplication {
   }
 
   async close(options) {
-    const result = Helpers.hooks.call(HOOKS.PRE_CLOSE_INTERFACE, this, this.merchant, this.recipient);
+    const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_CLOSE_INTERFACE, this, this.merchant, this.recipient);
     if (result === false) return;
     for (const app of Object.values(ui.windows)) {
       if (app !== this && this.svelte.applicationShell.store === app?.svelte?.applicationShell?.store) {
         app.close();
       }
     }
-    Helpers.hooks.callAll(HOOKS.CLOSE_INTERFACE, this, this.merchant, this.recipient);
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.CLOSE_INTERFACE, this, this.merchant, this.recipient);
     return super.close(options);
   }
 

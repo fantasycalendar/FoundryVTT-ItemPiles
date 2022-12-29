@@ -2,7 +2,6 @@ import * as Helpers from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
-import HOOKS from "../constants/hooks.js";
 import ItemPileSocket from "../socket.js";
 import SETTINGS from "../constants/settings.js";
 import CONSTANTS from "../constants/constants.js";
@@ -90,7 +89,7 @@ export default class PrivateAPI {
   static _onDeleteToken(doc) {
     ItemPileStore.notifyChanges("delete", doc.actor)
     if (!PileUtilities.isValidItemPile(doc)) return;
-    Helpers.hooks.callAll(HOOKS.PILE.DELETE, doc);
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.DELETE, doc);
   }
 
   /**
@@ -150,7 +149,7 @@ export default class PrivateAPI {
   static _onCreateToken(doc) {
     if (!PileUtilities.isValidItemPile(doc)) return;
     const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
-    Helpers.hooks.callAll(HOOKS.PILE.CREATE, doc, itemPileConfig);
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CREATE, doc, itemPileConfig);
     return this._preloadItemPileFiles(doc);
   }
 
@@ -171,12 +170,12 @@ export default class PrivateAPI {
 
     const { itemsToUpdate, itemsToCreate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_ADD, targetActor, itemsToCreate, itemsToUpdate, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_ADD, targetActor, itemsToCreate, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas } = await transaction.commit(); // Actually add the items to the actor
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.ADD, targetUuid, itemDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.ADD, targetUuid, itemDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "addItems", target: targetUuid, items: itemDeltas, userId: userId, interactionId: interactionId
@@ -196,12 +195,12 @@ export default class PrivateAPI {
 
     const { itemsToUpdate, itemsToDelete } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_REMOVE, targetActor, itemsToUpdate, itemsToDelete, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_REMOVE, targetActor, itemsToUpdate, itemsToDelete, interactionId);
     if (hookResult === false) return false;
 
     const { itemDeltas } = await transaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.REMOVE, targetUuid, itemDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.REMOVE, targetUuid, itemDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "removeItems", target: targetUuid, items: itemDeltas, userId: userId, interactionId: interactionId
@@ -229,13 +228,13 @@ export default class PrivateAPI {
     await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferItems",
@@ -283,13 +282,13 @@ export default class PrivateAPI {
     await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferAllItems",
@@ -330,12 +329,12 @@ export default class PrivateAPI {
 
     const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_ADD, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_ADD, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually add the items to the actor
 
-    await ItemPileSocket.callHook(HOOKS.CURRENCY.ADD, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.ADD, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "addCurrencies",
@@ -370,12 +369,12 @@ export default class PrivateAPI {
 
     const { actorUpdates, itemsToUpdate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_REMOVE, targetActor, actorUpdates, itemsToUpdate, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_REMOVE, targetActor, actorUpdates, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually add the items to the actor
 
-    await ItemPileSocket.callHook(HOOKS.CURRENCY.REMOVE, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.REMOVE, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "removeCurrencies",
@@ -420,13 +419,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas, { type: "currency" });
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.CURRENCY.TRANSFER, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.TRANSFER, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferCurrencies",
@@ -483,13 +482,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.CURRENCY.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferAllCurrencies",
@@ -520,12 +519,12 @@ export default class PrivateAPI {
     await transaction.appendActorChanges(attributes);
     const { actorUpdates } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_SET, targetActor, actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_SET, targetActor, actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     const { attributeDeltas } = await transaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.SET, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.SET, targetUuid, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "setAttributes",
@@ -547,12 +546,12 @@ export default class PrivateAPI {
     await transaction.appendActorChanges(attributes);
     const { actorUpdates } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, targetActor, actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_ADD, targetActor, actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     const { attributeDeltas } = await transaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.ADD, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.ADD, targetUuid, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "addAttributes",
@@ -574,12 +573,12 @@ export default class PrivateAPI {
     await transaction.appendActorChanges(attributes, { remove: true });
     const { actorUpdates } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, targetActor, actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_REMOVE, targetActor, actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     const { attributeDeltas } = await transaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.REMOVE, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.REMOVE, targetUuid, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "removeAttributes",
@@ -611,13 +610,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferAttributes",
@@ -666,13 +665,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.TRANSFER_ALL, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER_ALL, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferAllAttributes",
@@ -726,13 +725,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_TRANSFER_EVERYTHING, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferEverything",
@@ -817,7 +816,7 @@ export default class PrivateAPI {
 
     }
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemsDropped, position);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemsDropped, position);
 
     return { sourceUuid, targetUuid, position, itemsDropped };
 
@@ -954,7 +953,7 @@ export default class PrivateAPI {
 
       const scene = game.scenes.get(sceneId);
 
-      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CREATE, tokenData);
+      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CREATE, tokenData);
       if (hookResult === false) return false;
 
       const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
@@ -1021,7 +1020,7 @@ export default class PrivateAPI {
       }
     }
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
     if (hookResult === false) return false;
 
     await Actor.updateDocuments(Object.values(actorUpdateGroups));
@@ -1031,7 +1030,7 @@ export default class PrivateAPI {
       await scene.updateEmbeddedDocuments("Token", updateData);
     }
 
-    await ItemPileSocket.callHook(HOOKS.PILE.TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
 
     return targetUuids;
 
@@ -1076,7 +1075,7 @@ export default class PrivateAPI {
       }
     }
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);
     if (hookResult === false) return false;
 
     await Actor.updateDocuments(Object.values(actorUpdateGroups));
@@ -1086,7 +1085,7 @@ export default class PrivateAPI {
       await scene.updateEmbeddedDocuments("Token", updateData);
     }
 
-    await ItemPileSocket.callHook(HOOKS.PILE.REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);
 
     return targetUuids;
 
@@ -1103,7 +1102,7 @@ export default class PrivateAPI {
 
     const diff = foundry.utils.diffObject(oldData, data);
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_UPDATE, targetActor, data, interactingToken, tokenSettings);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_UPDATE, targetActor, data, interactingToken, tokenSettings);
     if (hookResult === false) return false;
 
     await Helpers.wait(15);
@@ -1146,20 +1145,20 @@ export default class PrivateAPI {
 
     const data = PileUtilities.getActorFlagData(target);
 
-    Helpers.hooks.callAll(HOOKS.PILE.UPDATE, target, diffData, interactingToken)
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.UPDATE, target, diffData, interactingToken)
 
     if (PileUtilities.isItemPileContainer(target, data)) {
       if (diffData?.closed === true) {
-        Helpers.hooks.callAll(HOOKS.PILE.CLOSE, target, interactingToken)
+        Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CLOSE, target, interactingToken)
       }
       if (diffData?.locked === true) {
-        Helpers.hooks.callAll(HOOKS.PILE.LOCK, target, interactingToken)
+        Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.LOCK, target, interactingToken)
       }
       if (diffData?.locked === false) {
-        Helpers.hooks.callAll(HOOKS.PILE.UNLOCK, target, interactingToken)
+        Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.UNLOCK, target, interactingToken)
       }
       if (diffData?.closed === false) {
-        Helpers.hooks.callAll(HOOKS.PILE.OPEN, target, interactingToken)
+        Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.OPEN, target, interactingToken)
       }
     }
   }
@@ -1167,7 +1166,7 @@ export default class PrivateAPI {
   static async _deleteItemPile(targetUuid) {
     const target = Utilities.getToken(targetUuid);
     if (!target) return false;
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_DELETE, target);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_DELETE, target);
     if (hookResult === false) return false;
     return target.document.delete();
   }
@@ -1314,7 +1313,7 @@ export default class PrivateAPI {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
     }
 
-    const pre_drop_determined_hook = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.itemData, dropData.position);
+    const pre_drop_determined_hook = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.itemData, dropData.position);
     if (pre_drop_determined_hook === false) return false;
 
     let droppableDocuments = [];
@@ -1476,7 +1475,7 @@ export default class PrivateAPI {
       }
     }
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
     if (hookResult === false) return false;
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DROP_ITEMS, {
@@ -1699,7 +1698,7 @@ export default class PrivateAPI {
 
     const actorPreparedData = Object.fromEntries(transactionMap.map(entry => [entry[0], entry[1].prepare()]));
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_SPLIT_INVENTORY, itemPileActor, preparedData, actorPreparedData, userId, instigator);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_SPLIT_INVENTORY, itemPileActor, preparedData, actorPreparedData, userId, instigator);
     if (hookResult === false) return false;
 
     const pileDeltas = await tempPileTransaction.commit();
@@ -1710,7 +1709,7 @@ export default class PrivateAPI {
 
     await SharingUtilities.clearItemPileSharingData(itemPileActor);
 
-    await ItemPileSocket.callHook(HOOKS.PILE.SPLIT_INVENTORY, itemPileUuid, pileDeltas, actorDeltas, userId, instigator);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.SPLIT_INVENTORY, itemPileUuid, pileDeltas, actorDeltas, userId, instigator);
 
     await this._executeItemPileMacro(itemPileUuid, {
       action: "splitInventory", source: itemPileUuid, target: actorUuids, transfers: {
@@ -1773,7 +1772,7 @@ export default class PrivateAPI {
       }
     }), { seller: sellingActor, buyer: buyingActor });
 
-    const preCalcHookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
+    const preCalcHookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
     if (preCalcHookResult === false) return false;
 
     const sellerTransaction = new Transaction(sellingActor);
@@ -1877,7 +1876,7 @@ export default class PrivateAPI {
     const sellerUpdates = sellerTransaction.prepare();
     const buyerUpdates = buyerTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRADE, sellingActor, sellerUpdates, buyingActor, buyerUpdates, userId, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_TRADE, sellingActor, sellerUpdates, buyingActor, buyerUpdates, userId, interactionId);
     if (hookResult === false) return false;
 
     const sellerTransactionData = await sellerTransaction.commit();
@@ -1913,7 +1912,7 @@ export default class PrivateAPI {
       }
     }
 
-    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
 
     return {
       itemDeltas: buyerTransactionData.itemDeltas, attributeDeltas: buyerTransactionData.attributeDeltas, itemPrices

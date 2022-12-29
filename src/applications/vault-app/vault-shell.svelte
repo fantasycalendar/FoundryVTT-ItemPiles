@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
-	import Grid from '../components/Grid/Grid.svelte';
+  import Grid from '../components/Grid/Grid.svelte';
 
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
@@ -15,9 +15,8 @@
   import CurrencyList from '../components/CurrencyList.svelte';
   import DropZone from '../components/DropZone.svelte';
   import CONSTANTS from '../../constants/constants.js';
-    import { snapOnMove } from '../components/Grid/grid-utils';
-    import { hooks } from '../../helpers/helpers';
-    import HOOKS from '../../constants/hooks';
+  import { snapOnMove } from '../components/Grid/grid-utils';
+  import * as Helpers from "../../helpers/helpers.js";
 
   const { application } = getContext('external');
 
@@ -36,11 +35,14 @@
   $: pileData = $pileDataStore;
 
   const dragPosition = writable({});
-  let itemBeingDragged = false;
+  let element;
 
-  async function onDropData(data, event) {
+  async function onDropData(data) {
 
-    if(data.type !== "Item") return false;
+    if (data.type !== "Item") {
+      Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`)
+      return false;
+    }
 
     let item = await Item.implementation.fromDropData(data);
     let itemData = item.toObject();
@@ -54,7 +56,7 @@
 
     const { x, y } = get(dragPosition);
 
-    dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false,});
+    dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
 
     setProperty(flags, "x", x);
     setProperty(flags, "y", y);
@@ -66,23 +68,20 @@
   }
 
   async function onDragOver(event) {
-    if(!itemBeingDragged) return;
-    const { width, height } = itemBeingDragged;
+    const rect = element.getBoundingClientRect();
+    const x = event.clientX - rect.left; //x position within the element.
+    const y = event.clientY - rect.top;  //y position within the element.
     dragPosition.set({
-      ...snapOnMove(event.offsetX, event.offsetY, { w: width, h: height }, { ...pileData, gap }),
-      w: width,
-      h: height,
+      ...snapOnMove(x, y, { w: 1, h: 1 }, { ...pileData, gap }),
+      w: 1,
+      h: 1,
       active: true
-    })
-    console.log(get(dragPosition))
+    });
   }
 
-  let hookId;
-  onMount(() => {
-    Hooks.on(HOOKS.GENERIC.ITEM_DRAG_START, (item) => {
-      itemBeingDragged = PileUtilities.getItemFlagData(item);
-    });
-  })
+  async function onDragLeave() {
+    dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+  }
 
   onDestroy(() => {
     store.onDestroy();
@@ -95,10 +94,11 @@
 <ApplicationShell bind:elementRoot>
 
   <main in:fade={{duration: 500}}>
-    
-    <DropZone callback={onDropData} on:dragover={onDragOver}>
+
+    <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave} style="z-index:20;">
 
       <Grid bind:items={$items}
+            bind:gridContainer={element}
             options={{
               ...pileData,
               bounds: true,

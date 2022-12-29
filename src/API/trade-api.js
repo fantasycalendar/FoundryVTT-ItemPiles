@@ -2,10 +2,10 @@ import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import { TradePromptDialog, TradeRequestDialog } from "../applications/trade-dialogs/trade-dialogs.js";
 
+import CONSTANTS from "../constants/constants.js";
 import ItemPileSocket from "../socket.js";
 import * as Helpers from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
-import HOOKS from "../constants/hooks.js";
 import TradeStore from "../applications/trading-app/trade-store.js";
 import TradingApp from "../applications/trading-app/trading-app.js";
 import Transaction from "../helpers/transaction.js";
@@ -142,12 +142,12 @@ export default class TradeAPI {
         actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
 
         if (isPrivate) {
-          return ItemPileSocket.callHookForUsers(HOOKS.TRADE.STARTED, [game.user.id, userId], {
+          return ItemPileSocket.callHookForUsers(CONSTANTS.HOOKS.TRADE.STARTED, [game.user.id, userId], {
             user: game.user.id, actor: actor.uuid
           }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
         }
 
-        return ItemPileSocket.callHook(HOOKS.TRADE.STARTED, {
+        return ItemPileSocket.callHook(CONSTANTS.HOOKS.TRADE.STARTED, {
           user: game.user.id, actor: actor.uuid
         }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
 
@@ -452,7 +452,7 @@ export default class TradeAPI {
   static async _tradeCompleted(tradeId, updates) {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;
-    Helpers.hooks.callAll(HOOKS.TRADE.COMPLETE, updates, tradeId)
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, updates, tradeId)
     trade.app.close({ callback: true });
     ongoingTrades.delete(tradeId);
   }

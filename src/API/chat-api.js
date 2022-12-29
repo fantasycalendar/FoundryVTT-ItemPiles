@@ -1,7 +1,6 @@
 import SETTINGS from "../constants/settings.js";
 import * as Helpers from "../helpers/helpers.js";
 import CONSTANTS from "../constants/constants.js";
-import HOOKS from "../constants/hooks.js";
 import ItemPileSocket from "../socket.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
@@ -13,13 +12,13 @@ export default class ChatAPI {
 
     Hooks.on("preCreateChatMessage", this._preCreateChatMessage.bind(this));
     Hooks.on("renderChatMessage", this._renderChatMessage.bind(this));
-    Hooks.on(HOOKS.ITEM.TRANSFER, this._outputTransferItem.bind(this));
-    Hooks.on(HOOKS.ATTRIBUTE.TRANSFER, this._outputTransferCurrency.bind(this));
-    Hooks.on(HOOKS.TRANSFER_EVERYTHING, this._outputTransferEverything.bind(this));
-    Hooks.on(HOOKS.PILE.SPLIT_INVENTORY, this._outputSplitItemPileInventory.bind(this));
-    Hooks.on(HOOKS.TRADE.STARTED, this._outputTradeStarted.bind(this));
-    Hooks.on(HOOKS.TRADE.COMPLETE, this._outputTradeComplete.bind(this));
-    Hooks.on(HOOKS.ITEM.TRADE, this._outputMerchantTradeComplete.bind(this));
+    Hooks.on(CONSTANTS.HOOKS.ITEM.TRANSFER, this._outputTransferItem.bind(this));
+    Hooks.on(CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER, this._outputTransferCurrency.bind(this));
+    Hooks.on(CONSTANTS.HOOKS.TRANSFER_EVERYTHING, this._outputTransferEverything.bind(this));
+    Hooks.on(CONSTANTS.HOOKS.PILE.SPLIT_INVENTORY, this._outputSplitItemPileInventory.bind(this));
+    Hooks.on(CONSTANTS.HOOKS.TRADE.STARTED, this._outputTradeStarted.bind(this));
+    Hooks.on(CONSTANTS.HOOKS.TRADE.COMPLETE, this._outputTradeComplete.bind(this));
+    Hooks.on(CONSTANTS.HOOKS.ITEM.TRADE, this._outputMerchantTradeComplete.bind(this));
 
     $(document).on("click", ".item-piles-chat-card .item-piles-collapsible", async function () {
       if ($(this).attr("open")) return;

@@ -1,11 +1,6 @@
 import ItemPileStore from "./item-pile-store.js";
 import { get, writable } from "svelte/store";
-import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
-import * as Helpers from "../helpers/helpers.js";
-import { isResponsibleGM } from "../helpers/helpers.js";
-import * as Utilities from "../helpers/utilities.js";
 import { PileItem } from "./pile-item.js";
 
 export class VaultStore extends ItemPileStore {
@@ -19,7 +14,7 @@ export class VaultStore extends ItemPileStore {
     this.grid = writable([]);
     this.refreshGridDebounce = foundry.utils.debounce(() => {
       this.refreshGrid();
-    }, 250);
+    }, 150);
   }
 
   setupSubscriptions() {
@@ -27,35 +22,38 @@ export class VaultStore extends ItemPileStore {
     this.refreshGrid();
   }
 
-  updateGrid(items){
-    const updates = items.map(item => ({
-      _id: item.id,
-      [CONSTANTS.FLAGS.ITEM + ".x"]: item.x,
-      [CONSTANTS.FLAGS.ITEM + ".y"]: item.y
-    }));
-    this.actor.updateEmbeddedDocuments("Item", updates);
+  updateGrid(items) {
+    const updates = items.map(item => {
+      const transform = get(item.transform);
+      return {
+        _id: item.id,
+        [CONSTANTS.FLAGS.ITEM + ".x"]: transform.x,
+        [CONSTANTS.FLAGS.ITEM + ".y"]: transform.y
+      }
+    });
+    return this.actor.updateEmbeddedDocuments("Item", updates);
   }
 
-  refreshItems(){
+  refreshItems() {
     super.refreshItems();
     this.refreshGridDebounce();
   }
 
-  createItem(...args){
+  createItem(...args) {
     super.createItem(...args);
     this.refreshGrid();
   }
 
-  deleteItem(...args){
+  deleteItem(...args) {
     super.deleteItem(...args);
     this.refreshGrid();
   }
 
-  refreshGrid(){
+  refreshGrid() {
     this.grid.set(this.placeItemsOnGrid());
   }
 
-  placeItemsOnGrid(){
+  placeItemsOnGrid() {
     const pileData = get(this.pileData);
     const columns = Math.min(pileData.cols, pileData.enabledCols);
     const rows = Math.min(pileData.rows, pileData.enabledRows);
@@ -67,10 +65,10 @@ export class VaultStore extends ItemPileStore {
         const item = allItems.find(item => {
           return item.x === x && item.y === y
         });
-        if(item){
+        if (item) {
           allItems.splice(allItems.indexOf(item), 1);
           existingItems.push({
-            id: item.id, x, y, w: 1, h: 1, item
+            id: item.id, transform: item.transform, item
           })
         }
         return item?.id ?? null;
@@ -79,12 +77,17 @@ export class VaultStore extends ItemPileStore {
 
     return allItems
       .map(item => {
-        for(let x = 0; x < columns; x++){
-          for(let y = 0; y < rows; y++){
-            if(!grid[x][y]){
+        for (let x = 0; x < columns; x++) {
+          for (let y = 0; y < rows; y++) {
+            if (!grid[x][y]) {
               grid[x][y] = item.id;
+              item.transform.update(trans => {
+                trans.x = x;
+                trans.y = y;
+                return trans;
+              })
               return {
-                id: item.id, x, y, w: 1, h: 1, item
+                id: item.id, transform: item.transform, item
               };
             }
           }
@@ -101,19 +104,24 @@ export class VaultItem extends PileItem {
 
   setupStores(item) {
     super.setupStores(item);
-    this.x = get(this.itemFlagData).x;
-    this.y = get(this.itemFlagData).y;
+    this.transform = writable({
+      x: 0, y: 0, w: 1, h: 1
+    });
+    this.x = 0;
+    this.y = 0;
   }
 
   setupSubscriptions() {
     super.setupSubscriptions();
-    let setup = false;
     this.subscribeTo(this.itemFlagData, (data) => {
-      if(!setup) return;
-      this.x = data.x;
-      this.y = data.y;
+      this.transform.set({
+        x: data.x, y: data.y, w: data.width ?? 1, h: data.height ?? 1
+      });
     });
-    setup = true;
+    this.subscribeTo(this.transform, (transform) => {
+      this.x = transform.x;
+      this.y = transform.y;
+    })
   }
-  
+
 }

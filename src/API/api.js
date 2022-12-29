@@ -2,9 +2,9 @@ import * as Helpers from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
+import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import ItemPileSocket from "../socket.js";
-import HOOKS from "../constants/hooks.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 
@@ -392,10 +392,10 @@ class API {
     pileData.closed = false;
     pileData.locked = false;
     if (wasLocked) {
-      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
+      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
       if (hookResult === false) return false;
     }
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_OPEN, targetActor, pileData, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_OPEN, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
     if (wasClosed && pileData.openSound) {
       let sound = pileData.openSound;
@@ -424,7 +424,7 @@ class API {
     const wasOpen = !pileData.closed;
     pileData.closed = true;
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
 
     if (wasOpen && pileData.closeSound) {
@@ -476,10 +476,10 @@ class API {
     pileData.closed = true;
     pileData.locked = true;
     if (!wasClosed) {
-      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
+      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
       if (hookResult === false) return false;
     }
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_LOCK, targetActor, pileData, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_LOCK, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
     if (!wasClosed && pileData.closeSound) {
       let sound = pileData.closeSound;
@@ -505,7 +505,7 @@ class API {
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
     pileData.locked = false;
-    Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
+    Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
   }
 
@@ -542,7 +542,7 @@ class API {
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
 
-    Helpers.hooks.call(HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
+    Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
 
     if (pileData.lockedSound) {
       let sound = pileData.lockedSound;
@@ -552,7 +552,7 @@ class API {
       AudioHelper.play({ src: sound }, true);
     }
 
-    return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, Utilities.getUuid(targetActor), pileData, Utilities.getUuid(interactingTokenDocument));
+    return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.PILE.RATTLE, Utilities.getUuid(targetActor), pileData, Utilities.getUuid(interactingTokenDocument));
   }
 
   /**
