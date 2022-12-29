@@ -52,13 +52,14 @@
     <Tabs bind:activeTab tabs={[
     { value: "general", label: localize("ITEM-PILES.Applications.ItemEditor.General") },
     { value: "price", label: localize("ITEM-PILES.Applications.ItemEditor.Price") },
+    { value: "vault", label: localize("ITEM-PILES.Applications.ItemEditor.Vault") },
   ]}/>
 
     <section class="tab-body">
 
-      {#if activeTab === 'general'}
+      <div class="tab flex">
 
-        <div class="tab flex">
+        {#if activeTab === 'general'}
 
           <div class="form-group">
             <label style="flex:4;">
@@ -144,27 +145,9 @@
             <MacroSelector bind:macro={itemFlagData.macro}/>
           </div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              Width<br>
-            </label>
-            <input type="number" bind:value={itemFlagData.width}/>
-          </div>
+        {/if}
 
-          <div class="form-group">
-            <label style="flex:4;">
-              Height<br>
-            </label>
-            <input type="number" bind:value={itemFlagData.height}/>
-          </div>
-
-        </div>
-
-      {/if}
-
-      {#if activeTab === 'price'}
-
-        <div class="tab flex">
+        {#if activeTab === 'price'}
 
           {#if game.system.id !== "pf2e"}
             <div class="form-group">
@@ -212,9 +195,41 @@
             {/each}
           {/if}
 
-        </div>
+        {/if}
 
-      {/if}
+        {#if activeTab === 'vault'}
+
+          <div class="form-group">
+            <label style="flex:4;">
+              {localize("ITEM-PILES.Applications.ItemEditor.VaultExpander")}<br>
+              <p>{localize("ITEM-PILES.Applications.ItemEditor.VaultExpanderExplanation")}</p>
+            </label>
+            <input type="checkbox" bind:checked={itemFlagData.vaultExpander}/>
+          </div>
+
+
+          <div class="form-group">
+            <label style="flex:6;">
+              <span>{localize("ITEM-PILES.Applications.ItemEditor.ExpandColumnsRows")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemEditor.ExpandColumnsRowsExplanation")}</p>
+            </label>
+            <div class="item-piles-grid-columns" style="flex: 3;">
+              <div style="text-align: center; font-size: 0.7rem;">
+                <i>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Columns")}</i>
+                <i>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Rows")}</i>
+              </div>
+              <div style="align-items: center;">
+                <input style="text-align: right;" type="number" placeholder="Enter a number..."
+                       bind:value={itemFlagData.addsCols}/>
+                <span style="flex: 0;">x</span>
+                <input type="number" placeholder="Enter a number..." bind:value={itemFlagData.addsRows}/>
+              </div>
+            </div>
+          </div>
+
+        {/if}
+
+      </div>
 
     </section>
 
@@ -274,6 +289,26 @@
 
     a {
       text-align: center;
+    }
+  }
+
+  .item-piles-grid-columns {
+    display: flex;
+    flex-direction: column;
+
+    & > div {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      & > * {
+        flex: 1;
+        margin: 0 0.25rem;
+      }
+
+      & > span {
+        flex: 0;
+      }
     }
   }
 

@@ -1,4 +1,3 @@
-import ItemPileStore from "./item-pile-store.js";
 import { get, writable } from "svelte/store";
 import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 import { PileItem } from "./pile-item.js";
@@ -8,6 +7,7 @@ import * as Helpers from "../helpers/helpers.js";
 import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
 import { isResponsibleGM } from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
+import ItemPileStore from "./item-pile-store.js";
 
 export default class MerchantStore extends ItemPileStore {
 

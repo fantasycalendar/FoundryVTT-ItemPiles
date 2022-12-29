@@ -785,18 +785,20 @@ export default class PrivateAPI {
     userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false
   } = {}) {
 
+    debugger;
+
     let itemsDropped;
 
     // If there's a source of the item (it wasn't dropped from the item bar)
     if (sourceUuid) {
 
-      const itemsToTransfer = [{ _id: itemData.item._id, quantity: itemData.quantity }];
+      setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
 
       // If there's a target token, add the item to it, otherwise create a new pile at the drop location
       if (targetUuid) {
-        itemsDropped = await this._transferItems(sourceUuid, targetUuid, itemsToTransfer, userId);
+        itemsDropped = await this._transferItems(sourceUuid, targetUuid, [itemData.item], userId);
       } else {
-        itemsDropped = (await this._removeItems(sourceUuid, itemsToTransfer, userId)).map(item => {
+        itemsDropped = (await this._removeItems(sourceUuid, [itemData.item], userId)).map(item => {
           item.quantity = Math.abs(item.quantity)
           Utilities.setItemQuantity(item.item, Math.abs(item.quantity), true);
           return item;

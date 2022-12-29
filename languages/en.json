@@ -285,6 +285,7 @@
         "Update": "Update Item",
         "General": "General Settings",
         "Price": "Price Settings",
+        "Vault": "Vault Settings",
         "NotForSale": "Item Is Not For Sale",
         "NotForSaleExplanation": "When enabled, this item is not for sale and cannot be bought. It still shows up in the merchant's item list unless the item is also hidden.",
         "CustomCategory": "Custom Item Category",
@@ -318,7 +319,11 @@
         "AddPurchaseOption": "Add Purchase Option",
         "DropMeClickMe": "Click to add an attribute or drag & drop an item to add",
         "PricePreset": "Or select an exiting price preset:",
-        "SelectPreset": "Select price preset"
+        "SelectPreset": "Select price preset",
+        "VaultExpander": "Vault Expander",
+        "VaultExpanderExplanation": "When this is enabled, this item does not act as a normal item in a vault, it instead increases the number of available slots, as determined below.",
+        "ExpandColumnsRows": "Column & Rows Expansion",
+        "ExpandColumnsRowsExplanation": "When the above setting is enabled, this sets how many columns and/or rows becomes available in the vault. This cannot extend beyond the capacity of the vault."
       },
       "FilterEditor": {
         "Title": "Item Piles Filters Editor",
@@ -469,6 +474,17 @@
           "ActorPriceModifiers": "Per-Actor Override Price Modifiers",
           "ActorPriceModifiersExplanation": "Here you can configure if certain specific actors should have different price modifiers than the price modifiers above.",
           "ConfigureActorPriceModifiers": "Configure Actor Price Modifiers."
+        },
+        "Vault": {
+          "Title": "Vault Settings",
+          "Layout": "Layout",
+          "LayoutExplanation": "This is how many columns and rows should be visible in the vault.",
+          "Columns": "Columns",
+          "Rows": "Rows",
+          "EnableExpansion": "Enable Expansion Items",
+          "EnableExpansionExplanation": "With this enabled, items that are configured as vault expanders will expand the vault's available space.",
+          "BaseExpansion": "Base Expansion",
+          "BaseExpansionExplanation": "This is how many columns and rows are enabled by default without any expansion items"
         }
       },
       "PricePresetEditor": {

@@ -1,9 +1,9 @@
-import { SvelteApplication } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+import { SvelteApplication } from "@typhonjs-fvtt/runtime/svelte/application";
 import { getActiveApps } from "../../../helpers/helpers";
 import TextEditorDialogShell from "./text-editor-dialog-shell.svelte";
 
 export default class TextEditorDialog extends SvelteApplication {
-  
+
   constructor(text, options) {
     super({
       title: game.i18n.localize("ITEM-PILES.Dialogs.TextEditor.Title"),
@@ -19,7 +19,7 @@ export default class TextEditorDialog extends SvelteApplication {
       ...options
     });
   }
-  
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       width: 550,
@@ -28,11 +28,11 @@ export default class TextEditorDialog extends SvelteApplication {
       resizable: true
     })
   }
-  
+
   static getActiveApps(id) {
     return getActiveApps(`item-pile-text-editor-${id}`);
   }
-  
+
   static async show(text, options = {}) {
     const apps = options.id ? this.getActiveApps(options.id) : [];
     if (apps.length) {
@@ -46,5 +46,5 @@ export default class TextEditorDialog extends SvelteApplication {
       new this(text, options).render(true, { focus: true });
     })
   }
-  
+
 }

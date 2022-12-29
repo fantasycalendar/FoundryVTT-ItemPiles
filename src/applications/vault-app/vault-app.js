@@ -7,7 +7,7 @@ import UserSelectDialog from "../dialogs/user-select-dialog/user-select-dialog.j
 import SETTINGS from "../../constants/settings.js";
 import CONSTANTS from "../../constants/constants.js";
 
-export default class BankVaultApp extends SvelteApplication {
+export default class VaultApp extends SvelteApplication {
 
   /**
    *

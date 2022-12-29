@@ -16,7 +16,6 @@
     enabledRows: null,
     gap: 10,
     gridSize: 40,
-    bounds: false,
     readOnly: false,
     backgroundGrid: false,
     class: "",
@@ -32,16 +31,15 @@
   const dispatch = createEventDispatcher();
 
 	function itemChangeEvent(event) {
-		dispatch('change', { items: event.detail.items });
-		items = [...items];
+		dispatch('change', { ...event.detail });
 	}
 
   function itemHoverEvent(event){
-    dispatch('hover', { item: event.detail.item });
+    dispatch('hover', { ...event.detail });
   }
 
   function itemHoverLeaveEvent(event){
-    dispatch('leave', { item: event.detail.item });
+    dispatch('leave', { ...event.detail });
   }
 
   function itemRightClickEvent(event){
@@ -63,7 +61,7 @@
     "gap": `${options.gap/2}px`,
     "top": `${options.gap/2}px`
   });
-  
+
 </script>
 
 <svelte:options accessors={true}/>
@@ -75,6 +73,14 @@
     bind:this={gridContainer}
     style={containerStyle}
   >
+    {#if dropGhost && dropGhost?.active}
+      {@const dropElem = calcPosition(dropGhost, options)}
+      <div
+        style={`position: absolute; left:${dropElem.left}px; top:${dropElem.top}px;
+        width: ${dropElem.width}px; height: ${dropElem.height}px;`}
+        class={options.previewClass}
+      />
+    {/if}
     {#each items as item (item.id)}
       <GridItem
         bind:item={item}
@@ -89,14 +95,6 @@
         <slot {item}/>
       </GridItem>
     {/each}
-    {#if dropGhost && dropGhost?.active}
-      {@const dropElem = calcPosition(dropGhost, options)}
-      <div
-        style={`position: absolute; left:${dropElem.left}px; top:${dropElem.top}px;  
-        width: ${dropElem.width}px; height: ${dropElem.height}px; z-index: -10;`}
-        class={options.previewClass}
-      />
-    {/if}
   </div>
 
   {#if options.backgroundGrid}
@@ -118,6 +116,8 @@
 
   .item-piles-grid-container {
     position: relative;
+    display: flex;
+    justify-content: center;
   }
 
 	.item-piles-grid {
@@ -129,7 +129,7 @@
     display: grid;
     border-radius: 0.25rem;
     position:absolute;
-    margin: 1px;
+    margin: -1px;
     pointer-events: none;
     > div {
       border-radius: 0.25rem;

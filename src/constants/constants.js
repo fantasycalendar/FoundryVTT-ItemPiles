@@ -32,7 +32,10 @@ const CONSTANTS = {
     prices: [],
 
     // Vaults
-    vaultBag: false,
+    vaultExpander: false,
+    vaultSlot: null,
+    addsCols: 0,
+    addsRows: 0,
     x: null,
     y: null,
     width: 1,
@@ -126,14 +129,20 @@ const CONSTANTS = {
     },
 
     // Vault settings
-    cols: 7,
-    rows: 7,
-    enabledCols: 5,
-    enabledRows: 7,
+    cols: 8,
+    rows: 5,
     gridSize: 40,
-    grid: [],
+    vaultExpansion: false,
+    baseExpansionCols: 4,
+    baseExpansionRows: 5,
+    expansionSlots: 4,
+    preventVaultAccess: false,
+    vaultAccess: [] // { id: String, withdraw: Boolean, deposit: Boolean }
   }
 }
+
+CONSTANTS.ITEM_FORCED_UNIQUE_KEYS = ["vaultExpander", "isService"]
+  .map(val => CONSTANTS.FLAGS.ITEM + "." + val);
 
 const prefix = (string) => (strings, ...expressions) => `${string}-${strings.reduce((a, c, i) => a + expressions[i - 1] + c)}`
 const module = prefix(CONSTANTS.MODULE_NAME);

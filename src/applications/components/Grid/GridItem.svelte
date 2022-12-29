@@ -61,6 +61,8 @@
 
   function moveStart(event) {
 
+    if (options.readOnly) return;
+
     if (event.button === 2) {
       return rightClick(event);
     }
@@ -161,11 +163,21 @@
   }
 
   function hoverOver() {
-    dispatch("itemhover", { item });
+    const { x, y } = itemRef.getBoundingClientRect();
+    dispatch("itemhover", {
+      item,
+      x: x + Math.floor(options.gridSize / 2),
+      y: y + Math.floor(options.gridSize / 2)
+    });
   }
 
   function hoverLeave() {
-    dispatch("itemhoverleave", { item });
+    const { x, y } = itemRef.getBoundingClientRect();
+    dispatch("itemhoverleave", {
+      item,
+      x: x + Math.floor(options.gridSize / 2),
+      y: y + Math.floor(options.gridSize / 2)
+    });
   }
 
   function rightClick(event) {

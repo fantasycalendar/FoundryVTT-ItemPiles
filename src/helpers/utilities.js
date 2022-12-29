@@ -1,4 +1,5 @@
 import * as Helpers from "./helpers.js";
+import CONSTANTS from "../constants/constants.js";
 
 export function getActor(target) {
   if (target instanceof Actor) return target;
@@ -44,23 +45,48 @@ export function findSimilarItem(items, findItem) {
 
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 
-  const findItemId = findItem instanceof Item ? findItem.id : findItem._id;
+  if (game.itempiles.API.ITEM_PRICE_ATTRIBUTE) {
+    itemSimilarities.push(game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
+  }
 
-  return items.find(item => {
-    const itemId = item instanceof Item ? item.id : item._id ?? item.id;
-    if (itemId && findItemId && itemId === findItemId) {
-      return true;
+  const findItemData = findItem instanceof Item ? findItem.toObject() : findItem;
+  const findItemId = findItemData._id;
+
+  let hasUniqueKey = false;
+  for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
+    if (getProperty(findItemData, prop)) {
+      hasUniqueKey = true;
+      break;
     }
+  }
 
-    const itemData = item instanceof Item ? item.toObject() : item;
-    for (const path of itemSimilarities) {
-      if (getProperty(itemData, path) !== getProperty(findItem, path) || (!hasProperty(itemData, path) ^ !hasProperty(findItem, path))) {
+  return items
+    .filter(item => {
+      for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
+        if (getProperty(item, prop)) {
+          return false;
+        }
+      }
+    })
+    .find(item => {
+      const itemId = item instanceof Item ? item.id : item._id ?? item.id;
+      if (itemId && findItemId && itemId === findItemId) {
+        return true;
+      }
+
+      if (hasUniqueKey) {
         return false;
       }
-    }
 
-    return true;
-  });
+      const itemData = item instanceof Item ? item.toObject() : item;
+      for (const path of itemSimilarities) {
+        if (getProperty(itemData, path) !== getProperty(findItemData, path) || (!hasProperty(itemData, path) ^ !hasProperty(findItemData, path))) {
+          return false;
+        }
+      }
+
+      return true;
+    });
 }
 
 export function setSimilarityProperties(obj, item) {
@@ -253,22 +279,17 @@ export async function runMacro(macroId, macroData) {
 
 }
 
-export function getUserCharacter() {
-
-  if (game.user.character) {
-    return game.user.character;
-  }
-
-  if (game.user.isGM) {
-    return false;
-  }
-
+export function getOwnedCharacters() {
   return game.actors.filter(actor => {
       return actor.ownership?.[game.user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER
         && actor.prototypeToken.actorLink;
     })
     .sort((a, b) => {
       return b._stats.modifiedTime - a._stats.modifiedTime;
-    })?.[0] ?? false;
+    });
+}
 
+export function getUserCharacter() {
+  return game.user.character
+    || (game.user.isGM ? false : (getOwnedCharacters()?.[0] ?? false));
 }

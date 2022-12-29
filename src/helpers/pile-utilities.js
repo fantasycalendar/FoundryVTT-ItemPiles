@@ -49,6 +49,12 @@ export function isValidItemPile(target, data = false) {
   return targetActor && pileData?.enabled;
 }
 
+export function isRegularItemPile(target, data = false) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor, data);
+  return targetActor && pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.PILE;
+}
+
 export function isItemPileContainer(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
@@ -106,7 +112,7 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
   const pileData = getActorFlagData(target);
 
-  if (isItemPileMerchant(target, pileData)) {
+  if (isRegularItemPile(target, pileData)) {
     return false;
   }
 

@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.4.0
+
+- Added vault type item piles - these item piles act like the Diablo inventory or the World of Warcraft banking system, where you have a set amount of grid slots that you can put items in
+- Added vault extenders - you can configure items to extend the space available in
+
 ## Version 2.3.11
 
 - Added support for the Symbaroum system

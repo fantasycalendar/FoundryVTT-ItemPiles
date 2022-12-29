@@ -259,6 +259,7 @@
     border-radius: 0.25rem;
     background-color: rgb(202, 33, 33);
     transition: all 0.2s;
+    z-index: 20;
   }
 
   &-grid-item-collision {

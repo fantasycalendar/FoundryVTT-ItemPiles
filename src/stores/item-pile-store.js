@@ -254,6 +254,11 @@ export default class ItemPileStore {
     pileItem.unsubscribe();
   }
 
+  hasSimilarItem(item) {
+    const items = get(this.allItems).map(item => item.item);
+    return !!Utilities.findSimilarItem(items, item);
+  }
+
   delete() {
     this.deleted.set(true);
   }

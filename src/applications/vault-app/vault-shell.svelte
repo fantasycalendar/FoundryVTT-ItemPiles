@@ -1,19 +1,23 @@
 <script>
+  import CONSTANTS from '../../constants/constants.js';
+
   import { getContext, onDestroy } from 'svelte';
   import { fade } from 'svelte/transition';
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
-  import Grid from '../components/Grid/Grid.svelte';
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import { VaultStore } from "../../stores/vault-store.js";
-  import VaultItemEntry from './VaultItemEntry.svelte';
+  import { TJSContextMenu } from "@typhonjs-fvtt/svelte-standard/application";
   import { get, writable } from 'svelte/store';
 
+  import Grid from '../components/Grid/Grid.svelte';
   import CurrencyList from '../components/CurrencyList.svelte';
   import DropZone from '../components/DropZone.svelte';
-  import CONSTANTS from '../../constants/constants.js';
+  import VaultItemEntry from './VaultItemEntry.svelte';
+
   import { snapOnMove } from '../components/Grid/grid-utils';
+  import * as PileUtilities from "../../helpers/pile-utilities.js";
   import * as Helpers from "../../helpers/helpers.js";
-  import { TJSContextMenu } from "@typhonjs-fvtt/svelte-standard/application";
+  import PrivateAPI from "../../API/private-api.js";
+
+  import { VaultStore } from "../../stores/vault-store.js";
 
   const { application } = getContext('external');
 
@@ -25,57 +29,66 @@
 
   const currencies = store.currencies;
   const pileDataStore = store.pileData;
-  const items = store.grid;
-
-  const gap = 4;
+  const gridDataStore = store.gridData;
+  const items = store.gridItems;
 
   $: pileData = $pileDataStore;
+  $: gridData = $gridDataStore;
 
   const dragPosition = writable({});
-  let hoveredItem = "";
+  let hoveredItem = "aaaaaaaa";
   let element;
 
   async function onDropData(data) {
 
+    const { x, y } = get(dragPosition);
+    dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+
     if (data.type !== "Item") {
-      Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`)
+      Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
       return false;
     }
 
-    if (!store.freeSpaces) {
-      Helpers.custom_warning(`This vault is full!`)
+    const item = await Item.implementation.fromDropData(data);
+
+    if (item.parent === store.actor) {
+      Helpers.custom_warning(`You can't drop items into the vault that originate from the vault!`, true)
       return false;
     }
 
-    let item = await Item.implementation.fromDropData(data);
-    let itemData = item.toObject();
+    const itemData = item.toObject();
 
     if (!itemData) {
       console.error(data);
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
 
-    const flags = PileUtilities.getItemFlagData(itemData);
+    const vaultExpander = getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
 
-    const { x, y } = get(dragPosition);
+    if (!store.hasSimilarItem(itemData) && !vaultExpander) {
 
-    dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+      if (!gridData?.freeSpaces) {
+        Helpers.custom_warning(`This vault is full!`, true)
+        return false;
+      }
 
-    setProperty(flags, "x", x);
-    setProperty(flags, "y", y);
+      const flags = PileUtilities.getItemFlagData(itemData);
+      setProperty(flags, "x", x);
+      setProperty(flags, "y", y);
+      setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
 
-    setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
+    }
 
-    await game.itempiles.API.addItems(store.actor, [itemData]);
+    return PrivateAPI._dropData(canvas, data, { target: store.actor });
 
   }
 
   async function onDragOver(event) {
     const rect = element.getBoundingClientRect();
-    const x = event.clientX - rect.left; //x position within the element.
-    const y = event.clientY - rect.top;  //y position within the element.
+    const x = (event.clientX - rect.left) - (gridData.gridSize / 2); //x position within the element.
+    const y = (event.clientY - rect.top) - (gridData.gridSize / 2);  //y position within the element.
     dragPosition.set({
-      ...snapOnMove(x, y, { w: 1, h: 1 }, { ...pileData, gap }),
+      ...snapOnMove(x, y, { w: 1, h: 1 }, { ...gridData }),
       w: 1,
       h: 1,
       active: true
@@ -87,14 +100,18 @@
   }
 
   let showItemName = false;
+  let timer = false;
 
   function hoverOverItem(event) {
+    clearTimeout(timer);
     showItemName = true;
     hoveredItem = get(event.detail.item.item.name);
   }
 
-  function hoverLeaveItem(event) {
-    showItemName = false;
+  function hoverLeaveItem() {
+    timer = setTimeout(() => {
+      showItemName = false;
+    }, 250);
   }
 
   onDestroy(() => {
@@ -132,21 +149,12 @@
 
   <main in:fade={{duration: 500}}>
 
-    <div class="item-piles-flexrow" style="margin-bottom: 0.25rem; align-items: center;">
-      <span style="font-size:1.25rem;">Vault</span>
-      {#if showItemName}
-        <span style="text-align: right;" transition:fade={{duration:100}}>{hoveredItem}</span>
-      {/if}
-    </div>
-
     <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}>
 
       <Grid bind:items={$items}
             bind:gridContainer={element}
             options={{
-              ...pileData,
-              bounds: true,
-              gap,
+              ...gridData,
               class: "item-piles-grid-background",
               activeClass: "item-piles-grid-item-active",
               previewClass: "item-piles-grid-item-preview",
@@ -166,11 +174,19 @@
 
     </DropZone>
 
-    <div class="item-piles-flexrow" style="margin-top: 0.5rem;">
+    <div class="item-piles-flexrow" style="margin-top: 0.25rem; align-items: center;">
+      <span style="text-align: right; visibility: {showItemName ? 'visible' : 'hidden'};" out:fade={{duration:250}}>{hoveredItem}</span>
+    </div>
 
-      <button type="button" class="item-piles-small-button">Withdraw</button>
+    <div class="item-piles-flexrow" style="margin-top: 0.25rem;">
 
-      <button type="button" class="item-piles-small-button">Deposit</button>
+      {#if gridData.canWithdraw}
+        <button type="button" class="item-piles-small-button">Withdraw</button>
+      {/if}
+
+      {#if gridData.canDeposit}
+        <button type="button" class="item-piles-small-button">Deposit</button>
+      {/if}
 
       <CurrencyList {currencies} options={{ reverse: true, abbreviation: false, imgSize: 18 }}/>
 
