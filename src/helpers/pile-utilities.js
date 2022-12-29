@@ -9,25 +9,25 @@ function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
   const flags = existing || (getProperty(inDocument, flag) ?? {});
   let data = foundry.utils.deepClone(flags);
-  if(flag === CONSTANTS.FLAGS.PILE){
+  if (flag === CONSTANTS.FLAGS.PILE) {
     data = migrateFlagData(inDocument, data);
   }
   return foundry.utils.mergeObject(defaultFlags, data);
 }
 
-export function migrateFlagData(document, data = false){
+export function migrateFlagData(document, data = false) {
 
   let flags = data || getProperty(document, CONSTANTS.FLAGS.PILE);
 
-  if(flags.type){
+  if (flags.type) {
     return flags;
   }
 
-  if(flags.isMerchant){
+  if (flags.isMerchant) {
     flags.type = CONSTANTS.PILE_TYPES.MERCHANT;
-  }else if(flags.isContainer){
+  } else if (flags.isContainer) {
     flags.type = CONSTANTS.PILE_TYPES.CONTAINER;
-  }else{
+  } else {
     flags.type = CONSTANTS.PILE_TYPES.PILE;
   }
 
@@ -184,7 +184,15 @@ export function getActorItemFilters(target, pileData = false) {
 export function cleanItemFilters(itemFilters) {
   return itemFilters ? foundry.utils.duplicate(itemFilters).map(filter => {
     filter.path = filter.path.trim();
-    filter.filters = Array.isArray(filter.filters) ? filter.filters : filter.filters.split(',').map(string => string.trim());
+    filter.filters = (Array.isArray(filter.filters) ? filter.filters : filter.filters.split(','))
+      .map(string => {
+        if (typeof string === "boolean") return string;
+        const str = string.trim();
+        if (str.toLowerCase() === "true" || str.toLowerCase() === "false") {
+          return str.toLowerCase() === "true";
+        }
+        return str;
+      });
     filter.filters = new Set(filter.filters)
     return filter;
   }) : [];
@@ -447,13 +455,13 @@ export async function updateItemPileData(target, flagData, tokenData) {
   return true;
 }
 
-export function cleanFlagData(flagData){
+export function cleanFlagData(flagData) {
   const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, CONSTANTS.PILE_DEFAULTS)));
   const toRemove = new Set(Object.keys(CONSTANTS.PILE_DEFAULTS).filter(key => !difference.has(key)));
-  if(flagData.enabled){
+  if (flagData.enabled) {
     toRemove.delete("type")
   }
-  for(const key of toRemove){
+  for (const key of toRemove) {
     delete flagData[key];
     flagData["-=" + key] = null;
   }
