@@ -195,6 +195,8 @@ CONSTANTS.HOOKS = {
     PRE_CALC_TRADE: module`preCalculateTradeItems`,
     PRE_TRADE: module`preTradeItems`,
     TRADE: module`tradeItems`,
+    PRE_GIVE: module`preGiveItem`,
+    GIVE: module`giveItem`,
   },
   CURRENCY: {
     PRE_TRANSFER: module`preTransferCurrencies`,

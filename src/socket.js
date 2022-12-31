@@ -167,6 +167,10 @@ export default class ItemPileSocket {
   }
 
   static executeAsGM(handler, ...args) {
+    if (!Helpers.isGMConnected()) {
+      Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.NoGMsConnectedAction", { action: handler }), true);
+      return false;
+    }
     return this._socket.executeAsGM(handler, ...args);
   }
 

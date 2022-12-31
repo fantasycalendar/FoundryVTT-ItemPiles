@@ -1,12 +1,23 @@
 <script>
 
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
-  import CustomDialog from "../../components/CustomDialog.svelte";
-  import * as SharingUtilities from "../../../helpers/sharing-utilities.js";
+  import VaultAccessEditor from "../../editors/vault-access-editor/vault-access-editor.js";
 
   export let pileData;
   export let pileActor;
+
+  async function showVaultAccessEditor() {
+    const data = pileData.vaultAccess || [];
+    return VaultAccessEditor.show(
+      data,
+      {
+        id: `vault-access-editor-item-pile-config-${pileActor.id}`,
+        title: game.i18n.format("ITEM-PILES.Applications.VaultAccessEditor.Title", { actor_name: pileActor.name }),
+      }
+    ).then((result) => {
+      pileData.vaultAccess = result || [];
+    });
+  }
 
 </script>
 
@@ -56,8 +67,17 @@
   </div>
 </div>
 
-<style lang="scss">
+<div class="form-group">
+  <label style="flex:4;">
+    <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Access")}</span>
+    <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.AccessExplanation")}</p>
+  </label>
+  <button style="flex:2;" type="button" on:click={() => showVaultAccessEditor()}>
+    {localize("ITEM-PILES.Applications.ItemPileConfig.Vault.ManageAccess")}
+  </button>
+</div>
 
+<style lang="scss">
   .item-piles-grid-columns {
     display: flex;
     flex-direction: column;

@@ -38,7 +38,7 @@
     <footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem; flex: 0;">
       <button type="button" disabled={originalText === text} on:click|once={requestSubmit}>
         <i class="fas fa-download"></i>
-        {localize("Submit")}
+        {localize("Save")}
       </button>
       <button type="button" on:click={() => { application.close() }}>
         <i class="fas fa-times"></i>

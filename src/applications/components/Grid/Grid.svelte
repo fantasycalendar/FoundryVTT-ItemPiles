@@ -16,7 +16,7 @@
     enabledRows: null,
     gap: 10,
     gridSize: 40,
-    readOnly: false,
+    canOrganize: false,
     backgroundGrid: false,
     class: "",
     activeClass: "",

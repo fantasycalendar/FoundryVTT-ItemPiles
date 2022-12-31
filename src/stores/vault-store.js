@@ -2,7 +2,9 @@ import ItemPileStore from "./item-pile-store.js";
 import { get, writable } from "svelte/store";
 import CONSTANTS from "../constants/constants.js";
 import { PileItem } from "./pile-item.js";
-import { getOwnedCharacters } from "../helpers/utilities.js";
+import * as Utilities from "../helpers/utilities.js";
+import PrivateAPI from "../API/private-api.js";
+import ItemPileSocket from "../socket.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -59,10 +61,25 @@ export class VaultStore extends ItemPileStore {
       enabledCols = Math.min(enabledCols, pileData.cols);
       enabledRows = Math.min(enabledRows, pileData.rows);
 
-      const ownedCharacters = new Set(getOwnedCharacters().map(actor => actor.id));
-      const access = pileData.vaultAccess.filter(access => {
-        return access.id === game.user.id || ownedCharacters.has(access.id);
+      const vaultAccess = pileData.vaultAccess.filter(access => {
+        const doc = fromUuidSync(access.uuid);
+        return doc?.isOwner;
       });
+
+      const access = vaultAccess.reduce((acc, access) => {
+        acc.canOrganize = acc.canOrganize || access.organize;
+        acc.canWithdrawItems = acc.canWithdrawItems || access.items.withdraw;
+        acc.canDepositItems = acc.canDepositItems || access.items.deposit;
+        acc.canWithdrawCurrencies = acc.canWithdrawCurrencies || access.currencies.withdraw;
+        acc.canDepositCurrencies = acc.canDepositCurrencies || access.currencies.deposit;
+        return acc;
+      }, {
+        canOrganize: this.actor.isOwner,
+        canWithdrawItems: this.actor.isOwner,
+        canDepositItems: this.actor.isOwner,
+        canWithdrawCurrencies: this.actor.isOwner,
+        canDepositCurrencies: this.actor.isOwner
+      })
 
       return {
         freeSpaces: Math.max(0, (enabledCols * enabledRows) - items.length),
@@ -71,17 +88,15 @@ export class VaultStore extends ItemPileStore {
         cols: pileData.cols,
         rows: pileData.rows,
         gridSize: pileData.gridSize,
-        readOnly: !(game.user.isGM || access.some(access => access.organize)),
-        canWithdraw: this.recipient && (game.user.isGM || access.some(access => access.withdraw)),
-        canDeposit: this.recipient && (game.user.isGM || access.some(access => access.deposit)),
+        ...access,
         gap: 4
       }
     })
   }
 
   updateGrid(items) {
-    if (!game.user.isGM && this.actor.permission[game.user.id] !== CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) return;
-    const updates = items.map(item => {
+
+    const itemsToUpdate = items.map(item => {
       const transform = get(item.transform);
       return {
         _id: item.id,
@@ -89,7 +104,19 @@ export class VaultStore extends ItemPileStore {
         [CONSTANTS.FLAGS.ITEM + ".y"]: transform.y
       }
     });
-    return this.actor.updateEmbeddedDocuments("Item", updates);
+
+    if (!itemsToUpdate.length) return;
+
+    const actorUuid = Utilities.getUuid(this.actor);
+    if (this.actor.isOwner) {
+      return PrivateAPI._commitActorChanges(actorUuid, {
+        itemsToUpdate,
+      })
+    }
+
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, actorUuid, {
+      itemsToUpdate,
+    });
   }
 
   refreshItems() {

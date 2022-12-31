@@ -27,7 +27,7 @@
 
   export let store = new VaultStore(application, actor, recipient);
 
-  const currencies = store.currencies;
+  const currencies = store.allCurrencies;
   const pileDataStore = store.pileData;
   const gridDataStore = store.gridData;
   const items = store.gridItems;
@@ -36,7 +36,7 @@
   $: gridData = $gridDataStore;
 
   const dragPosition = writable({});
-  let hoveredItem = "aaaaaaaa";
+  let hoveredItem = "";
   let element;
 
   async function onDropData(data) {
@@ -120,23 +120,33 @@
 
   function rightClickItem(event) {
     setTimeout(() => {
+
+      const items = []
+
+      if (gridData.canWithdrawItems) {
+        items.push({
+          icon: 'fas fa-hand', label: "Take", onclick: () => {
+            console.log('wat');
+          }
+        });
+      }
+
+      if (pileData.canInspectItems || game.user.isGM) {
+        items.push({
+          icon: 'fas fa-eye', label: "Inspect", onclick: () => {
+            event.detail.item.item.preview();
+          }
+        });
+      }
+
+      if (!items.length) return;
+
       TJSContextMenu.create({
         x: event.detail.x,
         y: event.detail.y,
         zIndex: 1000000000000,
-        items: [
-          {
-            icon: 'fas fa-hand', label: "Take", onclick: () => {
-              console.log('wat');
-            }
-          },
-          {
-            icon: 'fas fa-eye', label: "Inspect", onclick: () => {
-              event.detail.item.item.preview();
-            }
-          }
-        ],
-        transitionOptions: { duration: 0 }
+        transitionOptions: { duration: 0 },
+        items
       })
     })
   }
@@ -148,6 +158,15 @@
 <ApplicationShell bind:elementRoot>
 
   <main in:fade={{duration: 500}}>
+
+    <div class="item-piles-flexrow" style="align-items: center; margin-bottom: 0.25rem;">
+      <span style="font-size: 1.5rem;">Vault</span>
+      {#if store.recipient}
+        <div class="item-piles-flexcol" style="text-align: right; flex: 1 0 auto;">
+          <i>Viewing as {store.recipient.name}</i>
+        </div>
+      {/if}
+    </div>
 
     <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}>
 
@@ -174,17 +193,13 @@
 
     </DropZone>
 
-    <div class="item-piles-flexrow" style="margin-top: 0.25rem; align-items: center;">
-      <span style="text-align: right; visibility: {showItemName ? 'visible' : 'hidden'};" out:fade={{duration:250}}>{hoveredItem}</span>
-    </div>
-
     <div class="item-piles-flexrow" style="margin-top: 0.25rem;">
 
-      {#if gridData.canWithdraw}
+      {#if gridData.canWithdrawCurrencies}
         <button type="button" class="item-piles-small-button">Withdraw</button>
       {/if}
 
-      {#if gridData.canDeposit}
+      {#if gridData.canDepositCurrencies}
         <button type="button" class="item-piles-small-button">Deposit</button>
       {/if}
 

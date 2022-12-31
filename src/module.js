@@ -1,6 +1,6 @@
 import "./styles/styles.scss";
-import CONSTANTS from "./constants/constants.js";
 
+import CONSTANTS from "./constants/constants.js";
 import registerUIOverrides from "./foundry-ui-overrides.js";
 import registerLibwrappers from "./libwrapper.js";
 import { registerSettings, checkSystem, patchCurrencySettings, applySystemSpecificStyles } from "./settings.js";
@@ -12,6 +12,7 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import * as Helpers from "./helpers/helpers.js";
 import runMigrations from "./migrations.js"
+import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -51,12 +52,12 @@ Hooks.once("ready", () => {
       }
 
       if (game.modules.get('foundryvtt-simple-calendar')?.active && game.modules.get("foundryvtt-simple-calendar").version === "v1.3.75") {
-        throw Helpers.custom_error(`Simple Calendar version 1.3.75 is installed, but Item Piles requires version 2.0.0 or above. The author made a mistake, and you will need to reinstall the Simple Calendar module.`)
+        throw Helpers.custom_error("Simple Calendar version 1.3.75 is installed, but Item Piles requires version 2.0.0 or above. The author made a mistake, and you will need to reinstall the Simple Calendar module.")
       }
     }
 
     if (!Helpers.isGMConnected()) {
-      Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
+      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoGMsConnected"), true)
     }
 
     registerHotkeysPost();
@@ -79,7 +80,9 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
     applySystemSpecificStyles();
   }, 500);
 
-  game.itempiles.API.renderItemPileInterface(game.actors.getName("Item Pile"));
+  // game.itempiles.API.renderItemPileInterface(game.actors.getName("Item Pile"));
+
+  // ItemPileConfig.show(game.actors.getName("Item Pile"))
 
 });
 

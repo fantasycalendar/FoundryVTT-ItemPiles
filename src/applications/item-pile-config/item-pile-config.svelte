@@ -83,7 +83,7 @@
               promises.push(MerchantApp.getActiveApp(pileActor?.token?.id).close());
             }
             break;
-            
+
           case CONSTANTS.PILE_TYPES.VAULT:
             apps = VaultApp.getActiveApps(pileActor.id)
               .concat(VaultApp.getActiveApps(pileActor?.token?.id));
@@ -130,11 +130,14 @@
         label: "ITEM-PILES.Applications.ItemPileConfig.Main.Title",
         highlight: !$pileEnabled
       },
-      { value: "othersettings", label: "ITEM-PILES.Applications.ItemPileConfig.Other.Title" }
+      {
+        value: "othersettings",
+        label: "ITEM-PILES.Applications.ItemPileConfig.Other.Title"
+      }
     ]
   }
 
-  let activeTab = "mainsettings";
+  let activeTab = "othersettings";
 
 </script>
 
@@ -149,59 +152,63 @@
 
     <section class="tab-body">
 
-      {#if activeTab === 'mainsettings'}
+      <div class="tab">
 
-        <MainSettings bind:pileData {pileActor} {pileEnabled}/>
+        {#if activeTab === 'mainsettings'}
 
-      {/if}
-
-      {#if activeTab === "othersettings"}
-
-        <div class="form-group">
-          <label style="flex:4;">
-            <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.Type")}</span>
-            <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.TypeExplanation")}</p>
-          </label>
-          <select style="flex:4;" bind:value={pileData.type}>
-            {#each Object.values(CONSTANTS.PILE_TYPES) as type}
-              <option value={type}>
-                {localize(`ITEM-PILES.Types.${type}`)}
-              </option>
-            {/each}
-          </select>
-        </div>
-
-        <hr>
-
-        {#if pileData.type === CONSTANTS.PILE_TYPES.MERCHANT}
-
-          <MerchantSettings bind:pileData {pileActor}/>
-
-        {:else if pileData.type === CONSTANTS.PILE_TYPES.PILE || pileData.type === CONSTANTS.PILE_TYPES.CONTAINER}
-
-          {#if pileData.type === CONSTANTS.PILE_TYPES.PILE}
-
-            <ItemPileSettings bind:pileData/>
-
-          {/if}
-
-          {#if pileData.type === CONSTANTS.PILE_TYPES.CONTAINER}
-
-            <ContainerSettings bind:pileData/>
-
-          {/if}
-
-          <hr>
-
-          <SharingSettings bind:pileData {pileActor}/>
-
-        {:else if pileData.type === CONSTANTS.PILE_TYPES.VAULT}
-
-          <VaultSettings bind:pileData {pileActor}/>
+          <MainSettings bind:pileData {pileActor} {pileEnabled}/>
 
         {/if}
 
-      {/if}
+        {#if activeTab === "othersettings"}
+
+          <div class="form-group">
+            <label style="flex:4;">
+              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.Type")}</span>
+              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.TypeExplanation")}</p>
+            </label>
+            <select style="flex:4;" bind:value={pileData.type}>
+              {#each Object.values(CONSTANTS.PILE_TYPES) as type}
+                <option value={type}>
+                  {localize(`ITEM-PILES.Types.${type}`)}
+                </option>
+              {/each}
+            </select>
+          </div>
+
+          <hr>
+
+          {#if pileData.type === CONSTANTS.PILE_TYPES.MERCHANT}
+
+            <MerchantSettings bind:pileData {pileActor}/>
+
+          {:else if pileData.type === CONSTANTS.PILE_TYPES.PILE || pileData.type === CONSTANTS.PILE_TYPES.CONTAINER}
+
+            {#if pileData.type === CONSTANTS.PILE_TYPES.PILE}
+
+              <ItemPileSettings bind:pileData/>
+
+            {/if}
+
+            {#if pileData.type === CONSTANTS.PILE_TYPES.CONTAINER}
+
+              <ContainerSettings bind:pileData/>
+
+            {/if}
+
+            <hr>
+
+            <SharingSettings bind:pileData {pileActor}/>
+
+          {:else if pileData.type === CONSTANTS.PILE_TYPES.VAULT}
+
+            <VaultSettings bind:pileData {pileActor}/>
+
+          {/if}
+
+        {/if}
+
+      </div>
 
     </section>
 

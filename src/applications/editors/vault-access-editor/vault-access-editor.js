@@ -1,22 +1,16 @@
-import PriceModifiersEditorShell from './price-modifiers-editor-shell.svelte';
+import VaultAccessEditorShell from './vault-access-editor-shell.svelte';
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 
-export default class PriceModifiersEditor extends SvelteApplication {
+export default class VaultAccessEditor extends SvelteApplication {
 
-  constructor(priceModifiers, options) {
-
-    priceModifiers = priceModifiers.map(data => {
-      data.actor = fromUuidSync(data.actorUuid);
-      if (!data.actor) return false;
-      return data;
-    }).filter(Boolean);
+  constructor(vaultAccess, options) {
 
     super({
       svelte: {
-        class: PriceModifiersEditorShell,
+        class: VaultAccessEditorShell,
         target: document.body,
         props: {
-          priceModifiers
+          vaultAccess
         }
       },
       close: () => this.options.resolve?.(false),
@@ -26,7 +20,6 @@ export default class PriceModifiersEditor extends SvelteApplication {
 
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      title: game.i18n.localize("ITEM-PILES.Applications.PriceModifiersEditor.Title"),
       width: 600,
       height: "auto",
       classes: ["item-piles-app"]

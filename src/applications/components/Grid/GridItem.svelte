@@ -23,6 +23,9 @@
     w: transform.w,
     h: transform.h,
   }, options);
+  $: {
+    if (!active) $previewTransform = $transformStore;
+  }
 
   $: style = styleFromObject({
     "position": "absolute",
@@ -61,11 +64,11 @@
 
   function moveStart(event) {
 
-    if (options.readOnly) return;
-
     if (event.button === 2) {
       return rightClick(event);
     }
+
+    if (!options.canOrganize) return;
 
     // If not left mouse, skip
     if (event.button !== 0) return;
@@ -125,17 +128,22 @@
   }
 
   function moveEnd() {
-    active = false;
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerup', moveEnd);
 
     const finalTransform = get(previewTransform);
 
-    if (foundry.utils.isEmpty(finalTransform)) return;
+    active = false;
+
+    if (foundry.utils.isEmpty(finalTransform)
+      || (finalTransform.x === transform.x && finalTransform.y === transform.y)
+    ) {
+      return;
+    }
 
     if (collisions.length) {
-      const offset = collisions.reduce((acc, item) => {
-        const trans = get(item.transform);
+      const offset = collisions.reduce((acc, collision) => {
+        const trans = get(collision.transform);
         if (trans.x < acc.x) acc.x = trans.x;
         if (trans.y < acc.y) acc.y = trans.y;
         return acc;
@@ -155,8 +163,6 @@
       trans.y = finalTransform.y;
       return trans;
     });
-
-    previewTransform.set(transform)
 
     dispatch("itemchange", { items: collisions.concat(item) })
 

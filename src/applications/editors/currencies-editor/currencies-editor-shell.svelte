@@ -38,13 +38,14 @@
 
     <p class="small">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallAttributes")}</p>
 
-    <p class="small item-piles-bottom-divider">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallItems")}</p>
+    <p
+      class="small item-piles-bottom-divider">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallItems")}</p>
 
     <CurrencyList {store}/>
 
     <footer>
       <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("ITEM-PILES.Applications.CurrenciesEditor.Submit")}
+        <i class="far fa-save"></i> {localize("Save")}
       </button>
       <button type="button" on:click|once={() => { application.close(); }}>
         <i class="far fa-times"></i> { localize("Cancel") }
@@ -60,14 +61,14 @@
 
   form {
     padding: 0 0.25rem;
-    position:relative;
+    position: relative;
   }
 
   footer {
     border-top: 1px solid rgba(0, 0, 0, 0.5);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    display:flex;
+    display: flex;
   }
 
   .small {

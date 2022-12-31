@@ -756,12 +756,19 @@ export default class PrivateAPI {
 
   }
 
-  static async _commitActorChanges(actorUuid, actorUpdates, itemsToUpdate, itemsToDelete, itemsToCreate) {
+  static async _commitActorChanges(actorUuid, {
+    actorUpdates = {},
+    itemsToUpdate = [],
+    itemsToDelete = [],
+    itemsToCreate = []
+  } = {}) {
     const actor = Utilities.getActor(actorUuid);
-    await actor.update(actorUpdates);
-    await actor.updateEmbeddedDocuments("Item", itemsToUpdate);
-    await actor.deleteEmbeddedDocuments("Item", itemsToDelete);
-    const createdItems = await actor.createEmbeddedDocuments("Item", itemsToCreate);
+    if (!foundry.utils.isEmpty(actorUpdates)) {
+      await actor.update(actorUpdates);
+    }
+    if (itemsToUpdate.length) await actor.updateEmbeddedDocuments("Item", itemsToUpdate);
+    if (itemsToDelete.length) await actor.deleteEmbeddedDocuments("Item", itemsToDelete);
+    const createdItems = itemsToCreate.length ? await actor.createEmbeddedDocuments("Item", itemsToCreate) : [];
     return createdItems.map(item => item.toObject());
   }
 
@@ -1411,6 +1418,8 @@ export default class PrivateAPI {
       const sourceUuid = Utilities.getUuid(dropData.source);
       const targetUuid = Utilities.getUuid(dropData.target);
 
+      if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, dropData) === false) return;
+
       if ((!user || !user?.active) && game.user.isGM) {
         Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
           source_actor_name: dropData.source.name, target_actor_name: dropData.target.name, item_name: item.name
@@ -1520,6 +1529,9 @@ export default class PrivateAPI {
     });
 
     if (accepted) {
+      Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, {
+        sourceActor, targetActor, item: itemData, user: game.user.get(userId),
+      });
       await PrivateAPI._addItems(targetUuid, [itemData], game.user.id);
     }
 

@@ -34,9 +34,11 @@
       "DropNoToken": "You don't have a token on this scene, so you can't drop any items here."
     },
     "Warnings": {
+      "NoGMsConnected": "WARNING - No GMs connected - Item Piles requires a GM to be connected for players to be able to utilize most of the module's features.",
       "GiveItemNoGM": "There is no GM active to receive you giving this item.",
       "GiveItemDeclined": "{user_name} declined your item offer.",
-      "NoPlayersActive": "No players are active to do this action"
+      "NoPlayersActive": "No players are active to do this action",
+      "NoGMsConnectedAction": "WARNING - Could not execute \"{action}\" because no GMs are active."
     },
     "Inspect": {
       "Title": "Inspecting Pile Contents",
@@ -277,8 +279,7 @@
         "Exchange": "Exchange",
         "Data": "Data",
         "Icon": "Icon",
-        "AddNew": "Add new currency",
-        "Submit": "Submit currencies"
+        "AddNew": "Add new currency"
       },
       "ItemEditor": {
         "Title": "Item Piles Item Editor: {item_name}",
@@ -331,24 +332,21 @@
         "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
         "Filters": "Filters",
         "Path": "Attribute path",
-        "AddNew": "Add new filter",
-        "Submit": "Submit filters"
+        "AddNew": "Add new filter"
       },
       "SimilaritiesEditor": {
         "Title": "Item Piles Similarities Editor",
         "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
         "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"system.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
         "Path": "Attribute path",
-        "AddNew": "Add new attribute path",
-        "Submit": "Submit item similarities"
+        "AddNew": "Add new attribute path"
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "Item Type Price Modifiers Editor",
         "TitleActor": "Item Type Price Modifiers Editor: {actor_name}",
         "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific item types. The \"Override\" setting means that it overrides the merchant's normal price modifiers.",
         "ItemType": "Item Type",
-        "Override": "Override",
-        "Submit": "Submit price modifiers"
+        "Override": "Override"
       },
       "PriceModifiersEditor": {
         "Title": "Item Piles Price Modifiers Editor",
@@ -356,8 +354,7 @@
         "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors. The \"Override\" setting means that it overrides the merchant's normal price modifiers, including item-type specific price modifiers.",
         "DragDrop": "Drag and drop an actor to add it to the list",
         "Actor": "Actor",
-        "Override": "Override",
-        "Submit": "Submit price modifiers"
+        "Override": "Override"
       },
       "ItemPileConfig": {
         "Title": "Item Pile Configuration: {actor_name}",
@@ -484,8 +481,15 @@
           "EnableExpansion": "Enable Expansion Items",
           "EnableExpansionExplanation": "With this enabled, items that are configured as vault expanders will expand the vault's available space.",
           "BaseExpansion": "Base Expansion",
-          "BaseExpansionExplanation": "This is how many columns and rows are enabled by default without any expansion items"
+          "BaseExpansionExplanation": "This is how many columns and rows are enabled by default without any expansion items.",
+          "Access": "Character & Player Access",
+          "AccessExplanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access.",
+          "ManageAccess": "Manage Access"
         }
+      },
+      "VaultAccessEditor": {
+        "Title": "Vault Access Editor: {actor_name}",
+        "Explanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access."
       },
       "PricePresetEditor": {
         "Title": "Price Presets Editor",

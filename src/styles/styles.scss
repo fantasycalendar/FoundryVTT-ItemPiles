@@ -197,13 +197,13 @@
   }
 
   &-bottom-divider {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+    border-bottom: 1px solid var(--item-piles-border-light-primary);
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
   }
 
   &-top-divider {
-    border-top: 1px solid rgba(0, 0, 0, 0.35);
+    border-top: 1px solid var(--item-piles-border-light-primary);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
   }
