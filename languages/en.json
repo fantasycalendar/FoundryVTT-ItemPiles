@@ -225,23 +225,37 @@
     "Applications": {
       "DropItem": {
         "Title": "Dropping Item",
-        "Dropping": "You're dropping: {item_name}",
-        "ExistingPiles": "You're adding this item to the item pile \"{target_name}\".",
-        "QuantityToDrop": "You have {quantity} of this item, how many do you want to drop?",
-        "AddToPile": "Add to pile",
-        "NewPile": "Create new pile"
+        "Header": "You're dropping: {item_name}",
+        "Content": "You're adding this item to the item pile \"{target_name}\".",
+        "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to drop?",
+        "Submit": "Add to pile",
+        "SubmitNoTarget": "Create new pile"
       },
       "GiveItem": {
         "Title": "Giving Item",
-        "Giving": "You're giving: {item_name}",
-        "TargetActor": "Do you want to give this item to \"{target_name}\"?",
-        "QuantityToGive": "You have {quantity} of this item, how many do you want to give away?",
-        "Give": "Give"
+        "Header": "You're giving: {item_name}",
+        "Content": "Do you want to give this item to \"{target_name}\"?",
+        "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to give away?",
+        "Submit": "Give"
+      },
+      "DepositItem": {
+        "Title": "Deposit Item",
+        "Header": "You're depositing: {item_name}",
+        "Content": "Do you want to deposit this item into \"{target_name}\"?",
+        "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to deposit?",
+        "Submit": "Deposit"
+      },
+      "WithdrawItem": {
+        "Title": "Withdraw Item",
+        "Header": "You're withdrawing: {item_name}",
+        "Content": "Do you want to withdraw this item from \"{target_name}\"?",
+        "ContentMultipleQuantity": "There's {quantity} of this item, how many do you want to withdraw?",
+        "Submit": "Withdraw"
       },
       "DropCurrencies": {
         "Title": "Dropping Currencies",
         "Player": "You can drop the following currencies into this item pile:",
-        "GM": "As a GM, you can add currencies to this item pile:",
+        "GM": "As a GM, you can update the currencies this on item pile:",
         "NoCurrency": "{actor_name} has no valid currencies...",
         "AddToPile": "Add to pile"
       },

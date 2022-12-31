@@ -133,14 +133,14 @@ export class PileItem extends PileBaseItem {
   filter() {
     const name = get(this.name).trim();
     const search = get(this.store.search).trim();
-    const presentFromTheSTart = get(this.presentFromTheStart);
+    const presentFromTheStart = get(this.presentFromTheStart);
     const quantity = get(this.quantity);
-    if (quantity === 0 && !presentFromTheSTart) {
+    if (quantity === 0 && !presentFromTheStart) {
       this.filtered.set(true);
     } else if (search) {
       this.filtered.set(!name.toLowerCase().includes(search.toLowerCase()));
     } else {
-      this.filtered.set(!presentFromTheSTart && quantity === 0);
+      this.filtered.set(!presentFromTheStart && quantity === 0);
     }
   }
 
@@ -222,6 +222,7 @@ export class PileAttribute extends PileBaseItem {
       if (hasProperty(data, this.path)) {
         this.quantity.set(Number(getProperty(data, this.path) ?? 0));
         this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
+        this.store.refreshItems();
       }
     });
 
@@ -236,14 +237,14 @@ export class PileAttribute extends PileBaseItem {
   filter() {
     const name = get(this.name);
     const search = get(this.store.search);
-    const presentFromTheSTart = get(this.presentFromTheStart);
+    const presentFromTheStart = get(this.presentFromTheStart);
     const quantity = get(this.quantity);
-    if (quantity === 0 && !presentFromTheSTart && !this.store.editQuantities) {
+    if (quantity === 0 && !presentFromTheStart) {
       this.filtered.set(true);
     } else if (search) {
       this.filtered.set(!name.toLowerCase().includes(search.toLowerCase()));
     } else {
-      this.filtered.set(!presentFromTheSTart && quantity === 0 && !this.store.editQuantities);
+      this.filtered.set(!presentFromTheStart && quantity === 0);
     }
   }
 

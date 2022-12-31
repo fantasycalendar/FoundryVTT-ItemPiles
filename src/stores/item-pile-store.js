@@ -7,6 +7,7 @@ import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import * as Helpers from "../helpers/helpers.js";
 import { InterfaceTracker } from "../socket.js";
 import { PileAttribute, PileItem } from "./pile-item.js";
+import DropCurrencyDialog from "../applications/dialogs/drop-currency-dialog/drop-currency-dialog.js";
 
 const __STORES__ = new Map();
 
@@ -322,6 +323,38 @@ export default class ItemPileStore {
 
     this.refreshItems();
 
+  }
+
+  async addCurrency(recipient) {
+
+    const result = recipient
+      ? await DropCurrencyDialog.show(recipient, this.actor)
+      : await DropCurrencyDialog.show(this.actor, false, {
+        unlimitedCurrencies: true,
+        existingCurrencies: PileUtilities.getActorCurrencies(this.actor),
+        button: "Submit"
+      });
+
+    if (!result) return;
+
+    if (!this.recipient) {
+
+      if (!foundry.utils.isEmpty(result.attributes)) {
+        await game.itempiles.API.setAttributes(this.actor, result.attributes, { interactionId: this.interactionId })
+      }
+      if (result.items.length) {
+        await game.itempiles.API.addItems(this.actor, result.items, { interactionId: this.interactionId })
+      }
+
+    } else {
+
+      if (!foundry.utils.isEmpty(result.attributes)) {
+        await game.itempiles.API.transferAttributes(this.recipient, this.actor, result.attributes, { interactionId: this.interactionId })
+      }
+      if (result.items.length) {
+        await game.itempiles.API.transferItems(this.recipient, this.actor, result.items, { interactionId: this.interactionId })
+      }
+    }
   }
 
   takeAll() {

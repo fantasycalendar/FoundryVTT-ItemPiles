@@ -5,6 +5,7 @@ import ItemPileSocket from "../socket.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
 import TradeAPI from "./trade-api.js";
+import { isItemPileLootable } from "../helpers/pile-utilities.js";
 
 export default class ChatAPI {
 
@@ -120,7 +121,7 @@ export default class ChatAPI {
    * @returns {Promise}
    */
   static async _outputTransferItem(source, target, items, userId, interactionId) {
-    if (!PileUtilities.isValidItemPile(source)) return;
+    if (!PileUtilities.isItemPileLootable(source)) return;
     if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
     const itemData = await this._formatItemData(items);
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, [], userId, interactionId);
@@ -137,7 +138,7 @@ export default class ChatAPI {
    * @returns {Promise}
    */
   static async _outputTransferCurrency(source, target, currencies, userId, interactionId) {
-    if (!PileUtilities.isValidItemPile(source)) return;
+    if (!PileUtilities.isItemPileLootable(source)) return;
     if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
     const currencyData = this._formatCurrencyData(source, currencies);
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, [], currencyData, userId, interactionId);
@@ -170,7 +171,7 @@ export default class ChatAPI {
    * @returns {Promise}
    */
   static async _outputTransferEverything(source, target, items, currencies, userId, interactionId) {
-    if (!PileUtilities.isValidItemPile(source)) return;
+    if (!PileUtilities.isItemPileLootable(source)) return;
     if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
     const itemData = await this._formatItemData(items);
     const currencyData = this._formatCurrencyData(source, currencies);
@@ -178,7 +179,7 @@ export default class ChatAPI {
   }
 
   static _outputSplitItemPileInventory(source, pileDeltas, actorDeltas, userId) {
-    if (!PileUtilities.isValidItemPile(source)) return;
+    if (!PileUtilities.isItemPileLootable(source)) return;
     if (game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_CHAT_MESSAGE, source.uuid, pileDeltas, actorDeltas, userId);
   }

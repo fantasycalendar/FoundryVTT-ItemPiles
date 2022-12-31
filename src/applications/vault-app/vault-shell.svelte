@@ -18,6 +18,7 @@
   import PrivateAPI from "../../API/private-api.js";
 
   import { VaultStore } from "../../stores/vault-store.js";
+  import DropCurrencyDialog from "../dialogs/drop-currency-dialog/drop-currency-dialog.js";
 
   const { application } = getContext('external');
 
@@ -65,21 +66,12 @@
 
     const vaultExpander = getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
 
-    if (!store.hasSimilarItem(itemData) && !vaultExpander) {
-
-      if (!gridData?.freeSpaces) {
-        Helpers.custom_warning(`This vault is full!`, true)
-        return false;
-      }
-
-      const flags = PileUtilities.getItemFlagData(itemData);
-      setProperty(flags, "x", x);
-      setProperty(flags, "y", y);
-      setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
-
+    if (!store.hasSimilarItem(itemData) && !vaultExpander && !gridData?.freeSpaces) {
+      Helpers.custom_warning(`This vault is full!`, true)
+      return false;
     }
 
-    return PrivateAPI._dropData(canvas, data, { target: store.actor });
+    return PrivateAPI._dropData(canvas, data, { target: store.actor, gridPosition: { x, y } });
 
   }
 
@@ -126,7 +118,7 @@
       if (gridData.canWithdrawItems) {
         items.push({
           icon: 'fas fa-hand', label: "Take", onclick: () => {
-            console.log('wat');
+            event.detail.item.item.take();
           }
         });
       }
@@ -203,7 +195,14 @@
         <button type="button" class="item-piles-small-button">Deposit</button>
       {/if}
 
-      <CurrencyList {currencies} options={{ reverse: true, abbreviation: false, imgSize: 18 }}/>
+      <CurrencyList {currencies} options={{ reverse: true, abbreviation: false, imgSize: 18 }}
+                    style="align-items: center;">
+        {#if gridData.canEditCurrencies}
+          <a style="order:-1; display:flex; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
+            <i class="fas fa-cog"></i>
+          </a>
+        {/if}
+      </CurrencyList>
 
     </div>
 

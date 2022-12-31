@@ -61,6 +61,12 @@ export function isItemPileContainer(target, data = false) {
   return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER;
 }
 
+export function isItemPileLootable(target, data = false) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor, data);
+  return targetActor && pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.PILE || pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER;
+}
+
 export function isItemPileVault(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);

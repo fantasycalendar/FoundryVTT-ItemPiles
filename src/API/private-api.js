@@ -516,7 +516,7 @@ export default class PrivateAPI {
     const targetActor = Utilities.getActor(targetUuid);
 
     const transaction = new Transaction(targetActor);
-    await transaction.appendActorChanges(attributes);
+    await transaction.appendActorChanges(attributes, { set: true });
     const { actorUpdates } = transaction.prepare();
 
     const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_SET, targetActor, actorUpdates, interactionId);
@@ -1300,9 +1300,11 @@ export default class PrivateAPI {
    * @param {canvas} canvas
    * @param {Object} data
    * @param {Actor/Token/TokenDocument/Boolean}[target=false]
+   * @param {Object/Boolean}[gridPosition=false]
+   * @param {String/Boolean}[interactionId=false]
    * @return {Promise/Boolean}
    */
-  static async _dropData(canvas, data, { target = false } = {}) {
+  static async _dropData(canvas, data, { target = false, gridPosition = false, interactionId = false } = {}) {
 
     if (data.type !== "Item") return false;
 
@@ -1315,10 +1317,15 @@ export default class PrivateAPI {
     }
 
     const dropData = {
-      source: false, target: target, itemData: {
-        item: itemData, quantity: 1
-      }, position: false
-    }
+      source: false,
+      target: target,
+      itemData: {
+        item: itemData, quantity: 1,
+      },
+      position: false,
+      interactionId,
+      gridPosition
+    };
 
     dropData.source = item.parent;
 
@@ -1330,8 +1337,7 @@ export default class PrivateAPI {
     if (pre_drop_determined_hook === false) return false;
 
     let droppableDocuments = [];
-    let x;
-    let y;
+    let x, y;
 
     if (dropData.target) {
 
@@ -1365,7 +1371,12 @@ export default class PrivateAPI {
     const droppingItem = canDropItems && (droppableItemPiles.length || (dropData.position && !droppableNormalTokens.length));
     const givingItem = canGiveItems && droppableNormalTokens.length && !droppableItemPiles.length;
 
-    if (droppingItem) {
+    const itemPileIsVault = PileUtilities.isItemPileVault(droppableItemPiles[0]);
+
+    if (itemPileIsVault) {
+      dropData.target = droppableItemPiles[0];
+      return this._depositItem(dropData);
+    } else if (droppingItem) {
       dropData.target = droppableItemPiles[0];
       return this._dropItem(dropData);
     } else if (givingItem) {
@@ -1374,6 +1385,37 @@ export default class PrivateAPI {
     }
 
     return false;
+
+  }
+
+  static async _depositItem(dropData) {
+
+    if (dropData.source === dropData.target) return;
+
+    const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
+    if (!validItem) return;
+    dropData.itemData.item = validItem;
+
+    const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+
+    if (Utilities.canItemStack(dropData.itemData.item)) {
+      const quantity = await DropItemDialog.show(item, dropData.target, {
+        localizationTitle: "DepositItem"
+      });
+      Utilities.setItemQuantity(dropData.itemData.item, quantity);
+      dropData.itemData.quantity = quantity;
+    } else {
+      dropData.itemData.quantity = 1;
+    }
+
+    setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM + ".x", dropData.gridPosition.x);
+    setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM + ".y", dropData.gridPosition.y);
+
+    if (dropData.source) {
+      return game.itempiles.API.transferItems(dropData.source, dropData.target, [dropData.itemData], { interactionId: dropData.interactionId })
+    }
+
+    return game.itempiles.API.addItems(dropData.source, [dropData.itemData], { interactionId: dropData.interactionId })
 
   }
 
@@ -1413,7 +1455,9 @@ export default class PrivateAPI {
       const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
 
       if (Utilities.canItemStack(dropData.itemData.item)) {
-        const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
+        const quantity = await DropItemDialog.show(item, dropData.target.actor, {
+          localizationTitle: "GiveItem"
+        });
         Utilities.setItemQuantity(dropData.itemData.item, quantity);
         dropData.itemData.quantity = quantity;
       } else {

@@ -824,9 +824,13 @@ class API {
       }
 
       return {
-        _id: item._id, quantity: Math.max((itemData?.quantity ?? 0) ?? Utilities.getItemQuantity(itemData))
+        _id: item._id,
+        quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(itemData), 0),
+        flags: getProperty(itemData, CONSTANTS.FLAGS.ITEM)
       }
     });
+
+    debugger;
 
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid target`)

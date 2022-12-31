@@ -65,7 +65,7 @@
 
     application.options.resolve({
       attributes: Object.fromEntries(attributes
-        .filter(attribute => attribute.currentQuantity)
+        .filter(attribute => settings.unlimitedCurrencies || attribute.currentQuantity)
         .map(attribute => [attribute.path, attribute.currentQuantity])
       ),
       items: itemsToUpdate.concat(itemsToCreate)
@@ -85,7 +85,7 @@
     {#if attributes.length || items.length}
 
       <p style="text-align: center;" class="item-piles-bottom-divider">
-        {settings?.content ?? localize("ITEM-PILES.Applications.DropCurrencies." + (targetActor ? "Player" : "GM"))}
+        {localize(settings?.content ?? "ITEM-PILES.Applications.DropCurrencies." + (targetActor ? "Player" : "GM"))}
       </p>
 
       {#each attributes as attribute, index (attribute.path)}
@@ -150,7 +150,7 @@
       {#if attributes.length || items.length}
         <button type="button" on:click|once={requestSubmit}>
           <i class="fas fa-download"></i>
-          {settings?.button ?? localize("ITEM-PILES.Applications.DropCurrencies.AddToPile")}
+          {localize(settings?.button ?? "ITEM-PILES.Applications.DropCurrencies.AddToPile")}
         </button>
       {/if}
 

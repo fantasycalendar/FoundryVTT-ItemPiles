@@ -5,6 +5,7 @@ import { PileItem } from "./pile-item.js";
 import * as Utilities from "../helpers/utilities.js";
 import PrivateAPI from "../API/private-api.js";
 import ItemPileSocket from "../socket.js";
+import DropItemDialog from "../applications/dialogs/drop-item-dialog/drop-item-dialog.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -75,10 +76,11 @@ export class VaultStore extends ItemPileStore {
         return acc;
       }, {
         canOrganize: this.actor.isOwner,
-        canWithdrawItems: this.actor.isOwner,
-        canDepositItems: this.actor.isOwner,
-        canWithdrawCurrencies: this.actor.isOwner,
-        canDepositCurrencies: this.actor.isOwner
+        canWithdrawItems: this.actor.isOwner && this.recipient,
+        canDepositItems: this.actor.isOwner && this.recipient,
+        canWithdrawCurrencies: this.actor.isOwner && this.recipient,
+        canDepositCurrencies: this.actor.isOwner && this.recipient,
+        canEditCurrencies: game.user.isGM
       })
 
       return {
@@ -219,6 +221,19 @@ export class VaultItem extends PileItem {
       this.store.refreshFreeSpaces();
       this.store.refreshGridDebounce();
     })
+  }
+
+  async take() {
+    let quantity = get(this.quantity);
+    if (quantity > 1) {
+      quantity = await DropItemDialog.show(this.item, this.store.actor, {
+        localizationTitle: "WithdrawItem"
+      });
+    }
+    return game.itempiles.API.transferItems(this.store.actor, this.store.recipient, [{
+      _id: this.id,
+      quantity
+    }], { interactionId: this.store.interactionId });
   }
 
 }
