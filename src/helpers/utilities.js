@@ -45,10 +45,6 @@ export function findSimilarItem(items, findItem) {
 
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 
-  if (game.itempiles.API.ITEM_PRICE_ATTRIBUTE) {
-    itemSimilarities.push(game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
-  }
-
   const findItemData = findItem instanceof Item ? findItem.toObject() : findItem;
   const findItemId = findItemData._id;
 
@@ -67,6 +63,7 @@ export function findSimilarItem(items, findItem) {
           return false;
         }
       }
+      return true;
     })
     .find(item => {
       const itemId = item instanceof Item ? item.id : item._id ?? item.id;

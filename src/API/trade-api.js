@@ -129,7 +129,7 @@ export default class TradeAPI {
           return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.SameActor"), true);
         }
 
-        const store = new TradeStore({
+        const store = new TradeStore(game.user.id, {
           user: game.user, actor
         }, {
           user: game.users.get(userId), actor: traderActor
@@ -199,7 +199,9 @@ export default class TradeAPI {
       return "same-actor";
     }
 
-    const store = new TradeStore({ user: game.user, actor }, {
+    const store = new TradeStore(tradingUserId, {
+      user: game.user, actor
+    }, {
       user: tradingUser, actor: tradingActor
     }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
 
@@ -449,10 +451,19 @@ export default class TradeAPI {
     }
   }
 
-  static async _tradeCompleted(tradeId, updates) {
+  static async _tradeCompleted(tradeId) {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;
-    Helpers.hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, updates, tradeId)
+    const data = trade.store.export();
+    ItemPileSocket.executeForEveryone(
+      ItemPileSocket.HANDLERS.CALL_HOOK,
+      CONSTANTS.HOOKS.TRADE.COMPLETE,
+      trade.store.instigator,
+      data[0],
+      data[1],
+      tradeId,
+      trade.store.isPrivate
+    )
     trade.app.close({ callback: true });
     ongoingTrades.delete(tradeId);
   }

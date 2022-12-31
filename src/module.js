@@ -25,11 +25,6 @@ Hooks.once("ready", () => {
 
   setTimeout(() => {
 
-    Socket.initialize();
-    PrivateAPI.initialize();
-    TradeAPI.initialize();
-    ChatAPI.initialize();
-
     game.itempiles = {
       API,
       hooks: CONSTANTS.HOOKS
@@ -59,6 +54,11 @@ Hooks.once("ready", () => {
     if (!Helpers.isGMConnected()) {
       Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoGMsConnected"), true)
     }
+
+    Socket.initialize();
+    PrivateAPI.initialize();
+    TradeAPI.initialize();
+    ChatAPI.initialize();
 
     registerHotkeysPost();
 

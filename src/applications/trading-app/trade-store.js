@@ -3,8 +3,9 @@ import * as Utilities from "../../helpers/utilities.js";
 
 export default class TradeStore {
 
-  constructor(leftTrader, rightTrader, publicTradeId, privateTradeId = false, isPrivate = false) {
+  constructor(instigator, leftTrader, rightTrader, publicTradeId, privateTradeId = false, isPrivate = false) {
 
+    this.instigator = instigator;
     this.publicTradeId = publicTradeId;
     this.privateTradeId = privateTradeId;
     this.isPrivate = isPrivate;
@@ -28,8 +29,8 @@ export default class TradeStore {
   static import(leftTraderData, rightTraderData, publicTradeId) {
 
     const leftTrader = {
-      user: game.users.get(leftTraderData.userId),
-      actor: fromUuidSync(leftTraderData.actorUiid),
+      user: game.users.get(leftTraderData.user),
+      actor: fromUuidSync(leftTraderData.actor),
       items: leftTraderData.items,
       currencies: leftTraderData.currencies,
       itemCurrencies: leftTraderData.itemCurrencies,
@@ -37,8 +38,8 @@ export default class TradeStore {
     };
 
     const rightTrader = {
-      user: game.users.get(rightTraderData.userId),
-      actor: fromUuidSync(rightTraderData.actorUiid),
+      user: game.users.get(rightTraderData.user),
+      actor: fromUuidSync(rightTraderData.actor),
       items: rightTraderData.items,
       currencies: rightTraderData.currencies,
       itemCurrencies: rightTraderData.itemCurrencies,
@@ -50,15 +51,15 @@ export default class TradeStore {
 
   export() {
     return [{
-      userId: this.leftTraderUser.id,
-      actorUiid: Utilities.getUuid(this.leftTraderActor),
+      user: this.leftTraderUser.id,
+      actor: Utilities.getUuid(this.leftTraderActor),
       items: get(this.leftTraderItems),
       currencies: get(this.leftTraderCurrencies),
       itemCurrencies: get(this.leftTraderItemCurrencies),
       accepted: get(this.leftTraderAccepted)
     }, {
-      userId: this.rightTraderUser.id,
-      actorUiid: Utilities.getUuid(this.rightTraderActor),
+      user: this.rightTraderUser.id,
+      actor: Utilities.getUuid(this.rightTraderActor),
       items: get(this.rightTraderItems),
       currencies: get(this.rightTraderCurrencies),
       itemCurrencies: get(this.rightTraderItemCurrencies),

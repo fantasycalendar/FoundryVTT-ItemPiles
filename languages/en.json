@@ -512,7 +512,8 @@
       "SpectateDisabled": "Trade Concluded",
       "PrivateTrade": "Private Trade",
       "ExpandTrade": "View full trade details",
-      "MerchantTraded": "{name} bought the following things from {merchant}:"
+      "MerchantTraded": "{name} bought the following things from {merchant}:",
+      "GaveItems": "{source} gave some items to {target}:"
     },
     "Settings": {
       "Configure": {

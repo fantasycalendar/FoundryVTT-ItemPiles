@@ -792,8 +792,6 @@ export default class PrivateAPI {
     userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false
   } = {}) {
 
-    debugger;
-
     let itemsDropped;
 
     // If there's a source of the item (it wasn't dropped from the item bar)
@@ -1387,7 +1385,14 @@ export default class PrivateAPI {
     if (!validItem) return;
     dropData.itemData.item = validItem;
 
-    const user = Array.from(game.users).find(user => user?.character === dropData.target.actor);
+    const actorOwners = Object.entries(dropData.target.actor.ownership)
+      .filter(entry => {
+        return entry[0] !== "default" && entry[1] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+      })
+      .map(entry => game.users.get(entry[0]))
+      .sort(user => user.isGM ? 1 : -1);
+
+    const user = actorOwners?.[0];
 
     if (user && !user?.active && !game.user.isGM) {
       return TJSDialog.prompt({
@@ -1418,12 +1423,15 @@ export default class PrivateAPI {
       const sourceUuid = Utilities.getUuid(dropData.source);
       const targetUuid = Utilities.getUuid(dropData.target);
 
-      if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, dropData) === false) return;
+      if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, dropData.source, dropData.target, dropData.itemData, game.user.id) === false) {
+        return;
+      }
 
-      if ((!user || !user?.active) && game.user.isGM) {
+      if ((!user || !user?.active || user === game.user) && game.user.isGM) {
         Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
           source_actor_name: dropData.source.name, target_actor_name: dropData.target.name, item_name: item.name
         }));
+        Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, dropData.source, dropData.target, [dropData.itemData], game.user.id);
         return this._transferItems(sourceUuid, targetUuid, [dropData.itemData.item], game.user.id)
       }
 
@@ -1529,9 +1537,7 @@ export default class PrivateAPI {
     });
 
     if (accepted) {
-      Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, {
-        sourceActor, targetActor, item: itemData, user: game.user.get(userId),
-      });
+      Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, sourceActor, targetActor, [itemData], game.user.id);
       await PrivateAPI._addItems(targetUuid, [itemData], game.user.id);
     }
 

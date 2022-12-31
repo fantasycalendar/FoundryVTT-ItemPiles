@@ -19,6 +19,7 @@ export default class ChatAPI {
     Hooks.on(CONSTANTS.HOOKS.TRADE.STARTED, this._outputTradeStarted.bind(this));
     Hooks.on(CONSTANTS.HOOKS.TRADE.COMPLETE, this._outputTradeComplete.bind(this));
     Hooks.on(CONSTANTS.HOOKS.ITEM.TRADE, this._outputMerchantTradeComplete.bind(this));
+    Hooks.on(CONSTANTS.HOOKS.ITEM.GIVE, this._outputGiveItem.bind(this));
 
     $(document).on("click", ".item-piles-chat-card .item-piles-collapsible", async function () {
       if ($(this).attr("open")) return;
@@ -143,6 +144,21 @@ export default class ChatAPI {
   }
 
   /**
+   * Outputs to chat based on giving an item from one actor to another
+   *
+   * @param source
+   * @param target
+   * @param items
+   * @param userId
+   * @returns {Promise}
+   */
+  static async _outputGiveItem(source, target, items, userId) {
+    if (game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
+    const itemData = await this._formatItemData(items);
+    return this._giveChatMessage(source, target, itemData, userId);
+  }
+
+  /**
    * Outputs to chat based on transferring everything from or to an item pile
    *
    * @param source
@@ -172,9 +188,9 @@ export default class ChatAPI {
     return this._outputTradeStartedToChat(party_1, party_2, publicTradeId);
   }
 
-  static async _outputTradeComplete(party_1, party_2, publicTradeId, isPrivate) {
+  static async _outputTradeComplete(instigator, party_1, party_2, publicTradeId, isPrivate) {
     if (!Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
-    return this._outputTradeCompleteToChat(party_1, party_2, publicTradeId, isPrivate);
+    return this._outputTradeCompleteToChat(instigator, party_1, party_2, publicTradeId, isPrivate);
   }
 
   static async _outputMerchantTradeComplete(source, target, priceInformation, userId, interactionId) {
@@ -375,16 +391,16 @@ export default class ChatAPI {
     });
   }
 
-  static async _outputTradeCompleteToChat(party_1, party_2, publicTradeId, isPrivate) {
+  static async _outputTradeCompleteToChat(instigator, party_1, party_2, publicTradeId, isPrivate) {
 
-    if (party_1.user !== game.user.id) return;
+    if (instigator !== game.user.id) return;
 
     let party_1_actor = fromUuidSync(party_1.actor);
     party_1_actor = party_1_actor?.actor ?? party_1_actor;
     const party_1_data = {
       actor: party_1_actor,
       items: party_2.items,
-      currencies: party_2.currencies
+      currencies: party_2.currencies.concat(party_2.itemCurrencies)
     }
     party_1_data.got_nothing = !party_1_data.items.length && !party_1_data.currencies.length;
 
@@ -393,7 +409,7 @@ export default class ChatAPI {
     const party_2_data = {
       actor: party_2_actor,
       items: party_1.items,
-      currencies: party_1.currencies
+      currencies: party_1.currencies.concat(party_1.itemCurrencies)
     }
     party_2_data.got_nothing = !party_2_data.items.length && !party_2_data.currencies.length;
 
@@ -431,7 +447,7 @@ export default class ChatAPI {
 
     // Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
     const messages = Array.from(game.messages).filter(message => (now - message.timestamp) <= (10800000)).slice(-10);
-    messages.reverse()
+    messages.reverse();
 
     for (let [index, message] of messages.entries()) {
       const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
@@ -467,7 +483,66 @@ export default class ChatAPI {
         items: newItems,
         interactionId: interactionId
       }
+    });
+
+  }
+
+  static async _giveChatMessage(sourceActor, targetActor, items) {
+
+    const now = (+new Date());
+
+    // Get all messages younger than 1 minute, and grab the last 5, then reverse them (latest to oldest)
+    const messages = Array.from(game.messages)
+      .filter(message => (now - message.timestamp) <= (60000))
+      .slice(-5)
+      .reverse();
+
+    for (const message of messages) {
+      const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
+      if (flags && flags.source === sourceActor.uuid && flags.target === targetActor.uuid && message.isAuthor) {
+        return this._updateExistingGiveMessage(message, sourceActor, targetActor, items)
+      }
+    }
+
+    const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/gave-items.html", {
+      message: game.i18n.format("ITEM-PILES.Chat.GaveItems", { source: sourceActor.name, target: targetActor.name }),
+      source: sourceActor,
+      target: targetActor,
+      items: items
+    });
+
+    return this._createNewChatMessage(game.user.id, {
+      user: game.user.id,
+      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+      content: chatCardHtml,
+      flavor: "Item Piles",
+      speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
+      [CONSTANTS.FLAGS.PILE]: {
+        source: sourceActor.uuid,
+        target: targetActor.uuid,
+        items: items
+      }
     })
+
+  }
+
+  static async _updateExistingGiveMessage(message, sourceActor, targetActor, items) {
+
+    const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
+
+    const newItems = this._matchEntries(flags.items, items);
+
+    const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/gave-items.html", {
+      message: game.i18n.format("ITEM-PILES.Chat.GaveItems", { source: sourceActor.name, target: targetActor.name }),
+      source: sourceActor,
+      target: targetActor,
+      items: newItems
+    });
+
+    return message.update({
+      content: chatCardHtml,
+      [`${CONSTANTS.FLAGS.PILE}.items`]: newItems
+    });
 
   }
 

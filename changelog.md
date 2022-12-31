@@ -4,8 +4,10 @@
 
 - Added vault type item piles - these item piles act like the Diablo inventory or the World of Warcraft banking system, where you have a set amount of grid slots that you can put items in
 - Added vault extenders - you can configure items to extend the space available in
+- Added chat message for when users give each other items
 - Added support for `true` and `false` in system item filters
 - Tweaked `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
+- Fixed trades between users not creating chat messages when concluded
 
 ## Version 2.3.11
 
