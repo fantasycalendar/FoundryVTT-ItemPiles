@@ -1,74 +1,91 @@
 import CONSTANTS from "./constants/constants.js";
-import SETTINGS from "./constants/settings.js";
-import { custom_warning, getSetting, setSetting } from "./helpers/helpers.js";
+import { custom_warning } from "./helpers/helpers.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
 
 let oldSettings;
-export default async function runMigrations() {
 
-  oldSettings = game.settings.storage.get("world").filter(setting => setting.key.includes(CONSTANTS.MODULE_NAME))
+function findOldSettingValue(oldSettingKey) {
+  if (!oldSettings) {
+    oldSettings = game.settings.storage.get("world").filter(setting => setting.key.startsWith(CONSTANTS.MODULE_NAME));
+  }
+  return oldSettings.find(setting => setting.key.endsWith(oldSettingKey))?.value;
+}
+
+export default async function runMigrations() {
 
   const sortedMigrations = Object.entries(migrations)
     .sort((a, b) => {
       return isNewerVersion(b[0], a[0]) ? -1 : 1;
     });
 
-  let currentMigrationVersion = getSetting(SETTINGS.MIGRATION_VERSION);
   for (const [version, migration] of sortedMigrations) {
-    if (!isNewerVersion(version, currentMigrationVersion)) continue;
-    console.log(`Item Piles | Migrating to version ${version}...`)
     try {
-      await migration();
-      currentMigrationVersion = version;
+      await migration(version);
     } catch (err) {
       console.error(err);
       custom_warning(`Something went wrong when migrating to version ${version}. Please check the console for the error!`, true)
     }
   }
 
-  // await setSetting(SETTINGS.MIGRATION_VERSION, migrationVersion);
-
 }
-
-function findOldSettingValue(oldSettingKey) {
-  return oldSettings.find(setting => setting.key.endsWith(oldSettingKey))?.value;
-}
-
 const migrations = {
 
-  "2.4.0": async () => {
+  "2.4.0": async (version) => {
 
-    const actors = Array.from(game.actors).filter(a => getProperty(a, CONSTANTS.FLAGS.PILE));
+    const actors = Array.from(game.actors).filter(a => {
+      const actorFlagVersion = getProperty(a, CONSTANTS.FLAGS.VERSION) || "1.0.0";
+      return getProperty(a, CONSTANTS.FLAGS.PILE)
+        && isNewerVersion(version, actorFlagVersion)
+    });
 
     const actorUpdates = actors.map(a => {
+      const flagData = {
+        [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(a)),
+        [CONSTANTS.FLAGS.VERSION]: version
+      }
+      if (a.actorLink) {
+        flagData["token"] = foundry.utils.deepClone(flagData);
+      }
       return {
         _id: a.id,
-        [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(a))
-      }
+        ...flagData
+      };
     });
+
+    if (actorUpdates.length) {
+      console.log(`Item Piles | Migrating ${actorUpdates.length} actors to version ${version}...`)
+    }
 
     await Actor.updateDocuments(actorUpdates);
 
     const tokensOnScenes = Array.from(game.scenes)
       .map(scene => ([
         scene.id,
-        Array.from(scene.tokens).filter(t => getProperty(t, CONSTANTS.FLAGS.PILE))
+        Array.from(scene.tokens).filter(t => {
+          const actorFlagVersion = getProperty(t, CONSTANTS.FLAGS.VERSION) || "1.0.0";
+          return getProperty(t, CONSTANTS.FLAGS.PILE)
+            && isNewerVersion(version, actorFlagVersion)
+            && !t.actorLink;
+        })
       ]))
       .filter(scene => scene[1].length)
 
     for (const [sceneId, tokens] of tokensOnScenes) {
       const scene = game.scenes.get(sceneId)
       const updates = tokens.map(token => {
-        const flags = PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(token.actor));
-        const update = {
+        const flagData = {
+          [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(token.actor)),
+          [CONSTANTS.FLAGS.VERSION]: version,
+        }
+        return {
           _id: token.id,
-          [CONSTANTS.FLAGS.PILE]: flags
-        }
-        if (!token.actorLink) {
-          update["actorData." + CONSTANTS.FLAGS.PILE] = flags
-        }
-        return update;
+          ...flagData,
+          actorData: {
+            ...flagData
+          }
+        };
       });
+      console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
       await scene.updateEmbeddedDocuments("Token", updates);
     }
 

@@ -8,6 +8,7 @@ const CONSTANTS = {
   PATH: module_path,
 
   FLAGS: {
+    VERSION: baseFlag + "version",
     PILE: baseFlag + "data",
     SHARING: baseFlag + "sharing",
     ITEM: baseFlag + "item",
@@ -137,7 +138,8 @@ const CONSTANTS = {
     baseExpansionRows: 5,
     expansionSlots: 4,
     preventVaultAccess: false,
-    vaultAccess: [] // { id: String, withdraw: Boolean, deposit: Boolean }
+    vaultAccess: [],
+    logVaultActions: false
   }
 }
 

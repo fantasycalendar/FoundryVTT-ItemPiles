@@ -443,9 +443,11 @@ export async function updateItemPileData(target, flagData, tokenData) {
     };
     if (!foundry.utils.isEmpty(flagData)) {
       data[CONSTANTS.FLAGS.PILE] = flagData;
+      data[CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
     }
     if (!tokenDocument.actorLink) {
       data["actorData." + CONSTANTS.FLAGS.PILE] = flagData;
+      data["actorData." + CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
       if (tokenDocument.actor === documentActor) {
         documentActor = false;
       }
@@ -460,7 +462,9 @@ export async function updateItemPileData(target, flagData, tokenData) {
   if (!foundry.utils.isEmpty(flagData) && documentActor) {
     await documentActor.update({
       [CONSTANTS.FLAGS.PILE]: flagData,
-      [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
+      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+      [`token.${CONSTANTS.FLAGS.PILE}`]: flagData,
+      [`token.${CONSTANTS.FLAGS.VERSION}`]: Helpers.getModuleVersion()
     });
   }
 
@@ -484,7 +488,8 @@ export async function updateItemData(item, update) {
   const flagData = foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {});
   return item.update({
     ...update?.data ?? {},
-    [CONSTANTS.FLAGS.ITEM]: flagData
+    [CONSTANTS.FLAGS.ITEM]: flagData,
+    [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
   });
 }
 
@@ -1141,4 +1146,91 @@ export function getPricesForItems(itemsToBuy, {
 
   return paymentData;
 
+}
+
+/* ---------------------- VAULT FUNCTIONS ---------------------- */
+
+export async function getVaultJournal() {
+  let journal = Helpers.getSetting(SETTINGS.VAULT_LOG_JOURNAL_ID)
+    ? game.journal.get(Helpers.getSetting(SETTINGS.VAULT_LOG_JOURNAL_ID))
+    : false;
+  if (!journal) {
+    journal = await JournalEntry.create({ name: "Item Piles: Vault Log" })
+    await Helpers.setSetting(SETTINGS.VAULT_LOG_JOURNAL_ID, journal.id);
+    Helpers.custom_notify(game.i18n.localize("ITEM-PILES.Notifications.CreatedJournal"));
+  }
+  return journal;
+}
+
+export async function getVaultJournalPageForItemPile(actor, { create = false } = {}) {
+  const journal = await getVaultJournal();
+  let page = journal.pages.find(page => getProperty(page, CONSTANTS.FLAGS.PILE + ".actorId") === actor.id);
+  if (!page && create) {
+    page = (await journal.createEmbeddedDocuments("JournalEntryPage", [{
+      name: actor.name + ": Log",
+      ownership: foundry.utils.deepClone(actor.ownership),
+      text: {
+        markdown: "*Nothing here yet*",
+        format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.MARKDOWN
+      },
+      "flags.core.sheetClass": "core.MarkdownJournalPageSheet",
+      [CONSTANTS.FLAGS.PILE]: {
+        actorId: actor.id,
+      }
+    }]))[0];
+  }
+  return page;
+}
+
+function vaultTextGenerator(actor, user, itemName, quantity, withdraw) {
+  return "* " + game.i18n.format(`ITEM-PILES.VaultLog.${withdraw ? "Withdraw" : "Deposit"}`, {
+    actor_name: actor.name,
+    user_name: user.name,
+    item_name: itemName,
+    quantity,
+    date: new Date(Date.now()).toUTCString()
+  })
+}
+
+export async function updateVaultJournalLog(itemPile, {
+  actor = false,
+  userId = false,
+  items = [],
+  attributes = [],
+  withdrawal = true
+} = {}) {
+
+  const formattedItems = [];
+  const formattedCurrencies = [];
+
+  const user = game.users.get(userId);
+  const currencies = getActorCurrencies(itemPile, { getAll: true });
+
+  for (const itemData of items) {
+    if (currencies.some(currency => currency.name === itemData.item.name)) {
+      formattedCurrencies.push(vaultTextGenerator(actor, user, itemData.name, itemData.quantity, withdrawal));
+    } else {
+      const item = await Item.implementation.create(itemData.item, { temporary: true });
+      formattedItems.push(vaultTextGenerator(actor, user, item.name, itemData.quantity, withdrawal));
+    }
+  }
+
+  for (const [key, quantity] of Object.entries(attributes)) {
+    const currency = currencies.find(currency => currency.data.path === key);
+    if (currency) {
+      formattedCurrencies.push(vaultTextGenerator(actor, user, currency.name, quantity, withdrawal));
+    }
+  }
+
+  const formattedText = formattedItems.concat(formattedCurrencies).join("\n\n");
+
+  const page = await getVaultJournalPageForItemPile(itemPile, { create: true });
+
+  const newText = page.text.markdown !== "*Nothing here yet*"
+    ? formattedText + "\n\n" + page.text.markdown
+    : formattedText;
+
+  return page.update({
+    "text.markdown": newText
+  });
 }

@@ -830,8 +830,6 @@ class API {
       }
     });
 
-    debugger;
-
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid target`)
 

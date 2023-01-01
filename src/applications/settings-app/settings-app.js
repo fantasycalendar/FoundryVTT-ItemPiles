@@ -3,7 +3,7 @@ import { getActiveApps } from '../../helpers/helpers';
 import SettingsShell from './settings-shell.svelte';
 
 class SettingsApp extends SvelteApplication {
-  
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: `item-piles-application-system-settings-${randomID()}`,
@@ -16,11 +16,11 @@ class SettingsApp extends SvelteApplication {
       zIndex: 100,
     });
   }
-  
+
   static getActiveApp() {
     return getActiveApps("item-piles-application-system-settings", true);
   }
-  
+
   static async show(options = {}, dialogData = {}) {
     const app = this.getActiveApp()
     if (app) return app.render(false, { focus: true });
@@ -32,7 +32,7 @@ class SettingsApp extends SvelteApplication {
 }
 
 export default class SettingsShim extends FormApplication {
-  
+
   /**
    * @inheritDoc
    */
@@ -40,12 +40,12 @@ export default class SettingsShim extends FormApplication {
     super({});
     SettingsApp.show();
   }
-  
+
   async _updateObject(event, formData) {
   }
-  
+
   render() {
     this.close();
   }
-  
+
 }

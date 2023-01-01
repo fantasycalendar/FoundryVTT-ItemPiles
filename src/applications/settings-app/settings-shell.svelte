@@ -246,8 +246,8 @@
   }
 
   .tab-body {
-    max-height: 715px;
-    min-height: 715px;
+    max-height: 729px;
+    min-height: 729px;
     overflow-y: scroll;
     padding: 5px;
   }

@@ -44,6 +44,10 @@ export const hooks = {
   }
 }
 
+export function getModuleVersion() {
+  return game.modules.get(CONSTANTS.MODULE_NAME).version;
+}
+
 /**
  *  This function determines if the given parameter is a callable function
  *
@@ -137,12 +141,12 @@ export function roundToDecimals(num, decimals) {
 }
 
 export function clamp(num, min, max) {
-	return Math.max(Math.min(num, max), min);
+  return Math.max(Math.min(num, max), min);
 }
 
-export function getActiveApps(id, single = false){
+export function getActiveApps(id, single = false) {
   const apps = Object.values(ui.windows).filter(app => app.id.startsWith(id) && app._state > Application.RENDER_STATES.CLOSED);
-  if(single){
+  if (single) {
     return apps?.[0] ?? false;
   }
   return apps;
@@ -218,6 +222,6 @@ export function random_array_element(inArray, { recurse = false } = {}) {
 }
 
 
-export function styleFromObject(obj, vars = false){
+export function styleFromObject(obj, vars = false) {
   return Object.entries(obj).map(entry => (vars ? "--" : "") + entry[0] + ': ' + entry[1] + ";").join("");
 }

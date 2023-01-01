@@ -253,11 +253,23 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
-    } else if (PileUtilities.isItemPileEmpty(itemPile)) {
-      await SharingUtilities.clearItemPileSharingData(itemPile);
-    } else {
-      await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
-        items: itemDeltas
+    } else if (PileUtilities.isItemPileLootable(itemPile)) {
+      if (PileUtilities.isItemPileEmpty(itemPile)) {
+        await SharingUtilities.clearItemPileSharingData(itemPile);
+      } else {
+        await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+          items: itemDeltas
+        });
+      }
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
+        items: itemDeltas,
+        withdrawal: sourceIsItemPile
       });
     }
 
@@ -304,6 +316,16 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
+        items: itemDeltas,
+        withdrawal: sourceIsItemPile
+      });
     }
 
     return itemDeltas;
@@ -445,12 +467,25 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
-    } else if (PileUtilities.isItemPileEmpty(itemPile)) {
-      await SharingUtilities.clearItemPileSharingData(itemPile);
-    } else {
-      await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+    } else if (PileUtilities.isItemPileLootable(itemPile)) {
+      if (PileUtilities.isItemPileEmpty(itemPile)) {
+        await SharingUtilities.clearItemPileSharingData(itemPile);
+      } else {
+        await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+          items: itemDeltas,
+          attributes: attributeDeltas
+        });
+      }
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
         items: itemDeltas,
-        attributes: attributeDeltas
+        attributes: attributeDeltas,
+        withdrawal: sourceIsItemPile
       });
     }
 
@@ -505,6 +540,17 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
+        items: itemDeltas,
+        attributes: attributeDeltas,
+        withdrawal: sourceIsItemPile
+      });
     }
 
     return { itemDeltas, attributeDeltas };
@@ -629,18 +675,19 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
+    const itemPile = Utilities.getToken(sourceUuid);
+
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
-
-    const itemPile = await fromUuid(sourceUuid)
-
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
-    } else if (PileUtilities.isItemPileEmpty(itemPile)) {
-      await SharingUtilities.clearItemPileSharingData(itemPile);
-    } else {
-      await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
-        attributes: attributeDeltas
-      });
+    } else if (PileUtilities.isItemPileLootable(itemPile)) {
+      if (PileUtilities.isItemPileEmpty(itemPile)) {
+        await SharingUtilities.clearItemPileSharingData(itemPile);
+      } else {
+        await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+          attributes: attributeDeltas
+        });
+      }
     }
 
     return attributeDeltas;
@@ -860,16 +907,23 @@ export default class PrivateAPI {
         name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
       });
 
-      await pileActor.update({
-        [CONSTANTS.FLAGS.PILE]: pileDataDefaults, prototypeToken: {
-          name: "Item Pile",
-          actorLink: false,
-          bar1: { attribute: "" },
-          vision: false,
-          displayName: 50,
-          [CONSTANTS.FLAGS.PILE]: pileDataDefaults, ...tokenOverrides
-        }, ...actorOverrides
-      })
+      const prototypeTokenData = foundry.utils.mergeObject({
+        name: "Item Pile",
+        actorLink: false,
+        bar1: { attribute: "" },
+        vision: false,
+        displayName: 50,
+        [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+        [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+      }, tokenOverrides)
+
+      const actorUpdate = foundry.utils.mergeObject({
+        [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+        [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+        prototypeToken: prototypeTokenData,
+      }, actorOverrides)
+
+      await pileActor.update(actorUpdate);
 
     } else if (!actor) {
 
@@ -893,13 +947,16 @@ export default class PrivateAPI {
         });
 
         await pileActor.update({
-          [CONSTANTS.FLAGS.PILE]: pileDataDefaults, prototypeToken: {
+          [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+          [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+          prototypeToken: {
             name: "Item Pile",
             actorLink: false,
             bar1: { attribute: "" },
             vision: false,
             displayName: 50,
-            [CONSTANTS.FLAGS.PILE]: pileDataDefaults
+            [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+            [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
           }
         })
 
@@ -1390,7 +1447,9 @@ export default class PrivateAPI {
 
   static async _depositItem(dropData) {
 
-    if (dropData.source === dropData.target) return;
+    const sourceActor = dropData.source.actor ?? dropData.source;
+    const targetActor = dropData.target.actor ?? dropData.target;
+    if (sourceActor === targetActor) return;
 
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
     if (!validItem) return;
@@ -1412,16 +1471,18 @@ export default class PrivateAPI {
     setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM + ".y", dropData.gridPosition.y);
 
     if (dropData.source) {
-      return game.itempiles.API.transferItems(dropData.source, dropData.target, [dropData.itemData], { interactionId: dropData.interactionId })
+      return game.itempiles.API.transferItems(dropData.source, dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
     }
 
-    return game.itempiles.API.addItems(dropData.source, [dropData.itemData], { interactionId: dropData.interactionId })
+    return game.itempiles.API.addItems(dropData.source, [dropData.itemData], { interactionId: dropData.interactionId });
 
   }
 
   static async _giveItem(dropData) {
 
-    if (dropData.source === dropData.target) return;
+    const sourceActor = dropData.source.actor ?? dropData.source;
+    const targetActor = dropData.target.actor ?? dropData.target;
+    if (sourceActor === targetActor) return;
 
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
     if (!validItem) return;
@@ -1487,7 +1548,9 @@ export default class PrivateAPI {
 
   static async _dropItem(dropData) {
 
-    if (dropData.source === dropData.target) return;
+    const sourceActor = dropData.source.actor ?? dropData.source;
+    const targetActor = dropData.target.actor ?? dropData.target;
+    if (sourceActor === targetActor) return;
 
     if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;
 

@@ -8,6 +8,7 @@
 - Added support for `true` and `false` in system item filters
 - Tweaked `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
 - Fixed trades between users not creating chat messages when concluded
+- Fixed being able to give items to yourself
 
 ## Version 2.3.11
 

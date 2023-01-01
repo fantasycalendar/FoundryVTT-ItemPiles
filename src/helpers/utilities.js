@@ -10,6 +10,10 @@ export function getActor(target) {
   return target?.actor ?? target;
 }
 
+/**
+ * @param documentUuid
+ * @returns {PlaceableObject|foundry.abstract.Document}
+ */
 export function getToken(documentUuid) {
   const document = fromUuidSync(documentUuid);
   return document instanceof TokenDocument ? document.object : document;

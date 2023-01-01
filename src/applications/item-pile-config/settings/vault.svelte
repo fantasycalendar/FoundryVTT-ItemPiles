@@ -77,6 +77,14 @@
   </button>
 </div>
 
+<div class="form-group">
+  <label>
+    <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LogVaultAccess")}</span>
+    <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LogVaultAccessExplanation")}</p>
+  </label>
+  <input type="checkbox" bind:checked={pileData.logVaultActions}/>
+</div>
+
 <style lang="scss">
   .item-piles-grid-columns {
     display: flex;

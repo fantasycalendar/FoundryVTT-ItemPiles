@@ -90,6 +90,7 @@
 
   .form-fields {
     flex: 0 1 auto;
+    align-self: center;
   }
 
   select {

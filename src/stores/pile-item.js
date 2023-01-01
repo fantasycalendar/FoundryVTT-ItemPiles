@@ -4,6 +4,7 @@ import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
+import * as Helpers from "../helpers/helpers.js";
 
 class PileBaseItem {
 
@@ -167,7 +168,8 @@ export class PileItem extends PileBaseItem {
 
   async updateFlags() {
     await this.item.update({
-      [CONSTANTS.FLAGS.ITEM]: get(this.itemFlagData)
+      [CONSTANTS.FLAGS.ITEM]: get(this.itemFlagData),
+      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
     })
   }
 

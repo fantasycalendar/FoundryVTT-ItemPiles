@@ -21,7 +21,8 @@
       "UpdateMerchantSuccess": "Merchant successfully updated.",
       "ItemTransferred": "{source_actor_name}'s {item_name} was given to {target_actor_name}.",
       "GiveItemAccepted": "{user_name} accepted your item offer.",
-      "ShownToPlayers": "Showing {actor_name} to players"
+      "ShownToPlayers": "Showing {actor_name} to players",
+      "CreatedJournal": "Created the Item Piles Vault Log journal."
     },
     "Errors": {
       "DisallowedItemDrop": "You cannot drop \"{type}\" items",
@@ -498,7 +499,9 @@
           "BaseExpansionExplanation": "This is how many columns and rows are enabled by default without any expansion items.",
           "Access": "Character & Player Access",
           "AccessExplanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access.",
-          "ManageAccess": "Manage Access"
+          "ManageAccess": "Manage Access",
+          "LogVaultAccess": "Log Vault Access",
+          "LogVaultAccessExplanation": "When enabled, this vault will create a journal entry and create timestamped logs any time the vault is interacted with."
         }
       },
       "VaultAccessEditor": {
@@ -528,6 +531,10 @@
       "ExpandTrade": "View full trade details",
       "MerchantTraded": "{name} bought the following things from {merchant}:",
       "GaveItems": "{source} gave some items to {target}:"
+    },
+    "VaultLog": {
+      "Withdraw": "{actor_name} ({user_name}) **withdrew** {item_name} x {quantity} ({date})",
+      "Deposit": "{actor_name} ({user_name}) *deposited* {item_name} x {quantity} ({date})"
     },
     "Settings": {
       "Configure": {
