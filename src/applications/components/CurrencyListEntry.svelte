@@ -5,6 +5,7 @@
   export let currency;
   export let options = {
     reverse: false,
+    abbreviations: false,
     abbreviateNumbers: false,
     imgSize: 24
   };
@@ -18,7 +19,7 @@
   $: {
     let number = options.abbreviateNumbers ? Helpers.abbreviateNumbers($quantity) : $quantity;
     if(abbreviation){
-      if(options.abbreviation){
+      if(options.abbreviations){
         text = abbreviation.replace("{#}", number);
       }else{
         text = number;
