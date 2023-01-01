@@ -30,11 +30,10 @@
 
 </script>
 
-<div class="item-piles-flexrow{options.reverse ? '-reverse' : ''} item-piles-item-row" style="flex:0 1 auto;">
+<div class="item-piles-flexrow{options.reverse ? '-reverse' : ''} item-piles-item-row" style="flex:0 1 auto;" title={$name}>
 
-  <div class="item-piles-img-container"
-       style="min-height: {options.imgSize}px; min-width: {options.imgSize}px; max-width: {options.imgSize}px; max-height: {options.imgSize}px;">
-    <img class="item-piles-img" src="{$img}" alt={$name}/>
+  <div class="item-piles-img-container" style="min-height: {options.imgSize}px; min-width: {options.imgSize}px; max-width: {options.imgSize}px; max-height: {options.imgSize}px;">
+    <img class="item-piles-img" src="{$img}"/>
   </div>
 
   <div class="item-piles-name item-piles-text" style="flex:0 1 auto; margin: 0 0.25rem;">
