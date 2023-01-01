@@ -43,6 +43,10 @@ export default class ItemPileStore {
     return PileAttribute;
   };
 
+  get searchDelay() {
+    return 200;
+  }
+
   setupStores() {
 
     this.pileData = writable(PileUtilities.getActorFlagData(this.actor));
@@ -140,7 +144,7 @@ export default class ItemPileStore {
 
     const filterDebounce = foundry.utils.debounce(() => {
       this.refreshItems();
-    }, 300);
+    }, this.searchDelay);
     this.subscribeTo(this.search, (val) => {
       filterDebounce()
     });

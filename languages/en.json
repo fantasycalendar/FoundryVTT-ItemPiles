@@ -221,6 +221,10 @@
         "Title": "Remove Merchant Table",
         "Content": "Are you sure you want to remove the \"{table_name}\" table from this merchant? This is not undoable."
       },
+      "CantRemoveVaultExpander": {
+        "Title": "Cannot Remove Expander",
+        "Content": "You cannot remove this expander, the items in the vault would not fit without it. Remove {num_items} items before trying to remove this expander!"
+      },
       "ReceiveItem": {
         "Title": "Receiving Item",
         "Header": "Item Piles: Receiving Item",

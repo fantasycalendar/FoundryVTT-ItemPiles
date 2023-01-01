@@ -6,8 +6,14 @@ import * as Utilities from "../helpers/utilities.js";
 import PrivateAPI from "../API/private-api.js";
 import ItemPileSocket from "../socket.js";
 import DropItemDialog from "../applications/dialogs/drop-item-dialog/drop-item-dialog.js";
+import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+import CustomDialog from "../applications/components/CustomDialog.svelte";
 
 export class VaultStore extends ItemPileStore {
+
+  get searchDelay() {
+    return 50;
+  }
 
   get ItemClass() {
     return VaultItem;
@@ -18,10 +24,11 @@ export class VaultStore extends ItemPileStore {
     this.gridData = writable({});
     this.gridItems = writable([]);
     this.validGridItems = writable([]);
+    this.highlightedGridItems = writable([]);
     this.vaultExpanderItems = writable([]);
     this.refreshGridDebounce = foundry.utils.debounce(() => {
       this.refreshGrid();
-    }, 150);
+    }, this.searchDelay);
   }
 
   setupSubscriptions() {
@@ -118,7 +125,7 @@ export class VaultStore extends ItemPileStore {
 
     const enabledSpaces = enabledCols * enabledRows;
 
-    return enabledSpaces > items.length;
+    return enabledSpaces - items.length;
 
   }
 
@@ -150,11 +157,15 @@ export class VaultStore extends ItemPileStore {
   refreshItems() {
     super.refreshItems();
     const pileData = get(this.pileData);
-    this.validGridItems.set(get(this.items).filter(item => {
+    this.validGridItems.set(get(this.allItems).filter(item => {
       const itemFlagData = get(item.itemFlagData);
       return !pileData.vaultExpansion || !itemFlagData.vaultExpander;
     }));
-    this.vaultExpanderItems.set(get(this.items).filter(item => {
+    this.highlightedGridItems.set(get(this.items).filter(item => {
+      const itemFlagData = get(item.itemFlagData);
+      return !pileData.vaultExpansion || !itemFlagData.vaultExpander;
+    }).map(item => item.id));
+    this.vaultExpanderItems.set(get(this.allItems).filter(item => {
       const itemFlagData = get(item.itemFlagData);
       return !pileData.vaultExpansion || itemFlagData.vaultExpander;
     }));
@@ -177,6 +188,8 @@ export class VaultStore extends ItemPileStore {
   }
 
   placeItemsOnGrid() {
+    const search = get(this.search)
+    const highlightedItems = get(this.highlightedGridItems);
     const gridData = get(this.gridData);
     const allItems = [...get(this.validGridItems)];
     const existingItems = [];
@@ -189,7 +202,7 @@ export class VaultStore extends ItemPileStore {
         if (item) {
           allItems.splice(allItems.indexOf(item), 1);
           existingItems.push({
-            id: item.id, transform: item.transform, item
+            id: item.id, transform: item.transform, highlight: search && highlightedItems.includes(item.id), item,
           });
         }
         return item?.id ?? null;
@@ -208,7 +221,7 @@ export class VaultStore extends ItemPileStore {
                 return trans;
               });
               return {
-                id: item.id, transform: item.transform, item
+                id: item.id, transform: item.transform, highlight: search && highlightedItems.includes(item.id), item
               };
             }
           }
@@ -260,9 +273,19 @@ export class VaultItem extends PileItem {
     const itemFlagData = get(this.itemFlagData);
 
     if (pileData.vaultExpansion && itemFlagData.vaultExpander) {
-      if (!this.store.canItemsFitWithout(this)) {
-        console.log("OH NO")
-        return false;
+      const slotsLeft = this.store.canItemsFitWithout(this);
+      if (slotsLeft < 0) {
+        return TJSDialog.prompt({
+          title: "Item Piles", content: {
+            class: CustomDialog, props: {
+              header: game.i18n.localize("ITEM-PILES.Dialogs.CantRemoveVaultExpander.Title"),
+              content: game.i18n.format("ITEM-PILES.Dialogs.CantRemoveVaultExpander.Content", {
+                num_items: Math.abs(slotsLeft)
+              })
+            }
+          },
+          modal: true
+        });
       }
     }
 

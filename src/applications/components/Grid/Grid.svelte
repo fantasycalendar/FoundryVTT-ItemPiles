@@ -23,6 +23,8 @@
     previewClass: "",
     collisionClass: "",
     hoverClass: "",
+    highlightClass: "",
+    highlightItems: false
   }
 
   let containerHeight = writable(0);

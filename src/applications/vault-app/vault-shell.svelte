@@ -35,6 +35,7 @@
   const gridDataStore = store.gridData;
   const gridItems = store.gridItems;
   const vaultExpanderItems = store.vaultExpanderItems;
+  const searchStore = store.search;
 
   $: pileData = $pileDataStore;
   $: gridData = $gridDataStore;
@@ -175,19 +176,16 @@
 
   <main in:fade={{duration: 500}} class="item-piles-flexcol">
 
-    <Tabs bind:activeTab bind:tabs style="font-size: 1.5rem; flex: 0 1 auto;"/>
+    <Tabs bind:activeTab bind:tabs
+          style="font-size: 1.25rem; flex: 0 1 auto; margin-bottom: 0.25rem; padding-bottom: 0.25rem;"/>
 
     {#if activeTab === "vault"}
 
-      {#if store.recipient}
-        <div class="item-piles-flexrow" style="margin: 0.25rem 0; min-height: 21px; flex: 0 1 auto;">
-          {#if application.options.remote}
-            <ActorPicker {store} localization="ITEM-PILES.Vault.ViewingAs" style=""/>
-          {:else}
-            <i>{localize("ITEM-PILES.Vault.ViewingAs", { actorName: store.recipient.name })}</i>
-          {/if}
-        </div>
-      {/if}
+      <div class="form-group item-piles-flexrow item-piles-bottom-divider"
+           style="margin: 0.25rem 0; align-items: center; flex: 0 1 auto;">
+        <label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
+        <input type="text" bind:value={$searchStore}>
+      </div>
 
       <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}
                 style="display: flex; flex: 1; justify-content: center; align-items: center;">
@@ -201,7 +199,10 @@
               previewClass: "item-piles-grid-item-preview",
               collisionClass: "item-piles-grid-item-collision",
               hoverClass: "item-piles-grid-item-hover",
-              backgroundGrid: true
+              highlightClass: "item-piles-grid-item-highlight",
+              dimClass: "item-piles-grid-item-dim",
+              backgroundGrid: true,
+              highlightItems: !!$searchStore
             }}
               dropGhost={$dragPosition}
               on:change={(event) => store.updateGrid(event.detail.items)}

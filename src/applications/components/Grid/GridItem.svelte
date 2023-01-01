@@ -27,6 +27,14 @@
     if (!active) $previewTransform = $transformStore;
   }
 
+  let classes = "";
+  $: {
+    classes = "";
+    classes += " " + options.hoverClass;
+    classes += (options.highlightItems && item.highlight ? " " + options.highlightClass : "")
+    classes += (options.highlightItems && !item.highlight ? " " + options.dimClass : "")
+  }
+
   $: style = styleFromObject({
     "position": "absolute",
     "left": gridTransform.left + "px",
@@ -205,7 +213,7 @@
   on:pointerleave={hoverLeave}
   on:dragover|preventDefault
   style={style}
-  class={options.hoverClass}
+  class={classes}
 >
   <slot/>
 </div>

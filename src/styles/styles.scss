@@ -269,7 +269,6 @@
 
   &-grid-item-hover > div {
     &:after {
-      box-shadow: inset 0 0 10px var(--item-piles-shadow-primary);
       content: '';
       display: block;
       height: 100%;
@@ -281,8 +280,33 @@
     }
 
     &:hover:after {
+      box-shadow: inset 0 0 10px var(--item-piles-shadow-primary);
       opacity: 1.0;
     }
+  }
+
+  &-grid-item-highlight > div:after {
+    box-shadow: inset 0 0 10px rgb(119, 206, 50);
+    content: '';
+    display: block;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    transition: opacity 0.15s ease-in-out;
+    opacity: 1.0;
+  }
+
+  &-grid-item-dim > div:after {
+    background-color: rgba(0, 0, 0, 0.75);
+    content: '';
+    display: block;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    transition: opacity 0.15s ease-in-out;
+    opacity: 1.0;
   }
 
 }
@@ -779,5 +803,5 @@
 }
 
 .item-pile-vault {
-  min-width: 400px;
+  min-width: 350px;
 }
