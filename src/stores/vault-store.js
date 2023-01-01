@@ -18,6 +18,7 @@ export class VaultStore extends ItemPileStore {
     this.gridData = writable({});
     this.gridItems = writable([]);
     this.validGridItems = writable([]);
+    this.vaultExpanderItems = writable([]);
     this.refreshGridDebounce = foundry.utils.debounce(() => {
       this.refreshGrid();
     }, 150);
@@ -34,6 +35,7 @@ export class VaultStore extends ItemPileStore {
   refreshFreeSpaces() {
     const pileData = get(this.pileData);
     const items = get(this.validGridItems);
+    const vaultExpanders = get(this.vaultExpanderItems);
 
     this.gridData.update(() => {
 
@@ -41,12 +43,8 @@ export class VaultStore extends ItemPileStore {
       let enabledRows = pileData.rows;
 
       if (pileData.vaultExpansion) {
-        const bags = get(this.items).filter(item => {
-          const itemFlagData = get(item.itemFlagData);
-          return itemFlagData.vaultExpander;
-        });
 
-        const expansions = bags.reduce((acc, item) => {
+        const expansions = vaultExpanders.reduce((acc, item) => {
           acc.cols += get(item.itemFlagData).addsCols * get(item.quantity);
           acc.rows += get(item.itemFlagData).addsRows * get(item.quantity);
           return acc;
@@ -57,6 +55,7 @@ export class VaultStore extends ItemPileStore {
 
         enabledCols = expansions.cols;
         enabledRows = expansions.rows;
+
       }
 
       enabledCols = Math.min(enabledCols, pileData.cols);
@@ -84,16 +83,43 @@ export class VaultStore extends ItemPileStore {
       })
 
       return {
+        totalSpaces: Math.max(0, (pileData.cols * pileData.rows)),
+        enabledSpaces: Math.max(0, (enabledCols * enabledRows)),
         freeSpaces: Math.max(0, (enabledCols * enabledRows) - items.length),
         enabledCols: enabledCols,
         enabledRows: enabledRows,
         cols: pileData.cols,
         rows: pileData.rows,
-        gridSize: pileData.gridSize,
+        gridSize: 40,
         ...access,
         gap: 4
       }
     })
+  }
+
+  canItemsFitWithout(itemToCompare) {
+
+    const pileData = get(this.pileData);
+    const items = get(this.validGridItems);
+    const vaultExpanders = get(this.vaultExpanderItems);
+
+    const expansions = vaultExpanders.reduce((acc, item) => {
+      if (item === itemToCompare) return acc;
+      acc.cols += get(item.itemFlagData).addsCols * get(item.quantity);
+      acc.rows += get(item.itemFlagData).addsRows * get(item.quantity);
+      return acc;
+    }, {
+      cols: pileData.baseExpansionCols ?? 0,
+      rows: pileData.baseExpansionRows ?? 0
+    });
+
+    const enabledCols = expansions.cols;
+    const enabledRows = expansions.rows;
+
+    const enabledSpaces = enabledCols * enabledRows;
+
+    return enabledSpaces > items.length;
+
   }
 
   updateGrid(items) {
@@ -123,9 +149,14 @@ export class VaultStore extends ItemPileStore {
 
   refreshItems() {
     super.refreshItems();
+    const pileData = get(this.pileData);
     this.validGridItems.set(get(this.items).filter(item => {
       const itemFlagData = get(item.itemFlagData);
-      return !itemFlagData.vaultExpander;
+      return !pileData.vaultExpansion || !itemFlagData.vaultExpander;
+    }));
+    this.vaultExpanderItems.set(get(this.items).filter(item => {
+      const itemFlagData = get(item.itemFlagData);
+      return !pileData.vaultExpansion || itemFlagData.vaultExpander;
     }));
     this.refreshGridDebounce();
   }
@@ -224,6 +255,17 @@ export class VaultItem extends PileItem {
   }
 
   async take() {
+
+    const pileData = get(this.store.pileData);
+    const itemFlagData = get(this.itemFlagData);
+
+    if (pileData.vaultExpansion && itemFlagData.vaultExpander) {
+      if (!this.store.canItemsFitWithout(this)) {
+        console.log("OH NO")
+        return false;
+      }
+    }
+
     let quantity = get(this.quantity);
     if (quantity > 1) {
       quantity = await DropItemDialog.show(this.item, this.store.actor, {

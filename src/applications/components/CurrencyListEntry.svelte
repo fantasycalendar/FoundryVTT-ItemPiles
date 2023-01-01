@@ -1,8 +1,11 @@
 <script>
 
+  import * as Helpers from "../../helpers/helpers.js"
+
   export let currency;
   export let options = {
     reverse: false,
+    abbreviateNumbers: false,
     imgSize: 24
   };
 
@@ -11,9 +14,19 @@
   let abbreviation = currency.abbreviation;
   let quantity = currency.quantity;
 
-  $: text = abbreviation
-    ? (options.abbreviation ? abbreviation.replace("{#}", $quantity) : $quantity)
-    : `${$name} (x${$quantity})`;
+  let text = "";
+  $: {
+    let number = options.abbreviateNumbers ? Helpers.abbreviateNumbers($quantity) : $quantity;
+    if(abbreviation){
+      if(options.abbreviation){
+        text = abbreviation.replace("{#}", number);
+      }else{
+        text = number;
+      }
+    }else{
+      text = `${$name} (x${$quantity})`;
+    }
+  }
 
 </script>
 

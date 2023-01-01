@@ -160,6 +160,19 @@
       "ToolTipRemoveAllRolledItems": "Remove All Rolled Items",
       "ShoppingAs": "Shopping as {actorName}"
     },
+    "Vault": {
+      "Title": "Vault: {actor_name}",
+      "VaultTab": "Vault",
+      "ExpandersTab": "Expanders",
+      "ViewingAs": "Viewing as {actorName}",
+      "NeedsCapacity": "This vault has a total capacity of {total_capacity}, but none of it is available until vault expanders are added",
+      "CapacityLeft": "This vault has a capacity of {capacity}, with a maximum of {total_capacity}, drag and drop vault expanders to increase capacity",
+      "CapacityFull": "This vault has reached its maximum capacity of {total_capacity}",
+      "ExpandsCols": "{cols} columns",
+      "ExpandsRows": "{rows} rows",
+      "Withdraw": "Withdraw",
+      "Deposit": "Deposit"
+    },
     "Dialogs": {
       "TypeWarning": {
         "Title": "Item Type Warning",

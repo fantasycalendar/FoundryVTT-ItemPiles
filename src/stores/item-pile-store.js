@@ -337,7 +337,7 @@ export default class ItemPileStore {
 
     if (!result) return;
 
-    if (!this.recipient) {
+    if (!recipient) {
 
       if (!foundry.utils.isEmpty(result.attributes)) {
         await game.itempiles.API.setAttributes(this.actor, result.attributes, { interactionId: this.interactionId })

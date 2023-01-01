@@ -6,6 +6,7 @@
   import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
   import { TJSContextMenu } from "@typhonjs-fvtt/svelte-standard/application";
   import { get, writable } from 'svelte/store';
+  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
   import Grid from '../components/Grid/Grid.svelte';
   import CurrencyList from '../components/CurrencyList.svelte';
@@ -13,12 +14,13 @@
   import VaultItemEntry from './VaultItemEntry.svelte';
 
   import { snapOnMove } from '../components/Grid/grid-utils';
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
   import * as Helpers from "../../helpers/helpers.js";
   import PrivateAPI from "../../API/private-api.js";
 
   import { VaultStore } from "../../stores/vault-store.js";
-  import DropCurrencyDialog from "../dialogs/drop-currency-dialog/drop-currency-dialog.js";
+  import Tabs from "../components/Tabs.svelte";
+  import VaultExpanderEntry from "./VaultExpanderEntry.svelte";
+  import ActorPicker from "../components/ActorPicker.svelte";
 
   const { application } = getContext('external');
 
@@ -31,7 +33,8 @@
   const currencies = store.allCurrencies;
   const pileDataStore = store.pileData;
   const gridDataStore = store.gridData;
-  const items = store.gridItems;
+  const gridItems = store.gridItems;
+  const vaultExpanderItems = store.vaultExpanderItems;
 
   $: pileData = $pileDataStore;
   $: gridData = $gridDataStore;
@@ -110,6 +113,11 @@
     store.onDestroy();
   });
 
+  function doubleClickItem(event) {
+    if (!gridData.canWithdrawItems) return;
+    event.detail.item.item.take();
+  }
+
   function rightClickItem(event) {
     setTimeout(() => {
 
@@ -143,28 +151,50 @@
     })
   }
 
+  let tabs = [];
+  $: {
+    tabs = [
+      {
+        value: "vault",
+        label: "ITEM-PILES.Vault.VaultTab"
+      },
+      {
+        value: "expanders",
+        label: "ITEM-PILES.Vault.ExpandersTab"
+      }
+    ]
+  }
+
+  let activeTab = "vault";
+
 </script>
 
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
 
-  <main in:fade={{duration: 500}}>
+  <main in:fade={{duration: 500}} class="item-piles-flexcol">
 
-    <div class="item-piles-flexrow" style="align-items: center; margin-bottom: 0.25rem;">
-      <span style="font-size: 1.5rem;">Vault</span>
+    <Tabs bind:activeTab bind:tabs style="font-size: 1.5rem; flex: 0 1 auto;"/>
+
+    {#if activeTab === "vault"}
+
       {#if store.recipient}
-        <div class="item-piles-flexcol" style="text-align: right; flex: 1 0 auto;">
-          <i>Viewing as {store.recipient.name}</i>
+        <div class="item-piles-flexrow" style="margin: 0.25rem 0; min-height: 21px; flex: 0 1 auto;">
+          {#if application.options.remote}
+            <ActorPicker {store} localization="ITEM-PILES.Vault.ViewingAs" style=""/>
+          {:else}
+            <i>{localize("ITEM-PILES.Vault.ViewingAs", { actorName: store.recipient.name })}</i>
+          {/if}
         </div>
       {/if}
-    </div>
 
-    <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}>
+      <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}
+                style="display: flex; flex: 1; justify-content: center; align-items: center;">
 
-      <Grid bind:items={$items}
-            bind:gridContainer={element}
-            options={{
+        <Grid bind:items={$gridItems}
+              bind:gridContainer={element}
+              options={{
               ...gridData,
               class: "item-piles-grid-background",
               activeClass: "item-piles-grid-item-active",
@@ -173,38 +203,80 @@
               hoverClass: "item-piles-grid-item-hover",
               backgroundGrid: true
             }}
-            dropGhost={$dragPosition}
-            on:change={(event) => store.updateGrid(event.detail.items)}
-            on:rightclick={rightClickItem}
-            on:hover={hoverOverItem}
-            on:leave={hoverLeaveItem}
-            let:item
-      >
-        <VaultItemEntry entry={item}/>
-      </Grid>
+              dropGhost={$dragPosition}
+              on:change={(event) => store.updateGrid(event.detail.items)}
+              on:rightclick={rightClickItem}
+              on:hover={hoverOverItem}
+              on:leave={hoverLeaveItem}
+              on:doubleclick={doubleClickItem}
+              let:item
+        >
+          <VaultItemEntry entry={item}/>
+        </Grid>
 
-    </DropZone>
+      </DropZone>
 
-    <div class="item-piles-flexrow" style="margin-top: 0.25rem;">
+      <div class="item-piles-flexrow" style="margin-top: 0.5rem; min-height: 17px; flex: 0 1 auto;">
+        <div>
+          {#if showItemName}
+            <i out:fade={{ duration:100 }}>{hoveredItem}</i>
+          {/if}
+        </div>
+        <div style="flex:1; justify-self: flex-end; display: flex; justify-content: flex-end;">
+          {#if gridData.canWithdrawCurrencies}
+            <button type="button" class="item-piles-small-button">
+              {localize("ITEM-PILES.Vault.Withdraw")}
+            </button>
+          {/if}
+          {#if gridData.canDepositCurrencies}
+            <button type="button" class="item-piles-small-button">
+              {localize("ITEM-PILES.Vault.Deposit")}
+            </button>
+          {/if}
+        </div>
+      </div>
 
-      {#if gridData.canWithdrawCurrencies}
-        <button type="button" class="item-piles-small-button">Withdraw</button>
-      {/if}
+      <div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
 
-      {#if gridData.canDepositCurrencies}
-        <button type="button" class="item-piles-small-button">Deposit</button>
-      {/if}
+        <CurrencyList {currencies}
+                      options={{ reverse: true, abbreviation: false, imgSize: 18, abbreviateNumbers: true }}
+                      style="align-items: center;">
+          {#if gridData.canEditCurrencies}
+            <a style="order:-1; display:flex; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
+              <i class="fas fa-cog"></i>
+            </a>
+          {/if}
+        </CurrencyList>
 
-      <CurrencyList {currencies} options={{ reverse: true, abbreviation: false, imgSize: 18 }}
-                    style="align-items: center;">
-        {#if gridData.canEditCurrencies}
-          <a style="order:-1; display:flex; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
-            <i class="fas fa-cog"></i>
-          </a>
-        {/if}
-      </CurrencyList>
+      </div>
 
-    </div>
+    {/if}
+
+    {#if activeTab === "expanders"}
+
+      <DropZone callback={onDropData} style="flex:1;">
+
+        <div style="text-align: center;" class="item-piles-bottom-divider">
+          {@html localize("ITEM-PILES.Vault." + (
+            gridData.totalSpaces === gridData.enabledSpaces
+              ? "CapacityFull"
+              : (gridData.enabledSpaces ? "CapacityLeft" : "NeedsCapacity")), {
+            total_capacity: `<strong>${gridData.totalSpaces}</strong>`,
+            capacity: `<strong>${gridData.enabledSpaces}</strong>`,
+          })}
+        </div>
+
+        <div class="item-piles-items-list">
+
+          {#each $vaultExpanderItems as item (item.id)}
+            <VaultExpanderEntry {store} bind:item={item}/>
+          {/each}
+
+        </div>
+
+      </DropZone>
+
+    {/if}
 
   </main>
 

@@ -5,7 +5,8 @@
   export let currencies;
   export let options = {
     reverse: false,
-    abbreviations: true
+    abbreviations: true,
+    abbreviateNumbers: false
   };
 
 </script>

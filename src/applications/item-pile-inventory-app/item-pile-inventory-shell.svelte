@@ -1,77 +1,77 @@
 <script>
-  import { getContext, onDestroy } from 'svelte';
-  import { fade } from 'svelte/transition';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+    import { getContext, onDestroy } from 'svelte';
+    import { fade } from 'svelte/transition';
+    import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+    import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
 
-  import ItemList from "./ItemList.svelte";
-  import CurrencyList from "./CurrencyList.svelte";
-  import ActorPicker from "./ActorPicker.svelte";
+    import ItemList from "./ItemList.svelte";
+    import CurrencyList from "./CurrencyList.svelte";
+    import ActorPicker from "../components/ActorPicker.svelte";
 
-  import * as SharingUtilities from "../../helpers/sharing-utilities.js";
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import PrivateAPI from "../../API/private-api.js";
-  import ItemPileStore from "../../stores/item-pile-store.js";
-  import CategorizedItemList from "./CategorizedItemList.svelte";
+    import * as SharingUtilities from "../../helpers/sharing-utilities.js";
+    import * as PileUtilities from "../../helpers/pile-utilities.js";
+    import PrivateAPI from "../../API/private-api.js";
+    import ItemPileStore from "../../stores/item-pile-store.js";
+    import CategorizedItemList from "./CategorizedItemList.svelte";
 
-  const { application } = getContext('external');
+    const { application } = getContext('external');
 
-  export let elementRoot;
-  export let actor;
-  export let recipient;
+    export let elementRoot;
+    export let actor;
+    export let recipient;
 
-  export let store = new ItemPileStore(application, actor, recipient);
+    export let store = new ItemPileStore(application, actor, recipient);
 
-  // Stores
-  let searchStore = store.search;
-  let editQuantities = store.editQuantities;
-  let pileData = store.pileData;
-  let deleted = store.deleted;
+    // Stores
+    let searchStore = store.search;
+    let editQuantities = store.editQuantities;
+    let pileData = store.pileData;
+    let deleted = store.deleted;
 
-  let numItems = store.numItems;
-  let numCurrencies = store.numCurrencies;
+    let numItems = store.numItems;
+    let numCurrencies = store.numCurrencies;
 
-  $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
-  $: hasItems = $numItems > 0;
-  $: showSearchBar = ($numItems + $numCurrencies) >= 3;
-  $: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
+    $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
+    $: hasItems = $numItems > 0;
+    $: showSearchBar = ($numItems + $numCurrencies) >= 3;
+    $: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
 
-  let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
+    let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 
-  function dropData(event) {
+    function dropData(event) {
 
-    event.preventDefault();
+        event.preventDefault();
 
-    let data;
-    try {
-      data = JSON.parse(event.dataTransfer.getData('text/plain'));
-    } catch (err) {
-      return false;
+        let data;
+        try {
+            data = JSON.parse(event.dataTransfer.getData('text/plain'));
+        } catch (err) {
+            return false;
+        }
+
+        return PrivateAPI._dropData(canvas, data, { target: store.actor });
+
     }
 
-    return PrivateAPI._dropData(canvas, data, { target: store.actor });
+    function preventDefaultGM(event) {
+        if (game.user.isGM) return;
+        event.preventDefault();
+    }
 
-  }
+    function preventDefault(event) {
+        event.preventDefault();
+    }
 
-  function preventDefaultGM(event) {
-    if (game.user.isGM) return;
-    event.preventDefault();
-  }
+    let itemListElement;
+    let scrolled = false;
 
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+    function evaluateShadow() {
+        scrolled = itemListElement.scrollTop > 20;
+    }
 
-  let itemListElement;
-  let scrolled = false;
-
-  function evaluateShadow() {
-    scrolled = itemListElement.scrollTop > 20;
-  }
-
-  onDestroy(() => {
-    store.onDestroy();
-  });
+    onDestroy(() => {
+        store.onDestroy();
+    });
 
 </script>
 

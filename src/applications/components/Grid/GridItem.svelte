@@ -62,6 +62,11 @@
   let collisions = [];
   let pointerOffset = { left: 0, top: 0 };
 
+  function doubleClick(event) {
+    if (event.button !== 0) return;
+    dispatch("itemdoubleclick", { item });
+  }
+
   function moveStart(event) {
 
     if (event.button === 2) {
@@ -194,6 +199,7 @@
 
 <div
   bind:this={itemRef}
+  on:dblclick={doubleClick}
   on:pointerdown={moveStart}
   on:pointerover={hoverOver}
   on:pointerleave={hoverLeave}

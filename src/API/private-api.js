@@ -1457,7 +1457,8 @@ export default class PrivateAPI {
 
     const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
 
-    if (Utilities.canItemStack(dropData.itemData.item)) {
+    let itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
+    if (itemQuantity > 1 && Utilities.canItemStack(dropData.itemData.item)) {
       const quantity = await DropItemDialog.show(item, dropData.target, {
         localizationTitle: "DepositItem"
       });

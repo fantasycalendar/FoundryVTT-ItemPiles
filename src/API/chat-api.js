@@ -488,9 +488,12 @@ export default class ChatAPI {
 
   }
 
-  static async _giveChatMessage(sourceActor, targetActor, items) {
+  static async _giveChatMessage(source, target, items) {
 
     const now = (+new Date());
+
+    const sourceActor = Utilities.getActor(source);
+    const targetActor = Utilities.getActor(target);
 
     // Get all messages younger than 1 minute, and grab the last 5, then reverse them (latest to oldest)
     const messages = Array.from(game.messages)

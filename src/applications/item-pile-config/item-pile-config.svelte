@@ -141,7 +141,7 @@
     ]
   }
 
-  let activeTab = "othersettings";
+  let activeTab = "mainsettings";
 
 </script>
 

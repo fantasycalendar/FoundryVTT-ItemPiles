@@ -15,7 +15,7 @@
     enabledCols: null,
     enabledRows: null,
     gap: 10,
-    gridSize: 40,
+    gridSize: 50,
     canOrganize: false,
     backgroundGrid: false,
     class: "",
@@ -44,6 +44,10 @@
 
   function itemRightClickEvent(event){
     dispatch('rightclick', { ...event.detail });
+  }
+
+  function itemDoubleClickEvent(event) {
+    dispatch('doubleclick', { ...event.detail });
   }
 
 	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
@@ -87,6 +91,7 @@
         bind:items={items}
         bind:options={options}
         {gridContainer}
+        on:itemdoubleclick={itemDoubleClickEvent}
         on:itemchange={itemChangeEvent}
         on:itemhover={itemHoverEvent}
         on:itemhoverleave={itemHoverLeaveEvent}

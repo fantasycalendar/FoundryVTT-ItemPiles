@@ -257,8 +257,7 @@
   &-grid-item-preview {
     opacity: 0.35;
     border-radius: 0.25rem;
-    background-color: rgb(202, 33, 33);
-    transition: all 0.2s;
+    background-color: rgb(202, 109, 33);
     z-index: 20;
   }
 
@@ -266,7 +265,6 @@
     opacity: 0.35;
     border-radius: 0.25rem;
     background-color: rgb(33, 202, 33);
-    transition: all 0.2s;
   }
 
   &-grid-item-hover > div {
@@ -523,7 +521,7 @@
   flex-direction: column;
   justify-content: flex-start;
   overflow: hidden;
-  
+
 
   nav {
     margin-bottom: 0.25rem;
@@ -778,4 +776,8 @@
       border-bottom: 1px solid rgba(0, 0, 0, 0.5);
     }
   }
+}
+
+.item-pile-vault {
+  min-width: 400px;
 }
