@@ -1447,8 +1447,8 @@ export default class PrivateAPI {
 
   static async _depositItem(dropData) {
 
-    const sourceActor = dropData.source.actor ?? dropData.source;
-    const targetActor = dropData.target.actor ?? dropData.target;
+    const sourceActor = dropData.source?.actor ?? dropData.source;
+    const targetActor = dropData.target?.actor ?? dropData.target;
     if (sourceActor === targetActor) return;
 
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
@@ -1481,8 +1481,8 @@ export default class PrivateAPI {
 
   static async _giveItem(dropData) {
 
-    const sourceActor = dropData.source.actor ?? dropData.source;
-    const targetActor = dropData.target.actor ?? dropData.target;
+    const sourceActor = dropData.source?.actor ?? dropData.source;
+    const targetActor = dropData.target?.actor ?? dropData.target;
     if (sourceActor === targetActor) return;
 
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
@@ -1549,8 +1549,8 @@ export default class PrivateAPI {
 
   static async _dropItem(dropData) {
 
-    const sourceActor = dropData.source.actor ?? dropData.source;
-    const targetActor = dropData.target.actor ?? dropData.target;
+    const sourceActor = dropData.source?.actor ?? dropData.source;
+    const targetActor = dropData.target?.actor ?? dropData.target;
     if (sourceActor === targetActor) return;
 
     if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;
