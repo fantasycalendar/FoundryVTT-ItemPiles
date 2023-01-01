@@ -18,10 +18,6 @@ export default {
       "filters": "role, skill, criticalInjury"
     },
     {
-      "path": "system.type",
-      "filters": "cyberwareInternal, cyberwareExternal, fashionware"
-    },
-    {
       "path": "system.isInstalled",
       "filters": [true]
     }
