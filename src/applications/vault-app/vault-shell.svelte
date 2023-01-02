@@ -158,7 +158,7 @@
   <main in:fade={{duration: 500}} class="item-piles-flexcol">
 
     {#if gridData.fullAccess && (pileData.vaultExpansion || pileData.logVaultActions)}
-      <Tabs bind:activeTab={$activeTab} bind:tabs={[
+      <Tabs bind:activeTab={$activeTab} tabs={[
         {
           value: "vault",
           label: "ITEM-PILES.Vault.VaultTab",
