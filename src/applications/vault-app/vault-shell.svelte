@@ -44,7 +44,7 @@
   let hoveredItem = "";
   let element;
 
-  async function onDropData(data) {
+  async function onDropData(data, event, isExpander) {
 
     const { x, y } = get(dragPosition);
     dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
@@ -70,8 +70,13 @@
 
     const vaultExpander = getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
 
+    if (isExpander && !vaultExpander) {
+      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultItemNotExpander"), true)
+      return false;
+    }
+
     if (!store.hasSimilarItem(itemData) && !vaultExpander && !gridData?.freeSpaces) {
-      Helpers.custom_warning(`This vault is full!`, true)
+      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
       return false;
     }
 
@@ -255,7 +260,8 @@
 
     {#if activeTab === "expanders"}
 
-      <DropZone callback={onDropData} style="flex:1;">
+      <DropZone callback={(data, event) => { onDropData(data, event, true) }}
+                style="display: flex; flex-direction: column; flex:1;">
 
         <div style="text-align: center;" class="item-piles-bottom-divider">
           {@html localize("ITEM-PILES.Vault." + (
@@ -274,6 +280,12 @@
           {/each}
 
         </div>
+
+        {#if !$vaultExpanderItems.length}
+          <div style="flex: 1 0 auto; display: flex; align-items: center; place-content: center;">
+            <i>Drag and drop items to expand spaces</i>
+          </div>
+        {/if}
 
       </DropZone>
 

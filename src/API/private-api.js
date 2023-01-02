@@ -15,6 +15,7 @@ import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
+import * as Util from "util";
 
 const preloadedFiles = new Set();
 
@@ -1447,8 +1448,8 @@ export default class PrivateAPI {
 
   static async _depositItem(dropData) {
 
-    const sourceActor = dropData.source?.actor ?? dropData.source;
-    const targetActor = dropData.target?.actor ?? dropData.target;
+    const sourceActor = Utilities.getActor(dropData.source);
+    const targetActor = Utilities.getActor(dropData.target);
     if (sourceActor === targetActor) return;
 
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
@@ -1481,8 +1482,8 @@ export default class PrivateAPI {
 
   static async _giveItem(dropData) {
 
-    const sourceActor = dropData.source?.actor ?? dropData.source;
-    const targetActor = dropData.target?.actor ?? dropData.target;
+    const sourceActor = Utilities.getActor(dropData.source);
+    const targetActor = Utilities.getActor(dropData.target);
     if (sourceActor === targetActor) return;
 
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
@@ -1549,8 +1550,8 @@ export default class PrivateAPI {
 
   static async _dropItem(dropData) {
 
-    const sourceActor = dropData.source?.actor ?? dropData.source;
-    const targetActor = dropData.target?.actor ?? dropData.target;
+    const sourceActor = Utilities.getActor(dropData.source);
+    const targetActor = Utilities.getActor(dropData.target);
     if (sourceActor === targetActor) return;
 
     if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;

@@ -62,7 +62,7 @@ export default class TradeAPI {
 
     if (!actor) return false;
 
-    actor = actor?.actor ?? actor;
+    actor = Utilities.getActor(actor);
 
     const actorOwner = game.users.find(user => user.character === actor && user !== game.user);
     if (actorOwner) {
@@ -173,9 +173,7 @@ export default class TradeAPI {
     const fullPublicTradeId = publicTradeId + randomID();
 
     const tradingUser = game.users.get(tradingUserId);
-    let tradingActor = fromUuidSync(tradingActorUuid);
-
-    tradingActor = tradingActor?.actor ?? tradingActor;
+    const tradingActor = Utilities.getActor(tradingActorUuid);
 
     // Make em pick an actor (if more than one) and accept/decline/mute
     const result = await TradeRequestDialog.show({ tradeId: privateTradeId, tradingUser, tradingActor, isPrivate });

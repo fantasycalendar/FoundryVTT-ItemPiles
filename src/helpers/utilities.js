@@ -7,7 +7,7 @@ export function getActor(target) {
     target = fromUuidSync(target);
   }
   target = getDocument(target);
-  return target?.actor ?? target;
+  return target?.character ?? target?.actor ?? target;
 }
 
 /**

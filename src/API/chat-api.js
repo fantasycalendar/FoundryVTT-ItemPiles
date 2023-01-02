@@ -343,9 +343,7 @@ export default class ChatAPI {
 
   static async _outputSplitToChat(sourceUuid, pileDeltas, actorDeltas, userId) {
 
-    const source = fromUuidSync(sourceUuid);
-
-    const sourceActor = source?.actor ?? source;
+    const sourceActor = Utilities.getActor(sourceUuid);
 
     const divideBy = Object.values(actorDeltas).length;
 
@@ -396,8 +394,7 @@ export default class ChatAPI {
 
     if (instigator !== game.user.id) return;
 
-    let party_1_actor = fromUuidSync(party_1.actor);
-    party_1_actor = party_1_actor?.actor ?? party_1_actor;
+    const party_1_actor = Utilities.getActor(party_1.actor);
     const party_1_data = {
       actor: party_1_actor,
       items: party_2.items,
@@ -405,8 +402,7 @@ export default class ChatAPI {
     }
     party_1_data.got_nothing = !party_1_data.items.length && !party_1_data.currencies.length;
 
-    let party_2_actor = fromUuidSync(party_2.actor);
-    party_2_actor = party_2_actor?.actor ?? party_2_actor;
+    const party_2_actor = Utilities.getActor(party_1.actor);
     const party_2_data = {
       actor: party_2_actor,
       items: party_1.items,

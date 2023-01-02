@@ -39,7 +39,9 @@
       "GiveItemNoGM": "There is no GM active to receive you giving this item.",
       "GiveItemDeclined": "{user_name} declined your item offer.",
       "NoPlayersActive": "No players are active to do this action",
-      "NoGMsConnectedAction": "WARNING - Could not execute \"{action}\" because no GMs are active."
+      "NoGMsConnectedAction": "WARNING - Could not execute \"{action}\" because no GMs are active.",
+      "VaultFull": "This vault is full!",
+      "VaultItemNotExpander": "That item is not a vault expander"
     },
     "Inspect": {
       "Title": "Inspecting Pile Contents",

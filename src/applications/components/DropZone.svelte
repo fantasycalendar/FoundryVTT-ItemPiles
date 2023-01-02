@@ -10,7 +10,7 @@
   export let leaveCallback = () => {
   };
 
-  function dropData(event) {
+  function dropData(event, ...args) {
     if (!active) return;
     counter = 0;
     let data;
@@ -19,7 +19,7 @@
     } catch (err) {
       return false;
     }
-    callback(data, event);
+    callback(data, event, ...args);
   }
 
   let counter = 0;

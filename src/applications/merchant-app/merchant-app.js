@@ -5,6 +5,7 @@ import * as Helpers from "../../helpers/helpers.js";
 import UserSelectDialog from "../dialogs/user-select-dialog/user-select-dialog.js";
 import SETTINGS from "../../constants/settings.js";
 import CONSTANTS from "../../constants/constants.js";
+import * as Utilities from "../../helpers/utilities.js";
 
 export default class MerchantApp extends SvelteApplication {
 
@@ -44,15 +45,15 @@ export default class MerchantApp extends SvelteApplication {
   }
 
   static async show(merchant, recipient = false, options = {}, dialogData = {}) {
-    merchant = merchant?.actor ?? merchant;
-    recipient = recipient?.actor ?? recipient
-    const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, merchant, recipient, options, dialogData);
+    const merchantActor = Utilities.getActor(merchant);
+    const recipientActor = Utilities.getActor(recipient);
+    const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, merchantActor, recipientActor, options, dialogData);
     if (result === false) return;
     const app = this.getActiveApp(merchant.id);
     if (app) return app.render(false, { focus: true });
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(merchant, recipient, options, dialogData).render(true, { focus: true });
+      new this(merchant, recipientActor, options, dialogData).render(true, { focus: true });
     })
   }
 

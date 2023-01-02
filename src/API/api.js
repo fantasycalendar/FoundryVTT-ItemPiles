@@ -659,7 +659,7 @@ class API {
           throw Helpers.custom_error("SplitItemPileContents | Each of the entries in targets must be of type TokenDocument or Actor")
         }
       })
-      targets = targets.map(target => target?.character ?? target?.actor ?? target);
+      targets = targets.map(target => Utilities.getActor(target));
     }
 
     if (instigator && !(instigator instanceof TokenDocument || instigator instanceof Actor)) {
