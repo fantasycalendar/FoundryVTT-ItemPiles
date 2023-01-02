@@ -2,9 +2,9 @@
 
   <div class="item-piles-chat-card-title">
     <p>
-      <img src="{{source.img}}" title="{{source.name}}" height="32"/>
+      <img src="{{source.img}}" data-tooltip="{{source.name}}" height="32"/>
       <i class="fas fa-arrow-right"></i>
-      <img src="{{target.img}}" title="{{target.name}}" height="32"/>
+      <img src="{{target.img}}" data-tooltip="{{target.name}}" height="32"/>
     </p>
     <p>{{message}}</p>
   </div>
@@ -13,7 +13,7 @@
   <ul>
     {{#each items as |item id|}}
     <li>
-      <img src="{{item.img}}" title="{{item.name}}" height="16"/>
+      <img src="{{item.img}}" data-tooltip="{{item.name}}" height="16"/>
       <label>{{item.name}}</label>
       <small>{{item.quantity}}</small>
     </li>

@@ -114,10 +114,6 @@
       }
     });
 
-    if (currentData.enabled && currentData.type === CONSTANTS.PILE_TYPES.VAULT && currentData.logVaultActions) {
-      await PileUtilities.getVaultJournalPageForItemPile(pileActor, { create: true });
-    }
-
     application.close();
 
   }

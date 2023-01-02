@@ -1150,48 +1150,6 @@ export function getPricesForItems(itemsToBuy, {
 
 /* ---------------------- VAULT FUNCTIONS ---------------------- */
 
-export async function getVaultJournal() {
-  let journal = Helpers.getSetting(SETTINGS.VAULT_LOG_JOURNAL_ID)
-    ? game.journal.get(Helpers.getSetting(SETTINGS.VAULT_LOG_JOURNAL_ID))
-    : false;
-  if (!journal) {
-    journal = await JournalEntry.create({ name: "Item Piles: Vault Log" })
-    await Helpers.setSetting(SETTINGS.VAULT_LOG_JOURNAL_ID, journal.id);
-    Helpers.custom_notify(game.i18n.localize("ITEM-PILES.Notifications.CreatedJournal"));
-  }
-  return journal;
-}
-
-export async function getVaultJournalPageForItemPile(actor, { create = false } = {}) {
-  const journal = await getVaultJournal();
-  let page = journal.pages.find(page => getProperty(page, CONSTANTS.FLAGS.PILE + ".actorId") === actor.id);
-  if (!page && create) {
-    page = (await journal.createEmbeddedDocuments("JournalEntryPage", [{
-      name: actor.name + ": Log",
-      ownership: foundry.utils.deepClone(actor.ownership),
-      text: {
-        markdown: "*Nothing here yet*",
-        format: CONST.JOURNAL_ENTRY_PAGE_FORMATS.MARKDOWN
-      },
-      "flags.core.sheetClass": "core.MarkdownJournalPageSheet",
-      [CONSTANTS.FLAGS.PILE]: {
-        actorId: actor.id,
-      }
-    }]))[0];
-  }
-  return page;
-}
-
-function vaultTextGenerator(actor, user, itemName, quantity, withdraw) {
-  return "* " + game.i18n.format(`ITEM-PILES.VaultLog.${withdraw ? "Withdraw" : "Deposit"}`, {
-    actor_name: actor.name,
-    user_name: user.name,
-    item_name: itemName,
-    quantity,
-    date: new Date(Date.now()).toUTCString()
-  })
-}
-
 export async function updateVaultJournalLog(itemPile, {
   actor = false,
   userId = false,
@@ -1203,34 +1161,57 @@ export async function updateVaultJournalLog(itemPile, {
   const formattedItems = [];
   const formattedCurrencies = [];
 
-  const user = game.users.get(userId);
   const currencies = getActorCurrencies(itemPile, { getAll: true });
+
+  const date = Date.now();
 
   for (const itemData of items) {
     if (currencies.some(currency => currency.name === itemData.item.name)) {
-      formattedCurrencies.push(vaultTextGenerator(actor, user, itemData.name, itemData.quantity, withdrawal));
+      formattedCurrencies.push({
+        actor: actor.name,
+        user: userId,
+        name: itemData.name,
+        qty: itemData.quantity * (withdrawal ? -1 : 1),
+        date
+      });
     } else {
       const item = await Item.implementation.create(itemData.item, { temporary: true });
-      formattedItems.push(vaultTextGenerator(actor, user, item.name, itemData.quantity, withdrawal));
+      formattedItems.push({
+        actor: actor.name,
+        user: userId,
+        name: item.name,
+        qty: itemData.quantity * (withdrawal ? -1 : 1),
+        date
+      });
     }
   }
 
   for (const [key, quantity] of Object.entries(attributes)) {
     const currency = currencies.find(currency => currency.data.path === key);
     if (currency) {
-      formattedCurrencies.push(vaultTextGenerator(actor, user, currency.name, quantity, withdrawal));
+      formattedCurrencies.push({
+        actor: actor.name,
+        user: userId,
+        name: currency.name,
+        qty: quantity * (withdrawal ? -1 : 1),
+        date
+      });
     }
   }
 
-  const formattedText = formattedItems.concat(formattedCurrencies).join("\n\n");
+  const vaultLog = getActorVaultLog(itemPile);
 
-  const page = await getVaultJournalPageForItemPile(itemPile, { create: true });
+  return itemPile.update({
+    [CONSTANTS.FLAGS.LOG]: formattedItems.concat(formattedCurrencies).concat(vaultLog)
+  });
+}
 
-  const newText = page.text.markdown !== "*Nothing here yet*"
-    ? formattedText + "\n\n" + page.text.markdown
-    : formattedText;
+export function getActorVaultLog(actor) {
+  return getProperty(Utilities.getActor(actor), CONSTANTS.FLAGS.LOG) || [];
+}
 
-  return page.update({
-    "text.markdown": newText
+export function clearVaultLog(actor) {
+  return actor.update({
+    [CONSTANTS.FLAGS.LOG]: []
   });
 }

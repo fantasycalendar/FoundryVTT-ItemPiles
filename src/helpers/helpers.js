@@ -263,3 +263,27 @@ export function abbreviateNumbers(number, decPlaces = 2) {
 
   return number
 }
+
+
+export function timeSince(date) {
+
+  const seconds = Math.floor((new Date() - date) / 1000);
+
+  const intervals = {
+    "year": 31536000,
+    "month": 2592000,
+    "day": 86400,
+    "hour": 3600,
+    "minute": 60,
+    "second": 1
+  }
+
+  for (const [key, value] of Object.entries(intervals)) {
+    const interval = seconds / value;
+    if (interval > 1) {
+      const amount = Math.floor(interval);
+      return `${amount} ${key}${amount > 1 ? "s" : ""}`;
+    }
+  }
+  return "";
+}

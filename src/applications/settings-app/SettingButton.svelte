@@ -36,7 +36,7 @@
       {localize(data.name)}
       {#if !data.hideResetButton}
         <a>
-          <i title="Reset data" class="fas fa-undo reset-setting"
+          <i data-tooltip="Reset data" class="fas fa-undo reset-setting"
              on:click={() => { data.value = data.default; }}></i>
         </a>
       {/if}

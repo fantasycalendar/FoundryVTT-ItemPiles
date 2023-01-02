@@ -22,7 +22,7 @@
 </script>
 
 {#if editQuantities}
-  <div style="text-align: center; flex: 0 1 auto;">{localize("ITEM-PILES.Inspect.Owner")}</div>
+  <div {style}>{localize("ITEM-PILES.Inspect.Owner")}</div>
 {:else}
   <div {style}>
     {#if !changingActor}
@@ -31,7 +31,7 @@
     {#if playerActors.length > 1}
       {#if !changingActor}
         <a class='item-piles-highlight' on:click={() => { changingActor = true }} class:active={!changingActor}>
-          Change actor.
+          Change.
         </a>
       {:else}
         <select

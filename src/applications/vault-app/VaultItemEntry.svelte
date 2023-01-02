@@ -1,7 +1,5 @@
 <script>
 
-  import { TJSMenu } from "@typhonjs-fvtt/svelte-standard/component";
-
   export let entry;
 
   const item = entry.item;
@@ -13,8 +11,8 @@
 
 </script>
 
-<div class="grid-item">
-  <img title={$name} src={$img} alt={$name}/>
+<div class="grid-item" data-tooltip={$name} data-tooltip-activation-speed="0" data-tooltip-deactivation-speed="0">
+  <img src={$img} alt={$name}/>
   {#if canStack && $quantity > 1}
     <span>{$quantity}</span>
   {/if}

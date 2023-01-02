@@ -80,7 +80,7 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
     applySystemSpecificStyles();
   }, 500);
 
-  // game.itempiles.API.renderItemPileInterface(game.actors.getName("Item Pile"));
+  // game.itempiles.API.renderItemPileInterface(game.actors.getName("Vault"));
 
   // ItemPileConfig.show(game.actors.getName("Item Pile"))
 
@@ -91,4 +91,4 @@ Hooks.on(CONSTANTS.HOOKS.RESET_SETTINGS, async () => {
     await setting.delete();
   }
   checkSystem();
-});
+})

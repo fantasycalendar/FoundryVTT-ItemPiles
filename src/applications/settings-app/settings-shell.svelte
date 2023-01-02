@@ -55,7 +55,7 @@
   async function resetSettings() {
 
     const doThing = await TJSDialog.confirm({
-      title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
       content: {
         class: CustomDialog,
         props: {

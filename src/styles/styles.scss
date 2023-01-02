@@ -805,3 +805,19 @@
 .item-pile-vault {
   min-width: 350px;
 }
+
+.item-piles-vault-log {
+  > div {
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .item-piles-log-deposit span {
+    color: green;
+    
+  }
+
+  .item-piles-log-withdrawal span {
+    color: red;
+  }
+}

@@ -166,14 +166,17 @@
       "Title": "Vault: {actor_name}",
       "VaultTab": "Vault",
       "ExpandersTab": "Expanders",
-      "ViewingAs": "Viewing as {actorName}",
+      "LogTab": "Logs",
+      "ViewingAs": "Viewing as {actor_name}",
       "NeedsCapacity": "This vault has a total capacity of {total_capacity}, but none of it is available until vault expanders are added",
       "CapacityLeft": "This vault has a capacity of {capacity}, with a maximum of {total_capacity}, drag and drop vault expanders to increase capacity",
       "CapacityFull": "This vault has reached its maximum capacity of {total_capacity}",
       "ExpandsCols": "{cols} columns",
       "ExpandsRows": "{rows} rows",
       "Withdraw": "Withdraw",
-      "Deposit": "Deposit"
+      "Deposit": "Deposit",
+      "LogEntryDeposited": "{actor_name} ({user_name}) <span>deposited</span> <strong>{item_name}</strong> x {quantity}",
+      "LogEntryWithdrew": "{actor_name} ({user_name}) <span>withdrew</span> <strong>{item_name}</strong> x {quantity}"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -183,7 +186,7 @@
         "SellContent": "You're attempting to sell item of type (\"{type}\") that the merchant normally doesn't accept. Are you sure you want to do this?"
       },
       "ResetSettings": {
-        "Title": "Reset Item Piles Module Settings",
+        "Title": "Reset Module Settings",
         "Content": "Are you sure you want to reset all of the Item Piles module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
         "Confirm": "Reset Module Settings"
       },
@@ -240,6 +243,10 @@
       "UserSelect": {
         "Title": "Select Users",
         "Content": "Show to which users?"
+      },
+      "ClearVaultLog": {
+        "Title": "Clear Vault Log?",
+        "Content": "Are you sure you want to clear the log of the vault \"{actor_name}\"?"
       }
     },
     "Applications": {
@@ -274,10 +281,22 @@
       },
       "DropCurrencies": {
         "Title": "Dropping Currencies",
-        "Player": "You can drop the following currencies into this item pile:",
-        "GM": "As a GM, you can update the currencies this on item pile:",
+        "Content": "You can drop the following currencies into this item pile:",
+        "ContentNoTarget": "As a GM, you can update the currencies this on item pile:",
         "NoCurrency": "{actor_name} has no valid currencies...",
-        "AddToPile": "Add to pile"
+        "Submit": "Add to pile"
+      },
+      "DepositCurrencies": {
+        "Title": "Deposit Currencies",
+        "Content": "You can deposit the following currencies into this vault:",
+        "NoCurrency": "{actor_name} has no currencies to deposit.",
+        "Submit": "Deposit"
+      },
+      "WithdrawCurrencies": {
+        "Title": "Withdraw Item",
+        "Content": "You can withdraw the following currencies from this vault:",
+        "NoCurrency": "There are no currencies to withdraw.",
+        "Submit": "Withdraw"
       },
       "TradeMerchantItem": {
         "Title": "Trading Item: {item_name}",
@@ -520,7 +539,9 @@
           "AccessExplanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access.",
           "ManageAccess": "Manage Access",
           "LogVaultAccess": "Log Vault Access",
-          "LogVaultAccessExplanation": "When enabled, this vault will create a journal entry and create timestamped logs any time the vault is interacted with."
+          "LogVaultAccessExplanation": "When enabled, this vault will create a journal entry and create timestamped logs any time the vault is interacted with.",
+          "ClearVaultLog": "Clear Vault Logs",
+          "ClearVaultLogExplanation": "This will clear the vault logs, removing all entries. This cannot be undone."
         }
       },
       "VaultAccessEditor": {

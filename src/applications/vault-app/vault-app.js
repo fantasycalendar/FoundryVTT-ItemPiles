@@ -46,8 +46,7 @@ export default class VaultApp extends SvelteApplication {
       closeOnSubmit: false,
       classes: ["app window-app sheet item-pile-vault item-piles"],
       resizable: false,
-      minheight: "600",
-      minwidth: "600"
+      width: "auto"
     });
   }
 

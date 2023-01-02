@@ -11,11 +11,11 @@
   async function resetSharingData() {
     const doThing = await TJSDialog.confirm({
       id: `sharing-dialog-item-pile-config-${pileActor.id}`,
-      title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
       content: {
         class: CustomDialog,
         props: {
-          header: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
+          header: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
           content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content")
         },
       },

@@ -329,36 +329,48 @@ export default class ItemPileStore {
 
   }
 
-  async addCurrency(recipient) {
+  async depositCurrency() {
+    const result = await DropCurrencyDialog.show(this.recipient, this.actor, { localization: "DepositCurrencies" });
+    return this._addCurrency(result, this.recipient, this.actor);
+  }
 
-    const result = recipient
-      ? await DropCurrencyDialog.show(recipient, this.actor)
-      : await DropCurrencyDialog.show(this.actor, false, {
-        unlimitedCurrencies: true,
-        existingCurrencies: PileUtilities.getActorCurrencies(this.actor),
-        button: "Submit"
-      });
+  async withdrawCurrency() {
+    const result = await DropCurrencyDialog.show(this.actor, this.recipient, { localization: "WithdrawCurrencies" });
+    return this._addCurrency(result, this.actor, this.recipient);
+  }
 
-    if (!result) return;
+  async addCurrency() {
+    const result = await DropCurrencyDialog.show(this.actor, false, {
+      unlimitedCurrencies: true,
+      existingCurrencies: PileUtilities.getActorCurrencies(this.actor),
+      button: "Submit"
+    });
+    return this._addCurrency(result, this.actor);
+  }
 
-    if (!recipient) {
+  async _addCurrency(currencies, source, target = false) {
 
-      if (!foundry.utils.isEmpty(result.attributes)) {
-        await game.itempiles.API.setAttributes(this.actor, result.attributes, { interactionId: this.interactionId })
+    if (!currencies) return;
+
+    if (!target) {
+
+      if (!foundry.utils.isEmpty(currencies.attributes)) {
+        await game.itempiles.API.setAttributes(source, currencies.attributes, { interactionId: this.interactionId })
       }
-      if (result.items.length) {
-        await game.itempiles.API.addItems(this.actor, result.items, { interactionId: this.interactionId })
+      if (currencies.items.length) {
+        await game.itempiles.API.addItems(source, currencies.items, { interactionId: this.interactionId })
       }
 
     } else {
 
-      if (!foundry.utils.isEmpty(result.attributes)) {
-        await game.itempiles.API.transferAttributes(this.recipient, this.actor, result.attributes, { interactionId: this.interactionId })
+      if (!foundry.utils.isEmpty(currencies.attributes)) {
+        await game.itempiles.API.transferAttributes(source, target, currencies.attributes, { interactionId: this.interactionId })
       }
-      if (result.items.length) {
-        await game.itempiles.API.transferItems(this.recipient, this.actor, result.items, { interactionId: this.interactionId })
+      if (currencies.items.length) {
+        await game.itempiles.API.transferItems(source, target, currencies.items, { interactionId: this.interactionId })
       }
     }
+
   }
 
   takeAll() {

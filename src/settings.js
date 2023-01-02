@@ -93,7 +93,7 @@ export async function checkSystem() {
 
   if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
     const doThing = await TJSDialog.confirm({
-      title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
       content: {
         class: CustomDialog,
         props: {

@@ -689,6 +689,16 @@ export default class PrivateAPI {
           attributes: attributeDeltas
         });
       }
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
+        attributes: attributeDeltas,
+        withdrawal: sourceIsItemPile
+      });
     }
 
     return attributeDeltas;
@@ -1633,7 +1643,8 @@ export default class PrivateAPI {
     const item = await Item.implementation.create(itemData.item, { temporary: true });
 
     const accepted = await TJSDialog.confirm({
-      title: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"), content: {
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"),
+      content: {
         class: CustomDialog, props: {
           content: game.i18n.format(contentString, {
             source_actor_name: sourceActor.name,
@@ -2072,6 +2083,13 @@ export default class PrivateAPI {
       if (resetTable) {
         await rollTable.reset();
       }
+
+      await rollTable.update({
+        results: rollTable.results.map(result => ({
+          _id: result.id,
+          weight: result.range[1] - (result.range[0] - 1)
+        }))
+      });
       await rollTable.normalize();
     }
 

@@ -13,6 +13,7 @@ export default function registerUIOverrides() {
   Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
   Hooks.on("renderSidebarTab", hideTemporaryItems);
   Hooks.on("renderTokenHUD", renderPileHUD);
+  game.tooltip = new FastTooltipManager();
 }
 
 function hideTemporaryItems(sidebar) {
@@ -124,33 +125,181 @@ function renderPileHUD(app, html) {
 
   if (!PileUtilities.isValidItemPile(document)) return;
 
-  const pileData = PileUtilities.getActorFlagData(document);
+  if (PileUtilities.isItemPileContainer(document)) {
 
-  const container = $(`<div class="col right" style="right:-130px;"></div>`);
+    const pileData = PileUtilities.getActorFlagData(document);
 
-  if (PileUtilities.isItemPileContainer(target)) {
+    const container = $(`<div class="col right" style="right:-130px;"></div>`);
 
-    const lock_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pileData.locked ? "" : "-open"}"></i></div>`);
+    const lock_button = $(`<div class="control-icon item-piles" data-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pileData.locked ? "" : "-open"}"></i></div>`);
     lock_button.click(async function () {
       $(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
       await game.itempiles.API.toggleItemPileLocked(document);
     });
     container.append(lock_button);
 
-    const open_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${pileData.closed ? "" : "-open"}"></i></div>`);
+    const open_button = $(`<div class="control-icon item-piles" data-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${pileData.closed ? "" : "-open"}"></i></div>`);
     open_button.click(async function () {
       $(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
       await game.itempiles.API.toggleItemPileClosed(document);
     });
     container.append(open_button);
+
+    const configure_button = $(`<div class="control-icon item-piles" data-tooltip="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i class="fas fa-toolbox"></i></div>`);
+    configure_button.click(async function () {
+      ItemPileConfig.show(document);
+    });
+    container.append(configure_button);
+
+    html.append(container)
+
   }
 
-  const configure_button = $(`<div class="control-icon item-piles" title="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i class="fas fa-toolbox"></i></div>`);
-  configure_button.click(async function () {
-    ItemPileConfig.show(document);
-  });
-  container.append(configure_button);
+}
 
-  html.append(container)
+class FastTooltipManager extends TooltipManager {
 
+  /**
+   * A cached reference to the global tooltip element
+   * @type {HTMLElement}
+   */
+  tooltip = document.getElementById("tooltip");
+
+  /**
+   * A reference to the HTML element which is currently tool-tipped, if any.
+   * @type {HTMLElement|null}
+   */
+  element = null;
+
+  /**
+   * An amount of margin which is used to offset tooltips from their anchored element.
+   * @type {number}
+   */
+  static TOOLTIP_MARGIN_PX = 5;
+
+  /**
+   * The number of milliseconds delay which activates a tooltip on a "long hover".
+   * @type {number}
+   */
+  static TOOLTIP_ACTIVATION_MS = 500;
+
+  /**
+   * The number of milliseconds delay which activates a tooltip on a "long hover".
+   * @type {number}
+   */
+  static TOOLTIP_DEACTIVATION_MS = 500;
+
+  /**
+   * The directions in which a tooltip can extend, relative to its tool-tipped element.
+   * @enum {string}
+   */
+  static TOOLTIP_DIRECTIONS = {
+    UP: "UP",
+    DOWN: "DOWN",
+    LEFT: "LEFT",
+    RIGHT: "RIGHT",
+    CENTER: "CENTER"
+  };
+
+  /**
+   * Is the tooltip currently active?
+   * @type {boolean}
+   */
+  #active = false;
+
+  /**
+   * A reference to a window timeout function when an element is activated.
+   * @private
+   */
+  #activationTimeout;
+
+  /**
+   * A reference to a window timeout function when an element is deactivated.
+   * @private
+   */
+  #deactivationTimeout;
+
+  /**
+   * An element which is pending tooltip activation if hover is sustained
+   * @type {HTMLElement|null}
+   */
+  #pending;
+
+  /* -------------------------------------------- */
+
+  /**
+   * Activate interactivity by listening for hover events on HTML elements which have a data-tooltip defined.
+   */
+  activateEventListeners() {
+    document.body.addEventListener("pointerenter", this.#onActivate.bind(this), true);
+    document.body.addEventListener("pointerleave", this.#onDeactivate.bind(this), true);
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Handle hover events which activate a tooltipped element.
+   * @param {PointerEvent} event    The initiating pointerenter event
+   */
+  #onActivate(event) {
+    if (Tour.tourInProgress) return; // Don't activate tooltips during a tour
+    const element = event.target;
+    if (!element.dataset.tooltip) {
+      // Check if the element has moved out from underneath the cursor and pointerenter has fired on a non-child of the
+      // tooltipped element.
+      if (this.#active && !this.element.contains(element)) this.#startDeactivation();
+      return;
+    }
+
+    // Don't activate tooltips if the element contains an active context menu
+    if (element.matches("#context-menu") || element.querySelector("#context-menu")) return;
+
+    // If the tooltip is currently active, we can move it to a new element immediately
+    if (this.#active) this.activate(element);
+    else this.#clearDeactivation();
+
+    // Otherwise, delay activation to determine user intent
+    this.#pending = element;
+    this.#activationTimeout = window.setTimeout(() => {
+      this.activate(element);
+    }, Number(element?.dataset?.tooltipActivationSpeed) ?? this.constructor.TOOLTIP_ACTIVATION_MS);
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Handle hover events which deactivate a tooltipped element.
+   * @param {PointerEvent} event    The initiating pointerleave event
+   */
+  #onDeactivate(event) {
+    if (event.target !== (this.element ?? this.#pending)) return;
+    this.#startDeactivation();
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Start the deactivation process.
+   */
+  #startDeactivation() {
+    // Clear any existing activation workflow
+    window.clearTimeout(this.#activationTimeout);
+    this.#pending = this.#activationTimeout = null;
+
+    // Delay deactivation to confirm whether some new element is now pending
+    window.clearTimeout(this.#deactivationTimeout);
+    this.#deactivationTimeout = window.setTimeout(() => {
+      if (!this.#pending) this.deactivate();
+    }, Number(this.element?.dataset?.tooltipDeactivationSpeed) ?? this.constructor.TOOLTIP_DEACTIVATION_MS);
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Clear any existing deactivation workflow.
+   */
+  #clearDeactivation() {
+    window.clearTimeout(this.#deactivationTimeout);
+    this.#pending = this.#deactivationTimeout = null;
+  }
 }

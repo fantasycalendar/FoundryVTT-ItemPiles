@@ -8,6 +8,9 @@ import ItemPileSocket from "../socket.js";
 import DropItemDialog from "../applications/dialogs/drop-item-dialog/drop-item-dialog.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
+import * as SharingUtilities from "../helpers/sharing-utilities.js";
+import * as PileUtilities from "../helpers/pile-utilities.js";
+import { timeSince } from "../helpers/helpers.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -24,6 +27,11 @@ export class VaultStore extends ItemPileStore {
     this.gridData = writable({});
     this.gridItems = writable([]);
     this.validGridItems = writable([]);
+
+    this.logSearch = writable("");
+    this.vaultLog = writable([]);
+    this.visibleLogItems = writable(18);
+
     this.highlightedGridItems = writable([]);
     this.vaultExpanderItems = writable([]);
     this.refreshGridDebounce = foundry.utils.debounce(() => {
@@ -37,6 +45,48 @@ export class VaultStore extends ItemPileStore {
     this.subscribeTo(this.pileData, () => {
       this.refreshGridDebounce();
     });
+
+    this.subscribeTo(this.document, () => {
+      const { data } = this.document.updateOptions;
+      if (hasProperty(data, CONSTANTS.FLAGS.LOG)) {
+        this.processLogEntries();
+      }
+    });
+
+    this.subscribeTo(this.logSearch, this.filterLogEntries.bind(this));
+
+    this.processLogEntries();
+  }
+
+  processLogEntries() {
+
+    const logEntries = PileUtilities.getActorVaultLog(this.actor);
+
+    logEntries.map(log => {
+      log.text = game.i18n.format("ITEM-PILES.Vault.LogEntry" + (log.qty > 0 ? "Deposited" : "Withdrew"), {
+        actor_name: log.actor,
+        user_name: game.users.get(log.user)?.name ?? "unknown",
+        item_name: log.name,
+        quantity: Math.abs(log.qty),
+      })
+      log.visible = true;
+    });
+
+    this.vaultLog.set(logEntries);
+
+    this.filterLogEntries()
+
+  }
+
+  filterLogEntries() {
+    const search = get(this.logSearch).toLowerCase();
+    const regex = new RegExp(search, "g");
+    this.vaultLog.update((logs) => {
+      for (let log of logs) {
+        log.visible = log.text.toLowerCase().search(regex) !== -1;
+      }
+      return logs;
+    })
   }
 
   refreshFreeSpaces() {
@@ -85,11 +135,12 @@ export class VaultStore extends ItemPileStore {
         canWithdrawItems: this.actor.isOwner && this.recipient,
         canDepositItems: this.actor.isOwner && this.recipient,
         canWithdrawCurrencies: this.actor.isOwner && this.recipient,
-        canDepositCurrencies: this.actor.isOwner && this.recipient,
-        canEditCurrencies: game.user.isGM
+        canDepositCurrencies: this.actor.isOwner && this.recipient
       })
 
       return {
+        fullAccess: game.user.isGM || Object.values(access).every(Boolean),
+        canEditCurrencies: game.user.isGM,
         totalSpaces: Math.max(0, (pileData.cols * pileData.rows)),
         enabledSpaces: Math.max(0, (enabledCols * enabledRows)),
         freeSpaces: Math.max(0, (enabledCols * enabledRows) - items.length),
@@ -202,7 +253,10 @@ export class VaultStore extends ItemPileStore {
         if (item) {
           allItems.splice(allItems.indexOf(item), 1);
           existingItems.push({
-            id: item.id, transform: item.transform, highlight: search && highlightedItems.includes(item.id), item,
+            id: item.id,
+            transform: item.transform,
+            highlight: search && highlightedItems.includes(item.id),
+            item,
           });
         }
         return item?.id ?? null;
@@ -221,7 +275,10 @@ export class VaultStore extends ItemPileStore {
                 return trans;
               });
               return {
-                id: item.id, transform: item.transform, highlight: search && highlightedItems.includes(item.id), item
+                id: item.id,
+                transform: item.transform,
+                highlight: search && highlightedItems.includes(item.id),
+                item
               };
             }
           }

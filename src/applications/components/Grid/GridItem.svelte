@@ -15,6 +15,7 @@
   let itemRef = HTMLElement;
   const transformStore = item.transform;
   const previewTransform = writable({});
+  const tooltip = item.name;
 
   $: transform = $transformStore;
   $: gridTransform = calcPosition(transform, options);
@@ -85,6 +86,8 @@
 
     // If not left mouse, skip
     if (event.button !== 0) return;
+
+    dispatch("itembegindrag", { item, target: itemRef });
 
     // Get offset for pointer within the grid item
     pointerOffset = {
@@ -185,6 +188,7 @@
     const { x, y } = itemRef.getBoundingClientRect();
     dispatch("itemhover", {
       item,
+      target: itemRef,
       x: x + Math.floor(options.gridSize / 2),
       y: y + Math.floor(options.gridSize / 2)
     });
@@ -194,13 +198,19 @@
     const { x, y } = itemRef.getBoundingClientRect();
     dispatch("itemhoverleave", {
       item,
+      target: itemRef,
       x: x + Math.floor(options.gridSize / 2),
       y: y + Math.floor(options.gridSize / 2)
     });
   }
 
   function rightClick(event) {
-    dispatch("itemrightclick", { item, x: event.pageX, y: event.pageY });
+    dispatch("itemrightclick", {
+      item,
+      target: itemRef,
+      x: event.pageX,
+      y: event.pageY
+    });
   }
 
 </script>

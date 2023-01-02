@@ -40,6 +40,10 @@
     dispatch('hover', { ...event.detail });
   }
 
+  function itemBeginDrag(event){
+    dispatch('begindrag', { ...event.detail });
+  }
+
   function itemHoverLeaveEvent(event){
     dispatch('leave', { ...event.detail });
   }
@@ -96,6 +100,7 @@
         on:itemdoubleclick={itemDoubleClickEvent}
         on:itemchange={itemChangeEvent}
         on:itemhover={itemHoverEvent}
+        on:itembegindrag={itemBeginDrag}
         on:itemhoverleave={itemHoverLeaveEvent}
         on:itemrightclick={itemRightClickEvent}
       >
