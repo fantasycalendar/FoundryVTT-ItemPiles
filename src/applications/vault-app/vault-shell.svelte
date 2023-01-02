@@ -145,29 +145,6 @@
     })
   }
 
-  let tabs = [];
-  $: {
-    tabs = [
-      {
-        value: "vault",
-        label: "ITEM-PILES.Vault.VaultTab",
-        icon: "fas fa-vault",
-      },
-      {
-        value: "expanders",
-        label: "ITEM-PILES.Vault.ExpandersTab",
-        icon: "fas fa-maximize",
-        hidden: !pileData.vaultExpansion || !gridData.fullAccess
-      },
-      {
-        value: "log",
-        label: "ITEM-PILES.Vault.LogTab",
-        icon: "fas fa-note-sticky",
-        hidden: !pileData.logVaultActions || !gridData.fullAccess
-      }
-    ]
-  }
-
   let activeTab = writable("vault");
 
   const applicationHeight = application.position.stores.height;
@@ -181,8 +158,25 @@
   <main in:fade={{duration: 500}} class="item-piles-flexcol">
 
     {#if gridData.fullAccess && (pileData.vaultExpansion || pileData.logVaultActions)}
-      <Tabs bind:activeTab={$activeTab} bind:tabs
-            style="flex: 0 1 auto; margin-bottom: 0.5rem; padding-bottom: 0.5rem;"/>
+      <Tabs bind:activeTab={$activeTab} bind:tabs={[
+        {
+          value: "vault",
+          label: "ITEM-PILES.Vault.VaultTab",
+          icon: "fas fa-vault",
+        },
+        {
+          value: "expanders",
+          label: "ITEM-PILES.Vault.ExpandersTab",
+          icon: "fas fa-maximize",
+          hidden: !pileData.vaultExpansion || !gridData.fullAccess
+        },
+        {
+          value: "log",
+          label: "ITEM-PILES.Vault.LogTab",
+          icon: "fas fa-note-sticky",
+          hidden: !pileData.logVaultActions || !gridData.fullAccess
+        }
+      ]} style="flex: 0 1 auto; margin-bottom: 0.5rem; padding-bottom: 0.5rem;"/>
     {/if}
 
     {#if $activeTab === "vault"}
