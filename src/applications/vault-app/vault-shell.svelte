@@ -180,7 +180,7 @@
 
   <main in:fade={{duration: 500}} class="item-piles-flexcol">
 
-    {#if tabs.filter(tab => !tab.hidden).length > 1}
+    {#if gridData.fullAccess && (pileData.vaultExpansion || pileData.logVaultActions)}
       <Tabs bind:activeTab={$activeTab} bind:tabs
             style="flex: 0 1 auto; margin-bottom: 0.5rem; padding-bottom: 0.5rem;"/>
     {/if}
