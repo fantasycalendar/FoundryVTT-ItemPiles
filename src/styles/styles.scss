@@ -3,7 +3,7 @@
   --item-piles-minor-inactive: #c9c7b8;
   --item-piles-shadow-primary: #ff0000;
   --item-piles-even-color: #f0f0e0;
-  --item-piles-odd-color: #dad8cc;
+  --item-piles-odd-color: transparent;
   --item-piles-border-dark-primary: #191813;
   --item-piles-border-light-primary: #b5b3a4;
   --item-piles-text-light-highlight: #f0f0e0;
@@ -189,11 +189,11 @@
   }
 
   &-odd-color:nth-child(odd) {
-    background-color: var(--item-piles-odd-color);
+    background-color: var(--item-piles-even-color);
   }
 
   &-odd-color:nth-child(even) {
-    background-color: var(--item-piles-even-color);
+    background-color: var(--item-piles-odd-color);
   }
 
   &-bottom-divider {
