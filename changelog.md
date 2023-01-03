@@ -11,12 +11,13 @@
   - `item-piles-preClickItemPile`
   - `item-piles-preGiveItem`
   - `item-piles-giveItem`
+- Added more item piles constants and useful info in `game.itempiles`
 - Tweaked `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
 - Tweaked item piles containers to be the only tokens that get the additional buttons in its token HUD
 - Tweaked the item similarities setting - a lack of them will now treat every item as distinct items rather than the same
 - Fixed trades between users not creating chat messages when concluded
-- Fixed being able to give items to yourself
 - Fixed being able to loot/buy installed Cyberware in Cyberpunk Red
+- Fixed sometimes being able to give items to yourself
 
 ## Version 2.3.11
 
