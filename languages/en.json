@@ -14,7 +14,7 @@
       "pile": "Item Pile",
       "container": "Container",
       "merchant": "Merchant",
-      "vault": "Bank Vault"
+      "vault": "Vault"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile successfully updated.",
