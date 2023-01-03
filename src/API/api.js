@@ -7,7 +7,6 @@ import SETTINGS from "../constants/settings.js";
 import ItemPileSocket from "../socket.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
-import { getPaymentData } from "../helpers/pile-utilities.js";
 
 class API {
   /**
