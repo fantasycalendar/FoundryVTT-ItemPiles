@@ -439,6 +439,7 @@ export default class TradeAPI {
     await transaction.commit();
 
     if (trade.store.isPrivate) {
+      Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data[0], data[1], tradeId);
       trade.app.close({ callback: true });
       ongoingTrades.delete(tradeId);
     } else if (userId === game.user.id) {
@@ -453,15 +454,19 @@ export default class TradeAPI {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;
     const data = trade.store.export();
-    ItemPileSocket.executeForEveryone(
-      ItemPileSocket.HANDLERS.CALL_HOOK,
-      CONSTANTS.HOOKS.TRADE.COMPLETE,
-      trade.store.instigator,
-      data[0],
-      data[1],
-      tradeId,
-      trade.store.isPrivate
-    )
+    if (!trade.store.isPrivate) {
+      ItemPileSocket.executeForEveryone(
+        ItemPileSocket.HANDLERS.CALL_HOOK,
+        CONSTANTS.HOOKS.TRADE.COMPLETE,
+        trade.store.instigator,
+        data[0],
+        data[1],
+        tradeId,
+        trade.store.isPrivate
+      )
+    } else {
+      Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data[0], data[1], tradeId);
+    }
     trade.app.close({ callback: true });
     ongoingTrades.delete(tradeId);
   }
