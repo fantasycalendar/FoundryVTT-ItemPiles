@@ -15,7 +15,6 @@ import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
-import * as Util from "util";
 
 const preloadedFiles = new Set();
 
@@ -378,17 +377,30 @@ export default class PrivateAPI {
 
     const transaction = new Transaction(targetActor);
 
-    const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
-      .filter(currency => currency.quantity);
+    const priceData = PileUtilities.getPriceFromString(currencies)
+    const overallCost = priceData.overallCost;
 
-    const itemsToRemove = currenciesToAdd.filter(currency => currency.type === "item")
+    const paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }],
+      buyer: targetActor
+    });
+
+    const itemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")
       .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
 
-    const attributesToRemove = currenciesToAdd.filter(currency => currency.type === "attribute")
+    const attributesToRemove = paymentData.finalPrices.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+    const itemsToAdd = paymentData.buyerChange.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const attributesToAdd = paymentData.buyerChange.filter(currency => currency.type === "attribute")
       .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
     await transaction.appendItemChanges(itemsToRemove, { remove: true, type: "currency" });
     await transaction.appendActorChanges(attributesToRemove, { remove: true, type: "currency" });
+    await transaction.appendItemChanges(itemsToAdd, { type: "currency" });
+    await transaction.appendActorChanges(attributesToAdd, { type: "currency" });
 
     const { actorUpdates, itemsToUpdate } = transaction.prepare(); // Prepare data
 
@@ -403,8 +415,7 @@ export default class PrivateAPI {
       action: "removeCurrencies",
       target: targetUuid,
       items: itemDeltas,
-      attributes,
-      attributeDeltas,
+      attributes: attributeDeltas,
       userId: userId,
       interactionId: interactionId
     });
@@ -423,23 +434,42 @@ export default class PrivateAPI {
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
 
-    const currenciesToTransfer = PileUtilities.getPriceFromString(currencies).currencies
-      .filter(currency => currency.quantity);
+    const priceData = PileUtilities.getPriceFromString(currencies);
+    const overallCost = priceData.overallCost;
 
-    const itemsToTransfer = currenciesToTransfer.filter(currency => currency.type === "item")
+    const paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }],
+      buyer: sourceActor
+    });
+
+    const sourceItemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")
       .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
 
-    const attributesToTransfer = currenciesToTransfer.filter(currency => currency.type === "attribute")
+    const sourceAttributesToRemove = paymentData.finalPrices.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+    const sourceItemsToAdd = paymentData.buyerChange.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const sourceAttributesToAdd = paymentData.buyerChange.filter(currency => currency.type === "attribute")
       .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
     const sourceTransaction = new Transaction(sourceActor);
-    await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, type: "currency" });
-    await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
+    await sourceTransaction.appendItemChanges(sourceItemsToRemove, { remove: true, type: "currency" });
+    await sourceTransaction.appendActorChanges(sourceAttributesToRemove, { remove: true, type: "currency" });
+    await sourceTransaction.appendItemChanges(sourceItemsToAdd, { type: "currency" });
+    await sourceTransaction.appendActorChanges(sourceAttributesToAdd, { type: "currency" });
     const sourceUpdates = sourceTransaction.prepare();
 
+    const targetItemsToAdd = paymentData.sellerReceive.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const targetAttributesToAdd = paymentData.sellerReceive.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
     const targetTransaction = new Transaction(targetActor);
-    await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas, { type: "currency" });
-    await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas, { type: "currency" });
+    await targetTransaction.appendItemChanges(targetItemsToAdd, { type: "currency" });
+    await targetTransaction.appendActorChanges(targetAttributesToAdd, { type: "currency" });
     const targetUpdates = targetTransaction.prepare();
 
     const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
@@ -1914,12 +1944,16 @@ export default class PrivateAPI {
     const sellingActor = Utilities.getActor(sellerUuid);
     const buyingActor = Utilities.getActor(buyerUuid);
 
-    const itemPrices = PileUtilities.getPricesForItems(items.map(data => {
-      const item = sellingActor.items.get(data.id);
-      return {
-        ...data, item
-      }
-    }), { seller: sellingActor, buyer: buyingActor });
+    const itemPrices = PileUtilities.getPaymentData({
+      purchaseData: items.map(data => {
+        return {
+          ...data,
+          item: sellingActor.items.get(data.id)
+        }
+      }),
+      seller: sellingActor,
+      buyer: buyingActor
+    });
 
     const preCalcHookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
     if (preCalcHookResult === false) return false;

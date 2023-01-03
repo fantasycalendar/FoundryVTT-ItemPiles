@@ -7,7 +7,7 @@ import SETTINGS from "../constants/settings.js";
 import ItemPileSocket from "../socket.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
-
+import { getPaymentData } from "../helpers/pile-utilities.js";
 
 class API {
   /**
@@ -1167,24 +1167,40 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The actor to remove currencies from
    * @param {string} currencies                               A string of currencies to remove (eg, "5gp 25sp")
    * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.change=true]            Whether the actor can get change back
    * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
    *
    * @returns {Promise<object>}                               An object containing the items and attributes removed from the target
    */
-  static removeCurrencies(target, currencies, { interactionId = false } = {}) {
+  static removeCurrencies(target, currencies, { change = true, interactionId = false } = {}) {
 
-    const targetUuid = Utilities.getUuid(target);
+    const targetActor = Utilities.getActor(target);
+    const targetUuid = Utilities.getUuid(targetActor);
     if (!targetUuid) throw Helpers.custom_error(`removeCurrencies | Could not determine the UUID, please provide a valid target`);
 
     if (typeof currencies !== "string") {
       throw Helpers.custom_error(`removeCurrencies | currencies must be of type string`)
     }
 
-    const currenciesToRemove = PileUtilities.getPriceFromString(currencies).currencies
-      .filter(currency => currency.quantity);
+    const priceData = PileUtilities.getPriceFromString(currencies)
+    const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+    const overallCost = priceData.overallCost;
 
     if (!currenciesToRemove.length) {
       throw Helpers.custom_error(`removeCurrencies | Could not determine currencies to remove with string "${currencies}"`);
+    }
+
+    const paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }],
+      buyer: targetActor
+    });
+
+    if (!paymentData.canBuy) {
+      throw Helpers.custom_error(`removeCurrencies | ${targetActor.name} cannot afford "${currencies}"`);
+    }
+
+    if (!change && paymentData.buyerChange.length) {
+      throw Helpers.custom_error(`removeCurrencies | ${targetActor.name} cannot afford "${currencies}" without receiving change!`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_CURRENCIES, targetUuid, currencies, game.user.id, { interactionId });
@@ -1198,27 +1214,44 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The actor to receive the currencies
    * @param {string} currencies                               A string of currencies to transfer (eg, "5gp 25sp")
    * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.change=true]            Whether the source actor can get change back
    * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
    *
    * @returns {Promise<object>}                               An object containing the items and attributes transferred to the target
    */
-  static transferCurrencies(source, target, currencies, { interactionId = false } = {}) {
+  static transferCurrencies(source, target, currencies, { change = true, interactionId = false } = {}) {
 
-    const sourceUuid = Utilities.getUuid(source);
+    const sourceActor = Utilities.getActor(source);
+    const sourceUuid = Utilities.getUuid(sourceActor);
     if (!sourceUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid source`);
 
-    const targetUuid = Utilities.getUuid(target);
+    const targetActor = Utilities.getActor(target);
+    const targetUuid = Utilities.getUuid(targetActor);
     if (!targetUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid target`);
 
     if (typeof currencies !== "string") {
       throw Helpers.custom_error(`transferCurrencies | currencies must be of type string`)
     }
 
-    const currenciesToTransfer = PileUtilities.getPriceFromString(currencies).currencies
-      .filter(currency => currency.quantity);
+    const priceData = PileUtilities.getPriceFromString(currencies)
+    const currenciesToTransfer = priceData.currencies.filter(currency => currency.quantity);
+    const overallCost = priceData.overallCost;
 
     if (!currenciesToTransfer.length) {
-      throw Helpers.custom_error(`transferCurrencies | Could not determine currencies to transfer with string "${currencies}"`);
+      throw Helpers.custom_error(`transferCurrencies | Could not determine currencies to remove with string "${currencies}"`);
+    }
+
+    const paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }],
+      buyer: sourceActor
+    });
+
+    if (!paymentData.canBuy) {
+      throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}"`);
+    }
+
+    if (!change && paymentData.buyerChange.length) {
+      throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}" without receiving change!`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_CURRENCIES, sourceUuid, targetUuid, currencies, game.user.id, { interactionId });
@@ -1487,7 +1520,7 @@ class API {
       }
     }
 
-    return PileUtilities.getItemPrices(item, { seller, buyer, quantity });
+    return PileUtilities.getPriceData({ item, seller, buyer, quantity });
 
   }
 
@@ -1540,8 +1573,11 @@ class API {
         }
       }
 
-      const itemPrices = PileUtilities.getItemPrices(actorItem, {
-        seller: sellerActor, buyer: buyerActor, quantity: data.quantity
+      const itemPrices = PileUtilities.getPriceData({
+        items: actorItem,
+        seller: sellerActor,
+        buyer: buyerActor,
+        quantity: data.quantity
       });
       if (itemPrices.length) {
         if (data.paymentIndex >= itemPrices.length || data.paymentIndex < 0) {

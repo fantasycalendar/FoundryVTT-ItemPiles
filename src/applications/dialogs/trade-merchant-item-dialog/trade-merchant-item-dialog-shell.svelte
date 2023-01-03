@@ -37,11 +37,12 @@
 
   let paymentData = {};
   $: {
-    paymentData = PileUtilities.getPricesForItems([{
-      item: item.item,
-      quantity: $quantityToBuy,
-      paymentIndex: $selectedPriceGroup
-    }], {
+    paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{
+        item: item.item,
+        quantity: $quantityToBuy,
+        paymentIndex: $selectedPriceGroup
+      }],
       seller,
       buyer,
       sellerFlagData: $sellerPileData,

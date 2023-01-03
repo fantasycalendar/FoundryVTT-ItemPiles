@@ -6,6 +6,7 @@
 - Added vault extenders - you can configure items to extend the space available in
 - Added chat message for when users give each other items
 - Added support for `true` and `false` in system item filters
+- Added `change` as a secondary argument to `game.itempiles.API.removeCurrencies()` and `game.itempiles.API.transferCurrencies()` so that the currency removal/transfer can handle converting currencies into change to cover the full transfer
 - Added more hooks:
   - `item-piles-preClickItemPile`
   - `item-piles-preGiveItem`

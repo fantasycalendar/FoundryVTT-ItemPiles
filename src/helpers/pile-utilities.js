@@ -679,8 +679,15 @@ export function getPriceFromString(str, currencyList = false) {
 
 }
 
-export function getItemPrices(item, {
-  seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false, itemFlagData = false, quantity = 1
+export function getPriceData({
+  cost = false,
+  item = false,
+  seller = false,
+  buyer = false,
+  sellerFlagData = false,
+  buyerFlagData = false,
+  itemFlagData = false,
+  quantity = 1
 } = {}) {
 
   let priceData = [];
@@ -693,6 +700,12 @@ export function getItemPrices(item, {
   sellerFlagData = getActorFlagData(seller, sellerFlagData);
   if (!isItemPileMerchant(seller, sellerFlagData)) {
     sellerFlagData = false;
+  }
+
+  if (cost && !item) {
+    item = {};
+    setProperty(item, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
+    setProperty(item, CONSTANTS.FLAGS.ITEM, CONSTANTS.ITEM_DEFAULTS);
   }
 
   itemFlagData = itemFlagData || getItemFlagData(item);
@@ -889,8 +902,12 @@ export function getItemPrices(item, {
   return priceData;
 }
 
-export function getPricesForItems(itemsToBuy, {
-  seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false
+export function getPaymentData({
+  purchaseData = [],
+  seller = false,
+  buyer = false,
+  sellerFlagData = false,
+  buyerFlagData = false
 } = {}) {
 
   buyerFlagData = getActorFlagData(buyer, buyerFlagData);
@@ -913,9 +930,16 @@ export function getPricesForItems(itemsToBuy, {
 
   const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 
-  const paymentData = itemsToBuy.map(data => {
-      const prices = getItemPrices(data.item, {
-        seller, buyer, sellerFlagData, buyerFlagData, itemFlagData: data.itemFlagData, quantity: data.quantity || 1
+  const paymentData = purchaseData.map(data => {
+      const prices = getPriceData({
+        cost: data.cost,
+        item: data.item,
+        seller,
+        buyer,
+        sellerFlagData,
+        buyerFlagData,
+        itemFlagData: data.itemFlagData,
+        quantity: data.quantity || 1
       })[data.paymentIndex || 0];
       return {
         ...prices, item: data.item
@@ -923,7 +947,10 @@ export function getPricesForItems(itemsToBuy, {
     })
     .reduce((priceData, priceGroup) => {
 
-      if (!priceGroup.maxQuantity) return priceData;
+      if (!priceGroup.maxQuantity) {
+        priceData.canBuy = false;
+        return priceData;
+      }
 
       if (priceGroup.primary) {
 
@@ -955,13 +982,15 @@ export function getPricesForItems(itemsToBuy, {
         }
       }
 
-      priceData.buyerReceive.push({
-        type: "item",
-        name: priceGroup.item.name,
-        img: priceGroup.item.img,
-        quantity: priceGroup.quantity,
-        item: priceGroup.item,
-      });
+      if (priceGroup.item) {
+        priceData.buyerReceive.push({
+          type: "item",
+          name: priceGroup.item.name,
+          img: priceGroup.item.img,
+          quantity: priceGroup.quantity,
+          item: priceGroup.item,
+        });
+      }
 
       return priceData;
 
