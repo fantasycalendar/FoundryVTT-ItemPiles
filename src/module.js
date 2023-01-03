@@ -12,7 +12,6 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import * as Helpers from "./helpers/helpers.js";
 import runMigrations from "./migrations.js"
-import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -27,7 +26,11 @@ Hooks.once("ready", () => {
 
     game.itempiles = {
       API,
-      hooks: CONSTANTS.HOOKS
+      hooks: CONSTANTS.HOOKS,
+      flags: CONSTANTS.FLAGS,
+      pile_types: CONSTANTS.PILE_TYPES,
+      pile_flag_defaults: CONSTANTS.PILE_DEFAULTS,
+      item_flag_defaults: CONSTANTS.ITEM_DEFAULTS,
     };
     window.ItemPiles = {
       API: API
@@ -79,11 +82,6 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
     }
     applySystemSpecificStyles();
   }, 500);
-
-  // game.itempiles.API.renderItemPileInterface(game.actors.getName("Vault"));
-
-  // ItemPileConfig.show(game.actors.getName("Item Pile"))
-
 });
 
 Hooks.on(CONSTANTS.HOOKS.RESET_SETTINGS, async () => {

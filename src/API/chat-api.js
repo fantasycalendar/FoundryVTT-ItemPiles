@@ -149,13 +149,13 @@ export default class ChatAPI {
    *
    * @param source
    * @param target
-   * @param items
+   * @param item
    * @param userId
    * @returns {Promise}
    */
-  static async _outputGiveItem(source, target, items, userId) {
+  static async _outputGiveItem(source, target, item, userId) {
     if (game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
-    const itemData = await this._formatItemData(items);
+    const itemData = await this._formatItemData([item]);
     return this._giveChatMessage(source, target, itemData, userId);
   }
 

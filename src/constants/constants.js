@@ -131,10 +131,10 @@ const CONSTANTS = {
     },
 
     // Vault settings
-    cols: 9,
+    cols: 10,
     rows: 5,
     vaultExpansion: false,
-    baseExpansionCols: 4,
+    baseExpansionCols: 5,
     baseExpansionRows: 5,
     preventVaultAccess: false,
     vaultAccess: [],
@@ -180,6 +180,7 @@ CONSTANTS.HOOKS = {
     REVERT_FROM: module`revertFromItemPiles`,
     PRE_SPLIT_INVENTORY: module`preSplitItemPileContent`,
     SPLIT_INVENTORY: module`splitItemPileContent`,
+    PRE_CLICK: module`preClickItemPile`
   },
   ITEM: {
     PRE_DROP_DETERMINED: module`preDropItemDetermined`,

@@ -6,6 +6,10 @@
 - Added vault extenders - you can configure items to extend the space available in
 - Added chat message for when users give each other items
 - Added support for `true` and `false` in system item filters
+- Added more hooks:
+  - `item-piles-preClickItemPile`
+  - `item-piles-preGiveItem`
+  - `item-piles-giveItem`
 - Tweaked `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
 - Tweaked item piles containers to be the only tokens that get the additional buttons in its token HUD
 - Fixed trades between users not creating chat messages when concluded

@@ -1287,7 +1287,7 @@ export default class PrivateAPI {
    */
   static async _preloadItemPileFiles(tokenDocument) {
 
-    if (!PileUtilities.isValidItemPile(tokenDocument)) return false;
+    if (!PileUtilities.isItemPileContainer(tokenDocument)) return false;
 
     const pileData = PileUtilities.getActorFlagData(tokenDocument);
 
@@ -1540,7 +1540,7 @@ export default class PrivateAPI {
       const sourceUuid = Utilities.getUuid(dropData.source);
       const targetUuid = Utilities.getUuid(dropData.target);
 
-      if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, dropData.source, dropData.target, dropData.itemData, game.user.id) === false) {
+      if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, dropData.source, dropData.target, dropData.itemData, user.id) === false) {
         return;
       }
 
@@ -1548,7 +1548,7 @@ export default class PrivateAPI {
         Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
           source_actor_name: dropData.source.name, target_actor_name: dropData.target.name, item_name: item.name
         }));
-        Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, dropData.source, dropData.target, [dropData.itemData], game.user.id);
+        Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, dropData.source, dropData.target, dropData.itemData, game.user.id);
         return this._transferItems(sourceUuid, targetUuid, [dropData.itemData.item], game.user.id)
       }
 
@@ -1657,19 +1657,19 @@ export default class PrivateAPI {
     });
 
     if (accepted) {
-      Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, sourceActor, targetActor, [itemData], game.user.id);
       await PrivateAPI._addItems(targetUuid, [itemData], game.user.id);
     }
 
     return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS_RESPONSE, [userId], {
-      userId: game.user.id, accepted, sourceUuid, itemData
+      userId: game.user.id, accepted, sourceUuid, targetUuid, itemData
     });
 
   }
 
-  static async _giveItemsResponse({ userId, accepted, sourceUuid, itemData } = {}) {
+  static async _giveItemsResponse({ userId, accepted, sourceUuid, targetUuid, itemData } = {}) {
     const user = game.users.get(userId);
     if (accepted) {
+      await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.GIVE, sourceUuid, targetUuid, itemData, game.user.id, userId)
       await PrivateAPI._removeItems(sourceUuid, [itemData], game.user.id);
       return Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.GiveItemAccepted", { user_name: user.name }));
     }
@@ -1761,6 +1761,9 @@ export default class PrivateAPI {
       }
 
     }
+
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLICK, pileDocument, interactingActor, game.user.id);
+    if (hookResult === false) return false;
 
     return this._renderItemPileInterface(pileDocument.uuid, { inspectingTargetUuid: interactingActor?.uuid });
 
