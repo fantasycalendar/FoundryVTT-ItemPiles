@@ -1,10 +1,10 @@
 <script>
 
-	import { createEventDispatcher, getContext, onMount, setContext } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
-    import { styleFromObject } from '../../../helpers/helpers';
+  import { styleFromObject } from '../../../helpers/helpers';
   import { calcPosition } from './grid-utils';
-	import GridItem from './GridItem.svelte';
+  import GridItem from './GridItem.svelte';
 
   export let gridContainer = HTMLDivElement;
   export let items = [];
@@ -32,23 +32,23 @@
 
   const dispatch = createEventDispatcher();
 
-	function itemChangeEvent(event) {
-		dispatch('change', { ...event.detail });
-	}
+  function itemChangeEvent(event) {
+    dispatch('change', { ...event.detail });
+  }
 
-  function itemHoverEvent(event){
+  function itemHoverEvent(event) {
     dispatch('hover', { ...event.detail });
   }
 
-  function itemBeginDrag(event){
+  function itemBeginDrag(event) {
     dispatch('begindrag', { ...event.detail });
   }
 
-  function itemHoverLeaveEvent(event){
+  function itemHoverLeaveEvent(event) {
     dispatch('leave', { ...event.detail });
   }
 
-  function itemRightClickEvent(event){
+  function itemRightClickEvent(event) {
     dispatch('rightclick', { ...event.detail });
   }
 
@@ -56,8 +56,8 @@
     dispatch('doubleclick', { ...event.detail });
   }
 
-	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
-	$: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
+  $: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
+  $: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
 
   $: containerStyle = styleFromObject({
     "width": $containerWidth + "px",
@@ -66,10 +66,10 @@
 
   let backgroundGridStyle = "";
   $: backgroundGridStyle = styleFromObject({
-    "grid-template-columns": `repeat(${options.cols}, ${options.gridSize + options.gap/2}px)`,
-    "grid-template-rows": `repeat(${options.rows}, ${options.gridSize + options.gap/2}px)`,
-    "gap": `${options.gap/2}px`,
-    "top": `${options.gap/2}px`
+    "grid-template-columns": `repeat(${options.cols}, ${options.gridSize + options.gap / 2}px)`,
+    "grid-template-rows": `repeat(${options.rows}, ${options.gridSize + options.gap / 2}px)`,
+    "gap": `${options.gap / 2}px`,
+    "top": `${options.gap / 2}px`
   });
 
 </script>
@@ -132,23 +132,24 @@
     justify-content: center;
   }
 
-	.item-piles-grid {
-		position: relative !important;
+  .item-piles-grid {
+    position: relative !important;
     margin: -2px;
-	}
+  }
 
   .item-piles-inner-grid {
     display: grid;
     border-radius: 0.25rem;
-    position:absolute;
+    position: absolute;
     margin: -1px;
     pointer-events: none;
+
     > div {
       border-radius: 0.25rem;
-      border: 1px solid rgba(0,0,0,0.25);
+      border: 1px solid rgba(0, 0, 0, 0.25);
 
       &.grid-disabled {
-        background-color: rgba(0,0,0,0.25);
+        background-color: rgba(0, 0, 0, 0.25);
       }
     }
   }
