@@ -86,7 +86,7 @@ export function findSimilarItem(items, findItem) {
         }
       }
 
-      return true;
+      return itemSimilarities.length > 0;
     });
 }
 

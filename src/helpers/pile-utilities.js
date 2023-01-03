@@ -114,11 +114,9 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
   if (!(target instanceof TokenDocument)) return false;
 
-  if (!isItemPileEmpty(target)) return false;
-
   const pileData = getActorFlagData(target);
 
-  if (isRegularItemPile(target, pileData)) {
+  if (!isItemPileLootable(target, pileData) || !isItemPileEmpty(target)) {
     return false;
   }
 
