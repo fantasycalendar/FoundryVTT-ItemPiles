@@ -551,11 +551,12 @@ Removes currencies from the target
 
 **Returns**: `Promise<array>` - An object containing the items and attributes removed from the target
 
-| Param | Type                        | Default | Description                                       |
-| --- |-----------------------------| --- |---------------------------------------------------|
-| target | `Actor/Token/TokenDocument` |  | The target to remove currencies from              |
-| currencies | `string`                    |  | A string of currencies to remove (eg, "5gp 25sp") |
-| options | `object`                    |  | Options to pass to the function                   |
+| Param                   | Type                        | Default | Description                                       |
+|-------------------------|-----------------------------|---------|---------------------------------------------------|
+| target                  | `Actor/Token/TokenDocument` |         | The target to remove currencies from              |
+| currencies              | `string`                    |         | A string of currencies to remove (eg, "5gp 25sp") |
+| options                 | `object`                    |         | Options to pass to the function                   |
+| [options.change]        | `boolean`            | `true`  | Whether the actor can get change back                 |
 | [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                 |
 
 ---
@@ -574,6 +575,7 @@ Transfers currencies between the source and the target.
 | target                  | `Actor/Token/TokenDocument` |  | The target to transfer currencies to                          |
 | currencies              | `string`                    |  | A string of currencies to transfer (eg, "5gp 25sp") |
 | options                 | `object`                    |  | Options to pass to the function                     |
+| [options.change]        | `boolean`            | `true`  | Whether the actor can get change back                 |
 | [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                   |
 
 ---

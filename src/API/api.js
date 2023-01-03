@@ -1167,7 +1167,7 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The actor to remove currencies from
    * @param {string} currencies                               A string of currencies to remove (eg, "5gp 25sp")
    * @param {object} options                                  Options to pass to the function
-   * @param {string/boolean} [options.change=true]            Whether the actor can get change back
+   * @param {boolean} [options.change=true]                   Whether the actor can get change back
    * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
    *
    * @returns {Promise<object>}                               An object containing the items and attributes removed from the target
@@ -1214,7 +1214,7 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The actor to receive the currencies
    * @param {string} currencies                               A string of currencies to transfer (eg, "5gp 25sp")
    * @param {object} options                                  Options to pass to the function
-   * @param {string/boolean} [options.change=true]            Whether the source actor can get change back
+   * @param {boolean} [options.change=true]                   Whether the source actor can get change back
    * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
    *
    * @returns {Promise<object>}                               An object containing the items and attributes transferred to the target
