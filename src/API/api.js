@@ -254,7 +254,8 @@ class API {
    * @param {object} [options.itemPileFlags={}]                       Item pile specific flags to apply to the token and actor
    * @param {Array/boolean} [options.items=false]                     Any items to create on the item pile
    * @param {boolean} [options.createActor=false]                     Whether to create a new item pile actor
-   * @param {string/boolean} [options.actor=false]                    The UUID, ID, or name of the actor to use when creating this item pile (not compatible with createActor)
+   * @param {string/boolean} [options.actor=false]                    The UUID, ID, or name of the actor to use when creating this item pile
+   * @param {string/boolean} [options.folder=false]                   The folder
    *
    * @returns {Promise<string>}
    */
@@ -267,6 +268,7 @@ class API {
     items = false,
     createActor = false,
     actor = false,
+    folder = false
   } = {}) {
 
     if (position) {
@@ -275,6 +277,10 @@ class API {
       } else if (!Helpers.isRealNumber(position.x) || !Helpers.isRealNumber(position.y)) {
         throw Helpers.custom_error(`createItemPile | position.x and position.y must be of type numbers`);
       }
+    }
+
+    if (folder) {
+      folder = folder?.id ?? folder;
     }
 
     if (actor && !createActor) {
@@ -318,7 +324,7 @@ class API {
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.CREATE_PILE, {
-      sceneId, position, actor, createActor, items, tokenOverrides, actorOverrides, itemPileFlags
+      sceneId, position, actor, createActor, items, tokenOverrides, actorOverrides, itemPileFlags, folder
     });
   }
 
@@ -1131,6 +1137,38 @@ class API {
   }
 
   /**
+   * Turns a string of currencies into an array containing the data and quantities for each currency
+   *
+   * @param {string} price                                    A string of currencies to convert (eg, "5gp 25sp")
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.target=false]           The target whose currencies to check against
+   *
+   * @returns {Array<object>}                                 An object containing the price data
+   */
+  static getPaymentDataFromString(price, { target = false } = {}) {
+
+    let targetActor = false;
+    if (target) {
+      targetActor = Utilities.getActor(target);
+      if (!targetActor) throw Helpers.custom_error(`removeCurrencies | Could not determine target actor`);
+    }
+
+    const priceData = PileUtilities.getPriceFromString(price)
+    const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+    const overallCost = priceData.overallCost;
+
+    if (!currenciesToRemove.length) {
+      throw Helpers.custom_error(`removeCurrencies | Could not determine currencies to remove with string "${price}"`);
+    }
+
+    return PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }],
+      buyer: targetActor
+    });
+
+  }
+
+  /**
    * Adds currencies to the target
    *
    * @param {Actor/Token/TokenDocument} target                The actor to add the currencies to
@@ -1142,7 +1180,8 @@ class API {
    */
   static addCurrencies(target, currencies, { interactionId = false } = {}) {
 
-    const targetUuid = Utilities.getUuid(target);
+    const targetActor = Utilities.getActor(target);
+    const targetUuid = Utilities.getUuid(targetActor);
     if (!targetUuid) throw Helpers.custom_error(`addCurrency | Could not determine the UUID, please provide a valid target`);
 
     if (typeof currencies !== "string") {

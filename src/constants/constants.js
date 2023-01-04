@@ -136,7 +136,6 @@ const CONSTANTS = {
     vaultExpansion: false,
     baseExpansionCols: 5,
     baseExpansionRows: 5,
-    preventVaultAccess: false,
     vaultAccess: [],
     logVaultActions: false
   }

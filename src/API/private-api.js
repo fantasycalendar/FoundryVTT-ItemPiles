@@ -926,7 +926,8 @@ export default class PrivateAPI {
     items = false,
     tokenOverrides = {},
     actorOverrides = {},
-    itemPileFlags = {}
+    itemPileFlags = {},
+    folder = false,
   } = {}) {
 
     let returns = {};
@@ -938,15 +939,30 @@ export default class PrivateAPI {
       let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
       pileDataDefaults.enabled = true;
-      pileDataDefaults.deleteWhenEmpty = true;
-      pileDataDefaults.displayOne = true;
-      pileDataDefaults.showItemName = true;
-      pileDataDefaults.overrideSingleItemScale = true;
-      pileDataDefaults.singleItemScale = 0.75;
+      if (foundry.utils.isEmpty(itemPileFlags)) {
+        pileDataDefaults.deleteWhenEmpty = true;
+        pileDataDefaults.displayOne = true;
+        pileDataDefaults.showItemName = true;
+        pileDataDefaults.overrideSingleItemScale = true;
+        pileDataDefaults.singleItemScale = 0.75;
+      }
 
-      pileActor = await Actor.create({
-        name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
-      });
+      pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+
+      const actorData = {
+        name: actor || "New Item Pile",
+        type: Helpers.getSetting("actorClassType"),
+        img: "icons/svg/item-bag.svg"
+      };
+
+      if (folder) {
+        folder = game.folders.get(folder) || game.folders.getName(folder);
+        if (folder) {
+          actorData.folder = folder.id;
+        }
+      }
+
+      pileActor = await Actor.create(actorData);
 
       const prototypeTokenData = foundry.utils.mergeObject({
         name: "Item Pile",
@@ -977,15 +993,30 @@ export default class PrivateAPI {
         let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
         pileDataDefaults.enabled = true;
-        pileDataDefaults.deleteWhenEmpty = true;
-        pileDataDefaults.displayOne = true;
-        pileDataDefaults.showItemName = true;
-        pileDataDefaults.overrideSingleItemScale = true;
-        pileDataDefaults.singleItemScale = 0.75;
+        if (foundry.utils.isEmpty(itemPileFlags)) {
+          pileDataDefaults.deleteWhenEmpty = true;
+          pileDataDefaults.displayOne = true;
+          pileDataDefaults.showItemName = true;
+          pileDataDefaults.overrideSingleItemScale = true;
+          pileDataDefaults.singleItemScale = 0.75;
+        }
 
-        pileActor = await Actor.create({
-          name: "Default Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
-        });
+        pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+
+        const actorData = {
+          name: "Default Item Pile",
+          type: Helpers.getSetting("actorClassType"),
+          img: "icons/svg/item-bag.svg"
+        };
+
+        if (folder) {
+          folder = game.folders.get(folder) || game.folders.getName(folder);
+          if (folder) {
+            actorData.folder = folder.id;
+          }
+        }
+
+        pileActor = await Actor.create(actorData);
 
         await pileActor.update({
           [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
@@ -1758,8 +1789,8 @@ export default class PrivateAPI {
       }
       if (!interactingActor) {
         Helpers.custom_warning(game.i18n.localize(maxDistance === Infinity
-          ? "ITEM-PILES.Errors.PileTooFar"
-          : "ITEM-PILES.Errors.NoTokenFound"
+          ? "ITEM-PILES.Errors.NoTokenFound"
+          : "ITEM-PILES.Errors.PileTooFar"
         ), true);
         return false;
       }

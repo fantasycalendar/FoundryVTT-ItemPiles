@@ -133,14 +133,15 @@ export function shouldItemPileBeDeleted(targetUuid) {
 export function getActorItems(target, { itemFilters = false, getItemCurrencies = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorItemFilters = itemFilters ? cleanItemFilters(itemFilters) : getActorItemFilters(actor);
-  const currencies = getActorCurrencies(actor, { getAll: true }).map(entry => entry.id);
+  const currencies = (actor ? getActorCurrencies(actor, { getAll: true }) : game.itempiles.API.CURRENCIES)
+    .map(entry => entry.id);
   return actor.items.filter(item => (getItemCurrencies || currencies.indexOf(item.id) === -1) && !isItemInvalid(actor, item, actorItemFilters));
 }
 
 export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
 
   const actor = Utilities.getActor(target);
-  const actorItems = Array.from(actor.items);
+  const actorItems = actor ? Array.from(actor.items) : [];
   currencyList = currencyList || getCurrencyList(forActor || actor);
   let currencies = currencyList.map((currency, index) => {
     if (currency.type === "attribute") {
@@ -945,7 +946,7 @@ export function getPaymentData({
     })
     .reduce((priceData, priceGroup) => {
 
-      if (!priceGroup.maxQuantity) {
+      if (!priceGroup.maxQuantity && (buyer || seller)) {
         priceData.canBuy = false;
         return priceData;
       }
@@ -998,7 +999,11 @@ export function getPaymentData({
       buyerReceive: [], buyerChange: [], sellerReceive: []
     });
 
-  if (paymentData.totalCurrencyCost) {
+  if (paymentData.totalCurrencyCost && !seller && !buyer) {
+
+    paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies);
+
+  } else if (paymentData.totalCurrencyCost) {
 
     // The price array that we need to fill
     const prices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies);
