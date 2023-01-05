@@ -13,6 +13,7 @@ import twodsix from "./systems/twodsix.js";
 import forbiddenLands from "./systems/forbidden-lands.js";
 import icrpg from "./systems/icrpg.js";
 import swse from "./systems/swse.js";
+import sw5e from "./systems/sw5e.js";
 import fallout from "./systems/fallout.js";
 import cyberpunkRedCore from "./systems/cyberpunk-red-core.js";
 import knave from "./systems/knave.js";
@@ -46,6 +47,7 @@ export const SYSTEMS = {
     "forbidden-lands": forbiddenLands,
     "icrpg": icrpg,
     "swse": swse,
+    "sw5e": sw5e,
     "fallout": fallout,
     "cyberpunk-red-core": cyberpunkRedCore,
     "knave": knave,
