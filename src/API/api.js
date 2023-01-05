@@ -7,6 +7,7 @@ import SETTINGS from "../constants/settings.js";
 import ItemPileSocket from "../socket.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
+import { SYSTEMS } from "../systems.js";
 
 class API {
   /**
@@ -232,6 +233,120 @@ class API {
       await Helpers.setSetting(SETTINGS.ITEM_SIMILARITIES, inPaths);
       resolve();
     });
+  }
+
+  /**
+   * A combination of all the methods above, but this integrates a system's specific
+   * settings more readily into item piles, allowing users to also change the settings
+   * afterwards.
+   *
+   * @param {Object<{
+   *   VERSION: string,
+   *   ACTOR_CLASS_TYPE: string,
+   *   ITEM_QUANTITY_ATTRIBUTE: string,
+   *   ITEM_PRICE_ATTRIBUTE: string,
+   *   ITEM_FILTERS: Array<{path: string, filters: string}>,
+   *   ITEM_SIMILARITIES: Array<string>,
+   *   ITEM_TRANSFORMER: undefined/Function,
+   *   CURRENCIES: Array<{
+   *     primary: boolean,
+   *     type: string ["attribute"/"item"],
+   *     img: string,
+   *     abbreviation: string,
+   *     data: Object<{ path: string }|{ uuid: string }|{ item: object }>,
+   *     exchangeRate: number
+   *   }>,
+   *   CURRENCY_DECIMAL_DIGITS: undefined/number
+   * }>} data
+   */
+  static addSystemIntegration(data) {
+
+    if (typeof data["VERSION"] !== "string") {
+      throw Helpers.custom_error("addSystemIntegration | data.VERSION must be of type string");
+    }
+
+    if (typeof data["ACTOR_CLASS_TYPE"] !== "string") {
+      throw Helpers.custom_error("addSystemIntegration | data.ACTOR_CLASS_TYPE must be of type string");
+    }
+
+    if (typeof data["ITEM_QUANTITY_ATTRIBUTE"] !== "string") {
+      throw Helpers.custom_error("addSystemIntegration | data.ITEM_QUANTITY_ATTRIBUTE must be of type string");
+    }
+
+    if (typeof data["ITEM_PRICE_ATTRIBUTE"] !== "string") {
+      throw Helpers.custom_error("addSystemIntegration | data.ITEM_PRICE_ATTRIBUTE must be of type string");
+    }
+
+    if (!Array.isArray(data["ITEM_FILTERS"])) {
+      throw Helpers.custom_error("addSystemIntegration | data.ITEM_FILTERS must be of type array");
+    }
+
+    data["ITEM_FILTERS"].forEach(filter => {
+      if (typeof filter?.path !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | each entry in data.ITEM_FILTERS must have a \"path\" property with a value that is of type string");
+      }
+      if (typeof filter?.filters !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | each entry in data.ITEM_FILTERS must have a \"filters\" property with a value that is of type string");
+      }
+    });
+
+    if (data['ITEM_TRANSFORMER']) {
+      if (!Helpers.isFunction(data['ITEM_TRANSFORMER'])) {
+        throw Helpers.custom_error("addSystemIntegration | data.ITEM_TRANSFORMER must be of type function");
+      }
+      if (typeof data['ITEM_TRANSFORMER']({}) !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | data.ITEM_TRANSFORMER's return value must be of type object");
+      }
+    }
+
+    if (!Array.isArray(data['ITEM_SIMILARITIES'])) {
+      throw Helpers.custom_error("addSystemIntegration | data.ITEM_SIMILARITIES must be of type array");
+    }
+    data['ITEM_SIMILARITIES'].forEach(path => {
+      if (typeof path !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | each entry in data.ITEM_SIMILARITIES must be of type string");
+      }
+    });
+
+
+    if (!Array.isArray(data['CURRENCIES'])) {
+      throw Helpers.custom_error("addSystemIntegration | inCurrencies must be an array");
+    }
+    data['CURRENCIES'].forEach(currency => {
+      if (typeof currency !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | each entry in data.CURRENCIES must be of type object");
+      }
+      if (typeof currency.primary !== "boolean") {
+        throw Helpers.custom_error("addSystemIntegration | currency.primary must be of type boolean");
+      }
+      if (typeof currency.name !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | currency.name must be of type string");
+      }
+      if (typeof currency.abbreviation !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | currency.abbreviation must be of type string");
+      }
+      if (typeof currency.exchangeRate !== "number") {
+        throw Helpers.custom_error("addSystemIntegration | currency.exchangeRate must be of type number");
+      }
+      if (typeof currency.data !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | currency.data must be of type object");
+      }
+      if (typeof currency.data.path !== "string" && typeof currency.data.uuid !== "string" && typeof currency.data.item !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
+      }
+      if (currency.img && typeof currency.img !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | currency.img must be of type string");
+      }
+    });
+
+    if (data["CURRENCY_DECIMAL_DIGITS"] && typeof data['CURRENCY_DECIMAL_DIGITS'] !== "number") {
+      throw Helpers.custom_error("addSystemIntegration | data.CURRENCY_DECIMAL_DIGITS must be of type number");
+    }
+
+    data['INTEGRATION'] = true;
+
+    SYSTEMS.addSystem(data);
+
   }
 
   static async getPrimaryCurrency(actor = false) {
@@ -1137,13 +1252,13 @@ class API {
   }
 
   /**
-   * Turns a string of currencies into an array containing the data and quantities for each currency
+   * Turns a string of currencies into an object containing payment data, and the change an optional target would receive back
    *
    * @param {string} price                                    A string of currencies to convert (eg, "5gp 25sp")
    * @param {object} options                                  Options to pass to the function
    * @param {string/boolean} [options.target=false]           The target whose currencies to check against
    *
-   * @returns {Array<object>}                                 An object containing the price data
+   * @returns {object}                                        An object containing the price data
    */
   static getPaymentDataFromString(price, { target = false } = {}) {
 
@@ -1421,7 +1536,7 @@ class API {
   /**
    * Gets the valid currencies from a given actor or token
    *
-   * @param {Actor/TokenDocument/Token} target      The target to get the items from
+   * @param {Actor/TokenDocument/Token} target      The target to get the currencies from
    * @param {object} [options]                      Object containing optional parameters
    * @param {Boolean} [options.getAll]              Whether to get all the currencies, regardless of quantity
    *

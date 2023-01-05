@@ -83,7 +83,14 @@
       return false;
     }
 
-    return PrivateAPI._dropData(canvas, data, { target: store.actor, gridPosition: { x, y } });
+    return PrivateAPI._depositItem({
+      source: false,
+      target: store.actor,
+      itemData: {
+        item: itemData, quantity: 1
+      },
+      gridPosition: { x, y }
+    });
 
   }
 

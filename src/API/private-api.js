@@ -1428,14 +1428,16 @@ export default class PrivateAPI {
    *
    * @param {canvas} canvas
    * @param {Object} data
-   * @param {Actor/Token/TokenDocument/Boolean}[target=false]
-   * @param {Object/Boolean}[gridPosition=false]
-   * @param {String/Boolean}[interactionId=false]
-   * @return {Promise/Boolean}
+   * @return {Promise}
    */
-  static async _dropData(canvas, data, { target = false, gridPosition = false, interactionId = false } = {}) {
+  static async _dropData(canvas, data) {
 
-    if (data.type !== "Item") return false;
+    const canGiveItems = Helpers.getSetting(SETTINGS.ENABLE_GIVING_ITEMS);
+    const canDropItems = Helpers.getSetting(SETTINGS.ENABLE_DROPPING_ITEMS);
+
+    if (!canDropItems && !canGiveItems) return;
+
+    if (data.type !== "Item") return;
 
     let item = await Item.implementation.fromDropData(data);
     let itemData = item.toObject();
@@ -1447,13 +1449,11 @@ export default class PrivateAPI {
 
     const dropData = {
       source: false,
-      target: target,
+      target: false,
       itemData: {
         item: itemData, quantity: 1,
       },
-      position: false,
-      interactionId,
-      gridPosition
+      position: false
     };
 
     dropData.source = item.parent;
@@ -1463,7 +1463,7 @@ export default class PrivateAPI {
     }
 
     const pre_drop_determined_hook = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.itemData, dropData.position);
-    if (pre_drop_determined_hook === false) return false;
+    if (pre_drop_determined_hook === false) return;
 
     let droppableDocuments = [];
     let x, y;
@@ -1483,16 +1483,13 @@ export default class PrivateAPI {
 
       if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get("midi-qol", "DragDropTarget")) {
         Helpers.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items");
-        return false;
+        return;
       }
 
       if (!droppableDocuments.length) {
         dropData.position = { x, y };
       }
     }
-
-    const canGiveItems = Helpers.getSetting(SETTINGS.ENABLE_GIVING_ITEMS) || game.user.isGM;
-    const canDropItems = Helpers.getSetting(SETTINGS.ENABLE_DROPPING_ITEMS) || game.user.isGM;
 
     const droppableItemPiles = droppableDocuments.filter(token => PileUtilities.isValidItemPile(token));
     const droppableNormalTokens = droppableDocuments.filter(token => !PileUtilities.isValidItemPile(token));
@@ -1512,8 +1509,6 @@ export default class PrivateAPI {
       dropData.target = droppableNormalTokens[0];
       return this._giveItem(dropData);
     }
-
-    return false;
 
   }
 
@@ -1647,14 +1642,14 @@ export default class PrivateAPI {
 
           if (distance > maxDistance) {
             Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
-            return false;
+            return;
           }
         }
       }
 
       if (game.itempiles.API.isItemPileLocked(dropData.target)) {
         Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
-        return false;
+        return;
       }
     }
 
@@ -1681,7 +1676,7 @@ export default class PrivateAPI {
     }
 
     const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
-    if (hookResult === false) return false;
+    if (hookResult === false) return;
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DROP_ITEMS, {
       userId: game.user.id,
@@ -1739,13 +1734,13 @@ export default class PrivateAPI {
 
   static async _itemPileClicked(pileDocument) {
 
-    if (!PileUtilities.isValidItemPile(pileDocument)) return false;
+    if (!PileUtilities.isValidItemPile(pileDocument)) return;
 
     const pileToken = pileDocument.object;
 
     if (!Helpers.isGMConnected()) {
       Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
-      return false;
+      return;
     }
 
     Helpers.debug(`Clicked: ${pileDocument.uuid}`);
@@ -1792,7 +1787,7 @@ export default class PrivateAPI {
           ? "ITEM-PILES.Errors.NoTokenFound"
           : "ITEM-PILES.Errors.PileTooFar"
         ), true);
-        return false;
+        return;
       }
     }
 
@@ -1824,7 +1819,7 @@ export default class PrivateAPI {
     }
 
     const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLICK, pileDocument, interactingActor, game.user.id);
-    if (hookResult === false) return false;
+    if (hookResult === false) return;
 
     return this._renderItemPileInterface(pileDocument.uuid, { inspectingTargetUuid: interactingActor?.uuid });
 

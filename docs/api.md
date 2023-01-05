@@ -15,6 +15,7 @@
   * [setItemPriceAttribute](#setItemPriceAttribute)
   * [setItemFilters](#setItemFilters)
   * [setItemSimilarities](#setItemSimilarities)
+  * [addSystemIntegration](#addSystemIntegration)
 
 
 * [Item piles methods](#item-piles-methods)
@@ -42,16 +43,20 @@
   * [removeItems](#removeItems)
   * [transferItems](#transferItems)
   * [transferAllItems](#transferAllItems)
-  * [addCurrencies](#addCurrencies)
-  * [removeCurrencies](#removeCurrencies)
-  * [transferCurrencies](#transferCurrencies)
-  * [transferAllCurrencies](#transferAllCurrencies)
   * [setAttributes](#setAttributes)
   * [addAttributes](#addAttributes)
   * [removeAttributes](#removeAttributes)
   * [transferAttributes](#transferAttributes)
   * [transferAllAttributes](#transferAllAttributes)
   * [transferEverything](#transferEverything)
+  * [addCurrencies](#addCurrencies)
+  * [removeCurrencies](#removeCurrencies)
+  * [transferCurrencies](#transferCurrencies)
+  * [transferAllCurrencies](#transferAllCurrencies)
+  * [getCurrenciesFromString](#getCurrenciesFromString)
+  * [getPaymentDataFromString](#getPaymentDataFromString)
+  * [getActorItems](#getActorItems)
+  * [getActorCurrencies](#getActorCurrencies)
 
 
 * [Misc methods](#misc-methods)
@@ -198,6 +203,27 @@ Sets the attributes for detecting item similarities
 | Param | Type |
 | --- | --- |
 | inPaths | `Array<string>` |
+
+---
+
+### addSystemIntegration
+
+`game.itempiles.API.addSystemIntegration(data)`
+
+A combination of all the methods above, but this integrates a system's specific settings more readily into item piles, allowing users to also change the settings afterwards.
+
+| Param                        | Type                                                                                                                                                                                            | Description                                                                                                          |
+|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| data                         | `object`                                                                                                                                                                                        |                                                                                                                      |
+| data.VERSION                 | `string`                                                                                                                                                                                        | The integration version                                                                                              |
+| data.ACTOR_CLASS_TYPE        | `string`                                                                                                                                                                                        | The system's actor class type to represent item piles                                                                |
+| data.ITEM_PRICE_ATTRIBUTE    | `string`                                                                                                                                                                                        | The property path to the system's item price attribute                                                               |
+| data.ITEM_QUANTITY_ATTRIBUTE    | `string`                                                                                                                                                                                        | The property path to the system's item quantity attribute                                                            |
+| data.ITEM_FILTERS            | `Array<{path: string, filters: string}>`                                                                                                                                                        | The filters to determine which items to not include as droppable or tradable                                         |
+| data.ITEM_SIMILARITIES       | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item similarities                                               |
+| data.ITEM_TRANSFORMER        | `undefined/Function`                                                                                                                                                                            | An optional function that gets run over items before picked up, traded, or bought                                    |
+| data.CURRENCIES              | `Array<{ primary: boolean, type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }>, exchangeRate: number }>` | The array of currencies for this system                                                                              |
+| data.CURRENCY_DECIMAL_DIGITS | `undefined/number`                                                                                                                                                                              | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured) |
 
 ---
 
@@ -527,77 +553,6 @@ Transfers all items between the source and the target.
 
 ---
 
-### addCurrencies
-
-`game.itempiles.API.addCurrencies(target, currencies, options)` ⇒ `Promise<object>`
-
-Adds currencies to the target
-
-**Returns**: `Promise<object>` - An object containing the items and attributes added to the target
-
-| Param                                   | Type                        | Default | Description                                    |
-|-----------------------------------------|-----------------------------| --- |------------------------------------------------|
-| target                                  | `Actor/TokenDocument/Token` |  | The target to add the currencies to            |
-| currencies                              | `string`                    |  | A string of currencies to add (eg, "5gp 25sp") |
-| options                                 | `object`                    |  | Options to pass to the function                |
-| [options.interactionId]                 | `string/boolean`            | `false` | The interaction ID of this action              |
-
----
-
-### removeCurrencies
-
-`game.itempiles.API.removeCurrencies(target, currencies, options)` ⇒ `Promise<object>`
-
-Removes currencies from the target
-
-**Returns**: `Promise<array>` - An object containing the items and attributes removed from the target
-
-| Param                   | Type                        | Default | Description                                       |
-|-------------------------|-----------------------------|---------|---------------------------------------------------|
-| target                  | `Actor/Token/TokenDocument` |         | The target to remove currencies from              |
-| currencies              | `string`                    |         | A string of currencies to remove (eg, "5gp 25sp") |
-| options                 | `object`                    |         | Options to pass to the function                   |
-| [options.change]        | `boolean`            | `true`  | Whether the actor can get change back                 |
-| [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                 |
-
----
-
-### transferCurrencies
-
-`game.itempiles.API.transferCurrencies(source, target, items, options)` ⇒ `Promise<object>`
-
-Transfers currencies between the source and the target.
-
-**Returns**: `Promise<object>` - An object containing the items and attributes transferred to the target
-
-| Param                   | Type                        | Default | Description                                         |
-|-------------------------|-----------------------------| --- |-----------------------------------------------------|
-| source                  | `Actor/Token/TokenDocument` |  | The source to transfer currencies from                        |
-| target                  | `Actor/Token/TokenDocument` |  | The target to transfer currencies to                          |
-| currencies              | `string`                    |  | A string of currencies to transfer (eg, "5gp 25sp") |
-| options                 | `object`                    |  | Options to pass to the function                     |
-| [options.change]        | `boolean`            | `true`  | Whether the actor can get change back                 |
-| [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                   |
-
----
-
-### transferAllCurrencies
-
-`game.itempiles.API.transferAllCurrencies(source, target, options)` ⇒ `Promise<object>`
-
-Transfers all currencies between the source and the target.
-
-**Returns**: `Promise<object>` - An object containing all items and attributes transferred to the target
-
-| Param | Type | Default | Description                               |
-| --- | --- | --- |-------------------------------------------|
-| source | `Actor/Token/TokenDocument` |  | The actor to transfer all currencies from |
-| target | `Actor/Token/TokenDocument` |  | The actor to receive all the currencies   |
-| options | `object` |  | Options to pass to the function           |
-| [options.interactionId] | `string/boolean` | `false` | The interaction ID of this action         |
-
----
-
 ### setAttributes
 
 `game.itempiles.API.setAttributes(target, attributes, options)` ⇒ `Promise<object>`
@@ -699,6 +654,137 @@ Transfers all items and attributes between the source and the target.
 | options | `object` |  | Options to pass to the function |
 | [options.itemFilters] | `Array/boolean` | `false` | Array of item types disallowed - will default to module settings if none provided |
 | [options.interactionId] | `string/boolean` | `false` | The ID of this interaction |
+
+---
+
+### addCurrencies
+
+`game.itempiles.API.addCurrencies(target, currencies, options)` ⇒ `Promise<object>`
+
+Adds currencies to the target
+
+**Returns**: `Promise<object>` - An object containing the items and attributes added to the target
+
+| Param                                   | Type                        | Default | Description                                    |
+|-----------------------------------------|-----------------------------| --- |------------------------------------------------|
+| target                                  | `Actor/TokenDocument/Token` |  | The target to add the currencies to            |
+| currencies                              | `string`                    |  | A string of currencies to add (eg, "5gp 25sp") |
+| options                                 | `object`                    |  | Options to pass to the function                |
+| [options.interactionId]                 | `string/boolean`            | `false` | The interaction ID of this action              |
+
+---
+
+### removeCurrencies
+
+`game.itempiles.API.removeCurrencies(target, currencies, options)` ⇒ `Promise<object>`
+
+Removes currencies from the target
+
+**Returns**: `Promise<array>` - An object containing the items and attributes removed from the target
+
+| Param                   | Type                        | Default | Description                                       |
+|-------------------------|-----------------------------|---------|---------------------------------------------------|
+| target                  | `Actor/Token/TokenDocument` |         | The target to remove currencies from              |
+| currencies              | `string`                    |         | A string of currencies to remove (eg, "5gp 25sp") |
+| options                 | `object`                    |         | Options to pass to the function                   |
+| [options.change]        | `boolean`            | `true`  | Whether the actor can get change back                 |
+| [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                 |
+
+---
+
+### transferCurrencies
+
+`game.itempiles.API.transferCurrencies(source, target, items, options)` ⇒ `Promise<object>`
+
+Transfers currencies between the source and the target.
+
+**Returns**: `Promise<object>` - An object containing the items and attributes transferred to the target
+
+| Param                   | Type                        | Default | Description                                         |
+|-------------------------|-----------------------------| --- |-----------------------------------------------------|
+| source                  | `Actor/Token/TokenDocument` |  | The source to transfer currencies from                        |
+| target                  | `Actor/Token/TokenDocument` |  | The target to transfer currencies to                          |
+| currencies              | `string`                    |  | A string of currencies to transfer (eg, "5gp 25sp") |
+| options                 | `object`                    |  | Options to pass to the function                     |
+| [options.change]        | `boolean`            | `true`  | Whether the actor can get change back                 |
+| [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                   |
+
+---
+
+### transferAllCurrencies
+
+`game.itempiles.API.transferAllCurrencies(source, target, options)` ⇒ `Promise<object>`
+
+Transfers all currencies between the source and the target.
+
+**Returns**: `Promise<object>` - An object containing all items and attributes transferred to the target
+
+| Param | Type | Default | Description                               |
+| --- | --- | --- |-------------------------------------------|
+| source | `Actor/Token/TokenDocument` |  | The actor to transfer all currencies from |
+| target | `Actor/Token/TokenDocument` |  | The actor to receive all the currencies   |
+| options | `object` |  | Options to pass to the function           |
+| [options.interactionId] | `string/boolean` | `false` | The interaction ID of this action         |
+
+---
+
+### getCurrenciesFromString
+
+`game.itempiles.API.getCurrenciesFromString(currencies)` ⇒ `Promise<object>`
+
+Turns a string of currencies into an array containing the data and quantities for each currency
+
+**Returns**: `Promise<object>` - An array of object containing the data and quantity for each currency
+
+| Param                                   | Type                        | Default | Description                                    |
+|-----------------------------------------|-----------------------------| --- |------------------------------------------------|
+| currencies                              | `string`                    |  | A string of currencies to add (eg, "5gp 25sp") |
+
+---
+
+### getPaymentDataFromString
+
+`game.itempiles.API.getPaymentDataFromString(currencies, options)` ⇒ `Promise<object>`
+
+Turns a string of currencies into an object containing payment data, and the change an optional target would receive back
+
+**Returns**: `Promise<object>` - An object containing the price data
+
+| Param                                   | Type                        | Default | Description                                    |
+|-----------------------------------------|-----------------------------| --- |------------------------------------------------|
+| price                              | `string`                    |  | A string of currencies to add (eg, "5gp 25sp") |
+| options                                 | `object`                    |  | Options to pass to the function                |
+| [options.target]                 | `string/Actor/TokenDocument/Token`            | `false` | The target whose currencies to check against              |
+
+---
+
+### getActorItems
+
+`game.itempiles.API.getActorItems(target)` ⇒ `Promise<object>`
+
+Gets all the valid items from a given actor or token, excluding items based on its item type filters
+
+**Returns**: `Array<Item>` - Array containing the target's valid items
+
+| Param            | Type                        | Default | Description                                    |
+|------------------|-----------------------------| --- |------------------------------------------------|
+| target           | `string/Actor/TokenDocument/Token`                    |  | The target to get the items from |
+
+---
+
+### getActorCurrencies
+
+`game.itempiles.API.getActorCurrencies(target, options)` ⇒ `Promise<object>`
+
+Turns a string of currencies into an object containing payment data, and the change an optional target would receive back
+
+**Returns**: `Promise<object>` - An object containing the price data
+
+| Param                                   | Type                               | Default | Description                                    |
+|-----------------------------------------|------------------------------------| --- |------------------------------------------------|
+| target           | `string/Actor/TokenDocument/Token` |  | The target to get the currencies from |
+| options                                 | `object`                           |  | Options to pass to the function                |
+| [options.getAll]                 | `boolean`                          | `false` | Whether to get all the currencies, regardless of quantity              |
 
 ---
 

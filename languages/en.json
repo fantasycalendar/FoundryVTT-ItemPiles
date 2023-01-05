@@ -17,6 +17,7 @@
       "vault": "Vault"
     },
     "Notifications": {
+      "SystemSupportFound": "System support found! Applying default system settings to Item Piles...",
       "UpdateItemPileSuccess": "Item Pile successfully updated.",
       "UpdateMerchantSuccess": "Merchant successfully updated.",
       "ItemTransferred": "{source_actor_name}'s {item_name} was given to {target_actor_name}.",
@@ -197,11 +198,6 @@
       "NoSystemFound": {
         "Title": "System Not Recognized",
         "Content": "This system is not currently fully supported. This means that the module does not know how to best handle this system's items, but can still operate in a limited fashion.<br><br>You can configure the module's settings yourself, but it requires a bit of technical know-how.<br><br>If you have any questions, ping <strong>Wasp#2005</strong> on the Foundry discord."
-      },
-      "SystemFound": {
-        "Title": "System Recognized",
-        "Content": "This system was previously not supported, but in an recent update it was added as a supported system!<br><br>Do you want to load this system's default Item Pile settings?",
-        "Confirm": "Apply System Defaults"
       },
       "NewSystemVersion": {
         "Title": "New System Version",
@@ -625,7 +621,7 @@
       },
       "EnableDroppingItems": {
         "Title": "Enable Dropping Items",
-        "Hint": "This enables users being able to drop items on the ground to create their own item piles - with this disabled, users cannot create new piles, nor add items to existing piles."
+        "Hint": "This enables users being able to drop items on the ground to create their own item piles - with this disabled, users cannot create new piles."
       },
       "EnableGivingItems": {
         "Title": "Enable Giving Items",

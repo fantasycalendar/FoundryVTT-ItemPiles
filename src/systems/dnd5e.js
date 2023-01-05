@@ -23,7 +23,7 @@ export default {
     }
   ],
 
-  "ITEM_TRANSFORMER": async (itemData, actor = false) => {
+  "ITEM_TRANSFORMER": async (itemData) => {
     ["equipped", "proficient", "prepared"].forEach(key => {
       if (itemData?.system?.[key] !== undefined) {
         delete itemData.system[key];

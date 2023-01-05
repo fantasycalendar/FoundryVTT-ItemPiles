@@ -74,5 +74,9 @@ export const SYSTEMS = {
 
   get DATA() {
     return this.SUPPORTED_SYSTEMS?.[game.system.id.toLowerCase()] ?? this.DEFAULT_SETTINGS;
+  },
+
+  addSystem(systemId, data) {
+    this.SUPPORTED_SYSTEMS[systemId.toLowerCase()] = data;
   }
 };
