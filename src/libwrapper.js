@@ -2,6 +2,7 @@ import CONSTANTS from "./constants/constants.js";
 import { hotkeyActionState } from "./hotkeys.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
 import PrivateAPI from "./API/private-api.js";
+import * as Helpers from "./helpers/helpers.js";
 
 export default function registerLibwrappers() {
 
@@ -20,7 +21,10 @@ export default function registerLibwrappers() {
     const document = this.constructor.collection.get(documentId);
 
     if (PileUtilities.isValidItemPile(document) && hotkeyActionState.openPileInventory) {
-      return game.itempiles.API.renderItemPileInterface(document, { useDefaultCharacter: true });
+      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_DIRECTORY_CLICK, document);
+      if (hookResult) {
+        return game.itempiles.API.renderItemPileInterface(document, { useDefaultCharacter: true });
+      }
     }
     return wrapped(event);
   }, "MIXED");

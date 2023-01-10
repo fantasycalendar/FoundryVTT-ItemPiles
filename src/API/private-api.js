@@ -181,6 +181,14 @@ export default class PrivateAPI {
       action: "addItems", target: targetUuid, items: itemDeltas, userId: userId, interactionId: interactionId
     });
 
+    if (PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultJournalLog(targetActor, {
+        userId,
+        items: itemDeltas,
+        withdrawal: false
+      });
+    }
+
     return itemDeltas;
 
   }
@@ -209,6 +217,14 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(targetUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(targetUuid);
+    }
+
+    if (PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultJournalLog(targetActor, {
+        userId,
+        items: itemDeltas,
+        withdrawal: true
+      });
     }
 
     return itemDeltas;
@@ -367,6 +383,15 @@ export default class PrivateAPI {
       interactionId: interactionId
     });
 
+    if (PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultJournalLog(targetActor, {
+        userId,
+        items: itemDeltas,
+        attributes: attributeDeltas,
+        withdrawal: false
+      });
+    }
+
     return { itemDeltas, attributeDeltas };
 
   }
@@ -423,6 +448,15 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(targetUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(targetUuid);
+    }
+
+    if (PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultJournalLog(targetActor, {
+        userId,
+        items: itemDeltas,
+        attributes: attributeDeltas,
+        withdrawal: true
+      });
     }
 
     return { itemDeltas, attributeDeltas };
@@ -927,7 +961,7 @@ export default class PrivateAPI {
     tokenOverrides = {},
     actorOverrides = {},
     itemPileFlags = {},
-    folder = false,
+    folders = false,
   } = {}) {
 
     let returns = {};
@@ -955,10 +989,22 @@ export default class PrivateAPI {
         img: "icons/svg/item-bag.svg"
       };
 
-      if (folder) {
-        folder = game.folders.get(folder) || game.folders.getName(folder);
-        if (folder) {
-          actorData.folder = folder.id;
+      if (folders) {
+        let lastFolder = false
+        for (const folder of folders) {
+          let actualFolder = game.folders.getName(folder);
+          if (!actualFolder) {
+            const folderData = { name: folder, type: "Actor", sorting: 'a' };
+            if (lastFolder) {
+              folderData.parent = lastFolder.id;
+            }
+            actualFolder = await Folder.create(folderData);
+          }
+          lastFolder = actualFolder;
+        }
+
+        if (lastFolder) {
+          actorData.folder = lastFolder.id;
         }
       }
 
@@ -1542,7 +1588,7 @@ export default class PrivateAPI {
       return game.itempiles.API.transferItems(dropData.source, dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
     }
 
-    return game.itempiles.API.addItems(dropData.source, [dropData.itemData], { interactionId: dropData.interactionId });
+    return game.itempiles.API.addItems(dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
 
   }
 
@@ -1818,7 +1864,7 @@ export default class PrivateAPI {
 
     }
 
-    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLICK, pileDocument, interactingActor, game.user.id);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLICK, pileDocument, interactingActor);
     if (hookResult === false) return;
 
     return this._renderItemPileInterface(pileDocument.uuid, { inspectingTargetUuid: interactingActor?.uuid });

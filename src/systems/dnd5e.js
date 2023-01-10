@@ -15,7 +15,7 @@ export default {
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "spell,feat,class,subclass"
+      "filters": "spell,feat,class,subclass,background"
     },
     {
       "path": "system.weaponType",

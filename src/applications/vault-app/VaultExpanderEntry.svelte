@@ -1,18 +1,17 @@
 <script>
 
-    import { fade } from 'svelte/transition';
-    import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-    export let store;
-    export let item;
+  export let store;
+  export let item;
 
-    const name = item.name;
-    const img = item.img;
-    const quantity = item.quantity;
-    const itemFlagData = item.itemFlagData;
-    const pileData = store.pileData;
+  const name = item.name;
+  const img = item.img;
+  const quantity = item.quantity;
+  const itemFlagData = item.itemFlagData;
+  const pileData = store.pileData;
 
-    const editQuantities = store.editQuantities;
+  const editQuantities = store.editQuantities;
 
 </script>
 
@@ -36,31 +35,22 @@
     </div>
   </div>
 
-  {#if item.canStack}
-
-    <div class="item-piles-quantity-container" style="flex:2.5;">
-
-      {#if editQuantities}
-
-        <div class="item-piles-quantity-input-container">
-          <input class="item-piles-quantity" type="number" min="0" bind:value="{$quantity}"
-                 draggable="true" on:dragstart|stopPropagation|preventDefault/>
-        </div>
-
-      {/if}
-
-    </div>
-
-  {/if}
-
   {#if !editQuantities}
 
     <button
       on:click={() => { item.take() }}
       class="item-piles-item-take-button"
-      type="button"
-      disabled={!$quantity}>
+      type="button">
       {localize("ITEM-PILES.Inspect.Take")}
+    </button>
+
+  {:else}
+
+    <button
+      on:click={() => { item.remove() }}
+      class="item-piles-item-take-button"
+      type="button">
+      {localize("Remove")}
     </button>
 
   {/if}

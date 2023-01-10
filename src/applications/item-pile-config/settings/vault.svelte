@@ -5,6 +5,7 @@
   import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
   import CustomDialog from "../../components/CustomDialog.svelte";
   import * as PileUtilities from "../../../helpers/pile-utilities.js";
+  import CONSTANTS from "../../../constants/constants.js";
 
   export let pileData;
   export let pileActor;
@@ -113,6 +114,27 @@
   <button style="flex:2;" type="button" on:click={() => clearVaultLog()}>
     {localize("ITEM-PILES.Applications.ItemPileConfig.Vault.ClearVaultLog")}
   </button>
+</div>
+
+<div class="form-group">
+  <label>
+    <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LoggingFormat")}</span>
+    <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LoggingFormatExplanation")}</p>
+  </label>
+</div>
+
+<div class="form-group">
+  <select bind:value={pileData.vaultLogType}>
+    <option value={CONSTANTS.VAULT_LOGGING_TYPES.USER_ACTOR}>
+      {localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LoggingFormatUserActor")}
+    </option>
+    <option value={CONSTANTS.VAULT_LOGGING_TYPES.USER}>
+      {localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LoggingFormatUser")}
+    </option>
+    <option value={CONSTANTS.VAULT_LOGGING_TYPES.ACTOR}>
+      {localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LoggingFormatActor")}
+    </option>
+  </select>
 </div>
 
 <style lang="scss">

@@ -44,7 +44,6 @@
   $: gridData = $gridDataStore;
 
   const dragPosition = writable({});
-  let hoveredItem = "";
   let element;
 
   async function onDropData(data, event, isExpander) {
@@ -84,7 +83,7 @@
     }
 
     return PrivateAPI._depositItem({
-      source: false,
+      source: store.recipient ?? false,
       target: store.actor,
       itemData: {
         item: itemData, quantity: 1
@@ -155,6 +154,15 @@
   let activeTab = writable("vault");
 
   const applicationHeight = application.position.stores.height;
+  const applicationWidth = application.position.stores.width;
+  const applicationLeft = application.position.stores.left;
+  const defaultWidth = get(application.position.stores.width);
+
+  $: {
+    if($activeTab === "vault" && $applicationWidth){
+      application.position.stores.width.set(defaultWidth);
+    }
+  }
 
 </script>
 
@@ -224,7 +232,17 @@
 
       {#if store.recipient && (gridData.canWithdrawCurrencies || gridData.canDepositCurrencies)}
         <div class="item-piles-flexrow item-piles-top-divider" style="flex: 0 1 auto; align-items: center;">
-          <span>{localize("ITEM-PILES.Vault.ViewingAs", { actor_name: store.recipient.name })}</span>
+          <span>
+            <a on:click={() => {
+              const [appPosition, actorPosition] = Helpers.getApplicationPositions(application, store.recipient.sheet);
+              application.position.stores.left.set(appPosition.left);
+              application.position.stores.top.set(appPosition.top);
+              store.recipient.sheet.render(true, actorPosition);
+            }}>
+              <i class="fa-solid fa-suitcase"></i>
+              {localize("ITEM-PILES.Vault.ViewingAs", { actor_name: store.recipient.name })}
+            </a>
+          </span>
           <div style="flex:0 1 auto; justify-self: flex-end; display: flex; justify-content: flex-end;">
             {#if gridData.canWithdrawCurrencies}
               <button type="button" class="item-piles-small-button" on:click={() => store.withdrawCurrency()}>
@@ -308,7 +326,7 @@
 
         {#if $vaultLog.length > $visibleLogItems}
           <div class="item-piles-top-divider" style="text-align: center;">
-            <a on:click={() => { $visibleLogItems += 20; }}><i>Load more transactions...</i></a>
+            <a on:click={() => { $visibleLogItems += 20; }}><i>Load more transactions ({$visibleLogItems} / {$vaultLog.length})...</i></a>
           </div>
         {/if}
 

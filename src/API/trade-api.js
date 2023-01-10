@@ -135,11 +135,13 @@ export default class TradeAPI {
           user: game.users.get(userId), actor: traderActor
         }, data.fullPublicTradeId, data.fullPrivateTradeId, isPrivate);
 
-        const app = new TradingApp(store, this.getAppOptions(actor).tradeApp).render(true);
+        const [actorSheet, tradeApp] = Helpers.getApplicationPositions(actor.sheet);
+
+        const app = new TradingApp(store, tradeApp).render(true);
 
         ongoingTrades.set(data.fullPublicTradeId, { app, store });
 
-        actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
+        actor.sheet.render(true, actorSheet);
 
         if (isPrivate) {
           return ItemPileSocket.callHookForUsers(CONSTANTS.HOOKS.TRADE.STARTED, [game.user.id, userId], {
@@ -203,11 +205,13 @@ export default class TradeAPI {
       user: tradingUser, actor: tradingActor
     }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
 
-    const app = new TradingApp(store, this.getAppOptions(actor).tradeApp).render(true);
+    const [actorSheet, tradeApp] = Helpers.getApplicationPositions(actor.sheet);
+
+    const app = new TradingApp(store, tradeApp).render(true);
 
     ongoingTrades.set(fullPublicTradeId, { app, store });
 
-    actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
+    actor.sheet.render(true, actorSheet);
 
     return {
       fullPrivateTradeId, fullPublicTradeId, actorUuid: result.uuid

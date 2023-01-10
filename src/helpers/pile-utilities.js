@@ -471,10 +471,20 @@ export async function updateItemPileData(target, flagData, tokenData) {
 }
 
 export function cleanFlagData(flagData) {
+  const defaults = Object.keys(CONSTANTS.PILE_DEFAULTS);
   const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, CONSTANTS.PILE_DEFAULTS)));
-  const toRemove = new Set(Object.keys(CONSTANTS.PILE_DEFAULTS).filter(key => !difference.has(key)));
+  const toRemove = new Set(defaults.filter(key => !difference.has(key)));
   if (flagData.enabled) {
     toRemove.delete("type")
+  }
+  if (!CONSTANTS.CUSTOM_PILE_TYPES[flagData.type]) {
+    const baseKeys = new Set(defaults);
+    for (const key of Object.keys(flagData)) {
+      if (!baseKeys.has(key)) {
+        delete flagData[key];
+        flagData["-=" + key] = null;
+      }
+    }
   }
   for (const key of toRemove) {
     delete flagData[key];
@@ -1182,6 +1192,56 @@ export function getPaymentData({
 
 /* ---------------------- VAULT FUNCTIONS ---------------------- */
 
+export function getVaultGridData(vaultActor, flagData = false) {
+
+  const vaultFlags = getActorFlagData(vaultActor, flagData);
+
+  const vaultItems = getActorItems(vaultActor);
+  const validVaultItems = vaultItems.filter(item => {
+    return !getItemFlagData(item).vaultExpander;
+  });
+
+  let enabledCols = vaultFlags.cols;
+  let enabledRows = vaultFlags.rows;
+
+  if (vaultFlags.vaultExpansion) {
+
+    const vaultExpanders = vaultItems.filter(item => {
+      return getItemFlagData(item).vaultExpander;
+    }).map(item => ({
+      itemFlagData: getItemFlagData(item),
+      quantity: Utilities.getItemQuantity(item)
+    }))
+
+    const expansions = vaultExpanders.reduce((acc, item) => {
+      acc.cols += (item.itemFlagData.addsCols ?? 0) * item.quantity;
+      acc.rows += (item.itemFlagData.addsRows ?? 0) * item.quantity;
+      return acc;
+    }, {
+      cols: vaultFlags.baseExpansionCols ?? 0,
+      rows: vaultFlags.baseExpansionRows ?? 0
+    });
+
+    enabledCols = expansions.cols;
+    enabledRows = expansions.rows;
+
+  }
+
+  enabledCols = Math.min(enabledCols, vaultFlags.cols);
+  enabledRows = Math.min(enabledRows, vaultFlags.rows);
+
+  return {
+    totalSpaces: Math.max(0, (vaultFlags.cols * vaultFlags.rows)),
+    enabledSpaces: Math.max(0, (enabledCols * enabledRows)),
+    freeSpaces: Math.max(0, (enabledCols * enabledRows) - validVaultItems.length),
+    enabledCols: enabledCols,
+    enabledRows: enabledRows,
+    cols: vaultFlags.cols,
+    rows: vaultFlags.rows
+  }
+
+}
+
 export async function updateVaultJournalLog(itemPile, {
   actor = false,
   userId = false,
@@ -1200,7 +1260,7 @@ export async function updateVaultJournalLog(itemPile, {
   for (const itemData of items) {
     if (currencies.some(currency => currency.name === itemData.item.name)) {
       formattedCurrencies.push({
-        actor: actor.name,
+        actor: actor?.name ?? false,
         user: userId,
         name: itemData.name,
         qty: itemData.quantity * (withdrawal ? -1 : 1),
@@ -1209,7 +1269,7 @@ export async function updateVaultJournalLog(itemPile, {
     } else {
       const item = await Item.implementation.create(itemData.item, { temporary: true });
       formattedItems.push({
-        actor: actor.name,
+        actor: actor?.name ?? false,
         user: userId,
         name: item.name,
         qty: itemData.quantity * (withdrawal ? -1 : 1),
@@ -1222,7 +1282,7 @@ export async function updateVaultJournalLog(itemPile, {
     const currency = currencies.find(currency => currency.data.path === key);
     if (currency) {
       formattedCurrencies.push({
-        actor: actor.name,
+        actor: actor?.name ?? false,
         user: userId,
         name: currency.name,
         qty: quantity * (withdrawal ? -1 : 1),

@@ -3,7 +3,7 @@ import "./styles/styles.scss";
 import CONSTANTS from "./constants/constants.js";
 import registerUIOverrides from "./foundry-ui-overrides.js";
 import registerLibwrappers from "./libwrapper.js";
-import { registerSettings, checkSystem, patchCurrencySettings, applySystemSpecificStyles } from "./settings.js";
+import { applySystemSpecificStyles, checkSystem, patchCurrencySettings, registerSettings } from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import Socket from "./socket.js";
 import API from "./API/api.js";
@@ -12,6 +12,9 @@ import ChatAPI from "./API/chat-api.js";
 import PrivateAPI from "./API/private-api.js";
 import * as Helpers from "./helpers/helpers.js";
 import runMigrations from "./migrations.js"
+
+import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
+import ItemEditor from "./applications/item-editor/item-editor.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -31,6 +34,10 @@ Hooks.once("ready", () => {
       pile_types: CONSTANTS.PILE_TYPES,
       pile_flag_defaults: CONSTANTS.PILE_DEFAULTS,
       item_flag_defaults: CONSTANTS.ITEM_DEFAULTS,
+      apps: {
+        ItemPileConfig,
+        ItemEditor
+      }
     };
     window.ItemPiles = {
       API: API

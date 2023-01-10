@@ -282,3 +282,45 @@ export function timeSince(date) {
 
   return Math.ceil(seconds) + "s";
 }
+
+
+export function getApplicationPositions(application_1, application_2 = false) {
+
+  let midPoint = (window.innerWidth / 2);
+
+  if (!application_2) {
+    if (((midPoint - 200) - application_1.position.width - 25) > 0) {
+      midPoint -= 200
+    }
+    return [
+      { left: midPoint - application_1.position.width - 25 },
+      { left: midPoint + 25 }
+    ]
+  }
+
+  const application_1_position = {
+    left: application_1.position.left,
+    top: application_1.position.top,
+    width: application_1.position.width
+  };
+  const application_2_position = {
+    left: application_2.position.left,
+    top: application_1.position.top,
+    width: application_2.position.width
+  };
+
+  application_2_position.left = application_1_position.left - application_2_position.width - 25;
+  if (application_2_position.left < 0) {
+    application_2_position.left = application_1_position.left + application_1_position.width + 25
+  }
+  if ((application_2_position.left + application_2_position.width) > window.innerWidth) {
+    application_2_position.left = midPoint - application_2_position.width - 25;
+    application_1_position.left = midPoint + 25;
+  }
+
+  return [
+    application_1_position,
+    application_2_position
+  ]
+
+}

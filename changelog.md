@@ -13,11 +13,12 @@
   - `item-piles-preGiveItem`
   - `item-piles-giveItem`
 - Added more item piles constants and useful info in `game.itempiles`
+- Added `background` type items to the item filters of D&D5e
 - Tweaked `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
 - Tweaked item piles containers to be the only tokens that get the additional buttons in its token HUD
 - Tweaked the item similarities setting - a lack of them will now treat every item as distinct items rather than the same
 - Fixed GMs still being able to drop items on the canvas when the setting was not enabled
-- Fixed trades between users not creating chat messages when concluded
+- Fixed trades between users not creating a final chat message when concluded listing what was traded
 - Fixed being able to loot/buy installed Cyberware in Cyberpunk Red
 - Fixed sometimes being able to give items to yourself
 

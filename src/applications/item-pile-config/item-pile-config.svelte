@@ -19,6 +19,7 @@
   import ContainerSettings from "./settings/container.svelte";
   import SharingSettings from "./settings/sharing.svelte";
   import VaultSettings from "./settings/vault.svelte";
+  import CustomSettings from "./settings/custom.svelte";
 
   const { application } = getContext('external');
 
@@ -139,6 +140,8 @@
 
   let activeTab = "mainsettings";
 
+  const customTypes = Object.keys(CONSTANTS.CUSTOM_PILE_TYPES);
+
 </script>
 
 <svelte:options accessors={true}/>
@@ -173,6 +176,11 @@
                   {localize(`ITEM-PILES.Types.${type}`)}
                 </option>
               {/each}
+              {#each customTypes as customType}
+                <option value={customType}>
+                  {localize(`ITEM-PILES.Types.${customType}`)}
+                </option>
+              {/each}
             </select>
           </div>
 
@@ -203,6 +211,10 @@
           {:else if pileData.type === CONSTANTS.PILE_TYPES.VAULT}
 
             <VaultSettings bind:pileData {pileActor}/>
+
+          {:else if customTypes.includes(pileData.type)}
+
+            <CustomSettings bind:pileData {pileActor}/>
 
           {/if}
 

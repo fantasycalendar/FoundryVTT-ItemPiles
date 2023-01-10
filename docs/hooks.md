@@ -496,7 +496,6 @@ Called before resolving a click on an item pile token
 |------------------|---------------------------------|----------------------------------------------------------------|
 | target           | <code>TokenDocument</code> | The item pile token that was clicked                           |
 | interactingActor | <code>Actor</code>             | The actor of the user that interacted with the item pile token |
-| userId           | <code>string/boolean</code>     | The ID of the user that clicked on the token                   |
 
 If the hook returns `false`, the action is interrupted.
 

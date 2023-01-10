@@ -11,6 +11,7 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import { timeSince } from "../helpers/helpers.js";
+import { getVaultGridData } from "../helpers/pile-utilities.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -44,6 +45,7 @@ export class VaultStore extends ItemPileStore {
     this.refreshGrid();
     this.subscribeTo(this.pileData, () => {
       this.refreshGridDebounce();
+      this.processLogEntries();
     });
 
     this.subscribeTo(this.document, () => {
@@ -60,14 +62,29 @@ export class VaultStore extends ItemPileStore {
 
   processLogEntries() {
 
+    const pileData = get(this.pileData);
     const logEntries = PileUtilities.getActorVaultLog(this.actor);
 
     logEntries.map(log => {
+
+      let instigator = log.actor || "Unknown character";
+      if (pileData.vaultLogType === "user_actor") {
+        instigator = game.i18n.format("ITEM-PILES.Vault.LogUserActor", {
+          actor_name: log.actor || "Unknown character",
+          user_name: game.users.get(log.user)?.name ?? "unknown user",
+        })
+      } else if (pileData.vaultLogType === "user") {
+        instigator = game.users.get(log.user)?.name ?? "unknown user";
+      }
+
+      const quantity = Math.abs(log.qty) > 1
+        ? game.i18n.format("ITEM-PILES.Vault.LogQuantity", { quantity: Math.abs(log.qty) })
+        : "";
+
       log.text = game.i18n.format("ITEM-PILES.Vault.LogEntry" + (log.qty > 0 ? "Deposited" : "Withdrew"), {
-        actor_name: log.actor,
-        user_name: game.users.get(log.user)?.name ?? "unknown",
+        instigator,
         item_name: log.name,
-        quantity: Math.abs(log.qty),
+        quantity
       })
       log.visible = true;
     });
@@ -91,44 +108,18 @@ export class VaultStore extends ItemPileStore {
 
   refreshFreeSpaces() {
     const pileData = get(this.pileData);
-    const items = get(this.validGridItems);
-    const vaultExpanders = get(this.vaultExpanderItems);
-
     this.gridData.update(() => {
 
-      let enabledCols = pileData.cols;
-      let enabledRows = pileData.rows;
-
-      if (pileData.vaultExpansion) {
-
-        const expansions = vaultExpanders.reduce((acc, item) => {
-          acc.cols += get(item.itemFlagData).addsCols * get(item.quantity);
-          acc.rows += get(item.itemFlagData).addsRows * get(item.quantity);
-          return acc;
-        }, {
-          cols: pileData.baseExpansionCols ?? 0,
-          rows: pileData.baseExpansionRows ?? 0
-        });
-
-        enabledCols = expansions.cols;
-        enabledRows = expansions.rows;
-
-      }
-
-      enabledCols = Math.min(enabledCols, pileData.cols);
-      enabledRows = Math.min(enabledRows, pileData.rows);
-
       const vaultAccess = pileData.vaultAccess.filter(access => {
-        const doc = fromUuidSync(access.uuid);
-        return doc?.isOwner;
+        return fromUuidSync(access.uuid)?.isOwner;
       });
 
       const access = vaultAccess.reduce((acc, access) => {
         acc.canOrganize = acc.canOrganize || access.organize;
-        acc.canWithdrawItems = acc.canWithdrawItems || access.items.withdraw;
-        acc.canDepositItems = acc.canDepositItems || access.items.deposit;
-        acc.canWithdrawCurrencies = acc.canWithdrawCurrencies || access.currencies.withdraw;
-        acc.canDepositCurrencies = acc.canDepositCurrencies || access.currencies.deposit;
+        acc.canWithdrawItems = (acc.canWithdrawItems || access.items.withdraw) && this.recipient;
+        acc.canDepositItems = (acc.canDepositItems || access.items.deposit) && this.recipient;
+        acc.canWithdrawCurrencies = (acc.canWithdrawCurrencies || access.currencies.withdraw) && this.recipient;
+        acc.canDepositCurrencies = (acc.canDepositCurrencies || access.currencies.deposit) && this.recipient;
         return acc;
       }, {
         canOrganize: this.actor.isOwner,
@@ -136,20 +127,14 @@ export class VaultStore extends ItemPileStore {
         canDepositItems: this.actor.isOwner && this.recipient,
         canWithdrawCurrencies: this.actor.isOwner && this.recipient,
         canDepositCurrencies: this.actor.isOwner && this.recipient
-      })
+      });
 
       return {
-        fullAccess: game.user.isGM || Object.values(access).every(Boolean),
-        canEditCurrencies: game.user.isGM,
-        totalSpaces: Math.max(0, (pileData.cols * pileData.rows)),
-        enabledSpaces: Math.max(0, (enabledCols * enabledRows)),
-        freeSpaces: Math.max(0, (enabledCols * enabledRows) - items.length),
-        enabledCols: enabledCols,
-        enabledRows: enabledRows,
-        cols: pileData.cols,
-        rows: pileData.rows,
-        gridSize: 40,
+        ...PileUtilities.getVaultGridData(this.actor, pileData),
         ...access,
+        canEditCurrencies: game.user.isGM,
+        fullAccess: game.user.isGM || Object.values(access).every(Boolean),
+        gridSize: 40,
         gap: 4
       }
     })

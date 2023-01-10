@@ -176,8 +176,10 @@
       "ExpandsRows": "{rows} rows",
       "Withdraw": "Withdraw",
       "Deposit": "Deposit",
-      "LogEntryDeposited": "{actor_name} ({user_name}) <span>deposited</span> <strong>{item_name}</strong> x {quantity}",
-      "LogEntryWithdrew": "{actor_name} ({user_name}) <span>withdrew</span> <strong>{item_name}</strong> x {quantity}"
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogQuantity": "{quantity} x",
+      "LogEntryDeposited": "{instigator} <span>deposited</span> {quantity} <strong>{item_name}</strong>",
+      "LogEntryWithdrew": "{instigator} <span>withdrew</span> {quantity} <strong>{item_name}</strong>"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -537,7 +539,12 @@
           "LogVaultAccess": "Log Vault Access",
           "LogVaultAccessExplanation": "When enabled, this vault will create a journal entry and create timestamped logs any time the vault is interacted with.",
           "ClearVaultLog": "Clear Vault Logs",
-          "ClearVaultLogExplanation": "This will clear the vault logs, removing all entries. This cannot be undone."
+          "ClearVaultLogExplanation": "This will clear the vault logs, removing all entries. This cannot be undone.",
+          "LoggingFormat": "Logging Format",
+          "LoggingFormatExplanation": "This configures how the username and character name are displayed in the log.",
+          "LoggingFormatUserActor": "Display username and character name",
+          "LoggingFormatUser": "Display only username",
+          "LoggingFormatActor": "Display only character name"
         }
       },
       "VaultAccessEditor": {

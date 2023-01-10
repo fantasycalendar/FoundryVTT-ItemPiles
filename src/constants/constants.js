@@ -51,6 +51,14 @@ const CONSTANTS = {
     VAULT: "vault"
   },
 
+  VAULT_LOGGING_TYPES: {
+    USER_ACTOR: "user_actor",
+    USER: "user",
+    ACTOR: "actor",
+  },
+
+  CUSTOM_PILE_TYPES: {},
+
   PILE_DEFAULTS: {
     // Core settings
     enabled: false,
@@ -134,10 +142,11 @@ const CONSTANTS = {
     cols: 10,
     rows: 5,
     vaultExpansion: false,
-    baseExpansionCols: 5,
-    baseExpansionRows: 5,
+    baseExpansionCols: 0,
+    baseExpansionRows: 0,
     vaultAccess: [],
-    logVaultActions: false
+    logVaultActions: false,
+    vaultLogType: "user_actor"
   }
 }
 
@@ -179,7 +188,8 @@ CONSTANTS.HOOKS = {
     REVERT_FROM: module`revertFromItemPiles`,
     PRE_SPLIT_INVENTORY: module`preSplitItemPileContent`,
     SPLIT_INVENTORY: module`splitItemPileContent`,
-    PRE_CLICK: module`preClickItemPile`
+    PRE_CLICK: module`preClickItemPile`,
+    PRE_DIRECTORY_CLICK: module`preClickDirectoryItemPile`,
   },
   ITEM: {
     PRE_DROP_DETERMINED: module`preDropItemDetermined`,
