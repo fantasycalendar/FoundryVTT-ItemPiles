@@ -3,7 +3,7 @@
 ## Version 2.4.0
 
 - Added vault type item piles - these item piles act like the Diablo stash or the World of Warcraft banking system, where you have a set amount of grid slots that you can put items into
-- Added vault extenders - you can configure items to extend the space available in
+- Added vault extenders - you can configure items to extend the space available in vaults
 - Added chat message for when users give each other items
 - Added `game.itempiles.API.addSystemIntegration()` for systems to integrate into item piles more readily
 - Added support for `true` and `false` values in system item filters
