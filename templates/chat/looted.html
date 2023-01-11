@@ -2,8 +2,9 @@
 
   <div class="item-piles-chat-card-title">
     <p>
-      <img src="{{itemPile.img}}" title="{{itemPile.name}}" height="32"/>
-      {{#if actor}}<i class="fas fa-arrow-right"></i> <img src="{{actor.img}}" title="{{actor.name}}" height="32"/>{{/if}}
+      <img src="{{itemPile.img}}" data-tooltip="{{itemPile.name}}" height="32"/>
+      {{#if actor}}<i class="fas fa-arrow-right"></i> <img src="{{actor.img}}" data-tooltip="{{actor.name}}"
+                                                           height="32"/>{{/if}}
     </p>
     <p>{{message}}</p>
   </div>
@@ -12,7 +13,7 @@
   <ul>
     {{#each items as |item id|}}
     <li>
-      <img src="{{item.img}}" title="{{item.name}}" height="16"/>
+      <img src="{{item.img}}" data-tooltip="{{item.name}}" height="16"/>
       <label>{{item.name}}</label>
       <small>{{item.quantity}}</small>
     </li>
@@ -28,7 +29,7 @@
   <ul>
     {{#each currencies as |currency id|}}
     <li>
-      <img src="{{currency.img}}" title="{{currency.name}}" height="16"/>
+      <img src="{{currency.img}}" data-tooltip="{{currency.name}}" height="16"/>
       <label>{{currency.name}}</label>
       <small>{{currency.quantity}}</small>
     </li>

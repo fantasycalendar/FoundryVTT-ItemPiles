@@ -1,7 +1,7 @@
 <script>
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
-  import ItemEditor from "../editors/item-editor/item-editor.js";
+  import ItemEditor from "../item-editor/item-editor.js";
   import PriceSelector from "../components/PriceSelector.svelte";
   import ItemEntry from "./ItemEntry.svelte";
 
@@ -24,16 +24,6 @@
 
   const displayControlButtons = store.actor.isOwner;
   const displayBuyButton = !!store.recipient;
-
-  function previewItem(item) {
-    item = store.actor.items.get(item.id);
-    if (game.user.isGM || item.permission[game.user.id] === 3) {
-      return item.sheet.render(true);
-    }
-    const cls = item._getSheetClass()
-    const sheet = new cls(item, { editable: false })
-    return sheet._render(true);
-  }
 
 </script>
 

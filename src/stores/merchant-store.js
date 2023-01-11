@@ -1,4 +1,3 @@
-import ItemPileStore from "./item-pile-store.js";
 import { get, writable } from "svelte/store";
 import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 import { PileItem } from "./pile-item.js";
@@ -8,6 +7,7 @@ import * as Helpers from "../helpers/helpers.js";
 import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
 import { isResponsibleGM } from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
+import ItemPileStore from "./item-pile-store.js";
 
 export default class MerchantStore extends ItemPileStore {
 
@@ -223,10 +223,7 @@ class PileMerchantItem extends PileItem {
     });
     this.subscribeTo(this.itemDocument, () => {
       if (!setup) return;
-      const { data } = this.itemDocument.updateOptions;
-      if (hasProperty(data, game.itempiles.API.ITEM_PRICE_ATTRIBUTE)) {
-        this.refreshPriceData();
-      }
+      this.refreshPriceData();
     });
     this.refreshDisplayQuantity();
     this.subscribeTo(this.store.typeFilter, this.filter.bind(this));
@@ -270,7 +267,8 @@ class PileMerchantItem extends PileItem {
     const itemFlagData = get(this.itemFlagData);
     const sellerFlagData = get(this.store.pileData);
     const buyerFlagData = get(this.store.recipientPileData);
-    const priceData = PileUtilities.getItemPrices(this.item, {
+    const priceData = PileUtilities.getPriceData({
+      item: this.item,
       seller: this.store.actor,
       buyer: this.store.recipient,
       sellerFlagData,

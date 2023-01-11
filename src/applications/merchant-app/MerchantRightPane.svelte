@@ -3,8 +3,8 @@
   import MerchantBuyTab from "./MerchantBuyTab.svelte";
   import MerchantSellTab from "./MerchantSellTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
+  import CurrencyList from "../components/CurrencyList.svelte";
   import { writable } from "svelte/store";
-  import MerchantCurrencyColumn from "./MerchantCurrencyColumn.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
   export let store;
@@ -21,7 +21,7 @@
 <div class="merchant-right-pane item-piles-flexcol">
 
   <div class="merchant-tabbed-center"
-       style="flex: 1; max-height: calc(100% - {recipientStore && $currencies.length ? '46px' : '0px'})">
+       style="flex: 1; max-height: calc(100% - {recipientStore && $currencies.length ? '34px' : '0px'})">
 
     {#if $closed && !game.user.isGM}
       <div style="display: grid; place-items: center; height:100%;">
@@ -40,11 +40,14 @@
   </div>
 
 
-  {#if recipientStore && $currencies.length}
-    <div class="item-piles-flexrow item-piles-currency-list">
-      {#each $currencies as currency (currency.identifier)}
-        <MerchantCurrencyColumn {currency}/>
-      {/each}
+  {#if recipientStore}
+    <div class="item-piles-flexrow merchant-bottom-row">
+      <div style="flex: 0 1 auto;">
+        {localize("ITEM-PILES.Merchant.ShoppingAs", { actorName: recipientStore.actor.name })}
+      </div>
+      {#if $currencies.length}
+        <CurrencyList {currencies} options={{ imgSize: 18, reverse: true }} class="item-piles-currency-list"/>
+      {/if}
     </div>
   {/if}
 
@@ -65,10 +68,10 @@
     overflow-x: hidden;
   }
 
-  .item-piles-currency-list {
-    justify-content: center;
-    align-content: flex-end;
-    flex: 0;
+  .merchant-bottom-row {
+    flex: 0 1 auto;
+    align-items: center;
+    margin-top: 0.5rem;
   }
 
 </style>

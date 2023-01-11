@@ -5,7 +5,7 @@ import * as Helpers from "../../../helpers/helpers.js";
 import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
 export default class CurrencyStore {
-  
+
   constructor(data) {
     this.currencies = writable(data.map((entry, index) => {
       return {
@@ -15,7 +15,7 @@ export default class CurrencyStore {
       }
     }));
   }
-  
+
   setPrimary(index) {
     const currencies = get(this.currencies);
     currencies.forEach((entry, entryIndex) => {
@@ -23,7 +23,7 @@ export default class CurrencyStore {
     });
     this.currencies.set(currencies);
   }
-  
+
   sortCurrencies() {
     const currencies = get(this.currencies);
     currencies.sort((a, b) => {
@@ -31,7 +31,7 @@ export default class CurrencyStore {
     });
     this.currencies.set(currencies);
   }
-  
+
   addAttribute() {
     const currencies = get(this.currencies);
     this.currencies.set([...currencies, {
@@ -47,27 +47,27 @@ export default class CurrencyStore {
     }]);
     this.sortCurrencies();
   }
-  
+
   async addItem(data) {
-    
+
     let uuid = false;
     if (data.pack) {
       uuid = "Compendium" + data.pack + "." + data.id;
     }
-    
+
     let item = await Item.implementation.fromDropData(data);
     let itemData = item.toObject();
-    
+
     if (!itemData) {
       console.error(data);
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
-    
+
     let currencies = get(this.currencies);
-    
+
     const itemCurrencies = currencies.map(entry => entry.data?.item ?? {});
     const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
-    
+
     if (foundItem) {
       const index = itemCurrencies.indexOf(foundItem);
       currencies[index].data = {
@@ -93,7 +93,7 @@ export default class CurrencyStore {
     this.currencies.set(currencies);
     this.sortCurrencies();
   }
-  
+
   async editItem(index) {
     const currencies = get(this.currencies);
     const data = currencies[index].data;
@@ -103,7 +103,7 @@ export default class CurrencyStore {
     } else {
       let itemData = data.item;
       if (itemData._id) delete itemData._id;
-      if (itemData.permission) delete itemData._id;
+      if (itemData.ownership) delete itemData.ownership;
       const items = Array.from(game.items);
       item = Utilities.findSimilarItem(items, itemData);
       if (!item) {
@@ -114,15 +114,15 @@ export default class CurrencyStore {
     }
     item.sheet.render(true);
   }
-  
+
   removeEntry(index) {
     const currencies = get(this.currencies);
     currencies.splice(index, 1);
     this.currencies.set(currencies);
   }
-  
+
   export() {
     return get(this.currencies);
   }
-  
+
 }

@@ -1,5 +1,27 @@
 # Item Piles Changelog
 
+## Version 2.4.0
+
+- Added vault type item piles - these item piles act like the Diablo stash or the World of Warcraft banking system, where you have a set amount of grid slots that you can put items into
+- Added vault extenders - you can configure items to extend the space available in
+- Added chat message for when users give each other items
+- Added `game.itempiles.API.addSystemIntegration()` for systems to integrate into item piles more readily
+- Added support for `true` and `false` values in system item filters
+- Added `change` as a secondary argument to `game.itempiles.API.removeCurrencies()` and `game.itempiles.API.transferCurrencies()` so that the currency removal/transfer can handle converting currencies into change to cover the full transfer
+- Added more hooks:
+  - `item-piles-preClickItemPile`
+  - `item-piles-preGiveItem`
+  - `item-piles-giveItem`
+- Added more item piles constants and useful info in `game.itempiles`
+- Updated DnD5e system support to support the new 2.1.0 update
+- Tweaked `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
+- Tweaked item piles containers to be the only tokens that get the additional buttons in its token HUD
+- Tweaked the item similarities setting - a lack of them will now treat every item as distinct items rather than the same
+- Fixed GMs still being able to drop items on the canvas when the setting was not enabled
+- Fixed trades between users not creating a final chat message when concluded listing what was traded
+- Fixed being able to loot/buy installed Cyberware in Cyberpunk Red
+- Fixed sometimes being able to give items to yourself
+
 ## Version 2.3.11
 
 - Added support for the Symbaroum system

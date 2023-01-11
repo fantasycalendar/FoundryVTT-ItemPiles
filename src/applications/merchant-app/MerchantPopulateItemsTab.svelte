@@ -187,7 +187,7 @@
 
   async function clearAllItems() {
     const doContinue = await TJSDialog.confirm({
-      title: localize("ITEM-PILES.Dialogs.ClearAllItems.Title"),
+      title: "Item Piles - " + localize("ITEM-PILES.Dialogs.ClearAllItems.Title"),
       content: {
         class: CustomDialog,
         props: {
@@ -233,7 +233,7 @@
     const table = get(tables)[tableId];
 
     const doContinue = await TJSDialog.confirm({
-      title: game.i18n.localize("ITEM-PILES.Dialogs.RemoveMerchantTable.Title"),
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.RemoveMerchantTable.Title"),
       content: {
         class: CustomDialog,
         props: {
@@ -298,7 +298,7 @@
               class="item-piles-rolled-item-button"
               style="color:red;"
               on:click={() => removeAddedItem(item)}
-              title={localize("ITEM-PILES.Merchant.RemoveItem")}
+              data-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
             >
               <i class="fas fa-trash"/>
             </button>
@@ -333,19 +333,19 @@
             </div>
             <button class="item-piles-rolled-item-button"
                     on:click={() => { removeTable(table.id) }}
-                    title={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
+                    data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
             >
               <i class="fas fa-trash" style="color:#de0e0e;"></i>
             </button>
             <button class="item-piles-rolled-item-button"
                     on:click={() => { table.open = !table.open; }}
-                    title={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
+                    data-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
             >
               <i class="fas fa-cog"></i>
             </button>
             <button class="item-piles-rolled-item-button"
                     on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
-                    title={localize("ITEM-PILES.Merchant.TooltipRollTable")}
+                    data-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
                     style="margin-right:0;">
               <i class="fas fa-dice-d20"></i>
             </button>
@@ -452,7 +452,7 @@
             <button
               class="item-piles-rolled-item-button"
               on:click={() => addItem(item)}
-              title={localize("ITEM-PILES.Merchant.AddItem")}
+              data-tooltip={localize("ITEM-PILES.Merchant.AddItem")}
             >
               <i class="fas fa-arrow-left"/>
             </button>
@@ -492,7 +492,7 @@
               class="item-piles-rolled-item-button"
               style="color:red;"
               on:click={() => removeItem(item)}
-              title={localize("ITEM-PILES.Merchant.RemoveItem")}
+              data-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
             >
               <i class="fas fa-trash"/>
             </button>
@@ -509,7 +509,7 @@
           <button class="item-piles-button"
                   style="color:red; max-width:30px;"
                   on:click={() => { $itemsRolled = []; }}
-                  title={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
+                  data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
             <i class="fas fa-trash"/>
           </button>
 

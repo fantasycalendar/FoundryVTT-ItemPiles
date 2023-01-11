@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": "1.0.0",
+  "VERSION": "1.0.1",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -15,11 +15,11 @@ export default {
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "role,skill,criticalInjury"
+      "filters": "role, skill, criticalInjury"
     },
     {
-      "path": "system.type",
-      "filters": "cyberwareInternal,cyberwareExternal,fashionware"
+      "path": "system.isInstalled",
+      "filters": [true]
     }
   ],
 

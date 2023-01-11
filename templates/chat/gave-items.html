@@ -1,0 +1,24 @@
+<div class="item-piles-chat-card" data-actor-id="{{source.id}}">
+
+  <div class="item-piles-chat-card-title">
+    <p>
+      <img src="{{source.img}}" data-tooltip="{{source.name}}" height="32"/>
+      <i class="fas fa-arrow-right"></i>
+      <img src="{{target.img}}" data-tooltip="{{target.name}}" height="32"/>
+    </p>
+    <p>{{message}}</p>
+  </div>
+
+  {{#if items}}
+  <ul>
+    {{#each items as |item id|}}
+    <li>
+      <img src="{{item.img}}" data-tooltip="{{item.name}}" height="16"/>
+      <label>{{item.name}}</label>
+      <small>{{item.quantity}}</small>
+    </li>
+    {{/each}}
+  </ul>
+  {{/if}}
+
+</div>

@@ -8,8 +8,31 @@ import SETTINGS from "../constants/settings.js";
 function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
   const flags = existing || (getProperty(inDocument, flag) ?? {});
-  const data = foundry.utils.duplicate(flags);
+  let data = foundry.utils.deepClone(flags);
+  if (flag === CONSTANTS.FLAGS.PILE) {
+    data = migrateFlagData(inDocument, data);
+  }
   return foundry.utils.mergeObject(defaultFlags, data);
+}
+
+export function migrateFlagData(document, data = false) {
+
+  let flags = data || getProperty(document, CONSTANTS.FLAGS.PILE);
+
+  if (flags.type) {
+    return flags;
+  }
+
+  if (flags.isMerchant) {
+    flags.type = CONSTANTS.PILE_TYPES.MERCHANT;
+  } else if (flags.isContainer) {
+    flags.type = CONSTANTS.PILE_TYPES.CONTAINER;
+  } else {
+    flags.type = CONSTANTS.PILE_TYPES.PILE;
+  }
+
+  return flags;
+
 }
 
 export function getItemFlagData(item, data = false) {
@@ -26,29 +49,47 @@ export function isValidItemPile(target, data = false) {
   return targetActor && pileData?.enabled;
 }
 
+export function isRegularItemPile(target, data = false) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor, data);
+  return targetActor && pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.PILE;
+}
+
 export function isItemPileContainer(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
-  return pileData?.enabled && pileData?.isContainer;
+  return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER;
+}
+
+export function isItemPileLootable(target, data = false) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor, data);
+  return targetActor && pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.PILE || pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER;
+}
+
+export function isItemPileVault(target, data = false) {
+  const targetActor = Utilities.getActor(target);
+  const pileData = getActorFlagData(targetActor, data);
+  return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.VAULT;
 }
 
 export function isItemPileMerchant(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
-  return pileData?.enabled && pileData?.isMerchant;
+  return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.MERCHANT;
 }
 
 export function isItemPileClosed(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
-  if (!pileData?.enabled || !pileData?.isContainer) return false;
+  if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
   return pileData.closed;
 }
 
 export function isItemPileLocked(target, data = false) {
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
-  if (!pileData?.enabled || !pileData?.isContainer) return false;
+  if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
   return pileData.locked;
 }
 
@@ -73,11 +114,9 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
   if (!(target instanceof TokenDocument)) return false;
 
-  if (!isItemPileEmpty(target)) return false;
-
   const pileData = getActorFlagData(target);
 
-  if (isItemPileMerchant(target, pileData)) {
+  if (!isItemPileLootable(target, pileData) || !isItemPileEmpty(target)) {
     return false;
   }
 
@@ -94,14 +133,15 @@ export function shouldItemPileBeDeleted(targetUuid) {
 export function getActorItems(target, { itemFilters = false, getItemCurrencies = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorItemFilters = itemFilters ? cleanItemFilters(itemFilters) : getActorItemFilters(actor);
-  const currencies = getActorCurrencies(actor, { getAll: true }).map(entry => entry.id);
+  const currencies = (actor ? getActorCurrencies(actor, { getAll: true }) : game.itempiles.API.CURRENCIES)
+    .map(entry => entry.id);
   return actor.items.filter(item => (getItemCurrencies || currencies.indexOf(item.id) === -1) && !isItemInvalid(actor, item, actorItemFilters));
 }
 
 export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
 
   const actor = Utilities.getActor(target);
-  const actorItems = Array.from(actor.items);
+  const actorItems = actor ? Array.from(actor.items) : [];
   currencyList = currencyList || getCurrencyList(forActor || actor);
   let currencies = currencyList.map((currency, index) => {
     if (currency.type === "attribute") {
@@ -155,7 +195,15 @@ export function getActorItemFilters(target, pileData = false) {
 export function cleanItemFilters(itemFilters) {
   return itemFilters ? foundry.utils.duplicate(itemFilters).map(filter => {
     filter.path = filter.path.trim();
-    filter.filters = Array.isArray(filter.filters) ? filter.filters : filter.filters.split(',').map(string => string.trim());
+    filter.filters = (Array.isArray(filter.filters) ? filter.filters : filter.filters.split(','))
+      .map(string => {
+        if (typeof string === "boolean") return string;
+        const str = string.trim();
+        if (str.toLowerCase() === "true" || str.toLowerCase() === "false") {
+          return str.toLowerCase() === "true";
+        }
+        return str;
+      });
     filter.filters = new Set(filter.filters)
     return filter;
   }) : [];
@@ -246,7 +294,7 @@ export function getItemPileTokenImage(token, {
 
   let img = originalImg;
 
-  if (itemPileData.isContainer) {
+  if (itemPileData.type === CONSTANTS.PILE_TYPES.CONTAINER) {
 
     img = itemPileData.lockedImage || itemPileData.closedImage || itemPileData.openedImage || itemPileData.emptyImage;
 
@@ -298,7 +346,7 @@ export function getItemPileTokenScale(target, {
 
   const numItems = items.length + currencies.length;
 
-  if (itemPileData.isContainer || !itemPileData.displayOne || !itemPileData.overrideSingleItemScale || numItems > 1 || numItems === 0) {
+  if (itemPileData?.type === CONSTANTS.PILE_TYPES.CONTAINER || !itemPileData.displayOne || !itemPileData.overrideSingleItemScale || numItems > 1 || numItems === 0) {
     return baseScale;
   }
 
@@ -323,7 +371,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
   const numItems = items.length + currencies.length;
 
-  if (itemPileData.isContainer || !itemPileData.displayOne || !itemPileData.showItemName || numItems > 1 || numItems === 0) {
+  if (itemPileData?.type === CONSTANTS.PILE_TYPES.CONTAINER || !itemPileData.displayOne || !itemPileData.showItemName || numItems > 1 || numItems === 0) {
     return name;
   }
 
@@ -336,7 +384,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 export function shouldEvaluateChange(target, changes) {
   const flags = getActorFlagData(target, getProperty(changes, CONSTANTS.FLAGS.PILE) ?? {});
   if (!isValidItemPile(target, flags)) return false;
-  return (flags.isContainer && (flags.closedImage || flags.emptyImage || flags.openedImage || flags.lockedImage))
+  return (flags.type === CONSTANTS.PILE_TYPES.CONTAINER && (flags.closedImage || flags.emptyImage || flags.openedImage || flags.lockedImage))
     || flags.displayOne || flags.showItemName || flags.overrideSingleItemScale;
 }
 
@@ -381,6 +429,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
   const pileData = { data: flagData, items, currencies };
 
+  flagData = cleanFlagData(flagData);
+
   const updates = documentTokens.map(tokenDocument => {
     const newTokenData = foundry.utils.mergeObject(tokenData, {
       "img": getItemPileTokenImage(tokenDocument, pileData, tokenData?.img),
@@ -392,9 +442,11 @@ export async function updateItemPileData(target, flagData, tokenData) {
     };
     if (!foundry.utils.isEmpty(flagData)) {
       data[CONSTANTS.FLAGS.PILE] = flagData;
+      data[CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
     }
     if (!tokenDocument.actorLink) {
       data["actorData." + CONSTANTS.FLAGS.PILE] = flagData;
+      data["actorData." + CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
       if (tokenDocument.actor === documentActor) {
         documentActor = false;
       }
@@ -409,18 +461,44 @@ export async function updateItemPileData(target, flagData, tokenData) {
   if (!foundry.utils.isEmpty(flagData) && documentActor) {
     await documentActor.update({
       [CONSTANTS.FLAGS.PILE]: flagData,
-      [`token.${CONSTANTS.FLAGS.PILE}`]: flagData
+      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+      [`token.${CONSTANTS.FLAGS.PILE}`]: flagData,
+      [`token.${CONSTANTS.FLAGS.VERSION}`]: Helpers.getModuleVersion()
     });
   }
 
   return true;
 }
 
+export function cleanFlagData(flagData) {
+  const defaults = Object.keys(CONSTANTS.PILE_DEFAULTS);
+  const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, CONSTANTS.PILE_DEFAULTS)));
+  const toRemove = new Set(defaults.filter(key => !difference.has(key)));
+  if (flagData.enabled) {
+    toRemove.delete("type")
+  }
+  if (!CONSTANTS.CUSTOM_PILE_TYPES[flagData.type]) {
+    const baseKeys = new Set(defaults);
+    for (const key of Object.keys(flagData)) {
+      if (!baseKeys.has(key)) {
+        delete flagData[key];
+        flagData["-=" + key] = null;
+      }
+    }
+  }
+  for (const key of toRemove) {
+    delete flagData[key];
+    flagData["-=" + key] = null;
+  }
+  return flagData;
+}
+
 export async function updateItemData(item, update) {
   const flagData = foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {});
   return item.update({
     ...update?.data ?? {},
-    [CONSTANTS.FLAGS.ITEM]: flagData
+    [CONSTANTS.FLAGS.ITEM]: flagData,
+    [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
   });
 }
 
@@ -610,20 +688,33 @@ export function getPriceFromString(str, currencyList = false) {
 
 }
 
-export function getItemPrices(item, {
-  seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false, itemFlagData = false, quantity = 1
+export function getPriceData({
+  cost = false,
+  item = false,
+  seller = false,
+  buyer = false,
+  sellerFlagData = false,
+  buyerFlagData = false,
+  itemFlagData = false,
+  quantity = 1
 } = {}) {
 
   let priceData = [];
 
   buyerFlagData = getActorFlagData(buyer, buyerFlagData);
-  if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
+  if (!isItemPileMerchant(buyer, buyerFlagData)) {
     buyerFlagData = false;
   }
 
   sellerFlagData = getActorFlagData(seller, sellerFlagData);
-  if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
+  if (!isItemPileMerchant(seller, sellerFlagData)) {
     sellerFlagData = false;
+  }
+
+  if (cost && !item) {
+    item = {};
+    setProperty(item, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
+    setProperty(item, CONSTANTS.FLAGS.ITEM, CONSTANTS.ITEM_DEFAULTS);
   }
 
   itemFlagData = itemFlagData || getItemFlagData(item);
@@ -673,14 +764,14 @@ export function getItemPrices(item, {
   const smallestExchangeRate = getSmallestExchangeRate(currencyList);
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
-  let overallCost = Utilities.getItemCost(item);
-  if (game.system.id === "pf2e") {
-    const { copperValue } = new game.pf2e.Coins(overallCost.value);
-    overallCost = copperValue / 100 / (overallCost.per ?? 1);
-  } else if (typeof overallCost === "string" && isNaN(Number(overallCost))) {
-    overallCost = getPriceFromString(overallCost, currencyList).overallCost;
+  let overallCost;
+  let itemCost = Utilities.getItemCost(item);
+  if (SYSTEMS.DATA.ITEM_COST_TRANSFORMER) {
+    overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, currencyList);
+  } else if (typeof itemCost === "string" && isNaN(Number(itemCost))) {
+    overallCost = getPriceFromString(itemCost, currencyList).overallCost;
   } else {
-    overallCost = Number(overallCost);
+    overallCost = Number(itemCost);
   }
 
   if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices) || modifier <= 0) {
@@ -820,18 +911,22 @@ export function getItemPrices(item, {
   return priceData;
 }
 
-export function getPricesForItems(itemsToBuy, {
-  seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false
+export function getPaymentData({
+  purchaseData = [],
+  seller = false,
+  buyer = false,
+  sellerFlagData = false,
+  buyerFlagData = false
 } = {}) {
 
-  sellerFlagData = getActorFlagData(seller, sellerFlagData);
-  if (!sellerFlagData?.enabled || !sellerFlagData?.isMerchant) {
-    sellerFlagData = false;
+  buyerFlagData = getActorFlagData(buyer, buyerFlagData);
+  if (!isItemPileMerchant(buyer, buyerFlagData)) {
+    buyerFlagData = false;
   }
 
-  buyerFlagData = getActorFlagData(buyer, buyerFlagData);
-  if (!buyerFlagData?.enabled || !buyerFlagData?.isMerchant) {
-    buyerFlagData = false;
+  sellerFlagData = getActorFlagData(seller, sellerFlagData);
+  if (!isItemPileMerchant(seller, sellerFlagData)) {
+    sellerFlagData = false;
   }
 
   const merchant = sellerFlagData ? seller : buyer;
@@ -844,9 +939,16 @@ export function getPricesForItems(itemsToBuy, {
 
   const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 
-  const paymentData = itemsToBuy.map(data => {
-      const prices = getItemPrices(data.item, {
-        seller, buyer, sellerFlagData, buyerFlagData, itemFlagData: data.itemFlagData, quantity: data.quantity || 1
+  const paymentData = purchaseData.map(data => {
+      const prices = getPriceData({
+        cost: data.cost,
+        item: data.item,
+        seller,
+        buyer,
+        sellerFlagData,
+        buyerFlagData,
+        itemFlagData: data.itemFlagData,
+        quantity: data.quantity || 1
       })[data.paymentIndex || 0];
       return {
         ...prices, item: data.item
@@ -854,7 +956,10 @@ export function getPricesForItems(itemsToBuy, {
     })
     .reduce((priceData, priceGroup) => {
 
-      if (!priceGroup.maxQuantity) return priceData;
+      if (!priceGroup.maxQuantity && (buyer || seller)) {
+        priceData.canBuy = false;
+        return priceData;
+      }
 
       if (priceGroup.primary) {
 
@@ -886,13 +991,15 @@ export function getPricesForItems(itemsToBuy, {
         }
       }
 
-      priceData.buyerReceive.push({
-        type: "item",
-        name: priceGroup.item.name,
-        img: priceGroup.item.img,
-        quantity: priceGroup.quantity,
-        item: priceGroup.item,
-      });
+      if (priceGroup.item) {
+        priceData.buyerReceive.push({
+          type: "item",
+          name: priceGroup.item.name,
+          img: priceGroup.item.img,
+          quantity: priceGroup.quantity,
+          item: priceGroup.item,
+        });
+      }
 
       return priceData;
 
@@ -902,7 +1009,11 @@ export function getPricesForItems(itemsToBuy, {
       buyerReceive: [], buyerChange: [], sellerReceive: []
     });
 
-  if (paymentData.totalCurrencyCost) {
+  if (paymentData.totalCurrencyCost && !seller && !buyer) {
+
+    paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies);
+
+  } else if (paymentData.totalCurrencyCost) {
 
     // The price array that we need to fill
     const prices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies);
@@ -1077,4 +1188,126 @@ export function getPricesForItems(itemsToBuy, {
 
   return paymentData;
 
+}
+
+/* ---------------------- VAULT FUNCTIONS ---------------------- */
+
+export function getVaultGridData(vaultActor, flagData = false) {
+
+  const vaultFlags = getActorFlagData(vaultActor, flagData);
+
+  const vaultItems = getActorItems(vaultActor);
+  const validVaultItems = vaultItems.filter(item => {
+    return !getItemFlagData(item).vaultExpander;
+  });
+
+  let enabledCols = vaultFlags.cols;
+  let enabledRows = vaultFlags.rows;
+
+  if (vaultFlags.vaultExpansion) {
+
+    const vaultExpanders = vaultItems.filter(item => {
+      return getItemFlagData(item).vaultExpander;
+    }).map(item => ({
+      itemFlagData: getItemFlagData(item),
+      quantity: Utilities.getItemQuantity(item)
+    }))
+
+    const expansions = vaultExpanders.reduce((acc, item) => {
+      acc.cols += (item.itemFlagData.addsCols ?? 0) * item.quantity;
+      acc.rows += (item.itemFlagData.addsRows ?? 0) * item.quantity;
+      return acc;
+    }, {
+      cols: vaultFlags.baseExpansionCols ?? 0,
+      rows: vaultFlags.baseExpansionRows ?? 0
+    });
+
+    enabledCols = expansions.cols;
+    enabledRows = expansions.rows;
+
+  }
+
+  enabledCols = Math.min(enabledCols, vaultFlags.cols);
+  enabledRows = Math.min(enabledRows, vaultFlags.rows);
+
+  return {
+    totalSpaces: Math.max(0, (vaultFlags.cols * vaultFlags.rows)),
+    enabledSpaces: Math.max(0, (enabledCols * enabledRows)),
+    freeSpaces: Math.max(0, (enabledCols * enabledRows) - validVaultItems.length),
+    enabledCols: enabledCols,
+    enabledRows: enabledRows,
+    cols: vaultFlags.cols,
+    rows: vaultFlags.rows
+  }
+
+}
+
+export async function updateVaultJournalLog(itemPile, {
+  actor = false,
+  userId = false,
+  items = [],
+  attributes = [],
+  withdrawal = true,
+  vaultLogData = {},
+} = {}) {
+
+  const formattedItems = [];
+  const formattedCurrencies = [];
+
+  const currencies = getActorCurrencies(itemPile, { getAll: true });
+
+  const date = Date.now();
+
+  for (const itemData of items) {
+    if (currencies.some(currency => currency.name === itemData.item.name)) {
+      formattedCurrencies.push({
+        actor: actor?.name ?? false,
+        user: userId,
+        name: itemData.name,
+        qty: itemData.quantity * (withdrawal ? -1 : 1),
+        action: vaultLogData?.action ?? (withdrawal ? "withdrew" : "deposited"),
+        date
+      });
+    } else {
+      const item = await Item.implementation.create(itemData.item, { temporary: true });
+      formattedItems.push({
+        actor: actor?.name ?? false,
+        user: userId,
+        name: item.name,
+        qty: itemData.quantity * (withdrawal ? -1 : 1),
+        action: vaultLogData?.action ?? (withdrawal ? "withdrew" : "deposited"),
+        date
+      });
+    }
+  }
+
+  for (const [key, quantity] of Object.entries(attributes)) {
+    const currency = currencies.find(currency => currency.data.path === key);
+    if (currency) {
+      formattedCurrencies.push({
+        actor: actor?.name ?? false,
+        user: userId,
+        name: currency.name,
+        qty: quantity * (withdrawal ? -1 : 1),
+        action: vaultLogData?.action ?? (withdrawal ? "withdrew" : "deposited"),
+        date
+      });
+    }
+  }
+
+  const vaultLog = getActorVaultLog(itemPile);
+
+  return itemPile.update({
+    [CONSTANTS.FLAGS.LOG]: formattedItems.concat(formattedCurrencies).concat(vaultLog)
+  });
+}
+
+export function getActorVaultLog(actor) {
+  return getProperty(Utilities.getActor(actor), CONSTANTS.FLAGS.LOG) || [];
+}
+
+export function clearVaultLog(actor) {
+  return actor.update({
+    [CONSTANTS.FLAGS.LOG]: []
+  });
 }

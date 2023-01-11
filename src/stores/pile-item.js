@@ -4,6 +4,7 @@ import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
+import * as Helpers from "../helpers/helpers.js";
 
 class PileBaseItem {
 
@@ -40,6 +41,9 @@ class PileBaseItem {
   unsubscribe() {
     this.subscriptions.forEach(unsubscribe => unsubscribe());
     this.subscriptions = [];
+  }
+
+  preview() {
   }
 }
 
@@ -116,7 +120,7 @@ export class PileItem extends PileBaseItem {
       if (itemFlagData.customCategory) {
         cat.type = itemFlagData.customCategory.toLowerCase();
         cat.label = itemFlagData.customCategory;
-      } else if (cat.service && pileData.enabled && pileData.isMerchant) {
+      } else if (cat.service && pileData.enabled && pileData.type === CONSTANTS.PILE_TYPES.MERCHANT) {
         cat.type = "item-piles-service";
         cat.label = "ITEM-PILES.Merchant.Service";
       } else {
@@ -130,14 +134,14 @@ export class PileItem extends PileBaseItem {
   filter() {
     const name = get(this.name).trim();
     const search = get(this.store.search).trim();
-    const presentFromTheSTart = get(this.presentFromTheStart);
+    const presentFromTheStart = get(this.presentFromTheStart);
     const quantity = get(this.quantity);
-    if (quantity === 0 && !presentFromTheSTart) {
+    if (quantity === 0 && !presentFromTheStart) {
       this.filtered.set(true);
     } else if (search) {
       this.filtered.set(!name.toLowerCase().includes(search.toLowerCase()));
     } else {
-      this.filtered.set(!presentFromTheSTart && quantity === 0);
+      this.filtered.set(!presentFromTheStart && quantity === 0);
     }
   }
 
@@ -160,6 +164,24 @@ export class PileItem extends PileBaseItem {
     const roll = new Roll(quantity).evaluate({ async: false });
     this.quantity.set(roll.total);
     return this.item.update(Utilities.setItemQuantity({}, roll.total));
+  }
+
+  async updateFlags() {
+    await this.item.update({
+      [CONSTANTS.FLAGS.ITEM]: get(this.itemFlagData),
+      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+    })
+  }
+
+  preview() {
+    const pileData = get(this.store.pileData);
+    if (!pileData.canInspectItems && !game.user.isGM) return;
+    if (game.user.isGM || this.item.permission[game.user.id] === 3) {
+      return this.item.sheet.render(true);
+    }
+    const cls = this.item._getSheetClass();
+    const sheet = new cls(this.item, { editable: false });
+    return sheet._render(true);
   }
 }
 
@@ -202,6 +224,7 @@ export class PileAttribute extends PileBaseItem {
       if (hasProperty(data, this.path)) {
         this.quantity.set(Number(getProperty(data, this.path) ?? 0));
         this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
+        this.store.refreshItems();
       }
     });
 
@@ -216,14 +239,14 @@ export class PileAttribute extends PileBaseItem {
   filter() {
     const name = get(this.name);
     const search = get(this.store.search);
-    const presentFromTheSTart = get(this.presentFromTheStart);
+    const presentFromTheStart = get(this.presentFromTheStart);
     const quantity = get(this.quantity);
-    if (quantity === 0 && !presentFromTheSTart && !this.store.editQuantities) {
+    if (quantity === 0 && !presentFromTheStart) {
       this.filtered.set(true);
     } else if (search) {
       this.filtered.set(!name.toLowerCase().includes(search.toLowerCase()));
     } else {
-      this.filtered.set(!presentFromTheSTart && quantity === 0 && !this.store.editQuantities);
+      this.filtered.set(!presentFromTheStart && quantity === 0);
     }
   }
 

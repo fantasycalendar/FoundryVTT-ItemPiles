@@ -43,7 +43,7 @@
     border-bottom: 2px solid transparent;
 
     &.active {
-      text-shadow: 0 0 10px var(--color-shadow-primary, #FF0000);
+      text-shadow: 0 0 10px var(--item-piles-shadow-primary);
 
       &.underscore {
         text-shadow: none;

@@ -111,7 +111,7 @@
 
     <footer>
       <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Submit")}
+        <i class="far fa-save"></i> {localize("Save")}
       </button>
       <button type="button" on:click|once={() => { application.close(); }}>
         <i class="far fa-times"></i> { localize("Cancel") }

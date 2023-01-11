@@ -5,7 +5,6 @@ import PrivateAPI from "./API/private-api.js";
 import TradeAPI from "./API/trade-api.js";
 import ChatAPI from "./API/chat-api.js";
 import * as Helpers from "./helpers/helpers.js";
-import HOOKS from "./constants/hooks.js";
 
 export default class ItemPileSocket {
 
@@ -168,6 +167,10 @@ export default class ItemPileSocket {
   }
 
   static executeAsGM(handler, ...args) {
+    if (!Helpers.isGMConnected()) {
+      Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.NoGMsConnectedAction", { action: handler }), true);
+      return false;
+    }
     return this._socket.executeAsGM(handler, ...args);
   }
 
@@ -230,10 +233,10 @@ export const InterfaceTracker = {
     Array.from(game.users).forEach(user => {
       this.users[user.id] = new Set();
     });
-    Hooks.on(HOOKS.OPEN_INTERFACE, (app) => {
+    Hooks.on(CONSTANTS.HOOKS.OPEN_INTERFACE, (app) => {
       ItemPileSocket.executeForOthers(ItemPileSocket.HANDLERS.USER_OPENED_INTERFACE, game.user.id, app.id);
     });
-    Hooks.on(HOOKS.CLOSE_INTERFACE, (app) => {
+    Hooks.on(CONSTANTS.HOOKS.CLOSE_INTERFACE, (app) => {
       ItemPileSocket.executeForOthers(ItemPileSocket.HANDLERS.USER_CLOSED_INTERFACE, game.user.id, app.id);
     });
   },

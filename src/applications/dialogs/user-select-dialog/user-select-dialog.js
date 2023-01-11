@@ -26,10 +26,6 @@ export default class UserSelectDialog extends SvelteApplication {
     })
   }
 
-  static getActiveApps(id) {
-    return Object.values(ui.windows).filter(app => app.id === `item-pile-drop-currency-${id}`);
-  }
-
   static async show(options = {}) {
     return new Promise((resolve) => {
       options.resolve = resolve;

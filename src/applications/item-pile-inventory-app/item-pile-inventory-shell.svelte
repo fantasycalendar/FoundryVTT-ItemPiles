@@ -6,12 +6,14 @@
 
   import ItemList from "./ItemList.svelte";
   import CurrencyList from "./CurrencyList.svelte";
-  import ActorPicker from "./ActorPicker.svelte";
+  import ActorPicker from "../components/ActorPicker.svelte";
 
   import * as SharingUtilities from "../../helpers/sharing-utilities.js";
+  import * as PileUtilities from "../../helpers/pile-utilities.js";
   import PrivateAPI from "../../API/private-api.js";
   import ItemPileStore from "../../stores/item-pile-store.js";
   import CategorizedItemList from "./CategorizedItemList.svelte";
+  import * as Helpers from "../../helpers/helpers.js";
 
   const { application } = getContext('external');
 
@@ -33,10 +35,11 @@
   $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
   $: hasItems = $numItems > 0;
   $: showSearchBar = ($numItems + $numCurrencies) >= 3;
+  $: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
 
   let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 
-  function dropData(event) {
+  async function dropData(event) {
 
     event.preventDefault();
 
@@ -47,7 +50,26 @@
       return false;
     }
 
-    return PrivateAPI._dropData(canvas, data, { target: store.actor });
+    if (data.type !== "Item") {
+      Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
+      return false;
+    }
+
+    const item = await Item.implementation.fromDropData(data);
+
+    const itemData = item.toObject();
+
+    if (!itemData) {
+      console.error(data);
+      throw Helpers.custom_error("Something went wrong when dropping this item!")
+    }
+
+    return PrivateAPI._dropItem({
+      target: store.actor,
+      itemData: {
+        item: itemData, quantity: 1
+      },
+    });
 
   }
 
@@ -152,7 +174,7 @@
           </button>
         {/if}
 
-        {#if $pileData.isContainer && !application.options.remote}
+        {#if isContainer && !application.options.remote}
           <button type="submit" on:click={() => { store.closeContainer(); application.close(); }}>
             <i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
           </button>

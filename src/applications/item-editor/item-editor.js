@@ -1,5 +1,6 @@
 import ItemEditorShell from './item-editor-shell.svelte';
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { getActiveApps } from '../../helpers/helpers';
 
 export default class ItemEditor extends SvelteApplication {
   
@@ -28,7 +29,7 @@ export default class ItemEditor extends SvelteApplication {
   }
   
   static getActiveApp(id) {
-    return Object.values(ui.windows).find(app => app.id === `item-pile-item-editor-${id}`)
+    return getActiveApps(`item-pile-item-editor-${id}`, true);
   }
   
   static async show(item = false, options = {}, dialogData = {}) {

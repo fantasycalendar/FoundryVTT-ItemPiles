@@ -1,4 +1,4 @@
-import PriceModifiersShell from './price-modifiers-editor.svelte';
+import PriceModifiersEditorShell from './price-modifiers-editor-shell.svelte';
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 
 export default class PriceModifiersEditor extends SvelteApplication {
@@ -13,7 +13,7 @@ export default class PriceModifiersEditor extends SvelteApplication {
 
     super({
       svelte: {
-        class: PriceModifiersShell,
+        class: PriceModifiersEditorShell,
         target: document.body,
         props: {
           priceModifiers

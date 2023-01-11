@@ -2,12 +2,12 @@ import * as Helpers from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
+import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import ItemPileSocket from "../socket.js";
-import HOOKS from "../constants/hooks.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
-
+import { SYSTEMS } from "../systems.js";
 
 class API {
   /**
@@ -235,6 +235,120 @@ class API {
     });
   }
 
+  /**
+   * A combination of all the methods above, but this integrates a system's specific
+   * settings more readily into item piles, allowing users to also change the settings
+   * afterwards.
+   *
+   * @param {Object<{
+   *   VERSION: string,
+   *   ACTOR_CLASS_TYPE: string,
+   *   ITEM_QUANTITY_ATTRIBUTE: string,
+   *   ITEM_PRICE_ATTRIBUTE: string,
+   *   ITEM_FILTERS: Array<{path: string, filters: string}>,
+   *   ITEM_SIMILARITIES: Array<string>,
+   *   ITEM_TRANSFORMER: undefined/Function,
+   *   CURRENCIES: Array<{
+   *     primary: boolean,
+   *     type: string ["attribute"/"item"],
+   *     img: string,
+   *     abbreviation: string,
+   *     data: Object<{ path: string }|{ uuid: string }|{ item: object }>,
+   *     exchangeRate: number
+   *   }>,
+   *   CURRENCY_DECIMAL_DIGITS: undefined/number
+   * }>} data
+   */
+  static addSystemIntegration(data) {
+
+    if (typeof data["VERSION"] !== "string") {
+      throw Helpers.custom_error("addSystemIntegration | data.VERSION must be of type string");
+    }
+
+    if (typeof data["ACTOR_CLASS_TYPE"] !== "string") {
+      throw Helpers.custom_error("addSystemIntegration | data.ACTOR_CLASS_TYPE must be of type string");
+    }
+
+    if (typeof data["ITEM_QUANTITY_ATTRIBUTE"] !== "string") {
+      throw Helpers.custom_error("addSystemIntegration | data.ITEM_QUANTITY_ATTRIBUTE must be of type string");
+    }
+
+    if (typeof data["ITEM_PRICE_ATTRIBUTE"] !== "string") {
+      throw Helpers.custom_error("addSystemIntegration | data.ITEM_PRICE_ATTRIBUTE must be of type string");
+    }
+
+    if (!Array.isArray(data["ITEM_FILTERS"])) {
+      throw Helpers.custom_error("addSystemIntegration | data.ITEM_FILTERS must be of type array");
+    }
+
+    data["ITEM_FILTERS"].forEach(filter => {
+      if (typeof filter?.path !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | each entry in data.ITEM_FILTERS must have a \"path\" property with a value that is of type string");
+      }
+      if (typeof filter?.filters !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | each entry in data.ITEM_FILTERS must have a \"filters\" property with a value that is of type string");
+      }
+    });
+
+    if (data['ITEM_TRANSFORMER']) {
+      if (!Helpers.isFunction(data['ITEM_TRANSFORMER'])) {
+        throw Helpers.custom_error("addSystemIntegration | data.ITEM_TRANSFORMER must be of type function");
+      }
+      if (typeof data['ITEM_TRANSFORMER']({}) !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | data.ITEM_TRANSFORMER's return value must be of type object");
+      }
+    }
+
+    if (!Array.isArray(data['ITEM_SIMILARITIES'])) {
+      throw Helpers.custom_error("addSystemIntegration | data.ITEM_SIMILARITIES must be of type array");
+    }
+    data['ITEM_SIMILARITIES'].forEach(path => {
+      if (typeof path !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | each entry in data.ITEM_SIMILARITIES must be of type string");
+      }
+    });
+
+
+    if (!Array.isArray(data['CURRENCIES'])) {
+      throw Helpers.custom_error("addSystemIntegration | inCurrencies must be an array");
+    }
+    data['CURRENCIES'].forEach(currency => {
+      if (typeof currency !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | each entry in data.CURRENCIES must be of type object");
+      }
+      if (typeof currency.primary !== "boolean") {
+        throw Helpers.custom_error("addSystemIntegration | currency.primary must be of type boolean");
+      }
+      if (typeof currency.name !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | currency.name must be of type string");
+      }
+      if (typeof currency.abbreviation !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | currency.abbreviation must be of type string");
+      }
+      if (typeof currency.exchangeRate !== "number") {
+        throw Helpers.custom_error("addSystemIntegration | currency.exchangeRate must be of type number");
+      }
+      if (typeof currency.data !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | currency.data must be of type object");
+      }
+      if (typeof currency.data.path !== "string" && typeof currency.data.uuid !== "string" && typeof currency.data.item !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
+      }
+      if (currency.img && typeof currency.img !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | currency.img must be of type string");
+      }
+    });
+
+    if (data["CURRENCY_DECIMAL_DIGITS"] && typeof data['CURRENCY_DECIMAL_DIGITS'] !== "number") {
+      throw Helpers.custom_error("addSystemIntegration | data.CURRENCY_DECIMAL_DIGITS must be of type number");
+    }
+
+    data['INTEGRATION'] = true;
+
+    SYSTEMS.addSystem(data);
+
+  }
+
   static async getPrimaryCurrency(actor = false) {
     if (actor && actor instanceof Actor) {
       return PileUtilities.getActorPrimaryCurrency(actor);
@@ -255,7 +369,8 @@ class API {
    * @param {object} [options.itemPileFlags={}]                       Item pile specific flags to apply to the token and actor
    * @param {Array/boolean} [options.items=false]                     Any items to create on the item pile
    * @param {boolean} [options.createActor=false]                     Whether to create a new item pile actor
-   * @param {string/boolean} [options.actor=false]                    The UUID, ID, or name of the actor to use when creating this item pile (not compatible with createActor)
+   * @param {string/boolean} [options.actor=false]                    The UUID, ID, or name of the actor to use when creating this item pile
+   * @param {Array<string>/>string/boolean} [options.folders=false]   The folder to create the actor in, this can be an array of folder names, which will be traversed and created
    *
    * @returns {Promise<string>}
    */
@@ -268,6 +383,7 @@ class API {
     items = false,
     createActor = false,
     actor = false,
+    folders = false
   } = {}) {
 
     if (position) {
@@ -276,6 +392,17 @@ class API {
       } else if (!Helpers.isRealNumber(position.x) || !Helpers.isRealNumber(position.y)) {
         throw Helpers.custom_error(`createItemPile | position.x and position.y must be of type numbers`);
       }
+    }
+
+    if (folders) {
+      if (!Array.isArray(folders)) {
+        folders = [folders];
+      }
+      folders.forEach(f => {
+        if (typeof f !== 'string') {
+          throw Helpers.custom_error(`createItemPile | folder must be of type string or array of strings`);
+        }
+      });
     }
 
     if (actor && !createActor) {
@@ -319,7 +446,7 @@ class API {
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.CREATE_PILE, {
-      sceneId, position, actor, createActor, items, tokenOverrides, actorOverrides, itemPileFlags
+      sceneId, position, actor, createActor, items, tokenOverrides, actorOverrides, itemPileFlags, folders
     });
   }
 
@@ -384,18 +511,18 @@ class API {
    */
   static openItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     const wasLocked = pileData.locked;
     const wasClosed = pileData.closed;
     pileData.closed = false;
     pileData.locked = false;
     if (wasLocked) {
-      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
+      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
       if (hookResult === false) return false;
     }
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_OPEN, targetActor, pileData, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_OPEN, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
     if (wasClosed && pileData.openSound) {
       let sound = pileData.openSound;
@@ -417,14 +544,14 @@ class API {
    */
   static closeItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
 
     const wasOpen = !pileData.closed;
     pileData.closed = true;
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
 
     if (wasOpen && pileData.closeSound) {
@@ -448,9 +575,9 @@ class API {
    */
   static async toggleItemPileClosed(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     if (pileData.closed) {
       await this.openItemPile(targetActor, interactingTokenDocument);
     } else {
@@ -469,17 +596,17 @@ class API {
    */
   static lockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     const wasClosed = pileData.closed;
     pileData.closed = true;
     pileData.locked = true;
     if (!wasClosed) {
-      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
+      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLOSE, targetActor, pileData, interactingTokenDocument);
       if (hookResult === false) return false;
     }
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_LOCK, targetActor, pileData, interactingTokenDocument);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_LOCK, targetActor, pileData, interactingTokenDocument);
     if (hookResult === false) return false;
     if (!wasClosed && pileData.closeSound) {
       let sound = pileData.closeSound;
@@ -501,11 +628,11 @@ class API {
    */
   static unlockItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     pileData.locked = false;
-    Helpers.hooks.call(HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
+    Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
     return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
   }
 
@@ -519,9 +646,9 @@ class API {
    */
   static toggleItemPileLocked(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
     const pileData = PileUtilities.getActorFlagData(targetActor);
-    if (!pileData?.enabled || !pileData?.isContainer) return false;
     if (pileData.locked) {
       return this.unlockItemPile(targetActor, interactingTokenDocument);
     }
@@ -538,13 +665,11 @@ class API {
    */
   static rattleItemPile(target, interactingToken = false) {
     const targetActor = Utilities.getActor(target);
+    if (!PileUtilities.isItemPileContainer(target)) return false;
     const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
-
     const pileData = PileUtilities.getActorFlagData(targetActor);
 
-    if (!pileData?.enabled || !pileData?.isContainer || !pileData?.locked) return false;
-
-    Helpers.hooks.call(HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
+    Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
 
     if (pileData.lockedSound) {
       let sound = pileData.lockedSound;
@@ -554,7 +679,7 @@ class API {
       AudioHelper.play({ src: sound }, true);
     }
 
-    return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.PILE.RATTLE, Utilities.getUuid(targetActor), pileData, Utilities.getUuid(interactingTokenDocument));
+    return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.PILE.RATTLE, Utilities.getUuid(targetActor), pileData, Utilities.getUuid(interactingTokenDocument));
   }
 
   /**
@@ -661,7 +786,7 @@ class API {
           throw Helpers.custom_error("SplitItemPileContents | Each of the entries in targets must be of type TokenDocument or Actor")
         }
       })
-      targets = targets.map(target => target?.character ?? target?.actor ?? target);
+      targets = targets.map(target => Utilities.getActor(target));
     }
 
     if (instigator && !(instigator instanceof TokenDocument || instigator instanceof Actor)) {
@@ -691,9 +816,7 @@ class API {
    * @returns {Promise<array>}                                  An array of objects, each containing the item that was added or updated, and the quantity that was added
    */
   static addItems(target, items, {
-    mergeSimilarItems = true,
-    removeExistingActorItems = false,
-    interactionId = false
+    mergeSimilarItems = true, removeExistingActorItems = false, interactionId = false
   } = {}) {
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`addItems | Could not determine the UUID, please provide a valid target`)
@@ -726,8 +849,7 @@ class API {
     if (interactionId && typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, {
-      removeExistingActorItems,
-      interactionId
+      removeExistingActorItems, interactionId
     });
   }
 
@@ -791,11 +913,12 @@ class API {
    * @param {Actor/Token/TokenDocument} target              The target to transfer the items to
    * @param {Array} items                                   An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity"), or Items (the foundry class) or strings of IDs to transfer all quantities of
    * @param {object} options                                Options to pass to the function
+   * @param {object/boolean} [options.vaultLogData=false]   Vault log data used when storing that on actors
    * @param {string/boolean} [options.interactionId=false]  The interaction ID of this action
    *
    * @returns {Promise<object>}                             An array of objects, each containing the item that was added or updated, and the quantity that was transferred
    */
-  static transferItems(source, target, items, { interactionId = false } = {}) {
+  static transferItems(source, target, items, { vaultLogData = false, interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid source`)
@@ -826,7 +949,9 @@ class API {
       }
 
       return {
-        _id: item._id, quantity: Math.max((itemData?.quantity ?? 0) ?? Utilities.getItemQuantity(itemData))
+        _id: item._id,
+        quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(itemData), 0),
+        flags: getProperty(itemData, CONSTANTS.FLAGS.ITEM)
       }
     });
 
@@ -837,7 +962,9 @@ class API {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`transferItems | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ITEMS, sourceUuid, targetUuid, items, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ITEMS, sourceUuid, targetUuid, items, game.user.id, {
+      vaultLogData, interactionId
+    });
 
   }
 
@@ -1132,6 +1259,37 @@ class API {
   }
 
   /**
+   * Turns a string of currencies into an object containing payment data, and the change an optional target would receive back
+   *
+   * @param {string} price                                    A string of currencies to convert (eg, "5gp 25sp")
+   * @param {object} options                                  Options to pass to the function
+   * @param {string/boolean} [options.target=false]           The target whose currencies to check against
+   *
+   * @returns {object}                                        An object containing the price data
+   */
+  static getPaymentDataFromString(price, { target = false } = {}) {
+
+    let targetActor = false;
+    if (target) {
+      targetActor = Utilities.getActor(target);
+      if (!targetActor) throw Helpers.custom_error(`removeCurrencies | Could not determine target actor`);
+    }
+
+    const priceData = PileUtilities.getPriceFromString(price)
+    const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+    const overallCost = priceData.overallCost;
+
+    if (!currenciesToRemove.length) {
+      throw Helpers.custom_error(`removeCurrencies | Could not determine currencies to remove with string "${price}"`);
+    }
+
+    return PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }], buyer: targetActor
+    });
+
+  }
+
+  /**
    * Adds currencies to the target
    *
    * @param {Actor/Token/TokenDocument} target                The actor to add the currencies to
@@ -1143,7 +1301,8 @@ class API {
    */
   static addCurrencies(target, currencies, { interactionId = false } = {}) {
 
-    const targetUuid = Utilities.getUuid(target);
+    const targetActor = Utilities.getActor(target);
+    const targetUuid = Utilities.getUuid(targetActor);
     if (!targetUuid) throw Helpers.custom_error(`addCurrency | Could not determine the UUID, please provide a valid target`);
 
     if (typeof currencies !== "string") {
@@ -1167,24 +1326,39 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The actor to remove currencies from
    * @param {string} currencies                               A string of currencies to remove (eg, "5gp 25sp")
    * @param {object} options                                  Options to pass to the function
+   * @param {boolean} [options.change=true]                   Whether the actor can get change back
    * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
    *
    * @returns {Promise<object>}                               An object containing the items and attributes removed from the target
    */
-  static removeCurrencies(target, currencies, { interactionId = false } = {}) {
+  static removeCurrencies(target, currencies, { change = true, interactionId = false } = {}) {
 
-    const targetUuid = Utilities.getUuid(target);
+    const targetActor = Utilities.getActor(target);
+    const targetUuid = Utilities.getUuid(targetActor);
     if (!targetUuid) throw Helpers.custom_error(`removeCurrencies | Could not determine the UUID, please provide a valid target`);
 
     if (typeof currencies !== "string") {
       throw Helpers.custom_error(`removeCurrencies | currencies must be of type string`)
     }
 
-    const currenciesToRemove = PileUtilities.getPriceFromString(currencies).currencies
-      .filter(currency => currency.quantity);
+    const priceData = PileUtilities.getPriceFromString(currencies)
+    const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+    const overallCost = priceData.overallCost;
 
     if (!currenciesToRemove.length) {
       throw Helpers.custom_error(`removeCurrencies | Could not determine currencies to remove with string "${currencies}"`);
+    }
+
+    const paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }], buyer: targetActor
+    });
+
+    if (!paymentData.canBuy) {
+      throw Helpers.custom_error(`removeCurrencies | ${targetActor.name} cannot afford "${currencies}"`);
+    }
+
+    if (!change && paymentData.buyerChange.length) {
+      throw Helpers.custom_error(`removeCurrencies | ${targetActor.name} cannot afford "${currencies}" without receiving change!`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_CURRENCIES, targetUuid, currencies, game.user.id, { interactionId });
@@ -1198,27 +1372,43 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The actor to receive the currencies
    * @param {string} currencies                               A string of currencies to transfer (eg, "5gp 25sp")
    * @param {object} options                                  Options to pass to the function
+   * @param {boolean} [options.change=true]                   Whether the source actor can get change back
    * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
    *
    * @returns {Promise<object>}                               An object containing the items and attributes transferred to the target
    */
-  static transferCurrencies(source, target, currencies, { interactionId = false } = {}) {
+  static transferCurrencies(source, target, currencies, { change = true, interactionId = false } = {}) {
 
-    const sourceUuid = Utilities.getUuid(source);
+    const sourceActor = Utilities.getActor(source);
+    const sourceUuid = Utilities.getUuid(sourceActor);
     if (!sourceUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid source`);
 
-    const targetUuid = Utilities.getUuid(target);
+    const targetActor = Utilities.getActor(target);
+    const targetUuid = Utilities.getUuid(targetActor);
     if (!targetUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid target`);
 
     if (typeof currencies !== "string") {
       throw Helpers.custom_error(`transferCurrencies | currencies must be of type string`)
     }
 
-    const currenciesToTransfer = PileUtilities.getPriceFromString(currencies).currencies
-      .filter(currency => currency.quantity);
+    const priceData = PileUtilities.getPriceFromString(currencies)
+    const currenciesToTransfer = priceData.currencies.filter(currency => currency.quantity);
+    const overallCost = priceData.overallCost;
 
     if (!currenciesToTransfer.length) {
-      throw Helpers.custom_error(`transferCurrencies | Could not determine currencies to transfer with string "${currencies}"`);
+      throw Helpers.custom_error(`transferCurrencies | Could not determine currencies to remove with string "${currencies}"`);
+    }
+
+    const paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }], buyer: sourceActor
+    });
+
+    if (!paymentData.canBuy) {
+      throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}"`);
+    }
+
+    if (!change && paymentData.buyerChange.length) {
+      throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}" without receiving change!`);
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_CURRENCIES, sourceUuid, targetUuid, currencies, game.user.id, { interactionId });
@@ -1326,9 +1516,7 @@ class API {
 
     if (items) {
       for (const entry of items) {
-        entry.item = targetActor
-          ? targetActor.items.get(entry.item._id)
-          : await Item.implementation.create(entry.item, { temporary: true });
+        entry.item = targetActor ? targetActor.items.get(entry.item._id) : await Item.implementation.create(entry.item, { temporary: true });
       }
     }
 
@@ -1347,10 +1535,14 @@ class API {
     return PileUtilities.getActorItems(target);
   }
 
+  static findSimilarItem(itemsToSearch, itemToFind) {
+    return Utilities.findSimilarItem(itemsToSearch, itemToFind);
+  }
+
   /**
    * Gets the valid currencies from a given actor or token
    *
-   * @param {Actor/TokenDocument/Token} target      The target to get the items from
+   * @param {Actor/TokenDocument/Token} target      The target to get the currencies from
    * @param {object} [options]                      Object containing optional parameters
    * @param {Boolean} [options.getAll]              Whether to get all the currencies, regardless of quantity
    *
@@ -1414,9 +1606,7 @@ class API {
       }
     } else {
       userIds = userIds.map(user => {
-        return user instanceof User
-          ? user.id
-          : user;
+        return user instanceof User ? user.id : user;
       })
     }
 
@@ -1487,7 +1677,7 @@ class API {
       }
     }
 
-    return PileUtilities.getItemPrices(item, { seller, buyer, quantity });
+    return PileUtilities.getPriceData({ item, seller, buyer, quantity });
 
   }
 
@@ -1540,8 +1730,8 @@ class API {
         }
       }
 
-      const itemPrices = PileUtilities.getItemPrices(actorItem, {
-        seller: sellerActor, buyer: buyerActor, quantity: data.quantity
+      const itemPrices = PileUtilities.getPriceData({
+        items: actorItem, seller: sellerActor, buyer: buyerActor, quantity: data.quantity
       });
       if (itemPrices.length) {
         if (data.paymentIndex >= itemPrices.length || data.paymentIndex < 0) {
@@ -1562,6 +1752,27 @@ class API {
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEMS, sellerUuid, buyerUuid, itemsToSell, game.user.id, { interactionId });
 
+  }
+
+  static async registerItemPileType(type, label, flags = []) {
+    game.i18n.translations['ITEM-PILES'].Types[type] = "Custom: " + label;
+    CONSTANTS.CUSTOM_PILE_TYPES[type] = flags;
+  }
+
+  static isItemInvalid(item) {
+    return PileUtilities.isItemInvalid(item);
+  }
+
+  static canItemStack(item) {
+    return Utilities.canItemStack(item);
+  }
+
+  static getVaultGridData(vaultActor) {
+    return PileUtilities.getVaultGridData(vaultActor);
+  }
+
+  static getActorFlagData(actor) {
+    return PileUtilities.getActorFlagData(actor);
   }
 
 }

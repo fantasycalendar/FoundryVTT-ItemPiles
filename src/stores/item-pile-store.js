@@ -7,6 +7,7 @@ import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import * as Helpers from "../helpers/helpers.js";
 import { InterfaceTracker } from "../socket.js";
 import { PileAttribute, PileItem } from "./pile-item.js";
+import DropCurrencyDialog from "../applications/dialogs/drop-currency-dialog/drop-currency-dialog.js";
 
 const __STORES__ = new Map();
 
@@ -41,6 +42,10 @@ export default class ItemPileStore {
   get AttributeClass() {
     return PileAttribute;
   };
+
+  get searchDelay() {
+    return 200;
+  }
 
   setupStores() {
 
@@ -139,7 +144,7 @@ export default class ItemPileStore {
 
     const filterDebounce = foundry.utils.debounce(() => {
       this.refreshItems();
-    }, 300);
+    }, this.searchDelay);
     this.subscribeTo(this.search, (val) => {
       filterDebounce()
     });
@@ -233,10 +238,9 @@ export default class ItemPileStore {
     if (previouslyDeletedItem) {
       previouslyDeletedItem.pileItem.setup(item);
     } else {
-      items.push(new PileItem(this, item));
+      items.push(new this.ItemClass(this, item));
     }
     this.allItems.set(items);
-    this.refreshItems();
   }
 
   deleteItem(item) {
@@ -253,7 +257,11 @@ export default class ItemPileStore {
       pileItem.quantityLeft.set(0);
     }
     pileItem.unsubscribe();
-    this.refreshItems();
+  }
+
+  hasSimilarItem(item) {
+    const items = get(this.allItems).map(item => item.item);
+    return !!Utilities.findSimilarItem(items, item);
   }
 
   delete() {
@@ -318,6 +326,50 @@ export default class ItemPileStore {
     Helpers.custom_notify("Item Pile successfully updated.");
 
     this.refreshItems();
+
+  }
+
+  async depositCurrency() {
+    const result = await DropCurrencyDialog.show(this.recipient, this.actor, { localization: "DepositCurrencies" });
+    return this._addCurrency(result, this.recipient, this.actor);
+  }
+
+  async withdrawCurrency() {
+    const result = await DropCurrencyDialog.show(this.actor, this.recipient, { localization: "WithdrawCurrencies" });
+    return this._addCurrency(result, this.actor, this.recipient);
+  }
+
+  async addCurrency() {
+    const result = await DropCurrencyDialog.show(this.actor, false, {
+      unlimitedCurrencies: true,
+      existingCurrencies: PileUtilities.getActorCurrencies(this.actor),
+      button: "Submit"
+    });
+    return this._addCurrency(result, this.actor);
+  }
+
+  async _addCurrency(currencies, source, target = false) {
+
+    if (!currencies) return;
+
+    if (!target) {
+
+      if (!foundry.utils.isEmpty(currencies.attributes)) {
+        await game.itempiles.API.setAttributes(source, currencies.attributes, { interactionId: this.interactionId })
+      }
+      if (currencies.items.length) {
+        await game.itempiles.API.addItems(source, currencies.items, { interactionId: this.interactionId })
+      }
+
+    } else {
+
+      if (!foundry.utils.isEmpty(currencies.attributes)) {
+        await game.itempiles.API.transferAttributes(source, target, currencies.attributes, { interactionId: this.interactionId })
+      }
+      if (currencies.items.length) {
+        await game.itempiles.API.transferItems(source, target, currencies.items, { interactionId: this.interactionId })
+      }
+    }
 
   }
 

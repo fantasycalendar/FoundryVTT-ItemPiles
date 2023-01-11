@@ -9,8 +9,10 @@
 <div class="setting form-scope item-piles-flexrow">
 
   <div class="label-side">
-    <label>{localize(data.name)} <a><i title="Reset data" class="fas fa-undo reset-setting"
-                                       on:click={() => { data.value = data.default; }}></i></a></label>
+    <label>{localize(data.name)} <a>
+      <i data-tooltip="Reset data" class="fas fa-undo reset-setting"
+         on:click={() => { data.value = data.default; }}></i></a>
+    </label>
     <p class="notes">{localize(data.hint)}</p>
   </div>
 
@@ -90,6 +92,7 @@
 
   .form-fields {
     flex: 0 1 auto;
+    align-self: center;
   }
 
   select {

@@ -24,17 +24,6 @@
 
   $: canInspectItems = $pileData.canInspectItems || game.user.isGM;
 
-  function previewItem(item) {
-    if (!canInspectItems) return;
-    item = store.actor.items.get(item.id);
-    if (game.user.isGM || item.permission[game.user.id] === 3) {
-      return item.sheet.render(true);
-    }
-    const cls = item._getSheetClass()
-    const sheet = new cls(item, { editable: false })
-    return sheet._render(true);
-  }
-
 </script>
 
 <div class="item-piles-flexrow item-piles-item-row item-piles-odd-color"
@@ -49,7 +38,9 @@
 
   <div class="item-piles-name item-piles-text">
     <div class="item-piles-name-container">
-      <a class:item-piles-clickable={canInspectItems} on:click={previewItem(item)}>{$itemName}</a>
+      <a class:item-piles-clickable={canInspectItems} on:click={() => { item.preview() }}>
+        {$itemName}
+      </a>
       {#if displayQuantity}
         {#if itemFlagData.infiniteQuantity}
           <span class="item-piles-small-text">(∞)</span>

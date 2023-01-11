@@ -2,7 +2,6 @@ import * as Helpers from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
-import HOOKS from "../constants/hooks.js";
 import ItemPileSocket from "../socket.js";
 import SETTINGS from "../constants/settings.js";
 import CONSTANTS from "../constants/constants.js";
@@ -15,6 +14,7 @@ import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
+import BankVaultApp from "../applications/vault-app/vault-app.js";
 
 const preloadedFiles = new Set();
 
@@ -89,7 +89,7 @@ export default class PrivateAPI {
   static _onDeleteToken(doc) {
     ItemPileStore.notifyChanges("delete", doc.actor)
     if (!PileUtilities.isValidItemPile(doc)) return;
-    Helpers.hooks.callAll(HOOKS.PILE.DELETE, doc);
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.DELETE, doc);
   }
 
   /**
@@ -149,7 +149,7 @@ export default class PrivateAPI {
   static _onCreateToken(doc) {
     if (!PileUtilities.isValidItemPile(doc)) return;
     const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
-    Helpers.hooks.callAll(HOOKS.PILE.CREATE, doc, itemPileConfig);
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CREATE, doc, itemPileConfig);
     return this._preloadItemPileFiles(doc);
   }
 
@@ -170,16 +170,24 @@ export default class PrivateAPI {
 
     const { itemsToUpdate, itemsToCreate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_ADD, targetActor, itemsToCreate, itemsToUpdate, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_ADD, targetActor, itemsToCreate, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas } = await transaction.commit(); // Actually add the items to the actor
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.ADD, targetUuid, itemDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.ADD, targetUuid, itemDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "addItems", target: targetUuid, items: itemDeltas, userId: userId, interactionId: interactionId
     });
+
+    if (PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultJournalLog(targetActor, {
+        userId,
+        items: itemDeltas,
+        withdrawal: false
+      });
+    }
 
     return itemDeltas;
 
@@ -195,12 +203,12 @@ export default class PrivateAPI {
 
     const { itemsToUpdate, itemsToDelete } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_REMOVE, targetActor, itemsToUpdate, itemsToDelete, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_REMOVE, targetActor, itemsToUpdate, itemsToDelete, interactionId);
     if (hookResult === false) return false;
 
     const { itemDeltas } = await transaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.REMOVE, targetUuid, itemDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.REMOVE, targetUuid, itemDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "removeItems", target: targetUuid, items: itemDeltas, userId: userId, interactionId: interactionId
@@ -211,11 +219,22 @@ export default class PrivateAPI {
       await this._deleteItemPile(targetUuid);
     }
 
+    if (PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultJournalLog(targetActor, {
+        userId,
+        items: itemDeltas,
+        withdrawal: true
+      });
+    }
+
     return itemDeltas;
 
   }
 
-  static async _transferItems(sourceUuid, targetUuid, items, userId, { interactionId = false } = {}) {
+  static async _transferItems(sourceUuid, targetUuid, items, userId, {
+    vaultLogData = false,
+    interactionId = false
+  } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
@@ -228,13 +247,13 @@ export default class PrivateAPI {
     await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferItems",
@@ -253,11 +272,24 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
-    } else if (PileUtilities.isItemPileEmpty(itemPile)) {
-      await SharingUtilities.clearItemPileSharingData(itemPile);
-    } else {
-      await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
-        items: itemDeltas
+    } else if (PileUtilities.isItemPileLootable(itemPile)) {
+      if (PileUtilities.isItemPileEmpty(itemPile)) {
+        await SharingUtilities.clearItemPileSharingData(itemPile);
+      } else {
+        await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+          items: itemDeltas
+        });
+      }
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
+        items: itemDeltas,
+        withdrawal: sourceIsItemPile,
+        vaultLogData
       });
     }
 
@@ -282,13 +314,13 @@ export default class PrivateAPI {
     await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, userId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferAllItems",
@@ -304,6 +336,16 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
+        items: itemDeltas,
+        withdrawal: sourceIsItemPile
+      });
     }
 
     return itemDeltas;
@@ -329,12 +371,12 @@ export default class PrivateAPI {
 
     const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_ADD, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_ADD, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually add the items to the actor
 
-    await ItemPileSocket.callHook(HOOKS.CURRENCY.ADD, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.ADD, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "addCurrencies",
@@ -344,6 +386,15 @@ export default class PrivateAPI {
       userId: userId,
       interactionId: interactionId
     });
+
+    if (PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultJournalLog(targetActor, {
+        userId,
+        items: itemDeltas,
+        attributes: attributeDeltas,
+        withdrawal: false
+      });
+    }
 
     return { itemDeltas, attributeDeltas };
 
@@ -355,33 +406,45 @@ export default class PrivateAPI {
 
     const transaction = new Transaction(targetActor);
 
-    const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
-      .filter(currency => currency.quantity);
+    const priceData = PileUtilities.getPriceFromString(currencies)
+    const overallCost = priceData.overallCost;
 
-    const itemsToRemove = currenciesToAdd.filter(currency => currency.type === "item")
+    const paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }],
+      buyer: targetActor
+    });
+
+    const itemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")
       .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
 
-    const attributesToRemove = currenciesToAdd.filter(currency => currency.type === "attribute")
+    const attributesToRemove = paymentData.finalPrices.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+    const itemsToAdd = paymentData.buyerChange.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const attributesToAdd = paymentData.buyerChange.filter(currency => currency.type === "attribute")
       .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
     await transaction.appendItemChanges(itemsToRemove, { remove: true, type: "currency" });
     await transaction.appendActorChanges(attributesToRemove, { remove: true, type: "currency" });
+    await transaction.appendItemChanges(itemsToAdd, { type: "currency" });
+    await transaction.appendActorChanges(attributesToAdd, { type: "currency" });
 
     const { actorUpdates, itemsToUpdate } = transaction.prepare(); // Prepare data
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_REMOVE, targetActor, actorUpdates, itemsToUpdate, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_REMOVE, targetActor, actorUpdates, itemsToUpdate, interactionId);
     if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
 
     const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually add the items to the actor
 
-    await ItemPileSocket.callHook(HOOKS.CURRENCY.REMOVE, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.REMOVE, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "removeCurrencies",
       target: targetUuid,
       items: itemDeltas,
-      attributes,
-      attributeDeltas,
+      attributes: attributeDeltas,
       userId: userId,
       interactionId: interactionId
     });
@@ -389,6 +452,15 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(targetUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(targetUuid);
+    }
+
+    if (PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultJournalLog(targetActor, {
+        userId,
+        items: itemDeltas,
+        attributes: attributeDeltas,
+        withdrawal: true
+      });
     }
 
     return { itemDeltas, attributeDeltas };
@@ -400,32 +472,51 @@ export default class PrivateAPI {
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
 
-    const currenciesToTransfer = PileUtilities.getPriceFromString(currencies).currencies
-      .filter(currency => currency.quantity);
+    const priceData = PileUtilities.getPriceFromString(currencies);
+    const overallCost = priceData.overallCost;
 
-    const itemsToTransfer = currenciesToTransfer.filter(currency => currency.type === "item")
+    const paymentData = PileUtilities.getPaymentData({
+      purchaseData: [{ cost: overallCost, quantity: 1 }],
+      buyer: sourceActor
+    });
+
+    const sourceItemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")
       .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
 
-    const attributesToTransfer = currenciesToTransfer.filter(currency => currency.type === "attribute")
+    const sourceAttributesToRemove = paymentData.finalPrices.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+    const sourceItemsToAdd = paymentData.buyerChange.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const sourceAttributesToAdd = paymentData.buyerChange.filter(currency => currency.type === "attribute")
       .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
     const sourceTransaction = new Transaction(sourceActor);
-    await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, type: "currency" });
-    await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
+    await sourceTransaction.appendItemChanges(sourceItemsToRemove, { remove: true, type: "currency" });
+    await sourceTransaction.appendActorChanges(sourceAttributesToRemove, { remove: true, type: "currency" });
+    await sourceTransaction.appendItemChanges(sourceItemsToAdd, { type: "currency" });
+    await sourceTransaction.appendActorChanges(sourceAttributesToAdd, { type: "currency" });
     const sourceUpdates = sourceTransaction.prepare();
 
+    const targetItemsToAdd = paymentData.sellerReceive.filter(currency => currency.type === "item")
+      .map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+
+    const targetAttributesToAdd = paymentData.sellerReceive.filter(currency => currency.type === "attribute")
+      .map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
     const targetTransaction = new Transaction(targetActor);
-    await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas, { type: "currency" });
-    await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas, { type: "currency" });
+    await targetTransaction.appendItemChanges(targetItemsToAdd, { type: "currency" });
+    await targetTransaction.appendActorChanges(targetAttributesToAdd, { type: "currency" });
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.CURRENCY.TRANSFER, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.TRANSFER, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferCurrencies",
@@ -445,12 +536,25 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
-    } else if (PileUtilities.isItemPileEmpty(itemPile)) {
-      await SharingUtilities.clearItemPileSharingData(itemPile);
-    } else {
-      await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+    } else if (PileUtilities.isItemPileLootable(itemPile)) {
+      if (PileUtilities.isItemPileEmpty(itemPile)) {
+        await SharingUtilities.clearItemPileSharingData(itemPile);
+      } else {
+        await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+          items: itemDeltas,
+          attributes: attributeDeltas
+        });
+      }
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
         items: itemDeltas,
-        attributes: attributeDeltas
+        attributes: attributeDeltas,
+        withdrawal: sourceIsItemPile
       });
     }
 
@@ -482,13 +586,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.CURRENCY.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.CURRENCY.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferAllCurrencies",
@@ -505,6 +609,17 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
+        items: itemDeltas,
+        attributes: attributeDeltas,
+        withdrawal: sourceIsItemPile
+      });
     }
 
     return { itemDeltas, attributeDeltas };
@@ -516,15 +631,15 @@ export default class PrivateAPI {
     const targetActor = Utilities.getActor(targetUuid);
 
     const transaction = new Transaction(targetActor);
-    await transaction.appendActorChanges(attributes);
+    await transaction.appendActorChanges(attributes, { set: true });
     const { actorUpdates } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_SET, targetActor, actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_SET, targetActor, actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     const { attributeDeltas } = await transaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.SET, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.SET, targetUuid, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "setAttributes",
@@ -546,12 +661,12 @@ export default class PrivateAPI {
     await transaction.appendActorChanges(attributes);
     const { actorUpdates } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_ADD, targetActor, actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_ADD, targetActor, actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     const { attributeDeltas } = await transaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.ADD, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.ADD, targetUuid, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "addAttributes",
@@ -573,12 +688,12 @@ export default class PrivateAPI {
     await transaction.appendActorChanges(attributes, { remove: true });
     const { actorUpdates } = transaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_REMOVE, targetActor, actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_REMOVE, targetActor, actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     const { attributeDeltas } = await transaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.REMOVE, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.REMOVE, targetUuid, attributeDeltas, userId, interactionId);
 
     await this._executeItemPileMacro(targetUuid, {
       action: "removeAttributes",
@@ -610,13 +725,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferAttributes",
@@ -629,17 +744,28 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
+    const itemPile = Utilities.getToken(sourceUuid);
+
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
-
-    const itemPile = await fromUuid(sourceUuid)
-
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
-    } else if (PileUtilities.isItemPileEmpty(itemPile)) {
-      await SharingUtilities.clearItemPileSharingData(itemPile);
-    } else {
-      await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
-        attributes: attributeDeltas
+    } else if (PileUtilities.isItemPileLootable(itemPile)) {
+      if (PileUtilities.isItemPileEmpty(itemPile)) {
+        await SharingUtilities.clearItemPileSharingData(itemPile);
+      } else {
+        await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
+          attributes: attributeDeltas
+        });
+      }
+    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      const pileActor = sourceIsItemPile ? sourceActor : targetActor;
+      const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+      await PileUtilities.updateVaultJournalLog(pileActor, {
+        userId,
+        actor: actorToLog,
+        attributes: attributeDeltas,
+        withdrawal: sourceIsItemPile
       });
     }
 
@@ -665,13 +791,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.callHook(HOOKS.ATTRIBUTE.TRANSFER_ALL, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER_ALL, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferAllAttributes",
@@ -725,13 +851,13 @@ export default class PrivateAPI {
     await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
     const targetUpdates = targetTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.PRE_TRANSFER_EVERYTHING, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_TRANSFER_EVERYTHING, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
     if (hookResult === false) return false;
 
     await sourceTransaction.commit();
     const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
 
-    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
     const macroData = {
       action: "transferEverything",
@@ -756,12 +882,19 @@ export default class PrivateAPI {
 
   }
 
-  static async _commitActorChanges(actorUuid, actorUpdates, itemsToUpdate, itemsToDelete, itemsToCreate) {
+  static async _commitActorChanges(actorUuid, {
+    actorUpdates = {},
+    itemsToUpdate = [],
+    itemsToDelete = [],
+    itemsToCreate = []
+  } = {}) {
     const actor = Utilities.getActor(actorUuid);
-    await actor.update(actorUpdates);
-    await actor.updateEmbeddedDocuments("Item", itemsToUpdate);
-    await actor.deleteEmbeddedDocuments("Item", itemsToDelete);
-    const createdItems = await actor.createEmbeddedDocuments("Item", itemsToCreate);
+    if (!foundry.utils.isEmpty(actorUpdates)) {
+      await actor.update(actorUpdates);
+    }
+    if (itemsToUpdate.length) await actor.updateEmbeddedDocuments("Item", itemsToUpdate);
+    if (itemsToDelete.length) await actor.deleteEmbeddedDocuments("Item", itemsToDelete);
+    const createdItems = itemsToCreate.length ? await actor.createEmbeddedDocuments("Item", itemsToCreate) : [];
     return createdItems.map(item => item.toObject());
   }
 
@@ -790,13 +923,13 @@ export default class PrivateAPI {
     // If there's a source of the item (it wasn't dropped from the item bar)
     if (sourceUuid) {
 
-      const itemsToTransfer = [{ _id: itemData.item._id, quantity: itemData.quantity }];
+      setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
 
       // If there's a target token, add the item to it, otherwise create a new pile at the drop location
       if (targetUuid) {
-        itemsDropped = await this._transferItems(sourceUuid, targetUuid, itemsToTransfer, userId);
+        itemsDropped = await this._transferItems(sourceUuid, targetUuid, [itemData.item], userId);
       } else {
-        itemsDropped = (await this._removeItems(sourceUuid, itemsToTransfer, userId)).map(item => {
+        itemsDropped = (await this._removeItems(sourceUuid, [itemData.item], userId)).map(item => {
           item.quantity = Math.abs(item.quantity)
           Utilities.setItemQuantity(item.item, Math.abs(item.quantity), true);
           return item;
@@ -816,7 +949,7 @@ export default class PrivateAPI {
 
     }
 
-    await ItemPileSocket.callHook(HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemsDropped, position);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.DROP, sourceUuid, targetUuid, itemsDropped, position);
 
     return { sourceUuid, targetUuid, position, itemsDropped };
 
@@ -831,7 +964,8 @@ export default class PrivateAPI {
     items = false,
     tokenOverrides = {},
     actorOverrides = {},
-    itemPileFlags = {}
+    itemPileFlags = {},
+    folders = false,
   } = {}) {
 
     let returns = {};
@@ -843,26 +977,60 @@ export default class PrivateAPI {
       let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
       pileDataDefaults.enabled = true;
-      pileDataDefaults.deleteWhenEmpty = true;
-      pileDataDefaults.displayOne = true;
-      pileDataDefaults.showItemName = true;
-      pileDataDefaults.overrideSingleItemScale = true;
-      pileDataDefaults.singleItemScale = 0.75;
+      if (foundry.utils.isEmpty(itemPileFlags)) {
+        pileDataDefaults.deleteWhenEmpty = true;
+        pileDataDefaults.displayOne = true;
+        pileDataDefaults.showItemName = true;
+        pileDataDefaults.overrideSingleItemScale = true;
+        pileDataDefaults.singleItemScale = 0.75;
+      }
 
-      pileActor = await Actor.create({
-        name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
-      });
+      pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
 
-      await pileActor.update({
-        [CONSTANTS.FLAGS.PILE]: pileDataDefaults, prototypeToken: {
-          name: "Item Pile",
-          actorLink: false,
-          bar1: { attribute: "" },
-          vision: false,
-          displayName: 50,
-          [CONSTANTS.FLAGS.PILE]: pileDataDefaults, ...tokenOverrides
-        }, ...actorOverrides
-      })
+      const actorData = {
+        name: actor || "New Item Pile",
+        type: Helpers.getSetting("actorClassType"),
+        img: "icons/svg/item-bag.svg"
+      };
+
+      if (folders) {
+        let lastFolder = false
+        for (const folder of folders) {
+          let actualFolder = game.folders.getName(folder);
+          if (!actualFolder) {
+            const folderData = { name: folder, type: "Actor", sorting: 'a' };
+            if (lastFolder) {
+              folderData.parent = lastFolder.id;
+            }
+            actualFolder = await Folder.create(folderData);
+          }
+          lastFolder = actualFolder;
+        }
+
+        if (lastFolder) {
+          actorData.folder = lastFolder.id;
+        }
+      }
+
+      pileActor = await Actor.create(actorData);
+
+      const prototypeTokenData = foundry.utils.mergeObject({
+        name: "Item Pile",
+        actorLink: false,
+        bar1: { attribute: "" },
+        vision: false,
+        displayName: 50,
+        [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+        [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+      }, tokenOverrides)
+
+      const actorUpdate = foundry.utils.mergeObject({
+        [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+        [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+        prototypeToken: prototypeTokenData,
+      }, actorOverrides)
+
+      await pileActor.update(actorUpdate);
 
     } else if (!actor) {
 
@@ -875,24 +1043,42 @@ export default class PrivateAPI {
         let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
         pileDataDefaults.enabled = true;
-        pileDataDefaults.deleteWhenEmpty = true;
-        pileDataDefaults.displayOne = true;
-        pileDataDefaults.showItemName = true;
-        pileDataDefaults.overrideSingleItemScale = true;
-        pileDataDefaults.singleItemScale = 0.75;
+        if (foundry.utils.isEmpty(itemPileFlags)) {
+          pileDataDefaults.deleteWhenEmpty = true;
+          pileDataDefaults.displayOne = true;
+          pileDataDefaults.showItemName = true;
+          pileDataDefaults.overrideSingleItemScale = true;
+          pileDataDefaults.singleItemScale = 0.75;
+        }
 
-        pileActor = await Actor.create({
-          name: "Default Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
-        });
+        pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+
+        const actorData = {
+          name: "Default Item Pile",
+          type: Helpers.getSetting("actorClassType"),
+          img: "icons/svg/item-bag.svg"
+        };
+
+        if (folder) {
+          folder = game.folders.get(folder) || game.folders.getName(folder);
+          if (folder) {
+            actorData.folder = folder.id;
+          }
+        }
+
+        pileActor = await Actor.create(actorData);
 
         await pileActor.update({
-          [CONSTANTS.FLAGS.PILE]: pileDataDefaults, prototypeToken: {
+          [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+          [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+          prototypeToken: {
             name: "Item Pile",
             actorLink: false,
             bar1: { attribute: "" },
             vision: false,
             displayName: 50,
-            [CONSTANTS.FLAGS.PILE]: pileDataDefaults
+            [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+            [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
           }
         })
 
@@ -953,7 +1139,7 @@ export default class PrivateAPI {
 
       const scene = game.scenes.get(sceneId);
 
-      const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_CREATE, tokenData);
+      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CREATE, tokenData);
       if (hookResult === false) return false;
 
       const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
@@ -977,10 +1163,16 @@ export default class PrivateAPI {
 
       const target = fromUuidSync(targetUuid);
 
-      let specificPileSettings = foundry.utils.mergeObject(
-        PileUtilities.getActorFlagData(target),
-        pileSettings
-      );
+      let targetItemPileSettings = PileUtilities.getActorFlagData(target);
+
+      const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
+      const defaultItemPileActor = game.actors.get(defaultItemPileId);
+      if (defaultItemPileActor) {
+        const defaultItemPileSettings = PileUtilities.getActorFlagData(defaultItemPileActor);
+        targetItemPileSettings = foundry.utils.mergeObject(targetItemPileSettings, defaultItemPileSettings);
+      }
+
+      let specificPileSettings = foundry.utils.mergeObject(targetItemPileSettings, pileSettings);
       specificPileSettings.enabled = true;
 
       const targetItems = PileUtilities.getActorItems(target, { itemFilters: specificPileSettings.overrideItemFilters });
@@ -1020,7 +1212,7 @@ export default class PrivateAPI {
       }
     }
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
     if (hookResult === false) return false;
 
     await Actor.updateDocuments(Object.values(actorUpdateGroups));
@@ -1030,7 +1222,7 @@ export default class PrivateAPI {
       await scene.updateEmbeddedDocuments("Token", updateData);
     }
 
-    await ItemPileSocket.callHook(HOOKS.PILE.TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
 
     return targetUuids;
 
@@ -1075,7 +1267,7 @@ export default class PrivateAPI {
       }
     }
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);
     if (hookResult === false) return false;
 
     await Actor.updateDocuments(Object.values(actorUpdateGroups));
@@ -1085,7 +1277,7 @@ export default class PrivateAPI {
       await scene.updateEmbeddedDocuments("Token", updateData);
     }
 
-    await ItemPileSocket.callHook(HOOKS.PILE.REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);
 
     return targetUuids;
 
@@ -1102,14 +1294,14 @@ export default class PrivateAPI {
 
     const diff = foundry.utils.diffObject(oldData, data);
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_UPDATE, targetActor, data, interactingToken, tokenSettings);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_UPDATE, targetActor, data, interactingToken, tokenSettings);
     if (hookResult === false) return false;
 
     await Helpers.wait(15);
 
     await PileUtilities.updateItemPileData(targetActor, data, tokenSettings);
 
-    if (data.enabled && data.isContainer) {
+    if (PileUtilities.isItemPileContainer(targetActor, data)) {
       if (diff?.closed === true) {
         await this._executeItemPileMacro(targetUuid, {
           action: "closeItemPile", source: interactingTokenUuid, target: targetUuid
@@ -1145,20 +1337,20 @@ export default class PrivateAPI {
 
     const data = PileUtilities.getActorFlagData(target);
 
-    Helpers.hooks.callAll(HOOKS.PILE.UPDATE, target, diffData, interactingToken)
+    Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.UPDATE, target, diffData, interactingToken)
 
-    if (data.enabled && data.isContainer) {
+    if (PileUtilities.isItemPileContainer(target, data)) {
       if (diffData?.closed === true) {
-        Helpers.hooks.callAll(HOOKS.PILE.CLOSE, target, interactingToken)
+        Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CLOSE, target, interactingToken)
       }
       if (diffData?.locked === true) {
-        Helpers.hooks.callAll(HOOKS.PILE.LOCK, target, interactingToken)
+        Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.LOCK, target, interactingToken)
       }
       if (diffData?.locked === false) {
-        Helpers.hooks.callAll(HOOKS.PILE.UNLOCK, target, interactingToken)
+        Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.UNLOCK, target, interactingToken)
       }
       if (diffData?.closed === false) {
-        Helpers.hooks.callAll(HOOKS.PILE.OPEN, target, interactingToken)
+        Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.OPEN, target, interactingToken)
       }
     }
   }
@@ -1166,7 +1358,7 @@ export default class PrivateAPI {
   static async _deleteItemPile(targetUuid) {
     const target = Utilities.getToken(targetUuid);
     if (!target) return false;
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_DELETE, target);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_DELETE, target);
     if (hookResult === false) return false;
     return target.document.delete();
   }
@@ -1206,7 +1398,7 @@ export default class PrivateAPI {
    */
   static async _preloadItemPileFiles(tokenDocument) {
 
-    if (!PileUtilities.isValidItemPile(tokenDocument)) return false;
+    if (!PileUtilities.isItemPileContainer(tokenDocument)) return false;
 
     const pileData = PileUtilities.getActorFlagData(tokenDocument);
 
@@ -1286,12 +1478,16 @@ export default class PrivateAPI {
    *
    * @param {canvas} canvas
    * @param {Object} data
-   * @param {Actor/Token/TokenDocument/Boolean}[target=false]
-   * @return {Promise/Boolean}
+   * @return {Promise}
    */
-  static async _dropData(canvas, data, { target = false } = {}) {
+  static async _dropData(canvas, data) {
 
-    if (data.type !== "Item") return false;
+    const canGiveItems = Helpers.getSetting(SETTINGS.ENABLE_GIVING_ITEMS);
+    const canDropItems = Helpers.getSetting(SETTINGS.ENABLE_DROPPING_ITEMS);
+
+    if (!canDropItems && !canGiveItems) return;
+
+    if (data.type !== "Item") return;
 
     let item = await Item.implementation.fromDropData(data);
     let itemData = item.toObject();
@@ -1302,10 +1498,13 @@ export default class PrivateAPI {
     }
 
     const dropData = {
-      source: false, target: target, itemData: {
-        item: itemData, quantity: 1
-      }, position: false
-    }
+      source: false,
+      target: false,
+      itemData: {
+        item: itemData, quantity: 1,
+      },
+      position: false
+    };
 
     dropData.source = item.parent;
 
@@ -1313,12 +1512,11 @@ export default class PrivateAPI {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
     }
 
-    const pre_drop_determined_hook = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.itemData, dropData.position);
-    if (pre_drop_determined_hook === false) return false;
+    const pre_drop_determined_hook = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_DROP_DETERMINED, dropData.source, dropData.target, dropData.itemData, dropData.position);
+    if (pre_drop_determined_hook === false) return;
 
     let droppableDocuments = [];
-    let x;
-    let y;
+    let x, y;
 
     if (dropData.target) {
 
@@ -1335,7 +1533,7 @@ export default class PrivateAPI {
 
       if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get("midi-qol", "DragDropTarget")) {
         Helpers.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items");
-        return false;
+        return;
       }
 
       if (!droppableDocuments.length) {
@@ -1343,16 +1541,18 @@ export default class PrivateAPI {
       }
     }
 
-    const canGiveItems = Helpers.getSetting(SETTINGS.ENABLE_GIVING_ITEMS) || game.user.isGM;
-    const canDropItems = Helpers.getSetting(SETTINGS.ENABLE_DROPPING_ITEMS) || game.user.isGM;
-
     const droppableItemPiles = droppableDocuments.filter(token => PileUtilities.isValidItemPile(token));
     const droppableNormalTokens = droppableDocuments.filter(token => !PileUtilities.isValidItemPile(token));
 
     const droppingItem = canDropItems && (droppableItemPiles.length || (dropData.position && !droppableNormalTokens.length));
     const givingItem = canGiveItems && droppableNormalTokens.length && !droppableItemPiles.length;
 
-    if (droppingItem) {
+    const itemPileIsVault = PileUtilities.isItemPileVault(droppableItemPiles[0]);
+
+    if (itemPileIsVault) {
+      dropData.target = droppableItemPiles[0];
+      return this._depositItem(dropData);
+    } else if (droppingItem) {
       dropData.target = droppableItemPiles[0];
       return this._dropItem(dropData);
     } else if (givingItem) {
@@ -1360,19 +1560,62 @@ export default class PrivateAPI {
       return this._giveItem(dropData);
     }
 
-    return false;
-
   }
 
-  static async _giveItem(dropData) {
+  static async _depositItem(dropData) {
 
-    if (dropData.source === dropData.target) return;
+    const sourceActor = Utilities.getActor(dropData.source);
+    const targetActor = Utilities.getActor(dropData.target);
+    if (sourceActor === targetActor) return;
 
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
     if (!validItem) return;
     dropData.itemData.item = validItem;
 
-    const user = Array.from(game.users).find(user => user?.character === dropData.target.actor);
+    const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+
+    let itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
+    if (itemQuantity > 1 && Utilities.canItemStack(dropData.itemData.item)) {
+      const quantity = await DropItemDialog.show(item, dropData.target, {
+        localizationTitle: "DepositItem"
+      });
+      Utilities.setItemQuantity(dropData.itemData.item, quantity);
+      dropData.itemData.quantity = quantity;
+    } else {
+      dropData.itemData.quantity = 1;
+    }
+
+    setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM + ".x", dropData.gridPosition.x);
+    setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM + ".y", dropData.gridPosition.y);
+
+    if (dropData.source) {
+      return game.itempiles.API.transferItems(dropData.source, dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
+    }
+
+    if (!game.user.isGM) return;
+
+    return game.itempiles.API.addItems(dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
+
+  }
+
+  static async _giveItem(dropData) {
+
+    const sourceActor = Utilities.getActor(dropData.source);
+    const targetActor = Utilities.getActor(dropData.target);
+    if (sourceActor === targetActor) return;
+
+    const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
+    if (!validItem) return;
+    dropData.itemData.item = validItem;
+
+    const actorOwners = Object.entries(dropData.target.actor.ownership)
+      .filter(entry => {
+        return entry[0] !== "default" && entry[1] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+      })
+      .map(entry => game.users.get(entry[0]))
+      .sort(user => user.isGM ? 1 : -1);
+
+    const user = actorOwners?.[0];
 
     if (user && !user?.active && !game.user.isGM) {
       return TJSDialog.prompt({
@@ -1393,7 +1636,9 @@ export default class PrivateAPI {
       const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
 
       if (Utilities.canItemStack(dropData.itemData.item)) {
-        const quantity = await DropItemDialog.show(item, dropData.target.actor, { giving: true });
+        const quantity = await DropItemDialog.show(item, dropData.target.actor, {
+          localizationTitle: "GiveItem"
+        });
         Utilities.setItemQuantity(dropData.itemData.item, quantity);
         dropData.itemData.quantity = quantity;
       } else {
@@ -1403,10 +1648,15 @@ export default class PrivateAPI {
       const sourceUuid = Utilities.getUuid(dropData.source);
       const targetUuid = Utilities.getUuid(dropData.target);
 
-      if ((!user || !user?.active) && game.user.isGM) {
+      if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, dropData.source, dropData.target, dropData.itemData, user.id) === false) {
+        return;
+      }
+
+      if ((!user || !user?.active || user === game.user) && game.user.isGM) {
         Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
           source_actor_name: dropData.source.name, target_actor_name: dropData.target.name, item_name: item.name
         }));
+        Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, dropData.source, dropData.target, dropData.itemData, game.user.id);
         return this._transferItems(sourceUuid, targetUuid, [dropData.itemData.item], game.user.id)
       }
 
@@ -1418,7 +1668,9 @@ export default class PrivateAPI {
 
   static async _dropItem(dropData) {
 
-    if (dropData.source === dropData.target) return;
+    const sourceActor = Utilities.getActor(dropData.source);
+    const targetActor = Utilities.getActor(dropData.target);
+    if (sourceActor === targetActor) return;
 
     if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;
 
@@ -1442,14 +1694,14 @@ export default class PrivateAPI {
 
           if (distance > maxDistance) {
             Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileTooFar"), true);
-            return false;
+            return;
           }
         }
       }
 
       if (game.itempiles.API.isItemPileLocked(dropData.target)) {
         Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.PileLocked"), true);
-        return false;
+        return;
       }
     }
 
@@ -1475,8 +1727,8 @@ export default class PrivateAPI {
       }
     }
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
-    if (hookResult === false) return false;
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
+    if (hookResult === false) return;
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DROP_ITEMS, {
       userId: game.user.id,
@@ -1499,7 +1751,8 @@ export default class PrivateAPI {
     const item = await Item.implementation.create(itemData.item, { temporary: true });
 
     const accepted = await TJSDialog.confirm({
-      title: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"), content: {
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"),
+      content: {
         class: CustomDialog, props: {
           content: game.i18n.format(contentString, {
             source_actor_name: sourceActor.name,
@@ -1516,14 +1769,15 @@ export default class PrivateAPI {
     }
 
     return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS_RESPONSE, [userId], {
-      userId: game.user.id, accepted, sourceUuid, itemData
+      userId: game.user.id, accepted, sourceUuid, targetUuid, itemData
     });
 
   }
 
-  static async _giveItemsResponse({ userId, accepted, sourceUuid, itemData } = {}) {
+  static async _giveItemsResponse({ userId, accepted, sourceUuid, targetUuid, itemData } = {}) {
     const user = game.users.get(userId);
     if (accepted) {
+      await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.GIVE, sourceUuid, targetUuid, itemData, game.user.id, userId)
       await PrivateAPI._removeItems(sourceUuid, [itemData], game.user.id);
       return Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.GiveItemAccepted", { user_name: user.name }));
     }
@@ -1532,13 +1786,13 @@ export default class PrivateAPI {
 
   static async _itemPileClicked(pileDocument) {
 
-    if (!PileUtilities.isValidItemPile(pileDocument)) return false;
+    if (!PileUtilities.isValidItemPile(pileDocument)) return;
 
     const pileToken = pileDocument.object;
 
     if (!Helpers.isGMConnected()) {
       Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
-      return false;
+      return;
     }
 
     Helpers.debug(`Clicked: ${pileDocument.uuid}`);
@@ -1582,10 +1836,10 @@ export default class PrivateAPI {
       }
       if (!interactingActor) {
         Helpers.custom_warning(game.i18n.localize(maxDistance === Infinity
-          ? "ITEM-PILES.Errors.PileTooFar"
-          : "ITEM-PILES.Errors.NoTokenFound"
+          ? "ITEM-PILES.Errors.NoTokenFound"
+          : "ITEM-PILES.Errors.PileTooFar"
         ), true);
-        return false;
+        return;
       }
     }
 
@@ -1602,7 +1856,7 @@ export default class PrivateAPI {
       }
     }
 
-    if (pileData.isContainer && interactingActor) {
+    if (PileUtilities.isItemPileContainer(pileDocument) && interactingActor) {
 
       if (pileData.locked && !game.user.isGM) {
         Helpers.debug(`Attempted to open locked item pile with UUID ${pileDocument.uuid}`);
@@ -1615,6 +1869,9 @@ export default class PrivateAPI {
       }
 
     }
+
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CLICK, pileDocument, interactingActor);
+    if (hookResult === false) return;
 
     return this._renderItemPileInterface(pileDocument.uuid, { inspectingTargetUuid: interactingActor?.uuid });
 
@@ -1698,7 +1955,7 @@ export default class PrivateAPI {
 
     const actorPreparedData = Object.fromEntries(transactionMap.map(entry => [entry[0], entry[1].prepare()]));
 
-    const hookResult = Helpers.hooks.call(HOOKS.PILE.PRE_SPLIT_INVENTORY, itemPileActor, preparedData, actorPreparedData, userId, instigator);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_SPLIT_INVENTORY, itemPileActor, preparedData, actorPreparedData, userId, instigator);
     if (hookResult === false) return false;
 
     const pileDeltas = await tempPileTransaction.commit();
@@ -1709,7 +1966,7 @@ export default class PrivateAPI {
 
     await SharingUtilities.clearItemPileSharingData(itemPileActor);
 
-    await ItemPileSocket.callHook(HOOKS.PILE.SPLIT_INVENTORY, itemPileUuid, pileDeltas, actorDeltas, userId, instigator);
+    await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.SPLIT_INVENTORY, itemPileUuid, pileDeltas, actorDeltas, userId, instigator);
 
     await this._executeItemPileMacro(itemPileUuid, {
       action: "splitInventory", source: itemPileUuid, target: actorUuids, transfers: {
@@ -1746,8 +2003,11 @@ export default class PrivateAPI {
       inspectingTarget = inspectingTargetUuid ? fromUuidSync(inspectingTargetUuid) : false;
     }
 
-    const merchant = PileUtilities.isItemPileMerchant(target);
-    if (merchant) {
+    if (PileUtilities.isItemPileVault(target)) {
+      return BankVaultApp.show(target, inspectingTarget)
+    }
+
+    if (PileUtilities.isItemPileMerchant(target)) {
       return MerchantApp.show(target, inspectingTarget)
     }
 
@@ -1762,19 +2022,23 @@ export default class PrivateAPI {
     const sellingActor = Utilities.getActor(sellerUuid);
     const buyingActor = Utilities.getActor(buyerUuid);
 
-    const itemPrices = PileUtilities.getPricesForItems(items.map(data => {
-      const item = sellingActor.items.get(data.id);
-      return {
-        ...data, item
-      }
-    }), { seller: sellingActor, buyer: buyingActor });
+    const itemPrices = PileUtilities.getPaymentData({
+      purchaseData: items.map(data => {
+        return {
+          ...data,
+          item: sellingActor.items.get(data.id)
+        }
+      }),
+      seller: sellingActor,
+      buyer: buyingActor
+    });
 
-    const preCalcHookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
+    const preCalcHookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
     if (preCalcHookResult === false) return false;
 
     const sellerTransaction = new Transaction(sellingActor);
     const sellerFlagData = PileUtilities.getActorFlagData(sellerTransaction);
-    const sellerIsMerchant = sellerFlagData.enabled && sellerFlagData.isMerchant;
+    const sellerIsMerchant = PileUtilities.isItemPileMerchant(sellingActor, sellerFlagData);
     const sellerInfiniteQuantity = sellerIsMerchant && sellerFlagData.infiniteQuantity;
     const sellerInfiniteCurrencies = sellerIsMerchant && sellerFlagData.infiniteCurrencies;
     const sellerKeepZeroQuantity = sellerIsMerchant && sellerFlagData.keepZeroQuantity;
@@ -1818,7 +2082,7 @@ export default class PrivateAPI {
 
     const buyerTransaction = new Transaction(buyingActor);
     const buyerFlagData = PileUtilities.getActorFlagData(buyingActor);
-    const buyerIsMerchant = buyerFlagData.enabled && buyerFlagData.isMerchant;
+    const buyerIsMerchant = PileUtilities.isItemPileMerchant(buyingActor, buyerFlagData);
     const buyerInfiniteCurrencies = buyerIsMerchant && buyerFlagData.infiniteCurrencies;
     const buyerInfiniteQuantity = buyerIsMerchant && buyerFlagData.infiniteQuantity;
     const buyerHidesNewItems = buyerIsMerchant && buyerFlagData.hideNewItems;
@@ -1873,7 +2137,7 @@ export default class PrivateAPI {
     const sellerUpdates = sellerTransaction.prepare();
     const buyerUpdates = buyerTransaction.prepare();
 
-    const hookResult = Helpers.hooks.call(HOOKS.ITEM.PRE_TRADE, sellingActor, sellerUpdates, buyingActor, buyerUpdates, userId, interactionId);
+    const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_TRADE, sellingActor, sellerUpdates, buyingActor, buyerUpdates, userId, interactionId);
     if (hookResult === false) return false;
 
     const sellerTransactionData = await sellerTransaction.commit();
@@ -1909,7 +2173,7 @@ export default class PrivateAPI {
       }
     }
 
-    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
 
     return {
       itemDeltas: buyerTransactionData.itemDeltas, attributeDeltas: buyerTransactionData.attributeDeltas, itemPrices
@@ -1934,6 +2198,13 @@ export default class PrivateAPI {
       if (resetTable) {
         await rollTable.reset();
       }
+
+      await rollTable.update({
+        results: rollTable.results.map(result => ({
+          _id: result.id,
+          weight: result.range[1] - (result.range[0] - 1)
+        }))
+      });
       await rollTable.normalize();
     }
 
