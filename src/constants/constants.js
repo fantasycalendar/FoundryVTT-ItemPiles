@@ -190,6 +190,7 @@ CONSTANTS.HOOKS = {
     SPLIT_INVENTORY: module`splitItemPileContent`,
     PRE_CLICK: module`preClickItemPile`,
     PRE_DIRECTORY_CLICK: module`preClickDirectoryItemPile`,
+    PRE_RIGHT_CLICK_ITEM: module`preRightClickItem`
   },
   ITEM: {
     PRE_DROP_DETERMINED: module`preDropItemDetermined`,

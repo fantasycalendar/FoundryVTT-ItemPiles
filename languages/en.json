@@ -164,7 +164,6 @@
       "ShoppingAs": "Shopping as {actorName}"
     },
     "Vault": {
-      "Title": "Vault: {actor_name}",
       "VaultTab": "Vault",
       "ExpandersTab": "Expanders",
       "LogTab": "Logs",
@@ -177,9 +176,10 @@
       "Withdraw": "Withdraw",
       "Deposit": "Deposit",
       "LogUserActor": "{actor_name} ({user_name})",
-      "LogQuantity": "{quantity} x",
-      "LogEntryDeposited": "{instigator} <span>deposited</span> {quantity} <strong>{item_name}</strong>",
-      "LogEntryWithdrew": "{instigator} <span>withdrew</span> {quantity} <strong>{item_name}</strong>"
+      "Deposited": "deposited",
+      "Withdrew": "withdrew",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "LogQuantity": "{quantity} x "
     },
     "Dialogs": {
       "TypeWarning": {

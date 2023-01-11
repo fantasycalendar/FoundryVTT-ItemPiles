@@ -58,16 +58,24 @@
 
     const item = await Item.implementation.fromDropData(data);
 
-    if (item.parent === store.actor) {
-      Helpers.custom_warning(`You can't drop items into the vault that originate from the vault!`, true)
-      return false;
-    }
-
     const itemData = item.toObject();
 
     if (!itemData) {
       console.error(data);
       throw Helpers.custom_error("Something went wrong when dropping this item!")
+    }
+
+    const source = (data.uuid ? fromUuidSync(data.uuid) : false)?.parent ?? false;
+    const target = store.actor;
+
+    if (source === target) {
+      Helpers.custom_warning(`You can't drop items into the vault that originate from the vault!`, true)
+      return false;
+    }
+
+    if(!source && !game.user.isGM){
+      Helpers.custom_warning(`Only GMs can drop items from the sidebar!`, true)
+      return false;
     }
 
     const vaultExpander = getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
@@ -83,8 +91,8 @@
     }
 
     return PrivateAPI._depositItem({
-      source: store.recipient ?? false,
-      target: store.actor,
+      source,
+      target,
       itemData: {
         item: itemData, quantity: 1
       },
@@ -121,10 +129,10 @@
   function rightClickItem(event) {
     setTimeout(() => {
 
-      const items = []
+      const contextMenu = []
 
       if (gridData.canWithdrawItems) {
-        items.push({
+        contextMenu.push({
           icon: 'fas fa-hand', label: "Take", onclick: () => {
             event.detail.item.item.take();
           }
@@ -132,21 +140,23 @@
       }
 
       if (pileData.canInspectItems || game.user.isGM) {
-        items.push({
+        contextMenu.push({
           icon: 'fas fa-eye', label: "Inspect", onclick: () => {
             event.detail.item.item.preview();
           }
         });
       }
 
-      if (!items.length) return;
+      Hooks.call(CONSTANTS.HOOKS.PILE.PRE_RIGHT_CLICK_ITEM, event.detail.item.item.item, contextMenu, actor, recipient);
+
+      if (!contextMenu.length) return;
 
       TJSContextMenu.create({
         x: event.detail.x,
         y: event.detail.y,
         zIndex: 1000000000000,
         transitionOptions: { duration: 0 },
-        items
+        items: contextMenu
       })
     })
   }
@@ -319,7 +329,11 @@
            style="max-height: {$applicationHeight-130}px; overflow-y: scroll; font-size: 0.75rem; padding-right: 0.5rem;">
 
         {#each $vaultLog.slice(0, $visibleLogItems).filter(log => log.visible) as log, index (index)}
-          <div class:item-piles-log-deposit={log.qty > 0} class:item-piles-log-withdrawal={log.qty < 0}>
+          <div
+            class:item-piles-log-deposit={log.action === "deposited" || (!log.action && log.qty > 0)}
+            class:item-piles-log-withdrawal={log.action === "withdrew" || (!log.action && log.qty < 0)}
+            class:item-piles-log-other={log.action && log.action !== "deposited" && log.action !== "withdrew"}
+          >
             {@html log.text} - {Helpers.timeSince(log.date)} ago
           </div>
         {/each}

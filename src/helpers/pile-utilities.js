@@ -764,14 +764,14 @@ export function getPriceData({
   const smallestExchangeRate = getSmallestExchangeRate(currencyList);
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
-  let overallCost = Utilities.getItemCost(item);
-  if (game.system.id === "pf2e") {
-    const { copperValue } = new game.pf2e.Coins(overallCost.value);
-    overallCost = copperValue / 100 / (overallCost.per ?? 1);
-  } else if (typeof overallCost === "string" && isNaN(Number(overallCost))) {
-    overallCost = getPriceFromString(overallCost, currencyList).overallCost;
+  let overallCost;
+  let itemCost = Utilities.getItemCost(item);
+  if (SYSTEMS.DATA.ITEM_COST_TRANSFORMER) {
+    overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, currencyList);
+  } else if (typeof itemCost === "string" && isNaN(Number(itemCost))) {
+    overallCost = getPriceFromString(itemCost, currencyList).overallCost;
   } else {
-    overallCost = Number(overallCost);
+    overallCost = Number(itemCost);
   }
 
   if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices) || modifier <= 0) {
@@ -1247,7 +1247,8 @@ export async function updateVaultJournalLog(itemPile, {
   userId = false,
   items = [],
   attributes = [],
-  withdrawal = true
+  withdrawal = true,
+  vaultLogData = {},
 } = {}) {
 
   const formattedItems = [];
@@ -1264,6 +1265,7 @@ export async function updateVaultJournalLog(itemPile, {
         user: userId,
         name: itemData.name,
         qty: itemData.quantity * (withdrawal ? -1 : 1),
+        action: vaultLogData?.action ?? (withdrawal ? "withdrew" : "deposited"),
         date
       });
     } else {
@@ -1273,6 +1275,7 @@ export async function updateVaultJournalLog(itemPile, {
         user: userId,
         name: item.name,
         qty: itemData.quantity * (withdrawal ? -1 : 1),
+        action: vaultLogData?.action ?? (withdrawal ? "withdrew" : "deposited"),
         date
       });
     }
@@ -1286,6 +1289,7 @@ export async function updateVaultJournalLog(itemPile, {
         user: userId,
         name: currency.name,
         qty: quantity * (withdrawal ? -1 : 1),
+        action: vaultLogData?.action ?? (withdrawal ? "withdrew" : "deposited"),
         date
       });
     }

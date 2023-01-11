@@ -223,10 +223,7 @@ class PileMerchantItem extends PileItem {
     });
     this.subscribeTo(this.itemDocument, () => {
       if (!setup) return;
-      const { data } = this.itemDocument.updateOptions;
-      if (hasProperty(data, game.itempiles.API.ITEM_PRICE_ATTRIBUTE)) {
-        this.refreshPriceData();
-      }
+      this.refreshPriceData();
     });
     this.refreshDisplayQuantity();
     this.subscribeTo(this.store.typeFilter, this.filter.bind(this));

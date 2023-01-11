@@ -13,7 +13,7 @@
   - `item-piles-preGiveItem`
   - `item-piles-giveItem`
 - Added more item piles constants and useful info in `game.itempiles`
-- Added `background` type items to the item filters of D&D5e
+- Updated DnD5e system support to support the new 2.1.0 update
 - Tweaked `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
 - Tweaked item piles containers to be the only tokens that get the additional buttons in its token HUD
 - Tweaked the item similarities setting - a lack of them will now treat every item as distinct items rather than the same

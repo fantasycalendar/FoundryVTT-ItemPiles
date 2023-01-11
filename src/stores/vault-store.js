@@ -81,12 +81,22 @@ export class VaultStore extends ItemPileStore {
         ? game.i18n.format("ITEM-PILES.Vault.LogQuantity", { quantity: Math.abs(log.qty) })
         : "";
 
-      log.text = game.i18n.format("ITEM-PILES.Vault.LogEntry" + (log.qty > 0 ? "Deposited" : "Withdrew"), {
+      if (!log.action) {
+        log.action = log.qty > 0 ? "deposited" : "withdrew";
+      }
+
+      const action = log.action === "withdrew" || log.action === "deposited"
+        ? game.i18n.localize("ITEM-PILES.Vault." + (log.action.slice(0, 1).toUpperCase() + log.action.slice(1)))
+        : log.action;
+
+      log.text = game.i18n.format("ITEM-PILES.Vault.LogEntry", {
         instigator,
-        item_name: log.name,
-        quantity
+        action: `<span>${action}</span>`,
+        quantity: quantity,
+        item_name: `<strong>${log.name}</strong>`,
       })
       log.visible = true;
+
     });
 
     this.vaultLog.set(logEntries);
@@ -156,8 +166,8 @@ export class VaultStore extends ItemPileStore {
       rows: pileData.baseExpansionRows ?? 0
     });
 
-    const enabledCols = expansions.cols;
-    const enabledRows = expansions.rows;
+    const enabledCols = Math.min(pileData.cols, expansions.cols);
+    const enabledRows = Math.min(pileData.rows, expansions.rows);
 
     const enabledSpaces = enabledCols * enabledRows;
 

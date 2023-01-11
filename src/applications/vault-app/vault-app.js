@@ -13,7 +13,6 @@ export default class VaultApp extends SvelteApplication {
    *
    * @param actor
    * @param recipient
-   * @param overrides
    * @param options
    * @param dialogData
    */

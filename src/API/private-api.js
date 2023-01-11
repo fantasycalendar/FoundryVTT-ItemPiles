@@ -231,7 +231,10 @@ export default class PrivateAPI {
 
   }
 
-  static async _transferItems(sourceUuid, targetUuid, items, userId, { interactionId = false } = {}) {
+  static async _transferItems(sourceUuid, targetUuid, items, userId, {
+    vaultLogData = false,
+    interactionId = false
+  } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
@@ -285,7 +288,8 @@ export default class PrivateAPI {
         userId,
         actor: actorToLog,
         items: itemDeltas,
-        withdrawal: sourceIsItemPile
+        withdrawal: sourceIsItemPile,
+        vaultLogData
       });
     }
 
@@ -1587,6 +1591,8 @@ export default class PrivateAPI {
     if (dropData.source) {
       return game.itempiles.API.transferItems(dropData.source, dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
     }
+
+    if (!game.user.isGM) return;
 
     return game.itempiles.API.addItems(dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
 
