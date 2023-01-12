@@ -63,10 +63,15 @@ const migrations = {
         scene.id,
         Array.from(scene.tokens).filter(t => {
           const actorFlagVersion = getProperty(t, CONSTANTS.FLAGS.VERSION) || "1.0.0";
-          return getProperty(t, CONSTANTS.FLAGS.PILE)
-            && isNewerVersion(version, actorFlagVersion)
-            && !t.actorLink
-            && t.actor;
+          try {
+            return getProperty(t, CONSTANTS.FLAGS.PILE)
+              && isNewerVersion(version, actorFlagVersion)
+              && !t.actorLink
+              && t.actor;
+          } catch (err) {
+            console.log(t.id + " error on scene " + scene.id + "!", err);
+            return false;
+          }
         })
       ]))
       .filter(scene => scene[1].length)
