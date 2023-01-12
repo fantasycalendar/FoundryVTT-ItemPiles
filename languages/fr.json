@@ -110,7 +110,7 @@
         "Content": "Vous tentez d'échanger un objet d'un type (\"{type}\") qui n'est normalement pas autorisé à être échangé. Êtes-vous sûr de vouloir le faire ?"
       },
       "ResetSettings": {
-        "Title": "Réinitialiser les paramètres d'Item Piles",
+        "Title": "Réinitialiser les paramètres du module",
         "Content": "Êtes-vous sûr de vouloir réinitialiser tous les paramètres du module aux valeurs par défaut du système actuel ? <strong>NE PEUT PAS ÊTRE ANNULÉ !</strong>",
         "Confirm": "Réinitialiser les paramètres du module"
       },
@@ -170,6 +170,14 @@
       "RemoveMerchantTable": {
         "Title": "Retirer la table du marchand",
         "Content": "Êtes-vous sûr de vouloir retirer la table \"{table_name}\" de ce marchand ? Ce sera définitif."
+      },
+      "ClearVaultLog": {
+        "Title": "Effacer le journal de coffre-fort ?",
+        "Content": "Etes-vous sûr de vouloir effacer le journal du coffre-fort \"{actor_name}\" ?"
+      },
+      "CantRemoveVaultExpander": {
+        "Title": "Impossible de retirer l'extension",
+        "Content": "Vous ne pouvez pas retirer cet extension, les objets du coffre-fort ne tiendraient pas sans lui. Retirez {num_items} objets avant d'essayer de retirer cet extension !"
       }
     },
     "CurrenciesEditor": {
@@ -298,7 +306,8 @@
       "SpectateDisabled": "Échange réalisé",
       "PrivateTrade": "Échange privé",
       "ExpandTrade": "Voir tous les détails de l'échange",
-      "MerchantTraded": "{name} a acheté les choses suivantes chez {merchant} :"
+      "MerchantTraded": "{name} a acheté les choses suivantes chez {merchant} :",
+      "GaveItems": "{source} a donné des objets à {target} :"
     },
     "Setting": {
       "Reset": {
@@ -371,7 +380,9 @@
       "UpdateItemPileSuccess": "La pile d'objets a été mise à jour avec succès.",
       "ItemTransferred": "{item_name} a été donné à {target_actor_name} par {source_actor_name}.",
       "GiveItemAccepted": "{user_name} a accepté votre offre.",
-      "ShownToPlayers": "Montre {actor_name} aux joueurs"
+      "ShownToPlayers": "Montre {actor_name} aux joueurs",
+      "CreatedJournal": "Création du journal du coffre-fort des piles d'objets.",
+      "SystemSupportFound": "Support système trouvé ! Appliquer les paramètres système par défaut aux piles d'objets..."
     },
     "Merchant": {
       "AllTypes": "Tous les types",
@@ -416,7 +427,8 @@
       "ToolTipRemoveTable": "Retirer une table",
       "TooltipConfigureTable": "Configurer une table",
       "TooltipRollTable": "Lancer une table",
-      "ToolTipRemoveAllRolledItems": "Retirer tous les objets tirés"
+      "ToolTipRemoveAllRolledItems": "Retirer tous les objets tirés",
+      "ShoppingAs": "Shopping en tant que {nom de l'acteur}"
     },
     "Applications": {
       "DropItem": {
@@ -425,14 +437,22 @@
         "NewPile": "Créer une nouvelle pile",
         "ExistingPiles": "Vous ajoutez cet élément à la pile d'objet \"{target_name}\".",
         "Title": "Lâcher un Objet",
-        "Dropping": "Vous lâchez : {item_name}"
+        "Dropping": "Vous lâchez : {item_name}",
+        "Header": "Vous lâchez: {item_name}",
+        "Content": "Vous ajoutez cet objet à la pile d'objet \"{target_name}\".",
+        "ContentMultipleQuantity": "Vous avez {quantity} de cet objet, combien voulez-vous en déposer ?",
+        "Submit": "Ajouter à la pile",
+        "SubmitNoTarget": "Créer une nouvelle pile"
       },
       "DropCurrencies": {
         "GM": "En tant que MJ, vous pouvez ajouter des devises à cette pile d'objets :",
         "NoCurrency": "{actor_name} n'a pas de devises valides...",
         "AddToPile": "Ajouter à la pile",
         "Player": "Vous pouvez déposer les devises suivantes dans cette pile d'objet :",
-        "Title": "Lâcher des devises"
+        "Title": "Lâcher des devises",
+        "Content": "Vous pouvez déposer les monnaies suivantes dans cette pile d'objet :",
+        "Submit": "Ajouter à la pile",
+        "ContentNoTarget": "En tant que MJ, vous pouvez mettre à jour les monnaies sur cette pile d'objets :"
       },
       "Settings": {
         "Title": "Configuration du module Item Piles",
@@ -497,7 +517,12 @@
         "KeepZeroExplanation": "Lorsqu'il est vendu en totalité, la marchant ne retire pas cet objet mais indique à la place qu'il n'est plus à vendre.",
         "CustomCategory": "Catégorie d'objets personnalisée",
         "CustomTypeExplanation": "Cet objet sera répertorié sous un type différent de ce qu'il est à l'origine.",
-        "CustomCategoryExplanation": "Lorsqu'il n'est pas laissé vide, cet objet sera listé sous un type différent de ce qu'il est."
+        "CustomCategoryExplanation": "Lorsqu'il n'est pas laissé vide, cet objet sera listé sous un type différent de ce qu'il est.",
+        "ExpandColumnsRows": "Extension des colonnes & lignes",
+        "Vault": "Paramètres de coffre-fort",
+        "VaultExpander": "Extension de coffre-fort",
+        "VaultExpanderExplanation": "Lorsque cette option est activée, cet objet n'agit pas comme un objet normal dans un coffre-fort, mais augmente le nombre d'emplacements disponibles, comme déterminé ci-dessous.",
+        "ExpandColumnsRowsExplanation": "Lorsque le paramètre ci-dessus est activé, il définit le nombre de colonnes et/ou de lignes disponibles dans le coffre-fort. Ce nombre ne peut pas dépasser la capacité du coffre-fort."
       },
       "TradeMerchantItem": {
         "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
@@ -549,7 +574,9 @@
           "DisplayItemTypesExplanation": "Affichez chaque type d'objet séparément dans la pile d'objets, triés par leur type d'objets."
         },
         "Other": {
-          "Title": "Autres paramètres"
+          "Title": "Autres paramètres",
+          "Type": "Type de pile d'objets",
+          "TypeExplanation": "Ceci configure la manière dont cette pile d'objets sera affichée."
         },
         "SingleItem": {
           "DisplayOneContainerWarning": "Attention ! Vous avez activé à la fois \"Afficher l'image d'un élément unique\" et \"Est un conteneur\". Dans ce cas, l'image du conteneur est prioritaire.",
@@ -633,14 +660,41 @@
           "InactivePlayersExplanation": "Seuls les joueurs qui sont actifs au moment du pillage de cette pile d'objets recevront leur part de la pile.",
           "ResetSharingData": "Réinitialiser les paramètres de partage"
         },
-        "Configure": "Pile d'objets"
+        "Configure": "Pile d'objets",
+        "Vault": {
+          "Layout": "Mise en page",
+          "Columns": "Colonnes",
+          "Rows": "Lignes",
+          "EnableExpansion": "Activer les objets d'extension",
+          "Access": "Accès aux personnages et aux joueurs",
+          "ManageAccess": "Gérer les accès",
+          "LogVaultAccess": "Accès au journal du coffre-fort",
+          "ClearVaultLog": "Effacer le journal de coffre-fort",
+          "ClearVaultLogExplanation": "Cela effacera les journaux du coffre-fort, en supprimant toutes les entrées. Cette opération ne peut pas être annulée.",
+          "LoggingFormat": "Format des enregistrements",
+          "LoggingFormatUser": "Afficher uniquement le nom d'utilisateur",
+          "Title": "Paramètres de coffre-fort",
+          "LayoutExplanation": "Il s'agit du nombre de colonnes et de lignes qui doivent être visibles dans le coffre-fort.",
+          "EnableExpansionExplanation": "Lorsque cette option est activée, les objets qui sont configurés en tant qu'extensionss de coffre-fort augmentent l'espace disponible du coffre-fort.",
+          "BaseExpansion": "Extension de base",
+          "BaseExpansionExplanation": "Il s'agit du nombre de colonnes et de lignes activées par défaut sans aucun obejt d'extension.",
+          "AccessExplanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les monnaies du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
+          "LogVaultAccessExplanation": "Lorsqu'elle est activée, ce coffre-fort crée une entrée de journal et crée des journaux horodatés chaque fois qu'il y a une interaction avec le coffre-fort.",
+          "LoggingFormatExplanation": "Ceci configure la façon dont le nom d'utilisateur et le nom du personnage sont affichés dans le journal.",
+          "LoggingFormatUserActor": "Afficher le nom d'utilisateur et le nom du personnage",
+          "LoggingFormatActor": "Afficher uniquement le nom du personnage"
+        }
       },
       "GiveItem": {
         "TargetActor": "Voulez-vous donner cet objet à \"{target_name}\" ?",
         "Title": "Donner un Objet",
         "Giving": "Vous donnez : {item_name}",
         "QuantityToGive": "Vous possédez cet objet {quantity} fois. Combien voulez-vous en donner ?",
-        "Give": "Donner"
+        "Give": "Donner",
+        "Header": "Vous donnez : {item_name}",
+        "Content": "Voulez-vous donner cet objet à \"{target_name}\" ?",
+        "Submit": "Donnez",
+        "ContentMultipleQuantity": "Vous avez {quantity} fois cet objet, combien voulez-vous en donner ?"
       },
       "FilterEditor": {
         "Explanation": "Ici, vous pouvez définir différents types de filtres qui excluront certains types d'objets. En fonction du chemin d'attribut donné, la pile d'objets peut trouver le \"type\" d'un objet et en fonction des filtres, il cachera ces objets dans l'interface d'inventaire.",
@@ -672,6 +726,36 @@
         "Update": "Mise à jour des préréglages",
         "Explanation": "Vous pouvez y créer plusieurs prix prédéfinis qui peuvent ensuite être facilement utilisés dans les prix personnalisés des articles.",
         "Title": "Éditeur de préréglages de prix"
+      },
+      "DepositItem": {
+        "Title": "Dépôt d'objet",
+        "Header": "Vous déposez : {item_name}",
+        "Content": "Voulez-vous déposer cet objet dans \"{target_name}\" ?",
+        "ContentMultipleQuantity": "Vous avez {quantity} fois cet objet, combien voulez-vous en déposer ?",
+        "Submit": "Dépôt"
+      },
+      "WithdrawItem": {
+        "Title": "Retirer l'objet",
+        "Header": "Vous retirez : {item_name}",
+        "ContentMultipleQuantity": "Il y a {quantity} de cet objet, combien voulez-vous en retirer ?",
+        "Submit": "Retirer",
+        "Content": "Voulez-vous retirer cet objet de \"{target_name}\" ?"
+      },
+      "DepositCurrencies": {
+        "Content": "Vous pouvez déposer les monnaies suivantes dans ce coffre-fort :",
+        "NoCurrency": "{actor_name} n'a pas de monnaies à déposer.",
+        "Submit": "Dépôt",
+        "Title": "Dépot de monnaies"
+      },
+      "WithdrawCurrencies": {
+        "Title": "Retirer l'objet",
+        "NoCurrency": "Il n'y a pas de monnaies à retirer.",
+        "Content": "Vous pouvez retirer les monnaies suivantes de ce coffre-fort :",
+        "Submit": "Retirer"
+      },
+      "VaultAccessEditor": {
+        "Title": "Editeur d'accès au coffre-fort : {actor_name}",
+        "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les monnaies du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet."
       }
     },
     "Settings": {
@@ -707,7 +791,7 @@
         "Label": "Configurer les similarités des objets"
       },
       "EnableDroppingItems": {
-        "Hint": "Cette option permet aux utilisateurs de déposer des objets sur le sol pour créer leurs propres piles d'objets. Si cette fonction est désactivée, les utilisateurs ne peuvent pas créer de nouvelles piles, ni ajouter des objets aux piles existantes.",
+        "Hint": "Cela permet aux utilisateurs de déposer des objets sur le sol pour créer leurs propres piles d'objets. Si cette fonction est désactivée, les utilisateurs ne peuvent pas créer de nouvelles piles.",
         "Title": "Activer le dépôt d'objets"
       },
       "EnableGivingItems": {
@@ -786,10 +870,42 @@
     "Warnings": {
       "GiveItemNoGM": "Il n'y a pas de MJ actif pour recevoir votre objet.",
       "GiveItemDeclined": "{user_name} a décliné votre offre.",
-      "NoPlayersActive": "Aucun joueur actif pour effectuer cette action"
+      "NoPlayersActive": "Aucun joueur actif pour effectuer cette action",
+      "NoGMsConnectedAction": "WARNING - Impossible d'exécuter \"{action}\" car aucun MJ n'est actif.",
+      "VaultFull": "Ce coffre-fort est plein !",
+      "NoGMsConnected": "ATTENTION - Pas de MJ connecté - Item Piles nécessite qu'un MJ soit connecté pour que les joueurs puissent utiliser la plupart des fonctionnalités du module.",
+      "VaultItemNotExpander": "Cet objet n'est pas une extension de coffre-fort"
     },
     "HeaderButtons": {
       "ShowToPlayers": "Montrer aux joueurs"
+    },
+    "Types": {
+      "container": "Conteneur",
+      "vault": "Chambre forte",
+      "pile": "Pile d'objets",
+      "merchant": "Marchand"
+    },
+    "Vault": {
+      "VaultTab": "Coffre-fort",
+      "LogTab": "Journaux",
+      "CapacityFull": "Ce coffre-fort a atteint sa capacité maximale de {capacité_totale}",
+      "ExpandsCols": "{cols} colonnes",
+      "ExpandsRows": "{rows} lignes",
+      "Withdraw": "Retirer",
+      "Deposit": "Dépôt",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "Deposited": "déposé",
+      "Withdrew": "s'est retiré",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "LogQuantity": "{quantité} x ",
+      "ExpandersTab": "Extensions",
+      "ViewingAs": "Vu comme {nom de l'acteur}",
+      "NeedsCapacity": "Ce coffre-fort a une capacité totale de {capacité_totale}, mais elle n'est pas disponible tant que des extensions de coffres-forts ne sont pas ajoutées",
+      "CapacityLeft": "Ce coffre-fort a une capacité de {capacité}, avec un maximum de {capacité_totale}, faites glisser et déposer des extensions de coffre-fort pour augmenter la capacité"
+    },
+    "VaultLog": {
+      "Withdraw": "{actor_name} ({user_name}) **a retiré** {item_name} x {quantity} ({date})",
+      "Deposit": "{actor_name} ({user_name}) *a déposé* {item_name} x {quantity} ({date})"
     }
   }
 }
