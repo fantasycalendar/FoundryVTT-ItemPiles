@@ -888,7 +888,7 @@
     "Vault": {
       "VaultTab": "Coffre-fort",
       "LogTab": "Journaux",
-      "CapacityFull": "Ce coffre-fort a atteint sa capacité maximale de {capacité_totale}",
+      "CapacityFull": "Ce coffre-fort a atteint sa capacité maximale de {total_capacity}",
       "ExpandsCols": "{cols} colonnes",
       "ExpandsRows": "{rows} lignes",
       "Withdraw": "Retirer",
@@ -897,11 +897,11 @@
       "Deposited": "déposé",
       "Withdrew": "s'est retiré",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
-      "LogQuantity": "{quantité} x ",
+      "LogQuantity": "{quantity} x ",
       "ExpandersTab": "Extensions",
-      "ViewingAs": "Vu comme {nom de l'acteur}",
-      "NeedsCapacity": "Ce coffre-fort a une capacité totale de {capacité_totale}, mais elle n'est pas disponible tant que des extensions de coffres-forts ne sont pas ajoutées",
-      "CapacityLeft": "Ce coffre-fort a une capacité de {capacité}, avec un maximum de {capacité_totale}, faites glisser et déposer des extensions de coffre-fort pour augmenter la capacité"
+      "ViewingAs": "Vu comme {actor_name}",
+      "NeedsCapacity": "Ce coffre-fort a une capacité totale de {total_capacity}, mais elle n'est pas disponible tant que des extensions de coffres-forts ne sont pas ajoutées",
+      "CapacityLeft": "Ce coffre-fort a une capacité de {capacity}, avec un maximum de {total_capacity}, faites glisser et déposer des extensions de coffre-fort pour augmenter la capacité"
     },
     "VaultLog": {
       "Withdraw": "{actor_name} ({user_name}) **a retiré** {item_name} x {quantity} ({date})",
