@@ -65,7 +65,8 @@ const migrations = {
           const actorFlagVersion = getProperty(t, CONSTANTS.FLAGS.VERSION) || "1.0.0";
           return getProperty(t, CONSTANTS.FLAGS.PILE)
             && isNewerVersion(version, actorFlagVersion)
-            && !t.actorLink;
+            && !t.actorLink
+            && t.actor;
         })
       ]))
       .filter(scene => scene[1].length)
