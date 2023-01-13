@@ -81,6 +81,7 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Splittermond](https://foundryvtt.com/packages/splittermond)
 - [Starfinder](https://foundryvtt.com/packages/sfrpg)
 - [Star Wars: Saga Edition](https://github.com/kypvalanx/Foundry-VTT-StarWars-SagaEdition)
+- [Star Wars: 5th Edition](https://github.com/unrealkakeman89/sw5e)
 - [Index Card RPG](https://foundryvtt.com/packages/icrpg)
 - [Forbidden Lands](https://foundryvtt.com/packages/forbidden-lands)
 - [Fallout 2d20](https://foundryvtt.com/packages/fallout)
