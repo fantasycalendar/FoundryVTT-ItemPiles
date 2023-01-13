@@ -40,8 +40,7 @@ export function getItemFlagData(item, data = false) {
 }
 
 export function getActorFlagData(target, data = false) {
-  const actor = Utilities.getActor(target);
-  return migrateFlagData(actor, getFlagData(actor, CONSTANTS.FLAGS.PILE, foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS), data));
+  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS), data);
 }
 
 export function isValidItemPile(target, data = false) {

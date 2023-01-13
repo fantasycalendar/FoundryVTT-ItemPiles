@@ -36,7 +36,7 @@
   });
 
   $: {
-    const pileData = get(store.pileData);
+    const pileData = foundry.utils.deepClone(get(store.pileData));
     pileData.tablesForPopulate = $populationTables
       .filter((t) => $tables[t.id])
       .map((t) => ({

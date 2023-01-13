@@ -120,6 +120,7 @@ const CONSTANTS = {
     sellPriceModifier: 0.5,
     itemTypePriceModifiers: [],
     actorPriceModifiers: [],
+    tablesForPopulate: [],
     openTimes: {
       enabled: false,
       status: "open",
