@@ -93,6 +93,7 @@ const migrations = {
           });
         } catch (err) {
           ui.notifications.warn(`Item Piles | Corrupted token detected: token with ID ${token.id} on scene ${scene.name}!`);
+          console.log(`"Item Piles | You can run "fromUuidSync("${token.uuid}").delete()" to remove the faulty token`);
           console.error(err);
         }
       }
