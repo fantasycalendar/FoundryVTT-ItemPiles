@@ -91,36 +91,8 @@ export async function checkSystem() {
 
   await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
 
-  if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
-    const doThing = await TJSDialog.confirm({
-      title: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Title"),
-      content: {
-        class: CustomDialog,
-        props: {
-          content: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Content")
-        }
-      },
-      buttons: {
-        yes: {
-          icon: '<i class="fas fa-check"></i>',
-          label: game.i18n.localize("ITEM-PILES.Dialogs.SystemFound.Confirm")
-        },
-        no: {
-          icon: '<i class="fas fa-times"></i>',
-          label: game.i18n.localize("No")
-        }
-      },
-      modal: true,
-      draggable: false,
-      rejectClose: false,
-      defaultYes: true,
-      options: {
-        height: "auto"
-      }
-    });
-    if (!doThing) {
-      return;
-    }
+  if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN) && !SYSTEMS.DATA.INTEGRATION) {
+    Helpers.custom_notify(game.i18n.localize("ITEM-PILES.Notifications.SystemSupportFound"));
   }
 
   return applyDefaultSettings();

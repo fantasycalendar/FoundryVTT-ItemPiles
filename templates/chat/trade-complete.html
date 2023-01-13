@@ -2,8 +2,9 @@
 
   <div class="item-piles-chat-card-title item-piles-bottom-divider">
     <p>
-      <img src="{{party_1.actor.img}}" title="{{party_1.actor.name}}" height="32"/>
-      <i class="fas fa-handshake"></i> <img src="{{party_2.actor.img}}" title="{{party_2.actor.name}}" height="32"/>
+      <img src="{{party_1.actor.img}}" data-tooltip="{{party_1.actor.name}}" height="32"/>
+      <i class="fas fa-handshake"></i> <img src="{{party_2.actor.img}}" data-tooltip="{{party_2.actor.name}}"
+                                            height="32"/>
     </p>
     <p style="margin:0;">{{ localize "ITEM-PILES.Chat.TradeComplete" party_1=party_1.actor.name
       party_2=party_2.actor.name}}</p>
@@ -22,7 +23,7 @@
     <ul>
       {{#each party_1.items as |item id|}}
       <li>
-        <img src="{{item.img}}" title="{{item.name}}" height="16"/>
+        <img src="{{item.img}}" data-tooltip="{{item.name}}" height="16"/>
         <label>{{item.name}}</label>
         <small>{{item.quantity}}</small>
       </li>
@@ -38,7 +39,7 @@
     <ul>
       {{#each party_1.currencies as |currency id|}}
       <li>
-        <img src="{{currency.img}}" title="{{currency.name}}" height="16"/>
+        <img src="{{currency.img}}" data-tooltip="{{currency.name}}" height="16"/>
         <label>{{currency.name}}</label>
         <small>{{currency.quantity}}</small>
       </li>
@@ -62,7 +63,7 @@
     <ul>
       {{#each party_2.items as |item id|}}
       <li>
-        <img src="{{item.img}}" title="{{item.name}}" height="16"/>
+        <img src="{{item.img}}" data-tooltip="{{item.name}}" height="16"/>
         <label>{{item.name}}</label>
         <small>{{item.quantity}}</small>
       </li>
@@ -78,7 +79,7 @@
     <ul>
       {{#each party_2.currencies as |currency id|}}
       <li>
-        <img src="{{currency.img}}" title="{{currency.name}}" height="16"/>
+        <img src="{{currency.img}}" data-tooltip="{{currency.name}}" height="16"/>
         <label>{{currency.name}}</label>
         <small>{{currency.quantity}}</small>
       </li>

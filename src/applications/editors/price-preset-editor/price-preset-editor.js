@@ -1,11 +1,12 @@
 import PricePresetEditorShell from "./price-preset-editor-shell.svelte";
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { getActiveApps } from "../../../helpers/helpers";
 
 export default class PricePresetEditor extends SvelteApplication {
   
   constructor(prices, options) {
     super({
-      id: `item-pile-price-preset-editor`,
+      id: `item-pile-price-preset-editor-${randomID()}`,
       title: game.i18n.format("ITEM-PILES.Applications.PricePresetEditor.Title"),
       svelte: {
         class: PricePresetEditorShell,
@@ -28,7 +29,7 @@ export default class PricePresetEditor extends SvelteApplication {
   }
   
   static getActiveApp() {
-    return Object.values(ui.windows).find(app => app.id === `item-pile-price-preset-editor`)
+    return getActiveApps(`item-pile-price-preset-editor`, true);
   }
   
   static async show(prices, options = {}, dialogData = {}) {

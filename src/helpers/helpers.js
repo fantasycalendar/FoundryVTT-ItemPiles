@@ -44,6 +44,10 @@ export const hooks = {
   }
 }
 
+export function getModuleVersion() {
+  return game.modules.get(CONSTANTS.MODULE_NAME).version;
+}
+
 /**
  *  This function determines if the given parameter is a callable function
  *
@@ -136,6 +140,18 @@ export function roundToDecimals(num, decimals) {
   return Number(Math.round(num + 'e' + decimals) + 'e-' + decimals);
 }
 
+export function clamp(num, min, max) {
+  return Math.max(Math.min(num, max), min);
+}
+
+export function getActiveApps(id, single = false) {
+  const apps = Object.values(ui.windows).filter(app => app.id.startsWith(id) && app._state > Application.RENDER_STATES.CLOSED);
+  if (single) {
+    return apps?.[0] ?? false;
+  }
+  return apps;
+}
+
 /**
  *  This function linearly interpolates between p1 and p2 based on a normalized value of t
  *
@@ -203,4 +219,108 @@ export function random_array_element(inArray, { recurse = false } = {}) {
     return random_array_element(choice, { recurse: true });
   }
   return choice;
+}
+
+
+export function styleFromObject(obj, vars = false) {
+  return Object.entries(obj).map(entry => (vars ? "--" : "") + entry[0] + ': ' + entry[1] + ";").join("");
+}
+
+
+export function abbreviateNumbers(number, decPlaces = 2) {
+
+  // 2 decimal places => 100, 3 => 1000, etc
+  decPlaces = Math.pow(10, decPlaces)
+
+  // Enumerate number abbreviations
+  let abbrev = ['k', 'm', 'b', 't']
+
+  // Go through the array backwards, so we do the largest first
+  for (let i = abbrev.length - 1; i >= 0; i--) {
+
+    // Convert array index to "1000", "1000000", etc
+    let size = Math.pow(10, (i + 1) * 3)
+
+    // If the number is bigger or equal do the abbreviation
+    if (size <= number) {
+      // Here, we multiply by decPlaces, round, and then divide by decPlaces.
+      // This gives us nice rounding to a particular decimal place.
+      number = Math.round((number * decPlaces) / size) / decPlaces
+
+      // Handle special case where we round up to the next abbreviation
+      if (number === 1000 && i < abbrev.length - 1) {
+        number = 1
+        i++
+      }
+
+      // Add the letter for the abbreviation
+      number += abbrev[i]
+
+      // We are done... stop
+      break;
+    }
+  }
+
+  return number
+}
+
+
+export function timeSince(date) {
+  const seconds = Math.floor((new Date() - date) / 1000);
+  const intervals = {
+    "d": 86400,
+    "h": 3600,
+    "m": 60
+  }
+
+  for (const [key, value] of Object.entries(intervals)) {
+    const interval = seconds / value;
+    if (interval > 1) {
+      return Math.floor(interval) + key;
+    }
+  }
+
+  return Math.ceil(seconds) + "s";
+}
+
+
+export function getApplicationPositions(application_1, application_2 = false) {
+
+  let midPoint = (window.innerWidth / 2);
+
+  if (!application_2) {
+    if (((midPoint - 200) - application_1.position.width - 25) > 0) {
+      midPoint -= 200
+    }
+    return [
+      { left: midPoint - application_1.position.width - 25 },
+      { left: midPoint + 25 }
+    ]
+  }
+
+  const application_1_position = {
+    left: application_1.position.left,
+    top: application_1.position.top,
+    width: application_1.position.width
+  };
+  const application_2_position = {
+    left: application_2.position.left,
+    top: application_1.position.top,
+    width: application_2.position.width
+  };
+
+  application_2_position.left = application_1_position.left - application_2_position.width - 25;
+  if (application_2_position.left < 0) {
+    application_2_position.left = application_1_position.left + application_1_position.width + 25
+  }
+  if ((application_2_position.left + application_2_position.width) > window.innerWidth) {
+    application_2_position.left = midPoint - application_2_position.width - 25;
+    application_1_position.left = midPoint + 25;
+  }
+
+  return [
+    application_1_position,
+    application_2_position
+  ]
+
 }

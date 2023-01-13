@@ -16,18 +16,6 @@
 
   $: canInspectItems = entry.id && $pileData.canInspectItems;
 
-  function previewItem() {
-    if (!canInspectItems) return;
-    const item = store.actor.items.get(entry.id);
-    if (!item) return;
-    if (game.user.isGM || item.permission[game.user.id] === 3) {
-      return item.sheet.render(true);
-    }
-    const cls = item._getSheetClass()
-    const sheet = new cls(item, { editable: false })
-    return sheet._render(true);
-  }
-
   const editQuantities = store.editQuantities;
 
   function dragStart(event) {
@@ -51,7 +39,7 @@
 
   <div class="item-piles-name">
     <div class="item-piles-name-container">
-      <p class:item-piles-clickable-link="{canInspectItems}" on:click={previewItem}>{$name}</p>
+      <p class:item-piles-clickable-link="{canInspectItems}" on:click={() => { entry.preview() }}>{$name}</p>
       {#if !editQuantities && entry.canStack}
         <span class="item-piles-small-text">(x{$quantity})</span>
       {/if}

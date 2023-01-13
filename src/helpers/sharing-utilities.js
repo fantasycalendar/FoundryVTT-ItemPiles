@@ -46,7 +46,7 @@ export function updateItemPileSharingData(target, incomingSharingData) {
 /**
  * Clears an item pile's sharing data
  *
- * @param {Actor|TokenDocument|String} target
+ * @param {Actor|TokenDocument|foundry.abstract.Document|String} target
  * @returns {Promise}
  */
 export function clearItemPileSharingData(target) {

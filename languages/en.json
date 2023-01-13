@@ -10,12 +10,20 @@
     "HeaderButtons": {
       "ShowToPlayers": "Show To Players"
     },
+    "Types": {
+      "pile": "Item Pile",
+      "container": "Container",
+      "merchant": "Merchant",
+      "vault": "Vault"
+    },
     "Notifications": {
+      "SystemSupportFound": "System support found! Applying default system settings to Item Piles...",
       "UpdateItemPileSuccess": "Item Pile successfully updated.",
       "UpdateMerchantSuccess": "Merchant successfully updated.",
       "ItemTransferred": "{source_actor_name}'s {item_name} was given to {target_actor_name}.",
       "GiveItemAccepted": "{user_name} accepted your item offer.",
-      "ShownToPlayers": "Showing {actor_name} to players"
+      "ShownToPlayers": "Showing {actor_name} to players",
+      "CreatedJournal": "Created the Item Piles Vault Log journal."
     },
     "Errors": {
       "DisallowedItemDrop": "You cannot drop \"{type}\" items",
@@ -28,9 +36,13 @@
       "DropNoToken": "You don't have a token on this scene, so you can't drop any items here."
     },
     "Warnings": {
+      "NoGMsConnected": "WARNING - No GMs connected - Item Piles requires a GM to be connected for players to be able to utilize most of the module's features.",
       "GiveItemNoGM": "There is no GM active to receive you giving this item.",
       "GiveItemDeclined": "{user_name} declined your item offer.",
-      "NoPlayersActive": "No players are active to do this action"
+      "NoPlayersActive": "No players are active to do this action",
+      "NoGMsConnectedAction": "WARNING - Could not execute \"{action}\" because no GMs are active.",
+      "VaultFull": "This vault is full!",
+      "VaultItemNotExpander": "That item is not a vault expander"
     },
     "Inspect": {
       "Title": "Inspecting Pile Contents",
@@ -148,7 +160,26 @@
       "ToolTipRemoveTable": "Remove Table",
       "TooltipConfigureTable": "Configure Table",
       "TooltipRollTable": "Roll Table",
-      "ToolTipRemoveAllRolledItems": "Remove All Rolled Items"
+      "ToolTipRemoveAllRolledItems": "Remove All Rolled Items",
+      "ShoppingAs": "Shopping as {actorName}"
+    },
+    "Vault": {
+      "VaultTab": "Vault",
+      "ExpandersTab": "Expanders",
+      "LogTab": "Logs",
+      "ViewingAs": "Viewing as {actor_name}",
+      "NeedsCapacity": "This vault has a total capacity of {total_capacity}, but none of it is available until vault expanders are added",
+      "CapacityLeft": "This vault has a capacity of {capacity}, with a maximum of {total_capacity}, drag and drop vault expanders to increase capacity",
+      "CapacityFull": "This vault has reached its maximum capacity of {total_capacity}",
+      "ExpandsCols": "{cols} columns",
+      "ExpandsRows": "{rows} rows",
+      "Withdraw": "Withdraw",
+      "Deposit": "Deposit",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "Deposited": "deposited",
+      "Withdrew": "withdrew",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "LogQuantity": "{quantity} x "
     },
     "Dialogs": {
       "TypeWarning": {
@@ -158,7 +189,7 @@
         "SellContent": "You're attempting to sell item of type (\"{type}\") that the merchant normally doesn't accept. Are you sure you want to do this?"
       },
       "ResetSettings": {
-        "Title": "Reset Item Piles Module Settings",
+        "Title": "Reset Module Settings",
         "Content": "Are you sure you want to reset all of the Item Piles module settings to the current system's defaults? <strong>THIS CANNOT BE UNDONE!</strong>",
         "Confirm": "Reset Module Settings"
       },
@@ -169,11 +200,6 @@
       "NoSystemFound": {
         "Title": "System Not Recognized",
         "Content": "This system is not currently fully supported. This means that the module does not know how to best handle this system's items, but can still operate in a limited fashion.<br><br>You can configure the module's settings yourself, but it requires a bit of technical know-how.<br><br>If you have any questions, ping <strong>Wasp#2005</strong> on the Foundry discord."
-      },
-      "SystemFound": {
-        "Title": "System Recognized",
-        "Content": "This system was previously not supported, but in an recent update it was added as a supported system!<br><br>Do you want to load this system's default Item Pile settings?",
-        "Confirm": "Apply System Defaults"
       },
       "NewSystemVersion": {
         "Title": "New System Version",
@@ -198,6 +224,10 @@
         "Title": "Remove Merchant Table",
         "Content": "Are you sure you want to remove the \"{table_name}\" table from this merchant? This is not undoable."
       },
+      "CantRemoveVaultExpander": {
+        "Title": "Cannot Remove Expander",
+        "Content": "You cannot remove this expander, the items in the vault would not fit without it. Remove {num_items} items before trying to remove this expander!"
+      },
       "ReceiveItem": {
         "Title": "Receiving Item",
         "Header": "Item Piles: Receiving Item",
@@ -211,30 +241,60 @@
       "UserSelect": {
         "Title": "Select Users",
         "Content": "Show to which users?"
+      },
+      "ClearVaultLog": {
+        "Title": "Clear Vault Log?",
+        "Content": "Are you sure you want to clear the log of the vault \"{actor_name}\"?"
       }
     },
     "Applications": {
       "DropItem": {
         "Title": "Dropping Item",
-        "Dropping": "You're dropping: {item_name}",
-        "ExistingPiles": "You're adding this item to the item pile \"{target_name}\".",
-        "QuantityToDrop": "You have {quantity} of this item, how many do you want to drop?",
-        "AddToPile": "Add to pile",
-        "NewPile": "Create new pile"
+        "Header": "You're dropping: {item_name}",
+        "Content": "You're adding this item to the item pile \"{target_name}\".",
+        "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to drop?",
+        "Submit": "Add to pile",
+        "SubmitNoTarget": "Create new pile"
       },
       "GiveItem": {
         "Title": "Giving Item",
-        "Giving": "You're giving: {item_name}",
-        "TargetActor": "Do you want to give this item to \"{target_name}\"?",
-        "QuantityToGive": "You have {quantity} of this item, how many do you want to give away?",
-        "Give": "Give"
+        "Header": "You're giving: {item_name}",
+        "Content": "Do you want to give this item to \"{target_name}\"?",
+        "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to give away?",
+        "Submit": "Give"
+      },
+      "DepositItem": {
+        "Title": "Deposit Item",
+        "Header": "You're depositing: {item_name}",
+        "Content": "Do you want to deposit this item into \"{target_name}\"?",
+        "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to deposit?",
+        "Submit": "Deposit"
+      },
+      "WithdrawItem": {
+        "Title": "Withdraw Item",
+        "Header": "You're withdrawing: {item_name}",
+        "Content": "Do you want to withdraw this item from \"{target_name}\"?",
+        "ContentMultipleQuantity": "There's {quantity} of this item, how many do you want to withdraw?",
+        "Submit": "Withdraw"
       },
       "DropCurrencies": {
         "Title": "Dropping Currencies",
-        "Player": "You can drop the following currencies into this item pile:",
-        "GM": "As a GM, you can add currencies to this item pile:",
+        "Content": "You can drop the following currencies into this item pile:",
+        "ContentNoTarget": "As a GM, you can update the currencies this on item pile:",
         "NoCurrency": "{actor_name} has no valid currencies...",
-        "AddToPile": "Add to pile"
+        "Submit": "Add to pile"
+      },
+      "DepositCurrencies": {
+        "Title": "Deposit Currencies",
+        "Content": "You can deposit the following currencies into this vault:",
+        "NoCurrency": "{actor_name} has no currencies to deposit.",
+        "Submit": "Deposit"
+      },
+      "WithdrawCurrencies": {
+        "Title": "Withdraw Item",
+        "Content": "You can withdraw the following currencies from this vault:",
+        "NoCurrency": "There are no currencies to withdraw.",
+        "Submit": "Withdraw"
       },
       "TradeMerchantItem": {
         "Title": "Trading Item: {item_name}",
@@ -270,14 +330,14 @@
         "Exchange": "Exchange",
         "Data": "Data",
         "Icon": "Icon",
-        "AddNew": "Add new currency",
-        "Submit": "Submit currencies"
+        "AddNew": "Add new currency"
       },
       "ItemEditor": {
         "Title": "Item Piles Item Editor: {item_name}",
         "Update": "Update Item",
         "General": "General Settings",
         "Price": "Price Settings",
+        "Vault": "Vault Settings",
         "NotForSale": "Item Is Not For Sale",
         "NotForSaleExplanation": "When enabled, this item is not for sale and cannot be bought. It still shows up in the merchant's item list unless the item is also hidden.",
         "CustomCategory": "Custom Item Category",
@@ -311,7 +371,11 @@
         "AddPurchaseOption": "Add Purchase Option",
         "DropMeClickMe": "Click to add an attribute or drag & drop an item to add",
         "PricePreset": "Or select an exiting price preset:",
-        "SelectPreset": "Select price preset"
+        "SelectPreset": "Select price preset",
+        "VaultExpander": "Vault Expander",
+        "VaultExpanderExplanation": "When this is enabled, this item does not act as a normal item in a vault, it instead increases the number of available slots, as determined below.",
+        "ExpandColumnsRows": "Column & Rows Expansion",
+        "ExpandColumnsRowsExplanation": "When the above setting is enabled, this sets how many columns and/or rows becomes available in the vault. This cannot extend beyond the capacity of the vault."
       },
       "FilterEditor": {
         "Title": "Item Piles Filters Editor",
@@ -319,24 +383,21 @@
         "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
         "Filters": "Filters",
         "Path": "Attribute path",
-        "AddNew": "Add new filter",
-        "Submit": "Submit filters"
+        "AddNew": "Add new filter"
       },
       "SimilaritiesEditor": {
         "Title": "Item Piles Similarities Editor",
         "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
         "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"system.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
         "Path": "Attribute path",
-        "AddNew": "Add new attribute path",
-        "Submit": "Submit item similarities"
+        "AddNew": "Add new attribute path"
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "Item Type Price Modifiers Editor",
         "TitleActor": "Item Type Price Modifiers Editor: {actor_name}",
         "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific item types. The \"Override\" setting means that it overrides the merchant's normal price modifiers.",
         "ItemType": "Item Type",
-        "Override": "Override",
-        "Submit": "Submit price modifiers"
+        "Override": "Override"
       },
       "PriceModifiersEditor": {
         "Title": "Item Piles Price Modifiers Editor",
@@ -344,8 +405,7 @@
         "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors. The \"Override\" setting means that it overrides the merchant's normal price modifiers, including item-type specific price modifiers.",
         "DragDrop": "Drag and drop an actor to add it to the list",
         "Actor": "Actor",
-        "Override": "Override",
-        "Submit": "Submit price modifiers"
+        "Override": "Override"
       },
       "ItemPileConfig": {
         "Title": "Item Pile Configuration: {actor_name}",
@@ -379,7 +439,9 @@
           "ConfigureOverrideItemFilters": "Configure Override Item Filters"
         },
         "Other": {
-          "Title": "Other Settings"
+          "Title": "Other Settings",
+          "Type": "Item Pile Type",
+          "TypeExplanation": "This configures the way this item pile will be displayed."
         },
         "SingleItem": {
           "Title": "Single Item Settings",
@@ -460,7 +522,34 @@
           "ActorPriceModifiers": "Per-Actor Override Price Modifiers",
           "ActorPriceModifiersExplanation": "Here you can configure if certain specific actors should have different price modifiers than the price modifiers above.",
           "ConfigureActorPriceModifiers": "Configure Actor Price Modifiers."
+        },
+        "Vault": {
+          "Title": "Vault Settings",
+          "Layout": "Layout",
+          "LayoutExplanation": "This is how many columns and rows should be visible in the vault.",
+          "Columns": "Columns",
+          "Rows": "Rows",
+          "EnableExpansion": "Enable Expansion Items",
+          "EnableExpansionExplanation": "With this enabled, items that are configured as vault expanders will expand the vault's available space.",
+          "BaseExpansion": "Base Expansion",
+          "BaseExpansionExplanation": "This is how many columns and rows are enabled by default without any expansion items.",
+          "Access": "Character & Player Access",
+          "AccessExplanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access.",
+          "ManageAccess": "Manage Access",
+          "LogVaultAccess": "Log Vault Access",
+          "LogVaultAccessExplanation": "When enabled, this vault will create a journal entry and create timestamped logs any time the vault is interacted with.",
+          "ClearVaultLog": "Clear Vault Logs",
+          "ClearVaultLogExplanation": "This will clear the vault logs, removing all entries. This cannot be undone.",
+          "LoggingFormat": "Logging Format",
+          "LoggingFormatExplanation": "This configures how the username and character name are displayed in the log.",
+          "LoggingFormatUserActor": "Display username and character name",
+          "LoggingFormatUser": "Display only username",
+          "LoggingFormatActor": "Display only character name"
         }
+      },
+      "VaultAccessEditor": {
+        "Title": "Vault Access Editor: {actor_name}",
+        "Explanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access."
       },
       "PricePresetEditor": {
         "Title": "Price Presets Editor",
@@ -483,7 +572,12 @@
       "SpectateDisabled": "Trade Concluded",
       "PrivateTrade": "Private Trade",
       "ExpandTrade": "View full trade details",
-      "MerchantTraded": "{name} bought the following things from {merchant}:"
+      "MerchantTraded": "{name} bought the following things from {merchant}:",
+      "GaveItems": "{source} gave some items to {target}:"
+    },
+    "VaultLog": {
+      "Withdraw": "{actor_name} ({user_name}) **withdrew** {item_name} x {quantity} ({date})",
+      "Deposit": "{actor_name} ({user_name}) *deposited* {item_name} x {quantity} ({date})"
     },
     "Settings": {
       "Configure": {
@@ -534,7 +628,7 @@
       },
       "EnableDroppingItems": {
         "Title": "Enable Dropping Items",
-        "Hint": "This enables users being able to drop items on the ground to create their own item piles - with this disabled, users cannot create new piles, nor add items to existing piles."
+        "Hint": "This enables users being able to drop items on the ground to create their own item piles - with this disabled, users cannot create new piles."
       },
       "EnableGivingItems": {
         "Title": "Enable Giving Items",

@@ -39,6 +39,7 @@
   - [item-piles-openItemPileInventory](#item-piles-openItemPileInventory)
   - [item-piles-preSplitItemPileContent](#item-piles-preSplitItemPileContent)
   - [item-piles-splitItemPileContent](#item-piles-splitItemPileContent)
+  - [item-piles-preClickItemPile](#item-piles-preClickItemPile)
 
 - [Items](#Items)
   - [item-piles-preDropItemDetermined](#item-piles-preDropItemDetermined)
@@ -55,10 +56,14 @@
   - [item-piles-preCalculateTradeItems](#item-piles-preCalculateTradeItems)
   - [item-piles-preTradeItems](#item-piles-preTradeItems)
   - [item-piles-tradeItems](#item-piles-tradeItems)
+  - [item-piles-preGiveItem](#item-piles-preGiveItem)
+  - [item-piles-giveItem](#item-piles-giveItem)
 
 - [Attributes](#Attributes)
   - [item-piles-preAddAttributes](#item-piles-preAddAttributes)
   - [item-piles-addAttributes](#item-piles-addAttributes)
+  - [item-piles-preSetAttributes](#item-piles-preSetAttributes)
+  - [item-piles-setAttributes](#item-piles-setAttributes)
   - [item-piles-preRemoveAttributes](#item-piles-preRemoveAttributes)
   - [item-piles-removeAttributes](#item-piles-removeAttributes)
   - [item-piles-preTransferAttributes](#item-piles-preTransferAttributes)
@@ -147,6 +152,8 @@ and merchants.
 | options       | <code>object</code>                      | An object containing options regarding how to render the application                            |
 | dialogOptions | <code>object</code>                      | An object containing settings how the SvelteApplication behaves (separate from the application) |
 
+If the hook returns `false`, the action is interrupted.
+
 ### item-piles-openInterface
 
 Called after an item piles related interface has been opened. The supported interfaces are the ones for regular item
@@ -171,6 +178,8 @@ Called before an item piles related interface is closed.
 | source        | <code>Actor/TokenDocument</code>         | The item pile actor                                               |
 | recipient     | <code>Actor/TokenDocument,Boolean</code> | The actor that was involved in opening the interface              |
 | options       | <code>object</code>                      | An object containing options regarding how to close the interface |
+
+If the hook returns `false`, the action is interrupted.
 
 ### item-piles-closeInterface
 
@@ -479,6 +488,19 @@ Called after the content of an item pile has been split.
 
 ---
 
+### item-piles-preClickItemPile
+
+Called before resolving a click on an item pile token
+
+| Param            | Type                            | Description                                                    |
+|------------------|---------------------------------|----------------------------------------------------------------|
+| target           | <code>TokenDocument</code> | The item pile token that was clicked                           |
+| interactingActor | <code>Actor</code>             | The actor of the user that interacted with the item pile token |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
 ## Items
 
 ### item-piles-preDropItemDetermined
@@ -669,6 +691,8 @@ Called before a trade between a merchant and an actor has been finalized.
 | userId        | <code>string</code>         | The ID of the user that initiated this action             |
 | interactionId | <code>string/boolean</code> | The ID of this interaction, to identify ongoing transfers |
 
+If the hook returns `false`, the action is interrupted.
+
 ---
 
 ### item-piles-tradeItems
@@ -683,6 +707,36 @@ Called before a trade between a merchant and an actor has been finalized.
 | buyerUpdates  | <code>object</code>         | An object containing the updates to apply to the buyer    |
 | userId        | <code>string</code>         | The ID of the user that initiated this action             |
 | interactionId | <code>string/boolean</code> | The ID of this interaction, to identify ongoing transfers |
+
+---
+
+### item-piles-preGiveItem
+
+Called before the user has sent the request to give an item to another user's actor.
+
+| Param        | Type                | Description                                                  |
+|--------------|---------------------|--------------------------------------------------------------|
+| source       | <code>Actor</code>  | The source actor that will give the item                     |
+| target       | <code>Actor</code>  | The target actor that will receive the item                  |
+| item         | <code>Object</code> | The item data to be given                                    |
+| sourceUserId | <code>string</code> | The ID of the user that initiated this action                |
+| targetUserId | <code>string</code> | The ID of the user that will receive the request |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-giveItem
+
+Called after a user gave an item to another user's actor.
+
+| Param         | Type                        | Description                                     |
+|---------------|-----------------------------|-------------------------------------------------|
+| source       | <code>Actor</code>  | The source actor that gave the item             |
+| target       | <code>Actor</code>  | The target actor that received the item         |
+| item         | <code>Object</code> | The item data that was given                    |
+| sourceUserId | <code>string</code> | The ID of the user that initiated this action   |
+| targetUserId | <code>string</code> | The ID of the user that accepted the given item |
 
 ---
 
@@ -709,6 +763,33 @@ Called after attributes on the target have been added to. Not called in the case
 | Param           | Type                             | Description                                                                                                     |
 |-----------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------|
 | target          | <code>Actor/TokenDocument</code> | The target whose attributes' values has been added to                                                           |
+| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
+| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                   |
+| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                       |
+
+---
+
+### item-piles-preSetAttributes
+
+Called before attributes on the target are set. Not called in the case of a transfer.
+
+| Param         | Type                             | Description                                                                                                                  |
+|---------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| target        | <code>Actor/TokenDocument</code> | The target whose attribute's value will be set                                                                               |
+| actorUpdates  | <code>object</code>              | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                    |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-setAttributes
+
+Called after attributes on the target have been set. Not called in the case of a transfer.
+
+| Param           | Type                             | Description                                                                                                     |
+|-----------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| target          | <code>Actor/TokenDocument</code> | The target whose attributes' values has been set                                                                |
 | attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
 | userId          | <code>string</code>              | The ID of the user that initiated this action                                                                   |
 | interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                       |

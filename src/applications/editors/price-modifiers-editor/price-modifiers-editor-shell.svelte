@@ -1,66 +1,66 @@
 <script>
-    import { getContext } from 'svelte';
-    import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-    import SliderInput from "../../components/SliderInput.svelte";
-    import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-    import { getUuid } from "../../../helpers/utilities.js";
+  import { getContext } from 'svelte';
+  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import SliderInput from "../../components/SliderInput.svelte";
+  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+  import { getUuid } from "../../../helpers/utilities.js";
 
-    const { application } = getContext('external');
+  const { application } = getContext('external');
 
-    let form;
+  let form;
 
-    export let priceModifiers;
-    export let elementRoot;
+  export let priceModifiers;
+  export let elementRoot;
 
-    function remove(index) {
-        priceModifiers.splice(index, 1)
-        priceModifiers = priceModifiers;
+  function remove(index) {
+    priceModifiers.splice(index, 1)
+    priceModifiers = priceModifiers;
+  }
+
+  async function updateSettings() {
+    priceModifiers.forEach(data => {
+      data.actorUuid = getUuid(data.actor);
+    })
+    application.options.resolve?.(priceModifiers);
+    application.close();
+  }
+
+  export function requestSubmit() {
+    form.requestSubmit();
+  }
+
+  async function dropData(event) {
+
+    event.preventDefault();
+
+    let data;
+    try {
+      data = JSON.parse(event.dataTransfer.getData('text/plain'));
+    } catch (err) {
+      return false;
     }
 
-    async function updateSettings() {
-        priceModifiers.forEach(data => {
-            data.actorUuid = getUuid(data.actor);
-        })
-        application.options.resolve?.(priceModifiers);
-        application.close();
-    }
+    if (data.type !== "Actor") return;
 
-    export function requestSubmit() {
-        form.requestSubmit();
-    }
+    const actor = await fromUuid(data.uuid);
 
-    async function dropData(event) {
+    if (!actor) return;
 
-        event.preventDefault();
+    if (priceModifiers.find(data => data.actor === actor)) return;
 
-        let data;
-        try {
-            data = JSON.parse(event.dataTransfer.getData('text/plain'));
-        } catch (err) {
-            return false;
-        }
+    priceModifiers.push({
+      override: false,
+      actor: actor,
+      buyPriceModifier: 1,
+      sellPriceModifier: 0.5
+    });
 
-        if (data.type !== "Actor") return;
+    priceModifiers = priceModifiers;
+  }
 
-        const actor = await fromUuid(data.uuid);
-
-        if (!actor) return;
-
-        if (priceModifiers.find(data => data.actor === actor)) return;
-
-        priceModifiers.push({
-            override: false,
-            actor: actor,
-            buyPriceModifier: 1,
-            sellPriceModifier: 0.5
-        });
-
-        priceModifiers = priceModifiers;
-    }
-
-    function preventDefault(event) {
-        event.preventDefault();
-    }
+  function preventDefault(event) {
+    event.preventDefault();
+  }
 
 </script>
 
@@ -119,7 +119,7 @@
 
     <footer>
       <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("ITEM-PILES.Applications.PriceModifiersEditor.Submit")}
+        <i class="far fa-save"></i> {localize("Save")}
       </button>
       <button type="button" on:click|once={() => { application.close(); }}>
         <i class="far fa-times"></i> { localize("Cancel") }

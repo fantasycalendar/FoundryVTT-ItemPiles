@@ -37,7 +37,7 @@ const SETTINGS = {
   SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
   PRECONFIGURED_SYSTEM: "preconfiguredSystem",
   SYSTEM_VERSION: "systemVersion",
-  MIGRATION_VERSION: "migrationVersion",
+  VAULT_LOG_JOURNAL_ID: "vaultLogJournalId",
 
   GET_DEFAULT() {
     return foundry.utils.deepClone(SETTINGS.DEFAULTS())
@@ -188,10 +188,10 @@ const SETTINGS = {
       type: Boolean
     },
 
-    [SETTINGS.MIGRATION_VERSION]: {
+    [SETTINGS.VAULT_LOG_JOURNAL_ID]: {
       scope: "world",
       config: false,
-      default: "0.0.0",
+      default: "",
       type: String
     },
 

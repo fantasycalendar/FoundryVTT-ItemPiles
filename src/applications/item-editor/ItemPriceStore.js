@@ -1,8 +1,8 @@
 import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 import { writable, get } from "svelte/store";
-import CONSTANTS from "../../../constants/constants.js";
-import * as PileUtilities from "../../../helpers/pile-utilities.js";
-import { getItemCost } from "../../../helpers/utilities.js";
+import CONSTANTS from "../../constants/constants.js";
+import * as PileUtilities from "../../helpers/pile-utilities.js";
+import { getItemCost } from "../../helpers/utilities.js";
 
 const existingStores = new Map();
 

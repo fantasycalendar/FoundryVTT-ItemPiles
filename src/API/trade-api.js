@@ -2,10 +2,10 @@ import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import { TradePromptDialog, TradeRequestDialog } from "../applications/trade-dialogs/trade-dialogs.js";
 
+import CONSTANTS from "../constants/constants.js";
 import ItemPileSocket from "../socket.js";
 import * as Helpers from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
-import HOOKS from "../constants/hooks.js";
 import TradeStore from "../applications/trading-app/trade-store.js";
 import TradingApp from "../applications/trading-app/trading-app.js";
 import Transaction from "../helpers/transaction.js";
@@ -62,7 +62,7 @@ export default class TradeAPI {
 
     if (!actor) return false;
 
-    actor = actor?.actor ?? actor;
+    actor = Utilities.getActor(actor);
 
     const actorOwner = game.users.find(user => user.character === actor && user !== game.user);
     if (actorOwner) {
@@ -129,25 +129,27 @@ export default class TradeAPI {
           return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.SameActor"), true);
         }
 
-        const store = new TradeStore({
+        const store = new TradeStore(game.user.id, {
           user: game.user, actor
         }, {
           user: game.users.get(userId), actor: traderActor
         }, data.fullPublicTradeId, data.fullPrivateTradeId, isPrivate);
 
-        const app = new TradingApp(store, this.getAppOptions(actor).tradeApp).render(true);
+        const [actorSheet, tradeApp] = Helpers.getApplicationPositions(actor.sheet);
+
+        const app = new TradingApp(store, tradeApp).render(true);
 
         ongoingTrades.set(data.fullPublicTradeId, { app, store });
 
-        actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
+        actor.sheet.render(true, actorSheet);
 
         if (isPrivate) {
-          return ItemPileSocket.callHookForUsers(HOOKS.TRADE.STARTED, [game.user.id, userId], {
+          return ItemPileSocket.callHookForUsers(CONSTANTS.HOOKS.TRADE.STARTED, [game.user.id, userId], {
             user: game.user.id, actor: actor.uuid
           }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
         }
 
-        return ItemPileSocket.callHook(HOOKS.TRADE.STARTED, {
+        return ItemPileSocket.callHook(CONSTANTS.HOOKS.TRADE.STARTED, {
           user: game.user.id, actor: actor.uuid
         }, { user: userId, actor: data.actorUuid }, data.fullPublicTradeId, isPrivate);
 
@@ -173,9 +175,7 @@ export default class TradeAPI {
     const fullPublicTradeId = publicTradeId + randomID();
 
     const tradingUser = game.users.get(tradingUserId);
-    let tradingActor = fromUuidSync(tradingActorUuid);
-
-    tradingActor = tradingActor?.actor ?? tradingActor;
+    const tradingActor = Utilities.getActor(tradingActorUuid);
 
     // Make em pick an actor (if more than one) and accept/decline/mute
     const result = await TradeRequestDialog.show({ tradeId: privateTradeId, tradingUser, tradingActor, isPrivate });
@@ -199,15 +199,19 @@ export default class TradeAPI {
       return "same-actor";
     }
 
-    const store = new TradeStore({ user: game.user, actor }, {
+    const store = new TradeStore(tradingUserId, {
+      user: game.user, actor
+    }, {
       user: tradingUser, actor: tradingActor
     }, fullPublicTradeId, fullPrivateTradeId, isPrivate);
 
-    const app = new TradingApp(store, this.getAppOptions(actor).tradeApp).render(true);
+    const [actorSheet, tradeApp] = Helpers.getApplicationPositions(actor.sheet);
+
+    const app = new TradingApp(store, tradeApp).render(true);
 
     ongoingTrades.set(fullPublicTradeId, { app, store });
 
-    actor.sheet.render(true, this.getAppOptions(actor).actorSheet);
+    actor.sheet.render(true, actorSheet);
 
     return {
       fullPrivateTradeId, fullPublicTradeId, actorUuid: result.uuid
@@ -439,6 +443,7 @@ export default class TradeAPI {
     await transaction.commit();
 
     if (trade.store.isPrivate) {
+      Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data[0], data[1], tradeId);
       trade.app.close({ callback: true });
       ongoingTrades.delete(tradeId);
     } else if (userId === game.user.id) {
@@ -449,10 +454,23 @@ export default class TradeAPI {
     }
   }
 
-  static async _tradeCompleted(tradeId, updates) {
+  static async _tradeCompleted(tradeId) {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;
-    Helpers.hooks.callAll(HOOKS.TRADE.COMPLETE, updates, tradeId)
+    const data = trade.store.export();
+    if (!trade.store.isPrivate) {
+      ItemPileSocket.executeForEveryone(
+        ItemPileSocket.HANDLERS.CALL_HOOK,
+        CONSTANTS.HOOKS.TRADE.COMPLETE,
+        trade.store.instigator,
+        data[0],
+        data[1],
+        tradeId,
+        trade.store.isPrivate
+      )
+    } else {
+      Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data[0], data[1], tradeId);
+    }
     trade.app.close({ callback: true });
     ongoingTrades.delete(tradeId);
   }

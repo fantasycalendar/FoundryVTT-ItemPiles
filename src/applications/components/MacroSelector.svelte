@@ -94,7 +94,7 @@
     {/each}
   </datalist>
   <i
-    title="Open Macro"
+    data-tooltip="Open Macro"
     style="margin-top: 5px; font-size: 1rem; flex:0;"
     class="fas fa-edit item-piles-clickable-link"
     on:click={() => openMacro()}

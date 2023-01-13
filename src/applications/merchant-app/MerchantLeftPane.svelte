@@ -8,7 +8,6 @@
   import { TJSProseMirror } from "@typhonjs-fvtt/svelte-standard/component";
 
   export let store;
-  export let activeTab;
 
   const merchantImg = store.img;
   const pileDataStore = store.pileData;

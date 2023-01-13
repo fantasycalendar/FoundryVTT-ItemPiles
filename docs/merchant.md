@@ -3,7 +3,7 @@
 As all piles created by Item Piles are actors, the module can show different UIs and behave differently depending on the
 configuration of the pile in question.
 
-By setting the actor to have "Is Merchant" enabled on its configuration:
+You can make a character into a merchant by setting the item pile type to Merchant:
 
 ![Image showing where to configure the merchant](images/merchant-config.png)
 

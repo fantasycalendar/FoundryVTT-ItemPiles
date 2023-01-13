@@ -3,6 +3,7 @@ import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
+import { getItemFlagData } from "./pile-utilities.js";
 
 export default class Transaction {
 
@@ -18,6 +19,7 @@ export default class Transaction {
     this.attributeTypeMap = new Map();
     this.itemDeltas = new Map();
     this.itemTypeMap = new Map();
+    this.itemFlagMap = new Map();
     this.preCommitted = false;
   }
 
@@ -25,13 +27,16 @@ export default class Transaction {
     for (let data of items) {
 
       let item = data.item ?? data;
+      let flags = data.flags ?? false;
       let itemData = item instanceof Item ? item.toObject() : foundry.utils.duplicate(item);
       if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
         itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
       }
       const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
-      const actorExistingItem = Utilities.findSimilarItem(this.actor.items, itemData);
-      const canItemStack = Utilities.canItemStack(actorExistingItem ?? itemData);
+      const actorExistingItem = remove && itemData._id
+        ? this.actor.items.get(itemData._id)
+        : Utilities.findSimilarItem(this.actor.items, itemData);
+      const canItemStack = Utilities.canItemStack(actorExistingItem || itemData);
 
       if (!canItemStack) {
 
@@ -86,20 +91,31 @@ export default class Transaction {
           this.itemTypeMap.set(itemData._id, type)
         }
       }
+
+      if (flags) {
+        this.itemFlagMap.set(itemData._id, flags);
+      }
     }
   }
 
-  async appendActorChanges(attributes, { remove = false, type = "attribute" } = {}) {
+  async appendActorChanges(attributes, { set = false, remove = false, type = "attribute" } = {}) {
     if (!Array.isArray(attributes)) {
       attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
     }
     this.actorUpdates = attributes.reduce((acc, attribute) => {
       const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
       acc[attribute.path] = acc[attribute.path] ?? Number(getProperty(this.actor, attribute.path));
-      acc[attribute.path] += incomingQuantity
-      this.attributeDeltas.set(attribute.path,
-        (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity
-      );
+      if (set) {
+        acc[attribute.path] = incomingQuantity
+        this.attributeDeltas.set(attribute.path,
+          (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : acc[attribute.path]) + incomingQuantity
+        );
+      } else {
+        acc[attribute.path] += incomingQuantity
+        this.attributeDeltas.set(attribute.path,
+          (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity
+        );
+      }
       this.attributeTypeMap.set(attribute.path, type)
       return acc;
     }, this.actorUpdates);
@@ -127,6 +143,11 @@ export default class Transaction {
 
     this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
       const item = this.actor.items.get(id).toObject();
+      const existingFlags = getItemFlagData(item);
+      setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(
+        existingFlags,
+        this.itemFlagMap.get(id) ?? {}
+      ));
       const type = this.itemTypeMap.get(id);
       Utilities.setItemQuantity(item, quantity, true);
       return { item, quantity, type };
@@ -159,9 +180,19 @@ export default class Transaction {
     let itemsCreated;
     const actorUuid = Utilities.getUuid(this.actor);
     if (this.actor.isOwner) {
-      itemsCreated = await PrivateAPI._commitActorChanges(actorUuid, this.actorUpdates, this.itemsToUpdate, this.itemsToDelete, this.itemsToCreate)
+      itemsCreated = await PrivateAPI._commitActorChanges(actorUuid, {
+        actorUpdates: this.actorUpdates,
+        itemsToUpdate: this.itemsToUpdate,
+        itemsToDelete: this.itemsToDelete,
+        itemsToCreate: this.itemsToCreate
+      })
     } else {
-      itemsCreated = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, actorUuid, this.actorUpdates, this.itemsToUpdate, this.itemsToDelete, this.itemsToCreate);
+      itemsCreated = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, actorUuid, {
+        actorUpdates: this.actorUpdates,
+        itemsToUpdate: this.itemsToUpdate,
+        itemsToDelete: this.itemsToDelete,
+        itemsToCreate: this.itemsToCreate
+      });
     }
 
     return {

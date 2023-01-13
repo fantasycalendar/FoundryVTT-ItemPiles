@@ -55,7 +55,7 @@
   async function resetSettings() {
 
     const doThing = await TJSDialog.confirm({
-      title: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
       content: {
         class: CustomDialog,
         props: {
@@ -246,8 +246,8 @@
   }
 
   .tab-body {
-    max-height: 715px;
-    min-height: 715px;
+    max-height: 729px;
+    min-height: 729px;
     overflow-y: scroll;
     padding: 5px;
   }

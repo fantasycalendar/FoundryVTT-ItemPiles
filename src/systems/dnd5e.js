@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": "1.0.2",
+  "VERSION": "1.0.3",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -9,13 +9,13 @@ export default {
   "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
 
   // The item price attribute is the path to the attribute on each item that determine how much it costs
-  "ITEM_PRICE_ATTRIBUTE": "system.price",
+  "ITEM_PRICE_ATTRIBUTE": "system.price.value",
 
   // Item filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "spell,feat,class,subclass"
+      "filters": "spell,feat,class,subclass,background"
     },
     {
       "path": "system.weaponType",
@@ -23,7 +23,8 @@ export default {
     }
   ],
 
-  "ITEM_TRANSFORMER": async (itemData, actor = false) => {
+  // This function is an optional system handler that specifically transforms an item when it is added to actors
+  "ITEM_TRANSFORMER": async (itemData) => {
     ["equipped", "proficient", "prepared"].forEach(key => {
       if (itemData?.system?.[key] !== undefined) {
         delete itemData.system[key];
@@ -38,6 +39,21 @@ export default {
       }
     }
     return itemData;
+  },
+
+  // This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
+  "ITEM_COST_TRANSFORMER": (item, currencies) => {
+    const overallCost = Number(getProperty(item, this.ITEM_PRICE_ATTRIBUTE)) ?? 0;
+    const priceDenomination = getProperty(item, "system.price.denomination");
+    if (priceDenomination) {
+      const currencyDenomination = currencies.find(currency => {
+        return currency.abbreviation.toLowerCase().includes(priceDenomination);
+      });
+      if (currencyDenomination) {
+        return overallCost * currencyDenomination.exchangeRate;
+      }
+    }
+    return overallCost;
   },
 
   // Item similarities determines how item piles detect similarities and differences in the system

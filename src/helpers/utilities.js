@@ -1,4 +1,5 @@
 import * as Helpers from "./helpers.js";
+import CONSTANTS from "../constants/constants.js";
 
 export function getActor(target) {
   if (target instanceof Actor) return target;
@@ -6,9 +7,13 @@ export function getActor(target) {
     target = fromUuidSync(target);
   }
   target = getDocument(target);
-  return target?.actor ?? target;
+  return target?.character ?? target?.actor ?? target;
 }
 
+/**
+ * @param documentUuid
+ * @returns {PlaceableObject|foundry.abstract.Document}
+ */
 export function getToken(documentUuid) {
   const document = fromUuidSync(documentUuid);
   return document instanceof TokenDocument ? document.object : document;
@@ -44,23 +49,45 @@ export function findSimilarItem(items, findItem) {
 
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 
-  const findItemId = findItem instanceof Item ? findItem.id : findItem._id;
+  const findItemData = findItem instanceof Item ? findItem.toObject() : findItem;
+  const findItemId = findItemData._id;
 
-  return items.find(item => {
-    const itemId = item instanceof Item ? item.id : item._id ?? item.id;
-    if (itemId && findItemId && itemId === findItemId) {
-      return true;
+  let hasUniqueKey = false;
+  for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
+    if (getProperty(findItemData, prop)) {
+      hasUniqueKey = true;
+      break;
     }
+  }
 
-    const itemData = item instanceof Item ? item.toObject() : item;
-    for (const path of itemSimilarities) {
-      if (getProperty(itemData, path) !== getProperty(findItem, path) || (!hasProperty(itemData, path) ^ !hasProperty(findItem, path))) {
+  return items
+    .filter(item => {
+      for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
+        if (getProperty(item, prop)) {
+          return false;
+        }
+      }
+      return true;
+    })
+    .find(item => {
+      const itemId = item instanceof Item ? item.id : item._id ?? item.id;
+      if (itemId && findItemId && itemId === findItemId) {
+        return true;
+      }
+
+      if (hasUniqueKey) {
         return false;
       }
-    }
 
-    return true;
-  });
+      const itemData = item instanceof Item ? item.toObject() : item;
+      for (const path of itemSimilarities) {
+        if (getProperty(itemData, path) !== getProperty(findItemData, path) || (!hasProperty(itemData, path) ^ !hasProperty(findItemData, path))) {
+          return false;
+        }
+      }
+
+      return itemSimilarities.length > 0;
+    });
 }
 
 export function setSimilarityProperties(obj, item) {
@@ -253,22 +280,36 @@ export async function runMacro(macroId, macroData) {
 
 }
 
-export function getUserCharacter() {
-
-  if (game.user.character) {
-    return game.user.character;
-  }
-
-  if (game.user.isGM) {
-    return false;
-  }
-
+export function getOwnedCharacters() {
   return game.actors.filter(actor => {
       return actor.ownership?.[game.user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER
         && actor.prototypeToken.actorLink;
     })
     .sort((a, b) => {
       return b._stats.modifiedTime - a._stats.modifiedTime;
-    })?.[0] ?? false;
+    });
+}
 
+export function getUserCharacter() {
+  return game.user.character
+    || (game.user.isGM ? false : (getOwnedCharacters()?.[0] ?? false));
+}
+
+export async function createFoldersFromNames(folders, type = "Actor") {
+  let lastFolder = false;
+  for (const folder of folders) {
+    let actualFolder = game.folders.getName(folder);
+    if (!actualFolder) {
+      const folderData = { name: folder, type, sorting: 'a' };
+      if (lastFolder) {
+        folderData.parent = lastFolder.id;
+      }
+      actualFolder = await Folder.create(folderData);
+    }
+    lastFolder = actualFolder;
+  }
+
+  if (lastFolder) {
+    return lastFolder;
+  }
 }
