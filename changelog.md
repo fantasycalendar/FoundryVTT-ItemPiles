@@ -2,6 +2,7 @@
 
 ## Version 2.4.1
 
+- Updated French localization (Thank you Padhiver and rectulo! You are legends!)
 - Fixed critical error when trying to create new item piles in the DnD5e system due to the system's new data validation
 - Fixed error when creating the first item pile
 - Fixed dropping items into vault from compendiums or the item sidebar wouldn't place the items the dropped slot
