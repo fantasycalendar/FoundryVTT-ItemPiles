@@ -10,8 +10,7 @@ import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
-import { timeSince } from "../helpers/helpers.js";
-import { getVaultGridData } from "../helpers/pile-utilities.js";
+import * as helpers from "../helpers/helpers.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -177,6 +176,8 @@ export class VaultStore extends ItemPileStore {
 
   updateGrid(items) {
 
+    if (!items.length) return;
+
     const itemsToUpdate = items.map(item => {
       const transform = get(item.transform);
       return {
@@ -186,13 +187,13 @@ export class VaultStore extends ItemPileStore {
       }
     });
 
-    if (!itemsToUpdate.length) return;
+    helpers.debug("itemsToUpdate", itemsToUpdate);
 
     const actorUuid = Utilities.getUuid(this.actor);
     if (this.actor.isOwner) {
       return PrivateAPI._commitActorChanges(actorUuid, {
         itemsToUpdate,
-      })
+      });
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, actorUuid, {
@@ -258,6 +259,12 @@ export class VaultStore extends ItemPileStore {
       });
     });
 
+    helpers.debug("grid", grid);
+
+    helpers.debug("existingItems", existingItems);
+
+    helpers.debug("allItems", allItems);
+
     const itemsToUpdate = allItems
       .map(item => {
         for (let x = 0; x < gridData.enabledCols; x++) {
@@ -302,12 +309,19 @@ export class VaultItem extends PileItem {
 
   setupSubscriptions() {
     super.setupSubscriptions();
+    let setup = false;
     this.subscribeTo(this.itemFlagData, (data) => {
+      if (setup) {
+        helpers.debug("itemFlagData", data);
+      }
       this.transform.set({
         x: data.x, y: data.y, w: data.width ?? 1, h: data.height ?? 1
       });
     });
     this.subscribeTo(this.transform, (transform) => {
+      if (setup) {
+        helpers.debug("transform", transform);
+      }
       this.x = transform.x;
       this.y = transform.y;
     });
@@ -317,6 +331,7 @@ export class VaultItem extends PileItem {
       this.store.refreshFreeSpaces();
       this.store.refreshGridDebounce();
     })
+    setup = true;
   }
 
   async take() {

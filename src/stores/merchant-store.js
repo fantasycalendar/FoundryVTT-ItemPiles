@@ -98,10 +98,12 @@ export default class MerchantStore extends ItemPileStore {
 
   updatePriceModifiers() {
     let pileData = get(this.pileData);
-    this.priceModifiersPerType.set(pileData.itemTypePriceModifiers.reduce((acc, priceData) => {
-      acc[priceData.type] = priceData;
-      return acc;
-    }, {}));
+    if (pileData.itemTypePriceModifiers) {
+      this.priceModifiersPerType.set((pileData.itemTypePriceModifiers ?? {}).reduce((acc, priceData) => {
+        acc[priceData.type] = priceData;
+        return acc;
+      }, {}));
+    }
     if (this.recipient && pileData.actorPriceModifiers) {
       const actorSpecificModifiers = pileData.actorPriceModifiers?.find(data => data.actorUuid === this.recipientUuid);
       if (actorSpecificModifiers) {

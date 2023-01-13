@@ -69,7 +69,6 @@ const migrations = {
               && !t.actorLink
               && t.actor;
           } catch (err) {
-            console.log(t.id + " error on scene " + scene.id + "!", err);
             return false;
           }
         })
@@ -78,19 +77,25 @@ const migrations = {
 
     for (const [sceneId, tokens] of tokensOnScenes) {
       const scene = game.scenes.get(sceneId)
-      const updates = tokens.map(token => {
-        const flagData = {
-          [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(token.actor)),
-          [CONSTANTS.FLAGS.VERSION]: version,
-        }
-        return {
-          _id: token.id,
-          ...flagData,
-          actorData: {
-            ...flagData
+      const updates = [];
+      for (const token of tokens) {
+        try {
+          const flagData = {
+            [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(token.actor)),
+            [CONSTANTS.FLAGS.VERSION]: version,
           }
-        };
-      });
+          updates.push({
+            _id: token.id,
+            ...flagData,
+            actorData: {
+              ...flagData
+            }
+          });
+        } catch (err) {
+          ui.notifications.warn(`Item Piles | Corrupted token detected: token with ID ${token.id} on scene ${scene.name}!`);
+          console.error(err);
+        }
+      }
       console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
       await scene.updateEmbeddedDocuments("Token", updates);
     }

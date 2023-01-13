@@ -15,6 +15,7 @@ import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
+import { createFoldersFromNames } from "../helpers/utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -994,21 +995,9 @@ export default class PrivateAPI {
       };
 
       if (folders) {
-        let lastFolder = false
-        for (const folder of folders) {
-          let actualFolder = game.folders.getName(folder);
-          if (!actualFolder) {
-            const folderData = { name: folder, type: "Actor", sorting: 'a' };
-            if (lastFolder) {
-              folderData.parent = lastFolder.id;
-            }
-            actualFolder = await Folder.create(folderData);
-          }
-          lastFolder = actualFolder;
-        }
-
-        if (lastFolder) {
-          actorData.folder = lastFolder.id;
+        const folder = await Utilities.createFoldersFromNames(folders);
+        if (folder) {
+          actorData.folder = folder.id;
         }
       }
 
@@ -1059,8 +1048,8 @@ export default class PrivateAPI {
           img: "icons/svg/item-bag.svg"
         };
 
-        if (folder) {
-          folder = game.folders.get(folder) || game.folders.getName(folder);
+        if (folders) {
+          const folder = await Utilities.createFoldersFromNames(folders);
           if (folder) {
             actorData.folder = folder.id;
           }
@@ -1096,6 +1085,23 @@ export default class PrivateAPI {
 
     }
 
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        let itemData = items[i]?.item ?? items[i];
+        itemData = await Item.implementation.create(itemData, { temporary: true });
+        itemData = itemData.toObject();
+        if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
+          items[i] = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
+        }
+      }
+    } else {
+      items = []
+    }
+
+    items = items ? items.map(item => {
+      return item.item ?? item;
+    }) : [];
+
     if (position && sceneId) {
 
       let overrideData = { ...position, ...tokenOverrides };
@@ -1106,24 +1112,7 @@ export default class PrivateAPI {
 
       if (!pileActor.prototypeToken.actorLink) {
 
-        if (items) {
-          for (let i = 0; i < items.length; i++) {
-            const itemData = items[i]?.item ?? items[i];
-            if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-              items[i] = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
-            }
-          }
-        } else {
-          items = []
-        }
-
-        items = items ? items.map(item => {
-          return item.item ?? item;
-        }) : [];
-
-        overrideData['actorData'] = {
-          items: items, ...actorOverrides
-        }
+        overrideData['actorData'] = actorOverrides;
 
         const data = { data: pileData, items: items };
 
@@ -1144,7 +1133,17 @@ export default class PrivateAPI {
 
       const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
 
+      if (items.length && !pileActor.prototypeToken.actorLink) {
+        await tokenDocument.actor.createEmbeddedDocuments("Item", items);
+      }
+
       returns["tokenUuid"] = Utilities.getUuid(tokenDocument);
+
+    } else if (pileActor.prototypeToken.actorLink) {
+
+      if (items.length && !pileActor.prototypeToken.actorLink) {
+        await pileActor.createEmbeddedDocuments("Item", items);
+      }
 
     }
 

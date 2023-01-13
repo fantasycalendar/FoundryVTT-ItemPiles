@@ -294,3 +294,22 @@ export function getUserCharacter() {
   return game.user.character
     || (game.user.isGM ? false : (getOwnedCharacters()?.[0] ?? false));
 }
+
+export async function createFoldersFromNames(folders, type = "Actor") {
+  let lastFolder = false;
+  for (const folder of folders) {
+    let actualFolder = game.folders.getName(folder);
+    if (!actualFolder) {
+      const folderData = { name: folder, type, sorting: 'a' };
+      if (lastFolder) {
+        folderData.parent = lastFolder.id;
+      }
+      actualFolder = await Folder.create(folderData);
+    }
+    lastFolder = actualFolder;
+  }
+
+  if (lastFolder) {
+    return lastFolder;
+  }
+}

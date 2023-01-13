@@ -174,6 +174,8 @@
 
     }
 
+    console.log("finalTransform", finalTransform.x, finalTransform.y)
+
     transformStore.update(trans => {
       trans.x = finalTransform.x;
       trans.y = finalTransform.y;

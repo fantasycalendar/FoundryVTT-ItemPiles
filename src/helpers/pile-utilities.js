@@ -40,7 +40,8 @@ export function getItemFlagData(item, data = false) {
 }
 
 export function getActorFlagData(target, data = false) {
-  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS), data);
+  const actor = Utilities.getActor(target);
+  return migrateFlagData(actor, getFlagData(actor, CONSTANTS.FLAGS.PILE, foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS), data));
 }
 
 export function isValidItemPile(target, data = false) {
@@ -768,6 +769,9 @@ export function getPriceData({
   let itemCost = Utilities.getItemCost(item);
   if (SYSTEMS.DATA.ITEM_COST_TRANSFORMER) {
     overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, currencyList);
+    if (overallCost === false) {
+      Helpers.debug("failed to find price for item:", item)
+    }
   } else if (typeof itemCost === "string" && isNaN(Number(itemCost))) {
     overallCost = getPriceFromString(itemCost, currencyList).overallCost;
   } else {

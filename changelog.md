@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 2.4.1
+
+- Fixed critical error when trying to create new item piles in the DnD5e system due to the system's new data validation
+- Fixed error when creating the first item pile
+- Fixed dropping items into vault from compendiums or the item sidebar wouldn't place the items the dropped slot
+- Fixed PF2e prices sometimes not loading correctly
+- Tweaked migration code to not fall over as easily
+
 ## Version 2.4.0
 
 - Added vault type item piles - these item piles act like the Diablo stash or the World of Warcraft banking system, where you have a set amount of grid slots that you can put items into

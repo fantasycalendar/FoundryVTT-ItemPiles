@@ -12,7 +12,9 @@
 </script>
 
 <div class="grid-item" data-tooltip={$name} data-tooltip-activation-speed="0" data-tooltip-deactivation-speed="0">
-  <img src={$img} alt={$name}/>
+  {#if $img}
+    <img src={$img} alt={$name}/>
+  {/if}
   {#if canStack && $quantity > 1}
     <span>{$quantity}</span>
   {/if}

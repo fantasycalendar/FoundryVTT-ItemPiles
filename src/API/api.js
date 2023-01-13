@@ -829,8 +829,14 @@ class API {
         item = itemData.toObject();
       } else if (itemData.item instanceof Item) {
         item = itemData.item.toObject();
+        if (itemData.flags) {
+          setProperty(item, CONSTANTS.FLAGS.ITEM, getProperty(itemData, CONSTANTS.FLAGS.ITEM));
+        }
       } else if (itemData.item) {
         item = itemData.item;
+        if (itemData.flags) {
+          setProperty(item, CONSTANTS.FLAGS.ITEM, getProperty(itemData, CONSTANTS.FLAGS.ITEM));
+        }
       }
 
       if (itemData?.quantity !== undefined) {
