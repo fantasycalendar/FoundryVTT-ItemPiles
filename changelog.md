@@ -1,6 +1,6 @@
 # Item Piles Changelog
 
-## Version 2.4.5
+## Version 2.4.4
 
 - Fixed not being able to purchase items from merchants
 - Fixed users not being prompted with a dialog to drop items (holding when dropping alt will skip dialog)
