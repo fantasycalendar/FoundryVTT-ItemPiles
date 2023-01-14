@@ -3,7 +3,7 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import SliderInput from "../../components/SliderInput.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { getUuid } from "../../../helpers/utilities.js";
+  import { getSourceActorFromDropData, getUuid } from "../../../helpers/utilities.js";
 
   const { application } = getContext('external');
 
@@ -42,7 +42,7 @@
 
     if (data.type !== "Actor") return;
 
-    const actor = await fromUuid(data.uuid);
+    const actor = getSourceActorFromDropData(data);
 
     if (!actor) return;
 

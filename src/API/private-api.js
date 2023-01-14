@@ -15,7 +15,7 @@ import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
-import { createFoldersFromNames } from "../helpers/utilities.js";
+import { createFoldersFromNames, getActorFromDropData, getSourceActorFromDropData } from "../helpers/utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -1505,7 +1505,7 @@ export default class PrivateAPI {
       position: false
     };
 
-    dropData.source = item.parent;
+    dropData.source = Utilities.getSourceActorFromDropData(data);
 
     if (!dropData.source && !game.user.isGM) {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)
@@ -1666,6 +1666,8 @@ export default class PrivateAPI {
   }
 
   static async _dropItem(dropData) {
+
+    debugger;
 
     const sourceActor = Utilities.getActor(dropData.source);
     const targetActor = Utilities.getActor(dropData.target);

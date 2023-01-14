@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.4.2
+
+- Fixed issues with retrieving the source actor from drop data in certain systems (OSE, for example)
+- Fixed merchants not saving tables that were assigned to them
+- Fixed merchants not retrieving correct item prices in DnD5e
+
 ## Version 2.4.1
 
 - Added support for the Star Wars 5th Edition system (thank you bollwyvl!)

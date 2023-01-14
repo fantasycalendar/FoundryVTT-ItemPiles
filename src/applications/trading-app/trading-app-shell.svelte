@@ -33,7 +33,7 @@
 
     let item = await Item.implementation.fromDropData(data);
 
-    data.actorId = item.parent?.id;
+    data.actorId = Utilities.getSourceActorFromDropData(data)?.id;
 
     if (!data.actorId && !game.user.isGM) {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.NoSourceDrop"), true)

@@ -1,6 +1,7 @@
 <script>
 
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import { getSourceActorFromDropData } from "../../helpers/utilities.js";
 
   export let actor;
   export let actors;
@@ -23,7 +24,7 @@
       return false;
     }
     if (data.type !== "Actor") return;
-    actor = await fromUuid(data.uuid);
+    actor = getSourceActorFromDropData(data);
   }
 
   let counter = 0;

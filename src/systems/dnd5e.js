@@ -43,7 +43,7 @@ export default {
 
   // This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
   "ITEM_COST_TRANSFORMER": (item, currencies) => {
-    const overallCost = Number(getProperty(item, this.ITEM_PRICE_ATTRIBUTE)) ?? 0;
+    const overallCost = Number(getProperty(item, "system.price.value")) ?? 0;
     const priceDenomination = getProperty(item, "system.price.denomination");
     if (priceDenomination) {
       const currencyDenomination = currencies.find(currency => {
@@ -53,7 +53,7 @@ export default {
         return overallCost * currencyDenomination.exchangeRate;
       }
     }
-    return overallCost;
+    return overallCost ?? 0;
   },
 
   // Item similarities determines how item piles detect similarities and differences in the system

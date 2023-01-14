@@ -313,3 +313,15 @@ export async function createFoldersFromNames(folders, type = "Actor") {
     return lastFolder;
   }
 }
+
+
+export function getSourceActorFromDropData(dropData) {
+  if (dropData.uuid) {
+    return fromUuidSync(dropData.uuid).parent;
+  } else if (dropData.actorId) {
+    return game.actors.get(dropData.actorId);
+  } else if (dropData.tokenId) {
+    return canvas.tokens.get(dropData.tokenId).actor;
+  }
+  return false;
+}
