@@ -26,7 +26,7 @@ export default {
   "ITEM_COST_TRANSFORMER": (item) => {
     const itemCost = getProperty(item, "system.price");
     const { copperValue } = new game.pf2e.Coins(itemCost?.value ?? {});
-    return copperValue / 100 / (itemCost.per ?? 1);
+    return copperValue / 100 / (itemCost?.per ?? 1);
   },
 
   // Currencies in item piles is a versatile system that can accept actor attributes (a number field on the actor's sheet) or items (actual items in their inventory)

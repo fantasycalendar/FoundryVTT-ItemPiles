@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.4.5
+
+- Fixed not being able to purchase items from merchants
+- Fixed users not being prompted with a dialog to drop items (holding when dropping alt will skip dialog)
+- Fixed error that would sometimes pop up when users drop items to create new piles
+
 ## Version 2.4.3
 
 - Removed stray debugger because I am a hot mess

@@ -44,7 +44,7 @@ export default class DropItemDialog extends SvelteApplication {
   }
 
   static async show(item, target, options = {
-    "application": "DropItem"
+    localizationTitle: "DropItem"
   }) {
     const apps = this.getActiveApps(item.id + (target ? "-" + target.id : ""));
     if (apps.length) {

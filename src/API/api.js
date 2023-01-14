@@ -1737,7 +1737,7 @@ class API {
       }
 
       const itemPrices = PileUtilities.getPriceData({
-        items: actorItem, seller: sellerActor, buyer: buyerActor, quantity: data.quantity
+        item: actorItem, seller: sellerActor, buyer: buyerActor, quantity: data.quantity
       });
       if (itemPrices.length) {
         if (data.paymentIndex >= itemPrices.length || data.paymentIndex < 0) {

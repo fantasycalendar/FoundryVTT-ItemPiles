@@ -1,4 +1,5 @@
 import CONSTANTS from "../constants/constants.js";
+import ItemPileSocket from "../socket.js";
 
 export const debounceManager = {
 
@@ -21,9 +22,9 @@ export const hooks = {
   _hooks: {},
 
   async runWithout(callback) {
-    this.run = false;
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TOGGLE_HOOKS, false);
     await callback();
-    this.run = true;
+    await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TOGGLE_HOOKS, true);
   },
 
   call(hook, ...args) {

@@ -15,6 +15,7 @@ export default class ItemPileSocket {
      * Generic sockets
      */
     CALL_HOOK: "callHook",
+    TOGGLE_HOOKS: "toggleHooks",
 
     /**
      * Chat messages
@@ -93,6 +94,10 @@ export default class ItemPileSocket {
 
   static BINDINGS = {
     [this.HANDLERS.CALL_HOOK]: (hook, response, ...args) => callHook(hook, response, ...args),
+
+    [this.HANDLERS.TOGGLE_HOOKS]: (toggle) => {
+      Helpers.hooks.run = toggle;
+    },
 
     [this.HANDLERS.DROP_ITEMS]: (args) => PrivateAPI._dropItems(args),
     [this.HANDLERS.GIVE_ITEMS]: (...args) => PrivateAPI._giveItems(...args),

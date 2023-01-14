@@ -15,7 +15,6 @@ import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
-import { createFoldersFromNames, getActorFromDropData, getSourceActorFromDropData } from "../helpers/utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -1134,7 +1133,9 @@ export default class PrivateAPI {
       const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
 
       if (items.length && !pileActor.prototypeToken.actorLink) {
-        await tokenDocument.actor.createEmbeddedDocuments("Item", items);
+        await Helpers.hooks.runWithout(async () => {
+          await tokenDocument.actor.createEmbeddedDocuments("Item", items);
+        });
       }
 
       returns["tokenUuid"] = Utilities.getUuid(tokenDocument);
@@ -1142,7 +1143,9 @@ export default class PrivateAPI {
     } else if (pileActor.prototypeToken.actorLink) {
 
       if (items.length && !pileActor.prototypeToken.actorLink) {
-        await pileActor.createEmbeddedDocuments("Item", items);
+        await Helpers.hooks.runWithout(async () => {
+          await tokenDocument.actor.createEmbeddedDocuments("Item", items);
+        });
       }
 
     }
@@ -1714,7 +1717,7 @@ export default class PrivateAPI {
 
         let quantity = Utilities.getItemQuantity(dropData.itemData.item);
 
-        if (quantity > 1) {
+        if (dropData.source) {
           const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
           quantity = await DropItemDialog.show(item, dropData.target);
           if (!quantity) return;
