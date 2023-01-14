@@ -1667,8 +1667,6 @@ export default class PrivateAPI {
 
   static async _dropItem(dropData) {
 
-    debugger;
-
     const sourceActor = Utilities.getActor(dropData.source);
     const targetActor = Utilities.getActor(dropData.target);
     if (sourceActor === targetActor) return;
