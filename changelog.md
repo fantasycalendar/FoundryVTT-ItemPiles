@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.4.3
+
+- Removed stray debugger because I am a hot mess
+
 ## Version 2.4.2
 
 - Fixed issues with retrieving the source actor from drop data in certain systems (OSE, for example)
