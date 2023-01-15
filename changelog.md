@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.4.5
+
+- Additional fixes for actors with broken items in DnD5e breaking scenes (thanks dev7355608!)
+
 ## Version 2.4.4
 
 - Fixed not being able to purchase items from merchants
