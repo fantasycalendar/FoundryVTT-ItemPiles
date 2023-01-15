@@ -1,6 +1,7 @@
 import CONSTANTS from "./constants/constants.js";
-import { custom_warning } from "./helpers/helpers.js";
+import { custom_warning, getSetting } from "./helpers/helpers.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
+import SETTINGS from "./constants/settings.js";
 
 let oldSettings;
 
@@ -58,49 +59,103 @@ const migrations = {
 
     await Actor.updateDocuments(actorUpdates);
 
-    const tokensOnScenes = Array.from(game.scenes)
+    const allTokensOnScenes = Array.from(game.scenes)
       .map(scene => ([
         scene.id,
-        Array.from(scene.tokens).filter(t => {
-          const actorFlagVersion = getProperty(t, CONSTANTS.FLAGS.VERSION) || "1.0.0";
-          try {
-            return getProperty(t, CONSTANTS.FLAGS.PILE)
-              && isNewerVersion(version, actorFlagVersion)
-              && !t.actorLink
-              && t.actor;
-          } catch (err) {
-            return false;
-          }
-        })
+        Array.from(scene.tokens).filter(t => getProperty(t, CONSTANTS.FLAGS.PILE) && !t.actorLink)
       ]))
       .filter(scene => scene[1].length)
 
-    for (const [sceneId, tokens] of tokensOnScenes) {
+    const validTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [
+      scene,
+      tokens.filter(token => {
+        try {
+          const actorFlagVersion = getProperty(token, CONSTANTS.FLAGS.VERSION) || "1.0.0";
+          return token.actor && isNewerVersion(version, actorFlagVersion);
+        } catch (err) {
+          return false;
+        }
+      })
+    ]).filter(scene => scene[1].length)
+
+    for (const [sceneId, tokens] of validTokensOnScenes) {
       const scene = game.scenes.get(sceneId)
       const updates = [];
       for (const token of tokens) {
-        try {
-          const flagData = {
-            [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(token.actor)),
-            [CONSTANTS.FLAGS.VERSION]: version,
-          }
-          updates.push({
-            _id: token.id,
-            ...flagData,
-            actorData: {
-              ...flagData
-            }
-          });
-        } catch (err) {
-          ui.notifications.warn(`Item Piles | Corrupted token detected: token with ID ${token.id} on scene ${scene.name}!`);
-          console.log(`"Item Piles | You can run "fromUuidSync("${token.uuid}").delete()" to remove the faulty token`);
-          console.error(err);
+        const flagData = {
+          [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(token.actor)),
+          [CONSTANTS.FLAGS.VERSION]: version,
         }
+        updates.push({
+          _id: token.id,
+          ...flagData,
+          actorData: {
+            ...flagData
+          }
+        });
       }
       console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
       await scene.updateEmbeddedDocuments("Token", updates);
     }
 
-  }
+    const invalidTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [
+      scene,
+      tokens.filter(token => {
+        try {
+          const actorFlagVersion = getProperty(token, CONSTANTS.FLAGS.VERSION) || "1.0.0";
+          return !token.actor || isNewerVersion(version, actorFlagVersion);
+        } catch (err) {
+          return true;
+        }
+      })
+    ]).filter(scene => scene[1].length)
 
+    for (const [sceneId, tokens] of invalidTokensOnScenes) {
+
+      const scene = game.scenes.get(sceneId);
+
+      let updates = [];
+      for (const token of tokens) {
+
+        const flagData = {
+          [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(PileUtilities.migrateFlagData(token)),
+          [CONSTANTS.FLAGS.VERSION]: version,
+        }
+
+        const update = {
+          _id: token.id,
+          actorLink: false,
+          actorId: game.actors.get(token.actorId) ? token.actorId : getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID),
+          actorData: {
+            ...flagData,
+            items: []
+          },
+          ...flagData
+        }
+
+        for (let itemData of token.actorData?.items ?? []) {
+          const item = await Item.implementation.create(itemData, { temporary: true });
+          update.actorData.items.push(item.toObject());
+        }
+
+        updates.push(update);
+
+        await token.update({
+          actorLink: true
+        });
+      }
+
+      await scene.updateEmbeddedDocuments("Token", updates);
+
+      console.log(`Item Piles | Fixing ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
+
+    }
+
+    if (invalidTokensOnScenes.length && invalidTokensOnScenes.some(([sceneId]) => sceneId === game.user.viewedScene)) {
+      ui.notifications.notify("Item Piles | Fixed some broken tokens on various scenes, refreshing...")
+      setTimeout(() => {
+        foundry.utils.debouncedReload();
+      }, 1250);
+    }
+  }
 };
