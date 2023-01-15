@@ -172,6 +172,7 @@
                    disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
+          <SettingButton bind:data="{settings[SETTINGS.VAULT_STYLES]}"/>
         </div>
       {/if}
 

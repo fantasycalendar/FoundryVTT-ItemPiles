@@ -127,18 +127,18 @@
   $: {
     tabs = [
       {
-        value: "mainsettings",
+        value: "main",
         label: "ITEM-PILES.Applications.ItemPileConfig.Main.Title",
         highlight: !$pileEnabled
       },
       {
-        value: "othersettings",
+        value: "other",
         label: "ITEM-PILES.Applications.ItemPileConfig.Other.Title"
       }
     ]
   }
 
-  let activeTab = "mainsettings";
+  let activeTab = "other";
 
   const customTypes = Object.keys(CONSTANTS.CUSTOM_PILE_TYPES);
 
@@ -157,13 +157,13 @@
 
       <div class="tab">
 
-        {#if activeTab === 'mainsettings'}
+        {#if activeTab === 'main'}
 
           <MainSettings bind:pileData {pileActor} {pileEnabled}/>
 
         {/if}
 
-        {#if activeTab === "othersettings"}
+        {#if activeTab === "other"}
 
           <div class="form-group">
             <label style="flex:4;">

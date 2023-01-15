@@ -118,5 +118,15 @@ export default {
       primary: false,
       exchangeRate: 0.01
     }
+  ],
+
+  VAULT_STYLES: [
+    {
+      path: "system.rarity",
+      value: "rare",
+      styling: {
+        "box-shadow": "inset 0px 0px 15px 0px rgba(255,0,247,1)"
+      }
+    }
   ]
 }

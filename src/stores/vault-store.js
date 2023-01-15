@@ -11,6 +11,7 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as helpers from "../helpers/helpers.js";
+import { SYSTEMS } from "../systems.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -305,11 +306,19 @@ export class VaultItem extends PileItem {
     });
     this.x = 0;
     this.y = 0;
+    this.style = writable({});
   }
 
   setupSubscriptions() {
     super.setupSubscriptions();
     let setup = false;
+    this.subscribeTo(this.itemDocument, () => {
+      this.style.set(SYSTEMS.DATA?.VAULT_STYLES ? SYSTEMS.DATA?.VAULT_STYLES.filter(style => {
+        return getProperty(this.item, style.path) === style.value;
+      }).reduce((acc, style) => {
+        return foundry.utils.mergeObject(acc, style.styling);
+      }, {}) : {});
+    });
     this.subscribeTo(this.itemFlagData, (data) => {
       if (setup) {
         helpers.debug("itemFlagData", data);

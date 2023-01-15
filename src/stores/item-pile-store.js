@@ -163,14 +163,27 @@ export default class ItemPileStore {
     }
   }
 
+  static notifyAllOfChanges(event, ...args) {
+    for (const store of __STORES__.values()) {
+      if (store[event]) {
+        store[event](...args);
+      }
+    }
+  }
+
+  visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
+    const itemFlagData = entry.itemFlagData ? get(entry.itemFlagData) : {};
+    return !entry.isCurrency
+      && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden);
+  }
+
   refreshItems() {
     const allItems = get(this.allItems);
-    const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, get(this.pileData));
+    const pileData = get(this.pileData);
+    const recipientPileData = this.recipient ? PileUtilities.isItemPileMerchant(this.recipient) : {}
+    const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
 
-    const visibleItems = allItems.filter(entry => {
-      const itemFlagData = entry.itemFlagData ? get(entry.itemFlagData) : {};
-      return !entry.isCurrency && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden);
-    });
+    const visibleItems = allItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
     const itemCurrencies = allItems.filter(entry => entry.isCurrency);
 
     this.visibleItems.set(visibleItems);

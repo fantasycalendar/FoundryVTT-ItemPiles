@@ -392,6 +392,14 @@
         "Path": "Attribute path",
         "AddNew": "Add new attribute path"
       },
+      "VaultStylesEditor": {
+        "Title": "Item Piles Vault Styles Editor",
+        "Explanation": "Here you can define multiple styles for items in vaults. For example, you can make a style look at \"system.rarity\" to be \"rare\", and apply a style onto to items that matches the setup.",
+        "Path": "Attribute path",
+        "Value": "Matching Value",
+        "Style": "Configure Style",
+        "AddNew": "Add new style rule"
+      },
       "ItemTypePriceModifiersEditor": {
         "Title": "Item Type Price Modifiers Editor",
         "TitleActor": "Item Type Price Modifiers Editor: {actor_name}",
@@ -503,8 +511,10 @@
           "PurchaseOnlyExplanation": "When enabled, characters cannot sell items to this merchant.",
           "HideNewItems": "Hide New Items",
           "HideNewItemsExplanation": "When enabled, any items sold to this merchant will be hidden.",
-          "OnyAcceptBasePrice": "Only Accept Base Price",
-          "OnyAcceptBasePriceExplanation": "When enabled, all items sold to this merchant must use the base price, and not any custom prices.",
+          "HideItemsWithZeroCost": "Hide Items With Zero Cost",
+          "HideItemsWithZeroCostExplanation": "When enabled, this makes it so that customers cannot buy or sell items that have a cost of zero (free).",
+          "OnlyAcceptBasePrice": "Only Accept Base Price",
+          "OnlyAcceptBasePriceExplanation": "When enabled, all items sold to this merchant must use the base price, and not any custom prices.",
           "OpenTimes": "Open Times",
           "OpenTimesExplanation": "When enabled, the merchant is can only be interacted by players at certain times of the day.",
           "OpenStatus": "Open Status",
@@ -512,6 +522,10 @@
           "OpenStatusOpen": "Open",
           "OpenStatusClosed": "Closed",
           "OpenStatusAuto": "Automatic (Simple Calendar)",
+          "ClosedDays": "Closed Days (Simple Calendar)",
+          "ClosedDaysExplanation": "On the days checked, the merchant will be closed (if the merchant open status is set to automatic).",
+          "ClosedHolidays": "Closed Holidays (Simple Calendar)",
+          "ClosedHolidaysExplanation": "On days where there are notes with the given note category, the merchant will be closed (if the merchant open status is set to automatic).",
           "PriceModifierTitle": "Buy and Sell Price Modifiers",
           "PriceModifierExplanation": "This configures the modifiers for the cost of every item in the shop. You can also configure modifiers per item type, and even for specific characters (such as silver-tongued bards). You are not limited to 200%, type into the field to go even higher.",
           "BuyPriceModifier": "Buy Price Modifier (%)",
@@ -619,7 +633,12 @@
       "ItemSimilarities": {
         "Title": "Item Similarities",
         "Label": "Configure Item Similarities",
-        "Hint": "Here you can configure what how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
+        "Hint": "Here you can configure how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
+      },
+      "VaultStyles": {
+        "Title": "Vault Styles",
+        "Label": "Configure Vault Styles",
+        "Hint": "This allows you to add rules that will style items based on property paths and values on the items themselves."
       },
       "PricePresets": {
         "Title": "Price Presets",

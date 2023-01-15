@@ -15,6 +15,8 @@ import runMigrations from "./migrations.js"
 
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 import ItemEditor from "./applications/item-editor/item-editor.js";
+import setupPlugins from "./plugins/main.js";
+import SettingsShim from "./applications/settings-app/settings-app.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
@@ -55,10 +57,6 @@ Hooks.once("ready", () => {
         if (game.modules.get('socketlib')) word = "activate";
         throw Helpers.custom_error(`Item Piles requires the 'socketlib' module. Please ${word} it.`)
       }
-
-      if (game.modules.get('foundryvtt-simple-calendar')?.active && game.modules.get("foundryvtt-simple-calendar").version === "v1.3.75") {
-        throw Helpers.custom_error("Simple Calendar version 1.3.75 is installed, but Item Piles requires version 2.0.0 or above. The author made a mistake, and you will need to reinstall the Simple Calendar module.")
-      }
     }
 
     if (!Helpers.isGMConnected()) {
@@ -70,6 +68,7 @@ Hooks.once("ready", () => {
     TradeAPI.initialize();
     ChatAPI.initialize();
 
+    setupPlugins();
     registerHotkeysPost();
 
     ChatAPI.disablePastTradingButtons();
@@ -87,6 +86,8 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
       await patchCurrencySettings();
       await runMigrations();
     }
+    //game.itempiles.API.renderItemPileInterface(game.actors.getName("Test"));
+    //new SettingsShim().render(true);
     applySystemSpecificStyles();
   }, 500);
 });

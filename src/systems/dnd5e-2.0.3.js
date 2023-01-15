@@ -105,5 +105,43 @@ export default {
       primary: false,
       exchangeRate: 0.01
     }
+  ],
+
+  VAULT_STYLES: [
+    {
+      path: "system.rarity",
+      value: "artifact",
+      styling: {
+        "box-shadow": "inset 0px 0px 7px 0px rgba(255,191,0,1)"
+      }
+    },
+    {
+      path: "system.rarity",
+      value: "legendary",
+      styling: {
+        "box-shadow": "inset 0px 0px 7px 0px rgba(255,119,0,1)"
+      }
+    },
+    {
+      path: "system.rarity",
+      value: "veryRare",
+      styling: {
+        "box-shadow": "inset 0px 0px 7px 0px rgba(255,0,247,1)"
+      }
+    },
+    {
+      path: "system.rarity",
+      value: "rare",
+      styling: {
+        "box-shadow": "inset 0px 0px 7px 0px rgba(0,136,255,1)"
+      }
+    },
+    {
+      path: "system.rarity",
+      value: "uncommon",
+      styling: {
+        "box-shadow": "inset 0px 0px 7px 0px rgba(0,255,9,1)"
+      }
+    }
   ]
 }

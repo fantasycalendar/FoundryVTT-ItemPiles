@@ -12,6 +12,24 @@
 
   const simpleCalendarActive = game.modules.get('foundryvtt-simple-calendar')?.active;
 
+  const weekdays = (simpleCalendarActive ? window.SimpleCalendar.api.getAllWeekdays() : []).map(weekday => {
+    weekday.selected = pileData.closedDays.includes(weekday.name);
+    return weekday;
+  });
+
+  pileData.closedDays = pileData.closedDays.filter(closedWeekday => {
+    return weekdays.some(weekday => weekday.name === closedWeekday);
+  });
+
+  const holidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
+    holiday.selected = pileData.closedHolidays.includes(holiday.name);
+    return holiday;
+  });
+
+  pileData.closedHolidays = pileData.closedHolidays.filter(closedHoliday => {
+    return holidays.some(holiday => holiday.name === closedHoliday);
+  });
+
   async function showItemTypePriceModifiers() {
     const data = pileData.itemTypePriceModifiers || [];
     return ItemTypePriceModifiersEditor.show(
@@ -110,8 +128,24 @@
 
 <div class="form-group">
   <label>
-    <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OnyAcceptBasePrice")}</span>
-    <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OnyAcceptBasePriceExplanation")}</p>
+    <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyOnlyItemsWithCost")}</span>
+    <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyOnlyItemsWithCostExplanation")}</p>
+  </label>
+  <input type="checkbox" bind:checked={pileData.buyOnlyItemsWithCost}/>
+</div>
+
+<div class="form-group">
+  <label>
+    <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellOnlyItemsWithCost")}</span>
+    <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellOnlyItemsWithCostExplanation")}</p>
+  </label>
+  <input type="checkbox" bind:checked={pileData.sellOnlyItemsWithCost}/>
+</div>
+
+<div class="form-group">
+  <label>
+    <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OnlyAcceptBasePrice")}</span>
+    <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OnlyAcceptBasePriceExplanation")}</p>
   </label>
   <input type="checkbox" bind:checked={pileData.onlyAcceptBasePrice}/>
 </div>
@@ -190,8 +224,7 @@
   <input type="checkbox" bind:checked={pileData.openTimes.enabled}/>
 </div>
 
-<div class="form-group item-piles-open-times-container"
-     class:item-piles-disabled={!pileData.openTimes.enabled}>
+<div class="form-group" class:item-piles-disabled={!pileData.openTimes.enabled}>
   <div class="item-piles-flexcol" style="margin-right:1rem">
     <label class="item-piles-text-center">
       Open Time:
@@ -217,3 +250,64 @@
     </div>
   </div>
 </div>
+
+{#if simpleCalendarActive}
+
+  <div class="form-group" class:item-piles-disabled={!pileData.openTimes.enabled}>
+    <label>
+      <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClosedDays")}</span>
+      <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClosedDaysExplanation")}</p>
+    </label>
+    <div class="break"></div>
+    <div class="item-piles-flexrow" style="text-align: center;">
+      {#each weekdays as weekday (weekday.id)}
+        <div class="item-piles-flexcol" style="align-items: center;">
+          <label>{weekday.abbreviation}</label>
+          <input type="checkbox"
+                 bind:checked={weekday.selected}
+                 disabled={!pileData.openTimes.enabled}
+                 on:change={() => {
+                 let weekdaySet = new Set(pileData.closedDays);
+                 if(weekday.selected){
+                   weekdaySet.add(weekday.name)
+                 }else{
+                   weekdaySet.delete(weekday.name)
+                 }
+                 pileData.closedDays = Array.from(weekdaySet);
+                 console.log(pileData.closedDays);
+               }}
+          />
+        </div>
+      {/each}
+    </div>
+  </div>
+
+  <div class="form-group" class:item-piles-disabled={!pileData.openTimes.enabled}>
+    <label>
+      <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClosedHolidays")}</span>
+      <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClosedHolidaysExplanation")}</p>
+    </label>
+    <div class="break"></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+      {#each holidays as holiday, index (holiday.name + "-" + index)}
+        <div class="item-piles-flexrow" style="flex:0 1 auto;">
+          <input type="checkbox"
+                 bind:checked={holiday.selected}
+                 disabled={!pileData.openTimes.enabled}
+                 on:change={() => {
+                 let holidaySet = new Set(pileData.closedHolidays);
+                 if(holiday.selected){
+                   holidaySet.add(holiday.name)
+                 }else{
+                   holidaySet.delete(holiday.name)
+                 }
+                 pileData.closedHolidays = Array.from(holidaySet);
+                 console.log(pileData.closedHolidays);
+               }}/>
+          <label>{holiday.name}</label>
+        </div>
+      {/each}
+    </div>
+  </div>
+
+{/if}

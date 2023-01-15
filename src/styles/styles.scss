@@ -115,7 +115,7 @@
 
   &-disabled {
     opacity: 0.75;
-    background-color: var(--item-piles-inactive);
+    background-color: var(--item-piles-minor-inactive);
   }
 
   &-clickable {
@@ -504,6 +504,10 @@
   .dialog-content {
     height: 100%;
     overflow: hidden;
+  }
+
+  .form-group {
+    margin-bottom: 0.25rem;
   }
 }
 

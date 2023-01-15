@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.4.5 (unreleased)
+
+- Added further Simple Calendar support; merchants can now be closed on specific weekday, and categories on notes can cause merchants to be closed (think holidays)
+- Added support for vault item styling based on item properties
+- Fixed disabled elements being blue due to styling being incorrect
+
 ## Version 2.4.4
 
 - Fixed not being able to purchase items from merchants

@@ -1,5 +1,7 @@
 <script>
 
+  import * as Helpers from "../../helpers/helpers.js";
+
   export let entry;
 
   const item = entry.item;
@@ -8,12 +10,19 @@
   const img = item.img;
   const quantity = item.quantity;
   const canStack = item.canStack;
+  const style = item.style;
+
+  $: styling = Helpers.styleFromObject($style);
 
 </script>
 
-<div class="grid-item" data-tooltip={$name} data-tooltip-activation-speed="0" data-tooltip-deactivation-speed="0">
+<div class="grid-item" data-tooltip={$name}
+     data-tooltip-activation-speed="0" data-tooltip-deactivation-speed="0">
   {#if $img}
     <img src={$img} alt={$name}/>
+  {/if}
+  {#if styling}
+    <div class="grid-item-ghost" style={styling}></div>
   {/if}
   {#if canStack && $quantity > 1}
     <span>{$quantity}</span>
@@ -22,7 +31,7 @@
 
 <style lang="scss">
 
-  div {
+  .grid-item {
     width: 100%;
     height: 100%;
     background-color: rgb(56, 56, 56);
@@ -37,6 +46,7 @@
     border: 1px solid black;
 
     img {
+      position: absolute;
       flex-shrink: 0;
       min-width: 100%;
       min-height: 100%;
@@ -53,6 +63,12 @@
       color: white;
       text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
       pointer-events: none;
+    }
+
+    .grid-item-ghost {
+      position: absolute;
+      width: 100%;
+      height: 100%;
     }
   }
 

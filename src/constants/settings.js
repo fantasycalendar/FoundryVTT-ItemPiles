@@ -28,6 +28,7 @@ const SETTINGS = {
   ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
   ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
   ITEM_SIMILARITIES: "itemSimilarities",
+  VAULT_STYLES: "vaultStyles",
   PRICE_PRESETS: "pricePresets",
 
   // Hidden settings
@@ -100,6 +101,19 @@ const SETTINGS = {
       config: false,
       system: true,
       default: SYSTEMS.DATA.ITEM_SIMILARITIES ?? SYSTEMS.DEFAULT_SETTINGS.ITEM_SIMILARITIES,
+      type: Array
+    },
+
+    [SETTINGS.VAULT_STYLES]: {
+      name: "ITEM-PILES.Settings.VaultStyles.Title",
+      label: "ITEM-PILES.Settings.VaultStyles.Label",
+      hint: "ITEM-PILES.Settings.VaultStyles.Hint",
+      icon: "fa-solid fa-wand-magic-sparkles",
+      application: "vault-styles",
+      scope: "world",
+      config: false,
+      system: true,
+      default: SYSTEMS.DATA.VAULT_STYLES ?? SYSTEMS.DEFAULT_SETTINGS.VAULT_STYLES,
       type: Array
     },
 
