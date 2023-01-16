@@ -87,7 +87,7 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
       await runMigrations();
     }
     //game.itempiles.API.renderItemPileInterface(game.actors.getName("Test"));
-    //new SettingsShim().render(true);
+    new SettingsShim().render(true);
     applySystemSpecificStyles();
   }, 500);
 });

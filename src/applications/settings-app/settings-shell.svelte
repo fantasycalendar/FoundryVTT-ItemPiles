@@ -89,6 +89,7 @@
   let tabs = [
     { value: "local", label: localize("ITEM-PILES.Applications.Settings.Local") },
     { value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), hidden: !userIsGM },
+    { value: "styles", label: localize("ITEM-PILES.Applications.Settings.Styles"), hidden: !userIsGM },
     { value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userIsGM },
   ];
 
@@ -103,7 +104,9 @@
 
     <h2 style="text-align: center; margin-bottom: 1rem;">{localize("ITEM-PILES.Applications.Settings.Title")}</h2>
 
-    <Tabs bind:activeTab {tabs}/>
+    {#if userIsGM}
+      <Tabs bind:activeTab {tabs}/>
+    {/if}
 
     <section class="tab-body">
 
@@ -153,6 +156,11 @@
           <SettingButton bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
         </div>
 
+        <div class="tab flex" class:active={activeTab === 'styles'} data-scope="primary" data-tab="styles">
+          <SettingButton bind:data="{settings[SETTINGS.CSS_VARIABLES]}"/>
+          <SettingButton bind:data="{settings[SETTINGS.VAULT_STYLES]}"/>
+        </div>
+
         <div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
           <SettingButton data={{
             name: "ITEM-PILES.Settings.Reset.Title",
@@ -172,7 +180,6 @@
                    disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
           <SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
-          <SettingButton bind:data="{settings[SETTINGS.VAULT_STYLES]}"/>
         </div>
       {/if}
 

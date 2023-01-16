@@ -313,6 +313,7 @@
         "Title": "Item Piles Module Configuration",
         "Local": "Local Settings",
         "Module": "Module Settings",
+        "Styles": "Style Settings",
         "System": "System Specific Settings",
         "Donate": "If you like this module, consider donating to keep it running!",
         "MoreToCome": "And with more configuration options to come...",
@@ -399,6 +400,12 @@
         "Value": "Matching Value",
         "Style": "Configure Style",
         "AddNew": "Add new style rule"
+      },
+      "StylesEditor": {
+        "Title": "Styles Editor",
+        "Style": "Style",
+        "Variable": "Variable",
+        "Value": "Value"
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "Item Type Price Modifiers Editor",
@@ -634,6 +641,11 @@
         "Title": "Item Similarities",
         "Label": "Configure Item Similarities",
         "Hint": "Here you can configure how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
+      },
+      "CssVariables": {
+        "Title": "CSS Variables Styles",
+        "Label": "Configure CSS Variables",
+        "Hint": "This allows you to configure the various CSS variables that drive the colors and other styles within item piles' interfaces."
       },
       "VaultStyles": {
         "Title": "Vault Styles",

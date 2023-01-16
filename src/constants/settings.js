@@ -1,4 +1,5 @@
 import { SYSTEMS } from "../systems.js";
+import { applySystemSpecificStyles } from "../settings.js";
 
 const SETTINGS = {
 
@@ -19,6 +20,11 @@ const SETTINGS = {
   DELETE_EMPTY_PILES: "deleteEmptyPiles",
   INSPECT_ITEMS_IN_TRADE: "inspectItemsInTrade",
   POPULATION_TABLES_FOLDER: "populationTablesFolder",
+  PRICE_PRESETS: "pricePresets",
+
+  // Style settings
+  CSS_VARIABLES: "cssVariables",
+  VAULT_STYLES: "vaultStyles",
 
   // System Settings
   CURRENCIES: "currencies",
@@ -28,9 +34,6 @@ const SETTINGS = {
   ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
   ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
   ITEM_SIMILARITIES: "itemSimilarities",
-  VAULT_STYLES: "vaultStyles",
-  PRICE_PRESETS: "pricePresets",
-
   // Hidden settings
   DEFAULT_ITEM_PILE_JOURNAL_ID: "defaultItemPileJournalID",
   DEFAULT_ITEM_PILE_ACTOR_ID: "defaultItemPileActorID",
@@ -39,6 +42,18 @@ const SETTINGS = {
   PRECONFIGURED_SYSTEM: "preconfiguredSystem",
   SYSTEM_VERSION: "systemVersion",
   VAULT_LOG_JOURNAL_ID: "vaultLogJournalId",
+
+  DEFAULT_CSS_VARIABLES: {
+    "inactive": "#1e90ff",
+    "minor-inactive": "#c9c7b8",
+    "shadow-primary": "#ff0000",
+    "even-color": "#f0f0e0",
+    "odd-color": "transparent",
+    "border-dark-primary": "#191813",
+    "border-light-primary": "#b5b3a4",
+    "text-light-highlight": "#f0f0e0",
+    "text-important": "#ff6400",
+  },
 
   GET_DEFAULT() {
     return foundry.utils.deepClone(SETTINGS.DEFAULTS())
@@ -104,6 +119,26 @@ const SETTINGS = {
       type: Array
     },
 
+    [SETTINGS.CSS_VARIABLES]: {
+      name: "ITEM-PILES.Settings.CssVariables.Title",
+      label: "ITEM-PILES.Settings.CssVariables.Label",
+      hint: "ITEM-PILES.Settings.CssVariables.Hint",
+      icon: "fa-solid fa-wand-magic-sparkles",
+      application: "styles",
+      applicationOptions: {
+        readOnly: true,
+        variables: true
+      },
+      scope: "world",
+      config: false,
+      default: SYSTEMS.DATA.CSS_VARIABLES ?? {},
+      mergedDefaults: SETTINGS.DEFAULT_CSS_VARIABLES,
+      onchange: (data) => {
+        applySystemSpecificStyles(data);
+      },
+      type: Object
+    },
+
     [SETTINGS.VAULT_STYLES]: {
       name: "ITEM-PILES.Settings.VaultStyles.Title",
       label: "ITEM-PILES.Settings.VaultStyles.Label",
@@ -112,8 +147,7 @@ const SETTINGS = {
       application: "vault-styles",
       scope: "world",
       config: false,
-      system: true,
-      default: SYSTEMS.DATA.VAULT_STYLES ?? SYSTEMS.DEFAULT_SETTINGS.VAULT_STYLES,
+      default: SYSTEMS.DATA.VAULT_STYLES ?? [],
       type: Array
     },
 

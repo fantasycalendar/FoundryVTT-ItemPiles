@@ -43,12 +43,14 @@ export async function patchCurrencySettings() {
   return Helpers.setSetting(SETTINGS.CURRENCIES, currencies);
 }
 
-export function applySystemSpecificStyles() {
-  if (!SYSTEMS.DATA?.CSS_OVERRIDES) return;
+export function applySystemSpecificStyles(data = false) {
+  const defaultCssVariables = foundry.utils.deepClone(SETTINGS.DEFAULT_CSS_VARIABLES);
+  const cssVariables = data || Helpers.getSetting(SETTINGS.CSS_VARIABLES);
+  const mergedCssVariables = foundry.utils.mergeObject(defaultCssVariables, cssVariables)
   const root = document.documentElement;
-  Object.entries(SYSTEMS.DATA?.CSS_OVERRIDES).forEach(([style, val]) => {
-    root.style.setProperty(style, val);
-  });
+  for (const [style, val] of Object.entries(mergedCssVariables)) {
+    root.style.setProperty(`--item-piles-${style}`, val);
+  }
 }
 
 export async function checkSystem() {
