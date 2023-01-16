@@ -389,8 +389,12 @@
         "Title": "Item Piles Similarities Editor",
         "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
         "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"system.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
-        "Path": "Attribute path",
-        "AddNew": "Add new attribute path"
+        "Path": "Attribute path"
+      },
+      "UnstackableItemTypesEditor": {
+        "Title": "Unstackable Item Types Editor",
+        "Explanation": "Here you can define which types items that cannot be stacked.",
+        "Type": "Item Type"
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "Item Type Price Modifiers Editor",
@@ -619,7 +623,12 @@
       "ItemSimilarities": {
         "Title": "Item Similarities",
         "Label": "Configure Item Similarities",
-        "Hint": "Here you can configure what how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
+        "Hint": "Here you can configure how items are detected to be the same in this system. Some systems may have data that distinguishes items differently than others, such as temporary items."
+      },
+      "UnstackableItemTypes": {
+        "Title": "Unstackable Item Types",
+        "Label": "Configure Unstackable Types",
+        "Hint": "Here you can configure which types of items are considered to be unique, no matter what. The types configured here cannot be stacked and can only ever have a quantity of 1."
       },
       "PricePresets": {
         "Title": "Price Presets",

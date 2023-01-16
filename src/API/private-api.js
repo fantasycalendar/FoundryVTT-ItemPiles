@@ -1133,8 +1133,12 @@ export default class PrivateAPI {
       const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
 
       if (items.length && !pileActor.prototypeToken.actorLink) {
-        await Helpers.hooks.runWithout(async () => {
-          await tokenDocument.actor.createEmbeddedDocuments("Item", items);
+        new Promise(async (resolve) => {
+          await Helpers.wait(250);
+          await Helpers.hooks.runWithout(async () => {
+            await tokenDocument.actor.createEmbeddedDocuments("Item", items);
+          });
+          resolve();
         });
       }
 
@@ -1144,7 +1148,7 @@ export default class PrivateAPI {
 
       if (items.length && !pileActor.prototypeToken.actorLink) {
         await Helpers.hooks.runWithout(async () => {
-          await tokenDocument.actor.createEmbeddedDocuments("Item", items);
+          await pileActor.createEmbeddedDocuments("Item", items);
         });
       }
 
@@ -1492,7 +1496,7 @@ export default class PrivateAPI {
     if (data.type !== "Item") return;
 
     let item = await Item.implementation.fromDropData(data);
-    let itemData = item.toObject();
+    let itemData = item ? item.toObject() : false;
 
     if (!itemData) {
       console.error(data);
@@ -1568,7 +1572,7 @@ export default class PrivateAPI {
 
     const sourceActor = Utilities.getActor(dropData.source);
     const targetActor = Utilities.getActor(dropData.target);
-    if (sourceActor === targetActor) return;
+    if (sourceActor && targetActor && sourceActor === targetActor) return;
 
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
     if (!validItem) return;
@@ -1672,7 +1676,7 @@ export default class PrivateAPI {
 
     const sourceActor = Utilities.getActor(dropData.source);
     const targetActor = Utilities.getActor(dropData.target);
-    if (sourceActor === targetActor) return;
+    if (sourceActor && targetActor && sourceActor === targetActor) return;
 
     if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;
 

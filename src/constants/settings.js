@@ -1,4 +1,5 @@
 import { SYSTEMS } from "../systems.js";
+import { refreshItemTypesThatCanStack } from "../helpers/utilities.js";
 
 const SETTINGS = {
 
@@ -28,6 +29,7 @@ const SETTINGS = {
   ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
   ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
   ITEM_SIMILARITIES: "itemSimilarities",
+  UNSTACKABLE_ITEM_TYPES: "unstackableItemTypes",
   PRICE_PRESETS: "pricePresets",
 
   // Hidden settings
@@ -100,6 +102,25 @@ const SETTINGS = {
       config: false,
       system: true,
       default: SYSTEMS.DATA.ITEM_SIMILARITIES ?? SYSTEMS.DEFAULT_SETTINGS.ITEM_SIMILARITIES,
+      onChange: () => {
+        refreshItemTypesThatCanStack();
+      },
+      type: Array
+    },
+
+    [SETTINGS.UNSTACKABLE_ITEM_TYPES]: {
+      name: "ITEM-PILES.Settings.UnstackableItemTypes.Title",
+      label: "ITEM-PILES.Settings.UnstackableItemTypes.Label",
+      hint: "ITEM-PILES.Settings.UnstackableItemTypes.Hint",
+      icon: "fa fa-equals",
+      application: "unstackable-item-types",
+      scope: "world",
+      config: false,
+      system: true,
+      default: SYSTEMS.DATA.UNSTACKABLE_ITEM_TYPES ?? SYSTEMS.DEFAULT_SETTINGS.UNSTACKABLE_ITEM_TYPES,
+      onChange: () => {
+        refreshItemTypesThatCanStack();
+      },
       type: Array
     },
 

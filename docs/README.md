@@ -118,3 +118,4 @@ This package is under an [MIT](LICENSE) and the [Foundry Virtual Tabletop Limite
 - Otigon, Zhell, Gazkhan, and MrVauxs for their collective efforts surrounding macro evaluation and execution
 - Forgotten Adventures for their amazing chest sprites (not included in the module)
 - Caeora for their great maps and tokens (not included in this module)
+- The vaults feature were commissioned by TCR (The Cracked Realms) for their Westmeath server, as they are trying to create an MMORPG-feeling with DnD 5e.

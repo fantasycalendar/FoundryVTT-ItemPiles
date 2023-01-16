@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.4.6
+
+- Added a setting to be able to configure unstackable items
+- Fixes for the upcoming OSE update to support its Item Piles integration
+- Fixes dropping items on the canvas for various systems (OSE, Cyberpunk RED)
+- Fixed not being able to add any vault permissions if it did not have any to begin with
+
 ## Version 2.4.5
 
 - Additional fixes for actors with broken items in DnD5e breaking scenes (thanks dev7355608!)
