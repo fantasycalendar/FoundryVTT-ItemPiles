@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.4.7
+
+- Fixed vault expanders being added as regular items rather than expanding the available space
+
 ## Version 2.4.6
 
 - Added a setting to be able to configure unstackable items

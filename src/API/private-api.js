@@ -1591,8 +1591,10 @@ export default class PrivateAPI {
       dropData.itemData.quantity = 1;
     }
 
-    setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM + ".x", dropData.gridPosition.x);
-    setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM + ".y", dropData.gridPosition.y);
+    let flagData = PileUtilities.getItemFlagData(dropData.itemData.item);
+    setProperty(flagData, "x", dropData.gridPosition.x);
+    setProperty(flagData, "y", dropData.gridPosition.y);
+    setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
 
     if (dropData.source) {
       return game.itempiles.API.transferItems(dropData.source, dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
