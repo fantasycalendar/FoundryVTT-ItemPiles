@@ -247,6 +247,7 @@ class API {
    *   ITEM_PRICE_ATTRIBUTE: string,
    *   ITEM_FILTERS: Array<{path: string, filters: string}>,
    *   ITEM_SIMILARITIES: Array<string>,
+   *   UNSTACKABLE_ITEM_TYPES: Array<string>,
    *   ITEM_TRANSFORMER: undefined/Function,
    *   CURRENCIES: Array<{
    *     primary: boolean,
@@ -308,6 +309,16 @@ class API {
       }
     });
 
+    if (data['UNSTACKABLE_ITEM_TYPES']) {
+      if (!Array.isArray(data['UNSTACKABLE_ITEM_TYPES'])) {
+        throw Helpers.custom_error("addSystemIntegration | data.UNSTACKABLE_ITEM_TYPES must be of type array");
+      }
+      data['UNSTACKABLE_ITEM_TYPES'].forEach(path => {
+        if (typeof path !== "string") {
+          throw Helpers.custom_error("addSystemIntegration | each entry in data.UNSTACKABLE_ITEM_TYPES must be of type string");
+        }
+      });
+    }
 
     if (!Array.isArray(data['CURRENCIES'])) {
       throw Helpers.custom_error("addSystemIntegration | inCurrencies must be an array");

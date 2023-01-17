@@ -1,5 +1,6 @@
 import * as Helpers from "./helpers.js";
 import CONSTANTS from "../constants/constants.js";
+import SETTINGS from "../constants/settings.js";
 
 export function getActor(target) {
   if (target instanceof Actor) return target;
@@ -101,8 +102,14 @@ export function setSimilarityProperties(obj, item) {
 
 let itemTypesWithQuantities = false;
 
-export function getItemTypesWithQuantities() {
+export function refreshItemTypesThatCanStack() {
+  itemTypesWithQuantities = false;
+  getItemTypesThatCanStack();
+}
+
+export function getItemTypesThatCanStack() {
   if (!itemTypesWithQuantities) {
+    const unstackableItemTypes = Helpers.getSetting(SETTINGS.UNSTACKABLE_ITEM_TYPES);
     itemTypesWithQuantities = new Set(game.system.template.Item.types.filter(type => {
       const itemTemplate = {
         system: foundry.utils.deepClone(game.system.template.Item[type])
@@ -117,14 +124,14 @@ export function getItemTypesWithQuantities() {
         }
       }
       return hasItemQuantity(itemTemplate);
-    }));
+    })).filter(type => !unstackableItemTypes.includes(type));
   }
   return itemTypesWithQuantities;
 }
 
 export function canItemStack(item) {
   const itemData = item instanceof Item ? item.toObject() : item;
-  return getItemTypesWithQuantities().has(itemData.type);
+  return getItemTypesThatCanStack().has(itemData.type);
 }
 
 /**
@@ -159,7 +166,7 @@ export function hasItemQuantity(item) {
  * @returns {Object}
  */
 export function setItemQuantity(itemData, quantity, requiresExistingQuantity = false) {
-  if (!requiresExistingQuantity || getItemTypesWithQuantities().has(itemData.type)) {
+  if (!requiresExistingQuantity || getItemTypesThatCanStack().has(itemData.type)) {
     setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity)
   }
   return itemData;
@@ -178,7 +185,7 @@ export function getItemCost(item) {
  * @returns {Array<Token>}
  */
 export function getTokensAtLocation(position) {
-  const tokens = [...canvas.tokens.placeables].filter(token => token.mesh.visible);
+  const tokens = [...canvas.tokens.placeables].filter(token => token?.mesh?.visible);
   return tokens.filter(token => {
     return position.x >= token.x && position.x < (token.x + (token.document.width * canvas.grid.size))
       && position.y >= token.y && position.y < (token.y + (token.document.height * canvas.grid.size));
@@ -318,10 +325,14 @@ export async function createFoldersFromNames(folders, type = "Actor") {
 export function getSourceActorFromDropData(dropData) {
   if (dropData.uuid) {
     return fromUuidSync(dropData.uuid).parent;
+  } else if (dropData.tokenId) {
+    if (dropData.sceneId) {
+      const uuid = `Scene.${dropData.sceneId}.Token.${dropData.tokenId}`;
+      return fromUuidSync(uuid)?.actor;
+    }
+    return canvas.tokens.get(dropData.tokenId).actor;
   } else if (dropData.actorId) {
     return game.actors.get(dropData.actorId);
-  } else if (dropData.tokenId) {
-    return canvas.tokens.get(dropData.tokenId).actor;
   }
   return false;
 }

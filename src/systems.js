@@ -112,6 +112,7 @@ export const SYSTEMS = {
     ITEM_PRICE_ATTRIBUTE: "",
     ITEM_FILTERS: [],
     ITEM_SIMILARITIES: [],
+    UNSTACKABLE_ITEM_TYPES: [],
     CURRENCIES: [],
     CURRENCY_DECIMAL_DIGITS: 0.00001
   },
@@ -149,7 +150,7 @@ export const SYSTEMS = {
     return this._currentSystem;
   },
 
-  addSystem(systemId, data) {
-    this.SUPPORTED_SYSTEMS[systemId.toLowerCase()] = { latest: data };
+  addSystem(data) {
+    this.SUPPORTED_SYSTEMS[game.system.id.toLowerCase()] = { latest: data };
   }
 };
