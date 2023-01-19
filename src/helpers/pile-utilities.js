@@ -5,6 +5,7 @@ import { SYSTEMS } from "../systems.js";
 import { hotkeyState } from "../hotkeys.js";
 import SETTINGS from "../constants/settings.js";
 
+
 function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
   const flags = existing || (getProperty(inDocument, flag) ?? {});
@@ -378,6 +379,56 @@ export function getItemPileName(target, { data = false, items = false, currencie
   const item = items.length > 0 ? items[0] : currencies[0];
 
   return item.name;
+
+}
+
+export async function createDefaultItemPile(itemPileFlags = {}, folders = false) {
+
+  let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+
+  pileDataDefaults.enabled = true;
+  if (foundry.utils.isEmpty(itemPileFlags)) {
+    pileDataDefaults.deleteWhenEmpty = true;
+    pileDataDefaults.displayOne = true;
+    pileDataDefaults.showItemName = true;
+    pileDataDefaults.overrideSingleItemScale = true;
+    pileDataDefaults.singleItemScale = 0.75;
+  }
+
+  pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+
+  const actorData = {
+    name: "Default Item Pile",
+    type: Helpers.getSetting("actorClassType"),
+    img: "icons/svg/item-bag.svg"
+  };
+
+  if (folders) {
+    const folder = await Utilities.createFoldersFromNames(folders);
+    if (folder) {
+      actorData.folder = folder.id;
+    }
+  }
+
+  const pileActor = await Actor.create(actorData);
+
+  await pileActor.update({
+    [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+    [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+    prototypeToken: {
+      name: "Item Pile",
+      actorLink: false,
+      bar1: { attribute: "" },
+      vision: false,
+      displayName: 50,
+      [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
+      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+    }
+  })
+
+  await Helpers.setSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID, pileActor.id);
+
+  return pileActor;
 
 }
 

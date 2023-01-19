@@ -1028,49 +1028,7 @@ export default class PrivateAPI {
 
         Helpers.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
-        let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
-
-        pileDataDefaults.enabled = true;
-        if (foundry.utils.isEmpty(itemPileFlags)) {
-          pileDataDefaults.deleteWhenEmpty = true;
-          pileDataDefaults.displayOne = true;
-          pileDataDefaults.showItemName = true;
-          pileDataDefaults.overrideSingleItemScale = true;
-          pileDataDefaults.singleItemScale = 0.75;
-        }
-
-        pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
-
-        const actorData = {
-          name: "Default Item Pile",
-          type: Helpers.getSetting("actorClassType"),
-          img: "icons/svg/item-bag.svg"
-        };
-
-        if (folders) {
-          const folder = await Utilities.createFoldersFromNames(folders);
-          if (folder) {
-            actorData.folder = folder.id;
-          }
-        }
-
-        pileActor = await Actor.create(actorData);
-
-        await pileActor.update({
-          [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-          [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
-          prototypeToken: {
-            name: "Item Pile",
-            actorLink: false,
-            bar1: { attribute: "" },
-            vision: false,
-            displayName: 50,
-            [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-            [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
-          }
-        })
-
-        await game.settings.set(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", pileActor.id);
+        pileActor = await PileUtilities.createDefaultItemPile(itemPileFlags, folders);
 
       }
 

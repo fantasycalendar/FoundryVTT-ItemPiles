@@ -20,7 +20,7 @@
   let form;
 
   let settings = {};
-  let userIsGM = game.user.isGM;
+  let userCanChangeSettings = game.user.hasPermission(CONST.USER_PERMISSIONS.SETTINGS_MODIFY);
 
   getSettings();
 
@@ -45,7 +45,7 @@
   }
 
   async function updateSettings() {
-    let settingsToUpdate = Object.entries(settings).filter(entry => userIsGM || entry[1].scope === "client");
+    let settingsToUpdate = Object.entries(settings).filter(entry => userCanChangeSettings || entry[1].scope === "client");
     for (let [key, setting] of settingsToUpdate) {
       await helpers.setSetting(key, setting.value);
     }
@@ -88,8 +88,8 @@
 
   let tabs = [
     { value: "local", label: localize("ITEM-PILES.Applications.Settings.Local") },
-    { value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), hidden: !userIsGM },
-    { value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userIsGM },
+    { value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), hidden: !userCanChangeSettings },
+    { value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userCanChangeSettings },
   ];
 
   let activeTab = tabs[0].value;
@@ -140,7 +140,7 @@
 
       </div>
 
-      {#if userIsGM}
+      {#if userCanChangeSettings}
         <div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
           <Setting bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
           <Setting bind:data="{settings[SETTINGS.ENABLE_GIVING_ITEMS]}"/>

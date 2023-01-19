@@ -354,6 +354,8 @@ export default class ItemPileStore {
 
     if (!target) {
 
+      if (!game.user.isGM) return;
+
       if (!foundry.utils.isEmpty(currencies.attributes)) {
         await game.itempiles.API.setAttributes(source, currencies.attributes, { interactionId: this.interactionId })
       }
