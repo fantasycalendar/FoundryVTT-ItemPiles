@@ -5,6 +5,7 @@
 - Fixed GMs without permissions would be able to attempt to change the world settings of Item Piles (but be unable to, due to permissions)
 - Tweaked migrations to not refresh automatically, but prompts you to do so yourselves
 - Tweaked Simple Calendar integration to not cause Item Piles to hard-fail when Simple Calendar is out of date
+- Updated French localization (thanks Marc via Weblate!)
 
 ## Version 2.4.7
 
