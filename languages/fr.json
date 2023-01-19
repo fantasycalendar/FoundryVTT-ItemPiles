@@ -756,6 +756,11 @@
       "VaultAccessEditor": {
         "Title": "Editeur d'accès au coffre-fort : {actor_name}",
         "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les monnaies du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet."
+      },
+      "UnstackableItemTypesEditor": {
+        "Explanation": "Vous pouvez définir ici les types d'objets qui ne peuvent pas être empilés.",
+        "Type": "Type d'Objet",
+        "Title": "Éditeur de types d'objets non empilables"
       }
     },
     "Settings": {
@@ -865,6 +870,11 @@
       "HideHeaderButton": {
         "Title": "Cacher le bouton du titre",
         "Hint": "Cache le bouton \"Item Piles\" dans l'acteur et les titres des objets. Cela rendra plus difficile la configuration de nouvelles piles d'objets et d'objets."
+      },
+      "UnstackableItemTypes": {
+        "Title": "Types d'objets non empilables",
+        "Label": "Configurer les types d'empilables",
+        "Hint": "Vous pouvez configurer ici les types d'articles qui sont considérés comme uniques, quoi qu'il arrive. Les types configurés ici ne peuvent pas être empilés et ne peuvent avoir qu'une quantité de 1."
       }
     },
     "Warnings": {
