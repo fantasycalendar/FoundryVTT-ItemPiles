@@ -1,32 +1,33 @@
 <script>
-  import { getContext } from "svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { isValidItemPile } from "../../../helpers/pile-utilities.js";
-  import * as Utilities from "../../../helpers/utilities.js";
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import SliderInput from "../../components/SliderInput.svelte";
+	import { getContext } from "svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { isValidItemPile } from "../../../helpers/pile-utilities.js";
+	import * as Utilities from "../../../helpers/utilities.js";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import SliderInput from "../../components/SliderInput.svelte";
 
-  const { application } = getContext('external');
+	const { application } = getContext('external');
 
-  export let item;
-  export let elementRoot;
-  export let target = false;
+	export let item;
+	export let elementRoot;
+	export let target = false;
 
-  let form;
-  let sliderValue = 1;
+	let form;
+	let sliderValue = 1;
 
-  const isItemPile = !target || isValidItemPile(target);
+	const isItemPile = !target || isValidItemPile(target);
 
-  const itemQuantity = Utilities.getItemQuantity(item);
+	const itemQuantity = Utilities.getItemQuantity(item);
+	const canItemStack = Utilities.canItemStack(item);
 
-  function requestSubmit() {
-    form.requestSubmit();
-  }
+	function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  function submit() {
-    application.options.resolve(sliderValue);
-    application.close();
-  }
+	function submit() {
+		application.options.resolve(sliderValue);
+		application.close();
+	}
 
 </script>
 
@@ -38,28 +39,28 @@
 
     <h3 style="text-align: center;">
       {localize(`ITEM-PILES.Applications.${application.options.localizationTitle}.Header`, {
-        item_name: item.name
-      })}
+				item_name: item.name
+			})}
     </h3>
 
     {#if target}
 
       <p class="item-piles-text-center">
         {localize(`ITEM-PILES.Applications.${application.options.localizationTitle}.Content`, {
-          target_name: target.name
-        })}
+					target_name: target.name
+				})}
       </p>
 
     {/if}
 
-    {#if itemQuantity > 1}
+    {#if itemQuantity > 1 && canItemStack}
 
       <div class="form-group item-piles-text-center">
         <label>{localize(`ITEM-PILES.Applications.${application.options.localizationTitle}.ContentMultipleQuantity`, {
-          target_name: target.name,
-          quantity: itemQuantity,
-          itemName: item.name
-        })}</label>
+					target_name: target.name,
+					quantity: itemQuantity,
+					itemName: item.name
+				})}</label>
       </div>
       <SliderInput min={1} max={itemQuantity} maxInput={itemQuantity} divideBy={1} bind:value={sliderValue}/>
 

@@ -267,12 +267,11 @@ export default class PrivateAPI {
 		await this._executeItemPileMacro(sourceUuid, macroData);
 		await this._executeItemPileMacro(targetUuid, macroData);
 
-		const itemPile = Utilities.getToken(sourceUuid);
-
 		const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
 		if (shouldBeDeleted) {
 			await this._deleteItemPile(sourceUuid);
-		} else if (PileUtilities.isItemPileLootable(itemPile)) {
+		} else if (PileUtilities.isItemPileLootable(sourceActor) || PileUtilities.isItemPileLootable(targetActor)) {
+			const itemPile = PileUtilities.isItemPileLootable(sourceActor) ? sourceActor : targetActor;
 			if (PileUtilities.isItemPileEmpty(itemPile)) {
 				await SharingUtilities.clearItemPileSharingData(itemPile);
 			} else {
@@ -531,12 +530,11 @@ export default class PrivateAPI {
 		await this._executeItemPileMacro(sourceUuid, macroData);
 		await this._executeItemPileMacro(targetUuid, macroData);
 
-		const itemPile = Utilities.getToken(sourceUuid);
-
 		const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
 		if (shouldBeDeleted) {
 			await this._deleteItemPile(sourceUuid);
-		} else if (PileUtilities.isItemPileLootable(itemPile)) {
+		} else if (PileUtilities.isItemPileLootable(sourceActor) || PileUtilities.isItemPileLootable(targetActor)) {
+			const itemPile = PileUtilities.isItemPileLootable(sourceActor) ? sourceActor : targetActor;
 			if (PileUtilities.isItemPileEmpty(itemPile)) {
 				await SharingUtilities.clearItemPileSharingData(itemPile);
 			} else {
@@ -744,12 +742,11 @@ export default class PrivateAPI {
 		await this._executeItemPileMacro(sourceUuid, macroData);
 		await this._executeItemPileMacro(targetUuid, macroData);
 
-		const itemPile = Utilities.getToken(sourceUuid);
-
 		const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
 		if (shouldBeDeleted) {
 			await this._deleteItemPile(sourceUuid);
-		} else if (PileUtilities.isItemPileLootable(itemPile)) {
+		} else if (PileUtilities.isItemPileLootable(sourceActor) || PileUtilities.isItemPileLootable(targetActor)) {
+			const itemPile = PileUtilities.isItemPileLootable(sourceActor) ? sourceActor : targetActor;
 			if (PileUtilities.isItemPileEmpty(itemPile)) {
 				await SharingUtilities.clearItemPileSharingData(itemPile);
 			} else {
@@ -1071,6 +1068,10 @@ export default class PrivateAPI {
 
 				overrideData['actorData'] = actorOverrides;
 
+				if (!SYSTEMS.DATA.PREVENT_INJECTING_ITEMS) {
+					overrideData['actorData']['items'] = items;
+				}
+
 				const data = { data: pileData, items: items };
 
 				overrideData = foundry.utils.mergeObject(overrideData, {
@@ -1090,9 +1091,9 @@ export default class PrivateAPI {
 
 			const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
 
-			if (items.length && !pileActor.prototypeToken.actorLink) {
+			if (items.length && !pileActor.prototypeToken.actorLink && SYSTEMS.DATA.PREVENT_INJECTING_ITEMS) {
 				new Promise(async (resolve) => {
-					await Helpers.wait(250);
+					await Helpers.wait(750);
 					await Helpers.hooks.runWithout(async () => {
 						await tokenDocument.actor.createEmbeddedDocuments("Item", items);
 					});
@@ -1102,13 +1103,11 @@ export default class PrivateAPI {
 
 			returns["tokenUuid"] = Utilities.getUuid(tokenDocument);
 
-		} else if (pileActor.prototypeToken.actorLink) {
+		} else if (pileActor.prototypeToken.actorLink && items.length) {
 
-			if (items.length && !pileActor.prototypeToken.actorLink) {
-				await Helpers.hooks.runWithout(async () => {
-					await pileActor.createEmbeddedDocuments("Item", items);
-				});
-			}
+			await Helpers.hooks.runWithout(async () => {
+				await pileActor.createEmbeddedDocuments("Item", items);
+			});
 
 		}
 
@@ -1671,26 +1670,24 @@ export default class PrivateAPI {
 			}
 		}
 
-		if (Utilities.canItemStack(dropData.itemData.item)) {
-			if (hotkeyState.altDown) {
+		if (hotkeyState.altDown) {
 
-				Utilities.setItemQuantity(dropData.itemData.item, 1);
-				dropData.itemData.quantity = 1;
+			Utilities.setItemQuantity(dropData.itemData.item, 1);
+			dropData.itemData.quantity = 1;
 
-			} else {
+		} else {
 
-				let quantity = Utilities.getItemQuantity(dropData.itemData.item);
+			let quantity = Utilities.getItemQuantity(dropData.itemData.item);
 
-				if (dropData.source) {
-					const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
-					quantity = await DropItemDialog.show(item, dropData.target);
-					if (!quantity) return;
-				}
-
-				Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
-				dropData.itemData.quantity = Number(quantity);
-
+			if (dropData.source) {
+				const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+				quantity = await DropItemDialog.show(item, dropData.target);
+				if (!quantity) return;
 			}
+
+			Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
+			dropData.itemData.quantity = Number(quantity);
+
 		}
 
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);

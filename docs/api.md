@@ -15,6 +15,7 @@
   * [setItemPriceAttribute](#setItemPriceAttribute)
   * [setItemFilters](#setItemFilters)
   * [setItemSimilarities](#setItemSimilarities)
+  * [setUnstackableItemTypes](#setUnstackableItemTypes)
   * [addSystemIntegration](#addSystemIntegration)
 
 
@@ -203,6 +204,18 @@ Sets the attributes for detecting item similarities
 | Param | Type |
 | --- | --- |
 | inPaths | `Array<string>` |
+
+---
+
+### setUnstackableItemTypes
+
+`game.itempiles.API.setUnstackableItemTypes(inTypes)` ⇒ `Promise`
+
+Sets the types of items that will always be considered unique when transferring between actors
+
+| Param  | Type |
+|--------| --- |
+| inTypes | `Array<string>` |
 
 ---
 

@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.4.9
+
+- Fixed minor issue with GMs not having permission to change module settings
+- Fixed shares not being kept track of in item piles properly
+- Fixed adding currencies to item piles not working properly for players
+- Fixed to system integrations and how they apply their system specific settings
+
 ## Version 2.4.8
 
 - Fixed normal users with permissions to change the world settings of Item Piles would not be able to
