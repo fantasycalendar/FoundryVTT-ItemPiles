@@ -94,11 +94,12 @@
     "Errors": {
       "DisallowedItemDrop": "Du kannst keinen Gegenstand vom Typ \"{type}\" hier ablegen",
       "DisallowedItemTrade": "Du kannst keine \"{type}\"-Gegenstände handeln",
-      "NoSourceDrop": "Du kannst keine Gegenstände aus der Gegenstandsleiste fallen lassen, es sei denn, du bist ein GM.",
+      "NoSourceDrop": "Du kannst keine Gegenstände aus der Gegenstandsleiste fallen lassen, es sei denn, du bist ein SL.",
       "PileTooFar": "Du bist zu weit entfernt, um mit dem Stapel zu interagieren.",
       "PileLocked": "Dieser Stapel ist gesperrt und kann auch nicht geöffnet werden - du kannst keine Gegenstände ablegen.",
       "DropNoToken": "Du hast kein Token in dieser Szene, daher kannst du hier keinen Gegenstand fallen lassen.",
-      "DisallowedItemSell": "Dieser Händler akzeptiert Gegenstände vom Typ \"{type}\" nicht"
+      "DisallowedItemSell": "Dieser Händler akzeptiert Gegenstände vom Typ \"{type}\" nicht",
+      "NoTokenFound": "Es konnte kein Token oder Charakter gefunden werden, der dich repräsentiert."
     },
     "Dialogs": {
       "DropTypeWarning": {
@@ -110,7 +111,7 @@
         "Content": "Du versuchst gerade einen Gegenstand vom Typ (\"{type}\") zu handeln. Das ist normalerweise nicht erlaubt. Bist du dir sicher, dass du das tun möchtest?"
       },
       "ResetSettings": {
-        "Title": "Setze Einstellungen von Gegenstandsstapel zurück",
+        "Title": "Moduleinstellungen zurücksetzen",
         "Content": "Bist du sicher das du alle Einstellungen vom Gegenstandsstapelmodul auf die Standardwerte des Systems zurücksetzen willst? <strong>DIES KANN NICHT RÜCKGÄNGIG GEMACHT WERDEN!</strong>",
         "Confirm": "Moduleinstellungen zurücksetzen"
       },
@@ -158,6 +159,14 @@
         "TradeContent": "Du versuchst einen Gegenstand der Art \"{type}\" zu handeln. Das ist normalerweise nicht erlaubt. Bist du dir sicher, dass du das tun möchtest?",
         "DropContent": "Du versuchst einen Gegenstand der Art \"{type}\" abzulegen. Das ist normalerweise nicht möglich. Bist du dir sicher, dass du das tun möchtest?",
         "SellContent": "Du versuchst einen Gegenstand von der Art \"{type}\" zu verkaufen. Dieser Händler akzeptiert das normalerweise nicht. Bist du dir sicher, dass du das tun möchtest?"
+      },
+      "UserSelect": {
+        "Title": "Nutzer auswählen",
+        "Content": "Welchem Nutzer zeigen?"
+      },
+      "ClearVaultLog": {
+        "Title": "Tresor-Log löschen?",
+        "Content": "Bist du sicher, dass du das Log des Tresors von \"{actor_name}\" löschen willst?"
       }
     },
     "CurrenciesEditor": {
@@ -400,7 +409,7 @@
       "EditTypePrices": "Editiere Kostenmodifikator pro Art",
       "BuyNoItems": "Der Händler hat keine Gegenstände",
       "CurrentItems": "Aktuelle Gegenstände",
-      "NoRollTables": "Es existieren keine Würfeltabellen. Lege eine an, um loszulegen.",
+      "NoRollTables": "Es existieren keine Würfeltabellen, lege eine an, um loszulegen",
       "ClickRoll": "Klicke auf Würfeln um loszulegen",
       "RolledTimes": "{rolls} Mal gewürfelt",
       "KeepRolled": "Ergebnisse beibehalten",
@@ -414,7 +423,9 @@
       "UpdateMerchantSuccess": "Händler erfolgreich aktualisiert.",
       "GiveItemAccepted": "{user_name} hat deine Anfrage akzeptiert.",
       "ShownToPlayers": "Spielern {actor_name} zeigen",
-      "ItemTransferred": "{source_actor_name}'s {item_name} wurde {target_actor_name} gegeben."
+      "ItemTransferred": "{source_actor_name}'s {item_name} wurde {target_actor_name} gegeben.",
+      "CreatedJournal": "Item Piles Tresor-Journal erstellt.",
+      "SystemSupportFound": "Systemunterstützung gefunden! Standardmäßige Systemeinstellungen für Item Piles werden angewendet..."
     },
     "HeaderButtons": {
       "ShowToPlayers": "Spielern anzeigen"
@@ -422,7 +433,51 @@
     "Warnings": {
       "GiveItemDeclined": "{user_name} hat dein Angebot abgelehnt.",
       "NoPlayersActive": "Es sind keine Spieler aktiv, mit denen du diese Aktion durchführen könntest",
-      "GiveItemNoGM": "Es ist kein SL online, der dir diesen Gegenstand geben kann."
+      "GiveItemNoGM": "Es ist kein SL online, der dir diesen Gegenstand geben kann.",
+      "VaultFull": "Der Tresor ist voll!",
+      "VaultItemNotExpander": "Dieser Gegenstand ist keine Tresor-Erweiterung",
+      "NoGMsConnected": "WARNUNG - Kein SL verbunden - Item Piles benötigt für Spieler einen verbundenen SL, um die meisten Modulfunktionen zu nutzen.",
+      "NoGMsConnectedAction": "WARNUNG - \"{action}\" konnte nicht ausgeführt werden, weil keine SL aktiv ist."
+    },
+    "Types": {
+      "merchant": "Händler",
+      "vault": "Tresor",
+      "container": "Behälter"
+    },
+    "Vault": {
+      "VaultTab": "Tresor",
+      "ExpandersTab": "Erweiterungen",
+      "LogTab": "Protokolle",
+      "ViewingAs": "Als {actor_name} betrachten",
+      "NeedsCapacity": "Dieser Tresor hat eine Gesamtkapazität von {total_capacity}, aber ohne Tresor-Erweiterungen ist davon nichts verfügbar"
+    },
+    "Applications": {
+      "DropItem": {
+        "Content": "Du fügst diesen Gegenstand zum Stapel \"{target_name}\" hinzu.",
+        "ContentMultipleQuantity": "Du hast diesen Gegenstand {quantity} mal, wie viel möchtest du fallen lassen?",
+        "Title": "Gegenstand fallen lassen",
+        "Header": "Du lässt {item_name} fallen",
+        "Submit": "Zum Stapel hinzufügen",
+        "SubmitNoTarget": "Neuen Stapel erstellen"
+      },
+      "GiveItem": {
+        "ContentMultipleQuantity": "Du hast diesen Gegenstand {quantity} mal, wieviel möchtest du davon weggeben?",
+        "Submit": "geben",
+        "Title": "Gegenstand geben",
+        "Header": "Du gibst: {item_name}",
+        "Content": "Möchtest du diesen Gegenstand an \"{target_name}\" geben?"
+      },
+      "DepositItem": {
+        "Title": "Gegenstand einlagern",
+        "Submit": "einlagern",
+        "Header": "Du lagerst {item_name} ein",
+        "Content": "Möchtest du diesen Gegenstand in \"{target_name}\" einlagern?",
+        "ContentMultipleQuantity": "Du hast diesen Gegenstand {quantity} mal, wieviel davon möchtest du einlagern?"
+      },
+      "WithdrawItem": {
+        "Title": "Gegenstand herausnehmen",
+        "Header": "Du nimmst {item_name} heraus"
+      }
     }
   }
 }
