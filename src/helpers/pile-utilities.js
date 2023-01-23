@@ -270,6 +270,11 @@ export function isItemCurrency(item, { target = false } = {}) {
   return !!Utilities.findSimilarItem(currencies, item);
 }
 
+export function getItemCurrencyData(item, { target = false }) {
+  const actor = Utilities.getActor(target ? target : item.parent);
+  return getActorCurrencies(actor, { getAll: true })
+    .find(currency => currency.id === (item._id ?? item.id));
+}
 
 export function getItemPileTokenImage(token, {
   data = false,
@@ -1312,12 +1317,13 @@ export async function updateVaultJournalLog(itemPile, {
 
   const date = Date.now();
 
+
   for (const itemData of items) {
     if (currencies.some(currency => currency.name === itemData.item.name)) {
       formattedCurrencies.push({
         actor: actor?.name ?? false,
         user: userId,
-        name: itemData.name,
+        name: itemData.item.name,
         qty: itemData.quantity * (withdrawal ? -1 : 1),
         action: vaultLogData?.action ?? (withdrawal ? "withdrew" : "deposited"),
         date

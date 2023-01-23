@@ -58,40 +58,40 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
 
-    <div style="display: grid; grid-template-columns: 1.25fr 2fr {options.readOnly ? '' : 'auto'}; gap: 5px;"
-         class="item-piles-bottom-divider">
-      <span>{localize("ITEM-PILES.Applications.StylesEditor." + (options.variables ? "Variable" : "Style"))}</span>
-      <span>{localize("ITEM-PILES.Applications.StylesEditor.Value")}</span>
-      {#if !options.readOnly}
-        <a class="item-piles-flexrow align-center-row item-piles-clickable-green" style="text-align: center;"
-           on:click={() => add()}>
-          <i class="fas fa-plus"></i>
-        </a>
-      {/if}
+		<div style="display: grid; grid-template-columns: 1.25fr 2fr {options.readOnly ? '' : 'auto'}; gap: 5px;"
+				 class="item-piles-bottom-divider">
+			<span>{localize("ITEM-PILES.Applications.StylesEditor." + (options.variables ? "Variable" : "Style"))}</span>
+			<span>{localize("ITEM-PILES.Applications.StylesEditor.Value")}</span>
+			{#if !options.readOnly}
+				<a class="item-piles-flexrow align-center-row item-piles-clickable-green" style="text-align: center;"
+					 on:click={() => add()}>
+					<i class="fas fa-plus"></i>
+				</a>
+			{/if}
 
-      {#each $values as [key, value], index (index)}
-        <input autocomplete="false" type="text" bind:value={key}/>
-        <input autocomplete="false" type="text" bind:value={value}/>
-        {#if !options.readOnly}
-          <a class="item-piles-flexrow align-center-row" style="text-align: center;" on:click={() => remove(index)}>
-            <i class="fas fa-times item-piles-clickable-red"></i>
-          </a>
-        {/if}
-      {/each}
+			{#each $values as [key, value], index (index)}
+				<input disabled={options.readOnly} autocomplete="false" type="text" bind:value={key}/>
+				<input autocomplete="false" type="text" bind:value={value}/>
+				{#if !options.readOnly}
+					<a class="item-piles-flexrow align-center-row" style="text-align: center;" on:click={() => remove(index)}>
+						<i class="fas fa-times item-piles-clickable-red"></i>
+					</a>
+				{/if}
+			{/each}
 
-    </div>
+		</div>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("Save")}
-      </button>
-      <button type="button" on:click|once={() => { application.options.resolve(null); application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("Save")}
+			</button>
+			<button type="button" on:click|once={() => { application.options.resolve(null); application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 
 </ApplicationShell>

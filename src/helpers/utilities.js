@@ -44,9 +44,10 @@ export function getUuid(target) {
  *
  * @param {Array<Item|Object>} items
  * @param {Item|Object} findItem
+ * @param {boolean} returnFound
  * @returns {*}
  */
-export function findSimilarItem(items, findItem) {
+export function findSimilarItem(items, findItem, returnFound = false) {
 
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 

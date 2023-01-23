@@ -178,6 +178,7 @@
       "LogUserActor": "{actor_name} ({user_name})",
       "Deposited": "deposited",
       "Withdrew": "withdrew",
+      "Updated": "updated",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "LogQuantity": "{quantity} x "
     },

@@ -207,7 +207,7 @@ export class VaultStore extends ItemPileStore {
     const pileData = get(this.pileData);
     this.validGridItems.set(get(this.allItems).filter(item => {
       const itemFlagData = get(item.itemFlagData);
-      return !pileData.vaultExpansion || !itemFlagData.vaultExpander;
+      return (!pileData.vaultExpansion || !itemFlagData.vaultExpander) && !item.isCurrency;
     }));
     this.highlightedGridItems.set(get(this.items).filter(item => {
       const itemFlagData = get(item.itemFlagData);

@@ -4,9 +4,9 @@ import ItemPileConfigShell from './item-pile-config.svelte';
 import { getActiveApps } from "../../helpers/helpers.js";
 
 export default class ItemPileConfig extends SvelteApplication {
-  
+
   constructor(pileActor, options = {}) {
-    
+
     super({
       id: `item-pile-config-${pileActor.id}-${randomID()}`,
       title: game.i18n.format("ITEM-PILES.Applications.ItemPileConfig.Title", { actor_name: pileActor.name }),
@@ -21,20 +21,20 @@ export default class ItemPileConfig extends SvelteApplication {
       ...options
     });
   }
-  
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       width: 430,
       height: 627,
-      classes: ["item-piles-config"],
+      classes: ["item-piles-config", "item-piles-app"],
       resizable: true
     })
   }
-  
+
   static getActiveApp(id) {
     return getActiveApps(`item-pile-config-${id}`, true)
   }
-  
+
   static async show(target, options = {}, dialogData = {}) {
     const targetActor = Utilities.getActor(target);
     const app = this.getActiveApp(targetActor.id);
@@ -44,7 +44,7 @@ export default class ItemPileConfig extends SvelteApplication {
       new this(targetActor, options, dialogData).render(true);
     })
   }
-  
+
   async close(options) {
     Object.values(ui.windows).forEach(app => {
       if (app !== this && app.rendered && app.options?.parentApp === this) {

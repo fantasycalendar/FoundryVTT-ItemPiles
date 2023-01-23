@@ -5,6 +5,10 @@
 - Added further Simple Calendar support; merchants can now be closed on specific weekday, and categories on notes can cause merchants to be closed (think holidays)
 - Added support for vault item styling based on item properties
 - Fixed disabled elements being blue due to styling being incorrect
+- Fixed item-based currencies would show up in the vault grids
+- Fixed setting item-based currencies' quantity on item piles would instead always add them
+- Fixed items added through merchant tables would lose their item pile flags (such as being a service, custom prices, etc)
+- Fixed error when setting the price from the item editor
 
 ## Version 2.4.9
 

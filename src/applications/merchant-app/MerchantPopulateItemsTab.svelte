@@ -165,7 +165,10 @@
   }
 
   async function addItem(itemToAdd) {
-    await game.itempiles.API.addItems(store.actor, [itemToAdd]);
+    await game.itempiles.API.addItems(store.actor, [itemToAdd].map(entry => ({
+      item: entry.item,
+      quantity: entry.quantity
+    })));
     removeItem(itemToAdd);
   }
 
@@ -180,7 +183,7 @@
   }
 
   async function addAllItems() {
-    const itemsToAdd = get(itemsRolled);
+    const itemsToAdd = get(itemsRolled).map(entry => ({ item: entry.item, quantity: entry.quantity }));
     await game.itempiles.API.addItems(store.actor, itemsToAdd);
     itemsRolled.set([]);
   }
@@ -278,246 +281,246 @@
 
 <div>
 
-  <div class="item-piles-flexrow">
-    <div style="margin-right:0.5rem;">
-      <div class="item-piles-populate-header">
-        {localize(
+	<div class="item-piles-flexrow">
+		<div style="margin-right:0.5rem;">
+			<div class="item-piles-populate-header">
+				{localize(
           currentItems.length
             ? "ITEM-PILES.Merchant.CurrentItems"
             : "ITEM-PILES.Merchant.BuyNoItems"
         )}
-      </div>
+			</div>
 
-      {#each currentItems as item (item.id)}
-        <div
-          class="item-piles-flexrow item-piles-item-row item-piles-even-color"
-        >
-          <ItemEntry {item}>
-            <button
-              slot="right"
-              class="item-piles-rolled-item-button"
-              style="color:red;"
-              on:click={() => removeAddedItem(item)}
-              data-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
-            >
-              <i class="fas fa-trash"/>
-            </button>
-          </ItemEntry>
-        </div>
-      {/each}
+			{#each currentItems as item (item.id)}
+				<div
+					class="item-piles-flexrow item-piles-item-row item-piles-even-color"
+				>
+					<ItemEntry {item}>
+						<button
+							slot="right"
+							class="item-piles-rolled-item-button"
+							style="color:red;"
+							on:click={() => removeAddedItem(item)}
+							data-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
+						>
+							<i class="fas fa-trash"/>
+						</button>
+					</ItemEntry>
+				</div>
+			{/each}
 
-      {#if currentItems.length}
-        <button class="item-piles-button" style="margin:5px 0;" on:click={() => clearAllItems()}>
-          <i class="fas fa-trash"/>
-          {localize("ITEM-PILES.Merchant.ClearAllItems")}
-        </button>
-      {/if}
-    </div>
+			{#if currentItems.length}
+				<button class="item-piles-button" style="margin:5px 0;" on:click={() => clearAllItems()}>
+					<i class="fas fa-trash"/>
+					{localize("ITEM-PILES.Merchant.ClearAllItems")}
+				</button>
+			{/if}
+		</div>
 
-    <div style="padding-right:0.25rem;">
+		<div style="padding-right:0.25rem;">
 
-      <div class="item-piles-populate-header">
-        <span style="flex:1 0 auto;">{localize("ITEM-PILES.Merchant.RollableTables")}</span>
-        <button style="height: 20px; line-height: inherit; font-size: 0.75rem; flex:1 0 auto; margin:0;"
-                on:click={() => { rollAllTables() }}>
-          <i class="fas fa-dice-d20"></i> {localize("ITEM-PILES.Merchant.RollAllTables")}
-        </button>
-      </div>
+			<div class="item-piles-populate-header">
+				<span style="flex:1 0 auto;">{localize("ITEM-PILES.Merchant.RollableTables")}</span>
+				<button style="height: 20px; line-height: inherit; font-size: 0.75rem; flex:1 0 auto; margin:0;"
+								on:click={() => { rollAllTables() }}>
+					<i class="fas fa-dice-d20"></i> {localize("ITEM-PILES.Merchant.RollAllTables")}
+				</button>
+			</div>
 
-      {#each $populationTables as table}
-        <div class="item-piles-item-row item-piles-even-color"
-             style="min-height: 28px; padding: 3px 3px 3px 5px;">
-          <div class="item-piles-flexrow" style="align-items: center;">
-            <div>
-              <strong>{$tables[table.id].name}</strong>
-            </div>
-            <button class="item-piles-rolled-item-button"
-                    on:click={() => { removeTable(table.id) }}
-                    data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
-            >
-              <i class="fas fa-trash" style="color:#de0e0e;"></i>
-            </button>
-            <button class="item-piles-rolled-item-button"
-                    on:click={() => { table.open = !table.open; }}
-                    data-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
-            >
-              <i class="fas fa-cog"></i>
-            </button>
-            <button class="item-piles-rolled-item-button"
-                    on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
-                    data-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
-                    style="margin-right:0;">
-              <i class="fas fa-dice-d20"></i>
-            </button>
-          </div>
-          {#if table.open}
-            <div class="item-piles-flexcol" style="margin-top:5px;"
-                 transition:slide={{ duration: 200, easing: quintOut }}>
-              <div class="item-piles-flexrow">
-                <div class="item-piles-flexrow" style="align-items: center; flex:0 1 auto; min-height:26px;">
-                  <label style="flex:0 1 auto; margin-right:5px;" for={"table-id-"+table.id}>Add all items:</label>
-                  <input style="width:15px; height:15px; margin:0; flex:0;" id={"table-id-"+table.id}
-                         bind:checked={table.addAll}
-                         on:change={() => {
+			{#each $populationTables as table}
+				<div class="item-piles-item-row item-piles-even-color"
+						 style="min-height: 28px; padding: 3px 3px 3px 5px;">
+					<div class="item-piles-flexrow" style="align-items: center;">
+						<div>
+							<strong>{$tables[table.id].name}</strong>
+						</div>
+						<button class="item-piles-rolled-item-button"
+										on:click={() => { removeTable(table.id) }}
+										data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
+						>
+							<i class="fas fa-trash" style="color:#de0e0e;"></i>
+						</button>
+						<button class="item-piles-rolled-item-button"
+										on:click={() => { table.open = !table.open; }}
+										data-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
+						>
+							<i class="fas fa-cog"></i>
+						</button>
+						<button class="item-piles-rolled-item-button"
+										on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
+										data-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
+										style="margin-right:0;">
+							<i class="fas fa-dice-d20"></i>
+						</button>
+					</div>
+					{#if table.open}
+						<div class="item-piles-flexcol" style="margin-top:5px;"
+								 transition:slide={{ duration: 200, easing: quintOut }}>
+							<div class="item-piles-flexrow">
+								<div class="item-piles-flexrow" style="align-items: center; flex:0 1 auto; min-height:26px;">
+									<label style="flex:0 1 auto; margin-right:5px;" for={"table-id-"+table.id}>Add all items:</label>
+									<input style="width:15px; height:15px; margin:0; flex:0;" id={"table-id-"+table.id}
+												 bind:checked={table.addAll}
+												 on:change={() => {
                            if(!table.addAll) return;
                            table.items = Object.fromEntries($tables[table.id].items.map(item => [item.id, "1d4"]));
                          }}
-                         type="checkbox"/>
-                </div>
-                {#if !table.addAll}
-                  <div class="item-piles-flexrow item-piles-item-row" style="align-items: center; flex:1;">
-                    <label style="margin-right:5px; text-align: right;">Time to roll on table:</label>
-                    <input type="text" placeholder="2d6+4" bind:value={table.timesToRoll}
-                           style="height:20px; margin: 3px; max-width: 50px; font-size: 0.75rem;"
-                    />
-                  </div>
-                {/if}
-              </div>
-              {#if table.addAll}
-                {#each $tables[table.id].items as item (item.id)}
-                  <div class="item-piles-flexrow item-piles-item-row item-piles-odd-color">
-                    <div class="item-piles-img-container">
-                      <img class="item-piles-img" src={item.img}/>
-                    </div>
+												 type="checkbox"/>
+								</div>
+								{#if !table.addAll}
+									<div class="item-piles-flexrow item-piles-item-row" style="align-items: center; flex:1;">
+										<label style="margin-right:5px; text-align: right;">Time to roll on table:</label>
+										<input type="text" placeholder="2d6+4" bind:value={table.timesToRoll}
+													 style="height:20px; margin: 3px; max-width: 50px; font-size: 0.75rem;"
+										/>
+									</div>
+								{/if}
+							</div>
+							{#if table.addAll}
+								{#each $tables[table.id].items as item (item.id)}
+									<div class="item-piles-flexrow item-piles-item-row item-piles-odd-color">
+										<div class="item-piles-img-container">
+											<img class="item-piles-img" src={item.img}/>
+										</div>
 
-                    <div class="item-piles-name item-piles-text">
-                      <div class="item-piles-name-container">
-                        <a class="item-piles-clickable" on:click={() => previewItem(item)}>{item.text}</a>
-                      </div>
-                    </div>
+										<div class="item-piles-name item-piles-text">
+											<div class="item-piles-name-container">
+												<a class="item-piles-clickable" on:click={() => previewItem(item)}>{item.text}</a>
+											</div>
+										</div>
 
-                    <div class="item-piles-quantity-container" style="flex:0 1 75px;">
-                      <div class="item-piles-quantity-input-container">
-                        <input
-                          class="item-piles-quantity"
-                          type="text"
-                          value={(table?.items?.[item.id] ?? "1d4")}
-                          on:change={(event) => {
+										<div class="item-piles-quantity-container" style="flex:0 1 75px;">
+											<div class="item-piles-quantity-input-container">
+												<input
+													class="item-piles-quantity"
+													type="text"
+													value={(table?.items?.[item.id] ?? "1d4")}
+													on:change={(event) => {
                             table.items[item.id] = event.target.value;
                           }}
-                        />
-                      </div>
-                    </div>
+												/>
+											</div>
+										</div>
 
-                  </div>
-                {/each}
-              {/if}
-            </div>
-          {/if}
-        </div>
-      {/each}
+									</div>
+								{/each}
+							{/if}
+						</div>
+					{/if}
+				</div>
+			{/each}
 
-      <div class="item-piles-flexrow" style="margin-top: 0.5rem; flex-wrap:nowrap;">
+			<div class="item-piles-flexrow" style="margin-top: 0.5rem; flex-wrap:nowrap;">
 
-        <select bind:value={selectedTable}>
-          {#each selectableTables as [tableId, table] (tableId)}
-            <option value={tableId}>{table.name}</option>
-          {/each}
-          {#if foundry.utils.isEmpty($tables)}
-            <option value="">
-              {localize("ITEM-PILES.Merchant.NoRollTables")}
-            </option>
-          {/if}
-        </select>
+				<select bind:value={selectedTable}>
+					{#each selectableTables as [tableId, table] (tableId)}
+						<option value={tableId}>{table.name}</option>
+					{/each}
+					{#if foundry.utils.isEmpty($tables)}
+						<option value="">
+							{localize("ITEM-PILES.Merchant.NoRollTables")}
+						</option>
+					{/if}
+				</select>
 
-        <button class="item-piles-button" style="max-width:80px; min-width:80px;" on:click={() => addTable()}>
-          {localize("ITEM-PILES.Merchant.AddTable")}
-        </button>
+				<button class="item-piles-button" style="max-width:80px; min-width:80px;" on:click={() => addTable()}>
+					{localize("ITEM-PILES.Merchant.AddTable")}
+				</button>
 
-      </div>
+			</div>
 
-      <hr style="margin:5px 0;"/>
+			<hr style="margin:5px 0;"/>
 
-      <div class="item-piles-flexrow item-piles-roll-header">
-        <label>
-          {localize(
+			<div class="item-piles-flexrow item-piles-roll-header">
+				<label>
+					{localize(
             timesRolled && $itemsRolled.length
               ? "ITEM-PILES.Merchant.RolledTimes"
               : "ITEM-PILES.Merchant.ClickRoll",
             { rolls: timesRolled }
           )}
-        </label>
+				</label>
 
-        <div class="item-piles-flexrow item-piles-keep-rolled">
-          <label>{localize("ITEM-PILES.Merchant.KeepRolled")}</label>
-          <input type="checkbox" bind:checked={keepRolled}/>
-        </div>
-      </div>
+				<div class="item-piles-flexrow item-piles-keep-rolled">
+					<label>{localize("ITEM-PILES.Merchant.KeepRolled")}</label>
+					<input type="checkbox" bind:checked={keepRolled}/>
+				</div>
+			</div>
 
-      {#if $itemsRolled.length}
-        {#each $itemsRolled as item (item.documentId)}
-          <div
-            class="item-piles-flexrow item-piles-item-row item-piles-even-color"
-          >
-            <button
-              class="item-piles-rolled-item-button"
-              on:click={() => addItem(item)}
-              data-tooltip={localize("ITEM-PILES.Merchant.AddItem")}
-            >
-              <i class="fas fa-arrow-left"/>
-            </button>
+			{#if $itemsRolled.length}
+				{#each $itemsRolled as item (item.documentId)}
+					<div
+						class="item-piles-flexrow item-piles-item-row item-piles-even-color"
+					>
+						<button
+							class="item-piles-rolled-item-button"
+							on:click={() => addItem(item)}
+							data-tooltip={localize("ITEM-PILES.Merchant.AddItem")}
+						>
+							<i class="fas fa-arrow-left"/>
+						</button>
 
-            <div class="item-piles-img-container">
-              <img class="item-piles-img" src={item.img}/>
-            </div>
+						<div class="item-piles-img-container">
+							<img class="item-piles-img" src={item.img}/>
+						</div>
 
-            <div class="item-piles-name">
-              <div class="item-piles-name-container">
-                <a
-                  class="item-piles-clickable"
-                  on:click={(_) => previewItem(item)}>{item.text}</a
-                >
-              </div>
-            </div>
+						<div class="item-piles-name">
+							<div class="item-piles-name-container">
+								<a
+									class="item-piles-clickable"
+									on:click={(_) => previewItem(item)}>{item.text}</a
+								>
+							</div>
+						</div>
 
-            <div class="item-piles-quantity-container">
-              {#if item.price}
-                <small style="white-space: nowrap;">{item.price}</small>
-                <i
-                  class="fas fa-times"
-                  style="color: #555; font-size: 0.75rem; opacity: 0.75;"
-                />
-              {/if}
-              <div class="item-piles-quantity-input-container">
-                <input
-                  class="item-piles-quantity"
-                  type="number"
-                  min="0"
-                  bind:value={item.quantity}
-                />
-              </div>
-            </div>
+						<div class="item-piles-quantity-container">
+							{#if item.price}
+								<small style="white-space: nowrap;">{item.price}</small>
+								<i
+									class="fas fa-times"
+									style="color: #555; font-size: 0.75rem; opacity: 0.75;"
+								/>
+							{/if}
+							<div class="item-piles-quantity-input-container">
+								<input
+									class="item-piles-quantity"
+									type="number"
+									min="0"
+									bind:value={item.quantity}
+								/>
+							</div>
+						</div>
 
-            <button
-              class="item-piles-rolled-item-button"
-              style="color:red;"
-              on:click={() => removeItem(item)}
-              data-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
-            >
-              <i class="fas fa-trash"/>
-            </button>
-          </div>
-        {/each}
+						<button
+							class="item-piles-rolled-item-button"
+							style="color:red;"
+							on:click={() => removeItem(item)}
+							data-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
+						>
+							<i class="fas fa-trash"/>
+						</button>
+					</div>
+				{/each}
 
-        <div class="item-piles-flexrow" style="margin:5px 0;">
+				<div class="item-piles-flexrow" style="margin:5px 0;">
 
-          <button class="item-piles-button" on:click={() => addAllItems()}>
-            {localize("ITEM-PILES.Merchant.AddAll")}
-            <i class="fas fa-arrow-left"/>
-          </button>
+					<button class="item-piles-button" on:click={() => addAllItems()}>
+						{localize("ITEM-PILES.Merchant.AddAll")}
+						<i class="fas fa-arrow-left"/>
+					</button>
 
-          <button class="item-piles-button"
-                  style="color:red; max-width:30px;"
-                  on:click={() => { $itemsRolled = []; }}
-                  data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
-            <i class="fas fa-trash"/>
-          </button>
+					<button class="item-piles-button"
+									style="color:red; max-width:30px;"
+									on:click={() => { $itemsRolled = []; }}
+									data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
+						<i class="fas fa-trash"/>
+					</button>
 
-        </div>
-      {/if}
+				</div>
+			{/if}
 
-    </div>
-  </div>
+		</div>
+	</div>
 </div>
 
 <style lang="scss">

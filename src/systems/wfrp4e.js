@@ -61,8 +61,8 @@ export default {
     }],
 
   CSS_VARIABLES: {
-    "--item-piles-even-color": "#554d40",
-    "--item-piles-odd-color": "#2f2920",
-    "--item-piles-input-text-color": "#fff"
+    "even-color": "#554d40",
+    "odd-color": "#2f2920",
+    "input-text-color": "#fff"
   }
 }

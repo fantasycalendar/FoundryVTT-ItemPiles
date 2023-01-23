@@ -5,6 +5,7 @@ import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
+import { getItemCurrencyData } from "../helpers/pile-utilities.js";
 
 class PileBaseItem {
 
@@ -106,6 +107,8 @@ export class PileItem extends PileBaseItem {
 
   setupProperties() {
     this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: this.store.actor });
+    const currency = this.isCurrency ? PileUtilities.getItemCurrencyData(this.item, { target: this.store.actor }) : {};
+    this.abbreviation = this.isCurrency ? currency.abbreviation : "";
     this.similarities = Utilities.setSimilarityProperties({}, this.item);
     this.toShare = this.isCurrency
       ? get(this.store.pileData).shareCurrenciesEnabled && !!this.store.recipient

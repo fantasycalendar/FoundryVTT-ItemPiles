@@ -38,33 +38,32 @@
 
   function reset() {
     data.value = foundry.utils.deepClone(data.default);
-    console.log(data.value, data.default);
   }
 
 </script>
 
 <div class="setting form-scope item-piles-flexrow">
 
-  <div class="label-side">
-    <label>
-      {localize(data.name)}
-      {#if !data.hideResetButton}
-        <a on:click={() => reset()} data-tooltip="Reset setting">
-          <i class="fas fa-undo reset-setting"></i>
-        </a>
-      {/if}
-    </label>
-    <p class="notes">{localize(data.hint)}</p>
-  </div>
+	<div class="label-side">
+		<label>
+			{localize(data.name)}
+			{#if !data.hideResetButton}
+				<a on:click={() => reset()} data-tooltip="Reset setting">
+					<i class="fas fa-undo reset-setting"></i>
+				</a>
+			{/if}
+		</label>
+		<p class="notes">{localize(data.hint)}</p>
+	</div>
 
-  <div class="form-fields input-side">
-    <div class="button-container">
-      <button type="button" on:click={() => { callback(); }}>
-        <i class="{data.icon}"></i>
-        {localize(data.label)}
-      </button>
-    </div>
-  </div>
+	<div class="form-fields input-side">
+		<div class="button-container">
+			<button type="button" on:click={() => { callback(); }}>
+				<i class="{data.icon}"></i>
+				{localize(data.label)}
+			</button>
+		</div>
+	</div>
 
 </div>
 

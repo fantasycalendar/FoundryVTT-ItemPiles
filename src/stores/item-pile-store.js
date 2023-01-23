@@ -356,6 +356,7 @@ export default class ItemPileStore {
     const result = await DropCurrencyDialog.show(this.actor, false, {
       unlimitedCurrencies: true,
       existingCurrencies: PileUtilities.getActorCurrencies(this.actor),
+      getUpdates: true,
       button: "Submit"
     });
     return this._addCurrency(result, this.actor);
@@ -371,7 +372,10 @@ export default class ItemPileStore {
         await game.itempiles.API.setAttributes(source, currencies.attributes, { interactionId: this.interactionId })
       }
       if (currencies.items.length) {
-        await game.itempiles.API.addItems(source, currencies.items, { interactionId: this.interactionId })
+        const itemsToAdd = currencies.items.filter(currency => currency.quantity > 0);
+        const itemsToRemove = currencies.items.filter(currency => currency.quantity < 0);
+        await game.itempiles.API.addItems(source, itemsToAdd, { interactionId: this.interactionId })
+        await game.itempiles.API.removeItems(source, itemsToRemove, { interactionId: this.interactionId })
       }
 
     } else {

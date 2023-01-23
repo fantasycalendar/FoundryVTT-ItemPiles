@@ -138,7 +138,7 @@
     ]
   }
 
-  let activeTab = "other";
+  let activeTab = "main";
 
   const customTypes = Object.keys(CONSTANTS.CUSTOM_PILE_TYPES);
 
@@ -148,89 +148,89 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form bind:this={form} on:submit|once|preventDefault={updateSettings} autocomplete=off
-        class="item-piles-config-container">
+	<form bind:this={form} on:submit|once|preventDefault={updateSettings} autocomplete=off
+				class="item-piles-config-container">
 
-    <Tabs bind:activeTab bind:tabs/>
+		<Tabs bind:activeTab bind:tabs/>
 
-    <section class="tab-body">
+		<section class="tab-body">
 
-      <div class="tab">
+			<div class="tab">
 
-        {#if activeTab === 'main'}
+				{#if activeTab === 'main'}
 
-          <MainSettings bind:pileData {pileActor} {pileEnabled}/>
+					<MainSettings bind:pileData {pileActor} {pileEnabled}/>
 
-        {/if}
+				{/if}
 
-        {#if activeTab === "other"}
+				{#if activeTab === "other"}
 
-          <div class="form-group">
-            <label style="flex:4;">
-              <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.Type")}</span>
-              <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.TypeExplanation")}</p>
-            </label>
-            <select style="flex:4;" bind:value={pileData.type}>
-              {#each Object.values(CONSTANTS.PILE_TYPES) as type}
-                <option value={type}>
-                  {localize(`ITEM-PILES.Types.${type}`)}
-                </option>
-              {/each}
-              {#each customTypes as customType}
-                <option value={customType}>
-                  {localize(`ITEM-PILES.Types.${customType}`)}
-                </option>
-              {/each}
-            </select>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.Type")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.TypeExplanation")}</p>
+						</label>
+						<select style="flex:4;" bind:value={pileData.type}>
+							{#each Object.values(CONSTANTS.PILE_TYPES) as type}
+								<option value={type}>
+									{localize(`ITEM-PILES.Types.${type}`)}
+								</option>
+							{/each}
+							{#each customTypes as customType}
+								<option value={customType}>
+									{localize(`ITEM-PILES.Types.${customType}`)}
+								</option>
+							{/each}
+						</select>
+					</div>
 
-          <hr>
+					<hr>
 
-          {#if pileData.type === CONSTANTS.PILE_TYPES.MERCHANT}
+					{#if pileData.type === CONSTANTS.PILE_TYPES.MERCHANT}
 
-            <MerchantSettings bind:pileData {pileActor}/>
+						<MerchantSettings bind:pileData {pileActor}/>
 
-          {:else if pileData.type === CONSTANTS.PILE_TYPES.PILE || pileData.type === CONSTANTS.PILE_TYPES.CONTAINER}
+					{:else if pileData.type === CONSTANTS.PILE_TYPES.PILE || pileData.type === CONSTANTS.PILE_TYPES.CONTAINER}
 
-            {#if pileData.type === CONSTANTS.PILE_TYPES.PILE}
+						{#if pileData.type === CONSTANTS.PILE_TYPES.PILE}
 
-              <ItemPileSettings bind:pileData/>
+							<ItemPileSettings bind:pileData/>
 
-            {/if}
+						{/if}
 
-            {#if pileData.type === CONSTANTS.PILE_TYPES.CONTAINER}
+						{#if pileData.type === CONSTANTS.PILE_TYPES.CONTAINER}
 
-              <ContainerSettings bind:pileData/>
+							<ContainerSettings bind:pileData/>
 
-            {/if}
+						{/if}
 
-            <hr>
+						<hr>
 
-            <SharingSettings bind:pileData {pileActor}/>
+						<SharingSettings bind:pileData {pileActor}/>
 
-          {:else if pileData.type === CONSTANTS.PILE_TYPES.VAULT}
+					{:else if pileData.type === CONSTANTS.PILE_TYPES.VAULT}
 
-            <VaultSettings bind:pileData {pileActor}/>
+						<VaultSettings bind:pileData {pileActor}/>
 
-          {:else if customTypes.includes(pileData.type)}
+					{:else if customTypes.includes(pileData.type)}
 
-            <CustomSettings bind:pileData {pileActor}/>
+						<CustomSettings bind:pileData {pileActor}/>
 
-          {/if}
+					{/if}
 
-        {/if}
+				{/if}
 
-      </div>
+			</div>
 
-    </section>
+		</section>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i>
-        {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i>
+				{localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
+			</button>
+		</footer>
 
-  </form>
+	</form>
 
 </ApplicationShell>
