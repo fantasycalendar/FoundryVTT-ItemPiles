@@ -4,6 +4,8 @@
 
 - Added further Simple Calendar support; merchants can now be closed on specific weekday, and categories on notes can cause merchants to be closed (think holidays)
 - Added support for vault item styling based on item properties
+- Added `Hide Items With Zero Cost` setting to merchants, which automatically hides items in the buy/sell/service tabs if they are free
+- Tweaked `Buy Items` tab to be hidden if the merchant has no visible items for sale, and the customer can sell items
 - Fixed disabled elements being blue due to styling being incorrect
 - Fixed item-based currencies would show up in the vault grids
 - Fixed setting item-based currencies' quantity on item piles would instead always add them

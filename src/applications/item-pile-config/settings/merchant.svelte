@@ -128,18 +128,10 @@
 
 <div class="form-group">
 	<label>
-		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyOnlyItemsWithCost")}</span>
-		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyOnlyItemsWithCostExplanation")}</p>
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideItemsWithZeroCost")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideItemsWithZeroCostExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.buyOnlyItemsWithCost}/>
-</div>
-
-<div class="form-group">
-	<label>
-		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellOnlyItemsWithCost")}</span>
-		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellOnlyItemsWithCostExplanation")}</p>
-	</label>
-	<input type="checkbox" bind:checked={pileData.sellOnlyItemsWithCost}/>
+	<input type="checkbox" bind:checked={pileData.hideItemsWithZeroCost}/>
 </div>
 
 <div class="form-group">
