@@ -14,6 +14,7 @@ class SettingsApp extends SvelteApplication {
         target: document.body
       },
       zIndex: 100,
+      classes: ["item-piles-app"],
     });
   }
 

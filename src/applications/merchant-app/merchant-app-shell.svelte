@@ -66,14 +66,14 @@
   let sellHidden;
   let tabs;
   $: {
-    sellHidden = $pileData.purchaseOnly;
+    sellHidden = $pileData.purchaseOnly || !recipientStore;
     let hasItems = $visibleItems.some(item => !get(item.category).service)
     let hasServices = $visibleItems.some(item => get(item.category).service)
     tabs = [
       {
         value: 'buy',
         label: game.i18n.localize('ITEM-PILES.Merchant.BuyItems'),
-        hidden: !hasItems && hasServices
+        hidden: !hasItems && hasServices || !sellHidden
       },
       {
         value: 'services',
@@ -83,7 +83,7 @@
       {
         value: 'sell',
         label: game.i18n.localize('ITEM-PILES.Merchant.SellItems'),
-        hidden: !recipientStore || sellHidden
+        hidden: sellHidden
       },
       {
         value: 'tables',
@@ -103,21 +103,21 @@
 <svelte:window on:click={() => { $priceSelector = ""; }}/>
 
 <ApplicationShell bind:elementRoot>
-  <DropZone callback={dropData} style="display: flex; flex-direction: column; height: 100%;">
-    <MerchantTopBar {store}/>
-    <Tabs style="flex: 0 1 auto; font-size: 1.1rem; justify-content: flex-start;"
-          bind:tabs="{tabs}"
-          bind:activeTab={$activeTab}
-          separateElements
-          underscore
-    />
-    <div class="item-piles-flexrow item-pile-merchant-content">
-      {#if $activeTab !== "tables"}
-        <MerchantLeftPane {store}/>
-      {/if}
-      <MerchantRightPane {store} {recipientStore} {activeTab}/>
-    </div>
-  </DropZone>
+	<DropZone callback={dropData} style="display: flex; flex-direction: column; height: 100%;">
+		<MerchantTopBar {store}/>
+		<Tabs style="flex: 0 1 auto; font-size: 1.1rem; justify-content: flex-start;"
+					bind:tabs="{tabs}"
+					bind:activeTab={$activeTab}
+					separateElements
+					underscore
+		/>
+		<div class="item-piles-flexrow item-pile-merchant-content">
+			{#if $activeTab !== "tables"}
+				<MerchantLeftPane {store}/>
+			{/if}
+			<MerchantRightPane {store} {recipientStore} {activeTab}/>
+		</div>
+	</DropZone>
 </ApplicationShell>
 
 

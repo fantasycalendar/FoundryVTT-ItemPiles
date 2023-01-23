@@ -20,8 +20,7 @@ export default class MerchantStore extends ItemPileStore {
     this.priceModifiersForActor = writable({});
     this.priceSelector = writable("");
     this.closed = writable(false);
-    this.listenToDateChange = true;
-    this.activateHooks();
+    this.isMerchant = false;
   }
 
   get ItemClass() {
@@ -33,23 +32,12 @@ export default class MerchantStore extends ItemPileStore {
     return pileData?.merchantImage || this.actor.img;
   }
 
-  activateHooks() {
-    if (game.modules.get('foundryvtt-simple-calendar')?.active) {
-      this.setupSimpleCalendar();
-    }
-  }
-
-  setupSimpleCalendar() {
-    Hooks.on(window.SimpleCalendar.Hooks.DateTimeChange, () => {
-      this.updateClosedStatus();
-    });
-  }
-
   setupSubscriptions() {
     super.setupSubscriptions();
     this.subscribeTo(this.pileData, (pileData) => {
       this.updatePriceModifiers();
-      this.updateClosedStatus();
+      this.updateOpenCloseStatus();
+      this.isMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
     });
     if (this.recipientDocument) {
       this.subscribeTo(this.recipientPileData, () => {
@@ -73,6 +61,18 @@ export default class MerchantStore extends ItemPileStore {
     get(this.allItems).forEach(item => {
       item.refreshPriceData();
     });
+  }
+
+  visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
+    const itemFlagData = get(entry.itemFlagData) ?? {};
+    const itemIsFree = get(entry.prices)?.free ?? false;
+    return !entry.isCurrency
+      && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden)
+      && (
+        actorIsMerchant
+          ? !(pileData?.hideItemsWithZeroCost && itemIsFree)
+          : !(recipientPileData?.hideItemsWithZeroCost && itemIsFree)
+      );
   }
 
   createItem(item) {
@@ -149,11 +149,11 @@ export default class MerchantStore extends ItemPileStore {
     );
   }
 
-  async updateClosedStatus() {
-    if (!this.listenToDateChange) return;
+  async updateOpenCloseStatus() {
     const pileData = get(this.pileData);
     if (pileData.openTimes.status === "auto") {
       if (game.modules.get('foundryvtt-simple-calendar')?.active && pileData.openTimes.enabled) {
+        let isClosed = false;
         const openTimes = pileData.openTimes.open;
         const closeTimes = pileData.openTimes.close;
         const timestamp = window.SimpleCalendar.api.timestampToDate(window.SimpleCalendar.api.timestamp());
@@ -162,9 +162,19 @@ export default class MerchantStore extends ItemPileStore {
         const closingTime = Number(closeTimes.hour.toString() + "." + closeTimes.minute.toString());
         const currentTime = Number(timestamp.hour.toString() + "." + timestamp.minute.toString());
 
-        const isClosed = openingTime > closingTime
+        isClosed = openingTime > closingTime
           ? !(currentTime >= openingTime || currentTime <= closingTime)  // Is the store open over midnight?
           : !(currentTime >= openingTime && currentTime <= closingTime); // or is the store open during normal daylight hours?
+
+        const currentWeekday = window.SimpleCalendar.api.getCurrentWeekday();
+
+        isClosed = isClosed || (pileData.closedDays ?? []).includes(currentWeekday.name);
+
+        const currentDate = window.SimpleCalendar.api.currentDateTime();
+        const notes = window.SimpleCalendar.api.getNotesForDay(currentDate.year, currentDate.month, currentDate.day);
+        const categories = new Set(notes.map(note => getProperty(note, "flags.foundryvtt-simple-calendar.noteData.categories") ?? []).deepFlatten());
+
+        isClosed = isClosed || categories.intersection(new Set(pileData.closedHolidays ?? [])).size > 0;
 
         this.closed.set(isClosed);
 
@@ -192,7 +202,7 @@ class PileMerchantItem extends PileItem {
 
   setupStores(item) {
     super.setupStores(item);
-    this.prices = writable({});
+    this.prices = writable([]);
     this.displayQuantity = writable(false);
     this.selectedPriceGroup = writable(-1);
     this.quantityToBuy = writable(1);

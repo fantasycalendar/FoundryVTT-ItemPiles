@@ -113,6 +113,7 @@ const CONSTANTS = {
     infiniteCurrencies: true,
     purchaseOnly: false,
     hideNewItems: false,
+    hideItemsWithZeroCost: false,
     keepZeroQuantity: false,
     onlyAcceptBasePrice: true,
     displayQuantity: "yes",
@@ -136,8 +137,10 @@ const CONSTANTS = {
       close: {
         hour: 18,
         minute: 0
-      }
+      },
     },
+    closedDays: [],
+    closedHolidays: [],
 
     // Vault settings
     cols: 10,

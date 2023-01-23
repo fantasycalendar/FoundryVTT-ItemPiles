@@ -60,9 +60,9 @@ export default {
       exchangeRate: 0.01
     }],
 
-  "CSS_OVERRIDES": {
-    "--item-piles-even-color": "#554d40",
-    "--item-piles-odd-color": "#2f2920",
-    "--item-piles-input-text-color": "#fff"
+  CSS_VARIABLES: {
+    "even-color": "#554d40",
+    "odd-color": "#2f2920",
+    "input-text-color": "#fff"
   }
 }

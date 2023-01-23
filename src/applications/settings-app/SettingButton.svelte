@@ -18,40 +18,52 @@
 
   function showEditor() {
     if (editor) {
-      editor.show(data.value).then((result) => {
+      const combinedData = data?.mergedDefaults
+        ? foundry.utils.mergeObject(data.mergedDefaults, data.value)
+        : data.value;
+      editor.show(combinedData, { ...data.applicationOptions, onchange: data.onchange } ?? {}).then((result) => {
         if (result) {
+          if (data?.mergedDefaults) {
+            result = foundry.utils.diffObject(data?.mergedDefaults, result);
+          }
           data.value = result;
+          if (data.onchange) data.onchange(result);
+        } else {
+          if (data.onchange) data.onchange();
         }
       });
       application.options.zLevel = 100;
     }
   }
 
+  function reset() {
+    data.value = foundry.utils.deepClone(data.default);
+  }
+
 </script>
 
 <div class="setting form-scope item-piles-flexrow">
 
-  <div class="label-side">
-    <label>
-      {localize(data.name)}
-      {#if !data.hideResetButton}
-        <a>
-          <i data-tooltip="Reset data" class="fas fa-undo reset-setting"
-             on:click={() => { data.value = data.default; }}></i>
-        </a>
-      {/if}
-    </label>
-    <p class="notes">{localize(data.hint)}</p>
-  </div>
+	<div class="label-side">
+		<label>
+			{localize(data.name)}
+			{#if !data.hideResetButton}
+				<a on:click={() => reset()} data-tooltip="Reset setting">
+					<i class="fas fa-undo reset-setting"></i>
+				</a>
+			{/if}
+		</label>
+		<p class="notes">{localize(data.hint)}</p>
+	</div>
 
-  <div class="form-fields input-side">
-    <div class="button-container">
-      <button type="button" on:click={() => { callback(); }}>
-        <i class="{data.icon}"></i>
-        {localize(data.label)}
-      </button>
-    </div>
-  </div>
+	<div class="form-fields input-side">
+		<div class="button-container">
+			<button type="button" on:click={() => { callback(); }}>
+				<i class="{data.icon}"></i>
+				{localize(data.label)}
+			</button>
+		</div>
+	</div>
 
 </div>
 

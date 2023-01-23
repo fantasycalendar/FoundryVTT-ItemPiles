@@ -3,12 +3,7 @@
   import * as Helpers from "../../helpers/helpers.js"
 
   export let currency;
-  export let options = {
-    reverse: false,
-    abbreviations: false,
-    abbreviateNumbers: false,
-    imgSize: 24
-  };
+  export let options;
 
   let name = currency.name;
   let img = currency.img;

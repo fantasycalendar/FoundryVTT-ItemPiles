@@ -10,6 +10,8 @@
   export let text;
   export let elementRoot;
 
+  const options = application.options;
+
   const originalText = text;
 
   let form;

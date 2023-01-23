@@ -7,6 +7,7 @@
   import PriceList from "../components/PriceList.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import MacroSelector from "../components/MacroSelector.svelte";
+  import { get } from "svelte/store";
 
   const { application } = getContext('external');
 
@@ -17,6 +18,7 @@
 
   const flagDataStore = store.data;
   let price = store.price;
+  let oldPrice = get(price);
 
   $: itemFlagData = $flagDataStore;
 
@@ -47,202 +49,207 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-piles-config-container">
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-piles-config-container">
 
-    <Tabs bind:activeTab tabs={[
+		<Tabs bind:activeTab tabs={[
     { value: "general", label: localize("ITEM-PILES.Applications.ItemEditor.General") },
     { value: "price", label: localize("ITEM-PILES.Applications.ItemEditor.Price") },
     { value: "vault", label: localize("ITEM-PILES.Applications.ItemEditor.Vault") },
   ]}/>
 
-    <section class="tab-body">
+		<section class="tab-body">
 
-      <div class="tab flex">
+			<div class="tab flex">
 
-        {#if activeTab === 'general'}
+				{#if activeTab === 'general'}
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.CustomCategory")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.CustomCategoryExplanation")}</p>
-            </label>
-            <input type="text" bind:value={itemFlagData.customCategory} placeholder={item.type}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.CustomCategory")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.CustomCategoryExplanation")}</p>
+						</label>
+						<input type="text" bind:value={itemFlagData.customCategory} placeholder={item.type}/>
+					</div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.Hidden")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.HiddenExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.hidden}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.Hidden")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.HiddenExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.hidden}/>
+					</div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.NotForSale")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.NotForSaleExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.notForSale}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.NotForSale")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.NotForSaleExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.notForSale}/>
+					</div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.CantBeSoldToMerchants")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.CantBeSoldToMerchantsExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.cantBeSoldToMerchants}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.CantBeSoldToMerchants")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.CantBeSoldToMerchantsExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.cantBeSoldToMerchants}/>
+					</div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantity")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.infiniteQuantity}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantity")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.infiniteQuantity}/>
+					</div>
 
-          <div class="form-group">
-            <label>
-              <span>{localize("ITEM-PILES.Applications.ItemEditor.KeepZero")}</span>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.KeepZeroExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.keepZeroQuantity}/>
-          </div>
+					<div class="form-group">
+						<label>
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.KeepZero")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.KeepZeroExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.keepZeroQuantity}/>
+					</div>
 
-          <div class="form-group">
-            <label>
-              {localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantity")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityExplanation")}</p>
-            </label>
-            <select style="flex: 0 1 auto;" bind:value={itemFlagData.displayQuantity}>
-              <option value="default">
-                {localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityDefault")}
-              </option>
-              <option value="yes">
-                {localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityYes")}
-              </option>
-              <option value="no">
-                {localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityNo")}
-              </option>
-            </select>
-          </div>
+					<div class="form-group">
+						<label>
+							{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantity")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityExplanation")}</p>
+						</label>
+						<select style="flex: 0 1 auto;" bind:value={itemFlagData.displayQuantity}>
+							<option value="default">
+								{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityDefault")}
+							</option>
+							<option value="yes">
+								{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityYes")}
+							</option>
+							<option value="no">
+								{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityNo")}
+							</option>
+						</select>
+					</div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.Service")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.ServiceExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.isService}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.Service")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.ServiceExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.isService}/>
+					</div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              <span>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseMacro")}</span>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseMacroExplanation")}</p>
-            </label>
-          </div>
-          <div class="form-group">
-            <MacroSelector bind:macro={itemFlagData.macro}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseMacro")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseMacroExplanation")}</p>
+						</label>
+					</div>
+					<div class="form-group">
+						<MacroSelector bind:macro={itemFlagData.macro}/>
+					</div>
 
-        {/if}
+				{/if}
 
-        {#if activeTab === 'price'}
+				{#if activeTab === 'price'}
 
-          {#if game.system.id !== "pf2e"}
-            <div class="form-group">
-              <label style="flex:4;">
-                {localize("ITEM-PILES.Applications.ItemEditor.BasePrice")}<br>
-                <p>{localize("ITEM-PILES.Applications.ItemEditor.BasePriceExplanation")}</p>
-              </label>
-              <input type="text" bind:value={$price} on:change={() => {
-                $price = isNaN(Number($price)) ? $price : $price.max(0, Number($price));
+					{#if game.system.id !== "pf2e"}
+						<div class="form-group">
+							<label style="flex:4;">
+								{localize("ITEM-PILES.Applications.ItemEditor.BasePrice")}<br>
+								<p>{localize("ITEM-PILES.Applications.ItemEditor.BasePriceExplanation")}</p>
+							</label>
+							<input type="text" bind:value={$price} on:change={() => {
+                const forceNumber = game.system.id === "dnd5e";
+								const isPriceNumber = !isNaN(Number($price));
+                $price = isPriceNumber || forceNumber
+                	? Math.max(0, isPriceNumber ? Number($price) : oldPrice)
+                	: $price;
+                oldPrice = $price;
               }}/>
-            </div>
-          {/if}
+						</div>
+					{/if}
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.Free")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.FreeExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.free}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.Free")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.FreeExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.free}/>
+					</div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.DisableNormalCost")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.DisableNormalCostExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.disableNormalCost}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.DisableNormalCost")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.DisableNormalCostExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.disableNormalCost}/>
+					</div>
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptions")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsExplanation")}</p>
-            </label>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptions")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsExplanation")}</p>
+						</label>
 
-            <button type="button" on:click={() => { addGroup() }}>
-              <i class="fas fa-plus"></i>
-              {localize("ITEM-PILES.Applications.ItemEditor.AddPurchaseOption")}
-            </button>
-          </div>
+						<button type="button" on:click={() => { addGroup() }}>
+							<i class="fas fa-plus"></i>
+							{localize("ITEM-PILES.Applications.ItemEditor.AddPurchaseOption")}
+						</button>
+					</div>
 
-          {#if itemFlagData.prices.length}
-            {#each itemFlagData.prices as prices, groupIndex (groupIndex)}
-              <PriceList bind:prices={prices} remove={() => { store.removeGroup(groupIndex) }}/>
-            {/each}
-          {/if}
+					{#if itemFlagData.prices.length}
+						{#each itemFlagData.prices as prices, groupIndex (groupIndex)}
+							<PriceList bind:prices={prices} remove={() => { store.removeGroup(groupIndex) }}/>
+						{/each}
+					{/if}
 
-        {/if}
+				{/if}
 
-        {#if activeTab === 'vault'}
+				{#if activeTab === 'vault'}
 
-          <div class="form-group">
-            <label style="flex:4;">
-              {localize("ITEM-PILES.Applications.ItemEditor.VaultExpander")}<br>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.VaultExpanderExplanation")}</p>
-            </label>
-            <input type="checkbox" bind:checked={itemFlagData.vaultExpander}/>
-          </div>
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.VaultExpander")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultExpanderExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.vaultExpander}/>
+					</div>
 
 
-          <div class="form-group">
-            <label style="flex:6;">
-              <span>{localize("ITEM-PILES.Applications.ItemEditor.ExpandColumnsRows")}</span>
-              <p>{localize("ITEM-PILES.Applications.ItemEditor.ExpandColumnsRowsExplanation")}</p>
-            </label>
-            <div class="item-piles-grid-columns" style="flex: 3;">
-              <div style="text-align: center; font-size: 0.7rem;">
-                <i>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Columns")}</i>
-                <i>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Rows")}</i>
-              </div>
-              <div style="align-items: center;">
-                <input style="text-align: right;" type="number" placeholder="Enter a number..."
-                       bind:value={itemFlagData.addsCols}/>
-                <span style="flex: 0;">x</span>
-                <input type="number" placeholder="Enter a number..." bind:value={itemFlagData.addsRows}/>
-              </div>
-            </div>
-          </div>
+					<div class="form-group">
+						<label style="flex:6;">
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.ExpandColumnsRows")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.ExpandColumnsRowsExplanation")}</p>
+						</label>
+						<div class="item-piles-grid-columns" style="flex: 3;">
+							<div style="text-align: center; font-size: 0.7rem;">
+								<i>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Columns")}</i>
+								<i>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Rows")}</i>
+							</div>
+							<div style="align-items: center;">
+								<input style="text-align: right;" type="number" placeholder="Enter a number..."
+											 bind:value={itemFlagData.addsCols}/>
+								<span style="flex: 0;">x</span>
+								<input type="number" placeholder="Enter a number..." bind:value={itemFlagData.addsRows}/>
+							</div>
+						</div>
+					</div>
 
-        {/if}
+				{/if}
 
-      </div>
+			</div>
 
-    </section>
+		</section>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("ITEM-PILES.Applications.ItemEditor.Update")}
-      </button>
-      <button type="button" on:click|once={() => { application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("ITEM-PILES.Applications.ItemEditor.Update")}
+			</button>
+			<button type="button" on:click|once={() => { application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 
 </ApplicationShell>
 

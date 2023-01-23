@@ -400,7 +400,7 @@
         },
         "Merchant": {
           "EnabledExplanation": "Os jogadores não podem pegar itens de comerciantes, mas devem comprá-los",
-          "OnyAcceptBasePriceExplanation": "Quando ativado, todos os itens vendidos a este comerciante devem usar o preço base, e não os preços personalizados.",
+          "OnlyAcceptBasePriceExplanation": "Quando ativado, todos os itens vendidos a este comerciante devem usar o preço base, e não os preços personalizados.",
           "OpenTimesExplanation": "Quando ativado, o comerciante só pode interagir com os jogadores em determinados horários do dia.",
           "OpenStatusExplanation": "Isso configura o estado atual do status aberto do comerciante. Se Open Times (abaixo) estiver habilitado e o módulo Simple Calendar estiver habilitado, você pode configurar isso para ser automático.",
           "ActorPriceModifiers": "Modificadores de preço de substituição por ator",
@@ -422,7 +422,7 @@
           "DisplayQuantityYesAlways": "Sim, sempre mostrar a quantidade",
           "DisplayQuantityNoAlways": "Não, sempre ocultar a quantidade",
           "PurchaseOnly": "Somente compra",
-          "OnyAcceptBasePrice": "Aceitar apenas preço base",
+          "OnlyAcceptBasePrice": "Aceitar apenas preço base",
           "Enabled": "É Comerciante",
           "OpenTimes": "Horários abertos",
           "OpenStatus": "Status aberto",

@@ -25,7 +25,7 @@ export default class TradingApp extends SvelteApplication {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       zIndex: 100,
-      classes: ["dialog", "item-piles-trading-sheet", "item-piles"],
+      classes: ["dialog", "item-piles-trading-sheet", "item-piles", "item-piles-app"],
       width: 800,
       height: "auto",
       closeOnSubmit: false

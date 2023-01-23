@@ -1,160 +1,168 @@
 <script>
-	import SETTINGS from "../../constants/settings.js";
+  import SETTINGS from "../../constants/settings.js";
 
-	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+  import { getContext } from 'svelte';
+  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
 
-	import * as helpers from "../../helpers/helpers.js"
-	import { applyDefaultSettings } from "../../settings.js";
+  import * as helpers from "../../helpers/helpers.js"
+  import { applyDefaultSettings } from "../../settings.js";
 
-	import Setting from "./Setting.svelte";
-	import SettingButton from "./SettingButton.svelte";
-	import Tabs from "../components/Tabs.svelte";
-	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-	import CustomDialog from "../components/CustomDialog.svelte";
+  import Setting from "./Setting.svelte";
+  import SettingButton from "./SettingButton.svelte";
+  import Tabs from "../components/Tabs.svelte";
+  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+  import CustomDialog from "../components/CustomDialog.svelte";
 
-	const { application } = getContext('external');
+  const { application } = getContext('external');
 
-	export let elementRoot;
-	let form;
+  export let elementRoot;
+  let form;
 
-	let settings = {};
-	let userCanChangeSettings = game.user.hasPermission("SETTINGS_MODIFY");
+  let settings = {};
+  let userCanChangeSettings = game.user.hasPermission("SETTINGS_MODIFY");
 
-	getSettings();
+  getSettings();
 
-	function getSettings() {
-		settings = Object.fromEntries(Object.entries(SETTINGS.GET_DEFAULT()).map(entry => {
-			entry[1].value = helpers.getSetting(entry[0]);
-			return entry;
-		}));
+  function getSettings() {
+    settings = Object.fromEntries(Object.entries(SETTINGS.GET_DEFAULT()).map(entry => {
+      entry[1].value = helpers.getSetting(entry[0]);
+      return entry;
+    }));
 
-		settings[SETTINGS.POPULATION_TABLES_FOLDER].choices = {
-			"root": "ITEM-PILES.Settings.PopulationTablesFolder.AllTables",
-			...Object.fromEntries(
-				game.folders
-					.filter(f => f.type === "RollTable")
-					.map(f => [f.id, f.name])
-			)
-		}
-	}
+    settings[SETTINGS.POPULATION_TABLES_FOLDER].choices = {
+      "root": "ITEM-PILES.Settings.PopulationTablesFolder.AllTables",
+      ...Object.fromEntries(
+        game.folders
+          .filter(f => f.type === "RollTable")
+          .map(f => [f.id, f.name])
+      )
+    }
+  }
 
-	function requestSubmit() {
-		form.requestSubmit();
-	}
+  function requestSubmit() {
+    form.requestSubmit();
+  }
 
-	async function updateSettings() {
-		let settingsToUpdate = Object.entries(settings).filter(entry => userCanChangeSettings || entry[1].scope === "client");
-		for (let [key, setting] of settingsToUpdate) {
-			await helpers.setSetting(key, setting.value);
-		}
-		application.close();
-	}
+  async function updateSettings() {
+    let settingsToUpdate = Object.entries(settings).filter(entry => userCanChangeSettings || entry[1].scope === "client");
+    for (let [key, setting] of settingsToUpdate) {
+      await helpers.setSetting(key, setting.value);
+    }
+    application.close();
+  }
 
-	async function resetSettings() {
+  async function resetSettings() {
 
-		const doThing = await TJSDialog.confirm({
-			title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
-			content: {
-				class: CustomDialog,
-				props: {
-					content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Content")
-				}
-			},
-			buttons: {
-				yes: {
-					icon: '<i class="fas fa-check"></i>',
-					label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Confirm")
-				},
-				no: {
-					icon: '<i class="fas fa-times"></i>',
-					label: game.i18n.localize("No")
-				}
-			},
-			modal: true,
-			draggable: false,
-			rejectClose: false,
-			defaultYes: true,
-			options: {
-				height: "auto"
-			}
-		});
+    const doThing = await TJSDialog.confirm({
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
+      content: {
+        class: CustomDialog,
+        props: {
+          content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Content")
+        }
+      },
+      buttons: {
+        yes: {
+          icon: '<i class="fas fa-check"></i>',
+          label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Confirm")
+        },
+        no: {
+          icon: '<i class="fas fa-times"></i>',
+          label: game.i18n.localize("No")
+        }
+      },
+      modal: true,
+      draggable: false,
+      rejectClose: false,
+      defaultYes: true,
+      options: {
+        height: "auto"
+      }
+    });
 
-		if (!doThing) return;
+    if (!doThing) return;
 
-		return applyDefaultSettings();
-	}
+    return applyDefaultSettings();
+  }
 
-	let tabs = [
-		{ value: "local", label: localize("ITEM-PILES.Applications.Settings.Local") },
-		{ value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), hidden: !userCanChangeSettings },
-		{ value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userCanChangeSettings },
-	];
+  let tabs = [
+    { value: "local", label: localize("ITEM-PILES.Applications.Settings.Local") },
+    { value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), hidden: !userCanChangeSettings },
+    { value: "styles", label: localize("ITEM-PILES.Applications.Settings.Styles"), hidden: !userCanChangeSettings },
+    { value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userCanChangeSettings },
+  ];
 
-	let activeTab = tabs[0].value;
+  let activeTab = tabs[0].value;
 
 </script>
 
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-  <form bind:this={form} on:submit|once|preventDefault={updateSettings} autocomplete="off">
+	<form bind:this={form} on:submit|once|preventDefault={updateSettings} autocomplete="off">
 
-    <h2 style="text-align: center; margin-bottom: 1rem;">{localize("ITEM-PILES.Applications.Settings.Title")}</h2>
+		<h2 style="text-align: center; margin-bottom: 1rem;">{localize("ITEM-PILES.Applications.Settings.Title")}</h2>
 
-    <Tabs bind:activeTab {tabs}/>
+		{#if userCanChangeSettings}
+			<Tabs bind:activeTab {tabs}/>
+		{/if}
 
-    <section class="tab-body">
+		<section class="tab-body">
 
-      <div class="tab flex" class:active={activeTab === 'local'} data-scope="primary" data-tab="local">
+			<div class="tab flex" class:active={activeTab === 'local'} data-scope="primary" data-tab="local">
 
-        <Setting bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}"/>
-        <Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}"/>
-        <Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_BUTTON]}"/>
-        <Setting bind:data="{settings[SETTINGS.PRELOAD_FILES]}"/>
-        <Setting bind:data="{settings[SETTINGS.DEBUG]}"/>
-        <Setting bind:data="{settings[SETTINGS.DEBUG_HOOKS]}"/>
+				<Setting bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}"/>
+				<Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}"/>
+				<Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_BUTTON]}"/>
+				<Setting bind:data="{settings[SETTINGS.PRELOAD_FILES]}"/>
+				<Setting bind:data="{settings[SETTINGS.DEBUG]}"/>
+				<Setting bind:data="{settings[SETTINGS.DEBUG_HOOKS]}"/>
 
-        <div style="text-align: center; font-size: 1rem; margin-top:3rem;">
-          <p>{localize("ITEM-PILES.Applications.Settings.MoreToCome")}
-          <p>
-          <p style="margin-bottom:1rem;">
-            <a class="link-text"
-               href="https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=&labels=&template=feature_request.md&title="
-               target="_blank"
-            >{localize("ITEM-PILES.Applications.Settings.Request")}</a>
-          </p>
-          <p>
-            {localize("ITEM-PILES.Applications.Settings.Donate")}
-          </p>
-          <p>
-            <a href="https://ko-fi.com/fantasycomputerworks" target="_blank" style="text-decoration: none !important;">
-              <button class="donate-button" type="button">
-                <img src="https://storage.ko-fi.com/cdn/cup-border.png">
-                <span>Donate</span>
-              </button>
-            </a>
-          </p>
-        </div>
+				<div style="text-align: center; font-size: 1rem; margin-top:3rem;">
+					<p>{localize("ITEM-PILES.Applications.Settings.MoreToCome")}
+					<p>
+					<p style="margin-bottom:1rem;">
+						<a class="link-text"
+							 href="https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=&labels=&template=feature_request.md&title="
+							 target="_blank"
+						>{localize("ITEM-PILES.Applications.Settings.Request")}</a>
+					</p>
+					<p>
+						{localize("ITEM-PILES.Applications.Settings.Donate")}
+					</p>
+					<p>
+						<a href="https://ko-fi.com/fantasycomputerworks" target="_blank" style="text-decoration: none !important;">
+							<button class="donate-button" type="button">
+								<img src="https://storage.ko-fi.com/cdn/cup-border.png">
+								<span>Donate</span>
+							</button>
+						</a>
+					</p>
+				</div>
 
-      </div>
+			</div>
 
-      {#if userCanChangeSettings}
-        <div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
-          <Setting bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
-          <Setting bind:data="{settings[SETTINGS.ENABLE_GIVING_ITEMS]}"/>
-          <Setting bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>
-          <Setting bind:data="{settings[SETTINGS.SHOW_TRADE_BUTTON]}"/>
-          <Setting bind:data="{settings[SETTINGS.INSPECT_ITEMS_IN_TRADE]}"/>
-          <Setting bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
-          <Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
-          <Setting bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
-          <SettingButton bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
-        </div>
+			{#if userCanChangeSettings}
+				<div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
+					<Setting bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
+					<Setting bind:data="{settings[SETTINGS.ENABLE_GIVING_ITEMS]}"/>
+					<Setting bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>
+					<Setting bind:data="{settings[SETTINGS.SHOW_TRADE_BUTTON]}"/>
+					<Setting bind:data="{settings[SETTINGS.INSPECT_ITEMS_IN_TRADE]}"/>
+					<Setting bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
+					<Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
+					<Setting bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
+					<SettingButton bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
+				</div>
 
-        <div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
-          <SettingButton data={{
+				<div class="tab flex" class:active={activeTab === 'styles'} data-scope="primary" data-tab="styles">
+					<SettingButton bind:data="{settings[SETTINGS.CSS_VARIABLES]}"/>
+					<SettingButton bind:data="{settings[SETTINGS.VAULT_STYLES]}"/>
+				</div>
+
+				<div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
+					<SettingButton data={{
             name: "ITEM-PILES.Settings.Reset.Title",
             hint: "ITEM-PILES.Settings.Reset.Hint",
             label: "ITEM-PILES.Settings.Reset.Label",
@@ -164,25 +172,25 @@
             await resetSettings()
             getSettings();
           }}/>
-          <Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}" options={game.system.template.Actor.types}/>
-          <Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
-          <Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
-          <SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>
-          <Setting bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
-                   disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
-          <SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
-          <SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
-          <SettingButton bind:data="{settings[SETTINGS.UNSTACKABLE_ITEM_TYPES]}"/>
-        </div>
-      {/if}
+					<Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}" options={game.system.template.Actor.types}/>
+					<Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
+					<Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
+					<SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>
+					<Setting bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
+									 disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
+					<SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
+					<SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
+					<SettingButton bind:data="{settings[SETTINGS.UNSTACKABLE_ITEM_TYPES]}"/>
+				</div>
+			{/if}
 
-    </section>
+		</section>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}><i
-        class="far fa-save"></i> {localize("ITEM-PILES.Applications.Settings.Submit")}</button>
-    </footer>
-  </form>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}><i
+				class="far fa-save"></i> {localize("ITEM-PILES.Applications.Settings.Submit")}</button>
+		</footer>
+	</form>
 </ApplicationShell>
 
 <style lang="scss">

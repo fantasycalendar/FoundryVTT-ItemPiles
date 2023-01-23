@@ -43,7 +43,7 @@ export default class VaultApp extends SvelteApplication {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       closeOnSubmit: false,
-      classes: ["app window-app sheet item-pile-vault item-piles"],
+      classes: ["app", "window-app", "sheet", "item-pile-vault", "item-piles", "item-piles-app"],
       resizable: false
     });
   }

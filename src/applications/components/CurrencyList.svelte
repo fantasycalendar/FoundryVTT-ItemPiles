@@ -3,20 +3,23 @@
   import CurrencyListEntry from "./CurrencyListEntry.svelte";
 
   export let currencies;
-  export let options = {
+  export let options = {};
+
+  options = foundry.utils.mergeObject({
     reverse: false,
-    abbreviations: true,
-    abbreviateNumbers: false
-  };
+    abbreviations: false,
+    abbreviateNumbers: false,
+    imgSize: 24
+  }, options)
 
 </script>
 
 <div class="item-piles-flexrow{options.reverse ? '-reverse' : ''} item-piles-currency-list" style={$$props.style}>
 
-  {#each $currencies as currency (currency.identifier)}
-    <CurrencyListEntry {currency} {options}/>
-  {/each}
+	{#each $currencies as currency (currency.identifier)}
+		<CurrencyListEntry {currency} {options}/>
+	{/each}
 
-  <slot/>
+	<slot/>
 
 </div>

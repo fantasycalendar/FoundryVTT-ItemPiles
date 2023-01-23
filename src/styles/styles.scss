@@ -1,15 +1,3 @@
-:root {
-  --item-piles-inactive: #1e90ff;
-  --item-piles-minor-inactive: #c9c7b8;
-  --item-piles-shadow-primary: #ff0000;
-  --item-piles-even-color: #f0f0e0;
-  --item-piles-odd-color: transparent;
-  --item-piles-border-dark-primary: #191813;
-  --item-piles-border-light-primary: #b5b3a4;
-  --item-piles-text-light-highlight: #f0f0e0;
-  --item-piles-text-important: #ff6400;
-}
-
 /* ----------------------- Generic ----------------------- */
 
 .merchant-left-pane .prosemirror {
@@ -115,7 +103,7 @@
 
   &-disabled {
     opacity: 0.75;
-    background-color: var(--item-piles-inactive);
+    background-color: var(--item-piles-minor-inactive);
   }
 
   &-clickable {
@@ -312,7 +300,6 @@
 }
 
 .item-piles-app {
-
   footer {
     display: flex;
   }
@@ -504,6 +491,10 @@
   .dialog-content {
     height: 100%;
     overflow: hidden;
+  }
+
+  .form-group {
+    margin-bottom: 0.25rem;
   }
 }
 

@@ -32,7 +32,7 @@ export default class MerchantApp extends SvelteApplication {
   /** @inheritdoc */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["app window-app sheet", "item-piles-merchant-sheet", "item-piles"],
+      classes: ["app window-app sheet", "item-piles-merchant-sheet", "item-piles", "item-piles-app"],
       width: 800,
       height: 700,
       closeOnSubmit: false,

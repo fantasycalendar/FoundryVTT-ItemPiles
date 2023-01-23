@@ -3,7 +3,7 @@ import TradeDialogPrompt from './trade-dialog-prompt.svelte';
 import TradeDialogRequest from './trade-dialog-request.svelte';
 
 export class TradePromptDialog extends SvelteApplication {
-  
+
   constructor(tradeOptions, options = {}) {
     super({
       svelte: {
@@ -17,16 +17,16 @@ export class TradePromptDialog extends SvelteApplication {
       ...options
     });
   }
-  
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       title: game.i18n.localize("ITEM-PILES.Trade.Title"),
       width: 400,
       height: "auto",
-      classes: ["dialog"],
+      classes: ["dialog", "item-piles-app"],
     })
   }
-  
+
   static show(tradeOptions, options = {}, dialogData = {}) {
     return new Promise(resolve => {
       options.resolve = resolve;
@@ -36,9 +36,9 @@ export class TradePromptDialog extends SvelteApplication {
 }
 
 export class TradeRequestDialog extends SvelteApplication {
-  
+
   constructor(tradeOptions, options = {}) {
-    
+
     super({
       svelte: {
         class: TradeDialogRequest,
@@ -52,7 +52,7 @@ export class TradeRequestDialog extends SvelteApplication {
     });
     this.tradeId = tradeOptions.tradeId;
   }
-  
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       title: game.i18n.localize("ITEM-PILES.Trade.Title"),
@@ -61,14 +61,14 @@ export class TradeRequestDialog extends SvelteApplication {
       classes: ["dialog"],
     })
   }
-  
+
   static show(tradeOptions, options = {}) {
     return new Promise(resolve => {
       options.resolve = resolve;
       new this(tradeOptions, options).render(true);
     })
   }
-  
+
   static cancel(tradeId) {
     for (const app of Object.values(ui.windows)) {
       if (app instanceof this && app.tradeId === tradeId) {
@@ -78,5 +78,5 @@ export class TradeRequestDialog extends SvelteApplication {
     }
     return false;
   }
-  
+
 }
