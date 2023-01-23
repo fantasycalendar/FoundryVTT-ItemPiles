@@ -1,99 +1,99 @@
 <script>
-  import SETTINGS from "../../constants/settings.js";
+	import SETTINGS from "../../constants/settings.js";
 
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
 
-  import * as helpers from "../../helpers/helpers.js"
-  import { applyDefaultSettings } from "../../settings.js";
+	import * as helpers from "../../helpers/helpers.js"
+	import { applyDefaultSettings } from "../../settings.js";
 
-  import Setting from "./Setting.svelte";
-  import SettingButton from "./SettingButton.svelte";
-  import Tabs from "../components/Tabs.svelte";
-  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-  import CustomDialog from "../components/CustomDialog.svelte";
+	import Setting from "./Setting.svelte";
+	import SettingButton from "./SettingButton.svelte";
+	import Tabs from "../components/Tabs.svelte";
+	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import CustomDialog from "../components/CustomDialog.svelte";
 
-  const { application } = getContext('external');
+	const { application } = getContext('external');
 
-  export let elementRoot;
-  let form;
+	export let elementRoot;
+	let form;
 
-  let settings = {};
-  let userIsGM = game.user.isGM;
+	let settings = {};
+	let userCanChangeSettings = game.user.hasPermission("SETTINGS_MODIFY");
 
-  getSettings();
+	getSettings();
 
-  function getSettings() {
-    settings = Object.fromEntries(Object.entries(SETTINGS.GET_DEFAULT()).map(entry => {
-      entry[1].value = helpers.getSetting(entry[0]);
-      return entry;
-    }));
+	function getSettings() {
+		settings = Object.fromEntries(Object.entries(SETTINGS.GET_DEFAULT()).map(entry => {
+			entry[1].value = helpers.getSetting(entry[0]);
+			return entry;
+		}));
 
-    settings[SETTINGS.POPULATION_TABLES_FOLDER].choices = {
-      "root": "ITEM-PILES.Settings.PopulationTablesFolder.AllTables",
-      ...Object.fromEntries(
-        game.folders
-          .filter(f => f.type === "RollTable")
-          .map(f => [f.id, f.name])
-      )
-    }
-  }
+		settings[SETTINGS.POPULATION_TABLES_FOLDER].choices = {
+			"root": "ITEM-PILES.Settings.PopulationTablesFolder.AllTables",
+			...Object.fromEntries(
+				game.folders
+					.filter(f => f.type === "RollTable")
+					.map(f => [f.id, f.name])
+			)
+		}
+	}
 
-  function requestSubmit() {
-    form.requestSubmit();
-  }
+	function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  async function updateSettings() {
-    let settingsToUpdate = Object.entries(settings).filter(entry => userIsGM || entry[1].scope === "client");
-    for (let [key, setting] of settingsToUpdate) {
-      await helpers.setSetting(key, setting.value);
-    }
-    application.close();
-  }
+	async function updateSettings() {
+		let settingsToUpdate = Object.entries(settings).filter(entry => userCanChangeSettings || entry[1].scope === "client");
+		for (let [key, setting] of settingsToUpdate) {
+			await helpers.setSetting(key, setting.value);
+		}
+		application.close();
+	}
 
-  async function resetSettings() {
+	async function resetSettings() {
 
-    const doThing = await TJSDialog.confirm({
-      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
-      content: {
-        class: CustomDialog,
-        props: {
-          content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Content")
-        }
-      },
-      buttons: {
-        yes: {
-          icon: '<i class="fas fa-check"></i>',
-          label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Confirm")
-        },
-        no: {
-          icon: '<i class="fas fa-times"></i>',
-          label: game.i18n.localize("No")
-        }
-      },
-      modal: true,
-      draggable: false,
-      rejectClose: false,
-      defaultYes: true,
-      options: {
-        height: "auto"
-      }
-    });
+		const doThing = await TJSDialog.confirm({
+			title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Title"),
+			content: {
+				class: CustomDialog,
+				props: {
+					content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Content")
+				}
+			},
+			buttons: {
+				yes: {
+					icon: '<i class="fas fa-check"></i>',
+					label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSettings.Confirm")
+				},
+				no: {
+					icon: '<i class="fas fa-times"></i>',
+					label: game.i18n.localize("No")
+				}
+			},
+			modal: true,
+			draggable: false,
+			rejectClose: false,
+			defaultYes: true,
+			options: {
+				height: "auto"
+			}
+		});
 
-    if (!doThing) return;
+		if (!doThing) return;
 
-    return applyDefaultSettings();
-  }
+		return applyDefaultSettings();
+	}
 
-  let tabs = [
-    { value: "local", label: localize("ITEM-PILES.Applications.Settings.Local") },
-    { value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), hidden: !userIsGM },
-    { value: "styles", label: localize("ITEM-PILES.Applications.Settings.Styles"), hidden: !userIsGM },
-    { value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userIsGM },
-  ];
+	let tabs = [
+		{ value: "local", label: localize("ITEM-PILES.Applications.Settings.Local") },
+		{ value: "module", label: localize("ITEM-PILES.Applications.Settings.Module"), hidden: !userCanChangeSettings },
+		{ value: "styles", label: localize("ITEM-PILES.Applications.Settings.Styles"), hidden: !userIsGM },
+    { value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userCanChangeSettings },
+	];
 
-  let activeTab = tabs[0].value;
+	let activeTab = tabs[0].value;
 
 </script>
 
@@ -104,7 +104,7 @@
 
     <h2 style="text-align: center; margin-bottom: 1rem;">{localize("ITEM-PILES.Applications.Settings.Title")}</h2>
 
-    {#if userIsGM}
+    {#if userCanChangeSettings}
       <Tabs bind:activeTab {tabs}/>
     {/if}
 
@@ -143,7 +143,7 @@
 
       </div>
 
-      {#if userIsGM}
+      {#if userCanChangeSettings}
         <div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
           <Setting bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
           <Setting bind:data="{settings[SETTINGS.ENABLE_GIVING_ITEMS]}"/>

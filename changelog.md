@@ -1,10 +1,28 @@
 # Item Piles Changelog
 
-## Version 2.4.7 (unreleased)
+## Version 2.4.10 (unreleased)
 
 - Added further Simple Calendar support; merchants can now be closed on specific weekday, and categories on notes can cause merchants to be closed (think holidays)
 - Added support for vault item styling based on item properties
 - Fixed disabled elements being blue due to styling being incorrect
+
+## Version 2.4.9
+
+- Fixed minor issue with GMs not having permission to change module settings
+- Fixed shares not being kept track of in item piles properly
+- Fixed adding currencies to item piles not working properly for players
+- Fixed to system integrations and how they apply their system specific settings
+
+## Version 2.4.8
+
+- Fixed normal users with permissions to change the world settings of Item Piles would not be able to
+- Tweaked migrations to not refresh automatically, but prompts you to do so yourselves
+- Tweaked Simple Calendar integration to not cause Item Piles to hard-fail when Simple Calendar is out of date
+- Updated French localization (thanks Marc via Weblate!)
+
+## Version 2.4.7
+
+- Fixed vault expanders being added as regular items rather than expanding the available space
 
 ## Version 2.4.6
 
