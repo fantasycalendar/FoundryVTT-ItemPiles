@@ -1072,7 +1072,12 @@ export default class PrivateAPI {
 					overrideData['actorData']['items'] = items;
 				}
 
-				const data = { data: pileData, items: items };
+				const customItems = [];
+				for (const item of items) {
+					customItems.push(await Item.implementation.create(item, { temporary: true }))
+				}
+
+				const data = { data: pileData, items: customItems };
 
 				overrideData = foundry.utils.mergeObject(overrideData, {
 					"img": PileUtilities.getItemPileTokenImage(pileActor, data, overrideData?.img),
