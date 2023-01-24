@@ -1,7 +1,8 @@
 # Item Piles Changelog
 
-## Version 2.4.10 (unreleased)
+## Version 2.4.10
 
+- Updated German localization (thanks blueacousticmusic on Weblate!)
 - Added further Simple Calendar support; merchants can now be closed on specific weekday, and categories on notes can cause merchants to be closed (think holidays)
 - Added support for vault item styling based on item properties
 - Added `Hide Items With Zero Cost` setting to merchants, which automatically hides items in the buy/sell/service tabs if they are free
