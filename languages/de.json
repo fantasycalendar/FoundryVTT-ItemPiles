@@ -536,7 +536,11 @@
         "Local": "Lokale Einstellungen"
       },
       "PriceModifiersEditor": {
-        "Override": "Überschreiben"
+        "Override": "Überschreiben",
+        "DragDrop": "Füge einen Akteur per Drag & Drop zur Liste hinzu",
+        "Title": "Item Piles Preismodifikatoreditor",
+        "TitleActor": "Item Piles Preismodifikatoreditor: {actor_name}",
+        "Actor": "Akteur"
       },
       "ItemPileConfig": {
         "Title": "Item Pile Konfiguration: {actor_name}",
@@ -563,7 +567,27 @@
           "OnlyAcceptBasePrice": "Nur Grundpreis akzeptieren",
           "DisplayQuantityYesAlways": "Ja, Menge immer anzeigen",
           "ClosedHolidays": "Geschlossen Feiertage (Simple Calendar)",
-          "DisplayQuantity": "Sichtbarkeit Gegenstandsmenge"
+          "DisplayQuantity": "Sichtbarkeit Gegenstandsmenge",
+          "Title": "Händlereinstellungen",
+          "OpenStatus": "Öffnungsstatus",
+          "OpenTimesExplanation": "Wenn aktiviert, kann mit dem Händler spielerseitig nur an bestimmten Zeiten am Tag interagiert werden.",
+          "OpenStatusOpen": "offen",
+          "InfiniteCurrencyExplanation": "Wenn aktiviert, wird die Währung des Händlers durch einen Ankauf nicht verändert.",
+          "KeepZeroExplanation": "Sind Gegenstände vollständig ausverkauft, wird dieser Händler sie nicht entfernen, sondern als \"nicht zum Verkauf\" deklarieren.",
+          "KeepZero": "Null-Menge behalten",
+          "OpenStatusClosed": "geschlossen",
+          "PriceModifierTitle": "Kauf- und Verkaufspreismodifikatoren",
+          "PurchaseOnlyExplanation": "Wenn aktiviert, können Charaktere keine Gegenstände an diesen Händler verkaufen.",
+          "OpenStatusExplanation": "Dies konfiguriert den aktuellen Öffnungsstatus des Händlers. Wenn Öffnungszeiten (unten) und das Simple Calendar Modul aktiviert sind, kannst du dies automatisieren.",
+          "ItemTypeModifier": "Gegenstandstyp-Preismodifikatoren",
+          "ConfigureItemTypePriceModifiers": "Gegenstandstyp-Preismodifikatoren konfigurieren.",
+          "ItemTypeModifiersExplanation": "In diesem Dialog kannst du Preismodifikatoren für individuelle Gegenstandstypen konfigurieren.",
+          "ConfigureActorPriceModifiers": "Akteur-Preismodifikatoren konfigurieren.",
+          "OpenTimes": "Öffnungszeiten",
+          "ClosedHolidaysExplanation": "An Tagen mit Notizen mit entsprechender Notiz-Kategorie, wird der Händler geschlossen haben (wenn der Öffnungsstatus auf automatisch gesetzt wurde).",
+          "HideItemsWithZeroCostExplanation": "Wenn aktiviert, können Kunden Gegenstände weder kaufen noch verkaufen, wenn sie einen Preis von Null (kostenlos) haben.",
+          "OnlyAcceptBasePriceExplanation": "Wenn aktiviert, müssen alle Gegenstände, die an diesen Händler verkauft werden, den Grundpreis nutzen statt selbst angepasste Preise.",
+          "ClosedDaysExplanation": "An den markierten Tagen hat der Händler geschlossen (wenn der Öffnungsstatus auf automatisch gesetzt wurde)."
         },
         "Main": {
           "DeleteWhenEmptyDefault": "Standardmäßige Moduleinstellungen",
@@ -573,7 +597,21 @@
           "OverrideCurrencies": "Währungen überschreiben",
           "ConfigureOverrideCurrencies": "Währungsüberschreibung konfigurieren",
           "OverrideItemFilters": "Gegenstandsfilter überschreiben",
-          "OverrideCurrenciesExplanation": "Stelle ein, ob dieser Stapel andere Währungen als den Standard übertragen können soll."
+          "OverrideCurrenciesExplanation": "Stelle ein, ob dieser Stapel andere Währungen als den Standard übertragen können soll.",
+          "Title": "Haupteinstellungen",
+          "EnabledPile": "Aktivieren",
+          "EditDescription": "Beschreibung bearbeiten",
+          "EditDescriptionExplanation": "Diese Beschreibung wird in relevanten Interfaces gezeigt, wenn der Gegenstandsstapel angeschaut wird",
+          "InspectItemsExplanation": "Auf den Gegenstandsnamen klicken öffnet das Gegenstandsblatt.",
+          "Distance": "Interaktionsdistanz",
+          "GridUnits": "Gittereinheiten (leer lassen für unendlich)",
+          "MacroPlaceholder": "Makroname einfügen",
+          "DisplayItemTypes": "Gegenstände nach Gegenstandstyp aufteilen",
+          "DisplayItemTypesExplanation": "Jeden Gegenstandstyp separat im Gegenstandstapel anzeigen, nach Gegenstandstyp sortiert.",
+          "DeleteWhenEmptyExplanation": "Führt dazu, dass sich dieser Gegenstandsstapel von selbst löscht, wenn er leer ist.",
+          "EnabledPileExplanation": "Ob dies als Gegenstandsstapel fungieren soll.",
+          "InspectItems": "Gegenstand untersuchen aktivieren",
+          "OverrideItemFiltersExplanation": "Stelle ein, ob dieser Stapel in der Lage sein sollte, andere Gegenstandstypen zu übertragen als den Standard."
         },
         "Vault": {
           "ManageAccess": "Zugriff verwalten",
@@ -590,7 +628,51 @@
           "LoggingFormatUserActor": "Nutzer- und Charaktername anzeigen",
           "Title": "Tresoreinstellungen",
           "EnableExpansion": "Erweiterungsgegenstand aktivieren",
-          "ClearVaultLogExplanation": "Tresorprotokolle werden gelöscht und alle Einträge entfernt. Dies kann nicht rückgängig gemacht werden."
+          "ClearVaultLogExplanation": "Tresorprotokolle werden gelöscht und alle Einträge entfernt. Dies kann nicht rückgängig gemacht werden.",
+          "LoggingFormat": "Protokollierungsformat",
+          "Layout": "Belegung",
+          "LayoutExplanation": "Wie viele Spalten und Reihen im Tresor sichtbar sein sollen.",
+          "EnableExpansionExplanation": "Ist dies aktiviert, erweitern Gegenstände, die als Tresorerweiterungen konfiguriert sind, den vorhandenen Platz des Tresors.",
+          "LogVaultAccessExplanation": "Wenn aktiviert, erstellt dieser Tresor einen Journaleintrag und erstellt jedes Mal einen Zeitstempel, wenn mit dem Tresor interagiert wird.",
+          "AccessExplanation": "Dies konfiguriert, welche Charaktere & Spieler auf das Tresorinventar & Währungen zugreifen und modifizieren können. Wenn ein Spieler Besitzrechte des Tresorcharakters hat, besitzt er dauerhaft vollen Zugriff."
+        },
+        "Configure": "Gegenstandsstapel",
+        "Update": "Gegenstandsstapel aktualisieren",
+        "Other": {
+          "Title": "Andere Einstellungen",
+          "Type": "Gegenstandstyp",
+          "TypeExplanation": "Stellt ein, wie dieser Gegenstandstyp angezeigt wird."
+        },
+        "Sharing": {
+          "ShareCurrenciesEnabled": "Teilen aktiviert: Währungen",
+          "ResetSharingData": "Teilen-Daten zurücksetzen",
+          "TakeAllEnabledExplanation": "Aktiviert den \"Nimm alles\"-Button, wenn dieser Gegenstandsstapel gelootet wird. Benötigt das Deaktivieren beider obiger Einstellungen zum Teilen.",
+          "ShareItemsEnabled": "Teilen aktiviert: Gegenstände",
+          "SplitAllEnabled": "\"Mit Spielern aufteilen\"-Button aktivieren",
+          "TakeAllEnabled": "\"Nimm alles\"-Button aktivieren",
+          "Title": "Einstellungen zum Teilen",
+          "ShareCurrenciesEnabledExplanation": "Ist dies aktiviert, können Spieler nur ihren Anteil der Menge der Währungen aufnehmen. Deaktiviert bedeutet, dass sie so viel nehmen können, wie sie wollen.",
+          "InactivePlayersExplanation": "Nur Spieler, die aktiv sind, während der Gegenstandsstapel gelootet wird, erhalten ihren Anteil des Stapels.",
+          "ShareItemsEnabledExplanation": "Ist dies aktiviert, können Spieler nur ihren Anteil der Menge der Gegenstände aufnehmen. Deaktiviert bedeutet, dass sie so viel nehmen können, wie sie wollen.",
+          "InactivePlayers": "Nur mit aktiven Spielern aufteilen"
+        },
+        "Container": {
+          "Locked": "ist abgeschlossen",
+          "ClosedImagePath": "Bildpfad: zu",
+          "Closed": "ist zu",
+          "CloseSoundPath": "Soundpfad: schließen",
+          "Title": "Einstellungen für Behälter",
+          "IsContainer": "ist Behälter",
+          "EmptyImagePath": "Bildpfad: leer",
+          "OpenedImagePath": "Bildpfad: geöffnet",
+          "LockedImagePath": "Bildpfad: abgeschlossen",
+          "OpenSoundPath": "Soundpfad: öffnen",
+          "LockedSoundPath": "Soundpfad: abgeschlossen"
+        },
+        "SingleItem": {
+          "Title": "Einstellungen für einzelne Gegenstände",
+          "ItemName": "Nutze Gegenstandsname",
+          "ItemNameExplanation": "Sorgt dafür, dass der Gegenstandsstapel nach dem einzelnen Gegenstand benannt wird, den er enthält."
         }
       },
       "ItemEditor": {
@@ -613,7 +695,9 @@
         "CustomCategory": "Benutzerdefinierte Gegenstandskategorie",
         "Hidden": "Gegenstand ist versteckt",
         "HiddenExplanation": "Wenn aktiviert, wird dieser Gegenstand nicht in der Gegenstandsliste des Händlers aufgeführt.",
-        "InfiniteQuantityExplanation": "Wenn aktiviert, kann dieser Gegenstand nicht ausverkauft sein, wenn er vom Händler verkauft wird."
+        "InfiniteQuantityExplanation": "Wenn aktiviert, kann dieser Gegenstand nicht ausverkauft sein, wenn er vom Händler verkauft wird.",
+        "CantBeSoldToMerchants": "Kann nicht an Händler verkauft werden",
+        "CantBeSoldToMerchantsExplanation": "Wenn aktiviert, kann dieser Gegenstand nur gekauft und nicht wieder an den Händler verkauft werden."
       },
       "TradeMerchantItem": {
         "Change": "Wechselgeld",
@@ -630,25 +714,70 @@
         "Title": "Item Piles Währungseditor",
         "AddNew": "Neue Währung hinzufügen",
         "Name": "Währungsname",
-        "TitleActor": "Item Piles Währungseditor: {actor_name}"
+        "TitleActor": "Item Piles Währungseditor: {actor_name}",
+        "Icon": "Icon",
+        "DragDrop": "Füge einen Gegenstand per Drag & Drop zur Liste hinzu",
+        "Data": "Daten",
+        "Exchange": "Umwechslung",
+        "ExplanationSmallItems": "In anderen System handelt es sich hierbei vielleicht um tatsächliche Gegenstände der Akteure - in diesem Fall kannst du sie per Drag & Drop zu den Währungen hinzufügen."
       },
       "FilterEditor": {
-        "AddNew": "Neuen Filter hinzufügen"
+        "AddNew": "Neuen Filter hinzufügen",
+        "Path": "Attributspfad",
+        "Title": "Item Piles Filtereditor",
+        "Filters": "Filter",
+        "TitleActor": "Item Piles Filtereditor: {actor_name}"
       },
       "DropCurrencies": {
         "Title": "Währungen fallenlassen",
         "NoCurrency": "{actor_name} besitzt keine validen Währungen...",
         "Submit": "Zum Stapel hinzufügen",
-        "Content": "Du kannst folgende Währungen in diesen Gegenstandsstapel fallenlassen:"
+        "Content": "Du kannst folgende Währungen in diesen Gegenstandsstapel fallenlassen:",
+        "ContentNoTarget": "Als GM kannst du die Währungen dieses Stapels aktualisieren:"
       },
       "VaultAccessEditor": {
         "Title": "Tresorzugriffseditor: {actor_name}"
+      },
+      "ItemTypePriceModifiersEditor": {
+        "Title": "Gegenstandstyp-Preismodifikatoreditor",
+        "Override": "Überschreiben",
+        "TitleActor": "Gegenstandstyp-Preismodifikatoreditor: {actor_name}",
+        "ItemType": "Gegenstandstyp"
+      },
+      "SimilaritiesEditor": {
+        "Title": "Item Piles Gemeinsamkeiteneditor",
+        "Path": "Attributspfad"
+      },
+      "UnstackableItemTypesEditor": {
+        "Type": "Gegenstandstyp",
+        "Explanation": "Hier kann definiert werden, welche Gegenstände nicht stapelbar sind."
+      },
+      "PricePresetEditor": {
+        "Update": "Voreinstellungen aktualisieren",
+        "Title": "Editor: Preisvoreinstellungen"
+      },
+      "VaultStylesEditor": {
+        "Path": "Attributspfad",
+        "Value": "Passender Wert",
+        "Style": "Stil konfigurieren",
+        "AddNew": "Neue Stilregel hinzufügen",
+        "Title": "Item Piles Tresorstileditor"
+      },
+      "StylesEditor": {
+        "Title": "Stileditor",
+        "Style": "Stil",
+        "Variable": "Variable",
+        "Value": "Wert"
       }
     },
     "Settings": {
       "OutputToChat": {
-        "SelfGM": "Privat - nur GMs und Nutzer können Nachrichten sehen",
-        "Blind": "Blind - nur GMs können Nachrichten sehen"
+        "SelfGM": "Privat - nur GMs und Nutzer können Benachrichtigungen sehen",
+        "Blind": "Blind - nur GMs können Nachrichten sehen",
+        "Off": "Aus - stelle Benachrichtigungen aus",
+        "Public": "Öffentlich - jeder kann die Benachrichtigungen sehen",
+        "Title": "Ausgabe in den Chat",
+        "Hint": "Immer, wenn ein Spieler einen Gegenstand vom Gegenstandsstapel nimmt, wird dies eine Nachricht schicken und schreiben, was aufgenommen wurde."
       },
       "InvertSheetOpen": {
         "Title": "Invertiere Strg + Doppelklick Öffnen",
@@ -663,7 +792,8 @@
         "Hint": "Verbirgt den \"Item Piles\" Text in den Headern von Actors und Gegenständen - nützlich, wenn bereits viele andere Module aktiviert sind und den Header füllen."
       },
       "HideHeaderButton": {
-        "Title": "Headerbutton verbergen"
+        "Title": "Headerbutton verbergen",
+        "Hint": "Versteckt den \"Item Piles\" Button in Headern. Dies wird es schwerer machen, neue Gegenstandsstapel und Gegenstände zu konfigurieren."
       },
       "PreloadFiles": {
         "Hint": "Sorgt dafür, dass Dateien (Bilder und Audio) von Stapeln vorgeladen werden, was in einer nahtloseren Erfahrung resultiert.",
@@ -679,7 +809,65 @@
       },
       "PopulationTablesFolder": {
         "AllTables": "Alle Tabellen"
+      },
+      "Reset": {
+        "Title": "systemspezifische Einstellungen auf Standard zurücksetzen",
+        "Label": "Einstellungen zurücksetzen"
+      },
+      "InspectItemsTrade": {
+        "Title": "Aktiviert das Betrachten der Gegenstände während des Handels",
+        "Hint": "Ist dies aktiviert, können Nutzer Gegenstände im Handel anklicken und die jeweiligen Gegenstandsblätter betrachten."
+      },
+      "Configure": {
+        "Title": "Moduleinstellungen",
+        "Hint": "Du kannst Item Piles in diesem Dialog konfigurieren.",
+        "Label": "Modul konfigurieren"
+      },
+      "UnstackableItemTypes": {
+        "Title": "nicht stapelbare Gegenstandstypen",
+        "Label": "nicht stapelbare Typen konfigurieren"
+      },
+      "PricePresets": {
+        "Title": "Preisvoreinstellungen",
+        "Label": "Preisvoreinstellungen konfigurieren"
+      },
+      "EnableGivingItems": {
+        "Title": "Gegenstände weitergeben aktivieren"
+      },
+      "DeleteEmptyPiles": {
+        "Hint": "Dies führt dazu, dass Gegenstandsstapel sich selbst löschen, wenn sie keine Gegenstände mehr beinhalten. Dies kann bei individuellen Stapeln überschrieben werden.",
+        "Title": "Automatisches Löschen von leeren Stapeln"
+      },
+      "ShowTradeButton": {
+        "Title": "Handelsbutton zeigen",
+        "Hint": "Ist dies aktiviert, wird ein Handelsbutton unterhalb der Spielerliste unten rechts angezeigt."
+      },
+      "ActorClass": {
+        "Title": "Akteuer Klassentyp"
+      },
+      "CurrencyDecimalDigits": {
+        "Title": "Dezimaleinheiten der Währung"
+      },
+      "ItemFilters": {
+        "Title": "Gegenstandsfilter",
+        "Label": "Gegenstandsfilter einstellen"
+      },
+      "CssVariables": {
+        "Title": "CSS Variables Styles",
+        "Label": "CSS Variablen konfigurieren"
+      },
+      "VaultStyles": {
+        "Title": "Tresorstile",
+        "Label": "Tresorstile konfigurieren"
+      },
+      "EnableTrading": {
+        "Hint": "Dies aktiviert den Handel - ist dies deaktiviert, kann niemand einen Handel starten.",
+        "Title": "Handel aktivieren"
       }
+    },
+    "VaultLog": {
+      "Deposit": "{actor_name} ({user_name}) *lagerte* {item_name} x {quantity} ({date})",
+      "Withdraw": "{actor_name} ({user_name}) **entnahm** {item_name} x {quantity} ({date})"
     }
   }
 }
