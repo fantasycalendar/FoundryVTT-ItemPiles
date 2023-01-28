@@ -214,7 +214,7 @@ export default class ChatAPI {
       const tempItem = await Item.implementation.create(itemData.item, { temporary: true });
       formattedItems.push({
         name: game.i18n.localize(tempItem.name),
-        img: itemData.item.img ?? "",
+        img: tempItem.img ?? itemData?.item?.img ?? "",
         quantity: Math.abs(itemData.quantity) / divideBy
       });
     }

@@ -21,6 +21,7 @@
       "UpdateItemPileSuccess": "Item Pile successfully updated.",
       "UpdateMerchantSuccess": "Merchant successfully updated.",
       "ItemTransferred": "{source_actor_name}'s {item_name} was given to {target_actor_name}.",
+      "ItemAdded": "{item_name} was added to {target_actor_name}.",
       "GiveItemAccepted": "{user_name} accepted your item offer.",
       "ShownToPlayers": "Showing {actor_name} to players",
       "CreatedJournal": "Created the Item Piles Vault Log journal."

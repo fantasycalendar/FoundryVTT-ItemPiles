@@ -46,7 +46,7 @@
         {localize("ITEM-PILES.Merchant.ShoppingAs", { actorName: recipientStore.actor.name })}
       </div>
       {#if $currencies.length}
-        <CurrencyList {currencies} options={{ imgSize: 18, reverse: true }} class="item-piles-currency-list"/>
+        <CurrencyList {currencies} options={{ imgSize: 18, reverse: true, abbreviations: true }} class="item-piles-currency-list"/>
       {/if}
     </div>
   {/if}

@@ -1612,6 +1612,9 @@ export default class PrivateAPI {
     const targetActor = Utilities.getActor(dropData.target);
     if (sourceActor === targetActor) return;
 
+    const sourceUuid = Utilities.getUuid(sourceActor);
+    const targetUuid = Utilities.getUuid(targetActor);
+
     const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
     if (!validItem) return;
     dropData.itemData.item = validItem;
@@ -1637,11 +1640,18 @@ export default class PrivateAPI {
       });
     }
 
+    const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+
+    if (!dropData.source && game.user.isGM) {
+      Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemAdded", {
+        target_actor_name: dropData.target.name, item_name: item.name
+      }));
+      return this._addItems(targetUuid, [dropData.itemData.item], game.user.id)
+    }
+
     const gms = Helpers.getActiveGMs().map(user => user.id);
 
     if (user?.active || gms.length || game.user.isGM) {
-
-      const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
 
       if (Utilities.canItemStack(dropData.itemData.item)) {
         const quantity = await DropItemDialog.show(item, dropData.target.actor, {
@@ -1653,19 +1663,18 @@ export default class PrivateAPI {
         dropData.itemData.quantity = 1;
       }
 
-      const sourceUuid = Utilities.getUuid(dropData.source);
-      const targetUuid = Utilities.getUuid(dropData.target);
-
       if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, dropData.source, dropData.target, dropData.itemData, user.id) === false) {
         return;
       }
 
       if ((!user || !user?.active || user === game.user) && game.user.isGM) {
-        Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
-          source_actor_name: dropData.source.name, target_actor_name: dropData.target.name, item_name: item.name
-        }));
-        Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, dropData.source, dropData.target, dropData.itemData, game.user.id);
-        return this._transferItems(sourceUuid, targetUuid, [dropData.itemData.item], game.user.id)
+        if (dropData.source) {
+          Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
+            source_actor_name: dropData.source.name, target_actor_name: dropData.target.name, item_name: item.name
+          }));
+          Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, dropData.source, dropData.target, dropData.itemData, game.user.id);
+          return this._transferItems(sourceUuid, targetUuid, [dropData.itemData.item], game.user.id)
+        }
       }
 
       return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS, [user ? user.id : gms[0]], {
@@ -1724,9 +1733,11 @@ export default class PrivateAPI {
         let quantity = Utilities.getItemQuantity(dropData.itemData.item);
 
         if (dropData.source) {
-          const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
-          quantity = await DropItemDialog.show(item, dropData.target);
-          if (!quantity) return;
+          if (quantity > 1 && !dropData.skipCheck) {
+            const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+            quantity = await DropItemDialog.show(item, dropData.target);
+            if (!quantity) return;
+          }
         }
 
         Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));

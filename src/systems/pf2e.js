@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": "1.0.1",
+  "VERSION": "1.0.2",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "loot",
@@ -15,7 +15,7 @@ export default {
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "action,spell,melee,lore,heritage,feat,effect,class,background,ancestry"
+      "filters": 'action,ancestry,background,class,condition,deity,effect,feat,heritage,lore,melee,spell,spellcastingEntry'
     }
   ],
 

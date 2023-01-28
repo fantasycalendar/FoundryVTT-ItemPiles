@@ -14,6 +14,7 @@
   import ItemPileStore from "../../stores/item-pile-store.js";
   import CategorizedItemList from "./CategorizedItemList.svelte";
   import * as Helpers from "../../helpers/helpers.js";
+  import { getSourceActorFromDropData } from "../../helpers/utilities.js";
 
   const { application } = getContext('external');
 
@@ -56,7 +57,6 @@
     }
 
     const item = await Item.implementation.fromDropData(data);
-
     const itemData = item.toObject();
 
     if (!itemData) {
@@ -64,11 +64,15 @@
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
 
+    const source = getSourceActorFromDropData(data);
+
     return PrivateAPI._dropItem({
+      source: source,
       target: store.actor,
       itemData: {
         item: itemData, quantity: 1
       },
+      skipCheck: true
     });
 
   }
@@ -99,95 +103,95 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <main in:fade={{duration: 500}}>
+	<main in:fade={{duration: 500}}>
 
-    <div class="item-piles-item-drop-container" on:dragstart={preventDefaultGM} on:drop={dropData}
-         on:dragover={preventDefault}>
+		<div class="item-piles-item-drop-container" on:dragstart={preventDefaultGM} on:drop={dropData}
+				 on:dragover={preventDefault}>
 
-      {#if $deleted}
-        <p style="text-align: center; flex: 0 1 auto;">
-          {localize("ITEM-PILES.Inspect.Destroyed")}
-        </p>
-      {:else}
+			{#if $deleted}
+				<p style="text-align: center; flex: 0 1 auto;">
+					{localize("ITEM-PILES.Inspect.Destroyed")}
+				</p>
+			{:else}
 
-        <ActorPicker {store}/>
+				<ActorPicker {store}/>
 
-        {#if showSearchBar}
-          <div class="form-group item-piles-flexrow item-piles-top-divider item-piles-bottom-divider"
-               style="margin-bottom: 0.5rem; align-items: center;" transition:fade={{duration: 250}}>
-            <label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
-            <input type="text" bind:value={$searchStore}>
-          </div>
-        {/if}
+				{#if showSearchBar}
+					<div class="form-group item-piles-flexrow item-piles-top-divider item-piles-bottom-divider"
+							 style="margin-bottom: 0.5rem; align-items: center;" transition:fade={{duration: 250}}>
+						<label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
+						<input type="text" bind:value={$searchStore}>
+					</div>
+				{/if}
 
-        {#if isPileEmpty}
-          <p class="item-piles-top-divider" style="text-align: center; flex: 0 1 auto;">
-            {localize("ITEM-PILES.Inspect.Empty")}
-          </p>
+				{#if isPileEmpty}
+					<p class="item-piles-top-divider" style="text-align: center; flex: 0 1 auto;">
+						{localize("ITEM-PILES.Inspect.Empty")}
+					</p>
 
-        {/if}
+				{/if}
 
-        <div class="item-piles-items-list" bind:this={itemListElement} on:scroll={evaluateShadow}>
+				<div class="item-piles-items-list" bind:this={itemListElement} on:scroll={evaluateShadow}>
 
-          {#if scrolled}
-            <div class="item-pile-shadow scroll-shadow-top" transition:fade={{duration:300}}></div>
-            <div></div>
-          {/if}
+					{#if scrolled}
+						<div class="item-pile-shadow scroll-shadow-top" transition:fade={{duration:300}}></div>
+						<div></div>
+					{/if}
 
-          {#if $pileData.displayItemTypes}
-            <CategorizedItemList {store}/>
-          {:else}
-            <ItemList {store}/>
-          {/if}
+					{#if $pileData.displayItemTypes}
+						<CategorizedItemList {store}/>
+					{:else}
+						<ItemList {store}/>
+					{/if}
 
-          {#if hasItems}
-            <hr>
-          {/if}
+					{#if hasItems}
+						<hr>
+					{/if}
 
-          <CurrencyList {store}/>
+					<CurrencyList {store}/>
 
-        </div>
+				</div>
 
-      {/if}
+			{/if}
 
-      <footer class="sheet-footer item-piles-flexrow item-piles-top-divider">
-        {#if editQuantities}
-          <button type="button" on:click={() => { store.update() }}>
-            <i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
-          </button>
-        {/if}
+			<footer class="sheet-footer item-piles-flexrow item-piles-top-divider">
+				{#if editQuantities}
+					<button type="button" on:click={() => { store.update() }}>
+						<i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
+					</button>
+				{/if}
 
-        {#if $pileData.splitAllEnabled}
-          <button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty}">
-            <i class="fas fa-handshake"></i>
-            {#if $pileData.shareItemsEnabled}
-              {localize("ITEM-PILES.Inspect.SplitAll", { num_players })}
-            {:else}
-              {localize("ITEM-PILES.Inspect.SplitCurrencies", { num_players })}
-            {/if}
-          </button>
-        {/if}
+				{#if $pileData.splitAllEnabled}
+					<button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty}">
+						<i class="fas fa-handshake"></i>
+						{#if $pileData.shareItemsEnabled}
+							{localize("ITEM-PILES.Inspect.SplitAll", { num_players })}
+						{:else}
+							{localize("ITEM-PILES.Inspect.SplitCurrencies", { num_players })}
+						{/if}
+					</button>
+				{/if}
 
-        {#if store.recipient && $pileData.takeAllEnabled}
-          <button type="submit" on:click={() => { store.takeAll() }} disabled="{isPileEmpty}">
-            <i class="fas fa-fist-raised"></i> {localize("ITEM-PILES.Inspect.TakeAll")}
-          </button>
-        {/if}
+				{#if store.recipient && $pileData.takeAllEnabled}
+					<button type="submit" on:click={() => { store.takeAll() }} disabled="{isPileEmpty}">
+						<i class="fas fa-fist-raised"></i> {localize("ITEM-PILES.Inspect.TakeAll")}
+					</button>
+				{/if}
 
-        {#if isContainer && !application.options.remote}
-          <button type="submit" on:click={() => { store.closeContainer(); application.close(); }}>
-            <i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
-          </button>
-        {/if}
+				{#if isContainer && !application.options.remote}
+					<button type="submit" on:click={() => { store.closeContainer(); application.close(); }}>
+						<i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
+					</button>
+				{/if}
 
-        <button type="submit" on:click={() => { application.close() }}>
-          <i class="fas fa-sign-out-alt"></i> {localize("ITEM-PILES.Inspect.Leave")}
-        </button>
-      </footer>
+				<button type="submit" on:click={() => { application.close() }}>
+					<i class="fas fa-sign-out-alt"></i> {localize("ITEM-PILES.Inspect.Leave")}
+				</button>
+			</footer>
 
-    </div>
+		</div>
 
-  </main>
+	</main>
 
 </ApplicationShell>
 

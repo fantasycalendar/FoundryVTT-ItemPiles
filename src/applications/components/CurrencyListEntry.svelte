@@ -13,9 +13,9 @@
   let text = "";
   $: {
     let number = options.abbreviateNumbers ? Helpers.abbreviateNumbers($quantity) : $quantity;
-    if(abbreviation){
+    if($abbreviation){
       if(options.abbreviations){
-        text = abbreviation.replace("{#}", number);
+        text = $abbreviation.replace("{#}", number);
       }else{
         text = number;
       }

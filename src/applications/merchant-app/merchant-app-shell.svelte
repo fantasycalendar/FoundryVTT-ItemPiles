@@ -63,17 +63,16 @@
 
   const activeTab = writable("buy");
 
-  let sellHidden;
   let tabs;
   $: {
-    sellHidden = $pileData.purchaseOnly || !recipientStore;
     let hasItems = $visibleItems.some(item => !get(item.category).service)
     let hasServices = $visibleItems.some(item => get(item.category).service)
+    let canSell = !$pileData.purchaseOnly && recipientStore;
     tabs = [
       {
         value: 'buy',
         label: game.i18n.localize('ITEM-PILES.Merchant.BuyItems'),
-        hidden: !hasItems && hasServices || !sellHidden
+        hidden: !(hasItems || (!hasItems && !hasServices && !canSell))
       },
       {
         value: 'services',
@@ -83,7 +82,7 @@
       {
         value: 'sell',
         label: game.i18n.localize('ITEM-PILES.Merchant.SellItems'),
-        hidden: sellHidden
+        hidden: !canSell
       },
       {
         value: 'tables',

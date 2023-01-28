@@ -62,7 +62,7 @@ export class PileItem extends PileBaseItem {
     this.type = this.item.type;
     this.name = writable(this.item.name);
     this.img = writable(this.item.img);
-    this.abbreviation = this.item.abbreviation;
+    this.abbreviation = writable("");
     this.identifier = this.id;
     this.itemFlagData = writable(PileUtilities.getItemFlagData(this.item));
   }
@@ -106,13 +106,16 @@ export class PileItem extends PileBaseItem {
   }
 
   setupProperties() {
-    this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: this.store.actor });
-    const currency = this.isCurrency ? PileUtilities.getItemCurrencyData(this.item, { target: this.store.actor }) : {};
-    this.abbreviation = this.isCurrency ? currency.abbreviation : "";
+    const actorIsMerchant = PileUtilities.isItemPileMerchant(this.store.actor, get(this.store.pileData));
+    const pileActor = actorIsMerchant ? this.store.actor : this.store.recipient;
+    const pileActorData = actorIsMerchant ? this.store.pileData : this.store.recipientPileData;
+    this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: pileActor });
+    const currency = this.isCurrency ? PileUtilities.getItemCurrencyData(this.item, { target: pileActor }) : {};
+    this.abbreviation.set(currency?.abbreviation ?? "");
     this.similarities = Utilities.setSimilarityProperties({}, this.item);
     this.toShare = this.isCurrency
-      ? get(this.store.pileData).shareCurrenciesEnabled && !!this.store.recipient
-      : get(this.store.pileData).shareItemsEnabled && !!this.store.recipient;
+      ? get(pileActorData).shareCurrenciesEnabled && !!this.store.recipient
+      : get(pileActorData).shareItemsEnabled && !!this.store.recipient;
   }
 
   updateCategory() {
@@ -196,7 +199,7 @@ export class PileAttribute extends PileBaseItem {
     this.path = this.attribute.path;
     this.name = writable(this.attribute.name);
     this.img = writable(this.attribute.img);
-    this.abbreviation = this.attribute.abbreviation;
+    this.abbreviation = writable(this.attribute.abbreviation);
     this.identifier = this.attribute.path;
     const startingQuantity = Number(getProperty(this.store.actor, this.path) ?? 0);
     this.presentFromTheStart.set(startingQuantity > 0);

@@ -263,17 +263,18 @@ export async function checkItemType(targetActor, item, {
 }
 
 export function isItemCurrency(item, { target = false } = {}) {
-  const actor = Utilities.getActor(target ? target : item.parent);
-  const currencies = getActorCurrencies(actor, { getAll: true })
+  const currencies = getActorCurrencies(item.parent || false, { forActor: target, getAll: true })
     .filter(currency => currency.type === "item")
     .map(item => item.data.item);
   return !!Utilities.findSimilarItem(currencies, item);
 }
 
 export function getItemCurrencyData(item, { target = false }) {
-  const actor = Utilities.getActor(target ? target : item.parent);
-  return getActorCurrencies(actor, { getAll: true })
-    .find(currency => currency.id === (item._id ?? item.id));
+  return getActorCurrencies(item?.parent || false, { forActor: target, getAll: true })
+    .filter(currency => currency.type === "item")
+    .find(currency => {
+      return item.name === currency.data.item.name && item.type === currency.data.item.type;
+    })
 }
 
 export function getItemPileTokenImage(token, {

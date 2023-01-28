@@ -1,5 +1,14 @@
 # Item Piles Changelog
 
+## Version 2.4.11
+
+- Updated German and French localization - thank you blueacousticmusic & Elfenduil!
+- Fixed users dropping items onto the item piles UI would not remove items from the user's inventory
+- Fixed chat messages surrounding items would not use the item's image (in the case of mystified PF2e items)
+- Fixed systems with item-based currencies would fail to open merchants properly
+- Fixed Buy Items tab in the merchant UI would be hidden even if there were purchasable items
+- Fixed error when dropping items on tokens from the sidebar
+
 ## Version 2.4.10
 
 - Updated German localization (thanks blueacousticmusic on Weblate!)
