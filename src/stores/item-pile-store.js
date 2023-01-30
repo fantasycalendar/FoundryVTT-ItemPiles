@@ -352,14 +352,16 @@ export default class ItemPileStore {
     return this._addCurrency(result, this.actor, this.recipient);
   }
 
-  async addCurrency() {
-    const result = await DropCurrencyDialog.show(this.actor, false, {
-      unlimitedCurrencies: true,
-      existingCurrencies: PileUtilities.getActorCurrencies(this.actor),
-      getUpdates: true,
-      button: "Submit"
+  async addCurrency(recipient = false) {
+    const source = recipient || this.actor;
+    const target = recipient ? this.actor : false;
+    const result = await DropCurrencyDialog.show(source, target, {
+      localization: !target ? "EditCurrencies" : false,
+      unlimitedCurrencies: !target && game.user.isGM,
+      existingCurrencies: PileUtilities.getActorCurrencies(source),
+      getUpdates: !target
     });
-    return this._addCurrency(result, this.actor);
+    return this._addCurrency(result, source, target);
   }
 
   async _addCurrency(currencies, source, target = false) {
@@ -367,6 +369,8 @@ export default class ItemPileStore {
     if (!currencies) return;
 
     if (!target) {
+
+      if (!game.user.isGM) return;
 
       if (!foundry.utils.isEmpty(currencies.attributes)) {
         await game.itempiles.API.setAttributes(source, currencies.attributes, { interactionId: this.interactionId })

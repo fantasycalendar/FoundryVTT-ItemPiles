@@ -278,12 +278,16 @@
         "ContentMultipleQuantity": "There's {quantity} of this item, how many do you want to withdraw?",
         "Submit": "Withdraw"
       },
+      "EditCurrencies": {
+        "Title": "Editing Currencies",
+        "Content": "As a GM, you can update the currencies this on item pile:",
+        "Submit": "Submit"
+      },
       "DropCurrencies": {
         "Title": "Dropping Currencies",
-        "Content": "You can drop the following currencies into this item pile:",
-        "ContentNoTarget": "As a GM, you can update the currencies this on item pile:",
+        "Content": "You can add the following currencies into this item pile:",
         "NoCurrency": "{actor_name} has no valid currencies...",
-        "Submit": "Add to pile"
+        "Submit": "Add"
       },
       "DepositCurrencies": {
         "Title": "Deposit Currencies",

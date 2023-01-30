@@ -93,6 +93,8 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Kamigakari: God Hunter](https://foundryvtt.com/packages/kamigakari)
 - [Words Without Number](https://foundryvtt.com/packages/wwn)
 - [Symbaroum](https://foundryvtt.com/packages/symbaroum)
+- [Cypher System](https://foundryvtt.com/packages/cyphersystem)
+- [Pokemon Tabletop United](https://ptufvtt.com/)
 
 ## Externally support systems
 

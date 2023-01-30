@@ -95,7 +95,7 @@
 		{#if attributes.length || items.length}
 
 			<p style="text-align: center; margin: 0;" class="item-piles-bottom-divider">
-				{settings?.content ?? localize(`ITEM-PILES.Applications.${localization}.${targetActor ? "Content" : "ContentNoTarget"}`)}
+				{settings?.content ?? localize(`ITEM-PILES.Applications.${localization}.Content`)}
 			</p>
 
 			{#each attributes as attribute, index (attribute.path)}

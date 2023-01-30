@@ -267,11 +267,14 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const itemPile = Utilities.getToken(sourceUuid);
+    const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
 
-    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
+    const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
+    const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
     if (shouldBeDeleted) {
-      await this._deleteItemPile(sourceUuid);
+      await this._deleteItemPile(itemPileUuid);
     } else if (PileUtilities.isItemPileLootable(itemPile)) {
       if (PileUtilities.isItemPileEmpty(itemPile)) {
         await SharingUtilities.clearItemPileSharingData(itemPile);
@@ -281,7 +284,6 @@ export default class PrivateAPI {
         });
       }
     } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
-      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
       await PileUtilities.updateVaultJournalLog(pileActor, {
@@ -531,11 +533,14 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const itemPile = Utilities.getToken(sourceUuid);
+    const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
 
-    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
+    const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
+    const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
     if (shouldBeDeleted) {
-      await this._deleteItemPile(sourceUuid);
+      await this._deleteItemPile(itemPileUuid);
     } else if (PileUtilities.isItemPileLootable(itemPile)) {
       if (PileUtilities.isItemPileEmpty(itemPile)) {
         await SharingUtilities.clearItemPileSharingData(itemPile);
@@ -744,11 +749,14 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const itemPile = Utilities.getToken(sourceUuid);
+    const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
 
-    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
+    const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
+    const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
     if (shouldBeDeleted) {
-      await this._deleteItemPile(sourceUuid);
+      await this._deleteItemPile(itemPileUuid);
     } else if (PileUtilities.isItemPileLootable(itemPile)) {
       if (PileUtilities.isItemPileEmpty(itemPile)) {
         await SharingUtilities.clearItemPileSharingData(itemPile);
@@ -758,7 +766,6 @@ export default class PrivateAPI {
         });
       }
     } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
-      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
       await PileUtilities.updateVaultJournalLog(pileActor, {
@@ -810,10 +817,14 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
+    const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
 
+    const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
+    const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPile);
     if (shouldBeDeleted) {
-      await this._deleteItemPile(sourceUuid);
+      await this._deleteItemPile(itemPileUuid);
     }
 
     return attributeDeltas;

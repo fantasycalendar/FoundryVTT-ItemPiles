@@ -12,7 +12,7 @@ export default class DropCurrencyDialog extends SvelteApplication {
    * @param options
    */
   constructor(sourceActor, targetActor, settings = {}, options = {}) {
-    const localization = settings.localization ?? "DropCurrencies";
+    const localization = settings.localization || "DropCurrencies";
     super({
       id: `item-pile-drop-currency-${sourceActor ? (sourceActor.id + (targetActor ? "-" + targetActor.id : "")) : ""}-${randomID()}`,
       title: settings.title ?? game.i18n.localize(`ITEM-PILES.Applications.${localization}.Title`),

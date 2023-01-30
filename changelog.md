@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 2.4.12
+
+- Added support for the following systems:
+  - Cypher System
+  - Pokemon Tabletop United
+- Fixed sharing data would not be properly applied on item piles with sharing items/currencies enabled
+- Fixed players being able to add currencies to item piles without having to possess the currencies
+
 ## Version 2.4.11
 
 - Updated German and French localization - thank you blueacousticmusic & Elfenduil!

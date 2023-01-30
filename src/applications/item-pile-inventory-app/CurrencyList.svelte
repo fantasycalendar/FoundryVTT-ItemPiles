@@ -14,21 +14,21 @@
 
 <div>
 
-  <div class="item-piles-flexrow">
-    {#if $numCurrencies > 0 || $numItems > 0}
-      <h3>{localize("ITEM-PILES.Currencies")}:</h3>
-    {/if}
-    <a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
-       on:click={() => store.addCurrency(store.recipient)}>
-      <i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
-    </a>
-  </div>
-  {#if $numCurrencies > 0}
-    <div>
-      {#each $currencies as currency, index (currency.identifier)}
-        <ListEntry {store} bind:entry={currency}/>
-      {/each}
-    </div>
-  {/if}
+	<div class="item-piles-flexrow">
+		{#if $numCurrencies > 0}
+			<h3>{localize("ITEM-PILES.Currencies")}:</h3>
+		{/if}
+		<a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
+			 on:click={() => store.addCurrency(store.recipient)}>
+			<i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
+		</a>
+	</div>
+	{#if $numCurrencies > 0}
+		<div>
+			{#each $currencies as currency, index (currency.identifier)}
+				<ListEntry {store} bind:entry={currency}/>
+			{/each}
+		</div>
+	{/if}
 
 </div>

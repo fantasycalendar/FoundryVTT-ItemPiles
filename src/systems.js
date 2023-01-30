@@ -23,6 +23,7 @@ import yzecoriolis from "./systems/yzecoriolis.js";
 import kamigakari from "./systems/kamigakari.js";
 import symbaroum from "./systems/symbaroum.js";
 import wwn from "./systems/wwn.js";
+import cyphersystem from "./systems/cyphersystem.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -102,6 +103,12 @@ export const SYSTEMS = {
     },
     "symbaroum": {
       "latest": symbaroum
+    },
+    "cyphersystem": {
+      "latest": cyphersystem
+    },
+    "ptu": {
+      "latest": ptu
     },
     // ↑ ADD SYSTEMS HERE ↑
   },
