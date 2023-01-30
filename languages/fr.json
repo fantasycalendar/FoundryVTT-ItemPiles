@@ -382,7 +382,8 @@
       "GiveItemAccepted": "{user_name} a accepté votre offre.",
       "ShownToPlayers": "Montre {actor_name} aux joueurs",
       "CreatedJournal": "Création du journal du coffre-fort des piles d'objets.",
-      "SystemSupportFound": "Support système trouvé ! Appliquer les paramètres système par défaut aux piles d'objets..."
+      "SystemSupportFound": "Support système trouvé ! Appliquer les paramètres système par défaut aux piles d'objets...",
+      "ItemAdded": "{item_name} a été ajouté à {target_actor_name}."
     },
     "Merchant": {
       "AllTypes": "Tous les types",
