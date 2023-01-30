@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.4.13
+
+- Fixed missing import which broke module
+
 ## Version 2.4.12
 
 - Added support for the following systems:
