@@ -451,8 +451,8 @@
         "AddToPile": "Ajouter à la pile",
         "Player": "Vous pouvez déposer les devises suivantes dans cette pile d'objet :",
         "Title": "Lâcher des devises",
-        "Content": "Vous pouvez déposer les monnaies suivantes dans cette pile d'objet :",
-        "Submit": "Ajouter à la pile",
+        "Content": "Vous pouvez ajouter les monnaies suivantes dans cette pile d'articles :",
+        "Submit": "Ajouter",
         "ContentNoTarget": "En tant que MJ, vous pouvez mettre à jour les monnaies sur cette pile d'objets :"
       },
       "Settings": {
@@ -783,6 +783,11 @@
         "Style": "Style",
         "Variable": "Variable",
         "Value": "Valeur"
+      },
+      "EditCurrencies": {
+        "Content": "En tant que MJ, vous pouvez mettre à jour les monnaies sur cette pile d'objets :",
+        "Submit": "Soumettre",
+        "Title": "Modifier les monnaies"
       }
     },
     "Settings": {
