@@ -24,6 +24,7 @@ import kamigakari from "./systems/kamigakari.js";
 import symbaroum from "./systems/symbaroum.js";
 import wwn from "./systems/wwn.js";
 import cyphersystem from "./systems/cyphersystem.js";
+import ptu from "./systems/ptu.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
