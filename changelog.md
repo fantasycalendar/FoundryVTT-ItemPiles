@@ -5,6 +5,7 @@
 - Added support for the following systems:
   - Cypher System
   - Pokemon Tabletop United
+- Updated French localization - thank you rectulo!
 - Fixed sharing data would not be properly applied on item piles with sharing items/currencies enabled
 - Fixed players being able to add currencies to item piles without having to possess the currencies
 
