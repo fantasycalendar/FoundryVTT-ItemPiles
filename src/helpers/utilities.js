@@ -325,7 +325,8 @@ export async function createFoldersFromNames(folders, type = "Actor") {
 
 export function getSourceActorFromDropData(dropData) {
   if (dropData.uuid) {
-    return fromUuidSync(dropData.uuid).parent;
+    const doc = fromUuidSync(dropData.uuid);
+    return doc instanceof Actor ? doc : doc.parent;
   } else if (dropData.tokenId) {
     if (dropData.sceneId) {
       const uuid = `Scene.${dropData.sceneId}.Token.${dropData.tokenId}`;

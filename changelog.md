@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.4.14
+
+- Fixed not being able to add new actors to merchants' price modifiers
+- Minor code cleanup
+
 ## Version 2.4.13
 
 - Fixed missing import which broke module

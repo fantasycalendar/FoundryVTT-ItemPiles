@@ -14,6 +14,7 @@ This module features:
 * Item piles acting as containers with the ability to switch its token image depending on its open/closed/empty state,
   and play sounds accordingly
 * Turn characters into fully featured merchants, with complex item pricing, item quantity management, and more
+* Create Diablo and World of Warcraft-like gridded vaults of items
 * Robust player-to-player trading features
 * Incredibly intuitive API and documentation
 

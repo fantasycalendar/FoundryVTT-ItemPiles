@@ -65,14 +65,15 @@
 
   let tabs;
   $: {
-    let hasItems = $visibleItems.some(item => !get(item.category).service)
-    let hasServices = $visibleItems.some(item => get(item.category).service)
-    let canSell = !$pileData.purchaseOnly && recipientStore;
+    const hasItems = $visibleItems.some(item => !get(item.category).service)
+    const hasServices = $visibleItems.some(item => get(item.category).service)
+    const canSell = !$pileData.purchaseOnly && recipientStore;
+    const showBuy = hasItems || (!hasItems && !hasServices && !canSell)
     tabs = [
       {
         value: 'buy',
         label: game.i18n.localize('ITEM-PILES.Merchant.BuyItems'),
-        hidden: !(hasItems || (!hasItems && !hasServices && !canSell))
+        hidden: !showBuy
       },
       {
         value: 'services',
