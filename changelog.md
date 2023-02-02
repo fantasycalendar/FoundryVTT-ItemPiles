@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.4.15
+
+- Fixed issue with item based currency systems that would not properly subtract existing currency when removing from actors
+
 ## Version 2.4.14
 
 - Fixed not being able to add new actors to merchants' price modifiers
