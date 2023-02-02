@@ -445,7 +445,8 @@
       "ShownToPlayers": "Spielern {actor_name} zeigen",
       "ItemTransferred": "{source_actor_name}'s {item_name} wurde {target_actor_name} gegeben.",
       "CreatedJournal": "Item Piles Tresor-Journal erstellt.",
-      "SystemSupportFound": "Systemunterstützung gefunden! Standardmäßige Systemeinstellungen für Item Piles werden angewendet..."
+      "SystemSupportFound": "Systemunterstützung gefunden! Standardmäßige Systemeinstellungen für Item Piles werden angewendet...",
+      "ItemAdded": "{target_actor_name} hat {item_name} erhalten."
     },
     "HeaderButtons": {
       "ShowToPlayers": "Spielern anzeigen"
@@ -533,7 +534,8 @@
         "Submit": "Einstellungen senden",
         "Styles": "Stileinstellungen",
         "Request": "Neue Funktionen hier anfragen.",
-        "Local": "Lokale Einstellungen"
+        "Local": "Lokale Einstellungen",
+        "Title": "Einstellungen für das Modul Item Piles"
       },
       "PriceModifiersEditor": {
         "Override": "Überschreiben",
@@ -697,7 +699,17 @@
         "HiddenExplanation": "Wenn aktiviert, wird dieser Gegenstand nicht in der Gegenstandsliste des Händlers aufgeführt.",
         "InfiniteQuantityExplanation": "Wenn aktiviert, kann dieser Gegenstand nicht ausverkauft sein, wenn er vom Händler verkauft wird.",
         "CantBeSoldToMerchants": "Kann nicht an Händler verkauft werden",
-        "CantBeSoldToMerchantsExplanation": "Wenn aktiviert, kann dieser Gegenstand nur gekauft und nicht wieder an den Händler verkauft werden."
+        "CantBeSoldToMerchantsExplanation": "Wenn aktiviert, kann dieser Gegenstand nur gekauft und nicht wieder an den Händler verkauft werden.",
+        "DisableNormalCostExplanation": "Wenn dies aktiviert ist, kann der Gegenstand oder die Dienstleistung nicht mit der primären Währung gezahlt werden. Die folgenden Optionen sind verpflichtend.",
+        "DisplayQuantityNo": "Nein, Menge immer ausblenden",
+        "PurchaseMacro": "Kaufmakro",
+        "PurchaseMacroExplanation": "Name des ausgeführten Makros, wenn etwas gekauft wurde.",
+        "DisableNormalCost": "Normale Kosten ersetzen",
+        "PurchaseOptions": "Kaufoptionen",
+        "DisplayQuantityYes": "Ja, immer die Menge anzeigen",
+        "Service": "Ist eine Dienstleistung",
+        "Free": "Ist Kostenlos",
+        "FreeExplanation": "Wenn aktiviert ist der Gegenstand oder die Dienstleitung kostenlos."
       },
       "TradeMerchantItem": {
         "Change": "Wechselgeld",
@@ -708,7 +720,8 @@
         "TheyReceive": "Sie erhalten",
         "Quantity": "Menge",
         "YouCantAfford": "Du kannst dir diesen Preis nicht leisten",
-        "TheyCantAfford": "Sie können sich diesen Preis nicht leisten"
+        "TheyCantAfford": "Sie können sich diesen Preis nicht leisten",
+        "MaxQuantity": "Max {quantity}"
       },
       "CurrenciesEditor": {
         "Title": "Item Piles Währungseditor",
@@ -719,7 +732,9 @@
         "DragDrop": "Füge einen Gegenstand per Drag & Drop zur Liste hinzu",
         "Data": "Daten",
         "Exchange": "Umwechslung",
-        "ExplanationSmallItems": "In anderen System handelt es sich hierbei vielleicht um tatsächliche Gegenstände der Akteure - in diesem Fall kannst du sie per Drag & Drop zu den Währungen hinzufügen."
+        "ExplanationSmallItems": "In anderen System handelt es sich hierbei vielleicht um tatsächliche Gegenstände der Akteure - in diesem Fall kannst du sie per Drag & Drop zu den Währungen hinzufügen.",
+        "Explanation": "Hier kannst du alle Währungen und Einheiten definieren, die ein Charakter aufheben kann.",
+        "ExplanationSmallAttributes": "In D&D5e ist die Einheit für Gold unter dem folgenden Attributspfad abgelegt: \"actor.system.currency.gp\". Wenn du deine eigenen \"Goldmünzen\" hinzufügen willst, wäre der Pfad \"system.currency.gp\". Klicke auf das Plus in der Kopfzeile um Neue hinzufügen."
       },
       "FilterEditor": {
         "AddNew": "Neuen Filter hinzufügen",
@@ -731,8 +746,8 @@
       "DropCurrencies": {
         "Title": "Währungen fallenlassen",
         "NoCurrency": "{actor_name} besitzt keine validen Währungen...",
-        "Submit": "Zum Stapel hinzufügen",
-        "Content": "Du kannst folgende Währungen in diesen Gegenstandsstapel fallenlassen:",
+        "Submit": "Hinzufügen",
+        "Content": "Du kannst folgende Währungen diesen Stapel hinzufügen:",
         "ContentNoTarget": "Als GM kannst du die Währungen dieses Stapels aktualisieren:"
       },
       "VaultAccessEditor": {
@@ -768,6 +783,11 @@
         "Style": "Stil",
         "Variable": "Variable",
         "Value": "Wert"
+      },
+      "EditCurrencies": {
+        "Title": "Währungen anpassen",
+        "Content": "Als SL kannst du die Währungen dieses Stapels anpassen:",
+        "Submit": "Speichern"
       }
     },
     "Settings": {
@@ -853,7 +873,7 @@
         "Label": "Gegenstandsfilter einstellen"
       },
       "CssVariables": {
-        "Title": "CSS Variables Styles",
+        "Title": "CSS Style Variablen",
         "Label": "CSS Variablen konfigurieren"
       },
       "VaultStyles": {
