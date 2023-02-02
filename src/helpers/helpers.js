@@ -1,5 +1,7 @@
 import CONSTANTS from "../constants/constants.js";
 import ItemPileSocket from "../socket.js";
+import SETTINGS from "../constants/settings.js";
+import editors from "../applications/editors/index.js";
 
 export const debounceManager = {
 
@@ -323,5 +325,23 @@ export function getApplicationPositions(application_1, application_2 = false) {
     application_1_position,
     application_2_position
   ]
+
+}
+
+export async function openEditor(key, data = false) {
+
+  const setting = SETTINGS.DEFAULTS()[key];
+
+  const editor = editors[setting.application];
+
+  if (!data) {
+    data = getSetting(key);
+  }
+
+  const result = await editor.show(data, { ...setting.applicationOptions, onchange: setting.onchange } ?? {});
+  
+  if (setting.onchange && result) setting.onchange(result);
+
+  return result;
 
 }

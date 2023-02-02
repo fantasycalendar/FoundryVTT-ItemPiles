@@ -43,7 +43,7 @@ const SETTINGS = {
   SYSTEM_FOUND: "systemFound",
   SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
   SYSTEM_VERSION: "systemVersion",
-  VAULT_LOG_JOURNAL_ID: "vaultLogJournalId",
+  CUSTOM_ITEM_CATEGORIES: "customItemCategories",
 
   DEFAULT_CSS_VARIABLES: {
     "inactive": "rgba(31,143,255,1)",
@@ -114,6 +114,11 @@ const SETTINGS = {
       hint: "ITEM-PILES.Settings.ItemSimilarities.Hint",
       icon: "fa fa-equals",
       application: "item-similarities",
+      applicationOptions: {
+        title: "ITEM-PILES.Applications.SimilaritiesEditor.Title",
+        content: "ITEM-PILES.Applications.SimilaritiesEditor.Explanation",
+        column: "ITEM-PILES.Applications.SimilaritiesEditor.Path",
+      },
       scope: "world",
       config: false,
       system: true,
@@ -213,6 +218,22 @@ const SETTINGS = {
       system: true,
       default: SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE,
       type: String
+    },
+
+    [SETTINGS.CUSTOM_ITEM_CATEGORIES]: {
+      name: "ITEM-PILES.Settings.CustomItemCategories.Title",
+      label: "ITEM-PILES.Settings.CustomItemCategories.Label",
+      hint: "ITEM-PILES.Settings.CustomItemCategories.Hint",
+      application: "item-categories",
+      applicationOptions: {
+        title: "ITEM-PILES.Applications.CustomItemCategoriesEditor.Title",
+        content: "ITEM-PILES.Applications.CustomItemCategoriesEditor.Explanation",
+        column: "ITEM-PILES.Applications.CustomItemCategoriesEditor.Category",
+      },
+      scope: "world",
+      config: false,
+      default: [],
+      type: Array
     },
 
     [SETTINGS.SYSTEM_VERSION]: {

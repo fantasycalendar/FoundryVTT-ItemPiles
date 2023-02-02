@@ -200,8 +200,7 @@
     },
     "SimilaritiesEditor": {
       "Title": "Gegenstandsähnlichkeiten editieren",
-      "Explanation_P1": "Hier kannst du verschiedene Idenfikatoren definieren, die Item Piles helfen zwischen Gegenständen der gleichen Art zu unterscheiden. So gut wie jedes Rollenspielsystem unterscheidet Gegenstände an ihrem Namen (name) und Typ (type).",
-      "Explanation_P2": "In manchen Fällen, wie z.B. Pathfinder 2nd Edition, gibt es temporäre Gegenstände, die den gleichen Namen wie permanente haben. Daher kann man mit dem hinzufügen von \"system.temporary.value\" sicherstellen, dass diese sich \"unterscheiden\".",
+      "Explanation": "Hier kannst du verschiedene Idenfikatoren definieren, die Item Piles helfen zwischen Gegenständen der gleichen Art zu unterscheiden. So gut wie jedes Rollenspielsystem unterscheidet Gegenstände an ihrem Namen (name) und Typ (type). In manchen Fällen, wie z.B. Pathfinder 2nd Edition, gibt es temporäre Gegenstände, die den gleichen Namen wie permanente haben. Daher kann man mit dem hinzufügen von \"system.temporary.value\" sicherstellen, dass diese sich \"unterscheiden\".",
       "Path": "Attributspfad",
       "AddNew": "Neuen Attributspfad hinzufügen",
       "Submit": "Gegenstandsähnlichkeiten abschicken"

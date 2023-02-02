@@ -302,8 +302,7 @@
       },
       "SimilaritiesEditor": {
         "Title": "Editor de Similitudes de Item Piles",
-        "Explanation_P1": "Aquí puedes definir múltiples tipos de identificadores que ayudan a Item Piles a diferenciar entre artículos similares. En casi todos los sistemas, los artículos se pueden diferenciar por su \"nombre\" y \"tipo\".",
-        "Explanation_P2": "Pero en algunos casos, como en Pathfinder 2ª Edición, los artículos temporales pueden compartir los artículos permanentes. Entonces, al agregar \"system.temporary.value\", sus artículos temporales se consideran \"únicos\" y separados de los permanentes.",
+        "Explanation": "Aquí puedes definir múltiples tipos de identificadores que ayudan a Item Piles a diferenciar entre artículos similares. En casi todos los sistemas, los artículos se pueden diferenciar por su \"nombre\" y \"tipo\". Pero en algunos casos, como en Pathfinder 2ª Edición, los artículos temporales pueden compartir los artículos permanentes. Entonces, al agregar \"system.temporary.value\", sus artículos temporales se consideran \"únicos\" y separados de los permanentes.",
         "Path": "Ruta de atributo",
         "AddNew": "Agregar nueva ruta de atributo",
         "Submit": "Enviar similitudes de artículos"

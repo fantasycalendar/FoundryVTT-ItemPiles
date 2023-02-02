@@ -1,13 +1,16 @@
 <script>
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import * as Helpers from "../../helpers/helpers.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import ItemPriceStore from "./ItemPriceStore.js";
   import Tabs from "../components/Tabs.svelte";
   import PriceList from "../components/PriceList.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import MacroSelector from "../components/MacroSelector.svelte";
-  import { get } from "svelte/store";
+  import { get, writable } from "svelte/store";
+  import SETTINGS from "../../constants/settings.js";
+  import { openEditor } from "../../helpers/helpers.js";
 
   const { application } = getContext('external');
 
@@ -15,6 +18,8 @@
   export let elementRoot;
 
   let store = ItemPriceStore.make(item);
+
+  let currentCustomCategories = writable(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES));
 
   const flagDataStore = store.data;
   let price = store.price;
@@ -25,7 +30,14 @@
   let form;
 
   async function updateSettings() {
-    await PileUtilities.updateItemData(item, store.export());
+    const flagData = store.export();
+    if (flagData.flags.customCategory) {
+      let customCategories = get(currentCustomCategories);
+      customCategories.push(flagData.flags.customCategory)
+      customCategories = Array.from(new Set(customCategories));
+      await Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, customCategories);
+    }
+    await PileUtilities.updateItemData(item, flagData);
     application.options.resolve();
     application.close();
   }
@@ -39,6 +51,13 @@
       ...itemFlagData.prices,
       []
     ]
+  }
+
+  async function showCustomItemCategoryEditor() {
+    openEditor(SETTINGS.CUSTOM_ITEM_CATEGORIES).then((result) => {
+      Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, Array.from(new Set(result)));
+      currentCustomCategories.set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES));
+    })
   }
 
   let activeTab = "general";
@@ -68,7 +87,19 @@
 							{localize("ITEM-PILES.Applications.ItemEditor.CustomCategory")}<br>
 							<p>{localize("ITEM-PILES.Applications.ItemEditor.CustomCategoryExplanation")}</p>
 						</label>
-						<input type="text" bind:value={itemFlagData.customCategory} placeholder={item.type}/>
+						<div style="flex: 4; display: flex; align-items: center;">
+							<input type="text" list={"item-editor-list-"+item.id} bind:value={itemFlagData.customCategory}
+										 placeholder={item.type}/>
+							<a style="margin: 0 0.5rem;" on:click={() => showCustomItemCategoryEditor()}><i
+								class="fas fa-cog"></i></a>
+						</div>
+						{#if $currentCustomCategories.length}
+							<datalist id={"item-editor-list-"+item.id}>
+								{#each $currentCustomCategories as category}
+									<option>{category}</option>
+								{/each}
+							</datalist>
+						{/if}
 					</div>
 
 					<div class="form-group">

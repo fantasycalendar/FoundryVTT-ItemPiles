@@ -171,10 +171,7 @@
           return trans;
         });
       }
-
     }
-
-    //console.log("finalTransform", finalTransform.x, finalTransform.y)
 
     transformStore.update(trans => {
       trans.x = finalTransform.x;
@@ -218,26 +215,26 @@
 </script>
 
 <div
-  bind:this={itemRef}
-  on:dblclick={doubleClick}
-  on:pointerdown={moveStart}
-  on:pointerover={hoverOver}
-  on:pointerleave={hoverLeave}
-  on:dragover|preventDefault
-  style={style}
-  class={classes}
+	bind:this={itemRef}
+	on:dblclick={doubleClick}
+	on:pointerdown={moveStart}
+	on:pointerover={hoverOver}
+	on:pointerleave={hoverLeave}
+	on:dragover|preventDefault
+	style={style}
+	class={classes}
 >
-  <slot/>
+	<slot/>
 </div>
 
 {#if active}
-  <div style={previewStyle} class={options.activeClass}>
-    <slot/>
-  </div>
+	<div style={previewStyle} class={options.activeClass}>
+		<slot/>
+	</div>
 
-  <div style={ghostStyle} class={collisions.length ? options.collisionClass : options.previewClass}/>
+	<div style={ghostStyle} class={collisions.length ? options.collisionClass : options.previewClass}/>
 
-  {#if collisions.length}
-    <div style={style} class={collisions.length ? options.collisionClass : options.previewClass}/>
-  {/if}
+	{#if collisions.length}
+		<div style={style} class={collisions.length ? options.collisionClass : options.previewClass}/>
+	{/if}
 {/if}

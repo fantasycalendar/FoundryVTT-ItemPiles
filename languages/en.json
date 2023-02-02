@@ -393,9 +393,13 @@
       },
       "SimilaritiesEditor": {
         "Title": "Item Piles Similarities Editor",
-        "Explanation_P1": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\".",
-        "Explanation_P2": "But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"system.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
+        "Explanation": "Here you can define multiple types of identifiers that helps Item Piles differentiate between similar items. In almost every system, items can be differentiated with their \"name\" and \"type\". But in some cases, such as in Pathfinder 2nd Edition, temporary items may share those with permanent items. So by adding \"system.temporary.value\", your temporary items are considered \"unique\" and separate from permanent ones.",
         "Path": "Attribute path"
+      },
+      "CustomItemCategoriesEditor": {
+        "Title": "Custom Item Categories Editor",
+        "Explanation": "Here you can configure which custom item categories are available in your world. They are dynamically added to when you add a new one for an item.",
+        "Category": "Category"
       },
       "UnstackableItemTypesEditor": {
         "Title": "Unstackable Item Types Editor",
@@ -670,6 +674,11 @@
         "Title": "Price Presets",
         "Label": "Configure Price Presets",
         "Hint": "Here you can configure custom preset prices that you can then easily import onto items."
+      },
+      "CustomItemCategories": {
+        "Title": "Custom Item Categories",
+        "Label": "Configure Item Categories",
+        "Hint": "In this, you can configure the custom item categories, which are shown as suggestions in the item editor."
       },
       "EnableDroppingItems": {
         "Title": "Enable Dropping Items",

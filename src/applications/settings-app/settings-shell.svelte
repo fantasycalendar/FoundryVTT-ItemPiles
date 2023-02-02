@@ -112,12 +112,12 @@
 
 			<div class="tab flex" class:active={activeTab === 'local'} data-scope="primary" data-tab="local">
 
-				<Setting bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}"/>
-				<Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}"/>
-				<Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_BUTTON]}"/>
-				<Setting bind:data="{settings[SETTINGS.PRELOAD_FILES]}"/>
-				<Setting bind:data="{settings[SETTINGS.DEBUG]}"/>
-				<Setting bind:data="{settings[SETTINGS.DEBUG_HOOKS]}"/>
+				<Setting key={SETTINGS.INVERT_SHEET_OPEN} bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}"/>
+				<Setting key={SETTINGS.HIDE_ACTOR_HEADER_TEXT} bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}"/>
+				<Setting key={SETTINGS.HIDE_ACTOR_HEADER_BUTTON} bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_BUTTON]}"/>
+				<Setting key={SETTINGS.PRELOAD_FILES} bind:data="{settings[SETTINGS.PRELOAD_FILES]}"/>
+				<Setting key={SETTINGS.DEBUG} bind:data="{settings[SETTINGS.DEBUG]}"/>
+				<Setting key={SETTINGS.DEBUG_HOOKS} bind:data="{settings[SETTINGS.DEBUG_HOOKS]}"/>
 
 				<div style="text-align: center; font-size: 1rem; margin-top:3rem;">
 					<p>{localize("ITEM-PILES.Applications.Settings.MoreToCome")}
@@ -145,20 +145,21 @@
 
 			{#if userCanChangeSettings}
 				<div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
-					<Setting bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
-					<Setting bind:data="{settings[SETTINGS.ENABLE_GIVING_ITEMS]}"/>
-					<Setting bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>
-					<Setting bind:data="{settings[SETTINGS.SHOW_TRADE_BUTTON]}"/>
-					<Setting bind:data="{settings[SETTINGS.INSPECT_ITEMS_IN_TRADE]}"/>
-					<Setting bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
-					<Setting bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
-					<Setting bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
-					<SettingButton bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
+					<Setting key={SETTINGS.ENABLE_DROPPING_ITEMS} bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
+					<Setting key={SETTINGS.ENABLE_GIVING_ITEMS} bind:data="{settings[SETTINGS.ENABLE_GIVING_ITEMS]}"/>
+					<Setting key={SETTINGS.ENABLE_TRADING} bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>
+					<Setting key={SETTINGS.SHOW_TRADE_BUTTON} bind:data="{settings[SETTINGS.SHOW_TRADE_BUTTON]}"/>
+					<Setting key={SETTINGS.INSPECT_ITEMS_IN_TRADE} bind:data="{settings[SETTINGS.INSPECT_ITEMS_IN_TRADE]}"/>
+					<Setting key={SETTINGS.OUTPUT_TO_CHAT} bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
+					<Setting key={SETTINGS.DELETE_EMPTY_PILES} bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
+					<Setting key={SETTINGS.POPULATION_TABLES_FOLDER} bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
+					<SettingButton key={SETTINGS.PRICE_PRESETS} bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
+					<SettingButton key={SETTINGS.CUSTOM_ITEM_CATEGORIES} bind:data="{settings[SETTINGS.CUSTOM_ITEM_CATEGORIES]}"/>
 				</div>
 
 				<div class="tab flex" class:active={activeTab === 'styles'} data-scope="primary" data-tab="styles">
-					<SettingButton bind:data="{settings[SETTINGS.CSS_VARIABLES]}"/>
-					<SettingButton bind:data="{settings[SETTINGS.VAULT_STYLES]}"/>
+					<SettingButton key={SETTINGS.CSS_VARIABLES} bind:data="{settings[SETTINGS.CSS_VARIABLES]}"/>
+					<SettingButton key={SETTINGS.VAULT_STYLES} bind:data="{settings[SETTINGS.VAULT_STYLES]}"/>
 				</div>
 
 				<div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
@@ -172,15 +173,16 @@
             await resetSettings()
             getSettings();
           }}/>
-					<Setting bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}" options={game.system.template.Actor.types}/>
-					<Setting bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
-					<Setting bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
-					<SettingButton bind:data="{settings[SETTINGS.CURRENCIES]}"/>
-					<Setting bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
+					<Setting key={SETTINGS.ACTOR_CLASS_TYPE} bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}"
+									 options={game.system.template.Actor.types}/>
+					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
+					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
+					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>
+					<Setting key={SETTINGS.CURRENCY_DECIMAL_DIGITS} bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
 									 disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
-					<SettingButton bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
-					<SettingButton bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
-					<SettingButton bind:data="{settings[SETTINGS.UNSTACKABLE_ITEM_TYPES]}"/>
+					<SettingButton key={SETTINGS.ITEM_FILTERS} bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
+					<SettingButton key={SETTINGS.ITEM_SIMILARITIES} bind:data="{settings[SETTINGS.ITEM_SIMILARITIES]}"/>
+					<SettingButton key={SETTINGS.UNSTACKABLE_ITEM_TYPES} bind:data="{settings[SETTINGS.UNSTACKABLE_ITEM_TYPES]}"/>
 				</div>
 			{/if}
 

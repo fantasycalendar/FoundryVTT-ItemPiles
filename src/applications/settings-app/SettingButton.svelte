@@ -2,9 +2,11 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { getContext } from 'svelte';
   import editors from "../editors/index.js";
+  import { openEditor } from "../../helpers/helpers.js";
 
   const { application } = getContext('external');
 
+  export let key;
   export let data;
   export let callback = false;
 
@@ -21,16 +23,12 @@
       const combinedData = data?.mergedDefaults
         ? foundry.utils.mergeObject(data.mergedDefaults, data.value)
         : data.value;
-      editor.show(combinedData, { ...data.applicationOptions, onchange: data.onchange } ?? {}).then((result) => {
-        if (result) {
-          if (data?.mergedDefaults) {
-            result = foundry.utils.diffObject(data?.mergedDefaults, result);
-          }
-          data.value = result;
-          if (data.onchange) data.onchange(result);
-        } else {
-          if (data.onchange) data.onchange();
+      openEditor(key, combinedData).then((result) => {
+        if (!result) return;
+        if (data?.mergedDefaults) {
+          result = foundry.utils.diffObject(data?.mergedDefaults, result);
         }
+        data.value = result;
       });
       application.options.zLevel = 100;
     }

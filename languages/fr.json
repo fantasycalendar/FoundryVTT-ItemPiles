@@ -199,8 +199,7 @@
     },
     "SimilaritiesEditor": {
       "Title": "Éditeur de similarités d'objets",
-      "Explanation_P1": "Vous pouvez définir ici plusieurs types d'identifiants qui aident Item Piles à différencier les objets similaires. Dans presque tous les systèmes, les éléments peuvent être différenciés par leur \"nom\" et leur \"type\".",
-      "Explanation_P2": "Mais dans certains cas, comme dans la 2e édition de Pathfinder, les objets temporaires peuvent les partager avec les objets permanents. Ainsi, en ajoutant \"system.temporary.value\", vos objets temporaires sont considérés comme \"uniques\".",
+      "Explanation": "Vous pouvez définir ici plusieurs types d'identifiants qui aident Item Piles à différencier les objets similaires. Dans presque tous les systèmes, les éléments peuvent être différenciés par leur \"nom\" et leur \"type\". Mais dans certains cas, comme dans la 2e édition de Pathfinder, les objets temporaires peuvent les partager avec les objets permanents. Ainsi, en ajoutant \"system.temporary.value\", vos objets temporaires sont considérés comme \"uniques\".",
       "Path": "Chemin d'accès de l'attribut",
       "AddNew": "Ajouter un nouveau chemin d'accès aux attributs",
       "Submit": "Soumettre les similarités."
@@ -542,8 +541,7 @@
       "SimilaritiesEditor": {
         "Path": "Chemin d'attribut",
         "AddNew": "Ajouter un nouveau chemin d'attribut",
-        "Explanation_P1": "Ici, vous pouvez définir plusieurs types d'identifiants qui aident les piles d'objets à différencier les articles similaires. Dans presque tous les systèmes, les éléments peuvent être différenciés par leur \"nom\" et leur \"type\".",
-        "Explanation_P2": "Mais dans certains cas, comme dans Pathfinder 2nd Edition, les objets temporaires peuvent partager ceux avec des objets permanents. Ainsi, en ajoutant \"system.temporary.value\", vos éléments temporaires sont considérés comme \"uniques\" et distincts des éléments permanents.",
+        "Explanation": "Ici, vous pouvez définir plusieurs types d'identifiants qui aident les piles d'objets à différencier les articles similaires. Dans presque tous les systèmes, les éléments peuvent être différenciés par leur \"nom\" et leur \"type\". Mais dans certains cas, comme dans Pathfinder 2nd Edition, les objets temporaires peuvent partager ceux avec des objets permanents. Ainsi, en ajoutant \"system.temporary.value\", vos éléments temporaires sont considérés comme \"uniques\" et distincts des éléments permanents.",
         "Title": "Éditeur de similarités des piles d'objets",
         "Submit": "Soumettre des similitudes d'objets"
       },

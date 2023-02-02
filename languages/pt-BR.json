@@ -322,11 +322,10 @@
       },
       "SimilaritiesEditor": {
         "Title": "Editor de semelhanças do Item Piles",
-        "Explanation_P1": "Aqui você pode definir vários tipos de identificadores que ajudam o Item Piles a diferenciar entre itens semelhantes. Em quase todos os sistemas, os itens podem ser diferenciados com seu \"nome\" e \"tipo\".",
+        "Explanation": "Aqui você pode definir vários tipos de identificadores que ajudam o Item Piles a diferenciar entre itens semelhantes. Em quase todos os sistemas, os itens podem ser diferenciados com seu \"nome\" e \"tipo\". Mas em alguns casos, como no Pathfinder 2nd Edition, itens temporários podem ser compartilhados com itens permanentes. Portanto, ao adicionar \"system.temporary.value\", seus itens temporários são considerados \"únicos\" e separados dos permanentes.",
         "Path": "Caminho do atributo",
         "AddNew": "Adicionar novo caminho de atributo",
-        "Submit": "Enviar semelhanças de itens",
-        "Explanation_P2": "Mas em alguns casos, como no Pathfinder 2nd Edition, itens temporários podem ser compartilhados com itens permanentes. Portanto, ao adicionar \"system.temporary.value\", seus itens temporários são considerados \"únicos\" e separados dos permanentes."
+        "Submit": "Enviar semelhanças de itens"
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "Editor de modificadores de preço de tipo de item",
