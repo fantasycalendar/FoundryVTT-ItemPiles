@@ -2049,8 +2049,6 @@ export default class PrivateAPI {
     interactionId = false
   } = {}) {
 
-    debugger;
-
     const sellingActor = Utilities.getActor(sellerUuid);
     const buyingActor = Utilities.getActor(buyerUuid);
 
