@@ -3,6 +3,7 @@
 ## Version 2.4.15
 
 - Added setting to track custom item categories across items (will not track previously created categories)
+- Updated German and French localization - thank you Marc and IrishWolf!
 - Fixed issue with item based currency systems that would not properly subtract existing currency when removing from actors
 
 ## Version 2.4.14
