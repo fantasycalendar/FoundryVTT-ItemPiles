@@ -438,7 +438,7 @@
         "ExistingPiles": "Vous ajoutez cet élément à la pile d'objet \"{target_name}\".",
         "Title": "Lâcher un Objet",
         "Dropping": "Vous lâchez : {item_name}",
-        "Header": "Vous lâchez: {item_name}",
+        "Header": "Vous lâchez : {item_name}",
         "Content": "Vous ajoutez cet objet à la pile d'objet \"{target_name}\".",
         "ContentMultipleQuantity": "Vous avez {quantity} de cet objet, combien voulez-vous en déposer ?",
         "Submit": "Ajouter à la pile",
@@ -786,6 +786,11 @@
         "Content": "En tant que MJ, vous pouvez mettre à jour les monnaies sur cette pile d'objets :",
         "Submit": "Soumettre",
         "Title": "Modifier les monnaies"
+      },
+      "CustomItemCategoriesEditor": {
+        "Title": "Éditeur de catégories d'objets personnalisés",
+        "Category": "Catégorie",
+        "Explanation": "Vous pouvez configurez ici quelles catégories d'objets personnalisées sont disponibles dans votre monde. Elles y sont dynamiquement ajoutées lorsque vous en ajoutez une nouvelle pour un objet."
       }
     },
     "Settings": {
@@ -910,6 +915,11 @@
         "Title": "Styles de coffre-fort",
         "Label": "Configurer les styles de coffre-fort",
         "Hint": "Cela vous permet d'ajouter des règles qui donneront un style aux objets en fonction des chemins et des valeurs des propriétés des objets eux-mêmes."
+      },
+      "CustomItemCategories": {
+        "Title": "Catégories d'objets personnalisées",
+        "Label": "Configurer les catégories d'objets",
+        "Hint": "Vous pouvez configurer les catégories d'objets personnalisées qui sont affichées comme des suggestions dans l'éditeur d'objets."
       }
     },
     "Warnings": {
