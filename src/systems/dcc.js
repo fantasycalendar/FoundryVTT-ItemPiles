@@ -9,7 +9,7 @@ export default {
   "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
 
   // The item price attribute is the path to the attribute on each item that determine how much it costs
-  "ITEM_PRICE_ATTRIBUTE": "system.currency.value",
+  "ITEM_PRICE_ATTRIBUTE": "system.value",
 
   // Item filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
   "ITEM_FILTERS": [
@@ -36,15 +36,15 @@ export default {
 
   // This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
   "ITEM_COST_TRANSFORMER": (item, currencies) => {
-    var overallCost = 0;
+    let overallCost = 0;
     currencies.forEach((currency, index) => {
-      let denominationCost = getProperty(item, currency.data.path)
-      overallCost += denominationCost * currency.exchangeRate;
+      let denominationCost = Number(getProperty(item, currency.data.path.replace("system.currency.", "system.value.")));
+      if (!isNaN(denominationCost)) {
+        overallCost += denominationCost * currency.exchangeRate;
+      }
     })
     return overallCost ?? 0;
   },
-
-  "PREVENT_INJECTING_ITEMS": true,
 
   // Item similarities determines how item piles detect similarities and differences in the system
   "ITEM_SIMILARITIES": ["name", "type"],
@@ -57,10 +57,9 @@ export default {
       type: "attribute",
       name: "DCC.CurrencyPP",
       img: "icons/commodities/currency/coin-inset-snail-silver.webp",
-      abbreviation: "{#}Pp.",
+      abbreviation: "{#}Pp",
       data: {
         path: "system.currency.pp",
-        itemPath: "system.currency.value.pp",
       },
       primary: false,
       exchangeRate: 100
@@ -69,10 +68,9 @@ export default {
       type: "attribute",
       name: "DCC.CurrencyEP",
       img: "icons/commodities/currency/coin-inset-copper-axe.webp",
-      abbreviation: "{#} Ep.",
+      abbreviation: "{#} Ep",
       data: {
         path: "system.currency.ep",
-        itemPath: "system.currency.value.ep",
       },
       primary: false,
       exchangeRate: 10
@@ -81,10 +79,9 @@ export default {
       type: "attribute",
       name: "DCC.CurrencyGP",
       img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
-      abbreviation: "{#} Gp.",
+      abbreviation: "{#} Gp",
       data: {
         path: "system.currency.gp",
-        itemPath: "system.currency.value.gp",
       },
       primary: true,
       exchangeRate: 1
@@ -93,10 +90,9 @@ export default {
       type: "attribute",
       name: "DCC.CurrencySP",
       img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
-      abbreviation: "{#} Sp.",
+      abbreviation: "{#} Sp",
       data: {
         path: "system.currency.sp",
-        itemPath: "system.currency.value.sp",
       },
       primary: false,
       exchangeRate: 0.1
@@ -105,10 +101,9 @@ export default {
       type: "attribute",
       name: "DCC.CurrencyCP",
       img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
-      abbreviation: "{#} Cp.",
+      abbreviation: "{#} Cp",
       data: {
         path: "system.currency.cp",
-        itemPath: "system.currency.value.cp",
       },
       primary: false,
       exchangeRate: 0.01
