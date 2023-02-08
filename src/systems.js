@@ -25,6 +25,7 @@ import symbaroum from "./systems/symbaroum.js";
 import wwn from "./systems/wwn.js";
 import cyphersystem from "./systems/cyphersystem.js";
 import ptu from "./systems/ptu.js";
+import dcc from "./systems/dcc.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -110,6 +111,9 @@ export const SYSTEMS = {
     },
     "ptu": {
       "latest": ptu
+    },
+    "dcc": {
+      "latest": dcc
     },
     // ↑ ADD SYSTEMS HERE ↑
   },
