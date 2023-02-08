@@ -267,7 +267,7 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+    const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
 
     const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
     const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
@@ -533,7 +533,7 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+    const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
 
     const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
     const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
@@ -749,7 +749,7 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+    const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
 
     const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
     const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
@@ -817,7 +817,7 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+    const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
 
     const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
     const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
@@ -1564,7 +1564,7 @@ export default class PrivateAPI {
     const droppingItem = canDropItems && (droppableItemPiles.length || (dropData.position && !droppableNormalTokens.length));
     const givingItem = canGiveItems && droppableNormalTokens.length && !droppableItemPiles.length;
 
-    const itemPileIsVault = PileUtilities.isItemPileVault(droppableItemPiles[0]);
+    const itemPileIsVault = PileUtilities.isValidItemPile(droppableItemPiles[0]);
 
     if (itemPileIsVault) {
       dropData.target = droppableItemPiles[0];
@@ -1965,7 +1965,7 @@ export default class PrivateAPI {
         }));
       }
 
-      if (pileData.shareCurrenciesEnabled) {
+      if (pileData.shareCurrenciesEnabled || pileData.splitAllEnabled) {
         await transaction.appendItemChanges(deepClone(preparedData).itemDeltas.filter(delta => delta.type === "currency").map(delta => {
           delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
             players: numPlayers, shareData: shareData, floor: true

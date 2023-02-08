@@ -26,45 +26,50 @@ export default class TradeStore {
 
   }
 
-  static import(leftTraderData, rightTraderData, publicTradeId) {
+  static import(tradeData) {
 
     const leftTrader = {
-      user: game.users.get(leftTraderData.user),
-      actor: fromUuidSync(leftTraderData.actor),
-      items: leftTraderData.items,
-      currencies: leftTraderData.currencies,
-      itemCurrencies: leftTraderData.itemCurrencies,
-      accepted: leftTraderData.accepted
+      user: game.users.get(tradeData.leftTraderData.user),
+      actor: fromUuidSync(tradeData.leftTraderData.actor),
+      items: tradeData.leftTraderData.items,
+      currencies: tradeData.leftTraderData.currencies,
+      itemCurrencies: tradeData.leftTraderData.itemCurrencies,
+      accepted: tradeData.leftTraderData.accepted
     };
 
     const rightTrader = {
-      user: game.users.get(rightTraderData.user),
-      actor: fromUuidSync(rightTraderData.actor),
-      items: rightTraderData.items,
-      currencies: rightTraderData.currencies,
-      itemCurrencies: rightTraderData.itemCurrencies,
-      accepted: rightTraderData.accepted
+      user: game.users.get(tradeData.rightTraderData.user),
+      actor: fromUuidSync(tradeData.rightTraderData.actor),
+      items: tradeData.rightTraderData.items,
+      currencies: tradeData.rightTraderData.currencies,
+      itemCurrencies: tradeData.rightTraderData.itemCurrencies,
+      accepted: tradeData.rightTraderData.accepted
     };
 
-    return new this(leftTrader, rightTrader, publicTradeId);
+    return new this(tradeData.instigator, leftTrader, rightTrader, tradeData.publicTradeId);
   }
 
   export() {
-    return [{
-      user: this.leftTraderUser.id,
-      actor: Utilities.getUuid(this.leftTraderActor),
-      items: get(this.leftTraderItems),
-      currencies: get(this.leftTraderCurrencies),
-      itemCurrencies: get(this.leftTraderItemCurrencies),
-      accepted: get(this.leftTraderAccepted)
-    }, {
-      user: this.rightTraderUser.id,
-      actor: Utilities.getUuid(this.rightTraderActor),
-      items: get(this.rightTraderItems),
-      currencies: get(this.rightTraderCurrencies),
-      itemCurrencies: get(this.rightTraderItemCurrencies),
-      accepted: get(this.rightTraderAccepted)
-    }, this.publicTradeId]
+    return {
+      instigator: this.instigator,
+      publicTradeId: this.publicTradeId,
+      leftTraderData: {
+        user: this.leftTraderUser.id,
+        actor: Utilities.getUuid(this.leftTraderActor),
+        items: get(this.leftTraderItems),
+        currencies: get(this.leftTraderCurrencies),
+        itemCurrencies: get(this.leftTraderItemCurrencies),
+        accepted: get(this.leftTraderAccepted)
+      },
+      rightTraderData: {
+        user: this.rightTraderUser.id,
+        actor: Utilities.getUuid(this.rightTraderActor),
+        items: get(this.rightTraderItems),
+        currencies: get(this.rightTraderCurrencies),
+        itemCurrencies: get(this.rightTraderItemCurrencies),
+        accepted: get(this.rightTraderAccepted)
+      }
+    }
   }
 
   getTradeData() {

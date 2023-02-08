@@ -288,9 +288,10 @@ export async function runMacro(macroId, macroData) {
 
 }
 
-export function getOwnedCharacters() {
+export function getOwnedCharacters(user = false) {
+  user = user || game.user;
   return game.actors.filter(actor => {
-      return actor.ownership?.[game.user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER
+      return actor.ownership?.[user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER
         && actor.prototypeToken.actorLink;
     })
     .sort((a, b) => {
@@ -298,9 +299,10 @@ export function getOwnedCharacters() {
     });
 }
 
-export function getUserCharacter() {
-  return game.user.character
-    || (game.user.isGM ? false : (getOwnedCharacters()?.[0] ?? false));
+export function getUserCharacter(user = false) {
+  user = user || game.user;
+  return user.character
+    || (user.isGM ? false : (getOwnedCharacters(user)?.[0] ?? false));
 }
 
 export async function createFoldersFromNames(folders, type = "Actor") {

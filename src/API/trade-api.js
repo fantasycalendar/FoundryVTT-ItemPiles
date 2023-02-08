@@ -280,7 +280,7 @@ export default class TradeAPI {
       return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Over"), true);
     }
 
-    const store = TradeStore.import(...ongoingTradeData);
+    const store = TradeStore.import(ongoingTradeData);
 
     const app = new TradingApp(store).render(true);
 

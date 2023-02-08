@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.4.16
+
+- Fixed being unable to spectate trades
+- Fixed `Split currencies x ways` button not working when sharing currencies was not enabled
+- Fixed item piles not being deleted after users having looted all of their currencies
+- Fixed users being able to more than their share
+
 ## Version 2.4.15
 
 - Added setting to track custom item categories across items (will not track previously created categories)
