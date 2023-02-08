@@ -2,6 +2,8 @@
 
 ## Version 2.4.16
 
+- Added support for Dungeon Crawl Classics system - thanks mooped!
+- Updated French localization - thank you rectulo!
 - Fixed being unable to spectate trades
 - Fixed `Split currencies x ways` button not working when sharing currencies was not enabled
 - Fixed item piles not being deleted after users having looted all of their currencies
