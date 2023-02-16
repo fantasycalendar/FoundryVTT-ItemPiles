@@ -550,13 +550,27 @@ export function cleanFlagData(flagData) {
   return flagData;
 }
 
-export async function updateItemData(item, update) {
-  const flagData = foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {});
-  return item.update({
-    ...update?.data ?? {},
-    [CONSTANTS.FLAGS.ITEM]: flagData,
-    [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
-  });
+export function cleanItemFlagData(flagData) {
+  const defaults = Object.keys(CONSTANTS.ITEM_DEFAULTS);
+  const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, CONSTANTS.ITEM_DEFAULTS)));
+  const toRemove = new Set(defaults.filter(key => !difference.has(key)));
+  for (const key of toRemove) {
+    delete flagData[key];
+    flagData["-=" + key] = null;
+  }
+  return flagData;
+}
+
+export function updateItemData(item, update, { returnUpdate = false, version = false } = {}) {
+  const flagData = cleanItemFlagData(foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {}));
+  const updates = update?.data ?? {};
+  setProperty(updates, CONSTANTS.FLAGS.ITEM, flagData)
+  setProperty(updates, CONSTANTS.FLAGS.VERSION, version || Helpers.getModuleVersion())
+  if (returnUpdate) {
+    updates["_id"] = item?.id ?? item?._id;
+    return updates;
+  }
+  return item.update(updates);
 }
 
 /* -------------------------- Merchant Methods ------------------------- */

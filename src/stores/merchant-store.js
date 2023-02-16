@@ -242,6 +242,7 @@ class PileMerchantItem extends PileItem {
     this.subscribeTo(this.itemFlagData, () => {
       if (!setup) return;
       this.refreshPriceData();
+      this.refreshDisplayQuantity();
     });
     setup = true;
   }
@@ -253,6 +254,14 @@ class PileMerchantItem extends PileItem {
 
     const merchantDisplayQuantity = pileData.displayQuantity;
     const itemFlagDataQuantity = itemFlagData.displayQuantity;
+
+    const itemInfiniteQuantity = {
+      "default": pileData.infiniteQuantity,
+      "yes": true,
+      "no": false
+    }[itemFlagData.infiniteQuantity ?? "default"];
+
+    this.infiniteQuantity.set(itemInfiniteQuantity)
 
     if (itemFlagDataQuantity === "always") {
       return this.displayQuantity.set(true);
@@ -269,7 +278,6 @@ class PileMerchantItem extends PileItem {
     }
 
     this.displayQuantity.set(itemDisplayQuantity);
-    this.infiniteQuantity.set(pileData.infiniteQuantity || itemFlagData.infiniteQuantity)
 
   }
 

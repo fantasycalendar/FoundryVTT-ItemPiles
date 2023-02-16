@@ -22,7 +22,7 @@ const CONSTANTS = {
     // Merchants
     hidden: false,
     notForSale: false,
-    infiniteQuantity: false,
+    infiniteQuantity: "default",
     displayQuantity: "default",
     free: false,
     keepZeroQuantity: false,
