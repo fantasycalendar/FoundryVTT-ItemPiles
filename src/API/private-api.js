@@ -1484,6 +1484,14 @@ export default class PrivateAPI {
         macroData.items = macroData.items.map(item => targetActor.items.get(item?.item?._id ?? item._id));
       }
 
+      if (macroData.sourceItems) {
+        macroData.sourceItems = macroData.sourceItems.map(item => sourceActor.items.get(item?.item?._id ?? item._id));
+      }
+
+      if (macroData.targetItems) {
+        macroData.targetItems = macroData.targetItems.map(item => targetActor.items.get(item?.item?._id ?? item._id));
+      }
+
     }
 
     return Utilities.runMacro(pileData.macro, macroData)
@@ -1564,8 +1572,8 @@ export default class PrivateAPI {
     const droppingItem = canDropItems && (droppableItemPiles.length || (dropData.position && !droppableNormalTokens.length));
     const givingItem = canGiveItems && droppableNormalTokens.length && !droppableItemPiles.length;
 
-    const itemPileIsVault = PileUtilities.isValidItemPile(droppableItemPiles[0]);
-
+    const itemPileIsVault = PileUtilities.isItemPileVault(droppableItemPiles[0]);
+    
     if (itemPileIsVault) {
       dropData.target = droppableItemPiles[0];
       return this._depositItem(dropData);
@@ -2186,19 +2194,11 @@ export default class PrivateAPI {
       action: "tradeItems",
       source: sellerUuid,
       target: buyerUuid,
-      items: sellerTransactionData.itemDeltas,
-      attributes: sellerTransactionData.attributeDeltas,
-      prices: itemPrices,
-      userId: userId,
-      interactionId: interactionId
-    });
-
-    await this._executeItemPileMacro(itemPileActorUuid, {
-      action: "tradeItems",
-      source: sellerUuid,
-      target: buyerUuid,
-      items: buyerTransactionData.itemDeltas,
-      attributes: buyerTransactionData.attributeDeltas,
+      sourceIsMerchant: sellerIsMerchant,
+      sourceItems: sellerTransactionData.itemDeltas,
+      sourceAttributes: sellerTransactionData.attributeDeltas,
+      targetItems: buyerTransactionData.itemDeltas,
+      targetAttributes: buyerTransactionData.attributeDeltas,
       prices: itemPrices,
       userId: userId,
       interactionId: interactionId

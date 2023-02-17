@@ -383,8 +383,9 @@ export function getItemPileName(target, { data = false, items = false, currencie
   }
 
   const item = items.length > 0 ? items[0] : currencies[0];
+  const quantity = (items.length > 0 ? Utilities.getItemQuantity(item) : currencies[0]?.quantity) ?? 1
 
-  return item.name;
+  return item.name + (quantity > 1 ? " x " + quantity : "");
 
 }
 
