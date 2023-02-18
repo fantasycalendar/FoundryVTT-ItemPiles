@@ -2,12 +2,13 @@
 
 ## Version 2.4.17
 
+- Updates to German localization - thank you blueacousticmusic!
 - Added `x[quantity]` to the name of new pile-type item pile tokens, so you know how many of that item was dropped on the ground
 - Changed `Infinite Quantity` on items to be a multi-choice option whether to defer to the owner's setting, or whether to have infinite quantity
 - Dropping items now always prompts whether to create an item pile or not
 - Dropping items from the sidebar or compendiums should now allow you to change the dropped quantity
-- Fixed issue with items not being passed properly to macros being called when buying from and selling to merchants
-- Fixed issue with merchants' macros not being called when selling them
+- Fixed issue with items not being passed properly to macros being called when buying from and selling to merchants (thank you FeistyMango!)
+- Fixed issue with merchants' macros not being called when selling them (thank you FeistyMango!)
 - Fixed an issue where invalid item pile tokens were not being properly deleted during migrations
 
 ## Version 2.4.16
