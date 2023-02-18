@@ -1478,8 +1478,9 @@ export default class PrivateAPI {
         macroData.target = fromUuidSync(macroData.target);
       }
 
+      const sourceActor = macroData.source instanceof TokenDocument ? macroData.source.actor : macroData.source;
       const targetActor = macroData.target instanceof TokenDocument ? macroData.target.actor : macroData.target;
-
+      
       if (macroData.items) {
         macroData.items = macroData.items.map(item => targetActor.items.get(item?.item?._id ?? item._id));
       }
