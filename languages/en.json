@@ -254,6 +254,7 @@
         "Header": "You're dropping: {item_name}",
         "Content": "You're adding this item to the item pile \"{target_name}\".",
         "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to drop?",
+        "ContentInfiniteQuantity": "How many do you want to drop?",
         "Submit": "Add to pile",
         "SubmitNoTarget": "Create new pile"
       },
@@ -262,6 +263,7 @@
         "Header": "You're giving: {item_name}",
         "Content": "Do you want to give this item to \"{target_name}\"?",
         "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to give away?",
+        "ContentInfiniteQuantity": "How many do you want to give to \"{target_name}\"?",
         "Submit": "Give"
       },
       "DepositItem": {
@@ -269,6 +271,7 @@
         "Header": "You're depositing: {item_name}",
         "Content": "Do you want to deposit this item into \"{target_name}\"?",
         "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to deposit?",
+        "ContentInfiniteQuantity": "How many do you want to deposit?",
         "Submit": "Deposit"
       },
       "WithdrawItem": {
@@ -276,6 +279,7 @@
         "Header": "You're withdrawing: {item_name}",
         "Content": "Do you want to withdraw this item from \"{target_name}\"?",
         "ContentMultipleQuantity": "There's {quantity} of this item, how many do you want to withdraw?",
+        "ContentInfiniteQuantity": "",
         "Submit": "Withdraw"
       },
       "EditCurrencies": {
@@ -357,6 +361,9 @@
         "DisplayQuantityNo": "No, always hide quantity",
         "InfiniteQuantity": "Infinite Quantity",
         "InfiniteQuantityExplanation": "When enabled, this item cannot run out of quantity when sold by a merchant.",
+        "InfiniteQuantityDefault": "Default to merchant setting",
+        "InfiniteQuantityYes": "Yes, infinite quantity",
+        "InfiniteQuantityNo": "No, standard quantity",
         "KeepZero": "Keep Zero Quantity",
         "KeepZeroExplanation": "When fully sold out, the merchant does not remove this item but sets it to not for sale instead.",
         "PriceExplanation": "In this tab, you can configure the price of this item, including whether this item will cost other items to purchase.",

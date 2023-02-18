@@ -127,11 +127,21 @@
 					</div>
 
 					<div class="form-group">
-						<label style="flex:4;">
+						<label>
 							{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantity")}<br>
 							<p>{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityExplanation")}</p>
 						</label>
-						<input type="checkbox" bind:checked={itemFlagData.infiniteQuantity}/>
+						<select style="flex: 0 1 auto;" bind:value={itemFlagData.infiniteQuantity}>
+							<option value="default">
+								{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityDefault")}
+							</option>
+							<option value="yes">
+								{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityYes")}
+							</option>
+							<option value="no">
+								{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityNo")}
+							</option>
+						</select>
 					</div>
 
 					<div class="form-group">

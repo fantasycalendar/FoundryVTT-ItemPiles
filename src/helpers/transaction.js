@@ -23,7 +23,7 @@ export default class Transaction {
     this.preCommitted = false;
   }
 
-  async appendItemChanges(items, { remove = false, type = "item", keepIfZero = false } = {}) {
+  async appendItemChanges(items, { remove = false, type = "item", keepIfZero = false, onlyDelta = false } = {}) {
     for (let data of items) {
 
       let item = data.item ?? data;
@@ -42,8 +42,10 @@ export default class Transaction {
       if (!canItemStack) {
 
         if (remove && actorExistingItem) {
-          this.itemTypeMap.set(actorExistingItem.id, type)
-          this.itemsToForceDelete.add(actorExistingItem.id);
+          this.itemTypeMap.set(actorExistingItem.id, type);
+          if (!onlyDelta) {
+            this.itemsToForceDelete.add(actorExistingItem.id);
+          }
           this.itemDeltas.set(actorExistingItem.id, -1);
         } else {
           if (!itemData._id) {
@@ -59,24 +61,26 @@ export default class Transaction {
         if (keepIfZero || type === "currency") {
           this.itemsToNotDelete.add(item.id);
         }
-        if (existingItemUpdate) {
-          const newQuantity = Utilities.getItemQuantity(existingItemUpdate) + incomingQuantity;
-          Utilities.setItemQuantity(existingItemUpdate, newQuantity);
-          if (keepIfZero && type !== "currency") {
-            setProperty(existingItemUpdate, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
+        if (!onlyDelta) {
+          if (existingItemUpdate) {
+            const newQuantity = Utilities.getItemQuantity(existingItemUpdate) + incomingQuantity;
+            Utilities.setItemQuantity(existingItemUpdate, newQuantity);
+            if (keepIfZero && type !== "currency") {
+              setProperty(existingItemUpdate, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
+            }
+          } else {
+            const newQuantity = Utilities.getItemQuantity(actorExistingItem) + incomingQuantity;
+            const update = Utilities.setItemQuantity({ _id: actorExistingItem.id }, newQuantity);
+            if (keepIfZero && type !== "currency") {
+              setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
+            }
+            this.itemTypeMap.set(actorExistingItem.id, type)
+            this.itemsToUpdate.push(update);
           }
-        } else {
-          const newQuantity = Utilities.getItemQuantity(actorExistingItem) + incomingQuantity;
-          const update = Utilities.setItemQuantity({ _id: actorExistingItem.id }, newQuantity);
-          if (keepIfZero && type !== "currency") {
-            setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
-          }
-          this.itemTypeMap.set(actorExistingItem.id, type)
-          this.itemsToUpdate.push(update)
-          this.itemDeltas.set(actorExistingItem.id,
-            (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity
-          );
         }
+        this.itemDeltas.set(actorExistingItem.id,
+          (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity
+        );
       } else {
         if (!itemData._id) {
           itemData._id = randomID();
@@ -99,7 +103,7 @@ export default class Transaction {
     }
   }
 
-  async appendActorChanges(attributes, { set = false, remove = false, type = "attribute" } = {}) {
+  async appendActorChanges(attributes, { set = false, remove = false, type = "attribute", onlyDelta = false } = {}) {
     if (!Array.isArray(attributes)) {
       attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
     }
@@ -107,12 +111,16 @@ export default class Transaction {
       const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
       acc[attribute.path] = acc[attribute.path] ?? Number(getProperty(this.actor, attribute.path));
       if (set) {
-        acc[attribute.path] = incomingQuantity
+        if (!onlyDelta) {
+          acc[attribute.path] = incomingQuantity
+        }
         this.attributeDeltas.set(attribute.path,
           (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : acc[attribute.path]) + incomingQuantity
         );
       } else {
-        acc[attribute.path] += incomingQuantity
+        if (!onlyDelta) {
+          acc[attribute.path] += incomingQuantity
+        }
         this.attributeDeltas.set(attribute.path,
           (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity
         );

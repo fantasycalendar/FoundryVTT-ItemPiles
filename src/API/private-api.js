@@ -1478,10 +1478,19 @@ export default class PrivateAPI {
         macroData.target = fromUuidSync(macroData.target);
       }
 
+      const sourceActor = macroData.source instanceof TokenDocument ? macroData.source.actor : macroData.source;
       const targetActor = macroData.target instanceof TokenDocument ? macroData.target.actor : macroData.target;
-
+      
       if (macroData.items) {
-        macroData.items = macroData.items.map(item => targetActor.items.get(item._id));
+        macroData.items = macroData.items.map(item => targetActor.items.get(item?.item?._id ?? item._id));
+      }
+
+      if (macroData.sourceItems) {
+        macroData.sourceItems = macroData.sourceItems.map(item => sourceActor.items.get(item?.item?._id ?? item._id));
+      }
+
+      if (macroData.targetItems) {
+        macroData.targetItems = macroData.targetItems.map(item => targetActor.items.get(item?.item?._id ?? item._id));
       }
 
     }
@@ -1564,8 +1573,8 @@ export default class PrivateAPI {
     const droppingItem = canDropItems && (droppableItemPiles.length || (dropData.position && !droppableNormalTokens.length));
     const givingItem = canGiveItems && droppableNormalTokens.length && !droppableItemPiles.length;
 
-    const itemPileIsVault = PileUtilities.isValidItemPile(droppableItemPiles[0]);
-
+    const itemPileIsVault = PileUtilities.isItemPileVault(droppableItemPiles[0]);
+    
     if (itemPileIsVault) {
       dropData.target = droppableItemPiles[0];
       return this._depositItem(dropData);
@@ -1741,14 +1750,12 @@ export default class PrivateAPI {
 
       } else {
 
-        let quantity = Utilities.getItemQuantity(dropData.itemData.item);
+        let quantity = Utilities.getItemQuantity(dropData.itemData.item) ?? 1;
 
-        if (dropData.source) {
-          if (quantity > 1 && !dropData.skipCheck) {
-            const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
-            quantity = await DropItemDialog.show(item, dropData.target);
-            if (!quantity) return;
-          }
+        if (!dropData.skipCheck) {
+          const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+          quantity = await DropItemDialog.show(item, dropData.target, { unlimitedQuantity: !dropData.source && game.user.isGM });
+          if (!quantity) return;
         }
 
         Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
@@ -2087,25 +2094,33 @@ export default class PrivateAPI {
     }
 
     for (const entry of itemPrices.buyerReceive) {
-      if (!entry.quantity || (sellerInfiniteCurrencies && entry.isCurrency) || (sellerInfiniteQuantity && !entry.isCurrency)) {
+      if (!entry.quantity) {
         continue;
       }
+      const onlyDelta = (sellerInfiniteCurrencies && entry.isCurrency) || (sellerInfiniteQuantity && !entry.isCurrency);
       if (entry.type === "attribute") {
         await sellerTransaction.appendActorChanges([{
           path: entry.data.path, quantity: entry.quantity
         }], {
           remove: true,
-          type: entry.isCurrency ? "currency" : entry.type
+          type: entry.isCurrency ? "currency" : entry.type,
+          onlyDelta
         });
       } else {
         const itemFlagData = PileUtilities.getItemFlagData(entry.item);
-        if (sellerIsMerchant && itemFlagData.infiniteQuantity) continue;
+        const itemInfiniteQuantity = {
+          "default": sellerFlagData?.infiniteQuantity ?? false,
+          "yes": true,
+          "no": false
+        }[itemFlagData.infiniteQuantity ?? "default"];
+        if (sellerIsMerchant && itemInfiniteQuantity) continue;
         await sellerTransaction.appendItemChanges([{
           item: entry.item, quantity: entry.quantity
         }], {
           remove: true,
           type: entry.isCurrency ? "currency" : entry.type,
-          keepIfZero: itemFlagData.isService || sellerKeepZeroQuantity || itemFlagData.keepZeroQuantity
+          keepIfZero: itemFlagData.isService || sellerKeepZeroQuantity || itemFlagData.keepZeroQuantity,
+          onlyDelta
         });
       }
     }
@@ -2118,17 +2133,18 @@ export default class PrivateAPI {
     const buyerHidesNewItems = buyerIsMerchant && buyerFlagData.hideNewItems;
 
     for (const price of itemPrices.finalPrices) {
-      if (!price.quantity || (buyerInfiniteCurrencies && price.isCurrency) || (buyerInfiniteQuantity && !price.isCurrency)) {
+      if (!price.quantity) {
         continue;
       }
+      const onlyDelta = (buyerInfiniteCurrencies && price.isCurrency) || (buyerInfiniteQuantity && !price.isCurrency);
       if (price.type === "attribute") {
         await buyerTransaction.appendActorChanges([{
           path: price.data.path, quantity: price.quantity
-        }], { remove: true, type: price.isCurrency ? "currency" : price.type });
+        }], { remove: true, type: price.isCurrency ? "currency" : price.type, onlyDelta });
       } else {
         await buyerTransaction.appendItemChanges([{
           item: price.data.item, quantity: price.quantity
-        }], { remove: true, type: price.isCurrency ? "currency" : price.type });
+        }], { remove: true, type: price.isCurrency ? "currency" : price.type, onlyDelta });
       }
     }
 
@@ -2173,22 +2189,18 @@ export default class PrivateAPI {
     const sellerTransactionData = await sellerTransaction.commit();
     const buyerTransactionData = await buyerTransaction.commit();
 
-    await this._executeItemPileMacro(sellerUuid, {
-      action: "tradeItems",
-      source: sellerUuid,
-      target: buyerUuid,
-      items: sellerTransactionData.itemDeltas,
-      attributes: sellerTransactionData.attributeDeltas,
-      userId: userId,
-      interactionId: interactionId
-    });
+    const itemPileActorUuid = sellerIsMerchant ? sellerUuid : buyerUuid;
 
-    await this._executeItemPileMacro(buyerUuid, {
+    await this._executeItemPileMacro(itemPileActorUuid, {
       action: "tradeItems",
       source: sellerUuid,
       target: buyerUuid,
-      items: buyerTransactionData.itemDeltas,
-      attributes: buyerTransactionData.attributeDeltas,
+      sourceIsMerchant: sellerIsMerchant,
+      sourceItems: sellerTransactionData.itemDeltas,
+      sourceAttributes: sellerTransactionData.attributeDeltas,
+      targetItems: buyerTransactionData.itemDeltas,
+      targetAttributes: buyerTransactionData.attributeDeltas,
+      prices: itemPrices,
       userId: userId,
       interactionId: interactionId
     });
