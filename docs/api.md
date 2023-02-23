@@ -251,18 +251,18 @@ Creates an item pile token at a location, or an item pile actor, or both at the 
 
 **Returns**: `Promise<object<{tokenUuid: string, actorUuid: string}>>` - The UUID of the token and/or actor that was just created.
 
-| Param                    | Type                    | Default | Description                                                                 |
-|--------------------------|-------------------------|---------|-----------------------------------------------------------------------------|
-| options                  | `object`                |         | Options to pass to the function                                             |
-| [options.position]       | `object/boolean`        | `false` | Where to create the item pile, with x and y coordinates                     |
-| [options.sceneId]        | `string/boolean`        | `false` | Which scene to create the item pile on                                      |
-| [options.tokenOverrides] | `object`                | `{}`    | Token data to apply onto the newly created token                            |
-| [options.actorOverrides] | `object`                | `{}`    | Actor data to apply to the newly created actor (if unlinked)                |
-| [options.itemPileFlags]  | `object`                | `{}`    | Item pile specific flags to apply to the token and actor                    |
-| [options.items]          | `Array/boolean`         | `false` | Any items to create on the item pile                                        |
-| [options.createActor]    | `boolean`               | `false` | Whether to create a new item pile actor                                     |
-| [options.pileActorName]  | `string/boolean`        | `false` | The UUID, ID, or name of the actor to use when creating this item pile      |
-| [options.folder]         | `string/boolean/Folder` | `false` | The folder object, folder ID, or folder name to put the new item pile actor |
+| Param                    | Type                    | Default | Description                                                                                                           |
+|--------------------------|-------------------------|---------|-----------------------------------------------------------------------------------------------------------------------|
+| options                  | `object`                |         | Options to pass to the function                                                                                       |
+| [options.position]       | `object/boolean`        | `false` | Where to create the item pile, with x and y coordinates                                                               |
+| [options.sceneId]        | `string/boolean`        | `false` | Which scene to create the item pile on                                                                                |
+| [options.tokenOverrides] | `object`                | `{}`    | Token data to apply onto the newly created token                                                                      |
+| [options.actorOverrides] | `object`                | `{}`    | Actor data to apply to the newly created actor (if unlinked)                                                          |
+| [options.itemPileFlags]  | `object`                | `{}`    | Item pile specific flags to apply to the token and actor - see [pile flag defaults](constants.md#pile-flag-defaults)  |
+| [options.items]          | `Array/boolean`         | `false` | Any items to create on the item pile                                                                                  |
+| [options.createActor]    | `boolean`               | `false` | Whether to create a new item pile actor                                                                               |
+| [options.pileActorName]  | `string/boolean`        | `false` | The UUID, ID, or name of the actor to use when creating this item pile                                                |
+| [options.folder]         | `string/boolean/Folder` | `false` | The folder object, folder ID, or folder name to put the new item pile actor                                           |
 
 ---
 
@@ -274,12 +274,12 @@ Turns tokens and its actors into item piles
 
 **Returns**: `Promise<Array>` - The uuids of the targets after they were turned into item piles
 
-| Param | Type                                             | Description |
-| --- |--------------------------------------------------| --- |
-| targets | `Token/TokenDocument/Array<Token/TokenDocument>` | The targets to be turned into item piles |
-| options | `object`                                         | Options to pass to the function |
-| options.pileSettings | `object`                                         | Overriding settings to be put on the item piles' settings |
-| options.tokenSettings | `object/Function`                                | Overriding settings that will update the tokens' settings |
+| Param | Type                                             | Description                                                                                                           |
+| --- |--------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| targets | `Token/TokenDocument/Array<Token/TokenDocument>` | The targets to be turned into item piles                                                                              |
+| options | `object`                                         | Options to pass to the function                                                                                       |
+| options.pileSettings | `object`                                         | Overriding settings to be put on the item piles' settings - see [pile flag defaults](constants.md#pile-flag-defaults) |
+| options.tokenSettings | `object/Function`                                | Overriding settings that will update the tokens' settings                                                             |
 
 ---
 

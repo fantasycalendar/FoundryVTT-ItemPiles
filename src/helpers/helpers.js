@@ -180,7 +180,7 @@ export async function getFiles(inFile, { applyWildCard = false, softFail = false
     return (await FilePicker.browse(source, inFile, browseOptions)).files;
   } catch (err) {
     if (softFail) return false;
-    throw custom_error("Sequencer", `getFiles | ${err}`);
+    throw custom_error(`Could not get files! | ${err}`);
   }
 }
 
@@ -339,7 +339,7 @@ export async function openEditor(key, data = false) {
   }
 
   const result = await editor.show(data, { ...setting.applicationOptions, onchange: setting.onchange } ?? {});
-  
+
   if (setting.onchange && result) setting.onchange(result);
 
   return result;
