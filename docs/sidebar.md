@@ -46,6 +46,13 @@
   * [Item and attribute methods](api.md#item-and-attribute-methods)
   * [Misc methods](api.md#misc-methods)
 
+* [Constants](constants.md)
+  * [Hooks](constants.md#hooks)
+  * [Flags](constants.md#flags)
+  * [Pile Types](constants.md#pile-types)
+  * [Pile Flag Defaults](constants.md#pile-flag-defaults)
+  * [Item Flag Defaults](constants.md#item-flag-defaults)
+
 * [Hooks](hooks.md)
   * [Generic](hooks.md#generic)
   * [Specific](hooks.md#specific)
