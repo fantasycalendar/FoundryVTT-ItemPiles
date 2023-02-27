@@ -8,8 +8,8 @@ import d35e from "./systems/d35e.js";
 import sfrpg from "./systems/sfrpg.js";
 import swade from "./systems/swade.js";
 import tormenta20 from "./systems/tormenta20.js";
-import wfrp4e from "./systems/wfrp4e.js"
-import splittermond from "./systems/splittermond.js"
+import wfrp4e from "./systems/wfrp4e.js";
+import splittermond from "./systems/splittermond.js";
 import twodsix from "./systems/twodsix.js";
 import forbiddenLands from "./systems/forbidden-lands.js";
 import icrpg from "./systems/icrpg.js";
@@ -26,6 +26,7 @@ import wwn from "./systems/wwn.js";
 import cyphersystem from "./systems/cyphersystem.js";
 import ptu from "./systems/ptu.js";
 import dcc from "./systems/dcc.js";
+import a5e from "./systems/a5e.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -115,6 +116,9 @@ export const SYSTEMS = {
     "dcc": {
       "latest": dcc
     },
+    "a5e": {
+      "latest": a5e
+    }
     // ↑ ADD SYSTEMS HERE ↑
   },
 
