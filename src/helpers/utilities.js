@@ -77,6 +77,10 @@ export function findSimilarItem(items, findItem, returnFound = false) {
         return true;
       }
 
+      if (!itemSimilarities.some(path => hasProperty(findItem, path))) {
+        return false;
+      }
+
       if (hasUniqueKey) {
         return false;
       }

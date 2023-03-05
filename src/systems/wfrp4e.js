@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": "1.0.2",
+  "VERSION": "1.0.3",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -32,18 +32,38 @@ export default {
       img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
       abbreviation: "{#}GP",
       data: {
-        uuid: "Compendium.wfrp4e.basic.UHArNq3Vuu7Mj5AB"
+        item: {
+          "name": "Gold Crown",
+          "type": "money",
+          "img": "icons/commodities/currency/coin-embossed-crown-gold.webp",
+          "system": {
+            "quantity": { "type": "Number", "label": "Quantity", "value": 1 },
+            "encumbrance": { "type": "Number", "label": "Encumbrance", "value": 0.005 },
+            "coinValue": { "label": "Value (in d)", "type": "Number", "value": 240 },
+            "source": { "type": "String", "label": "Source" }
+          }
+        }
       },
       primary: true,
       exchangeRate: 1
     },
     {
       type: "item",
-      name: "Silver Pieces",
+      name: "Silver Shilling",
       img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
       abbreviation: "{#}SP",
       data: {
-        uuid: "Compendium.wfrp4e.basic.AtRuawWCHjgQxzdn"
+        item: {
+          "name": "Silver Shilling",
+          "type": "money",
+          "img": "icons/commodities/currency/coin-engraved-moon-silver.webp",
+          "system": {
+            "quantity": { "type": "Number", "label": "Quantity", "value": 1 },
+            "encumbrance": { "type": "Number", "label": "Encumbrance", "value": 0.01 },
+            "coinValue": { "label": "Value (in d)", "type": "Number", "value": 12 },
+            "source": { "type": "String", "label": "Source" }
+          }
+        }
       },
       primary: false,
       exchangeRate: 0.1
@@ -54,7 +74,17 @@ export default {
       img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
       abbreviation: "{#}CP",
       data: {
-        uuid: "Compendium.wfrp4e.basic.1BdNwUF0SfiCotWB"
+        item: {
+          "name": "Brass Penny",
+          "type": "money",
+          "img": "icons/commodities/currency/coin-engraved-waves-copper.webp",
+          "system": {
+            "quantity": { "type": "Number", "label": "Quantity", "value": 1 },
+            "encumbrance": { "type": "Number", "label": "Encumbrance", "value": 0.01 },
+            "coinValue": { "label": "Value (in d)", "type": "Number", "value": 1 },
+            "source": { "type": "String", "label": "Source" }
+          }
+        }
       },
       primary: false,
       exchangeRate: 0.01

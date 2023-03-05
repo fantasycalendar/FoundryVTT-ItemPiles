@@ -91,7 +91,7 @@ export async function checkSystem() {
     const newVersion = SYSTEMS.DATA.VERSION;
     Helpers.debug(`Comparing system version - Current: ${currentVersion} - New: ${newVersion}`)
     if (isNewerVersion(newVersion, currentVersion)) {
-      Helpers.debug(`Applying system settings for ${game.system.name}`)
+      Helpers.debug(`Applying system settings for ${game.system.title}`)
       await applyDefaultSettings();
     }
     return;

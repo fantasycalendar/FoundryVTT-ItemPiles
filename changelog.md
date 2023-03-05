@@ -3,6 +3,7 @@
 ## Version 2.4.18
 
 - Fixed not being able to set item prices in the Cypher system
+- Fixed systems with item-based currencies would sometimes not correctly update their quantities
 - Updated Star Wars 5e system settings to have correct property paths
 
 ## Version 2.4.17
