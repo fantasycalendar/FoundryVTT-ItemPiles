@@ -6,6 +6,7 @@
 - Fixed systems with item-based currencies would sometimes not correctly update their quantities
 - Updated Star Wars 5e system settings to have correct property paths
 - Improved merchant populate items table layout to better handle long table names
+- Updated French localization - thank you rectulo!
 
 ## Version 2.4.17
 
