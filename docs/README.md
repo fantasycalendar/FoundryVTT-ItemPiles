@@ -97,6 +97,7 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Cypher System](https://foundryvtt.com/packages/cyphersystem)
 - [Pokemon Tabletop United](https://ptufvtt.com/)
 - [Dungeon Crawl Classics](https://foundryvtt.com/packages/dcc/)
+- [Level Up: Advanced 5th Edition](https://foundryvtt.com/packages/a5e)
 
 ## Externally support systems
 
