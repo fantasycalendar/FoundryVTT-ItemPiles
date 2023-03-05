@@ -5,6 +5,7 @@
 - Fixed not being able to set item prices in the Cypher system
 - Fixed systems with item-based currencies would sometimes not correctly update their quantities
 - Updated Star Wars 5e system settings to have correct property paths
+- Improved merchant populate items table layout to better handle long table names
 
 ## Version 2.4.17
 

@@ -282,7 +282,7 @@
 <div>
 
 	<div class="item-piles-flexrow">
-		<div style="margin-right:0.5rem;">
+		<div style="margin-right:0.5rem; max-width: 50%;">
 			<div class="item-piles-populate-header">
 				{localize(
           currentItems.length
@@ -317,7 +317,7 @@
 			{/if}
 		</div>
 
-		<div style="padding-right:0.25rem;">
+		<div style="padding-right:0.25rem; max-width: 50%;">
 
 			<div class="item-piles-populate-header">
 				<span style="flex:1 0 auto;">{localize("ITEM-PILES.Merchant.RollableTables")}</span>
@@ -331,8 +331,8 @@
 				<div class="item-piles-item-row item-piles-even-color"
 						 style="min-height: 28px; padding: 3px 3px 3px 5px;">
 					<div class="item-piles-flexrow" style="align-items: center;">
-						<div>
-							<strong>{$tables[table.id].name}</strong>
+						<div style="max-width: 100%; overflow: hidden; text-overflow: ellipsis;">
+							<strong style="max-width:100%; word-break: break-all;">{$tables[table.id].name}</strong>
 						</div>
 						<button class="item-piles-rolled-item-button"
 										on:click={() => { removeTable(table.id) }}
@@ -412,7 +412,7 @@
 
 			<div class="item-piles-flexrow" style="margin-top: 0.5rem; flex-wrap:nowrap;">
 
-				<select bind:value={selectedTable}>
+				<select bind:value={selectedTable} style="max-width: calc(100% - 81px);">
 					{#each selectableTables as [tableId, table] (tableId)}
 						<option value={tableId}>{table.name}</option>
 					{/each}
