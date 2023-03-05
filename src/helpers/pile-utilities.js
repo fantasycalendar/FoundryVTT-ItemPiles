@@ -564,7 +564,7 @@ export function cleanItemFlagData(flagData) {
 
 export function updateItemData(item, update, { returnUpdate = false, version = false } = {}) {
   const flagData = cleanItemFlagData(foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {}));
-  const updates = update?.data ?? {};
+  const updates = foundry.utils.mergeObject(update?.data ?? {}, {});
   setProperty(updates, CONSTANTS.FLAGS.ITEM, flagData)
   setProperty(updates, CONSTANTS.FLAGS.VERSION, version || Helpers.getModuleVersion())
   if (returnUpdate) {

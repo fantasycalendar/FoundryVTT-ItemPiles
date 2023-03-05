@@ -25,15 +25,15 @@
 </script>
 
 <div>
-  {#if showImage}
-    <div class="item-piles-img-container">
-      <img class="item-piles-img" src={value}/>
-    </div>
-  {/if}
-  {#if showInput}
-    <input type="text" placeholder="{placeholder}" bind:value="{value}"/>
-  {/if}
-  <button on:click={handleClick} type="button"><i class="fas fa-file-import"></i></button>
+	{#if showImage}
+		<div class="item-piles-img-container">
+			<img class="item-piles-img" src={value}/>
+		</div>
+	{/if}
+	{#if showInput}
+		<input type="text" placeholder="{placeholder}" bind:value="{value}"/>
+	{/if}
+	<button on:click={handleClick} type="button"><i class="fas fa-file-import"></i></button>
 </div>
 
 <style lang="scss">

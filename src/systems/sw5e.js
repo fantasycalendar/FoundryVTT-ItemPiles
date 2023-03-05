@@ -1,5 +1,5 @@
 export default {
-  VERSION: "1.0.0",
+  VERSION: "1.0.1",
 
   ACTOR_CLASS_TYPE: "character",
 
@@ -10,7 +10,7 @@ export default {
   ITEM_FILTERS: [
     {
       path: "type",
-      filters: "power,feat,class,subclass",
+      filters: "power,feat,class,archetype,background",
     },
     {
       path: "system.weaponType",
@@ -41,10 +41,10 @@ export default {
     {
       type: "attribute",
       name: "SW5E.CurrencyGC",
-      img: "packs/Icons/Data Recording and Storage/CreditChip.webp",
+      img: "systems/sw5e/packs/Icons/Data Recording and Storage/CreditChip.webp",
       abbreviation: "{#}GC",
       data: {
-        path: "system.currency",
+        path: "system.currency.gc",
       },
       primary: true,
       exchangeRate: 1,

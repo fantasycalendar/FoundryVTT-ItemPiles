@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.4.18
+
+- Fixed not being able to set item prices in the Cypher system
+- Updated Star Wars 5e system settings to have correct property paths
+
 ## Version 2.4.17
 
 - Updates to German localization - thank you blueacousticmusic!
