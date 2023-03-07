@@ -11,7 +11,10 @@
       "UpdateMerchantSuccess": "Kupca zaktualizowany pomyślnie.",
       "ShownToPlayers": "Pokazuję {actor_name} graczom",
       "ItemTransferred": "{target_actor_name} dostał {item_name} od {source_actor_name}.",
-      "GiveItemAccepted": "{user_name} zaakceptował twoją ofertę."
+      "GiveItemAccepted": "{user_name} zaakceptował twoją ofertę.",
+      "SystemSupportFound": "Ten system jest wspierany przez Item Piles! Ustawiam domyślne ustawienia...",
+      "ItemAdded": "{item_name} został dodany do {target_actor_name}.",
+      "CreatedJournal": ""
     },
     "Errors": {
       "DisallowedItemDrop": "Nie możesz upuścić przedmioty typu \"{type}\"",
@@ -153,6 +156,12 @@
     "Items": "Przedmioty",
     "HeaderButtons": {
       "ShowToPlayers": "Pokaż Graczom"
+    },
+    "Types": {
+      "pile": "Stos Przedmiotów",
+      "container": "Pojemnik",
+      "merchant": "Kupiec",
+      "vault": "Skarbiec"
     }
   }
 }
