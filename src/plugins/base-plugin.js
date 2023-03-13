@@ -10,21 +10,27 @@ export default class BasePlugin {
     this.initialize();
   }
 
-  invalidVersionError = "Simple Calendar version 1.3.75 is installed, but Item Piles requires version 2.0.0 or above. The author made a mistake, and you will need to reinstall the Simple Calendar module.";
-  minVersionError = "Simple Calendar is out of date to be compatible with Item Piles, please update as soon as possible.";
+  invalidVersionError = ""
+  minVersionError = ""
 
   initialize() {
-    
+
     if (!game.modules.get(this.pluginName)?.active) {
       return;
     }
 
     if (game.modules.get(this.pluginName).version === this.invalidVersion) {
-      throw Helpers.custom_error(this.invalidVersionError);
+      if (this.invalidVersionError) {
+        throw Helpers.custom_error(this.invalidVersionError);
+      }
+      return;
     }
 
     if (isNewerVersion(this.minVersion, game.modules.get(this.pluginName).version)) {
-      throw Helpers.custom_error(this.minVersionError);
+      if (this.minVersionError) {
+        throw Helpers.custom_error(this.minVersionError);
+      }
+      return;
     }
 
     this.registerHooks();

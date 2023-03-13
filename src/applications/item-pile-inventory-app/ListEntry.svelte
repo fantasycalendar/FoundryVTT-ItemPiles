@@ -9,6 +9,7 @@
 
   const name = entry.name;
   const img = entry.img;
+  const rarityColor = entry.rarityColor;
   const quantityLeft = entry.quantityLeft;
   const quantity = entry.quantity;
   const currentQuantity = entry.currentQuantity;
@@ -39,7 +40,12 @@
 
   <div class="item-piles-name">
     <div class="item-piles-name-container">
-      <p class:item-piles-clickable-link="{canInspectItems}" on:click={() => { entry.preview() }}>{$name}</p>
+      <p class:item-piles-clickable-link="{canInspectItems}"
+				 on:click={() => { entry.preview() }}
+				 style="color: {$rarityColor || 'inherit'};"
+			>
+				{$name}
+			</p>
       {#if !editQuantities && entry.canStack}
         <span class="item-piles-small-text">(x{$quantity})</span>
       {/if}

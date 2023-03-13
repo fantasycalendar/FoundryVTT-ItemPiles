@@ -8,25 +8,34 @@
 
   const name = item.name;
   const img = item.img;
+  const rarityColor = item.rarityColor;
   const quantity = item.quantity;
   const canStack = item.canStack;
   const style = item.style;
 
-  $: styling = Helpers.styleFromObject($style);
+  let styling = "";
+  $: {
+    if ($rarityColor) {
+      styling = `box-shadow: inset 0px 0px 7px 0px ${$rarityColor};`;
+    } else {
+      styling = Helpers.styleFromObject({ ...$style })
+    }
+  }
+  ;
 
 </script>
 
 <div class="grid-item" data-tooltip={$name}
-     data-tooltip-activation-speed="0" data-tooltip-deactivation-speed="0">
-  {#if $img}
-    <img src={$img} alt={$name}/>
-  {/if}
-  {#if styling}
-    <div class="grid-item-ghost" style={styling}></div>
-  {/if}
-  {#if canStack && $quantity > 1}
-    <span>{$quantity}</span>
-  {/if}
+		 data-tooltip-activation-speed="0" data-tooltip-deactivation-speed="0">
+	{#if $img}
+		<img src={$img} alt={$name}/>
+	{/if}
+	{#if styling}
+		<div class="grid-item-ghost" style={styling}></div>
+	{/if}
+	{#if canStack && $quantity > 1}
+		<span>{$quantity}</span>
+	{/if}
 </div>
 
 <style lang="scss">

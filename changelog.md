@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.4.19
+
+- Added 3d Canvas integration (thanks theripper93 for the help!)
+- Added Rarity Colors module integration - items in item piles, merchants, and vault will now use the colors from the Rarity Colors module
+- Updated localization (thank you MrVauxs and eunaumtenhoid on weblate!)
+- Fixed minor localization issue (thanks to Elfrey on github!)
+
 ## Version 2.4.18
 
 - Fixed not being able to set item prices in the Cypher system

@@ -6,6 +6,7 @@ import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
 import { getItemCurrencyData } from "../helpers/pile-utilities.js";
+import { Plugins } from "../plugins/main.js";
 
 class PileBaseItem {
 
@@ -23,6 +24,7 @@ class PileBaseItem {
     this.quantityLeft = writable(1);
     this.filtered = writable(true);
     this.presentFromTheStart = writable(false);
+    this.rarityColor = writable(false);
   }
 
   setupSubscriptions() {
@@ -95,6 +97,9 @@ export class PileItem extends PileBaseItem {
         this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
         this.updateCategory();
         this.store.refreshItems();
+      }
+      if (Plugins["rarity-colors"].data) {
+        this.rarityColor.set(Plugins["rarity-colors"].data.getItemColor(this.item));
       }
     });
 

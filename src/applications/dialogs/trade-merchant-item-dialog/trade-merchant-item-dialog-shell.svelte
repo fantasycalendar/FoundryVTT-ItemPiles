@@ -18,6 +18,7 @@
 
   const itemName = item.name;
   const itemImg = item.img;
+  const itemRarityColor = item.rarityColor;
   const itemFlagData = item.itemFlagData;
   const quantityToBuy = item.quantityToBuy;
   const itemMaxQuantityStore = item.quantity;
@@ -79,7 +80,7 @@
 				<div class="item-piles-img-container" style="margin-right: 0.25rem;">
 					<img class="item-piles-img" src={$itemImg}/>
 				</div>
-				<span>{localize($itemName)}</span>
+				<span style="color: {$itemRarityColor || 'inherit'};">{localize($itemName)}</span>
 			</div>
 
 			<div

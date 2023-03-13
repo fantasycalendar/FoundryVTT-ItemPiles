@@ -15,7 +15,7 @@ import runMigrations from "./migrations.js"
 
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 import ItemEditor from "./applications/item-editor/item-editor.js";
-import setupPlugins from "./plugins/main.js";
+import { setupPlugins } from "./plugins/main.js";
 import SettingsShim from "./applications/settings-app/settings-app.js";
 
 Hooks.once("init", async () => {
@@ -23,6 +23,7 @@ Hooks.once("init", async () => {
   registerLibwrappers();
   registerSettings();
   registerUIOverrides();
+  setupPlugins("init");
 });
 
 Hooks.once("ready", () => {
@@ -68,8 +69,8 @@ Hooks.once("ready", () => {
     TradeAPI.initialize();
     ChatAPI.initialize();
 
-    setupPlugins();
     registerHotkeysPost();
+    setupPlugins("ready");
 
     ChatAPI.disablePastTradingButtons();
 
