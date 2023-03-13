@@ -271,13 +271,6 @@ const SETTINGS = {
       type: Boolean
     },
 
-    [SETTINGS.VAULT_LOG_JOURNAL_ID]: {
-      scope: "world",
-      config: false,
-      default: "",
-      type: String
-    },
-
     [SETTINGS.OUTPUT_TO_CHAT]: {
       name: "ITEM-PILES.Settings.OutputToChat.Title",
       hint: "ITEM-PILES.Settings.OutputToChat.Hint",
