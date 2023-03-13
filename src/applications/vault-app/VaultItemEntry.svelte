@@ -8,20 +8,11 @@
 
   const name = item.name;
   const img = item.img;
-  const rarityColor = item.rarityColor;
   const quantity = item.quantity;
   const canStack = item.canStack;
   const style = item.style;
 
-  let styling = "";
-  $: {
-    if ($rarityColor) {
-      styling = `box-shadow: inset 0px 0px 7px 0px ${$rarityColor};`;
-    } else {
-      styling = Helpers.styleFromObject({ ...$style })
-    }
-  }
-  ;
+  $: styling = Helpers.styleFromObject($style);
 
 </script>
 

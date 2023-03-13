@@ -313,11 +313,16 @@ export class VaultItem extends PileItem {
     super.setupSubscriptions();
     let setup = false;
     this.subscribeTo(this.itemDocument, () => {
-      this.style.set(SYSTEMS.DATA?.VAULT_STYLES ? SYSTEMS.DATA?.VAULT_STYLES.filter(style => {
-        return getProperty(this.item, style.path) === style.value;
-      }).reduce((acc, style) => {
-        return foundry.utils.mergeObject(acc, style.styling);
-      }, {}) : {});
+      let rarityColor = get(this.rarityColor);
+      if (rarityColor) {
+        this.style.set({ "box-shadow": `inset 0px 0px 7px 0px ${rarityColor}` });
+      } else {
+        this.style.set(SYSTEMS.DATA?.VAULT_STYLES ? SYSTEMS.DATA?.VAULT_STYLES.filter(style => {
+          return getProperty(this.item, style.path) === style.value;
+        }).reduce((acc, style) => {
+          return foundry.utils.mergeObject(acc, style.styling);
+        }, {}) : {});
+      }
     });
     this.subscribeTo(this.itemFlagData, (data) => {
       if (setup) {
