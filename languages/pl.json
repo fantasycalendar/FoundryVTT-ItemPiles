@@ -14,7 +14,7 @@
       "GiveItemAccepted": "{user_name} zaakceptował twoją ofertę.",
       "SystemSupportFound": "Ten system jest wspierany przez Item Piles! Ustawiam domyślne ustawienia...",
       "ItemAdded": "{item_name} został dodany do {target_actor_name}.",
-      "CreatedJournal": ""
+      "CreatedJournal": "Utworzono dziennik Item Piles Vault Log."
     },
     "Errors": {
       "DisallowedItemDrop": "Nie możesz upuścić przedmioty typu \"{type}\"",
@@ -23,12 +23,17 @@
       "PileTooFar": "Jesteś za daleko aby otworzyć ten stos.",
       "DropNoToken": "Nie masz token'a na tej scenie, więc nie możesz upuścić żadnych przedmiotów tutaj.",
       "NoSourceDrop": "Nie możesz upuszczać przedmioty z katalogu przedmiotów jeżeli nie jesteś GM'em.",
-      "PileLocked": "Ten pojemnik jest zamknięty i nie można go otworzyć - nie możesz upuszczać przedmioty do niego."
+      "PileLocked": "Ten pojemnik jest zamknięty i nie można go otworzyć - nie możesz upuszczać przedmioty do niego.",
+      "NoTokenFound": "Nie udało się znaleźć tokenu ani postaci, która by cię reprezentowała."
     },
     "Warnings": {
       "GiveItemDeclined": "{user_name} odrzucił twoją ofertę.",
       "NoPlayersActive": "Nie ma żadnych aktywnych graczy aby dokonać tej akcji",
-      "GiveItemNoGM": "Nie ma żadnego aktywnego GM'a który mógłby dostać twój przedmiot."
+      "GiveItemNoGM": "Nie ma żadnego aktywnego GM'a który mógłby dostać twój przedmiot.",
+      "NoGMsConnectedAction": "UWAGA - Nie można wykonać \"{action}\", ponieważ żaden GM nie jest aktywny.",
+      "VaultFull": "Ten skarbiec jest pełny!",
+      "VaultItemNotExpander": "Ten przedmiot nie jest rozszerzeniem skarbca",
+      "NoGMsConnected": "UWAGA - Brak podłączonych GMów - Item Piles wymaga GMa, aby gracze mogli korzystać z większości funkcji modułu."
     },
     "Inspect": {
       "Title": "Przeglądanie Zawartości Stosu",
@@ -101,7 +106,8 @@
       "ActorOwnerWarning": "Nie posiadasz tego aktora, więc nie możesz wymieniać się nim.",
       "AutoDecline": "Nie wystarczająco szybko odpowiedziałeś/aś na ofertę wymiany, więc została automatycznie odrzucona.",
       "DragDrop": "Przeciągnij i upuść przedmioty aby zacząć wymianę",
-      "UserCharacterWarning": "Wybrałeś/aś aktor \"{actor_name}\" który jest przypisany do gracza \"{player_name}\".<br><br>Czy jesteś pewny/a że chcesz to zrobić?"
+      "UserCharacterWarning": "Wybrałeś/aś aktor \"{actor_name}\" który jest przypisany do gracza \"{player_name}\".<br><br>Czy jesteś pewny/a że chcesz to zrobić?",
+      "SameActor": "Obaj użytkownicy nie mogą wybrać tej samej postaci - nie można handlować na ORAZ z tej samej postaci. Zatrzymaj to."
     },
     "Merchant": {
       "Title": "Kupca: {actor_name}",
