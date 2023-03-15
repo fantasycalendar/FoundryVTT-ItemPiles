@@ -956,7 +956,7 @@
       "Deposit": "Dépôt",
       "LogUserActor": "{actor_name} ({user_name})",
       "Deposited": "déposé",
-      "Withdrew": "s'est retiré",
+      "Withdrew": "a retiré",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "LogQuantity": "{quantity} x ",
       "ExpandersTab": "Extensions",
