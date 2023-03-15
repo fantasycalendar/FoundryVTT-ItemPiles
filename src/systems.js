@@ -126,6 +126,7 @@ export const SYSTEMS = {
     ACTOR_CLASS_TYPE: "",
     ITEM_QUANTITY_ATTRIBUTE: "",
     ITEM_PRICE_ATTRIBUTE: "",
+    QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
     ITEM_FILTERS: [],
     ITEM_SIMILARITIES: [],
     UNSTACKABLE_ITEM_TYPES: [],
@@ -140,19 +141,20 @@ export const SYSTEMS = {
   _currentSystem: false,
 
   get DATA() {
+
     if (this._currentSystem) return this._currentSystem;
 
     const system = this.SUPPORTED_SYSTEMS?.[game.system.id.toLowerCase()];
     if (!system) return this.DEFAULT_SETTINGS;
 
     if (system[game.system.version]) {
-      this._currentSystem = system[game.system.version];
+      this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[game.system.version]);
       return this._currentSystem;
     }
 
     const versions = Object.keys(system);
     if (versions.length === 1) {
-      this._currentSystem = system[versions[0]];
+      this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[versions[0]]);
       return this._currentSystem;
     }
 
@@ -162,7 +164,9 @@ export const SYSTEMS = {
     const version = versions.find(version => {
       return version === "latest" || !isNewerVersion(game.system.version, version);
     });
-    this._currentSystem = system[version];
+
+    this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[version]);
+
     return this._currentSystem;
   },
 

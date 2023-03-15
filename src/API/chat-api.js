@@ -402,7 +402,7 @@ export default class ChatAPI {
     }
     party_1_data.got_nothing = !party_1_data.items.length && !party_1_data.currencies.length;
 
-    const party_2_actor = Utilities.getActor(party_1.actor);
+    const party_2_actor = Utilities.getActor(party_2.actor);
     const party_2_data = {
       actor: party_2_actor,
       items: party_1.items,

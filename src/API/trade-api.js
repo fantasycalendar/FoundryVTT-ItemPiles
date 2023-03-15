@@ -425,15 +425,24 @@ export default class TradeAPI {
     if (trade.store.privateTradeId !== privateId) return;
     const updates = trade.store.getTradeData();
 
-    const itemsToAdd = updates.add.items.map(entry => {
-      const itemData = updates.targetActor.items.get(entry.id).toObject();
-      return Utilities.setItemQuantity(itemData, entry.quantity, true);
-    });
+    const itemsToAdd = [];
+    for (const entry of updates.add.items) {
+      let item = updates.targetActor.items.get(entry.id);
+      if (!item) {
+        item = await fromUuid(entry.uuid);
+        if (!item) continue;
+      }
+      const itemData = item.toObject();
+      itemsToAdd.push(Utilities.setItemQuantity(itemData, entry.quantity, true));
+    }
 
-    const itemsToRemove = updates.remove.items.map(entry => {
-      const itemData = updates.sourceActor.items.get(entry.id).toObject();
-      return Utilities.setItemQuantity(itemData, entry.quantity, true);
-    });
+    const itemsToRemove = []
+    for (const entry of updates.remove.items) {
+      const item = updates.sourceActor.items.get(entry.id);
+      if (!item) continue;
+      const itemData = item.toObject();
+      itemsToRemove.push(Utilities.setItemQuantity(itemData, entry.quantity, true));
+    }
 
     const transaction = new Transaction(updates.sourceActor);
     await transaction.appendItemChanges(itemsToAdd);
@@ -458,18 +467,20 @@ export default class TradeAPI {
     const trade = this._getOngoingTrade(tradeId);
     if (!trade) return;
     const data = trade.store.export();
-    if (!trade.store.isPrivate) {
-      ItemPileSocket.executeForEveryone(
-        ItemPileSocket.HANDLERS.CALL_HOOK,
-        CONSTANTS.HOOKS.TRADE.COMPLETE,
-        trade.store.instigator,
-        data[0],
-        data[1],
-        tradeId,
-        trade.store.isPrivate
-      )
-    } else {
-      Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data[0], data[1], tradeId);
+    if (data.instigator === game.user.id) {
+      if (trade.store.isPrivate) {
+        Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, data.instigator, data.leftTraderData, data.rightTraderData, tradeId);
+      } else {
+        ItemPileSocket.executeForEveryone(
+          ItemPileSocket.HANDLERS.CALL_HOOK,
+          CONSTANTS.HOOKS.TRADE.COMPLETE,
+          trade.store.instigator,
+          data.leftTraderData,
+          data.rightTraderData,
+          tradeId,
+          trade.store.isPrivate
+        )
+      }
     }
     trade.app.close({ callback: true });
     ongoingTrades.delete(tradeId);

@@ -1,9 +1,10 @@
 <script>
   export let item;
 
-  const itemName = item.name;
+  const itemNameStore = item.name;
   const itemImage = item.img;
   const itemRarityColor = item.rarityColor;
+  const itemQuantityForPrice = item.quantityForPrice;
 
   const store = item.store;
   const pileData = store.pileData;
@@ -15,8 +16,10 @@
   $: itemFlagData = $itemFlagDataStore;
   $: displayQuantity = $displayQuantityStore;
   $: infiniteQuantity = $infiniteQuantityStore;
+
   $: quantity = $quantityStore;
   $: editQuantity = $quantityStore;
+  $: itemName = $itemNameStore + ($itemQuantityForPrice > 1 ? ` (${$itemQuantityForPrice})` : "");
   let showEditQuantity = false;
 
   const displayControlButtons = store.actor.isOwner;
@@ -36,10 +39,10 @@
 		<span style="color: {$itemRarityColor || 'inherit'};">
 			{#if $pileData.canInspectItems || game.user.isGM}
 				<a class="item-piles-clickable" on:click={() => { item.preview() }}>
-					{$itemName}
+					{itemName}
 				</a>
 			{:else}
-				{$itemName}
+				{itemName}
 			{/if}
 		</span>
 		{#if displayQuantity && item.canStack}

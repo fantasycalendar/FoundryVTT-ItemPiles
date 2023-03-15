@@ -34,6 +34,7 @@ const SETTINGS = {
   ACTOR_CLASS_TYPE: "actorClassType",
   ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
   ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
+  QUANTITY_FOR_PRICE_ATTRIBUTE: "quantityForPriceAttribute",
   ITEM_SIMILARITIES: "itemSimilarities",
   UNSTACKABLE_ITEM_TYPES: "unstackableItemTypes",
 
@@ -217,6 +218,16 @@ const SETTINGS = {
       config: false,
       system: true,
       default: SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE,
+      type: String
+    },
+
+    [SETTINGS.QUANTITY_FOR_PRICE_ATTRIBUTE]: {
+      name: "ITEM-PILES.Settings.QuantityForPrice.Title",
+      hint: "ITEM-PILES.Settings.QuantityForPrice.Hint",
+      scope: "world",
+      config: false,
+      system: true,
+      default: SYSTEMS.DATA.QUANTITY_FOR_PRICE_ATTRIBUTE,
       type: String
     },
 

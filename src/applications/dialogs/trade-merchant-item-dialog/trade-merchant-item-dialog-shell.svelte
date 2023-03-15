@@ -5,7 +5,6 @@
   import { get } from "svelte/store";
   import * as PileUtilities from "../../../helpers/pile-utilities.js";
   import PriceSelector from "../../components/PriceSelector.svelte";
-  import { getActivePlayers } from "../../../helpers/sharing-utilities.js";
 
   const { application } = getContext('external');
 
@@ -16,12 +15,14 @@
   export let elementRoot;
   export let store = item.store;
 
-  const itemName = item.name;
+  const itemNameStore = item.name;
   const itemImg = item.img;
+  const itemInfiniteQuantity = item.infiniteQuantity;
   const itemRarityColor = item.rarityColor;
   const itemFlagData = item.itemFlagData;
   const quantityToBuy = item.quantityToBuy;
   const itemMaxQuantityStore = item.quantity;
+  const itemQuantityForPriceStore = item.quantityForPrice;
   const prices = item.prices;
 
   const sellerPileData = store.pileData;
@@ -52,9 +53,10 @@
     });
   }
 
-  $: maxMerchantItemQuantity = $sellerPileData.infiniteQuantity ? Infinity : $itemMaxQuantityStore;
+  $: maxSellerItemQuantity = $itemInfiniteQuantity ? Infinity : Math.floor($itemMaxQuantityStore / $itemQuantityForPriceStore);
   $: maxItemQuantity = $prices[$selectedPriceGroup]?.maxQuantity ?? Infinity;
-  $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxMerchantItemQuantity);
+  $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxSellerItemQuantity);
+  $: itemName = localize($itemNameStore) + ($itemQuantityForPriceStore > 1 ? ` (${$itemQuantityForPriceStore})` : "");
 
   function submit() {
     game.itempiles.API.tradeItems(seller, buyer, [{
@@ -80,12 +82,12 @@
 				<div class="item-piles-img-container" style="margin-right: 0.25rem;">
 					<img class="item-piles-img" src={$itemImg}/>
 				</div>
-				<span style="color: {$itemRarityColor || 'inherit'};">{localize($itemName)}</span>
+				<span style="color: {$itemRarityColor || 'inherit'};">{itemName}</span>
 			</div>
 
 			<div
 				style="display:flex; justify-content:flex-end; align-items: center; text-align: right;">
-				{#if maxItemQuantity}
+				{#if paymentData.canBuy}
 					<div style="display: flex; flex-direction: column; align-items: flex-end; margin-right: 0.5rem;">
 						<small>{localize("ITEM-PILES.Applications.TradeMerchantItem.Quantity")}</small>
 						<small style="font-style:italic;">
@@ -98,18 +100,19 @@
             $quantityToBuy = Math.max(1, Math.min(currentQuantityToBuy, maxItemPurchaseQuantity));
             currentQuantityToBuy = $quantityToBuy;
           }}/>
+				{:else}
+					<small>
+						{localize(...paymentData.reason)}
+					</small>
 				{/if}
 			</div>
 			<div style="margin-top: 0.25rem;">
 				<PriceSelector {item} standalone/>
 			</div>
 			<div style="margin-right: 0.25rem; text-align: right;">
-				{#if maxItemQuantity}
-					{#if $quantityToBuy > 1 && paymentData.primary}
-						<small>{paymentData.basePriceString}</small>
-					{/if}
-				{:else}
-					<small>{localize(`ITEM-PILES.Applications.TradeMerchantItem.${settings.selling ? "They" : "You"}CantAfford`)}</small>
+				{#if paymentData.canBuy && $quantityToBuy > 1 && paymentData.primary}
+					<small>{paymentData.basePriceString}</small>
+					<!-- `ITEM-PILES.Applications.TradeMerchantItem.${settings.selling ? "They" : "You"}CantAfford` -->
 				{/if}
 			</div>
 		</div>
@@ -139,12 +142,14 @@
 			</div>
 
 			<div style="display:flex; flex-direction: column; align-items: flex-end;">
-				<div style="display:flex; align-items: center;">
-					<span>{$quantityToBuy > 1 ? $quantityToBuy + " " : ""}{$itemName}</span>
-					<div class="item-piles-img-container" style="margin-left: 0.25rem;">
-						<img class="item-piles-img" src={$itemImg}/>
+				{#each paymentData.buyerReceive as price}
+					<div style="display:flex; align-items: center;">
+						<span>{price.quantity > 1 ? price.quantity + " " : ""}{price.name}</span>
+						<div class="item-piles-img-container" style="margin-left: 0.25rem;">
+							<img class="item-piles-img" src={price.img}/>
+						</div>
 					</div>
-				</div>
+				{/each}
 				{#if paymentData.buyerChange.length}
           <span class="item-piles-small-text item-piles-text-right" style="margin-right: 0.25rem; margin-top: 0.5rem;">
             {localize("ITEM-PILES.Applications.TradeMerchantItem.Change")}:
@@ -165,7 +170,7 @@
 		</div>
 
 		<footer class="sheet-footer item-piles-flexrow">
-			<button disabled={!maxItemPurchaseQuantity} on:click|once={ () => { submit() } } type="button">
+			<button disabled={!paymentData.canBuy} on:click|once={ () => { submit() } } type="button">
 				{#if settings.selling}
 					<i class="fas fa-hand-holding-usd"></i> {localize("ITEM-PILES.Applications.TradeMerchantItem.SellItem")}
 				{:else}

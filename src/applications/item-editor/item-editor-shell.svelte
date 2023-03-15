@@ -23,6 +23,7 @@
 
   const flagDataStore = store.data;
   let price = store.price;
+  let quantityForPrice = store.quantityForPrice;
   let oldPrice = get(price);
 
   $: itemFlagData = $flagDataStore;
@@ -206,6 +207,14 @@
                 	: $price;
                 oldPrice = $price;
               }}/>
+						</div>
+
+						<div class="form-group">
+							<label style="flex:4;">
+								{localize("ITEM-PILES.Applications.ItemEditor.QuantityForPrice")}<br>
+								<p>{localize("ITEM-PILES.Applications.ItemEditor.QuantityForPriceExplanation")}</p>
+							</label>
+							<input type="number" bind:value={$quantityForPrice}/>
 						</div>
 					{/if}
 

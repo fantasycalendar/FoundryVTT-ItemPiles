@@ -1,5 +1,14 @@
 # Item Piles Changelog
 
+## Version 2.5.0
+
+- Added support for `quantity per price` - this per item setting allows you to configure how many of the item is received when paying its price
+- Updated PF2e's system settings to account for the above
+- Updated Polish localization (thank you Leoheart on weblate!)
+- Updated WFRP4e system settings to take into account the multiple currencies on prices for items
+- Fixed issue where adding items to a trade from a compendium would not properly trade the items
+- Fixed other underlying issues with user to user trading
+
 ## Version 2.4.19
 
 - Added 3d Canvas integration (thanks theripper93 for the help!)

@@ -860,7 +860,7 @@ export function getPriceData({
       baseCost: 0,
       primary: true,
       maxQuantity: Infinity,
-      quantity
+      quantity: quantity
     })
     return priceData;
   }
@@ -888,7 +888,7 @@ export function getPriceData({
         baseCost,
         primary: true,
         maxQuantity: 0,
-        quantity
+        quantity: quantity
       });
 
     }
@@ -918,16 +918,16 @@ export function getPriceData({
         priceString: prices.filter(price => price.priceString).map(price => price.priceString).join(" "),
         basePriceString: prices.filter(price => price.basePriceString).map(price => price.basePriceString).join(" "),
         maxQuantity: 0,
-        quantity
+        quantity: quantity
       }
     }));
   }
 
-  const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
-  const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
-
   // If there's a buyer, we also calculate how many of the item the buyer can afford
   if (!buyer) return priceData;
+
+  const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
+  const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
 
   const recipientCurrencies = getActorCurrencies(buyer, { currencyList });
   const totalCurrencies = recipientCurrencies.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
@@ -1033,6 +1033,7 @@ export function getPaymentData({
 
       if (!priceGroup.maxQuantity && (buyer || seller)) {
         priceData.canBuy = false;
+        priceData.reason = ["ITEM-PILES.Applications.TradeMerchantItem." + (buyer === merchant ? "TheyCantAfford" : "YouCantAfford")];
         return priceData;
       }
 
@@ -1062,16 +1063,34 @@ export function getPaymentData({
 
           if (existingPrice.buyerQuantity < 0) {
             priceData.canBuy = false;
+            priceData.reason = ["ITEM-PILES.Applications.TradeMerchantItem." + (buyer === merchant ? "TheyCantAfford" : "YouCantAfford")];
           }
         }
       }
 
       if (priceGroup.item) {
+
+        const itemQuantity = Utilities.getItemQuantity(priceGroup.item);
+
+        const quantityPerPrice = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE
+          ? getProperty(priceGroup.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)
+          : 1;
+
+        const requiredQuantity = Math.floor(priceGroup.quantity * quantityPerPrice);
+
+        if (requiredQuantity > itemQuantity && requiredQuantity > (priceGroup.maxQuantity * quantityPerPrice)) {
+          priceData.canBuy = false;
+          priceData.reason = [`ITEM-PILES.Applications.TradeMerchantItem.${buyer === merchant ? "You" : "They"}LackQuantity`, {
+            quantity: itemQuantity,
+            requiredQuantity
+          }];
+        }
+
         priceData.buyerReceive.push({
           type: "item",
           name: priceGroup.item.name,
           img: priceGroup.item.img,
-          quantity: priceGroup.quantity,
+          quantity: requiredQuantity,
           item: priceGroup.item,
         });
       }
@@ -1079,7 +1098,7 @@ export function getPaymentData({
       return priceData;
 
     }, {
-      totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [],
+      totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [], reason: [],
 
       buyerReceive: [], buyerChange: [], sellerReceive: []
     });

@@ -206,6 +206,7 @@ class PileMerchantItem extends PileItem {
     this.displayQuantity = writable(false);
     this.selectedPriceGroup = writable(-1);
     this.quantityToBuy = writable(1);
+    this.quantityForPrice = writable(1);
     this.infiniteQuantity = writable(false);
     this.isService = false;
   }
@@ -237,13 +238,13 @@ class PileMerchantItem extends PileItem {
       if (!setup) return;
       this.refreshPriceData();
     });
-    this.refreshDisplayQuantity();
     this.subscribeTo(this.store.typeFilter, this.filter.bind(this));
     this.subscribeTo(this.itemFlagData, () => {
       if (!setup) return;
       this.refreshPriceData();
       this.refreshDisplayQuantity();
     });
+    this.refreshDisplayQuantity();
     setup = true;
   }
 
@@ -251,6 +252,7 @@ class PileMerchantItem extends PileItem {
 
     const pileData = get(this.store.pileData);
     const itemFlagData = get(this.itemFlagData);
+    const isMerchant = PileUtilities.isItemPileMerchant(this.store.actor, pileData)
 
     const merchantDisplayQuantity = pileData.displayQuantity;
     const itemFlagDataQuantity = itemFlagData.displayQuantity;
@@ -259,7 +261,7 @@ class PileMerchantItem extends PileItem {
       "default": pileData.infiniteQuantity,
       "yes": true,
       "no": false
-    }[itemFlagData.infiniteQuantity ?? "default"];
+    }[isMerchant ? (itemFlagData.infiniteQuantity ?? "default") : "no"];
 
     this.infiniteQuantity.set(itemInfiniteQuantity)
 
@@ -304,6 +306,12 @@ class PileMerchantItem extends PileItem {
     }
 
     this.prices.set(priceData);
+
+    this.quantityForPrice.set(
+      game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE
+        ? getProperty(this.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)
+        : 1
+    );
 
   }
 

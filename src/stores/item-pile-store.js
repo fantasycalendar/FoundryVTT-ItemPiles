@@ -123,8 +123,8 @@ export default class ItemPileStore {
 
     PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
       if (currency.type === "item") {
-        if (!currency.item) return;
-        items.push(new this.ItemClass(this, currency.item ?? currency.data, true));
+        if (!currency.item) return
+        items.push(new this.ItemClass(this, currency.item, true));
       } else {
         attributes.push(new this.AttributeClass(this, currency, true));
       }

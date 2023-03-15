@@ -20,7 +20,10 @@ export default class ItemPriceStore {
     this.item = item;
     this.itemDoc = new TJSDocument(this.item);
 
+    const quantityForPriceProp = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE;
+
     this.price = writable(0);
+    this.quantityForPrice = writable(getProperty(item, quantityForPriceProp) ?? 1);
 
     const data = PileUtilities.getItemFlagData(this.item);
 
@@ -42,6 +45,10 @@ export default class ItemPriceStore {
         this.data.set(foundry.utils.mergeObject(oldData, newData));
       }
       this.price.set(getItemCost(this.item));
+      const quantityForPriceProp = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE;
+      if (quantityForPriceProp && hasProperty(data, quantityForPriceProp)) {
+        this.quantityForPrice.set(getProperty(item, quantityForPriceProp))
+      }
     });
 
   }
@@ -53,12 +60,16 @@ export default class ItemPriceStore {
   }
 
   export() {
-    return {
+    const data = {
       data: {
         [game.itempiles.API.ITEM_PRICE_ATTRIBUTE]: get(this.price),
       },
       flags: get(this.data)
     };
+    if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) {
+      data["data"][game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE] = get(this.quantityForPrice);
+    }
+    return data;
   }
 
 }

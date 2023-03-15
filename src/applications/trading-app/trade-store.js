@@ -165,7 +165,8 @@ export default class TradeStore {
       item.maxQuantity = maxQuantity;
     } else if (!item) {
       items.push({
-        id: newItem.id,
+        id: newItem._id ?? newItem.id,
+        uuid: newItem.uuid,
         name: newItem.name,
         img: newItem?.img ?? "",
         type: newItem?.type,
