@@ -309,7 +309,7 @@ class PileMerchantItem extends PileItem {
 
     this.quantityForPrice.set(
       game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE
-        ? getProperty(this.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)
+        ? getProperty(this.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1
         : 1
     );
 

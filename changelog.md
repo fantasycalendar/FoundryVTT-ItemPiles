@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.5.1
+
+- Fixed issue with purchasing items from merchants would cause the buyer to be scammed, and not add the items to the inventory of the buyer
+
 ## Version 2.5.0
 
 - Added support for `quantity per price` - this per item setting allows you to configure how many of the item is received when paying its price
@@ -37,8 +41,8 @@
 
 ## Version 2.4.16
 
-- Added support for Dungeon Crawl Classics system - thanks mooped!
-- Updated French localization - thank you rectulo!
+- Added support for Dungeon Crawl Classics system - _thanks mooped!
+- Updated French localization - thank you rectulo!_
 - Fixed being unable to spectate trades
 - Fixed `Split currencies x ways` button not working when sharing currencies was not enabled
 - Fixed item piles not being deleted after users having looted all of their currencies

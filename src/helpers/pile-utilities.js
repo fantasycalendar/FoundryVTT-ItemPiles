@@ -1073,7 +1073,7 @@ export function getPaymentData({
         const itemQuantity = Utilities.getItemQuantity(priceGroup.item);
 
         const quantityPerPrice = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE
-          ? getProperty(priceGroup.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)
+          ? getProperty(priceGroup.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1
           : 1;
 
         const requiredQuantity = Math.floor(priceGroup.quantity * quantityPerPrice);
