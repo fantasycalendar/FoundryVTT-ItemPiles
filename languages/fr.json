@@ -527,7 +527,9 @@
         "ExpandColumnsRowsExplanation": "Lorsque le paramètre ci-dessus est activé, il définit le nombre de colonnes et/ou de lignes disponibles dans le coffre-fort. Ce nombre ne peut pas dépasser la capacité du coffre-fort.",
         "InfiniteQuantityYes": "Oui, en quantité infinie",
         "InfiniteQuantityNo": "Non, en quantité normale",
-        "InfiniteQuantityDefault": "Valeur par défaut du paramètre du marchand"
+        "InfiniteQuantityDefault": "Valeur par défaut du paramètre du marchand",
+        "QuantityForPriceExplanation": "Cela permet de configurer le nombre d'exemplaires de cet objet que l'on doit obtenir lors de l'achat de cet objet.",
+        "QuantityForPrice": "Quantité pour le prix"
       },
       "TradeMerchantItem": {
         "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
@@ -540,7 +542,9 @@
         "Quantity": "Quantité",
         "Change": "Changer",
         "MaxQuantity": "Maximum {quantity}",
-        "YouCantAfford": "Vous ne pouvez pas vous permettre ce prix"
+        "YouCantAfford": "Vous ne pouvez pas vous permettre ce prix",
+        "YouLackQuantity": "Vous n'avez pas assez de cet objet pour le vendre, vous avez {quantity}, mais vous avez besoin de {requiredQuantity}",
+        "TheyLackQuantity": "Ils n'ont pas assez de cet objet pour le vendre, ils ont {quantity}, mais ont besoin de {requiredQuantity}"
       },
       "SimilaritiesEditor": {
         "Path": "Chemin d'attribut",
@@ -926,6 +930,10 @@
         "Title": "Catégories d'objets personnalisées",
         "Label": "Configurer les catégories d'objets",
         "Hint": "Vous pouvez configurer les catégories d'objets personnalisées qui sont affichées comme des suggestions dans l'éditeur d'objets."
+      },
+      "QuantityForPrice": {
+        "Hint": "Ici, vous pouvez configurer le chemin d'attribut pour la quantité d'articles que vous obtenez pour le prix. Par exemple, dans le système PF2e, il y a une propriété \"par\" sur les objets, qui détermine la quantité d'articles que vous obtenez pour le prix de l'article, qui est stockée dans l'attribut \"item.system.price.per\" de l'objet, donc vous mettriez \"system.price.per\" dans ce paramètre.",
+        "Title": "Quantité d'objet pour l'attribut de prix"
       }
     },
     "Warnings": {
