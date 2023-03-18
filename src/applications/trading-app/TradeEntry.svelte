@@ -44,56 +44,56 @@
 
 <div class="item-piles-flexrow item-piles-item-row item-piles-even-color">
 
-  {#if editable}
-    <div style="flex: 0 1 auto; margin: 0 6px;">
-      <a class="item-piles-clickable-red" on:click={() => { store.removeEntry(data) }}>
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-  {/if}
+	{#if editable}
+		<div style="flex: 0 1 auto; margin: 0 6px;">
+			<a class="item-piles-clickable-red" on:click={() => { store.removeEntry(data) }}>
+				<i class="fas fa-times"></i>
+			</a>
+		</div>
+	{/if}
 
-  <div class="item-piles-img-container">
-    <img class="item-piles-img" src="{data.img}"/>
-  </div>
+	<div class="item-piles-img-container">
+		<img class="item-piles-img" src="{data.img}"/>
+	</div>
 
-  <div class="item-piles-name item-piles-text">
-    <div class="item-piles-name-container">
-      <p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{data.name}</p>
-    </div>
-  </div>
+	<div class="item-piles-name item-piles-text">
+		<div class="item-piles-name-container">
+			<p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{data.name}</p>
+		</div>
+	</div>
 
-  {#if editable}
-    <div style="flex: 0 1 17px; margin: 0 5px;">
-      {#if data.editing}
-        <a class="item-piles-clickable-green item-piles-confirm-quantity" on:click="{updateQuantity}">
-          <i class="fas fa-check"></i>
-        </a>
-      {/if}
-    </div>
-  {/if}
+	{#if editable}
+		<div style="flex: 0 1 17px; margin: 0 5px;">
+			{#if data.editing}
+				<a class="item-piles-clickable-green item-piles-confirm-quantity" on:click="{updateQuantity}">
+					<i class="fas fa-check"></i>
+				</a>
+			{/if}
+		</div>
+	{/if}
 
-  <div class="item-piles-text-right" class:item-piles-quantity-container={editable}
-       on:click={(evt) => evt.stopPropagation()}>
-    {#if editable}
-      <div class="item-piles-quantity-container">
-        {#if data.editing}
-          <div class="item-piles-quantity-input-container">
-            <input
-              class="item-piles-quantity"
-              type="number"
-              bind:value={data.newQuantity}
-              on:keydown={onKeyDown}
-            />
-          </div>
-        {:else}
+	<div class="item-piles-text-right" class:item-piles-quantity-container={editable}
+			 on:click={(evt) => evt.stopPropagation()}>
+		{#if editable}
+			<div class="item-piles-quantity-container">
+				{#if data.editing}
+					<div class="item-piles-quantity-input-container">
+						<input
+							class="item-piles-quantity"
+							type="number"
+							bind:value={data.newQuantity}
+							on:keydown={onKeyDown}
+						/>
+					</div>
+				{:else}
             <span class="item-piles-quantity-text"
-                  on:click="{ () => { data.editing = true } }">
+									on:click="{ () => { data.editing = true } }">
               {data.quantity}
             </span>
-        {/if}
-      </div>
-    {:else}
-      <span class="item-piles-text" style="padding-right:0.5rem;">{data.quantity}</span>
-    {/if}
-  </div>
+				{/if}
+			</div>
+		{:else}
+			<span class="item-piles-text" style="padding-right:0.5rem;">{data.quantity}</span>
+		{/if}
+	</div>
 </div>

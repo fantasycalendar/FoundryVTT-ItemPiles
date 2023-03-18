@@ -90,7 +90,7 @@ export default class VaultApp extends SvelteApplication {
           class: "item-piles-open-actor-sheet",
           icon: "fas fa-user",
           onclick: () => {
-            this.actor.sheet.render(true, { focus: true });
+            this.actor.sheet.render(true, { focus: true, bypassItemPiles: true });
           }
         },
         {

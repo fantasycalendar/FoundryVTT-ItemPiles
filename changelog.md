@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.5.2
+
+- Tweaked the way rendering item piles work - if the actor sheet is rendered without holding the actor sheet hotkey, it will render the item pile UI - if you call `ActorSheet#render` you can add `{ bypassItemPiles: true }` to the secondary options to prevent the item piles UI from opening, and instead open the actor sheet
+- Fixed `Split x ways` sometimes being able to be clicked when the item pile has nothing to be split
+
 ## Version 2.5.1
 
 - Fixed issue with purchasing items from merchants would cause the buyer to be scammed, and not add the items to the inventory of the buyer

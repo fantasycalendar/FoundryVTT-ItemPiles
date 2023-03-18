@@ -20,6 +20,49 @@ export function getPlayersForItemPile(target) {
 }
 
 /**
+ * Determines whether a pile can be split
+ *
+ * @param target
+ * @returns {boolean}
+ */
+export function canItemPileBeSplit(target) {
+  const pileData = PileUtilities.getActorFlagData(target);
+  const shareData = getItemPileSharingData(target);
+  const playerActors = getPlayersForItemPile(target).map(player => Utilities.getUserCharacter(player));
+  const items = pileData.shareItemsEnabled ? PileUtilities.getActorItems(target) : [];
+  const currencies = pileData.shareCurrenciesEnabled ? PileUtilities.getActorCurrencies(target) : [];
+  for (const item of items) {
+    if (playerActors.every(character => getItemSharesLeftForActor(target, item, character, {
+      shareData,
+      floor: true,
+      players: playerActors.length
+    }))) {
+      return true;
+    }
+  }
+  for (const currency of currencies) {
+    if (currency.type === "item") {
+      if (playerActors.every(character => getItemSharesLeftForActor(target, currency.item, character, {
+        shareData,
+        floor: true,
+        players: playerActors.length
+      }))) {
+        return true;
+      }
+    } else {
+      if (playerActors.every(character => getAttributeSharesLeftForActor(target, currency.path, character, {
+        shareData,
+        floor: true,
+        players: playerActors.length
+      }))) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Retrieves an item pile's sharing data
  *
  * @param {Actor|TokenDocument|String} target

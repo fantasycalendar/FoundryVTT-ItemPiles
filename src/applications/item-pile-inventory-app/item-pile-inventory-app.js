@@ -68,7 +68,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
     }
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(source, recipient, options, dialogData).render(true, { focus: true });
+      new this(source, recipient, options, dialogData).render(true, { focus: true, bypassItemPiles: true });
     })
   }
 
@@ -92,7 +92,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
           class: "item-piles-open-actor-sheet",
           icon: "fas fa-user",
           onclick: () => {
-            this.actor.sheet.render(true, { focus: true });
+            this.actor.sheet.render(true, { focus: true, bypassItemPiles: true });
           }
         },
         {

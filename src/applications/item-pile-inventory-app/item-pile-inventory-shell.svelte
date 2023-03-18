@@ -25,18 +25,28 @@
   export let store = new ItemPileStore(application, actor, recipient);
 
   // Stores
+  let canBeSplit = false;
   let searchStore = store.search;
   let editQuantities = store.editQuantities;
   let pileData = store.pileData;
   let deleted = store.deleted;
 
+  let items = store.allItems;
+  let currencies = store.currencies;
   let numItems = store.numItems;
+  let shareData = store.shareData;
   let numCurrencies = store.numCurrencies;
 
   $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
   $: hasItems = $numItems > 0;
-  $: showSearchBar = ($numItems + $numCurrencies) >= 3;
+  $: showSearchBar = $numItems >= 8;
   $: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
+  $: {
+    $shareData;
+    $items;
+    $currencies;
+    canBeSplit = SharingUtilities.canItemPileBeSplit(actor);
+  }
 
   let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 
@@ -162,7 +172,7 @@
 				{/if}
 
 				{#if $pileData.splitAllEnabled}
-					<button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty}">
+					<button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty || !canBeSplit}">
 						<i class="fas fa-handshake"></i>
 						{#if $pileData.shareItemsEnabled}
 							{localize("ITEM-PILES.Inspect.SplitAll", { num_players })}

@@ -109,7 +109,7 @@
             pileActor?.sheet.close();
             game.itempiles.API.renderItemPileInterface(pileActor);
           } else if (!data.enabled) {
-            pileActor?.sheet.render(true);
+            pileActor?.sheet.render(true, { bypassItemPiles: true });
           }
         }
       }

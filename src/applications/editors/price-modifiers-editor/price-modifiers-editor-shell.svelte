@@ -68,65 +68,65 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
 
-    <p>{localize("ITEM-PILES.Applications.PriceModifiersEditor.Explanation")}</p>
+		<p>{localize("ITEM-PILES.Applications.PriceModifiersEditor.Explanation")}</p>
 
-    <div on:dragstart={preventDefault} on:drop={dropData} on:dragover={preventDefault}
-         class:border-highlight={!priceModifiers.length}>
+		<div on:dragstart={preventDefault} on:drop={dropData} on:dragover={preventDefault}
+				 class:border-highlight={!priceModifiers.length}>
 
-      {#if priceModifiers.length}
-        <table>
-          <tr>
-            <th style="width:5%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Override")}</th>
-            <th style="width:25%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Actor")}</th>
-            <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</th>
-            <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
-            <th style="width:5%;"></th>
-          </tr>
-          {#each priceModifiers as priceData, index (index)}
-            <tr>
-              <td>
-                <div class="form-group">
-                  <input type="checkbox" bind:checked={priceData.override}>
-                </div>
-              </td>
-              <td>
-                <a class="item-piles-actor-name-clickable"
-                   on:click={(priceData.actor.sheet.render(true))}>{priceData.actor.name}</a>
-              </td>
-              <td>
-                <div class="item-piles-flexrow" style="margin: 0 0.25rem">
-                  <SliderInput bind:value={priceData.buyPriceModifier}/>
-                </div>
-              </td>
-              <td>
-                <div class="item-piles-flexrow" style="margin: 0 0.25rem">
-                  <SliderInput bind:value={priceData.sellPriceModifier}/>
-                </div>
-              </td>
-              <td class="small">
-                <button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
-              </td>
-            </tr>
-          {/each}
-        </table>
-      {/if}
+			{#if priceModifiers.length}
+				<table>
+					<tr>
+						<th style="width:5%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Override")}</th>
+						<th style="width:25%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Actor")}</th>
+						<th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</th>
+						<th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
+						<th style="width:5%;"></th>
+					</tr>
+					{#each priceModifiers as priceData, index (index)}
+						<tr>
+							<td>
+								<div class="form-group">
+									<input type="checkbox" bind:checked={priceData.override}>
+								</div>
+							</td>
+							<td>
+								<a class="item-piles-actor-name-clickable"
+									 on:click={(priceData.actor.sheet.render(true, { bypassItemPiles: true }))}>{priceData.actor.name}</a>
+							</td>
+							<td>
+								<div class="item-piles-flexrow" style="margin: 0 0.25rem">
+									<SliderInput bind:value={priceData.buyPriceModifier}/>
+								</div>
+							</td>
+							<td>
+								<div class="item-piles-flexrow" style="margin: 0 0.25rem">
+									<SliderInput bind:value={priceData.sellPriceModifier}/>
+								</div>
+							</td>
+							<td class="small">
+								<button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
+							</td>
+						</tr>
+					{/each}
+				</table>
+			{/if}
 
-      <p class="item-piles-text-center">{localize("ITEM-PILES.Applications.PriceModifiersEditor.DragDrop")}</p>
+			<p class="item-piles-text-center">{localize("ITEM-PILES.Applications.PriceModifiersEditor.DragDrop")}</p>
 
-    </div>
+		</div>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("Save")}
-      </button>
-      <button type="button" on:click|once={() => { application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("Save")}
+			</button>
+			<button type="button" on:click|once={() => { application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 
 </ApplicationShell>
 

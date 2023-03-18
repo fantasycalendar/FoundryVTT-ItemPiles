@@ -53,7 +53,7 @@ export default class MerchantApp extends SvelteApplication {
     if (app) return app.render(false, { focus: true });
     return new Promise((resolve) => {
       options.resolve = resolve;
-      new this(merchant, recipientActor, options, dialogData).render(true, { focus: true });
+      new this(merchant, recipientActor, options, dialogData).render(true, { focus: true, bypassItemPiles: true });
     })
   }
 
@@ -72,7 +72,7 @@ export default class MerchantApp extends SvelteApplication {
           class: "item-piles-open-actor-sheet",
           icon: "fas fa-user",
           onclick: () => {
-            this.merchant.sheet.render(true, { focus: true });
+            this.merchant.sheet.render(true, { focus: true, bypassItemPiles: true });
           }
         },
         {

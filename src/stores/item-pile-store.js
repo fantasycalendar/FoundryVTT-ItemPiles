@@ -336,9 +336,9 @@ export default class ItemPileStore {
 
     await SharingUtilities.updateItemPileSharingData(this.actor, pileSharingData);
 
-    Helpers.custom_notify(localize("ITEM-PILES.Notifications.UpdateItemPileSuccess"));
-
     this.refreshItems();
+
+    Helpers.custom_notify(game.i18n.localize("ITEM-PILES.Notifications.UpdateItemPileSuccess"));
 
   }
 

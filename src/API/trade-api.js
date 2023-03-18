@@ -141,6 +141,7 @@ export default class TradeAPI {
 
         ongoingTrades.set(data.fullPublicTradeId, { app, store });
 
+        actorSheet.byassItemPiles = true;
         actor.sheet.render(true, actorSheet);
 
         if (isPrivate) {
@@ -211,6 +212,7 @@ export default class TradeAPI {
 
     ongoingTrades.set(fullPublicTradeId, { app, store });
 
+    actorSheet.byassItemPiles = true;
     actor.sheet.render(true, actorSheet);
 
     return {
