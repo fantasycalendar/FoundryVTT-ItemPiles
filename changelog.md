@@ -4,6 +4,7 @@
 
 - Added the ability for GMs to drag and drop actors into item pile interfaces to inspect as that token
 - Fixed being unable to select a token, then shift double click on an item pile token to inspect the item pile as the first selected token
+- Updated French localization
 
 ## Version 2.5.2
 
