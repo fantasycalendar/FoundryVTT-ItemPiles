@@ -32,7 +32,7 @@
      transition:fade={{duration: 250}}
      draggable={!!entry.id}
      on:dragstart={(event) => { dragStart(event) }}
-     class:item-piles-disabled={!editQuantities && !$quantityLeft}>
+     class:item-piles-disabled={!$editQuantities && !$quantityLeft}>
 
   <div class="item-piles-img-container">
     <img class="item-piles-img" src="{$img}"/>
@@ -46,7 +46,7 @@
 			>
 				{$name}
 			</p>
-      {#if !editQuantities && entry.canStack}
+      {#if !$editQuantities && entry.canStack}
         <span class="item-piles-small-text">(x{$quantity})</span>
       {/if}
     </div>
@@ -56,7 +56,7 @@
 
     <div class="item-piles-quantity-container" style="flex:2.5;">
 
-      {#if editQuantities}
+      {#if $editQuantities}
 
         <div class="item-piles-quantity-input-container">
           <input class="item-piles-quantity" type="number" min="0" bind:value="{$quantity}"
@@ -85,7 +85,7 @@
 
   {/if}
 
-  {#if !editQuantities}
+  {#if !$editQuantities}
 
     <button
       on:click={() => { entry.take() }}

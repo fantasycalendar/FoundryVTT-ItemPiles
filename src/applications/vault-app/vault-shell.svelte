@@ -28,7 +28,9 @@
   export let actor;
   export let recipient;
 
-  export let store = new VaultStore(application, actor, recipient);
+  let mainContainer;
+
+  export let store = VaultStore.make(application, actor, recipient);
 
   const currencies = store.allCurrencies;
   const pileDataStore = store.pileData;
@@ -39,6 +41,7 @@
   const logSearchStore = store.logSearch;
   const vaultLog = store.vaultLog;
   const visibleLogItems = store.visibleLogItems;
+  const recipientDocument = store.recipientDocument;
 
   $: pileData = $pileDataStore;
   $: gridData = $gridDataStore;
@@ -50,6 +53,21 @@
 
     const { x, y } = get(dragPosition);
     dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+
+    if (data.type === "Actor" && game.user.isGM) {
+      const oldHeight = mainContainer.getBoundingClientRect().height;
+      const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
+      store.updateRecipient(newRecipient);
+      store.refreshFreeSpaces();
+      if(!recipient){
+				setTimeout(() => {
+          const newHeight = mainContainer.getBoundingClientRect().height - oldHeight;
+          application.position.stores.height.set(get(application.position.stores.height) + newHeight);
+        });
+        recipient = newRecipient;
+      }
+      return;
+    }
 
     if (data.type !== "Item") {
       Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
@@ -73,7 +91,7 @@
       return false;
     }
 
-    if(!source && !game.user.isGM){
+    if (!source && !game.user.isGM) {
       Helpers.custom_warning(`Only GMs can drop items from the sidebar!`, true)
       return false;
     }
@@ -147,7 +165,7 @@
         });
       }
 
-      Hooks.call(CONSTANTS.HOOKS.PILE.PRE_RIGHT_CLICK_ITEM, event.detail.item.item.item, contextMenu, actor, recipient);
+      Hooks.call(CONSTANTS.HOOKS.PILE.PRE_RIGHT_CLICK_ITEM, event.detail.item.item.item, contextMenu, actor, store.recipient);
 
       if (!contextMenu.length) return;
 
@@ -169,7 +187,7 @@
   const defaultWidth = get(application.position.stores.width);
 
   $: {
-    if($activeTab === "vault" && $applicationWidth){
+    if ($activeTab === "vault" && $applicationWidth) {
       application.position.stores.width.set(defaultWidth);
     }
   }
@@ -180,10 +198,10 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <main in:fade={{duration: 500}} class="item-piles-flexcol">
+	<main class="item-piles-flexcol" bind:this={mainContainer} in:fade={{duration: 500}}>
 
-    {#if gridData.fullAccess && (pileData.vaultExpansion || pileData.logVaultActions)}
-      <Tabs bind:activeTab={$activeTab} tabs={[
+		{#if gridData.fullAccess && (pileData.vaultExpansion || pileData.logVaultActions)}
+			<Tabs bind:activeTab={$activeTab} tabs={[
         {
           value: "vault",
           label: "ITEM-PILES.Vault.VaultTab",
@@ -202,22 +220,22 @@
           hidden: !pileData.logVaultActions || !gridData.fullAccess
         }
       ]} style="flex: 0 1 auto; margin-bottom: 0.5rem; padding-bottom: 0.5rem;"/>
-    {/if}
+		{/if}
 
-    {#if $activeTab === "vault"}
+		{#if $activeTab === "vault"}
 
-      <div class="form-group item-piles-flexrow item-piles-bottom-divider"
-           style="margin: 0.25rem 0; align-items: center; flex: 0 1 auto;">
-        <label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
-        <input type="text" bind:value={$searchStore}>
-      </div>
+			<div class="form-group item-piles-flexrow item-piles-bottom-divider"
+					 style="margin: 0.25rem 0; align-items: center; flex: 0 1 auto;">
+				<label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
+				<input type="text" bind:value={$searchStore}>
+			</div>
 
-      <DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}
-                style="display: flex; flex: 1; justify-content: center; align-items: center;">
+			<DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}
+								style="display: flex; flex: 1; justify-content: center; align-items: center;">
 
-        <Grid bind:items={$gridItems}
-              bind:gridContainer={element}
-              options={{
+				<Grid bind:items={$gridItems}
+							bind:gridContainer={element}
+							options={{
               ...gridData,
               class: "item-piles-grid-background",
               activeClass: "item-piles-grid-item-active",
@@ -229,19 +247,19 @@
               backgroundGrid: true,
               highlightItems: !!$searchStore
             }}
-              dropGhost={$dragPosition}
-              on:change={(event) => store.updateGrid(event.detail.items)}
-              on:rightclick={rightClickItem}
-              on:doubleclick={doubleClickItem}
-              let:item
-        >
-          <VaultItemEntry entry={item}/>
-        </Grid>
+							dropGhost={$dragPosition}
+							on:change={(event) => store.updateGrid(event.detail.items)}
+							on:rightclick={rightClickItem}
+							on:doubleclick={doubleClickItem}
+							let:item
+				>
+					<VaultItemEntry entry={item}/>
+				</Grid>
 
-      </DropZone>
+			</DropZone>
 
-      {#if store.recipient && (gridData.canWithdrawCurrencies || gridData.canDepositCurrencies)}
-        <div class="item-piles-flexrow item-piles-top-divider" style="flex: 0 1 auto; align-items: center;">
+			{#if $recipientDocument?.name}
+				<div class="item-piles-flexrow item-piles-top-divider" style="flex: 0 1 auto; align-items: center;">
           <span>
             <a on:click={() => {
               const [appPosition, actorPosition] = Helpers.getApplicationPositions(application, store.recipient.sheet);
@@ -250,105 +268,108 @@
               store.recipient.sheet.render(true, actorPosition);
             }}>
               <i class="fa-solid fa-suitcase"></i>
-              {localize("ITEM-PILES.Vault.ViewingAs", { actor_name: store.recipient.name })}
+							{localize("ITEM-PILES.Vault.ViewingAs", { actor_name: $recipientDocument.name })}
             </a>
           </span>
-          <div style="flex:0 1 auto; justify-self: flex-end; display: flex; justify-content: flex-end;">
-            {#if gridData.canWithdrawCurrencies}
-              <button type="button" class="item-piles-small-button" on:click={() => store.withdrawCurrency()}>
-                {localize("ITEM-PILES.Vault.Withdraw")}
-              </button>
-            {/if}
-            {#if gridData.canDepositCurrencies}
-              <button type="button" class="item-piles-small-button" on:click={() => store.depositCurrency()}>
-                {localize("ITEM-PILES.Vault.Deposit")}
-              </button>
-            {/if}
-          </div>
-        </div>
-      {/if}
+					{#if (gridData.canDepositCurrencies || gridData.canWithdrawCurrencies)}
+						<div style="flex:0 1 auto; justify-self: flex-end; display: flex; justify-content: flex-end;">
+							{#if gridData.canWithdrawCurrencies}
+								<button type="button" class="item-piles-small-button" on:click={() => store.withdrawCurrency()}>
+									{localize("ITEM-PILES.Vault.Withdraw")}
+								</button>
+							{/if}
+							{#if gridData.canDepositCurrencies}
+								<button type="button" class="item-piles-small-button" on:click={() => store.depositCurrency()}>
+									{localize("ITEM-PILES.Vault.Deposit")}
+								</button>
+							{/if}
+						</div>
+					{/if}
+				</div>
+			{/if}
 
-      <div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
+			<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
 
-        <CurrencyList {currencies}
-                      options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true, reverse: true }}
-                      style="align-items: center;">
-          {#if gridData.canEditCurrencies}
-            <a style="order: -1; display:flex; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
-              <i class="fas fa-cog"></i>
-            </a>
-          {/if}
-        </CurrencyList>
+				<CurrencyList {currencies}
+											options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true, reverse: true }}
+											style="align-items: center;">
+					{#if gridData.canEditCurrencies}
+						<a style="order: -1; display:flex; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
+							<i class="fas fa-cog"></i>
+						</a>
+					{/if}
+				</CurrencyList>
 
-      </div>
+			</div>
 
-    {/if}
+		{/if}
 
-    {#if $activeTab === "expanders"}
+		{#if $activeTab === "expanders"}
 
-      <DropZone callback={(data, event) => { onDropData(data, event, true) }}
-                style="display: flex; flex-direction: column; flex:1;">
+			<DropZone callback={(data, event) => { onDropData(data, event, true) }}
+								style="display: flex; flex-direction: column; flex:1;">
 
-        <div style="text-align: center;" class="item-piles-bottom-divider">
-          {@html localize("ITEM-PILES.Vault." + (
+				<div style="text-align: center;" class="item-piles-bottom-divider">
+					{@html localize("ITEM-PILES.Vault." + (
             gridData.totalSpaces === gridData.enabledSpaces
               ? "CapacityFull"
               : (gridData.enabledSpaces ? "CapacityLeft" : "NeedsCapacity")), {
             total_capacity: `<strong>${gridData.totalSpaces}</strong>`,
             capacity: `<strong>${gridData.enabledSpaces}</strong>`,
           })}
-        </div>
+				</div>
 
-        <div class="item-piles-items-list">
+				<div class="item-piles-items-list">
 
-          {#each $vaultExpanderItems as item (item.id)}
-            <VaultExpanderEntry {store} bind:item={item}/>
-          {/each}
+					{#each $vaultExpanderItems as item (item.id)}
+						<VaultExpanderEntry {store} bind:item={item}/>
+					{/each}
 
-        </div>
+				</div>
 
-        {#if !$vaultExpanderItems.length}
-          <div style="flex: 1 0 auto; display: flex; align-items: center; place-content: center;">
-            <i>Drag and drop items to expand spaces</i>
-          </div>
-        {/if}
+				{#if !$vaultExpanderItems.length}
+					<div style="flex: 1 0 auto; display: flex; align-items: center; place-content: center;">
+						<i>Drag and drop items to expand spaces</i>
+					</div>
+				{/if}
 
-      </DropZone>
+			</DropZone>
 
-    {/if}
+		{/if}
 
-    {#if $activeTab === "log"}
+		{#if $activeTab === "log"}
 
-      <div class="form-group item-piles-flexrow item-piles-bottom-divider"
-           style="margin: 0.25rem 0; align-items: center; flex: 0 1 auto;">
-        <label style="flex:0 1 auto; margin-right: 5px;">Log search:</label>
-        <input type="text" bind:value={$logSearchStore}>
-      </div>
+			<div class="form-group item-piles-flexrow item-piles-bottom-divider"
+					 style="margin: 0.25rem 0; align-items: center; flex: 0 1 auto;">
+				<label style="flex:0 1 auto; margin-right: 5px;">Log search:</label>
+				<input type="text" bind:value={$logSearchStore}>
+			</div>
 
-      <div class="item-piles-vault-log"
-           style="max-height: {$applicationHeight-130}px; overflow-y: scroll; font-size: 0.75rem; padding-right: 0.5rem;">
+			<div class="item-piles-vault-log"
+					 style="max-height: {$applicationHeight-130}px; overflow-y: scroll; font-size: 0.75rem; padding-right: 0.5rem;">
 
-        {#each $vaultLog.slice(0, $visibleLogItems).filter(log => log.visible) as log, index (index)}
-          <div
-            class:item-piles-log-deposit={log.action === "deposited" || (!log.action && log.qty > 0)}
-            class:item-piles-log-withdrawal={log.action === "withdrew" || (!log.action && log.qty < 0)}
-            class:item-piles-log-other={log.action && log.action !== "deposited" && log.action !== "withdrew"}
-          >
-            {@html log.text} - {Helpers.timeSince(log.date)} ago
-          </div>
-        {/each}
+				{#each $vaultLog.slice(0, $visibleLogItems).filter(log => log.visible) as log, index (index)}
+					<div
+						class:item-piles-log-deposit={log.action === "deposited" || (!log.action && log.qty > 0)}
+						class:item-piles-log-withdrawal={log.action === "withdrew" || (!log.action && log.qty < 0)}
+						class:item-piles-log-other={log.action && log.action !== "deposited" && log.action !== "withdrew"}
+					>
+						{@html log.text} - {Helpers.timeSince(log.date)} ago
+					</div>
+				{/each}
 
-        {#if $vaultLog.length > $visibleLogItems}
-          <div class="item-piles-top-divider" style="text-align: center;">
-            <a on:click={() => { $visibleLogItems += 20; }}><i>Load more transactions ({$visibleLogItems} / {$vaultLog.length})...</i></a>
-          </div>
-        {/if}
+				{#if $vaultLog.length > $visibleLogItems}
+					<div class="item-piles-top-divider" style="text-align: center;">
+						<a on:click={() => { $visibleLogItems += 20; }}><i>Load more transactions ({$visibleLogItems}
+							/ {$vaultLog.length})...</i></a>
+					</div>
+				{/if}
 
-      </div>
+			</div>
 
-    {/if}
+		{/if}
 
-  </main>
+	</main>
 
 </ApplicationShell>
 

@@ -79,3 +79,42 @@ Here's an example of an Adamantine Plate Armor that can be bought with 2500 gold
 bars are simply just another item, which you could put in item piles in your world or for sale from other merchants:
 
 ![Image showing the item configuration](images/custom-adamantine-price.png)
+
+## Services and custom behavior
+
+Items that are configured to be services (see `Item Is Service` on the item configuration) will not add the item to the
+buyer's inventory, but only subtract the currencies from the buyer and the quantity of the service (if not infinite
+quantity).
+
+If you wish to create additional behavior when you buy an item, you will need to create a macro to handle that additional
+logic. Just below `Item Is Service`, you can input the name of a macro that will be executed when the item is purchased.
+If you then script behavior that you would like, you can handle any edge case that you would like.
+
+The reason why Item Piles cannot handle "rolling" the item for you is because each system that item piles supports handles
+"rolling" differently. Since item piles supports over 20 systems, it would be nearly impossible to implement each one's
+edge cases.
+
+Instead, here's an example script that you can run when a `Cure Wounds` service was bought in the D&D5e system.
+
+**Note:** You will need the `advanced-macros` module installed in order for the macro to know what item was bought.
+
+```js
+const { buyer, seller, item, quantity } = args[0];
+
+const sellerSpellCastingAttr = seller.system.attributes?.spellcasting || "wis";
+const sellerSpellCastingBonus = seller.system.abilities[sellerSpellCastingAttr]?.mod || 0;
+
+const healingRoll = new Roll(`${quantity}d8 + @mod`, { mod: sellerSpellCastingBonus }).evaluate({ async: false });
+
+const buyerNewHealth = Math.min(buyer.system.attributes.hp.max, buyer.system.attributes.hp.value + healingRoll.total);
+
+await buyer.update({
+  "system.attributes.hp.value": buyerNewHealth
+});
+
+await healingRoll.toMessage({
+  flavor: `${seller.name} heals ${buyer.name}`
+});
+```
+
+In this case `args[0]` contains the buyer actor, the seller actor, the item that was bought, and how many of the item was bought.

@@ -18,17 +18,12 @@
   * [Inspecting pile as character](creating-item-piles.md#inspecting-pile-as-character)
   * [Modifying default sharing behavior](creating-item-piles.md#modifying-default-sharing-behavior)
 
-* [Sample Macros](sample-macros.md)
-  * [Show interface of Item Pile](sample-macros.md#show-interface-of-item-pile-or-merchant-for-all-active-players)
-  * [Make tokens lootable](sample-macros.md#make-tokens-lootable)
-  * [Revert tokens from being lootable](sample-macros.md#revert-tokens-from-being-lootable)
-  * [Populate loot via table](sample-macros.md#populate-loot-via-table)
-
 * [Merchants](merchant.md)
   * [Merchant interface](merchant.md#merchant-interface)
   * [Buy & sell price modifiers](merchant.md#buy-and-sell-price-modifiers)
   * [Item configuration](merchant.md#item-configuration)
   * [Custom item prices](merchant.md#custom-item-prices)
+  * [Services and custom behavior](merchant.md#services-and-custom-behavior)
 
 * [Vaults](vaults.md)
   * [Vault interface](vaults.md#vault-interface)
@@ -39,6 +34,12 @@
   * [Request a trade](trading.md#request-a-trade)
   * [Trading interface](trading.md#trading-interface)
   * [Quickly trading items](trading.md#quickly-trading-items)
+
+* [Sample Macros](sample-macros.md)
+  * [Show interface of Item Pile](sample-macros.md#show-interface-of-item-pile-or-merchant-for-all-active-players)
+  * [Make tokens lootable](sample-macros.md#make-tokens-lootable)
+  * [Revert tokens from being lootable](sample-macros.md#revert-tokens-from-being-lootable)
+  * [Populate loot via table](sample-macros.md#populate-loot-via-table)
 
 * [API](api.md)
   * [System settings methods](api.md#system-settings-methods)

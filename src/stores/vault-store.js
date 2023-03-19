@@ -15,6 +15,20 @@ import { SYSTEMS } from "../systems.js";
 
 export class VaultStore extends ItemPileStore {
 
+  constructor(...args) {
+    super(...args);
+    this.gridData = writable({});
+    this.gridItems = writable([]);
+    this.validGridItems = writable([]);
+    this.canDepositCurrency = writable(false);
+    this.canWithdrawCurrency = writable(false);
+    this.logSearch = writable("");
+    this.vaultLog = writable([]);
+    this.visibleLogItems = writable(18);
+    this.highlightedGridItems = writable([]);
+    this.vaultExpanderItems = writable([]);
+  }
+
   get searchDelay() {
     return 50;
   }
@@ -23,18 +37,17 @@ export class VaultStore extends ItemPileStore {
     return VaultItem;
   }
 
-  setupStores() {
-    super.setupStores();
-    this.gridData = writable({});
-    this.gridItems = writable([]);
-    this.validGridItems = writable([]);
+  setupStores(reset = false) {
+    super.setupStores(reset);
+    this.gridData.set({});
+    this.gridItems.set([]);
+    this.validGridItems.set([]);
+    this.logSearch.set("");
+    this.vaultLog.set([]);
+    this.visibleLogItems.set(18);
+    this.highlightedGridItems.set([]);
+    this.vaultExpanderItems.set([]);
 
-    this.logSearch = writable("");
-    this.vaultLog = writable([]);
-    this.visibleLogItems = writable(18);
-
-    this.highlightedGridItems = writable([]);
-    this.vaultExpanderItems = writable([]);
     this.refreshGridDebounce = foundry.utils.debounce(() => {
       this.refreshGrid();
     }, this.searchDelay);
@@ -126,17 +139,17 @@ export class VaultStore extends ItemPileStore {
 
       const access = vaultAccess.reduce((acc, access) => {
         acc.canOrganize = acc.canOrganize || access.organize;
-        acc.canWithdrawItems = (acc.canWithdrawItems || access.items.withdraw) && this.recipient;
-        acc.canDepositItems = (acc.canDepositItems || access.items.deposit) && this.recipient;
-        acc.canWithdrawCurrencies = (acc.canWithdrawCurrencies || access.currencies.withdraw) && this.recipient;
-        acc.canDepositCurrencies = (acc.canDepositCurrencies || access.currencies.deposit) && this.recipient;
+        acc.canWithdrawItems = (acc.canWithdrawItems || access.items.withdraw) && !!this.recipient;
+        acc.canDepositItems = (acc.canDepositItems || access.items.deposit) && !!this.recipient;
+        acc.canWithdrawCurrencies = (acc.canWithdrawCurrencies || access.currencies.withdraw) && !!this.recipient;
+        acc.canDepositCurrencies = (acc.canDepositCurrencies || access.currencies.deposit) && !!this.recipient;
         return acc;
       }, {
         canOrganize: this.actor.isOwner,
-        canWithdrawItems: this.actor.isOwner && this.recipient,
-        canDepositItems: this.actor.isOwner && this.recipient,
-        canWithdrawCurrencies: this.actor.isOwner && this.recipient,
-        canDepositCurrencies: this.actor.isOwner && this.recipient
+        canWithdrawItems: this.actor.isOwner && !!this.recipient,
+        canDepositItems: this.actor.isOwner && !!this.recipient,
+        canWithdrawCurrencies: this.actor.isOwner && !!this.recipient,
+        canDepositCurrencies: this.actor.isOwner && !!this.recipient
       });
 
       return {

@@ -3,18 +3,19 @@
   import MerchantBuyTab from "./MerchantBuyTab.svelte";
   import MerchantSellTab from "./MerchantSellTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
-  import CurrencyList from "../components/CurrencyList.svelte";
-  import { writable } from "svelte/store";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+  import RecipientFooter from "./RecipientFooter.svelte";
+  import { writable } from "svelte/store";
 
   export let store;
   export let recipientStore;
   export let activeTab;
 
-  const currencies = recipientStore?.allCurrencies || writable([]);
   let categories = store.categories;
 
   let closed = store.closed;
+
+  const currencies = recipientStore?.allCurrencies || writable([]);
 
 </script>
 
@@ -41,14 +42,7 @@
 
 
   {#if recipientStore}
-    <div class="item-piles-flexrow merchant-bottom-row">
-      <div style="flex: 0 1 auto;">
-        {localize("ITEM-PILES.Merchant.ShoppingAs", { actorName: recipientStore.actor.name })}
-      </div>
-      {#if $currencies.length}
-        <CurrencyList {currencies} options={{ imgSize: 18, reverse: true, abbreviations: true }} class="item-piles-currency-list"/>
-      {/if}
-    </div>
+		<RecipientFooter {recipientStore}/>
   {/if}
 
 </div>
@@ -66,12 +60,6 @@
   .merchant-tabbed-center {
     overflow-y: scroll;
     overflow-x: hidden;
-  }
-
-  .merchant-bottom-row {
-    flex: 0 1 auto;
-    align-items: center;
-    margin-top: 0.5rem;
   }
 
 </style>

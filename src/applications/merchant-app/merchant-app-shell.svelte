@@ -4,9 +4,7 @@
   import MerchantStore from "../../stores/merchant-store.js";
   import * as Helpers from "../../helpers/helpers.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import { hotkeyState } from "../../hotkeys.js";
   import DropZone from "../components/DropZone.svelte";
-  import { SYSTEMS } from "../../systems.js";
   import MerchantLeftPane from "./MerchantLeftPane.svelte";
   import MerchantRightPane from "./MerchantRightPane.svelte";
   import MerchantTopBar from "./MerchantTopBar.svelte";
@@ -20,14 +18,14 @@
   export let merchant;
   export let recipient;
 
-  export let store = new MerchantStore(application, merchant, recipient);
-  export let recipientStore = recipient ? new MerchantStore(application, recipient, merchant, { recipientPileData: store.pileData }) : false;
+  export let store = MerchantStore.make(application, merchant, recipient);
+  export let recipientStore = recipient ? MerchantStore.make(application, recipient, merchant, { recipientPileData: store.pileData }) : false;
 
   let pileData = store.pileData;
-  let closedStore = store.closed;
 
   onDestroy(() => {
     store.onDestroy();
+    if (recipientStore) recipientStore.onDestroy();
   });
 
   let priceSelector = store.priceSelector;
@@ -40,6 +38,16 @@
 
     if (!data.type) {
       throw Helpers.custom_error("Something went wrong when dropping this item!")
+    }
+
+    if (data.type === "Actor") {
+      const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
+      store.updateRecipient(newRecipient);
+      if (recipientStore) {
+        return recipientStore.updateSource(newRecipient);
+      }
+      recipientStore = MerchantStore.make(application, newRecipient, merchant, { recipientPileData: store.pileData });
+      return;
     }
 
     if (data.type !== "Item") {

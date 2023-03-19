@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.5.3
+
+- Added the ability for GMs to drag and drop actors into item pile interfaces to inspect as that token
+- Fixed being unable to select a token, then shift double click on an item pile token to inspect the item pile as the first selected token
+
 ## Version 2.5.2
 
 - Tweaked the way rendering item piles work - if the actor sheet is rendered without holding the actor sheet hotkey, it will render the item pile UI - if you call `ActorSheet#render` you can add `{ bypassItemPiles: true }` to the secondary options to prevent the item piles UI from opening, and instead open the actor sheet

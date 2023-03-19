@@ -11,8 +11,8 @@ import ItemPileStore from "./item-pile-store.js";
 
 export default class MerchantStore extends ItemPileStore {
 
-  setupStores() {
-    super.setupStores();
+  constructor(...args) {
+    super(...args);
     this.services = writable({});
     this.editPrices = writable(false);
     this.typeFilter = writable("all")
@@ -20,6 +20,18 @@ export default class MerchantStore extends ItemPileStore {
     this.priceModifiersForActor = writable({});
     this.priceSelector = writable("");
     this.closed = writable(false);
+    this.isMerchant = false;
+  }
+
+  setupStores() {
+    super.setupStores();
+    this.services.set({});
+    this.editPrices.set(false);
+    this.typeFilter.set("all")
+    this.priceModifiersPerType.set({});
+    this.priceModifiersForActor.set({});
+    this.priceSelector.set("");
+    this.closed.set(false);
     this.isMerchant = false;
   }
 

@@ -22,43 +22,22 @@ export default class ItemPileStore {
 
     this.uuid = Utilities.getUuid(source);
     this.actor = Utilities.getActor(source);
+    this.document = new TJSDocument(this.actor);
 
     this.recipient = recipient ? Utilities.getActor(recipient) : false;
+    this.recipientDocument = recipient ? new TJSDocument(this.recipient) : new TJSDocument();
+    this.recipientPileData = writable(recipientPileData);
 
-    this.document = new TJSDocument(this.actor);
-    this.recipientDocument = recipient ? new TJSDocument(this.recipient) : false;
-    this.recipientPileData = recipientPileData;
+    this.pileData = writable({});
+    this.shareData = writable({});
 
-    __STORES__.set(this.uuid, this);
-
-    this.setupStores();
-    this.setupSubscriptions();
-  }
-
-  get ItemClass() {
-    return PileItem;
-  };
-
-  get AttributeClass() {
-    return PileAttribute;
-  };
-
-  get searchDelay() {
-    return 200;
-  }
-
-  setupStores() {
-
-    this.pileData = writable(PileUtilities.getActorFlagData(this.actor));
-    this.shareData = writable(SharingUtilities.getItemPileSharingData(this.actor));
-
-    this.recipientPileData = this.recipientPileData || writable(this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {});
-    this.recipientShareData = writable(this.recipient ? SharingUtilities.getItemPileSharingData(this.recipient) : {});
+    this.recipientPileData = writable({})
+    this.recipientShareData = writable({});
 
     this.deleted = writable(false);
 
     this.search = writable("");
-    this.editQuantities = !this.recipient;
+    this.editQuantities = writable(true);
 
     this.allItems = writable([]);
     this.attributes = writable([]);
@@ -77,6 +56,60 @@ export default class ItemPileStore {
 
     this.name = writable("");
     this.img = writable("");
+
+    __STORES__.set(this.uuid, this);
+
+  }
+
+  get ItemClass() {
+    return PileItem;
+  };
+
+  get AttributeClass() {
+    return PileAttribute;
+  };
+
+  get searchDelay() {
+    return 200;
+  }
+
+  static make(...args) {
+    const store = new this(...args)
+    store.setupStores();
+    store.setupSubscriptions();
+    return store;
+  }
+
+  setupStores() {
+
+    this.pileData.set(PileUtilities.getActorFlagData(this.actor));
+    this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
+
+    this.recipientPileData.set(this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {});
+    this.recipientShareData.set(this.recipient ? SharingUtilities.getItemPileSharingData(this.recipient) : {});
+
+    this.deleted.set(false);
+
+    this.search.set("");
+    this.editQuantities.set(!this.recipient);
+
+    this.allItems.set([]);
+    this.attributes.set([]);
+
+    this.items.set([]);
+    this.currencies.set([]);
+    this.allCurrencies.set([]);
+    this.visibleItems.set([]);
+
+    this.itemsPerCategory.set({});
+    this.categories.set([]);
+    this.itemCategories.set([]);
+
+    this.numItems.set(0);
+    this.numCurrencies.set(0);
+
+    this.name.set("");
+    this.img.set("");
 
   }
 
@@ -171,6 +204,24 @@ export default class ItemPileStore {
     }
   }
 
+  updateSource(newSource) {
+    this.uuid = Utilities.getUuid(newSource);
+    this.actor = Utilities.getActor(newSource);
+    this.document.set(this.actor);
+    __STORES__.set(this.uuid, this);
+    this.unsubscribe();
+    this.setupStores();
+    this.setupSubscriptions();
+  }
+
+  updateRecipient(newRecipient) {
+    this.recipient = newRecipient;
+    this.recipientDocument.set(this.recipient);
+    this.unsubscribe();
+    this.setupStores();
+    this.setupSubscriptions();
+  }
+
   visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
     const itemFlagData = entry.itemFlagData ? get(entry.itemFlagData) : {};
     return !entry.isCurrency
@@ -261,7 +312,7 @@ export default class ItemPileStore {
     const items = get(this.allItems);
     const pileItem = items.find(pileItem => pileItem.id === item.id);
     if (!pileItem) return;
-    if (this.editQuantities || !InterfaceTracker.isOpened(this.application.id)) {
+    if (get(this.editQuantities) || !InterfaceTracker.isOpened(this.application.id)) {
       items.splice(items.indexOf(pileItem), 1);
       this.allItems.set(items);
     } else {

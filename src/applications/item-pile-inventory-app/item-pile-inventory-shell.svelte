@@ -22,7 +22,7 @@
   export let actor;
   export let recipient;
 
-  export let store = new ItemPileStore(application, actor, recipient);
+  export let store = ItemPileStore.make(application, actor, recipient);
 
   // Stores
   let canBeSplit = false;
@@ -59,6 +59,11 @@
       data = JSON.parse(event.dataTransfer.getData('text/plain'));
     } catch (err) {
       return false;
+    }
+
+    if (data.type === "Actor" && game.user.isGM) {
+      const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
+      return store.updateRecipient(newRecipient)
     }
 
     if (data.type !== "Item") {
