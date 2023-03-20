@@ -1,1 +1,446 @@
-{}
+{
+  "ITEM-PILES": {
+    "Items": "物品",
+    "Currencies": "货币",
+    "Currency": "货币",
+    "Inspect": {
+      "Close": "关上",
+      "Leave": "离开",
+      "Title": "检查交易内容",
+      "AsActor": "你正作为{actorName}查看该物品堆。",
+      "Owner": "作为此物品堆的拥有者, 你可以编辑其内容.",
+      "Empty": "该物品堆是空的.",
+      "Destroyed": "这里面已经没有宝物了.",
+      "TakeAll": "拿走所有物品",
+      "Take": "拿走",
+      "NoShareLeft": "没有剩余数量……",
+      "NoneLeft": "没有剩余……",
+      "OpenSheet": "打开角色卡",
+      "AddCurrency": "放入货币",
+      "SplitAll": "在 {num_players} 人中平分所有",
+      "SplitItems": "在 {num_players} 人中平分物品",
+      "SplitCurrencies": "在 {num_players} 人中平分货币"
+    },
+    "Trade": {
+      "Accept": "接受",
+      "Title": "Item Piles: 交易",
+      "Decline": "拒绝",
+      "Mute": "不回应",
+      "AutoDecline": "你对交易的请求超时未响应，已自动拒绝。",
+      "Declined": "对方拒绝了交易。",
+      "Private": "私下交易",
+      "PrivateExplanation": "交易不显示在聊天中，也无人能观看",
+      "Over": "该交易长时间未活跃.",
+      "Between": "{actor_1}与{actor_2}的交易",
+      "DragDrop": "拖放物品开始交易",
+      "Prompt": {
+        "Title": "Item Piles：交易请求",
+        "User": "选择你想与之交易的用户：",
+        "PickActor": "选择你在交易中代表的角色：",
+        "PickedActor": "你在交易中代表的角色：",
+        "PickToken": "使用选中的指示物",
+        "DropActor": "拖放角色至此",
+        "Label": "发送交易请求"
+      },
+      "NoActiveUsers": {
+        "Title": "Item Piles: 没有活跃用户",
+        "Content": "没有其他活跃玩家，因此你无法交易."
+      },
+      "Request": {
+        "Title": "Item Piles: 发送交易请求",
+        "Content": "{trading_actor_name}（用户 {trading_user_name}）想要与你进行交易。",
+        "PrivateContent": "{trading_actor_name}（用户 {trading_user_name}）想要与你进行<strong>私下</strong>交易。",
+        "AcceptQuery": "是否接受？"
+      },
+      "OngoingRequest": {
+        "Content": "等待{user_name}回复...",
+        "Label": "取消交易请求"
+      },
+      "CancelledRequest": {
+        "Content": "与{user_name}的交易请求取消."
+      },
+      "AddCurrency": {
+        "Title": "放入货币",
+        "Content": "在与{trader_actor_name}的交易中放入货币",
+        "Label": "更新货币"
+      },
+      "GMAddCurrency": "放入货币 (GM)",
+      "Closed": {
+        "Title": "交易关闭",
+        "You": "你关闭了交易窗口，因此交易取消了.",
+        "Them": "用户 \"{user_name}\" c关闭了交易窗口，因此交易取消了.",
+        "Someone": "其中一个用户关闭了交易窗口，因此交易取消了."
+      },
+      "Disconnected": "其中一个用户断开了连接，因此交易取消了.",
+      "UserCharacterWarning": "你选择了角色 \"{actor_name}\" 作为你的交易角色，但他是 \"{player_name}\"的指定角色.<br><br>你确定吗？",
+      "UserActiveCharacterWarning": "你选择了角色 \"{actor_name}\" 作为你的交易角色，但他是\"{player_name}\"正在<strong>使用</strong>的角色, 你确定吗?",
+      "ActorOwnerWarning": "你不拥有这个角色，因此你不能使用他交易."
+    },
+    "Merchant": {
+      "Title": "商人：{actor_name}",
+      "ToolTipRemoveTable": "移除随机表",
+      "TooltipConfigureTable": "配置随机表",
+      "BuyItems": "购买物品",
+      "BuyServices": "购买服务",
+      "SellItems": "出售物品",
+      "AllTypes": "所有类型",
+      "Buy": "购买",
+      "NoMatchFound": "未搜索到符合条件的结果",
+      "NoItemsForSale": "商人没有东西供出售",
+      "NoItemsToSell": "你没有东西出售给该商人",
+      "OpenTimes": "开张时间",
+      "OpenCloseAuto": "自动",
+      "Open": "打开",
+      "Closed": "关闭",
+      "Hours": "小时",
+      "Minutes": "分钟",
+      "MerchantClosed": "商店关门了，请稍后再来。",
+      "Sell": "出售",
+      "Description": "描述",
+      "Settings": "设置",
+      "Override": "覆盖",
+      "EditTypePrices": "编辑各类型价格调整值",
+      "EditTypePricesExplanation": "在物品购买标签页中切换各类型滑条的可见性",
+      "BuyNoItems": "商人没有物品",
+      "CurrentItems": "当前物品",
+      "NoRollTables": "无随机表，创建一个以继续",
+      "ClickRoll": "点击投骰以开始",
+      "RolledTimes": "已投骰{rolls}次",
+      "KeepRolled": "保留投骰结果",
+      "AddAll": "添加所有物品",
+      "ClearAllItems": "清除所有角色物品",
+      "AddItem": "应用",
+      "RemoveItem": "删除",
+      "ItemFree": "免费",
+      "RollableTables": "随机表",
+      "AddTable": "添加随机表",
+      "RollAllTables": "投掷所有随机表",
+      "TooltipRollTable": "投掷随机表",
+      "ToolTipRemoveAllRolledItems": "移除已骰出的物品"
+    },
+    "Applications": {
+      "DropCurrencies": {
+        "Title": "放入货币",
+        "NoCurrency": "{actor_name}没有有效货币……"
+      },
+      "Settings": {
+        "MoreToCome": "并提供更多配置选项……",
+        "Request": "在这里提出你的新特性要求。",
+        "Title": "Item Piles 模组配置",
+        "Local": "本地设置",
+        "Module": "模组设置",
+        "System": "系统专门设置",
+        "Donate": "如果喜欢该模组，您的捐款将会帮助它继续下去！",
+        "Submit": "提交设定"
+      },
+      "ItemPileConfig": {
+        "Main": {
+          "DisplayItemTypes": "通过物品类型筛选物品",
+          "Distance": "交互距离",
+          "Title": "主要设置",
+          "EnabledPile": "启用",
+          "EnabledPileExplanation": "是否为物品堆。",
+          "InspectItems": "启用物品检视",
+          "InspectItemsExplanation": "点击物品名称将打开其物品卡.",
+          "DisplayItemTypesExplanation": "在物品堆中分类别显示各种物品，根据其物品类型排序。",
+          "GridUnits": "单元格 (留空为无限)",
+          "Macro": "交互宏",
+          "MacroExplanation": "与此物品堆交互时执行的宏命令名称。",
+          "MacroPlaceholder": "插入宏名称",
+          "EditDescription": "编辑描述",
+          "EditDescriptionExplanation": "该描述会在查看物品堆时的相关界面上显示",
+          "DeleteWhenEmpty": "搬空后删除",
+          "DeleteWhenEmptyExplanation": "这个物品堆被搬空后自动删除。",
+          "DeleteWhenEmptyDefault": "默认模组设置",
+          "DeleteWhenEmptyYes": "是，搬空后自动删除",
+          "DeleteWhenEmptyNo": "否，搬空后不要删除",
+          "OverrideCurrencies": "覆盖货币"
+        },
+        "Title": "Item Pile 配置：{actor_name}",
+        "Configure": "物品堆",
+        "Update": "更新物品堆",
+        "Other": {
+          "Title": "其他设置"
+        },
+        "SingleItem": {
+          "Title": "单物品设置",
+          "DisplayOneContainerWarning": "警告！你同时启用了\"显示单物品图像\" 和 \"为容器\"，在这种情况下，会优先显示容器图像。",
+          "DisplayOne": "显示单物品图像",
+          "DisplayOneExplanation": "如果物品堆中只有一个物品，则会将物品堆的指示物图像设置为该物品图像。",
+          "OverrideScale": "覆盖单物品指示物大小",
+          "Scale": "单物品指示物大小",
+          "ItemName": "使用物品名称"
+        }
+      },
+      "DropItem": {
+        "Title": "抛下物品"
+      },
+      "GiveItem": {
+        "Title": "给予物品"
+      },
+      "TradeMerchantItem": {
+        "Title": "交易物品：{item_name}",
+        "BuyItem": "购买物品",
+        "SellItem": "出售物品",
+        "YouPay": "你支付",
+        "YouReceive": "你获得",
+        "TheyReceive": "他们获得",
+        "Quantity": "数量",
+        "Change": "更改",
+        "YouCantAfford": "你无法支付这个价格",
+        "TheyCantAfford": "他们无法支付这个价格",
+        "MaxQuantity": "最大{quantity}"
+      },
+      "CurrenciesEditor": {
+        "Title": "Item Piles 货币编辑器",
+        "TitleActor": "Item Piles 货币编辑器：{actor_name}",
+        "Explanation": "你可以在此处定义角色能够从物品堆中捡起的货币，比如这些货币。",
+        "DragDrop": "拖放物品来将其添加进列表",
+        "Name": "货币名称",
+        "Exchange": "兑换比例",
+        "Data": "数据",
+        "Icon": "图标",
+        "AddNew": "添加新货币"
+      },
+      "ItemEditor": {
+        "Title": "Item Piles 物品编辑器：{item_name}",
+        "Update": "更新物品",
+        "General": "常规设置",
+        "Price": "价格设置",
+        "NotForSale": "非卖品",
+        "NotForSaleExplanation": "启用后，该物品无法卖出，也不会买入。它仍然会显示在商人的物品列表中，除非被隐藏。",
+        "Hidden": "隐藏物品",
+        "HiddenExplanation": "启用后，该物品不会显示在商人的物品列表中。",
+        "DisplayQuantity": "物品数量可见",
+        "DisplayQuantityExplanation": "如果物品数量不为一，该选项可以配置该物品在商店中的数量显示方式。",
+        "DisplayQuantityDefault": "默认商人设置",
+        "DisplayQuantityYes": "总是显示数量",
+        "DisplayQuantityNo": "总是隐藏数量",
+        "InfiniteQuantity": "无限数量",
+        "InfiniteQuantityExplanation": "启用后，商人销售不会出现缺货的情况。",
+        "PriceExplanation": "在此选项卡中，您可以配置该物品的价格，以及购买该物品是否会消耗其他物品。",
+        "BasePrice": "基本价格",
+        "BasePriceExplanation": "此处配置商品在正常情况下的价格。",
+        "Service": "服务类商品",
+        "ServiceExplanation": "这会使物品不会添加到买方的所持物中。这种服务“物品”仍然拥有数量，但是如果数量归零，物品不会被从商人处删除，而是会被设置为非卖品。",
+        "PurchaseMacro": "购买宏",
+        "PurchaseMacroExplanation": "购买此物品时触发的宏名称。",
+        "Free": "免费物品",
+        "FreeExplanation": "启用后，在商人处购买此物品不用花钱。",
+        "DisableNormalCost": "禁用通常花费",
+        "DisableNormalCostExplanation": "该项启用后，无法使用主要货币购买此物品，而必须使用下列项目之一购买。",
+        "PurchaseOptions": "购买选项",
+        "CantBeSoldToMerchants": "不能卖回",
+        "CantBeSoldToMerchantsExplanation": "启用后，该物品只能从商人处购买，无法卖回。",
+        "AddPurchaseOption": "添加购买选项",
+        "DropMeClickMe": "通过点击或者拖放物品来添加属性",
+        "PricePreset": "或者选择已有的预设价格：",
+        "SelectPreset": "选择预设价格"
+      },
+      "FilterEditor": {
+        "Title": "Item Piles 过滤编辑器",
+        "TitleActor": "Item Piles 过滤编辑器：{actor_name}",
+        "Filters": "过滤器",
+        "Path": "属性路径",
+        "AddNew": "添加新过滤器"
+      },
+      "SimilaritiesEditor": {
+        "Title": "Item Piles 相似物品编辑器",
+        "Path": "属性路径"
+      },
+      "ItemTypePriceModifiersEditor": {
+        "Title": "物品类型价格调整值编辑器",
+        "TitleActor": "物品类型价格调整值编辑器：{actor_name}",
+        "ItemType": "物品类型"
+      },
+      "PriceModifiersEditor": {
+        "Title": "Item Piles 价格调整值编辑器",
+        "TitleActor": "Item Piles 价格调整值编辑器：{actor_name}",
+        "DragDrop": "向列表内拖放角色来进行添加",
+        "Actor": "角色"
+      }
+    },
+    "Chat": {
+      "PrivateTrade": "私下交易",
+      "Pickup": "{name} 挑选了以下物品:",
+      "Split": "一个物品堆的内容平分给了{num_players}个玩家, 每个人都收到了:",
+      "TradeComplete": "{party_1} 和 {party_2} 完成了一次交易.",
+      "TradeStarted": "{party_1} 和 {party_2} 开始了交易.",
+      "TradeStartedButton": "点击下面的按钮观看交易:",
+      "TradeSpectate": "观看交易",
+      "SpectateDisabled": "交易完成",
+      "ExpandTrade": "查看完整交易详情",
+      "MerchantTraded": "{name}从{merchant}处购买了以下物品："
+    },
+    "Settings": {
+      "ItemSimilarities": {
+        "Label": "设置相似物品",
+        "Hint": "在这里你可以设置在这个系统中如何检测相似物品。某些系统会具有将物品和其他类型区分开来的数据，例如临时物品。"
+      },
+      "ShowTradeButton": {
+        "Title": "显示交易按钮",
+        "Hint": "在左下角的玩家列表下方显示一个交易按钮."
+      },
+      "InvertSheetOpen": {
+        "Title": "按住Ctrl+双击打开",
+        "Hint": "通常，要打开物品堆的角色卡，你需要按住Ctrl点击。启用该项将默认打开物品堆角色卡，而按住Ctrl点击会打开物品堆UI。"
+      },
+      "HideHeaderButton": {
+        "Hint": "隐藏角色和物品标题栏中的整个“Item Piles”按钮，会增加配置新的物品堆和物品的难度。",
+        "Title": "隐藏标题栏按钮"
+      },
+      "Debug": {
+        "Title": "启用调试模式",
+        "Hint": "将调试模式信息输出到控制台"
+      },
+      "Configure": {
+        "Title": "模组配置",
+        "Label": "配置模组",
+        "Hint": "你可以在这个对话框中配置 Item Piles。"
+      },
+      "Reset": {
+        "Title": "重置系统专门设定为默认",
+        "Label": "重置设置"
+      },
+      "PricePresets": {
+        "Title": "预设价格",
+        "Label": "配置预设价格"
+      },
+      "EnableDroppingItems": {
+        "Title": "启用抛弃物品",
+        "Hint": "启用后，用户可以通过把物品抛在地上来创建他们自己的物品堆 — 禁用的话，用户无法创建新的物品堆，也不能向现有的物品堆添加物品。"
+      },
+      "EnableGivingItems": {
+        "Title": "启用给予物品",
+        "Hint": "启用后，用户可以通过将物品丢在别的指示物上来向他们给予物品 — 禁用的话，用户将无法给予其他用户物品。"
+      },
+      "EnableTrading": {
+        "Title": "启用交易",
+        "Hint": "此项启用交易——当此选项禁用时，没有人能够发起交易。"
+      },
+      "InspectItemsTrade": {
+        "Title": "启用交易中检查物品",
+        "Hint": "启用之后，用户可以在交易过程中点击交易的物品，查看物品卡。"
+      },
+      "OutputToChat": {
+        "Title": "输出至聊天",
+        "Hint": "当任何玩家在物品堆中获取道具时，都会显示一条信息以显示物品被捡起。",
+        "Off": "关 - 关闭消息",
+        "Public": "公开 - 所有人都能看到消息",
+        "SelfGM": "仅自身和GM - 只有GM和用户自己能看到消息",
+        "Blind": "仅GM - 只有GM能看到消息"
+      },
+      "HideHeaderButtonText": {
+        "Title": "隐藏标题栏按钮文本",
+        "Hint": "隐藏角色和物品标题栏中的“Item Piles”—如果启用的模组太多，标题栏变得十分拥挤，这会非常有用。"
+      },
+      "DeleteEmptyPiles": {
+        "Title": "自动删除空物品堆",
+        "Hint": "会使清空物品的物品堆自我删除。该项会被各个物品堆的单独设定覆盖。"
+      },
+      "PreloadFiles": {
+        "Title": "预加载文件",
+        "Hint": "预加载物品堆文件（音频和图片），来实现无缝体验。"
+      },
+      "DebugHooks": {
+        "Title": "启用钩子调试",
+        "Hint": "在控制台输出 item pile 钩子及其具体内容"
+      }
+    },
+    "ContextMenu": {
+      "ShowToPlayers": "显示给玩家",
+      "RequestTrade": "请求交易"
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "展示给玩家"
+    },
+    "Types": {
+      "pile": "物品堆",
+      "container": "容器"
+    },
+    "Notifications": {
+      "UpdateItemPileSuccess": "Item Pile 更新成功。",
+      "UpdateMerchantSuccess": "商人更新成功。",
+      "ItemTransferred": "已将{source_actor_name}的{item_name}给予{target_actor_name}。",
+      "GiveItemAccepted": "{user_name} 接受了您的物品报价。",
+      "ShownToPlayers": "展示{actor_name}给玩家"
+    },
+    "Errors": {
+      "DisallowedItemDrop": "你无法丢下\"{type}\" 类物品",
+      "DisallowedItemTrade": "你无法交易\"{type}\" 类物品",
+      "DisallowedItemSell": "该商人不接受“{type}”类型的物品",
+      "NoSourceDrop": "只有GM能往物品栏中拖放物品.",
+      "PileTooFar": "你距离该物品堆太远，因此无法与其交互.",
+      "PileLocked": "这个容器被锁上了，你无法打开它，所以也无法放入物品。",
+      "DropNoToken": "你在这个场景中没有指示物，因此你无法扔下任何东西。"
+    },
+    "Warnings": {
+      "GiveItemNoGM": "没有 GM 主动接收您给予的此物品。",
+      "GiveItemDeclined": "{user_name}拒绝了您的物品报价。",
+      "NoPlayersActive": "没有可以进行该行为的活跃玩家"
+    },
+    "Dialogs": {
+      "TypeWarning": {
+        "Title": "物品类型警告",
+        "DropContent": "您正在丢弃一个“{type}”类型的物品，该类型的物品通常不能丢弃。您确定要丢弃它吗？",
+        "TradeContent": "您正在交易一个“{type}”类型的物品，该类型的物品通常不能交易。您确定要交易它吗？",
+        "SellContent": "您正在尝试出售一个“{type}”类型的物品，商人通常不会接受该类型的物品。您确定要出售它吗？"
+      },
+      "ResetSettings": {
+        "Title": "重置Item Piles模组设置",
+        "Content": "你确定要将Item Piles的所有模组设置都恢复默认吗? <strong>此选择不可逆！！</strong>",
+        "Confirm": "重置模组设置"
+      },
+      "LinkedActorWarning": {
+        "Title": "物品堆与已关联角色",
+        "Content": "你确定将此<strong>已关联角色</strong>转化为物品堆吗？该角色指示物已被关联，因此该角色所有指示物的物品与货币将被共享."
+      },
+      "NoSystemFound": {
+        "Title": "无法识别的系统",
+        "Content": "此系统目前并未获得完整支持，这意味着模组不知道如何处理该系统的物品,但仍可在有限的条件下运行。<br><br>你可以自己配置模组设置，但他需要一些技术知识。<br><br>如果你有任何问题，请在Foundry discord上找<strong>Wasp#2005</strong>。"
+      },
+      "NewSystemVersion": {
+        "Title": "新的系统版本",
+        "Content": "您正在使用的 Item Piles 的系统设置已更新，是否使用最新的系统专门设置覆盖？",
+        "Content2": "Item Piles 崩溃风险 — 您需要重置模组的系统专门设置来修复该问题。",
+        "Confirm": "升级设置"
+      },
+      "ResetSharingData": {
+        "Title": "清除共享数据",
+        "Content": "这将重置从这个物品堆中已获得自己那份的玩家的记录。<br><br>你确定要这么做吗？",
+        "Confirm": "重置设置"
+      },
+      "ClearAllItems": {
+        "Title": "清除所有角色物品",
+        "Content": "这将清除所有角色的物品，是否确认？"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "给予物品",
+        "Content": "“{actor_name}”属于玩家\"{user_name}\"，但是该玩家与角色未处于活动状态，你无法将这个物品给予该角色。"
+      },
+      "RemoveMerchantTable": {
+        "Title": "移除商人随机表",
+        "Content": "你确定要移除商人身上的“{table_name}”随机表吗？该行为无法撤销。"
+      },
+      "ReceiveItem": {
+        "Title": "获得物品",
+        "Header": "Item Piles：获得物品",
+        "ContentOne": "{source_actor_name}想要将物品“{item_name}”给予{target_actor_name}，是否接受？",
+        "ContentMany": "{source_actor_name}想要将物品“{item_name}”（{quantity}）给予{target_actor_name}，是否接受？",
+        "Ignore": "忽略用户"
+      },
+      "TextEditor": {
+        "Title": "文本编辑器"
+      },
+      "UserSelect": {
+        "Title": "选择用户",
+        "Content": "向哪些用户显示？"
+      }
+    },
+    "HUD": {
+      "ToggleLocked": "切换锁定",
+      "ToggleClosed": "切换开关",
+      "Configure": "设置物品堆"
+    }
+  }
+}
