@@ -45,6 +45,7 @@ export default class ItemPileStore {
     this.items = writable([]);
     this.currencies = writable([]);
     this.allCurrencies = writable([]);
+    this.pileCurrencies = writable([]);
     this.visibleItems = writable([]);
 
     this.itemsPerCategory = writable({});
@@ -100,6 +101,7 @@ export default class ItemPileStore {
     this.currencies.set([]);
     this.allCurrencies.set([]);
     this.visibleItems.set([]);
+    this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
 
     this.itemsPerCategory.set({});
     this.categories.set([]);
@@ -233,6 +235,8 @@ export default class ItemPileStore {
     const pileData = get(this.pileData);
     const recipientPileData = this.recipient ? PileUtilities.isItemPileMerchant(this.recipient) : {}
     const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
+
+    this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
 
     const visibleItems = allItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
     const itemCurrencies = allItems.filter(entry => entry.isCurrency);

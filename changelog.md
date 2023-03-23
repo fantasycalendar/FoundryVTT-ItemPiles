@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.5.4
+
+- Added support for the Dark Heresy 2e system (thanks diwako on Github!)
+- Fixed issue with secret blocks being visible in merchant descriptions (thanks TyphonJS for the quick turnaround on the fix!)
+- Added Chinese (simplified) localization (Thank you bnp800 on weblate!)
+- Fixed being able to add currencies to piles when the system did not support any currencies
+
 ## Version 2.5.3
 
 - Added the ability for GMs to drag and drop actors into item pile interfaces to inspect as that token

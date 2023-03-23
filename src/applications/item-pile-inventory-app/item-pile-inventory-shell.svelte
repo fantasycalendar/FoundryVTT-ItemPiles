@@ -31,11 +31,12 @@
   let pileData = store.pileData;
   let deleted = store.deleted;
 
-  let items = store.allItems;
-  let currencies = store.currencies;
-  let numItems = store.numItems;
-  let shareData = store.shareData;
-  let numCurrencies = store.numCurrencies;
+  const items = store.allItems;
+  const currencies = store.currencies;
+  const numItems = store.numItems;
+  const shareData = store.shareData;
+  const numCurrencies = store.numCurrencies;
+  const pileCurrencies = store.pileCurrencies;
 
   $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
   $: hasItems = $numItems > 0;
@@ -163,7 +164,9 @@
 						<hr>
 					{/if}
 
-					<CurrencyList {store}/>
+					{#if $pileCurrencies.length}
+						<CurrencyList {store}/>
+					{/if}
 
 				</div>
 
