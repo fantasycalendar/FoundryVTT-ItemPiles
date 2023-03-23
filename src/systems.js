@@ -27,6 +27,7 @@ import cyphersystem from "./systems/cyphersystem.js";
 import ptu from "./systems/ptu.js";
 import dcc from "./systems/dcc.js";
 import a5e from "./systems/a5e.js";
+import darkHeresy2e from "./systems/dark-heresy.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -118,6 +119,9 @@ export const SYSTEMS = {
     },
     "a5e": {
       "latest": a5e
+    },
+    "dark-heresy": {
+      "latest": darkHeresy2e
     }
     // ↑ ADD SYSTEMS HERE ↑
   },

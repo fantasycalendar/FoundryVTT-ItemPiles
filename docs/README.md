@@ -98,6 +98,7 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Pokemon Tabletop United](https://ptufvtt.com/)
 - [Dungeon Crawl Classics](https://foundryvtt.com/packages/dcc/)
 - [Level Up: Advanced 5th Edition](https://foundryvtt.com/packages/a5e)
+- [Dark Heresy 2nd Edition](https://foundryvtt.com/packages/dark-heresy)
 
 ## Externally support systems
 
