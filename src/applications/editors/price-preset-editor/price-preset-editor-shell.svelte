@@ -4,7 +4,7 @@
   import PriceList from "../../components/PriceList.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let prices;
   export let elementRoot;
@@ -25,22 +25,22 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-piles-config-container">
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-piles-config-container">
 
-    <p>{localize("ITEM-PILES.Applications.PricePresetEditor.Explanation")}</p>
+		<p>{localize("ITEM-PILES.Applications.PricePresetEditor.Explanation")}</p>
 
-    <PriceList bind:prices presets={false}/>
+		<PriceList bind:prices presets={false}/>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("ITEM-PILES.Applications.PricePresetEditor.Update")}
-      </button>
-      <button type="button" on:click|once={() => { application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("ITEM-PILES.Applications.PricePresetEditor.Update")}
+			</button>
+			<button type="button" on:click|once={() => { application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 
 </ApplicationShell>
 

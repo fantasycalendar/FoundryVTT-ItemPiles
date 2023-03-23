@@ -3,7 +3,7 @@
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   let form;
 

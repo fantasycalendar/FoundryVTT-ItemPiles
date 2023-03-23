@@ -5,7 +5,7 @@
   import { getContext } from "svelte";
   import StylesEditor from "../styles-editor/styles-editor.js";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let index;
   export let entry;
@@ -35,20 +35,20 @@
 <div><input type="text" required placeholder="system.rarity" bind:value="{entry.path}"/></div>
 <div><input type="text" required placeholder="rare" bind:value="{entry.value}"/></div>
 <div>
-  {#if image}
-    <img class="item-piles-item-image-example" src={image}/>
-  {/if}
-  <div class="img-div" style={Helpers.styleFromObject($style)}></div>
+	{#if image}
+		<img class="item-piles-item-image-example" src={image}/>
+	{/if}
+	<div class="img-div" style={Helpers.styleFromObject($style)}></div>
 </div>
 <div>
-  <a class="item-piles-clickable-green" on:click={(evt) => renderStyleEditor(evt)}>
-    <i class="fas fa-cog"></i>
-  </a>
+	<a class="item-piles-clickable-green" on:click={(evt) => renderStyleEditor(evt)}>
+		<i class="fas fa-cog"></i>
+	</a>
 </div>
 <div>
-  <a class="item-piles-clickable-red" on:click={remove(index)}>
-    <i class="fas fa-times"></i>
-  </a>
+	<a class="item-piles-clickable-red" on:click={remove(index)}>
+		<i class="fas fa-times"></i>
+	</a>
 </div>
 
 <style lang="scss">

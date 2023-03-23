@@ -1480,7 +1480,7 @@ export default class PrivateAPI {
 
       const sourceActor = macroData.source instanceof TokenDocument ? macroData.source.actor : macroData.source;
       const targetActor = macroData.target instanceof TokenDocument ? macroData.target.actor : macroData.target;
-      
+
       if (macroData.items) {
         macroData.items = macroData.items.map(item => targetActor.items.get(item?.item?._id ?? item._id));
       }
@@ -1574,7 +1574,7 @@ export default class PrivateAPI {
     const givingItem = canGiveItems && droppableNormalTokens.length && !droppableItemPiles.length;
 
     const itemPileIsVault = PileUtilities.isItemPileVault(droppableItemPiles[0]);
-    
+
     if (itemPileIsVault) {
       dropData.target = droppableItemPiles[0];
       return this._depositItem(dropData);

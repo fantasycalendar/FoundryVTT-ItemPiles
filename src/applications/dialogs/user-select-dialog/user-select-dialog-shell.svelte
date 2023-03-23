@@ -3,7 +3,7 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { getContext } from "svelte";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let elementRoot;
 
@@ -33,33 +33,33 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form class="item-piles-flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
-        autocomplete="off">
+	<form class="item-piles-flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
+				autocomplete="off">
 
-    <p style="margin-top: 0;text-align: center;">
-      <strong>{localize("ITEM-PILES.Dialogs.UserSelect.Content")}</strong>
-    </p>
+		<p style="margin-top: 0;text-align: center;">
+			<strong>{localize("ITEM-PILES.Dialogs.UserSelect.Content")}</strong>
+		</p>
 
-    <div style="display:grid; grid-template-columns: auto 25px;">
+		<div style="display:grid; grid-template-columns: auto 25px;">
 
-      {#each users as user (user.id)}
+			{#each users as user (user.id)}
 
-        <div class="item-piles-flexrow" style="align-items: center;">
-          <label for={"item-piles-user-" + user.id} class="item-piles-clickable">{user.name}</label>
-        </div>
-        <input id={"item-piles-user-" + user.id} type="checkbox" bind:checked={user.selected}/>
+				<div class="item-piles-flexrow" style="align-items: center;">
+					<label for={"item-piles-user-" + user.id} class="item-piles-clickable">{user.name}</label>
+				</div>
+				<input id={"item-piles-user-" + user.id} type="checkbox" bind:checked={user.selected}/>
 
-      {/each}
+			{/each}
 
-    </div>
+		</div>
 
-    <footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="fas fa-check"></i>
-        {localize("Okay")}
-      </button>
-    </footer>
+		<footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="fas fa-check"></i>
+				{localize("Okay")}
+			</button>
+		</footer>
 
-  </form>
+	</form>
 
 </ApplicationShell>

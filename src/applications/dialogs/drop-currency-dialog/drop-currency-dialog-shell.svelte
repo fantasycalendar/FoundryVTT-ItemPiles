@@ -5,7 +5,7 @@
   import * as PileUtilities from "../../../helpers/pile-utilities.js";
   import { abbreviateNumbers } from "../../../helpers/helpers.js";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let sourceActor;
   export let targetActor;

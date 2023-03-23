@@ -11,7 +11,7 @@
   import Tabs from "../components/Tabs.svelte";
   import { get, writable } from "svelte/store";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let elementRoot;
 

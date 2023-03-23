@@ -4,7 +4,7 @@
   import SliderInput from "../../components/SliderInput.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let elementRoot;
   export let itemTypePriceModifiers = [];
@@ -49,76 +49,76 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
 
-    <p>{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Explanation")}</p>
+		<p>{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Explanation")}</p>
 
-    <div>
+		<div>
 
-      <table>
-        <tr>
-          <th style="width:5%;">{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Override")}</th>
-          <th style="width:20%;">{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.ItemType")}</th>
-          <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</th>
-          <th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
-          <th style="width:5%;">
+			<table>
+				<tr>
+					<th style="width:5%;">{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Override")}</th>
+					<th style="width:20%;">{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.ItemType")}</th>
+					<th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</th>
+					<th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
+					<th style="width:5%;">
           <span on:click={add} class:item-piles-clickable-link={unusedTypes.length}>
             <i class="fas fa-plus"></i>
           </span>
-          </th>
-        </tr>
-        {#each itemTypePriceModifiers as priceData, index (index)}
-          <tr>
-            <td>
-              <div class="form-group">
-                <input type="checkbox" bind:checked={priceData.override}>
-              </div>
-            </td>
-            <td>
-              <div class="form-group">
-                {#if priceData.type === "custom"}
-                  <input type="text" bind:value={priceData.category} placeholder="Custom Category">
-                {:else}
-                  <select bind:value={priceData.type}>
-                    {#each systemTypes as [itemType, label] (itemType)}
-                      <option value="{itemType}"
-                              disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
-                        {localize(label)}
-                      </option>
-                    {/each}
-                  </select>
-                {/if}
-              </div>
-            </td>
-            <td>
-              <div class="item-piles-flexrow" style="margin: 0 0.25rem">
-                <SliderInput style="flex:4;" bind:value={priceData.buyPriceModifier}/>
-              </div>
-            </td>
-            <td>
-              <div class="item-piles-flexrow" style="margin: 0 0.25rem">
-                <SliderInput style="flex:4;" bind:value={priceData.sellPriceModifier}/>
-              </div>
-            </td>
-            <td class="small">
-              <button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
-            </td>
-          </tr>
-        {/each}
-      </table>
+					</th>
+				</tr>
+				{#each itemTypePriceModifiers as priceData, index (index)}
+					<tr>
+						<td>
+							<div class="form-group">
+								<input type="checkbox" bind:checked={priceData.override}>
+							</div>
+						</td>
+						<td>
+							<div class="form-group">
+								{#if priceData.type === "custom"}
+									<input type="text" bind:value={priceData.category} placeholder="Custom Category">
+								{:else}
+									<select bind:value={priceData.type}>
+										{#each systemTypes as [itemType, label] (itemType)}
+											<option value="{itemType}"
+															disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
+												{localize(label)}
+											</option>
+										{/each}
+									</select>
+								{/if}
+							</div>
+						</td>
+						<td>
+							<div class="item-piles-flexrow" style="margin: 0 0.25rem">
+								<SliderInput style="flex:4;" bind:value={priceData.buyPriceModifier}/>
+							</div>
+						</td>
+						<td>
+							<div class="item-piles-flexrow" style="margin: 0 0.25rem">
+								<SliderInput style="flex:4;" bind:value={priceData.sellPriceModifier}/>
+							</div>
+						</td>
+						<td class="small">
+							<button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
+						</td>
+					</tr>
+				{/each}
+			</table>
 
-    </div>
+		</div>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("Save")}
-      </button>
-      <button type="button" on:click|once={() => { application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("Save")}
+			</button>
+			<button type="button" on:click|once={() => { application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 </ApplicationShell>
 
 

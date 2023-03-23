@@ -4,7 +4,7 @@
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { get, writable } from "svelte/store";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   let form;
 
@@ -71,72 +71,72 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
 
-    <p style="text-align: center;">
-      {localize("ITEM-PILES.Applications.VaultAccessEditor.Explanation")}
-    </p>
+		<p style="text-align: center;">
+			{localize("ITEM-PILES.Applications.VaultAccessEditor.Explanation")}
+		</p>
 
-    <div class="form-group item-pile-access-grid">
-      <div class="item-piles-grid-row-wrapper">
-        <div style="text-align: left;">
-          <span>Player/Character</span>
-        </div>
-        <div class="item-piles-flexcol">
-          <span>Organize Items</span>
-        </div>
-        <div class="item-piles-flexcol">
-          <span>Items</span>
-          <div><i>Withdraw</i> | <i>Deposit</i></div>
-        </div>
-        <div class="item-piles-flexcol">
-          <span>Currencies</span>
-          <div><i>Withdraw</i> | <i>Deposit</i></div>
-        </div>
-        <a on:click={() => addAccess()} style="margin-right: 0.5rem;">
-          <i class="fas fa-plus"></i>
-        </a>
-      </div>
+		<div class="form-group item-pile-access-grid">
+			<div class="item-piles-grid-row-wrapper">
+				<div style="text-align: left;">
+					<span>Player/Character</span>
+				</div>
+				<div class="item-piles-flexcol">
+					<span>Organize Items</span>
+				</div>
+				<div class="item-piles-flexcol">
+					<span>Items</span>
+					<div><i>Withdraw</i> | <i>Deposit</i></div>
+				</div>
+				<div class="item-piles-flexcol">
+					<span>Currencies</span>
+					<div><i>Withdraw</i> | <i>Deposit</i></div>
+				</div>
+				<a on:click={() => addAccess()} style="margin-right: 0.5rem;">
+					<i class="fas fa-plus"></i>
+				</a>
+			</div>
 
-      {#each $vaultAccessStore as access, index (access.uuid)}
-        <div class="item-piles-grid-row-wrapper">
-          <div>
-            <select bind:value={access.uuid}>
-              {#each validDocs as document (document.uuid)}
-                {#if access.uuid === document.uuid || validUuids.has(document.uuid)}
-                  <option value={document.uuid}>{document.document.name}</option>
-                {/if}
-              {/each}
-            </select>
-          </div>
-          <div style="text-align: center;">
-            <input type="checkbox" bind:checked={access.organize}>
-          </div>
-          <div style="text-align: center;">
-            <input type="checkbox" bind:checked={access.items.withdraw}>
-            <input type="checkbox" bind:checked={access.items.deposit}>
-          </div>
-          <div style="text-align: center;">
-            <input type="checkbox" bind:checked={access.currencies.withdraw}>
-            <input type="checkbox" bind:checked={access.currencies.deposit}>
-          </div>
-          <a on:click={() => removeAccess(index)} class="item-piles-clickable-red" style="margin-right: 0.5rem;">
-            <i class="fas fa-times"></i>
-          </a>
-        </div>
-      {/each}
-    </div>
+			{#each $vaultAccessStore as access, index (access.uuid)}
+				<div class="item-piles-grid-row-wrapper">
+					<div>
+						<select bind:value={access.uuid}>
+							{#each validDocs as document (document.uuid)}
+								{#if access.uuid === document.uuid || validUuids.has(document.uuid)}
+									<option value={document.uuid}>{document.document.name}</option>
+								{/if}
+							{/each}
+						</select>
+					</div>
+					<div style="text-align: center;">
+						<input type="checkbox" bind:checked={access.organize}>
+					</div>
+					<div style="text-align: center;">
+						<input type="checkbox" bind:checked={access.items.withdraw}>
+						<input type="checkbox" bind:checked={access.items.deposit}>
+					</div>
+					<div style="text-align: center;">
+						<input type="checkbox" bind:checked={access.currencies.withdraw}>
+						<input type="checkbox" bind:checked={access.currencies.deposit}>
+					</div>
+					<a on:click={() => removeAccess(index)} class="item-piles-clickable-red" style="margin-right: 0.5rem;">
+						<i class="fas fa-times"></i>
+					</a>
+				</div>
+			{/each}
+		</div>
 
-    <footer class="item-piles-top-divider">
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("Save")}
-      </button>
-      <button type="button" on:click|once={() => { application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer class="item-piles-top-divider">
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("Save")}
+			</button>
+			<button type="button" on:click|once={() => { application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 
 </ApplicationShell>
 

@@ -22,7 +22,7 @@
   import VaultExpanderEntry from "./VaultExpanderEntry.svelte";
   import vault from "../item-pile-config/settings/vault.svelte";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let elementRoot;
   export let actor;

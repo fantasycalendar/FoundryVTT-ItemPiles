@@ -5,7 +5,7 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let styles;
   export let elementRoot;

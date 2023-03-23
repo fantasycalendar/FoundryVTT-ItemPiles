@@ -8,7 +8,7 @@
   import ActorDropSelect from "./ActorDropSelect.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let elementRoot;
   export let isPrivate;

@@ -8,7 +8,7 @@
   import CurrencyList from "./CurrencyList.svelte";
   import CurrencyStore from "./currency-store.js"
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let data;
   export let elementRoot;
@@ -32,27 +32,27 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
 
-    <p>{localize("ITEM-PILES.Applications.CurrenciesEditor.Explanation")}</p>
+		<p>{localize("ITEM-PILES.Applications.CurrenciesEditor.Explanation")}</p>
 
-    <p class="small">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallAttributes")}</p>
+		<p class="small">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallAttributes")}</p>
 
-    <p
-      class="small item-piles-bottom-divider">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallItems")}</p>
+		<p
+			class="small item-piles-bottom-divider">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallItems")}</p>
 
-    <CurrencyList {store}/>
+		<CurrencyList {store}/>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("Save")}
-      </button>
-      <button type="button" on:click|once={() => { application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("Save")}
+			</button>
+			<button type="button" on:click|once={() => { application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 
 </ApplicationShell>
 

@@ -21,7 +21,7 @@
   import VaultSettings from "./settings/vault.svelte";
   import CustomSettings from "./settings/custom.svelte";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let elementRoot;
   export let pileActor;

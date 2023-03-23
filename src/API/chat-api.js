@@ -5,7 +5,6 @@ import ItemPileSocket from "../socket.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
 import TradeAPI from "./trade-api.js";
-import { isItemPileLootable } from "../helpers/pile-utilities.js";
 
 export default class ChatAPI {
 

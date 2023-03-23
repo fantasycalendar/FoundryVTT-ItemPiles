@@ -16,7 +16,7 @@
   import * as Helpers from "../../helpers/helpers.js";
   import { getSourceActorFromDropData } from "../../helpers/utilities.js";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let elementRoot;
   export let actor;

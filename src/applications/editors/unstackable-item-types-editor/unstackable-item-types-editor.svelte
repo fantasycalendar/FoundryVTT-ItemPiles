@@ -6,7 +6,7 @@
   import SETTINGS from "../../../constants/settings.js";
   import { getSetting } from "../../../helpers/helpers.js";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   let form;
 
@@ -52,42 +52,42 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
-    <p>{localize("ITEM-PILES.Applications.UnstackableItemTypesEditor.Explanation")}</p>
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+		<p>{localize("ITEM-PILES.Applications.UnstackableItemTypesEditor.Explanation")}</p>
 
-    <table>
-      <tr>
-        <th>{localize("ITEM-PILES.Applications.UnstackableItemTypesEditor.Type")}</th>
-        <th class="small"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a></th>
-      </tr>
-      {#each $unstackableItemTypesStore as type, index (index)}
-        <tr>
-          <td>
-            <select bind:value={type}>
-              {#each systemTypes as systemType}
-                <option value="{systemType}" disabled="{systemType !== type && !unusedTypes.includes(systemType)}">
-                  {systemType}
-                </option>
-              {/each}
-            </select>
-          </td>
-          <td class="small">
-            <button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
-          </td>
-        </tr>
-      {/each}
-    </table>
+		<table>
+			<tr>
+				<th>{localize("ITEM-PILES.Applications.UnstackableItemTypesEditor.Type")}</th>
+				<th class="small"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a></th>
+			</tr>
+			{#each $unstackableItemTypesStore as type, index (index)}
+				<tr>
+					<td>
+						<select bind:value={type}>
+							{#each systemTypes as systemType}
+								<option value="{systemType}" disabled="{systemType !== type && !unusedTypes.includes(systemType)}">
+									{systemType}
+								</option>
+							{/each}
+						</select>
+					</td>
+					<td class="small">
+						<button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
+					</td>
+				</tr>
+			{/each}
+		</table>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("Save")}
-      </button>
-      <button type="button" on:click|once={() => { application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("Save")}
+			</button>
+			<button type="button" on:click|once={() => { application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 </ApplicationShell>
 
 

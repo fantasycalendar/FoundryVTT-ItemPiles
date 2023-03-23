@@ -5,7 +5,7 @@
   import { get, writable } from "svelte/store";
   import StyleEntry from "./StyleEntry.svelte";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   let form;
 
@@ -52,32 +52,32 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-  <form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
-    <p>{localize("ITEM-PILES.Applications.VaultStylesEditor.Explanation")}</p>
+	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+		<p>{localize("ITEM-PILES.Applications.VaultStylesEditor.Explanation")}</p>
 
-    <div class="item-piles-table">
-      <div>{localize("ITEM-PILES.Applications.VaultStylesEditor.Path")}</div>
-      <div>{localize("ITEM-PILES.Applications.VaultStylesEditor.Value")}</div>
-      <div></div>
-      <div></div>
-      <div style="text-align: right;"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a>
-      </div>
+		<div class="item-piles-table">
+			<div>{localize("ITEM-PILES.Applications.VaultStylesEditor.Path")}</div>
+			<div>{localize("ITEM-PILES.Applications.VaultStylesEditor.Value")}</div>
+			<div></div>
+			<div></div>
+			<div style="text-align: right;"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a>
+			</div>
 
-      {#each $vaultStyleStore as entry, index (index)}
-        <StyleEntry bind:entry image={images[index]} {index} {remove}/>
-      {/each}
-    </div>
+			{#each $vaultStyleStore as entry, index (index)}
+				<StyleEntry bind:entry image={images[index]} {index} {remove}/>
+			{/each}
+		</div>
 
-    <footer>
-      <button type="button" on:click|once={requestSubmit}>
-        <i class="far fa-save"></i> {localize("Save")}
-      </button>
-      <button type="button" on:click|once={() => { application.close(); }}>
-        <i class="far fa-times"></i> { localize("Cancel") }
-      </button>
-    </footer>
+		<footer>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("Save")}
+			</button>
+			<button type="button" on:click|once={() => { application.close(); }}>
+				<i class="far fa-times"></i> { localize("Cancel") }
+			</button>
+		</footer>
 
-  </form>
+	</form>
 </ApplicationShell>
 
 

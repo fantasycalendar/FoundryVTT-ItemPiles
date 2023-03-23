@@ -12,45 +12,48 @@
 
   const aboutTimeEnabled = game.modules.get('foundryvtt-simple-calendar')?.active || false;
 
+  $: open = $pileDataStore.openTimes.enabled ? $pileDataStore.openTimes?.open : false;
+  $: close = $pileDataStore.openTimes.enabled ? $pileDataStore.openTimes?.close : false;
+
   $: {
-    let open = $pileDataStore.openTimes.open;
-    let close = $pileDataStore.openTimes.close;
-    let openText = `${open.hour.toString().padStart(2, "0")}:${open.minute.toString().padStart(2, "0")}`;
-    let closeText = `${close.hour.toString().padStart(2, "0")}:${close.minute.toString().padStart(2, "0")}`;
-    openTimeText = `${openText} - ${closeText}`;
+    if ($pileDataStore.openTimes.enabled) {
+      let openText = `${open.hour.toString().padStart(2, "0")}:${open.minute.toString().padStart(2, "0")}`;
+      let closeText = `${close.hour.toString().padStart(2, "0")}:${close.minute.toString().padStart(2, "0")}`;
+      openTimeText = `${openText} - ${closeText}`;
+    }
   }
 
 </script>
 
 <div class="item-piles-flexrow merchant-top-bar item-piles-bottom-divider">
-  <div class="merchant-name">{$merchantName}</div>
-  <div class="opening-hours item-piles-flexcol">
-    {#if $pileDataStore.openTimes.enabled}
+	<div class="merchant-name">{$merchantName}</div>
+	<div class="opening-hours item-piles-flexcol">
+		{#if $pileDataStore.openTimes.enabled}
       <span>
         {localize("ITEM-PILES.Merchant.OpenTimes")}
       </span>
-      <span style="font-style: italic;">
+			<span style="font-style: italic;">
         {#if game.user.isGM}
           {#if aboutTimeEnabled && $pileDataStore.openTimes.status !== "auto"}
           <a class="item-piles-right-divider" on:click={() => { store.setOpenStatus("auto"); }}>
             <i class="fas fa-clock"></i>
-            {localize(`ITEM-PILES.Merchant.OpenCloseAuto`)}
+						{localize(`ITEM-PILES.Merchant.OpenCloseAuto`)}
           </a>
-          {/if}
-          <a class="item-piles-right-divider" on:click={() => { store.setOpenStatus($closed ? "open" : "closed"); }}>
+					{/if}
+					<a class="item-piles-right-divider" on:click={() => { store.setOpenStatus($closed ? "open" : "closed"); }}>
             <i class="fas" class:fa-door-open={!$closed} class:fa-door-closed={$closed}></i>
-            {localize(`ITEM-PILES.Merchant.${!$closed ? "Open" : "Closed"}`)}
+						{localize(`ITEM-PILES.Merchant.${!$closed ? "Open" : "Closed"}`)}
           </a>
         {/if}
-        {openTimeText}
+				{openTimeText}
       </span>
-    {:else if game.user.isGM}
-      <a style="flex:0;" on:click={() => { store.setOpenStatus($closed ? "open" : "closed"); }}>
-        <i class="fas" class:fa-door-open={!$closed} class:fa-door-closed={$closed}></i>
-        {localize(`ITEM-PILES.Merchant.${!$closed ? "Open" : "Closed"}`)}
-      </a>
-    {/if}
-  </div>
+		{:else if game.user.isGM}
+			<a style="flex:0;" on:click={() => { store.setOpenStatus($closed ? "open" : "closed"); }}>
+				<i class="fas" class:fa-door-open={!$closed} class:fa-door-closed={$closed}></i>
+				{localize(`ITEM-PILES.Merchant.${!$closed ? "Open" : "Closed"}`)}
+			</a>
+		{/if}
+	</div>
 </div>
 
 <style lang="scss">

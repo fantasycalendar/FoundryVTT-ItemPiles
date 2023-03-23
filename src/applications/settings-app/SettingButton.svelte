@@ -4,7 +4,7 @@
   import editors from "../editors/index.js";
   import { openEditor } from "../../helpers/helpers.js";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let key;
   export let data;

@@ -1,7 +1,7 @@
 <script>
 
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import { TJSDialog } from "@typhonjs-fvtt/runtime/_dist/svelte/application/index.js";
+  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
   import CustomDialog from "../../components/CustomDialog.svelte";
   import * as SharingUtilities from "../../../helpers/sharing-utilities.js";
 
@@ -35,60 +35,60 @@
 
 <details class="item-piles-collapsible item-piles-clickable">
 
-  <summary>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.Title")}</summary>
+	<summary>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.Title")}</summary>
 
-  <div class="form-group">
-    <label>
-      <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareItemsEnabled")}</span>
-      <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareItemsEnabledExplanation")}</p>
-    </label>
-    <input type="checkbox" bind:checked={pileData.shareItemsEnabled}/>
-  </div>
+	<div class="form-group">
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareItemsEnabled")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareItemsEnabledExplanation")}</p>
+		</label>
+		<input type="checkbox" bind:checked={pileData.shareItemsEnabled}/>
+	</div>
 
-  <div class="form-group">
-    <label>
-      <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareCurrenciesEnabled")}</span>
-      <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareCurrenciesEnabledExplanation")}</p>
-    </label>
-    <input type="checkbox" bind:checked={pileData.shareCurrenciesEnabled}/>
-  </div>
+	<div class="form-group">
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareCurrenciesEnabled")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareCurrenciesEnabledExplanation")}</p>
+		</label>
+		<input type="checkbox" bind:checked={pileData.shareCurrenciesEnabled}/>
+	</div>
 
-  <div class="form-group">
-    <label>
-      <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.TakeAllEnabled")}</span>
-      <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.TakeAllEnabledExplanation")}</p>
-    </label>
-    <input type="checkbox" bind:checked={pileData.takeAllEnabled}/>
-  </div>
+	<div class="form-group">
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.TakeAllEnabled")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.TakeAllEnabledExplanation")}</p>
+		</label>
+		<input type="checkbox" bind:checked={pileData.takeAllEnabled}/>
+	</div>
 
-  <div class="form-group">
-    <label>
-      <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.SplitAllEnabled")}</span>
-      <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.SplitAllEnabledExplanation")}</p>
-    </label>
-    <input type="checkbox" bind:checked={pileData.splitAllEnabled}/>
-  </div>
+	<div class="form-group">
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.SplitAllEnabled")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.SplitAllEnabledExplanation")}</p>
+		</label>
+		<input type="checkbox" bind:checked={pileData.splitAllEnabled}/>
+	</div>
 
-  <div class="form-group">
-    <label>
-      <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.InactivePlayers")}</span>
-      <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.InactivePlayersExplanation")}</p>
-    </label>
-    <input type="checkbox" bind:checked={pileData.activePlayers}/>
-  </div>
+	<div class="form-group">
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.InactivePlayers")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.InactivePlayersExplanation")}</p>
+		</label>
+		<input type="checkbox" bind:checked={pileData.activePlayers}/>
+	</div>
 
-  <div class="form-group">
-    <label style="flex:4;">
-      <span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingData")}</span>
-      <p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingDataExplanation")}</p>
-    </label>
-  </div>
+	<div class="form-group">
+		<label style="flex:4;">
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingData")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingDataExplanation")}</p>
+		</label>
+	</div>
 
-  <div class="form-group">
-    <button type="button" class="item-piles-config-reset-sharing-data" style="flex:4;"
-            on:click={() => { resetSharingData() }}>
-      {localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingData")}
-    </button>
-  </div>
+	<div class="form-group">
+		<button type="button" class="item-piles-config-reset-sharing-data" style="flex:4;"
+						on:click={() => { resetSharingData() }}>
+			{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingData")}
+		</button>
+	</div>
 
 </details>

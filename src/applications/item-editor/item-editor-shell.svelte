@@ -12,7 +12,7 @@
   import SETTINGS from "../../constants/settings.js";
   import { openEditor } from "../../helpers/helpers.js";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let item;
   export let elementRoot;

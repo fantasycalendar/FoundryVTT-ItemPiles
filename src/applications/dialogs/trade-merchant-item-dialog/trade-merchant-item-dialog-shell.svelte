@@ -6,7 +6,7 @@
   import * as PileUtilities from "../../../helpers/pile-utilities.js";
   import PriceSelector from "../../components/PriceSelector.svelte";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let item;
   export let seller;

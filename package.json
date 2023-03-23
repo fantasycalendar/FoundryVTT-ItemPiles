@@ -1,18 +1,18 @@
 {
-  "name": "essential-svelte-esm",
-  "version": "0.0.5",
-  "description": "Provides essential TRL demos for reactivity and beyond.",
+  "name": "item-piles",
+  "version": "1.0.0",
+  "description": "A foundry module.",
   "license": "MIT",
   "private": true,
   "type": "module",
-  "author": "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)",
+  "author": "Fantasy Computerworks (https://github.com/fantasycalendar)",
   "contributors": [
-    "Michael Leahy <support@typhonjs.io> (https://github.com/typhonrt)"
+    "Wasp <adam@fantasy-calendar.com> (https://github.com/haxxer)"
   ],
   "dependencies": {
-    "@typhonjs-fvtt/runtime": "^0.0.20",
-    "@typhonjs-fvtt/svelte-standard": "^0.0.16",
-    "svelte": "^3.52.0"
+    "@typhonjs-fvtt/runtime": "^0.0.22",
+    "@typhonjs-fvtt/svelte-standard": "^0.0.23",
+    "svelte": "^3.57.0"
   },
   "devDependencies": {
     "@league-of-foundry-developers/foundry-vtt-types": "^9.238.1",
@@ -20,8 +20,8 @@
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "eslint": "^8",
     "svelte-dnd-action": "^0.9.18",
-    "svelte-preprocess": "^4.10.0",
-    "vite": "^3"
+    "svelte-preprocess": "^5",
+    "vite": "^4"
   },
   "browserslist": [
     ">5%",

@@ -5,7 +5,7 @@
   import ActorDropSelect from "./ActorDropSelect.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let elementRoot;
   export let isPrivate;
@@ -36,52 +36,52 @@
 
 <ApplicationShell bind:elementRoot>
 
-  <div class="item-piles-flexcol trade-dialog">
+	<div class="item-piles-flexcol trade-dialog">
 
-    <p><i class="item-piles-header-icon fas fa-handshake"></i></p>
+		<p><i class="item-piles-header-icon fas fa-handshake"></i></p>
 
-    <p style="margin-bottom: 1rem">
-      <strong style="font-size:1.2rem;">
-        {localize("ITEM-PILES.Trade.Prompt.Title")}
-      </strong>
-    </p>
+		<p style="margin-bottom: 1rem">
+			<strong style="font-size:1.2rem;">
+				{localize("ITEM-PILES.Trade.Prompt.Title")}
+			</strong>
+		</p>
 
-    <p>{localize("ITEM-PILES.Trade.Prompt.User")}</p>
+		<p>{localize("ITEM-PILES.Trade.Prompt.User")}</p>
 
-    <div class="item-piles-bottom-divider">
-      <div class="form-group align-center-row">
-        <select name="user" style="width: 66%;" bind:value={user}>
-          {#each users as potentialUser (potentialUser.id)}
-            <option value="{potentialUser}">{potentialUser.name}</option>
-          {/each}
-        </select>
-      </div>
-    </div>
-    <div class="item-piles-bottom-divider">
-      <div class="form-group align-center-col">
-        <label class="align-center-row">
-          <input type="checkbox" name="private" bind:checked={isPrivate}>
-          <span>{localize("ITEM-PILES.Trade.Private")}</span>
-        </label>
-        <small>{localize("ITEM-PILES.Trade.PrivateExplanation")}</small>
-      </div>
-    </div>
+		<div class="item-piles-bottom-divider">
+			<div class="form-group align-center-row">
+				<select name="user" style="width: 66%;" bind:value={user}>
+					{#each users as potentialUser (potentialUser.id)}
+						<option value="{potentialUser}">{potentialUser.name}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+		<div class="item-piles-bottom-divider">
+			<div class="form-group align-center-col">
+				<label class="align-center-row">
+					<input type="checkbox" name="private" bind:checked={isPrivate}>
+					<span>{localize("ITEM-PILES.Trade.Private")}</span>
+				</label>
+				<small>{localize("ITEM-PILES.Trade.PrivateExplanation")}</small>
+			</div>
+		</div>
 
-    {#if actor}
-      <p>{localize("ITEM-PILES.Trade.Prompt.PickedActor")}</p>
-    {:else}
-      <p>{localize("ITEM-PILES.Trade.Prompt.PickActor")}</p>
-    {/if}
+		{#if actor}
+			<p>{localize("ITEM-PILES.Trade.Prompt.PickedActor")}</p>
+		{:else}
+			<p>{localize("ITEM-PILES.Trade.Prompt.PickActor")}</p>
+		{/if}
 
-    <ActorDropSelect bind:actor={actor} {actors}/>
+		<ActorDropSelect bind:actor={actor} {actors}/>
 
-    <footer class="sheet-footer item-piles-flexrow">
-      <button type="button" on:click|once={requestTrade} disabled={!actor}>
-        <i class="fas fa-check"></i> {localize("ITEM-PILES.Trade.Prompt.Label")}
-      </button>
-    </footer>
+		<footer class="sheet-footer item-piles-flexrow">
+			<button type="button" on:click|once={requestTrade} disabled={!actor}>
+				<i class="fas fa-check"></i> {localize("ITEM-PILES.Trade.Prompt.Label")}
+			</button>
+		</footer>
 
-  </div>
+	</div>
 
 </ApplicationShell>
 

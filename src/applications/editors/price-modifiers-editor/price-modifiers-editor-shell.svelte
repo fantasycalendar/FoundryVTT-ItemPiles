@@ -5,7 +5,7 @@
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { getSourceActorFromDropData, getUuid } from "../../../helpers/utilities.js";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   let form;
 

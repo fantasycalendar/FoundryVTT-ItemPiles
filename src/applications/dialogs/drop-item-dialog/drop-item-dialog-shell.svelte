@@ -5,7 +5,7 @@
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import SliderInput from "../../components/SliderInput.svelte";
 
-  const { application } = getContext('external');
+  const { application } = getContext('#external');
 
   export let item;
   export let elementRoot;
