@@ -8,6 +8,7 @@
 - Fixed right-click context menu not working on vaults
 - Minor fixes to the vault grid not interacting well with touch screens
 - Fixed Warhammer System not correctly setting item prices on merchants
+- Fixed open actor sheets would not re-render if the item pile UI was open for that actor
 
 ## Version 2.5.4
 
