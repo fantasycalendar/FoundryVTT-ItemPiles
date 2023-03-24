@@ -4,6 +4,8 @@
 
 - Added support for dragging and dropping items between vaults other item piles, vaults, and character sheets
 - Added feature to forbid stacking items in vaults (which can be overridden in individual items)
+- Fixed not being able to right-click to take items from vaults
+- Minor fixes to the vault grid not interacting well with touch screens
 
 ## Version 2.5.4
 

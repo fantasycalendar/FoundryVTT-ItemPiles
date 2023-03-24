@@ -92,20 +92,26 @@
     });
 
     // Setup events for when item is moved and dropped
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', moveEnd);
+    window.addEventListener('pointermove', move, { passive: false });
+    window.addEventListener('pointerup', moveEnd, { passive: false });
+    window.addEventListener('touchmove', move, { passive: false });
+    window.addEventListener('touchend', moveEnd, { passive: false });
   }
 
   function move(event) {
+
+    const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
+
     active = true;
+
     const { left, top, outOfBounds } = constrainToContainer(
-      event.pageX - pointerOffset.left,
-      event.pageY - pointerOffset.top
+      pageX - pointerOffset.left,
+      pageY - pointerOffset.top
     );
     active = !outOfBounds;
     dispatch("itemmove", {
-      x: event.pageX - pointerOffset.internalLeft,
-      y: event.pageY - pointerOffset.internalTop
+      x: pageX - pointerOffset.internalLeft,
+      y: pageY - pointerOffset.internalTop
     });
     previewTransform.set({
       ...transform,
@@ -156,17 +162,21 @@
 
   }
 
-  function moveEnd() {
+  function moveEnd(event) {
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerup', moveEnd);
+    window.removeEventListener('touchmove', move);
+    window.removeEventListener('touchend', moveEnd);
 
     const finalTransform = get(previewTransform);
+
+    const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
 
     dispatch("itemstopdrag", {
       item,
       outOfBounds: !active,
-      x: event.pageX - pointerOffset.internalLeft,
-      y: event.pageY - pointerOffset.internalTop
+      x: pageX - pointerOffset.internalLeft,
+      y: pageY - pointerOffset.internalTop
     })
 
     if (!active) {
@@ -240,13 +250,14 @@
 
 <div
 	bind:this={itemRef}
-	on:dblclick={doubleClick}
-	on:pointerdown={moveStart}
-	on:pointerover={hoverOver}
-	on:pointerleave={hoverLeave}
-	on:dragover|preventDefault
-	style={style}
 	class={classes}
+	on:dblclick={doubleClick}
+	on:dragover|preventDefault
+	on:pointerdown={moveStart}
+	on:pointerleave={hoverLeave}
+	on:pointerover={hoverOver}
+	on:touchstart={moveStart}
+	style={style}
 >
 	<slot/>
 </div>

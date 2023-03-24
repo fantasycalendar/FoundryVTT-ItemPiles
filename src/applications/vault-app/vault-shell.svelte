@@ -100,7 +100,7 @@
 
       if (gridData.canWithdrawItems) {
         contextMenu.push({
-          icon: 'fas fa-hand', label: "Take", onclick: () => {
+          icon: 'fas fa-hand', label: "Take", onPress: () => {
             event.detail.item.item.take();
           }
         });
@@ -108,7 +108,7 @@
 
       if (pileData.canInspectItems || game.user.isGM) {
         contextMenu.push({
-          icon: 'fas fa-eye', label: "Inspect", onclick: () => {
+          icon: 'fas fa-eye', label: "Inspect", onPress: () => {
             event.detail.item.item.preview();
           }
         });
