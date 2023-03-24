@@ -18,13 +18,13 @@
 
   import { snapOnMove } from '../components/Grid/grid-utils';
   import * as Helpers from "../../helpers/helpers.js";
+  import { isCoordinateWithinPosition } from "../../helpers/helpers.js";
 
   import { VaultStore } from "../../stores/vault-store.js";
   import Tabs from "../components/Tabs.svelte";
   import VaultExpanderEntry from "./VaultExpanderEntry.svelte";
   import vault from "../item-pile-config/settings/vault.svelte";
   import { FloatingElement } from "../components/FloatingElement/FloatingElement.js";
-  import { isCoordinateWithinPosition } from "../../helpers/helpers.js";
 
   const { application } = getContext('#external');
 
@@ -53,21 +53,21 @@
   const floatingElementPositionStore = FloatingElement.positionStore;
   let element;
 
-  function onDragOverEvent(event){
+  function onDragOverEvent(event) {
     onDragOver(event.clientX, event.clientY);
-	}
+  }
 
   $: {
-    if($floatingElementPositionStore){
+    if ($floatingElementPositionStore) {
       onDragOver($floatingElementPositionStore?.x + 20, $floatingElementPositionStore?.y + 20);
-    }else{
+    } else {
       onDragLeave();
-		}
+    }
   }
 
   async function onDragOver(clientX, clientY) {
     const rect = element.getBoundingClientRect();
-    if(FloatingElement.id === application.id || !isCoordinateWithinPosition(clientX, clientY, rect)) {
+    if (FloatingElement.id === application.id || !isCoordinateWithinPosition(clientX, clientY, rect)) {
       return onDragLeave();
     }
     const x = (clientX - rect.left) - (gridData.gridSize / 2); //x position within the element.
@@ -109,7 +109,7 @@
       const quantity = get(event.detail.item.item.quantity);
       const freeSpacesAfterSplit = gridData.freeSpaces;
 
-      if((gridData.canDepositItems || game.user.isGM) && event.detail.item.item.canStack && quantity > 1 && freeSpacesAfterSplit) {
+      if ((gridData.canDepositItems || game.user.isGM) && event.detail.item.item.canStack && quantity > 1 && freeSpacesAfterSplit) {
         contextMenu.push({
           icon: 'fas fa-object-ungroup', label: "Split", onPress: () => {
             beginSplitItem(event)
@@ -139,7 +139,7 @@
     })
   }
 
-  function beginSplitItem(event){
+  function beginSplitItem(event) {
 
     const { item, splitStart, x, y } = event.detail;
 
@@ -157,81 +157,81 @@
     });
 
     splitStart({
-			pageX: x,
-			pageY: y,
-			offsetX: Math.floor(gridData.gridSize / 2),
-			offsetY: Math.floor(gridData.gridSize / 2)
-		});
+      pageX: x,
+      pageY: y,
+      offsetX: Math.floor(gridData.gridSize / 2),
+      offsetY: Math.floor(gridData.gridSize / 2)
+    });
 
-	}
+  }
 
-  function itemBeginDrag(event){
+  function itemBeginDrag(event) {
     const { x, y, item } = event.detail;
     FloatingElement.create({
-			id: application.id,
+      id: application.id,
       x,
       y,
       style: {
         width: gridData.gridSize + "px",
         height: gridData.gridSize + "px",
-				opacity: 0.7,
-			},
+        opacity: 0.7,
+      },
       component: VaultItemEntry,
-			componentData: { entry: item }
+      componentData: { entry: item }
     })
-	}
+  }
 
-  function itemStopDrag(event){
+  function itemStopDrag(event) {
 
-    if(!FloatingElement.id) return;
+    if (!FloatingElement.id) return;
 
     FloatingElement.destroy();
 
-    if(event.detail.cancelled) return;
+    if (event.detail.cancelled) return;
 
     const { item, outOfBounds, x, y, gridX, gridY, splitting } = event.detail;
 
-    if(splitting){
-      if(outOfBounds) return;
+    if (splitting) {
+      if (outOfBounds) return;
       item.item.split(gridX, gridY);
       return;
-		}
+    }
 
-    if(!outOfBounds) return;
+    if (!outOfBounds) return;
 
     const hitApps = Object.values(ui.windows)
-			.sort((a, b) => b.position.zIndex - a.position.zIndex)
-			.filter(app => {
-				return (app instanceof ActorSheet || app instanceof ItemPileInventoryApp || app instanceof VaultApp)
-					&& isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect());
-			});
+      .sort((a, b) => b.position.zIndex - a.position.zIndex)
+      .filter(app => {
+        return (app instanceof ActorSheet || app instanceof ItemPileInventoryApp || app instanceof VaultApp)
+          && isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect());
+      });
 
     let dropData = {
       type: "Item",
       uuid: item.item.item.uuid
-		}
-    if(hitApps.length){
-      if(hitApps[0] === application) return;
+    }
+    if (hitApps.length) {
+      if (hitApps[0] === application) return;
       dropData.target = hitApps[0].actor;
-      if(hitApps[0] instanceof VaultApp){
+      if (hitApps[0] instanceof VaultApp) {
         return hitApps[0].store.onDropData(dropData);
       }
-		}else{
+    } else {
       const mouse = canvas.app.renderer.plugins.interaction.mouse;
       const position = mouse.getLocalPosition(canvas.app.stage);
       dropData.x = position.x;
       dropData.y = position.y;
-		}
+    }
 
-		Hooks.call("dropCanvasData", canvas, dropData);
+    Hooks.call("dropCanvasData", canvas, dropData);
 
   }
 
-  function itemMove(event){
+  function itemMove(event) {
     const { x, y } = event.detail;
-    if(!FloatingElement.id) return;
+    if (!FloatingElement.id) return;
     FloatingElement.positionStore.set({ x, y });
-	}
+  }
 
   let activeTab = writable("vault");
 
@@ -252,7 +252,7 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<main class="item-piles-flexcol" bind:this={store.mainContainer} in:fade={{duration: 500}}>
+	<main bind:this={store.mainContainer} class="item-piles-flexcol" in:fade={{duration: 500}}>
 
 		{#if gridData.fullAccess && (pileData.vaultExpansion || pileData.logVaultActions)}
 			<Tabs bind:activeTab={$activeTab} tabs={[
