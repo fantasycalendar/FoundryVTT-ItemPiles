@@ -8,10 +8,10 @@ import ItemPileSocket from "../socket.js";
 import DropItemDialog from "../applications/dialogs/drop-item-dialog/drop-item-dialog.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
-import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as helpers from "../helpers/helpers.js";
 import { SYSTEMS } from "../systems.js";
+import * as Helpers from "../helpers/helpers.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -27,6 +27,8 @@ export class VaultStore extends ItemPileStore {
     this.visibleLogItems = writable(18);
     this.highlightedGridItems = writable([]);
     this.vaultExpanderItems = writable([]);
+    this.dragPosition = writable({ x: 0, y: 0, w: 1, h: 1, active: false, });
+    this.mainContainer = false;
   }
 
   get searchDelay() {
@@ -47,6 +49,7 @@ export class VaultStore extends ItemPileStore {
     this.visibleLogItems.set(18);
     this.highlightedGridItems.set([]);
     this.vaultExpanderItems.set([]);
+    this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
 
     this.refreshGridDebounce = foundry.utils.debounce(() => {
       this.refreshGrid();
@@ -305,6 +308,78 @@ export class VaultStore extends ItemPileStore {
     this.updateGrid(itemsToUpdate)
 
     return itemsToUpdate.concat(existingItems);
+
+  }
+
+  async onDropData(data, event, isExpander) {
+
+    const dragPosition = get(this.dragPosition);
+    const { x, y } = dragPosition;
+    this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+
+    if (data.type === "Actor" && game.user.isGM) {
+      const oldHeight = this.mainContainer.getBoundingClientRect().height;
+      const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
+      this.updateRecipient(newRecipient);
+      this.refreshFreeSpaces();
+      if (!recipient) {
+        setTimeout(() => {
+          const newHeight = this.mainContainer.getBoundingClientRect().height - oldHeight;
+          application.position.stores.height.set(get(application.position.stores.height) + newHeight);
+        });
+      }
+      return;
+    }
+
+    if (data.type !== "Item") {
+      Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
+      return false;
+    }
+
+    const item = await Item.implementation.fromDropData(data);
+
+    const itemData = item.toObject();
+
+    if (!itemData) {
+      console.error(data);
+      throw Helpers.custom_error("Something went wrong when dropping this item!")
+    }
+
+    const source = (data.uuid ? fromUuidSync(data.uuid) : false)?.parent ?? false;
+    const target = this.actor;
+
+    if (source === target) {
+      Helpers.custom_warning(`You can't drop items into the vault that originate from the vault!`, true)
+      return false;
+    }
+
+    if (!source && !game.user.isGM) {
+      Helpers.custom_warning(`Only GMs can drop items from the sidebar!`, true)
+      return false;
+    }
+
+    const vaultExpander = getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
+
+    if (isExpander && !vaultExpander) {
+      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultItemNotExpander"), true)
+      return false;
+    }
+
+    const gridData = get(this.gridData);
+
+    if (!this.hasSimilarItem(itemData) && !vaultExpander && !gridData?.freeSpaces) {
+      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
+      return false;
+    }
+
+    return PrivateAPI._depositWithdrawItem({
+      source,
+      target,
+      itemData: {
+        item: itemData, quantity: 1
+      },
+      gridPosition: { x, y }
+    });
 
   }
 

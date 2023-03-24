@@ -45,18 +45,6 @@
     "cursor": 'move'
   });
 
-  $: previewStyle = styleFromObject({
-    "position": "absolute",
-    "left": ($previewTransform.left ?? 0) + "px",
-    "top": ($previewTransform.top ?? 0) + "px",
-    "width": ($previewTransform.width ?? 0) + "px",
-    "height": ($previewTransform.height ?? 0) + "px",
-    "opacity": "0.75",
-    "touch-action": "none",
-    "user-select": "none",
-    "z-index": "10"
-  });
-
   $: ghostStyle = styleFromObject({
     "position": "absolute",
     "left": snappedGridTransform.left + "px",
@@ -87,14 +75,21 @@
     // If not left mouse, skip
     if (event.button !== 0) return;
 
-    dispatch("itembegindrag", { item, target: itemRef });
-
     // Get offset for pointer within the grid item
     pointerOffset = {
       left: event.clientX - gridTransform.left,
-      top: event.clientY - gridTransform.top
+      top: event.clientY - gridTransform.top,
+      internalLeft: event.offsetX,
+      internalTop: event.offsetY,
     };
     itemRef.setPointerCapture(event.pointerId);
+
+    dispatch("itembegindrag", {
+      item,
+      target: itemRef,
+      x: event.pageX - pointerOffset.internalLeft,
+      y: event.pageY - pointerOffset.internalTop
+    });
 
     // Setup events for when item is moved and dropped
     window.addEventListener('pointermove', move);
@@ -103,10 +98,15 @@
 
   function move(event) {
     active = true;
-    const { left, top } = constrainToContainer(
+    const { left, top, outOfBounds } = constrainToContainer(
       event.pageX - pointerOffset.left,
       event.pageY - pointerOffset.top
     );
+    active = !outOfBounds;
+    dispatch("itemmove", {
+      x: event.pageX - pointerOffset.internalLeft,
+      y: event.pageY - pointerOffset.internalTop
+    });
     previewTransform.set({
       ...transform,
       ...gridTransform,
@@ -119,6 +119,7 @@
 
   function constrainToContainer(left, top) {
 
+    let outOfBounds = false;
     const parentRect = gridContainer.getBoundingClientRect();
     const relativeRect = {
       left: (parentRect.left - parentRect.x),
@@ -127,19 +128,31 @@
       bottom: (parentRect.bottom - parentRect.y),
     }
     if (left < relativeRect.left) {
+      if (left < (relativeRect.left - gridTransform.width / 2)) {
+        outOfBounds = true;
+      }
       left = relativeRect.left;
     }
     if (top < relativeRect.top) {
+      if (top < (relativeRect.top - gridTransform.height / 2)) {
+        outOfBounds = true;
+      }
       top = relativeRect.top;
     }
     if ((left + gridTransform.width) > relativeRect.right) {
+      if ((left + gridTransform.width) > (relativeRect.right + gridTransform.width / 2)) {
+        outOfBounds = true;
+      }
       left = relativeRect.right - gridTransform.width;
     }
     if ((top + gridTransform.height) > relativeRect.bottom) {
+      if ((top + gridTransform.height) > (relativeRect.bottom + gridTransform.height / 2)) {
+        outOfBounds = true;
+      }
       top = relativeRect.bottom - gridTransform.height;
     }
 
-    return { left, top };
+    return { left, top, outOfBounds };
 
   }
 
@@ -148,6 +161,17 @@
     window.removeEventListener('pointerup', moveEnd);
 
     const finalTransform = get(previewTransform);
+
+    dispatch("itemstopdrag", {
+      item,
+      outOfBounds: !active,
+      x: event.pageX - pointerOffset.internalLeft,
+      y: event.pageY - pointerOffset.internalTop
+    })
+
+    if (!active) {
+      return;
+    }
 
     active = false;
 
@@ -179,7 +203,7 @@
       return trans;
     });
 
-    dispatch("itemchange", { items: collisions.concat(item) })
+    dispatch("itemchange", { items: collisions.concat(item) });
 
   }
 
@@ -228,13 +252,9 @@
 </div>
 
 {#if active}
-	<div style={previewStyle} class={options.activeClass}>
-		<slot/>
-	</div>
-
-	<div style={ghostStyle} class={collisions.length ? options.collisionClass : options.previewClass}/>
+	<div style={ghostStyle} class={collisions.length ? options.collisionClass : options.previewClass}></div>
 
 	{#if collisions.length}
-		<div style={style} class={collisions.length ? options.collisionClass : options.previewClass}/>
+		<div style={style} class={collisions.length ? options.collisionClass : options.previewClass}></div>
 	{/if}
 {/if}

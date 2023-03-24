@@ -87,7 +87,7 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
       await patchCurrencySettings();
       await runMigrations();
     }
-    //game.itempiles.API.renderItemPileInterface(game.actors.getName("Test"));
+    // game.itempiles.API.renderItemPileInterface(game.actors.getName("Vault"));
     //new SettingsShim().render(true);
     applySystemSpecificStyles();
   }, 500);

@@ -39,6 +39,10 @@ export default class VaultApp extends SvelteApplication {
 
   }
 
+  get store() {
+    return this.svelte.applicationShell.store;
+  }
+
   /** @inheritdoc */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {

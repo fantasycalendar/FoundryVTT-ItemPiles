@@ -1525,7 +1525,7 @@ export default class PrivateAPI {
 
     const dropData = {
       source: false,
-      target: false,
+      target: data?.target ?? false,
       itemData: {
         item: itemData, quantity: 1,
       },
@@ -1570,31 +1570,35 @@ export default class PrivateAPI {
     const droppableItemPiles = droppableDocuments.filter(token => PileUtilities.isValidItemPile(token));
     const droppableNormalTokens = droppableDocuments.filter(token => !PileUtilities.isValidItemPile(token));
 
-    const droppingItem = canDropItems && (droppableItemPiles.length || (dropData.position && !droppableNormalTokens.length));
-    const givingItem = canGiveItems && droppableNormalTokens.length && !droppableItemPiles.length;
+    dropData.target = droppableItemPiles?.[0] ?? droppableNormalTokens[0];
 
-    const itemPileIsVault = PileUtilities.isItemPileVault(droppableItemPiles[0]);
+    const sourceIsVault = dropData.source ? PileUtilities.isItemPileVault(dropData.source) : false;
+    const targetIsVault = PileUtilities.isItemPileVault(dropData.target);
+    const targetIsItemPile = PileUtilities.isItemPileVault(droppableItemPiles[0]);
 
-    if (itemPileIsVault) {
-      dropData.target = droppableItemPiles[0];
-      return this._depositItem(dropData);
-    } else if (droppingItem) {
-      dropData.target = droppableItemPiles[0];
-      return this._dropItem(dropData);
+    const givingItem = canGiveItems && dropData.target && !targetIsItemPile;
+    const droppingItem = canDropItems && (dropData.target || dropData.position);
+
+    if ((sourceIsVault || targetIsVault) && dropData.target) {
+      return this._depositWithdrawItem(dropData, sourceIsVault, targetIsVault);
     } else if (givingItem) {
-      dropData.target = droppableNormalTokens[0];
       return this._giveItem(dropData);
+    } else if (droppingItem) {
+      return this._dropItem(dropData);
     }
 
   }
 
-  static async _depositItem(dropData) {
+  static async _depositWithdrawItem(dropData, sourceIsVault = false, targetIsVault = true) {
 
     const sourceActor = Utilities.getActor(dropData.source);
     const targetActor = Utilities.getActor(dropData.target);
     if (sourceActor && targetActor && sourceActor === targetActor) return;
 
-    const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
+    const vaultActor = (!sourceIsVault && targetIsVault) || !sourceActor ? targetActor : sourceActor;
+    const localization = (!sourceIsVault && targetIsVault) || !sourceActor ? "DepositItem" : "WithdrawItem";
+
+    const validItem = await PileUtilities.checkItemType(vaultActor, dropData.itemData.item);
     if (!validItem) return;
     dropData.itemData.item = validItem;
 
@@ -1602,8 +1606,8 @@ export default class PrivateAPI {
 
     let itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
     if (itemQuantity > 1 && Utilities.canItemStack(dropData.itemData.item)) {
-      const quantity = await DropItemDialog.show(item, dropData.target, {
-        localizationTitle: "DepositItem"
+      const quantity = await DropItemDialog.show(item, vaultActor, {
+        localizationTitle: localization
       });
       Utilities.setItemQuantity(dropData.itemData.item, quantity);
       dropData.itemData.quantity = quantity;
@@ -1612,17 +1616,19 @@ export default class PrivateAPI {
     }
 
     let flagData = PileUtilities.getItemFlagData(dropData.itemData.item);
-    setProperty(flagData, "x", dropData.gridPosition.x);
-    setProperty(flagData, "y", dropData.gridPosition.y);
+    if (!sourceIsVault && targetIsVault) {
+      setProperty(flagData, "x", dropData.gridPosition.x);
+      setProperty(flagData, "y", dropData.gridPosition.y);
+    }
     setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
 
-    if (dropData.source) {
-      return game.itempiles.API.transferItems(dropData.source, dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
+    if (sourceActor) {
+      return game.itempiles.API.transferItems(sourceActor, targetActor, [dropData.itemData], { interactionId: dropData.interactionId });
     }
 
     if (!game.user.isGM) return;
 
-    return game.itempiles.API.addItems(dropData.target, [dropData.itemData], { interactionId: dropData.interactionId });
+    return game.itempiles.API.addItems(targetActor, [dropData.itemData], { interactionId: dropData.interactionId });
 
   }
 
@@ -1639,7 +1645,7 @@ export default class PrivateAPI {
     if (!validItem) return;
     dropData.itemData.item = validItem;
 
-    const actorOwners = Object.entries(dropData.target.actor.ownership)
+    const actorOwners = Object.entries(dropData.target?.actor?.ownership ?? dropData.target?.ownership)
       .filter(entry => {
         return entry[0] !== "default" && entry[1] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
       })

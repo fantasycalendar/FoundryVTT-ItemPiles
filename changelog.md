@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.5.5
+
+- Added support for dragging and dropping items between vaults other item piles, vaults, and character sheets
+
 ## Version 2.5.4
 
 - Added support for the Dark Heresy 2e system (thanks diwako on Github!)

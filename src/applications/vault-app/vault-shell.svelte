@@ -8,6 +8,9 @@
   import { get, writable } from 'svelte/store';
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
+  import ItemPileInventoryApp from "../item-pile-inventory-app/item-pile-inventory-app.js";
+  import VaultApp from "./vault-app.js";
+
   import Grid from '../components/Grid/Grid.svelte';
   import CurrencyList from '../components/CurrencyList.svelte';
   import DropZone from '../components/DropZone.svelte';
@@ -15,20 +18,19 @@
 
   import { snapOnMove } from '../components/Grid/grid-utils';
   import * as Helpers from "../../helpers/helpers.js";
-  import PrivateAPI from "../../API/private-api.js";
 
   import { VaultStore } from "../../stores/vault-store.js";
   import Tabs from "../components/Tabs.svelte";
   import VaultExpanderEntry from "./VaultExpanderEntry.svelte";
   import vault from "../item-pile-config/settings/vault.svelte";
+  import { FloatingElement } from "../components/FloatingElement/FloatingElement.js";
+  import { isCoordinateWithinPosition } from "../../helpers/helpers.js";
 
   const { application } = getContext('#external');
 
   export let elementRoot;
   export let actor;
   export let recipient;
-
-  let mainContainer;
 
   export let store = VaultStore.make(application, actor, recipient);
 
@@ -43,88 +45,34 @@
   const visibleLogItems = store.visibleLogItems;
   const recipientDocument = store.recipientDocument;
   const pileCurrencies = store.pileCurrencies;
+  const dragPositionStore = store.dragPosition;
 
   $: pileData = $pileDataStore;
   $: gridData = $gridDataStore;
 
-  const dragPosition = writable({});
+  const floatingElementPositionStore = FloatingElement.positionStore;
   let element;
 
-  async function onDropData(data, event, isExpander) {
+  function onDragOverEvent(event){
+    onDragOver(event.clientX, event.clientY);
+	}
 
-    const { x, y } = get(dragPosition);
-    dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
-
-    if (data.type === "Actor" && game.user.isGM) {
-      const oldHeight = mainContainer.getBoundingClientRect().height;
-      const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
-      store.updateRecipient(newRecipient);
-      store.refreshFreeSpaces();
-      if(!recipient){
-				setTimeout(() => {
-          const newHeight = mainContainer.getBoundingClientRect().height - oldHeight;
-          application.position.stores.height.set(get(application.position.stores.height) + newHeight);
-        });
-        recipient = newRecipient;
-      }
-      return;
-    }
-
-    if (data.type !== "Item") {
-      Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
-      return false;
-    }
-
-    const item = await Item.implementation.fromDropData(data);
-
-    const itemData = item.toObject();
-
-    if (!itemData) {
-      console.error(data);
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
-    }
-
-    const source = (data.uuid ? fromUuidSync(data.uuid) : false)?.parent ?? false;
-    const target = store.actor;
-
-    if (source === target) {
-      Helpers.custom_warning(`You can't drop items into the vault that originate from the vault!`, true)
-      return false;
-    }
-
-    if (!source && !game.user.isGM) {
-      Helpers.custom_warning(`Only GMs can drop items from the sidebar!`, true)
-      return false;
-    }
-
-    const vaultExpander = getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
-
-    if (isExpander && !vaultExpander) {
-      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultItemNotExpander"), true)
-      return false;
-    }
-
-    if (!store.hasSimilarItem(itemData) && !vaultExpander && !gridData?.freeSpaces) {
-      Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
-      return false;
-    }
-
-    return PrivateAPI._depositItem({
-      source,
-      target,
-      itemData: {
-        item: itemData, quantity: 1
-      },
-      gridPosition: { x, y }
-    });
-
+  $: {
+    if($floatingElementPositionStore){
+      onDragOver($floatingElementPositionStore?.x + 20, $floatingElementPositionStore?.y + 20);
+    }else{
+      onDragLeave();
+		}
   }
 
-  async function onDragOver(event) {
+  async function onDragOver(clientX, clientY) {
     const rect = element.getBoundingClientRect();
-    const x = (event.clientX - rect.left) - (gridData.gridSize / 2); //x position within the element.
-    const y = (event.clientY - rect.top) - (gridData.gridSize / 2);  //y position within the element.
-    dragPosition.set({
+    if(FloatingElement.id === application.id || !isCoordinateWithinPosition(clientX, clientY, rect)) {
+      return onDragLeave();
+    }
+    const x = (clientX - rect.left) - (gridData.gridSize / 2); //x position within the element.
+    const y = (clientY - rect.top) - (gridData.gridSize / 2);  //y position within the element.
+    dragPositionStore.set({
       ...snapOnMove(x, y, { w: 1, h: 1 }, { ...gridData }),
       w: 1,
       h: 1,
@@ -133,7 +81,7 @@
   }
 
   async function onDragLeave() {
-    dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+    dragPositionStore.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
   }
 
   onDestroy(() => {
@@ -180,6 +128,62 @@
     })
   }
 
+  function itemBeginDrag(event){
+    const { x, y, item } = event.detail;
+    FloatingElement.create({
+			id: application.id,
+      x,
+      y,
+      style: {
+        width: gridData.gridSize + "px",
+        height: gridData.gridSize + "px",
+				opacity: 0.7,
+			},
+      component: VaultItemEntry,
+			componentData: { entry: item }
+    })
+	}
+
+  function itemStopDrag(event){
+
+    const { item, outOfBounds, x, y } = event.detail;
+    FloatingElement.destroy();
+
+    if(!outOfBounds) return;
+
+    const hitApps = Object.values(ui.windows)
+			.sort((a, b) => b.position.zIndex - a.position.zIndex)
+			.filter(app => {
+				return (app instanceof ActorSheet || app instanceof ItemPileInventoryApp || app instanceof VaultApp)
+					&& isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect());
+			});
+
+    let dropData = {
+      type: "Item",
+      uuid: item.item.item.uuid
+		}
+    if(hitApps.length){
+      if(hitApps[0] === application) return;
+      dropData.target = hitApps[0].actor;
+      if(hitApps[0] instanceof VaultApp){
+        return hitApps[0].store.onDropData(dropData);
+      }
+		}else{
+      const mouse = canvas.app.renderer.plugins.interaction.mouse;
+      const position = mouse.getLocalPosition(canvas.app.stage);
+      dropData.x = position.x;
+      dropData.y = position.y;
+		}
+
+		Hooks.call("dropCanvasData", canvas, dropData);
+
+  }
+
+  function itemMove(event){
+    const { x, y } = event.detail;
+    FloatingElement.positionStore.set({ x, y });
+	}
+
   let activeTab = writable("vault");
 
   const applicationHeight = application.position.stores.height;
@@ -199,7 +203,7 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<main class="item-piles-flexcol" bind:this={mainContainer} in:fade={{duration: 500}}>
+	<main class="item-piles-flexcol" bind:this={store.mainContainer} in:fade={{duration: 500}}>
 
 		{#if gridData.fullAccess && (pileData.vaultExpansion || pileData.logVaultActions)}
 			<Tabs bind:activeTab={$activeTab} tabs={[
@@ -231,7 +235,7 @@
 				<input type="text" bind:value={$searchStore}>
 			</div>
 
-			<DropZone callback={onDropData} overCallback={onDragOver} leaveCallback={onDragLeave}
+			<DropZone callback={(data) => store.onDropData(data)} overCallback={onDragOverEvent} leaveCallback={onDragLeave}
 								style="display: flex; flex: 1; justify-content: center; align-items: center;">
 
 				<Grid bind:items={$gridItems}
@@ -248,8 +252,11 @@
               backgroundGrid: true,
               highlightItems: !!$searchStore
             }}
-							dropGhost={$dragPosition}
+							dropGhost={$dragPositionStore}
 							on:change={(event) => store.updateGrid(event.detail.items)}
+							on:itembegindrag={itemBeginDrag}
+							on:itemstopdrag={itemStopDrag}
+							on:itemmove={itemMove}
 							on:rightclick={rightClickItem}
 							on:doubleclick={doubleClickItem}
 							let:item
@@ -309,7 +316,7 @@
 
 		{#if $activeTab === "expanders"}
 
-			<DropZone callback={(data, event) => { onDropData(data, event, true) }}
+			<DropZone callback={(data, event) => { store.onDropData(data, event, true) }}
 								style="display: flex; flex-direction: column; flex:1;">
 
 				<div style="text-align: center;" class="item-piles-bottom-divider">

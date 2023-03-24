@@ -345,3 +345,8 @@ export async function openEditor(key, data = false) {
   return result;
 
 }
+
+export function isCoordinateWithinPosition(x, y, position) {
+  return x >= position.left && x < position.left + position.width
+    && y >= position.top && y < position.top + position.height;
+}

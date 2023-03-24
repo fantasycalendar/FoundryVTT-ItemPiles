@@ -41,7 +41,15 @@
   }
 
   function itemBeginDrag(event) {
-    dispatch('begindrag', { ...event.detail });
+    dispatch('itembegindrag', { ...event.detail });
+  }
+
+  function itemStopDrag(event) {
+    dispatch('itemstopdrag', { ...event.detail });
+  }
+
+  function itemMove(event) {
+    dispatch('itemmove', { ...event.detail });
   }
 
   function itemHoverLeaveEvent(event) {
@@ -74,8 +82,6 @@
 
 </script>
 
-<svelte:options accessors={true}/>
-
 <div class=item-piles-grid-container>
 
   <div
@@ -101,6 +107,8 @@
         on:itemchange={itemChangeEvent}
         on:itemhover={itemHoverEvent}
         on:itembegindrag={itemBeginDrag}
+        on:itemstopdrag={itemStopDrag}
+        on:itemmove={itemMove}
         on:itemhoverleave={itemHoverLeaveEvent}
         on:itemrightclick={itemRightClickEvent}
       >
