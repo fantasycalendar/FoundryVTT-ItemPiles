@@ -3,7 +3,7 @@
 ## Version 2.5.5
 
 - Added support for dragging and dropping items between vaults other item piles, vaults, and character sheets
-- Added feature to forbid stacking items in vaults
+- Added feature to forbid stacking items in vaults (which can be overridden in individual items)
 
 ## Version 2.5.4
 
