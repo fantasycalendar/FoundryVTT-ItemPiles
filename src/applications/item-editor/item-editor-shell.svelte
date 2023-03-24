@@ -2,6 +2,7 @@
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import * as Helpers from "../../helpers/helpers.js";
+  import { openEditor } from "../../helpers/helpers.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import ItemPriceStore from "./ItemPriceStore.js";
   import Tabs from "../components/Tabs.svelte";
@@ -10,7 +11,6 @@
   import MacroSelector from "../components/MacroSelector.svelte";
   import { get, writable } from "svelte/store";
   import SETTINGS from "../../constants/settings.js";
-  import { openEditor } from "../../helpers/helpers.js";
 
   const { application } = getContext('#external');
 
@@ -69,7 +69,7 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-piles-config-container">
+	<form autocomplete=off bind:this={form} class="item-piles-config-container" on:submit|preventDefault={updateSettings}>
 
 		<Tabs bind:activeTab tabs={[
     { value: "general", label: localize("ITEM-PILES.Applications.ItemEditor.General") },
@@ -194,12 +194,13 @@
 				{#if activeTab === 'price'}
 
 					{#if game.system.id !== "pf2e"}
-						<div class="form-group">
-							<label style="flex:4;">
-								{localize("ITEM-PILES.Applications.ItemEditor.BasePrice")}<br>
-								<p>{localize("ITEM-PILES.Applications.ItemEditor.BasePriceExplanation")}</p>
-							</label>
-							<input type="text" bind:value={$price} on:change={() => {
+						{#if game.system.id !== "wfrp4e"}
+							<div class="form-group">
+								<label style="flex:4;">
+									{localize("ITEM-PILES.Applications.ItemEditor.BasePrice")}<br>
+									<p>{localize("ITEM-PILES.Applications.ItemEditor.BasePriceExplanation")}</p>
+								</label>
+								<input type="text" bind:value={$price} on:change={() => {
                 const forceNumber = game.system.id === "dnd5e";
 								const isPriceNumber = !isNaN(Number($price));
                 $price = isPriceNumber || forceNumber
@@ -207,7 +208,8 @@
                 	: $price;
                 oldPrice = $price;
               }}/>
-						</div>
+							</div>
+						{/if}
 
 						<div class="form-group">
 							<label style="flex:4;">
@@ -309,10 +311,10 @@
 		</section>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("ITEM-PILES.Applications.ItemEditor.Update")}
 			</button>
-			<button type="button" on:click|once={() => { application.close(); }}>
+			<button on:click|once={() => { application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

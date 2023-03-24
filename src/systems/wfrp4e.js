@@ -23,15 +23,12 @@ export default {
   "ITEM_SIMILARITIES": ["name", "type"],
 
   // This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
-  "ITEM_COST_TRANSFORMER": (item, currencies) => {
+  "ITEM_COST_TRANSFORMER": (item) => {
     let overallCost = 0;
     const prices = getProperty(item, "system.price");
-    for (const currency of currencies) {
-      const currencyType = currency.abbreviation.toLowerCase().replace("{#}", "");
-      if (prices?.[currencyType]) {
-        overallCost += prices[currencyType] * currency.exchangeRate;
-      }
-    }
+    overallCost += (Number(prices?.["gc"]) ?? 0);
+    overallCost += (Number(prices?.["ss"]) ?? 0) * 0.1;
+    overallCost += (Number(prices?.["bp"]) ?? 0) * 0.01;
     return overallCost;
   },
 

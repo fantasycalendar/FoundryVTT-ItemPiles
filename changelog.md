@@ -7,6 +7,7 @@
 - Added option to split stacks of items in the vault item context menu
 - Fixed right-click context menu not working on vaults
 - Minor fixes to the vault grid not interacting well with touch screens
+- Fixed Warhammer System not correctly setting item prices on merchants
 
 ## Version 2.5.4
 
