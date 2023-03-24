@@ -56,6 +56,7 @@
   });
 
   let active = false;
+  let splitting = false;
   let collisions = [];
   let pointerOffset = { left: 0, top: 0 };
 
@@ -75,14 +76,17 @@
     // If not left mouse, skip
     if (event.button !== 0) return;
 
+    if (event.pointerId) {
+      itemRef.setPointerCapture(event.pointerId);
+    }
+
     // Get offset for pointer within the grid item
     pointerOffset = {
-      left: event.clientX - gridTransform.left,
-      top: event.clientY - gridTransform.top,
+      left: event.pageX - gridTransform.left,
+      top: event.pageY - gridTransform.top,
       internalLeft: event.offsetX,
       internalTop: event.offsetY,
     };
-    itemRef.setPointerCapture(event.pointerId);
 
     dispatch("itembegindrag", {
       item,
@@ -96,6 +100,27 @@
     window.addEventListener('pointerup', moveEnd, { passive: false });
     window.addEventListener('touchmove', move, { passive: false });
     window.addEventListener('touchend', moveEnd, { passive: false });
+
+  }
+
+  function splitStart(event) {
+
+    splitting = true;
+
+    // Get offset for pointer within the grid item
+    pointerOffset = {
+      left: event.pageX - gridTransform.left,
+      top: event.pageY - gridTransform.top,
+      internalLeft: event.offsetX,
+      internalTop: event.offsetY,
+    };
+
+    // Setup events for when item is moved and dropped
+    window.addEventListener('pointermove', move, { passive: false });
+    window.addEventListener('pointerup', moveEnd, { passive: false });
+    window.addEventListener('touchmove', move, { passive: false });
+    window.addEventListener('touchend', moveEnd, { passive: false });
+
   }
 
   function move(event) {
@@ -120,7 +145,11 @@
       left,
       top,
     });
-    collisions = getCollisions({ id: item.id, transform: previewTransform }, items);
+
+    if (!splitting) {
+      collisions = getCollisions({ id: item.id, transform: previewTransform }, items);
+    }
+
   }
 
   function constrainToContainer(left, top) {
@@ -163,6 +192,7 @@
   }
 
   function moveEnd(event) {
+
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerup', moveEnd);
     window.removeEventListener('touchmove', move);
@@ -172,18 +202,28 @@
 
     const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
 
-    dispatch("itemstopdrag", {
-      item,
-      outOfBounds: !active,
-      x: pageX - pointerOffset.internalLeft,
-      y: pageY - pointerOffset.internalTop
-    })
-
-    if (!active) {
-      return;
+    if (event.button === 2) {
+      dispatch("itemstopdrag", { cancelled: true });
+      active = false;
+    } else {
+      dispatch("itemstopdrag", {
+        item,
+        outOfBounds: !active,
+        x: pageX - pointerOffset.internalLeft,
+        y: pageY - pointerOffset.internalTop,
+        gridX: finalTransform.x,
+        gridY: finalTransform.y,
+        splitting
+      })
     }
 
+    if (!active) return;
     active = false;
+
+    if (splitting) {
+      splitting = false;
+      return;
+    }
 
     if (foundry.utils.isEmpty(finalTransform)
       || (finalTransform.x === transform.x && finalTransform.y === transform.y)
@@ -192,6 +232,11 @@
     }
 
     if (collisions.length) {
+
+      if (item.item.areItemsSimilar(collisions[0].item) && !globalThis.keyboard.downKeys.has("ControlLeft")) {
+        return collisions[0].item.merge(item.item);
+      }
+
       const offset = collisions.reduce((acc, collision) => {
         const trans = get(collision.transform);
         if (trans.x < acc.x) acc.x = trans.x;
@@ -242,7 +287,8 @@
       item,
       target: itemRef,
       x: event.pageX,
-      y: event.pageY
+      y: event.pageY,
+      splitStart,
     });
   }
 

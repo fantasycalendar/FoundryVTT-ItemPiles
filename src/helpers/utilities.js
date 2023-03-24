@@ -1,6 +1,7 @@
 import * as Helpers from "./helpers.js";
 import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
+import { getItemFlagData } from "./pile-utilities.js";
 
 export function getActor(target) {
   if (target instanceof Actor) return target;
@@ -44,10 +45,10 @@ export function getUuid(target) {
  *
  * @param {Array<Item|Object>} items
  * @param {Item|Object} findItem
- * @param {boolean} returnFound
+ * @param {boolean/object} actorFlagData
  * @returns {*}
  */
-export function findSimilarItem(items, findItem, returnFound = false) {
+export function findSimilarItem(items, findItem, actorFlagData = false) {
 
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 
@@ -62,7 +63,9 @@ export function findSimilarItem(items, findItem, returnFound = false) {
     }
   }
 
-  return items
+  const actorIsVault = actorFlagData ? actorFlagData?.enabled && actorFlagData?.type === CONSTANTS.PILE_TYPES.VAULT : false;
+
+  const filteredItems = items
     .filter(item => {
       for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
         if (getProperty(item, prop)) {
@@ -71,7 +74,7 @@ export function findSimilarItem(items, findItem, returnFound = false) {
       }
       return true;
     })
-    .find(item => {
+    .filter(item => {
       const itemId = item instanceof Item ? item.id : item._id ?? item.id;
       if (itemId && findItemId && itemId === findItemId) {
         return true;
@@ -86,14 +89,50 @@ export function findSimilarItem(items, findItem, returnFound = false) {
       }
 
       const itemData = item instanceof Item ? item.toObject() : item;
-      for (const path of itemSimilarities) {
-        if (getProperty(itemData, path) !== getProperty(findItemData, path) || (!hasProperty(itemData, path) ^ !hasProperty(findItemData, path))) {
-          return false;
-        }
+      if (areItemsDifferent(itemData, findItemData)) {
+        return false;
       }
 
       return itemSimilarities.length > 0;
+    })
+
+  let sortedItems = filteredItems;
+  if (actorIsVault) {
+
+    let distanceItems = filteredItems.map(item => {
+      const itemX = getProperty(item, CONSTANTS.FLAGS.ITEM + ".x") ?? Infinity;
+      const itemY = getProperty(item, CONSTANTS.FLAGS.ITEM + ".y") ?? Infinity;
+      const findX = getProperty(findItem, CONSTANTS.FLAGS.ITEM + ".x") ?? Infinity;
+      const findY = getProperty(findItem, CONSTANTS.FLAGS.ITEM + ".y") ?? Infinity;
+      const distance = new Ray({ x: itemX, y: itemY }, { x: findX, y: findY }).distance;
+      return { distance, item };
     });
+
+    distanceItems.sort((a, b) => a.distance - b.distance);
+    distanceItems = distanceItems.filter(item => {
+      return item.distance === 0 && {
+        "default": actorFlagData?.canStackItems ?? true,
+        "yes": true,
+        "no": false
+      }[getItemFlagData(item)?.canStack ?? "default"];
+    }).map(item => item.item);
+
+    sortedItems = distanceItems;
+
+  }
+
+  return sortedItems?.[0] ?? false;
+
+}
+
+export function areItemsDifferent(itemA, itemB) {
+  const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
+  for (const path of itemSimilarities) {
+    if (getProperty(itemA, path) !== getProperty(itemB, path) || (!hasProperty(itemA, path) ^ !hasProperty(itemB, path))) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export function setSimilarityProperties(obj, item) {

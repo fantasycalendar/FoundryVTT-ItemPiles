@@ -282,6 +282,14 @@
         "ContentInfiniteQuantity": "",
         "Submit": "Withdraw"
       },
+      "SplitItem": {
+        "Title": "Split Item Stack",
+        "Header": "You're splitting a stack of {item_name}",
+        "Content": "Do you want to split this stacked item?",
+        "ContentMultipleQuantity": "There's {quantity} of this item, how many do you want in the new stack?",
+        "ContentInfiniteQuantity": "",
+        "Submit": "Split Stack"
+      },
       "EditCurrencies": {
         "Title": "Editing Currencies",
         "Content": "As a GM, you can update the currencies this on item pile:",

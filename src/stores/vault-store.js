@@ -367,6 +367,11 @@ export class VaultStore extends ItemPileStore {
 
     const gridData = get(this.gridData);
 
+    let flagData = PileUtilities.getItemFlagData(itemData);
+    setProperty(flagData, "x", x);
+    setProperty(flagData, "y", y);
+    setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
+
     if (!this.hasSimilarItem(itemData) && !vaultExpander && !gridData?.freeSpaces) {
       Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
       return false;
@@ -376,7 +381,8 @@ export class VaultStore extends ItemPileStore {
       source,
       target,
       itemData: {
-        item: itemData, quantity: 1
+        item: itemData,
+        quantity: 1
       },
       gridPosition: { x, y }
     });
@@ -468,6 +474,47 @@ export class VaultItem extends PileItem {
       _id: this.id,
       quantity
     }], { interactionId: this.store.interactionId });
+  }
+
+  async split(x, y) {
+
+    let quantity = await DropItemDialog.show(this.item, this.store.actor, {
+      localizationTitle: "SplitItem",
+      quantityAdjustment: -1
+    });
+
+    await game.itempiles.API.removeItems(this.store.actor, [{
+      _id: this.id,
+      quantity
+    }], { interactionId: this.store.interactionId });
+
+    const itemData = this.item.toObject();
+
+    const flagData = PileUtilities.getItemFlagData(this.item);
+    setProperty(flagData, "x", x);
+    setProperty(flagData, "y", y);
+    setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
+
+    await game.itempiles.API.addItems(this.store.actor, [{
+      item: itemData,
+      quantity
+    }], { interactionId: this.store.interactionId });
+
+  }
+
+  async merge(itemToMerge) {
+
+    const itemDelta = await game.itempiles.API.removeItems(this.store.actor, [{
+      _id: itemToMerge.id
+    }], { interactionId: this.store.interactionId });
+
+    this.updateQuantity(Math.abs(itemDelta[0].quantity), true);
+
+  }
+
+  areItemsSimilar(itemToCompare) {
+    return !Utilities.areItemsDifferent(this.item, itemToCompare.item)
+      && PileUtilities.canItemStack(itemToCompare.item, this.store.actor);
   }
 
 }

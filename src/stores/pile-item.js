@@ -5,7 +5,6 @@ import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
-import { getItemCurrencyData } from "../helpers/pile-utilities.js";
 import { Plugins } from "../plugins/main.js";
 
 class PileBaseItem {
@@ -171,10 +170,13 @@ export class PileItem extends PileBaseItem {
     return game.itempiles.API.removeItems(this.store.actor, [this.id]);
   }
 
-  updateQuantity(quantity) {
-    const roll = new Roll(quantity).evaluate({ async: false });
-    this.quantity.set(roll.total);
-    return this.item.update(Utilities.setItemQuantity({}, roll.total));
+  updateQuantity(quantity, add = false) {
+    let total = typeof quantity === "string" ? (new Roll(quantity).evaluate({ async: false })).total : quantity;
+    if (add) {
+      total += get(this.quantity);
+    }
+    this.quantity.set(total);
+    return this.item.update(Utilities.setItemQuantity({}, total));
   }
 
   async updateFlags() {

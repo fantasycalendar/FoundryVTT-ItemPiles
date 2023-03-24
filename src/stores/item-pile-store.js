@@ -329,7 +329,7 @@ export default class ItemPileStore {
 
   hasSimilarItem(item) {
     const items = get(this.allItems).map(item => item.item);
-    return !!Utilities.findSimilarItem(items, item);
+    return !!Utilities.findSimilarItem(items, item, get(this.pileData));
   }
 
   delete() {

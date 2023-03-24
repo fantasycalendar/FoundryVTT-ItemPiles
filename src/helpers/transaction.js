@@ -24,7 +24,12 @@ export default class Transaction {
     this.preCommitted = false;
   }
 
-  async appendItemChanges(items, { remove = false, type = "item", keepIfZero = false, onlyDelta = false } = {}) {
+  async appendItemChanges(items, {
+    remove = false,
+    type = "item",
+    keepIfZero = false,
+    onlyDelta = false,
+  } = {}) {
     for (let data of items) {
 
       let item = data.item ?? data;
@@ -37,7 +42,7 @@ export default class Transaction {
       const actorHasItem = this.actor.items.get(itemData._id);
       const actorExistingItem = remove && actorHasItem
         ? actorHasItem
-        : Utilities.findSimilarItem(this.actor.items, itemData);
+        : Utilities.findSimilarItem(this.actor.items, itemData, PileUtilities.getActorFlagData(this.actor));
       const canItemStack = PileUtilities.canItemStack(actorExistingItem || itemData, this.actor);
 
       if (!canItemStack) {

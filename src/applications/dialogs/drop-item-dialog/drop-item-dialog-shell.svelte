@@ -18,6 +18,7 @@
   let quantity = 1;
 
   const itemQuantity = Utilities.getItemQuantity(item);
+  const sliderQuantity = itemQuantity + (application.options?.quantityAdjustment ?? 0);
   const canItemStack = PileUtilities.canItemStack(item, target);
 
   function requestSubmit() {
@@ -65,7 +66,7 @@
 			{#if unlimitedQuantity}
 				<input type="number" min="1" bind:value={quantity}/>
 			{:else}
-				<SliderInput min={1} max={itemQuantity} maxInput={itemQuantity} divideBy={1} bind:value={quantity}/>
+				<SliderInput min={1} max={sliderQuantity} maxInput={sliderQuantity} divideBy={1} bind:value={quantity}/>
 			{/if}
 		{/if}
 

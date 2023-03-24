@@ -106,6 +106,17 @@
         });
       }
 
+      const quantity = get(event.detail.item.item.quantity);
+      const freeSpacesAfterSplit = gridData.freeSpaces;
+
+      if((gridData.canDepositItems || game.user.isGM) && event.detail.item.item.canStack && quantity > 1 && freeSpacesAfterSplit) {
+        contextMenu.push({
+          icon: 'fas fa-object-ungroup', label: "Split", onPress: () => {
+            beginSplitItem(event)
+          }
+        });
+      }
+
       if (pileData.canInspectItems || game.user.isGM) {
         contextMenu.push({
           icon: 'fas fa-eye', label: "Inspect", onPress: () => {
@@ -128,6 +139,32 @@
     })
   }
 
+  function beginSplitItem(event){
+
+    const { item, splitStart, x, y } = event.detail;
+
+    FloatingElement.create({
+      id: application.id,
+      x,
+      y,
+      style: {
+        width: gridData.gridSize + "px",
+        height: gridData.gridSize + "px",
+        opacity: 0.7,
+      },
+      component: VaultItemEntry,
+      componentData: { entry: item }
+    });
+
+    splitStart({
+			pageX: x,
+			pageY: y,
+			offsetX: Math.floor(gridData.gridSize / 2),
+			offsetY: Math.floor(gridData.gridSize / 2)
+		});
+
+	}
+
   function itemBeginDrag(event){
     const { x, y, item } = event.detail;
     FloatingElement.create({
@@ -146,8 +183,19 @@
 
   function itemStopDrag(event){
 
-    const { item, outOfBounds, x, y } = event.detail;
+    if(!FloatingElement.id) return;
+
     FloatingElement.destroy();
+
+    if(event.detail.cancelled) return;
+
+    const { item, outOfBounds, x, y, gridX, gridY, splitting } = event.detail;
+
+    if(splitting){
+      if(outOfBounds) return;
+      item.item.split(gridX, gridY);
+      return;
+		}
 
     if(!outOfBounds) return;
 
@@ -181,6 +229,7 @@
 
   function itemMove(event){
     const { x, y } = event.detail;
+    if(!FloatingElement.id) return;
     FloatingElement.positionStore.set({ x, y });
 	}
 
