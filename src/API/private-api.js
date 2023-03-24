@@ -1605,7 +1605,7 @@ export default class PrivateAPI {
     const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
 
     let itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
-    if (itemQuantity > 1 && Utilities.canItemStack(dropData.itemData.item)) {
+    if (itemQuantity > 1 && PileUtilities.canItemStack(dropData.itemData.item, vaultActor)) {
       const quantity = await DropItemDialog.show(item, vaultActor, {
         localizationTitle: localization
       });
@@ -1679,7 +1679,7 @@ export default class PrivateAPI {
 
     if (user?.active || gms.length || game.user.isGM) {
 
-      if (Utilities.canItemStack(dropData.itemData.item)) {
+      if (PileUtilities.canItemStack(dropData.itemData.item)) {
         const quantity = await DropItemDialog.show(item, dropData.target.actor, {
           localizationTitle: "GiveItem"
         });
@@ -1748,7 +1748,7 @@ export default class PrivateAPI {
       }
     }
 
-    if (Utilities.canItemStack(dropData.itemData.item)) {
+    if (PileUtilities.canItemStack(dropData.itemData.item, targetActor)) {
       if (hotkeyState.altDown) {
 
         Utilities.setItemQuantity(dropData.itemData.item, 1);

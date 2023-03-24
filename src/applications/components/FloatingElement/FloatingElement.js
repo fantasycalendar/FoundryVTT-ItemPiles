@@ -14,7 +14,6 @@ export class FloatingElement {
     this.positionStore.set({ x, y })
     this.id = id;
 
-    // Create the new context menu with the last click x / y point.
     this.element = new FloatingElementImpl({
       target: document.body,
       props: {

@@ -59,6 +59,14 @@
 
 <div class="form-group">
 	<label>
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.CanStackItems")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.CanStackItemsExplanation")}</p>
+	</label>
+	<input type="checkbox" bind:checked={pileData.canStackItems}/>
+</div>
+
+<div class="form-group">
+	<label>
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.EnableExpansion")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.EnableExpansionExplanation")}</p>
 	</label>

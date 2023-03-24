@@ -2,6 +2,7 @@
   import { getContext } from "svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import * as Utilities from "../../../helpers/utilities.js";
+  import * as PileUtilities from "../../../helpers/pile-utilities.js";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import SliderInput from "../../components/SliderInput.svelte";
 
@@ -17,7 +18,7 @@
   let quantity = 1;
 
   const itemQuantity = Utilities.getItemQuantity(item);
-  const canItemStack = Utilities.canItemStack(item);
+  const canItemStack = PileUtilities.canItemStack(item, target);
 
   function requestSubmit() {
     form.requestSubmit();

@@ -888,7 +888,7 @@ class API {
       }
 
       const existingItems = mergeSimilarItems ? Utilities.findSimilarItem(itemsToAdd, item) : false;
-      if (existingItems && Utilities.canItemStack(item)) {
+      if (existingItems && PileUtilities.canItemStack(item, target)) {
         Utilities.setItemQuantity(existingItems, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item));
       } else {
         itemsToAdd.push(item);
@@ -1814,7 +1814,7 @@ class API {
   }
 
   static canItemStack(item) {
-    return Utilities.canItemStack(item);
+    return PileUtilities.canItemStack(item);
   }
 
   static getVaultGridData(vaultActor) {

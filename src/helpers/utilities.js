@@ -134,11 +134,6 @@ export function getItemTypesThatCanStack() {
   return itemTypesWithQuantities;
 }
 
-export function canItemStack(item) {
-  const itemData = item instanceof Item ? item.toObject() : item;
-  return getItemTypesThatCanStack().has(itemData.type);
-}
-
 /**
  * Returns a given item's quantity
  *

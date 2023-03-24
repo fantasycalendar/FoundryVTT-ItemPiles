@@ -41,7 +41,8 @@ const CONSTANTS = {
     x: null,
     y: null,
     width: 1,
-    height: 1
+    height: 1,
+    canStack: "default"
   },
 
   PILE_TYPES: {
@@ -150,7 +151,8 @@ const CONSTANTS = {
     baseExpansionRows: 0,
     vaultAccess: [],
     logVaultActions: false,
-    vaultLogType: "user_actor"
+    vaultLogType: "user_actor",
+    canStackItems: true
   }
 }
 

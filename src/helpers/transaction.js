@@ -1,4 +1,5 @@
 import * as Utilities from "./utilities.js";
+import * as PileUtilities from "./pile-utilities.js";
 import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
@@ -37,7 +38,7 @@ export default class Transaction {
       const actorExistingItem = remove && actorHasItem
         ? actorHasItem
         : Utilities.findSimilarItem(this.actor.items, itemData);
-      const canItemStack = Utilities.canItemStack(actorExistingItem || itemData);
+      const canItemStack = PileUtilities.canItemStack(actorExistingItem || itemData, this.actor);
 
       if (!canItemStack) {
 
@@ -138,7 +139,7 @@ export default class Transaction {
       return Number(getProperty(this.actor, entry[0])) !== entry[1];
     }))
     this.itemsToCreate = this.itemsToCreate.filter(item => {
-      return !Utilities.canItemStack(item) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
+      return !PileUtilities.canItemStack(item, this.actor) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
     });
     this.itemsToDelete = this.itemsToUpdate.filter(item => {
       return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
@@ -209,7 +210,7 @@ export default class Transaction {
       itemDeltas: this.itemDeltas.concat(itemsCreated.map(item => {
         return {
           item,
-          quantity: Utilities.canItemStack(item) ? Utilities.getItemQuantity(item) : 1
+          quantity: PileUtilities.canItemStack(item) ? Utilities.getItemQuantity(item) : 1
         }
       }))
     }

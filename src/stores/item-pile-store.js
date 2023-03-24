@@ -348,7 +348,7 @@ export default class ItemPileStore {
       if (itemQuantity === 0) {
         itemsToDelete.push(item.id);
       } else {
-        if (Utilities.canItemStack(item.item)) {
+        if (PileUtilities.canItemStack(item.item, this.actor)) {
           itemsToUpdate.push(Utilities.setItemQuantity({ _id: item.id }, itemQuantity));
         }
       }

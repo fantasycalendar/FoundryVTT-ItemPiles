@@ -36,6 +36,19 @@ export function migrateFlagData(document, data = false) {
 
 }
 
+export function canItemStack(item, targetActor) {
+  const itemData = item instanceof Item ? item.toObject() : item;
+  const unstackableType = Utilities.getItemTypesThatCanStack().has(itemData.type);
+  if (!unstackableType || (targetActor && !isItemPileVault(targetActor))) return unstackableType;
+  const itemFlagData = getItemFlagData(itemData);
+  const actorFlagData = getActorFlagData(targetActor);
+  return {
+    "default": actorFlagData.canStackItems,
+    "yes": true,
+    "no": false
+  }[itemFlagData?.canStack ?? "default"];
+}
+
 export function getItemFlagData(item, data = false) {
   return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, foundry.utils.deepClone(CONSTANTS.ITEM_DEFAULTS), data);
 }

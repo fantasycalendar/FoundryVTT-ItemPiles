@@ -258,6 +258,24 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.CanStack")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.CanStackExplanation")}</p>
+						</label>
+						<select style="flex: 0 1 auto;" bind:value={itemFlagData.canStack}>
+							<option value="default">
+								{localize("ITEM-PILES.Applications.ItemEditor.CanStackDefault")}
+							</option>
+							<option value="yes">
+								{localize("ITEM-PILES.Applications.ItemEditor.CanStackYes")}
+							</option>
+							<option value="no">
+								{localize("ITEM-PILES.Applications.ItemEditor.CanStackNo")}
+							</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label style="flex:4;">
 							{localize("ITEM-PILES.Applications.ItemEditor.VaultExpander")}<br>
 							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultExpanderExplanation")}</p>
 						</label>

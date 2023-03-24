@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store';
 import * as Utilities from "../../helpers/utilities.js";
+import * as PileUtilities from "../../helpers/pile-utilities.js";
 
 export default class TradeStore {
 
@@ -158,7 +159,7 @@ export default class TradeStore {
 
     const maxQuantity = game.user.isGM ? Infinity : Utilities.getItemQuantity(newItem);
 
-    if (item && Utilities.canItemStack(item)) {
+    if (item && PileUtilities.canItemStack(item)) {
       if (item.quantity >= maxQuantity) return;
       item.quantity = Math.min(quantity ? quantity : item.quantity + 1, maxQuantity);
       item.newQuantity = item.quantity;
