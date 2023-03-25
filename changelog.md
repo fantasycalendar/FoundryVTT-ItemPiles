@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.5.6
+
+- Fixed clicking on item pile actors in the sidebar would not open the item pile UI, but the actor sheet
+
 ## Version 2.5.5
 
 - Added support for dragging and dropping items between vaults other item piles, vaults, and character sheets
