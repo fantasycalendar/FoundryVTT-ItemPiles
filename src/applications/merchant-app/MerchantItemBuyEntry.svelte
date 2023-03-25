@@ -1,16 +1,18 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { fade } from 'svelte/transition';
-  import ItemEditor from "../item-editor/item-editor.js";
   import PriceSelector from "../components/PriceSelector.svelte";
   import ItemEntry from "./ItemEntry.svelte";
+  import EntryButtons from "./EntryButtons.svelte";
+  import QuantityColumn from "./QuantityColumn.svelte";
 
   export let item;
+  export let index;
 
   const itemName = item.name;
   const itemImage = item.img;
 
   const store = item.store;
+  const itemStore = item.itemDocument;
   const pileData = store.pileData;
   const displayQuantityStore = item.displayQuantity;
   const quantityStore = item.quantity;
@@ -25,77 +27,72 @@
   const displayControlButtons = store.actor.isOwner;
   const displayBuyButton = !!store.recipient;
 
+  let columns = [];
+  $: {
+    const customColumns = foundry.utils.deepClone($pileData.merchantColumns);
+    columns = [{
+      label: false,
+      component: ItemEntry
+    }, ...customColumns.map(column => {
+      if (column.path === "price") {
+        column.component = PriceSelector;
+      } else if (column.path === "quantity") {
+        column.component = QuantityColumn;
+      }
+      return column;
+    }), {
+      label: false,
+      component: EntryButtons
+    }]
+  }
+
 </script>
 
-<div class="item-piles-flexrow item-piles-item-row item-piles-odd-color"
-     class:merchant-item-hidden={itemFlagData.hidden}
-     transition:fade|local={{duration: 250}}
-     style="flex: 1 0 auto;">
+<div class="item-piles-flexrow item-piles-item-row"
+		 class:item-piles-child-even-color={index%2===0}
+		 class:item-piles-child-odd-color={index%2===1}
+		 class:merchant-item-hidden={itemFlagData.hidden}
+		 style="flex: 1 0 auto;"
+		 transition:fade|local={{duration: 250}}>
 
-  <ItemEntry {item}/>
+	{#each columns as column}
 
-  <PriceSelector {item}/>
+		{#if column?.component}
+			<svelte:component this={column.component} {item}/>
+		{:else}
+			<div><span>{getProperty($itemStore, column.path)}</span></div>
+		{/if}
 
-  <div class="item-piles-flexrow sidebar-buttons">
-    {#if displayControlButtons}
-      {#if game.user.isGM}
-        <span class="item-piles-clickable-link" on:click={() => { ItemEditor.show(item.item); }}>
-          <i class="fas fa-cog"></i>
-        </span>
-      {/if}
-      <span class="item-piles-clickable-link"
-            on:click={() => { itemFlagData.hidden = !itemFlagData.hidden; item.updateItemFlagData(); }}>
-        <i class="fas" class:fa-eye={!itemFlagData.hidden} class:fa-eye-slash={itemFlagData.hidden}></i>
-      </span>
-      <span class="item-piles-clickable-link"
-            on:click={() => { itemFlagData.notForSale = !itemFlagData.notForSale; item.updateItemFlagData(); }}>
-        <i class="fas" class:fa-store={!itemFlagData.notForSale} class:fa-store-slash={itemFlagData.notForSale}></i>
-      </span>
-    {/if}
-    {#if displayBuyButton}
-      <span
-        class:item-piles-clickable-link={!itemFlagData.notForSale || game.user.isGM}
-        class:item-piles-clickable-link-disabled={quantity <= 0 || (itemFlagData.notForSale && !game.user.isGM)}
-        class:buy-button={displayControlButtons}
-        on:click={() => {
-              if(quantity <= 0 || (itemFlagData.notForSale && !game.user.isGM)) return;
-              store.tradeItem(item)
-            }}>
-        <i class="fas fa-shopping-cart"></i>
-        {#if !displayControlButtons} {localize("ITEM-PILES.Merchant.Buy")}{/if}
-      </span>
-    {/if}
-  </div>
+	{/each}
+
 
 </div>
 
 
 <style lang="scss">
 
+
+  :global(.item-piles-child-even-color > *) {
+    background-color: var(--item-piles-even-color);
+  }
+
+  :global(.item-piles-child-odd-color > *) {
+    background-color: var(--item-piles-odd-color);
+  }
+
   .item-piles-item-row {
     margin: 0;
     overflow: visible;
+    display: contents;
 
-    .sidebar-buttons {
-      flex: 0 1 auto;
+    & > * {
+      padding: 0 10px;
+      text-align: center;
+      height: 100%;
+      display: flex;
       align-items: center;
-      justify-content: flex-end;
-      text-align: right;
-
-      & > span {
-        flex: 0 1 auto;
-        margin-right: 0.25rem;
-        min-width: 17.5px;
-      }
-
-      .buy-button {
-        padding-left: 0.25rem;
-        border-left: 1px solid rgba(0, 0, 0, 0.5)
-      }
-
-      .disabled-buy-button {
-        opacity: 0.5;
-      }
+      justify-content: center;
+      flex: 1;
     }
 
     &.merchant-item-hidden {

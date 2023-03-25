@@ -1,3 +1,5 @@
+import CONSTANTS from "../constants/constants.js";
+
 export default {
 
   "VERSION": "1.0.4",
@@ -54,6 +56,23 @@ export default {
       }
     }
     return overallCost ?? 0;
+  },
+
+  "PILE_TYPE_DEFAULTS": {
+    [CONSTANTS.PILE_TYPES.MERCHANT]: {
+      merchantColumns: [
+        {
+          label: "Quantity",
+          path: "quantity"
+        }, {
+          label: "Rarity",
+          path: "system.rarity"
+        }, {
+          type: "Price",
+          path: "price"
+        }
+      ],
+    }
   },
 
   "PREVENT_INJECTING_ITEMS": true,
