@@ -30,20 +30,25 @@
   let columns = [];
   $: {
     const customColumns = foundry.utils.deepClone($pileData.merchantColumns);
-    columns = [{
-      label: false,
-      component: ItemEntry
-    }, ...customColumns.map(column => {
-      if (column.path === "price") {
-        column.component = PriceSelector;
-      } else if (column.path === "quantity") {
-        column.component = QuantityColumn;
+    columns = [
+      {
+        label: false,
+        component: ItemEntry
+      },
+      {
+        label: "Quantity",
+        component: QuantityColumn
+      },
+      ...customColumns,
+      {
+        type: "Price",
+        component: PriceSelector
+      },
+      {
+        label: false,
+        component: EntryButtons
       }
-      return column;
-    }), {
-      label: false,
-      component: EntryButtons
-    }]
+    ]
   }
 
 </script>

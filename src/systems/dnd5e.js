@@ -60,18 +60,10 @@ export default {
 
   "PILE_TYPE_DEFAULTS": {
     [CONSTANTS.PILE_TYPES.MERCHANT]: {
-      merchantColumns: [
-        {
-          label: "Quantity",
-          path: "quantity"
-        }, {
-          label: "Rarity",
-          path: "system.rarity"
-        }, {
-          type: "Price",
-          path: "price"
-        }
-      ],
+      merchantColumns: [{
+        label: "Rarity",
+        path: "system.rarity"
+      }],
     }
   },
 

@@ -27,7 +27,15 @@
       {
         component: CategoryHeader
       },
+      {
+        label: "Quantity",
+        path: "quantity"
+      },
       ...customColumns,
+			{
+        type: "Price",
+        path: "price"
+      },
       {}
     ]
     console.log(columns);
