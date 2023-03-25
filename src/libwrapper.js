@@ -25,15 +25,14 @@ export default function registerLibwrappers() {
     return wrapped(event);
   }, "MIXED");
 
-  libWrapper.register(CONSTANTS.MODULE_NAME, `ActorSheet.prototype.render`, function (wrapped, forced, options) {
+  libWrapper.register(CONSTANTS.MODULE_NAME, `ActorSheet.prototype.render`, function (wrapped, forced, options, ...args) {
     if (this && this._state > Application.RENDER_STATES.NONE) {
-      wrapped(forced, options);
-    }
-    if (PileUtilities.isValidItemPile(this.document) && hotkeyActionState.openPileInventory && !options?.bypassItemPiles) {
+      wrapped(forced, options, ...args);
+    } else if (PileUtilities.isValidItemPile(this.document) && hotkeyActionState.openPileInventory && !options?.bypassItemPiles) {
       game.itempiles.API.renderItemPileInterface(this.document, { useDefaultCharacter: true });
       return this;
     }
-    return wrapped(forced);
+    return wrapped(forced, options, ...args);
   }, "MIXED");
 
 }

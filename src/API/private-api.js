@@ -903,9 +903,9 @@ export default class PrivateAPI {
     if (!foundry.utils.isEmpty(actorUpdates)) {
       await actor.update(actorUpdates);
     }
+    const createdItems = itemsToCreate.length ? await actor.createEmbeddedDocuments("Item", itemsToCreate) : [];
     if (itemsToUpdate.length) await actor.updateEmbeddedDocuments("Item", itemsToUpdate);
     if (itemsToDelete.length) await actor.deleteEmbeddedDocuments("Item", itemsToDelete);
-    const createdItems = itemsToCreate.length ? await actor.createEmbeddedDocuments("Item", itemsToCreate) : [];
     return createdItems.map(item => item.toObject());
   }
 

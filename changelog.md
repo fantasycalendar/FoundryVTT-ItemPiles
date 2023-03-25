@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.5.7
+
+- Fixed double-clicking on linked tokens' actor sheets would not open the ephemeral actor sheet that has [Token] instead of [Prototype Token] in the header
+- Fixed `removeExistingActorItems` causing the item pile UI to fail to display any new items
+
 ## Version 2.5.6
 
 - Fixed clicking on item pile actors in the sidebar would not open the item pile UI, but the actor sheet
