@@ -520,16 +520,21 @@
         "CustomCategory": "Catégorie d'objets personnalisée",
         "CustomTypeExplanation": "Cet objet sera répertorié sous un type différent de ce qu'il est à l'origine.",
         "CustomCategoryExplanation": "Lorsqu'il n'est pas laissé vide, cet objet sera listé sous un type différent de ce qu'il est.",
-        "ExpandColumnsRows": "Extension des colonnes & lignes",
+        "ExpandColumnsRows": "Expansion des colonnes & lignes",
         "Vault": "Paramètres de coffre-fort",
-        "VaultExpander": "Extension de coffre-fort",
-        "VaultExpanderExplanation": "Lorsque cette option est activée, cet objet n'agit pas comme un objet normal dans un coffre-fort, mais augmente le nombre d'emplacements disponibles, comme déterminé ci-dessous.",
-        "ExpandColumnsRowsExplanation": "Lorsque le paramètre ci-dessus est activé, il définit le nombre de colonnes et/ou de lignes disponibles dans le coffre-fort. Ce nombre ne peut pas dépasser la capacité du coffre-fort.",
+        "VaultExpander": "Extension de coffre",
+        "VaultExpanderExplanation": "Lorsque cette option est activée, cet objet n'agit pas comme un objet normal dans un coffre, mais augmente le nombre d'emplacements disponibles, comme déterminé ci-dessous.",
+        "ExpandColumnsRowsExplanation": "Lorsque le paramètre ci-dessus est activé, il définit le nombre de colonnes et/ou de lignes disponibles dans le coffre. Ce nombre ne peut pas dépasser la capacité du coffre.",
         "InfiniteQuantityYes": "Oui, en quantité infinie",
         "InfiniteQuantityNo": "Non, en quantité normale",
         "InfiniteQuantityDefault": "Valeur par défaut du paramètre du marchand",
         "QuantityForPriceExplanation": "Cela permet de configurer le nombre d'exemplaires de cet objet que l'on doit obtenir lors de l'achat de cet objet.",
-        "QuantityForPrice": "Quantité pour le prix"
+        "QuantityForPrice": "Quantité pour le prix",
+        "CanStack": "Peut s'empiler",
+        "CanStackDefault": "Valeur par défaut des paramètres du coffre",
+        "CanStackExplanation": "Cette option permet de configurer l'empilement de l'élément avec d'autres éléments similaires lorsqu'il est ajouté à un coffre.",
+        "CanStackYes": "Oui, peut toujours s'empiler",
+        "CanStackNo": "Non, ne peut pas s'empiler"
       },
       "TradeMerchantItem": {
         "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
@@ -713,8 +718,8 @@
       },
       "FilterEditor": {
         "Explanation": "Ici, vous pouvez définir différents types de filtres qui excluront certains types d'objets. En fonction du chemin d'attribut donné, la pile d'objets peut trouver le \"type\" d'un objet et en fonction des filtres, il cachera ces objets dans l'interface d'inventaire.",
-        "Title": "Editeur de Filtres d'Item Piles",
-        "TitleActor": "Editeur de Filtres d'Item Piles : {actor_name}",
+        "Title": "Éditeur de filtres d'Item Piles",
+        "TitleActor": "Éditeur de filtres d'Item Piles : {actor_name}",
         "Filters": "Filtres",
         "Path": "Chemin d'attribut",
         "AddNew": "Ajouter un nouveau filtre",
@@ -801,6 +806,13 @@
         "Title": "Éditeur de catégories d'objets personnalisés",
         "Category": "Catégorie",
         "Explanation": "Vous pouvez configurez ici quelles catégories d'objets personnalisées sont disponibles dans votre monde. Elles y sont dynamiquement ajoutées lorsque vous en ajoutez une nouvelle pour un objet."
+      },
+      "SplitItem": {
+        "Title": "Fractionner la pile d'éléments",
+        "Header": "Vous fractionnez une pile de {item_name}",
+        "Content": "Voulez-vous fractionner cette pile d'éléments ?",
+        "ContentMultipleQuantity": "Il y a {quantity} fois cet objet. Combien voulez vous en avoir dans la nouvelle pile ?",
+        "Submit": "Fractionner la pile"
       }
     },
     "Settings": {
