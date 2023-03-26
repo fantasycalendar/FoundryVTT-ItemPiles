@@ -1,4 +1,5 @@
 // ↓ IMPORT SYSTEMS HERE ↓
+import dnd4e from "./systems/dnd4e.js";
 import dnd5e from "./systems/dnd5e.js";
 import dnd5e203 from "./systems/dnd5e-2.0.3.js";
 import pf1 from "./systems/pf1.js";
@@ -38,6 +39,9 @@ export const SYSTEMS = {
 
   SUPPORTED_SYSTEMS: {
     // ↓ ADD SYSTEMS HERE ↓
+    "dnd4e": {
+      "latest": dnd4e
+    },
     "dnd5e": {
       "latest": dnd5e,
       "2.0.3": dnd5e203,
