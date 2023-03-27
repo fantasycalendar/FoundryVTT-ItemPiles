@@ -701,7 +701,9 @@
           "LogVaultAccessExplanation": "Lorsqu'elle est activée, ce coffre-fort crée une entrée de journal et crée des journaux horodatés chaque fois qu'il y a une interaction avec le coffre-fort.",
           "LoggingFormatExplanation": "Ceci configure la façon dont le nom d'utilisateur et le nom du personnage sont affichés dans le journal.",
           "LoggingFormatUserActor": "Afficher le nom d'utilisateur et le nom du personnage",
-          "LoggingFormatActor": "Afficher uniquement le nom du personnage"
+          "LoggingFormatActor": "Afficher uniquement le nom du personnage",
+          "CanStackItems": "Peut empiler des articles",
+          "CanStackItemsExplanation": "Si cette option est activée, les objets ajoutés au coffre-fort s'empileront avec les objets similaires. Ceci peut également être contrôlé par article dans leur configuration."
         }
       },
       "GiveItem": {
@@ -975,7 +977,7 @@
       "Withdraw": "Retirer",
       "Deposit": "Dépôt",
       "LogUserActor": "{actor_name} ({user_name})",
-      "Deposited": "déposé",
+      "Deposited": "a déposé",
       "Withdrew": "a retiré",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "LogQuantity": "{quantity} x ",
