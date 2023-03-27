@@ -389,7 +389,7 @@ class API {
 
     SYSTEMS.addSystem(data);
 
-    Helpers.debug(`Registered system settings for ${game.system.name}`, data)
+    Helpers.debug(`Registered system settings for ${game.system.id}`, data)
 
   }
 
