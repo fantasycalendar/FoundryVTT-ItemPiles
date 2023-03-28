@@ -84,8 +84,6 @@ export async function checkSystem() {
 
   }
 
-  await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
-
   if (Helpers.getSetting(SETTINGS.SYSTEM_FOUND) || SYSTEMS.DATA.INTEGRATION) {
     const currentVersion = Helpers.getSetting(SETTINGS.SYSTEM_VERSION);
     const newVersion = SYSTEMS.DATA.VERSION;
@@ -96,6 +94,8 @@ export async function checkSystem() {
     }
     return;
   }
+  
+  await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
 
   if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
     Helpers.custom_notify(game.i18n.localize("ITEM-PILES.Notifications.SystemSupportFound"));

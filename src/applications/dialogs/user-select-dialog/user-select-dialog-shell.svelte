@@ -2,6 +2,7 @@
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { getContext } from "svelte";
+  import { getUserCharacter, getOwnedCharacters } from "../../../helpers/utilities.js";
 
   const { application } = getContext('#external');
 
@@ -9,8 +10,10 @@
 
   let form;
 
+  getUserCharacter()
+
   const users = game.users
-    .filter(u => u.active && (u.character || u.isGM) && !(application.options.excludeSelf && u === game.user))
+    .filter(u => u.active && (getUserCharacter(u) || u.isGM) && !(application.options.excludeSelf && u === game.user))
     .map(u => ({
       id: u.id,
       name: u.name,

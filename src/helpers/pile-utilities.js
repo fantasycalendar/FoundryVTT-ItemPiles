@@ -158,12 +158,13 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
   const actorItems = actor ? Array.from(actor.items) : [];
   currencyList = currencyList || getCurrencyList(forActor || actor);
   let currencies = currencyList.map((currency, index) => {
-    if (currency.type === "attribute") {
+    if (currency.type === "attribute" || !currency.type) {
+      const path = currency?.data?.path ?? currency?.path;
       return {
         ...currency,
-        quantity: getProperty(actor, currency.data.path) ?? 0,
-        path: currency.data.path,
-        id: currency.data.path,
+        quantity: getProperty(actor, path) ?? 0,
+        path: path,
+        id: path,
         index
       }
     }

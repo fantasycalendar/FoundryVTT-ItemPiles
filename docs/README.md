@@ -86,7 +86,6 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Index Card RPG](https://foundryvtt.com/packages/icrpg)
 - [Forbidden Lands](https://foundryvtt.com/packages/forbidden-lands)
 - [Fallout 2d20](https://foundryvtt.com/packages/fallout)
-- [Cepheus & Traveller](https://foundryvtt.com/packages/twodsix)
 - [Cyberpunk RED](https://foundryvtt.com/packages/cyberpunk-red-core)
 - [Coriolis](https://foundryvtt.com/packages/yzecoriolis)
 - [KNAVE](https://foundryvtt.com/packages/knave)
@@ -99,12 +98,14 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Dungeon Crawl Classics](https://foundryvtt.com/packages/dcc/)
 - [Level Up: Advanced 5th Edition](https://foundryvtt.com/packages/a5e)
 - [Dark Heresy 2nd Edition](https://foundryvtt.com/packages/dark-heresy)
+- [Naheulbeuk](https://foundryvtt.com/packages/naheulbeuk)
 
 ## Externally support systems
 
 These systems have integrated their own support of Item Piles, rather than Item Piles managing the system's settings. If you have any bugs relating to these systems specifically, please contact their creators.
 
 - [Old-School Essentials](https://foundryvtt.com/packages/ose)
+- [Cepheus & Traveller](https://foundryvtt.com/packages/twodsix)
 
 ## Semi-supported systems
 

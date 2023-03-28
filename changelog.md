@@ -1,5 +1,16 @@
 # Item Piles Changelog
 
+## Version 2.5.8
+
+- Added support for the D&D 4e system (thank you EndlesNights on github!)
+- Added support for the Naheulbeuk system
+- Removed internal support for the Cepheus & Traveller system, as it is officially supported by the system! Thanks
+- Updates to French and Portuguese (Brazil) localization (thank you rectulo and eunaumtenhoid on Weblate!)
+- Tweaked the way item piles injects itself into the `ActorSheet#render` methods to be more robust
+- Tweaked the "Show To Users" UI to include users who own characters but have chosen to not tie them to their user account
+- Tweaked how some item pile data is stored on tokens and actors to improve long-term module health
+- Fixed deprecation warning (thank you marvin9257 on github!)
+
 ## Version 2.5.7
 
 - Fixed double-clicking on linked tokens' actor sheets would not open the ephemeral actor sheet that has [Token] instead of [Prototype Token] in the header

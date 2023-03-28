@@ -11,7 +11,6 @@ import swade from "./systems/swade.js";
 import tormenta20 from "./systems/tormenta20.js";
 import wfrp4e from "./systems/wfrp4e.js";
 import splittermond from "./systems/splittermond.js";
-import twodsix from "./systems/twodsix.js";
 import forbiddenLands from "./systems/forbidden-lands.js";
 import icrpg from "./systems/icrpg.js";
 import swse from "./systems/swse.js";
@@ -29,6 +28,7 @@ import ptu from "./systems/ptu.js";
 import dcc from "./systems/dcc.js";
 import a5e from "./systems/a5e.js";
 import darkHeresy2e from "./systems/dark-heresy.js";
+import naheulbeuk from "./systems/naheulbeuk.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -72,9 +72,6 @@ export const SYSTEMS = {
     },
     "splittermond": {
       "latest": splittermond
-    },
-    "twodsix": {
-      "latest": twodsix
     },
     "forbidden-lands": {
       "latest": forbiddenLands
@@ -126,6 +123,9 @@ export const SYSTEMS = {
     },
     "dark-heresy": {
       "latest": darkHeresy2e
+    },
+    "naheulbeuk": {
+      "latest": naheulbeuk
     }
     // ↑ ADD SYSTEMS HERE ↑
   },
