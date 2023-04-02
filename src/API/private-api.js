@@ -136,11 +136,14 @@ export default class PrivateAPI {
     const targetItems = PileUtilities.getActorItems(doc.actor);
     const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
     const pileData = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
-    doc.updateSource({
-      "img": PileUtilities.getItemPileTokenImage(doc, pileData),
-      "scale": PileUtilities.getItemPileTokenScale(doc, pileData),
+    const scale = PileUtilities.getItemPileTokenScale(doc, pileData);
+    const docData = {
+      "texture.src": PileUtilities.getItemPileTokenImage(doc, pileData),
+      "texture.scaleX": scale,
+      "texture.scaleY": scale,
       "name": PileUtilities.getItemPileName(doc, pileData)
-    });
+    };
+    doc.updateSource(docData);
   }
 
   /**
@@ -1574,7 +1577,7 @@ export default class PrivateAPI {
 
     const sourceIsVault = dropData.source ? PileUtilities.isItemPileVault(dropData.source) : false;
     const targetIsVault = PileUtilities.isItemPileVault(dropData.target);
-    const targetIsItemPile = PileUtilities.isItemPileVault(droppableItemPiles[0]);
+    const targetIsItemPile = PileUtilities.isValidItemPile(droppableItemPiles[0]);
 
     const givingItem = canGiveItems && dropData.target && !targetIsItemPile;
     const droppingItem = canDropItems && (dropData.target || dropData.position);
