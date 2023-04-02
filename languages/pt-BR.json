@@ -59,7 +59,7 @@
     },
     "Dialogs": {
       "ResetSettings": {
-        "Title": "Redefinir configurações de módulo Item Piles",
+        "Title": "Redefinir configurações do módulo",
         "Content": "Você tem certeza de que quer redefinir todas as configurações do módulo Item Piles para o padrão do sistema atual? <strong>ISTO NÃO PODE SER DESFEITO!</strong>",
         "Confirm": "Reedefinir configurações do módulo"
       },
@@ -110,6 +110,21 @@
       },
       "TextEditor": {
         "Title": "Editor de texto"
+      },
+      "RemoveMerchantTable": {
+        "Title": "Remover Tabela do Comerciante",
+        "Content": "Tem certeza de que deseja remover a tabela \"{table_name}\" deste comerciante? Isso não pode ser desfeito."
+      },
+      "CantRemoveVaultExpander": {
+        "Title": "Não é possível remover o expansor",
+        "Content": "Você não pode remover este expansor, os itens no cofre não caberiam sem ele. Remova {num_items} itens antes de tentar remover este expansor!"
+      },
+      "UserSelect": {
+        "Title": "Selecionar usuários",
+        "Content": "Mostrar para quais usuários?"
+      },
+      "ClearVaultLog": {
+        "Title": "Limpar registro do cofre?"
       }
     },
     "Currencies": "Moedas",
@@ -173,7 +188,8 @@
       "ShownToPlayers": "Mostrar {actor_name} para jogadores",
       "ItemTransferred": "O {item_name} de {source_actor_name} foi dado a {target_actor_name}.",
       "SystemSupportFound": "Suporte ao sistema encontrado! Aplicando as configurações padrão do sistema para Item Piles...",
-      "ItemAdded": "{item_name} foi adicionado a {target_actor_name}."
+      "ItemAdded": "{item_name} foi adicionado a {target_actor_name}.",
+      "CreatedJournal": "Criou o Diário de Registro de Cofre do Item Piles."
     },
     "Warnings": {
       "GiveItemNoGM": "Não há GM ativo para receber você dando este item.",
@@ -599,7 +615,13 @@
       "LogTab": "Logs",
       "ViewingAs": "Visualizando como {actor_name}",
       "NeedsCapacity": "Este cofre tem uma capacidade total de {total_capacity}, mas nada está disponível até que os expansores de cofre sejam adicionados",
-      "CapacityLeft": "Este cofre tem uma capacidade de {capacity}, com um máximo de {total_capacity}, arraste e solte expansores de cofre para aumentar a capacidade"
+      "CapacityLeft": "Este cofre tem uma capacidade de {capacity}, com um máximo de {total_capacity}, arraste e solte expansores de cofre para aumentar a capacidade",
+      "Deposit": "Depósito",
+      "Deposited": "depositado",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "Withdrew": "Retirar",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "LogQuantity": "{quantity} x "
     }
   }
 }

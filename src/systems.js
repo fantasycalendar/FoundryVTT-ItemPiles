@@ -1,4 +1,5 @@
 // ↓ IMPORT SYSTEMS HERE ↓
+import dnd4e from "./systems/dnd4e.js";
 import dnd5e from "./systems/dnd5e.js";
 import dnd5e203 from "./systems/dnd5e-2.0.3.js";
 import pf1 from "./systems/pf1.js";
@@ -10,7 +11,6 @@ import swade from "./systems/swade.js";
 import tormenta20 from "./systems/tormenta20.js";
 import wfrp4e from "./systems/wfrp4e.js";
 import splittermond from "./systems/splittermond.js";
-import twodsix from "./systems/twodsix.js";
 import forbiddenLands from "./systems/forbidden-lands.js";
 import icrpg from "./systems/icrpg.js";
 import swse from "./systems/swse.js";
@@ -28,6 +28,7 @@ import ptu from "./systems/ptu.js";
 import dcc from "./systems/dcc.js";
 import a5e from "./systems/a5e.js";
 import darkHeresy2e from "./systems/dark-heresy.js";
+import naheulbeuk from "./systems/naheulbeuk.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -38,6 +39,9 @@ export const SYSTEMS = {
 
   SUPPORTED_SYSTEMS: {
     // ↓ ADD SYSTEMS HERE ↓
+    "dnd4e": {
+      "latest": dnd4e
+    },
     "dnd5e": {
       "latest": dnd5e,
       "2.0.3": dnd5e203,
@@ -68,9 +72,6 @@ export const SYSTEMS = {
     },
     "splittermond": {
       "latest": splittermond
-    },
-    "twodsix": {
-      "latest": twodsix
     },
     "forbidden-lands": {
       "latest": forbiddenLands
@@ -122,6 +123,9 @@ export const SYSTEMS = {
     },
     "dark-heresy": {
       "latest": darkHeresy2e
+    },
+    "naheulbeuk": {
+      "latest": naheulbeuk
     }
     // ↑ ADD SYSTEMS HERE ↑
   },
