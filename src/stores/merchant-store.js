@@ -8,6 +8,11 @@ import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item
 import { isResponsibleGM } from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
 import ItemPileStore from "./item-pile-store.js";
+import CustomColumn from "../applications/merchant-app/CustomColumn.svelte";
+import ItemEntry from "../applications/merchant-app/ItemEntry.svelte";
+import QuantityColumn from "../applications/merchant-app/QuantityColumn.svelte";
+import PriceSelector from "../applications/components/PriceSelector.svelte";
+import EntryButtons from "../applications/merchant-app/EntryButtons.svelte";
 
 export default class MerchantStore extends ItemPileStore {
 
@@ -15,11 +20,15 @@ export default class MerchantStore extends ItemPileStore {
     super(...args);
     this.services = writable({});
     this.editPrices = writable(false);
-    this.typeFilter = writable("all")
+    this.typeFilter = writable("all");
+    this.sortType = writable(0);
     this.priceModifiersPerType = writable({});
     this.priceModifiersForActor = writable({});
     this.priceSelector = writable("");
     this.closed = writable(false);
+    this.itemColumns = writable([]);
+    this.sortTypes = writable([]);
+    this.inverseSort = writable(false);
     this.isMerchant = false;
   }
 
@@ -27,11 +36,15 @@ export default class MerchantStore extends ItemPileStore {
     super.setupStores();
     this.services.set({});
     this.editPrices.set(false);
-    this.typeFilter.set("all")
+    this.typeFilter.set("all");
+    this.sortType.set(0);
     this.priceModifiersPerType.set({});
     this.priceModifiersForActor.set({});
     this.priceSelector.set("");
     this.closed.set(false);
+    this.itemColumns.set([]);
+    this.sortTypes.set([]);
+    this.inverseSort.set(false);
     this.isMerchant = false;
   }
 
@@ -50,6 +63,62 @@ export default class MerchantStore extends ItemPileStore {
       this.updatePriceModifiers();
       this.updateOpenCloseStatus();
       this.isMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
+
+      const customColumns = foundry.utils.deepClone(pileData.merchantColumns)
+        .map(column => ({
+          label: column.label,
+          component: CustomColumn,
+          data: column,
+          sortMethod: (a, b, inverse) => {
+            const path = column.path;
+            const AProp = getProperty(b.item, path);
+            const BProp = getProperty(a.item, path);
+            if (!column?.mapping) {
+              return AProp > BProp ? 1 : -1;
+            }
+            const keys = Object.keys(column.mapping);
+            return (keys.indexOf(AProp) - keys.indexOf(BProp)) * (inverse ? -1 : 1);
+          }
+        }));
+
+      const columns = [
+        {
+          label: "Type",
+          component: ItemEntry
+        },
+        {
+          label: "Quantity",
+          component: QuantityColumn,
+          sortMethod: (a, b, inverse) => {
+            return (get(b.quantity) - get(a.quantity)) * (inverse ? -1 : 1);
+          }
+        },
+        ...customColumns,
+        {
+          label: "Price",
+          component: PriceSelector,
+          sortMethod: (a, b, inverse) => {
+            const APrice = get(a.prices).find(price => price.primary);
+            const BPrice = get(b.prices).find(price => price.primary);
+            if (!APrice) return 1;
+            if (!BPrice) return -1;
+            return (BPrice.totalCost - APrice.totalCost) * (inverse ? -1 : 1);
+          }
+        },
+        {
+          label: false,
+          component: EntryButtons
+        }
+      ];
+
+      this.itemColumns.set(columns);
+
+      const sortTypes = columns.filter(col => col.label);
+
+      sortTypes.splice(1, 0, { label: "Name" });
+
+      this.sortTypes.set(sortTypes)
+
     });
     if (this.recipientDocument) {
       this.subscribeTo(this.recipientPileData, () => {
@@ -60,13 +129,15 @@ export default class MerchantStore extends ItemPileStore {
       })
     }
 
-    const filterDebounce = foundry.utils.debounce(() => {
-      this.refreshItems();
-    }, 300);
     this.subscribeTo(this.typeFilter, (val) => {
-      if (!val) return;
-      filterDebounce()
+      this.refreshItems()
     });
+    this.subscribeTo(this.sortType, (val) => {
+      this.refreshItems();
+    })
+    this.subscribeTo(this.inverseSort, (val) => {
+      this.refreshItems();
+    })
   }
 
   refreshItemPrices() {
@@ -85,6 +156,16 @@ export default class MerchantStore extends ItemPileStore {
           ? !(pileData?.hideItemsWithZeroCost && itemIsFree)
           : !(recipientPileData?.hideItemsWithZeroCost && itemIsFree)
       );
+  }
+
+  itemSortFunction(a, b) {
+    const sortType = get(this.sortType);
+    const inverse = get(this.inverseSort);
+    if (sortType <= 1) {
+      return super.itemSortFunction(a, b, inverse);
+    }
+    const selectedSortType = get(this.sortTypes)[sortType];
+    return selectedSortType?.sortMethod(a, b, inverse, selectedSortType);
   }
 
   createItem(item) {
@@ -112,7 +193,7 @@ export default class MerchantStore extends ItemPileStore {
     let pileData = get(this.pileData);
     if (pileData.itemTypePriceModifiers) {
       this.priceModifiersPerType.set((pileData.itemTypePriceModifiers ?? {}).reduce((acc, priceData) => {
-        acc[priceData.type] = priceData;
+        acc[priceData.category.toLowerCase() || priceData.type] = priceData;
         return acc;
       }, {}));
     }
@@ -124,10 +205,11 @@ export default class MerchantStore extends ItemPileStore {
     }
   }
 
-  addOverrideTypePrice(type) {
+  addOverrideTypePrice(type, custom = false) {
     const pileData = get(this.pileData);
     pileData.itemTypePriceModifiers.push({
-      type: type,
+      category: custom ? type : "",
+      type: custom ? "custom" : type,
       override: false,
       buyPriceModifier: 1,
       sellPriceModifier: 1
@@ -249,6 +331,7 @@ class PileMerchantItem extends PileItem {
     this.subscribeTo(this.itemDocument, () => {
       if (!setup) return;
       this.refreshPriceData();
+      this.store.refreshItems();
     });
     this.subscribeTo(this.store.typeFilter, this.filter.bind(this));
     this.subscribeTo(this.itemFlagData, () => {

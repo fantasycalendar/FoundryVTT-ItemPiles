@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.6.0
+
+- Added system specific columns to merchants, such as rarity in D&D 5e and bulk in Pathfinder 2e
+- Fixed price modifiers on custom categories did not work when created through the merchant interface
+- Fixed duplication bug with custom categories
+
 ## Version 2.5.8
 
 - Added support for the D&D 4e system (thank you EndlesNights on github!)

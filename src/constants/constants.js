@@ -123,13 +123,7 @@ const CONSTANTS = {
     itemTypePriceModifiers: [],
     actorPriceModifiers: [],
     tablesForPopulate: [],
-    merchantColumns: [{
-      label: "Quantity",
-      path: "quantity"
-    }, {
-      label: "Price",
-      path: "price"
-    }],
+    merchantColumns: [],
     openTimes: {
       enabled: false,
       status: "open",

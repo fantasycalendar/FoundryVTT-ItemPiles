@@ -54,7 +54,9 @@ export function getItemFlagData(item, data = false) {
 }
 
 export function getActorFlagData(target, data = false) {
-  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS), data);
+  const defaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
+  const systemDefaults = foundry.utils.deepClone(Helpers.getSetting(SETTINGS.PILE_DEFAULTS));
+  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, foundry.utils.mergeObject(defaults, systemDefaults), data);
 }
 
 export function isValidItemPile(target, data = false) {
@@ -605,11 +607,13 @@ export function getMerchantModifiersForActor(merchant, {
     if (!itemFlagData) {
       itemFlagData = getItemFlagData(item);
     }
-    const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => {
-      return priceData.type === "custom"
-        ? priceData.category === itemFlagData.customCategory
-        : priceData.type === item.type;
-    });
+    const itemTypePriceModifier = itemTypePriceModifiers
+      .sort((a, b) => a.type === "custom" && b.type !== "custom" ? -1 : 0)
+      .find(priceData => {
+        return priceData.type === "custom"
+          ? priceData.category.toLowerCase() === itemFlagData.customCategory.toLowerCase()
+          : priceData.type === item.type;
+      });
     if (itemTypePriceModifier) {
       buyPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.buyPriceModifier : buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
       sellPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.sellPriceModifier : sellPriceModifier * itemTypePriceModifier.sellPriceModifier;

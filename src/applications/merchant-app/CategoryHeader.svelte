@@ -15,27 +15,30 @@
   const itemCategoriesStore = store.itemCategories;
   const typeFilterStore = store.typeFilter;
   const editPrices = store.editPrices;
+  const columns = store.itemColumns;
+
+  $: colSpan = $editPrices ? $columns.length + 1 : 1;
+  $: type = category.type === "custom" ? category.label.toLowerCase() : category.type;
 
 </script>
 
-<div class="merchant-item-group-type item-piles-flexrow">
-	{#if !$editPrices}
-		<h3>{localize(category.label)}</h3>
-	{:else}
+<div class="merchant-item-group-type item-piles-flexrow" style="grid-column: 1/{colSpan};">
+	<h3>{localize(category.label)}</h3>
+	{#if $editPrices}
 		<div class="price-header" style="font-size: 0.75rem;">
-			{#if $priceModifiersPerType[category.type]}
+			{#if $priceModifiersPerType[type]}
 				{localize("ITEM-PILES.Merchant.Override")}:
-				<input type="checkbox" bind:checked={$priceModifiersPerType[category.type].override}>
-				<SliderInput bind:value={$priceModifiersPerType[category.type].buyPriceModifier}/>
+				<input type="checkbox" bind:checked={$priceModifiersPerType[type].override}>
+				<SliderInput bind:value={$priceModifiersPerType[type].buyPriceModifier}/>
 			{/if}
 		</div>
 		<div style="flex: 0 1 auto">
-			{#if $priceModifiersPerType[category.type]}
+			{#if $priceModifiersPerType[type]}
 				<i class="fas fa-times item-piles-clickable-red"
-					 on:click={() => { store.removeOverrideTypePrice(category.type) }}></i>
+					 on:click={() => { store.removeOverrideTypePrice(type, category.type === "custom") }}></i>
 			{:else}
 				<i class="fas fa-plus item-piles-clickable-green"
-					 on:click={() => { store.addOverrideTypePrice(category.type) }}></i>
+					 on:click={() => { store.addOverrideTypePrice(type, category.type === "custom") }}></i>
 			{/if}
 		</div>
 	{/if}

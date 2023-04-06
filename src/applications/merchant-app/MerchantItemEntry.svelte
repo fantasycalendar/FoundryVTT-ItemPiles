@@ -1,12 +1,9 @@
 <script>
   import { fade } from 'svelte/transition';
-  import PriceSelector from "../components/PriceSelector.svelte";
-  import ItemEntry from "./ItemEntry.svelte";
-  import EntryButtons from "./EntryButtons.svelte";
-  import QuantityColumn from "./QuantityColumn.svelte";
 
   export let item;
   export let index;
+  export let columns;
 
   const itemName = item.name;
   const itemImage = item.img;
@@ -27,30 +24,6 @@
   const displayControlButtons = store.actor.isOwner;
   const displayBuyButton = !!store.recipient;
 
-  let columns = [];
-  $: {
-    const customColumns = foundry.utils.deepClone($pileData.merchantColumns);
-    columns = [
-      {
-        label: false,
-        component: ItemEntry
-      },
-      {
-        label: "Quantity",
-        component: QuantityColumn
-      },
-      ...customColumns,
-      {
-        type: "Price",
-        component: PriceSelector
-      },
-      {
-        label: false,
-        component: EntryButtons
-      }
-    ]
-  }
-
 </script>
 
 <div class="item-piles-flexrow item-piles-item-row"
@@ -61,15 +34,12 @@
 		 transition:fade|local={{duration: 250}}>
 
 	{#each columns as column}
-
-		{#if column?.component}
-			<svelte:component this={column.component} {item}/>
+		{#if column?.data}
+			<svelte:component this={column.component} {item} data={column.data}/>
 		{:else}
-			<div><span>{getProperty($itemStore, column.path)}</span></div>
+			<svelte:component this={column.component} {item}/>
 		{/if}
-
 	{/each}
-
 
 </div>
 
@@ -77,11 +47,11 @@
 <style lang="scss">
 
 
-  :global(.item-piles-child-even-color > *) {
+  .item-piles-item-row:global(.item-piles-child-even-color > *) {
     background-color: var(--item-piles-even-color);
   }
 
-  :global(.item-piles-child-odd-color > *) {
+  .item-piles-item-row:global(.item-piles-child-odd-color > *) {
     background-color: var(--item-piles-odd-color);
   }
 
@@ -100,7 +70,7 @@
       flex: 1;
     }
 
-    &.merchant-item-hidden {
+    &.merchant-item-hidden > * {
       font-style: italic;
       opacity: 0.5;
     }

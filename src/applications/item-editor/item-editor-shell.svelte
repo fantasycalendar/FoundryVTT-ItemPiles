@@ -19,7 +19,7 @@
 
   let store = ItemPriceStore.make(item);
 
-  let currentCustomCategories = writable(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES));
+  let currentCustomCategories = writable(Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES))));
 
   const flagDataStore = store.data;
   let price = store.price;
@@ -35,8 +35,7 @@
     if (flagData.flags.customCategory) {
       let customCategories = get(currentCustomCategories);
       customCategories.push(flagData.flags.customCategory)
-      customCategories = Array.from(new Set(customCategories));
-      await Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, customCategories);
+      await Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, Array.from(new Set(customCategories)));
     }
     await PileUtilities.updateItemData(item, flagData);
     application.options.resolve();

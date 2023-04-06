@@ -58,13 +58,19 @@ export default {
     return overallCost ?? 0;
   },
 
-  "PILE_TYPE_DEFAULTS": {
-    [CONSTANTS.PILE_TYPES.MERCHANT]: {
-      merchantColumns: [{
-        label: "Rarity",
-        path: "system.rarity"
-      }],
-    }
+  "PILE_DEFAULTS": {
+    merchantColumns: [{
+      label: "Rarity",
+      path: "system.rarity",
+      mapping: {
+        "common": "DND5E.ItemRarityCommon",
+        "uncommon": "DND5E.ItemRarityUncommon",
+        "rare": "DND5E.ItemRarityRare",
+        "veryrare": "DND5E.ItemRarityVeryRare",
+        "legendary": "DND5E.ItemRarityLegendary",
+        "artifact": "DND5E.ItemRarityArtifact"
+      }
+    }]
   },
 
   "PREVENT_INJECTING_ITEMS": true,

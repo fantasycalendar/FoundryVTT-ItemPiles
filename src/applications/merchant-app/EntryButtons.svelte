@@ -1,9 +1,15 @@
 <script>
 
+  import ItemEditor from "../item-editor/item-editor.js";
+  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+
   export let item;
 
   const itemName = item.name;
   const itemImage = item.img;
+  const quantity = item.quantity;
+  const store = item.store;
+  const isMerchant = store.isMerchant;
 
   const itemFlagDataStore = item.itemFlagData;
 
@@ -13,7 +19,7 @@
 </script>
 
 <div class="item-piles-flexrow sidebar-buttons">
-	{#if displayControlButtons}
+	{#if displayControlButtons && isMerchant}
 		{#if game.user.isGM}
         <span class="item-piles-clickable-link" on:click={() => { ItemEditor.show(item.item); }}>
           <i class="fas fa-cog"></i>
@@ -30,17 +36,29 @@
       </span>
 	{/if}
 	{#if displayBuyButton}
+		{#if isMerchant}
       <span
 				class:item-piles-clickable-link={!$itemFlagDataStore.notForSale || game.user.isGM}
-				class:item-piles-clickable-link-disabled={quantity <= 0 || ($itemFlagDataStore.notForSale && !game.user.isGM)}
+				class:item-piles-clickable-link-disabled={$quantity <= 0 || ($itemFlagDataStore.notForSale && !game.user.isGM)}
 				class:buy-button={displayControlButtons}
 				on:click={() => {
-              if(quantity <= 0 || ($itemFlagDataStore.notForSale && !game.user.isGM)) return;
+              if($quantity <= 0 || ($itemFlagDataStore.notForSale && !game.user.isGM)) return;
               store.tradeItem(item)
             }}>
         <i class="fas fa-shopping-cart"></i>
 				{#if !displayControlButtons} {localize("ITEM-PILES.Merchant.Buy")}{/if}
       </span>
+		{:else}
+      <span
+				class:item-piles-clickable-link={quantity > 0 && !$itemFlagDataStore.cantBeSoldToMerchants}
+				class:item-piles-clickable-link-disabled={quantity <= 0 || $itemFlagDataStore.cantBeSoldToMerchants}
+				on:click={() => {
+              if((quantity <= 0 || $itemFlagDataStore.cantBeSoldToMerchants)) return;
+              store.tradeItem(item, true)
+            }}>
+        <i class="fas fa-hand-holding-usd"></i> {localize("ITEM-PILES.Merchant.Sell")}
+      </span>
+		{/if}
 	{/if}
 </div>
 
@@ -65,10 +83,6 @@
     .buy-button {
       padding-left: 0.25rem;
       border-left: 1px solid rgba(0, 0, 0, 0.5)
-    }
-
-    .disabled-buy-button {
-      opacity: 0.5;
     }
   }
 

@@ -3,6 +3,9 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import SliderInput from "../../components/SliderInput.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+  import { writable } from "svelte/store";
+  import * as Helpers from "../../../helpers/helpers.js";
+  import SETTINGS from "../../../constants/settings.js";
 
   const { application } = getContext('#external');
 
@@ -12,10 +15,13 @@
   let form;
   let unusedTypes;
   let systemTypes = Object.entries(CONFIG.Item.typeLabels);
-  systemTypes.push(["custom", "Custom"])
+  let currentCustomCategories = Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES)));
 
   $: {
-    unusedTypes = systemTypes.filter(([type]) => type === "custom" || !itemTypePriceModifiers.some(priceData => priceData.type === type)).map(([type]) => type);
+    const allTypes = systemTypes.map(([type]) => type).concat(currentCustomCategories).map(type => type.toLowerCase())
+    unusedTypes = allTypes.filter(type => {
+      return !itemTypePriceModifiers.some(priceData => priceData.type === type || (priceData.type === "custom" && priceData.category === type))
+    });
   }
 
   function add() {
@@ -76,18 +82,25 @@
 						</td>
 						<td>
 							<div class="form-group">
-								{#if priceData.type === "custom"}
-									<input type="text" bind:value={priceData.category} placeholder="Custom Category">
-								{:else}
-									<select bind:value={priceData.type}>
-										{#each systemTypes as [itemType, label] (itemType)}
-											<option value="{itemType}"
-															disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
-												{localize(label)}
-											</option>
-										{/each}
-									</select>
-								{/if}
+								<select on:change={(e) => {
+									priceData.type = e.target.value;
+									priceData.category = e.target.value === "custom" ? e.target.options[e.target.selectedIndex].text.toLowerCase() : "";
+								}}>
+									{#each systemTypes as [itemType, label] (itemType)}
+										<option value="{itemType}"
+														selected="{priceData.type === itemType}"
+														disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
+											{localize(label)}
+										</option>
+									{/each}
+									{#each currentCustomCategories as customCategory}
+										<option value="custom"
+														selected="{priceData.type === 'custom' && customCategory.toLowerCase() === priceData.category.toLowerCase()}"
+														disabled="{customCategory.toLowerCase() !== priceData.category.toLowerCase() && !unusedTypes.includes(customCategory.toLowerCase())}">
+											{customCategory}
+										</option>
+									{/each}
+								</select>
 							</div>
 						</td>
 						<td>

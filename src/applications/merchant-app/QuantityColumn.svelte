@@ -2,8 +2,6 @@
 
   export let item;
 
-  console.log(item);
-
   const store = item.store;
   const displayQuantityStore = item.displayQuantity;
   const infiniteQuantityStore = item.infiniteQuantity;
@@ -16,7 +14,7 @@
 <div>
 	{#if $displayQuantityStore && item.canStack}
 		{#if $infiniteQuantityStore}
-			<span>(∞)</span>
+			<span>∞</span>
 		{:else if !showEditQuantity}
         <span
 					class:item-piles-clickable-link={game.user.isGM}

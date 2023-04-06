@@ -27,7 +27,8 @@
 
 </script>
 
-<div class="item-piles-merchant-item-container">
+<div class="item-piles-merchant-item-container"
+		 class:merchant-item-hidden={itemFlagData.hidden}>
 
 	<div
 		class="item-piles-img-container"
@@ -81,5 +82,10 @@
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
   }
+
+	.merchant-item-hidden > * {
+		font-style: italic;
+		opacity: 0.5;
+	}
 
 </style>
