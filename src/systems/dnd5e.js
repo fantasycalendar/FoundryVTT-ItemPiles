@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": "1.0.4",
+  "VERSION": "1.0.5",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -56,7 +56,21 @@ export default {
     return overallCost ?? 0;
   },
 
-  "PREVENT_INJECTING_ITEMS": true,
+  "PILE_DEFAULTS": {
+    merchantColumns: [{
+      label: "Rarity",
+      path: "system.rarity",
+      formatting: "{#}",
+      mapping: {
+        "common": "DND5E.ItemRarityCommon",
+        "uncommon": "DND5E.ItemRarityUncommon",
+        "rare": "DND5E.ItemRarityRare",
+        "veryrare": "DND5E.ItemRarityVeryRare",
+        "legendary": "DND5E.ItemRarityLegendary",
+        "artifact": "DND5E.ItemRarityArtifact"
+      }
+    }]
+  },
 
   // Item similarities determines how item piles detect similarities and differences in the system
   "ITEM_SIMILARITIES": ["name", "type"],

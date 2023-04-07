@@ -1,35 +1,14 @@
 import VaultStylesEditorShell from './vault-styles-editor.svelte';
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import Editor from "../Editor.js";
 
-export default class VaultStylesEditor extends SvelteApplication {
-
-  constructor(vaultStyles, options) {
-    super({
-      svelte: {
-        class: VaultStylesEditorShell,
-        target: document.body,
-        props: {
-          vaultStyles
-        }
-      },
-      close: () => this.options.resolve(null),
-      ...options
-    });
-  }
+export default class VaultStylesEditor extends Editor {
 
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       title: game.i18n.localize("ITEM-PILES.Applications.VaultStylesEditor.Title"),
-      width: 400,
-      height: "auto",
-      classes: ["item-piles-app"]
+      svelte: {
+        class: VaultStylesEditorShell,
+      }
     })
-  }
-
-  static async show(vaultStyles, options = {}) {
-    return new Promise(resolve => {
-      options.resolve = resolve;
-      return new this(vaultStyles, options).render(true, { focus: true });
-    });
   }
 }

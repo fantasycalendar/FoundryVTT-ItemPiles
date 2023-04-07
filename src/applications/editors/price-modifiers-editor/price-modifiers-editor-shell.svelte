@@ -9,8 +9,14 @@
 
   let form;
 
-  export let priceModifiers;
+  export let data;
   export let elementRoot;
+
+  let priceModifiers = data.map(data => {
+    data.actor = globalThis.fromUuidSync(data.actorUuid);
+    if (!data.actor) return false;
+    return data;
+  }).filter(Boolean);
 
   function remove(index) {
     priceModifiers.splice(index, 1)

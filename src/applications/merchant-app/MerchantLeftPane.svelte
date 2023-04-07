@@ -84,14 +84,6 @@
 
 						<div class="form-group">
 							<label style="flex:3;">
-								<span>{localize("ITEM-PILES.Merchant.EditTypePrices")}</span>
-								<p>{localize("ITEM-PILES.Merchant.EditTypePricesExplanation")}</p>
-							</label>
-							<input type="checkbox" bind:checked={$editPrices}/>
-						</div>
-
-						<div class="form-group">
-							<label style="flex:3;">
 								<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
 								<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
 							</label>
@@ -104,6 +96,14 @@
 								<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
 							</label>
 							<input type="checkbox" bind:checked={$pileDataStore.hideNewItems}/>
+						</div>
+
+						<div class="form-group">
+							<label style="flex:3;">
+								<span>{localize("ITEM-PILES.Merchant.EditTypePrices")}</span>
+								<p>{localize("ITEM-PILES.Merchant.EditTypePricesExplanation")}</p>
+							</label>
+							<input type="checkbox" bind:checked={$editPrices}/>
 						</div>
 
 						<div class="form-group slider-group item-piles-flexcol">
@@ -183,7 +183,7 @@
       .setting-container {
         overflow: hidden auto;
         top: 0;
-        bottom: 37px;
+        bottom: 0;
         position: absolute;
         padding: 0 0.25rem;
 

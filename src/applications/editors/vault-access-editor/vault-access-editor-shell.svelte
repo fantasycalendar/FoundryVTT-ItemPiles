@@ -8,10 +8,10 @@
 
   let form;
 
-  export let vaultAccess;
+  export let data;
   export let elementRoot;
 
-  const vaultAccessStore = writable(vaultAccess);
+  const vaultAccessStore = writable(data);
 
   const validUsers = Array.from(game.users).filter(user => !user.isGM);
 

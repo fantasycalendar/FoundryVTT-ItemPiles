@@ -2,26 +2,38 @@
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import { get, writable } from "svelte/store";
 
   const { application } = getContext('#external');
 
   let form;
 
   export let elementRoot;
-  export let stringList;
+  export let data;
+
+  const keyValuePair = application.options?.keyValuePair ?? false;
+  const stringListStore = writable(data);
 
   function add() {
-    stringList = [...stringList, ""];
-    stringList = stringList;
+    stringListStore.update(val => {
+      if (keyValuePair) {
+        val.push(["", ""]);
+      } else {
+        val.push("");
+      }
+      return val;
+    })
   }
 
   function remove(index) {
-    stringList.splice(index, 1)
-    stringList = stringList;
+    stringListStore.update(val => {
+      val.splice(index, 1);
+      return val;
+    })
   }
 
   async function updateSettings() {
-    application.options.resolve(stringList);
+    application.options.resolve(get(stringListStore));
     application.close();
   }
 
@@ -42,17 +54,32 @@
 
 		<table>
 			<tr>
-				<th>{localize(application.options.column)}</th>
+				{#if keyValuePair}
+					<th>{localize(application.options?.columnKey)}</th>
+				{/if}
+				<th>{localize(application.options?.column)}</th>
 				<th class="small"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a></th>
 			</tr>
-			{#each stringList as path, index (index)}
-				<tr>
-					<td><input type="text" required bind:value="{path}"/></td>
-					<td class="small">
-						<button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
-					</td>
-				</tr>
-			{/each}
+			{#if keyValuePair}
+				{#each $stringListStore as [key, path], index (index)}
+					<tr>
+						<td><input type="text" required bind:value="{key}"/></td>
+						<td><input type="text" bind:value="{path}"/></td>
+						<td class="small">
+							<button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
+						</td>
+					</tr>
+				{/each}
+			{:else}
+				{#each $stringListStore as path, index (index)}
+					<tr>
+						<td><input type="text" required bind:value="{path}"/></td>
+						<td class="small">
+							<button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
+						</td>
+					</tr>
+				{/each}
+			{/if}
 		</table>
 
 		<footer>

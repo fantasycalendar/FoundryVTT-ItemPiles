@@ -576,10 +576,13 @@
           "SellPriceModifier": "Sell Price Modifier (%)",
           "ItemTypeModifier": "Item Type Price Modifiers",
           "ItemTypeModifiersExplanation": "In this dialog you can configure price modifiers for individual item types.",
-          "ConfigureItemTypePriceModifiers": "Configure Item Type Price Modifiers.",
+          "ConfigureItemTypePriceModifiers": "Configure Item Type Price Modifiers",
           "ActorPriceModifiers": "Per-Actor Override Price Modifiers",
           "ActorPriceModifiersExplanation": "Here you can configure if certain specific actors should have different price modifiers than the price modifiers above.",
-          "ConfigureActorPriceModifiers": "Configure Actor Price Modifiers."
+          "ConfigureActorPriceModifiers": "Configure Actor Price Modifiers",
+          "MerchantColumns": "Merchant Columns",
+          "MerchantColumnsExplanation": "Here you can configure this merchant's system specific columns displayed in its merchant UI, such as the rarity of items.",
+          "ConfigureMerchantColumns": "Configure Merchant Columns"
         },
         "Vault": {
           "Title": "Vault Settings",
@@ -608,8 +611,20 @@
         }
       },
       "VaultAccessEditor": {
-        "Title": "Vault Access Editor: {actor_name}",
+        "Title": "Vault Access Editor",
+        "TitleActor": "Vault Access Editor: {actor_name}",
         "Explanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access."
+      },
+      "MerchantColumnsEditor": {
+        "Title": "Merchant Columns",
+        "TitleActor": "Merchant Columns: {actor_name}",
+        "Explanation": "This configures the columns visible in the merchant UI, beyond the name of the item, the quantity, and the price.",
+        "Label": "Label",
+        "PropertyPath": "Item Property Path",
+        "Formatting": "Formatting",
+        "ConfigureMapping": "Configure Mapping",
+        "MappingTitle": "Merchant Columns Mapping: {label}",
+        "MappingContent": "This configures the mapping between the value of the property to a label. This label can be a localized string."
       },
       "PricePresetEditor": {
         "Title": "Price Presets Editor",

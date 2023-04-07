@@ -2,6 +2,7 @@ import CONSTANTS from "./constants/constants.js";
 import { custom_warning, getSetting } from "./helpers/helpers.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
 import SETTINGS from "./constants/settings.js";
+import { SYSTEMS } from "./systems.js";
 
 let oldSettings;
 
@@ -261,6 +262,59 @@ const migrations = {
         await token.update(update);
         await token.actor.updateEmbeddedDocuments("Item", items)
       }
+
+    }
+
+  },
+
+  "2.6.0": async (version) => {
+
+    const actors = getItemPileActorsOfLowerVersion(version);
+
+    const actorUpdates = actors.map(actor => {
+      const flags = getProperty(actor, CONSTANTS.FLAGS.PILE);
+      const systemDefaultFlags = SYSTEMS.DATA?.PILE_DEFAULTS ?? false;
+      if (systemDefaultFlags) {
+        return {
+          _id: actor.id,
+          [CONSTANTS.FLAGS.PILE]: foundry.utils.mergeObject(flags, systemDefaultFlags),
+          [CONSTANTS.FLAGS.VERSION]: version
+        }
+      }
+      return false;
+    }).filter(Boolean);
+
+    if (actorUpdates.length) {
+      console.log(`Item Piles | Migrating ${actorUpdates.length} actors to version ${version}...`);
+    }
+
+    await Actor.updateDocuments(actorUpdates);
+
+    const { validTokensOnScenes } = getItemPileTokensOfLowerVersion(version);
+
+    for (const [sceneId, tokens] of validTokensOnScenes) {
+
+      const tokensToUpdate = tokens.map(token => {
+        const flags = getProperty(token, CONSTANTS.FLAGS.PILE);
+        const systemDefaultFlags = SYSTEMS.DATA?.PILE_DEFAULTS ?? false;
+        if (systemDefaultFlags) {
+          const updatedFlags = foundry.utils.mergeObject(flags, systemDefaultFlags);
+          return {
+            _id: token.id,
+            [CONSTANTS.FLAGS.VERSION]: version,
+            [CONSTANTS.FLAGS.PILE]: updatedFlags,
+            actorData: {
+              [CONSTANTS.FLAGS.VERSION]: version,
+              [CONSTANTS.FLAGS.PILE]: updatedFlags,
+            }
+          }
+        }
+        return false;
+      }).filter(Boolean);
+
+      console.log(`Item Piles | Migrating ${tokensToUpdate.length} tokens on scene "${sceneId}" to version ${version}...`);
+
+      await game.scenes.get(sceneId).updateEmbeddedDocuments("Token", tokensToUpdate);
 
     }
 

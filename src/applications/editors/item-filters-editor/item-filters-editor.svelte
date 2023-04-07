@@ -5,30 +5,33 @@
   import { getSetting, setSetting } from "../../../helpers/helpers.js";
   import SETTINGS from "../../../constants/settings.js";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+  import { get, writable } from "svelte/store";
 
   const { application } = getContext('#external');
 
-  export let itemFilters;
+  export let data;
   export let elementRoot;
 
   let form;
 
-  if (!itemFilters) {
-    itemFilters = getSetting(SETTINGS.ITEM_FILTERS);
-  }
+  const itemFilters = writable(data ? data : getSetting(SETTINGS.ITEM_FILTERS))
 
   function add() {
-    itemFilters = [...itemFilters, { path: "", filters: "" }];
-    itemFilters = itemFilters;
+    itemFilters.update(val => {
+      val.push({ path: "", filters: "" });
+      return val;
+    })
   }
 
   function remove(index) {
-    itemFilters.splice(index, 1)
-    itemFilters = itemFilters;
+    itemFilters.update(val => {
+      val.splice(index, 1)
+      return val;
+    })
   }
 
   async function updateSettings() {
-    application.options.resolve(itemFilters);
+    application.options.resolve(get(itemFilters));
     application.close();
   }
 
@@ -52,7 +55,7 @@
 				<th>{localize("ITEM-PILES.Applications.FilterEditor.Filters")}</th>
 				<th class="custom-small"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a></th>
 			</tr>
-			{#each itemFilters as { path, filters }, index (index)}
+			{#each $itemFilters as { path, filters }, index (index)}
 				<tr>
 					<td><input type="text" required placeholder="type" bind:value="{path}"/></td>
 					<td><input type="text" required placeholder="class, spell, feat" bind:value="{filters}"/></td>

@@ -1,7 +1,6 @@
 <script>
 
-  import MerchantBuyTab from "./MerchantBuyTab.svelte";
-  import MerchantSellTab from "./MerchantSellTab.svelte";
+  import MerchantItemTab from "./MerchantItemTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import RecipientFooter from "./RecipientFooter.svelte";
@@ -29,11 +28,11 @@
         <span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
       </div>
     {:else if $activeTab === "buy"}
-      <MerchantBuyTab {store} categoryFilter={(category) => { return !category.service }}/>
+      <MerchantItemTab {store}/>
     {:else if $activeTab === "services" }
-      <MerchantBuyTab {store} categoryFilter={(category) => { return category.service }}/>
+      <MerchantItemTab {store} services={true}/>
     {:else if $activeTab === "sell"}
-      <MerchantSellTab store={recipientStore}/>
+      <MerchantItemTab store={recipientStore} noItemsLabel="ITEM-PILES.Merchant.NoItemsToSell"/>
     {:else if $activeTab === "tables"}
       <MerchantPopulateItemsTab {store}/>
     {/if}
@@ -58,8 +57,8 @@
   }
 
   .merchant-tabbed-center {
-    overflow-y: scroll;
-    overflow-x: hidden;
+    overflow: hidden;
+		margin-bottom: 0.5rem;
   }
 
 </style>

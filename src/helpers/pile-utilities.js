@@ -403,56 +403,6 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
 }
 
-export async function createDefaultItemPile(itemPileFlags = {}, folders = false) {
-
-  let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
-
-  pileDataDefaults.enabled = true;
-  if (foundry.utils.isEmpty(itemPileFlags)) {
-    pileDataDefaults.deleteWhenEmpty = true;
-    pileDataDefaults.displayOne = true;
-    pileDataDefaults.showItemName = true;
-    pileDataDefaults.overrideSingleItemScale = true;
-    pileDataDefaults.singleItemScale = 0.75;
-  }
-
-  pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
-
-  const actorData = {
-    name: "Default Item Pile",
-    type: Helpers.getSetting("actorClassType"),
-    img: "icons/svg/item-bag.svg"
-  };
-
-  if (folders) {
-    const folder = await Utilities.createFoldersFromNames(folders);
-    if (folder) {
-      actorData.folder = folder.id;
-    }
-  }
-
-  const pileActor = await Actor.create(actorData);
-
-  await pileActor.update({
-    [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-    [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
-    prototypeToken: {
-      name: "Item Pile",
-      actorLink: false,
-      bar1: { attribute: "" },
-      vision: false,
-      displayName: 50,
-      [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
-    }
-  })
-
-  await Helpers.setSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID, pileActor.id);
-
-  return pileActor;
-
-}
-
 export function shouldEvaluateChange(target, changes) {
   const flags = getActorFlagData(target, getProperty(changes, CONSTANTS.FLAGS.PILE) ?? {});
   if (!isValidItemPile(target, flags)) return false;
@@ -605,11 +555,13 @@ export function getMerchantModifiersForActor(merchant, {
     if (!itemFlagData) {
       itemFlagData = getItemFlagData(item);
     }
-    const itemTypePriceModifier = itemTypePriceModifiers.find(priceData => {
-      return priceData.type === "custom"
-        ? priceData.category === itemFlagData.customCategory
-        : priceData.type === item.type;
-    });
+    const itemTypePriceModifier = itemTypePriceModifiers
+      .sort((a, b) => a.type === "custom" && b.type !== "custom" ? -1 : 0)
+      .find(priceData => {
+        return priceData.type === "custom"
+          ? priceData.category.toLowerCase() === itemFlagData.customCategory.toLowerCase()
+          : priceData.type === item.type;
+      });
     if (itemTypePriceModifier) {
       buyPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.buyPriceModifier : buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
       sellPriceModifier = itemTypePriceModifier.override ? itemTypePriceModifier.sellPriceModifier : sellPriceModifier * itemTypePriceModifier.sellPriceModifier;

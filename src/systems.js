@@ -29,6 +29,7 @@ import dcc from "./systems/dcc.js";
 import a5e from "./systems/a5e.js";
 import darkHeresy2e from "./systems/dark-heresy.js";
 import naheulbeuk from "./systems/naheulbeuk.js";
+import icrpgme from "./systems/icrpgme.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -78,6 +79,9 @@ export const SYSTEMS = {
     },
     "icrpg": {
       "latest": icrpg
+    },
+    "icrpgme": {
+      "latest": icrpgme
     },
     "swse": {
       "latest": swse
@@ -139,6 +143,7 @@ export const SYSTEMS = {
     ITEM_SIMILARITIES: [],
     UNSTACKABLE_ITEM_TYPES: [],
     CURRENCIES: [],
+    PILE_DEFAULTS: {},
     CURRENCY_DECIMAL_DIGITS: 0.00001
   },
 

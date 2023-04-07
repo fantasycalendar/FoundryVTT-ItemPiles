@@ -87,6 +87,24 @@ class API {
   }
 
   /**
+   * The types of items that will always be considered unique when transferring between actors
+   *
+   * @returns {Array<string>}
+   */
+  static get UNSTACKABLE_ITEM_TYPES() {
+    return Helpers.getSetting(SETTINGS.UNSTACKABLE_ITEM_TYPES);
+  }
+
+  /**
+   * The system specific default values for item pile actors created in this system
+   *
+   * @returns {Object}
+   */
+  static get PILE_DEFAULTS() {
+    return Helpers.getSetting(SETTINGS.PILE_DEFAULTS);
+  }
+
+  /**
    * Sets the actor class type used for the original item pile actor in this system
    *
    * @param {string} inClassType
@@ -248,6 +266,25 @@ class API {
   }
 
   /**
+   * Sets the types of items that will always be considered unique when transferring between actors
+   *
+   * @param {Object} inDefaults
+   * @returns {Promise}
+   */
+  static async setPileDefaults(inDefaults) {
+    if (typeof inDefaults !== "object") {
+      throw Helpers.custom_error("setPileDefaults | inDefaults must be of type object");
+    }
+    const validKeys = new Set(Object.keys(CONSTANTS.PILE_DEFAULTS));
+    for (const key of Object.keys(inDefaults)) {
+      if (!validKeys.has(key)) {
+        throw Helpers.custom_error(`setPileDefaults | ${key} is not a valid pile setting`);
+      }
+    }
+    return Helpers.setSetting(SETTINGS.PILE_DEFAULTS, inDefaults);
+  }
+
+  /**
    * A combination of all the methods above, but this integrates a system's specific
    * settings more readily into item piles, allowing users to also change the settings
    * afterwards.
@@ -261,6 +298,7 @@ class API {
    *   ITEM_FILTERS: Array<{path: string, filters: string}>,
    *   ITEM_SIMILARITIES: Array<string>,
    *   UNSTACKABLE_ITEM_TYPES: Array<string>,
+   *   PILE_DEFAULTS: Object,
    *   ITEM_TRANSFORMER: undefined/Function,
    *   CURRENCIES: Array<{
    *     primary: boolean,
@@ -284,6 +322,7 @@ class API {
       ITEM_FILTERS: [],
       ITEM_SIMILARITIES: [],
       UNSTACKABLE_ITEM_TYPES: [],
+      PILE_DEFAULTS: {},
       ITEM_TRANSFORMER: null,
       CURRENCIES: [],
       CURRENCY_DECIMAL_DIGITS: null
@@ -328,6 +367,16 @@ class API {
       }
       if (typeof data['ITEM_TRANSFORMER']({}) !== "object") {
         throw Helpers.custom_error("addSystemIntegration | data.ITEM_TRANSFORMER's return value must be of type object");
+      }
+    }
+
+    if (typeof data['PILE_DEFAULTS'] !== "object") {
+      throw Helpers.custom_error("addSystemIntegration | data.PILE_DEFAULTS must be of type object");
+    }
+    const validKeys = new Set(Object.keys(CONSTANTS.PILE_DEFAULTS));
+    for (const key of Object.keys(data['PILE_DEFAULTS'])) {
+      if (!validKeys.has(key)) {
+        throw Helpers.custom_error(`addSystemIntegration | data.PILE_DEFAULTS contains illegal key "${key}" that is not a valid pile default`);
       }
     }
 

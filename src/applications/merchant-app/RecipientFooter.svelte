@@ -24,6 +24,5 @@
     .merchant-bottom-row {
         flex: 0 1 auto;
         align-items: center;
-        margin-top: 0.5rem;
     }
 </style>

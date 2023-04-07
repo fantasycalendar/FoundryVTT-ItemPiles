@@ -37,6 +37,7 @@ const SETTINGS = {
   QUANTITY_FOR_PRICE_ATTRIBUTE: "quantityForPriceAttribute",
   ITEM_SIMILARITIES: "itemSimilarities",
   UNSTACKABLE_ITEM_TYPES: "unstackableItemTypes",
+  PILE_DEFAULTS: "pileDefaults",
 
   // Hidden settings
   DEFAULT_ITEM_PILE_JOURNAL_ID: "defaultItemPileJournalID",
@@ -229,6 +230,14 @@ const SETTINGS = {
       system: true,
       default: SYSTEMS.DATA.QUANTITY_FOR_PRICE_ATTRIBUTE,
       type: String
+    },
+
+    [SETTINGS.PILE_DEFAULTS]: {
+      scope: "world",
+      config: false,
+      system: true,
+      default: SYSTEMS.DATA.PILE_DEFAULTS,
+      type: Object
     },
 
     [SETTINGS.CUSTOM_ITEM_CATEGORIES]: {

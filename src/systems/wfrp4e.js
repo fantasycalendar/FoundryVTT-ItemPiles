@@ -1,3 +1,5 @@
+import CONSTANTS from "../constants/constants.js";
+
 export default {
 
   "VERSION": "1.0.4",
@@ -30,6 +32,15 @@ export default {
     overallCost += (Number(prices?.["ss"]) ?? 0) * 0.1;
     overallCost += (Number(prices?.["bp"]) ?? 0) * 0.01;
     return overallCost;
+  },
+
+  "PILE_TYPE_DEFAULTS": {
+    [CONSTANTS.PILE_TYPES.MERCHANT]: {
+      merchantColumns: [{
+        label: "Availability",
+        path: "system.availability.value"
+      }],
+    }
   },
 
   // Currencies in item piles is a versatile system that can accept actor attributes (a number field on the actor's sheet) or items (actual items in their inventory)

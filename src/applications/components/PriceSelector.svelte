@@ -25,49 +25,48 @@
 </script>
 
 <div class="price-container">
-  {#if $prices.length > 1}
-    <TJSToggleLabel>
-      <div slot=left
-           class:multiple-prices={$prices.length > 1 && !standalone}
-           class:cant-afford={cantAfford}
-           class:cant-afford-multiple-prices={cantAffordMultiplePrices}
-           class:item-piles-clickable-link={$prices.length > 1}>
-        {@html labelText}
-      </div>
-      <TJSMenu offset={{y: 4}}>
-        <div class="price-list">
-          {#each $prices as priceGroup, index (index)}
-            <div class="price-group" class:selected={$selectedPriceGroup === index}>
-              {#each priceGroup.prices.filter(price => price.cost) as price (price.id)}
-                <div class="price-group-container"
-                     on:click={() => {
+	{#if $prices.length > 1}
+		<TJSToggleLabel>
+			<div slot=left
+					 class:multiple-prices={$prices.length > 1 && !standalone}
+					 class:cant-afford={cantAfford}
+					 class:cant-afford-multiple-prices={cantAffordMultiplePrices}
+					 class:item-piles-clickable-link={$prices.length > 1}>
+				{@html labelText}
+			</div>
+			<TJSMenu offset={{y: 4}}>
+				<div class="price-list">
+					{#each $prices as priceGroup, index (index)}
+						<div class="price-group" class:selected={$selectedPriceGroup === index}>
+							{#each priceGroup.prices.filter(price => price.cost) as price (price.id)}
+								<div class="price-group-container"
+										 on:click={() => {
                          $selectedPriceGroup = index;
                          $priceSelector = "";
                        }}
-                     class:cant-afford={!priceGroup.maxQuantity && item.store.recipient}>
-                  <div class="item-piles-img-container"
-                       class:not-for-sale={!price.maxQuantity && item.store.recipient}>
-                    <img class="item-piles-img" src="{price.img}"/>
-                  </div>
-                  <div class="item-piles-name item-piles-text">
-                    {price.baseCost + (priceGroup.prices.length === 0 && price.percent ? "%" : "")} {price.name}
-                  </div>
-                </div>
-              {/each}
-            </div>
-          {/each}
-        </div>
-      </TJSMenu>
-    </TJSToggleLabel>
-  {:else}
-    <small class:cant-afford={cantAfford}>{@html labelText }</small>
-  {/if}
+										 class:cant-afford={!priceGroup.maxQuantity && item.store.recipient}>
+									<div class="item-piles-img-container"
+											 class:not-for-sale={!price.maxQuantity && item.store.recipient}>
+										<img class="item-piles-img" src="{price.img}"/>
+									</div>
+									<div class="item-piles-name item-piles-text">
+										{price.baseCost + (priceGroup.prices.length === 0 && price.percent ? "%" : "")} {price.name}
+									</div>
+								</div>
+							{/each}
+						</div>
+					{/each}
+				</div>
+			</TJSMenu>
+		</TJSToggleLabel>
+	{:else}
+		<small class:cant-afford={cantAfford}>{@html labelText }</small>
+	{/if}
 </div>
 
 <style lang="scss">
 
   .price-container {
-    flex: 0 1 100px;
     align-items: center;
     position: relative;
     --tjs-label-justify-content: flex-start;
@@ -76,6 +75,10 @@
     --tjs-menu-color: black;
     --tjs-menu-border: 1px solid #444;
     --tjs-menu-box-shadow: 0 6px 9px -1px rgba(0, 0, 0, 0.5);
+    padding: 0 5px;
+    display: flex;
+    justify-content: center;
+    height: 100%;
 
     small {
       padding-left: 2px;

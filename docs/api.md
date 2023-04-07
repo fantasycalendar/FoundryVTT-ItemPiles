@@ -8,6 +8,8 @@
   * [ITEM_QUANTITY_ATTRIBUTE](#ITEM_QUANTITY_ATTRIBUTE)
   * [ITEM_FILTERS](#ITEM_FILTERS)
   * [ITEM_SIMILARITIES](#ITEM_SIMILARITIES)
+  * [UNSTACKABLE_ITEM_TYPES](#UNSTACKABLE_ITEM_TYPES)
+  * [PILE_DEFAULTS](#PILE_DEFAULTS)
   * [setActorClassType](#setActorClassType)
   * [setCurrencies](#setCurrencies)
   * [setCurrencyDecimalDigits](#setCurrencyDecimalDigits)
@@ -16,6 +18,7 @@
   * [setItemFilters](#setItemFilters)
   * [setItemSimilarities](#setItemSimilarities)
   * [setUnstackableItemTypes](#setUnstackableItemTypes)
+  * [setPileDefaults](#setPileDefaults)
   * [addSystemIntegration](#addSystemIntegration)
 
 
@@ -121,6 +124,24 @@ The filters for item types eligible for interaction within this system
 
 The attributes for detecting item similarities
 
+
+---
+
+### UNSTACKABLE_ITEM_TYPES
+
+`game.itempiles.API.UNSTACKABLE_ITEM_TYPES` ⇒ `Array<string>`
+
+The types of items that will always be considered unique when transferring between actors
+
+
+---
+
+### PILE_DEFAULTS
+
+`game.itempiles.API.PILE_DEFAULTS` ⇒ `Object`
+
+The system specific default values for item pile actors created in this system
+
 ---
 
 ### setActorClassType
@@ -219,6 +240,18 @@ Sets the types of items that will always be considered unique when transferring 
 
 ---
 
+### setPileDefaults
+
+`game.itempiles.API.setPileDefaults(inTypes)` ⇒ `Promise`
+
+Sets the types of items that will always be considered unique when transferring between actors
+
+| Param  | Type             |
+|--------|------------------|
+| inTypes | `Object` |
+
+---
+
 ### addSystemIntegration
 
 `game.itempiles.API.addSystemIntegration(data)`
@@ -231,10 +264,11 @@ A combination of all the methods above, but this integrates a system's specific 
 | data.VERSION                 | `string`                                                                                                                                                                                        | The integration version                                                                                              |
 | data.ACTOR_CLASS_TYPE        | `string`                                                                                                                                                                                        | The system's actor class type to represent item piles                                                                |
 | data.ITEM_PRICE_ATTRIBUTE    | `string`                                                                                                                                                                                        | The property path to the system's item price attribute                                                               |
-| data.ITEM_QUANTITY_ATTRIBUTE    | `string`                                                                                                                                                                                        | The property path to the system's item quantity attribute                                                            |
+| data.ITEM_QUANTITY_ATTRIBUTE | `string`                                                                                                                                                                                        | The property path to the system's item quantity attribute                                                            |
 | data.ITEM_FILTERS            | `Array<{path: string, filters: string}>`                                                                                                                                                        | The filters to determine which items to not include as droppable or tradable                                         |
 | data.ITEM_SIMILARITIES       | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item similarities                                               |
-| data.UNSTACKABLE_ITEM_TYPES       | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item types that cannot stack, no matter what                    |
+| data.UNSTACKABLE_ITEM_TYPES  | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item types that cannot stack, no matter what                    |
+| data.PILE_DEFAULTS           | `Object`                                                                                                                                                                                        | The system specific default values for item pile actors created in this system                    |
 | data.ITEM_TRANSFORMER        | `undefined/Function`                                                                                                                                                                            | An optional function that gets run over items before picked up, traded, or bought                                    |
 | data.CURRENCIES              | `Array<{ primary: boolean, type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }>, exchangeRate: number }>` | The array of currencies for this system                                                                              |
 | data.CURRENCY_DECIMAL_DIGITS | `undefined/number`                                                                                                                                                                              | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured) |

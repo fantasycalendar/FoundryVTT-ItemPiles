@@ -230,6 +230,10 @@ export default class ItemPileStore {
       && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden);
   }
 
+  itemSortFunction(a, b, inverse) {
+    return (b.item.name > a.item.name ? -1 : 1) * (inverse ? -1 : 1);
+  }
+
   refreshItems() {
     const allItems = get(this.allItems);
     const pileData = get(this.pileData);
@@ -246,9 +250,7 @@ export default class ItemPileStore {
     const items = visibleItems.filter(entry => !get(entry.filtered));
 
     this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
-    this.items.set(items.sort((a, b) => {
-      return a.item.name < b.item.name ? -1 : 1;
-    }));
+    this.items.set(items.sort((a, b) => this.itemSortFunction(a, b)));
 
     const currencies = get(this.attributes).concat(itemCurrencies);
     this.numCurrencies.set(currencies.filter(entry => get(entry.quantity) > 0).length);
