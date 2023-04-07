@@ -233,8 +233,6 @@ const SETTINGS = {
     },
 
     [SETTINGS.PILE_DEFAULTS]: {
-      name: "ITEM-PILES.Settings.QuantityForPrice.Title",
-      hint: "ITEM-PILES.Settings.QuantityForPrice.Hint",
       scope: "world",
       config: false,
       system: true,

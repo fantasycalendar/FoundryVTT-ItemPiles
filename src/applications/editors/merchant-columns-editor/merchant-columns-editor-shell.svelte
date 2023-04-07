@@ -20,6 +20,7 @@
       value.push({
         label: "",
         path: "",
+        formatting: "{#}",
         mapping: {}
       });
       return value;
@@ -84,6 +85,9 @@
 				<div class="item-piles-flexcol">
 					<span>{localize("ITEM-PILES.Applications.MerchantColumnsEditor.PropertyPath")}</span>
 				</div>
+				<div class="item-piles-flexcol">
+					<span>{localize("ITEM-PILES.Applications.MerchantColumnsEditor.Formatting")}</span>
+				</div>
 				<div class="item-piles-flexcol"></div>
 				<a on:click={() => addColumn()} style="margin-right: 0.5rem;">
 					<i class="fas fa-plus"></i>
@@ -97,6 +101,9 @@
 					</div>
 					<div>
 						<PropertyPathInput bind:value={column.path} templateType="Item" required/>
+					</div>
+					<div>
+						<input type="text" bind:value={column.formatting} required/>
 					</div>
 					<div>
 						<button type="button" on:click={() => showMappingEditor(index)} disabled={!column.label || !column.path}>
@@ -129,7 +136,7 @@
 
   .item-pile-column-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
+    grid-template-columns: 1fr 0.75fr 0.75fr 1fr auto;
     gap: 4px;
 
     select {

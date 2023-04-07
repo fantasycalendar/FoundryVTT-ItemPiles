@@ -66,15 +66,15 @@ export default class MerchantStore extends ItemPileStore {
 
       const customColumns = foundry.utils.deepClone(pileData.merchantColumns)
         .map(column => ({
-          label: column.label,
+          label: localize(column.label),
           component: CustomColumn,
           data: column,
           sortMethod: (a, b, inverse) => {
             const path = column.path;
             const AProp = getProperty(b.item, path);
             const BProp = getProperty(a.item, path);
-            if (!column?.mapping) {
-              return AProp > BProp ? 1 : -1;
+            if (!column?.mapping[AProp] || !column?.mapping[BProp]) {
+              return (AProp > BProp ? 1 : -1) * (inverse ? -1 : 1);
             }
             const keys = Object.keys(column.mapping);
             return (keys.indexOf(AProp) - keys.indexOf(BProp)) * (inverse ? -1 : 1);

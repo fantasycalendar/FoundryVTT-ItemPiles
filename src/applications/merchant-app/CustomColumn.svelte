@@ -7,8 +7,13 @@
 
   const doc = item.itemDocument;
 
-  $: value = data.path ? getProperty($doc, data.path) : data.path;
-  $: text = localize(data.mapping?.[value] ?? value);
+  let text;
+
+  $: value = data.path ? getProperty($doc, data.path) ?? "" : "";
+  $: {
+    let localized = localize(`${data.mapping?.[value] ?? value}`);
+    text = data.formatting ? data.formatting.replace("{#}", localized) : localized;
+  }
 
 </script>
 
@@ -26,6 +31,7 @@
     align-items: center;
     justify-content: center;
     flex: 1;
+    font-size: smaller;
   }
 
 </style>

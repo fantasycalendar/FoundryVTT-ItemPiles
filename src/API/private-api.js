@@ -1139,12 +1139,12 @@ export default class PrivateAPI {
 
       }
 
+      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CREATE, overrideData, items);
+      if (hookResult === false) return false;
+
       const tokenData = await pileActor.getTokenDocument(overrideData);
 
       const scene = game.scenes.get(sceneId);
-
-      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CREATE, tokenData);
-      if (hookResult === false) return false;
 
       const [tokenDocument] = await scene.createEmbeddedDocuments("Token", [tokenData]);
 

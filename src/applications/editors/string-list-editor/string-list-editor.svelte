@@ -64,7 +64,7 @@
 				{#each $stringListStore as [key, path], index (index)}
 					<tr>
 						<td><input type="text" required bind:value="{key}"/></td>
-						<td><input type="text" required bind:value="{path}"/></td>
+						<td><input type="text" bind:value="{path}"/></td>
 						<td class="small">
 							<button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>
 						</td>
