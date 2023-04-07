@@ -124,7 +124,8 @@
         "Content": "Mostrar para quais usuários?"
       },
       "ClearVaultLog": {
-        "Title": "Limpar registro do cofre?"
+        "Title": "Limpar registro do cofre?",
+        "Content": "Tem certeza de que deseja limpar o registro do cofre \"{actor_name}\"?"
       }
     },
     "Currencies": "Moedas",
@@ -176,7 +177,8 @@
       "SpectateDisabled": "Negociação completa",
       "PrivateTrade": "Negociação privada",
       "ExpandTrade": "Veja detalhes da negociação",
-      "MerchantTraded": "{name} comprou os seguintes itens de {merchant}:"
+      "MerchantTraded": "{name} comprou os seguintes itens de {merchant}:",
+      "GaveItems": "{source} deu alguns itens ao {target}:"
     },
     "HeaderButtons": {
       "ShowToPlayers": "Mostrar aos Jogadores"
@@ -253,14 +255,25 @@
         "QuantityToDrop": "Você tem {quantity} deste item, quantos você quer descartar?",
         "AddToPile": "Adicionar à pilha",
         "NewPile": "Criar nova pilha",
-        "ExistingPiles": "Você está adicionando este item ao item pile \"{target_name}\"."
+        "ExistingPiles": "Você está adicionando este item ao item pile \"{target_name}\".",
+        "ContentMultipleQuantity": "Você tem {quantity} deste item, quantos você quer descartar?",
+        "ContentInfiniteQuantity": "Quantos você quer descartar?",
+        "Submit": "Adicionar à pilha",
+        "SubmitNoTarget": "Criar nova pilha",
+        "Header": "Você está descartando: {item_name}",
+        "Content": "Você está adicionando este item ao item pile \"{target_name}\"."
       },
       "GiveItem": {
         "Title": "Dando item",
         "Giving": "Você está dando: {item_name}",
         "TargetActor": "Deseja dar este item para \"{target_name}\"?",
         "Give": "Dar",
-        "QuantityToGive": "Você tem {quantity} deste item, quantos você quer dar?"
+        "QuantityToGive": "Você tem {quantity} deste item, quantos você quer dar?",
+        "Content": "Deseja dar este item para \"{target_name}\"?",
+        "Header": "Você está dando: {item_name}",
+        "ContentMultipleQuantity": "Você tem {quantity} deste item, quantos você quer dar?",
+        "ContentInfiniteQuantity": "Quantos você quer dar ao \"{target_name}\"?",
+        "Submit": "Dar"
       },
       "Settings": {
         "Donate": "Se você gosta deste módulo, considere doar para mantê-lo funcionando!",
@@ -270,7 +283,8 @@
         "System": "Configurações específicas do sistema",
         "MoreToCome": "E com mais opções de configuração por vir...",
         "Request": "Solicite novos recursos aqui.",
-        "Submit": "Enviar configurações"
+        "Submit": "Enviar configurações",
+        "Styles": "Configurações de Estilo"
       },
       "CurrenciesEditor": {
         "Title": "Editor de moedas do Item Piles",
@@ -320,14 +334,35 @@
         "PurchaseMacro": "Comprar Macro",
         "PurchaseMacroExplanation": "Nome da macro a ser executada quando o item for comprado.",
         "Service": "O item é serviço",
-        "ServiceExplanation": "Isso faz com que este item não adicione nenhum item ao inventário do comprador. O \"item\" de serviço ainda pode ter quantidade, mas se acabar, não será excluído do comerciante, mas definido como não à venda."
+        "ServiceExplanation": "Isso faz com que este item não adicione nenhum item ao inventário do comprador. O \"item\" de serviço ainda pode ter quantidade, mas se acabar, não será excluído do comerciante, mas definido como não à venda.",
+        "CustomCategoryExplanation": "Quando não estiver em branco, este item será listado em um tipo diferente do que é.",
+        "ExpandColumnsRowsExplanation": "Quando a configuração acima está habilitada, isso define quantas colunas e/ou linhas ficam disponíveis no cofre. Isso não pode se estender além da capacidade do cofre.",
+        "Vault": "Configurações do cofre",
+        "InfiniteQuantityDefault": "Padrão para configuração do comerciante",
+        "InfiniteQuantityNo": "Não, quantidade padrão",
+        "QuantityForPrice": "Quantidade por preço",
+        "QuantityForPriceExplanation": "Isso configura quanto deste item deve-se obter ao comprar este item.",
+        "CanStack": "Pode empilhar",
+        "CanStackExplanation": "Isso configura se este item será empilhado com outros itens semelhantes quando adicionado a um cofre.",
+        "CanStackDefault": "Padrão para configuração do cofre",
+        "CanStackYes": "Sim, pode sempre empilhar",
+        "CanStackNo": "Não, não pode empilhar",
+        "VaultExpander": "Expansor de cofre",
+        "VaultExpanderExplanation": "Quando ativado, este item não age como um item normal em um cofre, mas aumenta o número de slots disponíveis, conforme determinado abaixo.",
+        "ExpandColumnsRows": "Expansão de colunas e linhas",
+        "CustomCategory": "Categoria de itens personalizados",
+        "InfiniteQuantityYes": "Sim, quantidade infinita",
+        "KeepZeroExplanation": "Quando totalmente esgotado, o comerciante não remove este item, mas o define para não ser vendido.",
+        "KeepZero": "Manter quantidade zero"
       },
       "DropCurrencies": {
         "Title": "Descartando moedas",
         "Player": "Você pode colocar as seguintes moedas nesta pilha de itens:",
         "GM": "Como GM, você pode adicionar moedas a esta pilha de itens:",
         "NoCurrency": "{actor_name} não tem moedas válidas...",
-        "AddToPile": "Adicionar à pilha"
+        "AddToPile": "Adicionar à pilha",
+        "Content": "Você pode colocar as seguintes moedas nesta pilha de itens:",
+        "Submit": "Adicionar"
       },
       "TradeMerchantItem": {
         "Title": "Item de troca: {item_name}",
@@ -340,7 +375,9 @@
         "Change": "Mudar",
         "YouCantAfford": "Você não pode pagar esse preço",
         "TheyCantAfford": "Eles não podem pagar esse preço",
-        "MaxQuantity": "Máximo {quantidade}"
+        "MaxQuantity": "Máximo {quantidade}",
+        "TheyLackQuantity": "Eles não tem o suficiente deste item para vender, eles tem {quantity}, mas requer {requiredQuantity}",
+        "YouLackQuantity": "Você não tem o suficiente deste item para vender, você tem {quantity}, mas requer {requiredQuantity}"
       },
       "FilterEditor": {
         "Title": "Editor de Filtros do Item Piles",
@@ -466,7 +503,15 @@
           "ItemTypeModifier": "Modificadores de preço do tipo de item",
           "ItemTypeModifiersExplanation": "Nesta caixa de diálogo, você pode configurar modificadores de preço para tipos de itens individuais.",
           "ConfigureItemTypePriceModifiers": "Configurar modificadores de preço de tipo de item.",
-          "ConfigureActorPriceModifiers": "Configurar modificadores de preço de ator."
+          "ConfigureActorPriceModifiers": "Configurar modificadores de preço de ator.",
+          "KeepZero": "Manter quantidade zero",
+          "KeepZeroExplanation": "Quando os itens estiverem totalmente esgotados, este comerciante não os removerá, mas os definirá como não à venda.",
+          "HideItemsWithZeroCostExplanation": "Quando habilitado, faz com que os clientes não possam comprar ou vender itens com custo zero (grátis).",
+          "ClosedDays": "Dias Fechados (Simple Calendar)",
+          "ClosedDaysExplanation": "Nos dias marcados, o lojista estará fechado (caso o status de lojista aberto esteja definido como automático).",
+          "ClosedHolidaysExplanation": "Nos dias em que houver notas com a categoria de nota indicada, o estabelecimento estará fechado (caso o estado aberto do estabelecimento esteja definido como automático).",
+          "HideItemsWithZeroCost": "Ocultar itens com custo zero",
+          "ClosedHolidays": "Feriados Fechados (Simple Calendar)"
         },
         "Title": "Configuração do Item Pile: {actor_name}",
         "Configure": "Item Pile",
@@ -485,13 +530,107 @@
           "LockedSoundPath": "Caminho de som bloqueado"
         },
         "Other": {
-          "Title": "Outros ajustes"
+          "Title": "Outros ajustes",
+          "TypeExplanation": "Isso configura a forma como essa pilha de itens será exibida.",
+          "Type": "Tipo de Pilha de Item"
+        },
+        "Vault": {
+          "EnableExpansionExplanation": "Com isso ativado, os itens configurados como expansores de cofre expandirão o espaço disponível do cofre.",
+          "AccessExplanation": "Isso configura quais personagens e jogadores podem acessar e modificar o inventário e as moedas do cofre. Se um jogador possuir o personagem do cofre, ele sempre terá acesso total.",
+          "ClearVaultLogExplanation": "Isso limpará os logs do cofre, removendo todas as entradas. Isto não pode ser desfeito.",
+          "LayoutExplanation": "Este é o número de colunas e linhas que devem estar visíveis no cofre.",
+          "Columns": "Colunas",
+          "CanStackItems": "Pode empilhar itens",
+          "CanStackItemsExplanation": "Com isso ativado, os itens adicionados ao cofre serão empilhados com itens semelhantes. Isso também pode ser controlado por item em sua configuração.",
+          "BaseExpansionExplanation": "Este é o número de colunas e linhas habilitadas por padrão sem nenhum item de expansão.",
+          "LoggingFormatExplanation": "Isso configura como o nome de usuário e o nome do personagem são exibidos no log.",
+          "LoggingFormatUser": "Exibir apenas o nome de usuário",
+          "LoggingFormatActor": "Exibir apenas o nome do personagem",
+          "LoggingFormatUserActor": "Exibir nome de usuário e nome do personagem",
+          "Rows": "Linhas",
+          "BaseExpansion": "Expansão da base",
+          "LoggingFormat": "Formato do log",
+          "EnableExpansion": "Habilitar itens de expansão",
+          "ClearVaultLog": "Limpar Logs do Cofre",
+          "Access": "Acesso a personagens e jogadores",
+          "LogVaultAccess": "Acesso ao Log do cofre",
+          "LogVaultAccessExplanation": "Quando ativado, este cofre criará uma entrada de diário e registros com carimbo de data/hora sempre que o cofre for interagido.",
+          "ManageAccess": "Gerenciar o acesso",
+          "Title": "Configurações do cofre",
+          "Layout": "Layout"
         }
       },
       "PricePresetEditor": {
         "Title": "Editor de predefinições de preço",
         "Update": "Atualizar predefinições",
         "Explanation": "Aqui você pode criar vários preços predefinidos que podem ser facilmente usados nos preços personalizados dos itens."
+      },
+      "DepositItem": {
+        "ContentMultipleQuantity": "Você tem {quantity} deste item, quantos você quer depositar?",
+        "Title": "Depositar Item",
+        "Header": "Você está depositando: {item_name}",
+        "Content": "Você quer depositar este item em \"{target_name}\"?",
+        "ContentInfiniteQuantity": "Quantos você quer depositar?",
+        "Submit": "Depósito"
+      },
+      "SplitItem": {
+        "Title": "Pilha de itens divididos",
+        "Header": "Você está dividindo uma pilha de {item_name}",
+        "Content": "Você quer dividir este item empilhado?",
+        "ContentMultipleQuantity": "Há {quantity} deste item. Quantos você quer na nova pilha?",
+        "Submit": "Pilha Dividida"
+      },
+      "DepositCurrencies": {
+        "Title": "Depositar moedas",
+        "Content": "Você pode depositar as seguintes moedas neste cofre:",
+        "NoCurrency": "{actor_name} não tem moedas a depositar.",
+        "Submit": "Depositar"
+      },
+      "CustomItemCategoriesEditor": {
+        "Explanation": "Aqui você pode configurar quais categorias de itens personalizados estão disponíveis em seu mundo. Eles são adicionados dinamicamente quando você adiciona um novo para um item.",
+        "Title": "Editor de categorias de itens personalizados",
+        "Category": "Categoria"
+      },
+      "VaultStylesEditor": {
+        "Value": "Valor correspondente",
+        "Explanation": "Aqui você pode definir vários estilos para itens em cofres. Por exemplo, você pode fazer um estilo olhar para \"system.rarity\" para ser \"raro\" e aplicar um estilo aos itens que correspondam à configuração.",
+        "Path": "Caminho do atributo",
+        "Title": "Editor de Estilos do cofre Abóbada do Item Piles",
+        "Style": "Configurar Estilo",
+        "AddNew": "Adicionar nova regra de estilo"
+      },
+      "WithdrawCurrencies": {
+        "Title": "Retirar Item",
+        "NoCurrency": "Não há moedas para se retirar.",
+        "Submit": "Retirar",
+        "Content": "Você pode retirar as seguintes moedas deste cofre:"
+      },
+      "UnstackableItemTypesEditor": {
+        "Explanation": "Aqui você pode definir quais tipos de itens não podem ser empilhados.",
+        "Type": "Tipo de item",
+        "Title": "Editor de tipos de itens não empilháveis"
+      },
+      "VaultAccessEditor": {
+        "Title": "Editor de acesso ao cofre: {actor_name}",
+        "Explanation": "Isso configura quais personagens e jogadores podem acessar e modificar o inventário e as moedas do cofre. Se um jogador possuir o personagem do cofre, ele sempre terá acesso total."
+      },
+      "WithdrawItem": {
+        "Title": "Retirar Item",
+        "Header": "Você está retirando: {item_name}",
+        "Content": "Você quer retirar este item de \"{target_name}\"?",
+        "Submit": "Retirar",
+        "ContentMultipleQuantity": "Há {quantity} deste item, quantos você quer retirar?"
+      },
+      "StylesEditor": {
+        "Variable": "Variável",
+        "Value": "Valor",
+        "Title": "Editor de Estilos",
+        "Style": "Estilo"
+      },
+      "EditCurrencies": {
+        "Title": "Editando Moedas",
+        "Content": "Como um GM, você pode atualizar as moedas esta na pilha de itens:",
+        "Submit": "Enviar"
       }
     },
     "Settings": {
@@ -505,12 +644,12 @@
         "Title": "Atributo de quantidade do item"
       },
       "ItemSimilarities": {
-        "Hint": "Aqui você pode configurar como os itens são detectados para serem os mesmos neste sistema. Alguns sistemas podem ter dados que distinguem itens de forma diferente de outros, como itens temporários.",
+        "Hint": "Aqui você pode configurar como os itens são detectados para serem os mesmos neste sistema. Alguns sistemas podem ter dados que distinguem itens de maneira diferente de outros, como itens temporários.",
         "Title": "Semelhanças de itens",
         "Label": "Configurar semelhanças de itens"
       },
       "EnableDroppingItems": {
-        "Hint": "Isso permite que os usuários possam soltar itens no chão para criar suas próprias pilhas de itens - com isso desativado, os usuários não podem criar novas pilhas nem adicionar itens às pilhas existentes.",
+        "Hint": "Isso permite que os usuários joguem itens no chão para criar suas próprias pilhas de itens - com isso desativado, os usuários não podem criar novas pilhas.",
         "Title": "Ativar descarte de itens"
       },
       "ShowTradeButton": {
@@ -597,6 +736,34 @@
       "CurrencyDecimalDigits": {
         "Title": "Dígitos decimais de moeda",
         "Hint": "Essa configuração define o dígito decimal mais baixo para o qual suas moedas arredondam. Por exemplo, em uma configuração moderna com moedas modernas, '0,01' permite dois dígitos decimais. Isso não é usado se você tiver mais de uma moeda."
+      },
+      "QuantityForPrice": {
+        "Hint": "Aqui você pode configurar qual é o caminho do atributo para a quantidade de itens que você obtém pelo preço. Por exemplo, no sistema PF2e, há uma propriedade \"per\" nos itens, que determina a quantidade de itens que você obtém pelo preço do item, armazenado no atributo \"item.system.price.per\" do item, então você colocaria \"system.price.per\" nesta configuração.",
+        "Title": "Quantidade de item para atributo de preço"
+      },
+      "VaultStyles": {
+        "Label": "Configurar estilos de cofre",
+        "Title": "Estilos de Cofre",
+        "Hint": "Isso permite que você adicione regras que estilizarão itens com base em caminhos de propriedade e valores nos próprios itens."
+      },
+      "CustomItemCategories": {
+        "Title": "Categorias de itens personalizados",
+        "Label": "Configurar categorias de itens",
+        "Hint": "Nele, você pode configurar as categorias de itens personalizados, que são mostradas como sugestões no editor de itens."
+      },
+      "HideHeaderButton": {
+        "Hint": "Oculta o botão \"Item Piles\" nos cabeçalhos de itens e atores. Isso tornará mais difícil para você configurar novas pilhas de itens e itens.",
+        "Title": "Ocultar botão de cabeçalho"
+      },
+      "CssVariables": {
+        "Title": "Estilos de Variáveis CSS",
+        "Label": "Configurar Variáveis CSS",
+        "Hint": "Isso permite que você configure as várias variáveis CSS que orientam as cores e outros estilos nas interfaces do item piles."
+      },
+      "UnstackableItemTypes": {
+        "Title": "Tipos de itens não empilháveis",
+        "Label": "Configurar tipos não empilháveis",
+        "Hint": "Aqui você pode configurar quais tipos de itens são considerados únicos, não importa o quê. Os tipos configurados aqui não podem ser empilhados e só podem ter uma quantidade de 1."
       }
     },
     "Types": {
@@ -622,6 +789,10 @@
       "Withdrew": "Retirar",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "LogQuantity": "{quantity} x "
+    },
+    "VaultLog": {
+      "Withdraw": "{actor_name} ({user_name}) **retirou** {item_name} x {quantity} ({date})",
+      "Deposit": "{actor_name} ({user_name}) *depositado* {item_name} x {quantity} ({date})"
     }
   }
 }
