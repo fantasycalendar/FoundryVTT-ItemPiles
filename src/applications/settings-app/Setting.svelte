@@ -7,7 +7,7 @@
 
 </script>
 
-<div class="setting form-scope item-piles-flexrow">
+<div class="item-pile-setting form-scope item-piles-flexrow">
 
 	<div class="label-side">
 		<label>{localize(data.name)} <a>
@@ -51,7 +51,7 @@
 
 		{:else}
 
-			<div class="setting-container">
+			<div class="item-pile-setting-container">
 				<input type="text" bind:value={data.value} disabled={disabled}/>
 				{#if data.localize}
 					<input type="text" disabled value={localize(data.value)}/>
@@ -66,64 +66,63 @@
 
 <style lang="scss">
 
-  .setting:not(:last-child) {
+  .item-pile-setting:not(:last-child) {
+		
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
-  }
 
-  .reset-setting {
-    font-size: 0.75rem;
-    margin-left: 0.5rem;
-    opacity: 0.5;
-    transition: opacity 250ms;
+    .reset-setting {
+      font-size: 0.75rem;
+      margin-left: 0.5rem;
+      opacity: 0.5;
+      transition: opacity 250ms;
 
-    &:hover {
-      opacity: 1.0;
+      &:hover {
+        opacity: 1.0;
+      }
     }
-  }
 
-  .invalid {
-    border: 2px solid #d93131;
-  }
-
-  label {
-    flex: 1 0 auto;
-  }
-
-  .form-fields {
-    flex: 0 1 auto;
-    align-self: center;
-  }
-
-  select {
-    min-width: 200px;
-  }
-
-  .setting-container {
-    display: flex;
-    flex-direction: column;
-
-    input:first-child {
-      margin-bottom: 0.25rem;
+    .invalid {
+      border: 2px solid #d93131;
     }
-  }
 
-  .label-side {
-    flex: 1;
-    margin-right: 1rem;
-  }
+    label {
+      flex: 1 0 auto;
+    }
 
-  .choice-container {
-    max-width: 400px;
-  }
+    .form-fields {
+      flex: 0 1 auto;
+      align-self: center;
+    }
 
-  .setting-container {
-    min-width: 200px;
-  }
+    select {
+      min-width: 200px;
+    }
 
-  input[type="number"] {
-    min-width: 100px;
+    .item-pile-setting-container {
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+
+      input:first-child {
+        margin-bottom: 0.25rem;
+      }
+    }
+
+    .label-side {
+      flex: 1;
+      margin-right: 1rem;
+    }
+
+    .choice-container {
+      max-width: 400px;
+    }
+
+    input[type="number"] {
+      min-width: 100px;
+    }
+
   }
 
 </style>
