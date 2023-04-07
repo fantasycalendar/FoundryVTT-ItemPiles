@@ -9,90 +9,126 @@ assignees: ''
 
 # **[INSERT FOUNDRY PAGE LINK TO SYSTEM HERE]**
 
-### **Actor Class Type**: "[WRITE TYPE HERE]"
+If you are lost, you can take a look at the other system definitions:
 
-*The actor class type is the type of actor that will be used for the default item pile actor that is created on first
-item drop*
+<https://github.com/fantasycalendar/FoundryVTT-ItemPiles/tree/master/src/systems>
 
-D&D5e system example: `character`
+Fill in the following information:
 
-### **Item Quantity Attribute**: "[WRITE ATTRIBUTE PATH HERE]"
+```js
+{
 
-*The item quantity attribute is the path to the attribute on items that denote how many of that item that exists*
+  "VERSION": "1.0.0",
 
-D&D5e system example: `system.quantity`
+  // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
+  "ACTOR_CLASS_TYPE": "character",
 
-### **Item Price Attribute**: "[WRITE ATTRIBUTE PATH HERE]"
+  // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
+  "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
 
-*The item price attribute is the path to the attribute on each item that determine how much it costs*
+  // The item price attribute is the path to the attribute on each item that determine how much it costs
+  "ITEM_PRICE_ATTRIBUTE": "system.price.value",
 
-D&D5e system example: `system.price`
+  // Item filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
+  "ITEM_FILTERS": [
+    {
+      "path": "type",
+      "filters": "spell,feat,class,subclass,background"
+    },
+    {
+      "path": "system.weaponType",
+      "filters": "natural"
+    }
+  ],
 
-### **Item Filters**: "[WRITE ITEM FILTERS HERE]"
+  // This function is an optional system handler that specifically transforms an item when it is added to actors
+  "ITEM_TRANSFORMER": async (itemData) => {
+    ["equipped", "proficient", "prepared"].forEach(key => {
+      if (itemData?.system?.[key] !== undefined) {
+        delete itemData.system[key];
+      }
+    });
+    setProperty(itemData, "system.attunement", Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData?.system?.attunement ?? 0));
+    if (itemData.type === "spell") {
+      try {
+        const scroll = await Item.implementation.createScrollFromSpell(itemData);
+        itemData = scroll.toObject();
+      } catch (err) {
+      }
+    }
+    return itemData;
+  },
 
-*Item filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and
-classes*
+  // This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
+  "ITEM_COST_TRANSFORMER": (item, currencies) => {
+    const overallCost = Number(getProperty(item, "system.price.value")) ?? 0;
+    const priceDenomination = getProperty(item, "system.price.denomination");
+    if (priceDenomination) {
+      const currencyDenomination = currencies.find(currency => {
+        return currency.abbreviation.toLowerCase().includes(priceDenomination);
+      });
+      if (currencyDenomination) {
+        return overallCost * currencyDenomination.exchangeRate;
+      }
+    }
+    return overallCost ?? 0;
+  },
 
-D&D5e system example: `spell, feat, class`
+  "PILE_DEFAULTS": {
+    merchantColumns: [{
+      label: "Rarity",
+      path: "system.rarity",
+      mapping: {
+        "common": "DND5E.ItemRarityCommon",
+        "uncommon": "DND5E.ItemRarityUncommon",
+        "rare": "DND5E.ItemRarityRare",
+        "veryrare": "DND5E.ItemRarityVeryRare",
+        "legendary": "DND5E.ItemRarityLegendary",
+        "artifact": "DND5E.ItemRarityArtifact"
+      }
+    }]
+  },
 
-### **Item Similarities**: [WRITE ITEM SIMILARITIES HERE]
+  // Item similarities determines how item piles detect similarities and differences in the system
+  "ITEM_SIMILARITIES": ["name", "type"],
 
-*Item similarities determines how item piles detect similarities and differences in the system*
-
-D&D5e system example: `name, type`
-
-### **Currencies**:
-
-*Currencies in item piles are a list of names, attribute paths, and images*
-
-- **Name**: [WRITE ATTRIBUTE NAME HERE] _or localized name_ [WRITE ATTRIBUTE NAME HERE]
-- **Path**: [WRITE ATTRIBUTE PATH HERE]
-- **Image**: [WRITE IMAGE PATH HERE (or blank)]
-- **Exchange Rate**: [WRITE CURRENCY EXCHANGE RATE]
-- **Shorthand Name**: [WRITE CURRENCY SHORT HAND NAME]
-- **Primary Currency**: Yes/No
-
-D&D5e system example:
-
-- **Name**: "Platinum Coins" _or localized name_ "DND5E.CurrencyPP"
-- **Path**: "system.currency.pp"
-- **Image**: "icons/commodities/currency/coin-inset-snail-silver.webp"
-- **Exchange Rate**: 10
-- **Shorthand Name**: PP
-- **Primary Currency**: No
-
----
-
-- **Name**: "Gold Coins" _or localized name_ "DND5E.CurrencyGP"
-- **Path**: "system.currency.gp"
-- **Image**: "icons/commodities/currency/coin-embossed-crown-gold.webp"
-- **Exchange Rate**: 1
-- **Shorthand Name**: GP
-- **Primary Currency**: Yes
-
----
-
-- **Name**: "Electrum Coins" _or localized name_ "DND5E.CurrencyEP"
-- **Path**: "system.currency.ep"
-- **Image**: "icons/commodities/currency/coin-inset-copper-axe.webp"
-- **Exchange Rate**: 0.5
-- **Shorthand Name**: EP
-- **Primary Currency**: No
-
----
-
-- **Name**: "Silver Coins" _or localized name_ "DND5E.CurrencySP"
-- **Path**: "system.currency.sp"
-- **Image**: "icons/commodities/currency/coin-engraved-moon-silver.webp"
-- **Exchange Rate**: 0.1
-- **Shorthand Name**: SP
-- **Primary Currency**: No
-
----
-
-- **Name**: "Copper Coins" _or localized name_ "DND5E.CurrencyCP"
-- **Path**: "system.currency.cp"
-- **Image**: "icons/commodities/currency/coin-engraved-waves-copper.webp"
-- **Exchange Rate**: 0.01
-- **Shorthand Name**: CP
-- **Primary Currency**: No
+  // Currencies in item piles is a versatile system that can accept actor attributes (a number field on the actor's sheet) or items (actual items in their inventory)
+  // In the case of attributes, the path is relative to the "actor.system"
+  // In the case of items, it is recommended you export the item with `.toObject()` and strip out any module data
+  "CURRENCIES": [
+    {
+      type: "attribute",
+      name: "DND5E.CurrencyGP",
+      img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
+      abbreviation: "{#}GP",
+      data: {
+        path: "system.currency.gp",
+      },
+      primary: true,
+      exchangeRate: 1
+    },
+    {
+      type: "attribute",
+      name: "DND5E.CurrencySP",
+      img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
+      abbreviation: "{#}SP",
+      data: {
+        path: "system.currency.sp",
+      },
+      primary: false,
+      exchangeRate: 0.1
+    },
+    {
+      type: "attribute",
+      name: "DND5E.CurrencyCP",
+      img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
+      abbreviation: "{#}CP",
+      data: {
+        path: "system.currency.cp",
+      },
+      primary: false,
+      exchangeRate: 0.01
+    }
+  ]
+}
+```
