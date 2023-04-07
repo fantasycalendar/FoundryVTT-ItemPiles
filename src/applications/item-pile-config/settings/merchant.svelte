@@ -6,6 +6,7 @@
   import FilePicker from "../../components/FilePicker.svelte";
   import SliderInput from "../../components/SliderInput.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+  import MerchantColumnsEditor from "../../editors/merchant-columns-editor/merchant-columns-editor.js";
 
   export let pileData;
   export let pileActor;
@@ -35,7 +36,7 @@
     return ItemTypePriceModifiersEditor.show(
       data,
       { id: `item-type-price-modifier-item-pile-config-${pileActor.id}` },
-      { title: game.i18n.format("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
+      { title: localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
     ).then((result) => {
       pileData.itemTypePriceModifiers = result || [];
     });
@@ -46,9 +47,20 @@
     return PriceModifiersEditor.show(
       data,
       { id: `price-modifier-item-pile-config-${pileActor.id}` },
-      { title: game.i18n.format("ITEM-PILES.Applications.PriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
+      { title: localize("ITEM-PILES.Applications.PriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
     ).then((result) => {
       pileData.actorPriceModifiers = result || [];
+    });
+  }
+
+  async function showMerchantColumns() {
+    const data = pileData.merchantColumns || [];
+    return MerchantColumnsEditor.show(
+      data,
+      { id: `merchant-columns-item-pile-config-${pileActor.id}` },
+      { title: localize("ITEM-PILES.Applications.MerchantColumnsEditor.TitleActor", { actor_name: pileActor.name }), }
+    ).then((result) => {
+      pileData.merchantColumns = result || [];
     });
   }
 
@@ -183,6 +195,18 @@
 		</label>
 		<button type="button" on:click={() => { showActorPriceModifiers() }}>
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureActorPriceModifiers")}
+		</button>
+	</div>
+</div>
+
+<div class="form-group">
+	<div class="item-piles-flexcol">
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.MerchantColumns")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.MerchantColumnsExplanation")}</p>
+		</label>
+		<button type="button" on:click={() => { showMerchantColumns() }}>
+			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureMerchantColumns")}
 		</button>
 	</div>
 </div>

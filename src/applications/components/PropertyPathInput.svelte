@@ -1,0 +1,46 @@
+<script>
+
+  export let value = "";
+  export let templateType;
+  export let required = false;
+
+  const id = "property-list-" + randomID();
+  const templates = foundry.utils.deepClone(game.system.template[templateType]);
+  const templateObject = {
+    name: "",
+    type: "",
+    system: templates.types
+      .map(type => {
+        let obj = templates[type];
+        if (obj['templates']) {
+          for (const template of obj['templates']) {
+            obj = foundry.utils.mergeObject(obj, templates["templates"][template]);
+          }
+          delete obj['templates'];
+        }
+        return obj;
+      })
+      .reduce((acc, obj) => {
+        return foundry.utils.mergeObject(acc, obj);
+      }, {})
+  };
+
+  let suggestions = [];
+  $: {
+    let trimmedValue = value.trim();
+    let options = getProperty(templateObject, trimmedValue);
+    if (!options) {
+      trimmedValue = trimmedValue.split(".").slice(0, -1).join(".")
+      options = getProperty(templateObject, trimmedValue);
+    }
+    suggestions = options ? Object.keys(options).map(t => trimmedValue + "." + t).sort() : Object.keys(templateObject);
+  }
+
+</script>
+
+<input type="text" list={id} bind:value required={required}/>
+<datalist id={id}>
+	{#each suggestions as suggestion}
+		<option>{suggestion}</option>
+	{/each}
+</datalist>

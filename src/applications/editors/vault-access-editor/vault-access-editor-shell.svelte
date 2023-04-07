@@ -13,8 +13,6 @@
 
   const vaultAccessStore = writable(data);
 
-  console.log(data);
-
   const validUsers = Array.from(game.users).filter(user => !user.isGM);
 
   const validActors = Array.from(game.actors).filter(actor => actor.hasPlayerOwner);
