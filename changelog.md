@@ -4,8 +4,10 @@
 
 - Added system specific columns to merchants, such as rarity in D&D 5e and bulk in Pathfinder 2e
 - Added support for the Index Card RPG: Master Edition system
+- Updated Portuguese (Brazil) localization (thank you eunaumtenhoid on Weblate!)
 - Fixed price modifiers on custom categories did not work when created through the merchant interface
 - Fixed duplication bug with custom categories
+- Fixed elevation not being taken into account when dropping items
 
 ## Version 2.5.8
 

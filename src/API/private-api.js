@@ -924,12 +924,13 @@ export default class PrivateAPI {
    * @param {String/Boolean} [sourceUuid=false]
    * @param {String/Boolean} [targetUuid=false]
    * @param {Object/Boolean} [position=false]
+   * @param {Number/Boolean} [elevation=false]
    * @param {Object} [itemData=false]
    *
    * @returns {sourceUuid: string/boolean, targetUuid: string/boolean, position: object/boolean, itemsDropped: array }
    */
   static async _dropItems({
-    userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false
+    userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false, elevation = false
   } = {}) {
 
     let itemsDropped;
@@ -948,7 +949,11 @@ export default class PrivateAPI {
           Utilities.setItemQuantity(item.item, Math.abs(item.quantity), true);
           return item;
         });
-        targetUuid = await this._createItemPile({ sceneId, position, items: itemsDropped });
+        targetUuid = await this._createItemPile({
+          sceneId, position, items: itemsDropped, tokenOverrides: {
+            elevation: elevation || fromUuidSync(sourceUuid)?.elevation || 0
+          }
+        })
       }
 
       // If there's no source (it was dropped from the item bar)
@@ -958,7 +963,12 @@ export default class PrivateAPI {
       if (targetUuid) {
         itemsDropped = await this._addItems(targetUuid, [itemData], userId);
       } else {
-        targetUuid = await this._createItemPile({ sceneId, position, items: [itemData] });
+        targetUuid = await this._createItemPile({
+          sceneId,
+          position,
+          items: [itemData],
+          tokenOverrides: { elevation: elevation || 0 }
+        });
       }
 
     }
@@ -968,7 +978,6 @@ export default class PrivateAPI {
     return { sourceUuid, targetUuid, position, itemsDropped };
 
   }
-
 
   static async _createItemPile({
     sceneId = null,
@@ -1531,6 +1540,7 @@ export default class PrivateAPI {
     const dropData = {
       source: false,
       target: data?.target ?? false,
+      elevation: data?.elevation,
       itemData: {
         item: itemData, quantity: 1,
       },
@@ -1784,6 +1794,7 @@ export default class PrivateAPI {
       sourceUuid: Utilities.getUuid(dropData.source),
       targetUuid: Utilities.getUuid(dropData.target),
       position: dropData.position,
+      elevation: dropData.elevation,
       itemData: dropData.itemData
     });
 
