@@ -9,6 +9,10 @@
   let isHovering = false;
 
   $: currencies = $currenciesStore;
+  $: {
+    $currenciesStore;
+    store.sortCurrencies();
+  }
 
   async function dropData(data) {
 
@@ -27,52 +31,52 @@
 </script>
 
 <DropZone callback={dropData} bind:isHovering={isHovering}>
-  <div class="item-piles-sortable-list-columns header">
-    <div style="justify-content:flex-start;">Primary</div>
-    <div>Name</div>
-    <div>Exchange</div>
-    <div>Short</div>
-    <div>Icon</div>
-    <div>Data</div>
-    <div><a on:click={() => store.addAttribute()}><i class="fas fa-plus"></i></a></div>
-  </div>
-  <div class="table-container">
-    {#if isHovering}
-      <div class="drop-to-add">Drop to add</div>
-    {/if}
-    {#if !currencies.length}
-      <div class="item-piles-sortable-list-columns ">
-        <div class="full-span" class:invisible={isHovering}>
-          Drop an item or click the plus button to get started!
-        </div>
-      </div>
-    {/if}
-    {#each currencies as item, index (item.id)}
-      <div class="item-piles-sortable-list-columns">
-        <div><input type="checkbox" checked={item.primary} on:change={() => store.setPrimary(index)}/></div>
-        <div><input type="text" bind:value={item.name}/></div>
-        <div><input type="number" step="0.000000001" bind:value={item.exchangeRate}/></div>
-        <div><input type="text" bind:value={item.abbreviation}/></div>
-        <div>
-          <FilePicker type="imagevideo" showImage={true} showInput={false} bind:value={item.img}/>
-        </div>
-        <div>
-          {#if item.type === "attribute"}
-            <input type="text" bind:value={item.data.path} placeholder="system.attributes.hp.value"/>
-          {:else}
-            <button type="button" on:click={() => store.editItem(index)}>
-              <i class="fas fa-eye"></i> View item
-            </button>
-          {/if}
-        </div>
-        <div>
-          <button type="button" class="delete-button" on:click={() => store.removeEntry(index)}>
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </div>
-    {/each}
-  </div>
+	<div class="item-piles-sortable-list-columns header">
+		<div style="justify-content:flex-start;">Primary</div>
+		<div>Name</div>
+		<div>Exchange</div>
+		<div>Short</div>
+		<div>Icon</div>
+		<div>Data</div>
+		<div><a on:click={() => store.addAttribute()}><i class="fas fa-plus"></i></a></div>
+	</div>
+	<div class="table-container">
+		{#if isHovering}
+			<div class="drop-to-add">Drop to add</div>
+		{/if}
+		{#if !currencies.length}
+			<div class="item-piles-sortable-list-columns ">
+				<div class="full-span" class:invisible={isHovering}>
+					Drop an item or click the plus button to get started!
+				</div>
+			</div>
+		{/if}
+		{#each currencies as item, index (item.id)}
+			<div class="item-piles-sortable-list-columns">
+				<div><input type="checkbox" checked={item.primary} on:change={() => store.setPrimary(index)}/></div>
+				<div><input type="text" bind:value={item.name}/></div>
+				<div><input type="number" step="0.000000001" bind:value={item.exchangeRate}/></div>
+				<div><input type="text" bind:value={item.abbreviation}/></div>
+				<div>
+					<FilePicker type="imagevideo" showImage={true} showInput={false} bind:value={item.img}/>
+				</div>
+				<div>
+					{#if item.type === "attribute"}
+						<input type="text" bind:value={item.data.path} placeholder="system.attributes.hp.value"/>
+					{:else}
+						<button type="button" on:click={() => store.editItem(index)}>
+							<i class="fas fa-eye"></i> View item
+						</button>
+					{/if}
+				</div>
+				<div>
+					<button type="button" class="delete-button" on:click={() => store.removeEntry(index)}>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+		{/each}
+	</div>
 </DropZone>
 
 <style lang="scss">

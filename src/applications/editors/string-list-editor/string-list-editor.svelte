@@ -2,26 +2,33 @@
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+  import { get } from "svelte/store";
 
   const { application } = getContext('#external');
 
   let form;
 
   export let elementRoot;
-  export let stringList;
+  export let data;
+
+  const stringListStore = writable(data);
 
   function add() {
-    stringList = [...stringList, ""];
-    stringList = stringList;
+    stringListStore.update(val => {
+      val.push("");
+      return val;
+    })
   }
 
   function remove(index) {
-    stringList.splice(index, 1)
-    stringList = stringList;
+    stringListStore.update(val => {
+      val.splice(index, 1);
+      return val;
+    })
   }
 
   async function updateSettings() {
-    application.options.resolve(stringList);
+    application.options.resolve(get(stringListStore));
     application.close();
   }
 
@@ -45,7 +52,7 @@
 				<th>{localize(application.options.column)}</th>
 				<th class="small"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a></th>
 			</tr>
-			{#each stringList as path, index (index)}
+			{#each $stringListStore as path, index (index)}
 				<tr>
 					<td><input type="text" required bind:value="{path}"/></td>
 					<td class="small">

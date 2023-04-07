@@ -1,34 +1,12 @@
 import StringListEditorShell from './string-list-editor.svelte';
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import Editor from "../Editor.js";
 
-export default class StringListEditor extends SvelteApplication {
-
-  constructor(stringList, options) {
-    super({
-      svelte: {
-        class: StringListEditorShell,
-        target: document.body,
-        props: {
-          stringList
-        }
-      },
-      close: () => this.options.resolve(null),
-      ...options
-    });
-  }
-
+export default class StringListEditor extends Editor {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      width: 400,
-      height: "auto",
-      classes: ["item-piles-app"]
+      svelte: {
+        class: StringListEditorShell
+      }
     })
-  }
-
-  static async show(stringList, options = {}) {
-    return new Promise(resolve => {
-      options.resolve = resolve;
-      return new this(stringList, options).render(true, { focus: true });
-    });
   }
 }

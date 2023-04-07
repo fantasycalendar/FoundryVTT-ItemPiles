@@ -7,14 +7,14 @@
 
   const { application } = getContext('#external');
 
-  export let styles;
+  export let data;
   export let elementRoot;
 
   let form;
 
   const options = application.options;
 
-  const styleValues = styles?.subscribe ? styles : writable(styles);
+  const styleValues = data?.subscribe ? data : writable(data);
 
   const styleStore = Object.entries(get(styleValues));
   let values = writable(styleStore.length ? styleStore : [["", ""]])

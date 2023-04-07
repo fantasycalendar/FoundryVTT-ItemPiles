@@ -267,13 +267,13 @@ const migrations = {
 
   },
 
-  "2.5.6": async (version) => {
+  "2.6.0": async (version) => {
 
     const actors = getItemPileActorsOfLowerVersion(version);
 
     const actorUpdates = actors.map(actor => {
       const flags = getProperty(actor, CONSTANTS.FLAGS.PILE);
-      const systemDefaultFlags = SYSTEMS.DATA?.PILE_TYPE_DEFAULTS?.[flags.type] ?? false;
+      const systemDefaultFlags = SYSTEMS.DATA?.PILE_DEFAULTS ?? false;
       if (systemDefaultFlags) {
         return {
           _id: actor.id,
@@ -284,7 +284,9 @@ const migrations = {
       return false;
     }).filter(Boolean);
 
-    console.log(`Item Piles | Migrating ${actorUpdates.length} actors to version ${version}...`);
+    if (actorUpdates.length) {
+      console.log(`Item Piles | Migrating ${actorUpdates.length} actors to version ${version}...`);
+    }
 
     await Actor.updateDocuments(actorUpdates);
 
@@ -294,7 +296,7 @@ const migrations = {
 
       const tokensToUpdate = tokens.map(token => {
         const flags = getProperty(token, CONSTANTS.FLAGS.PILE);
-        const systemDefaultFlags = SYSTEMS.DATA?.PILE_TYPE_DEFAULTS?.[flags.type] ?? false;
+        const systemDefaultFlags = SYSTEMS.DATA?.PILE_DEFAULTS ?? false;
         if (systemDefaultFlags) {
           const updatedFlags = foundry.utils.mergeObject(flags, systemDefaultFlags);
           return {
@@ -310,9 +312,9 @@ const migrations = {
         return false;
       }).filter(Boolean);
 
-      await game.scenes.get(sceneId).updateEmbeddedDocuments("Token", tokensToUpdate)
-
       console.log(`Item Piles | Migrating ${tokensToUpdate.length} tokens on scene "${sceneId}" to version ${version}...`);
+
+      await game.scenes.get(sceneId).updateEmbeddedDocuments("Token", tokensToUpdate);
 
     }
 

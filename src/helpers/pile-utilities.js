@@ -54,9 +54,7 @@ export function getItemFlagData(item, data = false) {
 }
 
 export function getActorFlagData(target, data = false) {
-  const defaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
-  const systemDefaults = foundry.utils.deepClone(Helpers.getSetting(SETTINGS.PILE_DEFAULTS));
-  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, foundry.utils.mergeObject(defaults, systemDefaults), data);
+  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS), data);
 }
 
 export function isValidItemPile(target, data = false) {
@@ -402,56 +400,6 @@ export function getItemPileName(target, { data = false, items = false, currencie
   const quantity = (items.length > 0 ? Utilities.getItemQuantity(item) : currencies[0]?.quantity) ?? 1
 
   return item.name + (quantity > 1 ? " x " + quantity : "");
-
-}
-
-export async function createDefaultItemPile(itemPileFlags = {}, folders = false) {
-
-  let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
-
-  pileDataDefaults.enabled = true;
-  if (foundry.utils.isEmpty(itemPileFlags)) {
-    pileDataDefaults.deleteWhenEmpty = true;
-    pileDataDefaults.displayOne = true;
-    pileDataDefaults.showItemName = true;
-    pileDataDefaults.overrideSingleItemScale = true;
-    pileDataDefaults.singleItemScale = 0.75;
-  }
-
-  pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
-
-  const actorData = {
-    name: "Default Item Pile",
-    type: Helpers.getSetting("actorClassType"),
-    img: "icons/svg/item-bag.svg"
-  };
-
-  if (folders) {
-    const folder = await Utilities.createFoldersFromNames(folders);
-    if (folder) {
-      actorData.folder = folder.id;
-    }
-  }
-
-  const pileActor = await Actor.create(actorData);
-
-  await pileActor.update({
-    [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-    [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
-    prototypeToken: {
-      name: "Item Pile",
-      actorLink: false,
-      bar1: { attribute: "" },
-      vision: false,
-      displayName: 50,
-      [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
-    }
-  })
-
-  await Helpers.setSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID, pileActor.id);
-
-  return pileActor;
 
 }
 

@@ -988,7 +988,8 @@ export default class PrivateAPI {
 
     if (createActor) {
 
-      let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+      let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
+      pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, foundry.utils.deepClone(SYSTEMS.DATA?.PILE_DEFAULTS ?? {}));
 
       pileDataDefaults.enabled = true;
       if (foundry.utils.isEmpty(itemPileFlags)) {
@@ -1042,7 +1043,7 @@ export default class PrivateAPI {
 
         Helpers.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
-        let pileDataDefaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+        let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
 
         pileDataDefaults.enabled = true;
         if (foundry.utils.isEmpty(itemPileFlags)) {
@@ -1053,6 +1054,7 @@ export default class PrivateAPI {
           pileDataDefaults.singleItemScale = 0.75;
         }
 
+        pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, foundry.utils.deepClone(SYSTEMS.DATA?.PILE_DEFAULTS ?? {}));
         pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
 
         const actorData = {
@@ -1310,7 +1312,7 @@ export default class PrivateAPI {
 
     const oldData = PileUtilities.getActorFlagData(targetActor);
 
-    const data = foundry.utils.mergeObject(foundry.utils.duplicate(oldData), foundry.utils.duplicate(newData));
+    const data = foundry.utils.mergeObject(foundry.utils.deepClone(oldData), foundry.utils.deepClone(newData));
 
     const diff = foundry.utils.diffObject(oldData, data);
 

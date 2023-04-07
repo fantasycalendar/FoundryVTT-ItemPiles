@@ -17,35 +17,38 @@ export default class CurrencyStore {
   }
 
   setPrimary(index) {
-    const currencies = get(this.currencies);
-    currencies.forEach((entry, entryIndex) => {
-      entry.primary = entryIndex === index;
+    this.currencies.update(currencies => {
+      currencies.forEach((entry, entryIndex) => {
+        entry.primary = entryIndex === index;
+      });
+      return currencies;
     });
-    this.currencies.set(currencies);
   }
 
   sortCurrencies() {
-    const currencies = get(this.currencies);
-    currencies.sort((a, b) => {
-      return b.exchangeRate - a.exchangeRate;
+    this.currencies.update(currencies => {
+      currencies.sort((a, b) => {
+        return b.exchangeRate - a.exchangeRate;
+      });
+      return currencies;
     });
-    this.currencies.set(currencies);
   }
 
   addAttribute() {
-    const currencies = get(this.currencies);
-    this.currencies.set([...currencies, {
-      type: "attribute",
-      name: "New Attribute",
-      img: "",
-      abbreviation: "{#}N",
-      data: {
-        path: ""
-      },
-      primary: !currencies.length,
-      exchangeRate: 1
-    }]);
-    this.sortCurrencies();
+    this.currencies.update(currencies => {
+      currencies.push({
+        type: "attribute",
+        name: "New Attribute",
+        img: "",
+        abbreviation: "{#}N",
+        data: {
+          path: ""
+        },
+        primary: !currencies.length,
+        exchangeRate: 1
+      });
+      return currencies;
+    });
   }
 
   async addItem(data) {
@@ -63,35 +66,33 @@ export default class CurrencyStore {
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
 
-    let currencies = get(this.currencies);
-
-    const itemCurrencies = currencies.map(entry => entry.data?.item ?? {});
-    const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
-
-    if (foundItem) {
-      const index = itemCurrencies.indexOf(foundItem);
-      currencies[index].data = {
-        uuid,
-        item: itemData
-      }
-      Helpers.custom_notify(`Updated item data for ${localize(currencies[index].name)} (item name ${itemData.name})`)
-    } else {
-      currencies = [...currencies, {
-        id: randomID(),
-        type: "item",
-        name: itemData.name,
-        img: itemData.img,
-        abbreviation: "{#} " + itemData.name,
-        data: {
+    this.currencies.update(currencies => {
+      const itemCurrencies = currencies.map(entry => entry.data?.item ?? {});
+      const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
+      if (foundItem) {
+        const index = itemCurrencies.indexOf(foundItem);
+        currencies[index].data = {
           uuid,
           item: itemData
-        },
-        primary: !currencies.length,
-        exchangeRate: 1
-      }];
-    }
-    this.currencies.set(currencies);
-    this.sortCurrencies();
+        }
+        Helpers.custom_notify(`Updated item data for ${localize(currencies[index].name)} (item name ${itemData.name})`)
+      } else {
+        currencies.push({
+          id: randomID(),
+          type: "item",
+          name: itemData.name,
+          img: itemData.img,
+          abbreviation: "{#} " + itemData.name,
+          data: {
+            uuid,
+            item: itemData
+          },
+          primary: !currencies.length,
+          exchangeRate: 1
+        });
+      }
+      return currencies;
+    });
   }
 
   async editItem(index) {
@@ -116,9 +117,10 @@ export default class CurrencyStore {
   }
 
   removeEntry(index) {
-    const currencies = get(this.currencies);
-    currencies.splice(index, 1);
-    this.currencies.set(currencies);
+    this.currencies.update(currencies => {
+      currencies.splice(index, 1);
+      return currencies;
+    })
   }
 
   export() {

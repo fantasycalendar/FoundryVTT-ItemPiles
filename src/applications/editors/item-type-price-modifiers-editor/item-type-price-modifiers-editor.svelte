@@ -3,14 +3,16 @@
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import SliderInput from "../../components/SliderInput.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { writable } from "svelte/store";
+  import { get, writable } from "svelte/store";
   import * as Helpers from "../../../helpers/helpers.js";
   import SETTINGS from "../../../constants/settings.js";
 
   const { application } = getContext('#external');
 
   export let elementRoot;
-  export let itemTypePriceModifiers = [];
+  export let data = [];
+
+  const itemTypePriceModifiers = writable(data);
 
   let form;
   let unusedTypes;
@@ -20,29 +22,33 @@
   $: {
     const allTypes = systemTypes.map(([type]) => type).concat(currentCustomCategories).map(type => type.toLowerCase())
     unusedTypes = allTypes.filter(type => {
-      return !itemTypePriceModifiers.some(priceData => priceData.type === type || (priceData.type === "custom" && priceData.category === type))
+      return !$itemTypePriceModifiers.some(priceData => priceData.type === type || (priceData.type === "custom" && priceData.category === type))
     });
   }
 
   function add() {
     if (!unusedTypes.length) return;
-    itemTypePriceModifiers.push({
-      type: unusedTypes[0],
-      category: "",
-      override: false,
-      buyPriceModifier: 1,
-      sellPriceModifier: 0.5
-    });
-    itemTypePriceModifiers = itemTypePriceModifiers;
+    itemTypePriceModifiers.update(val => {
+      val.push({
+        type: unusedTypes[0],
+        category: "",
+        override: false,
+        buyPriceModifier: 1,
+        sellPriceModifier: 0.5
+      });
+      return val;
+    })
   }
 
   function remove(index) {
-    itemTypePriceModifiers.splice(index, 1);
-    itemTypePriceModifiers = itemTypePriceModifiers;
+    itemTypePriceModifiers.update(val => {
+      val.splice(index, 1);
+      return val;
+    })
   }
 
   async function updateSettings() {
-    application.options.resolve?.(itemTypePriceModifiers);
+    application.options.resolve?.(get(itemTypePriceModifiers));
     application.close();
   }
 
@@ -55,7 +61,7 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form autocomplete=off bind:this={form} on:submit|preventDefault={updateSettings}>
 
 		<p>{localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.Explanation")}</p>
 
@@ -68,12 +74,12 @@
 					<th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</th>
 					<th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
 					<th style="width:5%;">
-          <span on:click={add} class:item-piles-clickable-link={unusedTypes.length}>
+          <span class:item-piles-clickable-link={unusedTypes.length} on:click={add}>
             <i class="fas fa-plus"></i>
           </span>
 					</th>
 				</tr>
-				{#each itemTypePriceModifiers as priceData, index (index)}
+				{#each $itemTypePriceModifiers as priceData, index (index)}
 					<tr>
 						<td>
 							<div class="form-group">
@@ -86,20 +92,26 @@
 									priceData.type = e.target.value;
 									priceData.category = e.target.value === "custom" ? e.target.options[e.target.selectedIndex].text.toLowerCase() : "";
 								}}>
-									{#each systemTypes as [itemType, label] (itemType)}
-										<option value="{itemType}"
-														selected="{priceData.type === itemType}"
-														disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
-											{localize(label)}
-										</option>
-									{/each}
-									{#each currentCustomCategories as customCategory}
-										<option value="custom"
-														selected="{priceData.type === 'custom' && customCategory.toLowerCase() === priceData.category.toLowerCase()}"
-														disabled="{customCategory.toLowerCase() !== priceData.category.toLowerCase() && !unusedTypes.includes(customCategory.toLowerCase())}">
-											{customCategory}
-										</option>
-									{/each}
+									<optgroup label="System Types">
+										{#each systemTypes as [itemType, label] (itemType)}
+											<option value="{itemType}"
+															selected="{priceData.type === itemType}"
+															disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
+												{localize(label)}
+											</option>
+										{/each}
+									</optgroup>
+									{#if currentCustomCategories.length}
+										<optgroup label="Custom Categories">
+											{#each currentCustomCategories as customCategory}
+												<option value="custom"
+																selected="{priceData.type === 'custom' && customCategory.toLowerCase() === priceData.category.toLowerCase()}"
+																disabled="{customCategory.toLowerCase() !== priceData.category.toLowerCase() && !unusedTypes.includes(customCategory.toLowerCase())}">
+													{customCategory}
+												</option>
+											{/each}
+										</optgroup>
+									{/if}
 								</select>
 							</div>
 						</td>
@@ -123,10 +135,10 @@
 		</div>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("Save")}
 			</button>
-			<button type="button" on:click|once={() => { application.close(); }}>
+			<button on:click|once={() => { application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

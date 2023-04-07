@@ -6,9 +6,11 @@
 
   const { application } = getContext('#external');
 
-  export let prices;
+  export let data;
   export let elementRoot;
   let form;
+
+  let prices = foundry.utils.deepClone(data);
 
   async function updateSettings() {
     application.options.resolve(prices);

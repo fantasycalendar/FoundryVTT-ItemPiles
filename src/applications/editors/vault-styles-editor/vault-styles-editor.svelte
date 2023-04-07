@@ -10,9 +10,9 @@
   let form;
 
   export let elementRoot;
-  export let vaultStyles;
+  export let data;
 
-  const vaultStyleStore = writable(vaultStyles);
+  const vaultStyleStore = writable(data);
 
   loadImages();
 
