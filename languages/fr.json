@@ -617,7 +617,7 @@
           "LockedSoundPath": "Chemin du son verrouillé"
         },
         "Merchant": {
-          "ConfigureItemTypePriceModifiers": "Configurer les modificateurs de prix du type d'objet.",
+          "ConfigureItemTypePriceModifiers": "Configurer les modificateurs de prix du type d'objet",
           "Title": "Paramètres du marchand",
           "EnabledExplanation": "Les joueurs ne peuvent pas récupérer les objets auprès des marchands, mais doivent les acheter",
           "MerchantImageExplanation": "Il s'agit de l'image qui sera affichée dans l'interface du marchand",
@@ -654,7 +654,7 @@
           "ItemTypeModifiersExplanation": "Dans ce dialogue, vous pouvez configurer les modificateurs de prix pour des types d'objets individuels.",
           "ActorPriceModifiers": "Modificateurs de prix par acteur",
           "ActorPriceModifiersExplanation": "Ici, vous pouvez configurer si certains acteurs spécifiques doivent avoir des modificateurs de prix différents des modificateurs de prix ci-dessus.",
-          "ConfigureActorPriceModifiers": "Configurer les modificateurs de prix des acteurs.",
+          "ConfigureActorPriceModifiers": "Configurer les modificateurs de prix des acteurs",
           "KeepZero": "Conserver une quantité nulle",
           "KeepZeroExplanation": "Lorsque les articles sont totalement épuisés, ce commerçant ne les retire pas, mais les met plutôt à l'index.",
           "HideItemsWithZeroCost": "Cacher les objets à coût zéro",
@@ -662,7 +662,10 @@
           "ClosedDaysExplanation": "Les jours cochés, le commerçant sera fermé (si le statut d'ouverture du commerçant est réglé sur automatique).",
           "ClosedHolidays": "Jours fériés (Simple Calendar)",
           "ClosedHolidaysExplanation": "Les jours où il y a des notes avec la catégorie de note donnée, le commerçant sera fermé (si le statut d'ouverture du commerçant est réglé sur automatique).",
-          "HideItemsWithZeroCostExplanation": "Lorsqu'il est activé, il fait en sorte que les clients ne puissent pas acheter ou vendre des articles dont le coût est nul (gratuit)."
+          "HideItemsWithZeroCostExplanation": "Lorsqu'il est activé, il fait en sorte que les clients ne puissent pas acheter ou vendre des articles dont le coût est nul (gratuit).",
+          "MerchantColumns": "Colonnes marchand",
+          "MerchantColumnsExplanation": "Ici, vous pouvez configurer les colonnes spécifiques du système d'échoppe affichées dans son IU marchand tels que la rareté des objets.",
+          "ConfigureMerchantColumns": "Configurer les colonnes de marchand"
         },
         "Sharing": {
           "Title": "Paramètres de partage",
@@ -777,8 +780,9 @@
         "Submit": "Retirer"
       },
       "VaultAccessEditor": {
-        "Title": "Editeur d'accès au coffre-fort : {actor_name}",
-        "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les monnaies du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet."
+        "Title": "Éditeur d'accès au coffre-fort",
+        "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les monnaies du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
+        "TitleActor": "Éditeur d'accès au coffre : {actor_name}"
       },
       "UnstackableItemTypesEditor": {
         "Explanation": "Vous pouvez définir ici les types d'objets qui ne peuvent pas être empilés.",
@@ -815,6 +819,17 @@
         "Content": "Voulez-vous fractionner cette pile d'éléments ?",
         "ContentMultipleQuantity": "Il y a {quantity} fois cet objet. Combien voulez vous en avoir dans la nouvelle pile ?",
         "Submit": "Fractionner la pile"
+      },
+      "MerchantColumnsEditor": {
+        "TitleActor": "Colonnes Marchand : {actor_name}",
+        "Label": "Étiquette",
+        "PropertyPath": "Chemin de la propriété de l'objet",
+        "Formatting": "Formatage",
+        "ConfigureMapping": "Configurer la correspondance",
+        "MappingContent": "Ceci configure la correspondance entre la valeur de la propriété à une étiquette. Cette étiquette peut être une chaine localisée.",
+        "Title": "Colonnes marchand",
+        "Explanation": "Ceci configure les colonnes visibles dans l'IU Marchand, au delà du nom, de la quantité et du prix de l'objet.",
+        "MappingTitle": "Cartographie des colonnes marchand : {label}"
       }
     },
     "Settings": {
