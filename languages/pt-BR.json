@@ -502,8 +502,8 @@
           "SellPriceModifier": "Modificador de preço de venda (%)",
           "ItemTypeModifier": "Modificadores de preço do tipo de item",
           "ItemTypeModifiersExplanation": "Nesta caixa de diálogo, você pode configurar modificadores de preço para tipos de itens individuais.",
-          "ConfigureItemTypePriceModifiers": "Configurar modificadores de preço de tipo de item.",
-          "ConfigureActorPriceModifiers": "Configurar modificadores de preço de ator.",
+          "ConfigureItemTypePriceModifiers": "Configurar modificadores de preço de tipo de item",
+          "ConfigureActorPriceModifiers": "Configurar modificadores de preço de ator",
           "KeepZero": "Manter quantidade zero",
           "KeepZeroExplanation": "Quando os itens estiverem totalmente esgotados, este comerciante não os removerá, mas os definirá como não à venda.",
           "HideItemsWithZeroCostExplanation": "Quando habilitado, faz com que os clientes não possam comprar ou vender itens com custo zero (grátis).",
@@ -511,7 +511,10 @@
           "ClosedDaysExplanation": "Nos dias marcados, o lojista estará fechado (caso o status de lojista aberto esteja definido como automático).",
           "ClosedHolidaysExplanation": "Nos dias em que houver notas com a categoria de nota indicada, o estabelecimento estará fechado (caso o estado aberto do estabelecimento esteja definido como automático).",
           "HideItemsWithZeroCost": "Ocultar itens com custo zero",
-          "ClosedHolidays": "Feriados Fechados (Simple Calendar)"
+          "ClosedHolidays": "Feriados Fechados (Simple Calendar)",
+          "MerchantColumns": "Colunas do comerciante",
+          "MerchantColumnsExplanation": "Aqui você pode configurar as colunas específicas do sistema deste comerciante exibidas em sua IU do comerciante, como a raridade dos itens.",
+          "ConfigureMerchantColumns": "Configurar colunas do comerciante"
         },
         "Title": "Configuração do Item Pile: {actor_name}",
         "Configure": "Item Pile",
@@ -611,8 +614,9 @@
         "Title": "Editor de tipos de itens não empilháveis"
       },
       "VaultAccessEditor": {
-        "Title": "Editor de acesso ao cofre: {actor_name}",
-        "Explanation": "Isso configura quais personagens e jogadores podem acessar e modificar o inventário e as moedas do cofre. Se um jogador possuir o personagem do cofre, ele sempre terá acesso total."
+        "Title": "Editor de acesso ao cofre",
+        "Explanation": "Isso configura quais personagens e jogadores podem acessar e modificar o inventário e as moedas do cofre. Se um jogador possuir o personagem do cofre, ele sempre terá acesso total.",
+        "TitleActor": "Editor de acesso ao cofre: {actor_name}"
       },
       "WithdrawItem": {
         "Title": "Retirar Item",
@@ -631,6 +635,17 @@
         "Title": "Editando Moedas",
         "Content": "Como um GM, você pode atualizar as moedas esta na pilha de itens:",
         "Submit": "Enviar"
+      },
+      "MerchantColumnsEditor": {
+        "Title": "Colunas do comerciante",
+        "TitleActor": "Colunas do comerciante: {actor_name}",
+        "Explanation": "Isso configura as colunas visíveis na IU do comerciante, além do nome do item, a quantidade e o preço.",
+        "Label": "Rótulo",
+        "PropertyPath": "Caminho da propriedade do item",
+        "Formatting": "Formatação",
+        "ConfigureMapping": "Configurar o Mapeamento",
+        "MappingTitle": "Mapeamento de colunas do comerciante: {label}",
+        "MappingContent": "Isso configura o mapeamento entre o valor da propriedade para um rótulo. Esse rótulo pode ser uma string localizada."
       }
     },
     "Settings": {
