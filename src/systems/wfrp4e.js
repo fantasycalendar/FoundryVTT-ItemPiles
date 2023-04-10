@@ -29,8 +29,8 @@ export default {
     let overallCost = 0;
     const prices = getProperty(item, "system.price");
     overallCost += (Number(prices?.["gc"]) ?? 0);
-    overallCost += (Number(prices?.["ss"]) ?? 0) * 0.1;
-    overallCost += (Number(prices?.["bp"]) ?? 0) * 0.01;
+    overallCost += (Number(prices?.["ss"]) ?? 0) * 0.05;
+    overallCost += (Number(prices?.["bp"]) ?? 0) * 0.004166667;
     return overallCost;
   },
 
@@ -87,7 +87,7 @@ export default {
         }
       },
       primary: false,
-      exchangeRate: 0.1
+      exchangeRate: 0.05
     },
     {
       type: "item",
@@ -108,7 +108,7 @@ export default {
         }
       },
       primary: false,
-      exchangeRate: 0.01
+      exchangeRate: 0.004166667
     }],
 
   CSS_VARIABLES: {
