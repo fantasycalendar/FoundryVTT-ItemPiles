@@ -54,7 +54,11 @@ export function getItemFlagData(item, data = false) {
 }
 
 export function getActorFlagData(target, data = false) {
-  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS), data);
+  const defaults = foundry.utils.mergeObject(
+    foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+    foundry.utils.deepClone(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {})
+  );
+  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, defaults, data);
 }
 
 export function isValidItemPile(target, data = false) {
@@ -454,9 +458,15 @@ export async function updateItemPileData(target, flagData, tokenData) {
   flagData = cleanFlagData(flagData);
 
   const updates = documentTokens.map(tokenDocument => {
+    const overrideImage = getProperty(tokenData, "texture.src") ?? getProperty(tokenData, "img");
+    const overrideScale = getProperty(tokenData, "texture.scaleX")
+      ?? getProperty(tokenData, "texture.scaleY")
+      ?? getProperty(tokenData, "img");
+    const scale = getItemPileTokenScale(tokenDocument, pileData, overrideScale);
     const newTokenData = foundry.utils.mergeObject(tokenData, {
-      "img": getItemPileTokenImage(tokenDocument, pileData, tokenData?.img),
-      "scale": getItemPileTokenScale(tokenDocument, pileData, tokenData?.scale),
+      "texture.src": getItemPileTokenImage(tokenDocument, pileData, overrideImage),
+      "texture.scaleX": scale,
+      "texture.scaleY": scale,
       "name": getItemPileName(tokenDocument, pileData, tokenData?.name),
     });
     const data = {
@@ -493,14 +503,18 @@ export async function updateItemPileData(target, flagData, tokenData) {
 }
 
 export function cleanFlagData(flagData) {
-  const defaults = Object.keys(CONSTANTS.PILE_DEFAULTS);
-  const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, CONSTANTS.PILE_DEFAULTS)));
-  const toRemove = new Set(defaults.filter(key => !difference.has(key)));
+  const defaults = foundry.utils.mergeObject(
+    foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+    Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {}
+  );
+  const defaultKeys = Object.keys(defaults);
+  const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, defaults)));
+  const toRemove = new Set(defaultKeys.filter(key => !difference.has(key)));
   if (flagData.enabled) {
     toRemove.delete("type")
   }
   if (!CONSTANTS.CUSTOM_PILE_TYPES[flagData.type]) {
-    const baseKeys = new Set(defaults);
+    const baseKeys = new Set(defaultKeys);
     for (const key of Object.keys(flagData)) {
       if (!baseKeys.has(key)) {
         delete flagData[key];

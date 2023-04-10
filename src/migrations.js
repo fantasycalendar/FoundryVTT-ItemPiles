@@ -267,25 +267,35 @@ const migrations = {
 
   },
 
-  "2.6.0": async (version) => {
+  "2.6.1": async (version) => {
 
     const actors = getItemPileActorsOfLowerVersion(version);
 
-    const actorUpdates = actors.map(actor => {
-      const flags = getProperty(actor, CONSTANTS.FLAGS.PILE);
-      const systemDefaultFlags = SYSTEMS.DATA?.PILE_DEFAULTS ?? false;
-      if (systemDefaultFlags) {
-        return {
-          _id: actor.id,
-          [CONSTANTS.FLAGS.PILE]: foundry.utils.mergeObject(flags, systemDefaultFlags),
-          [CONSTANTS.FLAGS.VERSION]: version
-        }
+    const actorUpdates = actors.map(a => {
+      const flags = getProperty(a, CONSTANTS.FLAGS.PILE);
+      if (flags?.itemTypePriceModifiers) {
+        flags.itemTypePriceModifiers = flags.itemTypePriceModifiers.map(priceModifier => {
+          const custom = Object.keys(CONFIG.Item.typeLabels).indexOf(priceModifier.type) === -1;
+          priceModifier.category = custom ? priceModifier.type : "";
+          priceModifier.type = custom ? "custom" : priceModifier.type;
+          return priceModifier;
+        })
       }
-      return false;
-    }).filter(Boolean);
+      const flagData = {
+        [CONSTANTS.FLAGS.PILE]: flags,
+        [CONSTANTS.FLAGS.VERSION]: version
+      }
+      if (a.actorLink) {
+        flagData["token"] = foundry.utils.deepClone(flagData);
+      }
+      return {
+        _id: a.id,
+        ...flagData
+      };
+    });
 
     if (actorUpdates.length) {
-      console.log(`Item Piles | Migrating ${actorUpdates.length} actors to version ${version}...`);
+      console.log(`Item Piles | Migrating ${actorUpdates.length} actors to version ${version}...`)
     }
 
     await Actor.updateDocuments(actorUpdates);
@@ -293,30 +303,34 @@ const migrations = {
     const { validTokensOnScenes } = getItemPileTokensOfLowerVersion(version);
 
     for (const [sceneId, tokens] of validTokensOnScenes) {
-
-      const tokensToUpdate = tokens.map(token => {
+      const scene = game.scenes.get(sceneId)
+      const updates = [];
+      for (const token of tokens) {
         const flags = getProperty(token, CONSTANTS.FLAGS.PILE);
-        const systemDefaultFlags = SYSTEMS.DATA?.PILE_DEFAULTS ?? false;
-        if (systemDefaultFlags) {
-          const updatedFlags = foundry.utils.mergeObject(flags, systemDefaultFlags);
-          return {
-            _id: token.id,
-            [CONSTANTS.FLAGS.VERSION]: version,
-            [CONSTANTS.FLAGS.PILE]: updatedFlags,
-            actorData: {
-              [CONSTANTS.FLAGS.VERSION]: version,
-              [CONSTANTS.FLAGS.PILE]: updatedFlags,
-            }
-          }
+        if (flags?.itemTypePriceModifiers) {
+          flags.itemTypePriceModifiers = flags.itemTypePriceModifiers.map(priceModifier => {
+            const custom = Object.keys(CONFIG.Item.typeLabels).indexOf(priceModifier.type) === -1;
+            priceModifier.category = custom ? priceModifier.type : "";
+            priceModifier.type = custom ? "custom" : priceModifier.type;
+            return priceModifier;
+          })
         }
-        return false;
-      }).filter(Boolean);
-
-      console.log(`Item Piles | Migrating ${tokensToUpdate.length} tokens on scene "${sceneId}" to version ${version}...`);
-
-      await game.scenes.get(sceneId).updateEmbeddedDocuments("Token", tokensToUpdate);
-
+        const flagData = {
+          [CONSTANTS.FLAGS.PILE]: flags,
+          [CONSTANTS.FLAGS.VERSION]: version,
+        }
+        updates.push({
+          _id: token.id,
+          ...flagData,
+          actorData: {
+            ...flagData
+          }
+        });
+      }
+      console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
+      await scene.updateEmbeddedDocuments("Token", updates);
     }
 
   }
+
 };

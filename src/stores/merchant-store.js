@@ -13,6 +13,7 @@ import ItemEntry from "../applications/merchant-app/ItemEntry.svelte";
 import QuantityColumn from "../applications/merchant-app/QuantityColumn.svelte";
 import PriceSelector from "../applications/components/PriceSelector.svelte";
 import EntryButtons from "../applications/merchant-app/EntryButtons.svelte";
+import SETTINGS from "../constants/settings.js";
 
 export default class MerchantStore extends ItemPileStore {
 
@@ -73,7 +74,7 @@ export default class MerchantStore extends ItemPileStore {
             const path = column.path;
             const AProp = getProperty(b.item, path);
             const BProp = getProperty(a.item, path);
-            if (!column?.mapping[AProp] || !column?.mapping[BProp]) {
+            if (!column?.mapping?.[AProp] || !column?.mapping?.[BProp]) {
               return (AProp > BProp ? 1 : -1) * (inverse ? -1 : 1);
             }
             const keys = Object.keys(column.mapping);
@@ -205,8 +206,9 @@ export default class MerchantStore extends ItemPileStore {
     }
   }
 
-  addOverrideTypePrice(type, custom = false) {
+  addOverrideTypePrice(type) {
     const pileData = get(this.pileData);
+    const custom = Object.keys(CONFIG.Item.typeLabels).indexOf(type) === -1;
     pileData.itemTypePriceModifiers.push({
       category: custom ? type : "",
       type: custom ? "custom" : type,

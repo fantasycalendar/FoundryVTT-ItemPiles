@@ -998,7 +998,6 @@ export default class PrivateAPI {
     if (createActor) {
 
       let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
-      pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, foundry.utils.deepClone(SYSTEMS.DATA?.PILE_DEFAULTS ?? {}));
 
       pileDataDefaults.enabled = true;
       if (foundry.utils.isEmpty(itemPileFlags)) {
@@ -1063,7 +1062,6 @@ export default class PrivateAPI {
           pileDataDefaults.singleItemScale = 0.75;
         }
 
-        pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, foundry.utils.deepClone(SYSTEMS.DATA?.PILE_DEFAULTS ?? {}));
         pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
 
         const actorData = {
@@ -1140,9 +1138,17 @@ export default class PrivateAPI {
 
         const data = { data: pileData, items: items };
 
+        const overrideImage = getProperty(overrideData, "texture.src") ?? getProperty(overrideData, "img");
+        const overrideScale = getProperty(overrideData, "texture.scaleX")
+          ?? getProperty(overrideData, "texture.scaleY")
+          ?? getProperty(overrideData, "img");
+
+        const scale = PileUtilities.getItemPileTokenScale(pileActor, data, overrideScale);
+
         overrideData = foundry.utils.mergeObject(overrideData, {
-          "img": PileUtilities.getItemPileTokenImage(pileActor, data, overrideData?.img),
-          "scale": PileUtilities.getItemPileTokenScale(pileActor, data, overrideData?.scale),
+          "texture.src": PileUtilities.getItemPileTokenImage(pileActor, data, overrideImage),
+          "texture.scaleX": scale,
+          "texture.scaleY": scale,
           "name": PileUtilities.getItemPileName(pileActor, data, overrideData?.name),
         });
 
@@ -1215,9 +1221,17 @@ export default class PrivateAPI {
         ? await tokenSettings(target)
         : foundry.utils.deepClone(tokenSettings);
 
+      const overrideImage = getProperty(specificTokenSettings, "texture.src") ?? getProperty(specificTokenSettings, "img");
+      const overrideScale = getProperty(specificTokenSettings, "texture.scaleX")
+        ?? getProperty(specificTokenSettings, "texture.scaleY")
+        ?? getProperty(specificTokenSettings, "img");
+
+      const scale = PileUtilities.getItemPileTokenScale(target, data, overrideScale);
+
       specificTokenSettings = foundry.utils.mergeObject(specificTokenSettings, {
-        "img": PileUtilities.getItemPileTokenImage(target, data, specificTokenSettings?.img),
-        "scale": PileUtilities.getItemPileTokenScale(target, data, specificTokenSettings?.scale),
+        "texture.src": PileUtilities.getItemPileTokenImage(target, data, overrideImage),
+        "texture.scaleX": scale,
+        "texture.scaleY": scale,
         "name": PileUtilities.getItemPileName(target, data, specificTokenSettings?.name)
       });
 

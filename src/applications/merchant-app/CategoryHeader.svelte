@@ -35,10 +35,10 @@
 		<div style="flex: 0 1 auto">
 			{#if $priceModifiersPerType[type]}
 				<i class="fas fa-times item-piles-clickable-red"
-					 on:click={() => { store.removeOverrideTypePrice(type, category.type === "custom") }}></i>
+					 on:click={() => { store.removeOverrideTypePrice(type) }}></i>
 			{:else}
 				<i class="fas fa-plus item-piles-clickable-green"
-					 on:click={() => { store.addOverrideTypePrice(type, category.type === "custom") }}></i>
+					 on:click={() => { store.addOverrideTypePrice(type) }}></i>
 			{/if}
 		</div>
 	{/if}
@@ -56,10 +56,11 @@
 
     h3 {
       margin: 0;
+      flex: 1 0 auto;
     }
 
     .price-header {
-      flex: 0 1 250px;
+      flex: 0 1 calc(50% - 10px);
       padding-right: 10px;
       justify-content: center;
       display: flex;

@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.6.1
+
+- Tweaked the way default item pile data is applied, in the case of merchant columns
+- Fixed `game.itempiles.API.createItemPile` not respecting an overriding `texture.src`, `texture.scaleX`, and `texture.scaleY` property on the token data
+- Fixed populate items not having scroll bars when enough items was added to the merchant
+
 ## Version 2.6.0
 
 - Added system specific columns to merchants, such as rarity in D&D 5e and bulk in Pathfinder 2e
