@@ -4,6 +4,7 @@
   import SliderInput from "../../components/SliderInput.svelte";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { getSourceActorFromDropData, getUuid } from "../../../helpers/utilities.js";
+  import { get, writable } from "svelte/store";
 
   const { application } = getContext('#external');
 
@@ -12,22 +13,25 @@
   export let data;
   export let elementRoot;
 
-  let priceModifiers = data.map(data => {
+  const priceModifiers = writable(data.map(data => {
     data.actor = globalThis.fromUuidSync(data.actorUuid);
     if (!data.actor) return false;
     return data;
-  }).filter(Boolean);
+  }).filter(Boolean));
 
   function remove(index) {
-    priceModifiers.splice(index, 1)
-    priceModifiers = priceModifiers;
+    priceModifiers.update(val => {
+      val.splice(index, 1)
+      return val;
+    })
   }
 
   async function updateSettings() {
-    priceModifiers.forEach(data => {
+    let result = get(priceModifiers);
+    result.forEach(data => {
       data.actorUuid = getUuid(data.actor);
     })
-    application.options.resolve?.(priceModifiers);
+    application.options.resolve?.(result);
     application.close();
   }
 
@@ -52,16 +56,20 @@
 
     if (!actor) return;
 
-    if (priceModifiers.find(data => data.actor === actor)) return;
+    priceModifiers.update(val => {
 
-    priceModifiers.push({
-      override: false,
-      actor: actor,
-      buyPriceModifier: 1,
-      sellPriceModifier: 0.5
-    });
+      if (val.find(data => data.actor === actor)) return val;
 
-    priceModifiers = priceModifiers;
+      val.push({
+        override: false,
+        actor: actor,
+        buyPriceModifier: 1,
+        sellPriceModifier: 0.5
+      });
+
+      return val;
+
+    })
   }
 
   function preventDefault(event) {
@@ -79,9 +87,9 @@
 		<p>{localize("ITEM-PILES.Applications.PriceModifiersEditor.Explanation")}</p>
 
 		<div on:dragstart={preventDefault} on:drop={dropData} on:dragover={preventDefault}
-				 class:border-highlight={!priceModifiers.length}>
+				 class:border-highlight={!$priceModifiers.length}>
 
-			{#if priceModifiers.length}
+			{#if $priceModifiers.length}
 				<table>
 					<tr>
 						<th style="width:5%;">{localize("ITEM-PILES.Applications.PriceModifiersEditor.Override")}</th>
@@ -90,7 +98,7 @@
 						<th style="width:35%;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</th>
 						<th style="width:5%;"></th>
 					</tr>
-					{#each priceModifiers as priceData, index (index)}
+					{#each $priceModifiers as priceData, index (index)}
 						<tr>
 							<td>
 								<div class="form-group">

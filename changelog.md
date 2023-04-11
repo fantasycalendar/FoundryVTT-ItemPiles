@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.6.2
+
+- Fixed character price modifiers throwing errors
+
 ## Version 2.6.1
 
 - Updated WFRP4e system configuration (thank you Txus5012 on github!)
