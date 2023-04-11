@@ -4,8 +4,8 @@ import { PileItem } from "./pile-item.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
-import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
 import { isResponsibleGM } from "../helpers/helpers.js";
+import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
 import * as Utilities from "../helpers/utilities.js";
 import ItemPileStore from "./item-pile-store.js";
 import CustomColumn from "../applications/merchant-app/CustomColumn.svelte";
@@ -13,7 +13,6 @@ import ItemEntry from "../applications/merchant-app/ItemEntry.svelte";
 import QuantityColumn from "../applications/merchant-app/QuantityColumn.svelte";
 import PriceSelector from "../applications/components/PriceSelector.svelte";
 import EntryButtons from "../applications/merchant-app/EntryButtons.svelte";
-import SETTINGS from "../constants/settings.js";
 
 export default class MerchantStore extends ItemPileStore {
 
@@ -59,10 +58,11 @@ export default class MerchantStore extends ItemPileStore {
   }
 
   setupSubscriptions() {
+
+    let setup = false;
     super.setupSubscriptions();
     this.subscribeTo(this.pileData, (pileData) => {
-      this.updatePriceModifiers();
-      this.updateOpenCloseStatus();
+
       this.isMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
 
       const customColumns = foundry.utils.deepClone(pileData.merchantColumns)
@@ -120,30 +120,43 @@ export default class MerchantStore extends ItemPileStore {
 
       this.sortTypes.set(sortTypes)
 
+      if (!setup) return;
+      this.updatePriceModifiers();
+      this.updateOpenCloseStatus();
+
     });
     if (this.recipientDocument) {
       this.subscribeTo(this.recipientPileData, () => {
+        if (!setup) return;
         this.updatePriceModifiers();
       });
       this.subscribeTo(this.recipientDocument, () => {
+        if (!setup) return;
         this.refreshItemPrices();
       })
     }
-
     this.subscribeTo(this.typeFilter, (val) => {
+      if (!setup) return;
       this.refreshItems()
     });
     this.subscribeTo(this.sortType, (val) => {
+      if (!setup) return;
       this.refreshItems();
     })
     this.subscribeTo(this.inverseSort, (val) => {
+      if (!setup) return;
       this.refreshItems();
     })
+    setup = true;
+    this.updatePriceModifiers();
+    this.refreshItems();
   }
 
   refreshItemPrices() {
+    const pileData = get(this.pileData);
+    const recipientPileData = get(this.recipientPileData);
     get(this.allItems).forEach(item => {
-      item.refreshPriceData();
+      item.refreshPriceData(pileData, recipientPileData);
     });
   }
 
@@ -192,17 +205,23 @@ export default class MerchantStore extends ItemPileStore {
 
   updatePriceModifiers() {
     let pileData = get(this.pileData);
+    let change = false;
     if (pileData.itemTypePriceModifiers) {
+      change = true;
       this.priceModifiersPerType.set((pileData.itemTypePriceModifiers ?? {}).reduce((acc, priceData) => {
         acc[priceData.category.toLowerCase() || priceData.type] = priceData;
         return acc;
       }, {}));
     }
     if (this.recipient && pileData.actorPriceModifiers) {
+      change = true;
       const actorSpecificModifiers = pileData.actorPriceModifiers?.find(data => data.actorUuid === this.recipientUuid);
       if (actorSpecificModifiers) {
         this.priceModifiersForActor.set(actorSpecificModifiers);
       }
+    }
+    if (change) {
+      this.refreshItemPrices();
     }
   }
 
@@ -322,10 +341,6 @@ class PileMerchantItem extends PileItem {
         this.refreshDisplayQuantity();
       });
     }
-    this.subscribeTo(this.store.priceModifiersPerType, () => {
-      if (!setup) return;
-      this.refreshPriceData();
-    });
     this.subscribeTo(this.quantityToBuy, () => {
       if (!setup) return;
       this.refreshPriceData();
@@ -335,7 +350,10 @@ class PileMerchantItem extends PileItem {
       this.refreshPriceData();
       this.store.refreshItems();
     });
-    this.subscribeTo(this.store.typeFilter, this.filter.bind(this));
+    this.subscribeTo(this.store.typeFilter, () => {
+      if (!setup) return;
+      this.filter()
+    });
     this.subscribeTo(this.itemFlagData, () => {
       if (!setup) return;
       this.refreshPriceData();
@@ -343,6 +361,7 @@ class PileMerchantItem extends PileItem {
     });
     this.refreshDisplayQuantity();
     setup = true;
+    console.log("Setup " + this.item.name)
   }
 
   refreshDisplayQuantity() {
@@ -380,12 +399,12 @@ class PileMerchantItem extends PileItem {
 
   }
 
-  refreshPriceData() {
+  refreshPriceData(sellerFlagData, buyerFlagData) {
 
     const quantityToBuy = get(this.quantityToBuy);
     const itemFlagData = get(this.itemFlagData);
-    const sellerFlagData = get(this.store.pileData);
-    const buyerFlagData = get(this.store.recipientPileData);
+    sellerFlagData = sellerFlagData ?? get(this.store.pileData);
+    buyerFlagData = buyerFlagData ?? get(this.store.recipientPileData);
     const priceData = PileUtilities.getPriceData({
       item: this.item,
       seller: this.store.actor,

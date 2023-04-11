@@ -2217,7 +2217,7 @@ export default class PrivateAPI {
         }], { type: "currency" });
       } else {
         await buyerTransaction.appendItemChanges([{
-          item: change.item, quantity: change.quantity
+          item: change.data.item, quantity: change.quantity
         }], { type: "currency" });
       }
     }

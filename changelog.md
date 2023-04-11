@@ -2,7 +2,9 @@
 
 ## Version 2.6.2
 
-- Fixed character price modifiers throwing errors
+- Improved loading speed of merchants by a factor of five in systems with item based currencies
+- Fixed buying items in systems with item based currencies would not work if change was to be given to the buyer
+- Fixed editing character price modifiers throwing errors
 
 ## Version 2.6.1
 

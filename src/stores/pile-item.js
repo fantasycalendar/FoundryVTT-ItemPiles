@@ -113,8 +113,12 @@ export class PileItem extends PileBaseItem {
     const actorIsMerchant = PileUtilities.isItemPileMerchant(this.store.actor, get(this.store.pileData));
     const pileActor = actorIsMerchant ? this.store.actor : this.store.recipient;
     const pileActorData = actorIsMerchant ? this.store.pileData : this.store.recipientPileData;
-    this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: pileActor });
-    const currency = this.isCurrency ? PileUtilities.getItemCurrencyData(this.item, { target: pileActor }) : {};
+    const pileCurrencies = get(this.store.pileCurrencies);
+    this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: pileActor, actorCurrencies: pileCurrencies });
+    const currency = this.isCurrency ? PileUtilities.getItemCurrencyData(this.item, {
+      target: pileActor,
+      actorCurrencies: pileCurrencies
+    }) : {};
     this.abbreviation.set(currency?.abbreviation ?? "");
     this.similarities = Utilities.setSimilarityProperties({}, this.item);
     this.toShare = this.isCurrency

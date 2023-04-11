@@ -9,7 +9,7 @@ import SETTINGS from "../constants/settings.js";
 function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
   const flags = existing || (getProperty(inDocument, flag) ?? {});
-  let data = foundry.utils.deepClone(flags);
+  let data = { ...flags };
   if (flag === CONSTANTS.FLAGS.PILE) {
     data = migrateFlagData(inDocument, data);
   }
@@ -50,13 +50,13 @@ export function canItemStack(item, targetActor) {
 }
 
 export function getItemFlagData(item, data = false) {
-  return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, foundry.utils.deepClone(CONSTANTS.ITEM_DEFAULTS), data);
+  return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, { ...CONSTANTS.ITEM_DEFAULTS }, data);
 }
 
 export function getActorFlagData(target, data = false) {
   const defaults = foundry.utils.mergeObject(
-    foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
-    foundry.utils.deepClone(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {})
+    { ...CONSTANTS.PILE_DEFAULTS },
+    { ...(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {}) }
   );
   return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, defaults, data);
 }
@@ -156,17 +156,23 @@ export function getActorItems(target, { itemFilters = false, getItemCurrencies =
   return actor.items.filter(item => (getItemCurrencies || currencies.indexOf(item.id) === -1) && !isItemInvalid(actor, item, actorItemFilters));
 }
 
-export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
 
+const cachedCurrencyList = new Map();
+const clearCachedCurrencyList = foundry.utils.debounce((actorUuid) => {
+  cachedCurrencyList.delete(actorUuid);
+}, 100);
+
+export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
   const actor = Utilities.getActor(target);
+  const actorUuid = actor.uuid;
   const actorItems = actor ? Array.from(actor.items) : [];
   currencyList = currencyList || getCurrencyList(forActor || actor);
-  let currencies = currencyList.map((currency, index) => {
+  let currencies = cachedCurrencyList.get(actorUuid) || currencyList.map((currency, index) => {
     if (currency.type === "attribute" || !currency.type) {
       const path = currency?.data?.path ?? currency?.path;
       return {
         ...currency,
-        quantity: getProperty(actor, path) ?? 0,
+        quantity: 0,
         path: path,
         id: path,
         index
@@ -175,15 +181,28 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
     const item = Utilities.findSimilarItem(actorItems, currency.data.item);
     return {
       ...currency,
-      quantity: item ? Utilities.getItemQuantity(item) : 0,
+      quantity: 0,
       id: item?.id || null,
       item,
       index
     }
+  })
+
+  if (!cachedCurrencyList.has(actorUuid)) {
+    cachedCurrencyList.set(actorUuid, currencies);
+  }
+
+  currencies = currencies.map(currency => {
+    currency.quantity = currency.type === "attribute" ? getProperty(actor, currency.path) : Utilities.getItemQuantity(currency.item)
+    return currency;
   });
+
   if (!getAll) {
     currencies = currencies.filter(currency => currency.quantity);
   }
+
+  clearCachedCurrencyList(actorUuid);
+
   return currencies;
 }
 
@@ -280,15 +299,15 @@ export async function checkItemType(targetActor, item, {
 
 }
 
-export function isItemCurrency(item, { target = false } = {}) {
-  const currencies = getActorCurrencies(item.parent || false, { forActor: target, getAll: true })
+export function isItemCurrency(item, { target = false, actorCurrencies = false } = {}) {
+  const currencies = (actorCurrencies || getActorCurrencies(item.parent || false, { forActor: target, getAll: true }))
     .filter(currency => currency.type === "item")
     .map(item => item.data.item);
   return !!Utilities.findSimilarItem(currencies, item);
 }
 
-export function getItemCurrencyData(item, { target = false }) {
-  return getActorCurrencies(item?.parent || false, { forActor: target, getAll: true })
+export function getItemCurrencyData(item, { target = false, actorCurrencies = false }) {
+  return (actorCurrencies || getActorCurrencies(item?.parent || false, { forActor: target, getAll: true }))
     .filter(currency => currency.type === "item")
     .find(currency => {
       return item.name === currency.data.item.name && item.type === currency.data.item.type;
@@ -505,7 +524,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
 export function cleanFlagData(flagData) {
   const defaults = foundry.utils.mergeObject(
-    foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+    { ...CONSTANTS.PILE_DEFAULTS },
     Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {}
   );
   const defaultKeys = Object.keys(defaults);

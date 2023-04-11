@@ -3,7 +3,9 @@
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import MerchantItemEntry from "./MerchantItemEntry.svelte";
   import CategoryHeader from "./CategoryHeader.svelte";
-  import { get } from "svelte/store";
+  import { get, writable } from "svelte/store";
+  import { VirtualScroll } from "svelte-virtual-scroll-list";
+  import MerchantItemListHeader from "./MerchantItemListHeader.svelte";
 
   export let store;
   export let noItemsLabel = "ITEM-PILES.Merchant.NoItemsForSale";
@@ -26,8 +28,8 @@
 
   $: categoryDropDown = $itemCategoriesStore.filter(category => category.service === services);
   $: categories = $categoryStore.filter(category => category.service === services);
-	$: items = $itemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
-	$: visibleItems = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
+  $: items = $itemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
+  $: visibleItems = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
 
   let columns = [];
   $: {
@@ -40,7 +42,61 @@
     ]
   }
 
+  let itemListStore = writable([])
+  let header = false;
+  $: {
+    $sortTypeStore;
+    $editPrices;
+    itemListStore.update(itemList => {
+      itemList = [];
+      header = false;
+      if ($sortTypeStore === 0 || $editPrices) {
+        let first = true;
+        for (const category of categories) {
+          itemList.push({
+            id: category.type,
+            component: MerchantItemListHeader,
+            category,
+            columns,
+            store,
+            first
+          })
+          first = false;
+          $itemsPerCategoryStore[category.type].items.forEach((item, index) => {
+            itemList.push({
+              id: item.id,
+              component: MerchantItemEntry,
+              item,
+              index,
+              columns: $itemColumns
+            })
+          });
+        }
+      } else {
+        header = {
+          id: randomID(),
+          component: MerchantItemListHeader,
+          category: false,
+          columns,
+          store,
+          first: true,
+        }
+        items.forEach((item, index) => {
+          itemList.push({
+            id: item.id,
+            component: MerchantItemEntry,
+            item,
+            index,
+            columns: $itemColumns
+          })
+        });
+      }
+      return itemList;
+    })
+  }
+
 </script>
+
 <div class="item-piles-flexrow">
 	<input bind:value={$searchStore} placeholder="Type to search..." type="text">
 	{#if categoryDropDown.length > 1}
@@ -58,67 +114,20 @@
 	</select>
 </div>
 
-<div class="item-piles-items-list" style="grid-template-columns: auto repeat({columns.length-1}, max-content);">
+<div class="item-piles-items-list" style="--grid-template-columns: auto repeat({columns.length-1}, max-content);">
 
-	{#if $sortTypeStore === 0 || $editPrices}
-
-		{#each categories as category, index (category.type)}
-
-			<div class="item-piles-item-list-header">
-				{#each columns as column, columnIndex}
-					{#if columnIndex === 0}
-						<CategoryHeader {store} {category}/>
-					{:else if column.label && columnIndex > 0 && index === 0 && !$editPrices}
-						<div class="item-piles-small-text">
-							<a on:click={() => {
-              $inverseSortStore = $sortTypeStore === columnIndex+1 ? !$inverseSortStore : false;
-              $sortTypeStore = columnIndex+1;
-						}}>
-								{column.label}
-								<i class="fas"
-									 class:fa-chevron-down={!$inverseSortStore && $sortTypeStore === columnIndex+1}
-									 class:fa-chevron-up={$inverseSortStore && $sortTypeStore === columnIndex+1}
-								></i>
-							</a>
-						</div>
-					{:else if !$editPrices}
-						<div></div>
-					{/if}
-				{/each}
-			</div>
-			{#each $itemsPerCategoryStore[category.type].items as item, itemIndex (item.id)}
-				<MerchantItemEntry {item} index={itemIndex} columns={$itemColumns}/>
-			{/each}
-
-		{/each}
-
-	{:else}
-
-		<div class="item-piles-item-list-header">
-			{#each columns as column, columnIndex}
-				{#if column.label}
-					<div class="item-piles-small-text" class:item-piles-merchant-first-label={!columnIndex}>
-						<a on:click={() => {
-              $inverseSortStore = $sortTypeStore === columnIndex + 1 ? !$inverseSortStore : false;
-              $sortTypeStore = columnIndex + 1;
-						}}>
-							{column.label}
-							<i class="fas"
-								 class:fa-chevron-down={!$inverseSortStore && $sortTypeStore === columnIndex+1}
-								 class:fa-chevron-up={$inverseSortStore && $sortTypeStore === columnIndex+1}
-							></i>
-						</a>
-					</div>
-				{:else}
-					<div></div>
-				{/if}
-			{/each}
+	<VirtualScroll
+		data={$itemListStore}
+		key="id"
+		let:data
+	>
+		<div slot="header" class="item-piles-list-header">
+			{#if header}
+				<svelte:component data={header} this={header.component}/>
+			{/if}
 		</div>
-		{#each items as item, itemIndex (item.id)}
-			<MerchantItemEntry {item} index={itemIndex} columns={$itemColumns}/>
-		{/each}
-
-	{/if}
+		<svelte:component {data} this={data.component}/>
+	</VirtualScroll>
 
 </div>
 
@@ -146,22 +155,34 @@
     display: grid;
     align-items: center;
     max-height: calc(100% - 31px);
-		margin-top: 5px;
+    margin-top: 5px;
   }
 
-  .item-piles-item-list-header {
-    display: contents;
+  :global(.item-piles-items-list > div) {
+    display: grid !important;
+    grid-template-columns: var(--grid-template-columns);
+  }
 
-    & > * {
-      height: 1.5rem;
-      margin-top: 10px;
-      margin-bottom: 5px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  :global(.item-piles-items-list > div > div) {
+    display: contents;
+  }
+
+  .item-piles-items-list :global(.virtual-scroll-item), .item-piles-list-header {
+    display: contents;
+  }
+
+  :global(.virtual-scroll-item) {
+    padding: 2px;
+    margin-right: 5px;
+    border-radius: 4px;
+  }
+
+  :global(.item-piles-items-list .virtual-scroll-item:nth-child(even) .item-piles-flexrow > div) {
+    background-color: var(--item-piles-even-color);
+  }
+
+  :global(.item-piles-items-list .virtual-scroll-item:nth-child(odd) .item-piles-flexrow > div) {
+    background-color: var(--item-piles-odd-color);
   }
 
   .item-piles-merchant-first-label {

@@ -1,9 +1,11 @@
 <script>
   import { fade } from 'svelte/transition';
 
-  export let item;
-  export let index;
-  export let columns;
+  export let data;
+
+  let item = data.item;
+  let index = data.index;
+  let columns = data.columns;
 
   const itemName = item.name;
   const itemImage = item.img;
@@ -30,8 +32,7 @@
 		 class:item-piles-child-even-color={index%2===0}
 		 class:item-piles-child-odd-color={index%2===1}
 		 class:merchant-item-hidden={itemFlagData.hidden}
-		 style="flex: 1 0 auto;"
-		 transition:fade|local={{duration: 250}}>
+		 style="flex: 1 0 auto;">
 
 	{#each columns as column}
 		{#if column?.data}
@@ -45,15 +46,6 @@
 
 
 <style lang="scss">
-
-
-  .item-piles-item-row:global(.item-piles-child-even-color > *) {
-    background-color: var(--item-piles-even-color);
-  }
-
-  .item-piles-item-row:global(.item-piles-child-odd-color > *) {
-    background-color: var(--item-piles-odd-color);
-  }
 
   .item-piles-item-row {
     margin: 0;
