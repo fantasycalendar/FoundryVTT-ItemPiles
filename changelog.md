@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.6.3
+
+- Minor fix to the quantity for price attribute setting
+
 ## Version 2.6.2
 
 - Improved loading speed of merchants by a factor of five in systems with item based currencies
