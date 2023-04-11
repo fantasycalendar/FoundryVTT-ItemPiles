@@ -341,7 +341,7 @@ class API {
       ACTOR_CLASS_TYPE: "",
       ITEM_QUANTITY_ATTRIBUTE: "",
       ITEM_PRICE_ATTRIBUTE: "",
-      QUANTITY_FOR_PRICE_ATTRIBUTE: "",
+      QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
       ITEM_FILTERS: [],
       ITEM_SIMILARITIES: [],
       UNSTACKABLE_ITEM_TYPES: [],
@@ -349,7 +349,7 @@ class API {
       TOKEN_FLAG_DEFAULTS: {},
       ITEM_TRANSFORMER: null,
       CURRENCIES: [],
-      CURRENCY_DECIMAL_DIGITS: null
+      CURRENCY_DECIMAL_DIGITS: 0.00001
     }, inData)
 
     if (typeof data["VERSION"] !== "string") {
