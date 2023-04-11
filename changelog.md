@@ -2,12 +2,13 @@
 
 ## Version 2.6.1
 
-- Updated WFRP system configuration (thank you Txus5012 on github!)
+- Updated WFRP4e system configuration (thank you Txus5012 on github!)
 - Updated Portuguese (Brazil) and French localization (thank you eunaumtenhoid and rectulo on Weblate!)
 - Added `PILE_DEFAULTS` and `TOKEN_FLAG_DEFAULT` system specific settings
 - Tweaked the way default item pile data is applied, in the case of merchant columns
 - Fixed `game.itempiles.API.createItemPile` not respecting an overriding `texture.src`, `texture.scaleX`, and `texture.scaleY` property on the token data
 - Fixed populate items not having scroll bars when enough items was added to the merchant
+- Fixed item piles created in PF2e would not be scaled appropriately due to overriding system flags
 
 ## Version 2.6.0
 
