@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.6.4
+
+- Fixes to merchants not scrolling properly when the item list is long enough, unfortunately lost some initial opening speed with lots of items
+
 ## Version 2.6.3
 
 - Minor fix to the quantity for price attribute setting

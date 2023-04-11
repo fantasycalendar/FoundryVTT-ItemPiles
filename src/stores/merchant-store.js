@@ -361,7 +361,6 @@ class PileMerchantItem extends PileItem {
     });
     this.refreshDisplayQuantity();
     setup = true;
-    console.log("Setup " + this.item.name)
   }
 
   refreshDisplayQuantity() {
