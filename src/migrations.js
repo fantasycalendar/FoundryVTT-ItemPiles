@@ -2,16 +2,6 @@ import CONSTANTS from "./constants/constants.js";
 import { custom_warning, getSetting } from "./helpers/helpers.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
 import SETTINGS from "./constants/settings.js";
-import { SYSTEMS } from "./systems.js";
-
-let oldSettings;
-
-function findOldSettingValue(oldSettingKey) {
-  if (!oldSettings) {
-    oldSettings = game.settings.storage.get("world").filter(setting => setting.key.startsWith(CONSTANTS.MODULE_NAME));
-  }
-  return oldSettings.find(setting => setting.key.endsWith(oldSettingKey))?.value;
-}
 
 export default async function runMigrations() {
 
@@ -28,7 +18,6 @@ export default async function runMigrations() {
       custom_warning(`Something went wrong when migrating to version ${version}. Please check the console for the error!`, true)
     }
   }
-
 }
 
 function getItemPileActorsOfLowerVersion(version) {
@@ -201,7 +190,7 @@ const migrations = {
       const flags = getProperty(item, CONSTANTS.FLAGS.ITEM);
       flags.infiniteQuantity = "default";
       return PileUtilities.updateItemData(item, { flags }, { version, returnUpdate: true });
-    })
+    });
 
     if (itemUpdates.length) {
       console.log(`Item Piles | Migrating ${itemUpdates.length} items to version ${version}...`)

@@ -10,6 +10,7 @@
   * [ITEM_SIMILARITIES](#ITEM_SIMILARITIES)
   * [UNSTACKABLE_ITEM_TYPES](#UNSTACKABLE_ITEM_TYPES)
   * [PILE_DEFAULTS](#PILE_DEFAULTS)
+  * [TOKEN_FLAG_DEFAULTS](#TOKEN_FLAG_DEFAULTS)
   * [setActorClassType](#setActorClassType)
   * [setCurrencies](#setCurrencies)
   * [setCurrencyDecimalDigits](#setCurrencyDecimalDigits)
@@ -19,6 +20,7 @@
   * [setItemSimilarities](#setItemSimilarities)
   * [setUnstackableItemTypes](#setUnstackableItemTypes)
   * [setPileDefaults](#setPileDefaults)
+  * [setTokenFlagDefaults](#setTokenFlagDefaults)
   * [addSystemIntegration](#addSystemIntegration)
 
 
@@ -133,7 +135,6 @@ The attributes for detecting item similarities
 
 The types of items that will always be considered unique when transferring between actors
 
-
 ---
 
 ### PILE_DEFAULTS
@@ -141,6 +142,14 @@ The types of items that will always be considered unique when transferring betwe
 `game.itempiles.API.PILE_DEFAULTS` ⇒ `Object`
 
 The system specific default values for item pile actors created in this system
+
+---
+
+### TOKEN_FLAG_DEFAULTS
+
+`game.itempiles.API.TOKEN_FLAG_DEFAULTS` ⇒ `Object`
+
+The system specific default values for item pile tokens created in this system
 
 ---
 
@@ -242,13 +251,23 @@ Sets the types of items that will always be considered unique when transferring 
 
 ### setPileDefaults
 
-`game.itempiles.API.setPileDefaults(inTypes)` ⇒ `Promise`
+`game.itempiles.API.setPileDefaults(inDefaults)` ⇒ `Promise`
 
 Sets the types of items that will always be considered unique when transferring between actors
 
-| Param  | Type             |
-|--------|------------------|
-| inTypes | `Object` |
+| Param      | Type             |
+|------------|------------------|
+| inDefaults | `Object` |
+
+### setTokenFlagDefaults
+
+`game.itempiles.API.setTokenFlagDefaults(inDefaults)` ⇒ `Promise`
+
+Sets the types of items that will always be considered unique when transferring between actors
+
+| Param      | Type             |
+|------------|------------------|
+| inDefaults | `Object` |
 
 ---
 
@@ -265,10 +284,11 @@ A combination of all the methods above, but this integrates a system's specific 
 | data.ACTOR_CLASS_TYPE        | `string`                                                                                                                                                                                        | The system's actor class type to represent item piles                                                                |
 | data.ITEM_PRICE_ATTRIBUTE    | `string`                                                                                                                                                                                        | The property path to the system's item price attribute                                                               |
 | data.ITEM_QUANTITY_ATTRIBUTE | `string`                                                                                                                                                                                        | The property path to the system's item quantity attribute                                                            |
-| data.ITEM_FILTERS            | `Array<{path: string, filters: string}>`                                                                                                                                                        | The filters to determine which items to not include as droppable or tradable                                         |
+| data.ITEM_FILTERS            | `Array<{path: string, filters: string}>`                                                                                                                                                        | The filters to determine which items to not include as droppable or tradeable                                        |
 | data.ITEM_SIMILARITIES       | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item similarities                                               |
 | data.UNSTACKABLE_ITEM_TYPES  | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item types that cannot stack, no matter what                    |
-| data.PILE_DEFAULTS           | `Object`                                                                                                                                                                                        | The system specific default values for item pile actors created in this system                    |
+| data.PILE_DEFAULTS           | `Object`                                                                                                                                                                                        | The system specific default values for item pile actors created in this system                                       |
+| data.TOKEN_FLAG_DEFAULTS     | `Object`                                                                                                                                                                                        | The system specific default values for item pile tokens created in this system                                       |
 | data.ITEM_TRANSFORMER        | `undefined/Function`                                                                                                                                                                            | An optional function that gets run over items before picked up, traded, or bought                                    |
 | data.CURRENCIES              | `Array<{ primary: boolean, type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }>, exchangeRate: number }>` | The array of currencies for this system                                                                              |
 | data.CURRENCY_DECIMAL_DIGITS | `undefined/number`                                                                                                                                                                              | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured) |

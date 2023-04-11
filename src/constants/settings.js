@@ -38,6 +38,7 @@ const SETTINGS = {
   ITEM_SIMILARITIES: "itemSimilarities",
   UNSTACKABLE_ITEM_TYPES: "unstackableItemTypes",
   PILE_DEFAULTS: "pileDefaults",
+  TOKEN_FLAG_DEFAULTS: "tokenFlagDefaults",
 
   // Hidden settings
   DEFAULT_ITEM_PILE_JOURNAL_ID: "defaultItemPileJournalID",
@@ -237,6 +238,14 @@ const SETTINGS = {
       config: false,
       system: true,
       default: SYSTEMS.DATA.PILE_DEFAULTS,
+      type: Object
+    },
+
+    [SETTINGS.TOKEN_FLAG_DEFAULTS]: {
+      scope: "world",
+      config: false,
+      system: true,
+      default: SYSTEMS.DATA.TOKEN_FLAG_DEFAULTS,
       type: Object
     },
 

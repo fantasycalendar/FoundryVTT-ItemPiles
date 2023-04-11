@@ -49,6 +49,15 @@ export default {
     }]
   },
 
+  "TOKEN_FLAG_DEFAULTS": {
+    flags: {
+      pf2e: {
+        linkToActorSize: false,
+        autoscale: false
+      }
+    }
+  },
+
   // Currencies in item piles is a versatile system that can accept actor attributes (a number field on the actor's sheet) or items (actual items in their inventory)
   // In the case of attributes, the path is relative to the "actor.system"
   // In the case of items, it is recommended you export the item with `.toObject()`, put it into `data.item`, and strip out any module data

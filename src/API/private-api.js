@@ -1032,7 +1032,8 @@ export default class PrivateAPI {
         vision: false,
         displayName: 50,
         [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-        [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+        [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+        ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
       }, tokenOverrides)
 
       const actorUpdate = foundry.utils.mergeObject({
@@ -1089,7 +1090,8 @@ export default class PrivateAPI {
             vision: false,
             displayName: 50,
             [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-            [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+            [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+            ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
           }
         })
 
@@ -1126,7 +1128,11 @@ export default class PrivateAPI {
 
     if (position && sceneId) {
 
-      let overrideData = { ...position, ...tokenOverrides };
+      let overrideData = foundry.utils.mergeObject({
+        ...position,
+        ...tokenOverrides,
+        ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
+      }, {});
 
       let pileData = PileUtilities.getActorFlagData(pileActor);
       pileData.enabled = true;
@@ -1141,7 +1147,7 @@ export default class PrivateAPI {
         const overrideImage = getProperty(overrideData, "texture.src") ?? getProperty(overrideData, "img");
         const overrideScale = getProperty(overrideData, "texture.scaleX")
           ?? getProperty(overrideData, "texture.scaleY")
-          ?? getProperty(overrideData, "img");
+          ?? getProperty(overrideData, "scale");
 
         const scale = PileUtilities.getItemPileTokenScale(pileActor, data, overrideScale);
 
@@ -1224,7 +1230,7 @@ export default class PrivateAPI {
       const overrideImage = getProperty(specificTokenSettings, "texture.src") ?? getProperty(specificTokenSettings, "img");
       const overrideScale = getProperty(specificTokenSettings, "texture.scaleX")
         ?? getProperty(specificTokenSettings, "texture.scaleY")
-        ?? getProperty(specificTokenSettings, "img");
+        ?? getProperty(specificTokenSettings, "scale");
 
       const scale = PileUtilities.getItemPileTokenScale(target, data, overrideScale);
 

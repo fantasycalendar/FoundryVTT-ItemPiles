@@ -105,6 +105,15 @@ class API {
   }
 
   /**
+   * The system specific default values for item pile tokens created in this system
+   *
+   * @returns {Object}
+   */
+  static get TOKEN_FLAG_DEFAULTS() {
+    return Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS);
+  }
+
+  /**
    * Sets the actor class type used for the original item pile actor in this system
    *
    * @param {string} inClassType
@@ -285,6 +294,19 @@ class API {
   }
 
   /**
+   * Set the flags that will be applied to any tokens created through item piles
+   *
+   * @param {Object} inDefaults
+   * @returns {Promise}
+   */
+  static async setTokenFlagDefaults(inDefaults) {
+    if (typeof inDefaults !== "object") {
+      throw Helpers.custom_error("setTokenFlagDefaults | inDefaults must be of type object");
+    }
+    return Helpers.setSetting(SETTINGS.TOKEN_FLAG_DEFAULTS, inDefaults);
+  }
+
+  /**
    * A combination of all the methods above, but this integrates a system's specific
    * settings more readily into item piles, allowing users to also change the settings
    * afterwards.
@@ -299,6 +321,7 @@ class API {
    *   ITEM_SIMILARITIES: Array<string>,
    *   UNSTACKABLE_ITEM_TYPES: Array<string>,
    *   PILE_DEFAULTS: Object,
+   *   TOKEN_FLAG_DEFAULTS: Object,
    *   ITEM_TRANSFORMER: undefined/Function,
    *   CURRENCIES: Array<{
    *     primary: boolean,
@@ -323,6 +346,7 @@ class API {
       ITEM_SIMILARITIES: [],
       UNSTACKABLE_ITEM_TYPES: [],
       PILE_DEFAULTS: {},
+      TOKEN_FLAG_DEFAULTS: {},
       ITEM_TRANSFORMER: null,
       CURRENCIES: [],
       CURRENCY_DECIMAL_DIGITS: null
@@ -378,6 +402,10 @@ class API {
       if (!validKeys.has(key)) {
         throw Helpers.custom_error(`addSystemIntegration | data.PILE_DEFAULTS contains illegal key "${key}" that is not a valid pile default`);
       }
+    }
+
+    if (typeof data['TOKEN_FLAG_DEFAULTS'] !== "object") {
+      throw Helpers.custom_error("addSystemIntegration | data.TOKEN_FLAG_DEFAULTS must be of type object");
     }
 
     if (!Array.isArray(data['ITEM_SIMILARITIES'])) {

@@ -447,6 +447,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
   if (!flagData) flagData = getActorFlagData(target);
   if (!tokenData) tokenData = {};
+  tokenData = foundry.utils.mergeObject(tokenData, {});
 
   let [documentActor, documentTokens] = getRelevantTokensAndActor(target);
 
@@ -461,7 +462,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
     const overrideImage = getProperty(tokenData, "texture.src") ?? getProperty(tokenData, "img");
     const overrideScale = getProperty(tokenData, "texture.scaleX")
       ?? getProperty(tokenData, "texture.scaleY")
-      ?? getProperty(tokenData, "img");
+      ?? getProperty(tokenData, "scale");
     const scale = getItemPileTokenScale(tokenDocument, pileData, overrideScale);
     const newTokenData = foundry.utils.mergeObject(tokenData, {
       "texture.src": getItemPileTokenImage(tokenDocument, pileData, overrideImage),
