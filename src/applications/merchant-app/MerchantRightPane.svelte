@@ -3,7 +3,7 @@
   import MerchantItemTab from "./MerchantItemTab.svelte";
   import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import RecipientFooter from "./RecipientFooter.svelte";
+  import MerchantFooter from "./MerchantFooter.svelte";
   import { writable } from "svelte/store";
 
   export let store;
@@ -39,10 +39,7 @@
 
   </div>
 
-
-  {#if recipientStore}
-		<RecipientFooter {recipientStore}/>
-  {/if}
+	<MerchantFooter {store} {recipientStore}/>
 
 </div>
 
@@ -58,7 +55,6 @@
 
   .merchant-tabbed-center {
     overflow: hidden;
-		margin-bottom: 0.5rem;
   }
 
 </style>

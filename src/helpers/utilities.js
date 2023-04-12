@@ -2,14 +2,19 @@ import * as Helpers from "./helpers.js";
 import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import { getItemFlagData } from "./pile-utilities.js";
+import { deletedActorCache } from "./caches.js";
 
 export function getActor(target) {
   if (target instanceof Actor) return target;
+  let targetDoc = target;
   if (stringIsUuid(target)) {
-    target = fromUuidSync(target);
+    targetDoc = fromUuidSync(target);
+    if (!targetDoc && deletedActorCache.has(target)) {
+      return deletedActorCache.get(target);
+    }
   }
-  target = getDocument(target);
-  return target?.character ?? target?.actor ?? target;
+  targetDoc = getDocument(targetDoc);
+  return targetDoc?.character ?? targetDoc?.actor ?? targetDoc;
 }
 
 /**

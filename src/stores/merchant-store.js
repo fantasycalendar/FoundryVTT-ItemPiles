@@ -82,35 +82,39 @@ export default class MerchantStore extends ItemPileStore {
           }
         }));
 
-      const columns = [
-        {
-          label: "Type",
-          component: ItemEntry
-        },
-        {
+      const columns = [];
+
+      columns.push({
+        label: "Type",
+        component: ItemEntry
+      });
+
+      if (pileData.displayQuantity !== "alwaysno") {
+        columns.push({
           label: "Quantity",
           component: QuantityColumn,
           sortMethod: (a, b, inverse) => {
             return (get(b.quantity) - get(a.quantity)) * (inverse ? -1 : 1);
           }
-        },
-        ...customColumns,
-        {
-          label: "Price",
-          component: PriceSelector,
-          sortMethod: (a, b, inverse) => {
-            const APrice = get(a.prices).find(price => price.primary);
-            const BPrice = get(b.prices).find(price => price.primary);
-            if (!APrice) return 1;
-            if (!BPrice) return -1;
-            return (BPrice.totalCost - APrice.totalCost) * (inverse ? -1 : 1);
-          }
-        },
-        {
-          label: false,
-          component: EntryButtons
+        })
+      }
+
+      columns.push(...customColumns)
+      columns.push({
+        label: "Price",
+        component: PriceSelector,
+        sortMethod: (a, b, inverse) => {
+          const APrice = get(a.prices).find(price => price.primary);
+          const BPrice = get(b.prices).find(price => price.primary);
+          if (!APrice) return 1;
+          if (!BPrice) return -1;
+          return (BPrice.totalCost - APrice.totalCost) * (inverse ? -1 : 1);
         }
-      ];
+      })
+      columns.push({
+        label: false,
+        component: EntryButtons
+      });
 
       this.itemColumns.set(columns);
 

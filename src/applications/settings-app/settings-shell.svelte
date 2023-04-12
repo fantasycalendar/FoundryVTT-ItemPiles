@@ -153,6 +153,7 @@
 					<Setting key={SETTINGS.OUTPUT_TO_CHAT} bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
 					<Setting key={SETTINGS.DELETE_EMPTY_PILES} bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
 					<Setting key={SETTINGS.POPULATION_TABLES_FOLDER} bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
+					<Setting key={SETTINGS.HIDE_TOKEN_BORDER} bind:data="{settings[SETTINGS.HIDE_TOKEN_BORDER]}"/>
 					<SettingButton key={SETTINGS.PRICE_PRESETS} bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
 					<SettingButton key={SETTINGS.CUSTOM_ITEM_CATEGORIES} bind:data="{settings[SETTINGS.CUSTOM_ITEM_CATEGORIES]}"/>
 				</div>

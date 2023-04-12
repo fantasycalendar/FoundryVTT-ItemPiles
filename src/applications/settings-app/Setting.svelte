@@ -67,10 +67,10 @@
 <style lang="scss">
 
   .item-pile-setting:not(:last-child) {
-		
+
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.4rem;
 
     .reset-setting {
       font-size: 0.75rem;

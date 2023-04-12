@@ -50,6 +50,11 @@
       { title: localize("ITEM-PILES.Applications.PriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
     ).then((result) => {
       pileData.actorPriceModifiers = result || [];
+      pileData.actorPriceModifiers.forEach(modifier => {
+        if (modifier.actor) {
+          delete modifier['actor'];
+        }
+      })
     });
   }
 

@@ -1,5 +1,15 @@
 # Item Piles Changelog
 
+## Version 2.6.5
+
+- Added setting to hide item pile token borders when they are hovered, default behavior is hidden for everyone (unless selected)
+- Added merchant's currencies below the item list for GMs, displayed only if the merchant does not have infinite currencies
+- Fixed PF2e items would become de-mystified when dropped onto the ground
+- Fixed item piles' item names would be crunched into a very thin vertical line
+- Fixed merchant per-actor price modifiers not being able to be saved
+- Fixed merchants having a quantity column even if the merchant's display quantity setting was set to "Always No"
+- Minor fixes to the merchant styling
+
 ## Version 2.6.4
 
 - Fixes to merchants not scrolling properly when the item list is long enough, unfortunately lost some initial opening speed with lots of items

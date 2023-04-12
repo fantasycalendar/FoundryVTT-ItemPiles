@@ -292,7 +292,7 @@
       },
       "EditCurrencies": {
         "Title": "Editing Currencies",
-        "Content": "As a GM, you can update the currencies this on item pile:",
+        "Content": "As a GM, you can update the currencies on this item pile:",
         "Submit": "Submit"
       },
       "DropCurrencies": {
@@ -752,6 +752,13 @@
         "Public": "Public - everyone can see messages",
         "SelfGM": "Private - only GMs and user can see messages",
         "Blind": "Blind - only GMs can see messages"
+      },
+      "HideTokenBorder": {
+        "Title": "Hide Token Borders Of Item Piles",
+        "Hint": "This controls whether the token border is hidden when hovering over item pile tokens. Selecting the token always shows the border.",
+        "HideEveryone": "Hidden from everyone",
+        "HidePlayers": "Hidden from players",
+        "Show": "Show borders (core behavior)"
       },
       "InvertSheetOpen": {
         "Title": "Invert Ctrl + Double Click Open",

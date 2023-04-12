@@ -4,6 +4,7 @@ import * as Helpers from "./helpers.js";
 import { SYSTEMS } from "../systems.js";
 import { hotkeyState } from "../hotkeys.js";
 import SETTINGS from "../constants/settings.js";
+import { cachedActorCurrencies, cachedCurrencyList, cachedFilterList } from "./caches.js";
 
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
@@ -156,18 +157,13 @@ export function getActorItems(target, { itemFilters = false, getItemCurrencies =
   return actor.items.filter(item => (getItemCurrencies || currencies.indexOf(item.id) === -1) && !isItemInvalid(actor, item, actorItemFilters));
 }
 
-
-const cachedCurrencyList = new Map();
-const clearCachedCurrencyList = foundry.utils.debounce((actorUuid) => {
-  cachedCurrencyList.delete(actorUuid);
-}, 100);
-
+// Lots happening here, but in essence, it gets the actor's currencies, and creates an array of them
 export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorUuid = actor.uuid;
   const actorItems = actor ? Array.from(actor.items) : [];
   currencyList = currencyList || getCurrencyList(forActor || actor);
-  let currencies = cachedCurrencyList.get(actorUuid) || currencyList.map((currency, index) => {
+  let currencies = cachedActorCurrencies.get(actorUuid) || currencyList.map((currency, index) => {
     if (currency.type === "attribute" || !currency.type) {
       const path = currency?.data?.path ?? currency?.path;
       return {
@@ -188,46 +184,59 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
     }
   })
 
-  if (!cachedCurrencyList.has(actorUuid)) {
-    cachedCurrencyList.set(actorUuid, currencies);
-  }
+  cachedActorCurrencies.set(actorUuid, currencies);
 
   currencies = currencies.map(currency => {
-    currency.quantity = currency.type === "attribute" ? getProperty(actor, currency.path) : Utilities.getItemQuantity(currency.item)
+    currency.quantity = currency.type === "attribute" ? getProperty(actor, currency.path) : Utilities.getItemQuantity(currency.item);
     return currency;
   });
 
   if (!getAll) {
-    currencies = currencies.filter(currency => currency.quantity);
+    currencies = currencies.filter(currency => currency.quantity > 0);
   }
-
-  clearCachedCurrencyList(actorUuid);
 
   return currencies;
 }
 
 export function getActorPrimaryCurrency(target) {
   const actor = Utilities.getActor(target);
-  return getActorCurrencies(actor).find(currency => currency.primary);
+  return getActorCurrencies(actor, { getAll: true }).find(currency => currency.primary);
 }
 
 export function getCurrencyList(target = false, pileData = false) {
+  let targetUuid = false;
   if (target) {
+    targetUuid = Utilities.getUuid(target);
+    if (cachedCurrencyList.has(targetUuid)) {
+      return cachedCurrencyList.get(targetUuid)
+    }
     const targetActor = Utilities.getActor(target);
     pileData = getActorFlagData(targetActor, pileData);
   }
-  return (pileData.overrideCurrencies || game.itempiles.API.CURRENCIES).map(currency => {
+  const currencyList = (pileData.overrideCurrencies || game.itempiles.API.CURRENCIES).map(currency => {
     currency.name = game.i18n.localize(currency.name);
     return currency;
   });
+  if (target) {
+    cachedCurrencyList.set(targetUuid, currencyList);
+  }
+  return currencyList;
 }
 
 
 export function getActorItemFilters(target, pileData = false) {
   if (!target) return cleanItemFilters(game.itempiles.API.ITEM_FILTERS);
+  const targetUuid = Utilities.getUuid(target);
+  if (cachedFilterList.has(targetUuid)) {
+    return cachedFilterList.get(targetUuid)
+  }
   const targetActor = Utilities.getActor(target);
   pileData = getActorFlagData(targetActor, pileData);
-  return isValidItemPile(targetActor, pileData) && pileData?.overrideItemFilters ? cleanItemFilters(pileData.overrideItemFilters) : cleanItemFilters(game.itempiles.API.ITEM_FILTERS);
+  const itemFilters = isValidItemPile(targetActor, pileData) && pileData?.overrideItemFilters
+    ? cleanItemFilters(pileData.overrideItemFilters)
+    : cleanItemFilters(game.itempiles.API.ITEM_FILTERS);
+  cachedFilterList.set(targetUuid, itemFilters);
+  return itemFilters;
 }
 
 export function cleanItemFilters(itemFilters) {

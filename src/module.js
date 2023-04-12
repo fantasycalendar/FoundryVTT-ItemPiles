@@ -17,12 +17,15 @@ import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js"
 import ItemEditor from "./applications/item-editor/item-editor.js";
 import { setupPlugins } from "./plugins/main.js";
 import SettingsShim from "./applications/settings-app/settings-app.js";
+import { setupCaches } from "./helpers/caches.js";
+import { isValidItemPile } from "./helpers/pile-utilities.js";
 
 Hooks.once("init", async () => {
   registerHotkeysPre();
   registerLibwrappers();
   registerSettings();
   registerUIOverrides();
+  setupCaches();
   setupPlugins("init");
 });
 
@@ -70,6 +73,7 @@ Hooks.once("ready", () => {
     ChatAPI.initialize();
 
     registerHotkeysPost();
+    setupCaches();
     setupPlugins("ready");
 
     ChatAPI.disablePastTradingButtons();

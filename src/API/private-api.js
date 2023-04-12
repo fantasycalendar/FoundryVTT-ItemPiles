@@ -1115,8 +1115,9 @@ export default class PrivateAPI {
         itemData = await Item.implementation.create(itemData, { temporary: true });
         itemData = itemData.toObject();
         if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
-          items[i] = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
+          itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
         }
+        items[i] = await Item.implementation.create(itemData, { temporary: true });
       }
     } else {
       items = []
@@ -1887,7 +1888,7 @@ export default class PrivateAPI {
       playerToken = canvas.tokens.placeables.find(token => token.actor === game.user.character && Utilities.tokens_close_enough(pileToken, token, maxDistance));
     }
 
-    if (canvas.tokens.controlled.length > 0) {
+    if (!playerToken && canvas.tokens.controlled.length > 0) {
       validTokens = [...canvas.tokens.controlled];
       validTokens = validTokens.filter(token => token.document !== pileDocument);
     } else if (game.user.character) {
@@ -2112,6 +2113,8 @@ export default class PrivateAPI {
       buyer: buyingActor
     });
 
+    debugger;
+
     const preCalcHookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
     if (preCalcHookResult === false) return false;
 
@@ -2157,7 +2160,7 @@ export default class PrivateAPI {
         }[itemFlagData.infiniteQuantity ?? "default"];
         if (sellerIsMerchant && itemInfiniteQuantity) continue;
         await sellerTransaction.appendItemChanges([{
-          item: entry.item, quantity: entry.quantity
+          item: entry.data.item, quantity: entry.quantity
         }], {
           remove: true,
           type: entry.isCurrency ? "currency" : entry.type,

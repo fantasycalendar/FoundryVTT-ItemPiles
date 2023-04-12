@@ -50,10 +50,11 @@
       </span>
 		{:else}
       <span
-				class:item-piles-clickable-link={quantity > 0 && !$itemFlagDataStore.cantBeSoldToMerchants}
-				class:item-piles-clickable-link-disabled={quantity <= 0 || $itemFlagDataStore.cantBeSoldToMerchants}
+				style="margin-left: 0.25rem;"
+				class:item-piles-clickable-link={$quantity > 0 && !$itemFlagDataStore.cantBeSoldToMerchants}
+				class:item-piles-clickable-link-disabled={$quantity <= 0 || $itemFlagDataStore.cantBeSoldToMerchants}
 				on:click={() => {
-              if((quantity <= 0 || $itemFlagDataStore.cantBeSoldToMerchants)) return;
+              if(($quantity <= 0 || $itemFlagDataStore.cantBeSoldToMerchants)) return;
               store.tradeItem(item, true)
             }}>
         <i class="fas fa-hand-holding-usd"></i> {localize("ITEM-PILES.Merchant.Sell")}

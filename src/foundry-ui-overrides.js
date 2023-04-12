@@ -1,8 +1,9 @@
-import SETTINGS from "./constants/settings.js";
 import * as Helpers from "./helpers/helpers.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
+import { isValidItemPile } from "./helpers/pile-utilities.js";
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 import ItemEditor from "./applications/item-editor/item-editor.js";
+import SETTINGS from "./constants/settings.js";
 import CONSTANTS from "./constants/constants.js";
 import UserSelectDialog from "./applications/dialogs/user-select-dialog/user-select-dialog.js";
 
@@ -13,7 +14,20 @@ export default function registerUIOverrides() {
   Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
   Hooks.on("renderSidebarTab", hideTemporaryItems);
   Hooks.on("renderTokenHUD", renderPileHUD);
+  Hooks.on("hoverToken", handleTokenBorders);
+  Hooks.on("controlToken", handleTokenBorders);
   game.tooltip = new FastTooltipManager();
+}
+
+function handleTokenBorders(token) {
+  if (!isValidItemPile(token)) return;
+  const setting = Helpers.getSetting(SETTINGS.HIDE_TOKEN_BORDER);
+  token.border.renderable = token.controlled ||
+    (setting !== SETTINGS.HIDE_TOKEN_BORDER_OPTIONS.EVERYONE && (
+      setting === SETTINGS.HIDE_TOKEN_BORDER_OPTIONS.SHOW
+      ||
+      (setting === SETTINGS.HIDE_TOKEN_BORDER_OPTIONS.PLAYERS && game.user.isGM)
+    ));
 }
 
 function hideTemporaryItems(sidebar) {

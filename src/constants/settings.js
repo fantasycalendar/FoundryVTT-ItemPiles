@@ -22,6 +22,7 @@ const SETTINGS = {
   INSPECT_ITEMS_IN_TRADE: "inspectItemsInTrade",
   POPULATION_TABLES_FOLDER: "populationTablesFolder",
   PRICE_PRESETS: "pricePresets",
+  HIDE_TOKEN_BORDER: "hideTokenBorder",
 
   // Style settings
   CSS_VARIABLES: "cssVariables",
@@ -47,6 +48,12 @@ const SETTINGS = {
   SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
   SYSTEM_VERSION: "systemVersion",
   CUSTOM_ITEM_CATEGORIES: "customItemCategories",
+
+  HIDE_TOKEN_BORDER_OPTIONS: {
+    EVERYONE: "everyone",
+    PLAYERS: "players",
+    SHOW: "show"
+  },
 
   DEFAULT_CSS_VARIABLES: {
     "inactive": "rgba(31,143,255,1)",
@@ -177,19 +184,6 @@ const SETTINGS = {
       scope: "world",
       config: false,
       default: SYSTEMS.DATA.VAULT_STYLES ?? [],
-      type: Array
-    },
-
-    [SETTINGS.PRICE_PRESETS]: {
-      name: "ITEM-PILES.Settings.PricePresets.Title",
-      label: "ITEM-PILES.Settings.PricePresets.Label",
-      hint: "ITEM-PILES.Settings.PricePresets.Hint",
-      scope: "world",
-      icon: "fa fa-tags",
-      application: "price-presets",
-      config: false,
-      system: true,
-      default: [],
       type: Array
     },
 
@@ -376,6 +370,33 @@ const SETTINGS = {
       config: false,
       default: true,
       type: Boolean
+    },
+
+    [SETTINGS.PRICE_PRESETS]: {
+      name: "ITEM-PILES.Settings.PricePresets.Title",
+      label: "ITEM-PILES.Settings.PricePresets.Label",
+      hint: "ITEM-PILES.Settings.PricePresets.Hint",
+      scope: "world",
+      icon: "fa fa-tags",
+      application: "price-presets",
+      config: false,
+      default: [],
+      type: Array
+    },
+
+    [SETTINGS.HIDE_TOKEN_BORDER]: {
+      name: "ITEM-PILES.Settings.HideTokenBorder.Title",
+      label: "ITEM-PILES.Settings.HideTokenBorder.Label",
+      hint: "ITEM-PILES.Settings.HideTokenBorder.Hint",
+      scope: "world",
+      config: false,
+      default: SETTINGS.HIDE_TOKEN_BORDER_OPTIONS.EVERYONE,
+      choices: {
+        [SETTINGS.HIDE_TOKEN_BORDER_OPTIONS.EVERYONE]: "ITEM-PILES.Settings.HideTokenBorder.HideEveryone",
+        [SETTINGS.HIDE_TOKEN_BORDER_OPTIONS.PLAYERS]: "ITEM-PILES.Settings.HideTokenBorder.HidePlayers",
+        [SETTINGS.HIDE_TOKEN_BORDER_OPTIONS.SHOW]: "ITEM-PILES.Settings.HideTokenBorder.Show"
+      },
+      type: String
     },
 
     [SETTINGS.INVERT_SHEET_OPEN]: {
