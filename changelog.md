@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.6.6
+
+- Remove stray debugger, whoops
+
 ## Version 2.6.5
 
 - Added setting to hide item pile token borders when they are hovered, default behavior is hidden for everyone (unless selected)
