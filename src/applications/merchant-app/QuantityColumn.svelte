@@ -8,6 +8,7 @@
   const quantityStore = item.quantity;
 
   let showEditQuantity = false;
+  $: editQuantity = $quantityStore;
 
 </script>
 
@@ -15,6 +16,20 @@
 	{#if $displayQuantityStore && item.canStack}
 		{#if $infiniteQuantityStore}
 			<span>∞</span>
+		{:else if showEditQuantity}
+			<input
+				style="height: 18px; max-width: 35px;"
+				type="text"
+				bind:value={editQuantity}
+				autofocus
+				on:change={() => {
+              showEditQuantity = false;
+              item.updateQuantity(editQuantity);
+            }}
+				on:keydown={(evt) => {
+              if (evt.key === "Enter") showEditQuantity = false;
+            }}
+			/>
 		{:else if !showEditQuantity}
         <span
 					class:item-piles-clickable-link={game.user.isGM}

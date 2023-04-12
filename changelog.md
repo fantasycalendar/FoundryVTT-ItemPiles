@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.6.7
+
+- Fixed being unable to buy items from merchants, how embarrassing
+- Fixed being unable to edit the quantity of items in the merchant UI
+
 ## Version 2.6.6
 
 - Remove stray debugger, whoops

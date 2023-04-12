@@ -2158,7 +2158,7 @@ export default class PrivateAPI {
         }[itemFlagData.infiniteQuantity ?? "default"];
         if (sellerIsMerchant && itemInfiniteQuantity) continue;
         await sellerTransaction.appendItemChanges([{
-          item: entry.data.item, quantity: entry.quantity
+          item: entry.item, quantity: entry.quantity
         }], {
           remove: true,
           type: entry.isCurrency ? "currency" : entry.type,
