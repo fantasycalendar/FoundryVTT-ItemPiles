@@ -633,7 +633,7 @@
       },
       "EditCurrencies": {
         "Title": "Editando Moedas",
-        "Content": "Como um GM, você pode atualizar as moedas esta na pilha de itens:",
+        "Content": "Como GM, você pode atualizar as moedas nesta pilha de itens:",
         "Submit": "Enviar"
       },
       "MerchantColumnsEditor": {
@@ -779,6 +779,13 @@
         "Title": "Tipos de itens não empilháveis",
         "Label": "Configurar tipos não empilháveis",
         "Hint": "Aqui você pode configurar quais tipos de itens são considerados únicos, não importa o quê. Os tipos configurados aqui não podem ser empilhados e só podem ter uma quantidade de 1."
+      },
+      "HideTokenBorder": {
+        "HidePlayers": "Escondido dos jogadores",
+        "Show": "Mostrar bordas (comportamento central)",
+        "Title": "Ocultar Bordas de token do Item Piles",
+        "Hint": "Isso controla se a borda do token está oculta ao passar o mouse sobre os tokens da pilha de itens. Selecionar o token sempre mostra a borda.",
+        "HideEveryone": "Escondido de todos"
       }
     },
     "Types": {
