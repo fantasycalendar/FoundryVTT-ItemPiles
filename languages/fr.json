@@ -837,7 +837,7 @@
         "Public": "Public - tout le monde peut voir les messages",
         "Off": "Off - désactiver les messages",
         "SelfGM": "Privé - seuls les MJs et les utilisateurs peuvent voir les messages",
-        "Title": "Envoyer vers le tchat",
+        "Title": "Envoyer dans la conversation",
         "Hint": "Chaque fois qu'un joueur ramasse des objets d'une pile d'objets, il envoie un message indiquant ce qui a été ramassé.",
         "Blind": "Aveugle - seuls les MJs peuvent voir les messages"
       },
@@ -869,8 +869,8 @@
         "Title": "Activer le dépôt d'objets"
       },
       "EnableGivingItems": {
-        "Hint": "Cette option permet aux utilisateurs de déposer des objets sur d'autres token pour les leur donner. Si cette fonction est désactivée, les utilisateurs ne peuvent pas donner d'objets à d'autres utilisateurs.",
-        "Title": "Permettre le don d'objets"
+        "Hint": "Cette option permet aux utilisateurs de déposer des objets sur d'autres jetons pour les leur donner. Si cette fonction est désactivée, les utilisateurs ne peuvent pas donner d'objets à d'autres utilisateurs.",
+        "Title": "Activer le don d'objets"
       },
       "InspectItemsTrade": {
         "Hint": "L'activation de cette option permet aux utilisateurs de cliquer sur les objets qui sont échangés et d'ouvrir la fiche de l'objet pour les prévisualiser.",
