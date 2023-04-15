@@ -23,12 +23,19 @@
   });
 
   const holidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
-    holiday.selected = pileData.closedHolidays.includes(holiday.name);
-    return holiday;
+    return { name: holiday.name, selected: pileData.closedHolidays.includes(holiday.name) };
   });
 
   pileData.closedHolidays = pileData.closedHolidays.filter(closedHoliday => {
     return holidays.some(holiday => holiday.name === closedHoliday);
+  });
+
+  const refreshItemsHolidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
+    return { name: holiday.name, selected: pileData.refreshItemsHolidays.includes(holiday.name) };
+  });
+
+  pileData.refreshItemsHolidays = pileData.refreshItemsHolidays.filter(refreshItemsHoliday => {
+    return refreshItemsHolidays.some(holiday => holiday.name === refreshItemsHoliday);
   });
 
   async function showItemTypePriceModifiers() {
@@ -323,6 +330,35 @@
                  }
                  pileData.closedHolidays = Array.from(holidaySet);
                }}/>
+					<label>{holiday.name}</label>
+				</div>
+			{/each}
+		</div>
+	</div>
+
+	<div class="form-group" class:item-piles-disabled={!pileData.openTimes.enabled}>
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsHolidays")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsHolidaysExplanation")}</p>
+			<p
+				style="color: #c02609;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsHolidaysWarning")}</p>
+		</label>
+		<div class="break"></div>
+		<div style="display: grid; grid-template-columns: 1fr 1fr;">
+			{#each refreshItemsHolidays as holiday, index (holiday.name + "-remove-" + index)}
+				<div class="item-piles-flexrow" style="flex:0 1 auto;">
+					<input type="checkbox"
+								 bind:checked={holiday.selected}
+								 disabled={!pileData.openTimes.enabled}
+								 on:change={() => {
+									 let holidaySet = new Set(pileData.refreshItemsHolidays);
+									 if(holiday.selected){
+										 holidaySet.add(holiday.name)
+									 }else{
+										 holidaySet.delete(holiday.name)
+									 }
+									 pileData.refreshItemsHolidays = Array.from(holidaySet);
+								 }}/>
 					<label>{holiday.name}</label>
 				</div>
 			{/each}

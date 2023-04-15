@@ -30,6 +30,7 @@ export default class Transaction {
     keepIfZero = false,
     onlyDelta = false,
   } = {}) {
+
     for (let data of items) {
 
       let item = data.item ?? data;
@@ -76,7 +77,7 @@ export default class Transaction {
             }
           } else {
             const newQuantity = Utilities.getItemQuantity(actorExistingItem) + incomingQuantity;
-            const update = Utilities.setItemQuantity({ _id: actorExistingItem.id }, newQuantity);
+            const update = Utilities.setItemQuantity(actorExistingItem.toObject(), newQuantity);
             if (keepIfZero && type !== "currency") {
               setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
             }
@@ -137,6 +138,7 @@ export default class Transaction {
   }
 
   prepare() {
+
     this.actorUpdates = Object.fromEntries(Object.entries(this.actorUpdates).filter(entry => {
       if (this.attributeDeltas.get(entry[0]) === 0) {
         this.attributeDeltas.delete(entry[0]);

@@ -149,6 +149,35 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
 }
 
+
+export function getItemPileActors(filter = false) {
+  return Array.from(game.actors).filter((a) => {
+    return getProperty(a, CONSTANTS.FLAGS.PILE)?.enabled && (filter ? filter(a) : true);
+  });
+}
+
+export function getItemPileTokens(filter = false) {
+
+  const allTokensOnScenes = Array.from(game.scenes)
+    .map(scene => ([
+      scene.id,
+      Array.from(scene.tokens).filter(t => {
+        return getProperty(t, CONSTANTS.FLAGS.PILE)?.enabled && !t.actorLink;
+      })
+    ]))
+    .filter(([_, tokens]) => tokens.length)
+
+  const validTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [
+    scene,
+    tokens.filter((token) => {
+      return filter ? filter(token) : true;
+    })
+  ]).filter(([_, tokens]) => tokens.length);
+
+  return { allTokensOnScenes, validTokensOnScenes };
+}
+
+
 export function getActorItems(target, { itemFilters = false, getItemCurrencies = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorItemFilters = itemFilters ? cleanItemFilters(itemFilters) : getActorItemFilters(actor);
@@ -1414,4 +1443,90 @@ export function clearVaultLog(actor) {
   return actor.update({
     [CONSTANTS.FLAGS.LOG]: []
   });
+}
+
+export async function rollMerchantTables({ tableData = false, actor = false } = {}) {
+
+  if (tableData && !Array.isArray(tableData)) {
+    tableData = [tableData]
+  } else if (!tableData && actor) {
+    const flagData = getActorFlagData(actor);
+    tableData = flagData.tablesForPopulate;
+  } else if (!tableData && !actor) {
+    return [];
+  }
+
+  const items = [];
+
+  for (const table of tableData) {
+
+    const rollableTable = game.tables.get(table.id);
+
+    if (!rollableTable) continue;
+
+    await rollableTable.reset();
+    await rollableTable.normalize();
+
+    let tableItems = [];
+
+    if (table.addAll) {
+
+      for (const [itemId, formula] of Object.entries(table.items)) {
+        const rollResult = rollableTable.results.get(itemId).toObject();
+        const item = await getItem(rollResult);
+        if (!item) continue;
+        const roll = new Roll(formula).evaluate({ async: false });
+        if (roll.total <= 0) continue;
+        tableItems.push({
+          ...rollResult,
+          item: item,
+          quantity: roll.total
+        })
+      }
+
+    } else {
+
+      const roll = new Roll((table.timesToRoll ?? "1").toString()).evaluate({ async: false });
+
+      if (roll.total <= 0) {
+        continue;
+      }
+
+      tableItems = await game.itempiles.API.rollItemTable(rollableTable, { timesToRoll: roll.total });
+
+    }
+
+    tableItems.forEach(newItem => {
+
+      const existingItem = items.find(
+        (item) => item.documentId === newItem.documentId
+      );
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        if (table?.customCategory && !getProperty(newItem.item, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
+          setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
+        }
+        items.push({
+          ...newItem
+        });
+      }
+    })
+  }
+
+  return items;
+}
+
+
+async function getItem(itemToGet) {
+  let item;
+  if (itemToGet.documentCollection === "Item") {
+    item = game.items.get(itemToGet.documentId);
+  } else {
+    const compendium = game.packs.get(itemToGet.documentCollection);
+    if (compendium) {
+      item = await compendium.getDocument(itemToGet.documentId);
+    }
+  }
+  return item;
 }

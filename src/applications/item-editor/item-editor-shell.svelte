@@ -138,6 +138,14 @@
 
 					<div class="form-group">
 						<label>
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.KeepOnMerchant")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.KeepOnMerchantExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.keepOnMerchant}/>
+					</div>
+
+					<div class="form-group">
+						<label>
 							{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantity")}<br>
 							<p>{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityExplanation")}</p>
 						</label>

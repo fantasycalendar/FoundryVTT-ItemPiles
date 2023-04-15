@@ -359,7 +359,8 @@ class PileMerchantItem extends PileItem {
       if (!setup) return;
       this.filter()
     });
-    this.subscribeTo(this.itemFlagData, () => {
+    this.subscribeTo(this.itemFlagData, (flagData) => {
+      this.isService = flagData.isService;
       if (!setup) return;
       this.refreshPriceData();
       this.refreshDisplayQuantity();

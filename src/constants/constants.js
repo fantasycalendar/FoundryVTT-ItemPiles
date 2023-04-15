@@ -29,6 +29,7 @@ const CONSTANTS = {
     disableNormalCost: false,
     cantBeSoldToMerchants: false,
     isService: false,
+    keepOnMerchant: false,
     macro: "",
     customCategory: "",
     prices: [],
@@ -143,6 +144,7 @@ const CONSTANTS = {
     },
     closedDays: [],
     closedHolidays: [],
+    refreshItemsHolidays: [],
 
     // Vault settings
     cols: 10,

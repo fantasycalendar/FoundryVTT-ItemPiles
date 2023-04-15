@@ -100,9 +100,6 @@
           promises.push(app.close());
         }
 
-        if (currentData.type === CONSTANTS.PILE_TYPES.MERCHANT) {
-        } else {
-        }
         if (promises.length || pileActor?.sheet.rendered) {
           await Promise.allSettled(promises);
           if (data.enabled) {
