@@ -141,7 +141,20 @@
       "ItemFree": "Darmowe",
       "Closed": "Zamknięte",
       "EditTypePrices": "Edytuj Przelicznik Kosztów Na-Typ",
-      "RolledTimes": "Wylosowano {rolls} razy"
+      "RolledTimes": "Wylosowano {rolls} razy",
+      "ToolTipRemoveTable": "Usuń tabelę",
+      "TooltipConfigureTable": "Ustaw tabelę",
+      "TooltipRollTable": "Rzuć tabelę",
+      "ToolTipRemoveAllRolledItems": "Usuń wszystkie przedmioty",
+      "ShoppingAs": "Kupujesz jako {actorName}",
+      "NoMatchFound": "Nic nie pasuje do Twojego wyszukiwania",
+      "TableAddAllItems": "Dodaj wszystkie przedmioty:",
+      "TableTimesToRoll": "Ilość rzutów tabeli:",
+      "TableCustomCategory": "Dodaj przedmioty do niestandardowej kategorii:",
+      "RollableTables": "Tablice rzutów",
+      "AddTable": "Dodaj tabelę",
+      "RollAllTables": "Rzuć wszystkie tabele",
+      "Service": "Usługi"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -151,12 +164,61 @@
         "TradeContent": "Chcesz wymienić przedmiot nie dozwolonego do wymiany typu (\"{type}\"). Czy jesteś pewny/a że chcesz to zrobić?"
       },
       "ResetSettings": {
-        "Title": "Zresetuj Ustawienia Modułu Stosu Przedmiotów",
+        "Title": "Resetuj ustawienia modułu",
         "Content": "Czy na pewno chcesz zresetować wszystkie ustawienia modułu Stosu Przedmiotów do bieżących ustawień domyślnych systemu? <strong>NIE MOŻNA TEGO COFNĄĆ!</strong>",
         "Confirm": "Zresetuj Ustawienia Modułu"
       },
       "LinkedActorWarning": {
-        "Title": "Stos Przedmiotów i Powiązany Aktor"
+        "Title": "Stos Przedmiotów i Powiązany Aktor",
+        "Content": "Czy na pewno chcesz zmienić tego <strong>powiązanego aktora</strong> w item pile? Żeton tego aktora jest połączony i wszystkie żetony tego aktora będą współdzielić jego ekwipunek i waluty."
+      },
+      "UserSelect": {
+        "Title": "Zaznacz użytkowników",
+        "Content": "Pokazać jakim użytkownikom?"
+      },
+      "NoSystemFound": {
+        "Title": "Nie rozpoznano system",
+        "Content": "System ten nie jest obecnie w pełni obsługiwany. Oznacza to, że moduł nie wie, jak najlepiej obsługiwać elementy tego systemu, ale nadal może działać w ograniczony sposób.<br><br>Możesz samodzielnie skonfigurować ustawienia modułu, ale wymaga to trochę wiedzy technicznej.<br><br>Jeśli masz jakieś pytania, pinguj <strong>Wasp#2005</strong> na discordzie Foundry."
+      },
+      "CantRemoveVaultExpander": {
+        "Content": "Nie możesz usunąć tego rozszerzenia, przedmioty w skarbcu nie zmieściłyby się bez niego. Usuń {num_items} przedmiotów przed próbą usunięcia tego rozszerzenia!",
+        "Title": "Nie można usunąć rozszerzenia"
+      },
+      "ReceiveItem": {
+        "Header": "Item Piles: Przedmiot otrzymywany",
+        "Ignore": "Zingoruj użytkownika",
+        "ContentOne": "{source_actor_name} chce przekazać przedmiot \"{item_name}\" do {target_actor_name}, czy akceptujesz?",
+        "ContentMany": "{source_actor_name} chce przekazać przedmioty \"{item_name}\" ({ilość}) do {target_actor_name}, czy akceptujesz?",
+        "Title": "Przyjmowany przedmiot"
+      },
+      "NewSystemVersion": {
+        "Title": "Nowa wersja systemu",
+        "Content": "Ustawienia domyślne systemu, którego używasz z Item Piles zostały zaktualizowane, czy chcesz zastąpić ustawienia specyficzne dla systemu zaktualizowanymi?",
+        "Content2": "Nie zrobienie tego może uszkodzić Item Piles - aby to naprawić, musisz zresetować ustawienia systemowe modułu.",
+        "Confirm": "Aktualizacja ustawień"
+      },
+      "ResetSharingData": {
+        "Title": "Resetowanie udostępnianych danych",
+        "Content": "To zresetuje całą historię graczy, którzy wzięli swoją część z tego stosu.<br><br>Czy na pewno chcesz to zrobić?",
+        "Confirm": "Zresetuj udostępnianie danych"
+      },
+      "ClearAllItems": {
+        "Title": "Wyczyść wszystkie pozycje dotyczące aktora",
+        "Content": "To wyczyści wszystkie przedmioty aktora, czy na pewno chcesz to zrobić?"
+      },
+      "RemoveMerchantTable": {
+        "Title": "Usuń tabelę kupca",
+        "Content": "Czy na pewno chcesz usunąć tabelę \"{table_name}\" z tego handlowca? Tego nie da się cofnąć."
+      },
+      "TextEditor": {
+        "Title": "Edytor tekstu"
+      },
+      "ClearVaultLog": {
+        "Title": "Wyczyścić dziennik skarbca?",
+        "Content": "Czy na pewno chcesz wyczyścić dziennik skarbca \"{actor_name}\"?"
+      },
+      "GiveItemUserNotActive": {
+        "Content": "\"{actor_name}\" jest własnością gracza \"{user_name}\" ale nie są oni aktywni, więc nie możesz dać im tego przedmiotu."
       }
     },
     "Items": "Przedmioty",
@@ -168,6 +230,69 @@
       "container": "Pojemnik",
       "merchant": "Kupiec",
       "vault": "Skarbiec"
+    },
+    "Vault": {
+      "ExpandsRows": "{rows} wierszy",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "Deposited": "zdeponowane",
+      "Deposit": "Depozyt",
+      "Withdrew": "wycofane",
+      "VaultTab": "Skarbiec",
+      "ExpandersTab": "Rozszerzenia",
+      "LogTab": "Logi",
+      "ViewingAs": "Przeglądanie jako {actor_name}",
+      "ExpandsCols": "{cols} kolumn",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "LogQuantity": "{quantity} x ",
+      "NeedsCapacity": "Ten skarbiec ma całkowitą pojemność {total_capacity}, ale żaden z nich nie jest dostępny, póki nie zostaną dodane rozszerzenia skarbca",
+      "CapacityLeft": "Ten skarbiec ma pojemność {capacity}, z maksymalną {total_capacity}, przeciągnij i upuść rozszerzenia skarbca, aby zwiększyć pojemność",
+      "CapacityFull": "Ten skarbiec osiągnął swoją maksymalną pojemność {total_capacity}"
+    },
+    "Applications": {
+      "WithdrawItem": {
+        "Submit": "Wycofywanie",
+        "Content": "Czy chcesz wycofać tę pozycję z \"{target_name}\"?",
+        "ContentMultipleQuantity": "Jest {quantity} tej pozycji, ile chcesz wycofać?",
+        "Title": "Wycofanie przedmiotu",
+        "Header": "Wycofujesz: {item_name}"
+      },
+      "SplitItem": {
+        "Title": "Podzielenie stosu pozycji",
+        "Content": "Chcesz rozdzielić ten stos?",
+        "Header": "Dzielisz stos {item_name}",
+        "Submit": "Podziel stos",
+        "ContentMultipleQuantity": "Jest {quantity} tego przedmiotu, ile chcesz w nowym stosie?"
+      },
+      "DropItem": {
+        "Title": "Upuszczenie przedmiotu",
+        "ContentInfiniteQuantity": "Ile chcesz upuścić?",
+        "SubmitNoTarget": "Utwórz nowy stos",
+        "Header": "Upuszczasz: {item_name}",
+        "Content": "Dodajesz ten przedmiot do stosu przedmiotów \"{target_name}\".",
+        "ContentMultipleQuantity": "Masz {quantity} tego przedmiotu, ile chcesz upuścić?",
+        "Submit": "Dodaj do stosu"
+      },
+      "GiveItem": {
+        "Header": "Przekazujesz: {item_name}",
+        "Content": "Czy chcesz przekazać ten przedmiot \"{target_name}\"?",
+        "ContentMultipleQuantity": "Masz {quantity} tego przedmiotu, ile chcesz przekazać?",
+        "Title": "Przedmiot przekazywany",
+        "Submit": "Przekaż",
+        "ContentInfiniteQuantity": "Ile chcesz przekazać \"{target_name}\"?"
+      },
+      "DepositItem": {
+        "Title": "Zdeponuj przedmiot",
+        "Header": "Deponujesz: {item_name}",
+        "Content": "Czy chcesz zdeponować tę pozycję w \"{target_name}\"?",
+        "ContentInfiniteQuantity": "Ile chcesz zdeponować?",
+        "Submit": "Depozyt",
+        "ContentMultipleQuantity": "Masz {quantity} tego przedmiotu, ile chcesz zdeponować?"
+      },
+      "EditCurrencies": {
+        "Title": "Edycja walut",
+        "Content": "Jako GM możesz zaktualizować waluty na tym stosie przedmiotów:",
+        "Submit": "Wyślij"
+      }
     }
   }
 }
