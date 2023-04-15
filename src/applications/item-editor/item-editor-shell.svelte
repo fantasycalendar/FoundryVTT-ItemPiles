@@ -11,6 +11,7 @@
   import MacroSelector from "../components/MacroSelector.svelte";
   import { get, writable } from "svelte/store";
   import SETTINGS from "../../constants/settings.js";
+  import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
 
   const { application } = getContext('#external');
 
@@ -53,13 +54,6 @@
     ]
   }
 
-  async function showCustomItemCategoryEditor() {
-    openEditor(SETTINGS.CUSTOM_ITEM_CATEGORIES).then((result) => {
-      Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, Array.from(new Set(result)));
-      currentCustomCategories.set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES));
-    })
-  }
-
   let activeTab = "general";
 
 </script>
@@ -87,19 +81,9 @@
 							{localize("ITEM-PILES.Applications.ItemEditor.CustomCategory")}<br>
 							<p>{localize("ITEM-PILES.Applications.ItemEditor.CustomCategoryExplanation")}</p>
 						</label>
-						<div style="flex: 4; display: flex; align-items: center;">
-							<input type="text" list={"item-editor-list-"+item.id} bind:value={itemFlagData.customCategory}
-										 placeholder={item.type}/>
-							<a style="margin: 0 0.5rem;" on:click={() => showCustomItemCategoryEditor()}><i
-								class="fas fa-cog"></i></a>
+						<div style="flex: 4;">
+							<CustomCategoryInput bind:value={itemFlagData.customCategory} placeholder={item.type}/>
 						</div>
-						{#if $currentCustomCategories.length}
-							<datalist id={"item-editor-list-"+item.id}>
-								{#each $currentCustomCategories as category}
-									<option>{category}</option>
-								{/each}
-							</datalist>
-						{/if}
 					</div>
 
 					<div class="form-group">

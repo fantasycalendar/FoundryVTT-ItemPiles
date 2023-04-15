@@ -153,6 +153,7 @@ export default class MerchantStore extends ItemPileStore {
     })
     setup = true;
     this.updatePriceModifiers();
+    this.updateOpenCloseStatus();
     this.refreshItems();
   }
 

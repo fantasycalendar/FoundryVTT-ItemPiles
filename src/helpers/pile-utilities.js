@@ -1345,7 +1345,7 @@ export function getVaultGridData(vaultActor, flagData = false) {
 
 }
 
-export async function updateVaultJournalLog(itemPile, {
+export async function updateVaultLog(itemPile, {
   actor = false,
   userId = false,
   items = [],

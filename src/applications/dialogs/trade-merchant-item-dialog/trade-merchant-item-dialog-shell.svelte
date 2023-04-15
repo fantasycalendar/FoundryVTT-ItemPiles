@@ -106,7 +106,7 @@
 					</small>
 				{/if}
 			</div>
-			<div style="margin-top: 0.25rem;">
+			<div style="margin-top: 0.25rem; display: flex; align-items: flex-start;">
 				<PriceSelector {item} standalone/>
 			</div>
 			<div style="margin-right: 0.25rem; text-align: right;">

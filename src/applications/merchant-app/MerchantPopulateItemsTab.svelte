@@ -10,6 +10,8 @@
   import { slide } from "svelte/transition";
   import { quintOut } from "svelte/easing";
   import SETTINGS from "../../constants/settings";
+  import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
+  import CONSTANTS from "../../constants/constants.js";
 
   export let store;
 
@@ -22,7 +24,8 @@
         addAll: t.addAll ?? false,
         open: false,
         timesToRoll: t.timesToRoll ?? "1d4",
-        items: t.items ?? {}
+        items: t.items ?? {},
+        customCategory: t.customCategory ?? "",
       };
     }));
 
@@ -36,14 +39,18 @@
   });
 
   $: {
+    debounceSave($populationTables, $tables)
+  }
+
+  const debounceSave = foundry.utils.debounce((popTables, actualTables) => {
     const pileData = foundry.utils.deepClone(get(store.pileData));
-    pileData.tablesForPopulate = $populationTables
-      .filter((t) => $tables[t.id])
+    pileData.tablesForPopulate = popTables
+      .filter((t) => actualTables[t.id])
       .map((t) => ({
-        id: t.id, addAll: t.addAll, items: t.items
+        id: t.id, addAll: t.addAll, items: t.items, timesToRoll: t.timesToRoll, customCategory: t.customCategory
       }));
     PileUtilities.updateItemPileData(store.actor, pileData);
-  }
+  }, 200);
 
   let selectableTables = [];
   let selectedTable = "";
@@ -138,6 +145,9 @@
         if (existingItem) {
           existingItem.quantity++;
         } else {
+          if (table?.customCategory && !getProperty(newItem.item, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
+            setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
+          }
           items.push({
             ...newItem
           });
@@ -167,7 +177,8 @@
   async function addItem(itemToAdd) {
     await game.itempiles.API.addItems(store.actor, [itemToAdd].map(entry => ({
       item: entry.item,
-      quantity: entry.quantity
+      quantity: entry.quantity,
+      flags: entry.flags
     })));
     removeItem(itemToAdd);
   }
@@ -183,7 +194,11 @@
   }
 
   async function addAllItems() {
-    const itemsToAdd = get(itemsRolled).map(entry => ({ item: entry.item, quantity: entry.quantity }));
+    const itemsToAdd = get(itemsRolled).map(entry => ({
+      item: entry.item,
+      quantity: entry.quantity,
+      flags: entry.flags
+    }));
     await game.itempiles.API.addItems(store.actor, itemsToAdd);
     itemsRolled.set([]);
   }
@@ -225,6 +240,7 @@
         addAll: false,
         open: false,
         timesToRoll: "1d4-1",
+        customCategory: "",
         items: {}
       });
       return tabs;
@@ -335,18 +351,21 @@
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { removeTable(table.id) }}
 									data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
+									data-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-trash" style="color:#de0e0e;"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { table.open = !table.open; }}
 									data-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
+									data-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-cog"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
 									data-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
+									data-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 									style="margin-right:0;">
 						<i class="fas fa-dice-d20"></i>
 					</button>
@@ -354,9 +373,15 @@
 				{#if table.open}
 					<div class="item-piles-flexcol" style="margin-top:5px;"
 							 transition:slide={{ duration: 200, easing: quintOut }}>
+						<div class="item-piles-flexrow" style="align-items: center; margin-bottom: 0.25rem;">
+							<label
+								style="margin-right:5px;">{localize("ITEM-PILES.Merchant.TableCustomCategory")}</label>
+							<CustomCategoryInput bind:value={table.customCategory}/>
+						</div>
 						<div class="item-piles-flexrow">
 							<div class="item-piles-flexrow" style="align-items: center; flex:0 1 auto; min-height:26px;">
-								<label style="flex:0 1 auto; margin-right:5px;" for={"table-id-"+table.id}>Add all items:</label>
+								<label style="flex:0 1 auto; margin-right:5px;"
+											 for={"table-id-"+table.id}>{localize("ITEM-PILES.Merchant.TableAddAllItems")}</label>
 								<input style="width:15px; height:15px; margin:0; flex:0;" id={"table-id-"+table.id}
 											 bind:checked={table.addAll}
 											 on:change={() => {
@@ -367,7 +392,8 @@
 							</div>
 							{#if !table.addAll}
 								<div class="item-piles-flexrow item-piles-item-row" style="align-items: center; flex:1;">
-									<label style="margin-right:5px; text-align: right;">Time to roll on table:</label>
+									<label
+										style="margin-right:5px; text-align: right;">{localize("ITEM-PILES.Merchant.TableTimesToRoll")}</label>
 									<input type="text" placeholder="2d6+4" bind:value={table.timesToRoll}
 												 style="height:20px; margin: 3px; max-width: 50px; font-size: 0.75rem;"
 									/>

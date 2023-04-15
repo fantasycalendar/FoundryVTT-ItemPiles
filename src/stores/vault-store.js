@@ -506,9 +506,15 @@ export class VaultItem extends PileItem {
 
     const itemDelta = await game.itempiles.API.removeItems(this.store.actor, [{
       _id: itemToMerge.id
-    }], { interactionId: this.store.interactionId });
+    }], {
+      interactionId: this.store.interactionId,
+      skipVaultLogging: true
+    });
 
-    this.updateQuantity(Math.abs(itemDelta[0].quantity), true);
+    return game.itempiles.API.addItems(this.store.actor, [{ id: this.id, quantity: Math.abs(itemDelta[0].quantity) }], {
+      interactionId: this.store.interactionId,
+      skipVaultLogging: true
+    })
 
   }
 

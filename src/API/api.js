@@ -932,12 +932,13 @@ class API {
    * @param {object} options                                    Options to pass to the function
    * @param {boolean} [options.mergeSimilarItems=true]          Whether to merge similar items based on their name and type
    * @param {boolean} [options.removeExistingActorItems=false]  Whether to remove the actor's existing items before adding the new ones
+   * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
    *
    * @returns {Promise<array>}                                  An array of objects, each containing the item that was added or updated, and the quantity that was added
    */
   static addItems(target, items, {
-    mergeSimilarItems = true, removeExistingActorItems = false, interactionId = false
+    mergeSimilarItems = true, removeExistingActorItems = false, skipVaultLogging = false, interactionId = false
   } = {}) {
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`addItems | Could not determine the UUID, please provide a valid target`)
@@ -958,6 +959,13 @@ class API {
         if (itemData.flags) {
           setProperty(item, CONSTANTS.FLAGS.ITEM, getProperty(itemData, CONSTANTS.FLAGS.ITEM));
         }
+      } else if (itemData.id) {
+        item = target.items.get(itemData.id);
+        if (item) {
+          item = item.toObject();
+        } else {
+          throw Helpers.custom_error(`addItems | Could not find item with id ${itemData.id} on actor with UUID ${targetUuid}!`)
+        }
       }
 
       if (itemData?.quantity !== undefined) {
@@ -976,7 +984,7 @@ class API {
     if (interactionId && typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ITEMS, targetUuid, itemsToAdd, game.user.id, {
-      removeExistingActorItems, interactionId
+      removeExistingActorItems, interactionId, skipVaultLogging
     });
   }
 
@@ -986,11 +994,12 @@ class API {
    * @param {Actor/Token/TokenDocument} target                  The target to remove a items from
    * @param {Array} items                                       An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of
    * @param {object} options                                    Options to pass to the function
+   * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
    *
    * @returns {Promise<array>}                                  An array of objects, each containing the item that was removed or updated, the quantity that was removed, and whether the item was deleted
    */
-  static removeItems(target, items, { interactionId = false } = {}) {
+  static removeItems(target, items, { skipVaultLogging = false, interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`removeItems | Could not determine the UUID, please provide a valid target`);
@@ -1030,7 +1039,10 @@ class API {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`removeItems | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ITEMS, targetUuid, items, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ITEMS, targetUuid, items, game.user.id, {
+      interactionId,
+      skipVaultLogging
+    });
   }
 
   /**
@@ -1040,12 +1052,12 @@ class API {
    * @param {Actor/Token/TokenDocument} target              The target to transfer the items to
    * @param {Array} items                                   An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity"), or Items (the foundry class) or strings of IDs to transfer all quantities of
    * @param {object} options                                Options to pass to the function
-   * @param {object/boolean} [options.vaultLogData=false]   Vault log data used when storing that on actors
+   * @param {boolean} [options.skipVaultLogging=false]      Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]  The interaction ID of this action
    *
    * @returns {Promise<object>}                             An array of objects, each containing the item that was added or updated, and the quantity that was transferred
    */
-  static transferItems(source, target, items, { vaultLogData = false, interactionId = false } = {}) {
+  static transferItems(source, target, items, { skipVaultLogging = false, interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid source`)
@@ -1090,7 +1102,7 @@ class API {
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ITEMS, sourceUuid, targetUuid, items, game.user.id, {
-      vaultLogData, interactionId
+      interactionId, skipVaultLogging
     });
 
   }
@@ -1102,11 +1114,16 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The actor to receive all the items
    * @param {object} options                                  Options to pass to the function
    * @param {Array/boolean} [options.itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
+   * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
    *
    * @returns {Promise<array>}                                An array containing all the items that were transferred to the target
    */
-  static transferAllItems(source, target, { itemFilters = false, interactionId = false } = {}) {
+  static transferAllItems(source, target, {
+    itemFilters = false,
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid source`)
@@ -1127,7 +1144,7 @@ class API {
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, {
-      itemFilters, interactionId
+      itemFilters, skipVaultLogging, interactionId
     });
   }
 
@@ -1163,7 +1180,9 @@ class API {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`setAttributes | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SET_ATTRIBUTES, targetUuid, attributes, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SET_ATTRIBUTES, targetUuid, attributes, game.user.id, {
+      interactionId
+    });
 
   }
 
@@ -1173,12 +1192,13 @@ class API {
    * @param {Actor/Token/TokenDocument} target                  The target whose attribute will have a set quantity added to it
    * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to add
    * @param {object} options                                    Options to pass to the function
+   * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
    *
    * @returns {Promise<object>}                                 An array containing a key value pair of the attribute path and the quantity of that attribute that was added
    *
    */
-  static addAttributes(target, attributes, { interactionId = false } = {}) {
+  static addAttributes(target, attributes, { skipVaultLogging = false, interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`addAttributes | Could not determine the UUID, please provide a valid target`);
@@ -1199,7 +1219,10 @@ class API {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`addAttributes | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ATTRIBUTES, targetUuid, attributes, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.ADD_ATTRIBUTES, targetUuid, attributes, game.user.id, {
+      skipVaultLogging,
+      interactionId
+    });
 
   }
 
@@ -1209,11 +1232,12 @@ class API {
    * @param {Token/TokenDocument} target                      The target whose attributes will be subtracted from
    * @param {Array/object} attributes                         This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
    * @param {object} options                                  Options to pass to the function
+   * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
    *
    * @returns {Promise<object>}                               An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
    */
-  static removeAttributes(target, attributes, { interactionId = false } = {}) {
+  static removeAttributes(target, attributes, { skipVaultLogging = false, interactionId = false } = {}) {
 
     const targetUuid = Utilities.getUuid(target);
     if (!targetUuid) throw Helpers.custom_error(`removeAttributes | Could not determine the UUID, please provide a valid target`);
@@ -1248,7 +1272,10 @@ class API {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`removeAttributes | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ATTRIBUTES, targetUuid, attributesToSend, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REMOVE_ATTRIBUTES, targetUuid, attributesToSend, game.user.id, {
+      skipVaultLogging,
+      interactionId
+    });
 
   }
 
@@ -1259,11 +1286,12 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The target to transfer the attribute to
    * @param {Array/object} attributes                         This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer
    * @param {object} options                                  Options to pass to the function
+   * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
    *
    * @returns {Promise<object>}                               An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
    */
-  static transferAttributes(source, target, attributes, { interactionId = false } = {}) {
+  static transferAttributes(source, target, attributes, { skipVaultLogging = false, interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid source`);
@@ -1304,7 +1332,10 @@ class API {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`transferAttributes | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ATTRIBUTES, sourceUuid, targetUuid, attributes, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ATTRIBUTES, sourceUuid, targetUuid, attributes, game.user.id, {
+      skipVaultLogging,
+      interactionId
+    });
 
   }
 
@@ -1314,11 +1345,12 @@ class API {
    * @param {Actor/Token/TokenDocument} source                The source to transfer the attributes from
    * @param {Actor/Token/TokenDocument} target                The target to transfer the attributes to
    * @param {object} options                                  Options to pass to the function
+   * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
    *
    * @returns {Promise<object>}                               An object containing a key value pair of each attribute transferred, the key being the attribute path and its value being the quantity that was transferred
    */
-  static transferAllAttributes(source, target, { interactionId = false } = {}) {
+  static transferAllAttributes(source, target, { skipVaultLogging = false, interactionId = false } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`transferAllAttributes | Could not determine the UUID, please provide a valid source`);
@@ -1330,7 +1362,10 @@ class API {
       if (typeof interactionId !== "string") throw Helpers.custom_error(`transferAllAttributes | interactionId must be of type string`);
     }
 
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ATTRIBUTES, sourceUuid, targetUuid, game.user.id, { interactionId });
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ATTRIBUTES, sourceUuid, targetUuid, game.user.id, {
+      skipVaultLogging,
+      interactionId
+    });
 
   }
 
@@ -1341,11 +1376,16 @@ class API {
    * @param {Actor/Token/TokenDocument} target                The actor to receive all the items and attributes
    * @param {object} options                                  Options to pass to the function
    * @param {Array/boolean} [options.itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
+   * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
    * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
    *
    * @returns {Promise<object>}                               An object containing all items and attributes transferred to the target
    */
-  static transferEverything(source, target, { itemFilters = false, interactionId = false } = {}) {
+  static transferEverything(source, target, {
+    itemFilters = false,
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const sourceUuid = Utilities.getUuid(source);
     if (!sourceUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid source`);
@@ -1366,7 +1406,7 @@ class API {
     }
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, game.user.id, {
-      itemFilters, interactionId
+      itemFilters, skipVaultLogging, interactionId
     });
 
   }

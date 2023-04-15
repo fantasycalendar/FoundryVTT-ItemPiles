@@ -21,7 +21,8 @@
 			{localize("ITEM-PILES.Merchant.ShoppingAs", { actorName: $recipientDocument.name })}
 		</div>
 		{#if $currencies.length}
-			<CurrencyList {currencies} options={{ imgSize: 18, reverse: true, abbreviations: true }}
+			<CurrencyList {currencies}
+										options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
 										class="item-piles-currency-list"/>
 		{/if}
 	{:else if game.user.isGM && $merchantPileData.infiniteCurrencies}
@@ -31,7 +32,8 @@
 				<i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
 			</a>
 		</div>
-		<CurrencyList currencies={merchantCurrencies} options={{ imgSize: 18, reverse: true, abbreviations: true }}
+		<CurrencyList currencies={merchantCurrencies}
+									options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
 									class="item-piles-currency-list"/>
 	{/if}
 

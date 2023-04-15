@@ -75,7 +75,6 @@
     --tjs-menu-color: black;
     --tjs-menu-border: 1px solid #444;
     --tjs-menu-box-shadow: 0 6px 9px -1px rgba(0, 0, 0, 0.5);
-    padding: 0 5px;
     display: flex;
     justify-content: center;
     height: 100%;

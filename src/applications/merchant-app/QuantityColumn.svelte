@@ -48,6 +48,6 @@
     justify-content: center;
     padding: 0 10px;
     text-align: center;
-    height: 100%;
+    min-height: 28px;
   }
 </style>

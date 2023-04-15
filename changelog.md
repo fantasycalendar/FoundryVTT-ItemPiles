@@ -1,5 +1,17 @@
 # Item Piles Changelog
 
+## Version 2.6.8
+
+- Added optional custom category on the table configuration in merchant populate items, which will automatically put all items rolled from those tables into that category, unless the rolled item already has a custom category
+- Updated French, Portuguese (Brazilian), and Chinese (Simplified) localization (thank you rectulo, eunaumtenhoid, and psedonatural on Weblate!)
+- Fixed stacking items in vaults would only work for GMs and in vaults that the player owns, but not actually stack the items
+- Fixed stacked items would show as up as withdrawn in the vault logs
+- Fixed merchant open/close time not evaluating the first time you open the shop, so players could access the shop when it should have been closed
+- Fixed merchant tables not saving their roll formula
+- Fixed merchant buy/sell/service tables being crunched up into a small space when too few items had been added, which made it impossible to select a different price on items with more than one price
+- Fixed issues with creating new item piles on some systems (like Starfinder), caused by item piles trying to create items on the new item pile with `Item`s instead of the item's data
+- Fixed split currencies button being incorrectly disabled
+
 ## Version 2.6.7
 
 - Fixed being unable to buy items from merchants, how embarrassing

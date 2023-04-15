@@ -141,12 +141,13 @@
 <style lang="scss">
 
   .item-piles-items-list {
+    display: grid;
     overflow-y: scroll;
     padding-right: 5px;
-    display: grid;
     align-items: center;
-    max-height: calc(100% - 31px);
+    height: calc(100% - 31px);
 		margin-top: 5px;
+    align-content: flex-start;
   }
 
   .item-piles-item-list-header {

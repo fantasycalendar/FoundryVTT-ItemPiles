@@ -30,7 +30,7 @@ export function canItemPileBeSplit(target) {
   const shareData = getItemPileSharingData(target);
   const playerActors = getPlayersForItemPile(target).map(player => Utilities.getUserCharacter(player));
   const items = pileData.shareItemsEnabled ? PileUtilities.getActorItems(target) : [];
-  const currencies = pileData.shareCurrenciesEnabled ? PileUtilities.getActorCurrencies(target) : [];
+  const currencies = pileData.shareCurrenciesEnabled || pileData.splitAllEnabled ? PileUtilities.getActorCurrencies(target) : [];
   for (const item of items) {
     if (playerActors.every(character => getItemSharesLeftForActor(target, item, character, {
       shareData,

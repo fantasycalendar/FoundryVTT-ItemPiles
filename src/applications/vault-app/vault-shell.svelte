@@ -349,10 +349,10 @@
 				<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
 
 					<CurrencyList {currencies}
-												options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true, reverse: true }}
+												options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
 												style="align-items: center;">
 						{#if gridData.canEditCurrencies}
-							<a style="order: -1; display:flex; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
+							<a style="order: 100; display:flex; flex: 0; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
 								<i class="fas fa-cog"></i>
 							</a>
 						{/if}

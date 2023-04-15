@@ -12,9 +12,22 @@
 
 
   .item-piles-currency-list {
+    display: flex;
     flex: 1;
-    justify-content: flex-start;
+    justify-content: flex-end;
     padding-right: 1rem;
+    align-self: center;
+    align-content: flex-end;
+  }
+
+}
+
+.item-pile-vault {
+
+  .item-piles-currency-list {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
     align-self: center;
     align-content: flex-end;
   }

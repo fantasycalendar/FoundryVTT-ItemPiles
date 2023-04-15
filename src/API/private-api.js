@@ -157,7 +157,7 @@ export default class PrivateAPI {
   }
 
   static async _addItems(targetUuid, items, userId, {
-    removeExistingActorItems = false, interactionId = false
+    removeExistingActorItems = false, skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
@@ -184,8 +184,8 @@ export default class PrivateAPI {
       action: "addItems", target: targetUuid, items: itemDeltas, userId: userId, interactionId: interactionId
     });
 
-    if (PileUtilities.isItemPileVault(targetActor)) {
-      await PileUtilities.updateVaultJournalLog(targetActor, {
+    if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultLog(targetActor, {
         userId,
         items: itemDeltas,
         withdrawal: false
@@ -196,7 +196,7 @@ export default class PrivateAPI {
 
   }
 
-  static async _removeItems(targetUuid, items, userId, { interactionId = false } = {}) {
+  static async _removeItems(targetUuid, items, userId, { skipVaultLogging = false, interactionId = false } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
 
@@ -222,8 +222,8 @@ export default class PrivateAPI {
       await this._deleteItemPile(targetUuid);
     }
 
-    if (PileUtilities.isItemPileVault(targetActor)) {
-      await PileUtilities.updateVaultJournalLog(targetActor, {
+    if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultLog(targetActor, {
         userId,
         items: itemDeltas,
         withdrawal: true
@@ -235,7 +235,7 @@ export default class PrivateAPI {
   }
 
   static async _transferItems(sourceUuid, targetUuid, items, userId, {
-    vaultLogData = false,
+    skipVaultLogging = false,
     interactionId = false
   } = {}) {
 
@@ -286,15 +286,14 @@ export default class PrivateAPI {
           items: itemDeltas
         });
       }
-    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+    } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
-      await PileUtilities.updateVaultJournalLog(pileActor, {
+      await PileUtilities.updateVaultLog(pileActor, {
         userId,
         actor: actorToLog,
         items: itemDeltas,
-        withdrawal: sourceIsItemPile,
-        vaultLogData
+        withdrawal: sourceIsItemPile
       });
     }
 
@@ -303,7 +302,7 @@ export default class PrivateAPI {
   }
 
   static async _transferAllItems(sourceUuid, targetUuid, userId, {
-    itemFilters = false, interactionId = false
+    itemFilters = false, skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
@@ -341,11 +340,11 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
-    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+    } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
       const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
-      await PileUtilities.updateVaultJournalLog(pileActor, {
+      await PileUtilities.updateVaultLog(pileActor, {
         userId,
         actor: actorToLog,
         items: itemDeltas,
@@ -356,7 +355,10 @@ export default class PrivateAPI {
     return itemDeltas;
   }
 
-  static async _addCurrencies(targetUuid, currencies, userId, { interactionId = false } = {}) {
+  static async _addCurrencies(targetUuid, currencies, userId, {
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
 
@@ -392,8 +394,8 @@ export default class PrivateAPI {
       interactionId: interactionId
     });
 
-    if (PileUtilities.isItemPileVault(targetActor)) {
-      await PileUtilities.updateVaultJournalLog(targetActor, {
+    if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultLog(targetActor, {
         userId,
         items: itemDeltas,
         attributes: attributeDeltas,
@@ -405,7 +407,10 @@ export default class PrivateAPI {
 
   }
 
-  static async _removeCurrencies(targetUuid, currencies, userId, { interactionId = false } = {}) {
+  static async _removeCurrencies(targetUuid, currencies, userId, {
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
 
@@ -459,8 +464,8 @@ export default class PrivateAPI {
       await this._deleteItemPile(targetUuid);
     }
 
-    if (PileUtilities.isItemPileVault(targetActor)) {
-      await PileUtilities.updateVaultJournalLog(targetActor, {
+    if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultLog(targetActor, {
         userId,
         items: itemDeltas,
         attributes: attributeDeltas,
@@ -472,7 +477,10 @@ export default class PrivateAPI {
 
   }
 
-  static async _transferCurrencies(sourceUuid, targetUuid, currencies, userId, { interactionId = false } = {}) {
+  static async _transferCurrencies(sourceUuid, targetUuid, currencies, userId, {
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
@@ -553,11 +561,11 @@ export default class PrivateAPI {
           attributes: attributeDeltas
         });
       }
-    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+    } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
       const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
-      await PileUtilities.updateVaultJournalLog(pileActor, {
+      await PileUtilities.updateVaultLog(pileActor, {
         userId,
         actor: actorToLog,
         items: itemDeltas,
@@ -570,7 +578,10 @@ export default class PrivateAPI {
 
   }
 
-  static async _transferAllCurrencies(sourceUuid, targetUuid, userId, { interactionId = false } = {}) {
+  static async _transferAllCurrencies(sourceUuid, targetUuid, userId, {
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
@@ -617,11 +628,11 @@ export default class PrivateAPI {
     const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(sourceUuid);
-    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+    } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
       const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
-      await PileUtilities.updateVaultJournalLog(pileActor, {
+      await PileUtilities.updateVaultLog(pileActor, {
         userId,
         actor: actorToLog,
         items: itemDeltas,
@@ -661,7 +672,10 @@ export default class PrivateAPI {
 
   }
 
-  static async _addAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {
+  static async _addAttributes(targetUuid, attributes, userId, {
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
 
@@ -684,11 +698,22 @@ export default class PrivateAPI {
       interactionId: interactionId
     });
 
+    if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultLog(targetActor, {
+        userId,
+        attributes: attributeDeltas,
+        withdrawal: false
+      });
+    }
+
     return attributeDeltas;
 
   }
 
-  static async _removeAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {
+  static async _removeAttributes(targetUuid, attributes, userId, {
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
 
@@ -716,11 +741,22 @@ export default class PrivateAPI {
       await this._deleteItemPile(targetUuid);
     }
 
+    if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
+      await PileUtilities.updateVaultLog(targetActor, {
+        userId,
+        attributes: attributeDeltas,
+        withdrawal: true
+      });
+    }
+
     return attributeDeltas;
 
   }
 
-  static async _transferAttributes(sourceUuid, targetUuid, attributes, userId, { interactionId = false } = {}) {
+  static async _transferAttributes(sourceUuid, targetUuid, attributes, userId, {
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
@@ -768,10 +804,10 @@ export default class PrivateAPI {
           attributes: attributeDeltas
         });
       }
-    } else if (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor)) {
+    } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
-      await PileUtilities.updateVaultJournalLog(pileActor, {
+      await PileUtilities.updateVaultLog(pileActor, {
         userId,
         actor: actorToLog,
         attributes: attributeDeltas,
@@ -783,7 +819,10 @@ export default class PrivateAPI {
 
   }
 
-  static async _transferAllAttributes(sourceUuid, targetUuid, userId, { interactionId = false } = {}) {
+  static async _transferAllAttributes(sourceUuid, targetUuid, userId, {
+    skipVaultLogging = false,
+    interactionId = false
+  } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
@@ -1117,7 +1156,7 @@ export default class PrivateAPI {
         if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
           itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
         }
-        items[i] = await Item.implementation.create(itemData, { temporary: true });
+        items[i] = itemData;
       }
     } else {
       items = []
@@ -1143,7 +1182,11 @@ export default class PrivateAPI {
 
         overrideData['actorData'] = actorOverrides;
 
-        const data = { data: pileData, items: items };
+        const data = { data: pileData, items: [...items] };
+
+        for (let index = 0; index < data.items.length; index++) {
+          data.items[index] = await Item.implementation.create(data.items[index], { temporary: true });
+        }
 
         const overrideImage = getProperty(overrideData, "texture.src") ?? getProperty(overrideData, "img");
         const overrideScale = getProperty(overrideData, "texture.scaleX")
@@ -1543,11 +1586,6 @@ export default class PrivateAPI {
    */
   static async _dropData(canvas, data) {
 
-    const canGiveItems = Helpers.getSetting(SETTINGS.ENABLE_GIVING_ITEMS);
-    const canDropItems = Helpers.getSetting(SETTINGS.ENABLE_DROPPING_ITEMS);
-
-    if (!canDropItems && !canGiveItems) return;
-
     if (data.type !== "Item") return;
 
     let item = await Item.implementation.fromDropData(data);
@@ -1612,14 +1650,17 @@ export default class PrivateAPI {
     const targetIsVault = PileUtilities.isItemPileVault(dropData.target);
     const targetIsItemPile = PileUtilities.isValidItemPile(droppableItemPiles[0]);
 
+    const canGiveItems = Helpers.getSetting(SETTINGS.ENABLE_GIVING_ITEMS);
+    const canDropItems = Helpers.getSetting(SETTINGS.ENABLE_DROPPING_ITEMS);
+
     const givingItem = canGiveItems && dropData.target && !targetIsItemPile;
     const droppingItem = canDropItems && (dropData.target || dropData.position);
 
     if ((sourceIsVault || targetIsVault) && dropData.target) {
       return this._depositWithdrawItem(dropData, sourceIsVault, targetIsVault);
-    } else if (givingItem) {
+    } else if (givingItem && canGiveItems) {
       return this._giveItem(dropData);
-    } else if (droppingItem) {
+    } else if (droppingItem && canDropItems) {
       return this._dropItem(dropData);
     }
 
@@ -2095,9 +2136,7 @@ export default class PrivateAPI {
 
   }
 
-  static async _tradeItems(sellerUuid, buyerUuid, items, userId, {
-    interactionId = false
-  } = {}) {
+  static async _tradeItems(sellerUuid, buyerUuid, items, userId, { interactionId = false } = {}) {
 
     const sellingActor = Utilities.getActor(sellerUuid);
     const buyingActor = Utilities.getActor(buyerUuid);

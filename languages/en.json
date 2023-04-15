@@ -162,7 +162,10 @@
       "TooltipConfigureTable": "Configure Table",
       "TooltipRollTable": "Roll Table",
       "ToolTipRemoveAllRolledItems": "Remove All Rolled Items",
-      "ShoppingAs": "Shopping as {actorName}"
+      "ShoppingAs": "Shopping as {actorName}",
+      "TableAddAllItems": "Add all items:",
+      "TableTimesToRoll": "Times to roll on table:",
+      "TableCustomCategory": "Add items to custom category:"
     },
     "Vault": {
       "VaultTab": "Vault",
