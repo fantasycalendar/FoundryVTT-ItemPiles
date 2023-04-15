@@ -804,7 +804,7 @@
         "Value": "Valeur"
       },
       "EditCurrencies": {
-        "Content": "En tant que MJ, vous pouvez mettre à jour les monnaies sur cette pile d'objets :",
+        "Content": "En tant que MJ, vous pouvez mettre à jour les devises de cette pile d'objets :",
         "Submit": "Soumettre",
         "Title": "Modifier les monnaies"
       },
@@ -837,7 +837,7 @@
         "Public": "Public - tout le monde peut voir les messages",
         "Off": "Off - désactiver les messages",
         "SelfGM": "Privé - seuls les MJs et les utilisateurs peuvent voir les messages",
-        "Title": "Envoyer vers le tchat",
+        "Title": "Envoyer dans la conversation",
         "Hint": "Chaque fois qu'un joueur ramasse des objets d'une pile d'objets, il envoie un message indiquant ce qui a été ramassé.",
         "Blind": "Aveugle - seuls les MJs peuvent voir les messages"
       },
@@ -869,8 +869,8 @@
         "Title": "Activer le dépôt d'objets"
       },
       "EnableGivingItems": {
-        "Hint": "Cette option permet aux utilisateurs de déposer des objets sur d'autres token pour les leur donner. Si cette fonction est désactivée, les utilisateurs ne peuvent pas donner d'objets à d'autres utilisateurs.",
-        "Title": "Permettre le don d'objets"
+        "Hint": "Cette option permet aux utilisateurs de déposer des objets sur d'autres jetons pour les leur donner. Si cette fonction est désactivée, les utilisateurs ne peuvent pas donner d'objets à d'autres utilisateurs.",
+        "Title": "Activer le don d'objets"
       },
       "InspectItemsTrade": {
         "Hint": "L'activation de cette option permet aux utilisateurs de cliquer sur les objets qui sont échangés et d'ouvrir la fiche de l'objet pour les prévisualiser.",
@@ -963,6 +963,13 @@
       "QuantityForPrice": {
         "Hint": "Ici, vous pouvez configurer le chemin d'attribut pour la quantité d'articles que vous obtenez pour le prix. Par exemple, dans le système PF2e, il y a une propriété \"par\" sur les objets, qui détermine la quantité d'articles que vous obtenez pour le prix de l'article, qui est stockée dans l'attribut \"item.system.price.per\" de l'objet, donc vous mettriez \"system.price.per\" dans ce paramètre.",
         "Title": "Quantité d'objet pour l'attribut de prix"
+      },
+      "HideTokenBorder": {
+        "Title": "Cacher les bordures de jetons des piles d'objets",
+        "HidePlayers": "Caché aux joueurs",
+        "Show": "Afficher les bordures (comportement de base)",
+        "Hint": "Cette option permet de contrôler si la bordure du jeton est cachée lorsque l'on survole les jetons de la pile d'objets. La sélection du jeton affiche toujours la bordure.",
+        "HideEveryone": "Caché de tous"
       }
     },
     "Warnings": {

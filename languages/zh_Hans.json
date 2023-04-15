@@ -356,7 +356,9 @@
     },
     "Types": {
       "pile": "物品堆",
-      "container": "容器"
+      "container": "容器",
+      "merchant": "商人",
+      "vault": "数据库"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile 更新成功。",
