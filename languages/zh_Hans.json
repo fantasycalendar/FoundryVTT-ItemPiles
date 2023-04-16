@@ -365,7 +365,10 @@
       "UpdateMerchantSuccess": "商人更新成功。",
       "ItemTransferred": "已将{source_actor_name}的{item_name}给予{target_actor_name}。",
       "GiveItemAccepted": "{user_name} 接受了您的物品报价。",
-      "ShownToPlayers": "展示{actor_name}给玩家"
+      "ShownToPlayers": "展示{actor_name}给玩家",
+      "SystemSupportFound": "已找到系统支持！将默认系统设置应用到Item Piles...",
+      "ItemAdded": "已将{item_name}添加给{target_actor_name}。",
+      "CreatedJournal": "已创建道具堆金库记录日志。"
     },
     "Errors": {
       "DisallowedItemDrop": "你无法丢下\"{type}\" 类物品",
@@ -374,12 +377,16 @@
       "NoSourceDrop": "只有GM能往物品栏中拖放物品.",
       "PileTooFar": "你距离该物品堆太远，因此无法与其交互.",
       "PileLocked": "这个容器被锁上了，你无法打开它，所以也无法放入物品。",
-      "DropNoToken": "你在这个场景中没有指示物，因此你无法扔下任何东西。"
+      "DropNoToken": "你在这个场景中没有指示物，因此你无法扔下任何东西。",
+      "NoTokenFound": "无法找到代表你的指示物或角色。"
     },
     "Warnings": {
       "GiveItemNoGM": "没有 GM 主动接收您给予的此物品。",
       "GiveItemDeclined": "{user_name}拒绝了您的物品报价。",
-      "NoPlayersActive": "没有可以进行该行为的活跃玩家"
+      "NoPlayersActive": "没有可以进行该行为的活跃玩家",
+      "NoGMsConnected": "警告 - 无GM在线 -使用道具堆的大部分特性需要GM在线。",
+      "NoGMsConnectedAction": "警告 - 由于无GM在线，无法执行“{action}”。",
+      "VaultFull": "金库已满！"
     },
     "Dialogs": {
       "TypeWarning": {
