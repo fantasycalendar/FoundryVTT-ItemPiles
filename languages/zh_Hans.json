@@ -74,7 +74,8 @@
       "Disconnected": "其中一个用户断开了连接，因此交易取消了.",
       "UserCharacterWarning": "你选择了角色 \"{actor_name}\" 作为你的交易角色，但他是 \"{player_name}\"的指定角色.<br><br>你确定吗？",
       "UserActiveCharacterWarning": "你选择了角色 \"{actor_name}\" 作为你的交易角色，但他是\"{player_name}\"正在<strong>使用</strong>的角色, 你确定吗?",
-      "ActorOwnerWarning": "你不拥有这个角色，因此你不能使用他交易."
+      "ActorOwnerWarning": "你不拥有这个角色，因此你不能使用他交易.",
+      "SameActor": "两个用户不能选择同一个角色 - 你不能与同一个角色交易，快停手。"
     },
     "Merchant": {
       "Title": "商人：{actor_name}",
@@ -116,12 +117,19 @@
       "AddTable": "添加随机表",
       "RollAllTables": "投掷所有随机表",
       "TooltipRollTable": "投掷随机表",
-      "ToolTipRemoveAllRolledItems": "移除已骰出的物品"
+      "ToolTipRemoveAllRolledItems": "移除已骰出的物品",
+      "TableAddAllItems": "添加所有道具：",
+      "TableTimesToRoll": "在随机表中掷骰的次数：",
+      "TableCustomCategory": "将道具添加到自定义类别：",
+      "Service": "服务",
+      "ShoppingAs": "作为{actorName}购物"
     },
     "Applications": {
       "DropCurrencies": {
         "Title": "放入货币",
-        "NoCurrency": "{actor_name}没有有效货币……"
+        "NoCurrency": "{actor_name}没有有效货币……",
+        "Content": "你可以将以下货币添加到此道具堆：",
+        "Submit": "添加"
       },
       "Settings": {
         "MoreToCome": "并提供更多配置选项……",
@@ -131,7 +139,8 @@
         "Module": "模组设置",
         "System": "系统专门设置",
         "Donate": "如果喜欢该模组，您的捐款将会帮助它继续下去！",
-        "Submit": "提交设定"
+        "Submit": "提交设定",
+        "Styles": "风格设置"
       },
       "ItemPileConfig": {
         "Main": {
@@ -173,10 +182,21 @@
         }
       },
       "DropItem": {
-        "Title": "抛下物品"
+        "Title": "抛下物品",
+        "ContentInfiniteQuantity": "你要添加的数量？",
+        "Submit": "添加到道具堆",
+        "SubmitNoTarget": "创建新道具堆",
+        "Header": "你正在添加：{item_name}",
+        "Content": "你正在将此道具添加到道具堆\"{target_name}\"。",
+        "ContentMultipleQuantity": "你拥有{quantity}个该道具，你想添加多少？"
       },
       "GiveItem": {
-        "Title": "给予物品"
+        "Title": "给予物品",
+        "Header": "正在给出：{item_name}",
+        "Content": "确定将此道具交给\"{target_name}\"吗？",
+        "ContentMultipleQuantity": "你拥有{quantity}个该道具，你要给出多少？",
+        "ContentInfiniteQuantity": "你要交给\"{target_name}\"的数量？",
+        "Submit": "给出"
       },
       "TradeMerchantItem": {
         "Title": "交易物品：{item_name}",
@@ -189,7 +209,9 @@
         "Change": "更改",
         "YouCantAfford": "你无法支付这个价格",
         "TheyCantAfford": "他们无法支付这个价格",
-        "MaxQuantity": "最大{quantity}"
+        "MaxQuantity": "最大{quantity}",
+        "YouLackQuantity": "你没有足够道具可供出售，当前数量{quantity}，需求{requiredQuantity}",
+        "TheyLackQuantity": "他们没有足够道具可供出售，当前数量{quantity}，需求{requiredQuantity}"
       },
       "CurrenciesEditor": {
         "Title": "Item Piles 货币编辑器",
@@ -200,7 +222,9 @@
         "Exchange": "兑换比例",
         "Data": "数据",
         "Icon": "图标",
-        "AddNew": "添加新货币"
+        "AddNew": "添加新货币",
+        "ExplanationSmallItems": "在其他系统中，货币也许是角色拥有的道具 - 你可以拖拽道具到此表格，将其添加为货币。",
+        "ExplanationSmallAttributes": "在D&D5e中，角色货币路径为\"actor.system.currency.gp\"，所以你可以用名称“金币”和\"system.currency.gp\"路径来添加自己的货币。单击上方的加号增加1单位货币。"
       },
       "ItemEditor": {
         "Title": "Item Piles 物品编辑器：{item_name}",
@@ -235,7 +259,27 @@
         "AddPurchaseOption": "添加购买选项",
         "DropMeClickMe": "通过点击或者拖放物品来添加属性",
         "PricePreset": "或者选择已有的预设价格：",
-        "SelectPreset": "选择预设价格"
+        "SelectPreset": "选择预设价格",
+        "CanStackYes": "是，总是堆叠",
+        "InfiniteQuantityDefault": "商人默认设置",
+        "KeepZeroExplanation": "道具卖光时，商人不移除道具，而是将其标记为“售罄”。",
+        "QuantityForPrice": "标价对应数量",
+        "QuantityForPriceExplanation": "设置用标价购买道具时可获得的数量。",
+        "CanStack": "可堆叠",
+        "CanStackExplanation": "将道具添加到金库时，是否与同类道具堆叠。",
+        "CanStackDefault": "金库默认设置",
+        "CanStackNo": "否，不堆叠",
+        "VaultExpander": "金库扩展器",
+        "ExpandColumnsRows": "道具列/行扩展",
+        "CustomCategory": "自定义道具类别",
+        "CustomCategoryExplanation": "不为空时，道具将被添加到自定义类别，取代其原本归类。",
+        "VaultExpanderExplanation": "启用时，该道具不再是金库中的普通道具，而是按以下设置增加金库的可用槽位。",
+        "Vault": "金库设置",
+        "PurchaseOptionsExplanation": "你可以在这里设置购买道具的其他方式。每一组代表角色可用于购买此道具的另一种方式",
+        "InfiniteQuantityYes": "是，无限数量",
+        "InfiniteQuantityNo": "否，标准数量",
+        "KeepZero": "保持数量为零",
+        "ExpandColumnsRowsExplanation": "以上设置启用时，此处配置金库中可用的列数与行数。此设置最大为金库容量。"
       },
       "FilterEditor": {
         "Title": "Item Piles 过滤编辑器",
@@ -258,6 +302,45 @@
         "TitleActor": "Item Piles 价格调整值编辑器：{actor_name}",
         "DragDrop": "向列表内拖放角色来进行添加",
         "Actor": "角色"
+      },
+      "SplitItem": {
+        "Title": "分割道具",
+        "Submit": "分割道具",
+        "Header": "正在分割{item_name}",
+        "Content": "你要分割该道具吗？",
+        "ContentMultipleQuantity": "道具共有{quantity}个，分出多少？"
+      },
+      "DepositItem": {
+        "Title": "存入道具",
+        "ContentMultipleQuantity": "你拥有{quantity}个该道具，存入的数量？",
+        "ContentInfiniteQuantity": "你想存入的数量是？",
+        "Header": "正在存入：{item_name}",
+        "Content": "确定将此道具存入\"{target_name}\"吗？",
+        "Submit": "存入"
+      },
+      "DepositCurrencies": {
+        "Title": "存入货币",
+        "Content": "你可以将以下货币存入此金库：",
+        "NoCurrency": "{actor_name}没有可存入的货币。",
+        "Submit": "存入"
+      },
+      "WithdrawCurrencies": {
+        "Title": "取出道具",
+        "Content": "你可以从此金库取出以下货币：",
+        "Submit": "取出",
+        "NoCurrency": "没有可供取出的货币。"
+      },
+      "WithdrawItem": {
+        "Title": "取出道具",
+        "Header": "正在取出：{item_name}",
+        "Content": "确定要从\"{target_name}\"取出该道具？",
+        "ContentMultipleQuantity": "里面有{quantity}个该道具，你要取出多少？",
+        "Submit": "取出"
+      },
+      "EditCurrencies": {
+        "Title": "正在编辑货币",
+        "Content": "作为GM，你可以更新道具堆的货币：",
+        "Submit": "提交"
       }
     },
     "Chat": {
@@ -270,7 +353,8 @@
       "TradeSpectate": "观看交易",
       "SpectateDisabled": "交易完成",
       "ExpandTrade": "查看完整交易详情",
-      "MerchantTraded": "{name}从{merchant}处购买了以下物品："
+      "MerchantTraded": "{name}从{merchant}处购买了以下物品：",
+      "GaveItems": "{source}交易给{target}了一些道具："
     },
     "Settings": {
       "ItemSimilarities": {
@@ -345,6 +429,15 @@
       "DebugHooks": {
         "Title": "启用钩子调试",
         "Hint": "在控制台输出 item pile 钩子及其具体内容"
+      },
+      "Currencies": {
+        "Label": "货币配置",
+        "Hint": "本设置定义了适用于存取的货币类型，它可以是一串录入角色卡的数字，而非实际存在的道具。",
+        "Title": "货币"
+      },
+      "ActorClass": {
+        "Hint": "本设置定义了初次加入道具时默认为道具堆的角色类型。例如D&D5e系统中为“角色”，因该系统没有默认战利品角色类型。",
+        "Title": "角色类型"
       }
     },
     "ContextMenu": {
@@ -358,7 +451,7 @@
       "pile": "物品堆",
       "container": "容器",
       "merchant": "商人",
-      "vault": "数据库"
+      "vault": "金库"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile 更新成功。",
@@ -386,7 +479,8 @@
       "NoPlayersActive": "没有可以进行该行为的活跃玩家",
       "NoGMsConnected": "警告 - 无GM在线 -使用道具堆的大部分特性需要GM在线。",
       "NoGMsConnectedAction": "警告 - 由于无GM在线，无法执行“{action}”。",
-      "VaultFull": "金库已满！"
+      "VaultFull": "金库已满！",
+      "VaultItemNotExpander": "此道具不是金库扩展器"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -444,12 +538,42 @@
       "UserSelect": {
         "Title": "选择用户",
         "Content": "向哪些用户显示？"
+      },
+      "CantRemoveVaultExpander": {
+        "Title": "无法移除扩展器",
+        "Content": "你无法移除此金库扩展器，没有扩展器，金库中将无法装入道具。移除此扩展器前请先移除{num_items}道具！"
+      },
+      "ClearVaultLog": {
+        "Title": "清空金库记录？",
+        "Content": "确定要清空金库\"{actor_name}\"的记录吗？"
       }
     },
     "HUD": {
       "ToggleLocked": "切换锁定",
       "ToggleClosed": "切换开关",
       "Configure": "设置物品堆"
+    },
+    "Vault": {
+      "ViewingAs": "作为{actor_name}浏览",
+      "NeedsCapacity": "金库的容量上限为{total_capacity}，但直到添加金库扩展器前不会生效",
+      "LogUserActor": "{actor_name} （{user_name}）",
+      "Deposit": "存入",
+      "Deposited": "已存入",
+      "Withdrew": "已取出",
+      "Withdraw": "取出",
+      "ExpandsCols": "{cols}列",
+      "ExpandsRows": "{rows}行",
+      "CapacityFull": "金库容量已达到上限{total_capacity}",
+      "CapacityLeft": "此金库当前容量为{capacity}，容量上限为{total_capacity}，拖入金库扩展器以增加容量",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "LogQuantity": "{quantity} x ",
+      "VaultTab": "金库",
+      "ExpandersTab": "扩展器",
+      "LogTab": "记录"
+    },
+    "VaultLog": {
+      "Deposit": "{actor_name} ({user_name}) *存入了* {item_name} x {quantity} ({date})",
+      "Withdraw": "{actor_name} ({user_name}) **取出了** {item_name} x {quantity} ({date})"
     }
   }
 }
