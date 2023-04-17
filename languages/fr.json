@@ -428,7 +428,10 @@
       "TooltipConfigureTable": "Configurer une table",
       "TooltipRollTable": "Lancer une table",
       "ToolTipRemoveAllRolledItems": "Retirer tous les objets tirés",
-      "ShoppingAs": "Shopping en tant que {nom de l'acteur}"
+      "ShoppingAs": "Shopping en tant que {nom de l'acteur}",
+      "TableCustomCategory": "Ajouter des articles à une catégorie personnalisée :",
+      "TableAddAllItems": "Ajouter tous les articles:",
+      "TableTimesToRoll": "Temps de roulement sur la table :"
     },
     "Applications": {
       "DropItem": {
