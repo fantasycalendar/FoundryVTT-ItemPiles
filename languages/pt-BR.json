@@ -246,7 +246,10 @@
       "RollableTables": "Tabelas roláveis",
       "AddTable": "Adicionar tabela",
       "RollAllTables": "Role Todas as Tabelas",
-      "TooltipConfigureTable": "Configurar tabela"
+      "TooltipConfigureTable": "Configurar tabela",
+      "TableAddAllItems": "Adicionar todos os itens:",
+      "TableTimesToRoll": "Vezes para rolar na tabela:",
+      "TableCustomCategory": "Adicionar itens à categoria personalizada:"
     },
     "Applications": {
       "DropItem": {
