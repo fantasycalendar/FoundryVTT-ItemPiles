@@ -122,7 +122,8 @@
       "TableTimesToRoll": "在随机表中掷骰的次数：",
       "TableCustomCategory": "将道具添加到自定义类别：",
       "Service": "服务",
-      "ShoppingAs": "作为{actorName}购物"
+      "ShoppingAs": "作为{actorName}购物",
+      "PopulateItems": "填充物品"
     },
     "Applications": {
       "DropCurrencies": {
@@ -286,11 +287,13 @@
         "TitleActor": "Item Piles 过滤编辑器：{actor_name}",
         "Filters": "过滤器",
         "Path": "属性路径",
-        "AddNew": "添加新过滤器"
+        "AddNew": "添加新过滤器",
+        "Explanation": "在这里，您可以使用义多种类型的过滤器以筛选你所需的项目。根据给定的属性路径，物品堆可以找到物品的“类型”，并根据过滤器将这些物品隐藏在物品堆库存的UI中。"
       },
       "SimilaritiesEditor": {
         "Title": "Item Piles 相似物品编辑器",
-        "Path": "属性路径"
+        "Path": "属性路径",
+        "Explanation": "在这里，您可以定义多种类型的标识符，以帮助物品堆区分相似的项。在几乎所有系统中，物品都可以通过“名称”和“类型”进行区分，但是在某些情况下，例如在PF2系统中，临时物品可能会与永久物品共享。所以通过添加\"system.temporary.value\"，该物品会视为临时的“独特”物品，与其他永久物区分开。"
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "物品类型价格调整值编辑器",
@@ -341,6 +344,19 @@
         "Title": "正在编辑货币",
         "Content": "作为GM，你可以更新道具堆的货币：",
         "Submit": "提交"
+      },
+      "UnstackableItemTypesEditor": {
+        "Title": "不可堆叠物品编辑器",
+        "Explanation": "在这里，你可以定义哪些类别的物品不可堆叠。",
+        "Type": "物品类型"
+      },
+      "VaultStylesEditor": {
+        "Title": "物品堆储存物风格编辑器"
+      },
+      "CustomItemCategoriesEditor": {
+        "Title": "自定义物品类别编辑器",
+        "Explanation": "在这里，您可以配置在您的世界中可用的自定义物品类别。当您为数据库添加一个新的项目时，它会动态地加入到这些数据库中。",
+        "Category": "类别"
       }
     },
     "Chat": {
