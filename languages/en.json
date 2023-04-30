@@ -577,7 +577,7 @@
           "ClosedHolidaysExplanation": "On days where there are notes with the given note category, the merchant will be closed (if the merchant open status is set to automatic).",
           "RefreshItemsHolidays": "Refresh Items Holidays (Simple Calendar)",
           "RefreshItemsHolidaysExplanation": "When the calendar passes notes with the given note category, the merchant's inventory will be refreshed. This happens on the note's time, or at midnight if it is a note that is set to all day.",
-          "RefreshItemsHolidaysWarning": "Existing items will be DELETED, and individual items can be configured to be kept in their configuration.",
+          "RefreshItemsHolidaysWarning": "Existing items will be DELETED, and individual items can be configured to be kept in their configuration. Items set to services, keep zero quantity, and keep on merchant will stay.",
           "PriceModifierTitle": "Buy and Sell Price Modifiers",
           "PriceModifierExplanation": "This configures the modifiers for the cost of every item in the shop. You can also configure modifiers per item type, and even for specific characters (such as silver-tongued bards). You are not limited to 200%, type into the field to go even higher.",
           "BuyPriceModifier": "Buy Price Modifier (%)",
