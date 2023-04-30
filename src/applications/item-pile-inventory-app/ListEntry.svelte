@@ -6,6 +6,7 @@
 
   export let store;
   export let entry;
+  export let currency = false;
 
   const name = entry.name;
   const img = entry.img;
@@ -32,7 +33,7 @@
      transition:fade={{duration: 250}}
      draggable={!!entry.id}
      on:dragstart={(event) => { dragStart(event) }}
-     class:item-piles-disabled={!$editQuantities && !$quantityLeft}>
+     class:item-piles-disabled={!$editQuantities && (!$quantityLeft || !$quantity)}>
 
   <div class="item-piles-img-container">
     <img class="item-piles-img" src="{$img}"/>
@@ -46,7 +47,7 @@
 			>
 				{$name}
 			</p>
-      {#if !$editQuantities && entry.canStack}
+      {#if !$editQuantities && entry.canStack && !currency}
         <span class="item-piles-small-text">(x{$quantity})</span>
       {/if}
     </div>
@@ -65,7 +66,7 @@
 
       {:else}
 
-        {#if $quantityLeft}
+        {#if $quantityLeft && $quantity}
           <div class="item-piles-quantity-input-container">
             <input class="item-piles-quantity" type="number" min="1" bind:value="{$currentQuantity}"
                    max="{$quantity}" disabled="{!$quantity}"/>
@@ -76,7 +77,7 @@
           </div>
         {:else}
           <span>
-            {localize(`ITEM-PILES.Inspect.${entry.toShare ? "NoShareLeft" : "NoneLeft"}`)}
+            {localize(`ITEM-PILES.Inspect.${entry.toShare && $quantity ? "NoShareLeft" : "NoneLeft"}`)}
           </span>
         {/if}
       {/if}
@@ -91,7 +92,7 @@
       on:click={() => { entry.take() }}
       class="item-piles-item-take-button"
       type="button"
-      disabled={!$quantityLeft}>
+      disabled={!$quantityLeft || !$quantity}>
       {localize("ITEM-PILES.Inspect.Take")}
     </button>
 

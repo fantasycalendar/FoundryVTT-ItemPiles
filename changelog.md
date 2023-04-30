@@ -8,6 +8,7 @@
 - Added support for secondary currencies - these cannot be exchanged for one another when buying or selling from merchants
 - Added price paid for items and services to the chat message when purchasing from merchants
 - Updated Portuguese (Brazilian), Chinese (Simplified), Polish, and French localization - thank you eunaumtenhoid, sakusenerio, psedonatural, and Lioheart on Weblate, couldn't do it without ya!
+- Fixed error when taking everything from an item pile
 
 ## Version 2.6.8
 

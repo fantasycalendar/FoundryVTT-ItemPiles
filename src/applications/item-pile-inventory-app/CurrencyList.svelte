@@ -10,6 +10,8 @@
   const numCurrencies = store.numCurrencies;
   const editQuantities = store.editQuantities;
 
+  $: console.log($currencies)
+
 </script>
 
 <div>
@@ -26,7 +28,7 @@
 	{#if $numCurrencies > 0}
 		<div>
 			{#each $currencies as currency, index (currency.identifier)}
-				<ListEntry {store} bind:entry={currency}/>
+				<ListEntry {store} bind:entry={currency} currency/>
 			{/each}
 		</div>
 	{/if}

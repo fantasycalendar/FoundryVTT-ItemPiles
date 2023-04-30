@@ -163,10 +163,8 @@
 						<hr>
 					{/if}
 
-					{#if $numCurrencies > 0}
-						<CurrencyList {store}/>
-					{/if}
-
+					<CurrencyList {store}/>
+					
 				</div>
 
 			{/if}
