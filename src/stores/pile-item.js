@@ -9,10 +9,11 @@ import { Plugins } from "../plugins/main.js";
 
 class PileBaseItem {
 
-  constructor(store, data, isCurrency = false) {
+  constructor(store, data, isCurrency = false, isSecondaryCurrency = false) {
     this.store = store;
     this.subscriptions = [];
     this.isCurrency = isCurrency;
+    this.isSecondaryCurrency = isSecondaryCurrency;
     this.setup(data);
   }
 
@@ -64,14 +65,19 @@ export class PileItem extends PileBaseItem {
     this.name = writable(this.item.name);
     this.img = writable(this.item.img);
     this.abbreviation = writable("");
-    this.identifier = this.id;
+    this.identifier = randomID();
     this.itemFlagData = writable(PileUtilities.getItemFlagData(this.item));
   }
 
   setupSubscriptions() {
     super.setupSubscriptions()
 
-    this.subscribeTo(this.store.pileData, this.setupProperties.bind(this));
+    this.subscribeTo(this.store.pileData, () => {
+      this.setupProperties();
+    });
+    this.subscribeTo(this.store.pileCurrencies, () => {
+      this.setupProperties();
+    });
 
     this.subscribeTo(this.store.shareData, () => {
       if (!this.toShare) {
@@ -110,15 +116,19 @@ export class PileItem extends PileBaseItem {
   }
 
   setupProperties() {
-    const actorIsMerchant = PileUtilities.isItemPileMerchant(this.store.actor, get(this.store.pileData));
-    const pileActor = actorIsMerchant ? this.store.actor : this.store.recipient;
-    const pileActorData = actorIsMerchant ? this.store.pileData : this.store.recipientPileData;
-    const pileCurrencies = get(this.store.pileCurrencies);
-    this.isCurrency = PileUtilities.isItemCurrency(this.item, { target: pileActor, actorCurrencies: pileCurrencies });
+    const actorIsItemPile = PileUtilities.isValidItemPile(this.store.actor, get(this.store.pileData));
+    const pileActor = actorIsItemPile ? this.store.actor : this.store.recipient;
+    const pileActorData = actorIsItemPile ? this.store.pileData : this.store.recipientPileData;
+    const pileCurrencies = actorIsItemPile ? get(this.store.pileCurrencies) : get(this.store.recipientCurrencies);
+    this.isCurrency = PileUtilities.isItemCurrency(this.item, {
+      target: pileActor,
+      actorCurrencies: pileCurrencies
+    });
     const currency = this.isCurrency ? PileUtilities.getItemCurrencyData(this.item, {
       target: pileActor,
       actorCurrencies: pileCurrencies
     }) : {};
+    this.isSecondaryCurrency = !!currency?.secondary;
     this.abbreviation.set(currency?.abbreviation ?? "");
     this.similarities = Utilities.setSimilarityProperties({}, this.item);
     this.toShare = this.isCurrency
@@ -211,7 +221,7 @@ export class PileAttribute extends PileBaseItem {
     this.name = writable(this.attribute.name);
     this.img = writable(this.attribute.img);
     this.abbreviation = writable(this.attribute.abbreviation);
-    this.identifier = this.attribute.path;
+    this.identifier = randomID()
     const startingQuantity = Number(getProperty(this.store.actor, this.path) ?? 0);
     this.presentFromTheStart.set(startingQuantity > 0);
     this.quantity.set(startingQuantity);

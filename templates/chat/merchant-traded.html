@@ -1,21 +1,23 @@
 <div class="item-piles-chat-card" data-actor-id="{{actor.id}}">
 
-  <div class="item-piles-chat-card-title">
-    <p>
-      <img src="{{merchant.img}}" data-tooltip="{{merchant.name}}" height="32"/>
-      <i class="fas fa-handshake"></i> <img src="{{actor.img}}" data-tooltip="{{actor.name}}" height="32"/>
-    </p>
-    <p>{{message}}</p>
-  </div>
+	<div class="item-piles-chat-card-title">
+		<p>
+			<img src="{{merchant.img}}" data-tooltip="{{merchant.name}}" height="32"/>
+			<i class="fas fa-handshake"></i> <img src="{{actor.img}}" data-tooltip="{{actor.name}}" height="32"/>
+		</p>
+		<p>{{message}}</p>
+	</div>
 
-  <ul>
-    {{#each items as |item id|}}
-    <li>
-      <img src="{{item.img}}" data-tooltip="{{item.name}}" height="16"/>
-      <label>{{item.name}}</label>
-      <small>{{item.quantity}}</small>
-    </li>
-    {{/each}}
-  </ul>
+	<ul>
+		{{#each priceInformation as |bought basePriceString|}}
+		{{#each bought.buyerReceive as |item id|}}
+		<li>
+			<img src="{{item.img}}" data-tooltip="{{item.name}}" height="16"/>
+			<label>{{item.name}} <small>(x{{item.quantity}})</small></label>
+			<label class="item-piles-chat-price">{{bought.basePriceString}}</label>
+		</li>
+		{{/each}}
+		{{/each}}
+	</ul>
 
 </div>

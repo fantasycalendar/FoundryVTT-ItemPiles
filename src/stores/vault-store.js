@@ -58,7 +58,6 @@ export class VaultStore extends ItemPileStore {
 
   setupSubscriptions() {
     super.setupSubscriptions();
-    this.refreshGrid();
     this.subscribeTo(this.pileData, () => {
       this.refreshGridDebounce();
       this.processLogEntries();
@@ -73,6 +72,7 @@ export class VaultStore extends ItemPileStore {
 
     this.subscribeTo(this.logSearch, this.filterLogEntries.bind(this));
 
+    this.refreshGrid();
     this.processLogEntries();
   }
 
@@ -221,16 +221,16 @@ export class VaultStore extends ItemPileStore {
   refreshItems() {
     super.refreshItems();
     const pileData = get(this.pileData);
-    this.validGridItems.set(get(this.allItems).filter(item => {
-      const itemFlagData = get(item.itemFlagData);
-      return (!pileData.vaultExpansion || !itemFlagData.vaultExpander) && !item.isCurrency;
+    this.validGridItems.set(get(this.allItems).filter(entry => {
+      const itemFlagData = get(entry.itemFlagData);
+      return (!pileData.vaultExpansion || !itemFlagData.vaultExpander) && !entry.isCurrency;
     }));
-    this.highlightedGridItems.set(get(this.items).filter(item => {
-      const itemFlagData = get(item.itemFlagData);
+    this.highlightedGridItems.set(get(this.items).filter(entry => {
+      const itemFlagData = get(entry.itemFlagData);
       return !pileData.vaultExpansion || !itemFlagData.vaultExpander;
     }).map(item => item.id));
-    this.vaultExpanderItems.set(get(this.allItems).filter(item => {
-      const itemFlagData = get(item.itemFlagData);
+    this.vaultExpanderItems.set(get(this.allItems).filter(entry => {
+      const itemFlagData = get(entry.itemFlagData);
       return !pileData.vaultExpansion || itemFlagData.vaultExpander;
     }));
     this.refreshGridDebounce();
@@ -322,7 +322,7 @@ export class VaultStore extends ItemPileStore {
       const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
       this.updateRecipient(newRecipient);
       this.refreshFreeSpaces();
-      if (!recipient) {
+      if (!this.recipient) {
         setTimeout(() => {
           const newHeight = this.mainContainer.getBoundingClientRect().height - oldHeight;
           application.position.stores.height.set(get(application.position.stores.height) + newHeight);
@@ -393,8 +393,8 @@ export class VaultStore extends ItemPileStore {
 
 export class VaultItem extends PileItem {
 
-  setupStores(item) {
-    super.setupStores(item);
+  setupStores(...args) {
+    super.setupStores(...args);
     this.transform = writable({
       x: 0, y: 0, w: 1, h: 1
     });

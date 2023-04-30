@@ -1,4 +1,170 @@
+:root {
+  --item-piles-inactive: rgba(31, 143, 255, 1);
+  --item-piles-minor-inactive: rgba(201, 200, 185, 1);
+  --item-piles-shadow-primary: rgba(255, 0, 0, 1);
+  --item-piles-even-color: rgba(240, 240, 223, 1);
+  --item-piles-odd-color: rgba(0, 0, 0, 0);
+  --item-piles-border-dark-primary: rgba(25, 24, 19, 1);
+  --item-piles-border-light-primary: rgba(181, 179, 164, 1);
+  --item-piles-text-light-highlight: rgba(240, 240, 224, 1);
+  --item-piles-text-important: rgba(255, 100, 0, 1);
+
+
+  --item-piles-app-background: rgb(220, 220, 207);
+  --item-piles-app-box-shadow: none;
+  --item-piles-app-color: #000;
+  --item-piles-app-border: none;
+  --item-piles-app-padding: 8px;
+  --item-piles-app-border-image: none;
+
+  --item-piles-app-header-flex: 0 0 30px;
+  --item-piles-app-header-background: rgb(24, 24, 24, 0.25);
+  --item-piles-app-header-color: var(--item-piles-text-light-highlight);
+  --item-piles-app-header-border: none;
+  --item-piles-app-header-padding: 0 8px;
+  --item-piles-app-header-border-image: none;
+  --item-piles-app-header-line-height: 30px;
+  --item-piles-app-header-border-bottom: 1px solid var(--item-piles-border-dark-primary);
+
+  --item-piles-app-header-title-border: none;
+  --item-piles-app-header-title-box-shadow: none;
+  --item-piles-app-header-title-font-size: 14px;
+  --item-piles-app-header-title-font-weight: 400;
+
+  --item-piles-app-header-button-color: var(--item-piles-border-light-primary);
+  --item-piles-app-header-close-button-color: rgb(255, 50, 0);
+  --item-piles-app-header-close-button-background: none;
+
+  --item-piles-input-text-color: #000;
+  --item-piles-input-background: rgba(0, 0, 0, 0.05);
+  --item-piles-input-border: 1px solid var(--color-border-light-tertiary);
+  --item-piles-input-border-radius: 3px;
+  --item-piles-input-padding: 0 3px;
+  --item-piles-input-text-overflow: ellipsis;
+  --item-piles-input-placeholder-color: #000;
+
+  --item-piles-button-border: 1px solid var(--item-piles-border-light-primary);
+  --item-piles-button-border-radius: 5px;
+  --item-piles-button-background-color: rgba(255, 255, 240, 0.8);
+  --item-piles-button-font-size: var(--font-size-14);
+  --item-piles-button-font-family: "Signika", sans-serif;
+
+  --item-piles-scrollbar-width: 6px;
+  --item-piles-scrollbar-height: 6px;
+
+  --item-piles-scrollbar-track-box-shadow: 0 0 1px #999 inset;
+  --item-piles-scrollbar-track-border-radius: 4px;
+
+  --item-piles-scrollbar-thumb-outline: none;
+  --item-piles-scrollbar-thumb-border-radius: 3px;
+  --item-piles-scrollbar-thumb-background: #782e22;
+  --item-piles-scrollbar-thumb-border: 1px solid var(--color-border-highlight);
+
+}
+
 /* ----------------------- Generic ----------------------- */
+
+/*.item-piles-app {
+
+  *:not(i) {
+    font-family: var(--item-piles-button-font-family);
+  }
+
+  .window-header {
+    flex: var(--item-piles-app-header-flex);
+    color: var(--item-piles-app-header-color);
+    background: var(--item-piles-app-header-background);
+    border: var(--item-piles-app-header-border);
+    padding: var(--item-piles-app-header-padding);
+    border-image: var(--item-piles-app-header-border-image);
+    line-height: var(--item-piles-app-header-line-height);
+    border-bottom: var(--item-piles-app-header-border-bottom);
+
+    .window-title {
+      border: var(--item-piles-app-header-title-border);
+      box-shadow: var(--item-piles-app-header-title-box-shadow);
+      font-size: var(--item-piles-app-header-title-font-size);
+      font-weight: var(--item-piles-app-header-title-font-weight);
+    }
+
+    .header-button {
+      color: var(--item-piles-app-header-button-color);
+
+      &.close {
+        background: var(--item-piles-app-header-close-button-background);
+      }
+    }
+  }
+
+  .window-content {
+    box-shadow: var(--item-piles-app-box-shadow);
+    background: var(--item-piles-app-background);
+    border: var(--item-piles-app-border);
+    border-image: var(--item-piles-app-border-image);
+    padding: var(--item-piles-app-padding);
+
+    * {
+      color: var(--item-piles-app-color);
+    }
+
+    input {
+      color: var(--item-piles-input-text-color);
+      background: var(--item-piles-input-background);
+      border: var(--item-piles-input-border);
+      border-radius: var(--item-piles-input-border-radius);
+      padding: var(--item-piles-input-padding);
+      text-overflow: var(--item-piles-input-text-overflow);
+
+      &::placeholder {
+        color: var(--item-piles-input-placeholder-color);
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: var(--item-piles-scrollbar-width);
+      height: var(--item-piles-scrollbar-height);
+    }
+
+    ::-webkit-scrollbar-track {
+      box-shadow: var(--item-piles-scrollbar-track-box-shadow);
+      border-radius: var(--item-piles-scrollbar-track-border-radius);
+      background: initial;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      outline: var(--item-piles-scrollbar-thumb-outline);
+      border-radius: var(--item-piles-scrollbar-thumb-border-radius);
+      background: var(--item-piles-scrollbar-thumb-background);
+      border: var(--item-piles-scrollbar-thumb-border);
+      border-image: none;
+      border-image-width: initial;
+      border-image-outset: initial;
+    }
+
+    ::-webkit-scrollbar-button:end:increment {
+      background: initial;
+      box-shadow: initial;
+      height: initial;
+      background-position-y: initial;
+    }
+
+    ::-webkit-scrollbar-button:start:decrement {
+      background: initial;
+      box-shadow: initial;
+      height: initial;
+      background-position-y: initial;
+    }
+  }
+
+  button {
+    width: 100%;
+    border: var(--item-piles-button-border);
+    border-radius: var(--item-piles-button-border-radius);
+    background: var(--item-piles-button-background-color);
+    font-size: var(--item-piles-button-font-size);
+  }
+
+}*/
 
 .merchant-left-pane .prosemirror {
   display: block;
@@ -39,10 +205,6 @@
 }
 
 .item-piles {
-
-  input {
-    color: var(--item-piles-input-text-color, #000);
-  }
 
   h3 {
     border: 0;
@@ -647,6 +809,12 @@
     label {
       flex: 1;
       flex-wrap: wrap;
+    }
+
+    .item-piles-chat-price {
+      flex: 0 1 auto;
+      text-align: right;
+      font-size: 0.7rem;
     }
 
     small {

@@ -5,6 +5,7 @@ import ItemPileSocket from "../socket.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
 import TradeAPI from "./trade-api.js";
+import * as Util from "util";
 
 export default class ChatAPI {
 
@@ -265,7 +266,7 @@ export default class ChatAPI {
 
     for (let [index, message] of messages.entries()) {
       const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
-      if (flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
+      if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
         return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
       }
     }
@@ -285,6 +286,7 @@ export default class ChatAPI {
       flavor: "Item Piles",
       speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
       [CONSTANTS.FLAGS.PILE]: {
+        version: Helpers.getModuleVersion(),
         source: sourceUuid,
         target: targetUuid,
         items: items,
@@ -437,9 +439,9 @@ export default class ChatAPI {
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
 
-    const newItems = priceInformation.buyerReceive;
-
     const now = (+new Date());
+
+    priceInformation.id = randomID();
 
     // Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
     const messages = Array.from(game.messages).filter(message => (now - message.timestamp) <= (10800000)).slice(-10);
@@ -447,8 +449,8 @@ export default class ChatAPI {
 
     for (let [index, message] of messages.entries()) {
       const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
-      if (flags && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
-        return this._updateExistingMerchantMessage(message, sourceActor, targetActor, newItems, interactionId)
+      if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
+        return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
       }
     }
 
@@ -464,7 +466,7 @@ export default class ChatAPI {
         img: pileData.merchantImage || sourceActor.img
       },
       actor: targetActor,
-      items: newItems
+      priceInformation: [priceInformation]
     });
 
     return this._createNewChatMessage(userId, {
@@ -474,9 +476,10 @@ export default class ChatAPI {
       flavor: "Item Piles",
       speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
       [CONSTANTS.FLAGS.PILE]: {
+        version: Helpers.getModuleVersion(),
         source: sourceUuid,
         target: targetUuid,
-        items: newItems,
+        priceInformation: [priceInformation],
         interactionId: interactionId
       }
     });
@@ -498,7 +501,7 @@ export default class ChatAPI {
 
     for (const message of messages) {
       const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
-      if (flags && flags.source === sourceActor.uuid && flags.target === targetActor.uuid && message.isAuthor) {
+      if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceActor.uuid && flags.target === targetActor.uuid && message.isAuthor) {
         return this._updateExistingGiveMessage(message, sourceActor, targetActor, items)
       }
     }
@@ -517,6 +520,7 @@ export default class ChatAPI {
       flavor: "Item Piles",
       speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
       [CONSTANTS.FLAGS.PILE]: {
+        version: Helpers.getModuleVersion(),
         source: sourceActor.uuid,
         target: targetActor.uuid,
         items: items
@@ -545,11 +549,42 @@ export default class ChatAPI {
 
   }
 
-  static async _updateExistingMerchantMessage(message, sourceActor, targetActor, newItems, interactionId) {
+  static async _updateExistingMerchantMessage(message, sourceActor, targetActor, incomingPriceInformation, interactionId) {
 
     const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
 
-    const mergedItems = this._matchEntries(flags.items, newItems);
+    const newPriceInformation = flags.priceInformation
+      .map(priceInformation => {
+        const boughtItem = incomingPriceInformation.buyerReceive[0];
+        const foundEntry = Utilities.findSimilarItem(priceInformation.buyerReceive, boughtItem);
+        if (foundEntry) {
+          if (incomingPriceInformation.primary && priceInformation.primary) {
+            foundEntry.quantity += boughtItem.quantity;
+            incomingPriceInformation.buyerReceive.splice(0, 1);
+            priceInformation.totalCurrencyCost += incomingPriceInformation.totalCurrencyCost;
+            priceInformation.basePriceString = PileUtilities.getPriceArray(priceInformation.totalCurrencyCost, priceInformation.finalPrices)
+              .filter(price => price.cost).map(price => price.string).join(" ");
+          } else {
+            const sameTypePrice = incomingPriceInformation.finalPrices
+              .map(price => {
+                const foundItem = Utilities.findSimilarItem(priceInformation.buyerReceive, price);
+                if (foundItem) {
+                  return { foundItem, price }
+                }
+                return false;
+              })
+              .filter(Boolean);
+            if (sameTypePrice.length) {
+              incomingPriceInformation.buyerReceive.splice(0, 1);
+              sameTypePrice.forEach(match => {
+                match.price.quantity += match.foundItem.quantity;
+              });
+            }
+          }
+        }
+        return priceInformation;
+      })
+      .concat([incomingPriceInformation].filter(priceInformation => priceInformation.buyerReceive.length));
 
     const pileData = PileUtilities.getActorFlagData(sourceActor);
 
@@ -563,13 +598,13 @@ export default class ChatAPI {
         img: pileData.merchantImage || sourceActor.img
       },
       actor: targetActor,
-      items: mergedItems
+      priceInformation: newPriceInformation
     });
 
     return message.update({
       content: chatCardHtml,
       [`${CONSTANTS.FLAGS.PILE}.interactionId`]: interactionId,
-      [`${CONSTANTS.FLAGS.PILE}.items`]: mergedItems
+      [`${CONSTANTS.FLAGS.PILE}.priceInformation`]: newPriceInformation
     });
 
   }

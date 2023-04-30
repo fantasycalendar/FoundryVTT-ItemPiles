@@ -1,4 +1,4 @@
-import CurrenciesEditor from "./currencies-editor/currencies-editor.js";
+import { CurrenciesEditor, SecondaryCurrenciesEditor } from "./currencies-editor/currencies-editor.js";
 import ItemFiltersEditor from "./item-filters-editor/item-filters-editor.js";
 import StringListEditor from "./string-list-editor/string-list-editor.js";
 import PriceModifiersEditor from "./price-modifiers-editor/price-modifiers-editor.js";
@@ -9,6 +9,7 @@ import StylesEditor from "./styles-editor/styles-editor.js";
 
 export default {
   "currencies": CurrenciesEditor,
+  "secondary-currencies": SecondaryCurrenciesEditor,
   "item-filters": ItemFiltersEditor,
   "item-similarities": StringListEditor,
   "item-categories": StringListEditor,

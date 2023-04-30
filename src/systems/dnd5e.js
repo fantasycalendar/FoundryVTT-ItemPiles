@@ -136,7 +136,7 @@ export default {
     }
   ],
 
-  VAULT_STYLES: [
+  "VAULT_STYLES": [
     {
       path: "system.rarity",
       value: "artifact",

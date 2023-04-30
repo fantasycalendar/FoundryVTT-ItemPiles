@@ -32,7 +32,7 @@
 					 class:cant-afford={cantAfford}
 					 class:cant-afford-multiple-prices={cantAffordMultiplePrices}
 					 class:item-piles-clickable-link={$prices.length > 1}>
-				{@html labelText}
+				<small>{@html labelText}</small>
 			</div>
 			<TJSMenu offset={{y: 4}}>
 				<div class="price-list">
@@ -50,7 +50,7 @@
 										<img class="item-piles-img" src="{price.img}"/>
 									</div>
 									<div class="item-piles-name item-piles-text">
-										{price.baseCost + (priceGroup.prices.length === 0 && price.percent ? "%" : "")} {price.name}
+										<small>{price.baseCost + (priceGroup.prices.length === 0 && price.percent ? "%" : "")} {price.name}</small>
 									</div>
 								</div>
 							{/each}
@@ -60,7 +60,7 @@
 			</TJSMenu>
 		</TJSToggleLabel>
 	{:else}
-		<small class:cant-afford={cantAfford}>{@html labelText }</small>
+		<small class:cant-afford={cantAfford}>{@html labelText}</small>
 	{/if}
 </div>
 
@@ -70,7 +70,6 @@
     align-items: center;
     position: relative;
     --tjs-label-justify-content: flex-start;
-    --tjs-label-font-size: smaller;
     --tjs-label-overflow: visible;
     --tjs-menu-color: black;
     --tjs-menu-border: 1px solid #444;

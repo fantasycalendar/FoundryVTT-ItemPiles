@@ -296,6 +296,7 @@
       "EditCurrencies": {
         "Title": "Editing Currencies",
         "Content": "As a GM, you can update the currencies on this item pile:",
+        "Secondary": "Secondary Currencies:",
         "Submit": "Submit"
       },
       "DropCurrencies": {
@@ -355,6 +356,11 @@
         "Icon": "Icon",
         "AddNew": "Add new currency"
       },
+      "SecondaryCurrenciesEditor": {
+        "Title": "Item Piles Secondary Currencies Editor",
+        "TitleActor": "Item Piles Secondary Currencies Editor: {actor_name}",
+        "Explanation": "Here you can define which secondary currencies that can be picked up and dropped by characters."
+      },
       "ItemEditor": {
         "Title": "Item Piles Item Editor: {item_name}",
         "Update": "Update Item",
@@ -400,7 +406,7 @@
         "CantBeSoldToMerchantsExplanation": "When enabled, this item cannot be sold back to merchants, only purchased.",
         "AddPurchaseOption": "Add Purchase Option",
         "DropMeClickMe": "Click to add an attribute or drag & drop an item to add",
-        "PricePreset": "Or select an exiting price preset:",
+        "PricePreset": "Or select a price preset:",
         "SelectPreset": "Select price preset",
         "CanStack": "Can Stack",
         "CanStackExplanation": "This configures whether this item will stack with other similar items when added to a vault.",
@@ -491,6 +497,9 @@
           "OverrideCurrencies": "Override Currencies",
           "OverrideCurrenciesExplanation": "Configure if this pile should be able to transfer other currencies than the default.",
           "ConfigureOverrideCurrencies": "Configure Override Currencies",
+          "OverrideSecondaryCurrencies": "Override Secondary Currencies",
+          "OverrideSecondaryCurrenciesExplanation": "Configure this item pile's secondary currency overrides.",
+          "ConfigureOverrideSecondaryCurrencies": "Configure Override Secondary Currencies",
           "OverrideItemFilters": "Override Item Filters",
           "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
           "ConfigureOverrideItemFilters": "Configure Override Item Filters"
@@ -693,6 +702,11 @@
         "Title": "Currencies",
         "Label": "Configure Currencies",
         "Hint": "This setting define the currencies that are eligible for pickup, which may not be actual items but numerical inputs on the character sheet."
+      },
+      "SecondaryCurrencies": {
+        "Title": "Secondary Currencies",
+        "Label": "Configure Secondary Currencies",
+        "Hint": "This setting define secondary currencies, similar to but separate from regular currencies. These cannot have exchange rates or be split into other custom currencies."
       },
       "CurrencyDecimalDigits": {
         "Title": "Currency Decimal Digits",

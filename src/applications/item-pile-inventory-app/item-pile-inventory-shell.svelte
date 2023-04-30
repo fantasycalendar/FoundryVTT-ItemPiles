@@ -36,7 +36,6 @@
   const numItems = store.numItems;
   const shareData = store.shareData;
   const numCurrencies = store.numCurrencies;
-  const pileCurrencies = store.pileCurrencies;
 
   $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
   $: hasItems = $numItems > 0;
@@ -164,7 +163,7 @@
 						<hr>
 					{/if}
 
-					{#if $pileCurrencies.length}
+					{#if $numCurrencies > 0}
 						<CurrencyList {store}/>
 					{/if}
 

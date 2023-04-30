@@ -44,7 +44,7 @@
   const vaultLog = store.vaultLog;
   const visibleLogItems = store.visibleLogItems;
   const recipientDocument = store.recipientDocument;
-  const pileCurrencies = store.pileCurrencies;
+  const numCurrencies = store.numCurrencies;
   const dragPositionStore = store.dragPosition;
 
   $: pileData = $pileDataStore;
@@ -328,7 +328,7 @@
 							{localize("ITEM-PILES.Vault.ViewingAs", { actor_name: $recipientDocument.name })}
             </a>
           </span>
-					{#if $pileCurrencies.length && (gridData.canDepositCurrencies || gridData.canWithdrawCurrencies)}
+					{#if $numCurrencies > 0 && (gridData.canDepositCurrencies || gridData.canWithdrawCurrencies)}
 						<div style="flex:0 1 auto; justify-self: flex-end; display: flex; justify-content: flex-end;">
 							{#if gridData.canWithdrawCurrencies}
 								<button type="button" class="item-piles-small-button" on:click={() => store.withdrawCurrency()}>
@@ -345,7 +345,7 @@
 				</div>
 			{/if}
 
-			{#if $pileCurrencies.length}
+			{#if $numCurrencies > 0}
 				<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
 
 					<CurrencyList {currencies}

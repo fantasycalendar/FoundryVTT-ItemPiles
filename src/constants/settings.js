@@ -30,6 +30,7 @@ const SETTINGS = {
 
   // System Settings
   CURRENCIES: "currencies",
+  SECONDARY_CURRENCIES: "secondaryCurrencies",
   CURRENCY_DECIMAL_DIGITS: "currencyDecimalDigits",
   ITEM_FILTERS: "itemFilters",
   ACTOR_CLASS_TYPE: "actorClassType",
@@ -88,8 +89,21 @@ const SETTINGS = {
       scope: "world",
       config: false,
       system: true,
-      default: SYSTEMS.DATA.CURRENCIES ?? SYSTEMS.DEFAULT_SETTINGS.CURRENCIES,
-      type: Object
+      default: SYSTEMS.DATA.CURRENCIES,
+      type: Array
+    },
+
+    [SETTINGS.SECONDARY_CURRENCIES]: {
+      name: "ITEM-PILES.Settings.SecondaryCurrencies.Title",
+      label: "ITEM-PILES.Settings.SecondaryCurrencies.Label",
+      hint: "ITEM-PILES.Settings.SecondaryCurrencies.Hint",
+      icon: "fa fa-money-bill-alt",
+      application: "secondary-currencies",
+      scope: "world",
+      config: false,
+      system: true,
+      default: SYSTEMS.DATA.SECONDARY_CURRENCIES,
+      type: Array
     },
 
     [SETTINGS.CURRENCY_DECIMAL_DIGITS]: {
@@ -98,7 +112,7 @@ const SETTINGS = {
       scope: "world",
       config: false,
       system: true,
-      default: SYSTEMS.DATA.CURRENCY_DECIMAL_DIGITS ?? SYSTEMS.DEFAULT_SETTINGS.CURRENCY_DECIMAL_DIGITS,
+      default: SYSTEMS.DATA.CURRENCY_DECIMAL_DIGITS,
       step: 0.00001,
       min: 0,
       max: 1,
@@ -114,7 +128,7 @@ const SETTINGS = {
       scope: "world",
       config: false,
       system: true,
-      default: SYSTEMS.DATA.ITEM_FILTERS ?? SYSTEMS.DEFAULT_SETTINGS.ITEM_FILTERS,
+      default: SYSTEMS.DATA.ITEM_FILTERS,
       type: Array
     },
 
@@ -132,7 +146,7 @@ const SETTINGS = {
       scope: "world",
       config: false,
       system: true,
-      default: SYSTEMS.DATA.ITEM_SIMILARITIES ?? SYSTEMS.DEFAULT_SETTINGS.ITEM_SIMILARITIES,
+      default: SYSTEMS.DATA.ITEM_SIMILARITIES,
       onChange: () => {
         refreshItemTypesThatCanStack();
       },
@@ -148,7 +162,7 @@ const SETTINGS = {
       scope: "world",
       config: false,
       system: true,
-      default: SYSTEMS.DATA.UNSTACKABLE_ITEM_TYPES ?? SYSTEMS.DEFAULT_SETTINGS.UNSTACKABLE_ITEM_TYPES,
+      default: SYSTEMS.DATA.UNSTACKABLE_ITEM_TYPES,
       onChange: () => {
         refreshItemTypesThatCanStack();
       },
@@ -167,7 +181,7 @@ const SETTINGS = {
       },
       scope: "world",
       config: false,
-      default: SYSTEMS.DATA.CSS_VARIABLES ?? {},
+      default: SYSTEMS.DATA.CSS_VARIABLES,
       mergedDefaults: SETTINGS.DEFAULT_CSS_VARIABLES,
       onchange: (data) => {
         applySystemSpecificStyles(data);
@@ -183,7 +197,7 @@ const SETTINGS = {
       application: "vault-styles",
       scope: "world",
       config: false,
-      default: SYSTEMS.DATA.VAULT_STYLES ?? [],
+      default: SYSTEMS.DATA.VAULT_STYLES,
       type: Array
     },
 

@@ -11,9 +11,11 @@
   const { application } = getContext('#external');
 
   export let data;
+  export let secondary = false
+
   export let elementRoot;
 
-  const store = new CurrencyStore(data || getSetting(SETTINGS.CURRENCIES));
+  const store = new CurrencyStore(data || getSetting(SETTINGS.CURRENCIES), secondary);
 
   let form;
 
@@ -34,12 +36,15 @@
 
 	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
 
-		<p>{localize("ITEM-PILES.Applications.CurrenciesEditor.Explanation")}</p>
+		<p>{localize(`ITEM-PILES.Applications.${secondary ? "Secondary" : ""}CurrenciesEditor.Explanation`)}</p>
 
-		<p class="small">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallAttributes")}</p>
+		<p class="small">
+			{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallAttributes")}
+		</p>
 
-		<p
-			class="small item-piles-bottom-divider">{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallItems")}</p>
+		<p class="small item-piles-bottom-divider">
+			{localize("ITEM-PILES.Applications.CurrenciesEditor.ExplanationSmallItems")}
+		</p>
 
 		<CurrencyList {store}/>
 

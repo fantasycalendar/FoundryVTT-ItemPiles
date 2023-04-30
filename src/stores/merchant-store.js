@@ -166,10 +166,8 @@ export default class MerchantStore extends ItemPileStore {
   }
 
   visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
-    const itemFlagData = get(entry.itemFlagData) ?? {};
     const itemIsFree = get(entry.prices)?.free ?? false;
-    return !entry.isCurrency
-      && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden)
+    return super.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData)
       && (
         actorIsMerchant
           ? !(pileData?.hideItemsWithZeroCost && itemIsFree)
@@ -320,8 +318,8 @@ export default class MerchantStore extends ItemPileStore {
 
 class PileMerchantItem extends PileItem {
 
-  setupStores(item) {
-    super.setupStores(item);
+  setupStores(...args) {
+    super.setupStores(...args);
     this.prices = writable([]);
     this.displayQuantity = writable(false);
     this.selectedPriceGroup = writable(-1);

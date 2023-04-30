@@ -10,7 +10,6 @@
   const currencies = recipientStore?.allCurrencies;
   const merchantCurrencies = store?.allCurrencies;
   const merchantPileData = store.pileData;
-  const merchantDocument = store.document;
 
 </script>
 
@@ -20,11 +19,9 @@
 		<div style="flex: 0 1 auto;">
 			{localize("ITEM-PILES.Merchant.ShoppingAs", { actorName: $recipientDocument.name })}
 		</div>
-		{#if $currencies.length}
-			<CurrencyList {currencies}
-										options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
-										class="item-piles-currency-list"/>
-		{/if}
+		<CurrencyList {currencies}
+									options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
+									class="item-piles-currency-list"/>
 	{:else if game.user.isGM && $merchantPileData.infiniteCurrencies}
 		<div style="flex: 0 1 auto;">
 			<a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"

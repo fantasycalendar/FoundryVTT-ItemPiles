@@ -241,9 +241,10 @@
 
 					{#if itemFlagData.prices.length}
 						{#each itemFlagData.prices as prices, groupIndex (groupIndex)}
-							<PriceList bind:prices={prices} remove={() => { store.removeGroup(groupIndex) }}/>
+							<PriceList {item} bind:prices={prices} remove={() => { store.removeGroup(groupIndex) }}/>
 						{/each}
 					{/if}
+
 
 				{/if}
 

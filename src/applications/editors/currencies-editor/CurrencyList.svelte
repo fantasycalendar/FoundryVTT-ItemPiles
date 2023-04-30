@@ -2,6 +2,7 @@
   import FilePicker from "../../components/FilePicker.svelte";
   import DropZone from "../../components/DropZone.svelte";
   import * as Helpers from "../../../helpers/helpers.js";
+  import { applyStyles } from '@typhonjs-fvtt/runtime/svelte/action';
 
   export let store;
 
@@ -28,13 +29,21 @@
 
   }
 
+  $: style = {
+    "grid-template-columns": `${store.secondary ? "" : "28px"} 1.25fr ${store.secondary ? "" : "60px"} 0.5fr 60px 1fr 28px`
+  }
+
 </script>
 
 <DropZone callback={dropData} bind:isHovering={isHovering}>
-	<div class="item-piles-sortable-list-columns header">
-		<div style="justify-content:flex-start;">Primary</div>
+	<div class="item-piles-sortable-list-columns header" use:applyStyles={style}>
+		{#if !store.secondary}
+			<div style="justify-content:flex-start;">Primary</div>
+		{/if}
 		<div>Name</div>
-		<div>Exchange</div>
+		{#if !store.secondary}
+			<div>Exchange</div>
+		{/if}
 		<div>Short</div>
 		<div>Icon</div>
 		<div>Data</div>
@@ -45,17 +54,21 @@
 			<div class="drop-to-add">Drop to add</div>
 		{/if}
 		{#if !currencies.length}
-			<div class="item-piles-sortable-list-columns ">
+			<div class="item-piles-sortable-list-columns">
 				<div class="full-span" class:invisible={isHovering}>
 					Drop an item or click the plus button to get started!
 				</div>
 			</div>
 		{/if}
 		{#each currencies as item, index (item.id)}
-			<div class="item-piles-sortable-list-columns">
-				<div><input type="checkbox" checked={item.primary} on:change={() => store.setPrimary(index)}/></div>
+			<div class="item-piles-sortable-list-columns" use:applyStyles={style}>
+				{#if !store.secondary}
+					<div><input type="checkbox" checked={item.primary} on:change={() => store.setPrimary(index)}/></div>
+				{/if}
 				<div><input type="text" bind:value={item.name}/></div>
-				<div><input type="number" step="0.000000001" bind:value={item.exchangeRate}/></div>
+				{#if !store.secondary}
+					<div><input type="number" step="0.000000001" bind:value={item.exchangeRate}/></div>
+				{/if}
 				<div><input type="text" bind:value={item.abbreviation}/></div>
 				<div>
 					<FilePicker type="imagevideo" showImage={true} showInput={false} bind:value={item.img}/>
@@ -82,7 +95,6 @@
 <style lang="scss">
 
   .item-piles-sortable-list-columns {
-    grid-template-columns: 28px 1.25fr 60px 0.5fr 60px 1fr 28px;
 
     .full-span {
       padding: 2rem 1rem;
