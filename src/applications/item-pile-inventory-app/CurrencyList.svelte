@@ -10,8 +10,6 @@
   const numCurrencies = store.numCurrencies;
   const editQuantities = store.editQuantities;
 
-  $: console.log($currencies)
-
 </script>
 
 <div>
