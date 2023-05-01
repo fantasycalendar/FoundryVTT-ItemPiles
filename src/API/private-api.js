@@ -14,6 +14,7 @@ import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
 import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
+import GiveItemsShell from "../applications/dialogs/give-items-dialog/give-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 
 const preloadedFiles = new Set();
@@ -1867,20 +1868,17 @@ export default class PrivateAPI {
     const sourceActor = Utilities.getActor(sourceUuid);
     const targetActor = Utilities.getActor(targetUuid);
 
-    const contentString = "ITEM-PILES.Dialogs.ReceiveItem." + (itemData.quantity > 1 ? "ContentMany" : "ContentOne");
-
     const item = await Item.implementation.create(itemData.item, { temporary: true });
 
     const accepted = await TJSDialog.confirm({
       title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"),
       content: {
-        class: CustomDialog, props: {
-          content: game.i18n.format(contentString, {
-            source_actor_name: sourceActor.name,
-            target_actor_name: targetActor.name,
-            quantity: itemData.quantity,
-            item_name: item.name
-          }), icon: "fas fa-handshake", header: game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Header")
+        class: GiveItemsShell,
+        props: {
+          sourceActor,
+          targetActor,
+          quantity: itemData.quantity,
+          item
         }
       }
     });

@@ -235,8 +235,7 @@
       "ReceiveItem": {
         "Title": "Receiving Item",
         "Header": "Item Piles: Receiving Item",
-        "ContentOne": "{source_actor_name} wants to give the item \"{item_name}\" to {target_actor_name}, do you accept?",
-        "ContentMany": "{source_actor_name} wants to give the items \"{item_name}\" ({quantity}) to {target_actor_name}, do you accept?",
+        "Content": "{source_actor_name} wants to give an item to {target_actor_name}, do you accept?",
         "Ignore": "Ignore User"
       },
       "TextEditor": {

@@ -123,8 +123,8 @@ export default class ChatAPI {
   static async _outputTransferItem(source, target, items, userId, interactionId) {
     if (!PileUtilities.isItemPileLootable(source)) return;
     if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
-    const itemData = await this._formatItemData(items);
-    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, [], userId, interactionId);
+    const [itemData, itemCurrencies] = await this._formatItemData(source, items);
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, itemCurrencies, userId, interactionId);
   }
 
   /**
@@ -155,8 +155,8 @@ export default class ChatAPI {
    */
   static async _outputGiveItem(source, target, item, userId) {
     if (game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
-    const itemData = await this._formatItemData([item]);
-    return this._giveChatMessage(source, target, itemData, userId);
+    const [itemData, itemCurrencies] = await this._formatItemData(source, [item]);
+    return this._giveChatMessage(source, target, itemData.concat(itemCurrencies), userId);
   }
 
   /**
@@ -173,8 +173,8 @@ export default class ChatAPI {
   static async _outputTransferEverything(source, target, items, currencies, userId, interactionId) {
     if (!PileUtilities.isItemPileLootable(source)) return;
     if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
-    const itemData = await this._formatItemData(items);
-    const currencyData = this._formatCurrencyData(source, currencies);
+    const [itemData, itemCurrencies] = await this._formatItemData(source, items);
+    const currencyData = this._formatCurrencyData(source, currencies).concat(itemCurrencies);
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.PICKUP_CHAT_MESSAGE, source.uuid, target.uuid, itemData, currencyData, userId, interactionId);
   }
 
@@ -204,21 +204,29 @@ export default class ChatAPI {
   /**
    * Formats item data to a chat friendly structure
    *
+   * @param itemPile
    * @param items
    * @param divideBy
    * @returns {Promise<Array>}
    */
-  static async _formatItemData(items, divideBy = 1) {
+  static async _formatItemData(itemPile, items, divideBy = 1) {
     const formattedItems = [];
+    const formattedCurrencies = [];
+    const currencyList = PileUtilities.getActorCurrencies(itemPile, { getAll: true });
     for (const itemData of items) {
       const tempItem = await Item.implementation.create(itemData.item, { temporary: true });
-      formattedItems.push({
+      const data = {
         name: game.i18n.localize(tempItem.name),
         img: tempItem.img ?? itemData?.item?.img ?? "",
         quantity: Math.abs(itemData.quantity) / divideBy
-      });
+      };
+      if (PileUtilities.isItemCurrency(tempItem, { actorCurrencies: currencyList })) {
+        formattedCurrencies.push(data)
+      } else {
+        formattedItems.push(data);
+      }
     }
-    return formattedItems;
+    return [formattedItems, formattedCurrencies];
   }
 
   /**
@@ -264,9 +272,9 @@ export default class ChatAPI {
     const messages = Array.from(game.messages).filter(message => (now - message.timestamp) <= (10800000)).slice(-10);
     messages.reverse()
 
-    for (let [index, message] of messages.entries()) {
+    for (const message of messages) {
       const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
-      if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
+      if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
         return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
       }
     }
@@ -348,8 +356,8 @@ export default class ChatAPI {
 
     const divideBy = Object.values(actorDeltas).length;
 
-    const items = await this._formatItemData(pileDeltas.itemDeltas, divideBy);
-    const currencies = this._formatCurrencyData(sourceActor, pileDeltas.attributeDeltas, divideBy);
+    const [items, itemCurrencies] = await this._formatItemData(sourceActor, pileDeltas.itemDeltas, divideBy);
+    const currencies = this._formatCurrencyData(sourceActor, pileDeltas.attributeDeltas, divideBy).concat(itemCurrencies);
 
     const chatCardHtml = await renderTemplate(CONSTANTS.PATH + "templates/chat/looted.html", {
       message: game.i18n.format("ITEM-PILES.Chat.Split", { num_players: divideBy }),
@@ -447,9 +455,9 @@ export default class ChatAPI {
     const messages = Array.from(game.messages).filter(message => (now - message.timestamp) <= (10800000)).slice(-10);
     messages.reverse();
 
-    for (let [index, message] of messages.entries()) {
+    for (const message of messages) {
       const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
-      if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && (flags.interactionId === interactionId || index === 0)) {
+      if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
         return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
       }
     }
