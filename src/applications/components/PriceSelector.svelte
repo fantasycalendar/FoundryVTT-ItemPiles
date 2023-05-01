@@ -71,6 +71,7 @@
     position: relative;
     --tjs-label-justify-content: flex-start;
     --tjs-label-overflow: visible;
+    --tjs-menu-primary-color: black;
     --tjs-menu-color: black;
     --tjs-menu-border: 1px solid #444;
     --tjs-menu-box-shadow: 0 6px 9px -1px rgba(0, 0, 0, 0.5);
@@ -90,12 +91,16 @@
       opacity: 0.5;
     }
 
+    .multiple-prices {
+      overflow: visible;
+    }
+
     .multiple-prices::before,
     .multiple-prices::after {
       content: '';
       position: absolute;
-      top: -0.4rem;
-      left: -0.55rem;
+      top: -0.2rem;
+      left: -0.2rem;
       border-color: transparent;
       border-style: solid;
     }

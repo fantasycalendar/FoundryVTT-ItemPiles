@@ -10,6 +10,8 @@
 - Updated Portuguese (Brazilian), Chinese (Simplified), Polish, and French localization - thank you eunaumtenhoid, sakusenerio, psedonatural, and Lioheart on Weblate, couldn't do it without ya!
 - Updated the receiving item dialog when passing items between tokens
 - Fixed error when taking everything from an item pile
+- Fixed merchant items with multiple prices not being apparent
+- Fixed merchant items text color on the multiple price dropdown being too faded
 
 ## Version 2.6.8
 
