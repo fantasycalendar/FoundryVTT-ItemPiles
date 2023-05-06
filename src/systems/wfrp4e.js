@@ -2,7 +2,7 @@ import CONSTANTS from "../constants/constants.js";
 
 export default {
 
-  "VERSION": "1.0.5",
+  "VERSION": "1.0.6",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -109,11 +109,6 @@ export default {
       },
       primary: false,
       exchangeRate: 0.004166667
-    }],
-
-  CSS_VARIABLES: {
-    "even-color": "#554d40",
-    "odd-color": "#2f2920",
-    "input-text-color": "#fff"
-  }
+    }
+  ]
 }

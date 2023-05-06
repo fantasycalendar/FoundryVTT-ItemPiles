@@ -43,10 +43,13 @@ export default class ItemPileStore {
     this.attributes = writable([]);
 
     this.items = writable([]);
+    this.visibleItems = writable([]);
+
+    this.pileCurrencies = writable([]);
+    this.recipientCurrencies = writable([]);
+
     this.currencies = writable([]);
     this.allCurrencies = writable([]);
-    this.pileCurrencies = writable([]);
-    this.visibleItems = writable([]);
 
     this.itemsPerCategory = writable({});
     this.categories = writable([]);
@@ -98,10 +101,13 @@ export default class ItemPileStore {
     this.attributes.set([]);
 
     this.items.set([]);
+    this.visibleItems.set([]);
+
+    this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
+    this.recipientCurrencies.set(this.recipient ? PileUtilities.getActorCurrencies(this.recipient, { getAll: true }) : []);
+
     this.currencies.set([]);
     this.allCurrencies.set([]);
-    this.visibleItems.set([]);
-    this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
 
     this.itemsPerCategory.set({});
     this.categories.set([]);
@@ -129,6 +135,7 @@ export default class ItemPileStore {
       }
       if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
         this.pileData.set(PileUtilities.getActorFlagData(this.actor));
+        this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
         this.refreshItems();
       }
       this.name.set(this.actor.name);
@@ -144,6 +151,7 @@ export default class ItemPileStore {
         }
         if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
           this.recipientPileData.set(PileUtilities.getActorFlagData(this.recipient));
+          this.recipientCurrencies.set(PileUtilities.getActorCurrencies(this.recipient, { getAll: true }));
           this.refreshItems();
         }
       });
@@ -159,21 +167,19 @@ export default class ItemPileStore {
     PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
       if (currency.type === "item") {
         if (!currency.item) return
-        items.push(new this.ItemClass(this, currency.item, true));
+        items.push(new this.ItemClass(this, currency.item, true, !!currency?.secondary));
       } else {
-        attributes.push(new this.AttributeClass(this, currency, true));
+        attributes.push(new this.AttributeClass(this, currency, true, !!currency?.secondary));
       }
     });
 
     this.allItems.set(items);
     this.attributes.set(attributes);
 
-    this.subscribeTo(this.allItems, (val) => {
-      if (!val) return;
+    this.subscribeTo(this.allItems, () => {
       this.refreshItems();
     });
-    this.subscribeTo(this.attributes, (val) => {
-      if (!val) return;
+    this.subscribeTo(this.attributes, () => {
       this.refreshItems();
     });
 
@@ -240,10 +246,9 @@ export default class ItemPileStore {
     const recipientPileData = this.recipient ? PileUtilities.isItemPileMerchant(this.recipient) : {}
     const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
 
-    this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
-
     const visibleItems = allItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
-    const itemCurrencies = allItems.filter(entry => entry.isCurrency);
+    const itemCurrencies = allItems.filter(entry => entry.isCurrency && !entry.isSecondaryCurrency);
+    const secondaryItemCurrencies = allItems.filter(entry => entry.isSecondaryCurrency);
 
     this.visibleItems.set(visibleItems);
 
@@ -252,10 +257,13 @@ export default class ItemPileStore {
     this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
     this.items.set(items.sort((a, b) => this.itemSortFunction(a, b)));
 
-    const currencies = get(this.attributes).concat(itemCurrencies);
-    this.numCurrencies.set(currencies.filter(entry => get(entry.quantity) > 0).length);
-    this.currencies.set(currencies.filter(entry => !get(entry.filtered)));
-    this.allCurrencies.set(currencies);
+    const currencies = get(this.attributes).filter(entry => !entry.isSecondaryCurrency).concat(itemCurrencies);
+    const secondaryCurrencies = get(this.attributes).filter(entry => entry.isSecondaryCurrency).concat(secondaryItemCurrencies);
+
+    this.numCurrencies.set(currencies.concat(secondaryCurrencies).filter(entry => get(entry.quantity) > 0).length);
+
+    this.currencies.set(currencies.concat(secondaryCurrencies).filter(entry => !get(entry.filtered)));
+    this.allCurrencies.set(currencies.concat(secondaryCurrencies));
 
     this.itemCategories.set(Object.values(visibleItems.reduce((acc, item) => {
       const category = get(item.category);
@@ -415,7 +423,7 @@ export default class ItemPileStore {
     const result = await DropCurrencyDialog.show(source, target, {
       localization: !target ? "EditCurrencies" : false,
       unlimitedCurrencies: !target && game.user.isGM,
-      existingCurrencies: PileUtilities.getActorCurrencies(source),
+      existingCurrencies: PileUtilities.getActorCurrencies(source, { combine: true }),
       getUpdates: !target
     });
     return this._addCurrency(result, source, target);

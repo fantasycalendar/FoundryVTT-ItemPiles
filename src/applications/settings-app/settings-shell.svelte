@@ -179,6 +179,7 @@
 					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
 					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>
+					<SettingButton key={SETTINGS.SECONDARY_CURRENCIES} bind:data="{settings[SETTINGS.SECONDARY_CURRENCIES]}"/>
 					<Setting key={SETTINGS.CURRENCY_DECIMAL_DIGITS} bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
 									 disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
 					<SettingButton key={SETTINGS.ITEM_FILTERS} bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>
@@ -190,8 +191,9 @@
 		</section>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}><i
-				class="far fa-save"></i> {localize("ITEM-PILES.Applications.Settings.Submit")}</button>
+			<button type="button" on:click|once={requestSubmit}>
+				<i class="far fa-save"></i> {localize("ITEM-PILES.Applications.Settings.Submit")}
+			</button>
 		</footer>
 	</form>
 </ApplicationShell>

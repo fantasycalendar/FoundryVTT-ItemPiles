@@ -149,21 +149,56 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
 }
 
+export function getItemPileActors(filter = false) {
+  return Array.from(game.actors).filter((a) => {
+    return getProperty(a, CONSTANTS.FLAGS.PILE)?.enabled && (filter ? filter(a) : true);
+  });
+}
+
+export function getItemPileTokens(filter = false) {
+
+  const allTokensOnScenes = Array.from(game.scenes)
+    .map(scene => ([
+      scene.id,
+      Array.from(scene.tokens).filter(t => {
+        return getProperty(t, CONSTANTS.FLAGS.PILE)?.enabled && !t.actorLink;
+      })
+    ]))
+    .filter(([_, tokens]) => tokens.length)
+
+  const validTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [
+    scene,
+    tokens.filter((token) => {
+      return filter ? filter(token) : true;
+    })
+  ]).filter(([_, tokens]) => tokens.length);
+
+  return { allTokensOnScenes, validTokensOnScenes };
+}
+
 export function getActorItems(target, { itemFilters = false, getItemCurrencies = false } = {}) {
   const actor = Utilities.getActor(target);
   const actorItemFilters = itemFilters ? cleanItemFilters(itemFilters) : getActorItemFilters(actor);
-  const currencies = (actor ? getActorCurrencies(actor, { getAll: true }) : game.itempiles.API.CURRENCIES)
+  const currencies = (actor
+    ? getActorCurrencies(actor, { getAll: true })
+    : game.itempiles.API.CURRENCIES.concat(game.itempiles.API.SECONDARY_CURRENCIES))
     .map(entry => entry.id);
   return actor.items.filter(item => (getItemCurrencies || currencies.indexOf(item.id) === -1) && !isItemInvalid(actor, item, actorItemFilters));
 }
 
 // Lots happening here, but in essence, it gets the actor's currencies, and creates an array of them
-export function getActorCurrencies(target, { forActor = false, currencyList = false, getAll = false } = {}) {
+export function getActorCurrencies(target, {
+  forActor = false,
+  currencyList = false,
+  getAll = false,
+  secondary = true
+} = {}) {
   const actor = Utilities.getActor(target);
-  const actorUuid = actor.uuid;
+  const actorUuid = Utilities.getUuid(actor.uuid)
   const actorItems = actor ? Array.from(actor.items) : [];
-  currencyList = currencyList || getCurrencyList(forActor || actor);
-  let currencies = cachedActorCurrencies.get(actorUuid) || currencyList.map((currency, index) => {
+  const cached = cachedActorCurrencies.get(actorUuid)
+  currencyList = cached ? false : currencyList || getCurrencyList(forActor || actor);
+  let currencies = cached || (currencyList.map((currency, index) => {
     if (currency.type === "attribute" || !currency.type) {
       const path = currency?.data?.path ?? currency?.path;
       return {
@@ -182,17 +217,23 @@ export function getActorCurrencies(target, { forActor = false, currencyList = fa
       item,
       index
     }
-  })
+  }))
 
   cachedActorCurrencies.set(actorUuid, currencies);
 
   currencies = currencies.map(currency => {
-    currency.quantity = currency.type === "attribute" ? getProperty(actor, currency.path) : Utilities.getItemQuantity(currency.item);
+    currency.quantity = currency.type === "attribute"
+      ? getProperty(actor, currency.path)
+      : Utilities.getItemQuantity(currency.item);
     return currency;
   });
 
   if (!getAll) {
     currencies = currencies.filter(currency => currency.quantity > 0);
+  }
+
+  if (!secondary) {
+    currencies = currencies.filter(currency => !currency.secondary);
   }
 
   return currencies;
@@ -213,7 +254,16 @@ export function getCurrencyList(target = false, pileData = false) {
     const targetActor = Utilities.getActor(target);
     pileData = getActorFlagData(targetActor, pileData);
   }
-  const currencyList = (pileData.overrideCurrencies || game.itempiles.API.CURRENCIES).map(currency => {
+
+  const primaryCurrencies = (pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES);
+  const secondaryCurrencies = (pileData?.overrideSecondaryCurrencies || game.itempiles.API.SECONDARY_CURRENCIES).map(currency => {
+    currency.secondary = true;
+    return currency;
+  });
+
+  const currencies = primaryCurrencies.concat(secondaryCurrencies);
+
+  const currencyList = currencies.map(currency => {
     currency.name = game.i18n.localize(currency.name);
     return currency;
   });
@@ -222,7 +272,6 @@ export function getCurrencyList(target = false, pileData = false) {
   }
   return currencyList;
 }
-
 
 export function getActorItemFilters(target, pileData = false) {
   if (!target) return cleanItemFilters(game.itempiles.API.ITEM_FILTERS);
@@ -309,14 +358,21 @@ export async function checkItemType(targetActor, item, {
 }
 
 export function isItemCurrency(item, { target = false, actorCurrencies = false } = {}) {
-  const currencies = (actorCurrencies || getActorCurrencies(item.parent || false, { forActor: target, getAll: true }))
+  const currencies = (actorCurrencies || getActorCurrencies(item.parent || false, {
+    forActor: target,
+    getAll: true
+  }))
     .filter(currency => currency.type === "item")
     .map(item => item.data.item);
   return !!Utilities.findSimilarItem(currencies, item);
 }
 
 export function getItemCurrencyData(item, { target = false, actorCurrencies = false }) {
-  return (actorCurrencies || getActorCurrencies(item?.parent || false, { forActor: target, getAll: true }))
+  return (actorCurrencies || getActorCurrencies(item?.parent || false, {
+    forActor: target,
+    getAll: true,
+    combine: true
+  }))
     .filter(currency => currency.type === "item")
     .find(currency => {
       return item.name === currency.data.item.name && item.type === currency.data.item.type;
@@ -480,7 +536,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
   let [documentActor, documentTokens] = getRelevantTokensAndActor(target);
 
   const items = getActorItems(documentActor, { itemFilters: flagData.overrideItemFilters });
-  const currencies = getActorCurrencies(documentActor, { currencyList: flagData.overrideCurrencies });
+  const actorCurrencies = (flagData.overrideCurrencies || []).concat(flagData.overrideSecondaryCurrencies || []);
+  const currencies = getActorCurrencies(documentActor, { currencyList: actorCurrencies });
 
   const pileData = { data: flagData, items, currencies };
 
@@ -632,7 +689,7 @@ function getExchangeRateDecimals(smallestExchangeRate) {
   return smallestExchangeRate.toString().includes(".") ? smallestExchangeRate.toString().split(".")[1].length : 0;
 }
 
-function getPriceArray(totalCost, currencies) {
+export function getPriceArray(totalCost, currencies) {
 
   const primaryCurrency = currencies.find(currency => currency.primary);
 
@@ -716,7 +773,7 @@ function getPriceArray(totalCost, currencies) {
 export function getPriceFromString(str, currencyList = false) {
 
   if (!currencyList) {
-    currencyList = getCurrencyList();
+    currencyList = getCurrencyList().filter(currency => !currency.secondary);
   }
 
   const currencies = foundry.utils.duplicate(currencyList)
@@ -837,8 +894,8 @@ export function getPriceData({
   const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
   const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
 
-  const currencyList = getCurrencyList(merchant);
-  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
+  const currencyList = getCurrencyList(merchant).filter(currency => !currency.secondary);
+  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true, secondary: false });
 
   // In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
   // to it, in order have a stable form of exchange calculation
@@ -938,7 +995,7 @@ export function getPriceData({
   const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
   const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
 
-  const recipientCurrencies = getActorCurrencies(buyer, { currencyList });
+  const recipientCurrencies = getActorCurrencies(buyer, { currencyList, secondary: false });
   const totalCurrencies = recipientCurrencies.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
 
   // For each price group, check for properties and items and make sure that the actor can afford it
@@ -1014,12 +1071,12 @@ export function getPaymentData({
   }
 
   const merchant = sellerFlagData ? seller : buyer;
-  const currencyList = getCurrencyList(merchant);
-  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
+  const currencyList = getCurrencyList(merchant).filter(currency => !currency.secondary);
+  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true, secondary: false });
   const smallestExchangeRate = getSmallestExchangeRate(currencies)
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
-  const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
+  const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true, secondary: false });
 
   const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 
@@ -1361,7 +1418,6 @@ export async function updateVaultLog(itemPile, {
 
   const date = Date.now();
 
-
   for (const itemData of items) {
     if (currencies.some(currency => currency.name === itemData.item.name)) {
       formattedCurrencies.push({
@@ -1414,4 +1470,90 @@ export function clearVaultLog(actor) {
   return actor.update({
     [CONSTANTS.FLAGS.LOG]: []
   });
+}
+
+export async function rollMerchantTables({ tableData = false, actor = false } = {}) {
+
+  if (tableData && !Array.isArray(tableData)) {
+    tableData = [tableData]
+  } else if (!tableData && actor) {
+    const flagData = getActorFlagData(actor);
+    tableData = flagData.tablesForPopulate;
+  } else if (!tableData && !actor) {
+    return [];
+  }
+
+  const items = [];
+
+  for (const table of tableData) {
+
+    const rollableTable = game.tables.get(table.id);
+
+    if (!rollableTable) continue;
+
+    await rollableTable.reset();
+    await rollableTable.normalize();
+
+    let tableItems = [];
+
+    if (table.addAll) {
+
+      for (const [itemId, formula] of Object.entries(table.items)) {
+        const rollResult = rollableTable.results.get(itemId).toObject();
+        const item = await getItem(rollResult);
+        if (!item) continue;
+        const roll = new Roll(formula).evaluate({ async: false });
+        if (roll.total <= 0) continue;
+        tableItems.push({
+          ...rollResult,
+          item: item,
+          quantity: roll.total
+        })
+      }
+
+    } else {
+
+      const roll = new Roll((table.timesToRoll ?? "1").toString()).evaluate({ async: false });
+
+      if (roll.total <= 0) {
+        continue;
+      }
+
+      tableItems = await game.itempiles.API.rollItemTable(rollableTable, { timesToRoll: roll.total });
+
+    }
+
+    tableItems.forEach(newItem => {
+
+      const existingItem = items.find(
+        (item) => item.documentId === newItem.documentId
+      );
+      if (existingItem) {
+        existingItem.quantity++;
+      } else {
+        if (table?.customCategory && !getProperty(newItem.item, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
+          setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
+        }
+        items.push({
+          ...newItem
+        });
+      }
+    })
+  }
+
+  return items;
+}
+
+
+async function getItem(itemToGet) {
+  let item;
+  if (itemToGet.documentCollection === "Item") {
+    item = game.items.get(itemToGet.documentId);
+  } else {
+    const compendium = game.packs.get(itemToGet.documentCollection);
+    if (compendium) {
+      item = await compendium.getDocument(itemToGet.documentId);
+    }
+  }
+  return item;
 }

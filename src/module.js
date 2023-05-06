@@ -21,9 +21,9 @@ import { setupCaches } from "./helpers/caches.js";
 import { isValidItemPile } from "./helpers/pile-utilities.js";
 
 Hooks.once("init", async () => {
+  registerSettings();
   registerHotkeysPre();
   registerLibwrappers();
-  registerSettings();
   registerUIOverrides();
   setupCaches();
   setupPlugins("init");
@@ -91,8 +91,8 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
       await patchCurrencySettings();
       await runMigrations();
     }
-    //game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"));
-    //new SettingsShim().render(true);
+    // game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"));
+    // new SettingsShim().render(true);
     applySystemSpecificStyles();
   }, 500);
 });

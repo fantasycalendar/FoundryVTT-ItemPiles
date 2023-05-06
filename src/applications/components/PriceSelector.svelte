@@ -32,7 +32,7 @@
 					 class:cant-afford={cantAfford}
 					 class:cant-afford-multiple-prices={cantAffordMultiplePrices}
 					 class:item-piles-clickable-link={$prices.length > 1}>
-				{@html labelText}
+				<small>{@html labelText}</small>
 			</div>
 			<TJSMenu offset={{y: 4}}>
 				<div class="price-list">
@@ -50,7 +50,7 @@
 										<img class="item-piles-img" src="{price.img}"/>
 									</div>
 									<div class="item-piles-name item-piles-text">
-										{price.baseCost + (priceGroup.prices.length === 0 && price.percent ? "%" : "")} {price.name}
+										<small>{price.baseCost + (priceGroup.prices.length === 0 && price.percent ? "%" : "")} {price.name}</small>
 									</div>
 								</div>
 							{/each}
@@ -60,7 +60,7 @@
 			</TJSMenu>
 		</TJSToggleLabel>
 	{:else}
-		<small class:cant-afford={cantAfford}>{@html labelText }</small>
+		<small class:cant-afford={cantAfford}>{@html labelText}</small>
 	{/if}
 </div>
 
@@ -70,8 +70,8 @@
     align-items: center;
     position: relative;
     --tjs-label-justify-content: flex-start;
-    --tjs-label-font-size: smaller;
     --tjs-label-overflow: visible;
+    --tjs-menu-primary-color: black;
     --tjs-menu-color: black;
     --tjs-menu-border: 1px solid #444;
     --tjs-menu-box-shadow: 0 6px 9px -1px rgba(0, 0, 0, 0.5);
@@ -91,12 +91,16 @@
       opacity: 0.5;
     }
 
+    .multiple-prices {
+      overflow: visible;
+    }
+
     .multiple-prices::before,
     .multiple-prices::after {
       content: '';
       position: absolute;
-      top: -0.4rem;
-      left: -0.55rem;
+      top: -0.2rem;
+      left: -0.2rem;
       border-color: transparent;
       border-style: solid;
     }

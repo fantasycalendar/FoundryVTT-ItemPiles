@@ -235,8 +235,7 @@
       "ReceiveItem": {
         "Title": "Receiving Item",
         "Header": "Item Piles: Receiving Item",
-        "ContentOne": "{source_actor_name} wants to give the item \"{item_name}\" to {target_actor_name}, do you accept?",
-        "ContentMany": "{source_actor_name} wants to give the items \"{item_name}\" ({quantity}) to {target_actor_name}, do you accept?",
+        "Content": "{source_actor_name} wants to give an item to {target_actor_name}, do you accept?",
         "Ignore": "Ignore User"
       },
       "TextEditor": {
@@ -296,6 +295,7 @@
       "EditCurrencies": {
         "Title": "Editing Currencies",
         "Content": "As a GM, you can update the currencies on this item pile:",
+        "Secondary": "Secondary Currencies:",
         "Submit": "Submit"
       },
       "DropCurrencies": {
@@ -355,6 +355,11 @@
         "Icon": "Icon",
         "AddNew": "Add new currency"
       },
+      "SecondaryCurrenciesEditor": {
+        "Title": "Item Piles Secondary Currencies Editor",
+        "TitleActor": "Item Piles Secondary Currencies Editor: {actor_name}",
+        "Explanation": "Here you can define which secondary currencies that can be picked up and dropped by characters."
+      },
       "ItemEditor": {
         "Title": "Item Piles Item Editor: {item_name}",
         "Update": "Update Item",
@@ -379,6 +384,8 @@
         "InfiniteQuantityNo": "No, standard quantity",
         "KeepZero": "Keep Zero Quantity",
         "KeepZeroExplanation": "When fully sold out, the merchant does not remove this item but sets it to not for sale instead.",
+        "KeepOnMerchant": "Keep On Merchant",
+        "KeepOnMerchantExplanation": "When the items are cleared in the populate items tab of merchants or by the Simple Calendar refresh inventory integration (see the merchant config at the bottom), this item will always remain.",
         "PriceExplanation": "In this tab, you can configure the price of this item, including whether this item will cost other items to purchase.",
         "BasePrice": "Base Price",
         "BasePriceExplanation": "This configures the normal price of this item.",
@@ -398,7 +405,7 @@
         "CantBeSoldToMerchantsExplanation": "When enabled, this item cannot be sold back to merchants, only purchased.",
         "AddPurchaseOption": "Add Purchase Option",
         "DropMeClickMe": "Click to add an attribute or drag & drop an item to add",
-        "PricePreset": "Or select an exiting price preset:",
+        "PricePreset": "Or select a price preset:",
         "SelectPreset": "Select price preset",
         "CanStack": "Can Stack",
         "CanStackExplanation": "This configures whether this item will stack with other similar items when added to a vault.",
@@ -489,6 +496,9 @@
           "OverrideCurrencies": "Override Currencies",
           "OverrideCurrenciesExplanation": "Configure if this pile should be able to transfer other currencies than the default.",
           "ConfigureOverrideCurrencies": "Configure Override Currencies",
+          "OverrideSecondaryCurrencies": "Override Secondary Currencies",
+          "OverrideSecondaryCurrenciesExplanation": "Configure this item pile's secondary currency overrides.",
+          "ConfigureOverrideSecondaryCurrencies": "Configure Override Secondary Currencies",
           "OverrideItemFilters": "Override Item Filters",
           "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
           "ConfigureOverrideItemFilters": "Configure Override Item Filters"
@@ -573,6 +583,13 @@
           "ClosedDaysExplanation": "On the days checked, the merchant will be closed (if the merchant open status is set to automatic).",
           "ClosedHolidays": "Closed Holidays (Simple Calendar)",
           "ClosedHolidaysExplanation": "On days where there are notes with the given note category, the merchant will be closed (if the merchant open status is set to automatic).",
+          "RefreshItemsWarning": "With every options below, existing items will be DELETED and cannot be recovered. Individual items can be configured to be kept; items set to services, keep zero quantity, and keep on merchant will stay.",
+          "RefreshItemsOnOpen": "Refresh Items At Open Time (Simple Calendar)",
+          "RefreshItemsOnOpenExplanation": "When the calendar's time goes beyond the opening time of the merchant, the merchant's inventory will be refreshed.",
+          "RefreshItemsDays": "Refresh Items Weekdays (Simple Calendar)",
+          "RefreshItemsDaysExplanation": "When the calendar passes the checked days, the merchant's inventory will be refreshed. This happens on the opening time of the merchant, or at midnight if it doesn't have an open/close time.",
+          "RefreshItemsHolidays": "Refresh Items Holidays (Simple Calendar)",
+          "RefreshItemsHolidaysExplanation": "When the calendar passes notes with the given note category, the merchant's inventory will be refreshed. This happens on the note's time, or at midnight if it is a note that is set to all day.",
           "PriceModifierTitle": "Buy and Sell Price Modifiers",
           "PriceModifierExplanation": "This configures the modifiers for the cost of every item in the shop. You can also configure modifiers per item type, and even for specific characters (such as silver-tongued bards). You are not limited to 200%, type into the field to go even higher.",
           "BuyPriceModifier": "Buy Price Modifier (%)",
@@ -688,6 +705,11 @@
         "Title": "Currencies",
         "Label": "Configure Currencies",
         "Hint": "This setting define the currencies that are eligible for pickup, which may not be actual items but numerical inputs on the character sheet."
+      },
+      "SecondaryCurrencies": {
+        "Title": "Secondary Currencies",
+        "Label": "Configure Secondary Currencies",
+        "Hint": "This setting define secondary currencies, similar to but separate from regular currencies. These cannot have exchange rates or be split into other custom currencies."
       },
       "CurrencyDecimalDigits": {
         "Title": "Currency Decimal Digits",

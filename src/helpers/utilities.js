@@ -57,8 +57,9 @@ export function findSimilarItem(items, findItem, actorFlagData = false) {
 
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 
-  const findItemData = findItem instanceof Item ? findItem.toObject() : findItem;
-  const findItemId = findItemData._id;
+  let findItemData = findItem instanceof Item ? findItem.toObject() : findItem;
+  findItemData = findItemData?.item ?? findItemData;
+  const findItemId = findItemData?._id;
 
   let hasUniqueKey = false;
   for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
@@ -73,14 +74,14 @@ export function findSimilarItem(items, findItem, actorFlagData = false) {
   const filteredItems = items
     .filter(item => {
       for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
-        if (getProperty(item, prop)) {
+        if (getProperty(item?.item ?? item, prop)) {
           return false;
         }
       }
       return true;
     })
     .filter(item => {
-      const itemId = item instanceof Item ? item.id : item._id ?? item.id;
+      const itemId = item instanceof Item ? item.id : item?.item?._id ?? item?._id ?? item?.id;
       if (itemId && findItemId && itemId === findItemId) {
         return true;
       }
@@ -93,7 +94,8 @@ export function findSimilarItem(items, findItem, actorFlagData = false) {
         return false;
       }
 
-      const itemData = item instanceof Item ? item.toObject() : item;
+      let itemData = item instanceof Item ? item.toObject() : item;
+      itemData = itemData?.item ?? itemData;
       if (areItemsDifferent(itemData, findItemData)) {
         return false;
       }

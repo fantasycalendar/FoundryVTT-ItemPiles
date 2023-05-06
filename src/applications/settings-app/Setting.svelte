@@ -72,6 +72,10 @@
     margin-bottom: 0.4rem;
     padding-bottom: 0.4rem;
 
+  }
+	
+  .item-pile-setting {
+
     .reset-setting {
       font-size: 0.75rem;
       margin-left: 0.5rem;

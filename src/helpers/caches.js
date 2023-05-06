@@ -1,6 +1,5 @@
 import CONSTANTS from "../constants/constants.js";
 import * as Utilities from "./utilities.js";
-import { getCurrencyList } from "./pile-utilities.js";
 
 export function setupCaches() {
 
@@ -17,24 +16,33 @@ export function setupCaches() {
 
 class DebouncedCache extends Map {
 
-  #debounceClear;
+  #debounceClear = {};
+  #timeout = {};
 
-  constructor(timeout) {
+  constructor(timeout = 50) {
     super();
-    this.#debounceClear = foundry.utils.debounce((key) => {
-      this.delete(key);
-    }, timeout)
+    this.#timeout = timeout;
   }
 
   set(key, value) {
-    this.#debounceClear(key)
+    this.#setDebounce(key)
     return super.set(key, value);
+  }
+
+  #setDebounce(key) {
+    if (!this.#debounceClear[key]) {
+      this.#debounceClear[key] = foundry.utils.debounce(() => {
+        delete this.#debounceClear[key];
+        this.delete(key);
+      }, this.#timeout)
+    }
+    this.#debounceClear[key]();
   }
 }
 
 
-export const deletedActorCache = new DebouncedCache(1000);
-export const cachedActorCurrencies = new DebouncedCache(200);
-export const cachedFilterList = new DebouncedCache(1000);
-export const cachedCurrencyList = new DebouncedCache(1000);
+export const deletedActorCache = new DebouncedCache(5000);
+export const cachedActorCurrencies = new DebouncedCache();
+export const cachedFilterList = new DebouncedCache();
+export const cachedCurrencyList = new DebouncedCache();
 

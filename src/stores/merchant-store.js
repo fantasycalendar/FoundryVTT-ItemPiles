@@ -166,10 +166,8 @@ export default class MerchantStore extends ItemPileStore {
   }
 
   visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
-    const itemFlagData = get(entry.itemFlagData) ?? {};
     const itemIsFree = get(entry.prices)?.free ?? false;
-    return !entry.isCurrency
-      && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden)
+    return super.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData)
       && (
         actorIsMerchant
           ? !(pileData?.hideItemsWithZeroCost && itemIsFree)
@@ -273,7 +271,6 @@ export default class MerchantStore extends ItemPileStore {
     const pileData = get(this.pileData);
     if (pileData.openTimes.status === "auto") {
       if (game.modules.get('foundryvtt-simple-calendar')?.active && pileData.openTimes.enabled) {
-        let isClosed = false;
         const openTimes = pileData.openTimes.open;
         const closeTimes = pileData.openTimes.close;
         const timestamp = window.SimpleCalendar.api.timestampToDate(window.SimpleCalendar.api.timestamp());
@@ -282,7 +279,7 @@ export default class MerchantStore extends ItemPileStore {
         const closingTime = Number(closeTimes.hour.toString() + "." + closeTimes.minute.toString());
         const currentTime = Number(timestamp.hour.toString() + "." + timestamp.minute.toString());
 
-        isClosed = openingTime > closingTime
+        let isClosed = openingTime > closingTime
           ? !(currentTime >= openingTime || currentTime <= closingTime)  // Is the store open over midnight?
           : !(currentTime >= openingTime && currentTime <= closingTime); // or is the store open during normal daylight hours?
 
@@ -320,8 +317,8 @@ export default class MerchantStore extends ItemPileStore {
 
 class PileMerchantItem extends PileItem {
 
-  setupStores(item) {
-    super.setupStores(item);
+  setupStores(...args) {
+    super.setupStores(...args);
     this.prices = writable([]);
     this.displayQuantity = writable(false);
     this.selectedPriceGroup = writable(-1);
@@ -359,7 +356,8 @@ class PileMerchantItem extends PileItem {
       if (!setup) return;
       this.filter()
     });
-    this.subscribeTo(this.itemFlagData, () => {
+    this.subscribeTo(this.itemFlagData, (flagData) => {
+      this.isService = flagData.isService;
       if (!setup) return;
       this.refreshPriceData();
       this.refreshDisplayQuantity();

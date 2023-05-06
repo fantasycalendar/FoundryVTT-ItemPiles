@@ -44,7 +44,7 @@
   const vaultLog = store.vaultLog;
   const visibleLogItems = store.visibleLogItems;
   const recipientDocument = store.recipientDocument;
-  const pileCurrencies = store.pileCurrencies;
+  const numCurrencies = store.numCurrencies;
   const dragPositionStore = store.dragPosition;
 
   $: pileData = $pileDataStore;
@@ -328,7 +328,7 @@
 							{localize("ITEM-PILES.Vault.ViewingAs", { actor_name: $recipientDocument.name })}
             </a>
           </span>
-					{#if $pileCurrencies.length && (gridData.canDepositCurrencies || gridData.canWithdrawCurrencies)}
+					{#if gridData.canDepositCurrencies || gridData.canWithdrawCurrencies}
 						<div style="flex:0 1 auto; justify-self: flex-end; display: flex; justify-content: flex-end;">
 							{#if gridData.canWithdrawCurrencies}
 								<button type="button" class="item-piles-small-button" on:click={() => store.withdrawCurrency()}>
@@ -345,21 +345,19 @@
 				</div>
 			{/if}
 
-			{#if $pileCurrencies.length}
-				<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
+			<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
 
-					<CurrencyList {currencies}
-												options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
-												style="align-items: center;">
-						{#if gridData.canEditCurrencies}
-							<a style="order: 100; display:flex; flex: 0; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
-								<i class="fas fa-cog"></i>
-							</a>
-						{/if}
-					</CurrencyList>
+				<CurrencyList {currencies}
+											options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
+											style="align-items: center;">
+					{#if gridData.canEditCurrencies}
+						<a style="order: 100; display:flex; flex: 0; margin-left: 0.25rem;" on:click={() => store.addCurrency()}>
+							<i class="fas fa-cog"></i>
+						</a>
+					{/if}
+				</CurrencyList>
 
-				</div>
-			{/if}
+			</div>
 
 		{/if}
 

@@ -6,7 +6,8 @@ import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
 export default class CurrencyStore {
 
-  constructor(data) {
+  constructor(data, secondary = false) {
+    this.secondary = secondary;
     this.currencies = writable(data.map((entry, index) => {
       return {
         ...entry,
@@ -17,6 +18,7 @@ export default class CurrencyStore {
   }
 
   setPrimary(index) {
+    if (this.secondary) return;
     this.currencies.update(currencies => {
       currencies.forEach((entry, entryIndex) => {
         entry.primary = entryIndex === index;
@@ -26,6 +28,7 @@ export default class CurrencyStore {
   }
 
   sortCurrencies() {
+    if (this.secondary) return;
     this.currencies.update(currencies => {
       currencies.sort((a, b) => {
         return b.exchangeRate - a.exchangeRate;
@@ -36,17 +39,18 @@ export default class CurrencyStore {
 
   addAttribute() {
     this.currencies.update(currencies => {
-      currencies.push({
+      currencies.push(foundry.utils.mergeObject({
         type: "attribute",
         name: "New Attribute",
         img: "",
         abbreviation: "{#}N",
         data: {
           path: ""
-        },
+        }
+      }, this.secondary ? {} : {
         primary: !currencies.length,
         exchangeRate: 1
-      });
+      }));
       return currencies;
     });
   }
@@ -77,7 +81,7 @@ export default class CurrencyStore {
         }
         Helpers.custom_notify(`Updated item data for ${localize(currencies[index].name)} (item name ${itemData.name})`)
       } else {
-        currencies.push({
+        currencies.push(foundry.utils.mergeObject({
           id: randomID(),
           type: "item",
           name: itemData.name,
@@ -87,9 +91,10 @@ export default class CurrencyStore {
             uuid,
             item: itemData
           },
+        }, this.secondary ? {} : {
           primary: !currencies.length,
           exchangeRate: 1
-        });
+        }));
       }
       return currencies;
     });

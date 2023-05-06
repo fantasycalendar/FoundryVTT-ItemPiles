@@ -117,6 +117,8 @@
 
   button {
     flex: 1;
+    line-height: initial;
+    padding: 0.5rem 0;
   }
 
 </style>

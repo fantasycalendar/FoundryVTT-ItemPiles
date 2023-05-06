@@ -98,7 +98,7 @@
 				{settings?.content ?? localize(`ITEM-PILES.Applications.${localization}.Content`)}
 			</p>
 
-			{#each attributes as attribute, index (attribute.path)}
+			{#each attributes.filter(currency => !currency.secondary) as attribute, index (attribute.path)}
 				<div class="form-group item-piles-slider-group item-piles-odd-color">
 					<div class="item-piles-img-container">
 						<img class="item-piles-img" src="{attribute.img}">
@@ -123,7 +123,7 @@
 				</div>
 			{/each}
 
-			{#each items as item, index (item.id)}
+			{#each items.filter(currency => !currency.secondary) as item, index (item.id)}
 				<div class="form-group item-piles-slider-group item-piles-odd-color">
 					<div class="item-piles-img-container">
 						<img class="item-piles-img" src="{item.img}">
@@ -147,6 +147,62 @@
 					{/if}
 				</div>
 			{/each}
+
+			{#if attributes.filter(currency => currency.secondary).length || items.filter(currency => currency.secondary).length}
+
+				<div class="item-piles-top-divider"></div>
+
+				{#each attributes.filter(currency => currency.secondary) as attribute, index (attribute.path)}
+					<div class="form-group item-piles-slider-group item-piles-odd-color">
+						<div class="item-piles-img-container">
+							<img class="item-piles-img" src="{attribute.img}">
+						</div>
+						<div class="item-piles-name item-piles-text">
+							<div>{attribute.name}</div>
+						</div>
+
+						{#if settings?.unlimitedCurrencies}
+							<input class="item-piles-range-input" style="flex: 2; margin-left:1rem;" type="number"
+										 bind:value={attribute.currentQuantity}/>
+						{:else}
+							<input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{attribute.quantity}"
+										 bind:value={attribute.currentQuantity}/>
+							<input class="item-piles-range-input" style="flex: 2; margin-left:1rem;" type="number"
+										 bind:value={attribute.currentQuantity}
+										 on:click={() => {
+													attribute.currentQuantity = Math.max(0, Math.min(attribute.quantity, attribute.currentQuantity));
+										 }}/>
+							<div style="flex:0 1 50px; margin: 0 5px;">/ {abbreviateNumbers(attribute.quantity)}</div>
+						{/if}
+					</div>
+				{/each}
+
+				{#each items.filter(currency => currency.secondary) as item, index (item.id)}
+					<div class="form-group item-piles-slider-group item-piles-odd-color">
+						<div class="item-piles-img-container">
+							<img class="item-piles-img" src="{item.img}">
+						</div>
+						<div class="item-piles-name item-piles-text">
+							<div>{item.name}</div>
+						</div>
+
+						{#if settings?.unlimitedCurrencies}
+							<input class="item-piles-range-input" style="flex: 2; margin-left:1rem;" type="number"
+										 bind:value={item.currentQuantity}/>
+						{:else}
+							<input class="item-piles-range-slider" style="flex: 5;" type="range" min="0" max="{item.quantity}"
+										 bind:value={item.currentQuantity}/>
+							<input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
+										 bind:value={item.currentQuantity}
+										 on:click={() => {
+													item.currentQuantity = Math.max(0, Math.min(item.quantity, item.currentQuantity));
+										 }}/>
+							<div style="flex:0 1 50px; margin: 0 5px;">/ {abbreviateNumbers(item.quantity)}</div>
+						{/if}
+					</div>
+				{/each}
+
+			{/if}
 
 		{:else}
 

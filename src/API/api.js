@@ -33,6 +33,15 @@ class API {
   }
 
   /**
+   * The secondary currencies used in this system
+   *
+   * @returns {Array<{name: string, data: Object, img: string, abbreviation: string}>}
+   */
+  static get SECONDARY_CURRENCIES() {
+    return Helpers.getSetting(SETTINGS.SECONDARY_CURRENCIES);
+  }
+
+  /**
    * The smallest decimal digits shown for any fractional currency amounts. Only used when there is only one currency.
    *
    * @returns {Number}
@@ -163,6 +172,39 @@ class API {
       }
     });
     return Helpers.setSetting(SETTINGS.CURRENCIES, inCurrencies);
+  }
+
+  /**
+   * Sets the secondary currencies used in this system
+   *
+   * @param {Array<Object>} inSecondaryCurrencies
+   * @returns {Promise}
+   */
+  static async setSecondaryCurrencies(inSecondaryCurrencies) {
+    if (!Array.isArray(inSecondaryCurrencies)) {
+      throw Helpers.custom_error("setSecondaryCurrencies | inSecondaryCurrencies must be an array");
+    }
+    inSecondaryCurrencies.forEach(currency => {
+      if (typeof currency !== "object") {
+        throw Helpers.custom_error("setSecondaryCurrencies | each entry in inSecondaryCurrencies must be of type object");
+      }
+      if (typeof currency.name !== "string") {
+        throw Helpers.custom_error("setSecondaryCurrencies | currency.name must be of type string");
+      }
+      if (typeof currency.abbreviation !== "string") {
+        throw Helpers.custom_error("setSecondaryCurrencies | currency.abbreviation must be of type string");
+      }
+      if (typeof currency.data !== "object") {
+        throw Helpers.custom_error("setSecondaryCurrencies | currency.data must be of type object");
+      }
+      if (typeof currency.data.path !== "string" && typeof currency.data.uuid !== "string" && typeof currency.data.item !== "object") {
+        throw Helpers.custom_error("setSecondaryCurrencies | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
+      }
+      if (currency.img && typeof currency.img !== "string") {
+        throw Helpers.custom_error("setSecondaryCurrencies | currency.img must be of type string");
+      }
+    });
+    return Helpers.setSetting(SETTINGS.SECONDARY_CURRENCIES, inSecondaryCurrencies);
   }
 
   /**
@@ -331,6 +373,12 @@ class API {
    *     data: Object<{ path: string }|{ uuid: string }|{ item: object }>,
    *     exchangeRate: number
    *   }>,
+   *   SECONDARY_CURRENCIES: Array<{
+   *     type: string ["attribute"/"item"],
+   *     img: string,
+   *     abbreviation: string,
+   *     data: Object<{ path: string }|{ uuid: string }|{ item: object }>
+   *   }>,
    *   CURRENCY_DECIMAL_DIGITS: undefined/number
    * }>} inData
    */
@@ -349,6 +397,7 @@ class API {
       TOKEN_FLAG_DEFAULTS: {},
       ITEM_TRANSFORMER: null,
       CURRENCIES: [],
+      SECONDARY_CURRENCIES: [],
       CURRENCY_DECIMAL_DIGITS: 0.00001
     }, inData)
 
@@ -429,32 +478,56 @@ class API {
     }
 
     if (!Array.isArray(data['CURRENCIES'])) {
-      throw Helpers.custom_error("addSystemIntegration | inCurrencies must be an array");
+      throw Helpers.custom_error("addSystemIntegration | data.CURRENCIES must be an array");
     }
     data['CURRENCIES'].forEach(currency => {
       if (typeof currency !== "object") {
-        throw Helpers.custom_error("addSystemIntegration | each entry in data.CURRENCIES must be of type object");
+        throw Helpers.custom_error("addSystemIntegration | CURRENCIES | each entry in data.CURRENCIES must be of type object");
       }
       if (typeof currency.primary !== "boolean") {
-        throw Helpers.custom_error("addSystemIntegration | currency.primary must be of type boolean");
+        throw Helpers.custom_error("addSystemIntegration | CURRENCIES | currency.primary must be of type boolean");
       }
       if (typeof currency.name !== "string") {
-        throw Helpers.custom_error("addSystemIntegration | currency.name must be of type string");
+        throw Helpers.custom_error("addSystemIntegration | CURRENCIES | currency.name must be of type string");
       }
       if (typeof currency.abbreviation !== "string") {
-        throw Helpers.custom_error("addSystemIntegration | currency.abbreviation must be of type string");
+        throw Helpers.custom_error("addSystemIntegration | CURRENCIES | currency.abbreviation must be of type string");
       }
       if (typeof currency.exchangeRate !== "number") {
-        throw Helpers.custom_error("addSystemIntegration | currency.exchangeRate must be of type number");
+        throw Helpers.custom_error("addSystemIntegration | CURRENCIES | currency.exchangeRate must be of type number");
       }
       if (typeof currency.data !== "object") {
-        throw Helpers.custom_error("addSystemIntegration | currency.data must be of type object");
+        throw Helpers.custom_error("addSystemIntegration | CURRENCIES | currency.data must be of type object");
       }
       if (typeof currency.data.path !== "string" && typeof currency.data.uuid !== "string" && typeof currency.data.item !== "object") {
-        throw Helpers.custom_error("addSystemIntegration | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
+        throw Helpers.custom_error("addSystemIntegration | CURRENCIES | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
       }
       if (currency.img && typeof currency.img !== "string") {
-        throw Helpers.custom_error("addSystemIntegration | currency.img must be of type string");
+        throw Helpers.custom_error("addSystemIntegration | CURRENCIES | currency.img must be of type string");
+      }
+    });
+
+    if (!Array.isArray(data['SECONDARY_CURRENCIES'])) {
+      throw Helpers.custom_error("addSystemIntegration | data.SECONDARY_CURRENCIES must be an array");
+    }
+    data['SECONDARY_CURRENCIES'].forEach(currency => {
+      if (typeof currency !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | each entry in data.SECONDARY_CURRENCIES must be of type object");
+      }
+      if (typeof currency.name !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.name must be of type string");
+      }
+      if (typeof currency.abbreviation !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.abbreviation must be of type string");
+      }
+      if (typeof currency.data !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.data must be of type object");
+      }
+      if (typeof currency.data.path !== "string" && typeof currency.data.uuid !== "string" && typeof currency.data.item !== "object") {
+        throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
+      }
+      if (currency.img && typeof currency.img !== "string") {
+        throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.img must be of type string");
       }
     });
 

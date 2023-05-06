@@ -16,7 +16,9 @@ export default function registerUIOverrides() {
   Hooks.on("renderTokenHUD", renderPileHUD);
   Hooks.on("hoverToken", handleTokenBorders);
   Hooks.on("controlToken", handleTokenBorders);
-  game.tooltip = new FastTooltipManager();
+  if (!foundry.utils.isNewerVersion(game.version, "10.999")) {
+    game.tooltip = new FastTooltipManager();
+  }
 }
 
 function handleTokenBorders(token) {

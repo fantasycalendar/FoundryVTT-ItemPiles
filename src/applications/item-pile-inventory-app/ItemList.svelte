@@ -7,19 +7,19 @@
   export let store;
   const items = store.items;
   const numItems = store.numItems;
-
+  
 </script>
 
 
 {#if $numItems > 0}
-  <div in:fade|local={{duration: 150}}>
+	<div in:fade|local={{duration: 150}}>
 
-    <div class="item-piles-flexrow"><h3>{localize("ITEM-PILES.Items")}</h3></div>
+		<div class="item-piles-flexrow"><h3>{localize("ITEM-PILES.Items")}</h3></div>
 
-    {#each $items as item (item.identifier)}
-      <ListEntry {store} bind:entry={item}/>
-    {/each}
+		{#each $items as item (item.identifier)}
+			<ListEntry {store} bind:entry={item}/>
+		{/each}
 
-  </div>
+	</div>
 
 {/if}

@@ -29,6 +29,7 @@ const CONSTANTS = {
     disableNormalCost: false,
     cantBeSoldToMerchants: false,
     isService: false,
+    keepOnMerchant: false,
     macro: "",
     customCategory: "",
     prices: [],
@@ -74,6 +75,7 @@ const CONSTANTS = {
     // Overrides
     overrideItemFilters: false,
     overrideCurrencies: false,
+    overrideSecondaryCurrencies: false,
 
     // Token settings
     displayOne: false,
@@ -143,6 +145,9 @@ const CONSTANTS = {
     },
     closedDays: [],
     closedHolidays: [],
+    refreshItemsOnOpen: false,
+    refreshItemsDays: [],
+    refreshItemsHolidays: [],
 
     // Vault settings
     cols: 10,

@@ -21,36 +21,21 @@ export default async function runMigrations() {
 }
 
 function getItemPileActorsOfLowerVersion(version) {
-  return Array.from(game.actors).filter(a => {
+  return PileUtilities.getItemPileActors((a) => {
     const actorFlagVersion = getProperty(a, CONSTANTS.FLAGS.VERSION) || "1.0.0";
     return getProperty(a, CONSTANTS.FLAGS.PILE)?.enabled && isNewerVersion(version, actorFlagVersion);
-  });
+  })
 }
 
 function getItemPileTokensOfLowerVersion(version) {
-
-  const allTokensOnScenes = Array.from(game.scenes)
-    .map(scene => ([
-      scene.id,
-      Array.from(scene.tokens).filter(t => {
-        return getProperty(t, CONSTANTS.FLAGS.PILE)?.enabled && !t.actorLink;
-      })
-    ]))
-    .filter(([_, tokens]) => tokens.length)
-
-  const validTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [
-    scene,
-    tokens.filter(token => {
-      try {
-        const actorFlagVersion = getProperty(token, CONSTANTS.FLAGS.VERSION) || "1.0.0";
-        return token.actor && isNewerVersion(version, actorFlagVersion);
-      } catch (err) {
-        return false;
-      }
-    })
-  ]).filter(([_, tokens]) => tokens.length);
-
-  return { allTokensOnScenes, validTokensOnScenes };
+  return PileUtilities.getItemPileTokens((token) => {
+    try {
+      const actorFlagVersion = getProperty(token, CONSTANTS.FLAGS.VERSION) || "1.0.0";
+      return token.actor && isNewerVersion(version, actorFlagVersion);
+    } catch (err) {
+      return false;
+    }
+  })
 }
 
 function filterValidItems(items, version) {

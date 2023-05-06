@@ -1,5 +1,18 @@
 # Item Piles Changelog
 
+## Version 2.6.9
+
+- Added Simple Calendar support for auto-population and refresh of merchant inventory based on the opening time when driven by Simple Calendar, as well as Simple Calendar repeating notes and on specific weekdays
+- Added option on the item configuration to make individual items to not be cleared when the merchant's inventory is refreshed
+- Added option to merchant population tables to put new items directly into a custom item category
+- Added support for secondary currencies - these cannot be exchanged for one another when buying or selling from merchants
+- Added price paid for items and services to the chat message when purchasing from merchants
+- Updated Portuguese (Brazilian), Chinese (Simplified), Polish, and French localization - thank you eunaumtenhoid, sakusenerio, psedonatural, and Lioheart on Weblate, couldn't do it without ya!
+- Updated the receiving item dialog when passing items between tokens
+- Fixed error when taking everything from an item pile
+- Fixed merchant items with multiple prices not being apparent
+- Fixed merchant items text color on the multiple price dropdown being too faded
+
 ## Version 2.6.8
 
 - Added optional custom category on the table configuration in merchant populate items, which will automatically put all items rolled from those tables into that category, unless the rolled item already has a custom category

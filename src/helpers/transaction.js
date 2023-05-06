@@ -30,6 +30,7 @@ export default class Transaction {
     keepIfZero = false,
     onlyDelta = false,
   } = {}) {
+
     for (let data of items) {
 
       let item = data.item ?? data;
@@ -39,7 +40,8 @@ export default class Transaction {
         itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
       }
       const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
-      const actorHasItem = this.actor.items.get(itemData._id);
+      let itemId = itemData._id ?? itemData.id;
+      const actorHasItem = this.actor.items.get(itemId);
       const actorExistingItem = remove && actorHasItem
         ? actorHasItem
         : Utilities.findSimilarItem(this.actor.items, itemData, PileUtilities.getActorFlagData(this.actor));
@@ -54,16 +56,16 @@ export default class Transaction {
           }
           this.itemDeltas.set(actorExistingItem.id, -1);
         } else {
-          if (!itemData._id) {
-            itemData._id = randomID();
+          if (!itemId) {
+            itemId = randomID();
           }
-          this.itemTypeMap.set(itemData._id, type)
+          this.itemTypeMap.set(itemId, type)
           this.itemsToCreate.push(itemData);
         }
 
       } else if (actorExistingItem) {
 
-        const existingItemUpdate = remove ? this.itemsToUpdate.find(item => item._id === itemData._id) : Utilities.findSimilarItem(this.itemsToUpdate, itemData);
+        const existingItemUpdate = remove ? this.itemsToUpdate.find(item => item._id === itemId) : Utilities.findSimilarItem(this.itemsToUpdate, itemData);
         if (keepIfZero || type === "currency") {
           this.itemsToNotDelete.add(item.id);
         }
@@ -76,7 +78,7 @@ export default class Transaction {
             }
           } else {
             const newQuantity = Utilities.getItemQuantity(actorExistingItem) + incomingQuantity;
-            const update = Utilities.setItemQuantity({ _id: actorExistingItem.id }, newQuantity);
+            const update = Utilities.setItemQuantity(actorExistingItem.toObject(), newQuantity);
             if (keepIfZero && type !== "currency") {
               setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
             }
@@ -137,6 +139,7 @@ export default class Transaction {
   }
 
   prepare() {
+
     this.actorUpdates = Object.fromEntries(Object.entries(this.actorUpdates).filter(entry => {
       if (this.attributeDeltas.get(entry[0]) === 0) {
         this.attributeDeltas.delete(entry[0]);

@@ -141,8 +141,11 @@ export const SYSTEMS = {
     QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
     ITEM_FILTERS: [],
     ITEM_SIMILARITIES: [],
+    VAULT_STYLES: [],
+    CSS_VARIABLES: [],
     UNSTACKABLE_ITEM_TYPES: [],
     CURRENCIES: [],
+    SECONDARY_CURRENCIES: [],
     PILE_DEFAULTS: {},
     TOKEN_FLAG_DEFAULTS: {},
     CURRENCY_DECIMAL_DIGITS: 0.00001

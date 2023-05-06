@@ -13,7 +13,13 @@ export default function registerLibwrappers() {
     return wrapped(...args);
   }, "MIXED");
 
-  libWrapper.register(CONSTANTS.MODULE_NAME, `SidebarDirectory.prototype._onClickDocumentName`, function (wrapped, event) {
+  const versionIsEleven = foundry.utils.isNewerVersion(game.version, "10.999");
+
+  const overrideMethod = versionIsEleven
+    ? `DocumentDirectory.prototype._onClickEntryName`
+    : `SidebarDirectory.prototype._onClickDocumentName`;
+
+  libWrapper.register(CONSTANTS.MODULE_NAME, overrideMethod, function (wrapped, event) {
     event.preventDefault();
     const element = event.currentTarget;
     const documentId = element.parentElement.dataset.documentId;

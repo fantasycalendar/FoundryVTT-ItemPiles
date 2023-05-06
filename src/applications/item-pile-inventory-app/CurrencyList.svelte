@@ -26,7 +26,7 @@
 	{#if $numCurrencies > 0}
 		<div>
 			{#each $currencies as currency, index (currency.identifier)}
-				<ListEntry {store} bind:entry={currency}/>
+				<ListEntry {store} bind:entry={currency} currency/>
 			{/each}
 		</div>
 	{/if}

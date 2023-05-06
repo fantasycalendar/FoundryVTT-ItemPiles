@@ -12,6 +12,7 @@
   import SETTINGS from "../../constants/settings";
   import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
   import CONSTANTS from "../../constants/constants.js";
+  import { rollMerchantTables } from "../../helpers/pile-utilities.js";
 
   export let store;
 
@@ -36,7 +37,7 @@
 
   $: currentItems = $itemStore.sort((a, b) => {
     return a.item.name < b.item.name ? -1 : 1;
-  });
+  }).filter(item => !item.isService);
 
   $: {
     debounceSave($populationTables, $tables)
@@ -95,39 +96,15 @@
   }
 
   async function evaluateTable(table, keepRolledItems) {
+
     const rollableTable = game.tables.get(table.id);
     if (!rollableTable) return;
-    await rollableTable.reset();
-    await rollableTable.normalize();
+
     if (!keepRolledItems) {
       itemsRolled.set([]);
     }
-    let newItems = [];
-    if (table.addAll) {
 
-      for (const [itemId, formula] of Object.entries(table.items)) {
-        const rollResult = rollableTable.results.get(itemId).toObject();
-        const item = await getItem(rollResult);
-        const roll = new Roll(formula).evaluate({ async: false });
-        if (roll.total <= 0) continue;
-        newItems.push({
-          ...rollResult,
-          item: item,
-          quantity: roll.total
-        })
-      }
-
-    } else {
-
-      const roll = new Roll((table.timesToRoll ?? "1").toString()).evaluate({ async: false });
-
-      if (roll.total <= 0) {
-        return;
-      }
-
-      newItems = await game.itempiles.API.rollItemTable(rollableTable, { timesToRoll: roll.total });
-
-    }
+    const newItems = await PileUtilities.rollMerchantTables({ tableData: [table] });
 
     const processedItems = newItems.map(itemData => {
       const prices = game.itempiles.API.getPricesForItem(itemData.item, {
@@ -145,9 +122,6 @@
         if (existingItem) {
           existingItem.quantity++;
         } else {
-          if (table?.customCategory && !getProperty(newItem.item, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
-            setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
-          }
           items.push({
             ...newItem
           });
@@ -159,19 +133,6 @@
       return items;
     });
 
-  }
-
-  async function getItem(itemToGet) {
-    let item;
-    if (itemToGet.documentCollection === "Item") {
-      item = game.items.get(itemToGet.documentId);
-    } else {
-      const compendium = game.packs.get(itemToGet.documentCollection);
-      if (compendium) {
-        item = await compendium.getDocument(itemToGet.documentId);
-      }
-    }
-    return item;
   }
 
   async function addItem(itemToAdd) {
@@ -221,8 +182,11 @@
       },
     });
     if (!doContinue) return false;
-    const items = game.itempiles.API.getActorItems(store.actor);
-    await game.itempiles.API.removeItems(store.actor, items);
+    await game.itempiles.API.removeItems(store.actor, game.itempiles.API.getActorItems(store.actor)
+      .filter(item => {
+        const itemFlags = PileUtilities.getItemFlagData(item);
+        return !itemFlags.isService && !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
+      }));
   }
 
   async function previewItem(itemData) {
