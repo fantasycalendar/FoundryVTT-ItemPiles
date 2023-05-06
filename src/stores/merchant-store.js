@@ -271,7 +271,6 @@ export default class MerchantStore extends ItemPileStore {
     const pileData = get(this.pileData);
     if (pileData.openTimes.status === "auto") {
       if (game.modules.get('foundryvtt-simple-calendar')?.active && pileData.openTimes.enabled) {
-        let isClosed = false;
         const openTimes = pileData.openTimes.open;
         const closeTimes = pileData.openTimes.close;
         const timestamp = window.SimpleCalendar.api.timestampToDate(window.SimpleCalendar.api.timestamp());
@@ -280,7 +279,7 @@ export default class MerchantStore extends ItemPileStore {
         const closingTime = Number(closeTimes.hour.toString() + "." + closeTimes.minute.toString());
         const currentTime = Number(timestamp.hour.toString() + "." + timestamp.minute.toString());
 
-        isClosed = openingTime > closingTime
+        let isClosed = openingTime > closingTime
           ? !(currentTime >= openingTime || currentTime <= closingTime)  // Is the store open over midnight?
           : !(currentTime >= openingTime && currentTime <= closingTime); // or is the store open during normal daylight hours?
 
