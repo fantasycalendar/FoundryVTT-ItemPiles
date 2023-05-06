@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.6.10
+
+- Fixed rare error when adding items to item piles
+
 ## Version 2.6.9
 
 - Added Simple Calendar support for auto-population and refresh of merchant inventory based on the opening time when driven by Simple Calendar, as well as Simple Calendar repeating notes and on specific weekdays

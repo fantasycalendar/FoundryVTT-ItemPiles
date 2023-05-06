@@ -42,9 +42,7 @@ export default class Transaction {
       const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
       let itemId = itemData._id ?? itemData.id;
       const actorHasItem = this.actor.items.get(itemId);
-      const actorExistingItem = remove && actorHasItem
-        ? actorHasItem
-        : Utilities.findSimilarItem(this.actor.items, itemData, PileUtilities.getActorFlagData(this.actor));
+      const actorExistingItem = actorHasItem || Utilities.findSimilarItem(this.actor.items, itemData, PileUtilities.getActorFlagData(this.actor));
       const canItemStack = PileUtilities.canItemStack(actorExistingItem || itemData, this.actor);
 
       if (!canItemStack) {
