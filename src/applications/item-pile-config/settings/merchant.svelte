@@ -18,6 +18,11 @@
     return weekday;
   });
 
+  const refreshItemDays = (simpleCalendarActive ? window.SimpleCalendar.api.getAllWeekdays() : []).map(weekday => {
+    weekday.selected = pileData.refreshItemsDays.includes(weekday.name);
+    return weekday;
+  });
+
   pileData.closedDays = pileData.closedDays.filter(closedWeekday => {
     return weekdays.some(weekday => weekday.name === closedWeekday);
   });
@@ -288,7 +293,7 @@
 		</label>
 		<div class="break"></div>
 		<div class="item-piles-flexrow" style="text-align: center;">
-			{#each weekdays as weekday (weekday.id)}
+			{#each weekdays as weekday (weekday.id + "-weekday-close")}
 				<div class="item-piles-flexcol" style="align-items: center;">
 					<label>{weekday.abbreviation}</label>
 					<input type="checkbox"
@@ -336,12 +341,54 @@
 		</div>
 	</div>
 
+	<div class="form-group item-piles-top-divider">
+		<label>
+			<p style="color: #c02609;">
+				{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsWarning")}
+			</p>
+		</label>
+	</div>
+
+	<div class="form-group" class:item-piles-disabled={!pileData.openTimes.enabled}>
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsOnOpen")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsOnOpenExplanation")}</p>
+		</label>
+		<input type="checkbox" bind:checked={pileData.refreshItemsOnOpen} disabled={!pileData.openTimes.enabled}/>
+	</div>
+
+	<div class="form-group" class:item-piles-disabled={!pileData.openTimes.enabled}>
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsDays")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsDaysExplanation")}</p>
+		</label>
+		<div class="break"></div>
+		<div class="item-piles-flexrow" style="text-align: center;">
+			{#each refreshItemDays as weekday (weekday.id + "-weekday-refresh")}
+				<div class="item-piles-flexcol" style="align-items: center;">
+					<label>{weekday.abbreviation}</label>
+					<input type="checkbox"
+								 bind:checked={weekday.selected}
+								 disabled={!pileData.openTimes.enabled}
+								 on:change={() => {
+                 let weekdaySet = new Set(pileData.refreshItemsDays);
+                 if(weekday.selected){
+                   weekdaySet.add(weekday.name)
+                 }else{
+                   weekdaySet.delete(weekday.name)
+                 }
+                 pileData.refreshItemsDays = Array.from(weekdaySet);
+               }}
+					/>
+				</div>
+			{/each}
+		</div>
+	</div>
+
 	<div class="form-group" class:item-piles-disabled={!pileData.openTimes.enabled}>
 		<label>
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsHolidays")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsHolidaysExplanation")}</p>
-			<p
-				style="color: #c02609;">{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsHolidaysWarning")}</p>
 		</label>
 		<div class="break"></div>
 		<div style="display: grid; grid-template-columns: 1fr 1fr;">
@@ -366,3 +413,10 @@
 	</div>
 
 {/if}
+
+
+<style>
+    .form-group {
+        border-radius: 5px;
+    }
+</style>

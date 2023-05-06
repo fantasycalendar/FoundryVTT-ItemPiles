@@ -145,6 +145,8 @@ const CONSTANTS = {
     },
     closedDays: [],
     closedHolidays: [],
+    refreshItemsOnOpen: false,
+    refreshItemsDays: [],
     refreshItemsHolidays: [],
 
     // Vault settings

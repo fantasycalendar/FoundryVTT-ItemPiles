@@ -17,6 +17,7 @@ export default class SimpleCalendarPlugin extends BasePlugin {
       weekday: window.SimpleCalendar.api.getCurrentWeekday(),
       timestamp: window.SimpleCalendar.api.dateToTimestamp({})
     }
+    console.log(previousState)
     Hooks.on(window.SimpleCalendar.Hooks.DateTimeChange, () => {
       ItemPileStore.notifyAllOfChanges("updateOpenCloseStatus");
       this.handleTimePassed();
@@ -82,50 +83,103 @@ export default class SimpleCalendarPlugin extends BasePlugin {
         return note.timestamp > previousState.timestamp && note.timestamp <= newState.timestamp;
       });
 
-    previousState = newState;
-
     const categories = new Set(notes.map(note => note.flags?.categories ?? []).deepFlatten());
 
-    if (!categories.size) return;
-
     const actors = PileUtilities.getItemPileActors((actor) => {
-      const flags = getProperty(actor, CONSTANTS.FLAGS.PILE);
-      return flags?.type === CONSTANTS.PILE_TYPES.MERCHANT
-        && flags?.openTimes?.enabled
-        && categories.intersection(new Set(flags?.refreshItemsHolidays ?? [])).size > 0;
+      const flags = PileUtilities.getActorFlagData(actor, getProperty(actor, CONSTANTS.FLAGS.PILE));
+      if (flags.type !== CONSTANTS.PILE_TYPES.MERCHANT) return false;
+      return merchantRefreshFilter(flags, newState, previousState, categories);
     });
 
     const { validTokensOnScenes } = PileUtilities.getItemPileTokens((token) => {
-      const flags = getProperty(token, CONSTANTS.FLAGS.PILE);
-      return flags?.type === CONSTANTS.PILE_TYPES.MERCHANT
-        && flags?.openTimes?.enabled
-        && categories.intersection(new Set(flags?.refreshItemsHolidays ?? [])).size > 0;
+      const flags = PileUtilities.getActorFlagData(token, getProperty(token, CONSTANTS.FLAGS.PILE));
+      if (flags.type !== CONSTANTS.PILE_TYPES.MERCHANT) return false;
+      return merchantRefreshFilter(flags, newState, previousState, categories);
     });
 
-    for (const actor of actors.concat(validTokensOnScenes.map(t => t.actor))) {
+    previousState = newState;
 
-      const actorTransaction = new Transaction(actor);
+    for (const actor of actors) {
+      await this.refreshActorItems(actor);
+    }
 
-      const actorItems = game.itempiles.API.getActorItems(actor);
-      const newActorItems = await PileUtilities.rollMerchantTables({ actor });
-
-      await actorTransaction.appendItemChanges(actorItems.filter(item => {
-        const itemFlags = PileUtilities.getItemFlagData(item);
-        return !itemFlags.isService && !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
-      }), { remove: true });
-
-      await actorTransaction.appendItemChanges(actorItems.filter(item => {
-        const itemFlags = PileUtilities.getItemFlagData(item);
-        return !itemFlags.isService && !itemFlags.keepOnMerchant && itemFlags.keepIfZero;
-      }), { remove: true, keepIfZero: true });
-
-      await actorTransaction.appendItemChanges(newActorItems.map(entry => ({
-        item: entry.item, quantity: entry.quantity, flags: entry.flags
-      })));
-
-      await actorTransaction.commit();
-
+    for (const [_, tokens] of validTokensOnScenes) {
+      for (const token of tokens) {
+        await this.refreshActorItems(token.actor);
+      }
     }
   }
+
+  async refreshActorItems(actor) {
+
+    const actorTransaction = new Transaction(actor);
+
+    const actorItems = game.itempiles.API.getActorItems(actor);
+    const newActorItems = await PileUtilities.rollMerchantTables({ actor });
+
+    await actorTransaction.appendItemChanges(actorItems.filter(item => {
+      const itemFlags = PileUtilities.getItemFlagData(item);
+      return !itemFlags.isService && !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
+    }), { remove: true });
+
+    await actorTransaction.appendItemChanges(actorItems.filter(item => {
+      const itemFlags = PileUtilities.getItemFlagData(item);
+      return !itemFlags.isService && !itemFlags.keepOnMerchant && itemFlags.keepIfZero;
+    }), { remove: true, keepIfZero: true });
+
+    await actorTransaction.appendItemChanges(newActorItems.map(entry => ({
+      item: entry.item, quantity: entry.quantity, flags: entry.flags
+    })));
+
+    await actorTransaction.commit();
+
+  }
+}
+
+function merchantRefreshFilter(flags, newState, previousState, categories) {
+
+  const openTimesEnabled = flags.openTimes.enabled;
+
+  if (!openTimesEnabled) return false;
+
+  const openTimes = flags.openTimes.open;
+  const closeTimes = flags.openTimes.close;
+
+  const openHour = openTimesEnabled ? openTimes.hour : 0;
+  const openMinute = openTimesEnabled ? openTimes.minute : 0;
+  const closeHour = openTimesEnabled ? closeTimes.hour : 0;
+  const closeMinute = openTimesEnabled ? closeTimes.minute : 0;
+
+  const openingTime = Number(openHour.toString() + "." + openMinute.toString());
+  const closingTime = Number(closeHour.toString() + "." + closeMinute.toString());
+  const previousTime = Number(previousState.dateTime.hour.toString() + "." + previousState.dateTime.minute.toString());
+  const currentTime = Number(newState.dateTime.hour.toString() + "." + newState.dateTime.minute.toString());
+
+  const wasOpen = openingTime > closingTime
+    ? (previousTime >= openingTime || previousTime <= closingTime)
+    : (previousTime >= openingTime && previousTime <= closingTime);
+
+  const isOpen = openingTime > closingTime
+    ? (currentTime >= openingTime || currentTime <= closingTime)
+    : (currentTime >= openingTime && currentTime <= closingTime);
+
+  const allWeekdays = window.SimpleCalendar.api.getAllWeekdays();
+  const dayLength = SimpleCalendar.api.timestampPlusInterval(0, { day: 1 });
+
+  const daysPassed = Math.floor((newState.timestamp - previousState.timestamp) / dayLength);
+
+  const currentWeekday = newState.weekday;
+
+  const shouldRefreshOnCurrentWeekday = flags.refreshItemsDays.includes(currentWeekday.name);
+  const shouldRefreshPastWeekday = flags.refreshItemsDays.length > 0 && daysPassed >= allWeekdays.length;
+
+  const shouldRefresh = (
+    flags.refreshItemsOnOpen ||
+    shouldRefreshOnCurrentWeekday ||
+    shouldRefreshPastWeekday ||
+    categories.intersection(new Set(flags.refreshItemsHolidays)).size > 0
+  );
+
+  return (!wasOpen && isOpen) && shouldRefresh;
 
 }

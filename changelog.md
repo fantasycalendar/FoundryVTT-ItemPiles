@@ -2,7 +2,7 @@
 
 ## Version 2.6.9
 
-- Added Simple Calendar support for auto-population and refresh of merchant inventory based on Simple Calendar repeating notes
+- Added Simple Calendar support for auto-population and refresh of merchant inventory based on the opening time when driven by Simple Calendar, as well as Simple Calendar repeating notes and on specific weekdays
 - Added option on the item configuration to make individual items to not be cleared when the merchant's inventory is refreshed
 - Added option to merchant population tables to put new items directly into a custom item category
 - Added support for secondary currencies - these cannot be exchanged for one another when buying or selling from merchants
