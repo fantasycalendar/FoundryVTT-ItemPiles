@@ -131,6 +131,8 @@ export class PileItem extends PileBaseItem {
     this.isSecondaryCurrency = !!currency?.secondary;
     this.abbreviation.set(currency?.abbreviation ?? "");
     this.similarities = Utilities.setSimilarityProperties({}, this.item);
+    this.name.set(this.isCurrency ? currency.name : this.item.name);
+    this.img.set(this.isCurrency ? currency.img : this.item.img);
     this.toShare = this.isCurrency
       ? get(pileActorData).shareCurrenciesEnabled && !!this.store.recipient
       : get(pileActorData).shareItemsEnabled && !!this.store.recipient;

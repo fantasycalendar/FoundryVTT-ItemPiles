@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.6.11
+
+- Fixed item based currencies not working well when dragging and dropping them into vaults
+- Fixed item based currencies would use the item's name & image, rather than the Item Piles' currency name & image
+
 ## Version 2.6.10
 
 - Fixed rare error when adding items to item piles
