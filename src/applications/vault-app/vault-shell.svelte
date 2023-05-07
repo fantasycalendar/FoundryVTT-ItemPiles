@@ -25,6 +25,7 @@
   import VaultExpanderEntry from "./VaultExpanderEntry.svelte";
   import vault from "../item-pile-config/settings/vault.svelte";
   import { FloatingElement } from "../components/FloatingElement/FloatingElement.js";
+  import * as PileUtilities from "../../helpers/pile-utilities.js";
 
   const { application } = getContext('#external');
 
@@ -210,6 +211,7 @@
       type: "Item",
       uuid: item.item.item.uuid
     }
+
     if (hitApps.length) {
       if (hitApps[0] === application) return;
       dropData.target = hitApps[0].actor;

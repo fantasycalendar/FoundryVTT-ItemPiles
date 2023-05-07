@@ -51,9 +51,10 @@ export function getUuid(target) {
  * @param {Array<Item|Object>} items
  * @param {Item|Object} findItem
  * @param {boolean/object} actorFlagData
+ * @param {boolean} ignoreVault
  * @returns {*}
  */
-export function findSimilarItem(items, findItem, actorFlagData = false) {
+export function findSimilarItem(items, findItem, actorFlagData = false, ignoreVault = false) {
 
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 
@@ -104,7 +105,7 @@ export function findSimilarItem(items, findItem, actorFlagData = false) {
     })
 
   let sortedItems = filteredItems;
-  if (actorIsVault) {
+  if (actorIsVault && !ignoreVault) {
 
     let distanceItems = filteredItems.map(item => {
       const itemX = getProperty(item, CONSTANTS.FLAGS.ITEM + ".x") ?? Infinity;

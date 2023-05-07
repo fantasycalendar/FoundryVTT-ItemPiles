@@ -34,6 +34,10 @@ export default class Transaction {
     for (let data of items) {
 
       let item = data.item ?? data;
+
+      type = PileUtilities.isItemCurrency(item, { target: this.actor })
+        ? "currency" : type;
+
       let flags = data.flags ?? false;
       let itemData = item instanceof Item ? item.toObject() : foundry.utils.duplicate(item);
       if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
@@ -42,7 +46,7 @@ export default class Transaction {
       const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
       let itemId = itemData._id ?? itemData.id;
       const actorHasItem = this.actor.items.get(itemId);
-      const actorExistingItem = actorHasItem || Utilities.findSimilarItem(this.actor.items, itemData, PileUtilities.getActorFlagData(this.actor));
+      const actorExistingItem = actorHasItem || Utilities.findSimilarItem(this.actor.items, itemData, PileUtilities.getActorFlagData(this.actor), type === "currency");
       const canItemStack = PileUtilities.canItemStack(actorExistingItem || itemData, this.actor);
 
       if (!canItemStack) {
