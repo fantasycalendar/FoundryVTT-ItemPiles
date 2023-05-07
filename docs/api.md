@@ -3,6 +3,7 @@
 * [System settings methods](#system-settings-methods)
   * [ACTOR_CLASS_TYPE](#ACTOR_CLASS_TYPE)
   * [CURRENCIES](#CURRENCIES)
+  * [SECONDARY_CURRENCIES](#SECONDARY_CURRENCIES)
   * [CURRENCY_DECIMAL_DIGITS](#CURRENCY_DECIMAL_DIGITS)
   * [ITEM_PRICE_ATTRIBUTE](#ITEM_PRICE_ATTRIBUTE)
   * [ITEM_QUANTITY_ATTRIBUTE](#ITEM_QUANTITY_ATTRIBUTE)
@@ -13,6 +14,7 @@
   * [TOKEN_FLAG_DEFAULTS](#TOKEN_FLAG_DEFAULTS)
   * [setActorClassType](#setActorClassType)
   * [setCurrencies](#setCurrencies)
+  * [setSecondaryCurrencies](#setSecondaryCurrencies)
   * [setCurrencyDecimalDigits](#setCurrencyDecimalDigits)
   * [setItemQuantityAttribute](#setItemQuantityAttribute)
   * [setItemPriceAttribute](#setItemPriceAttribute)
@@ -85,6 +87,14 @@ The actor class type used for the original item pile actor in this system
 `game.itempiles.API.CURRENCIES` ⇒ `Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>`
 
 The currencies used in this system
+
+---
+
+### SECONDARY_CURRENCIES
+
+`game.itempiles.API.SECONDARY_CURRENCIES` ⇒ `Array<{name: string, data: Object, img: string, abbreviation: string}>`
+
+The secondary currencies used in this system
 
 ---
 
@@ -173,7 +183,19 @@ Sets the currencies used in this system
 
 | Param | Type |
 | --- | --- |
-| inCurrencies | `Array<Object>` |
+| inCurrencies | `Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>` |
+
+---
+
+### setSecondaryCurrencies
+
+`game.itempiles.API.setSecondaryCurrencies(inCurrencies)` ⇒ `Promise`
+
+Sets the secondary currencies used in this system
+
+| Param                 | Type |
+|-----------------------| --- |
+| inSecondaryCurrencies | `Array<{name: string, data: Object, img: string, abbreviation: string}>` |
 
 ---
 
@@ -277,21 +299,22 @@ Sets the types of items that will always be considered unique when transferring 
 
 A combination of all the methods above, but this integrates a system's specific settings more readily into item piles, allowing users to also change the settings afterwards.
 
-| Param                        | Type                                                                                                                                                                                            | Description                                                                                                          |
-|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| data                         | `object`                                                                                                                                                                                        |                                                                                                                      |
-| data.VERSION                 | `string`                                                                                                                                                                                        | The integration version                                                                                              |
-| data.ACTOR_CLASS_TYPE        | `string`                                                                                                                                                                                        | The system's actor class type to represent item piles                                                                |
-| data.ITEM_PRICE_ATTRIBUTE    | `string`                                                                                                                                                                                        | The property path to the system's item price attribute                                                               |
-| data.ITEM_QUANTITY_ATTRIBUTE | `string`                                                                                                                                                                                        | The property path to the system's item quantity attribute                                                            |
-| data.ITEM_FILTERS            | `Array<{path: string, filters: string}>`                                                                                                                                                        | The filters to determine which items to not include as droppable or tradeable                                        |
-| data.ITEM_SIMILARITIES       | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item similarities                                               |
-| data.UNSTACKABLE_ITEM_TYPES  | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item types that cannot stack, no matter what                    |
-| data.PILE_DEFAULTS           | `Object`                                                                                                                                                                                        | The system specific default values for item pile actors created in this system                                       |
-| data.TOKEN_FLAG_DEFAULTS     | `Object`                                                                                                                                                                                        | The system specific default values for item pile tokens created in this system                                       |
-| data.ITEM_TRANSFORMER        | `undefined/Function`                                                                                                                                                                            | An optional function that gets run over items before picked up, traded, or bought                                    |
+| Param                        | Type                                                                                                                                                                                           | Description                                                                                                          |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| data                         | `object`                                                                                                                                                                                       |                                                                                                                      |
+| data.VERSION                 | `string`                                                                                                                                                                                       | The integration version                                                                                              |
+| data.ACTOR_CLASS_TYPE        | `string`                                                                                                                                                                                       | The system's actor class type to represent item piles                                                                |
+| data.ITEM_PRICE_ATTRIBUTE    | `string`                                                                                                                                                                                       | The property path to the system's item price attribute                                                               |
+| data.ITEM_QUANTITY_ATTRIBUTE | `string`                                                                                                                                                                                       | The property path to the system's item quantity attribute                                                            |
+| data.ITEM_FILTERS            | `Array<{path: string, filters: string}>`                                                                                                                                                       | The filters to determine which items to not include as droppable or tradeable                                        |
+| data.ITEM_SIMILARITIES       | `Array<string>`                                                                                                                                                                                | The array of property path strings used to determine item similarities                                               |
+| data.UNSTACKABLE_ITEM_TYPES  | `Array<string>`                                                                                                                                                                                | The array of property path strings used to determine item types that cannot stack, no matter what                    |
+| data.PILE_DEFAULTS           | `Object`                                                                                                                                                                                       | The system specific default values for item pile actors created in this system                                       |
+| data.TOKEN_FLAG_DEFAULTS     | `Object`                                                                                                                                                                                       | The system specific default values for item pile tokens created in this system                                       |
+| data.ITEM_TRANSFORMER        | `undefined/Function`                                                                                                                                                                           | An optional function that gets run over items before picked up, traded, or bought                                    |
 | data.CURRENCIES              | `Array<{ primary: boolean, type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }>, exchangeRate: number }>` | The array of currencies for this system                                                                              |
-| data.CURRENCY_DECIMAL_DIGITS | `undefined/number`                                                                                                                                                                              | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured) |
+| data.SECONDARY_CURRENCIES    | `Array<{ type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }> }>` | The array of secondary currencies for this system                                                                    |
+| data.CURRENCY_DECIMAL_DIGITS | `undefined/number`                                                                                                                                                                             | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured) |
 
 ---
 
