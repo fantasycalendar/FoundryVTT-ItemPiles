@@ -5,7 +5,7 @@ export default {
 
   ITEM_QUANTITY_ATTRIBUTE: "system.quantity",
 
-  ITEM_PRICE_ATTRIBUTE: "system.price",
+  ITEM_PRICE_ATTRIBUTE: "system.price.value",
 
   ITEM_FILTERS: [
     {
