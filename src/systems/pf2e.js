@@ -1,3 +1,6 @@
+import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+import BasicItemDialog from "../applications/components/BasicItemDialog.svelte";
+
 export default {
 
   "VERSION": "1.0.4",
@@ -28,6 +31,25 @@ export default {
     const itemCost = getProperty(item, "system.price");
     const { copperValue } = new game.pf2e.Coins(itemCost?.value ?? {});
     return copperValue / 100;
+  },
+
+  "PREVIEW_ITEM_TRANSFORMER": (item) => {
+    if (game.user.isGM || item?.identificationStatus !== "unidentified") return item;
+    new TJSDialog({
+      title: item.name,
+      content: {
+        class: BasicItemDialog,
+        props: {
+          item
+        }
+      }
+    }, {
+      classes: ["pf2e item sheet dorako-ui"],
+      resizable: false,
+      height: "auto",
+      width: "auto"
+    }).render(true);
+    return false;
   },
 
   "PILE_DEFAULTS": {

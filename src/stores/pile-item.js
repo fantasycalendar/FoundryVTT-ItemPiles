@@ -6,6 +6,7 @@ import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
 import { Plugins } from "../plugins/main.js";
+import { SYSTEMS } from "../systems.js";
 
 class PileBaseItem {
 
@@ -205,6 +206,11 @@ export class PileItem extends PileBaseItem {
   preview() {
     const pileData = get(this.store.pileData);
     if (!pileData.canInspectItems && !game.user.isGM) return;
+    if (SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER) {
+      if (!SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER(this.item)) {
+        return;
+      }
+    }
     if (game.user.isGM || this.item.permission[game.user.id] === 3) {
       return this.item.sheet.render(true);
     }

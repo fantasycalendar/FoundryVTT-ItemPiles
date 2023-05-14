@@ -49,5 +49,6 @@
     padding: 0 10px;
     text-align: center;
     min-height: 28px;
+    height: 100%;
   }
 </style>

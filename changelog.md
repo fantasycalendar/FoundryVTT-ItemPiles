@@ -2,8 +2,9 @@
 
 ## Version 2.6.12
 
+- Added support for previewing mystified items in PF2e
 - Updated Portuguese (Brazilian), and French localization - thank you eunaumtenhoid and rectulo on Weblate!
-- Fixed Star Wars 5e system not having the correct item price property path
+- Fixed Star Wars 5e system not having the correct item price property path (thank you Ikaguia on github)
 - Fixed being able to withdraw infinite amount of currencies from vaults
 - Fixed merchant's currencies would not be visible at the bottom of the UI if it _didn't_ have infinite currencies
 

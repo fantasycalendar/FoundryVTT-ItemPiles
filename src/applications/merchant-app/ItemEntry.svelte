@@ -84,9 +84,9 @@
     border-bottom-left-radius: 5px;
   }
 
-	.merchant-item-hidden > * {
-		font-style: italic;
-		opacity: 0.5;
-	}
+  .merchant-item-hidden > * {
+    font-style: italic;
+    opacity: 0.5;
+  }
 
 </style>
