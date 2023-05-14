@@ -158,7 +158,8 @@
         "Header": "Item Piles : Recevoir un objet",
         "ContentOne": "{source_actor_name} veut donner \"{item_name}\" à {target_actor_name}. Acceptez-vous ?",
         "ContentMany": "{source_actor_name} veut donner {quantity} \"{item_name}\" à {target_actor_name}. Acceptez-vous ?",
-        "Ignore": "Ignorer l'utilisateur"
+        "Ignore": "Ignorer l'utilisateur",
+        "Content": "{source_actor_name} souhaite donner un objet à {target_actor_name}. Acceptez-vous ?"
       },
       "TextEditor": {
         "Title": "Éditeur de texte"
@@ -430,7 +431,7 @@
       "ToolTipRemoveAllRolledItems": "Retirer tous les objets tirés",
       "ShoppingAs": "Shopping en tant que {nom de l'acteur}",
       "TableCustomCategory": "Ajouter des articles à une catégorie personnalisée :",
-      "TableAddAllItems": "Ajouter tous les articles:",
+      "TableAddAllItems": "Ajouter tous les articles :",
       "TableTimesToRoll": "Temps de roulement sur la table :"
     },
     "Applications": {
@@ -454,7 +455,7 @@
         "AddToPile": "Ajouter à la pile",
         "Player": "Vous pouvez déposer les devises suivantes dans cette pile d'objet :",
         "Title": "Lâcher des devises",
-        "Content": "Vous pouvez ajouter les monnaies suivantes dans cette pile d'articles :",
+        "Content": "Vous pouvez ajouter les devises suivantes dans cette pile d'articles :",
         "Submit": "Ajouter",
         "ContentNoTarget": "En tant que MJ, vous pouvez mettre à jour les monnaies sur cette pile d'objets :"
       },
@@ -475,7 +476,7 @@
         "Title": "Éditeur de devises de pile d'objets",
         "TitleActor": "Éditeur de devises d'Item Piles : {actor_name}",
         "Explanation": "Ici, vous pouvez définir les devises sur les personnages qui peuvent être ramassés à partir des piles d'objets, comme les devises.",
-        "ExplanationSmallAttributes": "Dans D&D5e, les monnaies existent sur les acteurs sur le chemin d'attribut \"actor.system.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"system.currency.gp\". Ajoutez-en une en cliquant sur le plus dans l'en-tête.",
+        "ExplanationSmallAttributes": "Dans D&D5e, les devises existent sur les acteurs sur le chemin d'attribut \"actor.system.currency.gp\", donc vous ajouteriez la vôtre avec le nom \"Pièce d'Or\" et le chemin d'attribut \"system.currency.gp\". Ajoutez-en une en cliquant sur le plus dans l'en-tête.",
         "DragDrop": "Glisser et déposer un élément pour l'ajouter à la liste",
         "ExplanationSmallItems": "Dans d'autres systèmes, il peut s'agir d'éléments réels sur l'acteur - dans ce cas, vous pouvez glisser et déposer des éléments sur cette liste pour les ajouter aux devises.",
         "Name": "Nom de la devise",
@@ -513,7 +514,7 @@
         "DisableNormalCost": "Désactiver le coût normal",
         "DropMeClickMe": "Cliquer pour ajouter un attribut ou glisser/déposer un objet pour l'ajouter",
         "DisplayQuantityDefault": "Paramètre marchand par défaut",
-        "PricePreset": "Ou sélectionnez un préréglage de prix existant :",
+        "PricePreset": "Ou choisissez un préréglage de prix :",
         "PurchaseMacro": "Acheter une macro",
         "PurchaseMacroExplanation": "Nom de la macro à exécuter lorsque l'objet est acheté.",
         "Service": "L'objet est un service",
@@ -537,7 +538,9 @@
         "CanStackDefault": "Valeur par défaut des paramètres du coffre",
         "CanStackExplanation": "Cette option permet de configurer l'empilement de l'élément avec d'autres éléments similaires lorsqu'il est ajouté à un coffre.",
         "CanStackYes": "Oui, peut toujours s'empiler",
-        "CanStackNo": "Non, ne peut pas s'empiler"
+        "CanStackNo": "Non, ne peut pas s'empiler",
+        "KeepOnMerchant": "Conserver chez le marchand",
+        "KeepOnMerchantExplanation": "Lorsque les articles sont effacés dans l'onglet \"Remplir les articles\" des marchands ou par l'intégration de l'actualisation de l'inventaire de Simple Calendar (voir la configuration du marchand au bas de la page), cet article sera toujours présent."
       },
       "TradeMerchantItem": {
         "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
@@ -587,7 +590,10 @@
           "OverrideItemFilters": "Remplacer les filtres d'objets",
           "ConfigureOverrideItemFilters": "Configurer les filtres d'objets de remplacement",
           "DisplayItemTypes": "Diviser les objets par types d'objets",
-          "DisplayItemTypesExplanation": "Affichez chaque type d'objet séparément dans la pile d'objets, triés par leur type d'objets."
+          "DisplayItemTypesExplanation": "Affichez chaque type d'objet séparément dans la pile d'objets, triés par leur type d'objets.",
+          "ConfigureOverrideSecondaryCurrencies": "Configurer les devises secondaires prioritaires",
+          "OverrideSecondaryCurrencies": "Remplacer les devises secondaires",
+          "OverrideSecondaryCurrenciesExplanation": "Configurer les dérogations à la devise secondaire de cette pile d'articles."
         },
         "Other": {
           "Title": "Autres paramètres",
@@ -662,13 +668,20 @@
           "KeepZeroExplanation": "Lorsque les articles sont totalement épuisés, ce commerçant ne les retire pas, mais les met plutôt à l'index.",
           "HideItemsWithZeroCost": "Cacher les objets à coût zéro",
           "ClosedDays": "Jours de fermeture (Simple Calendar)",
-          "ClosedDaysExplanation": "Les jours cochés, le commerçant sera fermé (si le statut d'ouverture du commerçant est réglé sur automatique).",
+          "ClosedDaysExplanation": "Les jours cochés, le Marchand sera fermé (si le statut d'ouverture du Marchand est réglé sur automatique).",
           "ClosedHolidays": "Jours fériés (Simple Calendar)",
-          "ClosedHolidaysExplanation": "Les jours où il y a des notes avec la catégorie de note donnée, le commerçant sera fermé (si le statut d'ouverture du commerçant est réglé sur automatique).",
+          "ClosedHolidaysExplanation": "Les jours où il y a des notes avec la catégorie de note donnée, le marchand sera fermé (si le statut d'ouverture du commerçant est réglé sur automatique).",
           "HideItemsWithZeroCostExplanation": "Lorsqu'il est activé, il fait en sorte que les clients ne puissent pas acheter ou vendre des articles dont le coût est nul (gratuit).",
           "MerchantColumns": "Colonnes marchand",
           "MerchantColumnsExplanation": "Ici, vous pouvez configurer les colonnes spécifiques du système d'échoppe affichées dans son IU marchand tels que la rareté des objets.",
-          "ConfigureMerchantColumns": "Configurer les colonnes de marchand"
+          "ConfigureMerchantColumns": "Configurer les colonnes de marchand",
+          "RefreshItemsOnOpen": "Rafraîchir les articles au moment de l'ouverture (Simple Calendar)",
+          "RefreshItemsOnOpenExplanation": "Lorsque l'heure du calendrier dépasse l'heure d'ouverture du marchand, l'inventaire du commerçant sera actualisé.",
+          "RefreshItemsDays": "Rafraîchir les articles en fonction des jours de la semaine (Simple Calendar)",
+          "RefreshItemsDaysExplanation": "Lorsque le calendrier dépasse les jours cochés, l'inventaire du Marchand est actualisé. Cela se produit à l'heure d'ouverture du marchand ou à minuit s'il n'a pas d'heure d'ouverture/fermeture.",
+          "RefreshItemsHolidays": "Rafraîchir les articles lors des Jours fériés (Simple Calendar)",
+          "RefreshItemsHolidaysExplanation": "Lorsque le calendrier dépasse des notes de la catégorie de note donnée, l'inventaire du commerçant est actualisé. Cela se produit à l'heure de la note ou à minuit s'il s'agit d'une note réglée sur toute la journée.",
+          "RefreshItemsWarning": "Avec toutes les options ci-dessous, les articles existants seront SUPPRIMÉS et ne pourront pas être récupérés. Vous pouvez configurer les articles individuels qui seront conservés. Les articles définis comme des services, conservés en quantité nulle et conservés chez le marchand persisteront."
         },
         "Sharing": {
           "Title": "Paramètres de partage",
@@ -703,7 +716,7 @@
           "EnableExpansionExplanation": "Lorsque cette option est activée, les objets qui sont configurés en tant qu'extensionss de coffre-fort augmentent l'espace disponible du coffre-fort.",
           "BaseExpansion": "Extension de base",
           "BaseExpansionExplanation": "Il s'agit du nombre de colonnes et de lignes activées par défaut sans aucun obejt d'extension.",
-          "AccessExplanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les monnaies du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
+          "AccessExplanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les devises du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
           "LogVaultAccessExplanation": "Lorsqu'elle est activée, ce coffre-fort crée une entrée de journal et crée des journaux horodatés chaque fois qu'il y a une interaction avec le coffre-fort.",
           "LoggingFormatExplanation": "Ceci configure la façon dont le nom d'utilisateur et le nom du personnage sont affichés dans le journal.",
           "LoggingFormatUserActor": "Afficher le nom d'utilisateur et le nom du personnage",
@@ -771,20 +784,20 @@
         "Content": "Voulez-vous retirer cet objet de \"{target_name}\" ?"
       },
       "DepositCurrencies": {
-        "Content": "Vous pouvez déposer les monnaies suivantes dans ce coffre-fort :",
-        "NoCurrency": "{actor_name} n'a pas de monnaies à déposer.",
+        "Content": "Vous pouvez déposer les devises suivantes dans ce coffre-fort :",
+        "NoCurrency": "{actor_name} n'a pas de devises à déposer.",
         "Submit": "Dépôt",
-        "Title": "Dépot de monnaies"
+        "Title": "Dépot de devises"
       },
       "WithdrawCurrencies": {
         "Title": "Retirer l'objet",
-        "NoCurrency": "Il n'y a pas de monnaies à retirer.",
-        "Content": "Vous pouvez retirer les monnaies suivantes de ce coffre-fort :",
+        "NoCurrency": "Il n'y a pas de devises à retirer.",
+        "Content": "Vous pouvez retirer les devises suivantes de ce coffre-fort :",
         "Submit": "Retirer"
       },
       "VaultAccessEditor": {
         "Title": "Éditeur d'accès au coffre-fort",
-        "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les monnaies du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
+        "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les devises du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
         "TitleActor": "Éditeur d'accès au coffre : {actor_name}"
       },
       "UnstackableItemTypesEditor": {
@@ -809,7 +822,8 @@
       "EditCurrencies": {
         "Content": "En tant que MJ, vous pouvez mettre à jour les devises de cette pile d'objets :",
         "Submit": "Soumettre",
-        "Title": "Modifier les monnaies"
+        "Title": "Modifier les devises",
+        "Secondary": "Devises secondaires :"
       },
       "CustomItemCategoriesEditor": {
         "Title": "Éditeur de catégories d'objets personnalisés",
@@ -833,6 +847,11 @@
         "Title": "Colonnes marchand",
         "Explanation": "Ceci configure les colonnes visibles dans l'IU Marchand, au delà du nom, de la quantité et du prix de l'objet.",
         "MappingTitle": "Cartographie des colonnes marchand : {label}"
+      },
+      "SecondaryCurrenciesEditor": {
+        "Explanation": "Vous pouvez définir ici les devises secondaires qui peuvent être ramassées et déposées par les personnages.",
+        "Title": "Éditeur de Devises secondaires d'Item Piles",
+        "TitleActor": "Éditeur de Devises secondaires d'Item Piles : {actor_name}"
       }
     },
     "Settings": {
@@ -973,6 +992,11 @@
         "Show": "Afficher les bordures (comportement de base)",
         "Hint": "Cette option permet de contrôler si la bordure du jeton est cachée lorsque l'on survole les jetons de la pile d'objets. La sélection du jeton affiche toujours la bordure.",
         "HideEveryone": "Caché de tous"
+      },
+      "SecondaryCurrencies": {
+        "Label": "Configurer les devises secondaires",
+        "Title": "Devises secondaires",
+        "Hint": "Ce paramètre permet de définir des devises secondaires, similaires aux devises normales mais distinctes de celles-ci. Elles ne peuvent pas avoir de taux de change ni être divisées en d'autres devises personnalisées."
       }
     },
     "Warnings": {

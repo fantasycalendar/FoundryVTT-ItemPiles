@@ -106,7 +106,8 @@
         "Header": "Item Piles: Recebendo Item",
         "ContentOne": "{source_actor_name} quer dar o item \"{item_name}\" para {target_actor_name}, você aceita?",
         "Ignore": "Ignorar usuário",
-        "ContentMany": "{source_actor_name} quer dar os itens \"{item_name}\" ({quantity}) para {target_actor_name}, você aceita?"
+        "ContentMany": "{source_actor_name} quer dar os itens \"{item_name}\" ({quantity}) para {target_actor_name}, você aceita?",
+        "Content": "{source_actor_name} quer dar um item para {target_actor_name}, você aceita?"
       },
       "TextEditor": {
         "Title": "Editor de texto"
@@ -332,7 +333,7 @@
         "CantBeSoldToMerchantsExplanation": "Quando ativado, este item não pode ser vendido de volta a comerciantes, apenas comprado.",
         "AddPurchaseOption": "Adicionar opção de compra",
         "DropMeClickMe": "Clique para adicionar um atributo ou arraste e solte um item para adicionar",
-        "PricePreset": "Ou selecione uma predefinição de preço de saída:",
+        "PricePreset": "Ou selecione uma predefinição de preço:",
         "SelectPreset": "Selecione a predefinição de preço",
         "PurchaseMacro": "Comprar Macro",
         "PurchaseMacroExplanation": "Nome da macro a ser executada quando o item for comprado.",
@@ -356,7 +357,9 @@
         "CustomCategory": "Categoria de itens personalizados",
         "InfiniteQuantityYes": "Sim, quantidade infinita",
         "KeepZeroExplanation": "Quando totalmente esgotado, o comerciante não remove este item, mas o define para não ser vendido.",
-        "KeepZero": "Manter quantidade zero"
+        "KeepZero": "Manter quantidade zero",
+        "KeepOnMerchant": "Manter Comerciante",
+        "KeepOnMerchantExplanation": "Quando os itens são limpos na guia de preenchimento de itens dos comerciantes ou pela integração do inventário de atualização do Simple Calendar (consulte a configuração do comerciante na parte inferior), esse item sempre permanecerá."
       },
       "DropCurrencies": {
         "Title": "Descartando moedas",
@@ -441,7 +444,10 @@
           "OverrideItemFilters": "Substituir filtros de itens",
           "ConfigureOverrideItemFilters": "Configurar filtros de itens de substituição",
           "DisplayItemTypes": "Dividir itens por tipos de itens",
-          "DisplayItemTypesExplanation": "Exiba cada tipo de item separadamente na pilha de itens, ordenados por tipo de item."
+          "DisplayItemTypesExplanation": "Exiba cada tipo de item separadamente na pilha de itens, ordenados por tipo de item.",
+          "OverrideSecondaryCurrenciesExplanation": "Configure as substituições de moeda secundária do item pile.",
+          "OverrideSecondaryCurrencies": "Substituir Moedas Secundárias",
+          "ConfigureOverrideSecondaryCurrencies": "Configurar moedas secundárias de substituição"
         },
         "SingleItem": {
           "DisplayOneContainerWarning": "Aviso! Você tem \"Exibir imagem de item único\" e \"É contêiner\" ativados. Nesse caso, as imagens do contêiner têm prioridade.",
@@ -517,7 +523,14 @@
           "ClosedHolidays": "Feriados Fechados (Simple Calendar)",
           "MerchantColumns": "Colunas do comerciante",
           "MerchantColumnsExplanation": "Aqui você pode configurar as colunas específicas do sistema deste comerciante exibidas em sua IU do comerciante, como a raridade dos itens.",
-          "ConfigureMerchantColumns": "Configurar colunas do comerciante"
+          "ConfigureMerchantColumns": "Configurar colunas do comerciante",
+          "RefreshItemsOnOpen": "Atualizar itens no horário aberto (Simple Calendar)",
+          "RefreshItemsOnOpenExplanation": "Quando o horário do calendário ultrapassar o horário de abertura do comerciante, o estoque do comerciante será atualizado.",
+          "RefreshItemsDays": "Atualizar itens nos dias da semana (Simple Calendar)",
+          "RefreshItemsHolidays": "Atualizar itens nos feriados (Simple Calendar)",
+          "RefreshItemsWarning": "Com todas as opções abaixo, os itens existentes serão EXCLUÍDOS e não poderão ser recuperados. Itens individuais podem ser configurados para serem mantidos; itens definidos para serviços, manter a quantidade zero e manter o comerciante permanecerão.",
+          "RefreshItemsDaysExplanation": "Quando o calendário passar dos dias marcados, o estoque do comerciante será atualizado. Isso acontece no horário de abertura do lojista, ou à meia-noite caso não tenha horário de abertura/fechamento.",
+          "RefreshItemsHolidaysExplanation": "Quando o calendário passar as notas com a categoria de nota dada, o estoque do comerciante será atualizado. Isso acontece no horário da nota ou à meia-noite se for uma nota definida para o dia todo."
         },
         "Title": "Configuração do Item Pile: {actor_name}",
         "Configure": "Item Pile",
@@ -637,7 +650,8 @@
       "EditCurrencies": {
         "Title": "Editando Moedas",
         "Content": "Como GM, você pode atualizar as moedas nesta pilha de itens:",
-        "Submit": "Enviar"
+        "Submit": "Enviar",
+        "Secondary": "Moedas Secundárias:"
       },
       "MerchantColumnsEditor": {
         "Title": "Colunas do comerciante",
@@ -649,6 +663,11 @@
         "ConfigureMapping": "Configurar o Mapeamento",
         "MappingTitle": "Mapeamento de colunas do comerciante: {label}",
         "MappingContent": "Isso configura o mapeamento entre o valor da propriedade para um rótulo. Esse rótulo pode ser uma string localizada."
+      },
+      "SecondaryCurrenciesEditor": {
+        "Title": "Editor de Moedas Secundárias do Item Piles",
+        "TitleActor": "Editor de moedas secundárias do Item Piles: {actor_name}",
+        "Explanation": "Aqui você pode definir quais moedas secundárias podem ser coletadas e descartadas pelos personagens."
       }
     },
     "Settings": {
@@ -789,6 +808,11 @@
         "Title": "Ocultar Bordas de token do Item Piles",
         "Hint": "Isso controla se a borda do token está oculta ao passar o mouse sobre os tokens da pilha de itens. Selecionar o token sempre mostra a borda.",
         "HideEveryone": "Escondido de todos"
+      },
+      "SecondaryCurrencies": {
+        "Label": "Configurar moedas secundárias",
+        "Title": "Moedas secundárias",
+        "Hint": "Esta configuração define moedas secundárias, semelhantes, mas separadas das moedas regulares. Estes não podem ter taxas de câmbio ou ser divididos em outras moedas personalizadas."
       }
     },
     "Types": {
