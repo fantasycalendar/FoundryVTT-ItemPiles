@@ -65,18 +65,21 @@
       .map(item => {
         return {
           _id: item.id,
-          quantity: settings.getUpdates ? item.currentQuantity - item.quantity : item.currentQuantity
+          quantity: settings.getUpdates ? Math.max(0, Math.min(item.quantity, item.currentQuantity - item.quantity)) : item.currentQuantity
         }
       })
 
     const itemsToCreate = items
       .filter(item => item.currentQuantity && item.create)
-      .map(item => ({ item: item.data.item, quantity: item.currentQuantity }))
+      .map(item => ({
+        item: item.data.item,
+        quantity: settings.unlimitedCurrencies ? item.currentQuantity : Math.max(0, Math.min(item.quantity, item.currentQuantity))
+      }))
 
     application.options.resolve({
       attributes: Object.fromEntries(attributes
         .filter(attribute => settings.unlimitedCurrencies || attribute.currentQuantity)
-        .map(attribute => [attribute.path, attribute.currentQuantity])
+        .map(attribute => [attribute.path, settings.unlimitedCurrencies ? attribute.currentQuantity : Math.max(0, Math.min(attribute.quantity, attribute.currentQuantity))])
       ),
       items: itemsToUpdate.concat(itemsToCreate)
     });

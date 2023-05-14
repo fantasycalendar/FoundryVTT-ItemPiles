@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.6.12
+
+- Updated Portuguese (Brazilian), and French localization - thank you eunaumtenhoid and rectulo on Weblate!
+- Fixed Star Wars 5e system not having the correct item price property path
+- Fixed being able to withdraw infinite amount of currencies from vaults
+- Fixed merchant's currencies would not be visible at the bottom of the UI if it _didn't_ have infinite currencies
+
 ## Version 2.6.11
 
 - Fixed item based currencies not working well when dragging and dropping them into vaults

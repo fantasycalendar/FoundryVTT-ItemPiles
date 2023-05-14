@@ -13,16 +13,17 @@
 
 </script>
 
-<div class="item-piles-flexrow merchant-bottom-row">
-
-	{#if recipientStore}
+{#if recipientStore}
+	<div class="item-piles-flexrow merchant-bottom-row">
 		<div style="flex: 0 1 auto;">
 			{localize("ITEM-PILES.Merchant.ShoppingAs", { actorName: $recipientDocument.name })}
 		</div>
 		<CurrencyList {currencies}
 									options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
 									class="item-piles-currency-list"/>
-	{:else if game.user.isGM && $merchantPileData.infiniteCurrencies}
+	</div>
+{:else if game.user.isGM && !$merchantPileData.infiniteCurrencies}
+	<div class="item-piles-flexrow merchant-bottom-row">
 		<div style="flex: 0 1 auto;">
 			<a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
 				 on:click={() => store.addCurrency()}>
@@ -32,9 +33,8 @@
 		<CurrencyList currencies={merchantCurrencies}
 									options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
 									class="item-piles-currency-list"/>
-	{/if}
-
-</div>
+	</div>
+{/if}
 
 <style>
     .merchant-bottom-row {

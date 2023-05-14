@@ -15,6 +15,7 @@ import forbiddenLands from "./systems/forbidden-lands.js";
 import icrpg from "./systems/icrpg.js";
 import swse from "./systems/swse.js";
 import sw5e from "./systems/sw5e.js";
+import sw5e203 from "./systems/sw5e-2.0.3.2.3.8.js";
 import fallout from "./systems/fallout.js";
 import cyberpunkRedCore from "./systems/cyberpunk-red-core.js";
 import knave from "./systems/knave.js";
@@ -87,7 +88,8 @@ export const SYSTEMS = {
       "latest": swse
     },
     "sw5e": {
-      "latest": sw5e
+      "latest": sw5e,
+      "2.0.3.2.3.8": sw5e203
     },
     "fallout": {
       "latest": fallout
