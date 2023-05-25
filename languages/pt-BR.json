@@ -133,7 +133,7 @@
     "Currency": "Moeda",
     "ContextMenu": {
       "ShowToPlayers": "Item Piles: Mostrar pilha para os jogadores",
-      "RequestTrade": "Item Piles: Solicitar negociação"
+      "RequestTrade": "Solicitar negociação"
     },
     "Errors": {
       "DisallowedItemDrop": "Você não pode selecionar {type}",
