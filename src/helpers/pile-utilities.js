@@ -1531,7 +1531,8 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
       if (existingItem) {
         existingItem.quantity++;
       } else {
-        if (table?.customCategory && !getProperty(newItem.item, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
+        setProperty(newItem, "flags", newItem.item.flags);
+        if (table?.customCategory && !getProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
           setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
         }
         items.push({
