@@ -6,6 +6,7 @@
 - Implemented off custom tooltip override, as it doesn't work in v11 and don't work well with native tooltips
 - Fixed dragging and dropping actors into item piles UI to interact with the item pile "as" that actor
 - Fixed item flags being lost when they were added to merchants through rolling on tables
+- Fixed minor issue with hotkeys (fixes quick insert interaction with Item Piles)
 
 ## Version 2.6.12
 

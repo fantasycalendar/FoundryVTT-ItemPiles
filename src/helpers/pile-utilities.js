@@ -2,7 +2,6 @@ import * as Utilities from "./utilities.js"
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "./helpers.js";
 import { SYSTEMS } from "../systems.js";
-import { hotkeyState } from "../hotkeys.js";
 import SETTINGS from "../constants/settings.js";
 import { cachedActorCurrencies, cachedCurrencyList, cachedFilterList } from "./caches.js";
 
@@ -337,7 +336,7 @@ export async function checkItemType(targetActor, item, {
 
     const newDisallowedType = isItemInvalid(targetActor, item);
 
-    if (newDisallowedType && !hotkeyState.shiftDown) {
+    if (newDisallowedType && !hotkeyActionState.forceDropItem) {
       const force = await Dialog.confirm({
         title: game.i18n.localize(warningTitle),
         content: `<p class="item-piles-dialog">${game.i18n.format(warningContent, { type: newDisallowedType })}</p>`,

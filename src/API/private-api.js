@@ -5,7 +5,6 @@ import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import ItemPileSocket from "../socket.js";
 import SETTINGS from "../constants/settings.js";
 import CONSTANTS from "../constants/constants.js";
-import { hotkeyState } from "../hotkeys.js";
 import DropItemDialog from "../applications/dialogs/drop-item-dialog/drop-item-dialog.js";
 import ItemPileInventoryApp from "../applications/item-pile-inventory-app/item-pile-inventory-app.js";
 import Transaction from "../helpers/transaction.js";
@@ -1827,7 +1826,7 @@ export default class PrivateAPI {
     }
 
     if (PileUtilities.canItemStack(dropData.itemData.item, targetActor)) {
-      if (hotkeyState.altDown) {
+      if (hotkeyActionState.forceDropOneItem) {
 
         Utilities.setItemQuantity(dropData.itemData.item, 1);
         dropData.itemData.quantity = 1;
