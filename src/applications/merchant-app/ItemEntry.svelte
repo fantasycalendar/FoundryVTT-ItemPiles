@@ -33,7 +33,7 @@
 	<div
 		class="item-piles-img-container"
 		class:not-for-sale={itemFlagData.notForSale || !quantity}
-		data-tooltip={itemFlagData.notForSale ? "Not for sale" : ""}
+		data-fast-tooltip={itemFlagData.notForSale ? "Not for sale" : ""}
 	>
 		<img class="item-piles-img" src={$itemImage}/>
 	</div>

@@ -11,8 +11,7 @@
   import { quintOut } from "svelte/easing";
   import SETTINGS from "../../constants/settings";
   import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
-  import CONSTANTS from "../../constants/constants.js";
-  import { rollMerchantTables } from "../../helpers/pile-utilities.js";
+  import { fastToolTip } from "../../foundry-ui-overrides.js";
 
   export let store;
 
@@ -279,7 +278,7 @@
 						class="item-piles-rolled-item-button"
 						style="color:red;"
 						on:click={() => removeAddedItem(item)}
-						data-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
+						data-fast-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
 					>
 						<i class="fas fa-trash"/>
 					</button>
@@ -314,22 +313,22 @@
 					</div>
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { removeTable(table.id) }}
-									data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
-									data-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
+									data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
+									data-fast-tooltip-direction={fastToolTip.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-trash" style="color:#de0e0e;"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { table.open = !table.open; }}
-									data-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
-									data-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
+									data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
+									data-fast-tooltip-direction={fastToolTip.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-cog"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
-									data-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
-									data-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
+									data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
+									data-fast-tooltip-direction={fastToolTip.TOOLTIP_DIRECTIONS.UP}
 									style="margin-right:0;">
 						<i class="fas fa-dice-d20"></i>
 					</button>
@@ -443,7 +442,7 @@
 					<button
 						class="item-piles-rolled-item-button"
 						on:click={() => addItem(item)}
-						data-tooltip={localize("ITEM-PILES.Merchant.AddItem")}
+						data-fast-tooltip={localize("ITEM-PILES.Merchant.AddItem")}
 					>
 						<i class="fas fa-arrow-left"/>
 					</button>
@@ -483,7 +482,7 @@
 						class="item-piles-rolled-item-button"
 						style="color:red;"
 						on:click={() => removeItem(item)}
-						data-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
+						data-fast-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
 					>
 						<i class="fas fa-trash"/>
 					</button>
@@ -500,7 +499,7 @@
 				<button class="item-piles-button"
 								style="color:red; max-width:30px;"
 								on:click={() => { $itemsRolled = []; }}
-								data-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
+								data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
 					<i class="fas fa-trash"/>
 				</button>
 

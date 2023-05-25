@@ -7,6 +7,8 @@ import SETTINGS from "./constants/settings.js";
 import CONSTANTS from "./constants/constants.js";
 import UserSelectDialog from "./applications/dialogs/user-select-dialog/user-select-dialog.js";
 
+export let fastToolTip = null;
+
 export default function registerUIOverrides() {
   Hooks.on("renderPlayerList", addTradeButton);
   Hooks.on("getActorDirectoryEntryContext", insertActorContextMenuItems);
@@ -16,9 +18,7 @@ export default function registerUIOverrides() {
   Hooks.on("renderTokenHUD", renderPileHUD);
   Hooks.on("hoverToken", handleTokenBorders);
   Hooks.on("controlToken", handleTokenBorders);
-  if (!foundry.utils.isNewerVersion(game.version, "10.999")) {
-    game.tooltip = new FastTooltipManager();
-  }
+  fastToolTip = new FastTooltipManager();
 }
 
 function handleTokenBorders(token) {
@@ -147,21 +147,21 @@ function renderPileHUD(app, html) {
 
     const container = $(`<div class="col right" style="right:-130px;"></div>`);
 
-    const lock_button = $(`<div class="control-icon item-piles" data-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pileData.locked ? "" : "-open"}"></i></div>`);
+    const lock_button = $(`<div class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pileData.locked ? "" : "-open"}"></i></div>`);
     lock_button.click(async function () {
       $(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
       await game.itempiles.API.toggleItemPileLocked(document);
     });
     container.append(lock_button);
 
-    const open_button = $(`<div class="control-icon item-piles" data-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${pileData.closed ? "" : "-open"}"></i></div>`);
+    const open_button = $(`<div class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${pileData.closed ? "" : "-open"}"></i></div>`);
     open_button.click(async function () {
       $(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
       await game.itempiles.API.toggleItemPileClosed(document);
     });
     container.append(open_button);
 
-    const configure_button = $(`<div class="control-icon item-piles" data-tooltip="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i class="fas fa-toolbox"></i></div>`);
+    const configure_button = $(`<div class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i class="fas fa-toolbox"></i></div>`);
     configure_button.click(async function () {
       ItemPileConfig.show(document);
     });
@@ -179,7 +179,7 @@ class FastTooltipManager extends TooltipManager {
    * A cached reference to the global tooltip element
    * @type {HTMLElement}
    */
-  tooltip = document.getElementById("tooltip");
+  tooltip = document.getElementById("fast-tooltip");
 
   /**
    * A reference to the HTML element which is currently tool-tipped, if any.
@@ -244,7 +244,7 @@ class FastTooltipManager extends TooltipManager {
   /* -------------------------------------------- */
 
   /**
-   * Activate interactivity by listening for hover events on HTML elements which have a data-tooltip defined.
+   * Activate interactivity by listening for hover events on HTML elements which have a data-fast-tooltip defined.
    */
   activateEventListeners() {
     document.body.addEventListener("pointerenter", this.#onActivate.bind(this), true);
@@ -260,7 +260,7 @@ class FastTooltipManager extends TooltipManager {
   #onActivate(event) {
     if (Tour.tourInProgress) return; // Don't activate tooltips during a tour
     const element = event.target;
-    if (!element.dataset.tooltip) {
+    if (!element.dataset.fast_tooltip) {
       // Check if the element has moved out from underneath the cursor and pointerenter has fired on a non-child of the
       // tooltipped element.
       if (this.#active && !this.element.contains(element)) this.#startDeactivation();
@@ -268,7 +268,7 @@ class FastTooltipManager extends TooltipManager {
     }
 
     // Don't activate tooltips if the element contains an active context menu
-    if (element.matches("#context-menu") || element.querySelector("#context-menu")) return;
+    if (element.matches("#fast-context-menu") || element.querySelector("#fast-context-menu")) return;
 
     // If the tooltip is currently active, we can move it to a new element immediately
     if (this.#active) this.activate(element);

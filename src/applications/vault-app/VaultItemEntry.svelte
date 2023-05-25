@@ -16,8 +16,8 @@
 
 </script>
 
-<div class="grid-item" data-tooltip={$name}
-		 data-tooltip-activation-speed="0" data-tooltip-deactivation-speed="0">
+<div class="grid-item" data-fast-tooltip={$name}
+		 data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0">
 	{#if $img}
 		<img src={$img} alt={$name}/>
 	{/if}

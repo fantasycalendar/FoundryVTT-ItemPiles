@@ -119,11 +119,11 @@
       }
 
       if (pileData.canInspectItems || game.user.isGM) {
-        contextMenu.push({
-          icon: 'fas fa-eye', label: "Inspect", onPress: () => {
-            event.detail.item.item.preview();
-          }
-        });
+				contextMenu.push({
+					icon: 'fas fa-eye', label: "Inspect", onPress: () => {
+						event.detail.item.item.preview();
+					}
+				});
       }
 
       Hooks.call(CONSTANTS.HOOKS.PILE.PRE_RIGHT_CLICK_ITEM, event.detail.item.item.item, contextMenu, actor, store.recipient);

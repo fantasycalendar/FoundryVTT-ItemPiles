@@ -11,7 +11,7 @@
 
 	<div class="label-side">
 		<label>{localize(data.name)} <a>
-			<i data-tooltip="Reset data" class="fas fa-undo reset-setting"
+			<i data-fast-tooltip="Reset data" class="fas fa-undo reset-setting"
 				 on:click={() => { data.value = data.default; }}></i></a>
 		</label>
 		<p class="notes">{localize(data.hint)}</p>
@@ -73,7 +73,7 @@
     padding-bottom: 0.4rem;
 
   }
-	
+
   .item-pile-setting {
 
     .reset-setting {

@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.6.13
+
+- Fixed D&D 5e system implementation not supporting changing the name or abbreviation of currencies without breaking item costs
+- Split off custom tooltip override, as it doesn't work in v11 and don't work well with native tooltips
+
 ## Version 2.6.12
 
 - Added support for previewing mystified items in PF2e

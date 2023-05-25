@@ -80,23 +80,23 @@
 </script>
 
 <div class="item-piles-flexrow">
-  <input type="text"
-         list={id}
-         bind:value={macro}
-         style="flex:1; margin-right:5px;"
-         placeholder={localize("ITEM-PILES.Applications.ItemPileConfig.Main.MacroPlaceholder")}
-         on:keyup={() => { filterMacros() }}
-         on:change={() => { filterMacros() }}
-  />
-  <datalist id={id}>
-    {#each $macros as m (m.id)}
-      <option value={m.name}>{m.text ?? ""}</option>
-    {/each}
-  </datalist>
-  <i
-    data-tooltip="Open Macro"
-    style="margin-top: 5px; font-size: 1rem; flex:0;"
-    class="fas fa-edit item-piles-clickable-link"
-    on:click={() => openMacro()}
-  ></i>
+	<input type="text"
+				 list={id}
+				 bind:value={macro}
+				 style="flex:1; margin-right:5px;"
+				 placeholder={localize("ITEM-PILES.Applications.ItemPileConfig.Main.MacroPlaceholder")}
+				 on:keyup={() => { filterMacros() }}
+				 on:change={() => { filterMacros() }}
+	/>
+	<datalist id={id}>
+		{#each $macros as m (m.id)}
+			<option value={m.name}>{m.text ?? ""}</option>
+		{/each}
+	</datalist>
+	<i
+		data-fast-tooltip="Open Macro"
+		style="margin-top: 5px; font-size: 1rem; flex:0;"
+		class="fas fa-edit item-piles-clickable-link"
+		on:click={() => openMacro()}
+	></i>
 </div>

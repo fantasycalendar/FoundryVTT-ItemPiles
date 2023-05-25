@@ -2,8 +2,8 @@
 
 	<div class="item-piles-chat-card-title">
 		<p>
-			<img src="{{merchant.img}}" data-tooltip="{{merchant.name}}" height="32"/>
-			<i class="fas fa-handshake"></i> <img src="{{actor.img}}" data-tooltip="{{actor.name}}" height="32"/>
+			<img src="{{merchant.img}}" data-fast-tooltip="{{merchant.name}}" height="32"/>
+			<i class="fas fa-handshake"></i> <img src="{{actor.img}}" data-fast-tooltip="{{actor.name}}" height="32"/>
 		</p>
 		<p>{{message}}</p>
 	</div>
@@ -12,7 +12,7 @@
 		{{#each priceInformation as |bought basePriceString|}}
 		{{#each bought.buyerReceive as |item id|}}
 		<li>
-			<img src="{{item.img}}" data-tooltip="{{item.name}}" height="16"/>
+			<img src="{{item.img}}" data-fast-tooltip="{{item.name}}" height="16"/>
 			<label>{{item.name}} <small>(x{{item.quantity}})</small></label>
 			<label class="item-piles-chat-price">{{bought.basePriceString}}</label>
 		</li>
