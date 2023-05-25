@@ -46,9 +46,11 @@ export default {
     const overallCost = Number(getProperty(item, "system.price.value")) ?? 0;
     const priceDenomination = getProperty(item, "system.price.denomination");
     if (priceDenomination) {
-      const currencyDenomination = currencies.find(currency => {
-        return currency.path.toLowerCase().endsWith(priceDenomination);
-      });
+      const currencyDenomination = currencies
+        .filter(currency => currency.type === "attribute")
+        .find(currency => {
+          return currency.data.path.toLowerCase().endsWith(priceDenomination);
+        });
       if (currencyDenomination) {
         return overallCost * currencyDenomination.exchangeRate;
       }
