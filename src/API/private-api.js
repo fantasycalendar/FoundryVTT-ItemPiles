@@ -15,6 +15,7 @@ import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import GiveItemsShell from "../applications/dialogs/give-items-dialog/give-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
+import { hotkeyActionState } from "../hotkeys.js";
 
 const preloadedFiles = new Set();
 

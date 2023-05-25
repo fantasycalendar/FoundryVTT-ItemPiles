@@ -4,6 +4,7 @@ import * as Helpers from "./helpers.js";
 import { SYSTEMS } from "../systems.js";
 import SETTINGS from "../constants/settings.js";
 import { cachedActorCurrencies, cachedCurrencyList, cachedFilterList } from "./caches.js";
+import { hotkeyActionState } from "../hotkeys.js";
 
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
