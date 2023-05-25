@@ -1002,3 +1002,30 @@
     color: #ad7816;
   }
 }
+
+#fast-tooltip {
+  position: absolute;
+  width: max-content;
+  max-width: 320px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.95);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-16);
+  line-height: var(--font-size-16);
+  color: var(--color-text-light-highlight);
+  border: 1px solid var(--color-border-dark-secondary);
+  border-radius: 3px;
+  box-shadow: 0 0 4px #000;
+  z-index: var(--z-index-tooltip);
+  pointer-events: none;
+  overflow-wrap: break-word;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 500ms, opacity 500ms;
+
+  &.active {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 500ms;
+  }
+}

@@ -11,7 +11,6 @@
   import { quintOut } from "svelte/easing";
   import SETTINGS from "../../constants/settings";
   import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
-  import { fastToolTip } from "../../foundry-ui-overrides.js";
 
   export let store;
 
@@ -314,21 +313,21 @@
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { removeTable(table.id) }}
 									data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
-									data-fast-tooltip-direction={fastToolTip.TOOLTIP_DIRECTIONS.UP}
+									data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-trash" style="color:#de0e0e;"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { table.open = !table.open; }}
 									data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
-									data-fast-tooltip-direction={fastToolTip.TOOLTIP_DIRECTIONS.UP}
+									data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-cog"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 									on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
 									data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
-									data-fast-tooltip-direction={fastToolTip.TOOLTIP_DIRECTIONS.UP}
+									data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 									style="margin-right:0;">
 						<i class="fas fa-dice-d20"></i>
 					</button>

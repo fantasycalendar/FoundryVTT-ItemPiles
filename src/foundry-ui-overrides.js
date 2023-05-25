@@ -19,6 +19,7 @@ export default function registerUIOverrides() {
   Hooks.on("hoverToken", handleTokenBorders);
   Hooks.on("controlToken", handleTokenBorders);
   fastToolTip = new FastTooltipManager();
+  fastToolTip.activateEventListeners();
 }
 
 function handleTokenBorders(token) {
@@ -175,11 +176,12 @@ function renderPileHUD(app, html) {
 
 class FastTooltipManager extends TooltipManager {
 
-  /**
-   * A cached reference to the global tooltip element
-   * @type {HTMLElement}
-   */
-  tooltip = document.getElementById("fast-tooltip");
+  constructor() {
+    super();
+    const tooltipElem = $(`<aside id="fast-tooltip" role="tooltip"></aside>`);
+    $("body").append(tooltipElem);
+    this.tooltip = document.getElementById("fast-tooltip");
+  }
 
   /**
    * A reference to the HTML element which is currently tool-tipped, if any.
@@ -260,15 +262,16 @@ class FastTooltipManager extends TooltipManager {
   #onActivate(event) {
     if (Tour.tourInProgress) return; // Don't activate tooltips during a tour
     const element = event.target;
-    if (!element.dataset.fast_tooltip) {
+    if (!element.dataset.fastTooltip) {
       // Check if the element has moved out from underneath the cursor and pointerenter has fired on a non-child of the
       // tooltipped element.
       if (this.#active && !this.element.contains(element)) this.#startDeactivation();
       return;
     }
+    console.log(element.dataset.fastTooltip)
 
     // Don't activate tooltips if the element contains an active context menu
-    if (element.matches("#fast-context-menu") || element.querySelector("#fast-context-menu")) return;
+    if (element.matches("#context-menu") || element.querySelector("#context-menu")) return;
 
     // If the tooltip is currently active, we can move it to a new element immediately
     if (this.#active) this.activate(element);
@@ -279,6 +282,29 @@ class FastTooltipManager extends TooltipManager {
     this.#activationTimeout = window.setTimeout(() => {
       this.activate(element);
     }, Number(element?.dataset?.tooltipActivationSpeed) ?? this.constructor.TOOLTIP_ACTIVATION_MS);
+  }
+
+  activate(element, { text, direction, cssClass } = {}) {
+
+    // Check if the element still exists in the DOM.
+    if (!document.body.contains(element)) return;
+    this.#clearDeactivation();
+
+    // Mark the element as active
+    this.#active = true;
+    this.element = element;
+    element.setAttribute("aria-describedby", "tooltip");
+    this.tooltip.innerHTML = text || game.i18n.localize(element.dataset.fastTooltip);
+
+    // Activate display of the tooltip
+    this.tooltip.removeAttribute("class");
+    this.tooltip.classList.add("active");
+    if (cssClass) this.tooltip.classList.add(cssClass);
+
+    // Set tooltip position
+    direction = direction || element.closest("[data-tooltip-direction]")?.dataset.tooltipDirection;
+    if (!direction) direction = this._determineDirection();
+    this._setAnchor(direction);
   }
 
   /* -------------------------------------------- */

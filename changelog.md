@@ -3,7 +3,8 @@
 ## Version 2.6.13
 
 - Fixed D&D 5e system implementation not supporting changing the name or abbreviation of currencies without breaking item costs
-- Split off custom tooltip override, as it doesn't work in v11 and don't work well with native tooltips
+- Implemented off custom tooltip override, as it doesn't work in v11 and don't work well with native tooltips
+- Fixed dragging and dropping actors into item piles UI to interact with the item pile "as" that actor
 
 ## Version 2.6.12
 

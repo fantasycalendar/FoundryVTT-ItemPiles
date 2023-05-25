@@ -2,12 +2,17 @@
 
   import CurrencyList from "../components/CurrencyList.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+  import { writable } from "svelte/store";
 
   export let store;
   export let recipientStore;
 
-  const recipientDocument = recipientStore?.document;
-  const currencies = recipientStore?.allCurrencies;
+  let recipientDocument = writable({});
+  let currencies = writable([]);
+  $: {
+    recipientDocument = recipientStore?.document;
+    currencies = recipientStore?.allCurrencies;
+  }
   const merchantCurrencies = store?.allCurrencies;
   const merchantPileData = store.pileData;
 

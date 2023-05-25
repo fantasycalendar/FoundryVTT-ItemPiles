@@ -320,14 +320,14 @@ export class VaultStore extends ItemPileStore {
     if (data.type === "Actor" && game.user.isGM) {
       const oldHeight = this.mainContainer.getBoundingClientRect().height;
       const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
-      this.updateRecipient(newRecipient);
-      this.refreshFreeSpaces();
       if (!this.recipient) {
         setTimeout(() => {
           const newHeight = this.mainContainer.getBoundingClientRect().height - oldHeight;
-          application.position.stores.height.set(get(application.position.stores.height) + newHeight);
+          this.application.position.stores.height.set(get(this.application.position.stores.height) + newHeight);
         });
       }
+      this.updateRecipient(newRecipient);
+      this.refreshFreeSpaces();
       return;
     }
 
