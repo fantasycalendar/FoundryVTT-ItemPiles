@@ -10,7 +10,7 @@
     "Wasp <adam@fantasy-calendar.com> (https://github.com/haxxer)"
   ],
   "dependencies": {
-    "@typhonjs-fvtt/runtime": "^0.0.22",
+    "@typhonjs-fvtt/runtime": "^0.0.23",
     "@typhonjs-fvtt/svelte-standard": "^0.0.23",
     "svelte": "^3.57.0"
   },
@@ -21,7 +21,7 @@
     "eslint": "^8",
     "svelte-dnd-action": "^0.9.18",
     "svelte-preprocess": "^5",
-    "vite": "^4"
+    "vite": "^4.3.8"
   },
   "browserslist": [
     ">5%",
