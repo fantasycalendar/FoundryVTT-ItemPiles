@@ -10,7 +10,9 @@ const HOTKEYS = {
 
 export const hotkeyActionState = {
   get openPileInventory() {
-    const down = window.keyboard.downKeys.has(game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.FORCE_DEFAULT_SHEET)[0].key);
+    const down = game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.FORCE_DEFAULT_SHEET).some(key => {
+      return window.keyboard.downKeys.has(key);
+    });
     return (
       (!down && !game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"))
       ||
@@ -19,11 +21,15 @@ export const hotkeyActionState = {
   },
 
   get forceDropItem() {
-    return window.keyboard.downKeys.has(game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP)[0].key);
+    return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
+      return window.keyboard.downKeys.has(key);
+    });
   },
 
   get forceDropOneItem() {
-    return window.keyboard.downKeys.has(game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP_ONE)[0].key);
+    return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
+      return window.keyboard.downKeys.has(key);
+    });
   }
 }
 

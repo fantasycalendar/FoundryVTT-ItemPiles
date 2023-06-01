@@ -44,6 +44,7 @@
   * [deleteItemPile](#deleteItemPile)
   * [splitItemPileContents](#splitItemPileContents)
   * [renderItemPileInterface](#renderItemPileInterface)
+  * [unrenderItemPileInterface](#unrenderItemPileInterface)
 
 
 * [Item and attribute methods](#item-and-attribute-methods)
@@ -563,6 +564,22 @@ Renders the appropriate interface for a given actor.
 | [options.userIds]    | `Array<User/string>`  | `false`                             |   An array of users or user ids for each user to render the interface for (defaults to only self) |
 | [options.inspectingTarget] | `Actor/TokenDocument` | `false`                             | Sets what actor should be viewing the interface        |
 | [options.useDefaultCharacter] | `boolean`             | `false`                             | Whether other users should use their assigned character when rendering the interface        |
+
+---
+
+### unrenderItemPileInterface
+
+`game.itempiles.API.unrenderItemPileInterface(target, options)` ⇒ `Promise`
+
+Closes any open interfaces from a given item pile actor
+
+**Returns**: `Promise` - Returns a promise that resolves when all interfaces have been closed.
+
+| Param                    | Type                  | Description                         |
+|--------------------------|-----------------------|-------------------------------------|
+| target                   | `Actor/TokenDocument` | The actor whose interface to potentially close |
+| options                  | `object`              | Options to pass to the function     |
+| [options.userIds]    | `Array<User/string>`  | `false`                             |   An array of users or user ids for each user to close the interface for (defaults to only self) |
 
 ---
 

@@ -41,6 +41,7 @@ export default class ItemPileSocket {
      * UI sockets
      */
     RENDER_INTERFACE: "renderItemPileApplication",
+    UNRENDER_INTERFACE: "unrenderItemPileApplication",
     RERENDER_TOKEN_HUD: "rerenderTokenHud",
     USER_OPENED_INTERFACE: "userOpenedInterface",
     USER_CLOSED_INTERFACE: "userClosedInterface",
@@ -150,6 +151,7 @@ export default class ItemPileSocket {
     [this.HANDLERS.DISABLE_CHAT_TRADE_BUTTON]: (...args) => ChatAPI._disableTradingButton(...args),
 
     [this.HANDLERS.RENDER_INTERFACE]: (...args) => PrivateAPI._renderItemPileInterface(...args),
+    [this.HANDLERS.UNRENDER_INTERFACE]: (...args) => PrivateAPI._unrenderItemPileInterface(...args),
     [this.HANDLERS.RERENDER_TOKEN_HUD]: (...args) => PrivateAPI._updateTokenHud(...args),
     [this.HANDLERS.USER_OPENED_INTERFACE]: (...args) => InterfaceTracker.userOpened(...args),
     [this.HANDLERS.USER_CLOSED_INTERFACE]: (...args) => InterfaceTracker.userClosed(...args),

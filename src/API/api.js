@@ -1882,6 +1882,57 @@ class API {
   }
 
   /**
+   * Closes any open interfaces from a given item pile actor
+   *
+   * @param {Actor/TokenDocument} target                      The actor whose interface to potentially close
+   * @param {object} options                                  An object containing the options for this method
+   * @param {Array<string/User>} [options.userIds]            An array of users or user ids for each user to close the interface for (defaults to only self)
+   *
+   * @returns {Promise}
+   */
+  static unrenderItemPileInterface(target, { userIds = null } = {}) {
+
+    const targetDocument = Utilities.getDocument(target);
+    const targetUuid = Utilities.getUuid(targetDocument);
+    if (!targetUuid) throw Helpers.custom_error(`unrenderItemPileInterface | Could not determine the UUID, please provide a valid target item pile`);
+
+    if (!PileUtilities.isValidItemPile(targetDocument)) {
+      throw Helpers.custom_error("unrenderItemPileInterface | This target is not a valid item pile")
+    }
+
+    if (!Array.isArray(userIds)) {
+      if (userIds === null) {
+        userIds = [game.user.id];
+      } else {
+        userIds = [userIds]
+      }
+    } else {
+      userIds = userIds.map(user => {
+        return user instanceof User ? user.id : user;
+      })
+    }
+
+    if (!game.user.isGM) {
+      if (userIds.length > 1 || !userIds.includes(game.user.id)) {
+        throw Helpers.custom_error(`unrenderItemPileInterface | You are not a GM, so you cannot force others to close an item pile's interface`);
+      }
+      userIds = [game.user.id];
+    }
+
+    if (userIds.length === 1 && userIds[0] === game.user.id) {
+      return PrivateAPI._unrenderItemPileInterface(targetUuid, { remote: true });
+    }
+
+    for (const userId of userIds) {
+      const user = game.users.get(userId);
+      if (!user) throw Helpers.custom_error(`unrenderItemPileInterface | No user with ID "${userId}" exists`);
+    }
+
+    return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.UNRENDER_INTERFACE, userIds, targetUuid, { remote: true });
+
+  }
+
+  /**
    *  Get the prices array for a given item
    *
    * @param {Item} item                             Item to get the price for

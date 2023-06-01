@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.6.14
+
+- Added `game.itempiles.API.unrenderItemPileInterface` which can be used to remotely close item pile interfaces for players
+- Fixed opening document sheets in compendiums would throw error and fail to open (Foundry v11)
+- Fixed hovering over vault items sometimes throwing errors in the console
+- Fixed not having any hotkeys configured would throw errors when opening item pile UIs
+
 ## Version 2.6.13
 
 - Updated Portuguese (Brazil) localization (thank you mclemente on Weblate!)

@@ -2134,6 +2134,16 @@ export default class PrivateAPI {
 
   }
 
+  static async _unrenderItemPileInterface(targetUuid, { remote = false } = {}) {
+
+    const target = Utilities.getActor(targetUuid);
+
+    return Promise.allSettled(Object.values(ui.windows).filter(app => {
+      return app.id.includes(`-${target.id}-`) || app?.actor === target || app?.merchant === target;
+    }).map(app => app.close()));
+
+  }
+
   static async _tradeItems(sellerUuid, buyerUuid, items, userId, { interactionId = false } = {}) {
 
     const sellingActor = Utilities.getActor(sellerUuid);

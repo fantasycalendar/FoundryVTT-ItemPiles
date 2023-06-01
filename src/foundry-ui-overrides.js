@@ -265,10 +265,9 @@ class FastTooltipManager extends TooltipManager {
     if (!element.dataset.fastTooltip) {
       // Check if the element has moved out from underneath the cursor and pointerenter has fired on a non-child of the
       // tooltipped element.
-      if (this.#active && !this.element.contains(element)) this.#startDeactivation();
+      if (this.#active && this.element && !this.element.contains(element)) this.#startDeactivation();
       return;
     }
-    console.log(element.dataset.fastTooltip)
 
     // Don't activate tooltips if the element contains an active context menu
     if (element.matches("#context-menu") || element.querySelector("#context-menu")) return;
@@ -293,7 +292,7 @@ class FastTooltipManager extends TooltipManager {
     // Mark the element as active
     this.#active = true;
     this.element = element;
-    element.setAttribute("aria-describedby", "tooltip");
+    element.setAttribute("aria-describedby", "fast-tooltip");
     this.tooltip.innerHTML = text || game.i18n.localize(element.dataset.fastTooltip);
 
     // Activate display of the tooltip

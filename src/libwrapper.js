@@ -21,12 +21,13 @@ export default function registerLibwrappers() {
 
   libWrapper.register(CONSTANTS.MODULE_NAME, overrideMethod, function (wrapped, event) {
     event.preventDefault();
-    const element = event.currentTarget;
-    const documentId = element.parentElement.dataset.documentId;
-    const document = this.constructor.collection.get(documentId);
-    if (PileUtilities.isValidItemPile(document)) {
-      const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_DIRECTORY_CLICK, document);
-      if (hookResult === false) return false;
+    if (!(this instanceof Compendium)) {
+      const documentId = element.parentElement.dataset.documentId;
+      const document = this.constructor.collection.get(documentId);
+      if (PileUtilities.isValidItemPile(document)) {
+        const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_DIRECTORY_CLICK, document);
+        if (hookResult === false) return false;
+      }
     }
     return wrapped(event);
   }, "MIXED");
