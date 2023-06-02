@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.6.16
+
+- Fixed error preventing users from opening item piles on the canvas in Foundry v11
+
 ## Version 2.6.15
 
 - Fixed critical issue preventing opening most documents, whoops
