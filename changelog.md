@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.6.15
+
+- Fixed critical issue preventing opening most documents, whoops
+
 ## Version 2.6.14
 
 - Added `game.itempiles.API.unrenderItemPileInterface` which can be used to remotely close item pile interfaces for players

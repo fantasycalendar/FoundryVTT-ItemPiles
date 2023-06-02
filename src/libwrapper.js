@@ -21,6 +21,7 @@ export default function registerLibwrappers() {
 
   libWrapper.register(CONSTANTS.MODULE_NAME, overrideMethod, function (wrapped, event) {
     event.preventDefault();
+    const element = event.currentTarget;
     if (!(this instanceof Compendium)) {
       const documentId = element.parentElement.dataset.documentId;
       const document = this.constructor.collection.get(documentId);
