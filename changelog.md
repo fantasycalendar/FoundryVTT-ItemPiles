@@ -9,6 +9,7 @@
 - Fixed price preset editor not opening
 - Fixed not being able to turn actors into item piles through the actor sheet header
 - Fixed item piles having problems with the new Foundry V11 synthetic actor methodology in some systems
+- Fixed DnD5e system config for `veryRare` rarity not being correct
 
 ## Version 2.6.16
 
