@@ -190,7 +190,8 @@
         "Ignore": "Zingoruj użytkownika",
         "ContentOne": "{source_actor_name} chce przekazać przedmiot \"{item_name}\" do {target_actor_name}, czy akceptujesz?",
         "ContentMany": "{source_actor_name} chce przekazać przedmioty \"{item_name}\" ({ilość}) do {target_actor_name}, czy akceptujesz?",
-        "Title": "Przyjmowany przedmiot"
+        "Title": "Przyjmowany przedmiot",
+        "Content": "{source_actor_name} chce przekazać przedmiot {target_actor_name}, akceptujesz?"
       },
       "NewSystemVersion": {
         "Title": "Nowa wersja systemu",
@@ -294,7 +295,8 @@
       "EditCurrencies": {
         "Title": "Edycja walut",
         "Content": "Jako GM możesz zaktualizować waluty na tym stosie przedmiotów:",
-        "Submit": "Wyślij"
+        "Submit": "Wyślij",
+        "Secondary": "Waluty dodatkowe:"
       },
       "TradeMerchantItem": {
         "TheyReceive": "Oni otrzymują",
@@ -332,7 +334,7 @@
         "QuantityForPriceExplanation": "To konfiguruje ile sztuk tego przedmiotu powinno się otrzymać przy zakupie.",
         "Service": "Przedmiot jest usługą",
         "DisableNormalCostExplanation": "Gdy ta opcja jest włączona, przedmiot nie może być zakupiony za walutę podstawową i musi być zakupiony za jedną z poniższych opcji zakupu.",
-        "PricePreset": "Lub wybierz wstępne ustawienie cenowe:",
+        "PricePreset": "Można też wybrać wstępne ustawienie ceny:",
         "CanStackYes": "Tak, zawsze można układać w stos",
         "InfiniteQuantity": "Nieskończona ilość",
         "FreeExplanation": "Po włączeniu, ten przedmiot nie kosztuje nic, aby kupić od sprzedawcy.",
@@ -377,7 +379,8 @@
         "PurchaseMacroExplanation": "Nazwa makra do wykonania przy zakupie przedmiotu.",
         "CustomCategory": "Kategoria pozycji niestandardowej",
         "InfiniteQuantityNo": "Nie, standardowa ilość",
-        "ServiceExplanation": "Powoduje to, że ten przedmiot nie dodaje się do inwentarza kupca. Usługa \"item\" może nadal mieć ilość, ale jeśli się skończy, nie zostanie usunięta z kupca, ale zamiast tego ustawiona na nie do sprzedaży."
+        "ServiceExplanation": "Powoduje to, że ten przedmiot nie dodaje się do inwentarza kupca. Usługa \"item\" może nadal mieć ilość, ale jeśli się skończy, nie zostanie usunięta z kupca, ale zamiast tego ustawiona na nie do sprzedaży.",
+        "KeepOnMerchantExplanation": "Gdy przedmioty zostaną wyczyszczone w zakładce wypełnij przedmioty sprzedawców lub przez integrację Simple Calendar odświeżającą zapasy (patrz konfiguracja sprzedawcy na dole), ten przedmiot zawsze pozostanie."
       },
       "FilterEditor": {
         "Explanation": "Tutaj możesz zdefiniować wiele typów filtrów, które wykluczą pewne typy przedmiotów. Na podstawie podanej ścieżki atrybutu, stos przedmiotów mógłby znaleźć \"typ\" przedmiotu i na podstawie filtrów, ukrywa te przedmioty w UI inwentarza stosu przedmiotów.",
@@ -486,7 +489,14 @@
           "OpenStatusExplanation": "To konfiguruje aktualny stan otwarcia kupca. Jeśli włączone są czasy otwarcia (poniżej) i moduł Simple Calendar jest włączony, możesz skonfigurować to jako automatyczne.",
           "OpenStatusClosed": "Zamknięte",
           "OpenStatusAuto": "Automatycznie (Simple Calendar)",
-          "ClosedDays": "Dni zamknięte (Simple Calendar)"
+          "ClosedDays": "Dni zamknięte (Simple Calendar)",
+          "RefreshItemsWarning": "W przypadku każdej z poniższych opcji istniejące pozycje zostaną USUNIĘTE i nie będzie można ich odzyskać. Poszczególne pozycje można skonfigurować tak, aby zostały zachowane; pozycje ustawione na usługi, zachowaj zerową ilość i zachowaj u sprzedawcy pozostaną.",
+          "RefreshItemsOnOpen": "Odświeżanie elementów w czasie otwarcia (\"Simple Calendar\")",
+          "RefreshItemsOnOpenExplanation": "Gdy czas kalendarza przekroczy czas otwarcia sprzedawcy, zapasy sprzedawcy zostaną odświeżone.",
+          "RefreshItemsDays": "Odśwież elementy w dni powszednie (\"Simple Calendar\")",
+          "RefreshItemsDaysExplanation": "Gdy kalendarz przekroczy zaznaczone dni, zapasy sprzedawcy zostaną odświeżone. Dzieje się to o godzinie otwarcia sprzedawcy lub o północy, jeśli nie ma godziny otwarcia/zamknięcia.",
+          "RefreshItemsHolidays": "Odśwież przedmioty w Święta (Simple Calendar)",
+          "RefreshItemsHolidaysExplanation": "Gdy kalendarz przekroczy powiadomienia z daną kategorią powiadomień, zapasy sprzedawcy zostaną odświeżone. Dzieje się to w czasie powiadomienia lub o północy, jeśli jest to powiadomienie ustawiono na cały dzień."
         },
         "Main": {
           "DeleteWhenEmpty": "Usuń, gdy jest pusty",
@@ -513,7 +523,10 @@
           "Distance": "Odległość interakcji",
           "MacroPlaceholder": "Wstaw nazwę makra",
           "EditDescriptionExplanation": "Opis ten jest wyświetlany w odpowiednich interfejsach podczas przeglądania stosu przedmiotów",
-          "DeleteWhenEmptyDefault": "Domyślne ustawienie modułu"
+          "DeleteWhenEmptyDefault": "Domyślne ustawienie modułu",
+          "OverrideSecondaryCurrencies": "Zastąp waluty dodatkowe",
+          "OverrideSecondaryCurrenciesExplanation": "Skonfiguruj nadpisania waluty dodatkowej dla tego stosu pozycji.",
+          "ConfigureOverrideSecondaryCurrencies": "Konfiguracja zastępowania walut dodatkowych"
         },
         "Container": {
           "Title": "Ustawienia kontenera",
@@ -631,6 +644,11 @@
         "Update": "Aktualizacja ustawień wstępnych",
         "Explanation": "Tutaj można utworzyć wiele wstępnie ustawionych cen, które następnie można łatwo wykorzystać w niestandardowych cenach przedmiotów.",
         "Title": "Edytor ustawień cenowych"
+      },
+      "SecondaryCurrenciesEditor": {
+        "Explanation": "W tym miejscu można określić, które waluty dodatkowe mogą być podnoszone i upuszczane przez postacie.",
+        "Title": "Edytor walut drugorzędnych",
+        "TitleActor": "Edytor walut drugorzędnych: {actor_name}"
       }
     },
     "Settings": {
@@ -771,6 +789,11 @@
       "Quantity": {
         "Title": "Atrybut ilości przedmiotów",
         "Hint": "Tutaj możesz skonfigurować ścieżkę atrybutu dla ilości każdego przedmiotu. Na przykład w systemie D&D5e ilość każdego przedmiotu jest przechowywana w atrybucie \"item.system.quantity\", więc w tym ustawieniu wpisujesz \"system.quantity\"."
+      },
+      "SecondaryCurrencies": {
+        "Title": "Waluty drugorzędne",
+        "Label": "Konfiguracja walut dodatkowych",
+        "Hint": "To ustawienie definiuje waluty dodatkowe, podobne do zwykłych walut, ale od nich niezależne. Nie mogą one mieć kursów wymiany ani być podzielone na inne waluty niestandardowe."
       }
     },
     "HUD": {
