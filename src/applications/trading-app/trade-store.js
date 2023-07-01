@@ -149,7 +149,7 @@ export default class TradeStore {
     }
   }
 
-  addItem(newItem, { quantity = false, currency = false } = {}) {
+  addItem(newItem, { uuid = false, quantity = false, currency = false } = {}) {
 
     const items = !currency
       ? get(this.leftTraderItems)
@@ -167,7 +167,7 @@ export default class TradeStore {
     } else if (!item) {
       items.push({
         id: newItem._id ?? newItem.id,
-        uuid: newItem.uuid,
+        uuid: uuid,
         name: newItem.name,
         img: newItem?.img ?? "",
         type: newItem?.type,

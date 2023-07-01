@@ -57,9 +57,9 @@
       validItem._id = item._id;
     }
 
-    validItem.uuid = data.uuid;
+    const itemToSend = await Item.implementation.create(validItem, { temporary: true });
 
-    return store.addItem(validItem, { currency: isCurrency });
+    return store.addItem(itemToSend, { uuid: data.uuid, currency: isCurrency });
 
   }
 
