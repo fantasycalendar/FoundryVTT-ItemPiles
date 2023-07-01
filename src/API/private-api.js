@@ -110,11 +110,6 @@ export default class PrivateAPI {
       itemPileConfig
     );
     if (!itemPileConfig?.enabled) return;
-    if (!doc.isLinked) {
-      doc.updateSource({
-        [`${CONSTANTS.ACTOR_DELTA_PROPERTY}.flags.${CONSTANTS.MODULE_NAME}.-=sharing`]: null,
-      });
-    }
     if (itemPileConfig.closedImage.includes("*")) {
       itemPileConfig.closedImage = Helpers.random_array_element(itemPileConfig.closedImages);
       itemPileConfig.closedImages = [];
@@ -132,8 +127,7 @@ export default class PrivateAPI {
       itemPileConfig.lockedImages = [];
     }
     doc.updateSource({
-      [CONSTANTS.FLAGS.PILE]: itemPileConfig,
-      [CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE]: itemPileConfig
+      [CONSTANTS.FLAGS.PILE]: itemPileConfig
     });
     const targetItems = PileUtilities.getActorItems(doc.actor);
     const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
@@ -1296,8 +1290,7 @@ export default class PrivateAPI {
 
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId, ...specificTokenSettings,
-        [CONSTANTS.FLAGS.PILE]: specificPileSettings,
-        [`${CONSTANTS.ACTOR_DELTA_PROPERTY}.${CONSTANTS.FLAGS.PILE}`]: specificPileSettings
+        [CONSTANTS.FLAGS.PILE]: specificPileSettings
       });
 
       if (target.isLinked) {
@@ -1351,8 +1344,7 @@ export default class PrivateAPI {
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId,
         ...specificTokenSettings,
-        [CONSTANTS.FLAGS.PILE]: specificPileSettings,
-        [`${CONSTANTS.ACTOR_DELTA_PROPERTY}.${CONSTANTS.FLAGS.PILE}`]: specificPileSettings
+        [CONSTANTS.FLAGS.PILE]: specificPileSettings
       });
 
       if (target.isLinked) {

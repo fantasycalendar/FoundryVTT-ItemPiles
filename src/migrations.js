@@ -88,10 +88,7 @@ const migrations = {
         }
         updates.push({
           _id: token.id,
-          ...flagData,
-          [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
-            ...flagData
-          }
+          ...flagData
         });
       }
       console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
@@ -136,16 +133,7 @@ const migrations = {
           _id: token.id,
           actorLink: false,
           actorId: tokenActor.id,
-          [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
-            ...flagData,
-            items: []
-          },
           ...flagData
-        }
-
-        for (let itemData of token[CONSTANTS.ACTOR_DELTA_PROPERTY]?.items ?? []) {
-          const item = await Item.implementation.create(itemData, { temporary: true });
-          update[CONSTANTS.ACTOR_DELTA_PROPERTY].items.push(item.toObject());
         }
 
         updates.push(update);
@@ -217,10 +205,7 @@ const migrations = {
         return {
           token,
           update: {
-            [CONSTANTS.FLAGS.VERSION]: version,
-            [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
-              [CONSTANTS.FLAGS.VERSION]: version,
-            }
+            [CONSTANTS.FLAGS.VERSION]: version
           },
           items: itemPileItems.map(item => {
             const flags = PileUtilities.getItemFlagData(item);
@@ -296,9 +281,6 @@ const migrations = {
         updates.push({
           _id: token.id,
           ...flagData,
-          [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
-            ...flagData
-          }
         });
       }
       console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);

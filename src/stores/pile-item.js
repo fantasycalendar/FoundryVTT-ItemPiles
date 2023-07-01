@@ -57,7 +57,7 @@ export class PileItem extends PileBaseItem {
     super.setupStores();
     this.item = item;
     this.itemDocument = new TJSDocument(this.item);
-    this.canStack = PileUtilities.canItemStack(this.item, this.actor);
+    this.canStack = PileUtilities.canItemStack(this.item, this.store.actor);
     this.presentFromTheStart.set(Utilities.getItemQuantity(this.item) > 0 || !this.canStack);
     this.quantity.set(this.canStack ? Utilities.getItemQuantity(this.item) : 1);
     this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
