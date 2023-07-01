@@ -106,7 +106,7 @@ function insertActorHeaderButtons(actorSheet, buttons) {
 
   if (!game.user.isGM || Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_BUTTON)) return;
 
-  let obj = actorSheet.object;
+  let obj = actorSheet?.object ?? actorSheet?.actor;
 
   buttons.unshift({
     label: Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "" : "Configure",
@@ -122,7 +122,7 @@ function insertItemHeaderButtons(itemSheet, buttons) {
 
   if (!game.user.isGM || Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_BUTTON)) return;
 
-  let obj = itemSheet.object;
+  let obj = itemSheet?.object ?? itemSheet?.item;
 
   buttons.unshift({
     label: Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "" : "Configure",

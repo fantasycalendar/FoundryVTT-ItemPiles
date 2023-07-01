@@ -7,6 +7,7 @@
 - Fixed item piles not being deleted once empty
 - Fixed item piles being updated with `actorData` when that has been deprecated in Foundry V11
 - Fixed price preset editor not opening
+- Fixed not being able to turn actors into item piles through the actor sheet header
 
 ## Version 2.6.16
 
