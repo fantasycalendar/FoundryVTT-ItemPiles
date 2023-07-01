@@ -6,6 +6,7 @@
 - Fixed PF2e mystified items incorrectly showing the item's real name and icon in the user-to-user trading interface instead of the mystified ones
 - Fixed item piles not being deleted once empty
 - Fixed item piles being updated with `actorData` when that has been deprecated in Foundry V11
+- Fixed price preset editor not opening
 
 ## Version 2.6.16
 

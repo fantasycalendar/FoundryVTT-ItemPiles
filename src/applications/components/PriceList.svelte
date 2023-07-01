@@ -18,8 +18,8 @@
 
   let currencies = getSetting(SETTINGS.CURRENCIES);
   let secondaryCurrencies = getSetting(SETTINGS.SECONDARY_CURRENCIES);
-  if (item.parent) {
-    const flags = getActorFlagData(item.parent)
+  if (item?.parent) {
+    const flags = getActorFlagData(item?.parent)
     if (flags.overrideCurrencies) {
       currencies = flags.overrideCurrencies;
     }
