@@ -7,7 +7,8 @@ import {
   applySystemSpecificStyles,
   checkSystem,
   patchCurrencySettings,
-  registerSettings
+  registerSettings,
+  applyShims
 } from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import Socket from "./socket.js";
@@ -31,6 +32,7 @@ Hooks.once("init", async () => {
   registerLibwrappers();
   registerUIOverrides();
   setupCaches();
+  applyShims();
   setupPlugins("init");
 });
 

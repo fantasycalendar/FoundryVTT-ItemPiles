@@ -6,6 +6,7 @@ import SETTINGS from "../constants/settings.js";
 import { cachedActorCurrencies, cachedCurrencyList, cachedFilterList } from "./caches.js";
 import { hotkeyActionState } from "../hotkeys.js";
 
+
 function getFlagData(inDocument, flag, defaults, existing = false) {
   const defaultFlags = foundry.utils.duplicate(defaults);
   const flags = existing || (getProperty(inDocument, flag) ?? {});
@@ -41,7 +42,7 @@ export function canItemStack(item, targetActor) {
   const unstackableType = Utilities.getItemTypesThatCanStack().has(itemData.type);
   if (!unstackableType || (targetActor && !isItemPileVault(targetActor))) return unstackableType;
   const itemFlagData = getItemFlagData(itemData);
-  const actorFlagData = targetActor ? getActorFlagData(targetActor) : {};
+  const actorFlagData = getActorFlagData(targetActor);
   return {
     "default": actorFlagData.canStackItems,
     "yes": true,
@@ -58,57 +59,46 @@ export function getActorFlagData(target, data = false) {
     { ...CONSTANTS.PILE_DEFAULTS },
     { ...(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {}) }
   );
-  let targetDocument = Utilities.getActor(target);
-  if (targetDocument && !targetDocument?.prototypeToken?.actorLink) {
-    targetDocument = targetDocument.token;
-  }
-  return getFlagData(targetDocument, CONSTANTS.FLAGS.PILE, defaults, data);
+  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, defaults, data);
 }
 
 export function isValidItemPile(target, data = false) {
-  if (!target) return false;
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
   return targetActor && pileData?.enabled;
 }
 
 export function isRegularItemPile(target, data = false) {
-  if (!target) return false;
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
   return targetActor && pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.PILE;
 }
 
 export function isItemPileContainer(target, data = false) {
-  if (!target) return false;
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
   return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER;
 }
 
 export function isItemPileLootable(target, data = false) {
-  if (!target) return false;
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
   return targetActor && pileData?.enabled && (pileData?.type === CONSTANTS.PILE_TYPES.PILE || pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER);
 }
 
 export function isItemPileVault(target, data = false) {
-  if (!target) return false;
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
   return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.VAULT;
 }
 
 export function isItemPileMerchant(target, data = false) {
-  if (!target) return false;
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
   return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.MERCHANT;
 }
 
 export function isItemPileClosed(target, data = false) {
-  if (!target) return false;
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
   if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
@@ -116,7 +106,6 @@ export function isItemPileClosed(target, data = false) {
 }
 
 export function isItemPileLocked(target, data = false) {
-  if (!target) return false;
   const targetActor = Utilities.getActor(target);
   const pileData = getActorFlagData(targetActor, data);
   if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
@@ -575,10 +564,14 @@ export async function updateItemPileData(target, flagData, tokenData) {
       data[CONSTANTS.FLAGS.PILE] = flagData;
       data[CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
     }
-    if (!tokenDocument.actorLink && tokenDocument.actor === documentActor) {
-      documentActor = false;
+    if (!tokenDocument.actorLink) {
+      data[CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE] = flagData;
+      data[CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
+      if (tokenDocument.actor === documentActor) {
+        documentActor = false;
+      }
     }
-    return foundry.utils.mergeObject({}, data);
+    return data;
   });
 
   if (canvas.scene && !foundry.utils.isEmpty(updates)) {

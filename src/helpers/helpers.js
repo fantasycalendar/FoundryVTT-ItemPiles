@@ -15,7 +15,7 @@ export const debounceManager = {
     this.debounces[id] = debounce(function (...args) {
       delete debounceManager.debounces[id];
       return method(...args);
-    }, 100);
+    }, 50);
     return this.debounces[id];
   }
 };
