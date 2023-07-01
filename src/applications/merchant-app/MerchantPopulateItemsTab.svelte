@@ -37,6 +37,10 @@
     return a.item.name < b.item.name ? -1 : 1;
   }).filter(item => !item.isService);
 
+  $: currentServices = $itemStore.sort((a, b) => {
+    return a.item.name < b.item.name ? -1 : 1;
+  }).filter(item => item.isService);
+
   $: {
     debounceSave($populationTables, $tables)
   }
@@ -162,14 +166,15 @@
     itemsRolled.set([]);
   }
 
-  async function clearAllItems() {
+  async function clearAllItems(services = false) {
+    const localization = services ? "Services" : "Items";
     const doContinue = await TJSDialog.confirm({
-      title: "Item Piles - " + localize("ITEM-PILES.Dialogs.ClearAllItems.Title"),
+      title: "Item Piles - " + localize(`ITEM-PILES.Dialogs.ClearAll${localization}.Title`),
       content: {
         class: CustomDialog,
         props: {
           icon: "fas fa-exclamation-triangle",
-          content: localize("ITEM-PILES.Dialogs.ClearAllItems.Content"),
+          content: localize(`ITEM-PILES.Dialogs.ClearAll${localization}.Content`),
         },
       },
       modal: true,
@@ -183,7 +188,7 @@
     await game.itempiles.API.removeItems(store.actor, game.itempiles.API.getActorItems(store.actor)
       .filter(item => {
         const itemFlags = PileUtilities.getItemFlagData(item);
-        return !itemFlags.isService && !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
+        return services === itemFlags.isService && !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
       }));
   }
 
@@ -192,7 +197,7 @@
   }
 
   async function removeAddedItem(itemToRemove) {
-    await game.itempiles.API.removeItems(store.actor, [itemToRemove.item]);
+    store.actor.deleteEmbeddedDocuments("Item", [itemToRemove.item.id]);
   }
 
   function addTable() {
@@ -259,13 +264,48 @@
 
 <div class="item-piles-flexrow" style="height:100%;">
 	<div style="margin-right:0.5rem; max-width: 50%; max-height:100%; overflow-y:scroll;">
-		<div class="item-piles-populate-header">
-			{localize(
-        currentItems.length
-          ? "ITEM-PILES.Merchant.CurrentItems"
-          : "ITEM-PILES.Merchant.BuyNoItems"
-      )}
-		</div>
+		{#if !(currentItems.length + currentServices.length)}
+			<div class="item-piles-populate-header">
+				{localize("ITEM-PILES.Merchant.BuyNoItems")}
+			</div>
+		{/if}
+
+		{#if currentServices.length}
+			<div class="item-piles-populate-header">
+				{localize("ITEM-PILES.Merchant.CurrentServices")}
+			</div>
+		{/if}
+
+		{#each currentServices as item (item.id)}
+			<div
+				class="item-piles-flexrow item-piles-item-row item-piles-even-color"
+			>
+				<ItemEntry {item}>
+					<button
+						slot="right"
+						class="item-piles-rolled-item-button"
+						style="color:red;"
+						on:click={() => removeAddedItem(item)}
+						data-fast-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
+					>
+						<i class="fas fa-trash"/>
+					</button>
+				</ItemEntry>
+			</div>
+		{/each}
+
+		{#if currentServices.length}
+			<button class="item-piles-button" style="margin:5px 0;" on:click={() => clearAllItems(true)}>
+				<i class="fas fa-trash"/>
+				{localize("ITEM-PILES.Merchant.ClearAllServices")}
+			</button>
+		{/if}
+
+		{#if currentItems.length}
+			<div class="item-piles-populate-header">
+				{localize("ITEM-PILES.Merchant.CurrentItems")}
+			</div>
+		{/if}
 
 		{#each currentItems as item (item.id)}
 			<div

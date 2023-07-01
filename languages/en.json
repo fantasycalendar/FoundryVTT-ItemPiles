@@ -145,12 +145,14 @@
       "EditTypePricesExplanation": "Toggle the visibility of per-type sliders in the Buy Items tab",
       "BuyNoItems": "Merchant has no items",
       "CurrentItems": "Current items",
+      "CurrentServices": "Current services",
       "NoRollTables": "No roll tables exist, create one to get started",
       "ClickRoll": "Click roll to start",
       "RolledTimes": "Rolled {rolls} times",
       "KeepRolled": "Keep rolled",
       "AddAll": "Add All Items",
       "ClearAllItems": "Clear All Actor Items",
+      "ClearAllServices": "Clear All Actor Services",
       "AddItem": "Add",
       "RemoveItem": "Remove",
       "ItemFree": "Free",
@@ -218,7 +220,11 @@
       },
       "ClearAllItems": {
         "Title": "Clear All Actor Items",
-        "Content": "This will clear all of the actor's items, are you sure you want to do this?"
+        "Content": "This will clear all of the merchant's items, are you sure you want to do this?"
+      },
+      "ClearAllServices": {
+        "Title": "Clear All Actor Services",
+        "Content": "This will clear all of the merchant's services, are you sure you want to do this?"
       },
       "GiveItemUserNotActive": {
         "Title": "Giving Item",

@@ -2,6 +2,7 @@
 
 ## Version 2.6.17
 
+- Added services to the "Populate Items" tab in merchants, and buttons to clear them
 - Fixed item piles not being deleted once empty
 - Fixed item piles being updated with `actorData` when that has been deprecated in Foundry V11
 
