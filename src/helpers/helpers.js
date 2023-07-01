@@ -3,6 +3,7 @@ import ItemPileSocket from "../socket.js";
 import SETTINGS from "../constants/settings.js";
 import editors from "../applications/editors/index.js";
 
+
 export const debounceManager = {
 
   debounces: {},
@@ -349,4 +350,11 @@ export async function openEditor(key, data = false) {
 export function isCoordinateWithinPosition(x, y, position) {
   return x >= position.left && x < position.left + position.width
     && y >= position.top && y < position.top + position.height;
+}
+
+
+export function getCanvasMouse() {
+  return game.release.generation === 11
+    ? canvas.app.renderer.plugins.interaction.pointer
+    : canvas.app.renderer.plugins.interaction.mouse;
 }

@@ -94,7 +94,7 @@ export async function checkSystem() {
     }
     return;
   }
-  
+
   await Helpers.setSetting(SETTINGS.SYSTEM_FOUND, true);
 
   if (Helpers.getSetting(SETTINGS.SYSTEM_NOT_FOUND_WARNING_SHOWN)) {
@@ -102,4 +102,14 @@ export async function checkSystem() {
   }
 
   return applyDefaultSettings();
+}
+
+export function applyShims() {
+
+  if (game.release.generation !== 11) return;
+
+  CONSTANTS.ACTOR_DELTA_PROPERTY = "delta";
+
+  Object.freeze(CONSTANTS);
+
 }

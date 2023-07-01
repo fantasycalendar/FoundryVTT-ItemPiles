@@ -7,6 +7,8 @@ const CONSTANTS = {
   MODULE_NAME: module_name,
   PATH: module_path,
 
+  ACTOR_DELTA_PROPERTY: "actorData",
+
   FLAGS: {
     VERSION: baseFlag + "version",
     PILE: baseFlag + "data",
@@ -249,7 +251,5 @@ CONSTANTS.HOOKS = {
     COMPLETE: module`tradeComplete`
   }
 }
-
-Object.freeze(CONSTANTS);
 
 export default CONSTANTS;

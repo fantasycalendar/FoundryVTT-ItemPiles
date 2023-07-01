@@ -219,10 +219,8 @@
         return hitApps[0].store.onDropData(dropData);
       }
     } else {
-      const canvasPointer = game.release.generation === 11
-        ? canvas.app.renderer.plugins.interaction.pointer
-        : canvas.app.renderer.plugins.interaction.mouse;
-      const position = canvasPointer.getLocalPosition(canvas.app.stage);
+
+      const position = Helpers.getCanvasMouse().getLocalPosition(canvas.app.stage);
       dropData.x = position.x;
       dropData.y = position.y;
     }

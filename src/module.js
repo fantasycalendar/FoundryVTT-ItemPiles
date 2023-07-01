@@ -3,7 +3,13 @@ import "./styles/styles.scss";
 import CONSTANTS from "./constants/constants.js";
 import registerUIOverrides from "./foundry-ui-overrides.js";
 import registerLibwrappers from "./libwrapper.js";
-import { applySystemSpecificStyles, checkSystem, patchCurrencySettings, registerSettings } from "./settings.js";
+import {
+  applySystemSpecificStyles,
+  checkSystem,
+  patchCurrencySettings,
+  registerSettings,
+  applyShims
+} from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import Socket from "./socket.js";
 import API from "./API/api.js";
@@ -26,6 +32,7 @@ Hooks.once("init", async () => {
   registerLibwrappers();
   registerUIOverrides();
   setupCaches();
+  applyShims();
   setupPlugins("init");
 });
 

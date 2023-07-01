@@ -129,13 +129,15 @@ export function isItemPileEmpty(target) {
 
 export function shouldItemPileBeDeleted(targetUuid) {
 
-  const target = fromUuidSync(targetUuid);
+  const target = Utilities.getToken(targetUuid);
 
-  if (!(target instanceof TokenDocument)) return false;
+  if (!(target instanceof Token)) return false;
 
-  const pileData = getActorFlagData(target);
+  const targetDocument = Utilities.getDocument(target);
 
-  if (!isItemPileLootable(target, pileData) || !isItemPileEmpty(target)) {
+  const pileData = getActorFlagData(targetDocument);
+
+  if (!isItemPileLootable(targetDocument, pileData) || !isItemPileEmpty(targetDocument)) {
     return false;
   }
 
@@ -563,8 +565,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
       data[CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
     }
     if (!tokenDocument.actorLink) {
-      data["actorData." + CONSTANTS.FLAGS.PILE] = flagData;
-      data["actorData." + CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
+      data[CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE] = flagData;
+      data[CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
       if (tokenDocument.actor === documentActor) {
         documentActor = false;
       }

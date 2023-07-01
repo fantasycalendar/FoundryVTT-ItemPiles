@@ -89,7 +89,7 @@ const migrations = {
         updates.push({
           _id: token.id,
           ...flagData,
-          actorData: {
+          [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
             ...flagData
           }
         });
@@ -136,16 +136,16 @@ const migrations = {
           _id: token.id,
           actorLink: false,
           actorId: tokenActor.id,
-          actorData: {
+          [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
             ...flagData,
             items: []
           },
           ...flagData
         }
 
-        for (let itemData of token.actorData?.items ?? []) {
+        for (let itemData of token[CONSTANTS.ACTOR_DELTA_PROPERTY]?.items ?? []) {
           const item = await Item.implementation.create(itemData, { temporary: true });
-          update.actorData.items.push(item.toObject());
+          update[CONSTANTS.ACTOR_DELTA_PROPERTY].items.push(item.toObject());
         }
 
         updates.push(update);
@@ -218,7 +218,7 @@ const migrations = {
           token,
           update: {
             [CONSTANTS.FLAGS.VERSION]: version,
-            actorData: {
+            [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
               [CONSTANTS.FLAGS.VERSION]: version,
             }
           },
@@ -296,7 +296,7 @@ const migrations = {
         updates.push({
           _id: token.id,
           ...flagData,
-          actorData: {
+          [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
             ...flagData
           }
         });

@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.6.17
+
+- Fixed item piles not being deleted once empty
+- Fixed item piles being updated with `actorData` when that has been deprecated in Foundry V11
+
 ## Version 2.6.16
 
 - Fixed error preventing users from opening item piles on the canvas in Foundry v11

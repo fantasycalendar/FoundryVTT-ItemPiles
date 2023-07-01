@@ -1,6 +1,8 @@
 import CONSTANTS from "./constants/constants.js";
 import * as Utilities from "./helpers/utilities.js";
 import PrivateAPI from "./API/private-api.js";
+import { getCanvasMouse } from "./helpers/helpers.js";
+import * as Helpers from "./helpers/helpers.js";
 
 const HOTKEYS = {
   FORCE_DEFAULT_SHEET: "force-open-item-pile-inventory",
@@ -70,11 +72,7 @@ export function registerHotkeysPost() {
       if (!hover || (hover.id !== "board")) return;
       if (event.button !== 0) return;
 
-      const canvasPointer = game.release.generation === 11
-        ? canvas.app.renderer.plugins.interaction.pointer
-        : canvas.app.renderer.plugins.interaction.mouse;
-
-      const pos = canvasPointer.getLocalPosition(canvas.app.stage);
+      const pos = Helpers.getCanvasMouse().getLocalPosition(canvas.app.stage);
       const tokens = Utilities.getTokensAtLocation(pos)
         .filter(token => {
           const canView = token._canView(game.user);
