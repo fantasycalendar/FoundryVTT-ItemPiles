@@ -146,7 +146,7 @@
         "Title": "Avertissement sur type d'objet"
       },
       "ClearAllItems": {
-        "Content": "Cela va effacer tous les objets de l'acteur, êtes-vous sûr de vouloir faire cela ?",
+        "Content": "Cela va effacer tous les objets du marchand. Êtes-vous sûr de vouloir le faire ?",
         "Title": "Effacer tous les articles de l'acteur"
       },
       "GiveItemUserNotActive": {
@@ -179,6 +179,10 @@
       "CantRemoveVaultExpander": {
         "Title": "Impossible de retirer l'extension",
         "Content": "Vous ne pouvez pas retirer cet extension, les objets du coffre-fort ne tiendraient pas sans lui. Retirez {num_items} objets avant d'essayer de retirer cet extension !"
+      },
+      "ClearAllServices": {
+        "Title": "Effacer les services sur tous les acteurs",
+        "Content": "Cela effacera tous les services du marchand. Êtes vous certain de vouloir le faire ?"
       }
     },
     "CurrenciesEditor": {
@@ -432,7 +436,9 @@
       "ShoppingAs": "Shopping en tant que {nom de l'acteur}",
       "TableCustomCategory": "Ajouter des articles à une catégorie personnalisée :",
       "TableAddAllItems": "Ajouter tous les articles :",
-      "TableTimesToRoll": "Temps de roulement sur la table :"
+      "TableTimesToRoll": "Temps de roulement sur la table :",
+      "CurrentServices": "Services actuels",
+      "ClearAllServices": "Effacer les services sur tous les acteurs"
     },
     "Applications": {
       "DropItem": {
