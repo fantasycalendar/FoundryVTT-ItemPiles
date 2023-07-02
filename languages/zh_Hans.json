@@ -123,7 +123,9 @@
       "TableCustomCategory": "将道具添加到自定义类别：",
       "Service": "服务",
       "ShoppingAs": "作为{actorName}购物",
-      "PopulateItems": "填充物品"
+      "PopulateItems": "填充物品",
+      "CurrentServices": "当前服务",
+      "ClearAllServices": "清除所有角色服务"
     },
     "Applications": {
       "DropCurrencies": {
@@ -343,7 +345,8 @@
       "EditCurrencies": {
         "Title": "正在编辑货币",
         "Content": "作为GM，你可以更新道具堆的货币：",
-        "Submit": "提交"
+        "Submit": "提交",
+        "Secondary": "二级货币："
       },
       "UnstackableItemTypesEditor": {
         "Title": "不可堆叠物品编辑器",
@@ -357,6 +360,11 @@
         "Title": "自定义物品类别编辑器",
         "Explanation": "在这里，您可以配置在您的世界中可用的自定义物品类别。当您为数据库添加一个新的项目时，它会动态地加入到这些数据库中。",
         "Category": "类别"
+      },
+      "SecondaryCurrenciesEditor": {
+        "Title": "Item Piles 二级货币编辑器",
+        "TitleActor": "Item Piles 二级货币编辑器：{actor_name}",
+        "Explanation": "你可以在此处定义角色能够从物品堆中捡起的二级货币。"
       }
     },
     "Chat": {
@@ -531,7 +539,7 @@
       },
       "ClearAllItems": {
         "Title": "清除所有角色物品",
-        "Content": "这将清除所有角色的物品，是否确认？"
+        "Content": "这将清除所有商人的物品，是否确认？"
       },
       "GiveItemUserNotActive": {
         "Title": "给予物品",
@@ -546,7 +554,8 @@
         "Header": "Item Piles：获得物品",
         "ContentOne": "{source_actor_name}想要将物品“{item_name}”给予{target_actor_name}，是否接受？",
         "ContentMany": "{source_actor_name}想要将物品“{item_name}”（{quantity}）给予{target_actor_name}，是否接受？",
-        "Ignore": "忽略用户"
+        "Ignore": "忽略用户",
+        "Content": "{source_actor_name}想要将一个物品给予{target_actor_name}，是否接受？"
       },
       "TextEditor": {
         "Title": "文本编辑器"
@@ -562,6 +571,10 @@
       "ClearVaultLog": {
         "Title": "清空金库记录？",
         "Content": "确定要清空金库\"{actor_name}\"的记录吗？"
+      },
+      "ClearAllServices": {
+        "Title": "清除所有角色服务",
+        "Content": "这将清除所有商人的服务，是否确认？"
       }
     },
     "HUD": {
