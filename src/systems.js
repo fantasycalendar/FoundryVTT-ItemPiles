@@ -31,6 +31,7 @@ import a5e from "./systems/a5e.js";
 import darkHeresy2e from "./systems/dark-heresy.js";
 import naheulbeuk from "./systems/naheulbeuk.js";
 import icrpgme from "./systems/icrpgme.js";
+import bladeRunner from "./systems/blade-runner.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -59,6 +60,9 @@ export const SYSTEMS = {
     },
     "d35e": {
       "latest": d35e
+    },
+    "blade-runner": {
+      "latest": bladeRunner
     },
     "sfrpg": {
       "latest": sfrpg

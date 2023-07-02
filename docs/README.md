@@ -79,6 +79,7 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Savage Worlds Adventure Edition](https://foundryvtt.com/packages/swade)
 - [Tormenta20](https://foundryvtt.com/packages/tormenta20)
 - [Warhammer Fantasy Roleplay 4th Ed](https://foundryvtt.com/packages/wfrp4e)
+- [Blade Runner](https://foundryvtt.com/packages/blade-runner)
 - [Splittermond](https://foundryvtt.com/packages/splittermond)
 - [Starfinder](https://foundryvtt.com/packages/sfrpg)
 - [Star Wars: Saga Edition](https://github.com/kypvalanx/Foundry-VTT-StarWars-SagaEdition)
