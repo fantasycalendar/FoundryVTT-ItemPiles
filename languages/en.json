@@ -343,6 +343,8 @@
         "Module": "Module Settings",
         "Styles": "Style Settings",
         "System": "System Specific Settings",
+        "Export": "Export Settings",
+        "Import": "Import Settings",
         "Donate": "If you like this module, consider donating to keep it running!",
         "MoreToCome": "And with more configuration options to come...",
         "Request": "Request new features here.",
@@ -639,7 +641,12 @@
       "VaultAccessEditor": {
         "Title": "Vault Access Editor",
         "TitleActor": "Vault Access Editor: {actor_name}",
-        "Explanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access."
+        "Explanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access.",
+        "Character": "Player/Character",
+        "View": "View",
+        "Organize": "Organize",
+        "Withdraw": "Withdraw",
+        "Deposit": "Deposit"
       },
       "MerchantColumnsEditor": {
         "Title": "Merchant Columns",

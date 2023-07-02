@@ -4,6 +4,7 @@
 
 - Updated Polish localization (thank you Lioheart on Weblate!)
 - Added services to the "Populate Items" tab in merchants, and buttons to clear them
+- Added an export button to the settings UI to export and import the system specific settings
 - Fixed PF2e mystified items incorrectly showing the item's real name and icon in the user-to-user trading interface instead of the mystified ones
 - Fixed item piles not being deleted once empty
 - Fixed item piles being updated with `actorData` when that has been deprecated in Foundry V11

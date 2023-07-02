@@ -30,6 +30,67 @@ class SettingsApp extends SvelteApplication {
       new this(options, dialogData).render(true, { focus: true });
     })
   }
+
+
+  /** @override */
+  _getHeaderButtons() {
+    let buttons = super._getHeaderButtons();
+    if (game.user.isGM) {
+      buttons = [
+        {
+          label: "ITEM-PILES.Applications.Settings.Export",
+          class: "item-piles-export-settings",
+          icon: "fas fa-file-export",
+          onclick: () => {
+            const settings = Object.entries(this.svelte.applicationShell.settings)
+              .filter(([_, setting]) => {
+                return setting.system && setting.name;
+              }).map(([key, setting]) => [key, setting.value]);
+            const a = document.createElement("a");
+            const file = new Blob([JSON.stringify(Object.fromEntries(settings), null, 4)], { type: "text/json" });
+            a.href = URL.createObjectURL(file);
+            a.download = `item-piles-${game.system.id}.json`;
+            a.click();
+            a.remove();
+          }
+        },
+        {
+          label: "ITEM-PILES.Applications.Settings.Import",
+          class: "item-piles-import-settings",
+          icon: "fas fa-file-import",
+          onclick: () => {
+
+            const input = document.createElement('input');
+            input.type = 'file';
+
+            input.onchange = e => {
+
+              input.remove();
+
+              // getting a hold of the file reference
+              const file = e.target.files[0];
+
+              const reader = new FileReader();
+              reader.addEventListener('load', async () => {
+                try {
+                  const incomingSettings = JSON.parse(reader.result);
+                  this.svelte.applicationShell.importSettings(incomingSettings)
+                } catch (err) {
+                  console.error(err);
+                }
+              });
+
+              reader.readAsText(file);
+
+            }
+
+            input.click();
+          }
+        },
+      ].concat(buttons);
+    }
+    return buttons
+  }
 }
 
 export default class SettingsShim extends FormApplication {

@@ -19,7 +19,7 @@
   export let elementRoot;
   let form;
 
-  let settings = {};
+  export let settings = {};
   let userCanChangeSettings = game.user.hasPermission("SETTINGS_MODIFY");
 
   getSettings();
@@ -38,6 +38,14 @@
           .map(f => [f.id, f.name])
       )
     }
+  }
+
+  export function importSettings(incomingSettings) {
+    for (const [key, value] of Object.entries(incomingSettings)) {
+      if (settings[key] === undefined) continue;
+      settings[key].value = value;
+    }
+    settings = settings;
   }
 
   function requestSubmit() {
