@@ -96,7 +96,9 @@ edge cases.
 
 Instead, here's an example script that you can run when a `Cure Wounds` service was bought in the D&D5e system.
 
-**Note:** You will need the `advanced-macros` module installed in order for the macro to know what item was bought.
+**Note:** In Foundry v10, you will need the `advanced-macros` module installed in order for the macro to know what item was bought.
+
+### Foundry v10:
 
 ```js
 const { buyer, seller, item, quantity } = args[0];
@@ -118,3 +120,30 @@ await healingRoll.toMessage({
 ```
 
 In this case `args[0]` contains the buyer actor, the seller actor, the item that was bought, and how many of the item was bought.
+
+### Foundry v11:
+
+```js
+/*
+The macro will have these variables accessible to them:
+- buyer
+- seller
+- item
+- quantity
+*/
+
+const sellerSpellCastingAttr = seller.system.attributes?.spellcasting || "wis";
+const sellerSpellCastingBonus = seller.system.abilities[sellerSpellCastingAttr]?.mod || 0;
+
+const healingRoll = new Roll(`${quantity}d8 + @mod`, { mod: sellerSpellCastingBonus }).evaluate({ async: false });
+
+const buyerNewHealth = Math.min(buyer.system.attributes.hp.max, buyer.system.attributes.hp.value + healingRoll.total);
+
+await buyer.update({
+  "system.attributes.hp.value": buyerNewHealth
+});
+
+await healingRoll.toMessage({
+  flavor: `${seller.name} heals ${buyer.name}`
+});
+```

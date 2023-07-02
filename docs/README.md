@@ -56,7 +56,7 @@ hard dependency, and it is recommended for the best experience and compatibility
 
 ### Advanced Macros
 
-This module leverages the [Advanced Macros](https://github.com/League-of-Foundry-Developers/fvtt-advanced-macros) module
+In Foundry v10, this module leverages the [Advanced Macros](https://github.com/League-of-Foundry-Developers/fvtt-advanced-macros) module
 so that any macros can use extra data provided by the Item Piles module. This is an optional install, but highly
 recommended.
 
