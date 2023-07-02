@@ -10,8 +10,8 @@ import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as helpers from "../helpers/helpers.js";
-import { SYSTEMS } from "../systems.js";
 import * as Helpers from "../helpers/helpers.js";
+import { SYSTEMS } from "../systems.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -136,23 +136,9 @@ export class VaultStore extends ItemPileStore {
     const pileData = get(this.pileData);
     this.gridData.update(() => {
 
-      const vaultAccess = pileData.vaultAccess.filter(access => {
-        return fromUuidSync(access.uuid)?.isOwner;
-      });
-
-      const access = vaultAccess.reduce((acc, access) => {
-        acc.canOrganize = acc.canOrganize || access.organize;
-        acc.canWithdrawItems = (acc.canWithdrawItems || access.items.withdraw) && !!this.recipient;
-        acc.canDepositItems = (acc.canDepositItems || access.items.deposit) && !!this.recipient;
-        acc.canWithdrawCurrencies = (acc.canWithdrawCurrencies || access.currencies.withdraw) && !!this.recipient;
-        acc.canDepositCurrencies = (acc.canDepositCurrencies || access.currencies.deposit) && !!this.recipient;
-        return acc;
-      }, {
-        canOrganize: this.actor.isOwner,
-        canWithdrawItems: this.actor.isOwner && !!this.recipient,
-        canDepositItems: this.actor.isOwner && !!this.recipient,
-        canWithdrawCurrencies: this.actor.isOwner && !!this.recipient,
-        canDepositCurrencies: this.actor.isOwner && !!this.recipient
+      const access = PileUtilities.getVaultAccess(this.actor, {
+        flagData: pileData,
+        hasRecipient: !!this.recipient
       });
 
       return {

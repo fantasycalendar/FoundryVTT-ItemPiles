@@ -11,7 +11,20 @@
   export let data;
   export let elementRoot;
 
-  const vaultAccessStore = writable(data);
+  const vaultAccessStore = writable(data.map(access => {
+    return foundry.utils.mergeObject({
+      view: true,
+      organize: true,
+      items: {
+        withdraw: true,
+        deposit: true
+      },
+      currencies: {
+        withdraw: true,
+        deposit: true
+      }
+    }, access)
+  }));
 
   const validUsers = Array.from(game.users).filter(user => !user.isGM);
 
@@ -28,6 +41,7 @@
       value.push({
         uuid: validDocuments[0].uuid,
         document: validDocuments[0].document,
+        view: true,
         organize: true,
         items: {
           withdraw: true,
@@ -80,18 +94,23 @@
 		<div class="form-group item-pile-access-grid">
 			<div class="item-piles-grid-row-wrapper">
 				<div style="text-align: left;">
-					<span>Player/Character</span>
+					<span>{localize("ITEM-PILES.Applications.VaultAccessEditor.Character")}</span>
 				</div>
 				<div class="item-piles-flexcol">
-					<span>Organize Items</span>
+					<span>{localize("ITEM-PILES.Applications.VaultAccessEditor.View")}</span>
 				</div>
 				<div class="item-piles-flexcol">
-					<span>Items</span>
-					<div><i>Withdraw</i> | <i>Deposit</i></div>
+					<span>{localize("ITEM-PILES.Applications.VaultAccessEditor.Organize")}</span>
 				</div>
 				<div class="item-piles-flexcol">
-					<span>Currencies</span>
-					<div><i>Withdraw</i> | <i>Deposit</i></div>
+					<span>{localize("ITEM-PILES.Items")}</span>
+					<div><i>{localize("ITEM-PILES.Applications.VaultAccessEditor.Withdraw")}</i> |
+						<i>{localize("ITEM-PILES.Applications.VaultAccessEditor.Deposit")}</i></div>
+				</div>
+				<div class="item-piles-flexcol">
+					<span>{localize("ITEM-PILES.Currencies")}</span>
+					<div><i>{localize("ITEM-PILES.Applications.VaultAccessEditor.Withdraw")}</i> |
+						<i>{localize("ITEM-PILES.Applications.VaultAccessEditor.Deposit")}</i></div>
 				</div>
 				<a on:click={() => addAccess()} style="margin-right: 0.5rem;">
 					<i class="fas fa-plus"></i>
@@ -108,6 +127,9 @@
 								{/if}
 							{/each}
 						</select>
+					</div>
+					<div style="text-align: center;">
+						<input type="checkbox" bind:checked={access.view}>
 					</div>
 					<div style="text-align: center;">
 						<input type="checkbox" bind:checked={access.organize}>
@@ -145,7 +167,7 @@
 
   .item-pile-access-grid {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
+    grid-template-columns: 1.5fr 0.5fr 0.5fr 1fr 1fr auto;
     gap: 4px;
 
     select {

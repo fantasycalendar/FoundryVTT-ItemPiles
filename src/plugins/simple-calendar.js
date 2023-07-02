@@ -17,7 +17,6 @@ export default class SimpleCalendarPlugin extends BasePlugin {
       weekday: window.SimpleCalendar.api.getCurrentWeekday(),
       timestamp: window.SimpleCalendar.api.dateToTimestamp({})
     }
-    console.log(previousState)
     Hooks.on(window.SimpleCalendar.Hooks.DateTimeChange, () => {
       ItemPileStore.notifyAllOfChanges("updateOpenCloseStatus");
       this.handleTimePassed();

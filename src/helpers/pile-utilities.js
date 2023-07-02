@@ -1404,6 +1404,33 @@ export function getVaultGridData(vaultActor, flagData = false) {
 
 }
 
+export function getVaultAccess(vaultActor, { flagData = false, hasRecipient = false } = {}) {
+
+  const vaultFlags = getActorFlagData(vaultActor, flagData);
+
+  const vaultAccess = vaultFlags.vaultAccess.filter(access => {
+    return fromUuidSync(access.uuid)?.isOwner;
+  });
+
+  return vaultAccess.reduce((acc, access) => {
+    acc.canView = acc.canView || (access.view ?? true);
+    acc.canOrganize = acc.canOrganize || access.organize;
+    acc.canWithdrawItems = (acc.canWithdrawItems || access.items.withdraw) && hasRecipient;
+    acc.canDepositItems = (acc.canDepositItems || access.items.deposit) && hasRecipient;
+    acc.canWithdrawCurrencies = (acc.canWithdrawCurrencies || access.currencies.withdraw) && hasRecipient;
+    acc.canDepositCurrencies = (acc.canDepositCurrencies || access.currencies.deposit) && hasRecipient;
+    return acc;
+  }, {
+    canView: vaultActor.isOwner || !vaultFlags.restrictVaultAccess,
+    canOrganize: vaultActor.isOwner,
+    canWithdrawItems: vaultActor.isOwner && hasRecipient,
+    canDepositItems: vaultActor.isOwner && hasRecipient,
+    canWithdrawCurrencies: vaultActor.isOwner && hasRecipient,
+    canDepositCurrencies: vaultActor.isOwner && hasRecipient
+  });
+
+}
+
 export async function updateVaultLog(itemPile, {
   actor = false,
   userId = false,

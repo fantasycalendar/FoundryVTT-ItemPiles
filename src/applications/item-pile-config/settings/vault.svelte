@@ -94,6 +94,14 @@
 </div>
 
 <div class="form-group">
+	<label>
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.RestrictAccess")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.RestrictAccessExplanation")}</p>
+	</label>
+	<input type="checkbox" bind:checked={pileData.restrictVaultAccess}/>
+</div>
+
+<div class="form-group">
 	<label style="flex:4;">
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Access")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.AccessExplanation")}</p>

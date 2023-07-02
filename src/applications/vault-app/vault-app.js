@@ -6,6 +6,7 @@ import * as Helpers from "../../helpers/helpers.js";
 import UserSelectDialog from "../dialogs/user-select-dialog/user-select-dialog.js";
 import SETTINGS from "../../constants/settings.js";
 import CONSTANTS from "../../constants/constants.js";
+import { getVaultAccess } from "../../helpers/pile-utilities.js";
 
 export default class VaultApp extends SvelteApplication {
 
@@ -61,6 +62,15 @@ export default class VaultApp extends SvelteApplication {
     recipient = Utilities.getActor(recipient);
     const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, source, recipient, options, dialogData);
     if (result === false) return;
+    const access = getVaultAccess(source, { hasRecipient: !!recipient });
+    if (!access.canView) {
+      ui.notifications.error(game.i18n.format(recipient
+        ? "ITEM-PILES.Errors.NoVaultAccessActor"
+        : "ITEM-PILES.Errors.NoVaultAccess", {
+        actor_name: recipient?.name ?? ""
+      }));
+      return;
+    }
     const apps = this.getActiveApps(source?.token?.id ?? source.id);
     if (apps.length) {
       for (let app of apps) {

@@ -34,7 +34,9 @@
       "PileTooFar": "You're too far away to interact with this pile.",
       "NoTokenFound": "Could not find a token or character to represent you.",
       "PileLocked": "This container is locked and cannot be opened - you can't drop items in it.",
-      "DropNoToken": "You don't have a token on this scene, so you can't drop any items here."
+      "DropNoToken": "You don't have a token on this scene, so you can't drop any items here.",
+      "NoVaultAccess": "You don't have permission to view this vault.",
+      "NoVaultAccessActor": "{actor_name} doesn't have permission to view this vault."
     },
     "Warnings": {
       "NoGMsConnected": "WARNING - No GMs connected - Item Piles requires a GM to be connected for players to be able to utilize most of the module's features.",
@@ -624,6 +626,8 @@
           "EnableExpansionExplanation": "With this enabled, items that are configured as vault expanders will expand the vault's available space.",
           "BaseExpansion": "Base Expansion",
           "BaseExpansionExplanation": "This is how many columns and rows are enabled by default without any expansion items.",
+          "RestrictAccess": "Restrict Vault Access",
+          "RestrictAccessExplanation": "By default, everyone can access vaults if they can see them in the sidebar or can get next to them on a scene. When this setting is enabled, the vault will only be viewable by either the owner of the vault character or users/characters set up in the Access Editor (see below).",
           "Access": "Character & Player Access",
           "AccessExplanation": "This configures which characters & players can access and modify the vault's inventory & currencies. If a player has ownership of the vault character, they always have full access.",
           "ManageAccess": "Manage Access",

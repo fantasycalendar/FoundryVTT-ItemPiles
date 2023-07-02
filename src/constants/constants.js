@@ -154,6 +154,7 @@ const CONSTANTS = {
     // Vault settings
     cols: 10,
     rows: 5,
+    restrictVaultAccess: false,
     vaultExpansion: false,
     baseExpansionCols: 0,
     baseExpansionRows: 0,
