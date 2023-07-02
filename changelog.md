@@ -2,7 +2,7 @@
 
 ## Version 2.7.0
 
-- Updated Polish localization (thank you Lioheart on Weblate!)
+- Updated Polish, French, and Chinese (Simplified) localization (thank you Lioheart, rectulo, and TravelingK on Weblate!)
 - Added a "Restrict Access" setting and "View" permissions to vault access configuration - with these two configured, only characters with the permissions set up can view the contents of the vault
 - Added services to the "Populate Items" tab in merchants, and buttons to clear them
 - Added an export button to the settings UI to export and import the system specific settings
