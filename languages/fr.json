@@ -477,8 +477,8 @@
         "Module": "Paramètres du module",
         "MoreToCome": "Et avec plus d'options de configuration à venir...",
         "Styles": "Paramètres de style",
-        "Import": "Paramètres d'importation",
-        "Export": "Paramètres d'exportation"
+        "Import": "Importer les réglages",
+        "Export": "Exporter les réglages"
       },
       "CurrenciesEditor": {
         "Submit": "Soumettre les devises",
