@@ -3,6 +3,7 @@
 ## Version 2.7.1
 
 - Added support for the Alien RPG system
+- Updated French localization (thanks Rectulo on weblate!)
 - Fixed issue with items sometimes not updating in item pile interfaces after changing anything on their sheets
 - Improved the settings exporter/importer methods
 
