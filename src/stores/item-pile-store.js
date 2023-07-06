@@ -233,7 +233,7 @@ export default class ItemPileStore {
   visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
     const itemFlagData = entry.itemFlagData ? get(entry.itemFlagData) : {};
     return !entry.isCurrency
-      && (game.user.isGM || !actorIsMerchant || !itemFlagData?.hidden);
+      && (this.actor.isOwner || !actorIsMerchant || !itemFlagData?.hidden);
   }
 
   itemSortFunction(a, b, inverse) {

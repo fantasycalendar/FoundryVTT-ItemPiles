@@ -59,7 +59,11 @@ export function getActorFlagData(target, data = false) {
     { ...CONSTANTS.PILE_DEFAULTS },
     { ...(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {}) }
   );
-  return getFlagData(Utilities.getActor(target), CONSTANTS.FLAGS.PILE, defaults, data);
+  target = Utilities.getActor(target);
+  if (target?.token) {
+    target = target.token;
+  }
+  return getFlagData(target, CONSTANTS.FLAGS.PILE, defaults, data);
 }
 
 export function isValidItemPile(target, data = false) {
@@ -560,16 +564,10 @@ export async function updateItemPileData(target, flagData, tokenData) {
     const data = {
       "_id": tokenDocument.id, ...newTokenData
     };
-    if (!foundry.utils.isEmpty(flagData)) {
+    if (!tokenDocument.actorLink && (tokenDocument.actor === documentActor || !documentActor)) {
       data[CONSTANTS.FLAGS.PILE] = flagData;
       data[CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
-    }
-    if (!tokenDocument.actorLink) {
-      data[CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE] = flagData;
-      data[CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
-      if (tokenDocument.actor === documentActor) {
-        documentActor = false;
-      }
+      documentActor = false;
     }
     return data;
   });
@@ -578,12 +576,10 @@ export async function updateItemPileData(target, flagData, tokenData) {
     await canvas.scene.updateEmbeddedDocuments("Token", updates);
   }
 
-  if (!foundry.utils.isEmpty(flagData) && documentActor) {
+  if (documentActor) {
     await documentActor.update({
       [CONSTANTS.FLAGS.PILE]: flagData,
-      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
-      [`token.${CONSTANTS.FLAGS.PILE}`]: flagData,
-      [`token.${CONSTANTS.FLAGS.VERSION}`]: Helpers.getModuleVersion()
+      [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
     });
   }
 

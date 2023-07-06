@@ -32,6 +32,7 @@ import darkHeresy2e from "./systems/dark-heresy.js";
 import naheulbeuk from "./systems/naheulbeuk.js";
 import icrpgme from "./systems/icrpgme.js";
 import bladeRunner from "./systems/blade-runner.js";
+import alienrpg from "./systems/alienrpg.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -42,6 +43,9 @@ export const SYSTEMS = {
 
   SUPPORTED_SYSTEMS: {
     // ↓ ADD SYSTEMS HERE ↓
+    "alienrpg": {
+      "latest": alienrpg
+    },
     "dnd4e": {
       "latest": dnd4e
     },

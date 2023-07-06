@@ -33,6 +33,7 @@ export default class PrivateAPI {
     Helpers.hooks.on("deleteToken", this._onDeleteToken.bind(this));
     Helpers.hooks.on("deleteActor", this._onDeleteActor.bind(this));
     Helpers.hooks.on("preCreateToken", this._onPreCreateToken.bind(this))
+    Helpers.hooks.on("preUpdateToken", this._onPreUpdateToken.bind(this));
     Helpers.hooks.on("createToken", this._onCreateToken.bind(this))
     Helpers.hooks.on("dropCanvasData", this._dropData.bind(this));
   }
@@ -132,8 +133,7 @@ export default class PrivateAPI {
       itemPileConfig.lockedImages = [];
     }
     doc.updateSource({
-      [CONSTANTS.FLAGS.PILE]: itemPileConfig,
-      [CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE]: itemPileConfig
+      [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(itemPileConfig)
     });
     const targetItems = PileUtilities.getActorItems(doc.actor);
     const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
@@ -146,6 +146,14 @@ export default class PrivateAPI {
       "name": PileUtilities.getItemPileName(doc, pileData)
     };
     doc.updateSource(docData);
+  }
+
+  static _onPreUpdateToken(doc, changes) {
+    if (!hasProperty(changes, "actorLink")) return;
+    if (!PileUtilities.isValidItemPile(doc)) return;
+    const flagData = PileUtilities.getActorFlagData(doc);
+    const cleanFlagData = PileUtilities.cleanFlagData(flagData);
+    changes[CONSTANTS.FLAGS.PILE] = doc.actorLink ? cleanFlagData : null;
   }
 
   /**
@@ -1296,8 +1304,7 @@ export default class PrivateAPI {
 
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId, ...specificTokenSettings,
-        [CONSTANTS.FLAGS.PILE]: specificPileSettings,
-        [`${CONSTANTS.ACTOR_DELTA_PROPERTY}.${CONSTANTS.FLAGS.PILE}`]: specificPileSettings
+        [CONSTANTS.FLAGS.PILE]: specificPileSettings
       });
 
       if (target.isLinked) {
@@ -1351,8 +1358,7 @@ export default class PrivateAPI {
       tokenUpdateGroups[sceneId].push({
         "_id": tokenId,
         ...specificTokenSettings,
-        [CONSTANTS.FLAGS.PILE]: specificPileSettings,
-        [`${CONSTANTS.ACTOR_DELTA_PROPERTY}.${CONSTANTS.FLAGS.PILE}`]: specificPileSettings
+        [CONSTANTS.FLAGS.PILE]: specificPileSettings
       });
 
       if (target.isLinked) {
@@ -1471,7 +1477,7 @@ export default class PrivateAPI {
    * @returns {*}
    * @private
    */
-  static _evaluateItemPileChange(doc, changes = {}, force = false) {
+  static async _evaluateItemPileChange(doc, changes = {}, force = false) {
     const duplicatedChanges = foundry.utils.deepClone(changes);
     const target = doc?.token ?? doc;
     if (!Helpers.isResponsibleGM()) return;

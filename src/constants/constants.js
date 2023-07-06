@@ -12,9 +12,12 @@ const CONSTANTS = {
   FLAGS: {
     VERSION: baseFlag + "version",
     PILE: baseFlag + "data",
+    ITEM: baseFlag + "item",
+    NO_VERSION: baseFlag + "-=version",
+    NO_PILE: baseFlag + "-=data",
+    NO_ITEM: baseFlag + "-=item",
     LOG: baseFlag + "log",
     SHARING: baseFlag + "sharing",
-    ITEM: baseFlag + "item",
     PUBLIC_TRADE_ID: baseFlag + "publicTradeId",
     TRADE_USERS: baseFlag + "tradeUsers",
     TEMPORARY_ITEM: baseFlag + "temporary_item"

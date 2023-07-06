@@ -101,6 +101,7 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Level Up: Advanced 5th Edition](https://foundryvtt.com/packages/a5e)
 - [Dark Heresy 2nd Edition](https://foundryvtt.com/packages/dark-heresy)
 - [Naheulbeuk](https://foundryvtt.com/packages/naheulbeuk)
+- [Alien RPG](https://foundryvtt.com/packages/alienrpg)
 
 ## Externally support systems
 

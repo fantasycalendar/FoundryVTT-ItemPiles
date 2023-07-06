@@ -15,7 +15,7 @@ export const debounceManager = {
     this.debounces[id] = debounce(function (...args) {
       delete debounceManager.debounces[id];
       return method(...args);
-    }, 50);
+    }, 250);
     return this.debounces[id];
   }
 };
@@ -79,7 +79,10 @@ export function getSetting(key) {
 }
 
 export function setSetting(key, value) {
-  if (value === undefined) throw new Error("setSetting | value must not be undefined!");
+  if (value === undefined) {
+    console.log(key)
+    throw new Error("setSetting | value must not be undefined!");
+  }
   return game.settings.set(CONSTANTS.MODULE_NAME, key, value);
 }
 

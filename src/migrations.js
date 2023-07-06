@@ -88,10 +88,7 @@ const migrations = {
         }
         updates.push({
           _id: token.id,
-          ...flagData,
-          [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
-            ...flagData
-          }
+          ...flagData
         });
       }
       console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
@@ -137,7 +134,6 @@ const migrations = {
           actorLink: false,
           actorId: tokenActor.id,
           [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
-            ...flagData,
             items: []
           },
           ...flagData
@@ -217,10 +213,7 @@ const migrations = {
         return {
           token,
           update: {
-            [CONSTANTS.FLAGS.VERSION]: version,
-            [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
-              [CONSTANTS.FLAGS.VERSION]: version,
-            }
+            [CONSTANTS.FLAGS.VERSION]: version
           },
           items: itemPileItems.map(item => {
             const flags = PileUtilities.getItemFlagData(item);
@@ -295,10 +288,7 @@ const migrations = {
         }
         updates.push({
           _id: token.id,
-          ...flagData,
-          [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
-            ...flagData
-          }
+          ...flagData
         });
       }
       console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);

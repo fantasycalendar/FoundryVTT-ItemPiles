@@ -42,8 +42,8 @@
 
   export function importSettings(incomingSettings) {
     for (const [key, value] of Object.entries(incomingSettings)) {
-      if (settings[key] === undefined) continue;
-      settings[key].value = value;
+      if (settings[SETTINGS[key]] === undefined) continue;
+      settings[SETTINGS[key]].value = value;
     }
     settings = settings;
   }

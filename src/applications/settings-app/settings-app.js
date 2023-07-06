@@ -1,6 +1,7 @@
 import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
 import { getActiveApps } from '../../helpers/helpers';
 import SettingsShell from './settings-shell.svelte';
+import SETTINGS from "../../constants/settings.js";
 
 class SettingsApp extends SvelteApplication {
 
@@ -42,10 +43,15 @@ class SettingsApp extends SvelteApplication {
           class: "item-piles-export-settings",
           icon: "fas fa-file-export",
           onclick: () => {
+            const settingKeys = Object.fromEntries(Object.entries(SETTINGS)
+              .filter(([_, value]) => typeof value === "string")
+              .map(([key, value]) => [value, key]));
             const settings = Object.entries(this.svelte.applicationShell.settings)
               .filter(([_, setting]) => {
                 return setting.system && setting.name;
-              }).map(([key, setting]) => [key, setting.value]);
+              }).map(([key, setting]) => {
+                return [settingKeys[key], setting.value];
+              });
             const a = document.createElement("a");
             const file = new Blob([JSON.stringify(Object.fromEntries(settings), null, 4)], { type: "text/json" });
             a.href = URL.createObjectURL(file);
