@@ -98,7 +98,9 @@
       "PileLocked": "Ce tas d'objets est verrouillé et ne peut pas être ouvert - vous ne pouvez pas y déposer d'objets.",
       "DropNoToken": "Vous n'avez pas de token sur cette scène, donc vous ne pouvez pas déposer d'objets ici.",
       "DisallowedItemSell": "Ce marchand n'accepte pas les \"{type}\"",
-      "NoTokenFound": "N'a pas pu trouver un token ou un personnage pour vous représenter."
+      "NoTokenFound": "N'a pas pu trouver un token ou un personnage pour vous représenter.",
+      "NoVaultAccessActor": "{actor_name} n'a pas la permission de visualiser ce coffre-fort.",
+      "NoVaultAccess": "Vous n'avez pas l'autorisation de visualiser ce coffre-fort."
     },
     "Dialogs": {
       "DropTypeWarning": {
@@ -474,7 +476,9 @@
         "Submit": "Soumettre les paramètres",
         "Module": "Paramètres du module",
         "MoreToCome": "Et avec plus d'options de configuration à venir...",
-        "Styles": "Paramètres de style"
+        "Styles": "Paramètres de style",
+        "Import": "Importer les réglages",
+        "Export": "Exporter les réglages"
       },
       "CurrenciesEditor": {
         "Submit": "Soumettre les devises",
@@ -728,7 +732,9 @@
           "LoggingFormatUserActor": "Afficher le nom d'utilisateur et le nom du personnage",
           "LoggingFormatActor": "Afficher uniquement le nom du personnage",
           "CanStackItems": "Peut empiler des articles",
-          "CanStackItemsExplanation": "Si cette option est activée, les objets ajoutés au coffre-fort s'empileront avec les objets similaires. Ceci peut également être contrôlé par article dans leur configuration."
+          "CanStackItemsExplanation": "Si cette option est activée, les objets ajoutés au coffre-fort s'empileront avec les objets similaires. Ceci peut également être contrôlé par article dans leur configuration.",
+          "RestrictAccess": "Restreindre l'accès au coffre-fort",
+          "RestrictAccessExplanation": "Par défaut, tout le monde peut accéder aux coffres-fort s'ils sont visibles dans la barre latérale ou s'ils se trouvent à côté d'eux sur une scène. Lorsque ce paramètre est activé, le coffre-fort ne sera visible que par le propriétaire du personnage du coffre ou par les utilisateurs/personnages définis dans l'éditeur d'accès (voir ci-dessous)."
         }
       },
       "GiveItem": {
@@ -804,7 +810,12 @@
       "VaultAccessEditor": {
         "Title": "Éditeur d'accès au coffre-fort",
         "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les devises du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
-        "TitleActor": "Éditeur d'accès au coffre : {actor_name}"
+        "TitleActor": "Éditeur d'accès au coffre : {actor_name}",
+        "View": "Voir",
+        "Withdraw": "Retirer",
+        "Deposit": "Dépôt",
+        "Character": "Joueur/Personnage",
+        "Organize": "Organiser"
       },
       "UnstackableItemTypesEditor": {
         "Explanation": "Vous pouvez définir ici les types d'objets qui ne peuvent pas être empilés.",
