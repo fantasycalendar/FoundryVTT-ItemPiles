@@ -1,8 +1,0 @@
-2023/07/17-10:59:02.337 8ddc Recovering log #11
-2023/07/17-10:59:02.347 8ddc Delete type=0 #11
-2023/07/17-10:59:02.347 8ddc Delete type=3 #10
-2023/07/17-11:30:28.066 b330 Level-0 table #15: started
-2023/07/17-11:30:28.066 b330 Level-0 table #15: 0 bytes OK
-2023/07/17-11:30:28.069 b330 Delete type=0 #13
-2023/07/17-11:30:28.072 b330 Manual compaction at level-0 from '!tables!02WTBwcVhFAMOFlj' @ 72057594037927935 : 1 .. '!tables.results!zynBaAHsd2pcsD0c.xgRosmCyblqWx8u7' @ 0 : 0; will stop at (end)
-2023/07/17-11:30:28.080 b330 Manual compaction at level-1 from '!tables!02WTBwcVhFAMOFlj' @ 72057594037927935 : 1 .. '!tables.results!zynBaAHsd2pcsD0c.xgRosmCyblqWx8u7' @ 0 : 0; will stop at (end)
