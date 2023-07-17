@@ -36,7 +36,7 @@
   }
 
   async function showCurrenciesEditor() {
-    pileData.overrideCurrencies = pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES;
+    pileData.overrideCurrencies = pileData?.overrideCurrencies || foundry.utils.deepClone(game.itempiles.API.CURRENCIES);
     return CurrenciesEditor.show(
       pileData.overrideCurrencies,
       { id: `currencies-item-pile-config-${pileActor.id}` },
@@ -47,7 +47,7 @@
   }
 
   async function showSecondaryCurrenciesEditor() {
-    pileData.overrideSecondaryCurrencies = pileData?.overrideSecondaryCurrencies || game.itempiles.API.SECONDARY_CURRENCIES;
+    pileData.overrideSecondaryCurrencies = pileData?.overrideSecondaryCurrencies || foundry.utils.deepClone(game.itempiles.API.SECONDARY_CURRENCIES);
     return SecondaryCurrenciesEditor.show(
       pileData.overrideSecondaryCurrencies,
       { id: `secondary-currencies-item-pile-config-${pileActor.id}` },
@@ -58,7 +58,7 @@
   }
 
   async function showItemFiltersEditor() {
-    pileData.overrideItemFilters = pileData?.overrideItemFilters || game.itempiles.API.ITEM_FILTERS;
+    pileData.overrideItemFilters = pileData?.overrideItemFilters || foundry.utils.deepClone(game.itempiles.API.ITEM_FILTERS);
     return ItemFiltersEditor.show(
       pileData.overrideItemFilters,
       { id: `item-filters-item-pile-config-${pileActor.id}` },

@@ -105,16 +105,15 @@ export default class PrivateAPI {
    * @private
    */
   static _onPreCreateToken(doc, data) {
-    let itemPileConfig = foundry.utils.deepClone(getProperty(data, CONSTANTS.FLAGS.PILE));
-    itemPileConfig = foundry.utils.mergeObject(
-      foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
-      itemPileConfig
-    );
+    const docData = foundry.utils.deepClone(data);
+    const sourceActor = game.actors.get(doc.actorId);
+    const itemPileConfig = foundry.utils.mergeObject(
+      PileUtilities.getActorFlagData(sourceActor),
+      getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {}
+    )
     if (!itemPileConfig?.enabled) return;
     if (!doc.isLinked) {
-      doc.updateSource({
-        [`${CONSTANTS.ACTOR_DELTA_PROPERTY}.flags.${CONSTANTS.MODULE_NAME}.-=sharing`]: null,
-      });
+      docData[`${CONSTANTS.ACTOR_DELTA_PROPERTY}.flags.${CONSTANTS.MODULE_NAME}.-=sharing`] = null;
     }
     if (itemPileConfig.closedImage.includes("*")) {
       itemPileConfig.closedImage = Helpers.random_array_element(itemPileConfig.closedImages);
@@ -132,19 +131,15 @@ export default class PrivateAPI {
       itemPileConfig.lockedImage = Helpers.random_array_element(itemPileConfig.lockedImages);
       itemPileConfig.lockedImages = [];
     }
-    doc.updateSource({
-      [CONSTANTS.FLAGS.PILE]: PileUtilities.cleanFlagData(itemPileConfig)
-    });
+    docData[CONSTANTS.FLAGS.PILE] = PileUtilities.cleanFlagData(itemPileConfig);
     const targetItems = PileUtilities.getActorItems(doc.actor);
     const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
     const pileData = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
     const scale = PileUtilities.getItemPileTokenScale(doc, pileData);
-    const docData = {
-      "texture.src": PileUtilities.getItemPileTokenImage(doc, pileData),
-      "texture.scaleX": scale,
-      "texture.scaleY": scale,
-      "name": PileUtilities.getItemPileName(doc, pileData)
-    };
+    docData["texture.src"] = PileUtilities.getItemPileTokenImage(doc, pileData);
+    docData["texture.scaleX"] = scale;
+    docData["texture.scaleY"] = scale;
+    docData["name"] = PileUtilities.getItemPileName(doc, pileData);
     doc.updateSource(docData);
   }
 
@@ -196,9 +191,7 @@ export default class PrivateAPI {
 
     if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
       await PileUtilities.updateVaultLog(targetActor, {
-        userId,
-        items: itemDeltas,
-        withdrawal: false
+        userId, items: itemDeltas, withdrawal: false
       });
     }
 
@@ -234,9 +227,7 @@ export default class PrivateAPI {
 
     if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
       await PileUtilities.updateVaultLog(targetActor, {
-        userId,
-        items: itemDeltas,
-        withdrawal: true
+        userId, items: itemDeltas, withdrawal: true
       });
     }
 
@@ -245,8 +236,7 @@ export default class PrivateAPI {
   }
 
   static async _transferItems(sourceUuid, targetUuid, items, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
@@ -300,10 +290,7 @@ export default class PrivateAPI {
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
       await PileUtilities.updateVaultLog(pileActor, {
-        userId,
-        actor: actorToLog,
-        items: itemDeltas,
-        withdrawal: sourceIsItemPile
+        userId, actor: actorToLog, items: itemDeltas, withdrawal: sourceIsItemPile
       });
     }
 
@@ -347,18 +334,18 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
+    const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
+    const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
+    const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
     if (shouldBeDeleted) {
-      await this._deleteItemPile(sourceUuid);
-    } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
-      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      await this._deleteItemPile(itemPileUuid);
+    } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(itemPile) || PileUtilities.isItemPileVault(targetActor))) {
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
       await PileUtilities.updateVaultLog(pileActor, {
-        userId,
-        actor: actorToLog,
-        items: itemDeltas,
-        withdrawal: sourceIsItemPile
+        userId, actor: actorToLog, items: itemDeltas, withdrawal: sourceIsItemPile
       });
     }
 
@@ -366,8 +353,7 @@ export default class PrivateAPI {
   }
 
   static async _addCurrencies(targetUuid, currencies, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
@@ -406,10 +392,7 @@ export default class PrivateAPI {
 
     if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
       await PileUtilities.updateVaultLog(targetActor, {
-        userId,
-        items: itemDeltas,
-        attributes: attributeDeltas,
-        withdrawal: false
+        userId, items: itemDeltas, attributes: attributeDeltas, withdrawal: false
       });
     }
 
@@ -418,8 +401,7 @@ export default class PrivateAPI {
   }
 
   static async _removeCurrencies(targetUuid, currencies, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
@@ -430,8 +412,7 @@ export default class PrivateAPI {
     const overallCost = priceData.overallCost;
 
     const paymentData = PileUtilities.getPaymentData({
-      purchaseData: [{ cost: overallCost, quantity: 1 }],
-      buyer: targetActor
+      purchaseData: [{ cost: overallCost, quantity: 1 }], buyer: targetActor
     });
 
     const itemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")
@@ -476,10 +457,7 @@ export default class PrivateAPI {
 
     if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
       await PileUtilities.updateVaultLog(targetActor, {
-        userId,
-        items: itemDeltas,
-        attributes: attributeDeltas,
-        withdrawal: true
+        userId, items: itemDeltas, attributes: attributeDeltas, withdrawal: true
       });
     }
 
@@ -488,8 +466,7 @@ export default class PrivateAPI {
   }
 
   static async _transferCurrencies(sourceUuid, targetUuid, currencies, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
@@ -499,8 +476,7 @@ export default class PrivateAPI {
     const overallCost = priceData.overallCost;
 
     const paymentData = PileUtilities.getPaymentData({
-      purchaseData: [{ cost: overallCost, quantity: 1 }],
-      buyer: sourceActor
+      purchaseData: [{ cost: overallCost, quantity: 1 }], buyer: sourceActor
     });
 
     const sourceItemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")
@@ -567,8 +543,7 @@ export default class PrivateAPI {
         await SharingUtilities.clearItemPileSharingData(itemPile);
       } else {
         await SharingUtilities.setItemPileSharingData(sourceUuid, targetUuid, {
-          items: itemDeltas,
-          attributes: attributeDeltas
+          items: itemDeltas, attributes: attributeDeltas
         });
       }
     } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
@@ -576,11 +551,7 @@ export default class PrivateAPI {
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
       await PileUtilities.updateVaultLog(pileActor, {
-        userId,
-        actor: actorToLog,
-        items: itemDeltas,
-        attributes: attributeDeltas,
-        withdrawal: sourceIsItemPile
+        userId, actor: actorToLog, items: itemDeltas, attributes: attributeDeltas, withdrawal: sourceIsItemPile
       });
     }
 
@@ -589,8 +560,7 @@ export default class PrivateAPI {
   }
 
   static async _transferAllCurrencies(sourceUuid, targetUuid, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
@@ -635,19 +605,18 @@ export default class PrivateAPI {
     await this._executeItemPileMacro(sourceUuid, macroData);
     await this._executeItemPileMacro(targetUuid, macroData);
 
-    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(sourceUuid);
+    const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
+    const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
+    const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
+
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
     if (shouldBeDeleted) {
-      await this._deleteItemPile(sourceUuid);
-    } else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
-      const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
+      await this._deleteItemPile(itemPileUuid);
+    } else if (!skipVaultLogging && PileUtilities.isItemPileVault(itemPile)) {
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
       await PileUtilities.updateVaultLog(pileActor, {
-        userId,
-        actor: actorToLog,
-        items: itemDeltas,
-        attributes: attributeDeltas,
-        withdrawal: sourceIsItemPile
+        userId, actor: actorToLog, items: itemDeltas, attributes: attributeDeltas, withdrawal: sourceIsItemPile
       });
     }
 
@@ -683,8 +652,7 @@ export default class PrivateAPI {
   }
 
   static async _addAttributes(targetUuid, attributes, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
@@ -710,9 +678,7 @@ export default class PrivateAPI {
 
     if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
       await PileUtilities.updateVaultLog(targetActor, {
-        userId,
-        attributes: attributeDeltas,
-        withdrawal: false
+        userId, attributes: attributeDeltas, withdrawal: false
       });
     }
 
@@ -721,8 +687,7 @@ export default class PrivateAPI {
   }
 
   static async _removeAttributes(targetUuid, attributes, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const targetActor = Utilities.getActor(targetUuid);
@@ -753,9 +718,7 @@ export default class PrivateAPI {
 
     if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
       await PileUtilities.updateVaultLog(targetActor, {
-        userId,
-        attributes: attributeDeltas,
-        withdrawal: true
+        userId, attributes: attributeDeltas, withdrawal: true
       });
     }
 
@@ -764,8 +727,7 @@ export default class PrivateAPI {
   }
 
   static async _transferAttributes(sourceUuid, targetUuid, attributes, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
@@ -818,10 +780,7 @@ export default class PrivateAPI {
       const pileActor = sourceIsItemPile ? sourceActor : targetActor;
       const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
       await PileUtilities.updateVaultLog(pileActor, {
-        userId,
-        actor: actorToLog,
-        attributes: attributeDeltas,
-        withdrawal: sourceIsItemPile
+        userId, actor: actorToLog, attributes: attributeDeltas, withdrawal: sourceIsItemPile
       });
     }
 
@@ -830,8 +789,7 @@ export default class PrivateAPI {
   }
 
   static async _transferAllAttributes(sourceUuid, targetUuid, userId, {
-    skipVaultLogging = false,
-    interactionId = false
+    skipVaultLogging = false, interactionId = false
   } = {}) {
 
     const sourceActor = Utilities.getActor(sourceUuid);
@@ -874,7 +832,7 @@ export default class PrivateAPI {
     const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
     const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
 
-    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPile);
+    const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
     if (shouldBeDeleted) {
       await this._deleteItemPile(itemPileUuid);
     }
@@ -903,8 +861,7 @@ export default class PrivateAPI {
     const sourceTransaction = new Transaction(sourceActor);
     await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true });
     await sourceTransaction.appendItemChanges(itemCurrenciesToTransfer, {
-      remove: true,
-      type: "currency"
+      remove: true, type: "currency"
     });
     await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
     const sourceUpdates = sourceTransaction.prepare();
@@ -946,10 +903,7 @@ export default class PrivateAPI {
   }
 
   static async _commitActorChanges(actorUuid, {
-    actorUpdates = {},
-    itemsToUpdate = [],
-    itemsToDelete = [],
-    itemsToCreate = []
+    actorUpdates = {}, itemsToUpdate = [], itemsToDelete = [], itemsToCreate = []
   } = {}) {
     const actor = Utilities.getActor(actorUuid);
     if (!foundry.utils.isEmpty(actorUpdates)) {
@@ -1013,10 +967,7 @@ export default class PrivateAPI {
         itemsDropped = await this._addItems(targetUuid, [itemData], userId);
       } else {
         targetUuid = await this._createItemPile({
-          sceneId,
-          position,
-          items: [itemData],
-          tokenOverrides: { elevation: elevation || 0 }
+          sceneId, position, items: [itemData], tokenOverrides: { elevation: elevation || 0 }
         });
       }
 
@@ -1060,9 +1011,7 @@ export default class PrivateAPI {
       pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
 
       const actorData = {
-        name: actor || "New Item Pile",
-        type: Helpers.getSetting("actorClassType"),
-        img: "icons/svg/item-bag.svg"
+        name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
       };
 
       if (folders) {
@@ -1081,8 +1030,7 @@ export default class PrivateAPI {
         vision: false,
         displayName: 50,
         [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-        [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
-        ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
+        [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(), ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
       }, tokenOverrides)
 
       const actorUpdate = foundry.utils.mergeObject({
@@ -1115,9 +1063,7 @@ export default class PrivateAPI {
         pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
 
         const actorData = {
-          name: "Default Item Pile",
-          type: Helpers.getSetting("actorClassType"),
-          img: "icons/svg/item-bag.svg"
+          name: "Default Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
         };
 
         if (folders) {
@@ -1139,8 +1085,7 @@ export default class PrivateAPI {
             vision: false,
             displayName: 50,
             [CONSTANTS.FLAGS.PILE]: pileDataDefaults,
-            [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
-            ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
+            [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(), ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
           }
         })
 
@@ -1179,9 +1124,7 @@ export default class PrivateAPI {
     if (position && sceneId) {
 
       let overrideData = foundry.utils.mergeObject({
-        ...position,
-        ...tokenOverrides,
-        ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
+        ...position, ...tokenOverrides, ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
       }, {});
 
       let pileData = PileUtilities.getActorFlagData(pileActor);
@@ -1199,9 +1142,7 @@ export default class PrivateAPI {
         }
 
         const overrideImage = getProperty(overrideData, "texture.src") ?? getProperty(overrideData, "img");
-        const overrideScale = getProperty(overrideData, "texture.scaleX")
-          ?? getProperty(overrideData, "texture.scaleY")
-          ?? getProperty(overrideData, "scale");
+        const overrideScale = getProperty(overrideData, "texture.scaleX") ?? getProperty(overrideData, "texture.scaleY") ?? getProperty(overrideData, "scale");
 
         const scale = PileUtilities.getItemPileTokenScale(pileActor, data, overrideScale);
 
@@ -1277,14 +1218,10 @@ export default class PrivateAPI {
 
       const data = { data: specificPileSettings, items: targetItems, currencies: targetCurrencies };
 
-      let specificTokenSettings = Helpers.isFunction(tokenSettings)
-        ? await tokenSettings(target)
-        : foundry.utils.deepClone(tokenSettings);
+      let specificTokenSettings = Helpers.isFunction(tokenSettings) ? await tokenSettings(target) : foundry.utils.deepClone(tokenSettings);
 
       const overrideImage = getProperty(specificTokenSettings, "texture.src") ?? getProperty(specificTokenSettings, "img");
-      const overrideScale = getProperty(specificTokenSettings, "texture.scaleX")
-        ?? getProperty(specificTokenSettings, "texture.scaleY")
-        ?? getProperty(specificTokenSettings, "scale");
+      const overrideScale = getProperty(specificTokenSettings, "texture.scaleX") ?? getProperty(specificTokenSettings, "texture.scaleY") ?? getProperty(specificTokenSettings, "scale");
 
       const scale = PileUtilities.getItemPileTokenScale(target, data, overrideScale);
 
@@ -1303,15 +1240,13 @@ export default class PrivateAPI {
       }
 
       tokenUpdateGroups[sceneId].push({
-        "_id": tokenId, ...specificTokenSettings,
-        [CONSTANTS.FLAGS.PILE]: specificPileSettings
+        "_id": tokenId, ...specificTokenSettings, [CONSTANTS.FLAGS.PILE]: specificPileSettings
       });
 
       if (target.isLinked) {
         if (actorUpdateGroups[target.actor.id]) continue;
         actorUpdateGroups[target.actor.id] = {
-          "_id": target.actor.id,
-          [CONSTANTS.FLAGS.PILE]: specificPileSettings
+          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: specificPileSettings
         }
       }
     }
@@ -1351,21 +1286,16 @@ export default class PrivateAPI {
         tokenUpdateGroups[sceneId] = [];
       }
 
-      const specificTokenSettings = Helpers.isFunction(tokenSettings)
-        ? await tokenSettings(target)
-        : foundry.utils.deepClone(tokenSettings);
+      const specificTokenSettings = Helpers.isFunction(tokenSettings) ? await tokenSettings(target) : foundry.utils.deepClone(tokenSettings);
 
       tokenUpdateGroups[sceneId].push({
-        "_id": tokenId,
-        ...specificTokenSettings,
-        [CONSTANTS.FLAGS.PILE]: specificPileSettings
+        "_id": tokenId, ...specificTokenSettings, [CONSTANTS.FLAGS.PILE]: specificPileSettings
       });
 
       if (target.isLinked) {
         if (actorUpdateGroups[target.actor.id]) continue;
         actorUpdateGroups[target.actor.id] = {
-          "_id": target.actor.id,
-          [CONSTANTS.FLAGS.PILE]: specificPileSettings
+          "_id": target.actor.id, [CONSTANTS.FLAGS.PILE]: specificPileSettings
         }
       }
     }
@@ -1605,13 +1535,9 @@ export default class PrivateAPI {
     }
 
     const dropData = {
-      source: false,
-      target: data?.target ?? false,
-      elevation: data?.elevation,
-      itemData: {
+      source: false, target: data?.target ?? false, elevation: data?.elevation, itemData: {
         item: itemData, quantity: 1,
-      },
-      position: false
+      }, position: false
     };
 
     dropData.source = Utilities.getSourceActorFromDropData(data);
@@ -1878,14 +1804,9 @@ export default class PrivateAPI {
     const item = await Item.implementation.create(itemData.item, { temporary: true });
 
     const accepted = await TJSDialog.confirm({
-      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"),
-      content: {
-        class: GiveItemsShell,
-        props: {
-          sourceActor,
-          targetActor,
-          quantity: itemData.quantity,
-          item
+      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"), content: {
+        class: GiveItemsShell, props: {
+          sourceActor, targetActor, quantity: itemData.quantity, item
         }
       }
     });
@@ -1961,10 +1882,7 @@ export default class PrivateAPI {
         interactingActor = Utilities.getUserCharacter();
       }
       if (!interactingActor) {
-        Helpers.custom_warning(game.i18n.localize(maxDistance === Infinity
-          ? "ITEM-PILES.Errors.NoTokenFound"
-          : "ITEM-PILES.Errors.PileTooFar"
-        ), true);
+        Helpers.custom_warning(game.i18n.localize(maxDistance === Infinity ? "ITEM-PILES.Errors.NoTokenFound" : "ITEM-PILES.Errors.PileTooFar"), true);
         return;
       }
     }
@@ -2159,12 +2077,9 @@ export default class PrivateAPI {
     const itemPrices = PileUtilities.getPaymentData({
       purchaseData: items.map(data => {
         return {
-          ...data,
-          item: sellingActor.items.get(data.id)
+          ...data, item: sellingActor.items.get(data.id)
         }
-      }),
-      seller: sellingActor,
-      buyer: buyingActor
+      }), seller: sellingActor, buyer: buyingActor
     });
 
     const preCalcHookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
@@ -2199,16 +2114,12 @@ export default class PrivateAPI {
         await sellerTransaction.appendActorChanges([{
           path: entry.data.path, quantity: entry.quantity
         }], {
-          remove: true,
-          type: entry.isCurrency ? "currency" : entry.type,
-          onlyDelta
+          remove: true, type: entry.isCurrency ? "currency" : entry.type, onlyDelta
         });
       } else {
         const itemFlagData = PileUtilities.getItemFlagData(entry.item);
         const itemInfiniteQuantity = {
-          "default": sellerFlagData?.infiniteQuantity ?? false,
-          "yes": true,
-          "no": false
+          "default": sellerFlagData?.infiniteQuantity ?? false, "yes": true, "no": false
         }[itemFlagData.infiniteQuantity ?? "default"];
         if (sellerIsMerchant && itemInfiniteQuantity) continue;
         await sellerTransaction.appendItemChanges([{
@@ -2340,8 +2251,7 @@ export default class PrivateAPI {
 
       await rollTable.update({
         results: rollTable.results.map(result => ({
-          _id: result.id,
-          weight: result.range[1] - (result.range[0] - 1)
+          _id: result.id, weight: result.range[1] - (result.range[0] - 1)
         }))
       });
       await rollTable.normalize();

@@ -3,7 +3,7 @@ import { getActiveApps } from "../../helpers/helpers.js";
 
 export default class Editor extends SvelteApplication {
 
-  constructor(data, options) {
+  constructor(data, options, dialogOptions) {
     super({
       svelte: {
         props: {
@@ -11,7 +11,7 @@ export default class Editor extends SvelteApplication {
         }
       },
       ...options
-    });
+    }, dialogOptions);
   }
 
   static get defaultOptions() {
@@ -26,12 +26,12 @@ export default class Editor extends SvelteApplication {
     })
   }
 
-  static async show(data, options = {}) {
+  static async show(data, options = {}, dialogOptions = {}) {
     const app = options?.id ? getActiveApps(options?.id, true) : false;
     if (app) return app.render(false, { focus: true });
     return new Promise(resolve => {
       options.resolve = resolve;
-      return new this(data, options).render(true, { focus: true });
+      return new this(data, options, dialogOptions).render(true, { focus: true });
     });
   }
 }

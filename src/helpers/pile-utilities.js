@@ -204,6 +204,7 @@ export function getActorCurrencies(target, {
   const actorItems = actor ? Array.from(actor.items) : [];
   const cached = cachedActorCurrencies.get(actorUuid)
   currencyList = cached ? false : currencyList || getCurrencyList(forActor || actor);
+  // Loop through each currency and match it against the actor's data
   let currencies = cached || (currencyList.map((currency, index) => {
     if (currency.type === "attribute" || !currency.type) {
       const path = currency?.data?.path ?? currency?.path;
@@ -216,6 +217,8 @@ export function getActorCurrencies(target, {
       }
     }
     const item = Utilities.findSimilarItem(actorItems, currency.data.item);
+    // If the item exists on the actor, use the item's ID, so that we can match it against the actual item on the actor
+    currency.data.item._id = item?.id ?? currency.data.item._id;
     return {
       ...currency,
       quantity: 0,
@@ -370,6 +373,7 @@ export function isItemCurrency(item, { target = false, actorCurrencies = false }
   }))
     .filter(currency => currency.type === "item")
     .map(item => item.data.item);
+
   return !!Utilities.findSimilarItem(currencies, item);
 }
 
@@ -1179,10 +1183,12 @@ export function getPaymentData({
     // This is the target price amount we need to hit
     let priceLeft = paymentData.totalCurrencyCost;
 
-    // Starting from the smallest currency increment in the price
-    for (let i = prices.length - 1; i >= 0; i--) {
+    const inverse = prices[prices.length - 1].primary && prices[prices.length - 1].exchangeRate === 1;
 
-      const price = prices[i];
+    // Starting from the smallest currency increment in the price
+    for (let i = prices.length - 1, j = 0; i >= 0; i--, j++) {
+
+      const price = prices[inverse ? j : i];
 
       const buyerPrice = {
         ...price,
@@ -1227,6 +1233,7 @@ export function getPaymentData({
     // If there's STILL some remaining price (eg, we haven't been able to scrounge up enough currency to pay for it)
     // we can start using the larger currencies, such as platinum in D&D 5e
     if (currencies.length > 1) {
+
       while (priceLeft > 0) {
 
         // We then need to loop through each price, and check if we have any more left over
@@ -1256,6 +1263,7 @@ export function getPaymentData({
 
       // Since the change will be negative, we'll need to flip it, since this is what we'll get back
       let change = Math.abs(priceLeft);
+
       for (const currency of currencies) {
 
         if (!change) break;

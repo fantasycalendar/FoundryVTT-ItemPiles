@@ -8,6 +8,7 @@ import * as Helpers from "../helpers/helpers.js";
 import { InterfaceTracker } from "../socket.js";
 import { PileAttribute, PileItem } from "./pile-item.js";
 import DropCurrencyDialog from "../applications/dialogs/drop-currency-dialog/drop-currency-dialog.js";
+import PrivateAPI from "../API/private-api.js";
 
 const __STORES__ = new Map();
 

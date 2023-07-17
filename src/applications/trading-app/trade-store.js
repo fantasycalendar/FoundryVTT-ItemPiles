@@ -161,10 +161,14 @@ export default class TradeStore {
 
     if (item && PileUtilities.canItemStack(item)) {
       if (item.quantity >= maxQuantity) return;
-      item.quantity = Math.min(quantity ? quantity : item.quantity + 1, maxQuantity);
-      item.newQuantity = item.quantity;
-      item.maxQuantity = maxQuantity;
-    } else if (!item) {
+      if (quantity) {
+        item.quantity = Math.min(quantity ? quantity : item.quantity + 1, maxQuantity);
+        item.newQuantity = item.quantity;
+        item.maxQuantity = maxQuantity;
+      } else {
+        items.splice(items.indexOf(item));
+      }
+    } else if (!item && quantity) {
       items.push({
         id: newItem._id ?? newItem.id,
         uuid: uuid,

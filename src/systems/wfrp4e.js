@@ -2,7 +2,7 @@ import CONSTANTS from "../constants/constants.js";
 
 export default {
 
-  "VERSION": "1.0.6",
+  "VERSION": "1.0.7",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -28,9 +28,9 @@ export default {
   "ITEM_COST_TRANSFORMER": (item) => {
     let overallCost = 0;
     const prices = getProperty(item, "system.price");
-    overallCost += (Number(prices?.["gc"]) ?? 0);
-    overallCost += (Number(prices?.["ss"]) ?? 0) * 0.05;
-    overallCost += (Number(prices?.["bp"]) ?? 0) * 0.004166667;
+    overallCost += (Number(prices?.["gc"]) ?? 0) * 240;
+    overallCost += (Number(prices?.["ss"]) ?? 0) * 12;
+    overallCost += (Number(prices?.["bp"]) ?? 0) * 1;
     return overallCost;
   },
 
@@ -50,13 +50,13 @@ export default {
     {
       type: "item",
       name: "Gold Crown",
-      img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
+      img: "modules/wfrp4e-core/icons/currency/goldcrown.png",
       abbreviation: "{#}GC",
       data: {
         item: {
           "name": "Gold Crown",
           "type": "money",
-          "img": "icons/commodities/currency/coin-embossed-crown-gold.webp",
+          "img": "modules/wfrp4e-core/icons/currency/goldcrown.png",
           "system": {
             "quantity": { "type": "Number", "label": "Quantity", "value": 1 },
             "encumbrance": { "type": "Number", "label": "Encumbrance", "value": 0.005 },
@@ -65,19 +65,19 @@ export default {
           }
         }
       },
-      primary: true,
-      exchangeRate: 1
+      primary: false,
+      exchangeRate: 240
     },
     {
       type: "item",
       name: "Silver Shilling",
-      img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
+      img: "modules/wfrp4e-core/icons/currency/silvershilling.png",
       abbreviation: "{#}SS",
       data: {
         item: {
           "name": "Silver Shilling",
           "type": "money",
-          "img": "icons/commodities/currency/coin-engraved-moon-silver.webp",
+          "img": "modules/wfrp4e-core/icons/currency/silvershilling.png",
           "system": {
             "quantity": { "type": "Number", "label": "Quantity", "value": 1 },
             "encumbrance": { "type": "Number", "label": "Encumbrance", "value": 0.01 },
@@ -87,18 +87,18 @@ export default {
         }
       },
       primary: false,
-      exchangeRate: 0.05
+      exchangeRate: 12
     },
     {
       type: "item",
       name: "Brass Penny",
-      img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
+      img: "modules/wfrp4e-core/icons/currency/brasspenny.png",
       abbreviation: "{#}BP",
       data: {
         item: {
           "name": "Brass Penny",
           "type": "money",
-          "img": "icons/commodities/currency/coin-engraved-waves-copper.webp",
+          "img": "modules/wfrp4e-core/icons/currency/brasspenny.png",
           "system": {
             "quantity": { "type": "Number", "label": "Quantity", "value": 1 },
             "encumbrance": { "type": "Number", "label": "Encumbrance", "value": 0.01 },
@@ -107,8 +107,8 @@ export default {
           }
         }
       },
-      primary: false,
-      exchangeRate: 0.004166667
+      primary: true,
+      exchangeRate: 1
     }
   ]
 }

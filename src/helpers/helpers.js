@@ -80,7 +80,6 @@ export function getSetting(key) {
 
 export function setSetting(key, value) {
   if (value === undefined) {
-    console.log(key)
     throw new Error("setSetting | value must not be undefined!");
   }
   return game.settings.set(CONSTANTS.MODULE_NAME, key, value);
@@ -144,6 +143,7 @@ export function isGMConnected() {
 }
 
 export function roundToDecimals(num, decimals) {
+  if (!decimals) return Math.floor(num);
   return Number(Math.round(num + 'e' + decimals) + 'e-' + decimals);
 }
 

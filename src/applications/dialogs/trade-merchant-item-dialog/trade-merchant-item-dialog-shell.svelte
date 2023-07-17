@@ -53,7 +53,7 @@
     });
   }
 
-  $: maxSellerItemQuantity = $itemInfiniteQuantity ? Infinity : Math.floor($itemMaxQuantityStore / $itemQuantityForPriceStore);
+  $: maxSellerItemQuantity = $itemInfiniteQuantity ? Infinity : Math.ceil($itemMaxQuantityStore / $itemQuantityForPriceStore);
   $: maxItemQuantity = $prices[$selectedPriceGroup]?.maxQuantity ?? Infinity;
   $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxSellerItemQuantity);
   $: itemName = localize($itemNameStore) + ($itemQuantityForPriceStore > 1 ? ` (${$itemQuantityForPriceStore})` : "");

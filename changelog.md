@@ -1,5 +1,16 @@
 # Item Piles Changelog
 
+## Version 2.7.2
+
+- Tweaked Warhammer Fantasy Roleplay 4th Edition system settings (thanks Forien on github!)
+- Tweaked how prices are calculated when the lowest currency denomination has an exchange rate of 1 so that it would prioritize the seller getting the highest currency values
+- Fixed systems with non-fractional currencies (most multi-currency systems) sometimes rounding incorrectly
+- Fixed buy/sell dialog sometimes showing an incorrect max amount of items one could buy or sell
+- Fixed bug with item-based currencies when GMs would add currencies to user-to-user trades
+- Fixed bug with item-based currencies that prevented GMs from being able to add currencies to item piles
+- Fixed rare bug that caused item piles to not be deleted when empty
+- Fixed bug that caused item filters and other individual item pile token settings to locally override global module settings
+
 ## Version 2.7.1
 
 - Added support for the Alien RPG system

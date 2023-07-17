@@ -65,7 +65,7 @@
       .map(item => {
         return {
           _id: item.id,
-          quantity: settings.getUpdates ? Math.min(item.quantity, item.currentQuantity - item.quantity) : item.currentQuantity
+          quantity: settings.getUpdates && item.quantity ? Math.min(item.quantity, item.currentQuantity - item.quantity) : item.currentQuantity
         }
       })
 

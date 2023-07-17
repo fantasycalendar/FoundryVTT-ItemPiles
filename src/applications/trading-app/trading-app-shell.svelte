@@ -214,7 +214,7 @@
 									<TradeEntry bind:data={currency} {store} editable={store.isUserParticipant}/>
 								{/each}
 
-								{#each $leftItemCurrencies as item (item.path)}
+								{#each $leftItemCurrencies as item (item.id)}
 									<TradeEntry bind:data={item} {store} editable={store.isUserParticipant}/>
 								{/each}
 
@@ -277,7 +277,7 @@
 									<TradeEntry bind:data={currency} {store} editable={false}/>
 								{/each}
 
-								{#each $rightItemCurrencies as item (item.path)}
+								{#each $rightItemCurrencies as item (item.id)}
 									<TradeEntry bind:data={item} {store} editable={false}/>
 								{/each}
 
