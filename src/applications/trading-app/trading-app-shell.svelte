@@ -59,7 +59,7 @@
 
     const itemToSend = await Item.implementation.create(validItem, { temporary: true });
 
-    return store.addItem(itemToSend, { uuid: data.uuid, currency: isCurrency });
+    return store.addItem(itemToSend, { uuid: data.uuid, quantity: 1, currency: isCurrency });
 
   }
 

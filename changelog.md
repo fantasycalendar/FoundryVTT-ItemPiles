@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.7.3
+
+- Fixed minor bug preventing items from being traded in user-to-user trades
+- Minor tweak to minimum height and width of vault windows
+
 ## Version 2.7.2
 
 - Tweaked Warhammer Fantasy Roleplay 4th Edition system settings (thanks Forien on github!)
