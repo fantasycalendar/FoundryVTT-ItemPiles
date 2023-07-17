@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import * as Utilities from "../../helpers/utilities.js";
 import * as PileUtilities from "../../helpers/pile-utilities.js";
 
@@ -25,6 +25,14 @@ export default class TradeStore {
     this.rightTraderItemCurrencies = writable(rightTrader.itemCurrencies ?? []);
     this.rightTraderAccepted = writable(rightTrader?.accepted ?? false);
 
+  }
+
+  get isUserParticipant() {
+    return game.user === this.leftTraderUser || game.user === this.rightTraderUser;
+  }
+
+  get tradeIsAccepted() {
+    return get(this.leftTraderAccepted) && get(this.rightTraderAccepted);
   }
 
   static import(tradeData) {
@@ -87,16 +95,8 @@ export default class TradeStore {
     };
   }
 
-  get isUserParticipant() {
-    return game.user === this.leftTraderUser || game.user === this.rightTraderUser;
-  }
-
   getExistingCurrencies() {
     return [...get(this.leftTraderCurrencies), ...get(this.leftTraderItemCurrencies)]
-  }
-
-  get tradeIsAccepted() {
-    return get(this.leftTraderAccepted) && get(this.rightTraderAccepted);
   }
 
   async toggleAccepted() {

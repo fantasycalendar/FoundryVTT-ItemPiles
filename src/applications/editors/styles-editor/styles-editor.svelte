@@ -58,10 +58,10 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form autocomplete=off bind:this={form} on:submit|preventDefault={updateSettings}>
 
-		<div style="display: grid; grid-template-columns: 1.25fr 2fr {options.readOnly ? '' : 'auto'}; gap: 5px;"
-				 class="item-piles-bottom-divider">
+		<div class="item-piles-bottom-divider"
+				 style="display: grid; grid-template-columns: 1.25fr 2fr {options.readOnly ? '' : 'auto'}; gap: 5px;">
 			<span>{localize("ITEM-PILES.Applications.StylesEditor." + (options.variables ? "Variable" : "Style"))}</span>
 			<span>{localize("ITEM-PILES.Applications.StylesEditor.Value")}</span>
 			{#if !options.readOnly}
@@ -84,10 +84,10 @@
 		</div>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("Save")}
 			</button>
-			<button type="button" on:click|once={() => { application.options.resolve(null); application.close(); }}>
+			<button on:click|once={() => { application.options.resolve(null); application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

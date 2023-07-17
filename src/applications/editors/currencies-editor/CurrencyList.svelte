@@ -35,7 +35,7 @@
 
 </script>
 
-<DropZone callback={dropData} bind:isHovering={isHovering}>
+<DropZone bind:isHovering={isHovering} callback={dropData}>
 	<div class="item-piles-sortable-list-columns header" use:applyStyles={style}>
 		{#if !store.secondary}
 			<div style="justify-content:flex-start;">Primary</div>

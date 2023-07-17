@@ -2,7 +2,7 @@
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import { getContext } from "svelte";
-  import { getUserCharacter, getOwnedCharacters } from "../../../helpers/utilities.js";
+  import { getUserCharacter } from "../../../helpers/utilities.js";
 
   const { application } = getContext('#external');
 
@@ -36,8 +36,8 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form class="item-piles-flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
-				autocomplete="off">
+	<form autocomplete="off" bind:this={form} class="item-piles-flexcol" on:submit|once|preventDefault={submit}
+				style="padding:0.5rem;">
 
 		<p style="margin-top: 0;text-align: center;">
 			<strong>{localize("ITEM-PILES.Dialogs.UserSelect.Content")}</strong>
@@ -57,7 +57,7 @@
 		</div>
 
 		<footer class="sheet-footer item-piles-flexrow" style="margin-top: 1rem;">
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="fas fa-check"></i>
 				{localize("Okay")}
 			</button>

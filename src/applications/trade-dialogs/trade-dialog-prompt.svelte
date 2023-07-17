@@ -50,7 +50,7 @@
 
 		<div class="item-piles-bottom-divider">
 			<div class="form-group align-center-row">
-				<select name="user" style="width: 66%;" bind:value={user}>
+				<select bind:value={user} name="user" style="width: 66%;">
 					{#each users as potentialUser (potentialUser.id)}
 						<option value="{potentialUser}">{potentialUser.name}</option>
 					{/each}
@@ -60,7 +60,7 @@
 		<div class="item-piles-bottom-divider">
 			<div class="form-group align-center-col">
 				<label class="align-center-row">
-					<input type="checkbox" name="private" bind:checked={isPrivate}>
+					<input bind:checked={isPrivate} name="private" type="checkbox">
 					<span>{localize("ITEM-PILES.Trade.Private")}</span>
 				</label>
 				<small>{localize("ITEM-PILES.Trade.PrivateExplanation")}</small>
@@ -73,10 +73,10 @@
 			<p>{localize("ITEM-PILES.Trade.Prompt.PickActor")}</p>
 		{/if}
 
-		<ActorDropSelect bind:actor={actor} {actors}/>
+		<ActorDropSelect {actors} bind:actor={actor}/>
 
 		<footer class="sheet-footer item-piles-flexrow">
-			<button type="button" on:click|once={requestTrade} disabled={!actor}>
+			<button disabled={!actor} on:click|once={requestTrade} type="button">
 				<i class="fas fa-check"></i> {localize("ITEM-PILES.Trade.Prompt.Label")}
 			</button>
 		</footer>

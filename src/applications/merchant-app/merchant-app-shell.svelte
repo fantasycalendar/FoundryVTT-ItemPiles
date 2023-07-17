@@ -113,17 +113,17 @@
 <ApplicationShell bind:elementRoot>
 	<DropZone callback={dropData} style="display: flex; flex-direction: column; height: 100%;">
 		<MerchantTopBar {store}/>
-		<Tabs style="flex: 0 1 auto; font-size: 1.1rem; justify-content: flex-start;"
+		<Tabs bind:activeTab={$activeTab}
 					bind:tabs="{tabs}"
-					bind:activeTab={$activeTab}
 					separateElements
+					style="flex: 0 1 auto; font-size: 1.1rem; justify-content: flex-start;"
 					underscore
 		/>
 		<div class="item-piles-flexrow item-pile-merchant-content">
 			{#if $activeTab !== "tables"}
 				<MerchantLeftPane {store}/>
 			{/if}
-			<MerchantRightPane {store} {recipientStore} {activeTab}/>
+			<MerchantRightPane {activeTab} {recipientStore} {store}/>
 		</div>
 	</DropZone>
 </ApplicationShell>

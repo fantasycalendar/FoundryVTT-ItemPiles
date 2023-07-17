@@ -164,10 +164,10 @@
 						</h2>
 						<div>
 							<i
+								class="fas accepted-icon"
 								class:accepted={$leftTraderAccepted}
 								class:fa-user-check={$leftTraderAccepted}
 								class:fa-user-times={!$leftTraderAccepted}
-								class="fas accepted-icon"
 							></i>
 						</div>
 					</div>
@@ -246,10 +246,10 @@
 					<div class="character-header trader item-piles-bottom-divider">
 						<div>
 							<i
+								class="fas accepted-icon"
 								class:accepted={$rightTraderAccepted}
 								class:fa-user-check={$rightTraderAccepted}
 								class:fa-user-times={!$rightTraderAccepted}
-								class="fas accepted-icon"
 							></i>
 						</div>
 						<h2 class="character-name">

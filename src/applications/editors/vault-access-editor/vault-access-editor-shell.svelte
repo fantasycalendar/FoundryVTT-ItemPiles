@@ -85,7 +85,7 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form autocomplete=off bind:this={form} on:submit|preventDefault={updateSettings}>
 
 		<p style="text-align: center;">
 			{localize("ITEM-PILES.Applications.VaultAccessEditor.Explanation")}
@@ -150,10 +150,10 @@
 		</div>
 
 		<footer class="item-piles-top-divider">
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("Save")}
 			</button>
-			<button type="button" on:click|once={() => { application.close(); }}>
+			<button on:click|once={() => { application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

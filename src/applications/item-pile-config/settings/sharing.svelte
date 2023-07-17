@@ -42,7 +42,7 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareItemsEnabled")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareItemsEnabledExplanation")}</p>
 		</label>
-		<input type="checkbox" bind:checked={pileData.shareItemsEnabled}/>
+		<input bind:checked={pileData.shareItemsEnabled} type="checkbox"/>
 	</div>
 
 	<div class="form-group">
@@ -50,7 +50,7 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareCurrenciesEnabled")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ShareCurrenciesEnabledExplanation")}</p>
 		</label>
-		<input type="checkbox" bind:checked={pileData.shareCurrenciesEnabled}/>
+		<input bind:checked={pileData.shareCurrenciesEnabled} type="checkbox"/>
 	</div>
 
 	<div class="form-group">
@@ -58,7 +58,7 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.TakeAllEnabled")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.TakeAllEnabledExplanation")}</p>
 		</label>
-		<input type="checkbox" bind:checked={pileData.takeAllEnabled}/>
+		<input bind:checked={pileData.takeAllEnabled} type="checkbox"/>
 	</div>
 
 	<div class="form-group">
@@ -66,7 +66,7 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.SplitAllEnabled")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.SplitAllEnabledExplanation")}</p>
 		</label>
-		<input type="checkbox" bind:checked={pileData.splitAllEnabled}/>
+		<input bind:checked={pileData.splitAllEnabled} type="checkbox"/>
 	</div>
 
 	<div class="form-group">
@@ -74,7 +74,7 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.InactivePlayers")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.InactivePlayersExplanation")}</p>
 		</label>
-		<input type="checkbox" bind:checked={pileData.activePlayers}/>
+		<input bind:checked={pileData.activePlayers} type="checkbox"/>
 	</div>
 
 	<div class="form-group">
@@ -85,8 +85,8 @@
 	</div>
 
 	<div class="form-group">
-		<button type="button" class="item-piles-config-reset-sharing-data" style="flex:4;"
-						on:click={() => { resetSharingData() }}>
+		<button class="item-piles-config-reset-sharing-data" on:click={() => { resetSharingData() }} style="flex:4;"
+						type="button">
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingData")}
 		</button>
 	</div>

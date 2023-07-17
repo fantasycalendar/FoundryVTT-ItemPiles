@@ -38,7 +38,7 @@
 
 </script>
 
-<input type="text" list={id} bind:value required={required}/>
+<input bind:value list={id} required={required} type="text"/>
 <datalist id={id}>
 	{#each suggestions as suggestion}
 		<option>{suggestion}</option>

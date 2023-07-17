@@ -1,7 +1,6 @@
 <script>
 
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import DropCurrencyDialog from "../dialogs/drop-currency-dialog/drop-currency-dialog.js";
   import ListEntry from "./ListEntry.svelte";
 
   export let store;

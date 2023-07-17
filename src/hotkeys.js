@@ -1,7 +1,6 @@
 import CONSTANTS from "./constants/constants.js";
 import * as Utilities from "./helpers/utilities.js";
 import PrivateAPI from "./API/private-api.js";
-import { getCanvasMouse } from "./helpers/helpers.js";
 import * as Helpers from "./helpers/helpers.js";
 
 const HOTKEYS = {

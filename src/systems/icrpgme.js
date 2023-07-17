@@ -28,5 +28,5 @@ export default {
   "CURRENCIES": [],
 
   "CURRENCY_DECIMAL_DIGITS": 0.01
-  
+
 }

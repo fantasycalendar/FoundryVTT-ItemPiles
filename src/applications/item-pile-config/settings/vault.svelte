@@ -50,9 +50,9 @@
 			<i>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Rows")}</i>
 		</div>
 		<div style="align-items: center;">
-			<input style="text-align: right;" type="number" placeholder="Enter a number..." bind:value={pileData.cols}/>
+			<input bind:value={pileData.cols} placeholder="Enter a number..." style="text-align: right;" type="number"/>
 			<span style="flex: 0;">x</span>
-			<input type="number" placeholder="Enter a number..." bind:value={pileData.rows}/>
+			<input bind:value={pileData.rows} placeholder="Enter a number..." type="number"/>
 		</div>
 	</div>
 </div>
@@ -62,7 +62,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.CanStackItems")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.CanStackItemsExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.canStackItems}/>
+	<input bind:checked={pileData.canStackItems} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -70,7 +70,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.EnableExpansion")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.EnableExpansionExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.vaultExpansion}/>
+	<input bind:checked={pileData.vaultExpansion} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -84,11 +84,11 @@
 			<i>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Rows")}</i>
 		</div>
 		<div style="align-items: center;">
-			<input disabled={!pileData.vaultExpansion} style="text-align: right;" type="number"
-						 placeholder="Enter a number..." bind:value={pileData.baseExpansionCols}/>
+			<input bind:value={pileData.baseExpansionCols} disabled={!pileData.vaultExpansion} placeholder="Enter a number..."
+						 style="text-align: right;" type="number"/>
 			<span style="flex: 0;">x</span>
-			<input disabled={!pileData.vaultExpansion} type="number" placeholder="Enter a number..."
-						 bind:value={pileData.baseExpansionRows}/>
+			<input bind:value={pileData.baseExpansionRows} disabled={!pileData.vaultExpansion} placeholder="Enter a number..."
+						 type="number"/>
 		</div>
 	</div>
 </div>
@@ -98,7 +98,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.RestrictAccess")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.RestrictAccessExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.restrictVaultAccess}/>
+	<input bind:checked={pileData.restrictVaultAccess} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -106,7 +106,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.Access")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.AccessExplanation")}</p>
 	</label>
-	<button style="flex:2;" type="button" on:click={() => showVaultAccessEditor()}>
+	<button on:click={() => showVaultAccessEditor()} style="flex:2;" type="button">
 		{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.ManageAccess")}
 	</button>
 </div>
@@ -116,7 +116,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LogVaultAccess")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.LogVaultAccessExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.logVaultActions}/>
+	<input bind:checked={pileData.logVaultActions} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -124,7 +124,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.ClearVaultLog")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.ClearVaultLogExplanation")}</p>
 	</label>
-	<button style="flex:2;" type="button" on:click={() => clearVaultLog()}>
+	<button on:click={() => clearVaultLog()} style="flex:2;" type="button">
 		{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.ClearVaultLog")}
 	</button>
 </div>

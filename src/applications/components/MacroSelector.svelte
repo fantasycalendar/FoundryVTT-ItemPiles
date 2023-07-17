@@ -80,13 +80,13 @@
 </script>
 
 <div class="item-piles-flexrow">
-	<input type="text"
+	<input bind:value={macro}
 				 list={id}
-				 bind:value={macro}
-				 style="flex:1; margin-right:5px;"
-				 placeholder={localize("ITEM-PILES.Applications.ItemPileConfig.Main.MacroPlaceholder")}
-				 on:keyup={() => { filterMacros() }}
 				 on:change={() => { filterMacros() }}
+				 on:keyup={() => { filterMacros() }}
+				 placeholder={localize("ITEM-PILES.Applications.ItemPileConfig.Main.MacroPlaceholder")}
+				 style="flex:1; margin-right:5px;"
+				 type="text"
 	/>
 	<datalist id={id}>
 		{#each $macros as m (m.id)}
@@ -94,9 +94,9 @@
 		{/each}
 	</datalist>
 	<i
-		data-fast-tooltip="Open Macro"
-		style="margin-top: 5px; font-size: 1rem; flex:0;"
 		class="fas fa-edit item-piles-clickable-link"
+		data-fast-tooltip="Open Macro"
 		on:click={() => openMacro()}
+		style="margin-top: 5px; font-size: 1rem; flex:0;"
 	></i>
 </div>

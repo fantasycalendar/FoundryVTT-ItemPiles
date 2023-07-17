@@ -108,7 +108,7 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-	<form bind:this={form} on:submit|once|preventDefault={updateSettings} autocomplete="off">
+	<form autocomplete="off" bind:this={form} on:submit|once|preventDefault={updateSettings}>
 
 		<h2 style="text-align: center; margin-bottom: 1rem;">{localize("ITEM-PILES.Applications.Settings.Title")}</h2>
 
@@ -120,12 +120,12 @@
 
 			<div class="tab flex" class:active={activeTab === 'local'} data-scope="primary" data-tab="local">
 
-				<Setting key={SETTINGS.INVERT_SHEET_OPEN} bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}"/>
-				<Setting key={SETTINGS.HIDE_ACTOR_HEADER_TEXT} bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}"/>
-				<Setting key={SETTINGS.HIDE_ACTOR_HEADER_BUTTON} bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_BUTTON]}"/>
-				<Setting key={SETTINGS.PRELOAD_FILES} bind:data="{settings[SETTINGS.PRELOAD_FILES]}"/>
-				<Setting key={SETTINGS.DEBUG} bind:data="{settings[SETTINGS.DEBUG]}"/>
-				<Setting key={SETTINGS.DEBUG_HOOKS} bind:data="{settings[SETTINGS.DEBUG_HOOKS]}"/>
+				<Setting bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}" key={SETTINGS.INVERT_SHEET_OPEN}/>
+				<Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}" key={SETTINGS.HIDE_ACTOR_HEADER_TEXT}/>
+				<Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_BUTTON]}" key={SETTINGS.HIDE_ACTOR_HEADER_BUTTON}/>
+				<Setting bind:data="{settings[SETTINGS.PRELOAD_FILES]}" key={SETTINGS.PRELOAD_FILES}/>
+				<Setting bind:data="{settings[SETTINGS.DEBUG]}" key={SETTINGS.DEBUG}/>
+				<Setting bind:data="{settings[SETTINGS.DEBUG_HOOKS]}" key={SETTINGS.DEBUG_HOOKS}/>
 
 				<div style="text-align: center; font-size: 1rem; margin-top:3rem;">
 					<p>{localize("ITEM-PILES.Applications.Settings.MoreToCome")}
@@ -140,7 +140,7 @@
 						{localize("ITEM-PILES.Applications.Settings.Donate")}
 					</p>
 					<p>
-						<a href="https://ko-fi.com/fantasycomputerworks" target="_blank" style="text-decoration: none !important;">
+						<a href="https://ko-fi.com/fantasycomputerworks" style="text-decoration: none !important;" target="_blank">
 							<button class="donate-button" type="button">
 								<img src="https://storage.ko-fi.com/cdn/cup-border.png">
 								<span>Donate</span>
@@ -199,7 +199,7 @@
 		</section>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("ITEM-PILES.Applications.Settings.Submit")}
 			</button>
 		</footer>

@@ -120,8 +120,8 @@
 
 	<main in:fade={{duration: 500}}>
 
-		<div class="item-piles-item-drop-container" on:dragstart={preventDefaultGM} on:drop={dropData}
-				 on:dragover={preventDefault}>
+		<div class="item-piles-item-drop-container" on:dragover={preventDefault} on:dragstart={preventDefaultGM}
+				 on:drop={dropData}>
 
 			{#if $deleted}
 				<p style="text-align: center; flex: 0 1 auto;">
@@ -164,7 +164,7 @@
 					{/if}
 
 					<CurrencyList {store}/>
-					
+
 				</div>
 
 			{/if}
@@ -199,7 +199,7 @@
 					</button>
 				{/if}
 
-				<button type="submit" on:click={() => { application.close() }}>
+				<button on:click={() => { application.close() }} type="submit">
 					<i class="fas fa-sign-out-alt"></i> {localize("ITEM-PILES.Inspect.Leave")}
 				</button>
 			</footer>

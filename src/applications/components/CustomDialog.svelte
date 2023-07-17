@@ -9,19 +9,19 @@
 
 <div>
 
-  {#if icon}
-    <p class="header-icon"><i class="{icon}"></i></p>
-  {/if}
-  {#if header}
-    <p class="header"><strong>{header}</strong></p>
-  {/if}
-  {#if Array.isArray(content)}
-    {#each content as part}
-      <p>{@html part}</p>
-    {/each}
-  {:else}
-    <p>{@html content}</p>
-  {/if}
+	{#if icon}
+		<p class="header-icon"><i class="{icon}"></i></p>
+	{/if}
+	{#if header}
+		<p class="header"><strong>{header}</strong></p>
+	{/if}
+	{#if Array.isArray(content)}
+		{#each content as part}
+			<p>{@html part}</p>
+		{/each}
+	{:else}
+		<p>{@html content}</p>
+	{/if}
 
 </div>
 

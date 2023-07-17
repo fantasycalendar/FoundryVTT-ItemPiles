@@ -45,12 +45,12 @@
 </script>
 
 <div
-  on:dragenter={enter}
-  on:dragleave={leave}
-  on:dragstart|preventDefault
-  on:dragover={overCallback}
-  on:drop|preventDefault={dropData}
-  style={$$props.style}
+	on:dragenter={enter}
+	on:dragleave={leave}
+	on:dragover={overCallback}
+	on:dragstart|preventDefault
+	on:drop|preventDefault={dropData}
+	style={$$props.style}
 >
-  <slot/>
+	<slot/>
 </div>

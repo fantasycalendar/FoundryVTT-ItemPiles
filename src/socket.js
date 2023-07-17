@@ -1,10 +1,10 @@
 import CONSTANTS from "./constants/constants.js";
+import * as Helpers from "./helpers/helpers.js";
 import { debug } from "./helpers/helpers.js";
 import { stringIsUuid } from "./helpers/utilities.js";
 import PrivateAPI from "./API/private-api.js";
 import TradeAPI from "./API/trade-api.js";
 import ChatAPI from "./API/chat-api.js";
-import * as Helpers from "./helpers/helpers.js";
 
 export default class ItemPileSocket {
 

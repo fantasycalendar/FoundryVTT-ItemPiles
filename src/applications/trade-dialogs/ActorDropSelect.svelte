@@ -45,53 +45,53 @@
 
 
 <div class="item-piles-bottom-divider">
-  <div class="form-group item-piles-actor-container align-center-row"
-       class:item-piles-box-highlight={counter > 0}
-       on:dragstart={preventDefault}
-       on:drop={dropData}
-       on:dragover={preventDefault}
-       on:dragenter={dragEnter}
-       on:dragleave={dragLeave}
-  >
-    {#if actor}
-      <div class="align-center-col">
-        {#if actor.img}
-          <img src="{actor.img}">
-        {/if}
+	<div class="form-group item-piles-actor-container align-center-row"
+			 class:item-piles-box-highlight={counter > 0}
+			 on:dragenter={dragEnter}
+			 on:dragleave={dragLeave}
+			 on:dragover={preventDefault}
+			 on:dragstart={preventDefault}
+			 on:drop={dropData}
+	>
+		{#if actor}
+			<div class="align-center-col">
+				{#if actor.img}
+					<img src="{actor.img}">
+				{/if}
 
-        {#if multipleActors}
+				{#if multipleActors}
           <span>
             {#if changingActor}
               <select class="item-piles-change-actor-select"
-                      bind:value={actor}
-                      on:change={() => { changingActor = false }}
-              >
+											bind:value={actor}
+											on:change={() => { changingActor = false }}
+							>
                 {#each actors as potentialActor (potentialActor.id)}
                 <option value="{potentialActor}">{ potentialActor.name }</option>
                 {/each}
               </select>
             {:else}
               <a class='item-piles-change-actor item-piles-highlight'
-                 on:click={() => { changingActor = true }}>{ actor.name }</a>
+								 on:click={() => { changingActor = true }}>{ actor.name }</a>
             {/if}
           </span>
-        {:else}
-          <span>{ actor.name }</span>
-        {/if}
+				{:else}
+					<span>{ actor.name }</span>
+				{/if}
 
-      </div>
-    {:else}
-      <p>{ localize("ITEM-PILES.Trade.Prompt.DropActor") }</p>
-    {/if}
-  </div>
-  {#if hasUnlinkedTokenOwnership}
-    <div class="item-piles-flexrow">
-      <button type="button" on:click={setActorFromSelectedToken}>
-        <i class="fas fa-expand"></i>
-        {localize("ITEM-PILES.Trade.Prompt.PickToken")}
-      </button>
-    </div>
-  {/if}
+			</div>
+		{:else}
+			<p>{ localize("ITEM-PILES.Trade.Prompt.DropActor") }</p>
+		{/if}
+	</div>
+	{#if hasUnlinkedTokenOwnership}
+		<div class="item-piles-flexrow">
+			<button type="button" on:click={setActorFromSelectedToken}>
+				<i class="fas fa-expand"></i>
+				{localize("ITEM-PILES.Trade.Prompt.PickToken")}
+			</button>
+		</div>
+	{/if}
 </div>
 
 <style lang="scss">

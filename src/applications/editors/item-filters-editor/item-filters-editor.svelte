@@ -2,7 +2,7 @@
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-  import { getSetting, setSetting } from "../../../helpers/helpers.js";
+  import { getSetting } from "../../../helpers/helpers.js";
   import SETTINGS from "../../../constants/settings.js";
   import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
   import { get, writable } from "svelte/store";
@@ -45,7 +45,7 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form autocomplete=off bind:this={form} on:submit|preventDefault={updateSettings}>
 
 		<p>{localize("ITEM-PILES.Applications.FilterEditor.Explanation")}</p>
 
@@ -53,7 +53,7 @@
 			<tr>
 				<th>{localize("ITEM-PILES.Applications.FilterEditor.Path")}</th>
 				<th>{localize("ITEM-PILES.Applications.FilterEditor.Filters")}</th>
-				<th class="custom-small"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a></th>
+				<th class="custom-small"><a class="item-piles-clickable" on:click={add}><i class="fas fa-plus"></i></a></th>
 			</tr>
 			{#each $itemFilters as { path, filters }, index (index)}
 				<tr>
@@ -67,10 +67,10 @@
 		</table>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("Save")}
 			</button>
-			<button type="button" on:click|once={() => { application.close(); }}>
+			<button on:click|once={() => { application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

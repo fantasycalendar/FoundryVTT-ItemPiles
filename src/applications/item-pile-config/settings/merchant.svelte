@@ -89,7 +89,7 @@
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.MerchantImageExplanation")}</p>
 	</label>
 	<div class="form-fields">
-		<FilePicker type="imagevideo" bind:value={pileData.merchantImage} placeholder="path/image.png"/>
+		<FilePicker bind:value={pileData.merchantImage} placeholder="path/image.png" type="imagevideo"/>
 	</div>
 </div>
 
@@ -98,7 +98,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantity")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteQuantityExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.infiniteQuantity}/>
+	<input bind:checked={pileData.infiniteQuantity} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -106,7 +106,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteCurrency")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.InfiniteCurrencyExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.infiniteCurrencies}/>
+	<input bind:checked={pileData.infiniteCurrencies} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -114,7 +114,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.KeepZero")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.KeepZeroExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.keepZeroQuantity}/>
+	<input bind:checked={pileData.keepZeroQuantity} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -123,7 +123,7 @@
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityExplanation")}</p>
 	</label>
 	<div class="break"></div>
-	<select style="flex:4;" bind:value={pileData.displayQuantity}>
+	<select bind:value={pileData.displayQuantity} style="flex:4;">
 		<option value="yes">
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.DisplayQuantityYes")}
 		</option>
@@ -144,7 +144,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnly")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.PurchaseOnlyExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.purchaseOnly}/>
+	<input bind:checked={pileData.purchaseOnly} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -152,7 +152,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItems")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideNewItemsExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.hideNewItems}/>
+	<input bind:checked={pileData.hideNewItems} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -160,7 +160,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideItemsWithZeroCost")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideItemsWithZeroCostExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.hideItemsWithZeroCost}/>
+	<input bind:checked={pileData.hideItemsWithZeroCost} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -168,7 +168,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OnlyAcceptBasePrice")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OnlyAcceptBasePriceExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.onlyAcceptBasePrice}/>
+	<input bind:checked={pileData.onlyAcceptBasePrice} type="checkbox"/>
 </div>
 
 <div class="form-group slider-group">
@@ -182,14 +182,14 @@
 	<label style="flex:3;">
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</span>
 	</label>
-	<SliderInput style="flex:4;" bind:value={pileData.buyPriceModifier}/>
+	<SliderInput bind:value={pileData.buyPriceModifier} style="flex:4;"/>
 </div>
 
 <div class="form-group slider-group">
 	<label style="flex:3;">
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</span>
 	</label>
-	<SliderInput style="flex:4;" bind:value={pileData.sellPriceModifier}/>
+	<SliderInput bind:value={pileData.sellPriceModifier} style="flex:4;"/>
 </div>
 
 <div class="form-group">
@@ -198,7 +198,7 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifier")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemTypeModifiersExplanation")}</p>
 		</label>
-		<button type="button" on:click={() => { showItemTypePriceModifiers() }}>
+		<button on:click={() => { showItemTypePriceModifiers() }} type="button">
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureItemTypePriceModifiers")}
 		</button>
 	</div>
@@ -210,7 +210,7 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiers")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ActorPriceModifiersExplanation")}</p>
 		</label>
-		<button type="button" on:click={() => { showActorPriceModifiers() }}>
+		<button on:click={() => { showActorPriceModifiers() }} type="button">
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureActorPriceModifiers")}
 		</button>
 	</div>
@@ -222,7 +222,7 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.MerchantColumns")}</span>
 			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.MerchantColumnsExplanation")}</p>
 		</label>
-		<button type="button" on:click={() => { showMerchantColumns() }}>
+		<button on:click={() => { showMerchantColumns() }} type="button">
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureMerchantColumns")}
 		</button>
 	</div>
@@ -234,7 +234,7 @@
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenStatusExplanation")}</p>
 	</label>
 	<div class="break"></div>
-	<select style="flex:4;" bind:value={pileData.openTimes.status}>
+	<select bind:value={pileData.openTimes.status} style="flex:4;">
 		<option value="open">
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenStatusOpen")}
 		</option>
@@ -254,7 +254,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenTimes")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenTimesExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.openTimes.enabled}/>
+	<input bind:checked={pileData.openTimes.enabled} type="checkbox"/>
 </div>
 
 <div class="form-group" class:item-piles-disabled={!pileData.openTimes.enabled}>
@@ -263,11 +263,12 @@
 			Open Time:
 		</label>
 		<div class="item-piles-flexrow">
-			<input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}"
-						 bind:value="{pileData.openTimes.open.hour}"/>
+			<input bind:value="{pileData.openTimes.open.hour}" disabled="{!pileData.openTimes.enabled}"
+						 style="text-align: right;"
+						 type="number"/>
 			<span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
-			<input type="number" disabled="{!pileData.openTimes.enabled}"
-						 bind:value="{pileData.openTimes.open.minute}"/>
+			<input bind:value="{pileData.openTimes.open.minute}" disabled="{!pileData.openTimes.enabled}"
+						 type="number"/>
 		</div>
 	</div>
 	<div class="item-piles-flexcol">
@@ -275,11 +276,12 @@
 			Close Time:
 		</label>
 		<div class="item-piles-flexrow">
-			<input type="number" style="text-align: right;" disabled="{!pileData.openTimes.enabled}"
-						 bind:value="{pileData.openTimes.close.hour}"/>
+			<input bind:value="{pileData.openTimes.close.hour}" disabled="{!pileData.openTimes.enabled}"
+						 style="text-align: right;"
+						 type="number"/>
 			<span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
-			<input type="number" disabled="{!pileData.openTimes.enabled}"
-						 bind:value="{pileData.openTimes.close.minute}"/>
+			<input bind:value="{pileData.openTimes.close.minute}" disabled="{!pileData.openTimes.enabled}"
+						 type="number"/>
 		</div>
 	</div>
 </div>

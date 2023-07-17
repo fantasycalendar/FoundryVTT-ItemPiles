@@ -145,8 +145,8 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form bind:this={form} on:submit|once|preventDefault={updateSettings} autocomplete=off
-				class="item-piles-config-container">
+	<form autocomplete=off bind:this={form} class="item-piles-config-container"
+				on:submit|once|preventDefault={updateSettings}>
 
 		<Tabs bind:activeTab bind:tabs/>
 
@@ -222,7 +222,7 @@
 		</section>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i>
 				{localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
 			</button>

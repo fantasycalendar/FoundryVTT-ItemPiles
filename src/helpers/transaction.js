@@ -1,10 +1,10 @@
 import * as Utilities from "./utilities.js";
 import * as PileUtilities from "./pile-utilities.js";
+import { getItemFlagData } from "./pile-utilities.js";
 import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
-import { getItemFlagData } from "./pile-utilities.js";
 
 export default class Transaction {
 

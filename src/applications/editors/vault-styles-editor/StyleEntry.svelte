@@ -1,7 +1,7 @@
 <script>
 
   import * as Helpers from "../../../helpers/helpers.js";
-  import { get, writable } from "svelte/store";
+  import { writable } from "svelte/store";
   import { getContext } from "svelte";
   import StylesEditor from "../styles-editor/styles-editor.js";
 
@@ -32,8 +32,8 @@
 
 </script>
 
-<div><input type="text" required placeholder="system.rarity" bind:value="{entry.path}"/></div>
-<div><input type="text" required placeholder="rare" bind:value="{entry.value}"/></div>
+<div><input bind:value="{entry.path}" placeholder="system.rarity" required type="text"/></div>
+<div><input bind:value="{entry.value}" placeholder="rare" required type="text"/></div>
 <div>
 	{#if image}
 		<img class="item-piles-item-image-example" src={image}/>

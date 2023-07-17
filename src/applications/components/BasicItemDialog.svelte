@@ -9,11 +9,11 @@
 	<header class="sheet-header">
 		<img data-edit="img" src={item.img}>
 		<div class="details">
-			<input name="name" placeholder="Name" spellcheck="false" type="text" value={item.name} disabled/>
+			<input disabled name="name" placeholder="Name" spellcheck="false" type="text" value={item.name}/>
 
 			<span class="level">
 					<span>Item</span>
-					<input data-property="system.level.value" type="text" value="?" disabled>
+					<input data-property="system.level.value" disabled type="text" value="?">
 			</span>
 			<template class="traits-extra"></template>
 			<!-- showTraits true -->

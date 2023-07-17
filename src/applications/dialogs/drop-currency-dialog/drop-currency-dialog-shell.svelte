@@ -92,8 +92,8 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form class="item-piles-flexcol" bind:this={form} on:submit|once|preventDefault={submit} style="padding:0.5rem;"
-				autocomplete="off">
+	<form autocomplete="off" bind:this={form} class="item-piles-flexcol" on:submit|once|preventDefault={submit}
+				style="padding:0.5rem;">
 
 		{#if attributes.length || items.length}
 
@@ -223,7 +223,7 @@
 				</button>
 			{/if}
 
-			<button type="button" on:click|once={() => { application.close() }}>
+			<button on:click|once={() => { application.close() }} type="button">
 				<i class="fas fa-times"></i>
 				{localize("Cancel")}
 			</button>

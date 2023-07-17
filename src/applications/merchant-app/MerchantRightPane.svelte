@@ -20,26 +20,26 @@
 
 <div class="merchant-right-pane item-piles-flexcol">
 
-  <div class="merchant-tabbed-center"
-       style="flex: 1; max-height: calc(100% - {recipientStore && $currencies.length ? '34px' : '0px'})">
+	<div class="merchant-tabbed-center"
+			 style="flex: 1; max-height: calc(100% - {recipientStore && $currencies.length ? '34px' : '0px'})">
 
-    {#if $closed && !game.user.isGM}
-      <div style="display: grid; place-items: center; height:100%;">
-        <span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
-      </div>
-    {:else if $activeTab === "buy"}
-      <MerchantItemTab {store}/>
-    {:else if $activeTab === "services" }
-      <MerchantItemTab {store} services={true}/>
-    {:else if $activeTab === "sell"}
-      <MerchantItemTab store={recipientStore} noItemsLabel="ITEM-PILES.Merchant.NoItemsToSell"/>
-    {:else if $activeTab === "tables"}
-      <MerchantPopulateItemsTab {store}/>
-    {/if}
+		{#if $closed && !game.user.isGM}
+			<div style="display: grid; place-items: center; height:100%;">
+				<span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
+			</div>
+		{:else if $activeTab === "buy"}
+			<MerchantItemTab {store}/>
+		{:else if $activeTab === "services" }
+			<MerchantItemTab {store} services={true}/>
+		{:else if $activeTab === "sell"}
+			<MerchantItemTab store={recipientStore} noItemsLabel="ITEM-PILES.Merchant.NoItemsToSell"/>
+		{:else if $activeTab === "tables"}
+			<MerchantPopulateItemsTab {store}/>
+		{/if}
 
-  </div>
+	</div>
 
-	<MerchantFooter {store} {recipientStore}/>
+	<MerchantFooter {recipientStore} {store}/>
 
 </div>
 

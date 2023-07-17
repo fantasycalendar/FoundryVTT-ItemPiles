@@ -2,7 +2,6 @@
 
   import { fade } from 'svelte/transition';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { get } from "svelte/store";
 
   export let store;
   export let entry;
@@ -30,83 +29,83 @@
 </script>
 
 <div class="item-piles-flexrow item-piles-item-row item-piles-even-color"
-     transition:fade={{duration: 250}}
-     draggable={!!entry.id}
-     on:dragstart={(event) => { dragStart(event) }}
-     class:item-piles-disabled={!$editQuantities && (!$quantityLeft || !$quantity)}>
+		 class:item-piles-disabled={!$editQuantities && (!$quantityLeft || !$quantity)}
+		 draggable={!!entry.id}
+		 on:dragstart={(event) => { dragStart(event) }}
+		 transition:fade={{duration: 250}}>
 
-  <div class="item-piles-img-container">
-    <img class="item-piles-img" src="{$img}"/>
-  </div>
+	<div class="item-piles-img-container">
+		<img class="item-piles-img" src="{$img}"/>
+	</div>
 
-  <div class="item-piles-name">
-    <div class="item-piles-name-container">
-      <p class:item-piles-clickable-link="{canInspectItems}"
+	<div class="item-piles-name">
+		<div class="item-piles-name-container">
+			<p class:item-piles-clickable-link="{canInspectItems}"
 				 on:click={() => { entry.preview() }}
 				 style="color: {$rarityColor || 'inherit'};"
 			>
 				{$name}
 			</p>
-      {#if !$editQuantities && entry.canStack && !currency}
-        <span class="item-piles-small-text">(x{$quantity})</span>
-      {/if}
-    </div>
-  </div>
+			{#if !$editQuantities && entry.canStack && !currency}
+				<span class="item-piles-small-text">(x{$quantity})</span>
+			{/if}
+		</div>
+	</div>
 
-  {#if entry.canStack || !entry.id}
+	{#if entry.canStack || !entry.id}
 
-    <div class="item-piles-quantity-container" style="flex:2.5;">
+		<div class="item-piles-quantity-container" style="flex:2.5;">
 
-      {#if $editQuantities}
+			{#if $editQuantities}
 
-        <div class="item-piles-quantity-input-container">
-          <input class="item-piles-quantity" type="number" min="0" bind:value="{$quantity}"
-                 draggable="true" on:dragstart|stopPropagation|preventDefault/>
-        </div>
+				<div class="item-piles-quantity-input-container">
+					<input class="item-piles-quantity" type="number" min="0" bind:value="{$quantity}"
+								 draggable="true" on:dragstart|stopPropagation|preventDefault/>
+				</div>
 
-      {:else}
+			{:else}
 
-        {#if $quantityLeft && $quantity}
-          <div class="item-piles-quantity-input-container">
-            <input class="item-piles-quantity" type="number" min="1" bind:value="{$currentQuantity}"
-                   max="{$quantity}" disabled="{!$quantity}"/>
+				{#if $quantityLeft && $quantity}
+					<div class="item-piles-quantity-input-container">
+						<input class="item-piles-quantity" type="number" min="1" bind:value="{$currentQuantity}"
+									 max="{$quantity}" disabled="{!$quantity}"/>
 
-            <span class="item-piles-input-divider" class:item-piles-text-right={!store.recipient}>
+						<span class="item-piles-input-divider" class:item-piles-text-right={!store.recipient}>
                / {$quantityLeft}
             </span>
-          </div>
-        {:else}
+					</div>
+				{:else}
           <span>
             {localize(`ITEM-PILES.Inspect.${entry.toShare && $quantity ? "NoShareLeft" : "NoneLeft"}`)}
           </span>
-        {/if}
-      {/if}
+				{/if}
+			{/if}
 
-    </div>
+		</div>
 
-  {/if}
+	{/if}
 
-  {#if !$editQuantities}
+	{#if !$editQuantities}
 
-    <button
-      on:click={() => { entry.take() }}
-      class="item-piles-item-take-button"
-      type="button"
-      disabled={!$quantityLeft || !$quantity}>
-      {localize("ITEM-PILES.Inspect.Take")}
-    </button>
+		<button
+			on:click={() => { entry.take() }}
+			class="item-piles-item-take-button"
+			type="button"
+			disabled={!$quantityLeft || !$quantity}>
+			{localize("ITEM-PILES.Inspect.Take")}
+		</button>
 
-  {:else if !entry.canStack && !entry.isCurrency}
+	{:else if !entry.canStack && !entry.isCurrency}
 
-    <button
-      on:click={() => { entry.remove() }}
-      class="item-piles-item-take-button"
-      type="button"
-      disabled={!$quantityLeft}>
-      {localize("Remove")}
-    </button>
+		<button
+			on:click={() => { entry.remove() }}
+			class="item-piles-item-take-button"
+			type="button"
+			disabled={!$quantityLeft}>
+			{localize("Remove")}
+		</button>
 
-  {/if}
+	{/if}
 
 
 </div>

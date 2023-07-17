@@ -5,9 +5,9 @@
   import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
   import DropZone from "./DropZone.svelte";
   import * as Helpers from "../../helpers/helpers.js";
+  import { getSetting } from "../../helpers/helpers.js";
   import * as Utilities from "../../helpers/utilities.js";
   import CONSTANTS from "../../constants/constants.js";
-  import { getSetting } from "../../helpers/helpers.js";
   import SETTINGS from "../../constants/settings.js";
   import { getActorFlagData } from "../../helpers/pile-utilities.js";
 
@@ -175,7 +175,7 @@
 </script>
 
 
-<DropZone callback={dropData} bind:isHovering={isHovering}>
+<DropZone bind:isHovering={isHovering} callback={dropData}>
 	<div class="table-container item-piles-top-divider">
 		<div class="item-piles-sortable-list-columns header">
 			<div></div>
@@ -193,9 +193,9 @@
 			</div>
 		</div>
 		<section
-			use:dndzone="{{ items: prices, dragDisabled, flipDurationMs }}"
 			on:consider="{handleConsider}"
 			on:finalize="{handleFinalize}"
+			use:dndzone="{{ items: prices, dragDisabled, flipDurationMs }}"
 		>
 			{#if isHovering}
 				<div class="drop-to-add">Drop to add</div>
@@ -235,7 +235,7 @@
 			{/each}
 			<div class="item-piles-sortable-list-columns" style="margin-top: 0.5rem;">
 				<div class="full-span">
-					<a on:click={() => addAttribute()} class:invisible={isHovering}>
+					<a class:invisible={isHovering} on:click={() => addAttribute()}>
 						{localize("ITEM-PILES.Applications.ItemEditor.DropMeClickMe")}
 					</a>
 				</div>

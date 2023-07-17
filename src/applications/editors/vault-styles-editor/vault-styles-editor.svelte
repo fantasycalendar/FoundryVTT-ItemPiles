@@ -52,7 +52,7 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form autocomplete=off bind:this={form} on:submit|preventDefault={updateSettings}>
 		<p>{localize("ITEM-PILES.Applications.VaultStylesEditor.Explanation")}</p>
 
 		<div class="item-piles-table">
@@ -60,7 +60,7 @@
 			<div>{localize("ITEM-PILES.Applications.VaultStylesEditor.Value")}</div>
 			<div></div>
 			<div></div>
-			<div style="text-align: right;"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a>
+			<div style="text-align: right;"><a class="item-piles-clickable" on:click={add}><i class="fas fa-plus"></i></a>
 			</div>
 
 			{#each $vaultStyleStore as entry, index (index)}
@@ -69,10 +69,10 @@
 		</div>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("Save")}
 			</button>
-			<button type="button" on:click|once={() => { application.close(); }}>
+			<button on:click|once={() => { application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

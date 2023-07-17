@@ -4,7 +4,7 @@ import { get } from "svelte/store";
 import { getActiveApps } from "../../../helpers/helpers";
 
 export default class TradeMerchantItemDialog extends SvelteApplication {
-  
+
   /**
    *
    * @param item
@@ -31,7 +31,7 @@ export default class TradeMerchantItemDialog extends SvelteApplication {
       ...options
     });
   }
-  
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       width: 330,
@@ -39,11 +39,11 @@ export default class TradeMerchantItemDialog extends SvelteApplication {
       classes: ["item-piles-app"]
     })
   }
-  
+
   static getActiveApps(id) {
     return getActiveApps(`item-pile-buy-item-dialog-${id}`);
   }
-  
+
   static async show(item, seller, buyer, settings = {}, options = {}) {
     const apps = this.getActiveApps(item.id + "-" + seller.id + "-" + buyer.id);
     if (apps.length) {
@@ -57,5 +57,5 @@ export default class TradeMerchantItemDialog extends SvelteApplication {
       new this(item, seller, buyer, settings, options).render(true, { focus: true });
     })
   }
-  
+
 }

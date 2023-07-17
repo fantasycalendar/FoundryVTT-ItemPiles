@@ -27,17 +27,17 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off class="item-piles-config-container">
+	<form autocomplete=off bind:this={form} class="item-piles-config-container" on:submit|preventDefault={updateSettings}>
 
 		<p>{localize("ITEM-PILES.Applications.PricePresetEditor.Explanation")}</p>
 
 		<PriceList bind:prices presets={false}/>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("ITEM-PILES.Applications.PricePresetEditor.Update")}
 			</button>
-			<button type="button" on:click|once={() => { application.close(); }}>
+			<button on:click|once={() => { application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

@@ -22,7 +22,7 @@
 
 
 <div class="item-piles-floting-element" style={elementStyle}>
-	<svelte:component this={component} {...componentData}/>
+	<svelte:component {...componentData} this={component}/>
 </div>
 
 

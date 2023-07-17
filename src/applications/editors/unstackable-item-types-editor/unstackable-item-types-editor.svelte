@@ -52,13 +52,13 @@
 <svelte:options accessors={true}/>
 
 <ApplicationShell bind:elementRoot>
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form autocomplete=off bind:this={form} on:submit|preventDefault={updateSettings}>
 		<p>{localize("ITEM-PILES.Applications.UnstackableItemTypesEditor.Explanation")}</p>
 
 		<table>
 			<tr>
 				<th>{localize("ITEM-PILES.Applications.UnstackableItemTypesEditor.Type")}</th>
-				<th class="small"><a on:click={add} class="item-piles-clickable"><i class="fas fa-plus"></i></a></th>
+				<th class="small"><a class="item-piles-clickable" on:click={add}><i class="fas fa-plus"></i></a></th>
 			</tr>
 			{#each $unstackableItemTypesStore as type, index (index)}
 				<tr>
@@ -79,10 +79,10 @@
 		</table>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("Save")}
 			</button>
-			<button type="button" on:click|once={() => { application.close(); }}>
+			<button on:click|once={() => { application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

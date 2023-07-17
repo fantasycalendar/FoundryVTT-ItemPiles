@@ -2,6 +2,9 @@ import * as Helpers from "../helpers/helpers.js";
 
 export default class BasePlugin {
 
+  invalidVersionError = ""
+  minVersionError = ""
+
   constructor(pluginName, minVersion, invalidVersion) {
     this.pluginName = pluginName;
     this.minVersion = minVersion;
@@ -9,9 +12,6 @@ export default class BasePlugin {
     this.initialized = false;
     this.initialize();
   }
-
-  invalidVersionError = ""
-  minVersionError = ""
 
   initialize() {
 

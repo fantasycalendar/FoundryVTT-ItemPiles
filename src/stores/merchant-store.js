@@ -32,6 +32,10 @@ export default class MerchantStore extends ItemPileStore {
     this.isMerchant = false;
   }
 
+  get ItemClass() {
+    return PileMerchantItem;
+  }
+
   setupStores() {
     super.setupStores();
     this.services.set({});
@@ -46,10 +50,6 @@ export default class MerchantStore extends ItemPileStore {
     this.sortTypes.set([]);
     this.inverseSort.set(false);
     this.isMerchant = false;
-  }
-
-  get ItemClass() {
-    return PileMerchantItem;
   }
 
   getActorImage() {

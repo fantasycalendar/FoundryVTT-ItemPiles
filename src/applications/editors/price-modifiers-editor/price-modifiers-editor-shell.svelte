@@ -82,12 +82,12 @@
 
 <ApplicationShell bind:elementRoot>
 
-	<form bind:this={form} on:submit|preventDefault={updateSettings} autocomplete=off>
+	<form autocomplete=off bind:this={form} on:submit|preventDefault={updateSettings}>
 
 		<p>{localize("ITEM-PILES.Applications.PriceModifiersEditor.Explanation")}</p>
 
-		<div on:dragstart={preventDefault} on:drop={dropData} on:dragover={preventDefault}
-				 class:border-highlight={!$priceModifiers.length}>
+		<div class:border-highlight={!$priceModifiers.length} on:dragover={preventDefault} on:dragstart={preventDefault}
+				 on:drop={dropData}>
 
 			{#if $priceModifiers.length}
 				<table>
@@ -132,10 +132,10 @@
 		</div>
 
 		<footer>
-			<button type="button" on:click|once={requestSubmit}>
+			<button on:click|once={requestSubmit} type="button">
 				<i class="far fa-save"></i> {localize("Save")}
 			</button>
-			<button type="button" on:click|once={() => { application.close(); }}>
+			<button on:click|once={() => { application.close(); }} type="button">
 				<i class="far fa-times"></i> { localize("Cancel") }
 			</button>
 		</footer>

@@ -2,7 +2,6 @@
   import { getContext } from 'svelte';
   import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
   import * as Helpers from "../../helpers/helpers.js";
-  import { openEditor } from "../../helpers/helpers.js";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import ItemPriceStore from "./ItemPriceStore.js";
   import Tabs from "../components/Tabs.svelte";

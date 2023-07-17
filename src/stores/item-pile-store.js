@@ -8,7 +8,6 @@ import * as Helpers from "../helpers/helpers.js";
 import { InterfaceTracker } from "../socket.js";
 import { PileAttribute, PileItem } from "./pile-item.js";
 import DropCurrencyDialog from "../applications/dialogs/drop-currency-dialog/drop-currency-dialog.js";
-import PrivateAPI from "../API/private-api.js";
 
 const __STORES__ = new Map();
 
@@ -83,6 +82,26 @@ export default class ItemPileStore {
     store.setupStores();
     store.setupSubscriptions();
     return store;
+  }
+
+  static getStore(actor) {
+    const uuid = Utilities.getUuid(actor);
+    return __STORES__.get(uuid);
+  }
+
+  static notifyChanges(event, actor, ...args) {
+    const store = this.getStore(actor);
+    if (store) {
+      store[event](...args);
+    }
+  }
+
+  static notifyAllOfChanges(event, ...args) {
+    for (const store of __STORES__.values()) {
+      if (store[event]) {
+        store[event](...args);
+      }
+    }
   }
 
   setupStores() {
@@ -191,26 +210,6 @@ export default class ItemPileStore {
       filterDebounce()
     });
 
-  }
-
-  static getStore(actor) {
-    const uuid = Utilities.getUuid(actor);
-    return __STORES__.get(uuid);
-  }
-
-  static notifyChanges(event, actor, ...args) {
-    const store = this.getStore(actor);
-    if (store) {
-      store[event](...args);
-    }
-  }
-
-  static notifyAllOfChanges(event, ...args) {
-    for (const store of __STORES__.values()) {
-      if (store[event]) {
-        store[event](...args);
-      }
-    }
   }
 
   updateSource(newSource) {

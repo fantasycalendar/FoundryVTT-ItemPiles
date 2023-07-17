@@ -56,7 +56,7 @@
 
 	<div class="form-fields input-side">
 		<div class="button-container">
-			<button type="button" on:click={() => { callback(); }}>
+			<button on:click={() => { callback(); }} type="button">
 				<i class="{data.icon}"></i>
 				{localize(data.label)}
 			</button>

@@ -1,6 +1,6 @@
 <script>
 
-  import { SecondaryCurrenciesEditor, CurrenciesEditor } from "../../editors/currencies-editor/currencies-editor.js";
+  import { CurrenciesEditor, SecondaryCurrenciesEditor } from "../../editors/currencies-editor/currencies-editor.js";
   import ItemFiltersEditor from "../../editors/item-filters-editor/item-filters-editor.js";
   import MacroSelector from "../../components/MacroSelector.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
@@ -86,7 +86,7 @@
           {#if !$pileEnabled}
             <div style="flex:0 1 auto; margin-right: 1rem;" class="blob"><i class="fas fa-exclamation"></i></div>
           {/if}
-		<span style="flex:0 1 auto;"><input type="checkbox" bind:checked={$pileEnabled}/></span>
+		<span style="flex:0 1 auto;"><input bind:checked={$pileEnabled} type="checkbox"/></span>
         </span>
 </div>
 
@@ -95,7 +95,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.Distance")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.GridUnits")}</p>
 	</label>
-	<input style="flex:4;" type="number" placeholder="Infinity" bind:value={pileData.distance}/>
+	<input bind:value={pileData.distance} placeholder="Infinity" style="flex:4;" type="number"/>
 </div>
 
 <div class="form-group">
@@ -103,7 +103,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.InspectItems")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.InspectItemsExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.canInspectItems}/>
+	<input bind:checked={pileData.canInspectItems} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -111,7 +111,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DisplayItemTypes")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DisplayItemTypesExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={pileData.displayItemTypes}/>
+	<input bind:checked={pileData.displayItemTypes} type="checkbox"/>
 </div>
 
 <div class="form-group">
@@ -129,7 +129,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmpty")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyExplanation")}</p>
 	</label>
-	<select style="flex:4;" bind:value={pileData.deleteWhenEmpty}>
+	<select bind:value={pileData.deleteWhenEmpty} style="flex:4;">
 		<option
 			value="default">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyDefault")}
 			({localize(deleteWhenEmptySetting)})
@@ -146,7 +146,7 @@
 	</label>
 </div>
 <div class="form-group">
-	<button type="button" style="flex:4;" on:click={() => { showDescriptionDialog() }}>
+	<button on:click={() => { showDescriptionDialog() }} style="flex:4;" type="button">
 		{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}
 	</button>
 </div>
@@ -156,12 +156,12 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideCurrencies")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideCurrenciesExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={$hasOverrideCurrencies}/>
+	<input bind:checked={$hasOverrideCurrencies} type="checkbox"/>
 </div>
 
 <div class="form-group">
-	<button type="button" on:click={() => { showCurrenciesEditor() }}
-					disabled={!$hasOverrideCurrencies} style="flex:4;">
+	<button disabled={!$hasOverrideCurrencies} on:click={() => { showCurrenciesEditor() }}
+					style="flex:4;" type="button">
 		{localize("ITEM-PILES.Applications.ItemPileConfig.Main.ConfigureOverrideCurrencies")}
 	</button>
 </div>
@@ -171,12 +171,12 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideSecondaryCurrencies")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideSecondaryCurrenciesExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={$hasOverrideSecondaryCurrencies}/>
+	<input bind:checked={$hasOverrideSecondaryCurrencies} type="checkbox"/>
 </div>
 
 <div class="form-group">
-	<button type="button" on:click={() => { showSecondaryCurrenciesEditor() }}
-					disabled={!$hasOverrideSecondaryCurrencies} style="flex:4;">
+	<button disabled={!$hasOverrideSecondaryCurrencies} on:click={() => { showSecondaryCurrenciesEditor() }}
+					style="flex:4;" type="button">
 		{localize("ITEM-PILES.Applications.ItemPileConfig.Main.ConfigureOverrideSecondaryCurrencies")}
 	</button>
 </div>
@@ -186,12 +186,12 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideItemFilters")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OverrideItemFiltersExplanation")}</p>
 	</label>
-	<input type="checkbox" bind:checked={$hasOverrideItemFilters}/>
+	<input bind:checked={$hasOverrideItemFilters} type="checkbox"/>
 </div>
 
 <div class="form-group">
-	<button type="button" on:click={() => { showItemFiltersEditor() }}
-					disabled={!$hasOverrideItemFilters} style="flex:4;">
+	<button disabled={!$hasOverrideItemFilters} on:click={() => { showItemFiltersEditor() }}
+					style="flex:4;" type="button">
 		{localize("ITEM-PILES.Applications.ItemPileConfig.Main.ConfigureOverrideItemFilters")}
 	</button>
 </div>

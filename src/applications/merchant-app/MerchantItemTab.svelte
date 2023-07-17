@@ -26,8 +26,8 @@
 
   $: categoryDropDown = $itemCategoriesStore.filter(category => category.service === services);
   $: categories = $categoryStore.filter(category => category.service === services);
-	$: items = $itemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
-	$: visibleItems = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
+  $: items = $itemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
+  $: visibleItems = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
 
   let columns = [];
   $: {
@@ -146,7 +146,7 @@
     padding-right: 5px;
     align-items: center;
     height: calc(100% - 31px);
-		margin-top: 5px;
+    margin-top: 5px;
     align-content: flex-start;
   }
 

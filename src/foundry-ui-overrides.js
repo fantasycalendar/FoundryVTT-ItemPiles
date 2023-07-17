@@ -176,37 +176,21 @@ function renderPileHUD(app, html) {
 
 class FastTooltipManager extends TooltipManager {
 
-  constructor() {
-    super();
-    const tooltipElem = $(`<aside id="fast-tooltip" role="tooltip"></aside>`);
-    $("body").append(tooltipElem);
-    this.tooltip = document.getElementById("fast-tooltip");
-  }
-
-  /**
-   * A reference to the HTML element which is currently tool-tipped, if any.
-   * @type {HTMLElement|null}
-   */
-  element = null;
-
   /**
    * An amount of margin which is used to offset tooltips from their anchored element.
    * @type {number}
    */
   static TOOLTIP_MARGIN_PX = 5;
-
   /**
    * The number of milliseconds delay which activates a tooltip on a "long hover".
    * @type {number}
    */
   static TOOLTIP_ACTIVATION_MS = 500;
-
   /**
    * The number of milliseconds delay which activates a tooltip on a "long hover".
    * @type {number}
    */
   static TOOLTIP_DEACTIVATION_MS = 500;
-
   /**
    * The directions in which a tooltip can extend, relative to its tool-tipped element.
    * @enum {string}
@@ -218,30 +202,38 @@ class FastTooltipManager extends TooltipManager {
     RIGHT: "RIGHT",
     CENTER: "CENTER"
   };
-
+  /**
+   * A reference to the HTML element which is currently tool-tipped, if any.
+   * @type {HTMLElement|null}
+   */
+  element = null;
   /**
    * Is the tooltip currently active?
    * @type {boolean}
    */
   #active = false;
-
   /**
    * A reference to a window timeout function when an element is activated.
    * @private
    */
   #activationTimeout;
-
   /**
    * A reference to a window timeout function when an element is deactivated.
    * @private
    */
   #deactivationTimeout;
-
   /**
    * An element which is pending tooltip activation if hover is sustained
    * @type {HTMLElement|null}
    */
   #pending;
+
+  constructor() {
+    super();
+    const tooltipElem = $(`<aside id="fast-tooltip" role="tooltip"></aside>`);
+    $("body").append(tooltipElem);
+    this.tooltip = document.getElementById("fast-tooltip");
+  }
 
   /* -------------------------------------------- */
 

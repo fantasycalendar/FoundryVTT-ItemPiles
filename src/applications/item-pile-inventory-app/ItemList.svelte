@@ -7,7 +7,7 @@
   export let store;
   const items = store.items;
   const numItems = store.numItems;
-  
+
 </script>
 
 

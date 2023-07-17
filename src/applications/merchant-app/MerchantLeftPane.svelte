@@ -4,7 +4,6 @@
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import SliderInput from "../components/SliderInput.svelte";
   import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
-  import { get } from "svelte/store";
   import { TJSProseMirror } from "@typhonjs-fvtt/svelte-standard/component";
 
   export let store;

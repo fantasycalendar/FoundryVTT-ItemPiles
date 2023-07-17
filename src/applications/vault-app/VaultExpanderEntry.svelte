@@ -54,7 +54,7 @@
 		</button>
 
 	{/if}
-	
+
 </div>
 
 <style lang="scss">

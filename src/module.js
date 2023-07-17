@@ -4,11 +4,11 @@ import CONSTANTS from "./constants/constants.js";
 import registerUIOverrides from "./foundry-ui-overrides.js";
 import registerLibwrappers from "./libwrapper.js";
 import {
+  applyShims,
   applySystemSpecificStyles,
   checkSystem,
   patchCurrencySettings,
-  registerSettings,
-  applyShims
+  registerSettings
 } from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import Socket from "./socket.js";
@@ -22,9 +22,7 @@ import runMigrations from "./migrations.js"
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 import ItemEditor from "./applications/item-editor/item-editor.js";
 import { setupPlugins } from "./plugins/main.js";
-import SettingsShim from "./applications/settings-app/settings-app.js";
 import { setupCaches } from "./helpers/caches.js";
-import { isValidItemPile } from "./helpers/pile-utilities.js";
 
 Hooks.once("init", async () => {
   registerSettings();

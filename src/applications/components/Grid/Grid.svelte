@@ -84,51 +84,51 @@
 
 <div class=item-piles-grid-container>
 
-  <div
-    class="item-piles-grid {options.class}"
-    bind:this={gridContainer}
-    style={containerStyle}
-  >
-    {#if dropGhost && dropGhost?.active}
-      {@const dropElem = calcPosition(dropGhost, options)}
-      <div
-        style={`position: absolute; left:${dropElem.left}px; top:${dropElem.top}px;
+	<div
+		bind:this={gridContainer}
+		class="item-piles-grid {options.class}"
+		style={containerStyle}
+	>
+		{#if dropGhost && dropGhost?.active}
+			{@const dropElem = calcPosition(dropGhost, options)}
+			<div
+				style={`position: absolute; left:${dropElem.left}px; top:${dropElem.top}px;
         width: ${dropElem.width}px; height: ${dropElem.height}px;`}
-        class={options.previewClass}
-      />
-    {/if}
-    {#each items as item (item.id)}
-      <GridItem
-        bind:item={item}
-        bind:items={items}
-        bind:options={options}
-        {gridContainer}
-        on:itemdoubleclick={itemDoubleClickEvent}
-        on:itemchange={itemChangeEvent}
-        on:itemhover={itemHoverEvent}
-        on:itembegindrag={itemBeginDrag}
-        on:itemstopdrag={itemStopDrag}
-        on:itemmove={itemMove}
-        on:itemhoverleave={itemHoverLeaveEvent}
-        on:itemrightclick={itemRightClickEvent}
-      >
-        <slot {item}/>
-      </GridItem>
-    {/each}
-  </div>
+				class={options.previewClass}
+			/>
+		{/if}
+		{#each items as item (item.id)}
+			<GridItem
+				bind:item={item}
+				bind:items={items}
+				bind:options={options}
+				{gridContainer}
+				on:itemdoubleclick={itemDoubleClickEvent}
+				on:itemchange={itemChangeEvent}
+				on:itemhover={itemHoverEvent}
+				on:itembegindrag={itemBeginDrag}
+				on:itemstopdrag={itemStopDrag}
+				on:itemmove={itemMove}
+				on:itemhoverleave={itemHoverLeaveEvent}
+				on:itemrightclick={itemRightClickEvent}
+			>
+				<slot {item}/>
+			</GridItem>
+		{/each}
+	</div>
 
-  {#if options.backgroundGrid}
+	{#if options.backgroundGrid}
 
-    <div class="item-piles-inner-grid" style={backgroundGridStyle}>
-      {#each Array(options.rows) as _, rowIndex (rowIndex)}
-        {#each Array(options.cols) as _, colIndex (colIndex)}
-          <div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
-               style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}"></div>
-        {/each}
-      {/each}
-    </div>
+		<div class="item-piles-inner-grid" style={backgroundGridStyle}>
+			{#each Array(options.rows) as _, rowIndex (rowIndex)}
+				{#each Array(options.cols) as _, colIndex (colIndex)}
+					<div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
+							 style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}"></div>
+				{/each}
+			{/each}
+		</div>
 
-  {/if}
+	{/if}
 
 </div>
 
