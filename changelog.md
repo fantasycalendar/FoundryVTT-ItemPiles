@@ -4,6 +4,7 @@
 
 - Tweaked the way items that cost items are stored in the item's flags to avoid deeply nested data. Instead, the items that are required to buy other items are stored in a compendium for ease of access and long term storage.
 - Fixed free items still showing up in merchants when the setting to hide them was enabled
+- Fixed merchants with nothing for sale not displaying the text about this fact in the interface
 
 ## Version 2.7.3
 

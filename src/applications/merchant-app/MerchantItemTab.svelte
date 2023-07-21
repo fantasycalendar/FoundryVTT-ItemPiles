@@ -120,11 +120,9 @@
 
 	{/if}
 
-</div>
+	{#if !$categoryStore.length}
 
-{#if !$categoryStore.length}
-
-	<div style="height: calc(100% - 51px);" class="item-piles-flexcol align-center-col">
+		<div style="height: calc(100% - 51px);" class="item-piles-flexcol align-center-col">
 
     <span class="align-center-row" style="font-size:1.25rem; opacity: 0.8;">
       {#if visibleItems.length}
@@ -134,9 +132,11 @@
       {/if}
     </span>
 
-	</div>
+		</div>
 
-{/if}
+	{/if}
+
+</div>
 
 <style lang="scss">
 

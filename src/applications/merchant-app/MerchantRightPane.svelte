@@ -28,7 +28,7 @@
 				<span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
 			</div>
 		{:else if $activeTab === "buy"}
-			<MerchantItemTab {store}/>
+			<MerchantItemTab {store} noItemsLabel="ITEM-PILES.Merchant.NoItemsForSale"/>
 		{:else if $activeTab === "services" }
 			<MerchantItemTab {store} services={true}/>
 		{:else if $activeTab === "sell"}
