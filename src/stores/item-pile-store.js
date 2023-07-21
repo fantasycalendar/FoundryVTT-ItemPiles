@@ -243,7 +243,7 @@ export default class ItemPileStore {
   refreshItems() {
     const allItems = get(this.allItems);
     const pileData = get(this.pileData);
-    const recipientPileData = this.recipient ? PileUtilities.isItemPileMerchant(this.recipient) : {}
+    const recipientPileData = this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {}
     const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
 
     const visibleItems = allItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
