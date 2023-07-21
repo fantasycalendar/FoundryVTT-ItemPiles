@@ -10,6 +10,8 @@
   import CONSTANTS from "../../constants/constants.js";
   import SETTINGS from "../../constants/settings.js";
   import { getActorFlagData } from "../../helpers/pile-utilities.js";
+  import * as CompendiumUtilities from "../../helpers/compendium-utilities.js";
+  import { findOrCreateItemInCompendium } from "../../helpers/compendium-utilities.js";
 
   export let prices;
   export let item;
@@ -99,11 +101,14 @@
     const itemCurrencies = prices.map(entry => entry.data?.item ?? {});
     const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
 
+    if (!uuid) {
+      uuid = CompendiumUtilities.findOrCreateItemInCompendium(itemData).uuid;
+    }
+
     if (foundItem) {
       const index = itemCurrencies.indexOf(foundItem);
       prices[index].data = {
         uuid,
-        item: itemData
       }
       Helpers.custom_notify(`Updated item data for ${localize(prices[index].name)} (item name ${itemData.name})`)
     } else {
@@ -115,7 +120,6 @@
         abbreviation: "{#} " + itemData.name,
         data: {
           uuid,
-          item: itemData
         },
         quantity: 1,
         fixed: true,
@@ -126,21 +130,7 @@
 
   async function editItem(index) {
     const data = prices[index].data;
-    let item;
-    if (data.uuid) {
-      item = await fromUuid(data.uuid);
-    } else {
-      let itemData = data.item;
-      if (itemData._id) delete itemData._id;
-      if (itemData.ownership) delete itemData.ownership;
-      const items = Array.from(game.items);
-      item = Utilities.findSimilarItem(items, itemData);
-      if (!item) {
-        setProperty(itemData, CONSTANTS.FLAGS.TEMPORARY_ITEM, true);
-        item = await Item.implementation.create(itemData);
-        Helpers.custom_notify(`An item has been created for ${item.name} - drag and drop it into the list to update the stored item data`)
-      }
-    }
+    let item = await fromUuid(data.uuid);
     item.sheet.render(true);
   }
 

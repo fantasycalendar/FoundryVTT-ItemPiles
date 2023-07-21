@@ -617,13 +617,15 @@ export function cleanFlagData(flagData) {
   return flagData;
 }
 
-export function cleanItemFlagData(flagData) {
+export function cleanItemFlagData(flagData, { addRemoveFlag = false } = {}) {
   const defaults = Object.keys(CONSTANTS.ITEM_DEFAULTS);
   const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, CONSTANTS.ITEM_DEFAULTS)));
   const toRemove = new Set(defaults.filter(key => !difference.has(key)));
   for (const key of toRemove) {
     delete flagData[key];
-    flagData["-=" + key] = null;
+    if (!addRemoveFlag) {
+      flagData["-=" + key] = null;
+    }
   }
   return flagData;
 }

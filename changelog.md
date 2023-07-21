@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.4
+
+- Tweaked the way items that cost items are stored in the item's flags to avoid deeply nested data. Instead, the items that are required to buy other items are stored in a compendium for ease of access and long term storage.
+
 ## Version 2.7.3
 
 - Fixed minor bug preventing items from being traded in user-to-user trades

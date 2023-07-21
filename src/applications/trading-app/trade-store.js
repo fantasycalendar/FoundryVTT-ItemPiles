@@ -151,8 +151,6 @@ export default class TradeStore {
 
   addItem(newItem, { uuid = false, quantity = false, currency = false } = {}) {
 
-    debugger
-
     const items = !currency
       ? get(this.leftTraderItems)
       : get(this.leftTraderItemCurrencies);

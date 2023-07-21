@@ -2,17 +2,15 @@ import CONSTANTS from "./constants/constants.js";
 import { custom_warning, getSetting } from "./helpers/helpers.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
 import SETTINGS from "./constants/settings.js";
+import { findOrCreateItemInCompendium } from "./helpers/compendium-utilities.js";
+
+const sortedMigrations = ["2.7.3", "2.4.0", "2.4.17", "2.6.1"];
 
 export default async function runMigrations() {
 
-  const sortedMigrations = Object.entries(migrations)
-    .sort((a, b) => {
-      return isNewerVersion(b[0], a[0]) ? -1 : 1;
-    });
-
-  for (const [version, migration] of sortedMigrations) {
+  for (const version of sortedMigrations) {
     try {
-      await migration(version);
+      await migrations[version](version);
     } catch (err) {
       console.error(err);
       custom_warning(`Something went wrong when migrating to version ${version}. Please check the console for the error!`, true)
@@ -165,7 +163,7 @@ const migrations = {
 
   "2.4.17": async (version) => {
 
-    const items = filterValidItems(game.items);
+    const items = filterValidItems(game.items, version);
 
     const itemUpdates = items.map(item => {
       const flags = getProperty(item, CONSTANTS.FLAGS.ITEM);
@@ -174,10 +172,9 @@ const migrations = {
     });
 
     if (itemUpdates.length) {
-      console.log(`Item Piles | Migrating ${itemUpdates.length} items to version ${version}...`)
+      console.log(`Item Piles | Migrating ${itemUpdates.length} items to version ${version}...`);
+      await Item.updateDocuments(itemUpdates);
     }
-
-    await Item.updateDocuments(itemUpdates);
 
     const actors = getItemPileActorsOfLowerVersion(version);
 
@@ -293,6 +290,85 @@ const migrations = {
       }
       console.log(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
       await scene.updateEmbeddedDocuments("Token", updates);
+    }
+
+  },
+
+  "2.7.3": async (version) => {
+
+    const actors = getItemPileActorsOfLowerVersion(version);
+
+    const recursivelyAddItemsToCompendium = async (itemData) => {
+      const flagData = PileUtilities.getItemFlagData(itemData);
+      for (const priceGroup of flagData?.prices ?? []) {
+        for (const price of priceGroup) {
+          if (price.type !== "item" || !price.data.item) continue;
+          const compendiumItemUuid = (await recursivelyAddItemsToCompendium(price.data.item).uuid);
+          price.data = { uuid: compendiumItemUuid };
+        }
+      }
+      setProperty(itemData, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData, { addRemoveFlag: true }));
+      return findOrCreateItemInCompendium(itemData);
+    }
+
+    const getActorItemUpdates = async (actorItems) => {
+      const items = actorItems.filter(item => PileUtilities.getItemFlagData(item).prices.length);
+      const updates = [];
+      for (const item of items) {
+        const flagData = PileUtilities.getItemFlagData(item);
+        let update = false;
+        if (!flagData.prices.length) continue;
+        for (const priceGroup of flagData.prices) {
+          for (const price of priceGroup) {
+            if (price.type !== "item" || !price.data.item) continue;
+            const compendiumItem = await recursivelyAddItemsToCompendium(price.data.item);
+            price.data = { uuid: compendiumItem.uuid };
+            update = true;
+          }
+        }
+        if (update) {
+          updates.push({
+            _id: item.id,
+            [CONSTANTS.FLAGS.VERSION]: version,
+            [CONSTANTS.FLAGS.ITEM]: PileUtilities.cleanItemFlagData(flagData)
+          })
+        }
+      }
+      return updates;
+    }
+
+    const updates = await getActorItemUpdates(filterValidItems(game.items, version));
+    if (updates.length) {
+      console.log(`Item Piles | Migrating ${updates.length} items to version ${version}...`);
+      await Item.updateDocuments(updates);
+    }
+
+    let updatedActors = 0;
+    for (const actor of actors) {
+      const items = getActorValidItems(actor, version);
+      const updates = await getActorItemUpdates(items);
+      if (updates.length) {
+        await actor.updateEmbeddedDocuments("Item", updates);
+        updatedActors++;
+      }
+    }
+    if (updatedActors) {
+      console.log(`Item Piles | Migrating ${updatedActors} actors with out of date items to version ${version}...`);
+    }
+
+    const { validTokensOnScenes } = getItemPileTokensOfLowerVersion(version);
+
+    let updatedTokens = 0;
+    for (const validToken of validTokensOnScenes) {
+      const items = getActorValidItems(actor, version);
+      const updates = await getActorItemUpdates(items);
+      if (updates.length) {
+        updatedTokens++;
+        await validToken.actor.updateEmbeddedDocuments("Item", updates);
+      }
+    }
+    if (updatedTokens) {
+      console.log(`Item Piles | Migrating ${updatedTokens} tokens with out of date items to version ${version}...`);
     }
 
   }
