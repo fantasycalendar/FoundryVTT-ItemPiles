@@ -102,7 +102,7 @@
     const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
 
     if (!uuid) {
-      uuid = CompendiumUtilities.findOrCreateItemInCompendium(itemData).uuid;
+      uuid = (await CompendiumUtilities.findOrCreateItemInCompendium(itemData)).uuid;
     }
 
     if (foundItem) {

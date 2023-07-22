@@ -4,7 +4,7 @@ import * as PileUtilities from "./helpers/pile-utilities.js";
 import SETTINGS from "./constants/settings.js";
 import { findOrCreateItemInCompendium } from "./helpers/compendium-utilities.js";
 
-const sortedMigrations = ["2.7.3", "2.4.0", "2.4.17", "2.6.1"];
+const sortedMigrations = ["2.7.5", "2.4.0", "2.4.17", "2.6.1"];
 
 export default async function runMigrations() {
 
@@ -294,7 +294,7 @@ const migrations = {
 
   },
 
-  "2.7.3": async (version) => {
+  "2.7.5": async (version) => {
 
     const actors = getItemPileActorsOfLowerVersion(version);
 
@@ -358,17 +358,17 @@ const migrations = {
 
     const { validTokensOnScenes } = getItemPileTokensOfLowerVersion(version);
 
-    let updatedTokens = 0;
-    for (const validToken of validTokensOnScenes) {
-      const items = getActorValidItems(actor, version);
-      const updates = await getActorItemUpdates(items);
-      if (updates.length) {
-        updatedTokens++;
-        await validToken.actor.updateEmbeddedDocuments("Item", updates);
+    for (const [sceneId, tokens] of validTokensOnScenes) {
+      let updatedTokens = 0;
+      for (const token of tokens) {
+        const items = getActorValidItems(token.actor, version);
+        const updates = await getActorItemUpdates(items);
+        if (updates.length) {
+          updatedTokens++;
+          await token.actor.updateEmbeddedDocuments("Item", updates);
+        }
       }
-    }
-    if (updatedTokens) {
-      console.log(`Item Piles | Migrating ${updatedTokens} tokens with out of date items to version ${version}...`);
+      console.log(`Item Piles | Migrating ${updatedTokens} tokens on scene "${sceneId}" to version ${version}...`);
     }
 
   }
