@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.6
+
+- Fixed custom item prices not working
+
 ## Version 2.7.5
 
 - Fixed faulty migration throwing errors

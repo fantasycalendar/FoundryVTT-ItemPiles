@@ -1,10 +1,11 @@
-import * as Utilities from "./utilities.js"
 import CONSTANTS from "../constants/constants.js";
-import * as Helpers from "./helpers.js";
 import { SYSTEMS } from "../systems.js";
 import SETTINGS from "../constants/settings.js";
 import { cachedActorCurrencies, cachedCurrencyList, cachedFilterList } from "./caches.js";
 import { hotkeyActionState } from "../hotkeys.js";
+import * as Utilities from "./utilities.js"
+import * as Helpers from "./helpers.js";
+import * as CompendiumUtilities from "./compendium-utilities.js";
 
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
@@ -1032,7 +1033,8 @@ export function getPriceData({
           priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
 
         } else {
-          const foundItem = Utilities.findSimilarItem(buyer.items, price.data.item);
+          const priceItem = CompendiumUtilities.getItemFromCache(price.data.uuid);
+          const foundItem = Utilities.findSimilarItem(buyer.items, priceItem);
           const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
           price.buyerQuantity = itemQuantity;
 
@@ -1200,7 +1202,7 @@ export function getPaymentData({
       }
 
       if (price.type === "item") {
-        buyerPrice.item = price.data.item;
+        buyerPrice.item = price.data.item ?? CompendiumUtilities.getItemFromCache(price.data.uuid);
       }
 
       // If we have met the price target (or exceeded it, eg, we need change), populate empty entry

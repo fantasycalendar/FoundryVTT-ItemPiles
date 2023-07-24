@@ -23,6 +23,7 @@ import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js"
 import ItemEditor from "./applications/item-editor/item-editor.js";
 import { setupPlugins } from "./plugins/main.js";
 import { setupCaches } from "./helpers/caches.js";
+import { initializeCompendiumCache } from "./helpers/compendium-utilities.js";
 
 Hooks.once("init", async () => {
   registerSettings();
@@ -78,7 +79,7 @@ Hooks.once("ready", () => {
     ChatAPI.initialize();
 
     registerHotkeysPost();
-    setupCaches();
+    initializeCompendiumCache();
     setupPlugins("ready");
 
     ChatAPI.disablePastTradingButtons();
