@@ -16,6 +16,7 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import GiveItemsShell from "../applications/dialogs/give-items-dialog/give-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 import { hotkeyActionState } from "../hotkeys.js";
+import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
 
 const preloadedFiles = new Set();
 

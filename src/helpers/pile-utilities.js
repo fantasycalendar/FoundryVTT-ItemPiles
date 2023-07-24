@@ -974,6 +974,9 @@ export function getPriceData({
         const cost = Math.round(price.quantity * itemModifier * quantity);
         const baseCost = Math.round(price.quantity * itemModifier);
         price.name = game.i18n.localize(price.name);
+        if (!price.data?.item) {
+          price.data.item = CompendiumUtilities.getItemFromCache(price.data.uuid);
+        }
         return {
           ...price,
           cost,
