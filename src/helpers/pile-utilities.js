@@ -1010,6 +1010,9 @@ export function getPriceData({
   for (const priceGroup of priceData) {
     priceGroup.maxQuantity = Infinity;
     if (priceGroup.baseCost !== undefined) {
+      priceGroup.prices.forEach(price => {
+        price.maxQuantity = Infinity;
+      });
       if (buyerInfiniteCurrencies) continue;
       priceGroup.maxQuantity = Math.floor(totalCurrencies / priceGroup.baseCost);
       priceGroup.prices.forEach(price => {
