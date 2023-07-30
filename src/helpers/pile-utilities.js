@@ -1572,18 +1572,21 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         (item) => item.documentId === newItem.documentId
       );
       if (existingItem) {
-        existingItem.quantity++;
+        existingItem.quantity += Math.max(Utilities.getItemQuantity(newItem.item), 1);
       } else {
         setProperty(newItem, "flags", newItem.item.flags);
         if (table?.customCategory && !getProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
           setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
         }
         items.push({
-          ...newItem
+          ...newItem,
+          quantity: Math.max(Utilities.getItemQuantity(newItem.item), 1)
         });
       }
     })
   }
+
+  console.log(items)
 
   return items;
 }

@@ -3,6 +3,7 @@
 ## Version 2.7.7
 
 - Tweaked populate items menu tables dropdown to recursively find every table under a folder
+- Fixed `game.api.itemPiles.rollItemTable` not respecting the rolled item's existing quantity
 
 ## Version 2.7.6
 

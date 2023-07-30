@@ -6,6 +6,7 @@
   import CustomDialog from "../components/CustomDialog.svelte";
   import ItemEntry from "./ItemEntry.svelte";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
+  import * as Utilities from "../../helpers/utilities.js";
   import { getSetting } from "../../helpers/helpers";
   import { slide } from "svelte/transition";
   import { quintOut } from "svelte/easing";
@@ -131,12 +132,11 @@
         const existingItem = items.find(
           (item) => item.documentId === newItem.documentId
         );
+        console.log(items, existingItem?.quantity, newItem.quantity);
         if (existingItem) {
-          existingItem.quantity++;
+          existingItem.quantity += newItem.quantity;
         } else {
-          items.push({
-            ...newItem
-          });
+          items.push(newItem);
         }
       });
       items.sort((a, b) => {
