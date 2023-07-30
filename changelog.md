@@ -4,6 +4,7 @@
 
 - Tweaked populate items menu tables dropdown to recursively find every table under a folder
 - Fixed `game.api.itemPiles.rollItemTable` not respecting the rolled item's existing quantity
+- Added item quantity to the populate items tab of merchant
 
 ## Version 2.7.6
 

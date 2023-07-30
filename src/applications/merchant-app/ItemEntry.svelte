@@ -1,4 +1,7 @@
 <script>
+
+  import QuantityColumn from "./QuantityColumn.svelte";
+
   export let item;
 
   const itemNameStore = item.name;
@@ -20,7 +23,6 @@
   $: quantity = $quantityStore;
   $: editQuantity = $quantityStore;
   $: itemName = $itemNameStore + ($itemQuantityForPrice > 1 ? ` (${$itemQuantityForPrice})` : "");
-  let showEditQuantity = false;
 
   const displayControlButtons = store.actor.isOwner;
   const displayBuyButton = !!store.recipient;
@@ -40,35 +42,20 @@
 
 	<div class="item-piles-name item-piles-text">
 		<div class="item-piles-name-container">
-		<span style="color: {$itemRarityColor || 'inherit'};">
-			{#if $pileData.canInspectItems || game.user.isGM}
-				<a class="item-piles-clickable" on:click={() => { item.preview() }}>
+			<span style="color: {$itemRarityColor || 'inherit'};">
+				{#if $pileData.canInspectItems || game.user.isGM}
+					<a class="item-piles-clickable" on:click={() => { item.preview() }}>
+						{itemName}
+					</a>
+				{:else}
 					{itemName}
-				</a>
-			{:else}
-				{itemName}
-			{/if}
-		</span>
-			{#if showEditQuantity}
-				<div class="item-piles-quantity-container" style="flex:0 1 50px;">
-					<div class="item-piles-quantity-input-container">
-						<input
-							class="item-piles-quantity"
-							type="text"
-							bind:value={editQuantity}
-							autofocus
-							on:change={() => {
-              showEditQuantity = false;
-              item.updateQuantity(editQuantity);
-            }}
-							on:keydown={(evt) => {
-              if (evt.key === "Enter") showEditQuantity = false;
-            }}
-						/>
-					</div>
-				</div>
-			{/if}
+				{/if}
+			</span>
 		</div>
+	</div>
+
+	<div class="item-piles-quantity-container">
+		<QuantityColumn {item} showX/>
 	</div>
 
 	<slot name="right"/>
@@ -87,6 +74,14 @@
   .merchant-item-hidden > * {
     font-style: italic;
     opacity: 0.5;
+  }
+
+  .item-piles-name {
+    flex: 0 1 auto;
+  }
+
+  .item-piles-quantity-container {
+    flex: 1;
   }
 
 </style>

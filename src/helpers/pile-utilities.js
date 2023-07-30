@@ -1547,10 +1547,11 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         if (!item) continue;
         const roll = new Roll(formula).evaluate({ async: false });
         if (roll.total <= 0) continue;
+        const quantity = roll.total * Math.max(Utilities.getItemQuantity(item), 1);
         tableItems.push({
           ...rollResult,
-          item: item,
-          quantity: roll.total
+          item,
+          quantity
         })
       }
 
@@ -1580,13 +1581,11 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         }
         items.push({
           ...newItem,
-          quantity: Math.max(Utilities.getItemQuantity(newItem.item), 1)
+          quantity: newItem.quantity
         });
       }
     })
   }
-
-  console.log(items)
 
   return items;
 }

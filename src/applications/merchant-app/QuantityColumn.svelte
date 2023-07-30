@@ -1,6 +1,7 @@
 <script>
 
   export let item;
+  export let showX = false;
 
   const store = item.store;
   const displayQuantityStore = item.displayQuantity;
@@ -35,7 +36,7 @@
 					class:item-piles-clickable-link={game.user.isGM}
 					on:click={() => {
             if (game.user.isGM) showEditQuantity = true;
-          }}>{$quantityStore}</span
+          }}>{showX ? "x" : ""}{$quantityStore}</span
 				>
 		{/if}
 	{/if}

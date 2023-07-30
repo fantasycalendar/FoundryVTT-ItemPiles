@@ -2268,8 +2268,7 @@ export default class PrivateAPI {
     for (const rollData of tableDraw.results) {
       const existingItem = items.find((item) => item.documentId === rollData.documentId);
       if (existingItem) {
-        existingItem.quantity += existingItem.baseQuantity;
-        Utilities.setItemQuantity(existingItem.item, existingItem.quantity);
+        existingItem.quantity += Utilities.getItemQuantity(existingItem.item);
       } else {
 
         let item;
@@ -2284,12 +2283,10 @@ export default class PrivateAPI {
 
         if (item instanceof Item) {
           const quantity = Math.max(Utilities.getItemQuantity(item), 1);
-          const itemData = Utilities.setItemQuantity(item.toObject(), quantity);
           items.push({
             ...rollData,
-            item: itemData,
-            quantity,
-            baseQuantity: quantity
+            item,
+            quantity
           });
         }
       }
