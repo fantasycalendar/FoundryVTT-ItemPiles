@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.7
+
+- Tweaked populate items menu tables dropdown to recursively find every table under a folder
+
 ## Version 2.7.6
 
 - Fixed custom item prices not working

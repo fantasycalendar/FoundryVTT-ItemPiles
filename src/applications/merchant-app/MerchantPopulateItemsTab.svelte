@@ -65,13 +65,23 @@
 
   let itemsRolled = writable([]);
 
+  function recurseThroughFoldersForTables(folderId) {
+    const folder = game.folders.find(f => f.type === "RollTable" && f.id === folderId);
+    let folders = [folder.id];
+    for (const child of folder.children) {
+      folders = folders.concat(recurseThroughFoldersForTables(child.folder.id))
+    }
+    return folders;
+  }
+
   function getTables() {
     let tables = Array.from(game.tables);
     const folderId = getSetting(SETTINGS.POPULATION_TABLES_FOLDER);
     if (
       folderId !== "root" && game.folders.find((f) => f.type === "RollTable" && f.id === folderId)
     ) {
-      tables = tables.filter((t) => t.folder?.id === folderId);
+      const folderIds = recurseThroughFoldersForTables(folderId)
+      tables = tables.filter((t) => folderIds.includes(t.folder?.id));
     }
 
     const mappedTables = {};
