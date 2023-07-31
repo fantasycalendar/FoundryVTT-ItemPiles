@@ -583,6 +583,34 @@ Closes any open interfaces from a given item pile actor
 
 ---
 
+### getMerchantPriceModifiers
+
+`game.itempiles.API.getMerchantPriceModifiers(target, options)` ⇒ `Object`
+
+Retrieves the price modifiers for a given item piles merchant
+
+| Param              | Type                                       | Default | Description |
+|--------------------|--------------------------------------------| --- | --- |
+| target             | `Actor/TokenDocument`                      |  | Target token or actor to retrieve the modifiers from |
+| options            | `object`                                   |  | Options to pass to the function |
+| [options.actor]    | `Token/TokenDocument/Actor/string/boolean` | `false` | The actor whose price modifiers to consider |
+| [options.absolute] | `boolean`                           | `false` | Whether to only consider the actor's modifiers (true means not considering the merchant's base modifiers) |
+
+---
+
+### updateMerchantPriceModifiers
+
+`game.itempiles.API.updateMerchantPriceModifiers(target, options)` ⇒ `Object`
+
+Updates the price modifiers for a given item piles merchant
+
+| Param | Type                                       | Default | Description |
+| --- |--------------------------------------------| --- | --- |
+| target | `Actor/TokenDocument`                      |  | Target token or actor to update modifiers on |
+| priceModifierData | `Array<{ actor?: Actor, actorUuid?: string, relative?: boolean, override?: boolean, buyPriceModifier?: number, sellPriceModifier?: number }>} priceModifierData`                                   |  | The price modifier data to update on the merchant|
+
+---
+
 ## Item and attribute methods
 
 ### addItems

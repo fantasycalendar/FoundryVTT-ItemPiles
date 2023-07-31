@@ -3,10 +3,10 @@
 ## Version 2.7.7
 
 - Added item quantity to the populate items tab of merchant
+- Added `game.itempiles.API.getMerchantPriceModifiers` and `game.itempiles.API.updateMerchantPriceModifiers` (see API docs)
 - Tweaked merchant populate items menu tables dropdown to recursively find every table under a folder
 - Tweaked merchant populate items to recursively roll all tables within tables, including tables in compendiums
 - Fixed `game.api.itemPiles.rollItemTable` not respecting the rolled item's existing quantity
--
 
 ## Version 2.7.6
 

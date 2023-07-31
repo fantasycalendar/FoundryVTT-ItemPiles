@@ -8,6 +8,7 @@ import ItemPileSocket from "../socket.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 import { SYSTEMS } from "../systems.js";
+import { getMerchantModifiersForActor } from "../helpers/pile-utilities.js";
 
 class API {
   /**
@@ -964,7 +965,7 @@ class API {
    */
   static async splitItemPileContents(target, { targets = false, instigator = false } = {}) {
 
-    if (!PileUtilities.isValidItemPile(target)) return false;
+    if (!PileUtilities.isItemPileLootable(target)) return false;
 
     const itemPileUuid = Utilities.getUuid(target);
     if (!itemPileUuid) throw Helpers.custom_error(`SplitItemPileContents | Could not determine the UUID, please provide a valid item pile`)
@@ -992,6 +993,125 @@ class API {
       .map(actor => Utilities.getUuid(actor));
 
     return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_PILE, itemPileUuid, actorUuids, game.user.id, instigator);
+
+  }
+
+  /**
+   * Retrieves the price modifiers for a given item piles merchant
+   *
+   * @param {Actor/TokenDocument} target                                      Target token or actor to retrieve the modifiers from
+   * @param {object} options                                                  Options to pass to the function
+   * @param {Token/TokenDocument/Actor/string/boolean} [options.actor=false]  The actor whose price modifiers to consider
+   * @param {boolean} [options.absolute=false]                                Whether to only consider the actor's modifiers (true means not considering the merchant's base modifiers)
+   *
+   * @return {Object}
+   */
+  static getMerchantPriceModifiers(target, { actor = false, absolute = false } = {}) {
+
+    const merchantActor = Utilities.getActor(target);
+
+    if (!(merchantActor instanceof Actor)) {
+      throw Helpers.custom_error(`getMerchantPriceModifiers | target must be of type Actor`);
+    }
+
+    if (!PileUtilities.isItemPileMerchant(merchantActor)) {
+      throw Helpers.custom_error(`getMerchantPriceModifiers | target is not an item pile merchant`);
+    }
+
+    if (actor) {
+      if (!(actor instanceof Actor) && typeof actor !== "string") {
+        throw Helpers.custom_error(`getMerchantPriceModifiers | actor must be of type Actor or string (UUID)`);
+      }
+      if (typeof actor === "string") {
+        actor = fromUuidSync(actor) || false;
+      }
+    }
+
+    if (typeof absolute !== "boolean") {
+      throw Helpers.custom_error(`getMerchantPriceModifiers | absolute must be of type boolean`);
+    }
+
+    return PileUtilities.getMerchantModifiersForActor(target, { actor, absolute });
+
+  }
+
+  /**
+   * Updates the price modifiers for a given item piles merchant
+   *
+   * @param {Actor/TokenDocument} target                                      Target token or actor to update modifiers on
+   * @param {Array<{
+   *   actor?: Actor,
+   *   actorUuid?: string,
+   *   relative?: boolean,
+   *   override?: boolean,
+   *   buyPriceModifier?: number,
+   *   sellPriceModifier?: number
+   * }>} priceModifierData                                                    The price modifier data to update on the merchant
+   *
+   * @return {Promise}
+   */
+  static updateMerchantPriceModifiers(target, priceModifierData = []) {
+
+    const merchantActor = Utilities.getActor(target);
+
+    const targetUuid = Utilities.getUuid(merchantActor);
+    if (!targetUuid) throw Helpers.custom_error(`updateMerchantPriceModifiers | Could not determine the UUID, please provide a valid target`);
+
+    if (!PileUtilities.isItemPileMerchant(merchantActor)) {
+      throw Helpers.custom_error(`updateMerchantPriceModifiers | Target is not an item pile merchant`);
+    }
+
+    const flagData = PileUtilities.getActorFlagData(merchantActor);
+
+    const actorPriceModifiers = flagData?.actorPriceModifiers ?? [];
+
+    for (const priceModifier of priceModifierData) {
+      if (priceModifier.actor && !(priceModifier.actor instanceof Actor)) {
+        throw Helpers.custom_error(`updateMerchantPriceModifiers | priceModifierData.actor must be of type Actor`);
+      }
+      if (priceModifier.actor) {
+        priceModifier.actorUuid = priceModifier.actor.uuid;
+      }
+      if (priceModifier.actorUuid && typeof priceModifier.actorUuid !== "string") {
+        throw Helpers.custom_error(`updateMerchantPriceModifiers | if priceModifierData.actor if not provided, priceModifierData.actorUuid must be of type string `);
+      }
+      if (!priceModifier.actorUuid) {
+        throw Helpers.custom_error(`updateMerchantPriceModifiers | Could not find the UUID for the given actor`);
+      }
+      if (priceModifier.relative !== undefined && typeof priceModifier.relative !== "boolean") {
+        throw Helpers.custom_error(`updateMerchantPriceModifiers | priceModifierData.relative must be of type boolean`);
+      }
+      if (priceModifier.override !== undefined && typeof priceModifier.override !== "boolean") {
+        throw Helpers.custom_error(`updateMerchantPriceModifiers | priceModifierData.override must be of type boolean`);
+      }
+      if (priceModifier.buyPriceModifier !== undefined && typeof priceModifier.buyPriceModifier !== "number") {
+        throw Helpers.custom_error(`updateMerchantPriceModifiers | priceModifierData.buyPriceModifier must be of type number`);
+      }
+      if (priceModifier.sellPriceModifier !== undefined && typeof priceModifier.sellPriceModifier !== "number") {
+        throw Helpers.custom_error(`updateMerchantPriceModifiers | priceModifierData.sellPriceModifier must be of type number`);
+      }
+
+      let actorPriceModifierIndex = actorPriceModifiers.findIndex(existingPriceModifier => existingPriceModifier.actorUuid === priceModifier.actorUuid);
+      if (actorPriceModifierIndex === -1) {
+        actorPriceModifierIndex = actorPriceModifiers.push({}) - 1;
+      }
+
+      const oldBuyPriceModifier = actorPriceModifiers[actorPriceModifierIndex]?.buyPriceModifier ?? flagData?.buyPriceModifier ?? 1;
+      const newBuyPriceModifier = Math.max(0, priceModifier.relative ? oldBuyPriceModifier + priceModifier.buyPriceModifier : priceModifier.buyPriceModifier ?? oldBuyPriceModifier);
+
+      const oldSellPriceModifier = actorPriceModifiers[actorPriceModifierIndex]?.sellPriceModifier ?? flagData?.sellPriceModifier ?? 0.5;
+      const newSellPriceModifier = Math.max(0, priceModifier.relative ? oldSellPriceModifier + priceModifier.sellPriceModifier : priceModifier.sellPriceModifier ?? oldSellPriceModifier);
+
+      actorPriceModifiers[actorPriceModifierIndex] = foundry.utils.mergeObject(actorPriceModifiers[actorPriceModifierIndex], {
+        actorUuid: priceModifier.actorUuid,
+        buyPriceModifier: newBuyPriceModifier,
+        sellPriceModifier: newSellPriceModifier,
+        override: priceModifier.override ?? false,
+      });
+
+    }
+
+    return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.UPDATE_PILE, targetUuid, { actorPriceModifiers });
 
   }
 

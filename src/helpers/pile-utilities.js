@@ -649,7 +649,8 @@ export function getMerchantModifiersForActor(merchant, {
   item = false,
   actor = false,
   pileFlagData = false,
-  itemFlagData = false
+  itemFlagData = false,
+  absolute = false
 } = {}) {
 
   let {
@@ -676,13 +677,14 @@ export function getMerchantModifiersForActor(merchant, {
   if (actor && actorPriceModifiers) {
     const actorSpecificModifiers = actorPriceModifiers?.find(data => data.actorUuid === Utilities.getUuid(actor) || data.actor === actor.id);
     if (actorSpecificModifiers) {
-      buyPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.buyPriceModifier : buyPriceModifier * actorSpecificModifiers.buyPriceModifier;
-      sellPriceModifier = actorSpecificModifiers.override ? actorSpecificModifiers.sellPriceModifier : sellPriceModifier * actorSpecificModifiers.sellPriceModifier;
+      buyPriceModifier = actorSpecificModifiers.override || absolute ? actorSpecificModifiers.buyPriceModifier ?? buyPriceModifier : buyPriceModifier * actorSpecificModifiers.buyPriceModifier;
+      sellPriceModifier = actorSpecificModifiers.override || absolute ? actorSpecificModifiers.sellPriceModifier ?? sellPriceModifier : sellPriceModifier * actorSpecificModifiers.sellPriceModifier;
     }
   }
 
   return {
-    buyPriceModifier, sellPriceModifier
+    buyPriceModifier: Helpers.roundToDecimals(buyPriceModifier, 2),
+    sellPriceModifier: Helpers.roundToDecimals(sellPriceModifier, 2)
   }
 }
 
