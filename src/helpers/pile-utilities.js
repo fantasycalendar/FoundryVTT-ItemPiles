@@ -1653,6 +1653,9 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         if (table?.customCategory && !getProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
           setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
         }
+        if (game.itemPiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itemPiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
+          setProperty(newItem, game.itemPiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, newItem.quantity);
+        }
         items.push({
           ...newItem,
           quantity: newItem.quantity
