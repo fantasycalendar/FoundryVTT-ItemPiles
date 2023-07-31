@@ -1599,8 +1599,10 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 
     if (!rollableTable) continue;
 
-    await rollableTable.reset();
-    await rollableTable.normalize();
+    if (!table.uuid.startsWith("Compendium")) {
+      await rollableTable.reset();
+      await rollableTable.normalize();
+    }
 
     let tableItems = [];
 
@@ -1610,7 +1612,8 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         const roll = new Roll(formula).evaluate({ async: false });
         if (roll.total <= 0) continue;
         const rollResult = rollableTable.results.get(itemId).toObject();
-        if (rollResult.documentCollection === "RollTable") {
+        const potentialPack = game.packs.get(rollResult.documentCollection);
+        if (rollResult.documentCollection === "RollTable" || potentialPack?.documentName === "RollTable") {
           const subTable = await getTable(rollResult);
           items.push(...(await rollMerchantTables({
             tableData: [{ uuid: subTable.uuid, addAll: false, timesToRoll: roll.total }], actor
