@@ -1145,12 +1145,12 @@ class API {
       } else if (itemData.item instanceof Item) {
         item = itemData.item.toObject();
         if (itemData.flags) {
-          setProperty(item, CONSTANTS.FLAGS.ITEM, getProperty(itemData, CONSTANTS.FLAGS.ITEM));
+          setProperty(item, "flags", getProperty(itemData, "flags"));
         }
       } else if (itemData.item) {
         item = itemData.item;
         if (itemData.flags) {
-          setProperty(item, CONSTANTS.FLAGS.ITEM, getProperty(itemData, CONSTANTS.FLAGS.ITEM));
+          setProperty(item, "flags", getProperty(itemData, "flags"));
         }
       } else if (itemData.id) {
         item = target.items.get(itemData.id);
@@ -1283,7 +1283,7 @@ class API {
       return {
         _id: item._id,
         quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(itemData), 0),
-        flags: getProperty(itemData, CONSTANTS.FLAGS.ITEM)
+        flags: getProperty(itemData, "flags")
       }
     });
 

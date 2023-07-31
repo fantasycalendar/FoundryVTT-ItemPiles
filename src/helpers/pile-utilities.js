@@ -1653,8 +1653,8 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         if (table?.customCategory && !getProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
           setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
         }
-        if (game.itemPiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itemPiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
-          setProperty(newItem, game.itemPiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, newItem.quantity);
+        if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
+          setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
         }
         items.push({
           ...newItem,
