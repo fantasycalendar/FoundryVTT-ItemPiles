@@ -1142,15 +1142,10 @@ class API {
       let item = itemData;
       if (itemData instanceof Item) {
         item = itemData.toObject();
-      } else if (itemData.item instanceof Item) {
-        item = itemData.item.toObject();
-        if (itemData.flags) {
-          setProperty(item, "flags", getProperty(itemData, "flags"));
-        }
       } else if (itemData.item) {
-        item = itemData.item;
+        item = itemData.item instanceof Item ? itemData.item.toObject() : itemData.item;
         if (itemData.flags) {
-          setProperty(item, "flags", getProperty(itemData, "flags"));
+          setProperty(item, "flags", foundry.utils.mergeObject(getProperty(item, "flags") ?? {}, getProperty(itemData, "flags")));
         }
       } else if (itemData.id) {
         item = target.items.get(itemData.id);
