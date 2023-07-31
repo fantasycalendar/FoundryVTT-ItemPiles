@@ -2243,54 +2243,13 @@ export default class PrivateAPI {
     userId = false,
   } = {}) {
 
-    const rollTable = await fromUuid(table);
-
-    if (!table.startsWith("Compendium")) {
-      if (resetTable) {
-        await rollTable.reset();
-      }
-
-      await rollTable.update({
-        results: rollTable.results.map(result => ({
-          _id: result.id, weight: result.range[1] - (result.range[0] - 1)
-        }))
-      });
-      await rollTable.normalize();
-    }
-
-    const roll = new Roll(timesToRoll.toString(), rollData).evaluate({ async: false });
-    if (roll.total <= 0) {
-      return [];
-    }
-
-    let items = [];
-    const tableDraw = await rollTable.drawMany(roll.total, { displayChat, recursive: true });
-    for (const rollData of tableDraw.results) {
-      const existingItem = items.find((item) => item.documentId === rollData.documentId);
-      if (existingItem) {
-        existingItem.quantity += Utilities.getItemQuantity(existingItem.item);
-      } else {
-
-        let item;
-        if (rollData.documentCollection === "Item") {
-          item = game.items.get(rollData.documentId);
-        } else {
-          const compendium = game.packs.get(rollData.documentCollection);
-          if (compendium) {
-            item = await compendium.getDocument(rollData.documentId);
-          }
-        }
-
-        if (item instanceof Item) {
-          const quantity = Math.max(Utilities.getItemQuantity(item), 1);
-          items.push({
-            ...rollData,
-            item,
-            quantity
-          });
-        }
-      }
-    }
+    let items = PileUtilities.rollTable({
+      tableUuid: table,
+      formula: timesToRoll,
+      resetTable,
+      displayChat,
+      rollData
+    })
 
     if (targetActor) {
       items = await this._addItems(targetActor, items, userId, { removeExistingActorItems });

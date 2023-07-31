@@ -18,8 +18,11 @@
 
   let populationTables = writable((get(store.pileData).tablesForPopulate ?? [])
     .map(t => {
+      if (t.id) {
+        t.uuid = game.tables.get(t.id).uuid;
+      }
       return {
-        id: t.id,
+        uuid: t.uuid,
         addAll: t.addAll ?? false,
         open: false,
         timesToRoll: t.timesToRoll ?? "1d4",
@@ -48,9 +51,9 @@
   const debounceSave = foundry.utils.debounce((popTables, actualTables) => {
     const pileData = foundry.utils.deepClone(get(store.pileData));
     pileData.tablesForPopulate = popTables
-      .filter((t) => actualTables[t.id])
+      .filter((t) => actualTables[t.uuid])
       .map((t) => ({
-        id: t.id, addAll: t.addAll, items: t.items, timesToRoll: t.timesToRoll, customCategory: t.customCategory
+        uuid: t.uuid, addAll: t.addAll, items: t.items, timesToRoll: t.timesToRoll, customCategory: t.customCategory
       }));
     PileUtilities.updateItemPileData(store.actor, pileData);
   }, 200);
@@ -58,7 +61,7 @@
   let selectableTables = [];
   let selectedTable = "";
   $: {
-    selectableTables = Object.entries($tables).filter(entry => !$populationTables.some(table => table.id === entry[0]));
+    selectableTables = Object.entries($tables).filter(entry => !$populationTables.some(table => table.uuid === entry[0]));
     const tableSet = new Set(selectableTables.map(e => e[0]));
     selectedTable = tableSet.has(selectedTable) ? selectedTable : tableSet.first();
   }
@@ -86,7 +89,7 @@
 
     const mappedTables = {};
     for (const table of tables) {
-      mappedTables[table.id] = {
+      mappedTables[table.uuid] = {
         name: table.name,
         items: Array.from(table.collections.results)
       }
@@ -109,7 +112,7 @@
 
   async function evaluateTable(table, keepRolledItems) {
 
-    const rollableTable = game.tables.get(table.id);
+    const rollableTable = await fromUuid(table.uuid);
     if (!rollableTable) return;
 
     if (!keepRolledItems) {
@@ -211,7 +214,7 @@
   function addTable() {
     populationTables.update((tabs) => {
       tabs.push({
-        id: selectedTable,
+        uuid: selectedTable,
         addAll: false,
         open: false,
         timesToRoll: "1d4-1",
@@ -222,9 +225,9 @@
     });
   }
 
-  async function removeTable(tableId) {
+  async function removeTable(tableUuid) {
 
-    const table = get(tables)[tableId];
+    const table = get(tables)[tableUuid];
 
     const doContinue = await TJSDialog.confirm({
       title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.RemoveMerchantTable.Title"),
@@ -248,7 +251,7 @@
     if (!doContinue) return;
 
     populationTables.update((tabs) => {
-      return tabs.filter((t) => t.id !== tableId);
+      return tabs.filter((t) => t.uuid !== tableUuid);
     });
   }
 
@@ -258,7 +261,7 @@
   let deleteId = Hooks.on("deleteRollTable", () => {
     tables.update(() => {
       const newTables = getTables();
-      populationTables.update(values => values.filter((t) => newTables[t.id]));
+      populationTables.update(values => values.filter((t) => newTables[t.uuid]));
       return newTables;
     });
   });
@@ -356,10 +359,10 @@
 					 style="min-height: 28px; padding: 3px 3px 3px 5px;">
 				<div class="item-piles-flexrow" style="align-items: center;">
 					<div style="max-width: 100%; overflow: hidden; text-overflow: ellipsis;">
-						<strong style="max-width:100%; word-break: break-all;">{$tables[table.id].name}</strong>
+						<strong style="max-width:100%; word-break: break-all;">{$tables[table.uuid].name}</strong>
 					</div>
 					<button class="item-piles-rolled-item-button"
-									on:click={() => { removeTable(table.id) }}
+									on:click={() => { removeTable(table.uuid) }}
 									data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
 									data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
@@ -391,12 +394,12 @@
 						<div class="item-piles-flexrow">
 							<div class="item-piles-flexrow" style="align-items: center; flex:0 1 auto; min-height:26px;">
 								<label style="flex:0 1 auto; margin-right:5px;"
-											 for={"table-id-"+table.id}>{localize("ITEM-PILES.Merchant.TableAddAllItems")}</label>
-								<input style="width:15px; height:15px; margin:0; flex:0;" id={"table-id-"+table.id}
+											 for={"table-id-"+table.uuid}>{localize("ITEM-PILES.Merchant.TableAddAllItems")}</label>
+								<input style="width:15px; height:15px; margin:0; flex:0;" id={"table-id-"+table.uuid}
 											 bind:checked={table.addAll}
 											 on:change={() => {
                            if(!table.addAll) return;
-                           table.items = Object.fromEntries($tables[table.id].items.map(item => [item.id, "1d4"]));
+                           table.items = Object.fromEntries($tables[table.uuid].items.map(item => [item.id, "1d4"]));
                          }}
 											 type="checkbox"/>
 							</div>
@@ -411,7 +414,7 @@
 							{/if}
 						</div>
 						{#if table.addAll}
-							{#each $tables[table.id].items as item (item.id)}
+							{#each $tables[table.uuid].items as item (item.id)}
 								<div class="item-piles-flexrow item-piles-item-row item-piles-odd-color">
 									<div class="item-piles-img-container">
 										<img class="item-piles-img" src={item.img}/>
@@ -447,8 +450,8 @@
 		<div class="item-piles-flexrow" style="margin-top: 0.5rem; flex-wrap:nowrap;">
 
 			<select bind:value={selectedTable} style="max-width: calc(100% - 81px);">
-				{#each selectableTables as [tableId, table] (tableId)}
-					<option value={tableId}>{table.name}</option>
+				{#each selectableTables as [tableUuid, table] (tableUuid)}
+					<option value={tableUuid}>{table.name}</option>
 				{/each}
 				{#if foundry.utils.isEmpty($tables)}
 					<option value="">

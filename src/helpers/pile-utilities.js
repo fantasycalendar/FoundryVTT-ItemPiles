@@ -1515,6 +1515,69 @@ export function clearVaultLog(actor) {
   });
 }
 
+export async function rollTable({
+  tableUuid,
+  formula = "1",
+  resetTable = true,
+  displayChat = false,
+  rollData = {}
+} = {}) {
+
+  const items = [];
+
+  const table = await fromUuid(tableUuid);
+
+  if (!tableUuid.startsWith("Compendium")) {
+    if (resetTable) {
+      await table.reset();
+    }
+
+    await table.update({
+      results: table.results.map(result => ({
+        _id: result.id, weight: result.range[1] - (result.range[0] - 1)
+      }))
+    });
+    await table.normalize();
+  }
+
+  const roll = new Roll(formula.toString(), rollData).evaluate({ async: false });
+  if (roll.total <= 0) {
+    return [];
+  }
+
+  const tableDraw = await table.drawMany(roll.total, { displayChat, recursive: true });
+  for (const rollData of tableDraw.results) {
+
+    const existingItem = items.find((item) => item.documentId === rollData.documentId);
+    if (existingItem) {
+      existingItem.quantity += Utilities.getItemQuantity(existingItem.item);
+    } else {
+
+      let item;
+      if (rollData.documentCollection === "Item") {
+        item = game.items.get(rollData.documentId);
+      } else {
+        const compendium = game.packs.get(rollData.documentCollection);
+        if (compendium) {
+          item = await compendium.getDocument(rollData.documentId);
+        }
+      }
+
+      if (item instanceof Item) {
+        const quantity = Math.max(Utilities.getItemQuantity(item), 1);
+        items.push({
+          ...rollData,
+          item,
+          quantity
+        });
+      }
+    }
+  }
+
+  return items;
+
+}
+
 export async function rollMerchantTables({ tableData = false, actor = false } = {}) {
 
   if (tableData && !Array.isArray(tableData)) {
@@ -1526,11 +1589,11 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
     return [];
   }
 
-  const items = [];
+  let items = [];
 
   for (const table of tableData) {
 
-    const rollableTable = game.tables.get(table.id);
+    const rollableTable = await fromUuid(table.uuid);
 
     if (!rollableTable) continue;
 
@@ -1542,11 +1605,18 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
     if (table.addAll) {
 
       for (const [itemId, formula] of Object.entries(table.items)) {
-        const rollResult = rollableTable.results.get(itemId).toObject();
-        const item = await getItem(rollResult);
-        if (!item) continue;
         const roll = new Roll(formula).evaluate({ async: false });
         if (roll.total <= 0) continue;
+        const rollResult = rollableTable.results.get(itemId).toObject();
+        if (rollResult.documentCollection === "RollTable") {
+          const subTable = await getTable(rollResult);
+          items.push(...(await rollMerchantTables({
+            tableData: [{ uuid: subTable.uuid, addAll: false, timesToRoll: roll.total }], actor
+          })))
+          continue;
+        }
+        const item = await getItem(rollResult);
+        if (!item) continue;
         const quantity = roll.total * Math.max(Utilities.getItemQuantity(item), 1);
         tableItems.push({
           ...rollResult,
@@ -1563,12 +1633,11 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         continue;
       }
 
-      tableItems = await game.itempiles.API.rollItemTable(rollableTable, { timesToRoll: roll.total });
+      tableItems = await rollTable({ tableUuid: table.uuid, formula: roll.total })
 
     }
 
     tableItems.forEach(newItem => {
-
       const existingItem = items.find(
         (item) => item.documentId === newItem.documentId
       );
@@ -1590,6 +1659,18 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
   return items;
 }
 
+async function getTable(itemToGet) {
+  let item;
+  if (itemToGet.documentCollection === "RollTable") {
+    item = game.tables.get(itemToGet.documentId);
+  } else {
+    const compendium = game.packs.get(itemToGet.documentCollection);
+    if (compendium) {
+      item = await compendium.getDocument(itemToGet.documentId);
+    }
+  }
+  return item;
+}
 
 async function getItem(itemToGet) {
   let item;
