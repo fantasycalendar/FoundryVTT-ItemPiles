@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.8
+
+- Added `userId` to macros that get executed when items are bought from merchants
+
 ## Version 2.7.7
 
 - Added item quantity to the populate items tab of merchants

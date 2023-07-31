@@ -2219,7 +2219,7 @@ export default class PrivateAPI {
         const itemFlagData = PileUtilities.getItemFlagData(entry.item);
         if (!itemFlagData.macro) continue;
         await Utilities.runMacro(itemFlagData.macro, {
-          seller: sellingActor, buyer: buyingActor, item: entry.item, quantity: entry.quantity
+          seller: sellingActor, buyer: buyingActor, item: entry.item, quantity: entry.quantity, userId
         });
       }
     }
