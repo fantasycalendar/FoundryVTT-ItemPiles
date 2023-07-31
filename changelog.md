@@ -7,6 +7,7 @@
 - Tweaked merchant populate items menu tables dropdown to recursively find every table under a folder
 - Tweaked merchant populate items to recursively roll all tables within tables, including tables in compendiums
 - Fixed `game.api.itemPiles.rollItemTable` not respecting the rolled item's existing quantity
+- Fixed holding keybind to force open the character sheet for item piles not working
 
 ## Version 2.7.6
 

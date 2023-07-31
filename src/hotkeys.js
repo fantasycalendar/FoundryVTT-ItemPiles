@@ -11,8 +11,8 @@ const HOTKEYS = {
 
 export const hotkeyActionState = {
   get openPileInventory() {
-    const down = game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.FORCE_DEFAULT_SHEET).some(key => {
-      return window.keyboard.downKeys.has(key);
+    const down = game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.FORCE_DEFAULT_SHEET).some(keybind => {
+      return window.keyboard.downKeys.has(keybind?.key);
     });
     return (
       (!down && !game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"))
