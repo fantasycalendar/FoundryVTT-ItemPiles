@@ -6,6 +6,7 @@
 - Added `game.itempiles.API.getMerchantPriceModifiers` and `game.itempiles.API.updateMerchantPriceModifiers` (see API docs)
 - Tweaked merchant populate items menu tables dropdown to recursively find every table under the configured tables folder
 - Tweaked merchant populate items to recursively roll all tables within tables, including tables in compendiums
+- Tweaked merchant populate items table behavior - if an item has quantity, item piles will assume that its quantity is how many one will get when buying 1 quantity of the item
 - Fixed `game.api.itemPiles.rollItemTable` not respecting the rolled item's existing quantity
 - Fixed holding keybind to force open the character sheet for item piles not working
 
