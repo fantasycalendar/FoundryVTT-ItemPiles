@@ -95,7 +95,7 @@
       },
       "ClearAllItems": {
         "Title": "Limpar todos os itens do ator",
-        "Content": "Isso limpará todos os itens do ator. Tem certeza de que deseja fazer isso?"
+        "Content": "Isso limpará todos os itens do comerciante. Tem certeza de que deseja fazer isso?"
       },
       "GiveItemUserNotActive": {
         "Title": "Dando item",
@@ -127,6 +127,10 @@
       "ClearVaultLog": {
         "Title": "Limpar registro do cofre?",
         "Content": "Tem certeza de que deseja limpar o registro do cofre \"{actor_name}\"?"
+      },
+      "ClearAllServices": {
+        "Title": "Limpar todos os serviços do ator",
+        "Content": "Isso limpará todos os serviços do comerciante, você tem certeza de que deseja fazer isso?"
       }
     },
     "Currencies": "Moedas",
@@ -143,7 +147,9 @@
       "PileLocked": "Esta pilha de itens está trancada ou não pode ser aberta - você não pode soltar itens nela.",
       "DropNoToken": "Você não tem um token nesta cena, então não pode soltar itens aqui.",
       "DisallowedItemSell": "Este comerciante não aceita itens \"{type}\"",
-      "NoTokenFound": "Não foi possível encontrar um token ou personagem para representá-lo."
+      "NoTokenFound": "Não foi possível encontrar um token ou personagem para representá-lo.",
+      "NoVaultAccessActor": "{actor_name} não tem permissão para visualizar este cofre.",
+      "NoVaultAccess": "Você não tem permissão para visualizar este cofre."
     },
     "Inspect": {
       "Title": "Inspecionar conteúdo da pilha",
@@ -250,7 +256,9 @@
       "TooltipConfigureTable": "Configurar tabela",
       "TableAddAllItems": "Adicionar todos os itens:",
       "TableTimesToRoll": "Vezes para rolar na tabela:",
-      "TableCustomCategory": "Adicionar itens à categoria personalizada:"
+      "TableCustomCategory": "Adicionar itens à categoria personalizada:",
+      "CurrentServices": "Serviços atuais",
+      "ClearAllServices": "Limpar todos os serviços do ator"
     },
     "Applications": {
       "DropItem": {
@@ -288,7 +296,9 @@
         "MoreToCome": "E com mais opções de configuração por vir...",
         "Request": "Solicite novos recursos aqui.",
         "Submit": "Enviar configurações",
-        "Styles": "Configurações de Estilo"
+        "Styles": "Configurações de Estilo",
+        "Import": "Importar Configurações",
+        "Export": "Exportar Configurações"
       },
       "CurrenciesEditor": {
         "Title": "Editor de moedas do Item Piles",
@@ -576,7 +586,9 @@
           "LogVaultAccessExplanation": "Quando ativado, este cofre criará uma entrada de diário e registros com carimbo de data/hora sempre que o cofre for interagido.",
           "ManageAccess": "Gerenciar o acesso",
           "Title": "Configurações do cofre",
-          "Layout": "Layout"
+          "Layout": "Layout",
+          "RestrictAccess": "Restringir Acesso ao Cofre",
+          "RestrictAccessExplanation": "Por padrão, todos podem acessar os cofres se puderem vê-los na barra lateral ou chegarem perto deles em uma cena. Quando esta configuração é ativada, o cofre só será visível pelo proprietário do personagem do cofre ou por usuários/personagens configurados no Editor de Acesso (veja abaixo)."
         }
       },
       "PricePresetEditor": {
@@ -632,7 +644,12 @@
       "VaultAccessEditor": {
         "Title": "Editor de acesso ao cofre",
         "Explanation": "Isso configura quais personagens e jogadores podem acessar e modificar o inventário e as moedas do cofre. Se um jogador possuir o personagem do cofre, ele sempre terá acesso total.",
-        "TitleActor": "Editor de acesso ao cofre: {actor_name}"
+        "TitleActor": "Editor de acesso ao cofre: {actor_name}",
+        "View": "Visualizar",
+        "Organize": "Organizar",
+        "Deposit": "Depositar",
+        "Character": "Jogador/Personagem",
+        "Withdraw": "Sacar"
       },
       "WithdrawItem": {
         "Title": "Retirar Item",
