@@ -1,5 +1,16 @@
 # Item Piles Changelog
 
+## Version 2.7.9
+
+- Added better support for item prices in PF1e (thanks Mana on github!)
+- Added `game.itempiles.hooks.PRE_RENDER_INTERFACE` hook
+- Added support for buy and sell specific merchant columns
+- Updated Portuguese (Brazil) localization (thanks ltsoares on weblate!)
+- Fixed vaults and merchants sometimes changing token image and name to the last item in their inventory
+- Fixed prices sometimes not formatting correctly in Level Up A5e due to being strings, not numbers
+- Fixed item pile sheets not rendering properly in Level Up A5e
+- Fixed `game.itempiles.API.rollItemTable` not working
+
 ## Version 2.7.8
 
 - Added `userId` to macros that get executed when items are bought from merchants

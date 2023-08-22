@@ -179,6 +179,8 @@ CONSTANTS.HOOKS = {
   RESET_SETTINGS: module`resetSettings`,
   PRE_TRANSFER_EVERYTHING: module`preTransferEverything`,
   TRANSFER_EVERYTHING: module`transferEverything`,
+  PRE_RENDER_SHEET: module`preRenderActorSheet`,
+  PRE_RENDER_INTERFACE: module`preRenderInterface`,
   PRE_OPEN_INTERFACE: module`preOpenInterface`,
   OPEN_INTERFACE: module`openInterface`,
   PRE_CLOSE_INTERFACE: module`preCloseInterface`,

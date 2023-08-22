@@ -60,9 +60,21 @@ export default {
 
   "PILE_DEFAULTS": {
     merchantColumns: [{
+      label: "<i class=\"fa-solid fa-shield\"></i>",
+      path: "system.equipped",
+      formatting: "{#}",
+      buying: false,
+      selling: true,
+      mapping: {
+        "true": "✔",
+        "false": ""
+      }
+    }, {
       label: "Rarity",
       path: "system.rarity",
       formatting: "{#}",
+      buying: true,
+      selling: true,
       mapping: {
         "common": "DND5E.ItemRarityCommon",
         "uncommon": "DND5E.ItemRarityUncommon",

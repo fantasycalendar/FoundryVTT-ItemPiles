@@ -366,6 +366,7 @@ class API {
    *   PILE_DEFAULTS: Object,
    *   TOKEN_FLAG_DEFAULTS: Object,
    *   ITEM_TRANSFORMER: undefined/Function,
+   *   SHEET_OVERRIDES: undefined/Function,
    *   CURRENCIES: Array<{
    *     primary: boolean,
    *     type: string ["attribute"/"item"],
@@ -397,6 +398,7 @@ class API {
       PILE_DEFAULTS: {},
       TOKEN_FLAG_DEFAULTS: {},
       ITEM_TRANSFORMER: null,
+      SHEET_OVERRIDES: null,
       CURRENCIES: [],
       SECONDARY_CURRENCIES: [],
       CURRENCY_DECIMAL_DIGITS: 0.00001
@@ -441,6 +443,12 @@ class API {
       }
       if (typeof data['ITEM_TRANSFORMER']({}) !== "object") {
         throw Helpers.custom_error("addSystemIntegration | data.ITEM_TRANSFORMER's return value must be of type object");
+      }
+    }
+
+    if (data['SHEET_OVERRIDES']) {
+      if (!Helpers.isFunction(data['SHEET_OVERRIDES'])) {
+        throw Helpers.custom_error("addSystemIntegration | data.SHEET_OVERRIDES must be of type function");
       }
     }
 

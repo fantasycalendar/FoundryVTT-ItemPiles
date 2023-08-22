@@ -405,7 +405,7 @@ export function getItemPileTokenImage(token, {
       : pileDocument.prototypeToken.texture.src
   );
 
-  if (!isValidItemPile(pileDocument)) return originalImg;
+  if (!isValidItemPile(pileDocument, itemPileData) || !isItemPileLootable(pileDocument, itemPileData)) return originalImg;
 
   items = items || getActorItems(pileDocument);
   currencies = currencies || getActorCurrencies(pileDocument);
@@ -457,7 +457,7 @@ export function getItemPileTokenScale(target, {
       : pileDocument.prototypeToken.texture.scaleX
   );
 
-  if (!isValidItemPile(pileDocument, itemPileData)) {
+  if (!isValidItemPile(pileDocument, itemPileData) || !isItemPileLootable(pileDocument, itemPileData)) {
     return baseScale;
   }
 
@@ -482,7 +482,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
   let name = overrideName ?? (pileDocument instanceof TokenDocument ? pileDocument.name : pileDocument.prototypeToken.name);
 
-  if (!isValidItemPile(pileDocument, itemPileData)) {
+  if (!isValidItemPile(pileDocument, itemPileData) || !isItemPileLootable(pileDocument, itemPileData)) {
     return name;
   }
 
@@ -792,7 +792,7 @@ export function getPriceFromString(str, currencyList = false) {
 
   const splitBy = new RegExp("(.*?) *(" + currencies.map(currency => currency.identifier).join("|") + ")", "g");
 
-  const parts = [...str.trim().toLowerCase().matchAll(splitBy)];
+  const parts = [...str.split(",").join("").split(" ").join("").trim().toLowerCase().matchAll(splitBy)];
 
   let overallCost = 0;
   for (const part of parts) {

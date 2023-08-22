@@ -1,6 +1,8 @@
+import CONSTANTS from "../constants/constants.js";
+
 export default {
 
-  "VERSION": "1.0.0",
+  "VERSION": "1.0.1",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -81,5 +83,22 @@ export default {
       primary: false,
       exchangeRate: 0.01
     }
-  ]
+  ],
+
+  "SHEET_OVERRIDES": () => {
+
+    libWrapper.register(CONSTANTS.MODULE_NAME, `game.a5e.applications.ActorSheetA5e.prototype.render`, function (wrapped, forced, options, ...args) {
+      const renderItemPileInterface = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_SHEET, this.actor, forced, options) === false;
+      if (this._state > Application.RENDER_STATES.NONE) {
+        if (renderItemPileInterface) {
+          wrapped(forced, options, ...args)
+        } else {
+          return wrapped(forced, options, ...args)
+        }
+      }
+      if (renderItemPileInterface) return;
+      return wrapped(forced, options, ...args);
+    }, "MIXED");
+
+  }
 };

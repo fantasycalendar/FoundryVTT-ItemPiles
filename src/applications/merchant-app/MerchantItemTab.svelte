@@ -74,7 +74,7 @@
               $inverseSortStore = $sortTypeStore === columnIndex+1 ? !$inverseSortStore : false;
               $sortTypeStore = columnIndex+1;
 						}}>
-								{column.label}
+								{@html column.label}
 								<i class="fas"
 									 class:fa-chevron-down={!$inverseSortStore && $sortTypeStore === columnIndex+1}
 									 class:fa-chevron-up={$inverseSortStore && $sortTypeStore === columnIndex+1}
@@ -102,7 +102,7 @@
               $inverseSortStore = $sortTypeStore === columnIndex + 1 ? !$inverseSortStore : false;
               $sortTypeStore = columnIndex + 1;
 						}}>
-							{column.label}
+							{@html column.label}
 							<i class="fas"
 								 class:fa-chevron-down={!$inverseSortStore && $sortTypeStore === columnIndex+1}
 								 class:fa-chevron-up={$inverseSortStore && $sortTypeStore === columnIndex+1}

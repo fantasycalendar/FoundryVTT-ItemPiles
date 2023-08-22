@@ -18,7 +18,7 @@
 </script>
 
 <div>
-	<span>{text}</span>
+	<span>{@html text}</span>
 </div>
 
 <style lang="scss">

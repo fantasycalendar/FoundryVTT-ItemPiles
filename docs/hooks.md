@@ -9,6 +9,7 @@
   - [item-piles-transferEverything](#item-piles-transferEverything)
 
 - [Interfaces](#Interfaces)
+  - [item-piles-preRenderInterface](#item-piles-preRenderInterface)
   - [item-piles-preOpenInterface](#item-piles-preOpenInterface)
   - [item-piles-openInterface](#item-piles-openInterface)
   - [item-piles-preCloseInterface](#item-piles-preCloseInterface)
@@ -139,6 +140,17 @@ Called after all items and attributes have been transferred from the source to t
 ## Interfaces
 
 ## The only supported interfaces are regular item piles and merchants.
+
+### item-piles-preRenderInterface
+
+Called before an item piles related interface has begun rendering.
+
+| Param            | Type                                     | Description                                                                                     |
+|------------------|------------------------------------------|-------------------------------------------------------------------------------------------------|
+| source           | <code>Actor/TokenDocument</code>         | The item pile actor                                                                             |
+| inspectingTarget | <code>Actor/TokenDocument,Boolean</code> | The actor/token that started to render the interface                                            |
+
+If the hook returns `false`, the action is interrupted.
 
 ### item-piles-preOpenInterface
 

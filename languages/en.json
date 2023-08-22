@@ -657,8 +657,10 @@
         "TitleActor": "Merchant Columns: {actor_name}",
         "Explanation": "This configures the columns visible in the merchant UI, beyond the name of the item, the quantity, and the price.",
         "Label": "Label",
-        "PropertyPath": "Item Property Path",
+        "PropertyPath": "Property Path",
         "Formatting": "Formatting",
+        "Buying": "Buying",
+        "Selling": "Selling",
         "ConfigureMapping": "Configure Mapping",
         "MappingTitle": "Merchant Columns Mapping: {label}",
         "MappingContent": "This configures the mapping between the value of the property to a label. This label can be a localized string."

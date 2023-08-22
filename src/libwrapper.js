@@ -3,6 +3,7 @@ import PrivateAPI from "./API/private-api.js";
 import * as PileUtilities from "./helpers/pile-utilities.js";
 import * as Helpers from "./helpers/helpers.js";
 import { hotkeyActionState } from "./hotkeys.js";
+import { SYSTEMS } from "./systems.js";
 
 export default function registerLibwrappers() {
 
@@ -33,8 +34,15 @@ export default function registerLibwrappers() {
     return wrapped(event);
   }, "MIXED");
 
+  Hooks.on(CONSTANTS.HOOKS.PRE_RENDER_SHEET, (doc, forced, options) => {
+    const renderItemPileInterface = forced && !options?.bypassItemPiles && PileUtilities.isValidItemPile(doc) && hotkeyActionState.openPileInventory;
+    if (!renderItemPileInterface) return;
+    game.itempiles.API.renderItemPileInterface(doc, { useDefaultCharacter: true });
+    return false;
+  })
+
   libWrapper.register(CONSTANTS.MODULE_NAME, `ActorSheet.prototype.render`, function (wrapped, forced, options, ...args) {
-    const renderItemPileInterface = forced && !options?.bypassItemPiles && PileUtilities.isValidItemPile(this.document) && hotkeyActionState.openPileInventory;
+    const renderItemPileInterface = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_SHEET, this.document, forced, options) === false;
     if (this._state > Application.RENDER_STATES.NONE) {
       if (renderItemPileInterface) {
         wrapped(forced, options, ...args)
@@ -42,11 +50,12 @@ export default function registerLibwrappers() {
         return wrapped(forced, options, ...args)
       }
     }
-    if (renderItemPileInterface) {
-      game.itempiles.API.renderItemPileInterface(this.document, { useDefaultCharacter: true });
-      return;
-    }
+    if (renderItemPileInterface) return;
     return wrapped(forced, options, ...args);
   }, "MIXED");
+
+  if (SYSTEMS.DATA.SHEET_OVERRIDES) {
+    SYSTEMS.DATA.SHEET_OVERRIDES();
+  }
 
 }

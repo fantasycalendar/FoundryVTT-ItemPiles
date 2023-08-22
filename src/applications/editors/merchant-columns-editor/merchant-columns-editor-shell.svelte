@@ -21,7 +21,9 @@
         label: "",
         path: "",
         formatting: "{#}",
-        mapping: {}
+        mapping: {},
+        buying: true,
+        selling: true
       });
       return value;
     });
@@ -88,6 +90,12 @@
 				<div class="item-piles-flexcol">
 					<span>{localize("ITEM-PILES.Applications.MerchantColumnsEditor.Formatting")}</span>
 				</div>
+				<div class="item-piles-flexcol">
+					<span>{localize("ITEM-PILES.Applications.MerchantColumnsEditor.Buying")}</span>
+				</div>
+				<div class="item-piles-flexcol">
+					<span>{localize("ITEM-PILES.Applications.MerchantColumnsEditor.Selling")}</span>
+				</div>
 				<div class="item-piles-flexcol"></div>
 				<a on:click={() => addColumn()} style="margin-right: 0.5rem;">
 					<i class="fas fa-plus"></i>
@@ -104,6 +112,12 @@
 					</div>
 					<div>
 						<input type="text" bind:value={column.formatting} required/>
+					</div>
+					<div>
+						<input type="checkbox" bind:checked={column.buying}/>
+					</div>
+					<div>
+						<input type="checkbox" bind:checked={column.selling}/>
 					</div>
 					<div>
 						<button type="button" on:click={() => showMappingEditor(index)} disabled={!column.label || !column.path}>
@@ -136,7 +150,7 @@
 
   .item-pile-column-grid {
     display: grid;
-    grid-template-columns: 1fr 0.75fr 0.75fr 1fr auto;
+    grid-template-columns: 1fr 1fr 0.5fr 50px 50px 1fr auto;
     gap: 4px;
 
     select {
@@ -147,13 +161,19 @@
       display: contents;
       border-bottom: 1px solid rgba(0, 0, 0, 0.5);
 
+      & > div {
+        display: flex;
+        justify-content: center;
+      }
+
       button {
         line-height: 1.3rem;
       }
     }
 
     .item-piles-grid-row-wrapper:first-of-type {
-      > div {
+      & > div {
+        display: block;
         margin-bottom: 0.25rem;
         text-align: center;
 

@@ -57,6 +57,8 @@ export default {
       "label": "Rarity",
       "path": "system.traits.rarity",
       "formatting": "{#}",
+      "buying": true,
+      "selling": true,
       "mapping": {
         "common": "PF2E.TraitCommon",
         "uncommon": "PF2E.TraitUncommon",
@@ -67,6 +69,8 @@ export default {
       "label": "Bulk",
       "path": "system.bulk.value",
       "formatting": "{#}",
+      "buying": true,
+      "selling": true,
       "mapping": { "0": "" }
     }]
   },

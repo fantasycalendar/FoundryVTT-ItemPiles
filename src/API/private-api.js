@@ -2048,6 +2048,9 @@ export default class PrivateAPI {
       inspectingTarget = inspectingTargetUuid ? fromUuidSync(inspectingTargetUuid) : false;
     }
 
+    const hookResult = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_INTERFACE, target, inspectingTarget)
+    if (hookResult === false) return;
+
     if (PileUtilities.isItemPileVault(target)) {
       return BankVaultApp.show(target, inspectingTarget)
     }
@@ -2243,7 +2246,7 @@ export default class PrivateAPI {
     userId = false,
   } = {}) {
 
-    let items = PileUtilities.rollTable({
+    let items = await PileUtilities.rollTable({
       tableUuid: table,
       formula: timesToRoll,
       resetTable,

@@ -62,75 +62,16 @@ export default class MerchantStore extends ItemPileStore {
     let setup = false;
     super.setupSubscriptions();
     this.subscribeTo(this.pileData, (pileData) => {
-
       this.isMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
-
-      const customColumns = foundry.utils.deepClone(pileData.merchantColumns)
-        .map(column => ({
-          label: localize(column.label),
-          component: CustomColumn,
-          data: column,
-          sortMethod: (a, b, inverse) => {
-            const path = column.path;
-            const AProp = getProperty(b.item, path);
-            const BProp = getProperty(a.item, path);
-            if (!column?.mapping?.[AProp] || !column?.mapping?.[BProp]) {
-              return (AProp > BProp ? 1 : -1) * (inverse ? -1 : 1);
-            }
-            const keys = Object.keys(column.mapping);
-            return (keys.indexOf(AProp) - keys.indexOf(BProp)) * (inverse ? -1 : 1);
-          }
-        }));
-
-      const columns = [];
-
-      columns.push({
-        label: "Type",
-        component: ItemEntry
-      });
-
-      if (pileData.displayQuantity !== "alwaysno") {
-        columns.push({
-          label: "Quantity",
-          component: QuantityColumn,
-          sortMethod: (a, b, inverse) => {
-            return (get(b.quantity) - get(a.quantity)) * (inverse ? -1 : 1);
-          }
-        })
-      }
-
-      columns.push(...customColumns)
-      columns.push({
-        label: "Price",
-        component: PriceSelector,
-        sortMethod: (a, b, inverse) => {
-          const APrice = get(a.prices).find(price => price.primary);
-          const BPrice = get(b.prices).find(price => price.primary);
-          if (!APrice) return 1;
-          if (!BPrice) return -1;
-          return (BPrice.totalCost - APrice.totalCost) * (inverse ? -1 : 1);
-        }
-      })
-      columns.push({
-        label: false,
-        component: EntryButtons
-      });
-
-      this.itemColumns.set(columns);
-
-      const sortTypes = columns.filter(col => col.label);
-
-      sortTypes.splice(1, 0, { label: "Name" });
-
-      this.sortTypes.set(sortTypes)
-
+      this.setupColumns(pileData);
       if (!setup) return;
       this.updatePriceModifiers();
       this.updateOpenCloseStatus();
 
     });
     if (this.recipientDocument) {
-      this.subscribeTo(this.recipientPileData, () => {
+      this.subscribeTo(this.recipientPileData, (pileData) => {
+        this.setupColumns(pileData);
         if (!setup) return;
         this.updatePriceModifiers();
       });
@@ -155,6 +96,72 @@ export default class MerchantStore extends ItemPileStore {
     this.updatePriceModifiers();
     this.updateOpenCloseStatus();
     this.refreshItems();
+  }
+
+  setupColumns(pileData) {
+
+    const customColumns = foundry.utils.deepClone(pileData.merchantColumns ?? [])
+      .filter(column => {
+        return this.isMerchant ? (column?.buying ?? true) : (column?.selling ?? true);
+      })
+      .map(column => ({
+        label: localize(column.label),
+        component: CustomColumn,
+        data: column,
+        sortMethod: (a, b, inverse) => {
+          const path = column.path;
+          const AProp = getProperty(b.item, path);
+          const BProp = getProperty(a.item, path);
+          if (!column?.mapping?.[AProp] || !column?.mapping?.[BProp]) {
+            return (AProp > BProp ? 1 : -1) * (inverse ? -1 : 1);
+          }
+          const keys = Object.keys(column.mapping);
+          return (keys.indexOf(AProp) - keys.indexOf(BProp)) * (inverse ? -1 : 1);
+        }
+      }));
+
+    const columns = [];
+
+    columns.push({
+      label: "Type",
+      component: ItemEntry
+    });
+
+    if (pileData.displayQuantity !== "alwaysno") {
+      columns.push({
+        label: "Quantity",
+        component: QuantityColumn,
+        sortMethod: (a, b, inverse) => {
+          return (get(b.quantity) - get(a.quantity)) * (inverse ? -1 : 1);
+        }
+      })
+    }
+
+    columns.push(...customColumns)
+    columns.push({
+      label: "Price",
+      component: PriceSelector,
+      sortMethod: (a, b, inverse) => {
+        const APrice = get(a.prices).find(price => price.primary);
+        const BPrice = get(b.prices).find(price => price.primary);
+        if (!APrice) return 1;
+        if (!BPrice) return -1;
+        return (BPrice.totalCost - APrice.totalCost) * (inverse ? -1 : 1);
+      }
+    })
+    columns.push({
+      label: false,
+      component: EntryButtons
+    });
+
+    this.itemColumns.set(columns);
+
+    const sortTypes = columns.filter(col => col.label);
+
+    sortTypes.splice(1, 0, { label: "Name" });
+
+    this.sortTypes.set(sortTypes)
+
   }
 
   refreshItemPrices() {
