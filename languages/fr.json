@@ -857,13 +857,15 @@
       "MerchantColumnsEditor": {
         "TitleActor": "Colonnes Marchand : {actor_name}",
         "Label": "Étiquette",
-        "PropertyPath": "Chemin de la propriété de l'objet",
+        "PropertyPath": "Chemin de la propriété",
         "Formatting": "Formatage",
         "ConfigureMapping": "Configurer la correspondance",
         "MappingContent": "Ceci configure la correspondance entre la valeur de la propriété à une étiquette. Cette étiquette peut être une chaine localisée.",
         "Title": "Colonnes marchand",
         "Explanation": "Ceci configure les colonnes visibles dans l'IU Marchand, au delà du nom, de la quantité et du prix de l'objet.",
-        "MappingTitle": "Cartographie des colonnes marchand : {label}"
+        "MappingTitle": "Cartographie des colonnes marchand : {label}",
+        "Buying": "Achat",
+        "Selling": "Vente"
       },
       "SecondaryCurrenciesEditor": {
         "Explanation": "Vous pouvez définir ici les devises secondaires qui peuvent être ramassées et déposées par les personnages.",
