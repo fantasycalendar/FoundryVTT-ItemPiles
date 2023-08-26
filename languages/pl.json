@@ -24,7 +24,9 @@
       "DropNoToken": "Nie masz token'a na tej scenie, więc nie możesz upuścić żadnych przedmiotów tutaj.",
       "NoSourceDrop": "Nie możesz upuszczać przedmioty z katalogu przedmiotów jeżeli nie jesteś GM'em.",
       "PileLocked": "Ten pojemnik jest zamknięty i nie można go otworzyć - nie możesz upuszczać przedmioty do niego.",
-      "NoTokenFound": "Nie udało się znaleźć tokenu ani postaci, która by cię reprezentowała."
+      "NoTokenFound": "Nie udało się znaleźć tokenu ani postaci, która by cię reprezentowała.",
+      "NoVaultAccess": "Nie masz uprawnień do wyświetlania tego sejfu.",
+      "NoVaultAccessActor": "{actor_name} nie ma uprawnień do wyświetlania tego sejfu."
     },
     "Warnings": {
       "GiveItemDeclined": "{user_name} odrzucił twoją ofertę.",
@@ -155,7 +157,9 @@
       "AddTable": "Dodaj tabelę",
       "RollAllTables": "Rzuć wszystkie tabele",
       "Service": "Usługi",
-      "BuyServices": "Kupno usług"
+      "BuyServices": "Kupno usług",
+      "CurrentServices": "Bieżące usługi",
+      "ClearAllServices": "Wyczyść wszystkie usługi aktora"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -206,7 +210,7 @@
       },
       "ClearAllItems": {
         "Title": "Wyczyść wszystkie pozycje dotyczące aktora",
-        "Content": "To wyczyści wszystkie przedmioty aktora, czy na pewno chcesz to zrobić?"
+        "Content": "Spowoduje to wyczyszczenie wszystkich przedmiotów sprzedawcy, czy na pewno chcesz to zrobić?"
       },
       "RemoveMerchantTable": {
         "Title": "Usuń tabelę kupca",
@@ -222,6 +226,10 @@
       "GiveItemUserNotActive": {
         "Content": "\"{actor_name}\" jest własnością gracza \"{user_name}\" ale nie są oni aktywni, więc nie możesz dać im tego przedmiotu.",
         "Title": "Otrzymany przedmiot"
+      },
+      "ClearAllServices": {
+        "Title": "Wyczyść wszystkie usługi aktora",
+        "Content": "Spowoduje to wyczyszczenie wszystkich usług sprzedawcy, czy na pewno chcesz to zrobić?"
       }
     },
     "Items": "Przedmioty",
@@ -254,10 +262,10 @@
     },
     "Applications": {
       "WithdrawItem": {
-        "Submit": "Wycofywanie",
+        "Submit": "Wycofaj",
         "Content": "Czy chcesz wycofać tę pozycję z \"{target_name}\"?",
         "ContentMultipleQuantity": "Jest {quantity} tej pozycji, ile chcesz wycofać?",
-        "Title": "Wycofanie przedmiotu",
+        "Title": "Wycofaj przedmiot",
         "Header": "Wycofujesz: {item_name}"
       },
       "SplitItem": {
@@ -380,7 +388,8 @@
         "CustomCategory": "Kategoria pozycji niestandardowej",
         "InfiniteQuantityNo": "Nie, standardowa ilość",
         "ServiceExplanation": "Powoduje to, że ten przedmiot nie dodaje się do inwentarza kupca. Usługa \"item\" może nadal mieć ilość, ale jeśli się skończy, nie zostanie usunięta z kupca, ale zamiast tego ustawiona na nie do sprzedaży.",
-        "KeepOnMerchantExplanation": "Gdy przedmioty zostaną wyczyszczone w zakładce wypełnij przedmioty sprzedawców lub przez integrację Simple Calendar odświeżającą zapasy (patrz konfiguracja sprzedawcy na dole), ten przedmiot zawsze pozostanie."
+        "KeepOnMerchantExplanation": "Gdy przedmioty zostaną wyczyszczone w zakładce wypełnij przedmioty sprzedawców lub przez integrację Simple Calendar odświeżającą zapasy (patrz konfiguracja sprzedawcy na dole), ten przedmiot zawsze pozostanie.",
+        "KeepOnMerchant": "Zachowaj sprzedawcę"
       },
       "FilterEditor": {
         "Explanation": "Tutaj możesz zdefiniować wiele typów filtrów, które wykluczą pewne typy przedmiotów. Na podstawie podanej ścieżki atrybutu, stos przedmiotów mógłby znaleźć \"typ\" przedmiotu i na podstawie filtrów, ukrywa te przedmioty w UI inwentarza stosu przedmiotów.",
@@ -564,7 +573,9 @@
           "LoggingFormatExplanation": "Konfiguruje sposób wyświetlania nazwy użytkownika i nazwy postaci w dzienniku.",
           "LoggingFormatUserActor": "Wyświetlanie nazwy użytkownika i nazwy postaci",
           "CanStackItemsExplanation": "Po włączeniu tej opcji przedmioty dodane do skarbca będą się układać w stos z podobnymi przedmiotami. Można to również kontrolować dla każdego przedmiotu w ich konfiguracji.",
-          "LoggingFormatActor": "Wyświetl tylko nazwę"
+          "LoggingFormatActor": "Wyświetl tylko nazwę",
+          "RestrictAccess": "Ograniczenie dostępu do skarbca",
+          "RestrictAccessExplanation": "Domyślnie każdy może uzyskać dostęp do skarbców, jeśli widzi je na pasku bocznym lub może przejść obok nich na scenie. Gdy to ustawienie jest włączone, skarbiec będzie widoczny tylko dla właściciela postaci skarbca lub użytkowników/postaci skonfigurowanych w Edytorze dostępu (patrz poniżej)."
         },
         "Update": "Uaktualnij Item Pile",
         "SingleItem": {
@@ -600,7 +611,9 @@
         "Donate": "Jeśli podoba Ci się ten moduł, rozważ przekazanie darowizny!",
         "Module": "Ustawienia modułu",
         "Request": "Poproś o nowe funkcje tutaj.",
-        "Submit": "Prześlij ustawienia"
+        "Submit": "Prześlij ustawienia",
+        "Export": "Ustawienia eksportu",
+        "Import": "Ustawienia importu"
       },
       "DepositCurrencies": {
         "Title": "Waluty depozytu",
@@ -612,7 +625,7 @@
         "Title": "Wycofanie przedmiotu",
         "Content": "Z tego skarbca można wypłacić następujące waluty:",
         "NoCurrency": "Nie ma żadnych walut do wypłaty.",
-        "Submit": "Wycofywanie"
+        "Submit": "Wycofaj"
       },
       "CustomItemCategoriesEditor": {
         "Title": "Edytor kategorii niestandardowych",
@@ -621,14 +634,16 @@
       },
       "MerchantColumnsEditor": {
         "Label": "Etykieta",
-        "PropertyPath": "Ścieżka właściwości pozycji",
+        "PropertyPath": "Ścieżka właściwości",
         "Formatting": "Formatowanie",
         "ConfigureMapping": "Konfiguracja mapowania",
         "MappingTitle": "Mapowanie kolumn kupca: {label}",
         "TitleActor": "Kolumny kupca: {actor_name}",
         "Title": "Kolumny kupca",
         "Explanation": "Konfiguruje kolumny widoczne w UI kupca, poza nazwą towaru, ilością i ceną.",
-        "MappingContent": "Konfiguruje mapowanie pomiędzy wartością właściwości a etykietą. Ta etykieta może być łańcuchem znaków."
+        "MappingContent": "Konfiguruje mapowanie pomiędzy wartością właściwości a etykietą. Ta etykieta może być łańcuchem znaków.",
+        "Selling": "Sprzedaż",
+        "Buying": "Kupowanie"
       },
       "UnstackableItemTypesEditor": {
         "Explanation": "Tutaj można zdefiniować typy elementów, które nie mogą być układane w stos.",
@@ -638,7 +653,12 @@
       "VaultAccessEditor": {
         "Title": "Edytor dostępu do skarbca",
         "TitleActor": "Edytor dostępu do skarbca: {actor_name}",
-        "Explanation": "To konfiguruje, które postacie i gracze mogą mieć dostęp i modyfikować ekwipunek i waluty skarbca. Jeśli gracz jest właścicielem postaci w skarbcu, ma zawsze pełny dostęp."
+        "Explanation": "To konfiguruje, które postacie i gracze mogą mieć dostęp i modyfikować ekwipunek i waluty skarbca. Jeśli gracz jest właścicielem postaci w skarbcu, ma zawsze pełny dostęp.",
+        "Character": "Gracz/Postać",
+        "View": "Widok",
+        "Organize": "Organizacja",
+        "Withdraw": "Wycofaj",
+        "Deposit": "Depozyt"
       },
       "PricePresetEditor": {
         "Update": "Aktualizacja ustawień wstępnych",
