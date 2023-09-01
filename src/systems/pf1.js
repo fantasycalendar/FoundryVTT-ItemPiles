@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": "1.0.4",
+  "VERSION": "1.0.5",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "npc",
@@ -14,7 +14,14 @@ export default {
   // This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
   "ITEM_COST_TRANSFORMER": (item, currencies) => {
     // Account for wand charges, broken condition, and other traits that are not reflected in base price.
-    return item.getValue({ sellValue: 1.0 });
+    // Spoof quantity to 1 temporarily
+    const origQuantity = item.system.quantity;
+    item.system.quantity = 1;
+    // Get actual value
+    const value = item.getValue({ sellValue: 1.0 });
+    // Restore quantity
+    item.system.quantity = origQuantity;
+    return value;
   },
 
   // Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
