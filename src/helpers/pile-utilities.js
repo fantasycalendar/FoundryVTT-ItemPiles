@@ -1521,11 +1521,12 @@ export async function rollTable({
   tableUuid,
   formula = "1",
   resetTable = true,
+  normalize = false,
   displayChat = false,
   rollData = {}
 } = {}) {
 
-  const items = [];
+  const rolledItems = [];
 
   const table = await fromUuid(tableUuid);
 
@@ -1534,12 +1535,14 @@ export async function rollTable({
       await table.reset();
     }
 
-    await table.update({
-      results: table.results.map(result => ({
-        _id: result.id, weight: result.range[1] - (result.range[0] - 1)
-      }))
-    });
-    await table.normalize();
+    if (normalize) {
+      await table.update({
+        results: table.results.map(result => ({
+          _id: result.id, weight: result.range[1] - (result.range[0] - 1)
+        }))
+      });
+      await table.normalize();
+    }
   }
 
   const roll = new Roll(formula.toString(), rollData).evaluate({ async: false });
@@ -1548,33 +1551,58 @@ export async function rollTable({
   }
 
   const tableDraw = await table.drawMany(roll.total, { displayChat, recursive: true });
+
   for (const rollData of tableDraw.results) {
 
-    const existingItem = items.find((item) => item.documentId === rollData.documentId);
-    if (existingItem) {
-      existingItem.quantity += Utilities.getItemQuantity(existingItem.item);
+    let rolledQuantity = 1;
+
+    const formula = foundry.utils.getProperty(rollData, "flags.better-rolltables.brt-result-formula.formula");
+
+    if (formula) {
+      const roll = new Roll(formula.toString(), rollData).evaluate({ async: false });
+      rolledQuantity = roll.total ?? 0;
+    }
+
+    let item;
+    if (rollData.documentCollection === "Item") {
+      item = game.items.get(rollData.documentId);
     } else {
-
-      let item;
-      if (rollData.documentCollection === "Item") {
-        item = game.items.get(rollData.documentId);
-      } else {
-        const compendium = game.packs.get(rollData.documentCollection);
-        if (compendium) {
-          item = await compendium.getDocument(rollData.documentId);
-        }
-      }
-
-      if (item instanceof Item) {
-        const quantity = Math.max(Utilities.getItemQuantity(item), 1);
-        items.push({
-          ...rollData,
-          item,
-          quantity
-        });
+      const compendium = game.packs.get(rollData.documentCollection);
+      if (compendium) {
+        item = await compendium.getDocument(rollData.documentId);
       }
     }
+    if (item instanceof Item) {
+      const quantity = Math.max(Utilities.getItemQuantity(item) * rolledQuantity, 1);
+      const itemData = item.toObject();
+      rolledItems.push({
+        ...rollData,
+        item: Utilities.setItemQuantity(itemData, quantity),
+        quantity
+      });
+    }
+
   }
+
+  const items = [];
+
+  rolledItems.forEach(newItem => {
+    const existingItem = items.find(
+      (item) => item.documentId === newItem.documentId
+    );
+    if (existingItem) {
+      existingItem.quantity += Math.max(Utilities.getItemQuantity(newItem.item), 1);
+    } else {
+      setProperty(newItem, "flags", newItem.item.flags);
+      if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
+        setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
+      }
+      items.push({
+        ...newItem,
+        quantity: newItem.quantity
+      });
+    }
+  })
 
   return items;
 
@@ -1601,7 +1629,6 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 
     if (!table.uuid.startsWith("Compendium")) {
       await rollableTable.reset();
-      await rollableTable.normalize();
     }
 
     let tableItems = [];
@@ -1667,17 +1694,17 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
   return items;
 }
 
-async function getTable(itemToGet) {
-  let item;
-  if (itemToGet.documentCollection === "RollTable") {
-    item = game.tables.get(itemToGet.documentId);
+async function getTable(tableToGet) {
+  let table;
+  if (tableToGet.documentCollection === "RollTable") {
+    table = game.tables.get(tableToGet.documentId);
   } else {
-    const compendium = game.packs.get(itemToGet.documentCollection);
+    const compendium = game.packs.get(tableToGet.documentCollection);
     if (compendium) {
-      item = await compendium.getDocument(itemToGet.documentId);
+      table = await compendium.getDocument(tableToGet.documentId);
     }
   }
-  return item;
+  return table;
 }
 
 async function getItem(itemToGet) {

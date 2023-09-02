@@ -1,5 +1,15 @@
 # Item Piles Changelog
 
+## Version 2.7.10
+
+- Added tentative & rudimentary support for the Better Roll Tables module in merchants and in the API
+- Updated French and Polish localization (thank you Elfenduil and Lioheart on weblate!)
+- Fixed PF1e's item prices (thanks Mana on github!)
+- Fixed the Cyberpunk RED system not using the correct quantity property
+- Fixed "Open Sheet" header button not being visible to players in the interfaces of Item Piles of which they are owners
+- Fixed minor bug with transferring properties that were undefined on either side of the transfer
+- Fixed issue that caused roll tables being normalized when rolled through the API or through merchants
+
 ## Version 2.7.9
 
 - Added better support for item prices in PF1e (thanks Mana on github!)

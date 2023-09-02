@@ -2239,6 +2239,7 @@ export default class PrivateAPI {
     table = "",
     timesToRoll = "1",
     resetTable = true,
+    normalizeTable = false,
     displayChat = false,
     rollData = {},
     targetActor = false,
@@ -2249,6 +2250,7 @@ export default class PrivateAPI {
     let items = await PileUtilities.rollTable({
       tableUuid: table,
       formula: timesToRoll,
+      normalize: normalizeTable,
       resetTable,
       displayChat,
       rollData

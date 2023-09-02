@@ -119,7 +119,7 @@ export default class Transaction {
     }
     this.actorUpdates = attributes.reduce((acc, attribute) => {
       const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
-      acc[attribute.path] = acc[attribute.path] ?? Number(getProperty(this.actor, attribute.path));
+      acc[attribute.path] = acc[attribute.path] ?? Number(getProperty(this.actor, attribute.path) ?? 0);
       if (set) {
         if (!onlyDelta) {
           acc[attribute.path] = incomingQuantity

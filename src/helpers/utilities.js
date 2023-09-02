@@ -163,17 +163,21 @@ export function refreshItemTypesThatCanStack() {
 export function getItemTypesThatCanStack() {
   if (!itemTypesWithQuantities) {
     const unstackableItemTypes = Helpers.getSetting(SETTINGS.UNSTACKABLE_ITEM_TYPES);
-    itemTypesWithQuantities = new Set(game.system.template.Item.types.filter(type => {
-      const itemTemplate = {
-        system: foundry.utils.deepClone(game.system.template.Item[type])
-      };
-      if (itemTemplate.system?.templates?.length) {
-        const templates = foundry.utils.duplicate(itemTemplate.system.templates);
-        for (let template of templates) {
-          itemTemplate.system = foundry.utils.mergeObject(
-            itemTemplate.system,
-            foundry.utils.duplicate(game.system.template.Item.templates[template])
-          );
+    const types = new Set(Object.keys(CONFIG.Item.dataModels).concat(game.system.template.Item.types));
+    itemTypesWithQuantities = new Set(types.filter(type => {
+      let itemTemplate = {};
+      if (CONFIG.Item.dataModels[type]) {
+        itemTemplate.system = CONFIG.Item.dataModels[type].defineSchema();
+      } else {
+        itemTemplate.system = foundry.utils.deepClone(game.system.template.Item[type]);
+        if (itemTemplate.system?.templates?.length) {
+          const templates = foundry.utils.duplicate(itemTemplate.system.templates);
+          for (let template of templates) {
+            itemTemplate.system = foundry.utils.mergeObject(
+              itemTemplate.system,
+              foundry.utils.duplicate(game.system.template.Item.templates[template])
+            );
+          }
         }
       }
       return hasItemQuantity(itemTemplate);

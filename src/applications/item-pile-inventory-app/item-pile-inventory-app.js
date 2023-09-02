@@ -84,18 +84,23 @@ export default class ItemPileInventoryApp extends SvelteApplication {
   /** @override */
   _getHeaderButtons() {
     let buttons = super._getHeaderButtons();
-    const canConfigure = game.user.isGM;
-    if (canConfigure) {
-      buttons = [
-        {
+
+    const newButtons = [];
+
+    if (this.actor.isOwner) {
+      newButtons.push({
           label: !Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "ITEM-PILES.Inspect.OpenSheet" : "",
           class: "item-piles-open-actor-sheet",
           icon: "fas fa-user",
           onclick: () => {
             this.actor.sheet.render(true, { focus: true, bypassItemPiles: true });
           }
-        },
-        {
+        }
+      );
+    }
+
+    if (game.user.isGM) {
+      newButtons.push({
           label: !Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "ITEM-PILES.ContextMenu.ShowToPlayers" : "",
           class: "item-piles-show-to-players",
           icon: "fas fa-eye",
@@ -120,10 +125,11 @@ export default class ItemPileInventoryApp extends SvelteApplication {
           onclick: () => {
             ItemPileConfig.show(this.actor);
           }
-        },
-      ].concat(buttons);
+        }
+      );
     }
-    return buttons
+
+    return newButtons.concat(buttons)
   }
 
 }
