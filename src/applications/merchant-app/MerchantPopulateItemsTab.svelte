@@ -121,6 +121,8 @@
 
     const newItems = await PileUtilities.rollMerchantTables({ tableData: [table] });
 
+    debugger;
+
     const processedItems = newItems.map(itemData => {
       const prices = game.itempiles.API.getPricesForItem(itemData.item, {
         seller: store.actor,

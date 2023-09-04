@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.7.12 Hotfix
+
+- Actually fixed populate items tab in merchants
+- Removed a stray debugger
+
 ## Version 2.7.11
 
 - Fixed populate items tab in merchants not working properly

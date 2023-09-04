@@ -1571,10 +1571,6 @@ export async function rollTable({
       if (compendium) {
         item = await compendium.getDocument(rollData.documentId);
       }
-      rolledItems.push({
-        ...rollData,
-        item,
-      });
     }
     if (item instanceof Item) {
       const quantity = Math.max(Utilities.getItemQuantity(item) * rolledQuantity, 1);
@@ -1590,6 +1586,7 @@ export async function rollTable({
   const items = [];
 
   rolledItems.forEach(newItem => {
+
     const existingItem = items.find(
       (item) => item.documentId === newItem.documentId
     );
@@ -1601,13 +1598,10 @@ export async function rollTable({
         setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
       }
       items.push({
-        ...newItem,
-        quantity: newItem.quantity
+        ...newItem
       });
     }
   })
-
-  debugger;
 
   return items;
 
@@ -1679,7 +1673,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         (item) => item.documentId === newItem.documentId
       );
       if (existingItem) {
-        existingItem.quantity += Math.max(Utilities.getItemQuantity(newItem.item), 1);
+        existingItem.quantity += Math.max(newItem.quantity, 1);
       } else {
         items.push({
           ...newItem,
