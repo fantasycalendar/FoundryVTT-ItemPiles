@@ -12,6 +12,8 @@
   * [License](README.md#license)
   * [Credits](README.md#credits)
 
+* [Contributing to Item Piles](contributing-to-item-piles.md)
+
 * [Creating item piles](creating-item-piles.md)
   * [How does item piles work?](creating-item-piles.md#how-does-item-piles-work)
   * [Adding items to existing item piles](creating-item-piles.md#adding-items-to-existing-item-piles)

@@ -62,11 +62,7 @@ recommended.
 
 ## Requesting Support for System
 
-Item Piles works in any system, but requires setup. If you wish to request native support for a system, please create a new [system request here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/new?assignees=Haxxer&labels=enhancement&template=system-request.md&title=%5BSYSTEM%5D+-+Write+the+system%27s+name+here)
-
-Fill in _all_ of the information, and ask in the system's discord channel if you don't know what something means.
-
-Incomplete requests will be rejected.
+Item Piles works in any system, but requires setup. If you wish to request native support for a system, please read the [Contributing To Item Piles](contributing-to-item-piles.md) page.
 
 ## Natively Supported Systems
 
