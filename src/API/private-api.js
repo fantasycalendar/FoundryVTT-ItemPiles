@@ -2254,10 +2254,14 @@ export default class PrivateAPI {
       resetTable,
       displayChat,
       rollData
-    })
+    });
 
     if (targetActor) {
-      items = await this._addItems(targetActor, items, userId, { removeExistingActorItems });
+      const itemsToAdd = items.map((item) => {
+        const actualItem = item.item.toObject();
+        return Utilities.setItemQuantity(actualItem, item.quantity);
+      });
+      items = await this._addItems(targetActor, itemsToAdd, userId, { removeExistingActorItems });
     }
 
     return items;

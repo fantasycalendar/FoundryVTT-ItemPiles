@@ -163,12 +163,12 @@ export function refreshItemTypesThatCanStack() {
 export function getItemTypesThatCanStack() {
   if (!itemTypesWithQuantities) {
     const unstackableItemTypes = Helpers.getSetting(SETTINGS.UNSTACKABLE_ITEM_TYPES);
-    const types = new Set(Object.keys(CONFIG.Item.dataModels).concat(game.system.template.Item.types));
+    const types = new Set(Object.keys(CONFIG?.Item?.dataModels ?? {}).concat(game.system.template.Item.types));
     itemTypesWithQuantities = new Set(types.filter(type => {
       let itemTemplate = {};
-      if (CONFIG.Item.dataModels[type]) {
+      if (CONFIG?.Item?.dataModels?.[type]?.defineSchema !== undefined) {
         itemTemplate.system = CONFIG.Item.dataModels[type].defineSchema();
-      } else {
+      } else if (game.system?.template?.Item?.[type]) {
         itemTemplate.system = foundry.utils.deepClone(game.system.template.Item[type]);
         if (itemTemplate.system?.templates?.length) {
           const templates = foundry.utils.duplicate(itemTemplate.system.templates);

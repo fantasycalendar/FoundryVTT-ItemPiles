@@ -1571,13 +1571,16 @@ export async function rollTable({
       if (compendium) {
         item = await compendium.getDocument(rollData.documentId);
       }
+      rolledItems.push({
+        ...rollData,
+        item,
+      });
     }
     if (item instanceof Item) {
       const quantity = Math.max(Utilities.getItemQuantity(item) * rolledQuantity, 1);
-      const itemData = item.toObject();
       rolledItems.push({
         ...rollData,
-        item: Utilities.setItemQuantity(itemData, quantity),
+        item,
         quantity
       });
     }
@@ -1591,7 +1594,7 @@ export async function rollTable({
       (item) => item.documentId === newItem.documentId
     );
     if (existingItem) {
-      existingItem.quantity += Math.max(Utilities.getItemQuantity(newItem.item), 1);
+      existingItem.quantity += Math.max(newItem.quantity, 1);
     } else {
       setProperty(newItem, "flags", newItem.item.flags);
       if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
@@ -1603,6 +1606,8 @@ export async function rollTable({
       });
     }
   })
+
+  debugger;
 
   return items;
 
@@ -1676,13 +1681,6 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
       if (existingItem) {
         existingItem.quantity += Math.max(Utilities.getItemQuantity(newItem.item), 1);
       } else {
-        setProperty(newItem, "flags", newItem.item.flags);
-        if (table?.customCategory && !getProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory")) {
-          setProperty(newItem, CONSTANTS.FLAGS.ITEM + ".customCategory", table?.customCategory);
-        }
-        if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
-          setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
-        }
         items.push({
           ...newItem,
           quantity: newItem.quantity

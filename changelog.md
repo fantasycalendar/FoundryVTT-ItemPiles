@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.7.11
+
+- Fixed populate items tab in merchants not working properly
+- Fixed a v11 tweak breaking the v10 version of Item Piles
+- Fixed merchants sometimes losing track of actor-specific discounts
+
 ## Version 2.7.10
 
 - Added tentative & rudimentary support for the Better Roll Tables module in merchants and in the API
