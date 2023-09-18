@@ -2,6 +2,7 @@
 
 ## Version 2.7.13
 
+- Improved Better RollTables support
 - Fixed merchant columns sometimes resetting
 - Fixed populating items in the merchant not applying custom categories
 - Fixed opening the item pile UI of an unlinked token preventing opening the actor's default item pile UI

@@ -1562,18 +1562,24 @@ export async function rollTable({
     return [];
   }
 
-  const tableDraw = await table.drawMany(roll.total, { displayChat, recursive: true });
+  let results;
+  if (game.modules.get("better-rolltables")?.active) {
+    results = (await game.betterTables.roll(table)).itemsData.map(result => {
+      return {
+        documentCollection: result.compendiumName || result.documentName,
+        documentId: result.item.id,
+        text: result.item.text || result.item.name,
+        img: result.item.img,
+        quantity: result.quantity
+      }
+    })
+  } else {
+    results = (await table.drawMany(roll.total, { displayChat, recursive: true })).results;
+  }
 
-  for (const rollData of tableDraw.results) {
+  for (const rollData of results) {
 
-    let rolledQuantity = 1;
-
-    const formula = foundry.utils.getProperty(rollData, "flags.better-rolltables.brt-result-formula.formula");
-
-    if (formula) {
-      const roll = new Roll(formula.toString(), rollData).evaluate({ async: false });
-      rolledQuantity = roll.total ?? 0;
-    }
+    let rolledQuantity = rollData?.quantity ?? 1;
 
     let item;
     if (rollData.documentCollection === "Item") {
