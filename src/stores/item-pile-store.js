@@ -180,7 +180,9 @@ export default class ItemPileStore {
     const items = [];
     const attributes = [];
 
-    PileUtilities.getActorItems(this.actor).map(item => {
+    const pileData = PileUtilities.isValidItemPile(this.actor) || !this.recipient ? get(this.pileData) : get(this.recipientPileData);
+
+    PileUtilities.getActorItems(this.actor, { itemFilters: pileData.overrideItemFilters }).map(item => {
       items.push(new this.ItemClass(this, item));
     });
 
