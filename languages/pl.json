@@ -4,10 +4,10 @@
     "Currency": "Waluta",
     "ContextMenu": {
       "ShowToPlayers": "Pokaż Graczom",
-      "RequestTrade": "Poproś Wymianę"
+      "RequestTrade": "Poproś o Wymianę"
     },
     "Notifications": {
-      "UpdateItemPileSuccess": "Stos Przedmiotów zaktualizowany pomyślnie.",
+      "UpdateItemPileSuccess": "Item Pile zaktualizowany pomyślnie.",
       "UpdateMerchantSuccess": "Kupca zaktualizowany pomyślnie.",
       "ShownToPlayers": "Pokazuję {actor_name} graczom",
       "ItemTransferred": "{target_actor_name} dostał {item_name} od {source_actor_name}.",
@@ -47,7 +47,7 @@
       "Close": "Zamknij Przykrywkę",
       "Leave": "Wyjdź",
       "NoShareLeft": "Nie ma już wolnych podziałów...",
-      "NoneLeft": "Nic zostało...",
+      "NoneLeft": "Nic nie zostało...",
       "OpenSheet": "Otwórz Kartę",
       "AddCurrency": "Dodaj walutę",
       "SplitCurrencies": "Podziel walutę na {num_players} graczy",
@@ -56,7 +56,7 @@
       "SplitItems": "Podziel przedmioty na {num_players} graczy"
     },
     "Trade": {
-      "Title": "Stosy Przedmiotów: Wymiany",
+      "Title": "Item Piles: Wymiany",
       "Accept": "Akceptuj",
       "Decline": "Odrzuć",
       "Mute": "Wycisz",
@@ -65,7 +65,7 @@
       "Over": "Ta wymiana nie jest już aktywna.",
       "Between": "Wymień pomiędzy {actor_1} a {actor_2}",
       "Prompt": {
-        "Title": "Stosy Przedmiotów: Wyślij Ofertę Wymiany",
+        "Title": "Item Piles: Wyślij Ofertę Wymiany",
         "User": "Wybierz z kim chcesz się wymienić:",
         "PickActor": "Wybierz który aktor ciebie reprezentuję:",
         "PickToken": "Wybierz zaznaczony token",
@@ -75,11 +75,11 @@
       },
       "Declined": "Twój odbiorca odrzucił ofertę wymiany.",
       "NoActiveUsers": {
-        "Title": "Stosy Przedmiotów: Brak Aktywnych Graczy",
+        "Title": "Item Piles: Brak Aktywnych Graczy",
         "Content": "Żadni gracze są aktywni, więc nie możesz się z nikim wymienić."
       },
       "Request": {
-        "Title": "Stosy Przedmiotów: Oferta Wymiany",
+        "Title": "Item Piles: Oferta Wymiany",
         "Content": "{trading_actor_name} (gracz {trading_user_name}) chce się z tobą wymienić.",
         "PrivateContent": "{trading_actor_name} (gracz {trading_user_name}) chce się z tobą <strong>prywatnie</strong> wymienić.",
         "AcceptQuery": "Czy akceptujesz?"
@@ -89,7 +89,7 @@
         "Label": "Anuluj ofertę wymiany"
       },
       "CancelledRequest": {
-        "Content": "Oferta wymiany była anulowana przez {user_name}."
+        "Content": "Żądanie transakcji zostało anulowane przez {user_name}."
       },
       "AddCurrency": {
         "Title": "Dodaj Waluty",
@@ -112,26 +112,26 @@
       "SameActor": "Obaj użytkownicy nie mogą wybrać tej samej postaci - nie można handlować na ORAZ z tej samej postaci. Zatrzymaj to."
     },
     "Merchant": {
-      "Title": "Kupca: {actor_name}",
+      "Title": "Kupiec: {actor_name}",
       "BuyItems": "Kup Przedmioty",
       "SellItems": "Sprzedaj Przedmioty",
       "PopulateItems": "Załaduj Przedmioty",
       "AllTypes": "Wszystkie typy",
       "Buy": "Kup",
-      "NoItemsForSale": "Kupca nie ma nic na sprzedaż",
-      "NoItemsToSell": "Nie masz nic do sprzedania temu kupcu",
+      "NoItemsForSale": "Kupiec nie ma nic na sprzedaż",
+      "NoItemsToSell": "Nie masz nic do sprzedania temu kupcowi",
       "OpenTimes": "Godziny otwarcia",
       "OpenCloseAuto": "Automatyczne",
       "Open": "Otwarte",
       "Hours": "Godziny",
       "Minutes": "Minuty",
-      "MerchantClosed": "Kupca jest zamknięty, sprawdź ponownie później.",
+      "MerchantClosed": "Kupiec jest zamknięty, sprawdź ponownie później.",
       "Sell": "Sprzedaj",
       "Description": "Opis",
       "Settings": "Ustawienia",
       "Override": "Nadpisz",
       "EditTypePricesExplanation": "Przełącz widoczność przeliczników na-typ w zakładce Kup Przedmioty",
-      "BuyNoItems": "Kupca nie ma przedmiotów",
+      "BuyNoItems": "Kupiec nie ma przedmiotów",
       "CurrentItems": "Bieżące przedmioty",
       "NoRollTables": "Nie ma żadnych tablic, stwórz jedną aby zacząć",
       "ClickRoll": "Kliknij wylosuj aby zacząć",
@@ -170,19 +170,19 @@
       },
       "ResetSettings": {
         "Title": "Resetuj ustawienia modułu",
-        "Content": "Czy na pewno chcesz zresetować wszystkie ustawienia modułu Stosu Przedmiotów do bieżących ustawień domyślnych systemu? <strong>NIE MOŻNA TEGO COFNĄĆ!</strong>",
+        "Content": "Czy na pewno chcesz zresetować wszystkie ustawienia modułu Item Piles do bieżących ustawień domyślnych systemu? <strong>NIE MOŻNA TEGO COFNĄĆ!</strong>",
         "Confirm": "Zresetuj Ustawienia Modułu"
       },
       "LinkedActorWarning": {
-        "Title": "Stos Przedmiotów i Powiązany Aktor",
-        "Content": "Czy na pewno chcesz zmienić tego <strong>powiązanego aktora</strong> w item pile? Żeton tego aktora jest połączony i wszystkie żetony tego aktora będą współdzielić jego ekwipunek i waluty."
+        "Title": "Item Piles i Powiązany Aktor",
+        "Content": "Czy na pewno chcesz zmienić tego <strong>powiązanego aktora</strong> w stos przedmiotów? Żeton tego aktora jest połączony i wszystkie żetony tego aktora będą współdzielić jego ekwipunek i waluty."
       },
       "UserSelect": {
         "Title": "Zaznacz użytkowników",
         "Content": "Pokazać jakim użytkownikom?"
       },
       "NoSystemFound": {
-        "Title": "Nie rozpoznano system",
+        "Title": "Nie rozpoznano systemu",
         "Content": "System ten nie jest obecnie w pełni obsługiwany. Oznacza to, że moduł nie wie, jak najlepiej obsługiwać elementy tego systemu, ale nadal może działać w ograniczony sposób.<br><br>Możesz samodzielnie skonfigurować ustawienia modułu, ale wymaga to trochę wiedzy technicznej.<br><br>Jeśli masz jakieś pytania, pinguj <strong>Wasp#2005</strong> na discordzie Foundry."
       },
       "CantRemoveVaultExpander": {
@@ -214,7 +214,7 @@
       },
       "RemoveMerchantTable": {
         "Title": "Usuń tabelę kupca",
-        "Content": "Czy na pewno chcesz usunąć tabelę \"{table_name}\" z tego handlowca? Tego nie da się cofnąć."
+        "Content": "Czy na pewno chcesz usunąć tabelę \"{table_name}\" z tego kupca? Tego nie da się cofnąć."
       },
       "TextEditor": {
         "Title": "Edytor tekstu"
@@ -237,7 +237,7 @@
       "ShowToPlayers": "Pokaż Graczom"
     },
     "Types": {
-      "pile": "Stos Przedmiotów",
+      "pile": "Item Pile",
       "container": "Pojemnik",
       "merchant": "Kupiec",
       "vault": "Skarbiec"
@@ -336,7 +336,7 @@
       },
       "ItemEditor": {
         "DisplayQuantity": "Widoczność ilości pozycji",
-        "InfiniteQuantityDefault": "Domyślne ustawienie dla sklepikarza",
+        "InfiniteQuantityDefault": "Domyślne ustawienie dla kupca",
         "QuantityForPrice": "Ilość do ceny",
         "BasePriceExplanation": "Ustawia normalną cenę tej pozycji.",
         "QuantityForPriceExplanation": "To konfiguruje ile sztuk tego przedmiotu powinno się otrzymać przy zakupie.",
@@ -345,7 +345,7 @@
         "PricePreset": "Można też wybrać wstępne ustawienie ceny:",
         "CanStackYes": "Tak, zawsze można układać w stos",
         "InfiniteQuantity": "Nieskończona ilość",
-        "FreeExplanation": "Po włączeniu, ten przedmiot nie kosztuje nic, aby kupić od sprzedawcy.",
+        "FreeExplanation": "Po włączeniu, ten przedmiot nie kosztuje nic, aby kupić od kupca.",
         "PurchaseOptionsExplanation": "Tutaj możesz skonfigurować alternatywne sposoby zakupu tego przedmiotu. Każda grupa reprezentuje inny sposób, w jaki postać może kupić ten przedmiot od innych",
         "CantBeSoldToMerchants": "Nie można sprzedać kupcom",
         "CantBeSoldToMerchantsExplanation": "Gdy jest włączona, ten przedmiot nie może być odsprzedany kupcom, tylko kupiony.",
@@ -355,15 +355,15 @@
         "Price": "Ustawienia cen",
         "Vault": "Ustawienia skarbca",
         "NotForSale": "Przedmiot nie jest na sprzedaż",
-        "NotForSaleExplanation": "Kiedy jest włączona, ten przedmiot nie jest na sprzedaż i nie można go kupić. Nadal jest widoczny na liście przedmiotów sprzedawcy, chyba że przedmiot jest również ukryty.",
+        "NotForSaleExplanation": "Kiedy jest włączona, ten przedmiot nie jest na sprzedaż i nie można go kupić. Nadal jest widoczny na liście przedmiotów kupca, chyba że przedmiot jest również ukryty.",
         "Hidden": "Przedmiot jest ukryty",
         "HiddenExplanation": "Gdy jest włączona, ten przedmiot nie pojawia się na listach przedmiotów sprzedawcy.",
         "DisplayQuantityExplanation": "Konfiguruje sposób wyświetlania ilości tego przedmiotu w sklepie, jeśli w ogóle.",
-        "DisplayQuantityDefault": "Domyślne ustawienie dla sklepikarza",
+        "DisplayQuantityDefault": "Domyślne ustawienie dla kupca",
         "DisplayQuantityNo": "Nie, zawsze ukryj ilość",
-        "InfiniteQuantityExplanation": "Gdy jest włączona, ten przedmiot nie może się wyczerpać, gdy jest sprzedawany przez handlowca.",
+        "InfiniteQuantityExplanation": "Gdy jest włączona, ten przedmiot nie może się wyczerpać, gdy jest sprzedawany przez kupca.",
         "InfiniteQuantityYes": "Tak, nieskończona ilość",
-        "KeepZeroExplanation": "W przypadku całkowitego wyprzedania towaru, sprzedawca nie usuwa tego towaru, lecz ustawia go jako nie do sprzedaży.",
+        "KeepZeroExplanation": "W przypadku całkowitego wyprzedania towaru, kupiec nie usuwa tego towaru, lecz ustawia go jako nie do sprzedaży.",
         "Free": "Przedmiot jest darmowy",
         "DisableNormalCost": "Wyłączenie kosztu normalnego",
         "PurchaseOptions": "Opcje zakupu",
@@ -388,8 +388,8 @@
         "CustomCategory": "Kategoria pozycji niestandardowej",
         "InfiniteQuantityNo": "Nie, standardowa ilość",
         "ServiceExplanation": "Powoduje to, że ten przedmiot nie dodaje się do inwentarza kupca. Usługa \"item\" może nadal mieć ilość, ale jeśli się skończy, nie zostanie usunięta z kupca, ale zamiast tego ustawiona na nie do sprzedaży.",
-        "KeepOnMerchantExplanation": "Gdy przedmioty zostaną wyczyszczone w zakładce wypełnij przedmioty sprzedawców lub przez integrację Simple Calendar odświeżającą zapasy (patrz konfiguracja sprzedawcy na dole), ten przedmiot zawsze pozostanie.",
-        "KeepOnMerchant": "Zachowaj sprzedawcę"
+        "KeepOnMerchantExplanation": "Gdy przedmioty zostaną wyczyszczone w zakładce wypełnij przedmioty sprzedawców lub przez integrację Simple Calendar odświeżającą zapasy (patrz konfiguracja kupca na dole), ten przedmiot zawsze pozostanie.",
+        "KeepOnMerchant": "Zachowaj kupca"
       },
       "FilterEditor": {
         "Explanation": "Tutaj możesz zdefiniować wiele typów filtrów, które wykluczą pewne typy przedmiotów. Na podstawie podanej ścieżki atrybutu, stos przedmiotów mógłby znaleźć \"typ\" przedmiotu i na podstawie filtrów, ukrywa te przedmioty w UI inwentarza stosu przedmiotów.",
@@ -430,7 +430,7 @@
         "Actor": "Aktor",
         "Override": "Nadpisz",
         "TitleActor": "Item Piles Edytor modyfikatorów cen: {actor_name}",
-        "Explanation": "Tutaj możesz zdefiniować modyfikatory ceny i ceny sprzedaży dla tego handlowca odnoszące się do konkretnych aktorów. Ustawienie \"Nadpisz\" oznacza, że nadpisuje on normalne modyfikatory cenowe sprzedawcy, w tym modyfikatory cenowe specyficzne dla danego typu przedmiotu.",
+        "Explanation": "Tutaj możesz zdefiniować modyfikatory ceny i ceny sprzedaży dla tego kupca odnoszące się do konkretnych aktorów. Ustawienie \"Nadpisz\" oznacza, że nadpisuje on normalne modyfikatory cenowe kupca, w tym modyfikatory cenowe specyficzne dla danego typu przedmiotu.",
         "DragDrop": "Przeciągnij i upuść aktora, aby dodać go do listy"
       },
       "ItemPileConfig": {
@@ -503,9 +503,9 @@
           "RefreshItemsOnOpen": "Odświeżanie elementów w czasie otwarcia (\"Simple Calendar\")",
           "RefreshItemsOnOpenExplanation": "Gdy czas kalendarza przekroczy czas otwarcia sprzedawcy, zapasy sprzedawcy zostaną odświeżone.",
           "RefreshItemsDays": "Odśwież elementy w dni powszednie (\"Simple Calendar\")",
-          "RefreshItemsDaysExplanation": "Gdy kalendarz przekroczy zaznaczone dni, zapasy sprzedawcy zostaną odświeżone. Dzieje się to o godzinie otwarcia sprzedawcy lub o północy, jeśli nie ma godziny otwarcia/zamknięcia.",
+          "RefreshItemsDaysExplanation": "Gdy kalendarz przekroczy zaznaczone dni, zapasy kupca zostaną odświeżone. Dzieje się to o godzinie otwarcia kupca lub o północy, jeśli nie ma godziny otwarcia/zamknięcia.",
           "RefreshItemsHolidays": "Odśwież przedmioty w Święta (Simple Calendar)",
-          "RefreshItemsHolidaysExplanation": "Gdy kalendarz przekroczy powiadomienia z daną kategorią powiadomień, zapasy sprzedawcy zostaną odświeżone. Dzieje się to w czasie powiadomienia lub o północy, jeśli jest to powiadomienie ustawiono na cały dzień."
+          "RefreshItemsHolidaysExplanation": "Gdy kalendarz przekroczy powiadomienia z daną kategorią powiadomień, zapasy kupca zostaną odświeżone. Dzieje się to w czasie powiadomienia lub o północy, jeśli jest to powiadomienie ustawiono na cały dzień."
         },
         "Main": {
           "DeleteWhenEmpty": "Usuń, gdy jest pusty",
@@ -542,7 +542,7 @@
           "IsContainer": "Jest kontenerem",
           "Locked": "Jest zablokowany",
           "Closed": "Jest zamknięty",
-          "ClosedImagePath": "Ścieżka obrazka zamnięcia",
+          "ClosedImagePath": "Obrazek zamknięcia",
           "EmptyImagePath": "Ścieżka pustego obrazka",
           "OpenedImagePath": "Ścieżka otwartego obrazka",
           "LockedImagePath": "Ścieżka zablokowanego obrazka",
@@ -593,7 +593,7 @@
           "Title": "Inne ustawienia",
           "Type": "Item Pile Typ"
         },
-        "Configure": "Stos Przedmiotów",
+        "Configure": "Item Pile",
         "Title": "Item Pile Konfiguracja: {actor_name}"
       },
       "DropCurrencies": {
