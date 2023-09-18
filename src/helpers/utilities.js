@@ -167,7 +167,11 @@ export function getItemTypesThatCanStack() {
     itemTypesWithQuantities = new Set(types.filter(type => {
       let itemTemplate = {};
       if (CONFIG?.Item?.dataModels?.[type]?.defineSchema !== undefined) {
-        itemTemplate.system = CONFIG.Item.dataModels[type].defineSchema();
+        itemTemplate.system = Object.entries(CONFIG.Item.dataModels[type].defineSchema())
+          .map(([key, schema]) => {
+            return [key, schema.fields ?? true]
+          })
+        itemTemplate.system = Object.fromEntries(itemTemplate.system);
       } else if (game.system?.template?.Item?.[type]) {
         itemTemplate.system = foundry.utils.deepClone(game.system.template.Item[type]);
         if (itemTemplate.system?.templates?.length) {
