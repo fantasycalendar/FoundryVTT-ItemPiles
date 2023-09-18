@@ -1812,6 +1812,7 @@ class API {
    * @param {object} [options.rollData={}]                        Data to inject into the roll formula
    * @param {Actor/string/boolean} [options.targetActor=false]    The target actor to add the items to, or the UUID of an actor
    * @param {boolean} [options.removeExistingActorItems=false]    Whether to clear the target actor's items before adding the ones rolled
+   * @param {boolean/string} [options.customCategory=false]       Whether to apply a custom category to the items rolled
    *
    * @returns {Promise<Array<Item>>}                              An array of object containing the item data and their quantity
    */
@@ -1822,7 +1823,8 @@ class API {
     displayChat = false,
     rollData = {},
     targetActor = false,
-    removeExistingActorItems = false
+    removeExistingActorItems = false,
+    customCategory = false
   } = {}) {
 
     let rollTable = table;
@@ -1875,6 +1877,7 @@ class API {
       normalizeTable,
       displayChat,
       rollData,
+      customCategory,
       targetActor: Utilities.getUuid(targetActor),
       removeExistingActorItems,
       userId: game.user.id

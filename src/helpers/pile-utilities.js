@@ -1517,13 +1517,25 @@ export function clearVaultLog(actor) {
   });
 }
 
+/**
+ *
+ * @param tableUuid
+ * @param formula
+ * @param resetTable
+ * @param normalize
+ * @param displayChat
+ * @param rollData
+ * @param customCategory
+ * @returns {Promise<[object]>}
+ */
 export async function rollTable({
   tableUuid,
   formula = "1",
   resetTable = true,
   normalize = false,
   displayChat = false,
-  rollData = {}
+  rollData = {},
+  customCategory = false
 } = {}) {
 
   const rolledItems = [];
@@ -1572,7 +1584,10 @@ export async function rollTable({
         item = await compendium.getDocument(rollData.documentId);
       }
     }
-    if (item instanceof Item) {
+
+    if (item instanceof RollTable) {
+      rolledItems.push(...(await rollTable({ tableUuid: item.uuid, resetTable, normalize, displayChat })))
+    } else if (item instanceof Item) {
       const quantity = Math.max(Utilities.getItemQuantity(item) * rolledQuantity, 1);
       rolledItems.push({
         ...rollData,
@@ -1596,6 +1611,9 @@ export async function rollTable({
       setProperty(newItem, "flags", newItem.item.flags);
       if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
         setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
+      }
+      if (customCategory) {
+        setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, customCategory);
       }
       items.push({
         ...newItem
@@ -1642,7 +1660,12 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         if (rollResult.documentCollection === "RollTable" || potentialPack?.documentName === "RollTable") {
           const subTable = await getTable(rollResult);
           items.push(...(await rollMerchantTables({
-            tableData: [{ uuid: subTable.uuid, addAll: false, timesToRoll: roll.total }], actor
+            tableData: [{
+              uuid: subTable.uuid,
+              addAll: false,
+              timesToRoll: roll.total,
+              customCategory: table.customCategory
+            }], actor
           })))
           continue;
         }
@@ -1651,6 +1674,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         const quantity = roll.total * Math.max(Utilities.getItemQuantity(item), 1);
         tableItems.push({
           ...rollResult,
+          customCategory: table.customCategory,
           item,
           quantity
         })
@@ -1664,7 +1688,16 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
         continue;
       }
 
-      tableItems = await rollTable({ tableUuid: table.uuid, formula: roll.total })
+      tableItems = await rollTable({
+        tableUuid: table.uuid,
+        formula: roll.total
+      })
+
+      tableItems.forEach(item => {
+        if (table.customCategory) {
+          setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table.customCategory);
+        }
+      });
 
     }
 
@@ -1675,6 +1708,13 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
       if (existingItem) {
         existingItem.quantity += Math.max(newItem.quantity, 1);
       } else {
+        setProperty(newItem, "flags", newItem.item.flags);
+        if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
+          setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
+        }
+        if (newItem.customCategory) {
+          setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, newItem.customCategory);
+        }
         items.push({
           ...newItem,
           quantity: newItem.quantity

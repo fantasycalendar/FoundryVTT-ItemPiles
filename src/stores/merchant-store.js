@@ -67,11 +67,12 @@ export default class MerchantStore extends ItemPileStore {
       if (!setup) return;
       this.updatePriceModifiers();
       this.updateOpenCloseStatus();
-
     });
     if (this.recipientDocument) {
       this.subscribeTo(this.recipientPileData, (pileData) => {
-        this.setupColumns(pileData);
+        if (PileUtilities.isItemPileMerchant(this.recipient, pileData)) {
+          this.setupColumns(pileData);
+        }
         if (!setup) return;
         this.updatePriceModifiers();
       });
@@ -153,6 +154,8 @@ export default class MerchantStore extends ItemPileStore {
       label: false,
       component: EntryButtons
     });
+
+    console.log(columns);
 
     this.itemColumns.set(columns);
 

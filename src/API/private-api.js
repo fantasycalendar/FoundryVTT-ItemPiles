@@ -2242,6 +2242,7 @@ export default class PrivateAPI {
     normalizeTable = false,
     displayChat = false,
     rollData = {},
+    customCategory = false,
     targetActor = false,
     removeExistingActorItems = false,
     userId = false,
@@ -2253,7 +2254,8 @@ export default class PrivateAPI {
       normalize: normalizeTable,
       resetTable,
       displayChat,
-      rollData
+      rollData,
+      customCategory
     });
 
     if (targetActor) {

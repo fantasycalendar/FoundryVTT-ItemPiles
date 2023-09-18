@@ -3,6 +3,7 @@
   import QuantityColumn from "./QuantityColumn.svelte";
 
   export let item;
+  export let showQuantity = false;
 
   const itemNameStore = item.name;
   const itemImage = item.img;
@@ -54,9 +55,11 @@
 		</div>
 	</div>
 
-	<div class="item-piles-quantity-container">
-		<QuantityColumn {item} showX/>
-	</div>
+	{#if showQuantity}
+		<div class="item-piles-quantity-container">
+			<QuantityColumn {item} showX/>
+		</div>
+	{/if}
 
 	<slot name="right"/>
 

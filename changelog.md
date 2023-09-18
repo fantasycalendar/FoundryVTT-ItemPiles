@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.7.13
+
+- Fixed merchant columns sometimes resetting
+- Fixed populating items in the merchant not applying custom categories
+
 ## Version 2.7.12 Hotfix
 
 - Actually fixed populate items tab in merchants

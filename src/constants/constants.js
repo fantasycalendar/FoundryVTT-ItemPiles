@@ -20,7 +20,8 @@ const CONSTANTS = {
     SHARING: baseFlag + "sharing",
     PUBLIC_TRADE_ID: baseFlag + "publicTradeId",
     TRADE_USERS: baseFlag + "tradeUsers",
-    TEMPORARY_ITEM: baseFlag + "temporary_item"
+    TEMPORARY_ITEM: baseFlag + "temporary_item",
+    CUSTOM_CATEGORY: baseFlag + "item.customCategory"
   },
 
   ITEM_DEFAULTS: {

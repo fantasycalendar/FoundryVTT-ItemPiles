@@ -291,7 +291,7 @@
 			<div
 				class="item-piles-flexrow item-piles-item-row item-piles-even-color"
 			>
-				<ItemEntry {item}>
+				<ItemEntry {item} showQuantity={true}>
 					<button
 						slot="right"
 						class="item-piles-rolled-item-button"
@@ -322,7 +322,7 @@
 			<div
 				class="item-piles-flexrow item-piles-item-row item-piles-even-color"
 			>
-				<ItemEntry {item}>
+				<ItemEntry {item} showQuantity={true}>
 					<button
 						slot="right"
 						class="item-piles-rolled-item-button"
