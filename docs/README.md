@@ -98,6 +98,7 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Dark Heresy 2nd Edition](https://foundryvtt.com/packages/dark-heresy)
 - [Naheulbeuk](https://foundryvtt.com/packages/naheulbeuk)
 - [Alien RPG](https://foundryvtt.com/packages/alienrpg)
+- [Pirate Borg](https://foundryvtt.com/packages/pirateborg)
 
 ## Externally support systems
 

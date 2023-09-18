@@ -2,6 +2,7 @@
 
 ## Version 2.7.13
 
+- Added support for the Pirate Borg system (thanks to Sneat on github!)
 - Improved Better RollTables support
 - Fixed merchant columns sometimes resetting
 - Fixed populating items in the merchant not applying custom categories
