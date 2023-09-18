@@ -155,8 +155,6 @@ export default class MerchantStore extends ItemPileStore {
       component: EntryButtons
     });
 
-    console.log(columns);
-
     this.itemColumns.set(columns);
 
     const sortTypes = columns.filter(col => col.label);
