@@ -47,7 +47,7 @@ export default class DropItemDialog extends SvelteApplication {
     if (!options?.localizationTitle) {
       options.localizationTitle = "DropItem";
     }
-    const apps = this.getActiveApps(item.id + (target ? "-" + target.id : ""));
+    const apps = this.getActiveApps(item.uuid + (target ? "-" + target.uuid : ""));
     if (apps.length) {
       for (let app of apps) {
         app.render(false, { focus: true });

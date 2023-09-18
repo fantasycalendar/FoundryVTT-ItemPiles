@@ -59,7 +59,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
     recipient = Utilities.getActor(recipient);
     const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, source, recipient, options, dialogData);
     if (result === false) return;
-    const apps = this.getActiveApps(source?.token?.id ?? source.id);
+    const apps = this.getActiveApps(source?.token?.uuid ?? source.uuid);
     if (apps.length) {
       for (let app of apps) {
         app.render(false, { focus: true });

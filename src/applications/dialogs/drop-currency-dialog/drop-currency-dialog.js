@@ -45,7 +45,7 @@ export default class DropCurrencyDialog extends SvelteApplication {
 
   static async show(sourceActor, targetActor, settings = {}, options = {}) {
     if (sourceActor) {
-      const apps = this.getActiveApps(targetActor ? sourceActor.id + "-" + targetActor.id : sourceActor.id);
+      const apps = this.getActiveApps(targetActor ? sourceActor.uuid + "-" + targetActor.uuid : sourceActor.uuid);
       if (apps.length) {
         for (let app of apps) {
           app.render(false, { focus: true });

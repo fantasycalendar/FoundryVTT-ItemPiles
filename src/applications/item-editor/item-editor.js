@@ -33,7 +33,7 @@ export default class ItemEditor extends SvelteApplication {
   }
 
   static async show(item = false, options = {}, dialogData = {}) {
-    const app = this.getActiveApp(item.id);
+    const app = this.getActiveApp(item.uuid);
     if (app) return app.render(false, { focus: true });
     return new Promise((resolve) => {
       options.resolve = resolve;

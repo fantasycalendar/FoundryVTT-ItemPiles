@@ -49,7 +49,7 @@ export default class MerchantApp extends SvelteApplication {
     const recipientActor = Utilities.getActor(recipient);
     const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, merchantActor, recipientActor, options, dialogData);
     if (result === false) return;
-    const app = this.getActiveApp(merchant.id);
+    const app = this.getActiveApp(merchant.uuid);
     if (app) return app.render(false, { focus: true });
     return new Promise((resolve) => {
       options.resolve = resolve;

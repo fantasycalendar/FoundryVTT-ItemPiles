@@ -37,7 +37,7 @@ export default class ItemPileConfig extends SvelteApplication {
 
   static async show(target, options = {}, dialogData = {}) {
     const targetActor = Utilities.getActor(target);
-    const app = this.getActiveApp(targetActor.id);
+    const app = this.getActiveApp(targetActor.uuid);
     if (app) return app.render(false, { focus: true });
     return new Promise((resolve) => {
       options.resolve = resolve;

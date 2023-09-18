@@ -73,7 +73,7 @@ export default class VaultApp extends SvelteApplication {
       }));
       return;
     }
-    const apps = this.getActiveApps(source?.token?.id ?? source.id);
+    const apps = this.getActiveApps(source?.token?.uuid ?? source.uuid);
     if (apps.length) {
       for (let app of apps) {
         app.render(false, { focus: true });
