@@ -1,1 +1,148 @@
-{}
+{
+  "ITEM-PILES": {
+    "Currencies": "Měny",
+    "Currency": "Měna",
+    "ContextMenu": {
+      "ShowToPlayers": "Ukázat hráčům",
+      "RequestTrade": "Požádat o obchod"
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "Ukázat hráčům"
+    },
+    "Types": {
+      "pile": "Kupa položek",
+      "merchant": "Obchodník",
+      "vault": "Trezor",
+      "container": "Kontejner"
+    },
+    "Notifications": {
+      "UpdateItemPileSuccess": "Kupa položek úspěšně aktualizována.",
+      "UpdateMerchantSuccess": "Obchodník úspěšně aktualizován.",
+      "ItemAdded": "{target_actor_name} obdržel {item_name}.",
+      "GiveItemAccepted": "{user_name} přijal tvoji nabídku.",
+      "ShownToPlayers": "Ukázat {actor_name} hráčům",
+      "CreatedJournal": "Vytvořen Item Piles log trezoru.",
+      "SystemSupportFound": "Systémová podpora nalezena! Použití výchozího nastavení systému na Kupu položek...",
+      "ItemTransferred": "{target_actor_name} obdržel {item_name} od {source_actor_name}."
+    },
+    "Errors": {
+      "DisallowedItemDrop": "Nemůžeš odhodit položky typu \"{type}\"",
+      "DisallowedItemTrade": "Nemůžeš obchodovat s položkami typu \"{type}\"",
+      "DisallowedItemSell": "Tento obchodník neakceptuje položky typu \"{type}\"",
+      "NoSourceDrop": "Nemůžeš upustit položky z panelu položek pokud nejsi GM.",
+      "PileTooFar": "Jsi příliš daleko, než abys mohl zkoumat tuto kupu.",
+      "NoTokenFound": "Nelze nalézt token nebo postavu, která tě reprezentuje.",
+      "PileLocked": "Tento kontejner je uzamčen a nemůže být otevřen - nemůžeš do něj vkládat položky.",
+      "DropNoToken": "Nemáš token v této scéně, takže zde nemůžeš odložit žádné položky.",
+      "NoVaultAccess": "Nemáš oprávnění zobrazit tento trezor.",
+      "NoVaultAccessActor": "{actor_name} nemá oprávnění zobrazit tento trezor."
+    },
+    "Warnings": {
+      "NoGMsConnected": "VAROVÁNÍ - GM není připojen - Item Piles požadují připojení GM aby hráči mohli využít většinu funkcí modulu.",
+      "GiveItemNoGM": "Není aktivní žádný GM abyste obdrželi tuto položku.",
+      "GiveItemDeclined": "{user_name} odmítl vaši nabídku.",
+      "NoPlayersActive": "Žádní hráči nejsou aktivní, aby udělali tuto akci",
+      "NoGMsConnectedAction": "VAROVÁNÍ - Nelze provést \"{action}\" protože žádný GM není aktivní.",
+      "VaultFull": "Tento trezor je plný!",
+      "VaultItemNotExpander": "Tato položka není rozšířením trezoru"
+    },
+    "Inspect": {
+      "Title": "Průzkum obsahu kupy",
+      "Owner": "Jako vlastník této kupy položek, můžeš editovat její obsah.",
+      "Empty": "Tato kupa je prázdná.",
+      "Destroyed": "Tato kupa už neexistuje a leží ladem.",
+      "TakeAll": "Vzít všechno",
+      "Take": "Vzít",
+      "Close": "Zavřít víko",
+      "Leave": "Opustit",
+      "NoShareLeft": "Žádný podíl nezbyl...",
+      "NoneLeft": "Nic nezůstalo...",
+      "OpenSheet": "Otevřít list",
+      "AddCurrency": "Přidat měnu",
+      "SplitAll": "Rozdělit na {num_players} dílů",
+      "SplitItems": "Rozdělit položky pro {num_players}",
+      "SplitCurrencies": "Rozdělit peníze pro {num_players}",
+      "AsActor": "Zkoumáš tuto kupu jako {actorName}."
+    },
+    "Trade": {
+      "Title": "Item Piles: Obchod",
+      "Accept": "Přijmout",
+      "Decline": "Odmítnout",
+      "Mute": "Ztlumit",
+      "AutoDecline": "Nereagovali jste na návrh obchodu dost rychle, takže byl automaticky odmítnut.",
+      "Declined": "Jiný uživatel odmítl návrh obchodu.",
+      "Private": "Provést tento obchod soukromě",
+      "PrivateExplanation": "Nejsou zveřejněny žádné karty chatu a nikdo nemůže sledovat",
+      "Over": "Tento obchod již není aktivní.",
+      "Between": "Obchod mezi {actor_1} a {actor_2}",
+      "DragDrop": "Přetáhni položku k zahájení obchodování",
+      "Prompt": {
+        "Title": "Item Piles: Odeslání žádosti o obchod",
+        "User": "Vyber s jakým uživatelem chceš obchodovat:",
+        "PickedActor": "Postava, která tě bude reprezentovat při obchodu:",
+        "PickToken": "Vyber zvolený token",
+        "DropActor": "Přetáhni postavu sem",
+        "Label": "Odeslat návrh obchodu",
+        "PickActor": "Vyber jaká postava tě bude v tomto obchodě reprezentovat:"
+      },
+      "NoActiveUsers": {
+        "Title": "Item Piles: Žádní aktivní uživatelé",
+        "Content": "Žádní hráči nejsou aktivní, takže nemáš s kým obchodovat."
+      },
+      "Request": {
+        "Title": "Item Piles: Návrh obchodu",
+        "Content": "{trading_actor_name} (user {trading_user_name}) chce s tebou obchodovat.",
+        "AcceptQuery": "Přijímáš?",
+        "PrivateContent": "{trading_actor_name} (user {trading_user_name}) chce s tebou obchodovat <strong>soukromě</strong> ."
+      },
+      "OngoingRequest": {
+        "Content": "Čekání na odpověď od {user_name}...",
+        "Label": "Zrušit návrh obchodu"
+      },
+      "CancelledRequest": {
+        "Content": "{user_name} zrušil návrh obchodu."
+      },
+      "AddCurrency": {
+        "Title": "Přidat měny",
+        "Content": "Přidat měny do aktivního obchodu s {trader_actor_name}",
+        "Label": "Aktualizace měn"
+      },
+      "GMAddCurrency": "Přidání měny (GM mód)",
+      "Closed": {
+        "Title": "Obchod uzavřen",
+        "Them": "Uživatel \"{user_name}\" zavřel okno obchodování, takže obchod byl zrušen.",
+        "You": "Zavřel jsi okno obchodování, takže obchod byl stornován.",
+        "Someone": "Jeden z uživatelů zavřel okno obchodování, takže obchod byl zrušen."
+      },
+      "Disconnected": "Jeden z uživatelů byl odpojen, takže obchod byl zrušen.",
+      "UserCharacterWarning": "Vybral jsi postavu \"{actor_name}\" která je přiřazena hráči \"{player_name}\".<br><br>Určitě to chceš udělat?",
+      "ActorOwnerWarning": "Nevlastníš tuto postavu, takže za ni nemůžeš obchodovat.",
+      "SameActor": "Oba uživatelé nemohou vybrat stejnou postavu - nemůžeš obchodovat sám se sebou. Zastav to.",
+      "UserActiveCharacterWarning": "Vybral jsi postavu \"{actor_name}\" která je přiřazena hráči \"{player_name}\", který je <strong>aktivní</strong>.<br><br>Určitě to chceš udělat?"
+    },
+    "Merchant": {
+      "Title": "Obchodník: {actor_name}",
+      "BuyServices": "Koupit služby",
+      "BuyItems": "Koupit věci",
+      "SellItems": "Prodat věci",
+      "PopulateItems": "Doplnit zásoby",
+      "AllTypes": "Všechny typy",
+      "Buy": "Koupit",
+      "NoMatchFound": "Nic neodpovídá hledanému",
+      "NoItemsForSale": "Obchodník nemá nic na prodej",
+      "NoItemsToSell": "Nemáš nic co bys prodal tomuto obchodníkovi",
+      "OpenTimes": "Otvírací doba",
+      "OpenCloseAuto": "Automatické",
+      "Open": "Otevřeno",
+      "Closed": "Zavřeno",
+      "Hours": "Hodiny",
+      "Minutes": "Minuty",
+      "MerchantClosed": "Obchodník má zavřeno, zkuste to později.",
+      "Sell": "Prodej",
+      "Description": "Popis",
+      "Settings": "Nastavení",
+      "Override": "Přepsání"
+    },
+    "Items": "Položky"
+  }
+}
