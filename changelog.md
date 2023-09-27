@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.14
+
+- Added Czech localization (thank you Mortan on weblate - fantastic job!)
+
 ## Version 2.7.13
 
 - Added support for the Pirate Borg system (thanks to Sneat on github!)
