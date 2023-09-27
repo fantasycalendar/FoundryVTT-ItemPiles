@@ -1,0 +1,840 @@
+{
+  "ITEM-PILES": {
+    "Currencies": "Měny",
+    "Currency": "Měna",
+    "ContextMenu": {
+      "ShowToPlayers": "Ukázat hráčům",
+      "RequestTrade": "Požádat o obchod"
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "Ukázat hráčům"
+    },
+    "Types": {
+      "pile": "Kupa položek",
+      "merchant": "Obchodník",
+      "vault": "Trezor",
+      "container": "Kontejner"
+    },
+    "Notifications": {
+      "UpdateItemPileSuccess": "Kupa položek úspěšně aktualizována.",
+      "UpdateMerchantSuccess": "Obchodník úspěšně aktualizován.",
+      "ItemAdded": "{target_actor_name} obdržel {item_name}.",
+      "GiveItemAccepted": "{user_name} přijal tvoji nabídku.",
+      "ShownToPlayers": "Ukázat {actor_name} hráčům",
+      "CreatedJournal": "Vytvořen Item Piles log trezoru.",
+      "SystemSupportFound": "Systémová podpora nalezena! Použití výchozího nastavení systému na Kupu položek...",
+      "ItemTransferred": "{target_actor_name} obdržel {item_name} od {source_actor_name}."
+    },
+    "Errors": {
+      "DisallowedItemDrop": "Nemůžeš odhodit položky typu \"{type}\"",
+      "DisallowedItemTrade": "Nemůžeš obchodovat s položkami typu \"{type}\"",
+      "DisallowedItemSell": "Tento obchodník neakceptuje položky typu \"{type}\"",
+      "NoSourceDrop": "Nemůžeš upustit položky z panelu položek pokud nejsi GM.",
+      "PileTooFar": "Jsi příliš daleko, než abys mohl zkoumat tuto kupu.",
+      "NoTokenFound": "Nelze nalézt token nebo postavu, která tě reprezentuje.",
+      "PileLocked": "Tento kontejner je uzamčen a nemůže být otevřen - nemůžeš do něj vkládat položky.",
+      "DropNoToken": "Nemáš token v této scéně, takže zde nemůžeš odložit žádné položky.",
+      "NoVaultAccess": "Nemáš oprávnění zobrazit tento trezor.",
+      "NoVaultAccessActor": "{actor_name} nemá oprávnění zobrazit tento trezor."
+    },
+    "Warnings": {
+      "NoGMsConnected": "VAROVÁNÍ - GM není připojen - Item Piles požadují připojení GM aby hráči mohli využít většinu funkcí modulu.",
+      "GiveItemNoGM": "Není aktivní žádný GM abyste obdrželi tuto položku.",
+      "GiveItemDeclined": "{user_name} odmítl vaši nabídku.",
+      "NoPlayersActive": "Žádní hráči nejsou aktivní, aby udělali tuto akci",
+      "NoGMsConnectedAction": "VAROVÁNÍ - Nelze provést \"{action}\" protože žádný GM není aktivní.",
+      "VaultFull": "Tento trezor je plný!",
+      "VaultItemNotExpander": "Tato položka není rozšířením trezoru"
+    },
+    "Inspect": {
+      "Title": "Průzkum obsahu kupy",
+      "Owner": "Jako vlastník této kupy položek, můžeš editovat její obsah.",
+      "Empty": "Tato kupa je prázdná.",
+      "Destroyed": "Tato kupa už neexistuje a leží ladem.",
+      "TakeAll": "Vzít všechno",
+      "Take": "Vzít",
+      "Close": "Zavřít víko",
+      "Leave": "Opustit",
+      "NoShareLeft": "Žádný podíl nezbyl...",
+      "NoneLeft": "Nic nezůstalo...",
+      "OpenSheet": "Otevřít list",
+      "AddCurrency": "Přidat měnu",
+      "SplitAll": "Rozdělit na {num_players} dílů",
+      "SplitItems": "Rozdělit položky pro {num_players}",
+      "SplitCurrencies": "Rozdělit peníze pro {num_players}",
+      "AsActor": "Zkoumáš tuto kupu jako {actorName}."
+    },
+    "Trade": {
+      "Title": "Item Piles: Obchod",
+      "Accept": "Přijmout",
+      "Decline": "Odmítnout",
+      "Mute": "Ztlumit",
+      "AutoDecline": "Nereagovali jste na návrh obchodu dost rychle, takže byl automaticky odmítnut.",
+      "Declined": "Jiný uživatel odmítl návrh obchodu.",
+      "Private": "Provést tento obchod soukromě",
+      "PrivateExplanation": "Nejsou zveřejněny žádné karty chatu a nikdo nemůže sledovat",
+      "Over": "Tento obchod již není aktivní.",
+      "Between": "Obchod mezi {actor_1} a {actor_2}",
+      "DragDrop": "Přetáhni položku k zahájení obchodování",
+      "Prompt": {
+        "Title": "Item Piles: Odeslání žádosti o obchod",
+        "User": "Vyber s jakým uživatelem chceš obchodovat:",
+        "PickedActor": "Postava, která tě bude reprezentovat při obchodu:",
+        "PickToken": "Vyber zvolený token",
+        "DropActor": "Přetáhni postavu sem",
+        "Label": "Odeslat návrh obchodu",
+        "PickActor": "Vyber jaká postava tě bude v tomto obchodě reprezentovat:"
+      },
+      "NoActiveUsers": {
+        "Title": "Item Piles: Žádní aktivní uživatelé",
+        "Content": "Žádní hráči nejsou aktivní, takže nemáš s kým obchodovat."
+      },
+      "Request": {
+        "Title": "Item Piles: Návrh obchodu",
+        "Content": "{trading_actor_name} (user {trading_user_name}) chce s tebou obchodovat.",
+        "AcceptQuery": "Přijímáš?",
+        "PrivateContent": "{trading_actor_name} (user {trading_user_name}) chce s tebou obchodovat <strong>soukromě</strong> ."
+      },
+      "OngoingRequest": {
+        "Content": "Čekání na odpověď od {user_name}...",
+        "Label": "Zrušit návrh obchodu"
+      },
+      "CancelledRequest": {
+        "Content": "{user_name} zrušil návrh obchodu."
+      },
+      "AddCurrency": {
+        "Title": "Přidat měny",
+        "Content": "Přidat měny do aktivního obchodu s {trader_actor_name}",
+        "Label": "Aktualizace měn"
+      },
+      "GMAddCurrency": "Přidání měny (GM mód)",
+      "Closed": {
+        "Title": "Obchod uzavřen",
+        "Them": "Uživatel \"{user_name}\" zavřel okno obchodování, takže obchod byl zrušen.",
+        "You": "Zavřel jsi okno obchodování, takže obchod byl stornován.",
+        "Someone": "Jeden z uživatelů zavřel okno obchodování, takže obchod byl zrušen."
+      },
+      "Disconnected": "Jeden z uživatelů byl odpojen, takže obchod byl zrušen.",
+      "UserCharacterWarning": "Vybral jsi postavu \"{actor_name}\" která je přiřazena hráči \"{player_name}\".<br><br>Určitě to chceš udělat?",
+      "ActorOwnerWarning": "Nevlastníš tuto postavu, takže za ni nemůžeš obchodovat.",
+      "SameActor": "Oba uživatelé nemohou vybrat stejnou postavu - nemůžeš obchodovat sám se sebou. Zastav to.",
+      "UserActiveCharacterWarning": "Vybral jsi postavu \"{actor_name}\" která je přiřazena hráči \"{player_name}\", který je <strong>aktivní</strong>.<br><br>Určitě to chceš udělat?"
+    },
+    "Merchant": {
+      "Title": "Obchodník: {actor_name}",
+      "BuyServices": "Koupit služby",
+      "BuyItems": "Koupit věci",
+      "SellItems": "Prodat věci",
+      "PopulateItems": "Doplnit zásoby",
+      "AllTypes": "Všechny typy",
+      "Buy": "Koupit",
+      "NoMatchFound": "Nic neodpovídá hledanému",
+      "NoItemsForSale": "Obchodník nemá nic na prodej",
+      "NoItemsToSell": "Nemáš nic co bys prodal tomuto obchodníkovi",
+      "OpenTimes": "Otvírací doba",
+      "OpenCloseAuto": "Automatické",
+      "Open": "Otevřeno",
+      "Closed": "Zavřeno",
+      "Hours": "Hodiny",
+      "Minutes": "Minuty",
+      "MerchantClosed": "Obchodník má zavřeno, zkuste to později.",
+      "Sell": "Prodat",
+      "Description": "Popis",
+      "Settings": "Nastavení",
+      "Override": "Přepsání",
+      "EditTypePrices": "Editace modifikátorů nákladů dle typu",
+      "EditTypePricesExplanation": "Přepnutí viditelnosti posuvníků pro jednotlivé typy na kartě Koupit položky",
+      "BuyNoItems": "Obchodník je bez zboží",
+      "CurrentItems": "Aktuální položky",
+      "CurrentServices": "Aktuální služby",
+      "NoRollTables": "Neexistují tabulky hodů, pro začátek jednu vytvořte",
+      "ClickRoll": "Pro start klikněte na hod",
+      "RolledTimes": "Hozeno {rolls} krát",
+      "KeepRolled": "Zachovat výsledek",
+      "AddAll": "Přidat všechny položky",
+      "ClearAllItems": "Smazat všechny položky postavy",
+      "ClearAllServices": "Smazat všechny služby postavy",
+      "RemoveItem": "Odstranit",
+      "ItemFree": "Zdarma",
+      "RollableTables": "Tabulky hodů",
+      "AddTable": "Přidat tabulku",
+      "RollAllTables": "Hodit všechny tabulky",
+      "ToolTipRemoveTable": "Odstranit tabulku",
+      "TooltipConfigureTable": "Upravit tabulku",
+      "TooltipRollTable": "Hodit tabulku",
+      "ToolTipRemoveAllRolledItems": "Odstranit všechny hozené položky",
+      "ShoppingAs": "Nakupování jako {actorName}",
+      "TableAddAllItems": "Přidat všechny položky:",
+      "TableCustomCategory": "Přidat položky do zvolené kategorie:",
+      "AddItem": "Přidat",
+      "Service": "Služba",
+      "TableTimesToRoll": "Kolikrát házet na tabulku:"
+    },
+    "Items": "Položky",
+    "Settings": {
+      "Price": {
+        "Hint": "Zde můžete upravit jaká je cesta k atributu ceny každého předmětu. Například v systému D&D5e je cena každého předmětu uloženo v atributu \"item.system.price\", takže byste zadali \"system.price\" v tomto nastavení.",
+        "Title": "Atribut ceny předmětu"
+      },
+      "CssVariables": {
+        "Hint": "Toto vám umožní konfigurovat různé proměnné CSS, které určují barvy a další styly v rozhraních Kupy položek.",
+        "Title": "Styly CSS proměnných",
+        "Label": "Konfigurace CSS proměnných"
+      },
+      "CustomItemCategories": {
+        "Hint": "Zde můžete konfigurovat vlastní kategorie položek, které jsou zobrazeny jako návrhy v editoru položek.",
+        "Label": "Konfigurace kategorií položky",
+        "Title": "Vlastní kategorie položky"
+      },
+      "EnableGivingItems": {
+        "Hint": "Toto umožní uživatelům být schopni odložit předmety na jiný token, aby jim ho dali - s tímto zneplatněným uživatelé nemohou dát ostatním uživatelům předměty.",
+        "Title": "Umožnit dávání předmětů"
+      },
+      "InspectItemsTrade": {
+        "Hint": "Povolení umožní uživatelům kliknout na předměty které jsou obchodovány a otevřít kartu předmětu k prozkoumání.",
+        "Title": "Umožnit zkoumání předmětů během obchodů"
+      },
+      "HideTokenBorder": {
+        "Hint": "Toto řídí zda hranice tokenu jsou skryté, když přejíždíte nad tokeny Kupy položek. Vybrání tokenu vždy zobrazí hranice.",
+        "Title": "Skryj hranice tokenu Kupy položek",
+        "HideEveryone": "Skýt přede všemi",
+        "HidePlayers": "Skrýt před hráči",
+        "Show": "Zobraz hranice (základní chování)"
+      },
+      "InvertSheetOpen": {
+        "Hint": "Když chcete otevřít kartu Kupy položek, musíte obvykle podržet Ctrl. Povolením se otevře ve výchozím nastavení karta Kupy položek a podržením Ctrl se otevře uživatelské rozhraní inventáře Kupy položek.",
+        "Title": "Invertovat Ctrl + dvojklik pro Otevření"
+      },
+      "DeleteEmptyPiles": {
+        "Hint": "Toto způsobí, že se Kupa smaže poté, co v ní dojdou položky. Toto může být přepsáno na jednotlivých Kupách položek.",
+        "Title": "Automatické mazání prázdných Kup"
+      },
+      "Debug": {
+        "Title": "Povolit ladění",
+        "Hint": "Tiskne ladící zprávy do konzoly"
+      },
+      "DebugHooks": {
+        "Hint": "Tiskne háčky Kupy položek a jejich obsah na konzoli",
+        "Title": "Povolit ladění háčků"
+      },
+      "PopulationTablesFolder": {
+        "Title": "Složka RollTables pro \"Vyplnění položek\"",
+        "Hint": "Název složky pro filtrování tabulek hodů na kartě \"Populate Items\" obchodníka.",
+        "AllTables": "Všechny tabulky"
+      },
+      "Reset": {
+        "Hint": "Toto resetuje všechna nastavení Item Piles zpět na výchozí hodnoty aktivního herního systému.",
+        "Title": "Resetovat specifická nastavení systému na výchozí",
+        "Label": "Reset nastavení"
+      },
+      "ActorClass": {
+        "Hint": "Toto nastavení definuje typ postavy, který bude použit pro výchozí postavu Kupy položek, která je vytvořena při prvním odhození položky. V případě D&D5e je to \"character\" a nemá vyhrazený typ postavy.",
+        "Title": "Typ třídy postavy"
+      },
+      "QuantityForPrice": {
+        "Title": "Množství položky pro cenu",
+        "Hint": "Zde můžete upravit jaká je cesta k atributu množství položky, které dostanete za cenu. Například v systému PF2e je na položce vlastnost \"per\", která určuje jaké množství položky dostanete za její cenu, který je uložen v atributu \"item.system.price.per\" , takže byste zadali \"system.price.per\" v tomto nastavení."
+      },
+      "Currencies": {
+        "Title": "Měny",
+        "Label": "Konfigurace měn",
+        "Hint": "Toto nastavení definuje měny které jsou dostupné k vyzvednutí, což nemusí být skutečné předměty, ale číselné vstupy v kartě postavy."
+      },
+      "SecondaryCurrencies": {
+        "Title": "Druhotné měny",
+        "Label": "Konfigurace druhotných měn",
+        "Hint": "Toto nastavení definuje druhotné měny, podobné ale oddělené od běžných měn. Tyto nemají směnný kurz a nemohou být rozděleny do jiných vlastních měn."
+      },
+      "Configure": {
+        "Title": "Konfigurace modulu",
+        "Label": "Nastavit modul",
+        "Hint": "Můžeš konfigurovat Item Piles v tomto dialogu."
+      },
+      "Quantity": {
+        "Title": "Atribut množství položky",
+        "Hint": "Zde můžete nastavit cestu pro množství každé položky. Například v systému D&D5e je množství každého předmětu uloženo v atributu \"item.system.quantity\", takže v tomto nastavení uvedete \"system.quantity\"."
+      },
+      "CurrencyDecimalDigits": {
+        "Title": "Desetinná místa měny",
+        "Hint": "Toto nastavení definuje nejmenší desetinné místo vaší měny. Například v moderním nastavení s moderní měnou umožní \"0.01\" dvě desetinná místa. Toto není používáno pokud máte více než tuto jednu měnu."
+      },
+      "ItemFilters": {
+        "Title": "Filtry položek",
+        "Label": "Konfigurace filtrů položek",
+        "Hint": "Zde můžete určit jaké položky jsou ignorovány a nebudou zahrnuty do dialogu Kupy položek."
+      },
+      "ItemSimilarities": {
+        "Title": "Podobnosti položek",
+        "Label": "Konfigurace podobností položek",
+        "Hint": "Zde můžete určit jak jsou položky rozpoznány jako stejné v systému. Některé systémy mohou mít údaje, které rozlišují položky jinak než ostatní, například dočasné předměty."
+      },
+      "UnstackableItemTypes": {
+        "Title": "Nestohovatelné typy položek",
+        "Label": "Konfigurace nestohovatelných položek",
+        "Hint": "Zde můžete určit jaké typy položek jsou považovány za unikátní, bez ohledu na cokoliv. Typy zahrnuté zde nemohou být kumulovány a mohou mít pouze množství 1."
+      },
+      "VaultStyles": {
+        "Title": "Styly trezoru",
+        "Label": "Konfigurace stylů trezoru",
+        "Hint": "Toto vám umožní přidat pravidla, která budou stylizovat položky na základě cest k vlastnostem a hodnotám samotných položek."
+      },
+      "PricePresets": {
+        "Title": "Přednastavení ceny",
+        "Label": "Konfigurace přednastavení ceny",
+        "Hint": "Zde můžete konfigurovat vlastní přednastavení cen které pak můžete snadno importovat do položek."
+      },
+      "EnableDroppingItems": {
+        "Title": "Umožnit odhození předmětů",
+        "Hint": "Toto umožní uživatelům být schopni odhodit předmět na podlahu k vytvoření jejich vlastní Kupy položky - s tímto zneplatněným uživatelé nemohou tvořit nové Kupy."
+      },
+      "EnableTrading": {
+        "Title": "Umožnit obchodování",
+        "Hint": "Toto umožní obchodování - s tímto zneplatněným, nikdo nemůže iniciovat žádný obchod."
+      },
+      "ShowTradeButton": {
+        "Title": "Zobraz tlačítko obchodu",
+        "Hint": "Umožněním se zobrazí tlačítko obchodu dole pod seznamem hráčů."
+      },
+      "OutputToChat": {
+        "Title": "Výstup do chatu",
+        "Hint": "Kdykoliv nějaký hráč vyzvedne položky z Kupy, odešle se zpráva zobrazující, co bylo vyzvednuto.",
+        "Off": "Vypnuto - vypnutí zpráv",
+        "Public": "Veřejně - každý může vidět zprávy",
+        "SelfGM": "Soukromě - pouze GM a uživatel mohou vidět zprávy",
+        "Blind": "Slepě - pouze GM může vidět zprávy"
+      },
+      "HideHeaderButtonText": {
+        "Title": "Skrytí textu tlačítka v záhlaví",
+        "Hint": "Skryje text \"Item Piles\" v hlavičce postav a položek - užitečné pokud máte příliš mnoho modulů a hlavička se stává přeplněnou."
+      },
+      "HideHeaderButton": {
+        "Title": "Skryj tlačítko v záhlaví",
+        "Hint": "Skryje \"Item Piles\" tlačítko v hlavičce postav a položek. Tímto se pro vás stane těžším konfigurovat nové předměty a Kupy položek."
+      },
+      "PreloadFiles": {
+        "Title": "Předběžné načtení souborů",
+        "Hint": "Způsobí, že se soubory (obrázky a zvuky) Kup předem načtou, což vede k bezproblémovému zážitku."
+      }
+    },
+    "Applications": {
+      "ItemPileConfig": {
+        "Merchant": {
+          "RefreshItemsDaysExplanation": "Jakmile kalendář překročí zaškrtnuté dny, aktualizuje se inventář obchodníka. K tomu dojde v otevírací dobu obchodníka nebo o půlnoci, pokud nemá stanovenu otevírací/zavírací dobu.",
+          "RefreshItemsHolidaysExplanation": "Když kalendář předá poznámky s danou kategorií poznámek, aktualizuje se inventář obchodníka. Stane se tak v čase poznámky nebo o půlnoci, pokud se jedná o poznámku, která je nastavena na celý den.",
+          "ActorPriceModifiersExplanation": "Zde můžete nastavit, zda mají mít určité konkrétní postavy odlišné modifikátory ceny než výše uvedené.",
+          "Title": "Nastavení obchodníka",
+          "Enabled": "Je obchodník",
+          "EnabledExplanation": "Hráči nemohou vyzvednout položky od obchodníka, ale namísto toho je musí koupit",
+          "MerchantImage": "Obrázek obchodníka",
+          "MerchantImageExplanation": "Toto je obrázek, který bude zobrazen v obchodníkově rozhraní",
+          "InfiniteQuantity": "Nekonečné množství",
+          "InfiniteQuantityExplanation": "Když je povoleno, nemůže tomuto obchodníkovi dojít zboží.",
+          "InfiniteCurrency": "Nekonečné peníze",
+          "KeepZero": "Zachovej nulové množství",
+          "KeepZeroExplanation": "Když jsou předměty plně vyprodány, tento obchodník je neodstraní, ale namísto toho je nastaví na \"Není na prodej\".",
+          "DisplayQuantity": "Viditelnost množství položky",
+          "DisplayQuantityExplanation": "Toto určuje jak bude množství položky v obchodě zobrazeno, pokud vůbec.",
+          "DisplayQuantityYes": "Ano, zobraz množství (pokud předmět neříká jinak)",
+          "DisplayQuantityYesAlways": "Ano, vždy zobraz množství",
+          "DisplayQuantityNoAlways": "Ne, vždy skryj množství",
+          "PurchaseOnly": "Pouze nákup",
+          "PurchaseOnlyExplanation": "Když je povoleno, postavy nemohou prodat předměty tomuto obchodníkovi.",
+          "HideNewItems": "Skryj nové položky",
+          "HideNewItemsExplanation": "Když je umožněno, každá položka prodaná tomuto obchodníkovi bude skryta.",
+          "HideItemsWithZeroCost": "Skryj položky s nulovou cenou",
+          "OnlyAcceptBasePrice": "Přijmout pouze základní cenu",
+          "OnlyAcceptBasePriceExplanation": "Když je povoleno, všechny předměty prodané tomuto obchodníkovi musí použít základní cenu, ne žádnou vlastní cenu.",
+          "OpenTimes": "Otvírací doba",
+          "OpenStatus": "Otvírací status",
+          "OpenStatusExplanation": "Toto určuje aktuální stav obchodníkova otvíracího statusu. Pokud je povolena Otvírací doba (níže) a modul Simple Calendar je povolen, můžete toto nastavit jako automatické.",
+          "OpenStatusOpen": "Otevřeno",
+          "OpenStatusClosed": "Zavřeno",
+          "OpenStatusAuto": "Automaticky (Simple Calendar)",
+          "ClosedDays": "Zavírací dny (Simple Calendar)",
+          "ClosedHolidays": "Ve svátky zavřeno (Simple Calendar)",
+          "ClosedHolidaysExplanation": "Ve dnech, které jsou označeny zadanou kategorií poznámky, bude mít obchodník zavřeno (pokud jeho otvírací status je nastaven na automatický).",
+          "RefreshItemsOnOpen": "Aktualizuj nabídku v otvíracím čase (Simple Calendar)",
+          "RefreshItemsOnOpenExplanation": "Pokud čas v kalendáři překročí otevírací dobu obchodníka, dojde k obnovení zásob obchodníka.",
+          "RefreshItemsDays": "Dny obnovy položek (Simple Calendar)",
+          "RefreshItemsHolidays": "Obnova položek o svátcích (Simple Calendar)",
+          "PriceModifierTitle": "Nákupní a prodejní modifikátory ceny",
+          "PriceModifierExplanation": "Toto nastaví modifikátory pro cenu každé položky v obchodě. Můžete také nastavit modifikátory pro jednotlivé typy předmětů, a dokonce i pro konkrétní postavy (například výřečného barda). Nejste omezeni na 200 %, můžete zadat do pole ještě vyšší hodnotu.",
+          "BuyPriceModifier": "Modifikátor nákupní ceny (%)",
+          "SellPriceModifier": "Modifikátor prodejní ceny (%)",
+          "ItemTypeModifier": "Modifikátor ceny typu položky",
+          "ItemTypeModifiersExplanation": "V tomto dialogu můžete nastavit cenové modifikátory pro jednotlivé typy položek.",
+          "ConfigureItemTypePriceModifiers": "Konfigurace modifikátorů ceny typu položek",
+          "ActorPriceModifiers": "Přepsat modifikátory ceny pro postavy",
+          "ConfigureActorPriceModifiers": "Konfigurace modifikátorů ceny postav",
+          "MerchantColumns": "Sloupce obchodníka",
+          "MerchantColumnsExplanation": "Zde můžete konfigurovat specifické sloupce tohoto obchodníka, které se zobrazují v jeho uživatelském rozhraní, například vzácnost položek.",
+          "ConfigureMerchantColumns": "Konfigurace sloupců obchodníka",
+          "InfiniteCurrencyExplanation": "Když je povoleno, prodej věcí tomuto obchodníkovi není odečítán z jeho peněz.",
+          "DisplayQuantityNo": "Ne, skryj množství (pokud předmět neříká jinak)",
+          "HideItemsWithZeroCostExplanation": "Když je povoleno, způsobí, že zákazníci nemohou koupit nebo prodat položky, které mají cenu nula (zdarma).",
+          "OpenTimesExplanation": "Když je povoleno, s tímto obchodníkem mohou hráči jednat pouze v určitou denní dobu.",
+          "ClosedDaysExplanation": "V zaškrtnutých dnech bude mít obchodník zavřeno (pokud je jeho otvírací status nastaven na automatický).",
+          "RefreshItemsWarning": "Při všech možnostech níže budou existující položky SMAZÁNY a nemohou být obnoveny. Individuální položky mohou být konfigurovány pro zachování; položky nastavené jako služby, zachovej nulové množství a zachovej na obchodníkovi zůstanou."
+        },
+        "Vault": {
+          "CanStackItemsExplanation": "Když je toto povoleno, položky přidané do trezoru se budou slučovat s podobnými předměty. Toto může být také řízeno po položkách v jejich konfiguraci.",
+          "EnableExpansionExplanation": "Když je povoleno, předměty které jsou konfigurovány jako rozšíření trezoru zvýší dostupný prostor v trezoru.",
+          "RestrictAccessExplanation": "Ve výchozím nastavení má k trezorům přístup každý, kdo je vidí na postranním panelu nebo se k nim může dostat na scéně. Pokud je toto nastavení povoleno, trezor si bude moci prohlédnout pouze vlastník postavy trezoru nebo uživatelé/postavy nastavené v Editoru přístupu (viz níže).",
+          "LoggingFormatExplanation": "Toto nastaví jak se jméno uživatele a postavy zobrazí v protokolu.",
+          "Title": "Nastavení trezoru",
+          "Layout": "Uspořádání",
+          "LayoutExplanation": "Kolik sloupců a řádků má být viditelných v trezoru.",
+          "Columns": "Sloupce",
+          "Rows": "Řádky",
+          "CanStackItems": "Lze stohovat položky",
+          "EnableExpansion": "Povolit rozšiřující prvky",
+          "BaseExpansion": "Základní rozšíření",
+          "BaseExpansionExplanation": "Kolik sloupců a řádků je běžně dostupných bez jakéhokoliv rozšiřujícího prvku.",
+          "RestrictAccess": "Omezený přístup do trezoru",
+          "Access": "Přístup postav a hráčů",
+          "AccessExplanation": "Toto určuje které postavy a hráči mají přístup a mohou modifikovat inventář a peníze v trezoru. Pokud hráč má trezor ve vlastnictví, vždy má plný přístup.",
+          "ManageAccess": "Správa přístupu",
+          "LogVaultAccess": "Protokol přístupu k trezoru",
+          "LogVaultAccessExplanation": "Když je povoleno, tento trezor vytvoří záznam v deníku a vytvoří protokol s časovým razítkem při každé interakci s trezorem.",
+          "ClearVaultLog": "Smazat protokoly trezoru",
+          "ClearVaultLogExplanation": "Toto vyčistí protokoly trezoru, odstraní všechny záznamy. Toto nemůže být vráceno.",
+          "LoggingFormat": "Formát protokolů",
+          "LoggingFormatUserActor": "Zobraz jméno uživatele a postavy",
+          "LoggingFormatUser": "Zobraz pouze uživatele",
+          "LoggingFormatActor": "Zobraz pouze jméno postavy"
+        },
+        "Configure": "Kupa položek",
+        "Update": "Aktualizace Kupy položek",
+        "Main": {
+          "Title": "Hlavní nastavení",
+          "EnabledPile": "Povoleno",
+          "InspectItems": "Umožnit prohlížení položek",
+          "InspectItemsExplanation": "Kliknutím na jméno předmětu se otevře karta tohoto předmětu.",
+          "DisplayItemTypes": "Rozdělit položky dle typu",
+          "Distance": "Vzdálenost interakce",
+          "GridUnits": "Jednotky mřížky (ponechte prázdné pro nekonečno)",
+          "Macro": "Makro při interakci",
+          "MacroExplanation": "Jméno makra ke spuštění když dochází k interakci s touto Kupou položek.",
+          "MacroPlaceholder": "Vložte jméno makra",
+          "EditDescription": "Editace popisu",
+          "DeleteWhenEmpty": "Smazat když je prázdné",
+          "DeleteWhenEmptyExplanation": "Způsobí že tato Kupa položek se sama smaže když je prázdná.",
+          "DeleteWhenEmptyDefault": "Výchozí nastavení modulu",
+          "DeleteWhenEmptyNo": "Ne, nemazat, když je prázdné",
+          "OverrideCurrencies": "Přepsat měny",
+          "OverrideCurrenciesExplanation": "Upravuje zda tato Kupa může být schopná převádět jiné měny, než výchozí.",
+          "ConfigureOverrideCurrencies": "Konfigurace přepsání měn",
+          "OverrideSecondaryCurrenciesExplanation": "Upraví přepis druhotných měn pro tuto Kupu položek.",
+          "ConfigureOverrideSecondaryCurrencies": "Upraví přepsání druhotných měn",
+          "OverrideItemFilters": "Přepsat filtry položek",
+          "ConfigureOverrideItemFilters": "Konfigurace přepisu filtrů položek",
+          "EnabledPileExplanation": "Zda se toto má chovat jako Kupa položek.",
+          "DisplayItemTypesExplanation": "Zobrazit každý typ položky odděleně v Kupě položek, třízeno podle jejich typu.",
+          "EditDescriptionExplanation": "Tento popis se zobrazuje v relevantním rozhraní když je Kupa položek zobrazena",
+          "DeleteWhenEmptyYes": "Ano, smazat, když je prázdné",
+          "OverrideSecondaryCurrencies": "Přepsat druhotné měny",
+          "OverrideItemFiltersExplanation": "Upraví zda tato Kupa může být schopna převádět jiné typy položek, než výchozí."
+        },
+        "Other": {
+          "Title": "Jiná nastavení",
+          "Type": "Typ kupy položek",
+          "TypeExplanation": "Toto určuje způsob jakým tato Kupa položek bude zobrazena."
+        },
+        "SingleItem": {
+          "Title": "Nastavení jedné položky",
+          "DisplayOne": "Zobraz obrázek jedné položky",
+          "DisplayOneExplanation": "Pokud je Kupa tvořena z jediné položky, toto nastaví obrázek tokenu Kupy na obrázek této položky.",
+          "OverrideScale": "Přepsání stupnice tokenu jedné položky",
+          "Scale": "Stupnice tokenu jedné položky",
+          "ItemName": "Použít jméno položky",
+          "ItemNameExplanation": "Způsobí že Kupa položek bude pojmenována podle jediné položky, kterou obsahuje.",
+          "DisplayOneContainerWarning": "Varování! Máte obojí \"Zobraz obrázek jedné položky\" a \"Je kontejner\" povoleno. V tomto případě má prioritu obrázek kontejneru."
+        },
+        "Container": {
+          "Title": "Nastavení kontejneru",
+          "IsContainer": "Je kontejner",
+          "Locked": "Je uzamčeno",
+          "Closed": "Je zavřeno",
+          "ClosedImagePath": "Cesta k obrázku: Zavřeno",
+          "EmptyImagePath": "Cesta k obrázku: Prázdný",
+          "OpenedImagePath": "Cesta k obrázku: Otevřeno",
+          "LockedImagePath": "Cesta k obrázku: Uzamčeno",
+          "CloseSoundPath": "Cesta ke zvuku: Zavírání",
+          "OpenSoundPath": "Cesta ke zvuku: Otvírání",
+          "LockedSoundPath": "Cesta ke zvuku: Zamčeno"
+        },
+        "Sharing": {
+          "Title": "Nastavení sdílení",
+          "ShareItemsEnabled": "Sdílení umožněno: Položky",
+          "ShareItemsEnabledExplanation": "Když je toto povoleno, hráči si mohou vzít pouze jejich podíl množství položky. Zakázáno znamená že si mohou vzít tolik, kolik chtějí.",
+          "ShareCurrenciesEnabled": "Sdílení povoleno: Peníze",
+          "TakeAllEnabled": "Povolit tlačítko \"Vzít vše\"",
+          "SplitAllEnabled": "Povolit tlačítko \"Rozdělit s hráči\"",
+          "SplitAllEnabledExplanation": "Povolí tlačítko \"Rozdělit na [number] díly\" při drancování této Kupy položek. Stiskem tohoto tlačítka obdrží všichni hráči (nebo pouze aktivní hráči, viz níže) jejich podíl na Kupě položek.",
+          "InactivePlayers": "Rozdělit pouze s aktivními hráči",
+          "InactivePlayersExplanation": "Pouze hráči, kteří jsou aktivní když je drancována tato Kupa položek dostanou svůj podíl.",
+          "ResetSharingData": "Resetovat data o sdílení",
+          "ShareCurrenciesEnabledExplanation": "Když je toto povoleno, hráči si mohou vzít pouze jejich podíl množství peněz. Zakázáno znamená, že si mohou vzít tolik, kolik chtějí.",
+          "TakeAllEnabledExplanation": "Umožní tlačítko \"Vzít vše\" při drancování této Kupy položek. Vyžaduje zákaz u obou výše uvedených nastavení sdílení.",
+          "ResetSharingDataExplanation": "Když obsah Kupy položek byl manuálně změněn zatímco byla drancování, může dojít k tomu, že data o sdílení nebudou synchronizována se skutečnými podíly hráčů. Stiskem tohoto tlačítka dojde k resetu všech podílů na této kupě."
+        },
+        "Title": "Item Pile konfigurace: {actor_name}"
+      },
+      "VaultAccessEditor": {
+        "Explanation": "Toto nastaví které postavy a hráči mají přístup a mohou modifikovat inventář a peníze v trezoru. Pokud hráč trezor vlastní, má vždy plný přístup.",
+        "Title": "Editor přístupu k trezoru",
+        "TitleActor": "Editor přístupu k trezoru: {actor_name}",
+        "Character": "Hráč/Postava",
+        "View": "Zobrazení",
+        "Organize": "Organizace",
+        "Withdraw": "Vyjmutí",
+        "Deposit": "Uložení"
+      },
+      "MerchantColumnsEditor": {
+        "Explanation": "Toto nastaví sloupce viditelné v rozhraní obchodníka kromě názvu položku, množství a ceny.",
+        "Selling": "Prodej",
+        "Title": "Sloupce obchodníka",
+        "TitleActor": "Sloupce obchodníka: {actor_name}",
+        "Label": "Štítek",
+        "PropertyPath": "Cesta k majetku",
+        "Formatting": "Formátování",
+        "Buying": "Nákup",
+        "ConfigureMapping": "Konfigurace mapování",
+        "MappingTitle": "Mapování sloupců obchodníka: {label}",
+        "MappingContent": "Toto nastaví mapování mezi hodnotou vlastnosti a štítkem. Tento štítek může být lokalizovaný řetězec."
+      },
+      "PricePresetEditor": {
+        "Explanation": "Zde můžete vytvořit vícero přednastavených cen které mohou pak být snadno použity ve vlastních cenách položky.",
+        "Title": "Editor přednastavené ceny",
+        "Update": "Aktualizace přednastavení"
+      },
+      "DropItem": {
+        "Title": "Odhození předmětu",
+        "Header": "Odhazujete: {item_name}",
+        "Content": "Přidáváte tento předmět na hromádku \"{target_name}\".",
+        "Submit": "Přidat na kupu",
+        "SubmitNoTarget": "Vytvořit novou kupu",
+        "ContentMultipleQuantity": "Máte {quantity} tohoto předmětu. Kolik chcete odložit?",
+        "ContentInfiniteQuantity": "Kolik chcete odložit?"
+      },
+      "GiveItem": {
+        "Title": "Dát předmět",
+        "Content": "Chce dát \"{target_name}\" tento předmět?",
+        "ContentMultipleQuantity": "Máte {quantity} tohoto předmětu. Kolik chcete dát pryč?",
+        "ContentInfiniteQuantity": "Kolik chcete dát \"{target_name}\"?",
+        "Submit": "Dát",
+        "Header": "Dáváte předmět: {item_name}"
+      },
+      "DepositItem": {
+        "Title": "Vložit předmět",
+        "Header": "Vkládáte: {item_name}",
+        "Content": "Chcete vložit tento předmět do \"{target_name}\"?",
+        "ContentInfiniteQuantity": "Kolik chcete vložit?",
+        "ContentMultipleQuantity": "Máte {quantity} této položky. Kolik chcete vložit?",
+        "Submit": "Vloženo"
+      },
+      "WithdrawItem": {
+        "Title": "Vyjmout předmět",
+        "Header": "Berete: {item_name}",
+        "Content": "Chcete vzít tento předmět z \"{target_name}\"?",
+        "Submit": "Vyjmutí",
+        "ContentMultipleQuantity": "Je tam {quantity} této položky. Kolik chcete vzít?"
+      },
+      "SplitItem": {
+        "Title": "Rozdělit zásobu položky",
+        "Header": "Rozdělujete zásobu {item_name}",
+        "Content": "Chcete tuto naskládanou položku rozdělit?",
+        "Submit": "Rozdělit zásobník",
+        "ContentMultipleQuantity": "Je tam {quantity} této položky. Kolik jich chcete mít v novém zásobníku?"
+      },
+      "EditCurrencies": {
+        "Title": "Editovat měny",
+        "Content": "Jako GM můžete aktualizovat měny v této kupě položek:",
+        "Secondary": "Sekundární měny:",
+        "Submit": "Potvrdit"
+      },
+      "DropCurrencies": {
+        "NoCurrency": "{actor_name} nemá žádnou platnou měnu...",
+        "Submit": "Přidat",
+        "Title": "Odhození peněz",
+        "Content": "Můžeš přidat následující měny na tuto kupu položek:"
+      },
+      "DepositCurrencies": {
+        "NoCurrency": "{actor_name} nemá žádné měny k uložení.",
+        "Submit": "Vklad",
+        "Title": "Uložit peníze",
+        "Content": "Můžete uložit následující měny do tohoto trezoru:"
+      },
+      "WithdrawCurrencies": {
+        "Title": "Vyjmout předmět",
+        "Content": "Můžeš vyjmout následující měny z tohoto trezoru:",
+        "NoCurrency": "Nejsou zde žádné peníze k vyjmutí.",
+        "Submit": "Vyjmout"
+      },
+      "TradeMerchantItem": {
+        "Title": "Předmět obchodu: {item_name}",
+        "BuyItem": "Koupit předmět",
+        "SellItem": "Prodat předmět",
+        "YouPay": "Platíš",
+        "YouReceive": "Dostaneš",
+        "TheyReceive": "Oni dostanou",
+        "Quantity": "Množství",
+        "Change": "Změna",
+        "YouCantAfford": "Tuto cenu si nemůžeš dovolit",
+        "MaxQuantity": "Max {quantity}",
+        "TheyCantAfford": "Tuto cenu si nemohou dovolit",
+        "YouLackQuantity": "Nemáš dost této položky k prodeji. Máš {quantity}, ale je požadováno {requiredQuantity}",
+        "TheyLackQuantity": "Nemají dost této položky k prodeji. Mají {quantity}, ale je požadováno {requiredQuantity}"
+      },
+      "Settings": {
+        "Title": "Konfigurace modulu Item Piles",
+        "Local": "Lokální nastavení",
+        "Module": "Nastavení modulu",
+        "Styles": "Nastavení stylu",
+        "System": "Nastavení specifik systému",
+        "Export": "Nastavení exportu",
+        "Import": "Nastavení importu",
+        "Donate": "Pokud máte rádi tento modul, zvažte darování pro jeho udržení v běhu!",
+        "MoreToCome": "A více možností konfigurace bude následovat...",
+        "Request": "Zde můžete požádat o nové funkce.",
+        "Submit": "Potvrdit nastavení"
+      },
+      "CurrenciesEditor": {
+        "Title": "Item Piles editor měn",
+        "TitleActor": "Item Piles editor měn: {actor_name}",
+        "Explanation": "Zde můžete definovat, které měny na postavách lze vyzvednout z kupy předmětů, jako třeba peníze.",
+        "ExplanationSmallAttributes": "V D&D5e existují měny na postavách s cestou atributu \"actor.system.currency.gp\", takže byste přidali vlastní s názvem \"Gold Coins\" a cestou atributu \"system.currency.gp\". Přidejte ji kliknutím na plus v záhlaví.",
+        "ExplanationSmallItems": "V jiných systémech to mohou být skutečné položky na aktérovi - v takovém případě můžete položky přetáhnout na tento seznam a přidat je do měn.",
+        "DragDrop": "Přetáhněte položku k jejímu přidání do seznamu",
+        "Name": "Jméno měny",
+        "Exchange": "Směna",
+        "Data": "Data",
+        "Icon": "Ikona",
+        "AddNew": "Přidat novou měnu"
+      },
+      "SecondaryCurrenciesEditor": {
+        "Title": "Item Piles Editor druhotných měn",
+        "TitleActor": "Item Piles Editor druhotných měn: {actor_name}",
+        "Explanation": "Zde můžete definovat jaké druhotné měny mohou být vyzvednuty a odhozeny postavami."
+      },
+      "ItemEditor": {
+        "Title": "Item Piles Editor položek: {item_name}",
+        "Update": "Aktualizace položky",
+        "General": "Všeobecné nastavení",
+        "Price": "Nastavení cen",
+        "Vault": "Nastavení trezoru",
+        "NotForSale": "Předmět není na prodej",
+        "CustomCategory": "Vlastní kategorie položek",
+        "CustomCategoryExplanation": "Pokud není prázdné, předmět se bude řadit do jiné kategorie, než co je.",
+        "Hidden": "Předmět je skryt",
+        "HiddenExplanation": "Když povoleno, tento předmět se nebude zobrazovat v seznamu obchodníkových položek.",
+        "DisplayQuantity": "Viditelnost množství položky",
+        "DisplayQuantityExplanation": "Toto určuje jak se množství této položky bude zobrazovat v obchodě, pokud vůbec.",
+        "DisplayQuantityDefault": "Výchozí nastavení obchodníka",
+        "DisplayQuantityYes": "Ano, vždy zobraz množství",
+        "DisplayQuantityNo": "Ne, vždy skryj množství",
+        "InfiniteQuantity": "Nekonečné množství",
+        "InfiniteQuantityExplanation": "Když povoleno, tento předmět nemůže být vypotřebován když je prodán obchodníkem.",
+        "InfiniteQuantityDefault": "Výchozí nastavení obchodníka",
+        "InfiniteQuantityYes": "Ano, nekonečné množství",
+        "InfiniteQuantityNo": "Ne, běžné množství",
+        "KeepZero": "Udržuj nulové množství",
+        "KeepZeroExplanation": "Když je zcela vyprodán, obchodník neodstraní tento předmět ale namísto toho jej nastaví jako \"není k prodeji\".",
+        "KeepOnMerchant": "Zachovat na obchodníkovi",
+        "KeepOnMerchantExplanation": "Při vymazání položek na kartě naplnění položek u obchodníků nebo pomocí integrace aktualizace zásob v Simple Calendar (viz konfigurace obchodníka dole) tato položka vždy zůstane.",
+        "PriceExplanation": "Zde můžeš upravit cenu položky, včetně možnosti, že nákup tohoto předmětu bude stát jiné předměty.",
+        "BasePrice": "Základní cena",
+        "BasePriceExplanation": "Toto upraví normální cenu tohoto předmětu.",
+        "QuantityForPrice": "Množství pro cenu",
+        "QuantityForPriceExplanation": "Toto upraví jaké množství položky lze získat při jejím zakoupení.",
+        "Service": "Položka je služba",
+        "ServiceExplanation": "Toto způsobí, že tato položka nebude přidána do inventáře kupujícího. Položky služeb stále mohou mít množství, ale pokud je vyprodáno, nebude smazáno z obchodníka, ale nastaveno jako \"není na prodej\".",
+        "PurchaseMacro": "Nákupní makro",
+        "PurchaseMacroExplanation": "Jméno makra, které se má spustit při nákupu položky.",
+        "Free": "Je zdarma",
+        "FreeExplanation": "Když povoleno, tento předmět nestojí žádné peníze při pořízení od obchodníka.",
+        "DisableNormalCost": "Zakázat normální náklady",
+        "DisableNormalCostExplanation": "Když je povoleno, položka nemůže být pořízena za primární měny a musí být pořízena jednou s níže uvedených možností.",
+        "PurchaseOptions": "Nákupní možnosti",
+        "PurchaseOptionsExplanation": "Zde může určit alternativní cesty k pořízení tohoto předmětu. Každá skupina reprezentuje odlišnou cestu, jíž postava může koupit tento předmět od jiné",
+        "CantBeSoldToMerchants": "Nemůže být prodáno obchodníkům",
+        "CantBeSoldToMerchantsExplanation": "Když povoleno, tato položka nemůže být prodána zpět obchodníkům, pouze zakoupena.",
+        "AddPurchaseOption": "Přidat nákupní možnost",
+        "DropMeClickMe": "Klikněte pro přidání atributu nebo přetáhněte položku k přidání",
+        "PricePreset": "Nebo vyberte předvolbu ceny:",
+        "SelectPreset": "Výběr předvolby ceny",
+        "CanStack": "Lze slučovat",
+        "CanStackExplanation": "Nastavuje, zda se bude tato položka slučovat s jinými podobnými položkami, když je přidána do trezoru.",
+        "CanStackDefault": "Výchozí nastavení trezoru",
+        "CanStackYes": "Ano, vždy lze slučovat",
+        "CanStackNo": "Ne, nelze slučovat",
+        "VaultExpander": "Rozšiřovač trezoru",
+        "ExpandColumnsRows": "Rozšíření sloupců a řádků",
+        "ExpandColumnsRowsExplanation": "Pokud je výše uvedené nastavení povoleno, nastavuje, kolik sloupců a/nebo řádků bude v trezoru k dispozici. Tato hodnota nesmí přesáhnout kapacitu trezoru.",
+        "NotForSaleExplanation": "Když povoleno, tento předmět není na prodej a nemůže být koupen. Stále se zobrazuje v seznamu obchodníkových položek, pokud není také skryt.",
+        "VaultExpanderExplanation": "Když je povoleno, tento předmět se nechová jako běžná položka v trezoru. Namísto toho zvýší množství dostupných slotů, jak je stanoveno níže."
+      },
+      "FilterEditor": {
+        "Title": "Item Piles Editor filtrů",
+        "TitleActor": "Item Piles Editor filtrů: {actor_name}",
+        "Filters": "Filtry",
+        "Path": "Cesta k atributu",
+        "AddNew": "Přidat nový filtr",
+        "Explanation": "Zde můžete definovat několik typů filtrů, které vyloučí určité typy položek. Na základě zadané cesty k atributu může kupa položek najít \"typ\" položky a na základě filtrů tyto položky skrýt v uživatelském rozhraní inventáře kupy položek."
+      },
+      "SimilaritiesEditor": {
+        "Title": "Item Piles Editor podobností",
+        "Path": "Cesta k atributu",
+        "Explanation": "Zde můžete definovat více typů identifikátorů, které pomáhají Item Piles rozlišovat mezi podobnými položkami. Téměř v každém systému lze položky rozlišit pomocí jejich \"názvu\" a \"typu\". V některých případech, například v Pathfinderu 2. edice, je však dočasné předměty mohou sdílet s předměty trvalými. Takže přidáním \"system.temporary.value\" jsou vaše dočasné předměty považovány za \"jedinečné\" a oddělené od trvalých."
+      },
+      "CustomItemCategoriesEditor": {
+        "Title": "Editor vlastních kategorií položek",
+        "Explanation": "Zde můžete konfigurovat které vlastní kategorie položek jsou dostupné ve vašem světě. Jsou dynamicky přidávány, když přidáte novou pro položku.",
+        "Category": "Kategorie"
+      },
+      "UnstackableItemTypesEditor": {
+        "Title": "Editor nesčitatelných typů položek",
+        "Explanation": "Zde můžete definovat které typy položek nemohou být spojovány.",
+        "Type": "Typ položky"
+      },
+      "VaultStylesEditor": {
+        "Title": "Item Piles Editor stylu trezoru",
+        "Explanation": "Zde můžete definovat vícero stylů pro položky v trezoru. Například můžete vytvořit styl, který se podívá na \"system.rarity\", aby byl \"raritní\", a použít styl na položky, které odpovídají nastavení.",
+        "Path": "Cesta k atributu",
+        "Value": "Odpovídající hodnota",
+        "Style": "Konfigurace stylu",
+        "AddNew": "Přidat nové pravidlo stylu"
+      },
+      "StylesEditor": {
+        "Title": "Editor stylů",
+        "Style": "Styl",
+        "Variable": "Proměnná",
+        "Value": "Hodnota"
+      },
+      "ItemTypePriceModifiersEditor": {
+        "TitleActor": "Editor modifikátoru ceny typu položky: {actor_name}",
+        "ItemType": "Typ položky",
+        "Override": "Přepsat",
+        "Title": "Editor modifikátorů ceny typu položky",
+        "Explanation": "Zde můžete definovat modifikátory nákupní a prodejní ceny pro tohoto obchodníka týkající se konkrétních typů položek. Nastavení \"Přepsat\" znamená, že má přednost před běžnými modifikátory ceny obchodníka."
+      },
+      "PriceModifiersEditor": {
+        "Title": "Item Piles Editor modifikátorů ceny",
+        "TitleActor": "Item Piles Editor modifikátorů ceny: {actor_name}",
+        "Actor": "Postava",
+        "Override": "Přepsat",
+        "Explanation": "Zde můžete definovat nákupní a prodejní modifikátor ceny pro tohoto obchodníka vztažený ke konkrétní postavě. \"Override\" nastavení znamená že dojde k přepsání normálních cenových modifikátorů, včetně specifických cenových modifikátorů pro typ položky.",
+        "DragDrop": "Přetáhněte postavu k jejímu přidání do seznamu"
+      }
+    },
+    "Vault": {
+      "VaultTab": "Trezor",
+      "ExpandersTab": "Rozšiřovače",
+      "LogTab": "Protokoly",
+      "ViewingAs": "Zobrazit jako {actor_name}",
+      "CapacityLeft": "Tento trezor má kapacitu {capacity}, s maximem {total_capacity}. Přetáhněte rozšiřovače pro zvýšení kapacity",
+      "CapacityFull": "Tento trezor dosáhl své maximální kapacity {total_capacity}",
+      "ExpandsCols": "{cols} sloupců",
+      "ExpandsRows": "{rows} řádků",
+      "Withdraw": "Vyjmout",
+      "Deposit": "Vložit",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "Deposited": "uloženo",
+      "Withdrew": "vyjmuto",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "LogQuantity": "{quantity} x ",
+      "NeedsCapacity": "Tento trezor má celkovou kapacitu {total_capacity}, ale bez přidání rozšiřovačů nic z toho není dostupné"
+    },
+    "Dialogs": {
+      "TypeWarning": {
+        "Title": "Varování k typu položky",
+        "TradeContent": "Pokoušíte se obchodovat s předmětem, který je typu (\"{type}\"), s nímž se normálně obchodovat nesmí. Jste si jisti, že to chcete udělat?",
+        "DropContent": "Odhazujete předmět, který je typu (\"{type}\"), který normálně není povoleno odhazovat. Jste si jisti, že to chcete udělat?",
+        "SellContent": "Pokoušíte se prodat položku typu (\"{type}\"), kterou obchodník běžně nepřijímá. Jste si jisti, že to chcete udělat?"
+      },
+      "ResetSettings": {
+        "Title": "Reset nastavení modulu",
+        "Content": "Jste si jisti, že chcete obnovit všechna nastavení modulu Item Piles na výchozí hodnoty? <strong>Toto nelze vrátit!</strong>",
+        "Confirm": "Reset nastavení modulu"
+      },
+      "LinkedActorWarning": {
+        "Title": "Kupa položek a propojená postava",
+        "Content": "Jste si jisti, že chcete z této <strong>propojené postavy</strong> udělat hromadu položek? Token této postavy je propojený a všechny tokeny této postavy budou sdílet jeho zásoby a peníze."
+      },
+      "NoSystemFound": {
+        "Title": "Systém nerozpoznán",
+        "Content": "Tento systém není aktuálně plně podporován. To znamená že model neví jak nejlépe zpracovat položky systému, ale stále může fungovat v omezeném rozsahu. <br><br>Nastavení modulu si můžete nakonfigurovat sami, ale vyžaduje to trochu technických znalostí.<br><br>Pokud máte nějaké otázky, vyhledejte <strong>Wasp#2005</strong> na discordu Foundry."
+      },
+      "NewSystemVersion": {
+        "Title": "Nová verze systému",
+        "Content": "Výchozí nastavení systému, který používáte, bylo aktualizováno, chcete přepsat nastavení specifické pro váš systém aktualizovaným nastavením?",
+        "Content2": "Pokud to neuděláte, může dojít k rozbití Item Piles - pro opravu je třeba obnovit systémová nastavení modulu.",
+        "Confirm": "Aktualizace nastavení"
+      },
+      "ResetSharingData": {
+        "Title": "Obnova sdílených dat",
+        "Content": "Tímto se smaže veškerá historie hráčů, kteří si z této hromádky vzali svůj podíl.<br><br>Určitě to chcete udělat?",
+        "Confirm": "Obnova sdílení dat"
+      },
+      "ClearAllItems": {
+        "Title": "Smazat všechny položky postavy",
+        "Content": "Toto smaže všechny obchodníkovy položky. Určitě to chcete udělat?"
+      },
+      "ClearAllServices": {
+        "Title": "Smazat všechny služby postavy",
+        "Content": "Toto smaže všechny obchodníkovy služby. Určitě to chcete udělat?"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "Dávání položky",
+        "Content": "\"{actor_name}\" je vlastněn hráčem \"{user_name}\". Ten ale není aktivní, takže mu tento předmět nemůžeš dát."
+      },
+      "RemoveMerchantTable": {
+        "Title": "Odstranění tabulky obchodníka",
+        "Content": "Určitě chcete odstranit tabulku \"{table_name}\" z tohoto obchodníka? Toto je nevratné."
+      },
+      "CantRemoveVaultExpander": {
+        "Title": "Nelze odstranit rozšiřovač",
+        "Content": "Nemůžete odstranit tento rozšiřovač, bez něj by se předměty do trezoru nevešly. Odstraňte {num_items} položek před pokusem o odstranění rozšiřovače!"
+      },
+      "ReceiveItem": {
+        "Title": "Obdržení položky",
+        "Header": "Item Piles: Obdržení položky",
+        "Content": "{source_actor_name} chce dát položku {target_actor_name}, přijímáte?",
+        "Ignore": "Ignorovat uživatele"
+      },
+      "TextEditor": {
+        "Title": "Textový editor"
+      },
+      "UserSelect": {
+        "Title": "Výběr uživatele",
+        "Content": "Kterému uživateli ukázat?"
+      },
+      "ClearVaultLog": {
+        "Title": "Vyčistit log trezoru?",
+        "Content": "Určitě chcete vyčistit log trezoru \"{actor_name}\"?"
+      }
+    },
+    "HUD": {
+      "ToggleLocked": "Přepínač uzamčen",
+      "ToggleClosed": "Přepínač zavřen",
+      "Configure": "Konfigurace Kupy"
+    },
+    "Chat": {
+      "Pickup": "{name} vyzvednul následující předměty:",
+      "Split": "Obsah kupy byl rozdělen mezi {num_players} hráčů a každý obdržel:",
+      "TradeComplete": "{party_1} a {party_2} dokončili obchod.",
+      "TradeStarted": "{party_1} a {party_2} zahájili obchodování.",
+      "TradeStartedButton": "Klikněte na tlačítko níže pro sledování:",
+      "TradeSpectate": "Sledování obchodu",
+      "SpectateDisabled": "Obchod byl uzavřen",
+      "PrivateTrade": "Soukromý obchod",
+      "ExpandTrade": "Zobraz plné detaily obchodu",
+      "MerchantTraded": "{name} koupil následujcí věci od {merchant}:",
+      "GaveItems": "{source} dal nějaké věci {target}:"
+    },
+    "VaultLog": {
+      "Withdraw": "{actor_name} ({user_name}) **vyjmul** {item_name} x {quantity} ({date})",
+      "Deposit": "{actor_name} ({user_name}) *uložil* {item_name} x {quantity} ({date})"
+    }
+  }
+}
