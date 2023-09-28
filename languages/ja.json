@@ -1,92 +1,106 @@
 {
   "ITEM-PILES": {
     "Items": "アイテム",
-    "Currencies": "硬貨",
-    "Currency": "硬貨",
+    "Currencies": "通貨",
+    "Currency": "通貨",
     "ContextMenu": {
-      "ShowToPlayers": "PLに中身を表示する",
+      "ShowToPlayers": "PLに中身を表示",
       "RequestTrade": "トレード依頼"
     },
     "Inspect": {
-      "Title": "お宝の中身",
-      "AsActor": "{actorName}としてお宝を確認中",
-      "Owner": "このお宝の所有者権限を持っているので中身を編集できます。",
-      "Empty": "このお宝は空です",
-      "Destroyed": "このお宝はもはや存在せず……",
-      "TakeAll": "すべて取得",
-      "Take": "取得",
-      "Close": "閉じる",
+      "Title": "アイテムの山の内容を調査",
+      "AsActor": "{actorName}として、このアイテムの山を調べています。",
+      "Owner": "このアイテムの山のオーナーです。内容を編集できます。",
+      "Empty": "このアイテムの山は空です。",
+      "Destroyed": "このアイテムの山はもはや存在していません。",
+      "TakeAll": "全てのアイテムを取る",
+      "Take": "取る",
+      "Close": "蓋をする",
       "Leave": "離れる",
-      "NoShareLeft": "取り分がなくなりました…",
-      "NoneLeft": "中身がなくなりました",
+      "NoShareLeft": "取り分が残っていません……",
+      "NoneLeft": "何も残っていません……",
       "OpenSheet": "シートを開く",
-      "AddCurrency": "硬貨追加",
-      "SplitAll": "{num_players}等分に分ける",
-      "SplitItems": "アイテムを{num_players}等分に分ける",
-      "SplitCurrencies": "硬貨{num_players}等分に分ける"
+      "AddCurrency": "通貨を追加する",
+      "SplitAll": "すべて{num_players}等分する",
+      "SplitItems": "アイテムを{num_players}等分する",
+      "SplitCurrencies": "通貨を{num_players}等分する"
     },
     "Trade": {
-      "Title": "トレード中",
-      "Accept": "承諾",
-      "Decline": "拒否",
-      "Mute": "ミュート",
-      "AutoDecline": "トレード依頼に返信するのが遅すぎたため、自動的に拒否されました。",
-      "Declined": "トレード先が拒否しました。",
-      "Private": "トレードを秘匿する。",
-      "PrivateExplanation": "チャットカードが表示されていないため閲覧できません。",
-      "Over": "このトレードは終了しています。",
-      "Between": "{actor_1}と{actor_2}の間のトレード",
-      "DragDrop": "トレードを開始するにはアイテムをドラッグ＆ドロップしてください",
+      "Title": "Item Piles：取引",
+      "Accept": "受ける",
+      "Decline": "拒否する",
+      "Mute": "ミュートする",
+      "AutoDecline": "取引リクエストへの応答時間が過ぎたため、拒否しました。",
+      "Declined": "取引要求は拒否されました。",
+      "Private": "取引を非公開",
+      "PrivateExplanation": "チャットでは発言されず、誰も見ることはできない",
+      "Over": "この取引を終了する。",
+      "Between": "{actor_1}と{actor_2}の取引",
+      "DragDrop": "アイテムをドラッグ&ドロップで取引を開始",
       "Request": {
-        "Title": "トレード依頼を送る",
+        "Title": "Item Piles：取引リクエスト",
         "User": "誰とトレードしますか？",
         "PickActor": "あなたはどのキャラクターとしてトレードしますか？",
         "PickedActor": "トレードするキャラクター：",
         "PickToken": "選択されたコマ",
         "DropActor": "キャラクターをここにドラッグ＆ドロップ",
-        "Label": "依頼送信"
+        "Label": "依頼送信",
+        "Content": "{trading_actor_name}（ユーザー{trading_user_name}）があなたと取引したいと希望しています。",
+        "PrivateContent": "{trading_actor_name}（ユーザー{trading_user_name}）が<strong>秘密裏に</strong>あなたと取引したいと希望しています。",
+        "AcceptQuery": "承諾しますか？"
       },
       "NoActiveUsers": {
-        "Title": "お宝：アクティブなユーザがいません",
-        "Content": "プレイヤーがアクティブじゃないためトレードできません。"
+        "Title": "Item Piles：アクティブなユーザーがいません",
+        "Content": "アクティブなプレイヤーがおらず、取引相手がいません。"
       },
       "Prompt": {
-        "Title": "トレード依頼",
+        "Title": "アイテムの山：取引リクエストを送る",
         "Content": "{trading_actor_name} (PL {trading_user_name}) があなたにトレードを持ちかけてきました。",
         "PrivateContent": "{trading_actor_name} (PL {trading_user_name}) があなたに<strong>秘匿</strong>トレードを持ちかけてきました。",
-        "AcceptQuery": "許可しますか？"
+        "AcceptQuery": "許可しますか？",
+        "PickActor": "取引を代表するアクターを選択してください:",
+        "User": "取引を行うユーザーを選択してください:",
+        "PickedActor": "取引を代表するアクター:",
+        "PickToken": "トークンを選択",
+        "DropActor": "ここにドラッグしてアクターを取り出す",
+        "Label": "取引リクエストを送信"
       },
       "OngoingRequest": {
-        "Content": "{user_name}の返答を待っています...",
-        "Label": "トレード依頼取り消し"
+        "Content": "{user_name}からの返答を待っています……",
+        "Label": "取引リクエストを拒否"
       },
       "CancelledRequest": {
-        "Content": "{user_name}がトレードを中止しました"
+        "Content": "{user_name}によって取引リクエストが拒否されました。"
       },
       "AddCurrency": {
-        "Title": "硬貨追加",
-        "Content": "{trader_actor_name}とのトレードに硬貨を追加",
-        "Label": "硬貨更新"
+        "Title": "金額を追加",
+        "Content": "{trading_actor_name}との取引に通貨を追加",
+        "Label": "金額を更新"
       },
-      "GMAddCurrency": "硬貨追加（GMモード）",
+      "GMAddCurrency": "通貨を追加（GMモード）",
       "Closed": {
-        "Title": "トレード終了",
-        "You": "ウィンドウが閉じられたため、トレードが中止されました。",
-        "Them": "\"{user_name}\"がトレードウィンドウを閉じたのでトレードが中止されました。",
-        "Someone": "ユーザの誰かがトレードウィンドウを閉じたためトレードが中止されました。"
+        "Title": "取引が終了しました",
+        "You": "取引ウィンドウを閉じたため、取引はキャンセルされました。",
+        "Them": "ユーザー「{user_name}」が取引ウィンドウを閉じたため、取引はキャンセルされました。",
+        "Someone": "ユーザーの一人が取引ウィンドウを閉じたため、取引はキャンセルされました。"
       },
-      "Disconnected": "ユーザの誰かが切断されたのでトレードが中止されました。",
-      "UserCharacterWarning": "選択されたキャラクター \"{actor_name}\" は\"{player_name}\"の所有キャラクターです。<br><br>本当によろしいですか？",
-      "UserActiveCharacterWarning": "選択されたキャラクター \"{actor_name}\" は\"{player_name}\"の現在<strong>アクティブ</strong>な所有キャラクターです。本当によろしいですか？",
-      "ActorOwnerWarning": "このキャラクターを所有していないため、トレードできません。"
+      "Disconnected": "ユーザーの一人が接続が切れたため、取引はキャンセルされました。",
+      "UserCharacterWarning": "あなたはプレイヤー「{player_name}」に割り当てられたキャラクター「{actor_name}」を選びました。<br><br>本当に実行しますか？",
+      "UserActiveCharacterWarning": "あなたが選んだプレイヤー「{player_name}」に割り当てられたキャラクター「{actor_name}」は現在<strong>アクティブ</strong>です。<br><br>本当に実行しますか？",
+      "ActorOwnerWarning": "このアクターを所有していないため、取引できません。",
+      "SameActor": "両者が同じキャラクターを選ぶことはできません。"
     },
     "Errors": {
-      "DisallowedItemDrop": "\"{type}\"アイテムを置く事はできません。",
-      "DisallowedItemTrade": "\"{type}\"種別のアイテムはトレードできません。",
-      "NoSourceDrop": "アイテム一覧からシーンにアイテムを置くにはGM権限が必要です。",
-      "PileTooFar": "距離が離れすぎているためお宝を確認できません。",
-      "PileLocked": "このお宝はロック中です。中身の確認とアイテムの追加ができません。",
-      "DropNoToken": "このシーンにコマを所持していませんのでシーンにアイテムを置くことができません。"
+      "DisallowedItemDrop": "\"{type}\" アイテムを取り出せません",
+      "DisallowedItemTrade": "\"{type}\" アイテムを取引できません",
+      "NoSourceDrop": "GMのみがアイテムバーからアイテムを取り出せます。",
+      "PileTooFar": "距離があるため、アイテムの山に接触できません。",
+      "PileLocked": "このコンテナは鍵がかかっています。アイテムを取り出せません。",
+      "DropNoToken": "このシーンにはトークンがないため、アイテムを取り出せません。",
+      "NoTokenFound": "指定のトークンもしくはキャラクターが見つかりません。",
+      "NoVaultAccess": "この保管庫を見る権限がありません。",
+      "NoVaultAccessActor": "{actor_name}はこの保管庫を見る権限がありません。",
+      "DisallowedItemSell": "この商人は\"{type}\" アイテムを取り扱いません"
     },
     "Dialogs": {
       "DropTypeWarning": {
@@ -98,17 +112,17 @@
         "Content": "現在トレードしている(\"{type}\")種別のアイテムはトレードが禁止されているものです。本当にトレードを続行しますか？"
       },
       "ResetSettings": {
-        "Title": "設定初期化",
-        "Content": "設定を現在のシステムのデフォルトに初期化しますか？<strong>この操作を取り消すことはできません！</strong>",
-        "Confirm": "設定初期化"
+        "Title": "モジュール設定のリセット",
+        "Content": "Item Pilesモジュールのすべての設定を現在のシステムのデフォルトにリセットしますか？ <strong>これは取り消すことができません！</strong>",
+        "Confirm": "モジュール設定をリセット"
       },
       "LinkedActorWarning": {
-        "Title": "リンクキャラのお宝化警告",
-        "Content": "この<strong>リンクされている</strong>キャラクターをお宝に変換しますか？このキャラクターがリンクされているすべてのコマにこの変更が引き継がれ、同じ所持品とデータが使用されます。"
+        "Title": "Item Pilesとリンクされたアクター",
+        "Content": "この<strong>リンクされたアクター</strong>をアイテムの山に変更してもよろしいですか？ このアクターのトークンはリンクされており、このアクターのすべてのトークンはそのインベントリと通貨を共有します。"
       },
       "NoSystemFound": {
-        "Title": "不明なシステム",
-        "Content": "現在利用中のシステムはModに定義されていません。これにより最適なお宝の初期設定を読み込むことができませんでした。<br><br>設定を自分で変更し、最適化することも可能ですが上級の知識を必要とします。<br><br>詳しい情報が必要な場合は本家FVTTサーバの<strong>Wasp#2005</strong>またはオンセ工房FVTT日本語サーバの<strong>Brother Sharp#6921</strong>にメンションを飛ばしてください。"
+        "Title": "システムが認識されません",
+        "Content": "このシステムは現在完全にサポートされていません。モジュールがこのシステムのアイテム処理を適切に行えない可能性がありますが、制限付きで動作することはできます。<br><br>モジュールの設定を自分で構成できますが、それには少し技術的な知識が必要です。<br><br>質問がある場合は、Foundry discordの<strong>Wasp#2005</strong>にお問い合わせください。"
       },
       "SystemFound": {
         "Title": "システムが対応しました！",
@@ -120,7 +134,56 @@
         "Content": "お宝に設定されている取り分の現在の取得状況をリセットします。<br><br>本当によろしいですか？",
         "Confirm": "配分データ初期化"
       },
-      "Cancel": "キャンセル"
+      "Cancel": "キャンセル",
+      "ReceiveItem": {
+        "Header": "Item Piles:受け取るアイテム",
+        "Title": "受け取るアイテム",
+        "Content": "{source_actor_name}から{target_actor_name}へアイテム譲渡リクエストです。受諾しますか？",
+        "Ignore": "ユーザーを無視"
+      },
+      "TypeWarning": {
+        "Title": "アイテムタイプの警告",
+        "DropContent": "通常は取り出せないタイプ(\"{type}\")のアイテムを取り出そうとしています。本当に実行しますか？",
+        "TradeContent": "通常は取引できないタイプ(\"{type}\")のアイテムを取引しようとしています。本当に実行しますか？",
+        "SellContent": "通常は取り扱わないタイプ(\"{type}\")のアイテムを商人に売ろうとしています。本当に実行しますか？"
+      },
+      "NewSystemVersion": {
+        "Confirm": "設定更新",
+        "Title": "新しいシステムのバージョン",
+        "Content": "Item Pilesで使用しているシステムのデフォルト設定が更新されました。システム固有の設定を上書きしますか？",
+        "Content2": "モジュールのシステム固有の設定をリセットして修正します。これを行わない場合、Item Pilesが壊れる可能性があります 。"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "アイテム譲渡",
+        "Content": "プレイヤー\"{user_name}\"のアクター\"{actor_name}\" はアクティブではないため、アイテムを譲渡できません。"
+      },
+      "RemoveMerchantTable": {
+        "Title": "商人のテーブルを消去",
+        "Content": "本当にこの商人から \"{table_name}\" テーブルを削除しますか？この動作は元に戻せません。"
+      },
+      "CantRemoveVaultExpander": {
+        "Title": "拡張は取り外し不可",
+        "Content": "この拡張は取り外せません。この拡張を取り外すには、{num_items}個のアイテムを保管庫から引き出す必要があります！"
+      },
+      "UserSelect": {
+        "Content": "どのユーザーに見せますか？",
+        "Title": "ユーザー選択"
+      },
+      "ClearVaultLog": {
+        "Title": "保管庫ログを消去しますか？",
+        "Content": "本当に\"{actor_name}\"の保管庫ログを消去しますか？"
+      },
+      "ClearAllItems": {
+        "Content": "商人のアイテムをすべて消去します。実行しますか？",
+        "Title": "すべてのアクターのアイテムを消去"
+      },
+      "ClearAllServices": {
+        "Content": "商人のサービスをすべて消去します。実行しますか？",
+        "Title": "すべてのアクターのサービスを消去"
+      },
+      "TextEditor": {
+        "Title": "テキストエディター"
+      }
     },
     "CurrenciesEditor": {
       "Title": "参照データ設定",
@@ -216,9 +279,9 @@
       }
     },
     "HUD": {
-      "ToggleLocked": "ロック切替",
-      "ToggleClosed": "開閉",
-      "Configure": "お宝設定"
+      "ToggleLocked": "ロックの切り替え",
+      "ToggleClosed": "閉じるの切り替え",
+      "Configure": "アイテムの山の設定"
     },
     "DropItem": {
       "Title": "アイテムを置こうとしています",
@@ -238,15 +301,17 @@
       "AddToPile": "お宝に追加"
     },
     "Chat": {
-      "Pickup": "{name}が次のアイテムを拾いました：",
-      "Split": "お宝の中身が{num_players}等分されて、それぞれが以下のアイテムを受け取りました：",
-      "TradeComplete": "{party_1}と{party_2}がトレードを完了しました。",
-      "TradeStarted": "{party_1}と{party_2}がトレードを開始しました。",
-      "TradeStartedButton": "下記のボタンで閲覧できます：",
-      "TradeSpectate": "トレードを閲覧",
-      "SpectateDisabled": "トレード完了",
-      "PrivateTrade": "秘匿トレード",
-      "ExpandTrade": "トレード詳細を表示"
+      "Pickup": "{name}が以下のアイテムを拾いました：",
+      "Split": "アイテムの山の内容が{num_players}人のプレイヤー間で分割され、それぞれが以下を受け取りました：",
+      "TradeComplete": "{party_1}と{party_2}が取引を完了しました。",
+      "TradeStarted": "{party_1}と{party_2}が取引を開始しました。",
+      "TradeStartedButton": "以下のボタンをクリックして観戦：",
+      "TradeSpectate": "取引を観戦",
+      "SpectateDisabled": "取引が終了しました",
+      "PrivateTrade": "プライベートトレード",
+      "ExpandTrade": "完全な取引の詳細を表示",
+      "MerchantTraded": "{name}が{merchant}から以下のものを購入しました：",
+      "GaveItems": "{source}が{target}にアイテムを贈りました："
     },
     "Setting": {
       "Reset": {
@@ -313,6 +378,662 @@
         "Title": "デバッグモード",
         "Label": "コンソールにデバッグ用のメッセージを表示します。"
       }
+    },
+    "Settings": {
+      "DebugHooks": {
+        "Hint": "アイテムパイルのフックとその内容をコンソールに表示します",
+        "Title": "フックのデバッグを有効にする"
+      },
+      "QuantityForPrice": {
+        "Title": "価格属性のアイテムの数量",
+        "Hint": "価格に対するアイテムの数量の属性パスを設定できます。たとえば、PF2eシステムでは、アイテムには\"per\"プロパティがあり、アイテムの価格に対するアイテムの数量を決定します。これはアイテムの\"item.system.price.per\" 属性に格納されており、したがってこの設定には\"system.price.per\" を入力します。"
+      },
+      "Currencies": {
+        "Title": "通貨",
+        "Label": "通貨を設定",
+        "Hint": "この設定は、回収対象の通貨を定義します。これは実際のアイテムではなく、キャラクターシートの数値入力です。"
+      },
+      "ItemSimilarities": {
+        "Label": "アイテムの類似性を設定",
+        "Title": "アイテムの類似性",
+        "Hint": "このシステムでアイテムが同じと見なされる方法を設定できます。一部のシステムは、一時的なアイテムなど、他のシステムとは異なる方法でアイテムを区別するデータを持っている場合があります。"
+      },
+      "PricePresets": {
+        "Title": "価格プリセット",
+        "Label": "価格プリセットを設定",
+        "Hint": "アイテムに簡単にインポートできるカスタムプリセット価格を設定できます。"
+      },
+      "VaultStyles": {
+        "Title": "倉庫スタイル",
+        "Label": "倉庫スタイルを設定",
+        "Hint": "アイテムのプロパティパスと値に基づいてアイテムをスタイル設定するルールを追加できます。"
+      },
+      "PopulationTablesFolder": {
+        "AllTables": "すべてのテーブル",
+        "Title": "「アイテムの設定」のためのロールテーブルフォルダ",
+        "Hint": "商人の「アイテムの設定」タブでロールテーブルをフィルタリングするためのフォルダタイトル。"
+      },
+      "Quantity": {
+        "Title": "アイテムの数量属性",
+        "Hint": "各アイテムの数量の属性パスを設定できます。たとえば、D&D5eシステムでは、各アイテムの数量は\"item.system.quantity\"属性に格納されているため、この設定には\"system.quantity\"を入力します。"
+      },
+      "Price": {
+        "Title": "アイテムの価格属性",
+        "Hint": "各アイテムの価格の属性パスを設定できます。たとえば、D&D5eシステムでは、各アイテムの価格は \"item.system.price\" 属性に格納されているため、この設定には \"system.price\"を入力します。"
+      },
+      "CurrencyDecimalDigits": {
+        "Title": "通貨小数点桁数",
+        "Hint": "この設定は、通貨が丸める最小の小数点桁数を定義します。たとえば、現代的な通貨を使用する場合、'0.01'は2桁の小数点を許可します。複数の通貨がある場合は使用されません。"
+      },
+      "CustomItemCategories": {
+        "Hint": "アイテムエディタで提案として表示されるカスタムアイテムカテゴリを設定できます。",
+        "Title": "カスタムアイテムカテゴリ",
+        "Label": "カスタムアイテムカテゴリを設定"
+      },
+      "OutputToChat": {
+        "Title": "チャットへの出力",
+        "Public": "公開 - すべての人がメッセージを見ることができます",
+        "SelfGM": "プライベート - GMとユーザーのみがメッセージを見ることができます",
+        "Blind": "ブラインド - GMのみがメッセージを見ることができます",
+        "Hint": "プレイヤーがアイテムパイルからアイテムを取り出すたびに、取得した内容を表示するメッセージが送信されます。",
+        "Off": "オフ - メッセージをオフにする"
+      },
+      "InvertSheetOpen": {
+        "Title": "Ctrl + ダブルクリックでシートを開く反転",
+        "Hint": "通常、アイテムパイルのアクターシートを開く場合はCtrlキーを押す必要があります。有効にすると、アイテムパイルアクターシートはデフォルトで開き、Ctrlキーを押してアイテムパイルインベントリUIを開きます。"
+      },
+      "HideHeaderButtonText": {
+        "Title": "ヘッダーボタンテキストを非表示",
+        "Hint": "アクターとアイテムのヘッダーに表示される「アイテムパイル」のテキストを非表示にします。モジュールが多すぎてヘッダーが混雑している場合に便利です。"
+      },
+      "HideHeaderButton": {
+        "Title": "ヘッダーボタンを非表示",
+        "Hint": "アクターとアイテムのヘッダーに表示される「アイテムパイル」ボタンを非表示にします。新しいアイテムパイルとアイテムを設定するのが難しくなります。"
+      },
+      "Debug": {
+        "Hint": "コンソールにデバッグメッセージを表示します",
+        "Title": "デバッグを有効にする"
+      },
+      "Configure": {
+        "Title": "モジュールの設定",
+        "Label": "モジュールの設定",
+        "Hint": "このダイアログでアイテムの山を設定できます。"
+      },
+      "Reset": {
+        "Title": "システム固有の設定をデフォルトにリセット",
+        "Label": "設定をリセット",
+        "Hint": "アイテムの山のすべての設定をアクティブなゲームシステムのデフォルトにリセットします。"
+      },
+      "ActorClass": {
+        "Title": "アクタークラスのタイプ",
+        "Hint": "この設定は、最初のアイテム取り出し時に作成されるデフォルトのアイテムパイルアクターに使用されるアクタータイプを定義します。D&D5eの場合、これは\"character\"です。専用の戦利品アクタータイプは存在しません。"
+      },
+      "SecondaryCurrencies": {
+        "Title": "補助通貨",
+        "Label": "補助通貨を設定",
+        "Hint": "この設定は通常の通貨とは異なる補助通貨を定義します。これらは交換率を持たないか、他のカスタム通貨に分割できません。"
+      },
+      "ItemFilters": {
+        "Title": "アイテムフィルタ",
+        "Label": "アイテムフィルタを設定",
+        "Hint": "アイテムパイルのダイアログに表示されないアイテムを設定できます。"
+      },
+      "UnstackableItemTypes": {
+        "Title": "スタック不可アイテムタイプ",
+        "Label": "スタック不可タイプを設定",
+        "Hint": "どの種類のアイテムが一意であると見なされ、常に数量1しか持たないと設定できます。ここで設定されたタイプはスタックできず、常に数量1しか持つことができません。"
+      },
+      "CssVariables": {
+        "Title": "CSS変数スタイル",
+        "Hint": "アイテムパイルのインターフェース内の色やその他のスタイルを制御するさまざまなCSS変数を設定できます。",
+        "Label": "CSS変数を設定"
+      },
+      "EnableDroppingItems": {
+        "Title": "アイテムのドロップを有効にする",
+        "Hint": "ユーザーが地面にアイテムを置いて独自のアイテムパイルを作成できるようになります。これを無効にすると、ユーザーは新しいパイルを作成できません。"
+      },
+      "EnableGivingItems": {
+        "Title": "アイテムのプレゼントを有効にする",
+        "Hint": "ユーザーが他のトークンにアイテムを置いて贈ることができるようになります。これを無効にすると、ユーザーは他のユーザーにアイテムを贈ることができません。"
+      },
+      "EnableTrading": {
+        "Title": "取引を有効にする",
+        "Hint": "これにより取引が有効になります。これを無効にすると、誰も取引を開始できません。"
+      },
+      "InspectItemsTrade": {
+        "Title": "取引中のアイテムの検査を有効にする",
+        "Hint": "有効にすると、ユーザーは取引中のアイテムをクリックしてアイテムシートを開いてプレビューできるようになります。"
+      },
+      "HideTokenBorder": {
+        "Title": "アイテムパイルのトークンボーダーを非表示にする",
+        "Hint": "これはアイテムパイルトークンの上にカーソルを合わせたときにトークンボーダーを非表示にするかどうかを制御します。トークンを常に表示するにはトークンを選択します。",
+        "HideEveryone": "誰からも非表示",
+        "Show": "ボーダーを表示（デフォルトの動作）",
+        "HidePlayers": "プレイヤーから非表示"
+      },
+      "DeleteEmptyPiles": {
+        "Title": "空のパイルを自動削除",
+        "Hint": "アイテムパイルがアイテムを使い切ると自動的に削除されるようにします。個々のアイテムパイルでオーバーライドできます。"
+      },
+      "PreloadFiles": {
+        "Title": "ファイルの事前読み込み",
+        "Hint": "アイテムパイルのファイル（画像と音声）を事前に読み込むようにします。シームレスな体験が実現します。"
+      },
+      "ShowTradeButton": {
+        "Title": "取引ボタンを表示",
+        "Hint": "有効にすると、右下のプレイヤーリストのすぐ下に取引ボタンが表示されます。"
+      }
+    },
+    "Merchant": {
+      "OpenTimes": "営業時間",
+      "Title": "商人：{actor_name}",
+      "Description": "説明",
+      "ItemFree": "無料",
+      "TableAddAllItems": "すべてのアイテムを追加:",
+      "RollableTables": "ロール可能なテーブル",
+      "AddTable": "テーブルを追加",
+      "Service": "サービス",
+      "BuyNoItems": "商人はアイテムを持っていません",
+      "BuyItems": "アイテムを購入",
+      "BuyServices": "サービスを購入",
+      "SellItems": "アイテムを販売",
+      "PopulateItems": "アイテムを追加",
+      "AllTypes": "すべてのタイプ",
+      "Buy": "購入",
+      "NoMatchFound": "一致するものがありません",
+      "NoItemsForSale": "商人は何も売っていません",
+      "NoItemsToSell": "この商人には現在何も売れないようです",
+      "OpenCloseAuto": "自動",
+      "Open": "営業中",
+      "Closed": "閉店中",
+      "Hours": "時間",
+      "Minutes": "分",
+      "MerchantClosed": "商人は閉店中です、後で再度確認してください。",
+      "Sell": "販売",
+      "Settings": "設定",
+      "Override": "上書き",
+      "EditTypePrices": "タイプごとのコスト修正を編集",
+      "EditTypePricesExplanation": "アイテム購入タブのタイプごとのスライダーの可視性を切り替えます",
+      "CurrentItems": "現在のアイテム",
+      "RolledTimes": "{rolls}回ロールされました",
+      "KeepRolled": "ロール結果を維持",
+      "AddAll": "すべてのアイテムを追加",
+      "AddItem": "追加",
+      "RemoveItem": "削除",
+      "RollAllTables": "すべてのテーブルをロール",
+      "ToolTipRemoveTable": "テーブルを削除",
+      "TooltipConfigureTable": "テーブルを設定",
+      "TooltipRollTable": "テーブルをロール",
+      "ToolTipRemoveAllRolledItems": "ロールされたすべてのアイテムを削除",
+      "ShoppingAs": "{actorName}としてショッピング中",
+      "TableTimesToRoll": "テーブルでのロール回数:",
+      "TableCustomCategory": "カスタムカテゴリにアイテムを追加:",
+      "CurrentServices": "現在のサービス",
+      "NoRollTables": "ロールテーブルが存在しません、作成してください",
+      "ClickRoll": "ロールをクリックして開始",
+      "ClearAllItems": "すべてのアクターアイテムをクリア",
+      "ClearAllServices": "すべてのアクターサービスをクリア"
+    },
+    "Types": {
+      "pile": "アイテムの山",
+      "container": "コンテナ",
+      "merchant": "商人",
+      "vault": "保管庫"
+    },
+    "Warnings": {
+      "VaultItemNotExpander": "そのアイテムでは保管庫を拡張できません",
+      "NoGMsConnected": "警告 GMが不在です。Item Pilesでは、GMが存在していないとほとんどの機能を利用できません。",
+      "GiveItemNoGM": "このアイテムを受け取るGMがいません。",
+      "GiveItemDeclined": "{user_name}はアイテムの受け取りを拒否しました。",
+      "NoGMsConnectedAction": "警告 アクティブになっているGMがいないため、\"{action}\"を実行できませんでした。",
+      "NoPlayersActive": "このアクションを行うキャラクターがアクティブになっていません",
+      "VaultFull": "この保管庫は一杯です！"
+    },
+    "Applications": {
+      "Settings": {
+        "MoreToCome": "さらに多くの設定オプションが登場します……",
+        "Request": "新しい機能のリクエストはこちら。",
+        "Local": "ローカル設定",
+        "Module": "モジュール設定",
+        "Styles": "スタイル設定",
+        "Export": "設定のエクスポート",
+        "Import": "設定のインポート",
+        "Donate": "このモジュールが気に入ったら、開発維持のために寄付を検討してください！",
+        "Submit": "設定を送信",
+        "System": "システム固有の設定",
+        "Title": "Item Pilesモジュールの設定"
+      },
+      "SecondaryCurrenciesEditor": {
+        "TitleActor": "Item Piles 補助通貨エディタ: {actor_name}",
+        "Title": "Item Piles 補助通貨エディタ",
+        "Explanation": "キャラクターが拾って取り出せる補助通貨を定義できます。"
+      },
+      "ItemEditor": {
+        "Title": "アイテムの山 アイテムエディターー: {item_name}",
+        "DisplayQuantityYes": "数量を常に表示",
+        "CanStackNo": "スタック不可",
+        "InfiniteQuantityExplanation": "有効にすると、このアイテムを商人から無限に購入できるようになります。",
+        "General": "一般設定",
+        "CustomCategory": "カスタムアイテムカテゴリ",
+        "HiddenExplanation": "有効にすると、このアイテムは商人のアイテムリストに表示されません。",
+        "PricePreset": "価格プリセットを選択:",
+        "SelectPreset": "価格プリセットを選択",
+        "CanStackYes": "常にスタック可能",
+        "DropMeClickMe": "属性を追加するにはクリックまたはアイテムをドラッグしてください",
+        "KeepZeroExplanation": "完全に売り切れた場合、商人のアイテムリストから削除せず、代わりに販売不可に設定します。",
+        "BasePrice": "基本価格",
+        "BasePriceExplanation": "アイテムの通常の価格を設定します。",
+        "Update": "アイテムを更新",
+        "NotForSale": "販売不可",
+        "NotForSaleExplanation": "有効にすると、このアイテムは販売不可となります。非表示にされていない場合、商人のアイテムリストには表示されます。",
+        "CustomCategoryExplanation": "通常とは異なるタイプに羅列したい場合に入力してください。",
+        "DisplayQuantity": "アイテム数量の表示",
+        "DisplayQuantityExplanation": "ストア内のこのアイテムの数量がどのように表示されるかを設定します。",
+        "DisplayQuantityDefault": "商人の設定（デフォルト）",
+        "InfiniteQuantityDefault": "商人の設定（デフォルト）",
+        "InfiniteQuantityYes": "無限",
+        "InfiniteQuantityNo": "数量あり",
+        "KeepZero": "数量0を保持",
+        "KeepOnMerchant": "商人のアイテムを保持",
+        "KeepOnMerchantExplanation": "商人のアイテムをポップアップアイテムタブや、the Simple Calendarのリフレッシュインベントリ統合（下部の商人設定を参照）で削除した場合、アイテムを保持します。",
+        "PriceExplanation": "このタブでは、このアイテムの価格を設定できます。アイテムを購入する際に、他のアイテムを必要とするかどうかも設定できます。",
+        "QuantityForPrice": "価格ごとの数量",
+        "Hidden": "アイテムを非表示",
+        "QuantityForPriceExplanation": "価格ごとにいくつのアイテムが含まれているかの設定です。",
+        "Service": "サービス",
+        "ServiceExplanation": "回復や蘇生などの形に残らない商品。有効にされたアイテムは、購入者のインベントリに追加されません。サービス \"item\" は数量を持つことができますが、それが尽きても商人から削除されず、代わりに販売不可に設定されます。",
+        "PurchaseMacro": "購入時マクロ",
+        "PurchaseMacroExplanation": "アイテムが購入されたときに実行されるマクロの名前。",
+        "Free": "無料",
+        "FreeExplanation": "有効にすると、このアイテムは商人から購入するのに費用がかかりません。",
+        "DisableNormalCost": "特殊アイテム",
+        "DisableNormalCostExplanation": "有効になっている場合、このアイテムは主要通貨で購入できず、以下の購入オプションのいずれかで購入する必要があります。",
+        "PurchaseOptions": "購入オプション",
+        "CantBeSoldToMerchantsExplanation": "有効にすると、このアイテムは商人に販売できず、購入することしかできません。",
+        "CanStack": "スタック可能",
+        "CanStackExplanation": "これは、このアイテムを保管庫に追加した際に他の類似のアイテムとスタックするかどうかを設定します。",
+        "CanStackDefault": "保管庫の設定をデフォルトにする",
+        "VaultExpander": "保管庫拡張",
+        "VaultExpanderExplanation": "有効にすると、このアイテムは通常のアイテムとして機能せず、保管庫の容量を超えない範囲で、利用可能なスロットの数を増やします。",
+        "ExpandColumnsRows": "行列拡張",
+        "Price": "価格設定",
+        "Vault": "保管庫設定",
+        "DisplayQuantityNo": "数量を常に非表示",
+        "InfiniteQuantity": "在庫無限",
+        "CantBeSoldToMerchants": "商人に売れません",
+        "AddPurchaseOption": "購入オプションを追加",
+        "PurchaseOptionsExplanation": "このアイテムを購入するための代替方法を作成できます",
+        "ExpandColumnsRowsExplanation": "上記の設定を有効にすると、保管庫で使用可能になる行数および列数を容量を超えない範囲で設定できます。"
+      },
+      "FilterEditor": {
+        "Title": "アイテムの山フィルターエディター",
+        "TitleActor": "Item Piles フィルターエディター: {actor_name}",
+        "Explanation": "特定のアイテムの種類を除外する複数のフィルタのタイプを定義できます。アイテムの山はアイテムの\"type\" によって、インベントリUI内で該当タイプのアイテムを非表示にします。",
+        "Filters": "フィルタ",
+        "Path": "属性パス",
+        "AddNew": "新しいフィルタを追加する"
+      },
+      "ItemPileConfig": {
+        "Main": {
+          "InspectItems": "アイテムの検査を有効にする",
+          "DeleteWhenEmptyYes": "空になったら削除",
+          "Distance": "接触可能距離",
+          "EnabledPile": "有効",
+          "InspectItemsExplanation": "アイテム名をクリックするとアイテムのシートが表示されます。",
+          "DisplayItemTypes": "アイテムタイプごとにアイテムを分割",
+          "DisplayItemTypesExplanation": "アイテムの山内で各アイテムタイプを別々に表示し、アイテムタイプでソートします。",
+          "EnabledPileExplanation": "アイテムの山として扱う。",
+          "MacroExplanation": "このアイテムの山に接触したとき実行するマクロの名前。",
+          "Title": "メイン設定",
+          "GridUnits": "グリッドユニット（無制限の場合は空白にしてください）",
+          "Macro": "接触時のマクロ",
+          "MacroPlaceholder": "マクロ名を挿入",
+          "DeleteWhenEmptyDefault": "デフォルトのモジュール設定",
+          "DeleteWhenEmptyNo": "空になっても削除しない",
+          "OverrideCurrencies": "通貨を上書き",
+          "OverrideCurrenciesExplanation": "デフォルト以外の通貨をこのアイテムの山で転送できるかどうかを設定します。",
+          "ConfigureOverrideCurrencies": "通貨の上書き設定を構成",
+          "OverrideSecondaryCurrencies": "補助通貨を上書き",
+          "ConfigureOverrideSecondaryCurrencies": "補助通貨の上書き設定を構成",
+          "OverrideSecondaryCurrenciesExplanation": "このアイテムの山の補助通貨の上書きを設定します。",
+          "OverrideItemFilters": "アイテムフィルタを上書き",
+          "OverrideItemFiltersExplanation": "デフォルトのアイテムタイプ以外のアイテムをこのアイテムの山で転送できるかどうかを設定します。",
+          "ConfigureOverrideItemFilters": "アイテムフィルタの上書き設定を構成",
+          "EditDescription": "説明を編集",
+          "DeleteWhenEmpty": "空になったら削除",
+          "DeleteWhenEmptyExplanation": "このアイテムの山が空になったら自動的に削除される。",
+          "EditDescriptionExplanation": "この説明は、アイテムの山が表示される際、関係するインターフェイスで表示されます"
+        },
+        "Merchant": {
+          "ItemTypeModifier": "アイテムタイプ価格修正",
+          "KeepZero": "ゼロ数量を保持",
+          "Title": "商人設定",
+          "InfiniteCurrencyExplanation": "有効にすると、この商人は無限にアイテムを買い取れます。",
+          "DisplayQuantityExplanation": "ストア内のアイテムの数量が表示される方法を設定します。",
+          "OpenStatusClosed": "閉店中",
+          "ConfigureItemTypePriceModifiers": "アイテムタイプ価格修正を設定",
+          "InfiniteQuantity": "無限の在庫",
+          "MerchantImageExplanation": "商人インターフェースに表示される画像です",
+          "InfiniteCurrency": "無限の通貨",
+          "InfiniteQuantityExplanation": "有効にすると、この商人のアイテム在庫がなくなることはありません。",
+          "HideNewItems": "新しいアイテムを非表示",
+          "DisplayQuantityNo": "数量を非表示（アイテムが異なる場合を除く）",
+          "PurchaseOnly": "購入のみ",
+          "HideNewItemsExplanation": "有効にすると、この商人に売却されたアイテムは非表示になります。",
+          "RefreshItemsOnOpen": "オープン時にアイテムを更新（シンプルカレンダー）",
+          "RefreshItemsOnOpenExplanation": "カレンダーの時間が商人のオープン時間を超えると、商人の在庫が更新されます。",
+          "RefreshItemsDays": "平日にアイテムを更新（シンプルカレンダー）",
+          "RefreshItemsHolidaysExplanation": "カレンダーが指定されたノートカテゴリを持つノートを超えると、商人の在庫が更新されます。ノートが終日設定されている場合、更新はその日の真夜中に行われます。",
+          "MerchantColumns": "列の追加",
+          "HideItemsWithZeroCost": "コストがゼロのアイテムを非表示",
+          "HideItemsWithZeroCostExplanation": "有効にすると、顧客はゼロコスト（無料）のアイテムを購入または販売できなくなります。",
+          "Enabled": "商人である",
+          "MerchantImage": "商人の画像",
+          "KeepZeroExplanation": "アイテムが完全に売り切れた場合、この商人はアイテムを削除せず、代わりに販売不可に設定します。",
+          "OpenTimesExplanation": "有効にすると、商人は一日のうちで特定の時間にしかプレイヤーと取引しなくなります。",
+          "DisplayQuantity": "アイテム数量の表示",
+          "DisplayQuantityYes": "数量を表示（アイテムが異なる場合を除く）",
+          "DisplayQuantityYesAlways": "常に数量を表示",
+          "DisplayQuantityNoAlways": "常に数量を非表示",
+          "PurchaseOnlyExplanation": "有効にすると、キャラクターはこの商人にアイテムを売ることができません。",
+          "OnlyAcceptBasePrice": "基本価格のみ受け入れ",
+          "OnlyAcceptBasePriceExplanation": "有効にすると、この商人に売却されるすべてのアイテムは基本価格を使用し、カスタム価格は使用しません。",
+          "OpenStatusExplanation": "商人の営業状況の現在の状態を設定します。下記の「営業時間」が有効になっており、Simple Calendarモジュールが有効になっている場合、自動的に設定できます。",
+          "OpenStatusOpen": "営業中",
+          "OpenStatusAuto": "自動（Simple Calendar）",
+          "ClosedDays": "閉店日（Simple Calendar）",
+          "ClosedDaysExplanation": "チェックされた日は、商人が閉店日になります（商人の営業状況が自動設定されている場合）。",
+          "ClosedHolidays": "祝日（Simple Calendar）",
+          "ClosedHolidaysExplanation": "特定のノートカテゴリのノートがある日に、商人が閉店日になります（商人の営業状況が自動設定されている場合）。",
+          "RefreshItemsWarning": "以下のオプションを選択すると、既存のアイテムは削除され、もとに戻すことはできません。個々のアイテムは保護設定が可能です。サービス、数量0の維持、商人に保持するよう設定されたアイテムは保持されます。",
+          "RefreshItemsDaysExplanation": "カレンダーがチェックされた曜日を超えると、商人の在庫が更新されます。商人にオープン/クローズの時間がない場合、更新は真夜中に行われます。",
+          "RefreshItemsHolidays": "休日にアイテムを更新（シンプルカレンダー）",
+          "PriceModifierTitle": "購入価格および販売価格の修正",
+          "PriceModifierExplanation": "これはショップ内のすべてのアイテムのコストの修正を設定します。アイテムタイプごと、または魅力的な吟遊詩人などの特定のキャラクターごとに修正を設定することもできます。200%に制限されません。必要に応じてフィールドに入力してさらに高く設定できます。",
+          "BuyPriceModifier": "購入価格修正（%）",
+          "SellPriceModifier": "販売価格修正（%）",
+          "ItemTypeModifiersExplanation": "このダイアログで個々のアイテムタイプに対する価格修正を設定できます。",
+          "ActorPriceModifiers": "アクターごとの価格修正",
+          "ActorPriceModifiersExplanation": "ここでは特定のアクターが上記の価格修正とは異なる価格修正を持つかどうかを設定できます。",
+          "ConfigureActorPriceModifiers": "アクター価格修正を設定",
+          "ConfigureMerchantColumns": "列を設定",
+          "EnabledExplanation": "プレイヤーは商人からアイテムを取ることはできません。購入する必要があります",
+          "MerchantColumnsExplanation": "この商人のシステム固有の列の値を新しく設定できます（レアリティなど）。",
+          "OpenTimes": "営業時間",
+          "OpenStatus": "営業状況"
+        },
+        "Vault": {
+          "ClearVaultLog": "倉庫のログをクリア",
+          "Rows": "行",
+          "LoggingFormatUserActor": "ユーザー名とキャラクター名を表示",
+          "LoggingFormatActor": "キャラクター名のみ表示",
+          "Layout": "レイアウト",
+          "EnableExpansion": "拡張アイテムを有効にする",
+          "BaseExpansion": "基本の拡張",
+          "BaseExpansionExplanation": "追加の拡張アイテムなしでデフォルトで有効になる列と行の数です。",
+          "ClearVaultLogExplanation": "倉庫のログが削除され、すべてのエントリが削除されます。これは元に戻すことはできません。",
+          "LoggingFormat": "ログのフォーマット",
+          "LoggingFormatExplanation": "これはログにユーザー名とキャラクター名がどのように表示されるかを設定します。",
+          "Title": "倉庫の設定",
+          "LayoutExplanation": "倉庫で表示される列と行の数です。",
+          "Columns": "列",
+          "EnableExpansionExplanation": "有効にすると、倉庫を拡張するアイテムは倉庫の利用可能なスペースを拡大します。",
+          "RestrictAccess": "倉庫のアクセス制限",
+          "Access": "キャラクターとプレイヤーのアクセス",
+          "RestrictAccessExplanation": "デフォルトでは、誰もがサイドバーで倉庫を見ることができる場合か、シーンで近づくことができる場合、倉庫にアクセスできます。この設定を有効にすると、倉庫は倉庫キャラクターの所有者またはアクセスエディターで設定されたユーザー/キャラクターにのみ表示されるようになります。",
+          "ManageAccess": "アクセスの管理",
+          "LogVaultAccess": "倉庫アクセスのログを記録",
+          "LogVaultAccessExplanation": "有効にすると、この倉庫は倉庫が対話したときにジャーナルエントリを作成し、タイムスタンプのあるログを作成します。",
+          "LoggingFormatUser": "ユーザー名のみ表示",
+          "CanStackItems": "アイテムを重ねることができる",
+          "CanStackItemsExplanation": "有効にすると、倉庫に追加されたアイテムは類似のアイテムと重ねて表示されます。これはアイテムごとに設定できます。",
+          "AccessExplanation": "倉庫のインベントリと通貨にアクセスして変更できるキャラクターおよびプレイヤーを設定します。プレイヤーが倉庫キャラクターの所有権を持っている場合、常にフルアクセスできます。"
+        },
+        "Other": {
+          "Type": "アイテムの山のタイプ",
+          "Title": "その他の設定",
+          "TypeExplanation": "このアイテムの山の表示方法を設定する。"
+        },
+        "SingleItem": {
+          "Title": "単一アイテム設定",
+          "DisplayOneContainerWarning": "警告！\"Display Single Item Image\" と \"Is Container\" が両方有効になっています。この場合、コンテナの画像が優先されます。",
+          "DisplayOne": "単一アイテム画像を表示",
+          "Scale": "単一アイテムトークンスケール",
+          "ItemNameExplanation": "アイテムの山の名前を含む単一のアイテムに設定します。",
+          "OverrideScale": "単一アイテムトークンスケールを上書き",
+          "ItemName": "アイテム名を使用",
+          "DisplayOneExplanation": "アイテムの山が一種類のアイテムで構成されている場合、アイテムの山トークンの画像をアイテムの画像に設定します。"
+        },
+        "Container": {
+          "LockedImagePath": "ロックされた画像パス",
+          "CloseSoundPath": "閉じる音のパス",
+          "LockedSoundPath": "ロック音のパス",
+          "Title": "コンテナの設定",
+          "IsContainer": "コンテナである",
+          "Locked": "ロックされている",
+          "Closed": "閉じている",
+          "ClosedImagePath": "閉じた画像パス",
+          "EmptyImagePath": "空の画像パス",
+          "OpenedImagePath": "開いた画像パス",
+          "OpenSoundPath": "開く音のパス"
+        },
+        "Sharing": {
+          "SplitAllEnabled": "プレイヤーと分けるボタンを有効にする",
+          "ShareCurrenciesEnabled": "通貨の共有が有効",
+          "TakeAllEnabled": "「すべて取る」ボタンを有効にする",
+          "TakeAllEnabledExplanation": "この設定を有効にすると、このアイテムの山を略奪する際に\"Take All\"ボタンが表示されます。上記の共有設定の両方が無効になっている必要があります。",
+          "InactivePlayersExplanation": "このアイテムの山が略奪されたときにアクティブなプレイヤーのみが共有を受け取るようになります。",
+          "Title": "共有設定",
+          "ShareItemsEnabled": "アイテムの共有が有効",
+          "ShareItemsEnabledExplanation": "有効になっている場合、プレイヤーはアイテムの数量に対する自分の共有しか取得できません。無効にすると、必要なだけ取得できます。",
+          "ShareCurrenciesEnabledExplanation": "有効になっている場合、プレイヤーは通貨の数量に対する自分の共有しか取得できません。無効にすると、必要なだけ取得できます。",
+          "SplitAllEnabledExplanation": "この設定を有効にすると、このアイテムの山を略奪する際に \"Split [number] ways\"ボタンが表示されます。このボタンを押すと、すべてのプレイヤー（またはアクティブなプレイヤーのみ、下記参照）がアイテムの山の共有を受け取ります。",
+          "InactivePlayers": "アクティブなプレイヤーとのみ分割",
+          "ResetSharingData": "共有データをリセット",
+          "ResetSharingDataExplanation": "アイテムの山の内容が略奪中に手動で変更されると、共有データがプレイヤーの実際の共有と同期しなくなることがあります。このボタンを押すと、このアイテムの山内のすべての共有がリセットされます。"
+        },
+        "Title": "アイテムの山設定: {actor_name}",
+        "Configure": "設定",
+        "Update": "更新"
+      },
+      "WithdrawCurrencies": {
+        "Title": "通貨を取り出す",
+        "Content": "この保管庫から次の通貨を取り出すことができます：",
+        "NoCurrency": "取り出す通貨はありません。",
+        "Submit": "引出"
+      },
+      "CurrenciesEditor": {
+        "DragDrop": "アイテムをリストに追加するには、アイテムをドラッグアンドドロップしてください",
+        "Name": "通貨名",
+        "Exchange": "交換",
+        "Icon": "アイコン",
+        "ExplanationSmallItems": "他のシステムでは、アクターの実際のアイテムである場合があります。この場合、アイテムをこのリストにドラッグアンドドロップで通貨に追加できます。",
+        "Title": "Item Piles 通貨エディタ",
+        "TitleActor": "Item Piles 通貨エディタ: {actor_name}",
+        "Explanation": "アイテムの山から拾える通貨などの通貨を定義できます。",
+        "ExplanationSmallAttributes": "D&D5eでは、通貨は\"actor.system.currency.gp\"の属性パス上に存在するため、\"Gold Coins\" という名前と \"system.currency.gp\"という属性パスを追加すると、独自の通貨を追加できます。ヘッダーのプラスをクリックして1つ追加します。",
+        "Data": "データ",
+        "AddNew": "新しい通貨を追加"
+      },
+      "DepositCurrencies": {
+        "Submit": "預入",
+        "Title": "通貨を預ける",
+        "Content": "次の通貨をこの保管庫に預けることができます：",
+        "NoCurrency": "{actor_name}に預ける通貨はありません。"
+      },
+      "TradeMerchantItem": {
+        "YouPay": "支払",
+        "Title": "アイテムの取引: {item_name}",
+        "SellItem": "アイテムを売る",
+        "TheyReceive": "売る",
+        "Quantity": "数量",
+        "Change": "変更",
+        "YouCantAfford": "この価格は支払えません",
+        "BuyItem": "アイテムを購入",
+        "YouReceive": "受取",
+        "TheyCantAfford": "相手はこの価格を支払えません",
+        "TheyLackQuantity": "このアイテムを売るのに十分な数を持っていません。相手は{quantity}個持っていますが、{requiredQuantity}個必要です",
+        "YouLackQuantity": "このアイテムを売るのに十分な数を持っていません。あなたは{quantity}個持っていますが、{requiredQuantity}個必要です",
+        "MaxQuantity": "最大{quantity}"
+      },
+      "DepositItem": {
+        "Header": "預入：{item_name}",
+        "Title": "アイテムを預ける",
+        "Content": "このアイテムを\"{target_name}\"に預けますか？",
+        "ContentMultipleQuantity": "このアイテムを{quantity}個持っています。何個預けますか？",
+        "ContentInfiniteQuantity": "何個預けますか？",
+        "Submit": "預入"
+      },
+      "SplitItem": {
+        "Title": "アイテムスタックを分割",
+        "Content": "このスタックされたアイテムを分割しますか？",
+        "Submit": "スタックを分割",
+        "Header": "{item_name}のスタックを分割しています",
+        "ContentMultipleQuantity": "{item_name}は{quantity}個あります。新しいスタックに何個入れますか？"
+      },
+      "ItemTypePriceModifiersEditor": {
+        "ItemType": "アイテムタイプ",
+        "TitleActor": "アイテムタイプ価格修正エディタ: {actor_name}",
+        "Explanation": "特定のアイテムタイプに対する商人の価格と販売価格修正を定義できます。\"Override\"設定は、商人の通常の価格修正を上書きします。",
+        "Title": "アイテムタイプ価格修正エディター",
+        "Override": "上書き"
+      },
+      "PricePresetEditor": {
+        "Explanation": "アイテムのカスタム価格に簡単にインポートできる複数のプリセット価格を作成できます。",
+        "Title": "価格プリセットエディター",
+        "Update": "プリセットの更新"
+      },
+      "EditCurrencies": {
+        "Submit": "送信",
+        "Title": "通貨を編集",
+        "Content": "GMとして、このアイテムの山の金額を更新できます：",
+        "Secondary": "補助通貨："
+      },
+      "WithdrawItem": {
+        "Header": "引出：{item_name}",
+        "Title": "アイテムを引き出す",
+        "Content": "このアイテムを\"{target_name}\"から引き出しますか？",
+        "ContentMultipleQuantity": "このアイテムは{quantity}個あります。何個引き出しますか？",
+        "Submit": "引出"
+      },
+      "SimilaritiesEditor": {
+        "Title": "Item Piles 類似品エディター",
+        "Path": "属性パス",
+        "Explanation": "Item Pilesが類似のアイテムを区別するのに役立つ複数の識別子のタイプを定義できます。ほとんどのシステムでは、アイテムは\"name\" と\"type\" で区別できます。ただし、Pathfinder 2nd Editionのように一時的なアイテムと永続的なアイテムが共有する場合もあります。\"system.temporary.value\"を追加することで、そのアイテムは \"unique\"と見なされ、通常のアイテムとは別のものとして扱われます。"
+      },
+      "CustomItemCategoriesEditor": {
+        "Explanation": "ワールドで利用可能なカスタムアイテムカテゴリを構成できます。アイテムの新しいカスタムカテゴリを追加する際、自動的に追加されます。",
+        "Title": "カスタムアイテムカテゴリエディタ",
+        "Category": "カテゴリ"
+      },
+      "PriceModifiersEditor": {
+        "DragDrop": "アクターをドラッグしてリストに追加",
+        "TitleActor": "アイテムの山価格修正エディター: {actor_name}",
+        "Title": "アイテムの山価格修正エディター",
+        "Explanation": "特定のアクターに関連するこの商人の価格と販売価格修正を定義できます。\"Override\"設定は、アイテムタイプ固有の価格修正を含む商人の通常の価格修正を上書きすることを意味します。",
+        "Actor": "アクター",
+        "Override": "上書き"
+      },
+      "MerchantColumnsEditor": {
+        "TitleActor": "商人の列：{actor_name}",
+        "Label": "ラベル",
+        "Formatting": "フォーマット",
+        "Title": "商人の列",
+        "Explanation": "名前、数量、価格以外の商人のUIに表示される列を設定します。",
+        "PropertyPath": "プロパティパス",
+        "Buying": "購入",
+        "Selling": "販売",
+        "ConfigureMapping": "マッピングを設定",
+        "MappingTitle": "商人の列のマッピング：{label}",
+        "MappingContent": "プロパティの値とラベルとのマッピングを設定します。このラベルはローカライズされた文字列にすることができます。"
+      },
+      "DropItem": {
+        "ContentInfiniteQuantity": "何個取り出しますか？",
+        "Title": "アイテム取得",
+        "Header": "取得:{item_name}",
+        "Content": "このアイテムをアイテムの山\"{target_name}\"に追加しています。",
+        "ContentMultipleQuantity": "このアイテムを{quantity}個持っています。何個取り出しますか？",
+        "Submit": "アイテムの山に追加",
+        "SubmitNoTarget": "新しいアイテムの山を作成"
+      },
+      "GiveItem": {
+        "Content": "このアイテムを\"{target_name}\"に渡しますか？",
+        "ContentMultipleQuantity": "このアイテムを{quantity}個持っています。何個渡しますか？",
+        "ContentInfiniteQuantity": "\"{target_name}\"に何個渡しますか？",
+        "Submit": "譲渡",
+        "Title": "アイテム譲渡",
+        "Header": "譲渡：{item_name}"
+      },
+      "DropCurrencies": {
+        "Title": "通貨を追加",
+        "Content": "次の通貨をこのアイテムの山に追加できます：",
+        "NoCurrency": "{actor_name}に有効な通貨はありません……",
+        "Submit": "追加"
+      },
+      "UnstackableItemTypesEditor": {
+        "Title": "スタックできないアイテムタイプエディタ",
+        "Explanation": "スタックできないアイテムのタイプを定義できます。",
+        "Type": "アイテムタイプ"
+      },
+      "VaultStylesEditor": {
+        "Title": "Item Piles レアリティエディター",
+        "Path": "属性パス",
+        "Style": "レアリティを作成する",
+        "AddNew": "新しいレアリティルールを追加する",
+        "Value": "一致する値",
+        "Explanation": "保管庫内のアイテムの複数のスタイルを定義できます。たとえば、 \"system.rarity\"を参照して \"rare\"に見せるレアリティを作成し、その設定に一致するアイテムにレアリティを適用できます。"
+      },
+      "StylesEditor": {
+        "Title": "スタイルエディタ",
+        "Style": "スタイル",
+        "Variable": "変数",
+        "Value": "値"
+      },
+      "VaultAccessEditor": {
+        "Title": "倉庫アクセスエディター",
+        "Explanation": "倉庫のインベントリと通貨にアクセスして変更できるキャラクターおよびプレイヤーを設定します。プレイヤーが倉庫キャラクターの所有権を持っている場合、常にフルアクセスできます。",
+        "Character": "プレイヤー/キャラクター",
+        "View": "表示",
+        "Organize": "整理",
+        "Withdraw": "引き出す",
+        "Deposit": "預ける",
+        "TitleActor": "倉庫アクセスエディター：{actor_name}"
+      }
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "PLに中身を表示"
+    },
+    "Notifications": {
+      "UpdateMerchantSuccess": "商人は適切に更新されました。",
+      "ShownToPlayers": "{actor_name}をプレイヤーに表示",
+      "SystemSupportFound": "このシステムはItem Pileでサポートされています。デフォルトの設定を適用中です。",
+      "UpdateItemPileSuccess": "Item Pileが適切に更新されました。",
+      "ItemTransferred": "{source_actor_name}が{item_name}を{target_actor_name}に渡しました。",
+      "ItemAdded": "{target_actor_name}が{item_name}を手に入れました。",
+      "GiveItemAccepted": "{user_name}はアイテムを受け取りました。",
+      "CreatedJournal": "Item Piles保管ログを作成しました。"
+    },
+    "Vault": {
+      "ViewingAs": "{actor_name}として表示中",
+      "NeedsCapacity": "この保管庫の総容量は{total_capacity}ですが、拡張を追加するまで利用できません",
+      "VaultTab": "保管庫",
+      "ExpandersTab": "拡張",
+      "CapacityLeft": "この保管庫は{capacity}の容量を持っており、最大{total_capacity}まで拡張をドラッグアンドドロップすることで容量を増やすことができます",
+      "CapacityFull": "この保管庫は最大容量の{total_capacity}に達しました",
+      "ExpandsCols": "{cols}列",
+      "ExpandsRows": "{rows}行",
+      "Withdrew": "引き出ました",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "LogQuantity": "{quantity} x ",
+      "LogTab": "ログ",
+      "Withdraw": "引き出す",
+      "Deposit": "預ける",
+      "LogUserActor": "{actor_name}（ユーザー{user_name}）",
+      "Deposited": "預けました"
+    },
+    "VaultLog": {
+      "Withdraw": "{actor_name}（{user_name}）は{item_name} x {quantity}を引き出しました（{date}）",
+      "Deposit": "{actor_name}（{user_name}）が{item_name} x {quantity}を預けました（{date}）"
     }
   }
 }
