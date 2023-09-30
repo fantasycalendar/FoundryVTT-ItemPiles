@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve
 title: "[BUG] - [SYSTEM NAME] - Describe bug here"
-labels: bug, invalid
+labels: bug
 assignees: ''
 
 ---
