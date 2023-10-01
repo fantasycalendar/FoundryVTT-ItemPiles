@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.7.15
+
+- Added Japanese localization (thank you black11eleven on weblate, great work!)
+- Fixed issue where dropping a token onto a scene would sometimes not use the current item piles configuration
+
 ## Version 2.7.14
 
 - Added Czech localization (thank you Mortan on weblate - fantastic job!)

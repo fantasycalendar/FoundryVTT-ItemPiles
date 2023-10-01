@@ -109,8 +109,11 @@ export default class PrivateAPI {
     const docData = foundry.utils.deepClone(data);
     const sourceActor = game.actors.get(doc.actorId);
     const itemPileConfig = foundry.utils.mergeObject(
-      PileUtilities.getActorFlagData(sourceActor),
-      getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {}
+      foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+      foundry.utils.mergeObject(
+        getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {},
+        foundry.utils.deepClone(getProperty(sourceActor, CONSTANTS.FLAGS.PILE) ?? {})
+      )
     )
     if (!itemPileConfig?.enabled) return;
     if (!doc.isLinked) {
@@ -133,8 +136,12 @@ export default class PrivateAPI {
       itemPileConfig.lockedImages = [];
     }
     docData[CONSTANTS.FLAGS.PILE] = PileUtilities.cleanFlagData(itemPileConfig);
-    const targetItems = PileUtilities.getActorItems(doc.actor);
-    const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor);
+    const targetItems = PileUtilities.getActorItems(doc.actor, {
+      itemFilters: itemPileConfig?.overrideItemFilters
+    });
+    const targetCurrencies = PileUtilities.getActorCurrencies(doc.actor, {
+      currencyList: PileUtilities.getCurrencyList(doc.actor, itemPileConfig)
+    });
     const pileData = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
     const scale = PileUtilities.getItemPileTokenScale(doc, pileData);
     docData["texture.src"] = PileUtilities.getItemPileTokenImage(doc, pileData);
