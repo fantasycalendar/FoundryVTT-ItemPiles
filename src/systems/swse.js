@@ -1,6 +1,6 @@
 export default {
 
-  "VERSION": "1.0.2",
+  "VERSION": "1.0.3",
 
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "character",
@@ -16,6 +16,8 @@ export default {
     }
   ],
 
+  "ITEM_PRICE_ATTRIBUTE": "system.cost",
+
   // Item similarities determines how item piles detect similarities and differences in the system
   "ITEM_SIMILARITIES": ["type", "name", "strippable", "hasPrerequisites", "modifiable", "hasLevels"],
 
@@ -26,7 +28,7 @@ export default {
       img: "icons/svg/coins.svg",
       abbreviation: "{#}C",
       data: {
-        path: "system.common.credits",
+        path: "system.credits",
       },
       primary: true,
       exchangeRate: 1
