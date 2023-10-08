@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.16
+
+- Fixed minor issue with adding vault expanders to vaults via the API causing the expanders to stack
+
 ## Version 2.7.15
 
 - Added Japanese localization (thank you black11eleven on weblate, great work!)
