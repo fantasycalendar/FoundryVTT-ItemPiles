@@ -3,6 +3,7 @@
 ## Version 2.7.16
 
 - Fixed minor issue with adding vault expanders to vaults via the API causing the expanders to stack
+- Fixed non-GM users adding vault expanders to a vault would be added to the vault with 0 quantity
 
 ## Version 2.7.15
 
