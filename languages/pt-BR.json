@@ -675,11 +675,13 @@
         "TitleActor": "Colunas do comerciante: {actor_name}",
         "Explanation": "Isso configura as colunas visíveis na IU do comerciante, além do nome do item, a quantidade e o preço.",
         "Label": "Rótulo",
-        "PropertyPath": "Caminho da propriedade do item",
+        "PropertyPath": "Caminho da propriedade",
         "Formatting": "Formatação",
         "ConfigureMapping": "Configurar o Mapeamento",
         "MappingTitle": "Mapeamento de colunas do comerciante: {label}",
-        "MappingContent": "Isso configura o mapeamento entre o valor da propriedade para um rótulo. Esse rótulo pode ser uma string localizada."
+        "MappingContent": "Isso configura o mapeamento entre o valor da propriedade para um rótulo. Esse rótulo pode ser uma string localizada.",
+        "Buying": "Comprando",
+        "Selling": "Vendendo"
       },
       "SecondaryCurrenciesEditor": {
         "Title": "Editor de Moedas Secundárias do Item Piles",
@@ -852,7 +854,7 @@
       "Deposit": "Depósito",
       "Deposited": "depositado",
       "LogUserActor": "{actor_name} ({user_name})",
-      "Withdrew": "Retirar",
+      "Withdrew": "Retirado",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "LogQuantity": "{quantity} x "
     },
