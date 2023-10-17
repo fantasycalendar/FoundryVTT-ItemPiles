@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.17
+
+- Fixed services would not stack and instead duplicate when added to merchants - if you still want non-stacking services, set them as non-stacking in the service's settings
+
 ## Version 2.7.16
 
 - Fixed minor issue with adding vault expanders to vaults via the API causing the expanders to stack
