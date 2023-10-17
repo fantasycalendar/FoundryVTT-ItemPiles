@@ -3,6 +3,7 @@
 ## Version 2.7.17
 
 - Fixed services would not stack and instead duplicate when added to merchants - if you still want non-stacking services, set them as non-stacking in the service's settings
+- Fixed services not being removed by the Simple Calendar during refreshes - if you want to keep them, turn on `Keep On Merchant`
 
 ## Version 2.7.16
 
