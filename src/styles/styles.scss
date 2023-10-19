@@ -1003,6 +1003,33 @@
   }
 }
 
+.item-piles-merchant-log {
+  > div {
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .item-piles-log-bought span {
+    color: #06a606;
+  }
+
+  .item-piles-log-sold span {
+    color: #ad1616;
+  }
+
+  .item-piles-log-positive span {
+    color: #069664;
+  }
+
+  .item-piles-log-negative span {
+    color: #ad6216;
+  }
+
+  .item-piles-log-other span {
+    color: #1b76d2;
+  }
+}
+
 #fast-tooltip {
   position: absolute;
   width: max-content;

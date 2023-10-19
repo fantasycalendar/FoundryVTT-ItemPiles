@@ -4,7 +4,7 @@
   import { onDestroy } from "svelte";
   import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
   import CustomDialog from "../components/CustomDialog.svelte";
-  import ItemEntry from "./ItemEntry.svelte";
+  import ItemEntry from "./components/ItemEntry.svelte";
   import * as PileUtilities from "../../helpers/pile-utilities.js";
   import { getSetting } from "../../helpers/helpers";
   import { slide } from "svelte/transition";

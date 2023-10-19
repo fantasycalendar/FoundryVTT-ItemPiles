@@ -45,6 +45,8 @@
   * [splitItemPileContents](#splitItemPileContents)
   * [renderItemPileInterface](#renderItemPileInterface)
   * [unrenderItemPileInterface](#unrenderItemPileInterface)
+  * [getMerchantPriceModifiers](#getMerchantPriceModifiers)
+  * [updateMerchantPriceModifiers](#updateMerchantPriceModifiers)
 
 
 * [Item and attribute methods](#item-and-attribute-methods)

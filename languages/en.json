@@ -169,7 +169,19 @@
       "ShoppingAs": "Shopping as {actorName}",
       "TableAddAllItems": "Add all items:",
       "TableTimesToRoll": "Times to roll on table:",
-      "TableCustomCategory": "Add items to custom category:"
+      "TableCustomCategory": "Add items to custom category:",
+      "Log": "Activity Log",
+      "LogSearch": "Log Search:",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogBought": "bought",
+      "LogSold": "sold",
+      "LogQuantity": "{quantity} x ",
+      "LogSetQuantity": "{instigator} set <strong>{item}</strong> <span>quantity</span> to {quantity}",
+      "LogSetForSale": "{instigator} set <strong>{item}</strong> <span>for sale</span",
+      "LogSetNotForSale": "{instigator} set <strong>{item}</strong> <span>not for sale</span",
+      "LogSetVisible": "{instigator} set <strong>{item}</strong> to <span>visible</span",
+      "LogSetHidden": "{instigator} set <strong>{item}</strong> to <span>hidden</span",
+      "LogTransaction": "{instigator} {action} {quantity}{item} for {price}"
     },
     "Vault": {
       "VaultTab": "Vault",
@@ -256,6 +268,10 @@
       "ClearVaultLog": {
         "Title": "Clear Vault Log?",
         "Content": "Are you sure you want to clear the log of the vault \"{actor_name}\"?"
+      },
+      "ClearMerchantLog": {
+        "Title": "Clear Merchant Log?",
+        "Content": "Are you sure you want to clear the log of the merchant \"{actor_name}\"?"
       }
     },
     "Applications": {
@@ -612,7 +628,11 @@
           "ConfigureActorPriceModifiers": "Configure Actor Price Modifiers",
           "MerchantColumns": "Merchant Columns",
           "MerchantColumnsExplanation": "Here you can configure this merchant's system specific columns displayed in its merchant UI, such as the rarity of items.",
-          "ConfigureMerchantColumns": "Configure Merchant Columns"
+          "ConfigureMerchantColumns": "Configure Merchant Columns",
+          "LogMerchantActivity": "Log Merchant Activity",
+          "LogMerchantActivityExplanation": "When enabled, this causes the merchant to log events such as buying and selling items, and GMs updating the status (quantity, visibility, and for sale) of items.",
+          "ClearMerchantLog": "Clear Merchant Logs",
+          "ClearMerchantLogExplanation": "This will clear the merchant logs, removing all entries. This cannot be undone."
         },
         "Vault": {
           "Title": "Vault Settings",

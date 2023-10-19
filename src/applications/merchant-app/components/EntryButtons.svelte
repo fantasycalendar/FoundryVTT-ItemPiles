@@ -1,6 +1,6 @@
 <script>
 
-  import ItemEditor from "../item-editor/item-editor.js";
+  import ItemEditor from "../../item-editor/item-editor.js";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
   export let item;
@@ -26,11 +26,11 @@
         </span>
 		{/if}
 		<span class="item-piles-clickable-link"
-					on:click={() => { $itemFlagDataStore.hidden = !$itemFlagDataStore.hidden; item.updateItemFlagData(); }}>
+					on:click={() => { item.toggleProperty("hidden"); }}>
         <i class="fas" class:fa-eye={!$itemFlagDataStore.hidden} class:fa-eye-slash={$itemFlagDataStore.hidden}></i>
       </span>
 		<span class="item-piles-clickable-link"
-					on:click={() => { $itemFlagDataStore.notForSale = !$itemFlagDataStore.notForSale; item.updateItemFlagData(); }}>
+					on:click={() => { item.toggleProperty("notForSale"); }}>
         <i class="fas" class:fa-store={!$itemFlagDataStore.notForSale}
 					 class:fa-store-slash={$itemFlagDataStore.notForSale}></i>
       </span>

@@ -79,7 +79,7 @@ export class VaultStore extends ItemPileStore {
   processLogEntries() {
 
     const pileData = get(this.pileData);
-    const logEntries = PileUtilities.getActorVaultLog(this.actor);
+    const logEntries = PileUtilities.getActorLog(this.actor);
 
     logEntries.map(log => {
 

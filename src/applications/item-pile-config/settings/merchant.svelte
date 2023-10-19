@@ -7,6 +7,9 @@
   import SliderInput from "../../components/SliderInput.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import MerchantColumnsEditor from "../../editors/merchant-columns-editor/merchant-columns-editor.js";
+  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+  import CustomDialog from "../../components/CustomDialog.svelte";
+  import * as PileUtilities from "../../../helpers/pile-utilities.js";
 
   export let pileData;
   export let pileActor;
@@ -79,6 +82,23 @@
     ).then((result) => {
       pileData.merchantColumns = result || [];
     });
+  }
+
+  async function clearLog() {
+    const doThing = await TJSDialog.confirm({
+      id: `sharing-dialog-item-pile-config-${pileActor.id}`,
+      title: "Item Piles - " + localize("ITEM-PILES.Dialogs.ClearMerchantLog.Title"),
+      content: {
+        class: CustomDialog,
+        props: {
+          header: localize("ITEM-PILES.Dialogs.ClearMerchantLog.Title"),
+          content: localize("ITEM-PILES.Dialogs.ClearMerchantLog.Content", { actor_name: pileActor.name })
+        },
+      },
+      modal: true
+    });
+    if (!doThing) return;
+    return PileUtilities.clearActorLog(pileActor);
   }
 
 </script>
@@ -169,6 +189,24 @@
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OnlyAcceptBasePriceExplanation")}</p>
 	</label>
 	<input bind:checked={pileData.onlyAcceptBasePrice} type="checkbox"/>
+</div>
+
+<div class="form-group">
+	<label>
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.LogMerchantActivity")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.LogMerchantActivityExplanation")}</p>
+	</label>
+	<input bind:checked={pileData.logMerchantActivity} type="checkbox"/>
+</div>
+
+<div class="form-group">
+	<label style="flex:4;">
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClearMerchantLog")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClearMerchantLogExplanation")}</p>
+	</label>
+	<button on:click={() => clearLog()} style="flex:2;" type="button">
+		{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClearMerchantLog")}
+	</button>
 </div>
 
 <div class="form-group slider-group">

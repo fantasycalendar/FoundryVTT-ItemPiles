@@ -8,11 +8,11 @@ import { isResponsibleGM } from "../helpers/helpers.js";
 import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
 import * as Utilities from "../helpers/utilities.js";
 import ItemPileStore from "./item-pile-store.js";
-import CustomColumn from "../applications/merchant-app/CustomColumn.svelte";
-import ItemEntry from "../applications/merchant-app/ItemEntry.svelte";
-import QuantityColumn from "../applications/merchant-app/QuantityColumn.svelte";
+import CustomColumn from "../applications/merchant-app/components/CustomColumn.svelte";
+import ItemEntry from "../applications/merchant-app/components/ItemEntry.svelte";
+import QuantityColumn from "../applications/merchant-app/components/QuantityColumn.svelte";
 import PriceSelector from "../applications/components/PriceSelector.svelte";
-import EntryButtons from "../applications/merchant-app/EntryButtons.svelte";
+import EntryButtons from "../applications/merchant-app/components/EntryButtons.svelte";
 
 export default class MerchantStore extends ItemPileStore {
 
@@ -30,6 +30,9 @@ export default class MerchantStore extends ItemPileStore {
     this.sortTypes = writable([]);
     this.inverseSort = writable(false);
     this.isMerchant = false;
+    this.log = writable([]);
+    this.visibleLogItems = writable(20);
+    this.logSearch = writable("");
   }
 
   get ItemClass() {
@@ -50,6 +53,9 @@ export default class MerchantStore extends ItemPileStore {
     this.sortTypes.set([]);
     this.inverseSort.set(false);
     this.isMerchant = false;
+    this.log.set([]);
+    this.visibleLogItems.set(20);
+    this.logSearch.set("");
   }
 
   getActorImage() {
@@ -61,6 +67,10 @@ export default class MerchantStore extends ItemPileStore {
 
     let setup = false;
     super.setupSubscriptions();
+    this.subscribeTo(this.document, () => {
+      if (!setup) return;
+      this.processLogEntries();
+    });
     this.subscribeTo(this.pileData, (pileData) => {
       this.isMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
       this.setupColumns(pileData);
@@ -93,10 +103,15 @@ export default class MerchantStore extends ItemPileStore {
       if (!setup) return;
       this.refreshItems();
     })
+    this.subscribeTo(this.logSearch, () => {
+      if (!setup) return;
+      this.filterLogEntries();
+    })
     setup = true;
     this.updatePriceModifiers();
     this.updateOpenCloseStatus();
     this.refreshItems();
+    this.processLogEntries();
   }
 
   setupColumns(pileData) {
@@ -322,6 +337,81 @@ export default class MerchantStore extends ItemPileStore {
     await PileUtilities.updateItemPileData(this.actor, pileData);
   }
 
+  processLogEntries() {
+
+    //const pileData = get(this.pileData);
+    const logEntries = PileUtilities.getActorLog(this.actor);
+
+    logEntries.sort((a, b) => b.date - a.date);
+
+    logEntries.forEach(log => {
+
+      let instigator;
+      if (log.actor !== undefined) {
+        instigator = game.i18n.format("ITEM-PILES.Merchant.LogUserActor", {
+          actor_name: log.actor || "Unknown character",
+          user_name: game.users.get(log.user)?.name ?? "unknown user",
+        })
+      } else {
+        instigator = game.users.get(log.user)?.name ?? "unknown user";
+      }
+
+      if (log.property) {
+
+        const properties = {
+          "notForSale": ["ITEM-PILES.Merchant.LogSetForSale", "ITEM-PILES.Merchant.LogSetNotForSale"],
+          "hidden": ["ITEM-PILES.Merchant.LogSetVisible", "ITEM-PILES.Merchant.LogSetHidden"]
+        }
+
+        log.text = localize(properties[log.property][Number(log.value)], { instigator, item: log.item });
+
+        log.class = log.value ? "item-piles-log-positive" : "item-piles-log-negative";
+
+      } else if (log.sold !== undefined) {
+
+        const quantity = Math.abs(log.qty) > 1
+          ? game.i18n.format("ITEM-PILES.Merchant.LogQuantity", { quantity: Math.abs(log.qty) })
+          : "";
+
+        const action = localize("ITEM-PILES.Merchant." + (log.sold ? "LogSold" : "LogBought"));
+
+        log.text = localize("ITEM-PILES.Merchant.LogTransaction", {
+          instigator, quantity, item: `<strong>${log.item}</strong>`, action: `<span>${action}</span>`, price: log.price
+        });
+
+        log.class = log.sold ? "item-piles-log-sold" : "item-piles-log-bought";
+
+      } else {
+
+        log.text = localize("ITEM-PILES.Merchant.LogSetQuantity", {
+          instigator, quantity: Math.abs(log.qty), item: `<strong>${log.item}</strong>`
+        });
+
+        log.class = "item-piles-log-other";
+
+      }
+
+      log.visible = true;
+
+    });
+
+    this.log.set(logEntries);
+
+    this.filterLogEntries()
+
+  }
+
+  filterLogEntries() {
+    const search = get(this.logSearch).toLowerCase();
+    const regex = new RegExp(search, "g");
+    this.log.update((logs) => {
+      for (let log of logs) {
+        log.visible = log.text.toLowerCase().search(regex) !== -1;
+      }
+      return logs;
+    })
+  }
+
 }
 
 class PileMerchantItem extends PileItem {
@@ -452,9 +542,27 @@ class PileMerchantItem extends PileItem {
     this.filtered.set(searchFiltered || typeFiltered);
   }
 
-  async updateItemFlagData() {
+  async toggleProperty(property) {
+
+    this.itemFlagData.update((data) => {
+      data[property] = !data[property]
+      return data;
+    });
+
     const itemFlagData = get(this.itemFlagData);
+
     await PileUtilities.updateItemData(this.item, { flags: itemFlagData });
+
+    const pileFlagData = get(this.store.pileData);
+    if (pileFlagData.logMerchantActivity) {
+      await PileUtilities.updateMerchantLog(this.store.actor, {
+        type: "event",
+        user: game.user.id,
+        item: this.item.name,
+        property,
+        value: !itemFlagData[property]
+      });
+    }
   }
 
   updateQuantity(quantity) {
@@ -465,6 +573,14 @@ class PileMerchantItem extends PileItem {
     const baseData = {};
     if (itemFlagData.isService || pileFlagData.keepZeroQuantity || itemFlagData.keepZeroQuantity) {
       baseData[CONSTANTS.FLAGS.ITEM + ".notForSale"] = roll.total <= 0;
+    }
+    if (pileFlagData.logMerchantActivity) {
+      PileUtilities.updateMerchantLog(this.store.actor, {
+        type: "event",
+        user: game.user.id,
+        item: this.item.name,
+        qty: roll.total
+      });
     }
     return this.item.update(Utilities.setItemQuantity(baseData, roll.total));
   }

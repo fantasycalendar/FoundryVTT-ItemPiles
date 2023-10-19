@@ -2,7 +2,7 @@
 
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import MerchantItemEntry from "./MerchantItemEntry.svelte";
-  import CategoryHeader from "./CategoryHeader.svelte";
+  import CategoryHeader from "./components/CategoryHeader.svelte";
   import { get } from "svelte/store";
 
   export let store;

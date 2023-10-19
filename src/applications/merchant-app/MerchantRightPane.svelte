@@ -5,6 +5,7 @@
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
   import MerchantFooter from "./MerchantFooter.svelte";
   import { writable } from "svelte/store";
+  import MerchantActivityLog from "./MerchantActivityLog.svelte";
 
   export let store;
   export let recipientStore;
@@ -35,6 +36,8 @@
 			<MerchantItemTab store={recipientStore} noItemsLabel="ITEM-PILES.Merchant.NoItemsToSell"/>
 		{:else if $activeTab === "tables"}
 			<MerchantPopulateItemsTab {store}/>
+		{:else if $activeTab === "log"}
+			<MerchantActivityLog {store}/>
 		{/if}
 
 	</div>

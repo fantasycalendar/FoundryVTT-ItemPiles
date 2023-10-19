@@ -34,7 +34,7 @@
       modal: true
     });
     if (!doThing) return;
-    return PileUtilities.clearVaultLog(pileActor);
+    return PileUtilities.clearActorLog(pileActor);
   }
 
 </script>

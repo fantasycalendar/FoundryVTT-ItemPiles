@@ -98,6 +98,11 @@
         label: game.i18n.localize('ITEM-PILES.Merchant.PopulateItems'),
         hidden: !game.user.isGM
       },
+      {
+        value: 'log',
+        label: game.i18n.localize('ITEM-PILES.Merchant.Log'),
+        hidden: !merchant.isOwner || !$pileData.logMerchantActivity
+      },
     ];
     if (tabs.find(tab => tab.value === $activeTab).hidden) {
       $activeTab = tabs.find(tab => !tab.hidden).value;

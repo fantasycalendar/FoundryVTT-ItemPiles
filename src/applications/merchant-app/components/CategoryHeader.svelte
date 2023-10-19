@@ -1,6 +1,6 @@
 <script>
 
-  import SliderInput from "../components/SliderInput.svelte";
+  import SliderInput from "../../components/SliderInput.svelte";
   import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
   export let store;
