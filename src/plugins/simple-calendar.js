@@ -118,12 +118,12 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 
     await actorTransaction.appendItemChanges(actorItems.filter(item => {
       const itemFlags = PileUtilities.getItemFlagData(item);
-      return !itemFlags.isService && !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
+      return !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
     }), { remove: true });
 
     await actorTransaction.appendItemChanges(actorItems.filter(item => {
       const itemFlags = PileUtilities.getItemFlagData(item);
-      return !itemFlags.isService && !itemFlags.keepOnMerchant && itemFlags.keepIfZero;
+      return !itemFlags.keepOnMerchant && itemFlags.keepIfZero;
     }), { remove: true, keepIfZero: true });
 
     await actorTransaction.appendItemChanges(newActorItems.map(entry => ({
