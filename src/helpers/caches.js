@@ -31,10 +31,11 @@ class DebouncedCache extends Map {
 
   #setDebounce(key) {
     if (!this.#debounceClear[key]) {
+      const self = this;
       this.#debounceClear[key] = foundry.utils.debounce(() => {
-        delete this.#debounceClear[key];
-        this.delete(key);
-      }, this.#timeout)
+        delete self.#debounceClear[key];
+        self.delete(key);
+      }, this.#timeout);
     }
     this.#debounceClear[key]();
   }

@@ -3,6 +3,7 @@ import * as Utilities from "../../../helpers/utilities.js";
 import CONSTANTS from "../../../constants/constants.js";
 import * as Helpers from "../../../helpers/helpers.js";
 import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+import * as CompendiumUtilities from "../../../helpers/compendium-utilities.js";
 
 export default class CurrencyStore {
 
@@ -70,6 +71,10 @@ export default class CurrencyStore {
       throw Helpers.custom_error("Something went wrong when dropping this item!")
     }
 
+    if (!uuid) {
+      uuid = (await CompendiumUtilities.findOrCreateItemInCompendium(itemData)).uuid;
+    }
+
     this.currencies.update(currencies => {
       const itemCurrencies = currencies.map(entry => entry.data?.item ?? {});
       const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
@@ -77,7 +82,6 @@ export default class CurrencyStore {
         const index = itemCurrencies.indexOf(foundItem);
         currencies[index].data = {
           uuid,
-          item: itemData
         }
         Helpers.custom_notify(`Updated item data for ${localize(currencies[index].name)} (item name ${itemData.name})`)
       } else {
@@ -88,8 +92,7 @@ export default class CurrencyStore {
           img: itemData.img,
           abbreviation: "{#} " + itemData.name,
           data: {
-            uuid,
-            item: itemData
+            uuid
           },
         }, this.secondary ? {} : {
           primary: !currencies.length,

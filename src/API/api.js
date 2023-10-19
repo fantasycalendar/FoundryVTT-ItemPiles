@@ -2,13 +2,13 @@ import * as Helpers from "../helpers/helpers.js";
 import * as Utilities from "../helpers/utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
+import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import ItemPileSocket from "../socket.js";
 import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 import { SYSTEMS } from "../systems.js";
-import { getMerchantModifiersForActor } from "../helpers/pile-utilities.js";
 
 class API {
   /**
@@ -30,7 +30,15 @@ class API {
    * @returns {Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>}
    */
   static get CURRENCIES() {
-    return Helpers.getSetting(SETTINGS.CURRENCIES);
+    return Helpers.getSetting(SETTINGS.CURRENCIES).map(currency => {
+      if (currency.type === "item" && currency.data.uuid) {
+        const compendiumItem = CompendiumUtilities.getItemFromCache(currency.data.uuid);
+        if (compendiumItem) {
+          currency.data.item = compendiumItem;
+        }
+      }
+      return currency;
+    });
   }
 
   /**
@@ -39,7 +47,15 @@ class API {
    * @returns {Array<{name: string, data: Object, img: string, abbreviation: string}>}
    */
   static get SECONDARY_CURRENCIES() {
-    return Helpers.getSetting(SETTINGS.SECONDARY_CURRENCIES);
+    return Helpers.getSetting(SETTINGS.SECONDARY_CURRENCIES).map(currency => {
+      if (currency.type === "item" && currency.data.uuid) {
+        const compendiumItem = CompendiumUtilities.getItemFromCache(currency.data.uuid);
+        if (compendiumItem) {
+          currency.data.item = compendiumItem;
+        }
+      }
+      return currency;
+    });
   }
 
   /**

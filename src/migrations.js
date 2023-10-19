@@ -4,11 +4,9 @@ import * as PileUtilities from "./helpers/pile-utilities.js";
 import SETTINGS from "./constants/settings.js";
 import { findOrCreateItemInCompendium } from "./helpers/compendium-utilities.js";
 
-const sortedMigrations = ["2.7.5", "2.4.0", "2.4.17", "2.6.1"];
-
 export default async function runMigrations() {
 
-  for (const version of sortedMigrations) {
+  for (const version of Object.keys(migrations)) {
     try {
       await migrations[version](version);
     } catch (err) {
@@ -186,9 +184,10 @@ const migrations = {
         actor,
         items: itemPileItems.map(item => {
           const flags = getProperty(item, CONSTANTS.FLAGS.ITEM);
+          if (!flags) return false;
           flags.infiniteQuantity = "default";
           return PileUtilities.updateItemData(item, { flags }, { version, returnUpdate: true });
-        })
+        }).filter(Boolean)
       }
 
     }).filter(update => update.items.length);
@@ -294,7 +293,7 @@ const migrations = {
 
   },
 
-  "2.7.5": async (version) => {
+  "2.7.18": async (version) => {
 
     const actors = getItemPileActorsOfLowerVersion(version);
 
@@ -370,7 +369,5 @@ const migrations = {
       }
       console.log(`Item Piles | Migrating ${updatedTokens} tokens on scene "${sceneId}" to version ${version}...`);
     }
-
   }
-
 };

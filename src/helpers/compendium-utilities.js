@@ -43,7 +43,8 @@ export async function findSimilarItemInCompendium(itemToFind) {
 }
 
 export function getItemFromCache(uuid) {
-  return COMPENDIUM_CACHE[uuid];
+  if (!game.packs.get(PACK_ID)) return false;
+  return COMPENDIUM_CACHE[uuid] ?? false;
 }
 
 export async function findOrCreateItemInCompendium(itemData) {

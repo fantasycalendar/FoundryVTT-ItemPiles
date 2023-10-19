@@ -217,9 +217,12 @@ export function getActorCurrencies(target, {
         index
       }
     }
-    const item = Utilities.findSimilarItem(actorItems, currency.data.item);
+    const itemData = CompendiumUtilities.getItemFromCache(currency.data.uuid) ?? currency.data.item ?? false;
+    if (!itemData) return false;
+    const item = Utilities.findSimilarItem(actorItems, itemData);
     // If the item exists on the actor, use the item's ID, so that we can match it against the actual item on the actor
-    currency.data.item._id = item?.id ?? currency.data.item._id;
+    currency.data.item = itemData;
+    currency.data.item._id = item?.id ?? itemData._id;
     return {
       ...currency,
       quantity: 0,
@@ -901,8 +904,8 @@ export function getPriceData({
   const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
   const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
 
-  const currencyList = getCurrencyList(merchant).filter(currency => !currency.secondary);
-  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true, secondary: false });
+  const currencyList = getCurrencyList(merchant);
+  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
 
   // In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
   // to it, in order have a stable form of exchange calculation
@@ -1005,7 +1008,7 @@ export function getPriceData({
   const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
   const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
 
-  const recipientCurrencies = getActorCurrencies(buyer, { currencyList, secondary: false });
+  const recipientCurrencies = getActorCurrencies(buyer, { currencyList });
   const totalCurrencies = recipientCurrencies.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
 
   // For each price group, check for properties and items and make sure that the actor can afford it
@@ -1042,7 +1045,7 @@ export function getPriceData({
 
         } else {
           const priceItem = CompendiumUtilities.getItemFromCache(price.data.uuid);
-          const foundItem = Utilities.findSimilarItem(buyer.items, priceItem);
+          const foundItem = priceItem ? Utilities.findSimilarItem(buyer.items, priceItem) : false;
           const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
           price.buyerQuantity = itemQuantity;
 
@@ -1085,12 +1088,12 @@ export function getPaymentData({
   }
 
   const merchant = sellerFlagData ? seller : buyer;
-  const currencyList = getCurrencyList(merchant).filter(currency => !currency.secondary);
-  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true, secondary: false });
+  const currencyList = getCurrencyList(merchant);
+  const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
   const smallestExchangeRate = getSmallestExchangeRate(currencies)
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
-  const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true, secondary: false });
+  const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
 
   const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 
