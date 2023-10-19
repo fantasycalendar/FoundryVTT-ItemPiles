@@ -65,9 +65,11 @@
       .map(item => {
         return {
           _id: item.id,
-          quantity: settings.getUpdates && item.quantity ? Math.min(item.quantity, item.currentQuantity - item.quantity) : item.currentQuantity
+          quantity: settings.getUpdates && item.quantity
+            ? item.currentQuantity - item.quantity
+            : item.currentQuantity
         }
-      })
+      });
 
     const itemsToCreate = items
       .filter(item => item.currentQuantity && item.create)

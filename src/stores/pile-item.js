@@ -7,6 +7,8 @@ import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
 import { Plugins } from "../plugins/main.js";
 import { SYSTEMS } from "../systems.js";
+import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
+import { findSimilarItemInCompendiumSync } from "../helpers/compendium-utilities.js";
 
 class PileBaseItem {
 
@@ -63,8 +65,9 @@ export class PileItem extends PileBaseItem {
     this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
     this.id = this.item.id;
     this.type = this.item.type;
-    this.name = writable(this.item.name);
-    this.img = writable(this.item.img);
+    const itemData = CompendiumUtilities.findSimilarItemInCompendiumSync(this.item);
+    this.name = writable(itemData?.name ?? this.item.name);
+    this.img = writable(itemData?.img ?? this.item.img);
     this.abbreviation = writable("");
     this.identifier = randomID();
     this.itemFlagData = writable(PileUtilities.getItemFlagData(this.item));
@@ -91,8 +94,9 @@ export class PileItem extends PileBaseItem {
 
     this.subscribeTo(this.itemDocument, () => {
       const { data } = this.itemDocument.updateOptions;
-      this.name.set(this.item.name);
-      this.img.set(this.item.img);
+      const itemData = CompendiumUtilities.findSimilarItemInCompendiumSync(this.item);
+      this.name = writable(itemData?.name ?? this.item.name);
+      this.img = writable(itemData?.img ?? this.item.img);
       this.similarities = Utilities.setSimilarityProperties({}, this.item);
       if (PileUtilities.canItemStack(this.item, this.store.actor) && Utilities.hasItemQuantity(data)) {
         this.quantity.set(Utilities.getItemQuantity(data));

@@ -55,3 +55,10 @@ export async function findOrCreateItemInCompendium(itemData) {
   COMPENDIUM_CACHE[compendiumItem.uuid] = itemData;
   return compendiumItem;
 }
+
+export function findSimilarItemInCompendiumSync(itemToFind) {
+  return Object.values(COMPENDIUM_CACHE).find(compendiumItem => {
+    return compendiumItem.name === itemToFind.name
+      && compendiumItem.type === itemToFind.type;
+  }) ?? false;
+}
