@@ -36,8 +36,7 @@ export async function findSimilarItemInCompendium(itemToFind) {
   const pack = await getItemCompendium();
   const item = game.packs.get(PACK_ID).index.find(compendiumItem => {
     return compendiumItem.name === itemToFind.name
-      && compendiumItem.type === itemToFind.type
-      && compendiumItem.img === itemToFind.img;
+      && compendiumItem.type === itemToFind.type;
   });
   return (item?._id ? pack.getDocument(item._id) : false);
 }

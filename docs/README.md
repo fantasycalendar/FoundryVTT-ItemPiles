@@ -69,6 +69,7 @@ Item Piles works in any system, but requires setup. If you wish to request nativ
 Item Piles is designed to work in all systems, but may require some setup for it to fully function. Please refer to the module settings to configure that.
 
 - [Dungeons & Dragons 5e](https://foundryvtt.com/packages/dnd5e)
+- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e)
 - [Pathfinder 1e](https://foundryvtt.com/packages/pf1)
 - [Dungeon Slayers 4](https://foundryvtt.com/packages/ds4)
 - [D&D 3.5e SRD](https://foundryvtt.com/packages/D35E)
@@ -106,10 +107,6 @@ These systems have integrated their own support of Item Piles, rather than Item 
 
 - [Old-School Essentials](https://foundryvtt.com/packages/ose)
 - [Cepheus & Traveller](https://foundryvtt.com/packages/twodsix)
-
-## Semi-supported systems
-
-- [Pathfinder 2e](https://foundryvtt.com/packages/pf2e) - Major features for Item Piles does not work in this system, such as dropping items on scenes to create item piles, and dropping items on tokens to give it to them. Merchants and existing piles still work, but the module is not strictly needed as PF2e already has a loot actor.
 
 ## Issues
 

@@ -130,6 +130,11 @@ export default class SimpleCalendarPlugin extends BasePlugin {
       item: entry.item, quantity: entry.quantity, flags: entry.flags
     })));
 
+    const commit = actorTransaction.prepare();
+
+    const result = Hooks.call(CONSTANTS.HOOKS.PILE.PRE_REFRESH_INVENTORY, actor, commit)
+    if (result === false) return;
+
     await actorTransaction.commit();
 
   }

@@ -1,5 +1,16 @@
 # Item Piles Changelog
 
+## Version 2.7.18
+
+- Added optional logging to merchants
+- Added hook: `item-piles-preRefreshInventory`
+  - Called when the inventory of a merchant is refreshed by Simple Calendar, which will allow you to add additional changes to the merchant, or fully interrupt that merchant's refresh
+- Updated Portuguese localization (thanks to ltsoares on weblate!)
+- Updated Star Wars: Saga Edition system configuration (thanks to cpadilla on github!)
+- Fixed secondary currencies would not be cached in the Item Piles currency compendium
+- Fixed buying/selling things on merchants with secondary currencies
+- Fixed adding currency to item piles & vaults not updating to the correct amount
+
 ## Version 2.7.17
 
 - Fixed services would not stack and instead duplicate when added to merchants - if you still want non-stacking services, set them as non-stacking in the service's settings

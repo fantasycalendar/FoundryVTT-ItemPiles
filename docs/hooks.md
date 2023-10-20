@@ -41,6 +41,9 @@
   - [item-piles-preSplitItemPileContent](#item-piles-preSplitItemPileContent)
   - [item-piles-splitItemPileContent](#item-piles-splitItemPileContent)
   - [item-piles-preClickItemPile](#item-piles-preClickItemPile)
+  - [item-piles-preClickDirectoryItemPile](#item-piles-preClickDirectoryItemPile)
+  - [item-piles-preRightClickItem](#item-piles-preRightClickItem)
+  - [item-piles-preRefreshInventory](#item-piles-preRefreshInventory)
 
 - [Items](#Items)
   - [item-piles-preDropItemDetermined](#item-piles-preDropItemDetermined)
@@ -508,6 +511,19 @@ Called before resolving a click on an item pile token
 |------------------|---------------------------------|----------------------------------------------------------------|
 | target           | <code>TokenDocument</code> | The item pile token that was clicked                           |
 | interactingActor | <code>Actor</code>             | The actor of the user that interacted with the item pile token |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-preRefreshInventory
+
+Called before a merchant has had their inventory refreshed by item piles
+
+| Param   | Type                | Description                                                                              |
+|---------|---------------------|------------------------------------------------------------------------------------------|
+| actor   | <code>Actor</code>  | The merchant actor that is going to have its inventory refreshed                         |
+| changes | <code>Object</code> | The object containing all of the information that is going to be altered on the merchant |
 
 If the hook returns `false`, the action is interrupted.
 
