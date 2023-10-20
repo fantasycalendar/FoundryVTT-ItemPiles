@@ -693,7 +693,7 @@ export function getMerchantModifiersForActor(merchant, {
 
 function getSmallestExchangeRate(currencies) {
   return currencies.length > 1
-    ? Math.min(...currencies.filter(currency => currency.primary).map(currency => currency.exchangeRate))
+    ? Math.min(...currencies.filter(currency => !currency.secondary).map(currency => currency.exchangeRate))
     : (Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001);
 }
 
