@@ -100,6 +100,7 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Naheulbeuk](https://foundryvtt.com/packages/naheulbeuk)
 - [Alien RPG](https://foundryvtt.com/packages/alienrpg)
 - [Pirate Borg](https://foundryvtt.com/packages/pirateborg)
+- [Star Wars FFG](https://foundryvtt.com/packages/starwarsffg)
 
 ## Externally support systems
 
