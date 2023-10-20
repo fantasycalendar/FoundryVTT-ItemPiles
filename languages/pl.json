@@ -159,7 +159,19 @@
       "Service": "Usługi",
       "BuyServices": "Kupno usług",
       "CurrentServices": "Bieżące usługi",
-      "ClearAllServices": "Wyczyść wszystkie usługi aktora"
+      "ClearAllServices": "Wyczyść wszystkie usługi aktora",
+      "Log": "Dziennik aktywności",
+      "LogSearch": "Wyszukiwanie w dzienniku:",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogBought": "zakupiony",
+      "LogSold": "sprzedany",
+      "LogQuantity": "{quantity} x ",
+      "LogSetQuantity": "{instigator} ustaw <strong>{item}</strong> <span>ilość</span> na {quantity}",
+      "LogSetForSale": "{instigator} ustaw <strong>{item}</strong> <span>na sprzedaż</span>",
+      "LogSetVisible": "{instigator} ustaw <strong>{item}</strong> jako <span>widoczny</span>",
+      "LogTransaction": "{instigator} {action} {quantity}{item} na {price}",
+      "LogSetNotForSale": "{instigator} ustaw <strong>{item}</strong> <span>nie na sprzedaż</span>",
+      "LogSetHidden": "{instigator} ustaw <strong>{item}</strong> jako <span>ukryty</span>"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -230,6 +242,10 @@
       "ClearAllServices": {
         "Title": "Wyczyść wszystkie usługi aktora",
         "Content": "Spowoduje to wyczyszczenie wszystkich usług sprzedawcy, czy na pewno chcesz to zrobić?"
+      },
+      "ClearMerchantLog": {
+        "Title": "Wyczyścić dziennik kupca?",
+        "Content": "Czy na pewno chcesz wyczyścić dziennik kupca \"{actor_name}\"?"
       }
     },
     "Items": "Przedmioty",
@@ -505,7 +521,11 @@
           "RefreshItemsDays": "Odśwież elementy w dni powszednie (\"Simple Calendar\")",
           "RefreshItemsDaysExplanation": "Gdy kalendarz przekroczy zaznaczone dni, zapasy kupca zostaną odświeżone. Dzieje się to o godzinie otwarcia kupca lub o północy, jeśli nie ma godziny otwarcia/zamknięcia.",
           "RefreshItemsHolidays": "Odśwież przedmioty w Święta (Simple Calendar)",
-          "RefreshItemsHolidaysExplanation": "Gdy kalendarz przekroczy powiadomienia z daną kategorią powiadomień, zapasy kupca zostaną odświeżone. Dzieje się to w czasie powiadomienia lub o północy, jeśli jest to powiadomienie ustawiono na cały dzień."
+          "RefreshItemsHolidaysExplanation": "Gdy kalendarz przekroczy powiadomienia z daną kategorią powiadomień, zapasy kupca zostaną odświeżone. Dzieje się to w czasie powiadomienia lub o północy, jeśli jest to powiadomienie ustawiono na cały dzień.",
+          "LogMerchantActivity": "Dziennik aktywności kupca",
+          "ClearMerchantLog": "Wyczyść dziennik kupca",
+          "ClearMerchantLogExplanation": "Spowoduje to wyczyszczenie dzienników kupca, usuwając wszystkie wpisy. Nie można tego cofnąć.",
+          "LogMerchantActivityExplanation": "Po włączeniu tej funkcji kupiec rejestruje zdarzenia, takie jak kupno i sprzedaż przedmiotów, a GM aktualizuje status (ilość, widoczność i sprzedaż) przedmiotów."
         },
         "Main": {
           "DeleteWhenEmpty": "Usuń, gdy jest pusty",
