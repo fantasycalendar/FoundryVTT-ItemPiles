@@ -440,7 +440,19 @@
       "TableAddAllItems": "Ajouter tous les articles :",
       "TableTimesToRoll": "Temps de roulement sur la table :",
       "CurrentServices": "Services actuels",
-      "ClearAllServices": "Effacer les services sur tous les acteurs"
+      "ClearAllServices": "Effacer les services sur tous les acteurs",
+      "Log": "Journal d'activité",
+      "LogSearch": "Recherche de journal :",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogBought": "achetés",
+      "LogSold": "vendu",
+      "LogQuantity": "{quantity} x ",
+      "LogSetForSale": "{instigator} définit <strong>{item}</strong> <span>à vendre</span",
+      "LogSetVisible": "{instigator} définit <strong>{item}</strong> sur <span>visible</span",
+      "LogSetHidden": "{instigator} définit <strong>{item}</strong> à <span>caché</span",
+      "LogTransaction": "{instigator} {action} {quantity}{item} pour {price}",
+      "LogSetQuantity": "{instigator} définit <strong>{item}</strong> <span>quantité</span> à {quantity}",
+      "LogSetNotForSale": "{instigator} définit <strong>{item}</strong> <span>à ne pas vendre</span"
     },
     "Applications": {
       "DropItem": {
