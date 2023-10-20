@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.19
+
+- Added support for the Star Wars FFG system (thanks Grumpkin on the Foundry discord server!)
+
 ## Version 2.7.18
 
 - Added optional logging to merchants

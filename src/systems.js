@@ -34,6 +34,7 @@ import icrpgme from "./systems/icrpgme.js";
 import bladeRunner from "./systems/blade-runner.js";
 import alienrpg from "./systems/alienrpg.js";
 import pirateborg from "./systems/pirateborg.js";
+import starwarsffg from "./systems/starwarsffg.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -144,6 +145,9 @@ export const SYSTEMS = {
     },
     "pirateborg": {
       "latest": pirateborg
+    },
+    "starwarsffg": {
+      "latest": starwarsffg
     }
     // ↑ ADD SYSTEMS HERE ↑
   },
