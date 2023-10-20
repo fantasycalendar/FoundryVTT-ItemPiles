@@ -230,7 +230,7 @@ export function getActorCurrencies(target, {
       item,
       index
     }
-  }))
+  })).filter(Boolean);
 
   cachedActorCurrencies.set(actorUuid, currencies);
 

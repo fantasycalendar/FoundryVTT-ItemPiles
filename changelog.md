@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.20 Hotfix
+
+- Fixed item based currencies breaking AGAIN
+
 ## Version 2.7.19
 
 - Added support for the Star Wars FFG system (thanks Grumpkin on the Foundry discord server!)

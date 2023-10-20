@@ -1,3 +1,6 @@
+import SETTINGS from "../constants/settings.js";
+import { getSetting } from "./helpers.js";
+
 const PACK_ID = `world.item-piles-item-backup-do-not-delete`;
 
 const COMPENDIUM_CACHE = {};
@@ -17,6 +20,19 @@ export async function initializeCompendiumCache() {
     }
   }
 
+  Hooks.on("updateCompendium", updateCache);
+
+  updateCache();
+
+}
+
+async function updateCache() {
+  const currencies = getSetting(SETTINGS.CURRENCIES);
+  const secondaryCurrencies = getSetting(SETTINGS.SECONDARY_CURRENCIES);
+  for (const currency of currencies.concat(secondaryCurrencies)) {
+    if (!currency.data?.uuid) continue;
+    COMPENDIUM_CACHE[currency.data?.uuid] = (await fromUuid(currency.data.uuid)).toObject();
+  }
 }
 
 export async function getItemCompendium() {
@@ -42,7 +58,6 @@ export async function findSimilarItemInCompendium(itemToFind) {
 }
 
 export function getItemFromCache(uuid) {
-  if (!game.packs.get(PACK_ID)) return false;
   return COMPENDIUM_CACHE[uuid] ?? false;
 }
 
