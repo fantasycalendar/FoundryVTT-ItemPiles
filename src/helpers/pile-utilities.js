@@ -226,7 +226,7 @@ export function getActorCurrencies(target, {
     return {
       ...currency,
       quantity: 0,
-      id: item?.id || null,
+      id: item?.id ?? item?._id ?? null,
       item,
       index
     }
@@ -908,21 +908,22 @@ export function getPriceData({
 
   const currencyList = getCurrencyList(merchant);
   const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
+  const defaultCurrencies = currencies.filter(currency => !currency.secondary);
 
   // In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
   // to it, in order have a stable form of exchange calculation
-  const smallestExchangeRate = getSmallestExchangeRate(currencyList);
+  const smallestExchangeRate = getSmallestExchangeRate(defaultCurrencies);
   const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
   let overallCost;
   let itemCost = Utilities.getItemCost(item);
   if (SYSTEMS.DATA.ITEM_COST_TRANSFORMER) {
-    overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, currencyList);
+    overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, defaultCurrencies);
     if (overallCost === false) {
       Helpers.debug("failed to find price for item:", item)
     }
   } else if (typeof itemCost === "string" && isNaN(Number(itemCost))) {
-    overallCost = getPriceFromString(itemCost, currencyList).overallCost;
+    overallCost = getPriceFromString(itemCost, defaultCurrencies).overallCost;
   } else {
     overallCost = Number(itemCost);
   }
@@ -948,12 +949,12 @@ export function getPriceData({
 
     // Base prices is the displayed price, without quantity taken into account
     const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
-    const basePrices = getPriceArray(baseCost, currencies);
+    const basePrices = getPriceArray(baseCost, defaultCurrencies);
 
     // Prices is the cost with the amount of quantity taken into account, which may change the number of the different
     // types of currencies it costs (eg, an item wouldn't cost 1 gold and 100 silver, it would cost 11 gold
     let totalCost = Helpers.roundToDecimals(overallCost * modifier * quantity, decimals);
-    let prices = getPriceArray(totalCost, currencies);
+    let prices = getPriceArray(totalCost, defaultCurrencies);
 
     if (baseCost) {
 
@@ -1011,7 +1012,9 @@ export function getPriceData({
   const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
 
   const recipientCurrencies = getActorCurrencies(buyer, { currencyList });
-  const totalCurrencies = recipientCurrencies.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
+  const totalCurrencies = recipientCurrencies
+    .filter(currency => currency.exchangeRate !== undefined)
+    .map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
 
   // For each price group, check for properties and items and make sure that the actor can afford it
   for (const priceGroup of priceData) {
