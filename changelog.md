@@ -2,11 +2,12 @@
 
 ## Version 2.7.20 Hotfix
 
-- Fixed item based currencies breaking AGAIN
+- Fixed new system support breaking most systems, whoops
 
 ## Version 2.7.19
 
 - Added support for the Star Wars FFG system (thanks Grumpkin on the Foundry discord server!)
+- Fixed item based currencies breaking AGAIN
 
 ## Version 2.7.18
 
