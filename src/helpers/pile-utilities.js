@@ -217,7 +217,7 @@ export function getActorCurrencies(target, {
         index
       }
     }
-    const itemData = CompendiumUtilities.getItemFromCache(currency.data.uuid) ?? currency.data.item ?? false;
+    const itemData = CompendiumUtilities.getItemFromCache(currency.data.uuid) || currency.data.item || false;
     if (!itemData) return false;
     const item = Utilities.findSimilarItem(actorItems, itemData);
     // If the item exists on the actor, use the item's ID, so that we can match it against the actual item on the actor

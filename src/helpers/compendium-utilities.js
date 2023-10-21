@@ -30,8 +30,13 @@ async function updateCache() {
   const currencies = getSetting(SETTINGS.CURRENCIES);
   const secondaryCurrencies = getSetting(SETTINGS.SECONDARY_CURRENCIES);
   for (const currency of currencies.concat(secondaryCurrencies)) {
-    if (!currency.data?.uuid) continue;
-    COMPENDIUM_CACHE[currency.data?.uuid] = (await fromUuid(currency.data.uuid)).toObject();
+    if (currency.type !== "item") continue;
+    if (currency.data.uuid) {
+      COMPENDIUM_CACHE[currency.data?.uuid] = (await fromUuid(currency.data.uuid)).toObject();
+    } else if (currency.data.item) {
+      const item = await findOrCreateItemInCompendium(currency.data.item)
+      COMPENDIUM_CACHE[item.uuid] = item.toObject();
+    }
   }
 }
 

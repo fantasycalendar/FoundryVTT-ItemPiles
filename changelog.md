@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.21
+
+- Fixed the OSE system breaking in the latest updates
+
 ## Version 2.7.20 Hotfix
 
 - Fixed new system support breaking most systems, whoops
