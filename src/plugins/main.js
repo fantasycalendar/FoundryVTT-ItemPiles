@@ -20,7 +20,7 @@ export const Plugins = {
     on: "init",
     data: null,
     class: RarityColors,
-    minVersion: "0.2.4"
+    minVersion: "0.3.6"
   }
 }
 

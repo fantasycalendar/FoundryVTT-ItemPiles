@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.7.22
+
+- Fixed Rarity Colors not working - now requires the module's version to be at least 0.3.6
+
 ## Version 2.7.21
 
 - Fixed the OSE system breaking in the latest updates

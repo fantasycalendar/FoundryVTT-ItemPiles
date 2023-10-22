@@ -99,17 +99,17 @@ export default class SimpleCalendarPlugin extends BasePlugin {
     previousState = newState;
 
     for (const actor of actors) {
-      await this.refreshActorItems(actor);
+      await this.refreshActorItems(actor, notes);
     }
 
     for (const [_, tokens] of validTokensOnScenes) {
       for (const token of tokens) {
-        await this.refreshActorItems(token.actor);
+        await this.refreshActorItems(token.actor, notes);
       }
     }
   }
 
-  async refreshActorItems(actor) {
+  async refreshActorItems(actor, notes) {
 
     const actorTransaction = new Transaction(actor);
 
@@ -132,7 +132,7 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 
     const commit = actorTransaction.prepare();
 
-    const result = Hooks.call(CONSTANTS.HOOKS.PILE.PRE_REFRESH_INVENTORY, actor, commit)
+    const result = Hooks.call(CONSTANTS.HOOKS.PILE.PRE_REFRESH_INVENTORY, actor, commit, notes)
     if (result === false) return;
 
     await actorTransaction.commit();

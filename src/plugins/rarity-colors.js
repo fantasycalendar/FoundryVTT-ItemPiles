@@ -2,32 +2,16 @@ import BasePlugin from "./base-plugin.js";
 
 export default class RarityColors extends BasePlugin {
 
+  minVersionError = "Rarity Colors is out of date to be compatible with Item Piles, please update to 0.3.6 soon as possible.";
+
   getItemColor(item) {
 
     if (game.system.id !== "dnd5e") return false;
 
-    const itemType = item.type;
-    const rarity = item.system.rarity ? item.system.rarity.replaceAll(/\s/g, "").toLowerCase().trim() : itemType;
-
-    const isSpell = itemType === "spell";
-    const spellFlag = game.settings.get(this.pluginName, "spellFlag");
-
-    const isFeat = itemType === "feat";
-    const featFlag = game.settings.get(this.pluginName, "featFlag");
-
-    let doColor = false;
-    if (item.system.rarity && item.system.rarity !== "common") {
-      doColor = true;
-    } else if (isSpell && spellFlag) {
-      doColor = true;
-    } else if (isFeat && featFlag) {
-      doColor = true;
-    }
-
-    if (!doColor) return false;
+    if (!game.modules.get(this.pluginName)?.api?.getColorFromItem) return false;
 
     try {
-      return game.settings.get(this.pluginName, rarity);
+      return game.modules.get(this.pluginName)?.api?.getColorFromItem(item);
     } catch (err) {
       return false;
     }
