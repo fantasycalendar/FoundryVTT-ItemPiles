@@ -2,6 +2,7 @@
 
 ## Version 2.7.22
 
+- Updated French, Polish, and Portuguese (Brazil) localization (thank you lucasts, Lioheart, and ltsoares on weblate!)
 - Fixed Rarity Colors not working - now requires the module's version to be at least 0.3.6
 
 ## Version 2.7.21
