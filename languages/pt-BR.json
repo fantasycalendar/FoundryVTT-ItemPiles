@@ -131,6 +131,10 @@
       "ClearAllServices": {
         "Title": "Limpar todos os serviços do ator",
         "Content": "Isso limpará todos os serviços do comerciante, você tem certeza de que deseja fazer isso?"
+      },
+      "ClearMerchantLog": {
+        "Title": "Limpar Registro do Comerciante?",
+        "Content": "Tem certeza de que deseja limpar o registro do comerciante \"{actor_name}\"?"
       }
     },
     "Currencies": "Moedas",
@@ -258,7 +262,19 @@
       "TableTimesToRoll": "Vezes para rolar na tabela:",
       "TableCustomCategory": "Adicionar itens à categoria personalizada:",
       "CurrentServices": "Serviços atuais",
-      "ClearAllServices": "Limpar todos os serviços do ator"
+      "ClearAllServices": "Limpar todos os serviços do ator",
+      "Log": "Registro de Atividades",
+      "LogSearch": "Busca de Registros:",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogBought": "comprado",
+      "LogSold": "vendido",
+      "LogQuantity": "{quantity} x ",
+      "LogSetQuantity": "{instigator} definiu <strong>{item}</strong> <span>quantidade</span> para {quantity}",
+      "LogSetForSale": "{instigator} definiu <strong>{item}</strong> <span>à venda</span>",
+      "LogSetNotForSale": "{instigator} definiu <strong>{item}</strong><span>como não disponível para venda</span>",
+      "LogSetVisible": "{instigator} definiu <strong>{item}</strong> <span>como visível</span>",
+      "LogSetHidden": "{instigator} definiu <strong>{item}</strong> <span>como oculto</span>",
+      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}"
     },
     "Applications": {
       "DropItem": {
@@ -540,7 +556,11 @@
           "RefreshItemsHolidays": "Atualizar itens nos feriados (Simple Calendar)",
           "RefreshItemsWarning": "Com todas as opções abaixo, os itens existentes serão EXCLUÍDOS e não poderão ser recuperados. Itens individuais podem ser configurados para serem mantidos; itens definidos para serviços, manter a quantidade zero e manter o comerciante permanecerão.",
           "RefreshItemsDaysExplanation": "Quando o calendário passar dos dias marcados, o estoque do comerciante será atualizado. Isso acontece no horário de abertura do lojista, ou à meia-noite caso não tenha horário de abertura/fechamento.",
-          "RefreshItemsHolidaysExplanation": "Quando o calendário passar as notas com a categoria de nota dada, o estoque do comerciante será atualizado. Isso acontece no horário da nota ou à meia-noite se for uma nota definida para o dia todo."
+          "RefreshItemsHolidaysExplanation": "Quando o calendário passar as notas com a categoria de nota dada, o estoque do comerciante será atualizado. Isso acontece no horário da nota ou à meia-noite se for uma nota definida para o dia todo.",
+          "LogMerchantActivity": "Registro de Atividade do Comerciante",
+          "ClearMerchantLog": "Limpar Registros do Comerciante",
+          "ClearMerchantLogExplanation": "Isso irá limpar os registros do comerciante, removendo todas as entradas. Esta ação não pode ser desfeita.",
+          "LogMerchantActivityExplanation": "Quando ativado, isso faz com que o comerciante registre eventos como compra e venda de itens, e MJs atualizem o status (quantidade, visibilidade e disponibilidade para venda) dos itens."
         },
         "Title": "Configuração do Item Pile: {actor_name}",
         "Configure": "Item Pile",
