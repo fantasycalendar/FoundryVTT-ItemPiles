@@ -168,7 +168,19 @@
       "TableCustomCategory": "Přidat položky do zvolené kategorie:",
       "AddItem": "Přidat",
       "Service": "Služba",
-      "TableTimesToRoll": "Kolikrát házet na tabulku:"
+      "TableTimesToRoll": "Kolikrát házet na tabulku:",
+      "LogSearch": "Hledání v protokolu:",
+      "LogSetQuantity": "{instigator} nastavil <strong>{item}</strong> <span>quantity</span> na {quantity}",
+      "LogSetHidden": "{instigator} nastavil <strong>{item}</strong> na <span>Skrytý</span",
+      "Log": "Záznam o činnosti",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogBought": "zakoupeno",
+      "LogSold": "prodáno",
+      "LogQuantity": "{quantity} x ",
+      "LogSetForSale": "{instigator} nastavil <strong>{item}</strong> <span>Na prodej</span",
+      "LogSetNotForSale": "{instigator} nastavil <strong>{item}</strong> <span>Ne k prodeji</span",
+      "LogSetVisible": "{instigator} nastavil <strong>{item}</strong> na <span>Viditelný</span",
+      "LogTransaction": "{instigator} {action} {quantity}{item} za {price}"
     },
     "Items": "Položky",
     "Settings": {
@@ -374,7 +386,11 @@
           "HideItemsWithZeroCostExplanation": "Když je povoleno, způsobí, že zákazníci nemohou koupit nebo prodat položky, které mají cenu nula (zdarma).",
           "OpenTimesExplanation": "Když je povoleno, s tímto obchodníkem mohou hráči jednat pouze v určitou denní dobu.",
           "ClosedDaysExplanation": "V zaškrtnutých dnech bude mít obchodník zavřeno (pokud je jeho otvírací status nastaven na automatický).",
-          "RefreshItemsWarning": "Při všech možnostech níže budou existující položky SMAZÁNY a nemohou být obnoveny. Individuální položky mohou být konfigurovány pro zachování; položky nastavené jako služby, zachovej nulové množství a zachovej na obchodníkovi zůstanou."
+          "RefreshItemsWarning": "Při všech možnostech níže budou existující položky SMAZÁNY a nemohou být obnoveny. Individuální položky mohou být konfigurovány pro zachování; položky nastavené jako služby, zachovej nulové množství a zachovej na obchodníkovi zůstanou.",
+          "LogMerchantActivity": "Protokol aktivit obchodníka",
+          "LogMerchantActivityExplanation": "Pokud je tato funkce povolena, obchodník zaznamenává události, jako je nákup a prodej položek a aktualizace stavu (množství, viditelnost a prodej) položek GM.",
+          "ClearMerchantLog": "Vyčistit protokol obchodníka",
+          "ClearMerchantLogExplanation": "Tímto se vymaže protokol obchodníka a odstraní se všechny záznamy. Tuto akci nelze vrátit zpět."
         },
         "Vault": {
           "CanStackItemsExplanation": "Když je toto povoleno, položky přidané do trezoru se budou slučovat s podobnými předměty. Toto může být také řízeno po položkách v jejich konfiguraci.",
@@ -812,6 +828,10 @@
       "ClearVaultLog": {
         "Title": "Vyčistit log trezoru?",
         "Content": "Určitě chcete vyčistit log trezoru \"{actor_name}\"?"
+      },
+      "ClearMerchantLog": {
+        "Title": "Vymazat Protokol obchodníka?",
+        "Content": "Jste si jistí, že chcete vymazat protokol obchodníka \"{actor_name}\"?"
       }
     },
     "HUD": {
