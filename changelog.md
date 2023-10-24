@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.3.0
+
+- Added "Send To Character" when right-clicking items in your inventory in D&D5e - a much faster way to send items between characters
+- Added Merchant price modifier support for "group" type actors in D&D5e - adding a group to a merchant's price modifiers will apply the price modifiers to anyone belonging to that group actor (thanks to Paith on discord for the idea!)
+- Added `PRICE_MODIFIER_TRANSFORMER` and `SYSTEM_HOOKS` to `game.itempiles.API.addSystemIntegration()`
+
 ## Version 2.7.22
 
 - Updated French, Polish, and Portuguese (Brazil) localization (thank you lucasts, Lioheart, and ltsoares on weblate!)

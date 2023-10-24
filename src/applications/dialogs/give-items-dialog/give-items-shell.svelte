@@ -1,89 +1,116 @@
 <script>
+	import { getContext } from "svelte";
+	import * as Utilities from "../../../helpers/utilities.js";
+	import * as PileUtilities from "../../../helpers/pile-utilities.js";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import SliderInput from "../../components/SliderInput.svelte";
+	import Select from 'svelte-select';
 
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	const { application } = getContext('#external');
 
-  export let item;
-  export let quantity;
-  export let sourceActor;
-  export let targetActor;
+	export let item;
+
+	let form;
+
+	const itemQuantity = Utilities.getItemQuantity(item);
+	const sliderQuantity = itemQuantity + (application.options?.quantityAdjustment ?? 0);
+	const canItemStack = PileUtilities.canItemStack(item);
+
+	let quantity = 1;
+	let selectedActor = localStorage.getItem("item-piles-give-item") ?? false;
+
+	let items = Array.from(game.actors)
+		.filter(actor => {
+			return (actor.type === "character" || actor.type === "npc")
+				&& actor !== item.parent
+				&& !PileUtilities.isValidItemPile(actor)
+		})
+		.map(actor => ({
+			value: actor.uuid,
+			label: actor.name,
+			actor,
+			group: actor.hasPlayerOwner ? "Player Characters" : "Other Characters"
+		}))
+		.sort((a, b) => {
+			return a.name > b.name ? ((b.actor.hasPlayerOwner - a.actor.hasPlayerOwner) - 1) : ((b.actor.hasPlayerOwner - a.actor.hasPlayerOwner) + 1);
+		});
+
+	if (selectedActor && !items.some(data => data.value === selectedActor)) {
+		selectedActor = false;
+	}
+
+	const groupBy = (item) => item.group;
+
+	function requestSubmit() {
+		form.requestSubmit();
+	}
+
+	function submit() {
+		localStorage.setItem("item-piles-give-item", selectedActor.value)
+		application.options.resolve({ quantity, target: selectedActor.value });
+		application.close();
+	}
 
 </script>
 
+<form autocomplete="off" bind:this={form} class="item-piles-flexcol" on:submit|once|preventDefault={submit}
+      style="padding:0.5rem;">
 
-<div class="item-piles-dialog-root">
+	<h3 style="text-align: center;">
+		{localize(`ITEM-PILES.Dialogs.GiveItems.Header`, {
+			item_name: item.name
+		})}
+	</h3>
 
-	<p class="header">
-		{localize("ITEM-PILES.Dialogs.ReceiveItem.Header")}
-	</p>
+	{#if itemQuantity > 1 && canItemStack}
+		<div class="form-group item-piles-text-center">
+			<label>{localize(`ITEM-PILES.Dialogs.GiveItems.ContentMultipleQuantity`, {
+				quantity: itemQuantity,
+				itemName: item.name
+			})}</label>
+		</div>
+		<SliderInput min={1} max={sliderQuantity} maxInput={sliderQuantity} divideBy={1} bind:value={quantity}/>
+	{/if}
 
-	<div class="item-piles-give-image-container">
-		<img src="{sourceActor.img}"/>
-		<i class="fas fa-arrow-right"></i>
-		<img src="{targetActor.img}"/>
+
+	<div class="form-group">
+		<Select
+			--background="rgba(0, 0, 0, 0.05)"
+			--border-radius="5px"
+			--font-family="inherit"
+			--font-size="0.833rem"
+			--group-item-padding-left="1rem"
+			--group-title-font-size="0.833rem"
+			--group-title-font-weight="bold"
+			--height="calc(var(--form-field-height) + 1px)"
+			--input-color="black"
+			--item-padding="0.25rem"
+			--padding="0 8px"
+			--margin="0.25rem 0"
+			--text-overflow="ellipsis"
+			bind:value={selectedActor}
+			floatingConfig={{ strategy: "fixed", placement: "bottom" }}
+			{groupBy}
+			{items}
+			on:hoverItem={() => { console.log("test")}}
+			placeholder="{localize('ITEM-PILES.Dialogs.GiveItems.SelectPlaceholder')}"
+		></Select>
 	</div>
 
-	<div class="item-piles-give-item-container">
-		<img src="{item.img}"/>
-		<span>{item.name} ({quantity})</span>
-	</div>
+	<footer class="sheet-footer item-piles-flexrow" style="margin-top: 0.25rem;">
+		<button disabled={!selectedActor} on:click|once={requestSubmit} type="button">
+			<i class="fas fa-box"></i>
+			{localize(`ITEM-PILES.Dialogs.GiveItems.Submit`)}
+		</button>
+		<button on:click={() => { application.close() }} type="button">
+			<i class="fas fa-times"></i>
+			{localize("Cancel")}
+		</button>
+	</footer>
 
-	<p>{localize("ITEM-PILES.Dialogs.ReceiveItem.Content", {
-    source_actor_name: sourceActor.name,
-    target_actor_name: targetActor.name
-  })}</p>
-
-</div>
+</form>
 
 <style lang="scss">
 
-  .item-piles-dialog-root {
-
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    text-align: center;
-
-    .header {
-      margin-bottom: 0.5rem;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    .item-piles-give-item-container, .item-piles-give-image-container {
-      display: grid;
-
-      grid-auto-flow: column;
-      align-items: center;
-      justify-items: center;
-      justify-content: center;
-      align-content: center;
-      gap: 1rem;
-
-      margin-bottom: 0.5rem;
-
-    }
-
-    .item-piles-give-image-container {
-
-      font-size: 2rem;
-
-      img {
-        max-height: 70px;
-        border: 0;
-      }
-    }
-
-    .item-piles-give-item-container {
-
-      font-size: 1rem;
-
-      img {
-        max-height: 40px;
-        border: 0;
-        border-radius: 0.5rem;
-      }
-
-    }
-
-  }
 
 </style>

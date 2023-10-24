@@ -9,7 +9,6 @@
   --item-piles-text-light-highlight: rgba(240, 240, 224, 1);
   --item-piles-text-important: rgba(255, 100, 0, 1);
 
-
   --item-piles-app-background: rgb(220, 220, 207);
   --item-piles-app-box-shadow: none;
   --item-piles-app-color: #000;
@@ -59,7 +58,6 @@
   --item-piles-scrollbar-thumb-border-radius: 3px;
   --item-piles-scrollbar-thumb-background: #782e22;
   --item-piles-scrollbar-thumb-border: 1px solid var(--color-border-highlight);
-
 }
 
 /* ----------------------- Generic ----------------------- */
@@ -475,6 +473,7 @@
 }
 
 .item-piles-app {
+
   footer {
     display: flex;
   }
@@ -482,6 +481,10 @@
   .window-title {
     margin: 0 5px !important;
   }
+}
+
+.visible-overflow {
+  --tjs-app-overflow: visible;
 }
 
 .align-center {
