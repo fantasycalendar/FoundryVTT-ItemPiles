@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.8.1
+
+- Fixed D&D5e displaying all characters for players when giving items, instead of just the ones they have at least limited visibility of
+
 ## Version 2.8.0
 
 - Added "Send To Character" when right-clicking items in your inventory in D&D5e - a much faster way to send items between characters

@@ -24,6 +24,7 @@
 			return (actor.type === "character" || actor.type === "npc")
 				&& actor !== item.parent
 				&& !PileUtilities.isValidItemPile(actor)
+				&& (game.user.isGM || (actor.ownership["default"] >= 1 || actor.ownership[game.user.id] >= 1))
 		})
 		.map(actor => ({
 			value: actor.uuid,
