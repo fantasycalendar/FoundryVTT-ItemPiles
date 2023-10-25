@@ -125,7 +125,18 @@
       "ShoppingAs": "作为{actorName}购物",
       "PopulateItems": "填充物品",
       "CurrentServices": "当前服务",
-      "ClearAllServices": "清除所有角色服务"
+      "ClearAllServices": "清除所有角色服务",
+      "LogSetQuantity": "{instigator} 设置 <strong>{item}</strong> 的 <span>数量</span> 为 {quantity}",
+      "LogSetVisible": "{instigator} 设置 <strong>{item}</strong> 为 <span>可见</span",
+      "Log": "记录",
+      "LogSearch": "查询记录:",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogBought": "购买了",
+      "LogSold": "卖出了",
+      "LogQuantity": "{quantity} x ",
+      "LogSetNotForSale": "{instigator} 设置 <strong>{item}</strong> 为 <span>非卖品</span",
+      "LogSetForSale": "{instigator} 设置 <strong>{item}</strong> 为 <span>待售</span",
+      "LogSetHidden": "{instigator} 设置 <strong>{item}</strong> 为 <span>隐藏</span"
     },
     "Applications": {
       "DropCurrencies": {
@@ -143,7 +154,9 @@
         "System": "系统专门设置",
         "Donate": "如果喜欢该模组，您的捐款将会帮助它继续下去！",
         "Submit": "提交设定",
-        "Styles": "风格设置"
+        "Styles": "风格设置",
+        "Export": "导出配置",
+        "Import": "导入配置"
       },
       "ItemPileConfig": {
         "Main": {
@@ -261,7 +274,7 @@
         "CantBeSoldToMerchantsExplanation": "启用后，该物品只能从商人处购买，无法卖回。",
         "AddPurchaseOption": "添加购买选项",
         "DropMeClickMe": "通过点击或者拖放物品来添加属性",
-        "PricePreset": "或者选择已有的预设价格：",
+        "PricePreset": "或者选择预设价格：",
         "SelectPreset": "选择预设价格",
         "CanStackYes": "是，总是堆叠",
         "InfiniteQuantityDefault": "商人默认设置",
@@ -282,7 +295,9 @@
         "InfiniteQuantityYes": "是，无限数量",
         "InfiniteQuantityNo": "否，标准数量",
         "KeepZero": "保持数量为零",
-        "ExpandColumnsRowsExplanation": "以上设置启用时，此处配置金库中可用的列数与行数。此设置最大为金库容量。"
+        "ExpandColumnsRowsExplanation": "以上设置启用时，此处配置金库中可用的列数与行数。此设置最大为金库容量。",
+        "KeepOnMerchantExplanation": "当在商人的填充物品选项卡中清除所有角色物品时，或通过简单日历刷新库存的集成功能清除物品时（请参阅设置物品堆-其他设置底部的商人配置），该物品将始终保留。",
+        "KeepOnMerchant": "保留在商人上"
       },
       "FilterEditor": {
         "Title": "Item Piles 过滤编辑器",
@@ -354,7 +369,12 @@
         "Type": "物品类型"
       },
       "VaultStylesEditor": {
-        "Title": "物品堆储存物风格编辑器"
+        "Title": "物品堆储存物风格编辑器",
+        "Path": "属性路径",
+        "Value": "匹配值",
+        "Style": "配置样式",
+        "AddNew": "增加新的样式规则",
+        "Explanation": "可以在此处为金库中的物品定义多种样式。例如，可以将“system.rarity”的样式设置为“珍稀”，并将样式应用到与设置匹配的物品上。"
       },
       "CustomItemCategoriesEditor": {
         "Title": "自定义物品类别编辑器",
@@ -365,6 +385,12 @@
         "Title": "Item Piles 二级货币编辑器",
         "TitleActor": "Item Piles 二级货币编辑器：{actor_name}",
         "Explanation": "你可以在此处定义角色能够从物品堆中捡起的二级货币。"
+      },
+      "StylesEditor": {
+        "Title": "样式编辑",
+        "Style": "样式",
+        "Variable": "变量",
+        "Value": "配置值"
       }
     },
     "Chat": {
@@ -495,7 +521,9 @@
       "PileTooFar": "你距离该物品堆太远，因此无法与其交互.",
       "PileLocked": "这个容器被锁上了，你无法打开它，所以也无法放入物品。",
       "DropNoToken": "你在这个场景中没有指示物，因此你无法扔下任何东西。",
-      "NoTokenFound": "无法找到代表你的指示物或角色。"
+      "NoTokenFound": "无法找到代表你的指示物或角色。",
+      "NoVaultAccess": "你没有权限查看这个金库。",
+      "NoVaultAccessActor": "{actor_name} 没有权限查看这个金库。"
     },
     "Warnings": {
       "GiveItemNoGM": "没有 GM 主动接收您给予的此物品。",
@@ -575,6 +603,10 @@
       "ClearAllServices": {
         "Title": "清除所有角色服务",
         "Content": "这将清除所有商人的服务，是否确认？"
+      },
+      "ClearMerchantLog": {
+        "Title": "清空商人日志?",
+        "Content": "你确定想要清空商人 \"{actor_name}\" 的日志吗?"
       }
     },
     "HUD": {
