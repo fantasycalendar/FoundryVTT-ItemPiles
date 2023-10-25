@@ -92,7 +92,6 @@
 			floatingConfig={{ strategy: "fixed", placement: "bottom" }}
 			{groupBy}
 			{items}
-			on:hoverItem={() => { console.log("test")}}
 			placeholder="{localize('ITEM-PILES.Dialogs.GiveItems.SelectPlaceholder')}"
 		></Select>
 	</div>
