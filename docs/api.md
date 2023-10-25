@@ -47,6 +47,7 @@
   * [unrenderItemPileInterface](#unrenderItemPileInterface)
   * [getMerchantPriceModifiers](#getMerchantPriceModifiers)
   * [updateMerchantPriceModifiers](#updateMerchantPriceModifiers)
+  * [refreshMerchantInventory](#refreshMerchantInventory)
 
 
 * [Item and attribute methods](#item-and-attribute-methods)
@@ -595,9 +596,11 @@ Closes any open interfaces from a given item pile actor
 
 Retrieves the price modifiers for a given item piles merchant
 
+**Returns**: `Object` - Returns the merchant's price modifiers
+
 | Param              | Type                                       | Default | Description                                                                                               |
 |--------------------|--------------------------------------------|---------|-----------------------------------------------------------------------------------------------------------|
-| target             | `Actor/TokenDocument`                      |         | Target token or actor to retrieve the modifiers from                                                      |
+| target             | `Actor/TokenDocument/Token/String`         |         | Target token or actor to retrieve the modifiers from                                                      |
 | options            | `object`                                   |         | Options to pass to the function                                                                           |
 | [options.actor]    | `Token/TokenDocument/Actor/string/boolean` | `false` | The actor whose price modifiers to consider                                                               |
 | [options.absolute] | `boolean`                                  | `false` | Whether to only consider the actor's modifiers (true means not considering the merchant's base modifiers) |
@@ -606,14 +609,32 @@ Retrieves the price modifiers for a given item piles merchant
 
 ### updateMerchantPriceModifiers
 
-`game.itempiles.API.updateMerchantPriceModifiers(target, options)` ⇒ `Object`
+`game.itempiles.API.updateMerchantPriceModifiers(target, options)` ⇒ `Promise<Object>`
 
 Updates the price modifiers for a given item piles merchant
 
+**Returns**: `Promise<Object>` - Returns the merchant's updated price modifiers
+
 | Param             | Type                                                                                                                                                             | Default | Description                                       |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|---------------------------------------------------|
-| target            | `Actor/TokenDocument`                                                                                                                                            |         | Target token or actor to update modifiers on      |
+| target            | `Actor/TokenDocument/Token/String`                                                                                                                               |         | Target token or actor to update modifiers on      |
 | priceModifierData | `Array<{ actor?: Actor, actorUuid?: string, relative?: boolean, override?: boolean, buyPriceModifier?: number, sellPriceModifier?: number }>} priceModifierData` |         | The price modifier data to update on the merchant |
+
+---
+
+### refreshMerchantInventory
+
+`game.itempiles.API.refreshMerchantInventory(target, options)` ⇒ `Promise<Array<Item>>`
+
+Refreshes the merchant's inventory, potentially removing existing items and populating it based on its item tables
+
+**Returns**: `Promise<Array<Item>>` - An array of object containing the item data and their quantity
+
+| Param                              | Type                               | Default | Description                                                                    |
+|------------------------------------|------------------------------------|---------|--------------------------------------------------------------------------------|
+| target                             | `Actor/TokenDocument/Token/String` |         | The merchant actor to refresh the inventory of                                 |
+| options                            | `object`                           |         | Options to pass to the function                                                |
+| [options.removeExistingActorItems] | `boolean`                          | `true`  | Whether to clear the merchant's existing inventory before adding the new items |
 
 ---
 

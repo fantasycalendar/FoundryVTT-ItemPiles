@@ -2297,4 +2297,22 @@ export default class PrivateAPI {
 
 	}
 
+	static async _refreshMerchantInventory(merchantUuid, {
+		removeExistingActorItems = false,
+		userId = false
+	} = {}) {
+
+		const merchant = Utilities.getActor(merchantUuid);
+
+		const items = await PileUtilities.rollMerchantTables({ actor: merchant });
+
+		const itemsToAdd = items.map((item) => {
+			const actualItem = item.item.toObject();
+			return Utilities.setItemQuantity(actualItem, item.quantity);
+		});
+
+		return this._addItems(merchantUuid, itemsToAdd, userId, { removeExistingActorItems });
+
+	}
+
 }

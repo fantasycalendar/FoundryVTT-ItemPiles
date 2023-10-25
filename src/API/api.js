@@ -1929,6 +1929,49 @@ class API {
 	}
 
 	/**
+	 * Refreshes the merchant's inventory, potentially removing existing items and populating it based on its item tables
+	 *
+	 * @param {Actor/Token/TokenDocument} target                  The merchant actor to refresh the inventory of
+	 * @param {object} options                                    Options to pass to the function
+	 * @param {boolean} [options.removeExistingActorItems=true]   Whether to clear the merchant's existing inventory before adding the new items
+	 * @returns {Promise<boolean|*>}
+	 */
+	static async refreshMerchantInventory(target, { removeExistingActorItems = true } = {}) {
+
+		if (target) {
+			target = Utilities.getActor(target);
+			if (!(target instanceof Actor)) {
+				throw Helpers.custom_error(`refreshMerchantInventory | could not find the actor of the target actor`);
+			}
+		}
+
+		const targetUuid = Utilities.getUuid(target);
+
+		if (!PileUtilities.isItemPileMerchant(target)) {
+			throw Helpers.custom_error(`refreshMerchantInventory | target of uuid ${targetUuid} is not a merchant`);
+		}
+
+		if (typeof removeExistingActorItems !== "boolean") {
+			throw Helpers.custom_error(`refreshMerchantInventory | removeExistingActorItems of type boolean`);
+		}
+
+		const items = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REFRESH_MERCHANT_INVENTORY, targetUuid, {
+			removeExistingActorItems,
+			userId: game.user.id
+		});
+
+		if (items) {
+			for (const entry of items) {
+				entry.item = target.items.get(entry.item._id);
+			}
+		}
+
+		return items;
+
+	}
+
+
+	/**
 	 * Gets all the valid items from a given actor or token, excluding items based on its item type filters
 	 *
 	 * @param {Actor/TokenDocument/Token} target      The target to get the items from
