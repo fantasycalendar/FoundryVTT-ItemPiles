@@ -135,6 +135,13 @@
       "ClearMerchantLog": {
         "Title": "Limpar Registro do Comerciante?",
         "Content": "Tem certeza de que deseja limpar o registro do comerciante \"{actor_name}\"?"
+      },
+      "GiveItems": {
+        "Header": "Dando Itens: {item_name}",
+        "ContentMultipleQuantity": "Você possui {quantity} deste item, quantos você deseja dar?",
+        "Submit": "Enviar",
+        "Title": "Dando Itens",
+        "SelectPlaceholder": "Escolha o personagem para enviar o item"
       }
     },
     "Currencies": "Moedas",
