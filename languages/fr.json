@@ -185,6 +185,17 @@
       "ClearAllServices": {
         "Title": "Effacer les services sur tous les acteurs",
         "Content": "Cela effacera tous les services du marchand. Êtes vous certain de vouloir le faire ?"
+      },
+      "GiveItems": {
+        "Title": "Donne des objets",
+        "Header": "Donne un objet : {item_name}",
+        "SelectPlaceholder": "Choisir le personnage à qui envoyer l'objet",
+        "Submit": "Envoyer",
+        "ContentMultipleQuantity": "Vous possédez {quantity} fois cet objet. Combien voulez-vous en donner ?"
+      },
+      "ClearMerchantLog": {
+        "Title": "Effacer le journal du commerçant ?",
+        "Content": "Êtes-vous sûr de vouloir effacer le journal du commerçant \"{actor_name}\" ?"
       }
     },
     "CurrenciesEditor": {
@@ -703,7 +714,8 @@
           "RefreshItemsDaysExplanation": "Lorsque le calendrier dépasse les jours cochés, l'inventaire du Marchand est actualisé. Cela se produit à l'heure d'ouverture du marchand ou à minuit s'il n'a pas d'heure d'ouverture/fermeture.",
           "RefreshItemsHolidays": "Rafraîchir les articles lors des Jours fériés (Simple Calendar)",
           "RefreshItemsHolidaysExplanation": "Lorsque le calendrier dépasse des notes de la catégorie de note donnée, l'inventaire du commerçant est actualisé. Cela se produit à l'heure de la note ou à minuit s'il s'agit d'une note réglée sur toute la journée.",
-          "RefreshItemsWarning": "Avec toutes les options ci-dessous, les articles existants seront SUPPRIMÉS et ne pourront pas être récupérés. Vous pouvez configurer les articles individuels qui seront conservés. Les articles définis comme des services, conservés en quantité nulle et conservés chez le marchand persisteront."
+          "RefreshItemsWarning": "Avec toutes les options ci-dessous, les articles existants seront SUPPRIMÉS et ne pourront pas être récupérés. Vous pouvez configurer les articles individuels qui seront conservés. Les articles définis comme des services, conservés en quantité nulle et conservés chez le marchand persisteront.",
+          "LogMerchantActivity": "Enregistrer l'activité du commerçant"
         },
         "Sharing": {
           "Title": "Paramètres de partage",
