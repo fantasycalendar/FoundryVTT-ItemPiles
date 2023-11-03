@@ -99,7 +99,9 @@
       "PileLocked": "Dieser Stapel ist gesperrt und kann auch nicht geöffnet werden - du kannst keine Gegenstände ablegen.",
       "DropNoToken": "Du hast kein Token in dieser Szene, daher kannst du hier keinen Gegenstand fallen lassen.",
       "DisallowedItemSell": "Dieser Händler akzeptiert Gegenstände vom Typ \"{type}\" nicht",
-      "NoTokenFound": "Es konnte kein Token oder Charakter gefunden werden, der dich repräsentiert."
+      "NoTokenFound": "Es konnte kein Token oder Charakter gefunden werden, der dich repräsentiert.",
+      "NoVaultAccessActor": "{actor_name} hat nicht die Berechtigung, diesen Tresor zu durchsuchen.",
+      "NoVaultAccess": "Du hast nicht die Berechtigung, diesen Tresor zu durchsuchen."
     },
     "Dialogs": {
       "DropTypeWarning": {
@@ -139,7 +141,8 @@
         "Title": "Gegenstand erhalten",
         "Header": "Item Piles: Gegenstand erhalten",
         "ContentMany": "{source_actor_name} möchte den Gegenstand \"{item_name}\" ({quantity}) {target_actor_name} geben. Stimmst du zu?",
-        "Ignore": "Nutzer ignorieren"
+        "Ignore": "Nutzer ignorieren",
+        "Content": "{source_actor_name} möchte {target_actor_name} einen Gegenstand geben, nimmst du ihn an?"
       },
       "NewSystemVersion": {
         "Content": "Die Standardeinstellungen, für das System das du benutzt, für Item Piles wurden aktualisiert. Möchtest du deine systemspezifischen Einstellungen überschreiben lassen?",
@@ -148,7 +151,7 @@
         "Confirm": "Einstellungen aktualisieren"
       },
       "ClearAllItems": {
-        "Content": "Das wird alle Gegenstände des Akteurs entfernen. Bist du dir sicher, dass du das tun möchtest?",
+        "Content": "Das wird alle Gegenstände des Händlers entfernen. Bist du dir sicher, dass du das tun möchtest?",
         "Title": "Alle Gegenstände des Akteurs entfernen"
       },
       "GiveItemUserNotActive": {
@@ -179,6 +182,21 @@
       "CantRemoveVaultExpander": {
         "Content": "Du kannst die Erweiterung nicht entfernen, die Gegenstände im Tresor würden ohne diese nicht hinein passen. Entferne {num_items} Gegenstände, bevor du die Erweiterung entfernen kannst!",
         "Title": "Erweiterung nicht entfernbar"
+      },
+      "ClearAllServices": {
+        "Title": "Alle Dienstleistungen entfernen",
+        "Content": "Hiermit werden alle Dienstleistungen des Händlers gelöscht. Bist du sicher, dass du dies machen möchtest?"
+      },
+      "GiveItems": {
+        "Header": "Gegenstand abgeben: {item_name}",
+        "SelectPlaceholder": "Wähle den Charakter, an den du den Gegenstand senden willst",
+        "ContentMultipleQuantity": "Du hast {quantity} von diesem Gegenstand, wie viele möchtest du abgeben?",
+        "Submit": "Senden",
+        "Title": "Gegenstände abgeben"
+      },
+      "ClearMerchantLog": {
+        "Title": "Händlerprotokoll leeren?",
+        "Content": "Bist du sicher, dass du das Protokoll des Händlers \"{actor_name}\" löschen möchtest?"
       }
     },
     "CurrenciesEditor": {
@@ -411,7 +429,7 @@
       "AllTypes": "Alle Arten",
       "OpenCloseAuto": "Automatisch",
       "Open": "Offen",
-      "BuyServices": "Kaufe Leistungen",
+      "BuyServices": "Kaufe Dienstleistungen",
       "NoItemsForSale": "Der Händler hat nichts zu verkaufen",
       "ClearAllItems": "Alle Gegenstände entfernen",
       "EditTypePricesExplanation": "Stelle die Sichtbarkeit des pro Art-Reglers im Kaufe Gegenstände-Tab ein",
@@ -427,7 +445,7 @@
       "AddAll": "Alle Gegenstände hinzufügen",
       "AddItem": "Hinzufügen",
       "RemoveItem": "Entfernen",
-      "Service": "Service",
+      "Service": "Dienstleistung",
       "RollAllTables": "Rolle alle Tabellen",
       "ToolTipRemoveTable": "Tabelle entfernen",
       "TooltipConfigureTable": "Tabelle konfigurieren",
@@ -435,7 +453,24 @@
       "AddTable": "Tabelle hinzufügen",
       "TooltipRollTable": "Tabelle würfeln",
       "ToolTipRemoveAllRolledItems": "Entferne alle gewürfelten Gegenstände",
-      "ShoppingAs": "Als {actorName} einkaufen"
+      "ShoppingAs": "Als {actorName} einkaufen",
+      "Log": "Aktivitätsprotokoll",
+      "LogSearch": "Protokollsuche:",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogBought": "kaufte",
+      "LogSold": "verkaufte",
+      "LogQuantity": "{quantity} x ",
+      "LogSetNotForSale": "{instigator} hat <strong>{item}</strong> als <span>nicht zum Verkauf</span> eingestellt",
+      "LogSetForSale": "{instigator} hat <strong>{item}</strong> <span>zum Verkauf freigegeben</span>",
+      "LogSetQuantity": "{instigator} hat die <span>Menge</span> von <strong>{item}</strong> auf {quantity} festgelegt",
+      "LogSetVisible": "{instigator} hat <strong>{item}</strong> auf <span>sichtbar</span> gesetzt",
+      "LogSetHidden": "{instigator} hat <strong>{item}</strong> auf <span>unsichtbar</span> gesetzt",
+      "LogTransaction": "{instigator} {action} {quantity}{item} für {price}",
+      "TableAddAllItems": "Alle Gegenstände hinzufügen:",
+      "TableCustomCategory": "Gegenstände zur benutzerdefinierten Kategorie hinzufügen:",
+      "CurrentServices": "Aktuelle Dienstleistungen",
+      "ClearAllServices": "Alle Dienstleistungen entfernen",
+      "TableTimesToRoll": "Würfelhäufigkeit für die Tabelle:"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile erfolgreich aktualisiert.",
@@ -490,21 +525,24 @@
         "Title": "Gegenstand fallen lassen",
         "Header": "Du lässt {item_name} fallen",
         "Submit": "Zum Stapel hinzufügen",
-        "SubmitNoTarget": "Neuen Stapel erstellen"
+        "SubmitNoTarget": "Neuen Stapel erstellen",
+        "ContentInfiniteQuantity": "Wie viele möchtest du fallenlassen?"
       },
       "GiveItem": {
         "ContentMultipleQuantity": "Du hast diesen Gegenstand {quantity} mal, wieviel möchtest du davon weggeben?",
         "Submit": "geben",
         "Title": "Gegenstand geben",
         "Header": "Du gibst: {item_name}",
-        "Content": "Möchtest du diesen Gegenstand an \"{target_name}\" geben?"
+        "Content": "Möchtest du diesen Gegenstand an \"{target_name}\" geben?",
+        "ContentInfiniteQuantity": "Wie viele möchtest du an \"{target_name}\" geben?"
       },
       "DepositItem": {
         "Title": "Gegenstand einlagern",
         "Submit": "einlagern",
         "Header": "Du lagerst {item_name} ein",
         "Content": "Möchtest du diesen Gegenstand in \"{target_name}\" einlagern?",
-        "ContentMultipleQuantity": "Du hast diesen Gegenstand {quantity} mal, wieviel davon möchtest du einlagern?"
+        "ContentMultipleQuantity": "Du hast diesen Gegenstand {quantity} mal, wieviel davon möchtest du einlagern?",
+        "ContentInfiniteQuantity": "Wie viele möchtest du deponieren?"
       },
       "WithdrawItem": {
         "Title": "Gegenstand herausnehmen",
@@ -534,7 +572,9 @@
         "Styles": "Stileinstellungen",
         "Request": "Neue Funktionen hier anfragen.",
         "Local": "Lokale Einstellungen",
-        "Title": "Einstellungen für das Modul Item Piles"
+        "Title": "Einstellungen für das Modul Item Piles",
+        "Export": "Exporteinstellungen",
+        "Import": "Importeinstellungen"
       },
       "PriceModifiersEditor": {
         "Override": "Überschreiben",
@@ -582,9 +622,9 @@
           "PurchaseOnlyExplanation": "Wenn aktiviert, können Charaktere keine Gegenstände an diesen Händler verkaufen.",
           "OpenStatusExplanation": "Dies konfiguriert den aktuellen Öffnungsstatus des Händlers. Wenn Öffnungszeiten (unten) und das Simple Calendar Modul aktiviert sind, kannst du dies automatisieren.",
           "ItemTypeModifier": "Gegenstandstyp-Preismodifikatoren",
-          "ConfigureItemTypePriceModifiers": "Gegenstandstyp-Preismodifikatoren konfigurieren.",
+          "ConfigureItemTypePriceModifiers": "Gegenstandstyp-Preismodifikatoren konfigurieren",
           "ItemTypeModifiersExplanation": "In diesem Dialog kannst du Preismodifikatoren für individuelle Gegenstandstypen konfigurieren.",
-          "ConfigureActorPriceModifiers": "Akteur-Preismodifikatoren konfigurieren.",
+          "ConfigureActorPriceModifiers": "Akteur-Preismodifikatoren konfigurieren",
           "OpenTimes": "Öffnungszeiten",
           "ClosedHolidaysExplanation": "An Tagen mit Notizen mit entsprechender Notiz-Kategorie, wird der Händler geschlossen haben (wenn der Öffnungsstatus auf automatisch gesetzt wurde).",
           "HideItemsWithZeroCostExplanation": "Wenn aktiviert, können Kunden Gegenstände weder kaufen noch verkaufen, wenn sie einen Preis von Null (kostenlos) haben.",
@@ -592,7 +632,21 @@
           "ClosedDaysExplanation": "An den markierten Tagen hat der Händler geschlossen (wenn der Öffnungsstatus auf automatisch gesetzt wurde).",
           "ActorPriceModifiersExplanation": "Hier kannst du konfigurieren, ob bestimmte Akteure andere Preismodifikatoren haben sollen als die oben genannten.",
           "ActorPriceModifiers": "Preismodifikatoren pro Akteur überschreiben",
-          "PriceModifierExplanation": "Damit werden die Modifikatoren für die Kosten jedes Gegenstands im Shop konfiguriert. Du kannst auch Modifikatoren pro Gegenstandstyp und sogar für bestimmte Charaktere (z. B. sprachgewandte Barden) konfigurieren. Du bist nicht auf 200% beschränkt, tippe in das Feld, um noch höher zu gehen."
+          "PriceModifierExplanation": "Damit werden die Modifikatoren für die Kosten jedes Gegenstands im Shop konfiguriert. Du kannst auch Modifikatoren pro Gegenstandstyp und sogar für bestimmte Charaktere (z. B. sprachgewandte Barden) konfigurieren. Du bist nicht auf 200% beschränkt, tippe in das Feld, um noch höher zu gehen.",
+          "RefreshItemsWarning": "Bei jeder der folgenden Optionen werden vorhandene Artikel GELÖSCHT und können nicht wiederhergestellt werden. Individuelle Gegenstände können so konfiguriert werden, dass sie beibehalten werden; Gegenstände, die auf \"Dienstleistung\", \"Menge Null behalten\" und \"Auf Händler behalten\" eingestellt sind, bleiben erhalten.",
+          "ConfigureMerchantColumns": "Händlerspalten konfigurieren",
+          "MerchantColumnsExplanation": "Hier können Sie die systemspezifischen Spalten dieses Händlers konfigurieren, die in der Händleroberfläche angezeigt werden, z. B. die Seltenheit von Gegenständen.",
+          "ClearMerchantLog": "Händlerprotokolle löschen",
+          "ClearMerchantLogExplanation": "Hierdurch werden die Händlerprotokolle gelöscht und alle Einträge entfernt. Dies kann nicht rückgängig gemacht werden.",
+          "RefreshItemsOnOpenExplanation": "Wenn die Zeit des Kalenders über die Öffnungszeit des Händlers hinausgeht, wird das Inventar des Händlers aufgefrischt.",
+          "RefreshItemsDays": "Gegenstände an Wochentagen auffrischen (Simple Calendar)",
+          "RefreshItemsHolidays": "Gegenstände an Feiertagen auffrischen (Simple Calendar)",
+          "RefreshItemsOnOpen": "Auffrischen von Gegenständen zur Öffnungszeit (Simple Calendar)",
+          "RefreshItemsDaysExplanation": "Wenn der Kalender die angekreuzten Tage durchläuft, wird das Inventar des Händlers aufgefrischt. Dies geschieht zur Öffnungszeit des Händlers oder um Mitternacht, wenn er keine Öffnungs-/Schließungszeit hat.",
+          "MerchantColumns": "Händlerspalten",
+          "LogMerchantActivity": "Händleraktivität protokollieren",
+          "LogMerchantActivityExplanation": "Wenn diese Funktion aktiviert ist, protokolliert der Händler Ereignisse wie den Kauf und Verkauf von Gegenständen und Aktualisierungen des Status (Menge, Sichtbarkeit und zum Verkauf) von Gegenständen durch SL.",
+          "RefreshItemsHolidaysExplanation": "Wenn der Kalender Notizen mit der angegebenen Notizkategorie passiert, wird das Inventar des Händlers aktualisiert. Dies geschieht zur Zeit der Notiz oder um Mitternacht, wenn es eine Notiz ist, die auf den ganzen Tag eingestellt ist."
         },
         "Main": {
           "DeleteWhenEmptyDefault": "Standardmäßige Moduleinstellungen",
@@ -619,7 +673,10 @@
           "OverrideItemFiltersExplanation": "Stelle ein, ob dieser Stapel in der Lage sein sollte, andere Gegenstandstypen zu übertragen als den Standard.",
           "MacroExplanation": "Name des Makros, das ausgeführt werden soll, wenn mit diesem Stapel interagiert wird.",
           "Macro": "bei interagieren Makro",
-          "ConfigureOverrideItemFilters": "Gegenstandsfilter überschreiben konfigurieren"
+          "ConfigureOverrideItemFilters": "Gegenstandsfilter überschreiben konfigurieren",
+          "OverrideSecondaryCurrencies": "Sekundärwährungen überschreiben",
+          "ConfigureOverrideSecondaryCurrencies": "Sekundärwährungen zum Überschreiben konfigurieren",
+          "OverrideSecondaryCurrenciesExplanation": "Stelle die Sekundärwährungs-Überschreibungen für diesen Item Pile ein."
         },
         "Vault": {
           "ManageAccess": "Zugriff verwalten",
@@ -642,13 +699,17 @@
           "LayoutExplanation": "Wie viele Spalten und Reihen im Tresor sichtbar sein sollen.",
           "EnableExpansionExplanation": "Ist dies aktiviert, erweitern Gegenstände, die als Tresorerweiterungen konfiguriert sind, den vorhandenen Platz des Tresors.",
           "LogVaultAccessExplanation": "Wenn aktiviert, erstellt dieser Tresor einen Journaleintrag und erstellt jedes Mal einen Zeitstempel, wenn mit dem Tresor interagiert wird.",
-          "AccessExplanation": "Dies konfiguriert, welche Charaktere & Spieler auf das Tresorinventar & Währungen zugreifen und modifizieren können. Wenn ein Spieler Besitzrechte des Tresorcharakters hat, besitzt er dauerhaft vollen Zugriff."
+          "AccessExplanation": "Dies konfiguriert, welche Charaktere & Spieler auf das Tresorinventar & Währungen zugreifen und modifizieren können. Wenn ein Spieler Besitzrechte des Tresorcharakters hat, besitzt er dauerhaft vollen Zugriff.",
+          "CanStackItems": "Kann Gegenstände stapeln",
+          "RestrictAccess": "Zugang zum Tresor einschränken",
+          "CanStackItemsExplanation": "Wenn diese Option aktiviert ist, werden dem Tresor hinzugefügte Gegenstände mit ähnlichen Gegenständen gestapelt. Dies kann auch pro Gegenstand in der jeweiligen Konfiguration gesteuert werden.",
+          "RestrictAccessExplanation": "Standardmäßig kann jeder auf Tresore zugreifen, wenn er sie in der Seitenleiste sehen kann oder sich in einer Szene in ihre Nähe begeben kann. Wenn diese Einstellung aktiviert ist, kann der Tresor nur vom Besitzer des Tresor-Charakters oder von Benutzern/Charakteren, die im Zugriffs-Editor (siehe unten) eingerichtet wurden, eingesehen werden."
         },
         "Configure": "Gegenstandsstapel",
         "Update": "Gegenstandsstapel aktualisieren",
         "Other": {
           "Title": "Andere Einstellungen",
-          "Type": "Gegenstandstyp",
+          "Type": "Typ des Gegenstandsstapels",
           "TypeExplanation": "Stellt ein, wie dieser Gegenstandstyp angezeigt wird."
         },
         "Sharing": {
@@ -728,12 +789,24 @@
         "PurchaseOptionsExplanation": "Hier kannst du die alternativen Möglichkeiten zum Kauf dieses Gegenstands konfigurieren. Jede Gruppe steht für eine andere Art und Weise, wie ein Charakter diesen Gegenstand von anderen Spielern kaufen kann",
         "DisplayQuantityExplanation": "Hier wird festgelegt, wie die Menge dieses Gegenstands im Geschäft angezeigt wird, wenn überhaupt.",
         "ExpandColumnsRowsExplanation": "Wenn die obige Einstellung aktiviert ist, wird damit festgelegt, wie viele Spalten und/oder Zeilen im Tresorraum verfügbar werden. Dies kann nicht über die Kapazität des Tresors hinausgehen.",
-        "PricePreset": "Oder wähle eine aktuelle Preisvoreinstellung:",
+        "PricePreset": "Oder wähle eine Preisvoreinstellung:",
         "SelectPreset": "Preisvoreinstellung auswählen",
         "VaultExpanderExplanation": "Wenn dies aktiviert ist, verhält sich dieser Gegenstand nicht wie ein normaler Gegenstand in einem Tresor, sondern erhöht die Anzahl der verfügbaren Plätze, wie unten festgelegt.",
         "DropMeClickMe": "Klicken, um ein Attribut hinzuzufügen, oder ziehe einen Gegenstand per Drag & Drop, um ihn hinzuzufügen",
         "DisplayQuantityDefault": "Standardeinstellungen des Händlers",
-        "ServiceExplanation": "Dies führt dazu, dass dieser Gegenstand nicht in den Bestand des Käufers aufgenommen wird. Der Dienst \"Gegenstand\" kann immer noch eine bestimmte Menge haben, aber wenn sie zur Neige geht, wird er nicht vom Händler gelöscht, sondern stattdessen auf \"unverkäuflich\" gesetzt."
+        "ServiceExplanation": "Dies führt dazu, dass dieser Gegenstand nicht in den Bestand des Käufers aufgenommen wird. Der Dienst \"Gegenstand\" kann immer noch eine bestimmte Menge haben, aber wenn sie zur Neige geht, wird er nicht vom Händler gelöscht, sondern stattdessen auf \"unverkäuflich\" gesetzt.",
+        "InfiniteQuantityYes": "Ja, unendliche Menge",
+        "QuantityForPriceExplanation": "Dies bestimmt, wie viele von diesem Gegenstand man beim Kauf erhalten sollte.",
+        "CanStackDefault": "Standardeinstellung für den Tresor",
+        "CanStack": "Stapelbar",
+        "InfiniteQuantityDefault": "Standardeinstellung des Händlers",
+        "InfiniteQuantityNo": "Nein, Standardmenge",
+        "QuantityForPrice": "Menge für Preis",
+        "CanStackYes": "Ja, kann immer gestapelt werden",
+        "CanStackNo": "Nein, nicht stapelbar",
+        "KeepOnMerchant": "Auf Händler behalten",
+        "KeepOnMerchantExplanation": "Wenn die Gegenstände im Tab 'Gegenstände hinzufügen' bei Händlern gelöscht werden oder durch die Integration 'Simple Calendar refresh inventory' (siehe die Händler-Konfiguration am Ende), wird dieser Gegenstand immer bestehen bleiben.",
+        "CanStackExplanation": "Dies bestimmt, ob dieser Gegenstand mit anderen ähnlichen Gegenständen im Tresor gestapelt wird, wenn er hinzugefügt wird."
       },
       "TradeMerchantItem": {
         "Change": "Wechselgeld",
@@ -746,7 +819,9 @@
         "YouCantAfford": "Du kannst dir diesen Preis nicht leisten",
         "TheyCantAfford": "Sie können sich diesen Preis nicht leisten",
         "MaxQuantity": "Max {quantity}",
-        "Title": "Gegenstand handeln: {item_name}"
+        "Title": "Gegenstand handeln: {item_name}",
+        "TheyLackQuantity": "Der Händler hat nicht genug von diesem Gegenstand zum Verkaufen. Er/sie hat {quantity}, benötigt aber {requiredQuantity}",
+        "YouLackQuantity": "Du hast nicht genug von diesem Gegenstand zum Verkaufen. Du hast {quantity}, benötigst aber {requiredQuantity}"
       },
       "CurrenciesEditor": {
         "Title": "Item Piles Währungseditor",
@@ -777,8 +852,14 @@
         "ContentNoTarget": "Als GM kannst du die Währungen dieses Stapels aktualisieren:"
       },
       "VaultAccessEditor": {
-        "Title": "Tresorzugriffseditor: {actor_name}",
-        "Explanation": "Hier wird festgelegt, welche Charaktere und Spieler auf das Inventar und die Währungen des Tresors zugreifen und diese verändern können. Wenn ein Spieler Eigentümer des Tresor-Charakters ist, hat er immer vollen Zugriff."
+        "Title": "Tresorzugriffseditor",
+        "Explanation": "Hier wird festgelegt, welche Charaktere und Spieler auf das Inventar und die Währungen des Tresors zugreifen und diese verändern können. Wenn ein Spieler Eigentümer des Tresor-Charakters ist, hat er immer vollen Zugriff.",
+        "TitleActor": "Editor für Tresorzugang: {actor_name}",
+        "Character": "Spieler/Charakter",
+        "Withdraw": "Entnehmen",
+        "Deposit": "Ablegen",
+        "View": "Betrachten",
+        "Organize": "Organisieren"
       },
       "ItemTypePriceModifiersEditor": {
         "Title": "Gegenstandstyp-Preismodifikatoreditor",
@@ -819,12 +900,38 @@
       "EditCurrencies": {
         "Title": "Währungen anpassen",
         "Content": "Als SL kannst du die Währungen dieses Stapels anpassen:",
-        "Submit": "Speichern"
+        "Submit": "Speichern",
+        "Secondary": "Sekundärwährungen:"
       },
       "CustomItemCategoriesEditor": {
         "Category": "Kategorie",
         "Explanation": "Hier kannst du konfigurieren, welche benutzerdefinierten Gegenstandskategorien in deiner Welt verfügbar sind. Sie werden dynamisch hinzugefügt, wenn du eine neue Kategorie für einen Gegenstand hinzufügen.",
         "Title": "Editor für benutzerdefinierte Gegenstandskategorien"
+      },
+      "SplitItem": {
+        "Title": "Gegenstandsstapel teilen",
+        "Header": "Du teilst einen Stapel von {item_name}",
+        "Content": "Möchtest du diesen Gegenstandsstapel teilen?",
+        "ContentMultipleQuantity": "Es gibt {quantity} von diesem Gegenstand. Wie viele möchtest du im neuen Stapel haben?",
+        "Submit": "Stapel aufteilen"
+      },
+      "SecondaryCurrenciesEditor": {
+        "TitleActor": "Item Piles Sekundärwährungs-Editor: {actor_name}",
+        "Explanation": "Hier kannst du festlegen, welche Sekundärwährungen von Charakteren aufgehoben und fallengelassen werden können.",
+        "Title": "Item Piles Sekundärwährungs-Editor"
+      },
+      "MerchantColumnsEditor": {
+        "Buying": "Einkaufen",
+        "PropertyPath": "Attributspfad",
+        "Title": "Händlerspalten",
+        "Selling": "Verkaufen",
+        "Label": "Bezeichnung",
+        "MappingContent": "Hiermit wird die Zuordnung zwischen dem Wert der Eigenschaft und einer Bezeichnung konfiguriert. Diese Bezeichnung kann ein lokalisierter Text sein.",
+        "Formatting": "Formatierung",
+        "ConfigureMapping": "Zuordnung konfigurieren",
+        "MappingTitle": "Händlerspalten-Zuordnung: {label}",
+        "TitleActor": "Händlerspalten: {actor_name}",
+        "Explanation": "Hiermit werden die Spalten konfiguriert, die in der Benutzeroberfläche des Händlers sichtbar sind, abgesehen vom Namen des Artikels, der Menge und dem Preis."
       }
     },
     "Settings": {
@@ -954,6 +1061,22 @@
         "Hint": "Hier kannst du einstellen, wie Gegenstände in diesem System als gleich erkannt werden sollen. Einige Systeme verfügen möglicherweise über Daten, die Gegenstände anders unterscheiden als andere, z. B. temporäre Gegenstände.",
         "Label": "Ähnlichkeit von Gegenständen konfigurieren",
         "Title": "Ähnlichkeit von Gegenständen"
+      },
+      "QuantityForPrice": {
+        "Hint": "Hier kannst du konfigurieren, was der Attributspfad für die Menge der Gegenstände ist, die du für den Preis bekommst. Zum Beispiel gibt es im PF2e-System eine \"pro\"-Eigenschaft für Gegenstände, die festlegt, welche Menge an Gegenständen man für den Preis des Gegenstands erhält, die im \"item.system.price.per\"-Attribut des Gegenstands gespeichert ist, also würde man \"system.price.per\" in diese Einstellung eintragen.",
+        "Title": "Attribut für die Menge des Gegenstands zum Preis"
+      },
+      "SecondaryCurrencies": {
+        "Label": "Sekundärwährungen konfigurieren",
+        "Title": "Sekundärwährungen",
+        "Hint": "Diese Einstellung definiert Sekundärwährungen, ähnlich wie, aber getrennt von regulären Währungen. Sie können keine Wechselkurse haben oder in andere benutzerdefinierte Währungen aufgeteilt werden."
+      },
+      "HideTokenBorder": {
+        "HideEveryone": "Ausgeblendet für alle",
+        "HidePlayers": "Ausgeblendet für Spieler",
+        "Show": "Ränder anzeigen (Standardverhalten)",
+        "Title": "Tokenränder von Gegenstandsstapeln ausblenden",
+        "Hint": "Dies steuert, ob der Rand der Token ausgeblendet wird, wenn du den Mauszeiger über Item Pile Token bewegst. Wenn du das Token auswählst, wird der Rand immer angezeigt."
       }
     },
     "VaultLog": {
