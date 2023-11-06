@@ -715,7 +715,10 @@
           "RefreshItemsHolidays": "Rafraîchir les articles lors des Jours fériés (Simple Calendar)",
           "RefreshItemsHolidaysExplanation": "Lorsque le calendrier dépasse des notes de la catégorie de note donnée, l'inventaire du commerçant est actualisé. Cela se produit à l'heure de la note ou à minuit s'il s'agit d'une note réglée sur toute la journée.",
           "RefreshItemsWarning": "Avec toutes les options ci-dessous, les articles existants seront SUPPRIMÉS et ne pourront pas être récupérés. Vous pouvez configurer les articles individuels qui seront conservés. Les articles définis comme des services, conservés en quantité nulle et conservés chez le marchand persisteront.",
-          "LogMerchantActivity": "Enregistrer l'activité du commerçant"
+          "LogMerchantActivity": "Enregistrer l'activité du commerçant",
+          "ClearMerchantLog": "Effacer le journal du marchand",
+          "ClearMerchantLogExplanation": "Cette opération efface les journaux du marchand et supprime toutes les entrées. Cette opération ne peut être annulée.",
+          "LogMerchantActivityExplanation": "Lorsqu'elle est activée, cette fonction permet au marchand d'enregistrer des événements tels que l'achat et la vente d'objets, et la mise à jour par les MJ du statut (quantité, visibilité et mise en vente) des objets."
         },
         "Sharing": {
           "Title": "Paramètres de partage",
