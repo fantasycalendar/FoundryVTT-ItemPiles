@@ -237,7 +237,6 @@ export default {
   "SYSTEM_HOOKS": () => {
 
     Hooks.on("dnd5e.getItemContextOptions", (item, options) => {
-      console.log(game.itempiles.API.isItemInvalid(item))
       options.push({
         name: "Give to character",
         icon: "<i class='fa fa-user'></i>",
