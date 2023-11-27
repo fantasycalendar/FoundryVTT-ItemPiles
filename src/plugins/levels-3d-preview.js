@@ -3,15 +3,15 @@ import PrivateAPI from "../API/private-api.js";
 
 export default class Levels3dPreview extends BasePlugin {
 
-  registerHooks() {
+	registerHooks() {
 
-    Hooks.on("3DCanvasConfig", (config) => {
-      config.INTERACTIONS.dropFunctions.Item = async function (event, data) {
-        canvas.tokens.activate();
-        return PrivateAPI._dropData(canvas, data);
-      }
-    });
+		Hooks.on("3DCanvasConfig", (config) => {
+			config.INTERACTIONS.dropFunctions.Item = async function (event, data) {
+				canvas.tokens.activate();
+				return PrivateAPI._dropData(canvas, data);
+			}
+		});
 
-  }
+	}
 
 }

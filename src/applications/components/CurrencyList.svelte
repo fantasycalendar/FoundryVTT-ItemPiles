@@ -1,19 +1,19 @@
 <script>
 
-  import CurrencyListEntry from "./CurrencyListEntry.svelte";
+	import CurrencyListEntry from "./CurrencyListEntry.svelte";
 
-  export let currencies;
-  export let options = {};
+	export let currencies;
+	export let options = {};
 
-  $: primary = $currencies.filter(currency => !currency.isSecondaryCurrency);
-  $: secondary = $currencies.filter(currency => currency.isSecondaryCurrency);
+	$: primary = $currencies.filter(currency => !currency.isSecondaryCurrency);
+	$: secondary = $currencies.filter(currency => currency.isSecondaryCurrency);
 
-  options = foundry.utils.mergeObject({
-    reverse: false,
-    abbreviations: false,
-    abbreviateNumbers: false,
-    imgSize: 24
-  }, options)
+	options = foundry.utils.mergeObject({
+		reverse: false,
+		abbreviations: false,
+		abbreviateNumbers: false,
+		imgSize: 24
+	}, options)
 
 </script>
 

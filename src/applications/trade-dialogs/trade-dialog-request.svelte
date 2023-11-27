@@ -1,83 +1,83 @@
 <script>
 
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { getContext } from "svelte";
-  import { tweened } from 'svelte/motion';
-  import { linear } from 'svelte/easing';
-  import * as Helpers from "../../helpers/helpers.js";
-  import ActorDropSelect from "./ActorDropSelect.svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getContext } from "svelte";
+	import { tweened } from 'svelte/motion';
+	import { linear } from 'svelte/easing';
+	import * as Helpers from "../../helpers/helpers.js";
+	import ActorDropSelect from "./ActorDropSelect.svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let elementRoot;
-  export let isPrivate;
-  export let tradingActor;
-  export let tradingUser;
-  export let users;
-  export let user;
-  export let actors;
-  export let actor;
+	export let elementRoot;
+	export let isPrivate;
+	export let tradingActor;
+	export let tradingUser;
+	export let users;
+	export let user;
+	export let actors;
+	export let actor;
 
-  let isGM = game.user.isGM;
+	let isGM = game.user.isGM;
 
-  users = game.users.filter(user => user.active && user !== game.user);
-  user = user || users?.[0] || false;
-  actors = actors || game.actors.filter(actor => actor.isOwner);
-  actor = actor || game.user.character || (!isGM ? actors?.[0] : false);
+	users = game.users.filter(user => user.active && user !== game.user);
+	user = user || users?.[0] || false;
+	actors = actors || game.actors.filter(actor => actor.isOwner);
+	actor = actor || game.user.character || (!isGM ? actors?.[0] : false);
 
-  let done = false;
+	let done = false;
 
-  async function accept() {
-    application.options.resolve(actor);
-    close();
-  }
+	async function accept() {
+		application.options.resolve(actor);
+		close();
+	}
 
-  async function decline() {
-    application.options.resolve(false);
-    close();
-  }
+	async function decline() {
+		application.options.resolve(false);
+		close();
+	}
 
-  async function mute() {
-    application.options.resolve("mute");
-    close();
-  }
+	async function mute() {
+		application.options.resolve("mute");
+		close();
+	}
 
-  async function disconnected() {
-    Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true)
-    close();
-  }
+	async function disconnected() {
+		Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Disconnected"), true)
+		close();
+	}
 
-  const progress = tweened(0, {
-    duration: 20000,
-    easing: linear
-  });
+	const progress = tweened(0, {
+		duration: 20000,
+		easing: linear
+	});
 
-  $: actualProgress = $progress * 100;
+	$: actualProgress = $progress * 100;
 
-  let timeout = setTimeout(() => {
-    if (done) return;
-    progress.set(1);
-    timeout = setTimeout(() => {
-      if (done) return;
-      Helpers.custom_warning(localize("ITEM-PILES.Trade.AutoDecline"), true)
-      decline();
-    }, 21000)
-  }, 14000);
+	let timeout = setTimeout(() => {
+		if (done) return;
+		progress.set(1);
+		timeout = setTimeout(() => {
+			if (done) return;
+			Helpers.custom_warning(localize("ITEM-PILES.Trade.AutoDecline"), true)
+			decline();
+		}, 21000)
+	}, 14000);
 
-  const connection = setInterval(() => {
-    const user = game.users.get(tradingUser.id)
-    if (!user.active) {
-      disconnected();
-    }
-  }, 100);
+	const connection = setInterval(() => {
+		const user = game.users.get(tradingUser.id)
+		if (!user.active) {
+			disconnected();
+		}
+	}, 100);
 
-  function close() {
-    clearInterval(connection);
-    clearTimeout(timeout);
-    done = true;
-    application.close();
-  }
+	function close() {
+		clearInterval(connection);
+		clearTimeout(timeout);
+		done = true;
+		application.close();
+	}
 
 </script>
 
@@ -98,14 +98,14 @@
 		<div class="item-piles-bottom-divider">
 			{#if isPrivate}
 				<p>{@html localize("ITEM-PILES.Trade.Request.PrivateContent", {
-          trading_user_name: tradingUser.name,
-          trading_actor_name: tradingActor.name
-        })}</p>
+					trading_user_name: tradingUser.name,
+					trading_actor_name: tradingActor.name
+				})}</p>
 			{:else}
 				<p>{localize("ITEM-PILES.Trade.Request.Content", {
-          trading_user_name: tradingUser.name,
-          trading_actor_name: tradingActor.name
-        })}</p>
+					trading_user_name: tradingUser.name,
+					trading_actor_name: tradingActor.name
+				})}</p>
 			{/if}
 			<p>{localize("ITEM-PILES.Trade.Request.AcceptQuery")}</p>
 		</div>

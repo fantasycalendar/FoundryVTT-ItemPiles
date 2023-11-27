@@ -1,71 +1,71 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { get, writable } from "svelte/store";
-  import PropertyPathInput from "../../components/PropertyPathInput.svelte";
-  import StringListEditor from "../string-list-editor/string-list-editor.js";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { get, writable } from "svelte/store";
+	import PropertyPathInput from "../../components/PropertyPathInput.svelte";
+	import StringListEditor from "../string-list-editor/string-list-editor.js";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  let form;
+	let form;
 
-  export let data;
-  export let elementRoot;
+	export let data;
+	export let elementRoot;
 
-  const merchantColumns = writable(data);
+	const merchantColumns = writable(data);
 
-  function addColumn() {
-    merchantColumns.update(value => {
-      value.push({
-        label: "",
-        path: "",
-        formatting: "{#}",
-        mapping: {},
-        buying: true,
-        selling: true
-      });
-      return value;
-    });
-  }
+	function addColumn() {
+		merchantColumns.update(value => {
+			value.push({
+				label: "",
+				path: "",
+				formatting: "{#}",
+				mapping: {},
+				buying: true,
+				selling: true
+			});
+			return value;
+		});
+	}
 
-  function removeColumn(index) {
-    merchantColumns.update(value => {
-      value.splice(index, 1)
-      return value;
-    })
-  }
+	function removeColumn(index) {
+		merchantColumns.update(value => {
+			value.splice(index, 1)
+			return value;
+		})
+	}
 
-  async function showMappingEditor(index) {
-    const data = get(merchantColumns)[index];
-    return StringListEditor.show(
-      Object.entries(data.mapping),
-      {
-        id: `merchant-columns-mapping-editor-${data.path}`,
-        title: localize("ITEM-PILES.Applications.MerchantColumnsEditor.MappingTitle", { label: data.label }),
-        content: localize("ITEM-PILES.Applications.MerchantColumnsEditor.MappingContent"),
-        keyValuePair: true,
-      }
-    ).then((result) => {
-      merchantColumns.update(value => {
-        value[index].mapping = Object.fromEntries(result);
-        return value;
-      })
-    });
-  }
+	async function showMappingEditor(index) {
+		const data = get(merchantColumns)[index];
+		return StringListEditor.show(
+			Object.entries(data.mapping),
+			{
+				id: `merchant-columns-mapping-editor-${data.path}`,
+				title: localize("ITEM-PILES.Applications.MerchantColumnsEditor.MappingTitle", { label: data.label }),
+				content: localize("ITEM-PILES.Applications.MerchantColumnsEditor.MappingContent"),
+				keyValuePair: true,
+			}
+		).then((result) => {
+			merchantColumns.update(value => {
+				value[index].mapping = Object.fromEntries(result);
+				return value;
+			})
+		});
+	}
 
-  async function updateSettings() {
-    application.options.resolve(get(merchantColumns));
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve(get(merchantColumns));
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+	function preventDefault(event) {
+		event.preventDefault();
+	}
 
 </script>
 
@@ -125,7 +125,7 @@
 						</button>
 					</div>
 					<a on:click={() => removeColumn(index)} class="item-piles-clickable-red"
-						 style="margin-right: 0.5rem; text-align: center;">
+					   style="margin-right: 0.5rem; text-align: center;">
 						<i class="fas fa-times"></i>
 					</a>
 				</div>

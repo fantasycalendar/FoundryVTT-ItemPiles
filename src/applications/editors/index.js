@@ -8,14 +8,14 @@ import VaultStylesEditor from "./vault-styles-editor/vault-styles-editor.js";
 import StylesEditor from "./styles-editor/styles-editor.js";
 
 export default {
-  "currencies": CurrenciesEditor,
-  "secondary-currencies": SecondaryCurrenciesEditor,
-  "item-filters": ItemFiltersEditor,
-  "item-similarities": StringListEditor,
-  "item-categories": StringListEditor,
-  "styles": StylesEditor,
-  "vault-styles": VaultStylesEditor,
-  "price-modifiers": PriceModifiersEditor,
-  "unstackable-item-types": UnstackableItemTypesEditor,
-  "price-presets": PricePresetEditor
+	"currencies": CurrenciesEditor,
+	"secondary-currencies": SecondaryCurrenciesEditor,
+	"item-filters": ItemFiltersEditor,
+	"item-similarities": StringListEditor,
+	"item-categories": StringListEditor,
+	"styles": StylesEditor,
+	"vault-styles": VaultStylesEditor,
+	"price-modifiers": PriceModifiersEditor,
+	"unstackable-item-types": UnstackableItemTypesEditor,
+	"price-presets": PricePresetEditor
 }

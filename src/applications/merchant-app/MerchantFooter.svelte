@@ -1,20 +1,20 @@
 <script>
 
-  import CurrencyList from "../components/CurrencyList.svelte";
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import { writable } from "svelte/store";
+	import CurrencyList from "../components/CurrencyList.svelte";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { writable } from "svelte/store";
 
-  export let store;
-  export let recipientStore;
+	export let store;
+	export let recipientStore;
 
-  let recipientDocument = writable({});
-  let currencies = writable([]);
-  $: {
-    recipientDocument = recipientStore?.document;
-    currencies = recipientStore?.allCurrencies;
-  }
-  const merchantCurrencies = store?.allCurrencies;
-  const merchantPileData = store.pileData;
+	let recipientDocument = writable({});
+	let currencies = writable([]);
+	$: {
+		recipientDocument = recipientStore?.document;
+		currencies = recipientStore?.allCurrencies;
+	}
+	const merchantCurrencies = store?.allCurrencies;
+	const merchantPileData = store.pileData;
 
 </script>
 
@@ -24,20 +24,20 @@
 			{localize("ITEM-PILES.Merchant.ShoppingAs", { actorName: $recipientDocument.name })}
 		</div>
 		<CurrencyList {currencies}
-									options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
-									class="item-piles-currency-list"/>
+		              options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
+		              class="item-piles-currency-list"/>
 	</div>
 {:else if game.user.isGM && !$merchantPileData.infiniteCurrencies}
 	<div class="item-piles-flexrow merchant-bottom-row">
 		<div style="flex: 0 1 auto;">
 			<a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
-				 on:click={() => store.addCurrency()}>
+			   on:click={() => store.addCurrency()}>
 				<i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
 			</a>
 		</div>
 		<CurrencyList currencies={merchantCurrencies}
-									options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
-									class="item-piles-currency-list"/>
+		              options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
+		              class="item-piles-currency-list"/>
 	</div>
 {/if}
 

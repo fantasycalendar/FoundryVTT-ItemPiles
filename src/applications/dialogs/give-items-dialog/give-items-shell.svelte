@@ -86,8 +86,8 @@
 			--height="calc(var(--form-field-height) + 1px)"
 			--input-color="black"
 			--item-padding="0.25rem"
-			--padding="0 8px"
 			--margin="0.25rem 0"
+			--padding="0 8px"
 			--text-overflow="ellipsis"
 			bind:value={selectedActor}
 			floatingConfig={{ strategy: "fixed", placement: "bottom" }}

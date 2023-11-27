@@ -1,60 +1,60 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import SliderInput from "../../components/SliderInput.svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { get, writable } from "svelte/store";
-  import * as Helpers from "../../../helpers/helpers.js";
-  import SETTINGS from "../../../constants/settings.js";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import SliderInput from "../../components/SliderInput.svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { get, writable } from "svelte/store";
+	import * as Helpers from "../../../helpers/helpers.js";
+	import SETTINGS from "../../../constants/settings.js";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let elementRoot;
-  export let data = [];
+	export let elementRoot;
+	export let data = [];
 
-  const itemTypePriceModifiers = writable(data);
+	const itemTypePriceModifiers = writable(data);
 
-  let form;
-  let unusedTypes;
-  let systemTypes = Object.entries(CONFIG.Item.typeLabels);
-  let currentCustomCategories = Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES)));
+	let form;
+	let unusedTypes;
+	let systemTypes = Object.entries(CONFIG.Item.typeLabels);
+	let currentCustomCategories = Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES)));
 
-  $: {
-    const allTypes = systemTypes.map(([type]) => type).concat(currentCustomCategories).map(type => type.toLowerCase())
-    unusedTypes = allTypes.filter(type => {
-      return !$itemTypePriceModifiers.some(priceData => priceData.type === type || (priceData.type === "custom" && priceData.category === type))
-    });
-  }
+	$: {
+		const allTypes = systemTypes.map(([type]) => type).concat(currentCustomCategories).map(type => type.toLowerCase())
+		unusedTypes = allTypes.filter(type => {
+			return !$itemTypePriceModifiers.some(priceData => priceData.type === type || (priceData.type === "custom" && priceData.category === type))
+		});
+	}
 
-  function add() {
-    if (!unusedTypes.length) return;
-    itemTypePriceModifiers.update(val => {
-      val.push({
-        type: unusedTypes[0],
-        category: "",
-        override: false,
-        buyPriceModifier: 1,
-        sellPriceModifier: 0.5
-      });
-      return val;
-    })
-  }
+	function add() {
+		if (!unusedTypes.length) return;
+		itemTypePriceModifiers.update(val => {
+			val.push({
+				type: unusedTypes[0],
+				category: "",
+				override: false,
+				buyPriceModifier: 1,
+				sellPriceModifier: 0.5
+			});
+			return val;
+		})
+	}
 
-  function remove(index) {
-    itemTypePriceModifiers.update(val => {
-      val.splice(index, 1);
-      return val;
-    })
-  }
+	function remove(index) {
+		itemTypePriceModifiers.update(val => {
+			val.splice(index, 1);
+			return val;
+		})
+	}
 
-  async function updateSettings() {
-    application.options.resolve?.(get(itemTypePriceModifiers));
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve?.(get(itemTypePriceModifiers));
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
 </script>
 
@@ -95,8 +95,8 @@
 									<optgroup label="System Types">
 										{#each systemTypes as [itemType, label] (itemType)}
 											<option value="{itemType}"
-															selected="{priceData.type === itemType}"
-															disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
+											        selected="{priceData.type === itemType}"
+											        disabled="{itemType !== priceData.type && !unusedTypes.includes(itemType)}">
 												{localize(label)}
 											</option>
 										{/each}
@@ -105,8 +105,8 @@
 										<optgroup label="Custom Categories">
 											{#each currentCustomCategories as customCategory}
 												<option value="custom"
-																selected="{priceData.type === 'custom' && customCategory.toLowerCase() === priceData.category.toLowerCase()}"
-																disabled="{customCategory.toLowerCase() !== priceData.category.toLowerCase() && !unusedTypes.includes(customCategory.toLowerCase())}">
+												        selected="{priceData.type === 'custom' && customCategory.toLowerCase() === priceData.category.toLowerCase()}"
+												        disabled="{customCategory.toLowerCase() !== priceData.category.toLowerCase() && !unusedTypes.includes(customCategory.toLowerCase())}">
 													{customCategory}
 												</option>
 											{/each}

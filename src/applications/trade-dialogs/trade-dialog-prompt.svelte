@@ -1,34 +1,34 @@
 <script>
 
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { getContext } from "svelte";
-  import ActorDropSelect from "./ActorDropSelect.svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getContext } from "svelte";
+	import ActorDropSelect from "./ActorDropSelect.svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let elementRoot;
-  export let isPrivate;
-  export let users;
-  export let user;
-  export let actors;
-  export let actor;
+	export let elementRoot;
+	export let isPrivate;
+	export let users;
+	export let user;
+	export let actors;
+	export let actor;
 
-  let isGM = game.user.isGM;
+	let isGM = game.user.isGM;
 
-  users = game.users.filter(user => user.active && user !== game.user);
-  user = user || users?.[0] || false;
-  actors = actors || game.actors.filter(actor => actor.isOwner);
-  actor = actor || game.user.character || (!isGM ? actors?.[0] : false);
+	users = game.users.filter(user => user.active && user !== game.user);
+	user = user || users?.[0] || false;
+	actors = actors || game.actors.filter(actor => actor.isOwner);
+	actor = actor || game.user.character || (!isGM ? actors?.[0] : false);
 
-  function requestTrade() {
-    application.options.resolve({
-      user,
-      actor,
-      isPrivate
-    });
-    application.close();
-  }
+	function requestTrade() {
+		application.options.resolve({
+			user,
+			actor,
+			isPrivate
+		});
+		application.close();
+	}
 
 </script>
 

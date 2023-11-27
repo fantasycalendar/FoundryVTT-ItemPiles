@@ -4,93 +4,93 @@ import PrivateAPI from "./API/private-api.js";
 import * as Helpers from "./helpers/helpers.js";
 
 const HOTKEYS = {
-  FORCE_DEFAULT_SHEET: "force-open-item-pile-inventory",
-  DROP: "force-drop-item",
-  DROP_ONE: "force-drop-one-item"
+	FORCE_DEFAULT_SHEET: "force-open-item-pile-inventory",
+	DROP: "force-drop-item",
+	DROP_ONE: "force-drop-one-item"
 }
 
 export const hotkeyActionState = {
-  get openPileInventory() {
-    const down = game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.FORCE_DEFAULT_SHEET).some(keybind => {
-      return window.keyboard.downKeys.has(keybind?.key);
-    });
-    return (
-      (!down && !game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"))
-      ||
-      (down && game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"))
-    );
-  },
+	get openPileInventory() {
+		const down = game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.FORCE_DEFAULT_SHEET).some(keybind => {
+			return window.keyboard.downKeys.has(keybind?.key);
+		});
+		return (
+			(!down && !game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"))
+			||
+			(down && game.settings.get(CONSTANTS.MODULE_NAME, "invertSheetOpen"))
+		);
+	},
 
-  get forceDropItem() {
-    return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
-      return window.keyboard.downKeys.has(key);
-    });
-  },
+	get forceDropItem() {
+		return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
+			return window.keyboard.downKeys.has(key);
+		});
+	},
 
-  get forceDropOneItem() {
-    return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
-      return window.keyboard.downKeys.has(key);
-    });
-  }
+	get forceDropOneItem() {
+		return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
+			return window.keyboard.downKeys.has(key);
+		});
+	}
 }
 
 export function registerHotkeysPre() {
 
-  game.keybindings.register(CONSTANTS.MODULE_NAME, HOTKEYS.FORCE_DEFAULT_SHEET, {
-    name: "Force open inventory modifier",
-    editable: [
-      { key: "ControlLeft" },
-    ]
-  });
+	game.keybindings.register(CONSTANTS.MODULE_NAME, HOTKEYS.FORCE_DEFAULT_SHEET, {
+		name: "Force open inventory modifier",
+		editable: [
+			{ key: "ControlLeft" },
+		]
+	});
 
-  game.keybindings.register(CONSTANTS.MODULE_NAME, HOTKEYS.DROP, {
-    name: "Force drop item (GM only) modifier",
-    editable: [
-      { key: "ShiftLeft" },
-    ]
-  });
+	game.keybindings.register(CONSTANTS.MODULE_NAME, HOTKEYS.DROP, {
+		name: "Force drop item (GM only) modifier",
+		editable: [
+			{ key: "ShiftLeft" },
+		]
+	});
 
-  game.keybindings.register(CONSTANTS.MODULE_NAME, HOTKEYS.DROP_ONE, {
-    name: "Force drop one item modifier",
-    editable: [
-      { key: "AltLeft" },
-    ]
-  });
+	game.keybindings.register(CONSTANTS.MODULE_NAME, HOTKEYS.DROP_ONE, {
+		name: "Force drop one item modifier",
+		editable: [
+			{ key: "AltLeft" },
+		]
+	});
 
 }
 
 export function registerHotkeysPost() {
 
-  if (!game.user.isGM) {
-    let clicked = false;
-    window.addEventListener("mousedown", (event) => {
-      if (!canvas.ready) return;
-      if (!(canvas.activeLayer instanceof TokenLayer)) return;
-      if (game.activeTool !== "select") return;
-      const hover = document.elementFromPoint(event.clientX, event.clientY);
-      if (!hover || (hover.id !== "board")) return;
-      if (event.button !== 0) return;
+	if (!game.user.isGM) {
+		let clicked = false;
+		window.addEventListener("mousedown", (event) => {
+			if (!canvas.ready) return;
+			if (!(canvas.activeLayer instanceof TokenLayer)) return;
+			if (game.activeTool !== "select") return;
+			const hover = document.elementFromPoint(event.clientX, event.clientY);
+			if (!hover || (hover.id !== "board")) return;
+			if (event.button !== 0) return;
 
-      const pos = Helpers.getCanvasMouse().getLocalPosition(canvas.app.stage);
-      const tokens = Utilities.getTokensAtLocation(pos)
-        .filter(token => {
-          const canView = token._canView(game.user);
-          const canSee = token.visible || game.user.isGM;
-          return !canView && canSee;
-        });
-      if (!tokens.length) return;
-      tokens.sort((a, b) => b.zIndex - a.zIndex);
-      const token = Utilities.getDocument(tokens[0]);
+			const pos = Helpers.getCanvasMouse().getLocalPosition(canvas.app.stage);
+			const tokens = Utilities.getTokensAtLocation(pos)
+				.filter(token => {
+					const canView = token._canView(game.user);
+					const canSee = token.visible || game.user.isGM;
+					return !canView && canSee;
+				});
+			if (!tokens.length) return;
+			tokens.sort((a, b) => b.zIndex - a.zIndex);
+			const token = Utilities.getDocument(tokens[0]);
 
-      if (clicked === token) {
-        clicked = false;
-        return PrivateAPI._itemPileClicked(token);
-      }
+			if (clicked === token) {
+				clicked = false;
+				return PrivateAPI._itemPileClicked(token);
+			}
 
-      clicked = token;
-      setTimeout(() => {
-        clicked = false;
-      }, 500);
-    });
-  }
+			clicked = token;
+			setTimeout(() => {
+				clicked = false;
+			}, 500);
+		});
+	}
 }

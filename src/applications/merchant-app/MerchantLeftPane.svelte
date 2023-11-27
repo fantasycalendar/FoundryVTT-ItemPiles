@@ -1,48 +1,48 @@
 <script>
 
-  import Tabs from "../components/Tabs.svelte";
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import SliderInput from "../components/SliderInput.svelte";
-  import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
-  import { TJSProseMirror } from "@typhonjs-fvtt/svelte-standard/component";
+	import Tabs from "../components/Tabs.svelte";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import SliderInput from "../components/SliderInput.svelte";
+	import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
+	import { TJSProseMirror } from "@typhonjs-fvtt/svelte-standard/component";
 
-  export let store;
+	export let store;
 
-  const merchantImg = store.img;
-  const pileDataStore = store.pileData;
-  const editPrices = store.editPrices;
+	const merchantImg = store.img;
+	const pileDataStore = store.pileData;
+	const editPrices = store.editPrices;
 
-  let tabs = [];
-  let description;
-  let activeSidebarTab = false;
-  $: {
-    description = $pileDataStore.description;
-  }
-  $: {
-    tabs = [
-      {
-        value: 'description',
-        label: `ITEM-PILES.Merchant.Description`,
-        hidden: !game.user.isGM && !description
-      },
-      {
-        value: 'settings',
-        label: `ITEM-PILES.Merchant.Settings`,
-        hidden: !game.user.isGM
-      },
-    ];
-    activeSidebarTab = activeSidebarTab || tabs.find(tab => !tab.hidden)?.value;
-  }
+	let tabs = [];
+	let description;
+	let activeSidebarTab = false;
+	$: {
+		description = $pileDataStore.description;
+	}
+	$: {
+		tabs = [
+			{
+				value: 'description',
+				label: `ITEM-PILES.Merchant.Description`,
+				hidden: !game.user.isGM && !description
+			},
+			{
+				value: 'settings',
+				label: `ITEM-PILES.Merchant.Settings`,
+				hidden: !game.user.isGM
+			},
+		];
+		activeSidebarTab = activeSidebarTab || tabs.find(tab => !tab.hidden)?.value;
+	}
 
-  function showDescriptionEditor() {
-    return TextEditorDialog.show(description, { id: "item-pile-text-editor-" + store.actor.id }).then((result) => {
-      store.pileData.update((pileData) => {
-        pileData.description = result || "";
-        return pileData;
-      });
-      store.update();
-    });
-  }
+	function showDescriptionEditor() {
+		return TextEditorDialog.show(description, { id: "item-pile-text-editor-" + store.actor.id }).then((result) => {
+			store.pileData.update((pileData) => {
+				pileData.description = result || "";
+				return pileData;
+			});
+			store.update();
+		});
+	}
 
 </script>
 
@@ -69,8 +69,8 @@
 					/>
 					{#if game.user.isGM && !description}
 						<button type="button"
-										style="flex:1;"
-										on:click={() => { showDescriptionEditor() }}
+						        style="flex:1;"
+						        on:click={() => { showDescriptionEditor() }}
 						>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.EditDescription")}</button>
 					{/if}
 				</div>

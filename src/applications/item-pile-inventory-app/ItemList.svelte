@@ -1,12 +1,12 @@
 <script>
 
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { fade } from 'svelte/transition';
-  import ListEntry from "./ListEntry.svelte";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { fade } from 'svelte/transition';
+	import ListEntry from "./ListEntry.svelte";
 
-  export let store;
-  const items = store.items;
-  const numItems = store.numItems;
+	export let store;
+	const items = store.items;
+	const numItems = store.numItems;
 
 </script>
 

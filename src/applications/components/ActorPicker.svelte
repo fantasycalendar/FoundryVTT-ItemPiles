@@ -1,29 +1,29 @@
 <script>
 
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import * as Utilities from "../../helpers/utilities.js";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import * as Utilities from "../../helpers/utilities.js";
 
-  export let store;
-  export let localization = "ITEM-PILES.Inspect.AsActor";
-  export let style = "text-align: center; flex: 0 1 auto; height: 27px;";
+	export let store;
+	export let localization = "ITEM-PILES.Inspect.AsActor";
+	export let style = "text-align: center; flex: 0 1 auto; height: 27px;";
 
-  let editQuantities = store.editQuantities;
+	let editQuantities = store.editQuantities;
 
-  let changingActor = false;
-  let playerActors = game.actors.filter(actor => actor.isOwner && actor !== store.pileActor && actor.prototypeToken.actorLink);
-  let recipientUuid = Utilities.getUuid(store.recipient);
-  const recipientDoc = store.recipientDocument;
+	let changingActor = false;
+	let playerActors = game.actors.filter(actor => actor.isOwner && actor !== store.pileActor && actor.prototypeToken.actorLink);
+	let recipientUuid = Utilities.getUuid(store.recipient);
+	const recipientDoc = store.recipientDocument;
 
-  $: {
-    $recipientDoc;
-    recipientUuid = store.recipient ? Utilities.getUuid(store.recipient) : false;
-  }
+	$: {
+		$recipientDoc;
+		recipientUuid = store.recipient ? Utilities.getUuid(store.recipient) : false;
+	}
 
-  function changeRecipientActor() {
-    store.recipient = playerActors.find(actor => Utilities.getUuid(actor) === recipientUuid);
-    store.update();
-    changingActor = false;
-  }
+	function changeRecipientActor() {
+		store.recipient = playerActors.find(actor => Utilities.getUuid(actor) === recipientUuid);
+		store.update();
+		changingActor = false;
+	}
 
 </script>
 

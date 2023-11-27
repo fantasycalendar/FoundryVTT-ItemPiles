@@ -1,15 +1,15 @@
 <script>
 
-  export let item;
-  export let showX = false;
+	export let item;
+	export let showX = false;
 
-  const store = item.store;
-  const displayQuantityStore = item.displayQuantity;
-  const infiniteQuantityStore = item.infiniteQuantity;
-  const quantityStore = item.quantity;
+	const store = item.store;
+	const displayQuantityStore = item.displayQuantity;
+	const infiniteQuantityStore = item.infiniteQuantity;
+	const quantityStore = item.quantity;
 
-  let showEditQuantity = false;
-  $: editQuantity = $quantityStore;
+	let showEditQuantity = false;
+	$: editQuantity = $quantityStore;
 
 </script>
 
@@ -33,11 +33,11 @@
 			/>
 		{:else if !showEditQuantity}
         <span
-					class:item-piles-clickable-link={game.user.isGM}
-					on:click={() => {
+	        class:item-piles-clickable-link={game.user.isGM}
+	        on:click={() => {
             if (game.user.isGM) showEditQuantity = true;
           }}>{showX ? "x" : ""}{$quantityStore}</span
-				>
+        >
 		{/if}
 	{/if}
 </div>

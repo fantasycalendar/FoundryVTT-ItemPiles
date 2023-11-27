@@ -1,19 +1,19 @@
 <script>
 
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
-  export let item;
-  export let data;
+	export let item;
+	export let data;
 
-  const doc = item.itemDocument;
+	const doc = item.itemDocument;
 
-  let text;
+	let text;
 
-  $: value = data.path ? getProperty($doc, data.path) ?? "" : "";
-  $: {
-    let localized = localize(`${data.mapping?.[value] ?? value}`);
-    text = data.formatting ? data.formatting.replace("{#}", localized) : localized;
-  }
+	$: value = data.path ? getProperty($doc, data.path) ?? "" : "";
+	$: {
+		let localized = localize(`${data.mapping?.[value] ?? value}`);
+		text = data.formatting ? data.formatting.replace("{#}", localized) : localized;
+	}
 
 </script>
 

@@ -1,80 +1,80 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import SliderInput from "../../components/SliderInput.svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { getSourceActorFromDropData, getUuid } from "../../../helpers/utilities.js";
-  import { get, writable } from "svelte/store";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import SliderInput from "../../components/SliderInput.svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { getSourceActorFromDropData, getUuid } from "../../../helpers/utilities.js";
+	import { get, writable } from "svelte/store";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  let form;
+	let form;
 
-  export let data;
-  export let elementRoot;
+	export let data;
+	export let elementRoot;
 
-  const priceModifiers = writable(data.map(data => {
-    data.actor = globalThis.fromUuidSync(data.actorUuid);
-    if (!data.actor) return false;
-    return data;
-  }).filter(Boolean));
+	const priceModifiers = writable(data.map(data => {
+		data.actor = globalThis.fromUuidSync(data.actorUuid);
+		if (!data.actor) return false;
+		return data;
+	}).filter(Boolean));
 
-  function remove(index) {
-    priceModifiers.update(val => {
-      val.splice(index, 1)
-      return val;
-    })
-  }
+	function remove(index) {
+		priceModifiers.update(val => {
+			val.splice(index, 1)
+			return val;
+		})
+	}
 
-  async function updateSettings() {
-    let result = get(priceModifiers);
-    result.forEach(data => {
-      data.actorUuid = getUuid(data.actor);
-    })
-    application.options.resolve?.(result);
-    application.close();
-  }
+	async function updateSettings() {
+		let result = get(priceModifiers);
+		result.forEach(data => {
+			data.actorUuid = getUuid(data.actor);
+		})
+		application.options.resolve?.(result);
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  async function dropData(event) {
+	async function dropData(event) {
 
-    event.preventDefault();
+		event.preventDefault();
 
-    let data;
-    try {
-      data = JSON.parse(event.dataTransfer.getData('text/plain'));
-    } catch (err) {
-      return false;
-    }
+		let data;
+		try {
+			data = JSON.parse(event.dataTransfer.getData('text/plain'));
+		} catch (err) {
+			return false;
+		}
 
-    if (data.type !== "Actor") return;
+		if (data.type !== "Actor") return;
 
-    const actor = getSourceActorFromDropData(data);
+		const actor = getSourceActorFromDropData(data);
 
-    if (!actor) return;
+		if (!actor) return;
 
-    priceModifiers.update(val => {
+		priceModifiers.update(val => {
 
-      if (val.find(data => data.actor === actor)) return val;
+			if (val.find(data => data.actor === actor)) return val;
 
-      val.push({
-        override: false,
-        actor: actor,
-        buyPriceModifier: 1,
-        sellPriceModifier: 0.5
-      });
+			val.push({
+				override: false,
+				actor: actor,
+				buyPriceModifier: 1,
+				sellPriceModifier: 0.5
+			});
 
-      return val;
+			return val;
 
-    })
-  }
+		})
+	}
 
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+	function preventDefault(event) {
+		event.preventDefault();
+	}
 
 </script>
 
@@ -87,7 +87,7 @@
 		<p>{localize("ITEM-PILES.Applications.PriceModifiersEditor.Explanation")}</p>
 
 		<div class:border-highlight={!$priceModifiers.length} on:dragover={preventDefault} on:dragstart={preventDefault}
-				 on:drop={dropData}>
+		     on:drop={dropData}>
 
 			{#if $priceModifiers.length}
 				<table>
@@ -107,7 +107,7 @@
 							</td>
 							<td>
 								<a class="item-piles-actor-name-clickable"
-									 on:click={(priceData.actor.sheet.render(true, { bypassItemPiles: true }))}>{priceData.actor.name}</a>
+								   on:click={(priceData.actor.sheet.render(true, { bypassItemPiles: true }))}>{priceData.actor.name}</a>
 							</td>
 							<td>
 								<div class="item-piles-flexrow" style="margin: 0 0.25rem">

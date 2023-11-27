@@ -1,57 +1,57 @@
 <script>
 
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { getSourceActorFromDropData } from "../../helpers/utilities.js";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getSourceActorFromDropData } from "../../helpers/utilities.js";
 
-  export let actor;
-  export let actors;
+	export let actor;
+	export let actors;
 
-  let changingActor = false;
-  let multipleActors = actors.length > 1 && !game.user.isGM;
-  let hasUnlinkedTokenOwnership = actors.filter(a => !a.prototypeToken.actorLink).length > 0;
+	let changingActor = false;
+	let multipleActors = actors.length > 1 && !game.user.isGM;
+	let hasUnlinkedTokenOwnership = actors.filter(a => !a.prototypeToken.actorLink).length > 0;
 
-  function setActorFromSelectedToken() {
-    if (canvas.tokens.controlled.length === 0) return;
-    actor = canvas.tokens.controlled[0].actor;
-  }
+	function setActorFromSelectedToken() {
+		if (canvas.tokens.controlled.length === 0) return;
+		actor = canvas.tokens.controlled[0].actor;
+	}
 
-  async function dropData(event) {
-    counter = 0;
-    let data;
-    try {
-      data = JSON.parse(event.dataTransfer.getData('text/plain'));
-    } catch (err) {
-      return false;
-    }
-    if (data.type !== "Actor") return;
-    actor = getSourceActorFromDropData(data);
-  }
+	async function dropData(event) {
+		counter = 0;
+		let data;
+		try {
+			data = JSON.parse(event.dataTransfer.getData('text/plain'));
+		} catch (err) {
+			return false;
+		}
+		if (data.type !== "Actor") return;
+		actor = getSourceActorFromDropData(data);
+	}
 
-  let counter = 0;
+	let counter = 0;
 
-  function dragEnter() {
-    counter++;
-  }
+	function dragEnter() {
+		counter++;
+	}
 
-  function dragLeave() {
-    counter--;
-  }
+	function dragLeave() {
+		counter--;
+	}
 
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+	function preventDefault(event) {
+		event.preventDefault();
+	}
 
 </script>
 
 
 <div class="item-piles-bottom-divider">
 	<div class="form-group item-piles-actor-container align-center-row"
-			 class:item-piles-box-highlight={counter > 0}
-			 on:dragenter={dragEnter}
-			 on:dragleave={dragLeave}
-			 on:dragover={preventDefault}
-			 on:dragstart={preventDefault}
-			 on:drop={dropData}
+	     class:item-piles-box-highlight={counter > 0}
+	     on:dragenter={dragEnter}
+	     on:dragleave={dragLeave}
+	     on:dragover={preventDefault}
+	     on:dragstart={preventDefault}
+	     on:drop={dropData}
 	>
 		{#if actor}
 			<div class="align-center-col">
@@ -63,16 +63,16 @@
           <span>
             {#if changingActor}
               <select class="item-piles-change-actor-select"
-											bind:value={actor}
-											on:change={() => { changingActor = false }}
-							>
+                      bind:value={actor}
+                      on:change={() => { changingActor = false }}
+              >
                 {#each actors as potentialActor (potentialActor.id)}
                 <option value="{potentialActor}">{ potentialActor.name }</option>
                 {/each}
               </select>
             {:else}
               <a class='item-piles-change-actor item-piles-highlight'
-								 on:click={() => { changingActor = true }}>{ actor.name }</a>
+                 on:click={() => { changingActor = true }}>{ actor.name }</a>
             {/if}
           </span>
 				{:else}

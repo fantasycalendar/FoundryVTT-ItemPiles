@@ -1,166 +1,164 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import FilePicker from "./FilePicker.svelte";
-  import { flip } from "svelte/animate";
-  import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
-  import DropZone from "./DropZone.svelte";
-  import * as Helpers from "../../helpers/helpers.js";
-  import { getSetting } from "../../helpers/helpers.js";
-  import * as Utilities from "../../helpers/utilities.js";
-  import CONSTANTS from "../../constants/constants.js";
-  import SETTINGS from "../../constants/settings.js";
-  import { getActorFlagData } from "../../helpers/pile-utilities.js";
-  import * as CompendiumUtilities from "../../helpers/compendium-utilities.js";
-  import { findOrCreateItemInCompendium } from "../../helpers/compendium-utilities.js";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import FilePicker from "./FilePicker.svelte";
+	import { flip } from "svelte/animate";
+	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';
+	import DropZone from "./DropZone.svelte";
+	import * as Helpers from "../../helpers/helpers.js";
+	import { getSetting } from "../../helpers/helpers.js";
+	import * as Utilities from "../../helpers/utilities.js";
+	import SETTINGS from "../../constants/settings.js";
+	import { getActorFlagData } from "../../helpers/pile-utilities.js";
+	import * as CompendiumUtilities from "../../helpers/compendium-utilities.js";
 
-  export let prices;
-  export let item;
-  export let remove = false;
-  export let presets = true;
+	export let prices;
+	export let item;
+	export let remove = false;
+	export let presets = true;
 
-  let currencies = getSetting(SETTINGS.CURRENCIES);
-  let secondaryCurrencies = getSetting(SETTINGS.SECONDARY_CURRENCIES);
-  if (item?.parent) {
-    const flags = getActorFlagData(item?.parent)
-    if (flags.overrideCurrencies) {
-      currencies = flags.overrideCurrencies;
-    }
-    if (flags.overrideSecondaryCurrencies) {
-      secondaryCurrencies = flags.overrideSecondaryCurrencies;
-    }
-  }
+	let currencies = getSetting(SETTINGS.CURRENCIES);
+	let secondaryCurrencies = getSetting(SETTINGS.SECONDARY_CURRENCIES);
+	if (item?.parent) {
+		const flags = getActorFlagData(item?.parent)
+		if (flags.overrideCurrencies) {
+			currencies = flags.overrideCurrencies;
+		}
+		if (flags.overrideSecondaryCurrencies) {
+			secondaryCurrencies = flags.overrideSecondaryCurrencies;
+		}
+	}
 
-  let presetPrices = currencies
-    .concat(secondaryCurrencies)
-    .map(currency => {
-      return {
-        id: randomID(),
-        quantity: 1,
-        fixed: true,
-        percent: false,
-        ...currency,
-      }
-    })
-    .concat(getSetting(SETTINGS.PRICE_PRESETS));
+	let presetPrices = currencies
+		.concat(secondaryCurrencies)
+		.map(currency => {
+			return {
+				id: randomID(),
+				quantity: 1,
+				fixed: true,
+				percent: false,
+				...currency,
+			}
+		})
+		.concat(getSetting(SETTINGS.PRICE_PRESETS));
 
-  let isHovering = false;
-  let flipDurationMs = 200;
-  let dragDisabled = true;
-  let selectedPreset = "";
+	let isHovering = false;
+	let flipDurationMs = 200;
+	let dragDisabled = true;
+	let selectedPreset = "";
 
-  function removeEntry(index) {
-    prices.splice(index, 1);
-    prices = prices;
-  }
+	function removeEntry(index) {
+		prices.splice(index, 1);
+		prices = prices;
+	}
 
-  function addAttribute() {
-    prices = [...prices, {
-      id: randomID(),
-      type: "attribute",
-      name: "New Attribute",
-      img: "",
-      abbreviation: "{#}N",
-      data: {
-        path: ""
-      },
-      quantity: 1,
-      fixed: true,
-      percent: false
-    }];
-  }
+	function addAttribute() {
+		prices = [...prices, {
+			id: randomID(),
+			type: "attribute",
+			name: "New Attribute",
+			img: "",
+			abbreviation: "{#}N",
+			data: {
+				path: ""
+			},
+			quantity: 1,
+			fixed: true,
+			percent: false
+		}];
+	}
 
-  function addPreset(index) {
-    const preset = foundry.utils.duplicate(presetPrices[index]);
-    preset.id = randomID();
-    prices = [...prices, preset];
-  }
+	function addPreset(index) {
+		const preset = foundry.utils.duplicate(presetPrices[index]);
+		preset.id = randomID();
+		prices = [...prices, preset];
+	}
 
-  async function dropData(data) {
+	async function dropData(data) {
 
-    if (!data.type) {
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
-    }
+		if (!data.type) {
+			throw Helpers.custom_error("Something went wrong when dropping this item!")
+		}
 
-    if (data.type !== "Item") {
-      throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
-    }
+		if (data.type !== "Item") {
+			throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
+		}
 
-    let uuid = false;
-    if (data.pack) {
-      uuid = "Compendium" + data.pack + "." + data.id;
-    }
+		let uuid = false;
+		if (data.pack) {
+			uuid = "Compendium" + data.pack + "." + data.id;
+		}
 
-    let item = await Item.implementation.fromDropData(data);
-    let itemData = item.toObject();
+		let item = await Item.implementation.fromDropData(data);
+		let itemData = item.toObject();
 
-    if (!itemData) {
-      console.error(data);
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
-    }
+		if (!itemData) {
+			console.error(data);
+			throw Helpers.custom_error("Something went wrong when dropping this item!")
+		}
 
-    const itemCurrencies = prices.map(entry => entry.data?.item ?? {});
-    const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
+		const itemCurrencies = prices.map(entry => entry.data?.item ?? {});
+		const foundItem = Utilities.findSimilarItem(itemCurrencies, itemData);
 
-    if (!uuid) {
-      uuid = (await CompendiumUtilities.findOrCreateItemInCompendium(itemData)).uuid;
-    }
+		if (!uuid) {
+			uuid = (await CompendiumUtilities.findOrCreateItemInCompendium(itemData)).uuid;
+		}
 
-    if (foundItem) {
-      const index = itemCurrencies.indexOf(foundItem);
-      prices[index].data = {
-        uuid,
-      }
-      Helpers.custom_notify(`Updated item data for ${localize(prices[index].name)} (item name ${itemData.name})`)
-    } else {
-      prices = [...prices, {
-        id: randomID(),
-        type: "item",
-        name: itemData.name,
-        img: itemData.img,
-        abbreviation: "{#} " + itemData.name,
-        data: {
-          uuid,
-        },
-        quantity: 1,
-        fixed: true,
-        percent: false
-      }];
-    }
-  }
+		if (foundItem) {
+			const index = itemCurrencies.indexOf(foundItem);
+			prices[index].data = {
+				uuid,
+			}
+			Helpers.custom_notify(`Updated item data for ${localize(prices[index].name)} (item name ${itemData.name})`)
+		} else {
+			prices = [...prices, {
+				id: randomID(),
+				type: "item",
+				name: itemData.name,
+				img: itemData.img,
+				abbreviation: "{#} " + itemData.name,
+				data: {
+					uuid,
+				},
+				quantity: 1,
+				fixed: true,
+				percent: false
+			}];
+		}
+	}
 
-  async function editItem(index) {
-    const data = prices[index].data;
-    let item = await fromUuid(data.uuid);
-    item.sheet.render(true);
-  }
+	async function editItem(index) {
+		const data = prices[index].data;
+		let item = await fromUuid(data.uuid);
+		item.sheet.render(true);
+	}
 
-  function handleConsider(e) {
-    const { items: newItems, info: { source, trigger } } = e.detail;
-    prices = newItems;
-    // Ensure dragging is stopped on drag finish via keyboard
-    if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
-      dragDisabled = true;
-    }
-  }
+	function handleConsider(e) {
+		const { items: newItems, info: { source, trigger } } = e.detail;
+		prices = newItems;
+		// Ensure dragging is stopped on drag finish via keyboard
+		if (source === SOURCES.KEYBOARD && trigger === TRIGGERS.DRAG_STOPPED) {
+			dragDisabled = true;
+		}
+	}
 
-  function handleFinalize(e) {
-    const { items: newItems, info: { source } } = e.detail;
-    prices = newItems;
-    // Ensure dragging is stopped on drag finish via pointer (mouse, touch)
-    if (source === SOURCES.POINTER) {
-      dragDisabled = true;
-    }
-  }
+	function handleFinalize(e) {
+		const { items: newItems, info: { source } } = e.detail;
+		prices = newItems;
+		// Ensure dragging is stopped on drag finish via pointer (mouse, touch)
+		if (source === SOURCES.POINTER) {
+			dragDisabled = true;
+		}
+	}
 
-  function startDrag(e) {
-    // preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
-    e.preventDefault();
-    dragDisabled = false;
-  }
+	function startDrag(e) {
+		// preventing default to prevent lag on touch devices (because of the browser checking for screen scrolling)
+		e.preventDefault();
+		dragDisabled = false;
+	}
 
-  function handleKeyDown(e) {
-    if ((e.key === "Enter" || e.key === " ") && dragDisabled) dragDisabled = false;
-  }
+	function handleKeyDown(e) {
+		if ((e.key === "Enter" || e.key === " ") && dragDisabled) dragDisabled = false;
+	}
 
 </script>
 
@@ -192,18 +190,18 @@
 			{/if}
 			{#each prices as price, index (price.id)}
 				<div class="item-piles-sortable-list-columns item-piles-sortable-list-entry item-piles-even-color"
-						 animate:flip="{{ duration: flipDurationMs }}">
+				     animate:flip="{{ duration: flipDurationMs }}">
 					<div tabIndex={dragDisabled? 0 : -1}
-							 aria-label="drag-handle"
-							 style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
-							 on:mousedown={startDrag}
-							 on:touchstart={startDrag}
-							 on:keydown={handleKeyDown}
+					     aria-label="drag-handle"
+					     style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
+					     on:mousedown={startDrag}
+					     on:touchstart={startDrag}
+					     on:keydown={handleKeyDown}
 					><i class="fas fa-bars"></i></div>
 					<div><input type="text" bind:value={price.name}/></div>
 					<div><input type="number" bind:value={price.quantity}/></div>
 					<div><input type="checkbox" bind:checked={price.fixed} min="0"
-											max="{price.percent ? 100 : 1000000000000000}"/></div>
+					            max="{price.percent ? 100 : 1000000000000000}"/></div>
 					<div><input type="checkbox" bind:checked={price.percent}/></div>
 					<div><input type="text" bind:value={price.abbreviation}/></div>
 					<div>
@@ -233,7 +231,7 @@
 					<div class="full-span" style="margin-top:0.5rem;">
 						<span style="margin-right:0.25rem;">{localize("ITEM-PILES.Applications.ItemEditor.PricePreset")}</span>
 						<select class="price-preset-selector" bind:value={selectedPreset}
-										on:change={() => { addPreset(selectedPreset); selectedPreset = ""; }}>
+						        on:change={() => { addPreset(selectedPreset); selectedPreset = ""; }}>
 							<option value="">{localize("ITEM-PILES.Applications.ItemEditor.SelectPreset")}</option>
 							{#each presetPrices as price, index (index)}
 								<option value={index}>{price.name}</option>

@@ -1,40 +1,40 @@
 <script>
 
-  import * as Helpers from "../../helpers/helpers.js";
-  import SETTINGS from "../../constants/settings.js";
+	import * as Helpers from "../../helpers/helpers.js";
+	import SETTINGS from "../../constants/settings.js";
 
-  export let store;
-  export let data;
-  export let editable = true;
+	export let store;
+	export let data;
+	export let editable = true;
 
-  const canPreview = data.id && (Helpers.getSetting(SETTINGS.INSPECT_ITEMS_IN_TRADE) || editable)
+	const canPreview = data.id && (Helpers.getSetting(SETTINGS.INSPECT_ITEMS_IN_TRADE) || editable)
 
-  function previewItem() {
-    if (!canPreview || !data.id) return;
-    const item = store.leftTraderActor.items.get(data.id) ?? store.rightTraderActor.items.get(data.id);
-    if (!item) return;
-    if (game.user.isGM || item.ownership[game.user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) {
-      return item.sheet.render(true);
-    }
-    const cls = item._getSheetClass()
-    const sheet = new cls(item, { editable: false })
-    return sheet._render(true);
-  }
+	function previewItem() {
+		if (!canPreview || !data.id) return;
+		const item = store.leftTraderActor.items.get(data.id) ?? store.rightTraderActor.items.get(data.id);
+		if (!item) return;
+		if (game.user.isGM || item.ownership[game.user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) {
+			return item.sheet.render(true);
+		}
+		const cls = item._getSheetClass()
+		const sheet = new cls(item, { editable: false })
+		return sheet._render(true);
+	}
 
-  function onKeyDown(e) {
-    if (e.keyCode === 13) {
-      updateQuantity();
-    }
-  }
+	function onKeyDown(e) {
+		if (e.keyCode === 13) {
+			updateQuantity();
+		}
+	}
 
-  function updateQuantity() {
-    data.quantity = Math.max(0, Math.min(data.maxQuantity, data.newQuantity));
-    if (data.quantity === 0) {
-      return store.removeEntry(data);
-    }
-    data.newQuantity = data.quantity;
-    data.editing = false;
-  }
+	function updateQuantity() {
+		data.quantity = Math.max(0, Math.min(data.maxQuantity, data.newQuantity));
+		if (data.quantity === 0) {
+			return store.removeEntry(data);
+		}
+		data.newQuantity = data.quantity;
+		data.editing = false;
+	}
 
 </script>
 
@@ -73,7 +73,7 @@
 	{/if}
 
 	<div class="item-piles-text-right" class:item-piles-quantity-container={editable}
-			 on:click={(evt) => evt.stopPropagation()}>
+	     on:click={(evt) => evt.stopPropagation()}>
 		{#if editable}
 			<div class="item-piles-quantity-container">
 				{#if data.editing}
@@ -87,7 +87,7 @@
 					</div>
 				{:else}
             <span class="item-piles-quantity-text"
-									on:click="{ () => { data.editing = true } }">
+                  on:click="{ () => { data.editing = true } }">
               {data.quantity}
             </span>
 				{/if}

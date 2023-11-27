@@ -1,37 +1,37 @@
 <script>
-  import FilePicker from "../../components/FilePicker.svelte";
-  import DropZone from "../../components/DropZone.svelte";
-  import * as Helpers from "../../../helpers/helpers.js";
-  import { applyStyles } from '@typhonjs-fvtt/runtime/svelte/action';
+	import FilePicker from "../../components/FilePicker.svelte";
+	import DropZone from "../../components/DropZone.svelte";
+	import * as Helpers from "../../../helpers/helpers.js";
+	import { applyStyles } from '@typhonjs-fvtt/runtime/svelte/action';
 
-  export let store;
+	export let store;
 
-  const currenciesStore = store.currencies;
-  let isHovering = false;
+	const currenciesStore = store.currencies;
+	let isHovering = false;
 
-  $: currencies = $currenciesStore;
-  $: {
-    $currenciesStore;
-    store.sortCurrencies();
-  }
+	$: currencies = $currenciesStore;
+	$: {
+		$currenciesStore;
+		store.sortCurrencies();
+	}
 
-  async function dropData(data) {
+	async function dropData(data) {
 
-    if (!data.type) {
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
-    }
+		if (!data.type) {
+			throw Helpers.custom_error("Something went wrong when dropping this item!")
+		}
 
-    if (data.type !== "Item") {
-      throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
-    }
+		if (data.type !== "Item") {
+			throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
+		}
 
-    store.addItem(data);
+		store.addItem(data);
 
-  }
+	}
 
-  $: style = {
-    "grid-template-columns": `${store.secondary ? "" : "28px"} 1.25fr ${store.secondary ? "" : "60px"} 0.5fr 60px 1fr 28px`
-  }
+	$: style = {
+		"grid-template-columns": `${store.secondary ? "" : "28px"} 1.25fr ${store.secondary ? "" : "60px"} 0.5fr 60px 1fr 28px`
+	}
 
 </script>
 

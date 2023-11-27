@@ -1,8 +1,8 @@
 <script>
 
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
-  export let pileData;
+	export let pileData;
 
 </script>
 
@@ -37,11 +37,11 @@
 			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.SingleItem.Scale")}</span>
 		</label>
 		<input bind:value="{pileData.singleItemScale}" class="item-piles-scaleRange"
-					 disabled="{!pileData.overrideSingleItemScale}" max="3" min="0.2" step="0.01"
-					 style="flex:3;" type="range"/>
+		       disabled="{!pileData.overrideSingleItemScale}" max="3" min="0.2" step="0.01"
+		       style="flex:3;" type="range"/>
 		<input bind:value="{pileData.singleItemScale}" class="item-piles-scaleInput"
-					 disabled="{!pileData.overrideSingleItemScale}" step="0.01"
-					 style="flex:0.5; margin-left:1rem;" type="number"/>
+		       disabled="{!pileData.overrideSingleItemScale}" step="0.01"
+		       style="flex:0.5; margin-left:1rem;" type="number"/>
 	</div>
 
 </div>

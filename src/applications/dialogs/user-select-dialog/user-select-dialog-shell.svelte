@@ -1,34 +1,34 @@
 <script>
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { getContext } from "svelte";
-  import { getUserCharacter } from "../../../helpers/utilities.js";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getContext } from "svelte";
+	import { getUserCharacter } from "../../../helpers/utilities.js";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let elementRoot;
+	export let elementRoot;
 
-  let form;
+	let form;
 
-  getUserCharacter()
+	getUserCharacter()
 
-  const users = game.users
-    .filter(u => u.active && (getUserCharacter(u) || u.isGM) && !(application.options.excludeSelf && u === game.user))
-    .map(u => ({
-      id: u.id,
-      name: u.name,
-      selected: true
-    }));
+	const users = game.users
+		.filter(u => u.active && (getUserCharacter(u) || u.isGM) && !(application.options.excludeSelf && u === game.user))
+		.map(u => ({
+			id: u.id,
+			name: u.name,
+			selected: true
+		}));
 
-  function requestSubmit() {
-    form.requestSubmit();
-  }
+	function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  function submit() {
-    const finalUsers = users.filter(user => user.selected).map(user => user.id);
-    application.options.resolve(finalUsers);
-    application.close();
-  }
+	function submit() {
+		const finalUsers = users.filter(user => user.selected).map(user => user.id);
+		application.options.resolve(finalUsers);
+		application.close();
+	}
 
 </script>
 
@@ -37,7 +37,7 @@
 <ApplicationShell bind:elementRoot>
 
 	<form autocomplete="off" bind:this={form} class="item-piles-flexcol" on:submit|once|preventDefault={submit}
-				style="padding:0.5rem;">
+	      style="padding:0.5rem;">
 
 		<p style="margin-top: 0;text-align: center;">
 			<strong>{localize("ITEM-PILES.Dialogs.UserSelect.Content")}</strong>

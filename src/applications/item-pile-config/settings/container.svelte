@@ -1,9 +1,9 @@
 <script>
 
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import FilePicker from "../../components/FilePicker.svelte";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import FilePicker from "../../components/FilePicker.svelte";
 
-  export let pileData;
+	export let pileData;
 
 </script>
 

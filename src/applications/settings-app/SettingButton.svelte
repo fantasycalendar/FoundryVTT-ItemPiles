@@ -1,42 +1,42 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { getContext } from 'svelte';
-  import editors from "../editors/index.js";
-  import { openEditor } from "../../helpers/helpers.js";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getContext } from 'svelte';
+	import editors from "../editors/index.js";
+	import { openEditor } from "../../helpers/helpers.js";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let key;
-  export let data;
-  export let callback = false;
+	export let key;
+	export let data;
+	export let callback = false;
 
-  let editor = false;
-  if (!callback) {
-    editor = editors[data.application];
-    callback = () => {
-      showEditor();
-    }
-  }
+	let editor = false;
+	if (!callback) {
+		editor = editors[data.application];
+		callback = () => {
+			showEditor();
+		}
+	}
 
-  function showEditor() {
-    if (editor) {
-      const combinedData = data?.mergedDefaults
-        ? foundry.utils.mergeObject(data.mergedDefaults, data.value)
-        : data.value;
-      openEditor(key, combinedData).then((result) => {
-        if (!result) return;
-        if (data?.mergedDefaults) {
-          result = foundry.utils.diffObject(data?.mergedDefaults, result);
-        }
-        data.value = result;
-      });
-      application.options.zLevel = 100;
-    }
-  }
+	function showEditor() {
+		if (editor) {
+			const combinedData = data?.mergedDefaults
+				? foundry.utils.mergeObject(data.mergedDefaults, data.value)
+				: data.value;
+			openEditor(key, combinedData).then((result) => {
+				if (!result) return;
+				if (data?.mergedDefaults) {
+					result = foundry.utils.diffObject(data?.mergedDefaults, result);
+				}
+				data.value = result;
+			});
+			application.options.zLevel = 100;
+		}
+	}
 
-  function reset() {
-    data.value = foundry.utils.deepClone(data.default);
-  }
+	function reset() {
+		data.value = foundry.utils.deepClone(data.default);
+	}
 
 </script>
 

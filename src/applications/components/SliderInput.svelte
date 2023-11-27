@@ -1,17 +1,17 @@
 <script>
 
-  export let value;
-  export let min = 0;
-  export let max = 200;
-  export let maxInput = Infinity;
-  export let step = 1;
-  export let divideBy = 100;
+	export let value;
+	export let min = 0;
+	export let max = 200;
+	export let maxInput = Infinity;
+	export let step = 1;
+	export let divideBy = 100;
 
-  let displayValue = value * divideBy;
+	let displayValue = value * divideBy;
 
-  $: {
-    value = displayValue / divideBy;
-  }
+	$: {
+		value = displayValue / divideBy;
+	}
 
 </script>
 

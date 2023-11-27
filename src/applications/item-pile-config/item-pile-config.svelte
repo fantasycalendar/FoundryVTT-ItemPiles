@@ -1,143 +1,143 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import CONSTANTS from "../../constants/constants.js";
-  import * as Helpers from "../../helpers/helpers.js";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import CONSTANTS from "../../constants/constants.js";
+	import * as Helpers from "../../helpers/helpers.js";
 
-  import Tabs from "../components/Tabs.svelte";
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { writable } from "svelte/store";
+	import Tabs from "../components/Tabs.svelte";
+	import * as PileUtilities from "../../helpers/pile-utilities.js";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { writable } from "svelte/store";
 
-  import MerchantApp from "../merchant-app/merchant-app.js";
-  import ItemPileInventoryApp from "../item-pile-inventory-app/item-pile-inventory-app.js";
-  import VaultApp from "../vault-app/vault-app.js";
+	import MerchantApp from "../merchant-app/merchant-app.js";
+	import ItemPileInventoryApp from "../item-pile-inventory-app/item-pile-inventory-app.js";
+	import VaultApp from "../vault-app/vault-app.js";
 
-  import MainSettings from "./settings/main.svelte";
-  import MerchantSettings from "./settings/merchant.svelte";
-  import ItemPileSettings from "./settings/itempile.svelte";
-  import ContainerSettings from "./settings/container.svelte";
-  import SharingSettings from "./settings/sharing.svelte";
-  import VaultSettings from "./settings/vault.svelte";
-  import CustomSettings from "./settings/custom.svelte";
+	import MainSettings from "./settings/main.svelte";
+	import MerchantSettings from "./settings/merchant.svelte";
+	import ItemPileSettings from "./settings/itempile.svelte";
+	import ContainerSettings from "./settings/container.svelte";
+	import SharingSettings from "./settings/sharing.svelte";
+	import VaultSettings from "./settings/vault.svelte";
+	import CustomSettings from "./settings/custom.svelte";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let elementRoot;
-  export let pileActor;
+	export let elementRoot;
+	export let pileActor;
 
-  let form;
+	let form;
 
-  let pileData = PileUtilities.getActorFlagData(pileActor);
+	let pileData = PileUtilities.getActorFlagData(pileActor);
 
-  if (typeof pileData?.deleteWhenEmpty === "boolean") {
-    pileData.deleteWhenEmpty = !!pileData?.deleteWhenEmpty;
-  }
+	if (typeof pileData?.deleteWhenEmpty === "boolean") {
+		pileData.deleteWhenEmpty = !!pileData?.deleteWhenEmpty;
+	}
 
-  let pileEnabled = writable(pileData.enabled);
+	let pileEnabled = writable(pileData.enabled);
 
-  $: pileData.enabled = $pileEnabled;
+	$: pileData.enabled = $pileEnabled;
 
-  async function updateSettings() {
+	async function updateSettings() {
 
-    let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+		let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
 
-    const types = [
-      "closedImage",
-      "emptyImage",
-      "openedImage",
-      "lockedImage",
-      "closeSound",
-      "openSound",
-      "lockedSound",
-      "unlockedSound",
-    ];
+		const types = [
+			"closedImage",
+			"emptyImage",
+			"openedImage",
+			"lockedImage",
+			"closeSound",
+			"openSound",
+			"lockedSound",
+			"unlockedSound",
+		];
 
-    for (let type of types) {
-      if (pileData[type].includes("*")) {
-        pileData[type + "s"] = await Helpers.getFiles(pileData[type], { applyWildCard: true, softFail: true });
-        pileData[type + "s"] = pileData[type + "s"] || [];
-      }
-    }
+		for (let type of types) {
+			if (pileData[type].includes("*")) {
+				pileData[type + "s"] = await Helpers.getFiles(pileData[type], { applyWildCard: true, softFail: true });
+				pileData[type + "s"] = pileData[type + "s"] || [];
+			}
+		}
 
-    const data = foundry.utils.mergeObject(defaults, pileData);
+		const data = foundry.utils.mergeObject(defaults, pileData);
 
-    data.deleteWhenEmpty = {
-      "default": "default",
-      "true": true,
-      "false": false
-    }[data.deleteWhenEmpty];
+		data.deleteWhenEmpty = {
+			"default": "default",
+			"true": true,
+			"false": false
+		}[data.deleteWhenEmpty];
 
-    const currentData = PileUtilities.getActorFlagData(pileActor);
-    const diff = Object.keys(foundry.utils.diffObject(currentData, foundry.utils.deepClone(data)));
+		const currentData = PileUtilities.getActorFlagData(pileActor);
+		const diff = Object.keys(foundry.utils.diffObject(currentData, foundry.utils.deepClone(data)));
 
-    game.itempiles.API.updateItemPile(pileActor, data).then(async () => {
-      if (diff.includes("enabled") || diff.includes("type")) {
-        const promises = [];
-        let apps = [];
-        switch (currentData.type) {
-          case CONSTANTS.PILE_TYPES.MERCHANT:
-            if (MerchantApp.getActiveApp(pileActor.uuid)) {
-              promises.push(MerchantApp.getActiveApp(pileActor.uuid).close());
-            }
-            if (MerchantApp.getActiveApp(pileActor?.token?.uuid)) {
-              promises.push(MerchantApp.getActiveApp(pileActor?.token?.uuid).close());
-            }
-            break;
+		game.itempiles.API.updateItemPile(pileActor, data).then(async () => {
+			if (diff.includes("enabled") || diff.includes("type")) {
+				const promises = [];
+				let apps = [];
+				switch (currentData.type) {
+					case CONSTANTS.PILE_TYPES.MERCHANT:
+						if (MerchantApp.getActiveApp(pileActor.uuid)) {
+							promises.push(MerchantApp.getActiveApp(pileActor.uuid).close());
+						}
+						if (MerchantApp.getActiveApp(pileActor?.token?.uuid)) {
+							promises.push(MerchantApp.getActiveApp(pileActor?.token?.uuid).close());
+						}
+						break;
 
-          case CONSTANTS.PILE_TYPES.VAULT:
-            apps = VaultApp.getActiveApps(pileActor.uuid)
-              .concat(VaultApp.getActiveApps(pileActor?.token?.uuid));
-            break;
+					case CONSTANTS.PILE_TYPES.VAULT:
+						apps = VaultApp.getActiveApps(pileActor.uuid)
+							.concat(VaultApp.getActiveApps(pileActor?.token?.uuid));
+						break;
 
-          default:
-            apps = ItemPileInventoryApp.getActiveApps(pileActor.uuid)
-              .concat(ItemPileInventoryApp.getActiveApps(pileActor?.token?.uuid));
-            break;
-        }
+					default:
+						apps = ItemPileInventoryApp.getActiveApps(pileActor.uuid)
+							.concat(ItemPileInventoryApp.getActiveApps(pileActor?.token?.uuid));
+						break;
+				}
 
-        for (let app of apps) {
-          promises.push(app.close());
-        }
+				for (let app of apps) {
+					promises.push(app.close());
+				}
 
-        if (promises.length || pileActor?.sheet.rendered) {
-          await Promise.allSettled(promises);
-          if (data.enabled) {
-            pileActor?.sheet.close();
-            game.itempiles.API.renderItemPileInterface(pileActor);
-          } else if (!data.enabled) {
-            pileActor?.sheet.render(true, { bypassItemPiles: true });
-          }
-        }
-      }
-    });
+				if (promises.length || pileActor?.sheet.rendered) {
+					await Promise.allSettled(promises);
+					if (data.enabled) {
+						pileActor?.sheet.close();
+						game.itempiles.API.renderItemPileInterface(pileActor);
+					} else if (!data.enabled) {
+						pileActor?.sheet.render(true, { bypassItemPiles: true });
+					}
+				}
+			}
+		});
 
-    application.close();
+		application.close();
 
-  }
+	}
 
-  function requestSubmit() {
-    form.requestSubmit();
-  }
+	function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  let tabs = [];
-  $: {
-    tabs = [
-      {
-        value: "main",
-        label: "ITEM-PILES.Applications.ItemPileConfig.Main.Title",
-        highlight: !$pileEnabled
-      },
-      {
-        value: "other",
-        label: "ITEM-PILES.Applications.ItemPileConfig.Other.Title"
-      }
-    ]
-  }
+	let tabs = [];
+	$: {
+		tabs = [
+			{
+				value: "main",
+				label: "ITEM-PILES.Applications.ItemPileConfig.Main.Title",
+				highlight: !$pileEnabled
+			},
+			{
+				value: "other",
+				label: "ITEM-PILES.Applications.ItemPileConfig.Other.Title"
+			}
+		]
+	}
 
-  let activeTab = "main";
+	let activeTab = "main";
 
-  const customTypes = Object.keys(CONSTANTS.CUSTOM_PILE_TYPES);
+	const customTypes = Object.keys(CONSTANTS.CUSTOM_PILE_TYPES);
 
 </script>
 
@@ -146,7 +146,7 @@
 <ApplicationShell bind:elementRoot>
 
 	<form autocomplete=off bind:this={form} class="item-piles-config-container"
-				on:submit|once|preventDefault={updateSettings}>
+	      on:submit|once|preventDefault={updateSettings}>
 
 		<Tabs bind:activeTab bind:tabs/>
 

@@ -1,105 +1,105 @@
 <script>
 
-  import ItemTypePriceModifiersEditor
-    from "../../editors/item-type-price-modifiers-editor/item-type-price-modifiers-editor.js";
-  import PriceModifiersEditor from "../../editors/price-modifiers-editor/price-modifiers-editor.js";
-  import FilePicker from "../../components/FilePicker.svelte";
-  import SliderInput from "../../components/SliderInput.svelte";
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import MerchantColumnsEditor from "../../editors/merchant-columns-editor/merchant-columns-editor.js";
-  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-  import CustomDialog from "../../components/CustomDialog.svelte";
-  import * as PileUtilities from "../../../helpers/pile-utilities.js";
+	import ItemTypePriceModifiersEditor
+		from "../../editors/item-type-price-modifiers-editor/item-type-price-modifiers-editor.js";
+	import PriceModifiersEditor from "../../editors/price-modifiers-editor/price-modifiers-editor.js";
+	import FilePicker from "../../components/FilePicker.svelte";
+	import SliderInput from "../../components/SliderInput.svelte";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import MerchantColumnsEditor from "../../editors/merchant-columns-editor/merchant-columns-editor.js";
+	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import CustomDialog from "../../components/CustomDialog.svelte";
+	import * as PileUtilities from "../../../helpers/pile-utilities.js";
 
-  export let pileData;
-  export let pileActor;
+	export let pileData;
+	export let pileActor;
 
-  const simpleCalendarActive = game.modules.get('foundryvtt-simple-calendar')?.active;
+	const simpleCalendarActive = game.modules.get('foundryvtt-simple-calendar')?.active;
 
-  const weekdays = (simpleCalendarActive ? window.SimpleCalendar.api.getAllWeekdays() : []).map(weekday => {
-    weekday.selected = pileData.closedDays.includes(weekday.name);
-    return weekday;
-  });
+	const weekdays = (simpleCalendarActive ? window.SimpleCalendar.api.getAllWeekdays() : []).map(weekday => {
+		weekday.selected = pileData.closedDays.includes(weekday.name);
+		return weekday;
+	});
 
-  const refreshItemDays = (simpleCalendarActive ? window.SimpleCalendar.api.getAllWeekdays() : []).map(weekday => {
-    weekday.selected = pileData.refreshItemsDays.includes(weekday.name);
-    return weekday;
-  });
+	const refreshItemDays = (simpleCalendarActive ? window.SimpleCalendar.api.getAllWeekdays() : []).map(weekday => {
+		weekday.selected = pileData.refreshItemsDays.includes(weekday.name);
+		return weekday;
+	});
 
-  pileData.closedDays = pileData.closedDays.filter(closedWeekday => {
-    return weekdays.some(weekday => weekday.name === closedWeekday);
-  });
+	pileData.closedDays = pileData.closedDays.filter(closedWeekday => {
+		return weekdays.some(weekday => weekday.name === closedWeekday);
+	});
 
-  const holidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
-    return { name: holiday.name, selected: pileData.closedHolidays.includes(holiday.name) };
-  });
+	const holidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
+		return { name: holiday.name, selected: pileData.closedHolidays.includes(holiday.name) };
+	});
 
-  pileData.closedHolidays = pileData.closedHolidays.filter(closedHoliday => {
-    return holidays.some(holiday => holiday.name === closedHoliday);
-  });
+	pileData.closedHolidays = pileData.closedHolidays.filter(closedHoliday => {
+		return holidays.some(holiday => holiday.name === closedHoliday);
+	});
 
-  const refreshItemsHolidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
-    return { name: holiday.name, selected: pileData.refreshItemsHolidays.includes(holiday.name) };
-  });
+	const refreshItemsHolidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
+		return { name: holiday.name, selected: pileData.refreshItemsHolidays.includes(holiday.name) };
+	});
 
-  pileData.refreshItemsHolidays = pileData.refreshItemsHolidays.filter(refreshItemsHoliday => {
-    return refreshItemsHolidays.some(holiday => holiday.name === refreshItemsHoliday);
-  });
+	pileData.refreshItemsHolidays = pileData.refreshItemsHolidays.filter(refreshItemsHoliday => {
+		return refreshItemsHolidays.some(holiday => holiday.name === refreshItemsHoliday);
+	});
 
-  async function showItemTypePriceModifiers() {
-    const data = pileData.itemTypePriceModifiers || [];
-    return ItemTypePriceModifiersEditor.show(
-      data,
-      { id: `item-type-price-modifier-item-pile-config-${pileActor.id}` },
-      { title: localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
-    ).then((result) => {
-      pileData.itemTypePriceModifiers = result || [];
-    });
-  }
+	async function showItemTypePriceModifiers() {
+		const data = pileData.itemTypePriceModifiers || [];
+		return ItemTypePriceModifiersEditor.show(
+			data,
+			{ id: `item-type-price-modifier-item-pile-config-${pileActor.id}` },
+			{ title: localize("ITEM-PILES.Applications.ItemTypePriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
+		).then((result) => {
+			pileData.itemTypePriceModifiers = result || [];
+		});
+	}
 
-  async function showActorPriceModifiers() {
-    const data = pileData.actorPriceModifiers || [];
-    return PriceModifiersEditor.show(
-      data,
-      { id: `price-modifier-item-pile-config-${pileActor.id}` },
-      { title: localize("ITEM-PILES.Applications.PriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
-    ).then((result) => {
-      pileData.actorPriceModifiers = result || [];
-      pileData.actorPriceModifiers.forEach(modifier => {
-        if (modifier.actor) {
-          delete modifier['actor'];
-        }
-      })
-    });
-  }
+	async function showActorPriceModifiers() {
+		const data = pileData.actorPriceModifiers || [];
+		return PriceModifiersEditor.show(
+			data,
+			{ id: `price-modifier-item-pile-config-${pileActor.id}` },
+			{ title: localize("ITEM-PILES.Applications.PriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
+		).then((result) => {
+			pileData.actorPriceModifiers = result || [];
+			pileData.actorPriceModifiers.forEach(modifier => {
+				if (modifier.actor) {
+					delete modifier['actor'];
+				}
+			})
+		});
+	}
 
-  async function showMerchantColumns() {
-    const data = pileData.merchantColumns || [];
-    return MerchantColumnsEditor.show(
-      data,
-      { id: `merchant-columns-item-pile-config-${pileActor.id}` },
-      { title: localize("ITEM-PILES.Applications.MerchantColumnsEditor.TitleActor", { actor_name: pileActor.name }), }
-    ).then((result) => {
-      pileData.merchantColumns = result || [];
-    });
-  }
+	async function showMerchantColumns() {
+		const data = pileData.merchantColumns || [];
+		return MerchantColumnsEditor.show(
+			data,
+			{ id: `merchant-columns-item-pile-config-${pileActor.id}` },
+			{ title: localize("ITEM-PILES.Applications.MerchantColumnsEditor.TitleActor", { actor_name: pileActor.name }), }
+		).then((result) => {
+			pileData.merchantColumns = result || [];
+		});
+	}
 
-  async function clearLog() {
-    const doThing = await TJSDialog.confirm({
-      id: `sharing-dialog-item-pile-config-${pileActor.id}`,
-      title: "Item Piles - " + localize("ITEM-PILES.Dialogs.ClearMerchantLog.Title"),
-      content: {
-        class: CustomDialog,
-        props: {
-          header: localize("ITEM-PILES.Dialogs.ClearMerchantLog.Title"),
-          content: localize("ITEM-PILES.Dialogs.ClearMerchantLog.Content", { actor_name: pileActor.name })
-        },
-      },
-      modal: true
-    });
-    if (!doThing) return;
-    return PileUtilities.clearActorLog(pileActor);
-  }
+	async function clearLog() {
+		const doThing = await TJSDialog.confirm({
+			id: `sharing-dialog-item-pile-config-${pileActor.id}`,
+			title: "Item Piles - " + localize("ITEM-PILES.Dialogs.ClearMerchantLog.Title"),
+			content: {
+				class: CustomDialog,
+				props: {
+					header: localize("ITEM-PILES.Dialogs.ClearMerchantLog.Title"),
+					content: localize("ITEM-PILES.Dialogs.ClearMerchantLog.Content", { actor_name: pileActor.name })
+				},
+			},
+			modal: true
+		});
+		if (!doThing) return;
+		return PileUtilities.clearActorLog(pileActor);
+	}
 
 </script>
 
@@ -289,6 +289,14 @@
 
 <div class="form-group">
 	<label>
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideTokenWhenClosed")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideTokenWhenClosedExplanation")}</p>
+	</label>
+	<input bind:checked={pileData.openTimes.hideTokenWhenClosed} type="checkbox"/>
+</div>
+
+<div class="form-group">
+	<label>
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenTimes")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OpenTimesExplanation")}</p>
 	</label>
@@ -302,11 +310,11 @@
 		</label>
 		<div class="item-piles-flexrow">
 			<input bind:value="{pileData.openTimes.open.hour}" disabled="{!pileData.openTimes.enabled}"
-						 style="text-align: right;"
-						 type="number"/>
+			       style="text-align: right;"
+			       type="number"/>
 			<span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
 			<input bind:value="{pileData.openTimes.open.minute}" disabled="{!pileData.openTimes.enabled}"
-						 type="number"/>
+			       type="number"/>
 		</div>
 	</div>
 	<div class="item-piles-flexcol">
@@ -315,11 +323,11 @@
 		</label>
 		<div class="item-piles-flexrow">
 			<input bind:value="{pileData.openTimes.close.hour}" disabled="{!pileData.openTimes.enabled}"
-						 style="text-align: right;"
-						 type="number"/>
+			       style="text-align: right;"
+			       type="number"/>
 			<span style="flex: 0; line-height:1.7; margin: 0 0.25rem;">:</span>
 			<input bind:value="{pileData.openTimes.close.minute}" disabled="{!pileData.openTimes.enabled}"
-						 type="number"/>
+			       type="number"/>
 		</div>
 	</div>
 </div>
@@ -337,9 +345,9 @@
 				<div class="item-piles-flexcol" style="align-items: center;">
 					<label>{weekday.abbreviation}</label>
 					<input type="checkbox"
-								 bind:checked={weekday.selected}
-								 disabled={!pileData.openTimes.enabled}
-								 on:change={() => {
+					       bind:checked={weekday.selected}
+					       disabled={!pileData.openTimes.enabled}
+					       on:change={() => {
                  let weekdaySet = new Set(pileData.closedDays);
                  if(weekday.selected){
                    weekdaySet.add(weekday.name)
@@ -364,9 +372,9 @@
 			{#each holidays as holiday, index (holiday.name + "-" + index)}
 				<div class="item-piles-flexrow" style="flex:0 1 auto;">
 					<input type="checkbox"
-								 bind:checked={holiday.selected}
-								 disabled={!pileData.openTimes.enabled}
-								 on:change={() => {
+					       bind:checked={holiday.selected}
+					       disabled={!pileData.openTimes.enabled}
+					       on:change={() => {
                  let holidaySet = new Set(pileData.closedHolidays);
                  if(holiday.selected){
                    holidaySet.add(holiday.name)
@@ -408,9 +416,9 @@
 				<div class="item-piles-flexcol" style="align-items: center;">
 					<label>{weekday.abbreviation}</label>
 					<input type="checkbox"
-								 bind:checked={weekday.selected}
-								 disabled={!pileData.openTimes.enabled}
-								 on:change={() => {
+					       bind:checked={weekday.selected}
+					       disabled={!pileData.openTimes.enabled}
+					       on:change={() => {
                  let weekdaySet = new Set(pileData.refreshItemsDays);
                  if(weekday.selected){
                    weekdaySet.add(weekday.name)
@@ -435,9 +443,9 @@
 			{#each refreshItemsHolidays as holiday, index (holiday.name + "-remove-" + index)}
 				<div class="item-piles-flexrow" style="flex:0 1 auto;">
 					<input type="checkbox"
-								 bind:checked={holiday.selected}
-								 disabled={!pileData.openTimes.enabled}
-								 on:change={() => {
+					       bind:checked={holiday.selected}
+					       disabled={!pileData.openTimes.enabled}
+					       on:change={() => {
 									 let holidaySet = new Set(pileData.refreshItemsHolidays);
 									 if(holiday.selected){
 										 holidaySet.add(holiday.name)

@@ -1,34 +1,34 @@
 <script>
-  import { getContext } from "svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import * as Utilities from "../../../helpers/utilities.js";
-  import * as PileUtilities from "../../../helpers/pile-utilities.js";
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import SliderInput from "../../components/SliderInput.svelte";
+	import { getContext } from "svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import * as Utilities from "../../../helpers/utilities.js";
+	import * as PileUtilities from "../../../helpers/pile-utilities.js";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import SliderInput from "../../components/SliderInput.svelte";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let item;
-  export let elementRoot;
-  export let target = false;
+	export let item;
+	export let elementRoot;
+	export let target = false;
 
-  const unlimitedQuantity = application.options?.unlimitedQuantity ?? false;
+	const unlimitedQuantity = application.options?.unlimitedQuantity ?? false;
 
-  let form;
-  let quantity = 1;
+	let form;
+	let quantity = 1;
 
-  const itemQuantity = Utilities.getItemQuantity(item);
-  const sliderQuantity = itemQuantity + (application.options?.quantityAdjustment ?? 0);
-  const canItemStack = PileUtilities.canItemStack(item, target);
+	const itemQuantity = Utilities.getItemQuantity(item);
+	const sliderQuantity = itemQuantity + (application.options?.quantityAdjustment ?? 0);
+	const canItemStack = PileUtilities.canItemStack(item, target);
 
-  function requestSubmit() {
-    form.requestSubmit();
-  }
+	function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  function submit() {
-    application.options.resolve(quantity);
-    application.close();
-  }
+	function submit() {
+		application.options.resolve(quantity);
+		application.close();
+	}
 
 </script>
 
@@ -36,20 +36,20 @@
 
 <ApplicationShell bind:elementRoot>
 	<form autocomplete="off" bind:this={form} class="item-piles-flexcol" on:submit|once|preventDefault={submit}
-				style="padding:0.5rem;">
+	      style="padding:0.5rem;">
 
 		<h3 style="text-align: center;">
 			{localize(`ITEM-PILES.Applications.${application.options.localizationTitle}.Header`, {
-        item_name: item.name
-      })}
+				item_name: item.name
+			})}
 		</h3>
 
 		{#if target}
 
 			<p class="item-piles-text-center">
 				{localize(`ITEM-PILES.Applications.${application.options.localizationTitle}.Content`, {
-          target_name: target.name
-        })}
+					target_name: target.name
+				})}
 			</p>
 
 		{/if}
@@ -58,10 +58,10 @@
 
 			<div class="form-group item-piles-text-center">
 				<label>{localize(`ITEM-PILES.Applications.${application.options.localizationTitle}.${unlimitedQuantity ? "ContentInfiniteQuantity" : "ContentMultipleQuantity"}`, {
-          target_name: target?.name ?? "",
-          quantity: itemQuantity,
-          itemName: item.name
-        })}</label>
+					target_name: target?.name ?? "",
+					quantity: itemQuantity,
+					itemName: item.name
+				})}</label>
 			</div>
 			{#if unlimitedQuantity}
 				<input type="number" min="1" bind:value={quantity}/>

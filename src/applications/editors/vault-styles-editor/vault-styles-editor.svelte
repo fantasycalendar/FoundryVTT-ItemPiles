@@ -1,50 +1,50 @@
 <script>
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { get, writable } from "svelte/store";
-  import StyleEntry from "./StyleEntry.svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { get, writable } from "svelte/store";
+	import StyleEntry from "./StyleEntry.svelte";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  let form;
+	let form;
 
-  export let elementRoot;
-  export let data;
+	export let elementRoot;
+	export let data;
 
-  const vaultStyleStore = writable(data);
+	const vaultStyleStore = writable(data);
 
-  loadImages();
+	loadImages();
 
-  function add() {
-    vaultStyleStore.update(arr => {
-      arr.push({ path: "", value: "", styling: {} })
-      return arr;
-    });
-  }
+	function add() {
+		vaultStyleStore.update(arr => {
+			arr.push({ path: "", value: "", styling: {} })
+			return arr;
+		});
+	}
 
-  let images = [];
+	let images = [];
 
-  async function loadImages() {
-    const data = await FilePicker.browse("public", "icons/weapons/swords/*.webp", { wildcard: true });
-    images = data.files;
-  }
+	async function loadImages() {
+		const data = await FilePicker.browse("public", "icons/weapons/swords/*.webp", { wildcard: true });
+		images = data.files;
+	}
 
-  function remove(index) {
-    vaultStyleStore.update(arr => {
-      arr.splice(index, 1)
-      return arr;
-    });
-  }
+	function remove(index) {
+		vaultStyleStore.update(arr => {
+			arr.splice(index, 1)
+			return arr;
+		});
+	}
 
-  async function updateSettings() {
-    application.options.resolve(get(vaultStyleStore));
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve(get(vaultStyleStore));
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
 
 </script>

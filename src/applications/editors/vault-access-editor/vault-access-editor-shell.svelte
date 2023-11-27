@@ -1,83 +1,83 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { get, writable } from "svelte/store";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { get, writable } from "svelte/store";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  let form;
+	let form;
 
-  export let data;
-  export let elementRoot;
+	export let data;
+	export let elementRoot;
 
-  const vaultAccessStore = writable(data.map(access => {
-    return foundry.utils.mergeObject({
-      view: true,
-      organize: true,
-      items: {
-        withdraw: true,
-        deposit: true
-      },
-      currencies: {
-        withdraw: true,
-        deposit: true
-      }
-    }, access)
-  }));
+	const vaultAccessStore = writable(data.map(access => {
+		return foundry.utils.mergeObject({
+			view: true,
+			organize: true,
+			items: {
+				withdraw: true,
+				deposit: true
+			},
+			currencies: {
+				withdraw: true,
+				deposit: true
+			}
+		}, access)
+	}));
 
-  const validUsers = Array.from(game.users).filter(user => !user.isGM);
+	const validUsers = Array.from(game.users).filter(user => !user.isGM);
 
-  const validActors = Array.from(game.actors).filter(actor => actor.hasPlayerOwner);
+	const validActors = Array.from(game.actors).filter(actor => actor.hasPlayerOwner);
 
-  const validDocs = validUsers.concat(validActors).map(document => ({ uuid: document.uuid, document }));
+	const validDocs = validUsers.concat(validActors).map(document => ({ uuid: document.uuid, document }));
 
-  $: validDocuments = validDocs.filter(document => !$vaultAccessStore.some(access => access.uuid === document.uuid))
-  $: validUuids = new Set(validDocuments.map(document => document.uuid));
+	$: validDocuments = validDocs.filter(document => !$vaultAccessStore.some(access => access.uuid === document.uuid))
+	$: validUuids = new Set(validDocuments.map(document => document.uuid));
 
-  function addAccess() {
-    if (!validDocuments.length) return
-    vaultAccessStore.update(value => {
-      value.push({
-        uuid: validDocuments[0].uuid,
-        document: validDocuments[0].document,
-        view: true,
-        organize: true,
-        items: {
-          withdraw: true,
-          deposit: true
-        },
-        currencies: {
-          withdraw: true,
-          deposit: true
-        }
-      });
-      return value;
-    });
-  }
+	function addAccess() {
+		if (!validDocuments.length) return
+		vaultAccessStore.update(value => {
+			value.push({
+				uuid: validDocuments[0].uuid,
+				document: validDocuments[0].document,
+				view: true,
+				organize: true,
+				items: {
+					withdraw: true,
+					deposit: true
+				},
+				currencies: {
+					withdraw: true,
+					deposit: true
+				}
+			});
+			return value;
+		});
+	}
 
-  function removeAccess(index) {
-    vaultAccessStore.update(value => {
-      value.splice(index, 1)
-      return value;
-    })
-  }
+	function removeAccess(index) {
+		vaultAccessStore.update(value => {
+			value.splice(index, 1)
+			return value;
+		})
+	}
 
-  async function updateSettings() {
-    application.options.resolve?.(get(vaultAccessStore).map(access => {
-      delete access.document;
-      return access;
-    }));
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve?.(get(vaultAccessStore).map(access => {
+			delete access.document;
+			return access;
+		}));
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+	function preventDefault(event) {
+		event.preventDefault();
+	}
 
 </script>
 

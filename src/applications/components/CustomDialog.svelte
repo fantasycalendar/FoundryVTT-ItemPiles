@@ -1,8 +1,8 @@
 <script>
 
-  export let icon = "fas fa-exclamation-triangle";
-  export let header = "Item Piles";
-  export let content;
+	export let icon = "fas fa-exclamation-triangle";
+	export let header = "Item Piles";
+	export let content;
 
 </script>
 

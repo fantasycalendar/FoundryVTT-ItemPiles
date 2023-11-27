@@ -1,27 +1,27 @@
 <script>
 
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
-  export let store;
+	export let store;
 
-  const pileDataStore = store.pileData;
-  const merchantName = store.name;
-  const closed = store.closed;
+	const pileDataStore = store.pileData;
+	const merchantName = store.name;
+	const closed = store.closed;
 
-  let openTimeText = "";
+	let openTimeText = "";
 
-  const aboutTimeEnabled = game.modules.get('foundryvtt-simple-calendar')?.active || false;
+	const aboutTimeEnabled = game.modules.get('foundryvtt-simple-calendar')?.active || false;
 
-  $: open = $pileDataStore.openTimes.enabled ? $pileDataStore.openTimes?.open : false;
-  $: close = $pileDataStore.openTimes.enabled ? $pileDataStore.openTimes?.close : false;
+	$: open = $pileDataStore.openTimes.enabled ? $pileDataStore.openTimes?.open : false;
+	$: close = $pileDataStore.openTimes.enabled ? $pileDataStore.openTimes?.close : false;
 
-  $: {
-    if ($pileDataStore.openTimes.enabled) {
-      let openText = `${open.hour.toString().padStart(2, "0")}:${open.minute.toString().padStart(2, "0")}`;
-      let closeText = `${close.hour.toString().padStart(2, "0")}:${close.minute.toString().padStart(2, "0")}`;
-      openTimeText = `${openText} - ${closeText}`;
-    }
-  }
+	$: {
+		if ($pileDataStore.openTimes.enabled) {
+			let openText = `${open.hour.toString().padStart(2, "0")}:${open.minute.toString().padStart(2, "0")}`;
+			let closeText = `${close.hour.toString().padStart(2, "0")}:${close.minute.toString().padStart(2, "0")}`;
+			openTimeText = `${openText} - ${closeText}`;
+		}
+	}
 
 </script>
 
@@ -37,12 +37,12 @@
           {#if aboutTimeEnabled && $pileDataStore.openTimes.status !== "auto"}
           <a class="item-piles-right-divider" on:click={() => { store.setOpenStatus("auto"); }}>
             <i class="fas fa-clock"></i>
-						{localize(`ITEM-PILES.Merchant.OpenCloseAuto`)}
+	          {localize(`ITEM-PILES.Merchant.OpenCloseAuto`)}
           </a>
-					{/if}
-					<a class="item-piles-right-divider" on:click={() => { store.setOpenStatus($closed ? "open" : "closed"); }}>
+          {/if}
+	        <a class="item-piles-right-divider" on:click={() => { store.setOpenStatus($closed ? "open" : "closed"); }}>
             <i class="fas" class:fa-door-open={!$closed} class:fa-door-closed={$closed}></i>
-						{localize(`ITEM-PILES.Merchant.${!$closed ? "Open" : "Closed"}`)}
+		        {localize(`ITEM-PILES.Merchant.${!$closed ? "Open" : "Closed"}`)}
           </a>
         {/if}
 				{openTimeText}

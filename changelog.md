@@ -1,5 +1,24 @@
 # Item Piles Changelog
 
+## Version 2.8.2
+
+- Added API endpoints:
+  - `game.itempiles.API.getItemCategories()`
+  - `game.itempiles.API.getCostOfItem()`
+  - `game.itempiles.API.getItemQuantity()`
+  - `game.itempiles.API.calculateCurrencies()` which can be used to calculate different currency strings;
+    - `game.itempiles.API.calculateCurrencies("10gp", "5gp")` would result in 5GP (wow, impressive right?)
+    - `game.itempiles.API.calculateCurrencies("9gp 4sp 9cp", "5sp 4cp")` would result in `8GP 9SP 4CP`, which is a bit more impressive
+    - `game.itempiles.API.calculateCurrencies("9gp 4sp 9cp", "5sp 4cp", false)` would result in `10GP 3CP`
+    - `game.itempiles.API.calculateCurrencies("9gp", 0.5)` would result in `4GP 5EP`
+- Deprecated `game.itempiles.API.getPaymentDataFromString()` in favor of `game.itempiles.API.getPaymentData()`
+- Updated `game.itempiles.API.getPaymentData()` to also accept a number as its first argument
+- Added support for Custom System Builder property paths
+- Added support for soft migrations to systems, which will avoid customized settings being overwritten
+- Fixed DnD5e's race type item being able to be dropped
+- Fixed Alien RPG's currency quantity
+- Fixed Forbidden Land's currency paths
+
 ## Version 2.8.1
 
 - Fixed D&D5e displaying all characters for players when giving items, instead of just the ones they have at least limited visibility of

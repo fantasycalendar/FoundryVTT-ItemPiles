@@ -34,27 +34,28 @@ Hooks.once("init", async () => {
 	setupCaches();
 	applyShims();
 	setupPlugins("init");
+
+	game.itempiles = {
+		API,
+		hooks: CONSTANTS.HOOKS,
+		flags: CONSTANTS.FLAGS,
+		pile_types: CONSTANTS.PILE_TYPES,
+		pile_flag_defaults: CONSTANTS.PILE_DEFAULTS,
+		item_flag_defaults: CONSTANTS.ITEM_DEFAULTS,
+		apps: {
+			ItemPileConfig,
+			ItemEditor
+		}
+	};
+	window.ItemPiles = {
+		API: API
+	};
+
 });
 
 Hooks.once("ready", () => {
 
 	setTimeout(() => {
-
-		game.itempiles = {
-			API,
-			hooks: CONSTANTS.HOOKS,
-			flags: CONSTANTS.FLAGS,
-			pile_types: CONSTANTS.PILE_TYPES,
-			pile_flag_defaults: CONSTANTS.PILE_DEFAULTS,
-			item_flag_defaults: CONSTANTS.ITEM_DEFAULTS,
-			apps: {
-				ItemPileConfig,
-				ItemEditor
-			}
-		};
-		window.ItemPiles = {
-			API: API
-		};
 
 		if (game.user.isGM) {
 			if (!game.modules.get('lib-wrapper')?.active) {

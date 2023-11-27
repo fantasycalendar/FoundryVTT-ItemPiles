@@ -1,25 +1,25 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import PriceList from "../../components/PriceList.svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import PriceList from "../../components/PriceList.svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let data;
-  export let elementRoot;
-  let form;
+	export let data;
+	export let elementRoot;
+	let form;
 
-  let prices = foundry.utils.deepClone(data);
+	let prices = foundry.utils.deepClone(data);
 
-  async function updateSettings() {
-    application.options.resolve(prices);
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve(prices);
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
 </script>
 

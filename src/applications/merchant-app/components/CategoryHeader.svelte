@@ -1,24 +1,24 @@
 <script>
 
-  import SliderInput from "../../components/SliderInput.svelte";
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import SliderInput from "../../components/SliderInput.svelte";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
-  export let store;
-  export let category;
+	export let store;
+	export let category;
 
-  const pileData = store.pileData;
-  const searchStore = store.search;
-  const visibleItemsStore = store.visibleItems;
-  const itemsPerCategoryStore = store.itemsPerCategory;
-  const categoryStore = store.categories;
-  const priceModifiersPerType = store.priceModifiersPerType;
-  const itemCategoriesStore = store.itemCategories;
-  const typeFilterStore = store.typeFilter;
-  const editPrices = store.editPrices;
-  const columns = store.itemColumns;
+	const pileData = store.pileData;
+	const searchStore = store.search;
+	const visibleItemsStore = store.visibleItems;
+	const itemsPerCategoryStore = store.itemsPerCategory;
+	const categoryStore = store.categories;
+	const priceModifiersPerType = store.priceModifiersPerType;
+	const itemCategoriesStore = store.itemCategories;
+	const typeFilterStore = store.typeFilter;
+	const editPrices = store.editPrices;
+	const columns = store.itemColumns;
 
-  $: colSpan = $editPrices ? $columns.length + 1 : 1;
-  $: type = category.type === "custom" ? category.label.toLowerCase() : category.type;
+	$: colSpan = $editPrices ? $columns.length + 1 : 1;
+	$: type = category.type === "custom" ? category.label.toLowerCase() : category.type;
 
 </script>
 
@@ -35,10 +35,10 @@
 		<div style="flex: 0 1 auto">
 			{#if $priceModifiersPerType[type]}
 				<i class="fas fa-times item-piles-clickable-red"
-					 on:click={() => { store.removeOverrideTypePrice(type) }}></i>
+				   on:click={() => { store.removeOverrideTypePrice(type) }}></i>
 			{:else}
 				<i class="fas fa-plus item-piles-clickable-green"
-					 on:click={() => { store.addOverrideTypePrice(type) }}></i>
+				   on:click={() => { store.addOverrideTypePrice(type) }}></i>
 			{/if}
 		</div>
 	{/if}

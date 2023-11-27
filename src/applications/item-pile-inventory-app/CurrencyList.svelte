@@ -1,13 +1,13 @@
 <script>
 
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import ListEntry from "./ListEntry.svelte";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import ListEntry from "./ListEntry.svelte";
 
-  export let store;
-  const currencies = store.currencies;
-  const numItems = store.numItems;
-  const numCurrencies = store.numCurrencies;
-  const editQuantities = store.editQuantities;
+	export let store;
+	const currencies = store.currencies;
+	const numItems = store.numItems;
+	const numCurrencies = store.numCurrencies;
+	const editQuantities = store.editQuantities;
 
 </script>
 
@@ -18,7 +18,7 @@
 			<h3>{localize("ITEM-PILES.Currencies")}:</h3>
 		{/if}
 		<a class="item-piles-clickable item-piles-text-right item-piles-small-text item-piles-middle"
-			 on:click={() => store.addCurrency(store.recipient)}>
+		   on:click={() => store.addCurrency(store.recipient)}>
 			<i class="fas fa-plus"></i> {localize("ITEM-PILES.Inspect.AddCurrency")}
 		</a>
 	</div>

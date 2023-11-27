@@ -66,9 +66,14 @@
   * [transferCurrencies](#transferCurrencies)
   * [transferAllCurrencies](#transferAllCurrencies)
   * [getCurrenciesFromString](#getCurrenciesFromString)
-  * [getPaymentDataFromString](#getPaymentDataFromString)
+  * [calculateCurrencies](#calculateCurrencies)
+  * [getPaymentData](#getPaymentData)
   * [getActorItems](#getActorItems)
   * [getActorCurrencies](#getActorCurrencies)
+  * [getCostOfItem](#getCostOfItem)
+  * [isItemInvalid](#isItemInvalid)
+  * [canItemStack](#canItemStack)
+  * [getItemQuantity](#getItemQuantity)
 
 
 * [Misc methods](#misc-methods)
@@ -285,6 +290,8 @@ Sets the types of items that will always be considered unique when transferring 
 |------------|----------|
 | inDefaults | `Object` |
 
+---
+
 ### setTokenFlagDefaults
 
 `game.itempiles.API.setTokenFlagDefaults(inDefaults)` ⇒ `Promise`
@@ -303,24 +310,49 @@ Sets the types of items that will always be considered unique when transferring 
 
 A combination of all the methods above, but this integrates a system's specific settings more readily into item piles, allowing users to also change the settings afterwards.
 
-| Param                           | Type                                                                                                                                                                                            | Description                                                                                                          |
-|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| data                            | `object`                                                                                                                                                                                        |                                                                                                                      |
-| data.VERSION                    | `string`                                                                                                                                                                                        | The integration version                                                                                              |
-| data.ACTOR_CLASS_TYPE           | `string`                                                                                                                                                                                        | The system's actor class type to represent item piles                                                                |
-| data.ITEM_PRICE_ATTRIBUTE       | `string`                                                                                                                                                                                        | The property path to the system's item price attribute                                                               |
-| data.ITEM_QUANTITY_ATTRIBUTE    | `string`                                                                                                                                                                                        | The property path to the system's item quantity attribute                                                            |
-| data.ITEM_FILTERS               | `Array<{path: string, filters: string}>`                                                                                                                                                        | The filters to determine which items to not include as droppable or tradeable                                        |
-| data.ITEM_SIMILARITIES          | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item similarities                                               |
-| data.UNSTACKABLE_ITEM_TYPES     | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item types that cannot stack, no matter what                    |
-| data.PILE_DEFAULTS              | `Object`                                                                                                                                                                                        | The system specific default values for item pile actors created in this system                                       |
-| data.TOKEN_FLAG_DEFAULTS        | `Object`                                                                                                                                                                                        | The system specific default values for item pile tokens created in this system                                       |
-| data.ITEM_TRANSFORMER           | `undefined/Function`                                                                                                                                                                            | An optional function that gets run over items before picked up, traded, or bought                                    |
-| data.PRICE_MODIFIER_TRANSFORMER | `undefined/Function`                                                                                                                                                                            | An optional function that gets run when fetching the price modifier of an actor                                      |
-| data.SYSTEM_HOOKS               | `undefined/Function`                                                                                                                                                                            | An optional function that runs and sets up system specific hooks relating to Item Piles                              |
-| data.CURRENCIES                 | `Array<{ primary: boolean, type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }>, exchangeRate: number }>` | The array of currencies for this system                                                                              |
-| data.SECONDARY_CURRENCIES       | `Array<{ type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }> }>`                                         | The array of secondary currencies for this system                                                                    |
-| data.CURRENCY_DECIMAL_DIGITS    | `undefined/number`                                                                                                                                                                              | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured) |
+| Param                             | Type                                                                                                                                                                                            | Description                                                                                                          |
+|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| data                              | `object`                                                                                                                                                                                        |                                                                                                                      |
+| data.VERSION                      | `string`                                                                                                                                                                                        | The integration version                                                                                              |
+| data.ACTOR_CLASS_TYPE             | `string`                                                                                                                                                                                        | The system's actor class type to represent item piles                                                                |
+| data.ITEM_PRICE_ATTRIBUTE         | `string`                                                                                                                                                                                        | The property path to the system's item price attribute                                                               |
+| data.ITEM_QUANTITY_ATTRIBUTE      | `string`                                                                                                                                                                                        | The property path to the system's item quantity attribute                                                            |
+| data.QUANTITY_FOR_PRICE_ATTRIBUTE | `string`                                                                                                                                                                                        | The property path to the system's item quantity per price attribute                                                  |
+| data.ITEM_FILTERS                 | `Array<{path: string, filters: string}>`                                                                                                                                                        | The filters to determine which items to not include as droppable or tradeable                                        |
+| data.ITEM_SIMILARITIES            | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item similarities                                               |
+| data.UNSTACKABLE_ITEM_TYPES       | `Array<string>`                                                                                                                                                                                 | The array of property path strings used to determine item types that cannot stack, no matter what                    |
+| data.PILE_DEFAULTS                | `Object`                                                                                                                                                                                        | The system specific default values for item pile actors created in this system                                       |
+| data.TOKEN_FLAG_DEFAULTS          | `Object`                                                                                                                                                                                        | The system specific default values for item pile tokens created in this system                                       |
+| data.ITEM_TRANSFORMER             | `undefined/Function`                                                                                                                                                                            | An optional function that gets run over items before picked up, traded, or bought                                    |
+| data.PRICE_MODIFIER_TRANSFORMER   | `undefined/Function`                                                                                                                                                                            | An optional function that gets run when fetching the price modifier of an actor                                      |
+| data.SYSTEM_HOOKS                 | `undefined/Function`                                                                                                                                                                            | An optional function that runs and sets up system specific hooks relating to Item Piles                              |
+| data.SHEET_OVERRIDES              | `undefined/Function`                                                                                                                                                                            | An optional function that runs and sets up system specific sheet hooks to handle system specific implementations     |
+| data.CURRENCIES                   | `Array<{ primary: boolean, type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }>, exchangeRate: number }>` | The array of currencies for this system                                                                              |
+| data.SECONDARY_CURRENCIES         | `Array<{ type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }> }>`                                         | The array of secondary currencies for this system                                                                    |
+| data.CURRENCY_DECIMAL_DIGITS      | `undefined/number`                                                                                                                                                                              | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured) |
+
+---
+
+### getPrimaryCurrency
+
+`game.itempiles.API.getPrimaryCurrency(actor)` ⇒ `Promise<Array>`
+
+Retrieves the system default currencies, or an actor's default currencies
+
+**Returns
+**: `Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>`
+
+| Param | Type            |
+|-------|-----------------|
+| actor | `boolean/Actor` |
+
+---
+
+### getItemCategories
+
+`game.itempiles.API.getItemCategories()` ⇒ `Object`
+
+Retrieves all the system item types, including custom item piles item categories
 
 ---
 
@@ -898,11 +930,11 @@ Transfers all currencies between the source and the target.
 
 ### getCurrenciesFromString
 
-`game.itempiles.API.getCurrenciesFromString(currencies)` ⇒ `Promise<object>`
+`game.itempiles.API.getCurrenciesFromString(currencies)` ⇒ `object`
 
 Turns a string of currencies into an array containing the data and quantities for each currency
 
-**Returns**: `Promise<object>` - An array of object containing the data and quantity for each currency
+**Returns**: `object` - An array of object containing the data and quantity for each currency
 
 | Param      | Type     | Default | Description                                    |
 |------------|----------|---------|------------------------------------------------|
@@ -910,19 +942,39 @@ Turns a string of currencies into an array containing the data and quantities fo
 
 ---
 
-### getPaymentDataFromString
+### calculateCurrencies
 
-`game.itempiles.API.getPaymentDataFromString(currencies, options)` ⇒ `Promise<object>`
+`game.itempiles.API.calculateCurrencies(firstCurrencies, secondCurrencies, subtract)` ⇒ `string`
 
-Turns a string of currencies into an object containing payment data, and the change an optional target would receive back
+This method takes a string, and another string or number, an alternatively a boolean, to modify the first string's currencies.Whether to subtract the second currencies from the first; not needed if the second argument is a number
 
-**Returns**: `Promise<object>` - An object containing the price data
+**Returns**: `string` - The resulting currency string
 
-| Param            | Type                               | Default | Description                                    |
-|------------------|------------------------------------|---------|------------------------------------------------|
-| price            | `string`                           |         | A string of currencies to add (eg, "5gp 25sp") |
-| options          | `object`                           |         | Options to pass to the function                |
-| [options.target] | `string/Actor/TokenDocument/Token` | `false` | The target whose currencies to check against   |
+| Param            | Type            | Default | Description                                                                                             |
+|------------------|-----------------|---------|---------------------------------------------------------------------------------------------------------|
+| firstCurrencies  | `string`        |         | The starting sum of money as strings (eg, "5gp 25sp")                                                   |
+| secondCurrencies | `string/number` |         | A string of currencies to alter the first with, or a number to multiply it                              |
+| subtract         | `boolean`       | `false` | Whether to subtract the second currencies from the first; not needed if the second argument is a number |
+
+---
+
+### getPaymentData
+
+`game.itempiles.API.getPaymentData(currencies, options)` ⇒ `object`
+
+Turns a string of currencies or a number into an object containing payment data, and the change an optional target would receive back
+
+**Returns**: `object` - An object containing the price data
+
+| Param              | Type                               | Default | Description                                                |
+|--------------------|------------------------------------|---------|------------------------------------------------------------|
+| price              | `string/number`                    |         | A string of currencies to add (eg, "5gp 25sp") or a number |
+| options            | `object`                           |         | Options to pass to the function                            |
+| [options.quantity] | `number`                           | `1`     | The number of this to buy                                  |
+| [options.target]   | `string/Actor/TokenDocument/Token` | `false` | The target whose currencies to check against               |
+
+**Previously (now deprecated):**
+`game.itempiles.API.getPaymentDataFromString`
 
 ---
 
@@ -953,6 +1005,62 @@ Turns a string of currencies into an object containing payment data, and the cha
 | target           | `string/Actor/TokenDocument/Token` |         | The target to get the currencies from                     |
 | options          | `object`                           |         | Options to pass to the function                           |
 | [options.getAll] | `boolean`                          | `false` | Whether to get all the currencies, regardless of quantity |
+
+---
+
+### getCostOfItem
+
+`game.itempiles.API.getCostOfItem(item)` ⇒ `number`
+
+Retrieves the total numerical cost of an item
+
+**Returns**: `number`
+
+| Param | Type   | Default | Description                |
+|-------|--------|---------|----------------------------|
+| item  | `Item` |         | The item whose cost to get |
+
+---
+
+### isItemInvalid
+
+`game.itempiles.API.isItemInvalid(item)` ⇒ `boolean`
+
+Returns a boolean whether the item is a valid physical item
+
+**Returns**: `boolean`
+
+| Param | Type   | Default | Description       |
+|-------|--------|---------|-------------------|
+| item  | `Item` |         | The item to check |
+
+---
+
+### canItemStack
+
+`game.itempiles.API.canItemStack(item)` ⇒ `boolean`
+
+Returns whether an item can be stacked or not
+
+**Returns**: `boolean`
+
+| Param | Type   | Default | Description       |
+|-------|--------|---------|-------------------|
+| item  | `Item` |         | The item to check |
+
+---
+
+### getItemQuantity
+
+`game.itempiles.API.getItemQuantity(item)` ⇒ `number`
+
+Returns the item's quantity
+
+**Returns**: `number`
+
+| Param | Type   | Default | Description       |
+|-------|--------|---------|-------------------|
+| item  | `Item` |         | The item to check |
 
 ---
 

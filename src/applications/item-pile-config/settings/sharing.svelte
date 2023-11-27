@@ -1,35 +1,35 @@
 <script>
 
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-  import CustomDialog from "../../components/CustomDialog.svelte";
-  import * as SharingUtilities from "../../../helpers/sharing-utilities.js";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import CustomDialog from "../../components/CustomDialog.svelte";
+	import * as SharingUtilities from "../../../helpers/sharing-utilities.js";
 
-  export let pileData;
-  export let pileActor;
+	export let pileData;
+	export let pileActor;
 
-  async function resetSharingData() {
-    const doThing = await TJSDialog.confirm({
-      id: `sharing-dialog-item-pile-config-${pileActor.id}`,
-      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
-      content: {
-        class: CustomDialog,
-        props: {
-          header: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
-          content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content")
-        },
-      },
-      buttons: {
-        yes: {
-          icon: '<i class="fas fa-check"></i>',
-          label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Confirm"),
-        }
-      },
-      modal: true
-    });
-    if (!doThing) return;
-    return SharingUtilities.clearItemPileSharingData(pileActor);
-  }
+	async function resetSharingData() {
+		const doThing = await TJSDialog.confirm({
+			id: `sharing-dialog-item-pile-config-${pileActor.id}`,
+			title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
+			content: {
+				class: CustomDialog,
+				props: {
+					header: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Title"),
+					content: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Content")
+				},
+			},
+			buttons: {
+				yes: {
+					icon: '<i class="fas fa-check"></i>',
+					label: game.i18n.localize("ITEM-PILES.Dialogs.ResetSharingData.Confirm"),
+				}
+			},
+			modal: true
+		});
+		if (!doThing) return;
+		return SharingUtilities.clearItemPileSharingData(pileActor);
+	}
 
 </script>
 
@@ -86,7 +86,7 @@
 
 	<div class="form-group">
 		<button class="item-piles-config-reset-sharing-data" on:click={() => { resetSharingData() }} style="flex:4;"
-						type="button">
+		        type="button">
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Sharing.ResetSharingData")}
 		</button>
 	</div>

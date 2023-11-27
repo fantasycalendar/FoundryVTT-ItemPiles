@@ -1,23 +1,23 @@
 <script>
 
-  import * as Helpers from "../../helpers/helpers.js";
+	import * as Helpers from "../../helpers/helpers.js";
 
-  export let entry;
+	export let entry;
 
-  const item = entry.item;
+	const item = entry.item;
 
-  const name = item.name;
-  const img = item.img;
-  const quantity = item.quantity;
-  const canStack = item.canStack;
-  const style = item.style;
+	const name = item.name;
+	const img = item.img;
+	const quantity = item.quantity;
+	const canStack = item.canStack;
+	const style = item.style;
 
-  $: styling = Helpers.styleFromObject($style);
+	$: styling = Helpers.styleFromObject($style);
 
 </script>
 
 <div class="grid-item" data-fast-tooltip={$name}
-		 data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0">
+     data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0">
 	{#if $img}
 		<img src={$img} alt={$name}/>
 	{/if}

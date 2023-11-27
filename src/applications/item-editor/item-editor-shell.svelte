@@ -1,59 +1,59 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import * as Helpers from "../../helpers/helpers.js";
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import ItemPriceStore from "./ItemPriceStore.js";
-  import Tabs from "../components/Tabs.svelte";
-  import PriceList from "../components/PriceList.svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import MacroSelector from "../components/MacroSelector.svelte";
-  import { get, writable } from "svelte/store";
-  import SETTINGS from "../../constants/settings.js";
-  import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import * as Helpers from "../../helpers/helpers.js";
+	import * as PileUtilities from "../../helpers/pile-utilities.js";
+	import ItemPriceStore from "./ItemPriceStore.js";
+	import Tabs from "../components/Tabs.svelte";
+	import PriceList from "../components/PriceList.svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import MacroSelector from "../components/MacroSelector.svelte";
+	import { get, writable } from "svelte/store";
+	import SETTINGS from "../../constants/settings.js";
+	import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let item;
-  export let elementRoot;
+	export let item;
+	export let elementRoot;
 
-  let store = ItemPriceStore.make(item);
+	let store = ItemPriceStore.make(item);
 
-  let currentCustomCategories = writable(Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES))));
+	let currentCustomCategories = writable(Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES))));
 
-  const flagDataStore = store.data;
-  let price = store.price;
-  let quantityForPrice = store.quantityForPrice;
-  let oldPrice = get(price);
+	const flagDataStore = store.data;
+	let price = store.price;
+	let quantityForPrice = store.quantityForPrice;
+	let oldPrice = get(price);
 
-  $: itemFlagData = $flagDataStore;
+	$: itemFlagData = $flagDataStore;
 
-  let form;
+	let form;
 
-  async function updateSettings() {
-    const flagData = store.export();
-    if (flagData.flags.customCategory) {
-      let customCategories = get(currentCustomCategories);
-      customCategories.push(flagData.flags.customCategory)
-      await Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, Array.from(new Set(customCategories)));
-    }
-    await PileUtilities.updateItemData(item, flagData);
-    application.options.resolve();
-    application.close();
-  }
+	async function updateSettings() {
+		const flagData = store.export();
+		if (flagData.flags.customCategory) {
+			let customCategories = get(currentCustomCategories);
+			customCategories.push(flagData.flags.customCategory)
+			await Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, Array.from(new Set(customCategories)));
+		}
+		await PileUtilities.updateItemData(item, flagData);
+		application.options.resolve();
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  function addGroup() {
-    itemFlagData.prices = [
-      ...itemFlagData.prices,
-      []
-    ]
-  }
+	function addGroup() {
+		itemFlagData.prices = [
+			...itemFlagData.prices,
+			[]
+		]
+	}
 
-  let activeTab = "general";
+	let activeTab = "general";
 
 </script>
 
@@ -288,7 +288,7 @@
 							</div>
 							<div style="align-items: center;">
 								<input style="text-align: right;" type="number" placeholder="Enter a number..."
-											 bind:value={itemFlagData.addsCols}/>
+								       bind:value={itemFlagData.addsCols}/>
 								<span style="flex: 0;">x</span>
 								<input type="number" placeholder="Enter a number..." bind:value={itemFlagData.addsRows}/>
 							</div>

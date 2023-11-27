@@ -1,9 +1,9 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-  export let key;
-  export let data;
-  export let disabled = false;
+	export let key;
+	export let data;
+	export let disabled = false;
 
 </script>
 
@@ -12,7 +12,7 @@
 	<div class="label-side">
 		<label>{localize(data.name)} <a>
 			<i class="fas fa-undo reset-setting" data-fast-tooltip="Reset data"
-				 on:click={() => { data.value = data.default; }}></i></a>
+			   on:click={() => { data.value = data.default; }}></i></a>
 		</label>
 		<p class="notes">{localize(data.hint)}</p>
 	</div>

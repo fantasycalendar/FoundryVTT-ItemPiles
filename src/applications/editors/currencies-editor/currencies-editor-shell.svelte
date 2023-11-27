@@ -1,32 +1,32 @@
 <script>
 
-  import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { getSetting } from "../../../helpers/helpers.js";
-  import SETTINGS from "../../../constants/settings.js";
-  import CurrencyList from "./CurrencyList.svelte";
-  import CurrencyStore from "./currency-store.js"
+	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getSetting } from "../../../helpers/helpers.js";
+	import SETTINGS from "../../../constants/settings.js";
+	import CurrencyList from "./CurrencyList.svelte";
+	import CurrencyStore from "./currency-store.js"
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let data;
-  export let secondary = false
+	export let data;
+	export let secondary = false
 
-  export let elementRoot;
+	export let elementRoot;
 
-  const store = new CurrencyStore(data || getSetting(SETTINGS.CURRENCIES), secondary);
+	const store = new CurrencyStore(data || getSetting(SETTINGS.CURRENCIES), secondary);
 
-  let form;
+	let form;
 
-  async function updateSettings() {
-    application.options.resolve(store.export());
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve(store.export());
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
 </script>
 

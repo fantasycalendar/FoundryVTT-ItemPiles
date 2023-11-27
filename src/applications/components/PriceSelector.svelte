@@ -1,26 +1,26 @@
 <script>
 
-  import { writable } from "svelte/store";
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { TJSMenu, TJSToggleLabel } from '@typhonjs-fvtt/svelte-standard/component';
+	import { writable } from "svelte/store";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { TJSMenu, TJSToggleLabel } from '@typhonjs-fvtt/svelte-standard/component';
 
-  export let item;
-  export let standalone = false;
+	export let item;
+	export let standalone = false;
 
-  let labelText = "";
+	let labelText = "";
 
-  const prices = item.prices;
-  const itemFlagData = item.itemFlagData;
-  const selectedPriceGroup = item.selectedPriceGroup;
-  const priceSelector = standalone ? writable("") : item.store.priceSelector;
+	const prices = item.prices;
+	const itemFlagData = item.itemFlagData;
+	const selectedPriceGroup = item.selectedPriceGroup;
+	const priceSelector = standalone ? writable("") : item.store.priceSelector;
 
-  $: cantAfford = $prices.length > 0 && !$prices[$selectedPriceGroup]?.maxQuantity && item.store.recipient && !standalone;
-  $: cantAffordMultiplePrices = cantAfford && !$prices.filter(group => group.maxQuantity).length;
-  $: labelText = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "")
-    + ($prices[$selectedPriceGroup]?.free
-        ? localize("ITEM-PILES.Merchant.ItemFree")
-        : $prices[$selectedPriceGroup]?.basePriceString
-    );
+	$: cantAfford = $prices.length > 0 && !$prices[$selectedPriceGroup]?.maxQuantity && item.store.recipient && !standalone;
+	$: cantAffordMultiplePrices = cantAfford && !$prices.filter(group => group.maxQuantity).length;
+	$: labelText = (standalone && $prices.length > 1 ? "<i class=\"fas fa-edit\"></i> " : "")
+		+ ($prices[$selectedPriceGroup]?.free
+				? localize("ITEM-PILES.Merchant.ItemFree")
+				: $prices[$selectedPriceGroup]?.basePriceString
+		);
 
 </script>
 
@@ -28,10 +28,10 @@
 	{#if $prices.length > 1}
 		<TJSToggleLabel>
 			<div slot=left
-					 class:multiple-prices={$prices.length > 1 && !standalone}
-					 class:cant-afford={cantAfford}
-					 class:cant-afford-multiple-prices={cantAffordMultiplePrices}
-					 class:item-piles-clickable-link={$prices.length > 1}>
+			     class:multiple-prices={$prices.length > 1 && !standalone}
+			     class:cant-afford={cantAfford}
+			     class:cant-afford-multiple-prices={cantAffordMultiplePrices}
+			     class:item-piles-clickable-link={$prices.length > 1}>
 				<small>{@html labelText}</small>
 			</div>
 			<TJSMenu offset={{y: 4}}>
@@ -40,13 +40,13 @@
 						<div class="price-group" class:selected={$selectedPriceGroup === index}>
 							{#each priceGroup.prices.filter(price => price.cost) as price (price.id)}
 								<div class="price-group-container"
-										 on:click={() => {
+								     on:click={() => {
                          $selectedPriceGroup = index;
                          $priceSelector = "";
                        }}
-										 class:cant-afford={!priceGroup.maxQuantity && item.store.recipient}>
+								     class:cant-afford={!priceGroup.maxQuantity && item.store.recipient}>
 									<div class="item-piles-img-container"
-											 class:not-for-sale={!price.maxQuantity && item.store.recipient}>
+									     class:not-for-sale={!price.maxQuantity && item.store.recipient}>
 										<img class="item-piles-img" src="{price.img}"/>
 									</div>
 									<div class="item-piles-name item-piles-text">

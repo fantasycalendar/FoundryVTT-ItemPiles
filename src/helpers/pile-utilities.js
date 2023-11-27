@@ -40,12 +40,17 @@ export function migrateFlagData(document, data = false) {
 
 export function canItemStack(item, targetActor) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	const unstackableType = Utilities.getItemTypesThatCanStack().has(itemData.type);
-	if (!unstackableType || (targetActor && !isItemPileVault(targetActor))) return unstackableType;
+	if (!Utilities.isItemStackable(itemData)) return false;
 	const itemFlagData = getItemFlagData(itemData);
 	const actorFlagData = getActorFlagData(targetActor);
+	if (typeof actorFlagData.canStackItems === "boolean") {
+		actorFlagData.canStackItems = "yes";
+	}
+	if (actorFlagData.canStackItems === "always" || actorFlagData.canStackItems === "alwaysno") {
+		return actorFlagData.canStackItems === "always";
+	}
 	return {
-		"default": actorFlagData.canStackItems,
+		"default": actorFlagData.canStackItems === "yes",
 		"yes": true,
 		"no": false
 	}[itemFlagData?.canStack ?? "default"] && !(actorFlagData.type === CONSTANTS.PILE_TYPES.VAULT && itemFlagData.vaultExpander);
@@ -55,6 +60,12 @@ export function getItemFlagData(item, data = false) {
 	return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, { ...CONSTANTS.ITEM_DEFAULTS }, data);
 }
 
+/**
+ *
+ * @param target
+ * @param data
+ * @returns {Object<CONSTANTS.PILE_DEFAULTS>}
+ */
 export function getActorFlagData(target, data = false) {
 	const defaults = foundry.utils.mergeObject(
 		{ ...CONSTANTS.PILE_DEFAULTS },
@@ -180,7 +191,18 @@ export function getItemPileTokens(filter = false) {
 		})
 	]).filter(([_, tokens]) => tokens.length);
 
-	return { allTokensOnScenes, validTokensOnScenes };
+	const invalidTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [
+		scene,
+		tokens.filter(token => {
+			try {
+				return filter ? !filter(token) : false;
+			} catch (err) {
+				return true;
+			}
+		})
+	]).filter(([_, tokens]) => tokens.length);
+
+	return { invalidTokensOnScenes, validTokensOnScenes };
 }
 
 export function getActorItems(target, { itemFilters = false, getItemCurrencies = false } = {}) {
@@ -226,7 +248,7 @@ export function getActorCurrencies(target, {
 		return {
 			...currency,
 			quantity: 0,
-			id: item?.id ?? item?._id ?? null,
+			id: item?.id ?? item?._id ?? itemData._id ?? null,
 			item,
 			index
 		}
@@ -716,15 +738,19 @@ function getExchangeRateDecimals(smallestExchangeRate) {
 
 export function getPriceArray(totalCost, currencies) {
 
+	if (!currencies) currencies = getCurrencyList()
+
 	const primaryCurrency = currencies.find(currency => currency.primary);
 
 	if (currencies.length === 1) {
 		return [{
 			...primaryCurrency,
 			cost: totalCost,
+			quantity: totalCost,
 			baseCost: totalCost,
 			maxCurrencyCost: totalCost,
-			string: primaryCurrency.abbreviation.replace('{#}', totalCost)
+			string: primaryCurrency.abbreviation.replace('{#}', totalCost),
+			secondary: false
 		}]
 	}
 
@@ -745,9 +771,11 @@ export function getPriceArray(totalCost, currencies) {
 			prices.push({
 				...currency,
 				cost: Math.round(numCurrency),
+				quantity: Math.round(numCurrency),
 				baseCost: Math.round(numCurrency),
 				maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
-				string: currency.abbreviation.replace("{#}", numCurrency)
+				string: currency.abbreviation.replace("{#}", numCurrency),
+				secondary: false
 			});
 
 		}
@@ -767,9 +795,11 @@ export function getPriceArray(totalCost, currencies) {
 		prices.push({
 			...primaryCurrency,
 			cost: cost,
+			quantity: cost,
 			baseCost: cost,
 			maxCurrencyCost: totalCost,
-			string: primaryCurrency.abbreviation.replace('{#}', cost)
+			string: primaryCurrency.abbreviation.replace('{#}', cost),
+			secondary: false
 		});
 	}
 
@@ -784,9 +814,11 @@ export function getPriceArray(totalCost, currencies) {
 		prices.push({
 			...currency,
 			cost: Math.round(numCurrency),
+			quantity: Math.round(numCurrency),
 			baseCost: Math.round(numCurrency),
 			maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
-			string: currency.abbreviation.replace("{#}", numCurrency)
+			string: currency.abbreviation.replace("{#}", numCurrency),
+			secondary: false
 		});
 	}
 
@@ -798,17 +830,19 @@ export function getPriceArray(totalCost, currencies) {
 export function getPriceFromString(str, currencyList = false) {
 
 	if (!currencyList) {
-		currencyList = getCurrencyList().filter(currency => !currency.secondary);
+		currencyList = getCurrencyList()
 	}
 
 	const currencies = foundry.utils.duplicate(currencyList)
 		.map(currency => {
 			currency.quantity = 0
-			currency.identifier = currency.abbreviation.toLowerCase().replace("{#}", "")
+			currency.identifier = currency.abbreviation.toLowerCase().replace("{#}", "").trim()
 			return currency;
 		});
 
-	const splitBy = new RegExp("(.*?) *(" + currencies.map(currency => currency.identifier).join("|") + ")", "g");
+	const sortedCurrencies = currencies.map(currency => `(${currency.identifier})`);
+	sortedCurrencies.sort((a, b) => b.length - a.length);
+	const splitBy = new RegExp("(.*?) *(" + sortedCurrencies.join("|") + ")", "g");
 
 	const parts = [...str.split(",").join("").split(" ").join("").trim().toLowerCase().matchAll(splitBy)];
 
@@ -824,14 +858,16 @@ export function getPriceFromString(str, currencyList = false) {
 				if (roll.total !== Number(part[1])) {
 					currency.roll = roll;
 				}
-				overallCost += roll.total * currency.exchangeRate;
+				if (currency.exchangeRate) {
+					overallCost += roll.total * currency.exchangeRate;
+				}
 			} catch (err) {
 
 			}
 		}
 	}
 
-	if (overallCost === 0) {
+	if (!currencies.some(currency => currency.quantity)) {
 		try {
 			const roll = new Roll(str).evaluate({ async: false });
 			if (roll.total) {
@@ -851,6 +887,29 @@ export function getPriceFromString(str, currencyList = false) {
 
 }
 
+export function getCostOfItem(item, defaultCurrencies = false) {
+
+	if (!defaultCurrencies) {
+		defaultCurrencies = getCurrencyList().filter(currency => !currency.secondary);
+	}
+
+	let overallCost = 0;
+	let itemCost = Utilities.getItemCost(item);
+	if (SYSTEMS.DATA.ITEM_COST_TRANSFORMER) {
+		overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, defaultCurrencies);
+		if (overallCost === false) {
+			Helpers.debug("failed to find price for item:", item)
+		}
+	} else if (typeof itemCost === "string" && isNaN(Number(itemCost))) {
+		overallCost = getPriceFromString(itemCost, defaultCurrencies).overallCost;
+	} else {
+		overallCost = Number(itemCost);
+	}
+
+	return Math.max(0, overallCost);
+
+}
+
 export function getPriceData({
 	cost = false,
 	item = false,
@@ -859,7 +918,8 @@ export function getPriceData({
 	sellerFlagData = false,
 	buyerFlagData = false,
 	itemFlagData = false,
-	quantity = 1
+	quantity = 1,
+	secondaryPrices = false
 } = {}) {
 
 	let priceData = [];
@@ -917,7 +977,7 @@ export function getPriceData({
 	}
 
 	const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
-	const hasOtherPrices = itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
+	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
 
 	const currencyList = getCurrencyList(merchant);
 	const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
@@ -928,18 +988,7 @@ export function getPriceData({
 	const smallestExchangeRate = getSmallestExchangeRate(defaultCurrencies);
 	const decimals = getExchangeRateDecimals(smallestExchangeRate);
 
-	let overallCost;
-	let itemCost = Utilities.getItemCost(item);
-	if (SYSTEMS.DATA.ITEM_COST_TRANSFORMER) {
-		overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, defaultCurrencies);
-		if (overallCost === false) {
-			Helpers.debug("failed to find price for item:", item)
-		}
-	} else if (typeof itemCost === "string" && isNaN(Number(itemCost))) {
-		overallCost = getPriceFromString(itemCost, defaultCurrencies).overallCost;
-	} else {
-		overallCost = Number(itemCost);
-	}
+	let overallCost = getCostOfItem(item, defaultCurrencies);
 
 	if (itemFlagData?.free || (!disableNormalCost && (overallCost === 0 || overallCost < smallestExchangeRate) && !hasOtherPrices) || modifier <= 0) {
 		priceData.push({
@@ -987,9 +1036,62 @@ export function getPriceData({
 	}
 
 	// If the item has custom prices, we include them here
+	if (secondaryPrices) {
+
+		if (!priceData.length) {
+			priceData.push({
+				basePrices: [],
+				basePriceString: "",
+				prices: [],
+				priceString: "",
+				totalCost: 0,
+				baseCost: 0,
+				primary: true,
+				maxQuantity: 0,
+				quantity: quantity
+			});
+		}
+
+		for (const secondaryPrice of secondaryPrices) {
+
+			const itemModifier = modifier;
+			const cost = Math.round(secondaryPrice.quantity * itemModifier * quantity);
+			const baseCost = Math.round(secondaryPrice.quantity * itemModifier);
+			secondaryPrice.name = game.i18n.localize(secondaryPrice.name);
+			if (!secondaryPrice.data?.item) {
+				secondaryPrice.data.item = CompendiumUtilities.getItemFromCache(secondaryPrice.data.uuid);
+			}
+			priceData[0].basePrices.push({
+				...secondaryPrice,
+				cost,
+				baseCost,
+				modifier: itemModifier,
+				string: secondaryPrice.abbreviation.replace("{#}", baseCost),
+				priceString: cost ? secondaryPrice.abbreviation.replace("{#}", cost) : "",
+				basePriceString: baseCost ? secondaryPrice.abbreviation.replace("{#}", baseCost) : ""
+			});
+			priceData[0].prices.push({
+				...secondaryPrice,
+				cost,
+				baseCost,
+				modifier: itemModifier,
+				string: secondaryPrice.abbreviation.replace("{#}", cost),
+				priceString: cost ? secondaryPrice.abbreviation.replace("{#}", cost) : "",
+				basePriceString: baseCost ? secondaryPrice.abbreviation.replace("{#}", baseCost) : ""
+			});
+
+			priceData[0].basePriceString = priceData[0].basePrices.filter(price => price.cost).map(price => price.string).join(" ");
+			priceData[0].priceString = priceData[0].prices.filter(price => price.cost).map(price => price.string).join(" ");
+
+		}
+
+	}
+
+	// If the item has custom prices, we include them here
 	if (itemFlagData.prices.length && !(merchant === buyer && buyerFlagData.onlyAcceptBasePrice)) {
 
-		priceData = priceData.concat(itemFlagData.prices.map(priceGroup => {
+		priceData = itemFlagData.prices.concat(otherPrices.map(priceGroup => {
+			if (!Array.isArray(priceGroup)) priceGroup = [priceGroup];
 			const prices = priceGroup.map(price => {
 				const itemModifier = price.fixed ? 1 : modifier;
 				const cost = Math.round(price.quantity * itemModifier * quantity);
@@ -1004,7 +1106,8 @@ export function getPriceData({
 					baseCost,
 					modifier: itemModifier,
 					priceString: cost ? price.abbreviation.replace("{#}", cost) : "",
-					basePriceString: baseCost ? price.abbreviation.replace("{#}", baseCost) : ""
+					basePriceString: baseCost ? price.abbreviation.replace("{#}", baseCost) : "",
+					secondary: true
 				};
 			});
 
@@ -1031,56 +1134,72 @@ export function getPriceData({
 
 	// For each price group, check for properties and items and make sure that the actor can afford it
 	for (const priceGroup of priceData) {
+
+		const primaryPrices = priceGroup.prices.filter(price => !price.secondary);
+		const secondaryPrices = priceGroup.prices.filter(price => price.secondary);
 		priceGroup.maxQuantity = Infinity;
-		if (priceGroup.baseCost !== undefined) {
+
+		if (primaryPrices.length) {
 			priceGroup.prices.forEach(price => {
 				price.maxQuantity = Infinity;
 			});
-			if (buyerInfiniteCurrencies) continue;
-			priceGroup.maxQuantity = Math.floor(totalCurrencies / priceGroup.baseCost);
-			priceGroup.prices.forEach(price => {
-				price.maxQuantity = priceGroup.maxQuantity;
-			});
-		} else {
-			if (buyerInfiniteQuantity) continue;
-			for (const price of priceGroup.prices) {
-				if (price.type === "attribute") {
-					const attributeQuantity = Number(getProperty(buyer, price.data.path));
-					price.buyerQuantity = attributeQuantity;
-
-					if (price.percent) {
-						const percent = Math.min(1, price.baseCost / 100);
-						const percentQuantity = Math.max(0, Math.floor(attributeQuantity * percent));
-						price.maxQuantity = Math.floor(attributeQuantity / percentQuantity);
-						price.baseCost = !buyer ? price.baseCost : percentQuantity;
-						price.cost = !buyer ? price.cost : percentQuantity * quantity;
-						price.quantity = !buyer ? price.quantity : percentQuantity;
-					} else {
-						price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
-					}
-
-					priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
-
-				} else {
-					const priceItem = CompendiumUtilities.getItemFromCache(price.data.uuid);
-					const foundItem = priceItem ? Utilities.findSimilarItem(buyer.items, priceItem) : false;
-					const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
-					price.buyerQuantity = itemQuantity;
-
-					if (price.percent) {
-						const percent = Math.min(1, price.baseCost / 100);
-						const percentQuantity = Math.max(0, Math.floor(itemQuantity * percent));
-						price.maxQuantity = Math.floor(itemQuantity / percentQuantity);
-						price.baseCost = !buyer ? price.baseCost : percentQuantity;
-						price.cost = !buyer ? price.cost : percentQuantity * quantity;
-						price.quantity = !buyer ? price.quantity : percentQuantity;
-					} else {
-						price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
-					}
-
-					priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity);
-				}
+			if (!buyerInfiniteCurrencies) {
+				priceGroup.maxQuantity = Math.floor(totalCurrencies / priceGroup.baseCost);
+				priceGroup.prices.forEach(price => {
+					price.maxQuantity = priceGroup.maxQuantity;
+				});
 			}
+		}
+
+		for (const price of secondaryPrices) {
+
+			if (buyerInfiniteQuantity) {
+				price.maxQuantity = Infinity;
+				continue;
+			}
+
+			if (price.type === "attribute") {
+				const attributeQuantity = Number(getProperty(buyer, price.data.path));
+				price.buyerQuantity = attributeQuantity;
+
+				if (price.percent) {
+					const percent = Math.min(1, price.baseCost / 100);
+					const percentQuantity = Math.max(0, Math.floor(attributeQuantity * percent));
+					price.maxQuantity = Math.floor(attributeQuantity / percentQuantity);
+					price.baseCost = !buyer ? price.baseCost : percentQuantity;
+					price.cost = !buyer ? price.cost : percentQuantity * quantity;
+					price.quantity = !buyer ? price.quantity : percentQuantity;
+				} else {
+					price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
+				}
+
+				priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
+
+			} else {
+				const priceItem = CompendiumUtilities.getItemFromCache(price.data.uuid);
+				const foundItem = priceItem ? Utilities.findSimilarItem(buyer.items, priceItem) : false;
+				const itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
+				price.buyerQuantity = itemQuantity;
+				if (!itemQuantity) {
+					priceGroup.maxQuantity = 0;
+					priceGroup.quantity = 0;
+					continue;
+				}
+
+				if (price.percent) {
+					const percent = Math.min(1, price.baseCost / 100);
+					const percentQuantity = Math.max(0, Math.floor(itemQuantity * percent));
+					price.maxQuantity = Math.floor(itemQuantity / percentQuantity);
+					price.baseCost = !buyer ? price.baseCost : percentQuantity;
+					price.cost = !buyer ? price.cost : percentQuantity * quantity;
+					price.quantity = !buyer ? price.quantity : percentQuantity;
+				} else {
+					price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
+				}
+
+				priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity);
+			}
+
 		}
 	}
 
@@ -1119,6 +1238,7 @@ export function getPaymentData({
 			const prices = getPriceData({
 				cost: data.cost,
 				item: data.item,
+				secondaryPrices: data.secondaryPrices,
 				seller,
 				buyer,
 				sellerFlagData,
@@ -1138,14 +1258,19 @@ export function getPaymentData({
 				return priceData;
 			}
 
-			if (priceGroup.primary) {
+			const primaryPrices = priceGroup.prices.filter(price => !price.secondary && price.cost);
+			const secondaryPrices = priceGroup.prices.filter(price => price.secondary && price.cost);
+
+			if (primaryPrices.length) {
 
 				priceData.totalCurrencyCost = Helpers.roundToDecimals(priceData.totalCurrencyCost + priceGroup.totalCost, decimals);
 				priceData.primary = true;
 
-			} else {
+			}
 
-				for (const price of priceGroup.prices) {
+			if (secondaryPrices.length) {
+
+				for (const price of secondaryPrices) {
 
 					let existingPrice = priceData.otherPrices.find(otherPrice => {
 						return otherPrice.id === price.id || (otherPrice.name === price.name && otherPrice.img === price.img && otherPrice.type === price.type);
@@ -1386,6 +1511,35 @@ export function getPaymentData({
 	delete paymentData.otherPrices;
 
 	return paymentData;
+
+}
+
+export function isMerchantClosed(merchant, { pileData = false } = {}) {
+
+	if (!pileData) pileData = getActorFlagData(merchant);
+
+	const timestamp = window.SimpleCalendar.api.timestampToDate(window.SimpleCalendar.api.timestamp());
+
+	const openTimes = pileData.openTimes.open;
+	const closeTimes = pileData.openTimes.close;
+
+	const openingTime = Number(openTimes.hour.toString() + "." + openTimes.minute.toString());
+	const closingTime = Number(closeTimes.hour.toString() + "." + closeTimes.minute.toString());
+	const currentTime = Number(timestamp.hour.toString() + "." + timestamp.minute.toString());
+
+	let isClosed = openingTime > closingTime
+		? !(currentTime >= openingTime || currentTime <= closingTime)  // Is the store open over midnight?
+		: !(currentTime >= openingTime && currentTime <= closingTime); // or is the store open during normal daylight hours?
+
+	const currentWeekday = window.SimpleCalendar.api.getCurrentWeekday();
+
+	isClosed = isClosed || (pileData.closedDays ?? []).includes(currentWeekday.name);
+
+	const currentDate = window.SimpleCalendar.api.currentDateTime();
+	const notes = window.SimpleCalendar.api.getNotesForDay(currentDate.year, currentDate.month, currentDate.day);
+	const categories = new Set(notes.map(note => getProperty(note, "flags.foundryvtt-simple-calendar.noteData.categories") ?? []).deepFlatten());
+
+	return isClosed || categories.intersection(new Set(pileData.closedHolidays ?? [])).size > 0;
 
 }
 

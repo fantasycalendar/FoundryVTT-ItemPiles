@@ -3,42 +3,42 @@ import * as Utilities from "./utilities.js";
 
 export function setupCaches() {
 
-  Hooks.on(CONSTANTS.HOOKS.PILE.DELETE, (doc) => {
-    const uuid = Utilities.getUuid(doc);
-    let actor = Utilities.getActor(doc);
-    if (actor instanceof Actor) {
-      actor = actor.toObject();
-    }
-    deletedActorCache.set(uuid, actor);
-  });
+	Hooks.on(CONSTANTS.HOOKS.PILE.DELETE, (doc) => {
+		const uuid = Utilities.getUuid(doc);
+		let actor = Utilities.getActor(doc);
+		if (actor instanceof Actor) {
+			actor = actor.toObject();
+		}
+		deletedActorCache.set(uuid, actor);
+	});
 
 }
 
 class DebouncedCache extends Map {
 
-  #debounceClear = {};
-  #timeout = {};
+	#debounceClear = {};
+	#timeout = {};
 
-  constructor(timeout = 50) {
-    super();
-    this.#timeout = timeout;
-  }
+	constructor(timeout = 50) {
+		super();
+		this.#timeout = timeout;
+	}
 
-  set(key, value) {
-    this.#setDebounce(key)
-    return super.set(key, value);
-  }
+	set(key, value) {
+		this.#setDebounce(key)
+		return super.set(key, value);
+	}
 
-  #setDebounce(key) {
-    if (!this.#debounceClear[key]) {
-      const self = this;
-      this.#debounceClear[key] = foundry.utils.debounce(() => {
-        delete self.#debounceClear[key];
-        self.delete(key);
-      }, this.#timeout);
-    }
-    this.#debounceClear[key]();
-  }
+	#setDebounce(key) {
+		if (!this.#debounceClear[key]) {
+			const self = this;
+			this.#debounceClear[key] = foundry.utils.debounce(() => {
+				delete self.#debounceClear[key];
+				self.delete(key);
+			}, this.#timeout);
+		}
+		this.#debounceClear[key]();
+	}
 }
 
 

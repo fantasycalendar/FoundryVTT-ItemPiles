@@ -1,74 +1,74 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { getContext } from "svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { get } from "svelte/store";
-  import * as PileUtilities from "../../../helpers/pile-utilities.js";
-  import PriceSelector from "../../components/PriceSelector.svelte";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getContext } from "svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { get } from "svelte/store";
+	import * as PileUtilities from "../../../helpers/pile-utilities.js";
+	import PriceSelector from "../../components/PriceSelector.svelte";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let item;
-  export let seller;
-  export let buyer;
-  export let settings;
-  export let elementRoot;
-  export let store = item.store;
+	export let item;
+	export let seller;
+	export let buyer;
+	export let settings;
+	export let elementRoot;
+	export let store = item.store;
 
-  const itemNameStore = item.name;
-  const itemImg = item.img;
-  const itemInfiniteQuantity = item.infiniteQuantity;
-  const itemRarityColor = item.rarityColor;
-  const itemFlagData = item.itemFlagData;
-  const quantityToBuy = item.quantityToBuy;
-  const itemMaxQuantityStore = item.quantity;
-  const itemQuantityForPriceStore = item.quantityForPrice;
-  const prices = item.prices;
+	const itemNameStore = item.name;
+	const itemImg = item.img;
+	const itemInfiniteQuantity = item.infiniteQuantity;
+	const itemRarityColor = item.rarityColor;
+	const itemFlagData = item.itemFlagData;
+	const quantityToBuy = item.quantityToBuy;
+	const itemMaxQuantityStore = item.quantity;
+	const itemQuantityForPriceStore = item.quantityForPrice;
+	const prices = item.prices;
 
-  const sellerPileData = store.pileData;
-  const buyerPileData = store.recipientPileData;
+	const sellerPileData = store.pileData;
+	const buyerPileData = store.recipientPileData;
 
-  let maxItemPurchaseQuantity;
-  let currentQuantityToBuy;
+	let maxItemPurchaseQuantity;
+	let currentQuantityToBuy;
 
-  const selectedPriceGroup = item.selectedPriceGroup;
-  $: {
-    $selectedPriceGroup;
-    currentQuantityToBuy = 1;
-    $quantityToBuy = 1;
-  }
+	const selectedPriceGroup = item.selectedPriceGroup;
+	$: {
+		$selectedPriceGroup;
+		currentQuantityToBuy = 1;
+		$quantityToBuy = 1;
+	}
 
-  let paymentData = {};
-  $: {
-    paymentData = PileUtilities.getPaymentData({
-      purchaseData: [{
-        item: item.item,
-        quantity: $quantityToBuy,
-        paymentIndex: $selectedPriceGroup
-      }],
-      seller,
-      buyer,
-      sellerFlagData: $sellerPileData,
-      buyerFlagData: $buyerPileData,
-    });
-  }
+	let paymentData = {};
+	$: {
+		paymentData = PileUtilities.getPaymentData({
+			purchaseData: [{
+				item: item.item,
+				quantity: $quantityToBuy,
+				paymentIndex: $selectedPriceGroup
+			}],
+			seller,
+			buyer,
+			sellerFlagData: $sellerPileData,
+			buyerFlagData: $buyerPileData,
+		});
+	}
 
-  $: maxSellerItemQuantity = $itemInfiniteQuantity ? Infinity : Math.ceil($itemMaxQuantityStore / $itemQuantityForPriceStore);
-  $: maxItemQuantity = $prices[$selectedPriceGroup]?.maxQuantity ?? Infinity;
-  $: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxSellerItemQuantity);
-  $: itemName = localize($itemNameStore) + ($itemQuantityForPriceStore > 1 ? ` (${$itemQuantityForPriceStore})` : "");
+	$: maxSellerItemQuantity = $itemInfiniteQuantity ? Infinity : Math.ceil($itemMaxQuantityStore / $itemQuantityForPriceStore);
+	$: maxItemQuantity = $prices[$selectedPriceGroup]?.maxQuantity ?? Infinity;
+	$: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxSellerItemQuantity);
+	$: itemName = localize($itemNameStore) + ($itemQuantityForPriceStore > 1 ? ` (${$itemQuantityForPriceStore})` : "");
 
-  function submit() {
-    game.itempiles.API.tradeItems(seller, buyer, [{
-      item: item.item,
-      paymentIndex: get(selectedPriceGroup),
-      quantity: get(quantityToBuy),
-    }], {
-      interactionId: store.interactionId
-    });
-    application.options.resolve();
-    application.close();
-  }
+	function submit() {
+		game.itempiles.API.tradeItems(seller, buyer, [{
+			item: item.item,
+			paymentIndex: get(selectedPriceGroup),
+			quantity: get(quantityToBuy),
+		}], {
+			interactionId: store.interactionId
+		});
+		application.options.resolve();
+		application.close();
+	}
 
 </script>
 
@@ -92,8 +92,8 @@
 						<small>{localize("ITEM-PILES.Applications.TradeMerchantItem.Quantity")}</small>
 						<small style="font-style:italic;">
 							({localize("ITEM-PILES.Applications.TradeMerchantItem.MaxQuantity", {
-              quantity: maxItemPurchaseQuantity
-            })})
+							quantity: maxItemPurchaseQuantity
+						})})
 						</small>
 					</div>
 					<input style="max-width: 40px; max-height: 24px;" type="number" bind:value={currentQuantityToBuy} on:change={(evt) => {
@@ -124,7 +124,7 @@
 			</strong>
 
 			<strong class="item-piles-bottom-divider item-piles-text-right"
-							style="margin-bottom:0.25rem; padding-bottom:0.25rem;">
+			        style="margin-bottom:0.25rem; padding-bottom:0.25rem;">
 				{localize("ITEM-PILES.Applications.TradeMerchantItem." + (settings.selling ? "TheyReceive" : "YouReceive"))}:
 			</strong>
 

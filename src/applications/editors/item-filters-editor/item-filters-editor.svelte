@@ -1,43 +1,43 @@
 <script>
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-  import { getSetting } from "../../../helpers/helpers.js";
-  import SETTINGS from "../../../constants/settings.js";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { get, writable } from "svelte/store";
+	import { getSetting } from "../../../helpers/helpers.js";
+	import SETTINGS from "../../../constants/settings.js";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { get, writable } from "svelte/store";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let data;
-  export let elementRoot;
+	export let data;
+	export let elementRoot;
 
-  let form;
+	let form;
 
-  const itemFilters = writable(data ? data : getSetting(SETTINGS.ITEM_FILTERS))
+	const itemFilters = writable(data ? data : getSetting(SETTINGS.ITEM_FILTERS))
 
-  function add() {
-    itemFilters.update(val => {
-      val.push({ path: "", filters: "" });
-      return val;
-    })
-  }
+	function add() {
+		itemFilters.update(val => {
+			val.push({ path: "", filters: "" });
+			return val;
+		})
+	}
 
-  function remove(index) {
-    itemFilters.update(val => {
-      val.splice(index, 1)
-      return val;
-    })
-  }
+	function remove(index) {
+		itemFilters.update(val => {
+			val.splice(index, 1)
+			return val;
+		})
+	}
 
-  async function updateSettings() {
-    application.options.resolve(get(itemFilters));
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve(get(itemFilters));
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
 </script>
 

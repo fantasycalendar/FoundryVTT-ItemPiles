@@ -1,34 +1,34 @@
 <script>
 
-  import * as Helpers from "../../../helpers/helpers.js";
-  import { writable } from "svelte/store";
-  import { getContext } from "svelte";
-  import StylesEditor from "../styles-editor/styles-editor.js";
+	import * as Helpers from "../../../helpers/helpers.js";
+	import { writable } from "svelte/store";
+	import { getContext } from "svelte";
+	import StylesEditor from "../styles-editor/styles-editor.js";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let index;
-  export let entry;
-  export let image;
-  export let remove;
+	export let index;
+	export let entry;
+	export let image;
+	export let remove;
 
-  let style = writable(entry.styling);
+	let style = writable(entry.styling);
 
-  async function renderStyleEditor(event) {
+	async function renderStyleEditor(event) {
 
-    const oldStyle = entry.styling;
+		const oldStyle = entry.styling;
 
-    const newStyles = await StylesEditor.show(style, {
-      width: 400,
-      left: application.position.left + 405,
-      top: event.clientY - 75,
-      readOnly: true
-    });
+		const newStyles = await StylesEditor.show(style, {
+			width: 400,
+			left: application.position.left + 405,
+			top: event.clientY - 75,
+			readOnly: true
+		});
 
-    style.set(newStyles || oldStyle);
-    entry.styling = newStyles || oldStyle;
+		style.set(newStyles || oldStyle);
+		entry.styling = newStyles || oldStyle;
 
-  }
+	}
 
 </script>
 

@@ -1,28 +1,28 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { getContext } from "svelte";
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { getContext } from "svelte";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let text;
-  export let elementRoot;
+	export let text;
+	export let elementRoot;
 
-  const options = application.options;
+	const options = application.options;
 
-  const originalText = text;
+	const originalText = text;
 
-  let form;
+	let form;
 
-  function requestSubmit() {
-    form.requestSubmit();
-  }
+	function requestSubmit() {
+		form.requestSubmit();
+	}
 
-  function submit() {
-    application.options.resolve(text);
-    application.close();
-  }
+	function submit() {
+		application.options.resolve(text);
+		application.close();
+	}
 
 </script>
 
@@ -30,7 +30,7 @@
 
 <ApplicationShell bind:elementRoot>
 	<form autocomplete="off" bind:this={form} class="item-piles-flexcol" on:submit|once|preventDefault={submit}
-				style="padding:0.5rem;">
+	      style="padding:0.5rem;">
 
 		<TJSProseMirror
 			bind:content={text}

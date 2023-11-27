@@ -1,37 +1,37 @@
 <script>
-  import { fade } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 
-  export let item;
-  export let index;
-  export let columns;
+	export let item;
+	export let index;
+	export let columns;
 
-  const itemName = item.name;
-  const itemImage = item.img;
+	const itemName = item.name;
+	const itemImage = item.img;
 
-  const store = item.store;
-  const itemStore = item.itemDocument;
-  const pileData = store.pileData;
-  const displayQuantityStore = item.displayQuantity;
-  const quantityStore = item.quantity;
-  const itemFlagDataStore = item.itemFlagData;
+	const store = item.store;
+	const itemStore = item.itemDocument;
+	const pileData = store.pileData;
+	const displayQuantityStore = item.displayQuantity;
+	const quantityStore = item.quantity;
+	const itemFlagDataStore = item.itemFlagData;
 
-  $: itemFlagData = $itemFlagDataStore;
-  $: displayQuantity = $displayQuantityStore;
-  $: quantity = $quantityStore;
-  $: editQuantity = $quantityStore;
-  let showEditQuantity = false;
+	$: itemFlagData = $itemFlagDataStore;
+	$: displayQuantity = $displayQuantityStore;
+	$: quantity = $quantityStore;
+	$: editQuantity = $quantityStore;
+	let showEditQuantity = false;
 
-  const displayControlButtons = store.actor.isOwner;
-  const displayBuyButton = !!store.recipient;
+	const displayControlButtons = store.actor.isOwner;
+	const displayBuyButton = !!store.recipient;
 
 </script>
 
 <div class="item-piles-flexrow item-piles-item-row"
-		 class:item-piles-child-even-color={index%2===0}
-		 class:item-piles-child-odd-color={index%2===1}
-		 class:merchant-item-hidden={itemFlagData.hidden}
-		 style="flex: 1 0 auto;"
-		 transition:fade|local={{duration: 250}}>
+     class:item-piles-child-even-color={index%2===0}
+     class:item-piles-child-odd-color={index%2===1}
+     class:merchant-item-hidden={itemFlagData.hidden}
+     style="flex: 1 0 auto;"
+     transition:fade|local={{duration: 250}}>
 
 	{#each columns as column}
 		{#if column?.data}

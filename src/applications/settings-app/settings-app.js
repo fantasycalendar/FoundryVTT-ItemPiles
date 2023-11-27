@@ -5,115 +5,115 @@ import SETTINGS from "../../constants/settings.js";
 
 class SettingsApp extends SvelteApplication {
 
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id: `item-piles-application-system-settings-${randomID()}`,
-      title: "Item Piles Module Configuration",
-      width: 600,
-      svelte: {
-        class: SettingsShell,
-        target: document.body
-      },
-      zIndex: 100,
-      classes: ["item-piles-app"],
-    });
-  }
+	static get defaultOptions() {
+		return foundry.utils.mergeObject(super.defaultOptions, {
+			id: `item-piles-application-system-settings-${randomID()}`,
+			title: "Item Piles Module Configuration",
+			width: 600,
+			svelte: {
+				class: SettingsShell,
+				target: document.body
+			},
+			zIndex: 100,
+			classes: ["item-piles-app"],
+		});
+	}
 
-  static getActiveApp() {
-    return getActiveApps("item-piles-application-system-settings", true);
-  }
+	static getActiveApp() {
+		return getActiveApps("item-piles-application-system-settings", true);
+	}
 
-  static async show(options = {}, dialogData = {}) {
-    const app = this.getActiveApp()
-    if (app) return app.render(false, { focus: true });
-    return new Promise((resolve) => {
-      options.resolve = resolve;
-      new this(options, dialogData).render(true, { focus: true });
-    })
-  }
+	static async show(options = {}, dialogData = {}) {
+		const app = this.getActiveApp()
+		if (app) return app.render(false, { focus: true });
+		return new Promise((resolve) => {
+			options.resolve = resolve;
+			new this(options, dialogData).render(true, { focus: true });
+		})
+	}
 
 
-  /** @override */
-  _getHeaderButtons() {
-    let buttons = super._getHeaderButtons();
-    if (game.user.isGM) {
-      buttons = [
-        {
-          label: "ITEM-PILES.Applications.Settings.Export",
-          class: "item-piles-export-settings",
-          icon: "fas fa-file-export",
-          onclick: () => {
-            const settingKeys = Object.fromEntries(Object.entries(SETTINGS)
-              .filter(([_, value]) => typeof value === "string")
-              .map(([key, value]) => [value, key]));
-            const settings = Object.entries(this.svelte.applicationShell.settings)
-              .filter(([_, setting]) => {
-                return setting.system && setting.name;
-              }).map(([key, setting]) => {
-                return [settingKeys[key], setting.value];
-              });
-            const a = document.createElement("a");
-            const file = new Blob([JSON.stringify(Object.fromEntries(settings), null, 4)], { type: "text/json" });
-            a.href = URL.createObjectURL(file);
-            a.download = `item-piles-${game.system.id}.json`;
-            a.click();
-            a.remove();
-          }
-        },
-        {
-          label: "ITEM-PILES.Applications.Settings.Import",
-          class: "item-piles-import-settings",
-          icon: "fas fa-file-import",
-          onclick: () => {
+	/** @override */
+	_getHeaderButtons() {
+		let buttons = super._getHeaderButtons();
+		if (game.user.isGM) {
+			buttons = [
+				{
+					label: "ITEM-PILES.Applications.Settings.Export",
+					class: "item-piles-export-settings",
+					icon: "fas fa-file-export",
+					onclick: () => {
+						const settingKeys = Object.fromEntries(Object.entries(SETTINGS)
+							.filter(([_, value]) => typeof value === "string")
+							.map(([key, value]) => [value, key]));
+						const settings = Object.entries(this.svelte.applicationShell.settings)
+							.filter(([_, setting]) => {
+								return setting.system && setting.name;
+							}).map(([key, setting]) => {
+								return [settingKeys[key], setting.value];
+							});
+						const a = document.createElement("a");
+						const file = new Blob([JSON.stringify(Object.fromEntries(settings), null, 4)], { type: "text/json" });
+						a.href = URL.createObjectURL(file);
+						a.download = `item-piles-${game.system.id}.json`;
+						a.click();
+						a.remove();
+					}
+				},
+				{
+					label: "ITEM-PILES.Applications.Settings.Import",
+					class: "item-piles-import-settings",
+					icon: "fas fa-file-import",
+					onclick: () => {
 
-            const input = document.createElement('input');
-            input.type = 'file';
+						const input = document.createElement('input');
+						input.type = 'file';
 
-            input.onchange = e => {
+						input.onchange = e => {
 
-              input.remove();
+							input.remove();
 
-              // getting a hold of the file reference
-              const file = e.target.files[0];
+							// getting a hold of the file reference
+							const file = e.target.files[0];
 
-              const reader = new FileReader();
-              reader.addEventListener('load', async () => {
-                try {
-                  const incomingSettings = JSON.parse(reader.result);
-                  this.svelte.applicationShell.importSettings(incomingSettings)
-                } catch (err) {
-                  console.error(err);
-                }
-              });
+							const reader = new FileReader();
+							reader.addEventListener('load', async () => {
+								try {
+									const incomingSettings = JSON.parse(reader.result);
+									this.svelte.applicationShell.importSettings(incomingSettings)
+								} catch (err) {
+									console.error(err);
+								}
+							});
 
-              reader.readAsText(file);
+							reader.readAsText(file);
 
-            }
+						}
 
-            input.click();
-          }
-        },
-      ].concat(buttons);
-    }
-    return buttons
-  }
+						input.click();
+					}
+				},
+			].concat(buttons);
+		}
+		return buttons
+	}
 }
 
 export default class SettingsShim extends FormApplication {
 
-  /**
-   * @inheritDoc
-   */
-  constructor() {
-    super({});
-    SettingsApp.show();
-  }
+	/**
+	 * @inheritDoc
+	 */
+	constructor() {
+		super({});
+		SettingsApp.show();
+	}
 
-  async _updateObject(event, formData) {
-  }
+	async _updateObject(event, formData) {
+	}
 
-  render() {
-    this.close();
-  }
+	render() {
+		this.close();
+	}
 
 }

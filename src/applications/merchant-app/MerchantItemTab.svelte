@@ -1,44 +1,44 @@
 <script>
 
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import MerchantItemEntry from "./MerchantItemEntry.svelte";
-  import CategoryHeader from "./components/CategoryHeader.svelte";
-  import { get } from "svelte/store";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import MerchantItemEntry from "./MerchantItemEntry.svelte";
+	import CategoryHeader from "./components/CategoryHeader.svelte";
+	import { get } from "svelte/store";
 
-  export let store;
-  export let noItemsLabel = "ITEM-PILES.Merchant.NoItemsForSale";
-  export let services = false;
+	export let store;
+	export let noItemsLabel = "ITEM-PILES.Merchant.NoItemsForSale";
+	export let services = false;
 
-  const pileData = store.pileData;
-  const searchStore = store.search;
-  const visibleItemsStore = store.visibleItems;
-  const itemsStore = store.items;
-  const itemsPerCategoryStore = store.itemsPerCategory;
-  const categoryStore = store.categories;
-  const priceModifiersPerType = store.priceModifiersPerType;
-  const itemCategoriesStore = store.itemCategories;
-  const typeFilterStore = store.typeFilter;
-  const sortTypesStore = store.sortTypes;
-  const sortTypeStore = store.sortType;
-  const inverseSortStore = store.inverseSort;
-  const editPrices = store.editPrices;
-  const itemColumns = store.itemColumns;
+	const pileData = store.pileData;
+	const searchStore = store.search;
+	const visibleItemsStore = store.visibleItems;
+	const itemsStore = store.items;
+	const itemsPerCategoryStore = store.itemsPerCategory;
+	const categoryStore = store.categories;
+	const priceModifiersPerType = store.priceModifiersPerType;
+	const itemCategoriesStore = store.itemCategories;
+	const typeFilterStore = store.typeFilter;
+	const sortTypesStore = store.sortTypes;
+	const sortTypeStore = store.sortType;
+	const inverseSortStore = store.inverseSort;
+	const editPrices = store.editPrices;
+	const itemColumns = store.itemColumns;
 
-  $: categoryDropDown = $itemCategoriesStore.filter(category => category.service === services);
-  $: categories = $categoryStore.filter(category => category.service === services);
-  $: items = $itemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
-  $: visibleItems = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
+	$: categoryDropDown = $itemCategoriesStore.filter(category => category.service === services);
+	$: categories = $categoryStore.filter(category => category.service === services);
+	$: items = $itemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
+	$: visibleItems = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
 
-  let columns = [];
-  $: {
-    columns = [
-      {
-        label: "Name",
-        component: CategoryHeader
-      },
-      ...$itemColumns.slice(1)
-    ]
-  }
+	let columns = [];
+	$: {
+		columns = [
+			{
+				label: "Name",
+				component: CategoryHeader
+			},
+			...$itemColumns.slice(1)
+		]
+	}
 
 </script>
 <div class="item-piles-flexrow">
@@ -76,8 +76,8 @@
 						}}>
 								{@html column.label}
 								<i class="fas"
-									 class:fa-chevron-down={!$inverseSortStore && $sortTypeStore === columnIndex+1}
-									 class:fa-chevron-up={$inverseSortStore && $sortTypeStore === columnIndex+1}
+								   class:fa-chevron-down={!$inverseSortStore && $sortTypeStore === columnIndex+1}
+								   class:fa-chevron-up={$inverseSortStore && $sortTypeStore === columnIndex+1}
 								></i>
 							</a>
 						</div>
@@ -104,8 +104,8 @@
 						}}>
 							{@html column.label}
 							<i class="fas"
-								 class:fa-chevron-down={!$inverseSortStore && $sortTypeStore === columnIndex+1}
-								 class:fa-chevron-up={$inverseSortStore && $sortTypeStore === columnIndex+1}
+							   class:fa-chevron-down={!$inverseSortStore && $sortTypeStore === columnIndex+1}
+							   class:fa-chevron-up={$inverseSortStore && $sortTypeStore === columnIndex+1}
 							></i>
 						</a>
 					</div>

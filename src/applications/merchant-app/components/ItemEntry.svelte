@@ -1,37 +1,37 @@
 <script>
 
-  import QuantityColumn from "./QuantityColumn.svelte";
+	import QuantityColumn from "./QuantityColumn.svelte";
 
-  export let item;
-  export let showQuantity = false;
+	export let item;
+	export let showQuantity = false;
 
-  const itemNameStore = item.name;
-  const itemImage = item.img;
-  const itemRarityColor = item.rarityColor;
-  const itemQuantityForPrice = item.quantityForPrice;
+	const itemNameStore = item.name;
+	const itemImage = item.img;
+	const itemRarityColor = item.rarityColor;
+	const itemQuantityForPrice = item.quantityForPrice;
 
-  const store = item.store;
-  const pileData = store.pileData;
-  const displayQuantityStore = item.displayQuantity;
-  const infiniteQuantityStore = item.infiniteQuantity;
-  const quantityStore = item.quantity;
-  const itemFlagDataStore = item.itemFlagData;
+	const store = item.store;
+	const pileData = store.pileData;
+	const displayQuantityStore = item.displayQuantity;
+	const infiniteQuantityStore = item.infiniteQuantity;
+	const quantityStore = item.quantity;
+	const itemFlagDataStore = item.itemFlagData;
 
-  $: itemFlagData = $itemFlagDataStore;
-  $: displayQuantity = $displayQuantityStore;
-  $: infiniteQuantity = $infiniteQuantityStore;
+	$: itemFlagData = $itemFlagDataStore;
+	$: displayQuantity = $displayQuantityStore;
+	$: infiniteQuantity = $infiniteQuantityStore;
 
-  $: quantity = $quantityStore;
-  $: editQuantity = $quantityStore;
-  $: itemName = $itemNameStore + ($itemQuantityForPrice > 1 ? ` (${$itemQuantityForPrice})` : "");
+	$: quantity = $quantityStore;
+	$: editQuantity = $quantityStore;
+	$: itemName = $itemNameStore + ($itemQuantityForPrice > 1 ? ` (${$itemQuantityForPrice})` : "");
 
-  const displayControlButtons = store.actor.isOwner;
-  const displayBuyButton = !!store.recipient;
+	const displayControlButtons = store.actor.isOwner;
+	const displayBuyButton = !!store.recipient;
 
 </script>
 
 <div class="item-piles-merchant-item-container"
-		 class:merchant-item-hidden={itemFlagData.hidden}>
+     class:merchant-item-hidden={itemFlagData.hidden}>
 
 	<div
 		class="item-piles-img-container"

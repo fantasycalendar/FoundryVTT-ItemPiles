@@ -32,6 +32,16 @@ export async function applyDefaultSettings() {
   await patchCurrencySettings();
 }
 
+export async function applySoftMigration(migrationKey) {
+  const migrationSettings = SYSTEMS.DATA.SOFT_MIGRATIONS[migrationKey];
+  for (const [key, values] of Object.entries(migrationSettings)) {
+    const settingsKey = SETTINGS[key];
+    const currentSettingValue = Helpers.getSetting(settingsKey);
+    await Helpers.setSetting(settingsKey, foundry.utils.mergeObject(currentSettingValue, values));
+  }
+  await Helpers.setSetting(SETTINGS.SYSTEM_VERSION, SYSTEMS.DATA.VERSION);
+}
+
 export async function patchCurrencySettings() {
   const currencies = Helpers.getSetting(SETTINGS.CURRENCIES);
   for (let currency of currencies) {
@@ -88,7 +98,10 @@ export async function checkSystem() {
     const currentVersion = Helpers.getSetting(SETTINGS.SYSTEM_VERSION);
     const newVersion = SYSTEMS.DATA.VERSION;
     Helpers.debug(`Comparing system version - Current: ${currentVersion} - New: ${newVersion}`)
-    if (isNewerVersion(newVersion, currentVersion)) {
+    if (SYSTEMS.DATA.SOFT_MIGRATIONS[currentVersion + "-" + newVersion]) {
+      Helpers.debug(`Applying soft migration for ${game.system.title}`);
+      await applySoftMigration(currentVersion + "-" + newVersion);
+    } else if (isNewerVersion(newVersion, currentVersion)) {
       Helpers.debug(`Applying system settings for ${game.system.title}`)
       await applyDefaultSettings();
     }

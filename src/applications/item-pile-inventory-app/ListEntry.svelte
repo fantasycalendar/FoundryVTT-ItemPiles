@@ -1,38 +1,38 @@
 <script>
 
-  import { fade } from 'svelte/transition';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { fade } from 'svelte/transition';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-  export let store;
-  export let entry;
-  export let currency = false;
+	export let store;
+	export let entry;
+	export let currency = false;
 
-  const name = entry.name;
-  const img = entry.img;
-  const rarityColor = entry.rarityColor;
-  const quantityLeft = entry.quantityLeft;
-  const quantity = entry.quantity;
-  const currentQuantity = entry.currentQuantity;
-  const pileData = store.pileData;
+	const name = entry.name;
+	const img = entry.img;
+	const rarityColor = entry.rarityColor;
+	const quantityLeft = entry.quantityLeft;
+	const quantity = entry.quantity;
+	const currentQuantity = entry.currentQuantity;
+	const pileData = store.pileData;
 
-  $: canInspectItems = entry.id && $pileData.canInspectItems;
+	$: canInspectItems = entry.id && $pileData.canInspectItems;
 
-  const editQuantities = store.editQuantities;
+	const editQuantities = store.editQuantities;
 
-  function dragStart(event) {
-    event.dataTransfer.setData('text/plain', JSON.stringify({
-      type: "Item",
-      uuid: entry.item.uuid
-    }));
-  }
+	function dragStart(event) {
+		event.dataTransfer.setData('text/plain', JSON.stringify({
+			type: "Item",
+			uuid: entry.item.uuid
+		}));
+	}
 
 </script>
 
 <div class="item-piles-flexrow item-piles-item-row item-piles-even-color"
-		 class:item-piles-disabled={!$editQuantities && (!$quantityLeft || !$quantity)}
-		 draggable={!!entry.id}
-		 on:dragstart={(event) => { dragStart(event) }}
-		 transition:fade={{duration: 250}}>
+     class:item-piles-disabled={!$editQuantities && (!$quantityLeft || !$quantity)}
+     draggable={!!entry.id}
+     on:dragstart={(event) => { dragStart(event) }}
+     transition:fade={{duration: 250}}>
 
 	<div class="item-piles-img-container">
 		<img class="item-piles-img" src="{$img}"/>
@@ -41,8 +41,8 @@
 	<div class="item-piles-name">
 		<div class="item-piles-name-container">
 			<p class:item-piles-clickable-link="{canInspectItems}"
-				 on:click={() => { entry.preview() }}
-				 style="color: {$rarityColor || 'inherit'};"
+			   on:click={() => { entry.preview() }}
+			   style="color: {$rarityColor || 'inherit'};"
 			>
 				{$name}
 			</p>
@@ -60,7 +60,7 @@
 
 				<div class="item-piles-quantity-input-container">
 					<input class="item-piles-quantity" type="number" min="0" bind:value="{$quantity}"
-								 draggable="true" on:dragstart|stopPropagation|preventDefault/>
+					       draggable="true" on:dragstart|stopPropagation|preventDefault/>
 				</div>
 
 			{:else}
@@ -68,7 +68,7 @@
 				{#if $quantityLeft && $quantity}
 					<div class="item-piles-quantity-input-container">
 						<input class="item-piles-quantity" type="number" min="1" bind:value="{$currentQuantity}"
-									 max="{$quantity}" disabled="{!$quantity}"/>
+						       max="{$quantity}" disabled="{!$quantity}"/>
 
 						<span class="item-piles-input-divider" class:item-piles-text-right={!store.recipient}>
                / {$quantityLeft}

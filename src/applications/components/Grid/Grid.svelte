@@ -1,84 +1,84 @@
 <script>
 
-  import { createEventDispatcher } from 'svelte';
-  import { writable } from 'svelte/store';
-  import { styleFromObject } from '../../../helpers/helpers';
-  import { calcPosition } from './grid-utils';
-  import GridItem from './GridItem.svelte';
+	import { createEventDispatcher } from 'svelte';
+	import { writable } from 'svelte/store';
+	import { styleFromObject } from '../../../helpers/helpers';
+	import { calcPosition } from './grid-utils';
+	import GridItem from './GridItem.svelte';
 
-  export let gridContainer = HTMLDivElement;
-  export let items = [];
-  export let dropGhost = false;
-  export let options = {
-    cols: null,
-    rows: null,
-    enabledCols: null,
-    enabledRows: null,
-    gap: 10,
-    gridSize: 50,
-    canOrganize: false,
-    backgroundGrid: false,
-    class: "",
-    activeClass: "",
-    previewClass: "",
-    collisionClass: "",
-    hoverClass: "",
-    highlightClass: "",
-    highlightItems: false
-  }
+	export let gridContainer = HTMLDivElement;
+	export let items = [];
+	export let dropGhost = false;
+	export let options = {
+		cols: null,
+		rows: null,
+		enabledCols: null,
+		enabledRows: null,
+		gap: 10,
+		gridSize: 50,
+		canOrganize: false,
+		backgroundGrid: false,
+		class: "",
+		activeClass: "",
+		previewClass: "",
+		collisionClass: "",
+		hoverClass: "",
+		highlightClass: "",
+		highlightItems: false
+	}
 
-  let containerHeight = writable(0);
-  let containerWidth = writable(0);
+	let containerHeight = writable(0);
+	let containerWidth = writable(0);
 
-  const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher();
 
-  function itemChangeEvent(event) {
-    dispatch('change', { ...event.detail });
-  }
+	function itemChangeEvent(event) {
+		dispatch('change', { ...event.detail });
+	}
 
-  function itemHoverEvent(event) {
-    dispatch('hover', { ...event.detail });
-  }
+	function itemHoverEvent(event) {
+		dispatch('hover', { ...event.detail });
+	}
 
-  function itemBeginDrag(event) {
-    dispatch('itembegindrag', { ...event.detail });
-  }
+	function itemBeginDrag(event) {
+		dispatch('itembegindrag', { ...event.detail });
+	}
 
-  function itemStopDrag(event) {
-    dispatch('itemstopdrag', { ...event.detail });
-  }
+	function itemStopDrag(event) {
+		dispatch('itemstopdrag', { ...event.detail });
+	}
 
-  function itemMove(event) {
-    dispatch('itemmove', { ...event.detail });
-  }
+	function itemMove(event) {
+		dispatch('itemmove', { ...event.detail });
+	}
 
-  function itemHoverLeaveEvent(event) {
-    dispatch('leave', { ...event.detail });
-  }
+	function itemHoverLeaveEvent(event) {
+		dispatch('leave', { ...event.detail });
+	}
 
-  function itemRightClickEvent(event) {
-    dispatch('rightclick', { ...event.detail });
-  }
+	function itemRightClickEvent(event) {
+		dispatch('rightclick', { ...event.detail });
+	}
 
-  function itemDoubleClickEvent(event) {
-    dispatch('doubleclick', { ...event.detail });
-  }
+	function itemDoubleClickEvent(event) {
+		dispatch('doubleclick', { ...event.detail });
+	}
 
-  $: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
-  $: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
+	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
+	$: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
 
-  $: containerStyle = styleFromObject({
-    "width": $containerWidth + "px",
-    "height": $containerHeight + "px",
-  });
+	$: containerStyle = styleFromObject({
+		"width": $containerWidth + "px",
+		"height": $containerHeight + "px",
+	});
 
-  let backgroundGridStyle = "";
-  $: backgroundGridStyle = styleFromObject({
-    "grid-template-columns": `repeat(${options.cols}, ${options.gridSize + options.gap / 2}px)`,
-    "grid-template-rows": `repeat(${options.rows}, ${options.gridSize + options.gap / 2}px)`,
-    "gap": `${options.gap / 2}px`,
-    "top": `${options.gap / 2}px`
-  });
+	let backgroundGridStyle = "";
+	$: backgroundGridStyle = styleFromObject({
+		"grid-template-columns": `repeat(${options.cols}, ${options.gridSize + options.gap / 2}px)`,
+		"grid-template-rows": `repeat(${options.rows}, ${options.gridSize + options.gap / 2}px)`,
+		"gap": `${options.gap / 2}px`,
+		"top": `${options.gap / 2}px`
+	});
 
 </script>
 
@@ -123,7 +123,7 @@
 			{#each Array(options.rows) as _, rowIndex (rowIndex)}
 				{#each Array(options.cols) as _, colIndex (colIndex)}
 					<div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
-							 style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}"></div>
+					     style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}"></div>
 				{/each}
 			{/each}
 		</div>

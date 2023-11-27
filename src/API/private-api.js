@@ -416,10 +416,11 @@ export default class PrivateAPI {
 		const transaction = new Transaction(targetActor);
 
 		const priceData = PileUtilities.getPriceFromString(currencies)
+		const secondaryPrices = priceData.currencies.filter(currency => currency.secondary && currency.quantity);
 		const overallCost = priceData.overallCost;
 
 		const paymentData = PileUtilities.getPaymentData({
-			purchaseData: [{ cost: overallCost, quantity: 1 }], buyer: targetActor
+			purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: targetActor
 		});
 
 		const itemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")

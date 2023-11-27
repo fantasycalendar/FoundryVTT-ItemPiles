@@ -1,116 +1,116 @@
 <script>
-  import { getContext, onDestroy } from 'svelte';
-  import { fade } from 'svelte/transition';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+	import { getContext, onDestroy } from 'svelte';
+	import { fade } from 'svelte/transition';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
 
-  import ItemList from "./ItemList.svelte";
-  import CurrencyList from "./CurrencyList.svelte";
-  import ActorPicker from "../components/ActorPicker.svelte";
+	import ItemList from "./ItemList.svelte";
+	import CurrencyList from "./CurrencyList.svelte";
+	import ActorPicker from "../components/ActorPicker.svelte";
 
-  import * as SharingUtilities from "../../helpers/sharing-utilities.js";
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import PrivateAPI from "../../API/private-api.js";
-  import ItemPileStore from "../../stores/item-pile-store.js";
-  import CategorizedItemList from "./CategorizedItemList.svelte";
-  import * as Helpers from "../../helpers/helpers.js";
-  import { getSourceActorFromDropData } from "../../helpers/utilities.js";
+	import * as SharingUtilities from "../../helpers/sharing-utilities.js";
+	import * as PileUtilities from "../../helpers/pile-utilities.js";
+	import PrivateAPI from "../../API/private-api.js";
+	import ItemPileStore from "../../stores/item-pile-store.js";
+	import CategorizedItemList from "./CategorizedItemList.svelte";
+	import * as Helpers from "../../helpers/helpers.js";
+	import { getSourceActorFromDropData } from "../../helpers/utilities.js";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  export let elementRoot;
-  export let actor;
-  export let recipient;
+	export let elementRoot;
+	export let actor;
+	export let recipient;
 
-  export let store = ItemPileStore.make(application, actor, recipient);
+	export let store = ItemPileStore.make(application, actor, recipient);
 
-  // Stores
-  let canBeSplit = false;
-  let searchStore = store.search;
-  let editQuantities = store.editQuantities;
-  let pileData = store.pileData;
-  let deleted = store.deleted;
+	// Stores
+	let canBeSplit = false;
+	let searchStore = store.search;
+	let editQuantities = store.editQuantities;
+	let pileData = store.pileData;
+	let deleted = store.deleted;
 
-  const items = store.allItems;
-  const currencies = store.currencies;
-  const numItems = store.numItems;
-  const shareData = store.shareData;
-  const numCurrencies = store.numCurrencies;
+	const items = store.allItems;
+	const currencies = store.currencies;
+	const numItems = store.numItems;
+	const shareData = store.shareData;
+	const numCurrencies = store.numCurrencies;
 
-  $: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
-  $: hasItems = $numItems > 0;
-  $: showSearchBar = $numItems >= 8;
-  $: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
-  $: {
-    $shareData;
-    $items;
-    $currencies;
-    canBeSplit = SharingUtilities.canItemPileBeSplit(actor);
-  }
+	$: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
+	$: hasItems = $numItems > 0;
+	$: showSearchBar = $numItems >= 8;
+	$: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
+	$: {
+		$shareData;
+		$items;
+		$currencies;
+		canBeSplit = SharingUtilities.canItemPileBeSplit(actor);
+	}
 
-  let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
+	let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 
-  async function dropData(event) {
+	async function dropData(event) {
 
-    event.preventDefault();
+		event.preventDefault();
 
-    let data;
-    try {
-      data = JSON.parse(event.dataTransfer.getData('text/plain'));
-    } catch (err) {
-      return false;
-    }
+		let data;
+		try {
+			data = JSON.parse(event.dataTransfer.getData('text/plain'));
+		} catch (err) {
+			return false;
+		}
 
-    if (data.type === "Actor" && game.user.isGM) {
-      const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
-      return store.updateRecipient(newRecipient)
-    }
+		if (data.type === "Actor" && game.user.isGM) {
+			const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
+			return store.updateRecipient(newRecipient)
+		}
 
-    if (data.type !== "Item") {
-      Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
-      return false;
-    }
+		if (data.type !== "Item") {
+			Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
+			return false;
+		}
 
-    const item = await Item.implementation.fromDropData(data);
-    const itemData = item.toObject();
+		const item = await Item.implementation.fromDropData(data);
+		const itemData = item.toObject();
 
-    if (!itemData) {
-      console.error(data);
-      throw Helpers.custom_error("Something went wrong when dropping this item!")
-    }
+		if (!itemData) {
+			console.error(data);
+			throw Helpers.custom_error("Something went wrong when dropping this item!")
+		}
 
-    const source = getSourceActorFromDropData(data);
+		const source = getSourceActorFromDropData(data);
 
-    return PrivateAPI._dropItem({
-      source: source,
-      target: store.actor,
-      itemData: {
-        item: itemData, quantity: 1
-      },
-      skipCheck: true
-    });
+		return PrivateAPI._dropItem({
+			source: source,
+			target: store.actor,
+			itemData: {
+				item: itemData, quantity: 1
+			},
+			skipCheck: true
+		});
 
-  }
+	}
 
-  function preventDefaultGM(event) {
-    if (game.user.isGM) return;
-    event.preventDefault();
-  }
+	function preventDefaultGM(event) {
+		if (game.user.isGM) return;
+		event.preventDefault();
+	}
 
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+	function preventDefault(event) {
+		event.preventDefault();
+	}
 
-  let itemListElement;
-  let scrolled = false;
+	let itemListElement;
+	let scrolled = false;
 
-  function evaluateShadow() {
-    scrolled = itemListElement.scrollTop > 20;
-  }
+	function evaluateShadow() {
+		scrolled = itemListElement.scrollTop > 20;
+	}
 
-  onDestroy(() => {
-    store.onDestroy();
-  });
+	onDestroy(() => {
+		store.onDestroy();
+	});
 
 </script>
 
@@ -121,7 +121,7 @@
 	<main in:fade={{duration: 500}}>
 
 		<div class="item-piles-item-drop-container" on:dragover={preventDefault} on:dragstart={preventDefaultGM}
-				 on:drop={dropData}>
+		     on:drop={dropData}>
 
 			{#if $deleted}
 				<p style="text-align: center; flex: 0 1 auto;">
@@ -133,7 +133,7 @@
 
 				{#if showSearchBar}
 					<div class="form-group item-piles-flexrow item-piles-top-divider item-piles-bottom-divider"
-							 style="margin-bottom: 0.5rem; align-items: center;" transition:fade={{duration: 250}}>
+					     style="margin-bottom: 0.5rem; align-items: center;" transition:fade={{duration: 250}}>
 						<label style="flex:0 1 auto; margin-right: 5px;">Search:</label>
 						<input type="text" bind:value={$searchStore}>
 					</div>

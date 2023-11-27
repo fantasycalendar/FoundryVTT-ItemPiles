@@ -1,17 +1,17 @@
 <script>
 
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-  export let store;
-  export let item;
+	export let store;
+	export let item;
 
-  const name = item.name;
-  const img = item.img;
-  const quantity = item.quantity;
-  const itemFlagData = item.itemFlagData;
-  const pileData = store.pileData;
+	const name = item.name;
+	const img = item.img;
+	const quantity = item.quantity;
+	const itemFlagData = item.itemFlagData;
+	const pileData = store.pileData;
 
-  const editQuantities = store.editQuantities;
+	const editQuantities = store.editQuantities;
 
 </script>
 

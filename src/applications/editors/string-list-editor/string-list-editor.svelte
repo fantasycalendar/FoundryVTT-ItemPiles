@@ -1,45 +1,45 @@
 <script>
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { get, writable } from "svelte/store";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { get, writable } from "svelte/store";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  let form;
+	let form;
 
-  export let elementRoot;
-  export let data;
+	export let elementRoot;
+	export let data;
 
-  const keyValuePair = application.options?.keyValuePair ?? false;
-  const stringListStore = writable(data);
+	const keyValuePair = application.options?.keyValuePair ?? false;
+	const stringListStore = writable(data);
 
-  function add() {
-    stringListStore.update(val => {
-      if (keyValuePair) {
-        val.push(["", ""]);
-      } else {
-        val.push("");
-      }
-      return val;
-    })
-  }
+	function add() {
+		stringListStore.update(val => {
+			if (keyValuePair) {
+				val.push(["", ""]);
+			} else {
+				val.push("");
+			}
+			return val;
+		})
+	}
 
-  function remove(index) {
-    stringListStore.update(val => {
-      val.splice(index, 1);
-      return val;
-    })
-  }
+	function remove(index) {
+		stringListStore.update(val => {
+			val.splice(index, 1);
+			return val;
+		})
+	}
 
-  async function updateSettings() {
-    application.options.resolve(get(stringListStore));
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve(get(stringListStore));
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
 </script>
 

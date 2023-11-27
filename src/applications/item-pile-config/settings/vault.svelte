@@ -1,41 +1,41 @@
 <script>
 
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import VaultAccessEditor from "../../editors/vault-access-editor/vault-access-editor.js";
-  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-  import CustomDialog from "../../components/CustomDialog.svelte";
-  import * as PileUtilities from "../../../helpers/pile-utilities.js";
-  import CONSTANTS from "../../../constants/constants.js";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import VaultAccessEditor from "../../editors/vault-access-editor/vault-access-editor.js";
+	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import CustomDialog from "../../components/CustomDialog.svelte";
+	import * as PileUtilities from "../../../helpers/pile-utilities.js";
+	import CONSTANTS from "../../../constants/constants.js";
 
-  export let pileData;
-  export let pileActor;
+	export let pileData;
+	export let pileActor;
 
-  async function showVaultAccessEditor() {
-    const data = pileData.vaultAccess || [];
-    return VaultAccessEditor.show(data, {
-      id: `vault-access-editor-item-pile-config-${pileActor.id}`,
-      title: localize("ITEM-PILES.Applications.VaultAccessEditor.Title", { actor_name: pileActor.name }),
-    }).then((result) => {
-      pileData.vaultAccess = result || [];
-    });
-  }
+	async function showVaultAccessEditor() {
+		const data = pileData.vaultAccess || [];
+		return VaultAccessEditor.show(data, {
+			id: `vault-access-editor-item-pile-config-${pileActor.id}`,
+			title: localize("ITEM-PILES.Applications.VaultAccessEditor.Title", { actor_name: pileActor.name }),
+		}).then((result) => {
+			pileData.vaultAccess = result || [];
+		});
+	}
 
-  async function clearVaultLog() {
-    const doThing = await TJSDialog.confirm({
-      id: `sharing-dialog-item-pile-config-${pileActor.id}`,
-      title: "Item Piles - " + localize("ITEM-PILES.Dialogs.ClearVaultLog.Title"),
-      content: {
-        class: CustomDialog,
-        props: {
-          header: localize("ITEM-PILES.Dialogs.ClearVaultLog.Title"),
-          content: localize("ITEM-PILES.Dialogs.ClearVaultLog.Content", { actor_name: pileActor.name })
-        },
-      },
-      modal: true
-    });
-    if (!doThing) return;
-    return PileUtilities.clearActorLog(pileActor);
-  }
+	async function clearVaultLog() {
+		const doThing = await TJSDialog.confirm({
+			id: `sharing-dialog-item-pile-config-${pileActor.id}`,
+			title: "Item Piles - " + localize("ITEM-PILES.Dialogs.ClearVaultLog.Title"),
+			content: {
+				class: CustomDialog,
+				props: {
+					header: localize("ITEM-PILES.Dialogs.ClearVaultLog.Title"),
+					content: localize("ITEM-PILES.Dialogs.ClearVaultLog.Content", { actor_name: pileActor.name })
+				},
+			},
+			modal: true
+		});
+		if (!doThing) return;
+		return PileUtilities.clearActorLog(pileActor);
+	}
 
 </script>
 
@@ -59,14 +59,6 @@
 
 <div class="form-group">
 	<label>
-		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.CanStackItems")}</span>
-		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.CanStackItemsExplanation")}</p>
-	</label>
-	<input bind:checked={pileData.canStackItems} type="checkbox"/>
-</div>
-
-<div class="form-group">
-	<label>
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.EnableExpansion")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Vault.EnableExpansionExplanation")}</p>
 	</label>
@@ -85,10 +77,10 @@
 		</div>
 		<div style="align-items: center;">
 			<input bind:value={pileData.baseExpansionCols} disabled={!pileData.vaultExpansion} placeholder="Enter a number..."
-						 style="text-align: right;" type="number"/>
+			       style="text-align: right;" type="number"/>
 			<span style="flex: 0;">x</span>
 			<input bind:value={pileData.baseExpansionRows} disabled={!pileData.vaultExpansion} placeholder="Enter a number..."
-						 type="number"/>
+			       type="number"/>
 		</div>
 	</div>
 </div>

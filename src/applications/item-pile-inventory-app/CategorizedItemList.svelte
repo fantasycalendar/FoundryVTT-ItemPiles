@@ -1,13 +1,13 @@
 <script>
 
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { fade } from 'svelte/transition';
-  import ListEntry from "./ListEntry.svelte";
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { fade } from 'svelte/transition';
+	import ListEntry from "./ListEntry.svelte";
 
-  export let store;
-  const numItems = store.numItems;
-  const categories = store.categories;
-  const itemsPerCategory = store.itemsPerCategory;
+	export let store;
+	const numItems = store.numItems;
+	const categories = store.categories;
+	const itemsPerCategory = store.itemsPerCategory;
 
 </script>
 

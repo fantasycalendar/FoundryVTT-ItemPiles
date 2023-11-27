@@ -1,10 +1,10 @@
 <script>
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 
-  export let activeTab;
-  export let tabs;
-  export let underscore = false;
-  export let separateElements = false;
+	export let activeTab;
+	export let tabs;
+	export let underscore = false;
+	export let separateElements = false;
 
 </script>
 
@@ -14,10 +14,10 @@
 			<div style="border-right: 1px solid rgba(0,0,0,0.5); margin: 0 10px;"></div>
 		{/if}
 		<div on:click={() => { activeTab = tab.value}}
-				 class="item item-piles-flexrow item-piles-clickable-link"
-				 class:underscore={underscore}
-				 class:active={activeTab === tab.value}
-				 data-tab="rest">
+		     class="item item-piles-flexrow item-piles-clickable-link"
+		     class:underscore={underscore}
+		     class:active={activeTab === tab.value}
+		     data-tab="rest">
 			{#if tab.icon} <i class="icon {tab.icon}"></i> {/if}
 			{localize(tab.label)}
 			{#if tab.highlight}

@@ -1,51 +1,51 @@
 <script>
-  import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-  import { getContext } from 'svelte';
-  import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-  import { get, writable } from "svelte/store";
-  import SETTINGS from "../../../constants/settings.js";
-  import { getSetting } from "../../../helpers/helpers.js";
+	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { getContext } from 'svelte';
+	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { get, writable } from "svelte/store";
+	import SETTINGS from "../../../constants/settings.js";
+	import { getSetting } from "../../../helpers/helpers.js";
 
-  const { application } = getContext('#external');
+	const { application } = getContext('#external');
 
-  let form;
+	let form;
 
-  export let elementRoot;
-  export let data;
+	export let elementRoot;
+	export let data;
 
-  const itemFilters = (getSetting(SETTINGS.ITEM_FILTERS).find(filter => filter.path === "type")?.filters ?? "").split(',');
+	const itemFilters = (getSetting(SETTINGS.ITEM_FILTERS).find(filter => filter.path === "type")?.filters ?? "").split(',');
 
-  const unstackableItemTypesStore = writable(data);
-  let systemTypes = game.system.template.Item.types.filter(type => !itemFilters.includes(type));
-  let unusedTypes = [];
+	const unstackableItemTypesStore = writable(data);
+	let systemTypes = game.system.template.Item.types.filter(type => !itemFilters.includes(type));
+	let unusedTypes = [];
 
-  $: {
-    unusedTypes = systemTypes.filter(systemType => !$unstackableItemTypesStore.some(type => type === systemType));
-  }
+	$: {
+		unusedTypes = systemTypes.filter(systemType => !$unstackableItemTypesStore.some(type => type === systemType));
+	}
 
-  function add() {
-    if (!unusedTypes.length) return;
-    unstackableItemTypesStore.update(arr => {
-      arr.push(unusedTypes[0]);
-      return arr;
-    })
-  }
+	function add() {
+		if (!unusedTypes.length) return;
+		unstackableItemTypesStore.update(arr => {
+			arr.push(unusedTypes[0]);
+			return arr;
+		})
+	}
 
-  function remove(index) {
-    unstackableItemTypesStore.update(arr => {
-      arr.splice(index, 1)
-      return arr;
-    })
-  }
+	function remove(index) {
+		unstackableItemTypesStore.update(arr => {
+			arr.splice(index, 1)
+			return arr;
+		})
+	}
 
-  async function updateSettings() {
-    application.options.resolve(get(unstackableItemTypesStore));
-    application.close();
-  }
+	async function updateSettings() {
+		application.options.resolve(get(unstackableItemTypesStore));
+		application.close();
+	}
 
-  export function requestSubmit() {
-    form.requestSubmit();
-  }
+	export function requestSubmit() {
+		form.requestSubmit();
+	}
 
 </script>
 

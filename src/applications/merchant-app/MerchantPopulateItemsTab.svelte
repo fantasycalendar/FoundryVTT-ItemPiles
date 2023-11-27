@@ -1,275 +1,275 @@
 <script>
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import { get, writable } from "svelte/store";
-  import { onDestroy } from "svelte";
-  import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
-  import CustomDialog from "../components/CustomDialog.svelte";
-  import ItemEntry from "./components/ItemEntry.svelte";
-  import * as PileUtilities from "../../helpers/pile-utilities.js";
-  import { getSetting } from "../../helpers/helpers";
-  import { slide } from "svelte/transition";
-  import { quintOut } from "svelte/easing";
-  import SETTINGS from "../../constants/settings";
-  import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { get, writable } from "svelte/store";
+	import { onDestroy } from "svelte";
+	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import CustomDialog from "../components/CustomDialog.svelte";
+	import ItemEntry from "./components/ItemEntry.svelte";
+	import * as PileUtilities from "../../helpers/pile-utilities.js";
+	import { getSetting } from "../../helpers/helpers";
+	import { slide } from "svelte/transition";
+	import { quintOut } from "svelte/easing";
+	import SETTINGS from "../../constants/settings";
+	import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
 
-  export let store;
+	export let store;
 
-  let tables = writable(getTables());
+	let tables = writable(getTables());
 
-  let populationTables = writable((get(store.pileData).tablesForPopulate ?? [])
-    .map(t => {
-      if (t.id) {
-        t.uuid = game.tables.get(t.id).uuid;
-      }
-      return {
-        uuid: t.uuid,
-        addAll: t.addAll ?? false,
-        open: false,
-        timesToRoll: t.timesToRoll ?? "1d4",
-        items: t.items ?? {},
-        customCategory: t.customCategory ?? "",
-      };
-    }));
+	let populationTables = writable((get(store.pileData).tablesForPopulate ?? [])
+		.map(t => {
+			if (t.id) {
+				t.uuid = game.tables.get(t.id).uuid;
+			}
+			return {
+				uuid: t.uuid,
+				addAll: t.addAll ?? false,
+				open: false,
+				timesToRoll: t.timesToRoll ?? "1d4",
+				items: t.items ?? {},
+				customCategory: t.customCategory ?? "",
+			};
+		}));
 
-  let timesRolled = "";
-  let keepRolled = false;
+	let timesRolled = "";
+	let keepRolled = false;
 
-  let itemStore = store.items;
+	let itemStore = store.items;
 
-  $: currentItems = $itemStore.sort((a, b) => {
-    return a.item.name < b.item.name ? -1 : 1;
-  }).filter(item => !item.isService);
+	$: currentItems = $itemStore.sort((a, b) => {
+		return a.item.name < b.item.name ? -1 : 1;
+	}).filter(item => !item.isService);
 
-  $: currentServices = $itemStore.sort((a, b) => {
-    return a.item.name < b.item.name ? -1 : 1;
-  }).filter(item => item.isService);
+	$: currentServices = $itemStore.sort((a, b) => {
+		return a.item.name < b.item.name ? -1 : 1;
+	}).filter(item => item.isService);
 
-  $: {
-    debounceSave($populationTables, $tables)
-  }
+	$: {
+		debounceSave($populationTables, $tables)
+	}
 
-  const debounceSave = foundry.utils.debounce((popTables, actualTables) => {
-    const pileData = foundry.utils.deepClone(get(store.pileData));
-    pileData.tablesForPopulate = popTables
-      .filter((t) => actualTables[t.uuid])
-      .map((t) => ({
-        uuid: t.uuid, addAll: t.addAll, items: t.items, timesToRoll: t.timesToRoll, customCategory: t.customCategory
-      }));
-    PileUtilities.updateItemPileData(store.actor, pileData);
-  }, 200);
+	const debounceSave = foundry.utils.debounce((popTables, actualTables) => {
+		const pileData = foundry.utils.deepClone(get(store.pileData));
+		pileData.tablesForPopulate = popTables
+			.filter((t) => actualTables[t.uuid])
+			.map((t) => ({
+				uuid: t.uuid, addAll: t.addAll, items: t.items, timesToRoll: t.timesToRoll, customCategory: t.customCategory
+			}));
+		PileUtilities.updateItemPileData(store.actor, pileData);
+	}, 200);
 
-  let selectableTables = [];
-  let selectedTable = "";
-  $: {
-    selectableTables = Object.entries($tables).filter(entry => !$populationTables.some(table => table.uuid === entry[0]));
-    const tableSet = new Set(selectableTables.map(e => e[0]));
-    selectedTable = tableSet.has(selectedTable) ? selectedTable : tableSet.first();
-  }
+	let selectableTables = [];
+	let selectedTable = "";
+	$: {
+		selectableTables = Object.entries($tables).filter(entry => !$populationTables.some(table => table.uuid === entry[0]));
+		const tableSet = new Set(selectableTables.map(e => e[0]));
+		selectedTable = tableSet.has(selectedTable) ? selectedTable : tableSet.first();
+	}
 
-  let itemsRolled = writable([]);
+	let itemsRolled = writable([]);
 
-  function recurseThroughFoldersForTables(folderId) {
-    const folder = game.folders.find(f => f.type === "RollTable" && f.id === folderId);
-    let folders = [folder.id];
-    for (const child of folder.children) {
-      folders = folders.concat(recurseThroughFoldersForTables(child.folder.id))
-    }
-    return folders;
-  }
+	function recurseThroughFoldersForTables(folderId) {
+		const folder = game.folders.find(f => f.type === "RollTable" && f.id === folderId);
+		let folders = [folder.id];
+		for (const child of folder.children) {
+			folders = folders.concat(recurseThroughFoldersForTables(child.folder.id))
+		}
+		return folders;
+	}
 
-  function getTables() {
-    let tables = Array.from(game.tables);
-    const folderId = getSetting(SETTINGS.POPULATION_TABLES_FOLDER);
-    if (
-      folderId !== "root" && game.folders.find((f) => f.type === "RollTable" && f.id === folderId)
-    ) {
-      const folderIds = recurseThroughFoldersForTables(folderId)
-      tables = tables.filter((t) => folderIds.includes(t.folder?.id));
-    }
+	function getTables() {
+		let tables = Array.from(game.tables);
+		const folderId = getSetting(SETTINGS.POPULATION_TABLES_FOLDER);
+		if (
+			folderId !== "root" && game.folders.find((f) => f.type === "RollTable" && f.id === folderId)
+		) {
+			const folderIds = recurseThroughFoldersForTables(folderId)
+			tables = tables.filter((t) => folderIds.includes(t.folder?.id));
+		}
 
-    const mappedTables = {};
-    for (const table of tables) {
-      mappedTables[table.uuid] = {
-        name: table.name,
-        items: Array.from(table.collections.results)
-      }
-    }
-    return mappedTables;
-  }
+		const mappedTables = {};
+		for (const table of tables) {
+			mappedTables[table.uuid] = {
+				name: table.name,
+				items: Array.from(table.collections.results)
+			}
+		}
+		return mappedTables;
+	}
 
-  async function rollAllTables() {
-    if (!keepRolled) {
-      itemsRolled.set([]);
-    }
-    for (const table of $populationTables) {
-      table.open = false;
-      await evaluateTable(table, true);
-    }
-    timesRolled = $itemsRolled.reduce((total, item) => {
-      return total + item.quantity;
-    }, 0);
-  }
+	async function rollAllTables() {
+		if (!keepRolled) {
+			itemsRolled.set([]);
+		}
+		for (const table of $populationTables) {
+			table.open = false;
+			await evaluateTable(table, true);
+		}
+		timesRolled = $itemsRolled.reduce((total, item) => {
+			return total + item.quantity;
+		}, 0);
+	}
 
-  async function evaluateTable(table, keepRolledItems) {
+	async function evaluateTable(table, keepRolledItems) {
 
-    const rollableTable = await fromUuid(table.uuid);
-    if (!rollableTable) return;
+		const rollableTable = await fromUuid(table.uuid);
+		if (!rollableTable) return;
 
-    if (!keepRolledItems) {
-      itemsRolled.set([]);
-    }
+		if (!keepRolledItems) {
+			itemsRolled.set([]);
+		}
 
-    const newItems = await PileUtilities.rollMerchantTables({ tableData: [table] });
+		const newItems = await PileUtilities.rollMerchantTables({ tableData: [table] });
 
-    const processedItems = newItems.map(itemData => {
-      const prices = game.itempiles.API.getPricesForItem(itemData.item, {
-        seller: store.actor,
-      });
-      itemData.price = prices[0]?.free ? localize("ITEM-PILES.Merchant.ItemFree") : prices[0]?.priceString;
-      return itemData;
-    });
+		const processedItems = newItems.map(itemData => {
+			const prices = game.itempiles.API.getPricesForItem(itemData.item, {
+				seller: store.actor,
+			});
+			itemData.price = prices[0]?.free ? localize("ITEM-PILES.Merchant.ItemFree") : prices[0]?.priceString;
+			return itemData;
+		});
 
-    itemsRolled.update((items) => {
-      processedItems.forEach((newItem) => {
-        const existingItem = items.find(
-          (item) => item.documentId === newItem.documentId
-        );
-        if (existingItem) {
-          existingItem.quantity += newItem.quantity;
-        } else {
-          items.push(newItem);
-        }
-      });
-      items.sort((a, b) => {
-        return a.text < b.text ? -1 : 1;
-      });
-      return items;
-    });
+		itemsRolled.update((items) => {
+			processedItems.forEach((newItem) => {
+				const existingItem = items.find(
+					(item) => item.documentId === newItem.documentId
+				);
+				if (existingItem) {
+					existingItem.quantity += newItem.quantity;
+				} else {
+					items.push(newItem);
+				}
+			});
+			items.sort((a, b) => {
+				return a.text < b.text ? -1 : 1;
+			});
+			return items;
+		});
 
-  }
+	}
 
-  async function addItem(itemToAdd) {
-    await game.itempiles.API.addItems(store.actor, [itemToAdd].map(entry => ({
-      item: entry.item,
-      quantity: entry.quantity,
-      flags: entry.flags
-    })));
-    removeItem(itemToAdd);
-  }
+	async function addItem(itemToAdd) {
+		await game.itempiles.API.addItems(store.actor, [itemToAdd].map(entry => ({
+			item: entry.item,
+			quantity: entry.quantity,
+			flags: entry.flags
+		})));
+		removeItem(itemToAdd);
+	}
 
-  function removeItem(itemToRemove) {
-    itemsRolled.update((items) => {
-      const existingItemIndex = items.findIndex(
-        (item) => item.documentId === itemToRemove.documentId
-      );
-      items.splice(existingItemIndex, 1);
-      return items;
-    });
-  }
+	function removeItem(itemToRemove) {
+		itemsRolled.update((items) => {
+			const existingItemIndex = items.findIndex(
+				(item) => item.documentId === itemToRemove.documentId
+			);
+			items.splice(existingItemIndex, 1);
+			return items;
+		});
+	}
 
-  async function addAllItems() {
-    const itemsToAdd = get(itemsRolled).map(entry => ({
-      item: entry.item,
-      quantity: entry.quantity,
-      flags: entry.flags
-    }));
-    await game.itempiles.API.addItems(store.actor, itemsToAdd);
-    itemsRolled.set([]);
-  }
+	async function addAllItems() {
+		const itemsToAdd = get(itemsRolled).map(entry => ({
+			item: entry.item,
+			quantity: entry.quantity,
+			flags: entry.flags
+		}));
+		await game.itempiles.API.addItems(store.actor, itemsToAdd);
+		itemsRolled.set([]);
+	}
 
-  async function clearAllItems(services = false) {
-    const localization = services ? "Services" : "Items";
-    const doContinue = await TJSDialog.confirm({
-      title: "Item Piles - " + localize(`ITEM-PILES.Dialogs.ClearAll${localization}.Title`),
-      content: {
-        class: CustomDialog,
-        props: {
-          icon: "fas fa-exclamation-triangle",
-          content: localize(`ITEM-PILES.Dialogs.ClearAll${localization}.Content`),
-        },
-      },
-      modal: true,
-      draggable: false,
-      options: {
-        height: "auto",
-        headerButtonNoClose: true,
-      },
-    });
-    if (!doContinue) return false;
-    await game.itempiles.API.removeItems(store.actor, game.itempiles.API.getActorItems(store.actor)
-      .filter(item => {
-        const itemFlags = PileUtilities.getItemFlagData(item);
-        return services === itemFlags.isService && !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
-      }));
-  }
+	async function clearAllItems(services = false) {
+		const localization = services ? "Services" : "Items";
+		const doContinue = await TJSDialog.confirm({
+			title: "Item Piles - " + localize(`ITEM-PILES.Dialogs.ClearAll${localization}.Title`),
+			content: {
+				class: CustomDialog,
+				props: {
+					icon: "fas fa-exclamation-triangle",
+					content: localize(`ITEM-PILES.Dialogs.ClearAll${localization}.Content`),
+				},
+			},
+			modal: true,
+			draggable: false,
+			options: {
+				height: "auto",
+				headerButtonNoClose: true,
+			},
+		});
+		if (!doContinue) return false;
+		await game.itempiles.API.removeItems(store.actor, game.itempiles.API.getActorItems(store.actor)
+			.filter(item => {
+				const itemFlags = PileUtilities.getItemFlagData(item);
+				return services === itemFlags.isService && !itemFlags.keepOnMerchant && !itemFlags.keepIfZero;
+			}));
+	}
 
-  async function previewItem(itemData) {
-    itemData.item?.sheet?.render(true);
-  }
+	async function previewItem(itemData) {
+		itemData.item?.sheet?.render(true);
+	}
 
-  async function removeAddedItem(itemToRemove) {
-    store.actor.deleteEmbeddedDocuments("Item", [itemToRemove.item.id]);
-  }
+	async function removeAddedItem(itemToRemove) {
+		store.actor.deleteEmbeddedDocuments("Item", [itemToRemove.item.id]);
+	}
 
-  function addTable() {
-    populationTables.update((tabs) => {
-      tabs.push({
-        uuid: selectedTable,
-        addAll: false,
-        open: false,
-        timesToRoll: "1d4-1",
-        customCategory: "",
-        items: {}
-      });
-      return tabs;
-    });
-  }
+	function addTable() {
+		populationTables.update((tabs) => {
+			tabs.push({
+				uuid: selectedTable,
+				addAll: false,
+				open: false,
+				timesToRoll: "1d4-1",
+				customCategory: "",
+				items: {}
+			});
+			return tabs;
+		});
+	}
 
-  async function removeTable(tableUuid) {
+	async function removeTable(tableUuid) {
 
-    const table = get(tables)[tableUuid];
+		const table = get(tables)[tableUuid];
 
-    const doContinue = await TJSDialog.confirm({
-      title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.RemoveMerchantTable.Title"),
-      content: {
-        class: CustomDialog,
-        props: {
-          header: game.i18n.localize("ITEM-PILES.Dialogs.RemoveMerchantTable.Title"),
-          content: game.i18n.format("ITEM-PILES.Dialogs.RemoveMerchantTable.Content", { table_name: table.name }),
-          icon: "fas fa-exclamation-triangle"
-        }
-      },
-      modal: true,
-      draggable: false,
-      rejectClose: false,
-      defaultYes: true,
-      options: {
-        height: "auto"
-      }
-    });
+		const doContinue = await TJSDialog.confirm({
+			title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.RemoveMerchantTable.Title"),
+			content: {
+				class: CustomDialog,
+				props: {
+					header: game.i18n.localize("ITEM-PILES.Dialogs.RemoveMerchantTable.Title"),
+					content: game.i18n.format("ITEM-PILES.Dialogs.RemoveMerchantTable.Content", { table_name: table.name }),
+					icon: "fas fa-exclamation-triangle"
+				}
+			},
+			modal: true,
+			draggable: false,
+			rejectClose: false,
+			defaultYes: true,
+			options: {
+				height: "auto"
+			}
+		});
 
-    if (!doContinue) return;
+		if (!doContinue) return;
 
-    populationTables.update((tabs) => {
-      return tabs.filter((t) => t.uuid !== tableUuid);
-    });
-  }
+		populationTables.update((tabs) => {
+			return tabs.filter((t) => t.uuid !== tableUuid);
+		});
+	}
 
-  let createId = Hooks.on("createRollTable", () => {
-    tables.set(getTables());
-  });
-  let deleteId = Hooks.on("deleteRollTable", () => {
-    tables.update(() => {
-      const newTables = getTables();
-      populationTables.update(values => values.filter((t) => newTables[t.uuid]));
-      return newTables;
-    });
-  });
+	let createId = Hooks.on("createRollTable", () => {
+		tables.set(getTables());
+	});
+	let deleteId = Hooks.on("deleteRollTable", () => {
+		tables.update(() => {
+			const newTables = getTables();
+			populationTables.update(values => values.filter((t) => newTables[t.uuid]));
+			return newTables;
+		});
+	});
 
-  onDestroy(() => {
-    Hooks.off("createRollTable", createId);
-    Hooks.off("deleteRollTable", deleteId);
-  });
+	onDestroy(() => {
+		Hooks.off("createRollTable", createId);
+		Hooks.off("deleteRollTable", deleteId);
+	});
 
 </script>
 
@@ -349,43 +349,43 @@
 		<div class="item-piles-populate-header">
 			<span style="flex:1 0 auto;">{localize("ITEM-PILES.Merchant.RollableTables")}</span>
 			<button on:click={() => { rollAllTables() }}
-							style="height: 20px; line-height: inherit; font-size: 0.75rem; flex:1 0 auto; margin:0;">
+			        style="height: 20px; line-height: inherit; font-size: 0.75rem; flex:1 0 auto; margin:0;">
 				<i class="fas fa-dice-d20"></i> {localize("ITEM-PILES.Merchant.RollAllTables")}
 			</button>
 		</div>
 
 		{#each $populationTables as table}
 			<div class="item-piles-item-row item-piles-even-color"
-					 style="min-height: 28px; padding: 3px 3px 3px 5px;">
+			     style="min-height: 28px; padding: 3px 3px 3px 5px;">
 				<div class="item-piles-flexrow" style="align-items: center;">
 					<div style="max-width: 100%; overflow: hidden; text-overflow: ellipsis;">
 						<strong style="max-width:100%; word-break: break-all;">{$tables[table.uuid].name}</strong>
 					</div>
 					<button class="item-piles-rolled-item-button"
-									on:click={() => { removeTable(table.uuid) }}
-									data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
-									data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
+					        on:click={() => { removeTable(table.uuid) }}
+					        data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
+					        data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-trash" style="color:#de0e0e;"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
-									on:click={() => { table.open = !table.open; }}
-									data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
-									data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
+					        on:click={() => { table.open = !table.open; }}
+					        data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
+					        data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-cog"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
-									on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
-									data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
-									data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
-									style="margin-right:0;">
+					        on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
+					        data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
+					        data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
+					        style="margin-right:0;">
 						<i class="fas fa-dice-d20"></i>
 					</button>
 				</div>
 				{#if table.open}
 					<div class="item-piles-flexcol" style="margin-top:5px;"
-							 transition:slide={{ duration: 200, easing: quintOut }}>
+					     transition:slide={{ duration: 200, easing: quintOut }}>
 						<div class="item-piles-flexrow" style="align-items: center; margin-bottom: 0.25rem;">
 							<label
 								style="margin-right:5px;">{localize("ITEM-PILES.Merchant.TableCustomCategory")}</label>
@@ -394,21 +394,21 @@
 						<div class="item-piles-flexrow">
 							<div class="item-piles-flexrow" style="align-items: center; flex:0 1 auto; min-height:26px;">
 								<label style="flex:0 1 auto; margin-right:5px;"
-											 for={"table-id-"+table.uuid}>{localize("ITEM-PILES.Merchant.TableAddAllItems")}</label>
+								       for={"table-id-"+table.uuid}>{localize("ITEM-PILES.Merchant.TableAddAllItems")}</label>
 								<input style="width:15px; height:15px; margin:0; flex:0;" id={"table-id-"+table.uuid}
-											 bind:checked={table.addAll}
-											 on:change={() => {
+								       bind:checked={table.addAll}
+								       on:change={() => {
                            if(!table.addAll) return;
                            table.items = Object.fromEntries($tables[table.uuid].items.map(item => [item.id, "1d4"]));
                          }}
-											 type="checkbox"/>
+								       type="checkbox"/>
 							</div>
 							{#if !table.addAll}
 								<div class="item-piles-flexrow item-piles-item-row" style="align-items: center; flex:1;">
 									<label
 										style="margin-right:5px; text-align: right;">{localize("ITEM-PILES.Merchant.TableTimesToRoll")}</label>
 									<input type="text" placeholder="2d6+4" bind:value={table.timesToRoll}
-												 style="height:20px; margin: 3px; max-width: 50px; font-size: 0.75rem;"
+									       style="height:20px; margin: 3px; max-width: 50px; font-size: 0.75rem;"
 									/>
 								</div>
 							{/if}
@@ -471,11 +471,11 @@
 		<div class="item-piles-flexrow item-piles-roll-header">
 			<label>
 				{localize(
-          timesRolled && $itemsRolled.length
-            ? "ITEM-PILES.Merchant.RolledTimes"
-            : "ITEM-PILES.Merchant.ClickRoll",
-          { rolls: timesRolled }
-        )}
+					timesRolled && $itemsRolled.length
+						? "ITEM-PILES.Merchant.RolledTimes"
+						: "ITEM-PILES.Merchant.ClickRoll",
+					{ rolls: timesRolled }
+				)}
 			</label>
 
 			<div class="item-piles-flexrow item-piles-keep-rolled">
@@ -547,9 +547,9 @@
 				</button>
 
 				<button class="item-piles-button"
-								style="color:red; max-width:30px;"
-								on:click={() => { $itemsRolled = []; }}
-								data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
+				        style="color:red; max-width:30px;"
+				        on:click={() => { $itemsRolled = []; }}
+				        data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
 					<i class="fas fa-trash"/>
 				</button>
 

@@ -1,26 +1,26 @@
 <script>
-  export let value;
-  export let type;
-  export let placeholder = "";
-  export let showImage = false;
-  export let showInput = true;
+	export let value;
+	export let type;
+	export let placeholder = "";
+	export let showImage = false;
+	export let showInput = true;
 
-  let filePicker = false;
+	let filePicker = false;
 
-  function handleClick() {
-    if (!filePicker) {
-      filePicker = new FilePicker({
-        type: type,
-        current: value,
-        callback: path => {
-          value = path;
-          filePicker = false;
-        }
-      });
-    }
+	function handleClick() {
+		if (!filePicker) {
+			filePicker = new FilePicker({
+				type: type,
+				current: value,
+				callback: path => {
+					value = path;
+					filePicker = false;
+				}
+			});
+		}
 
-    filePicker.render(true, { focus: true });
-  }
+		filePicker.render(true, { focus: true });
+	}
 
 </script>
 
