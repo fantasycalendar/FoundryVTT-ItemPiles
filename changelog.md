@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.8.3
+
+- Fixed Custom System Builder item quantity not working properly
+- Fixed issue with merchants causing them to not work property with custom prices
+
 ## Version 2.8.2
 
 - Added API endpoints:
