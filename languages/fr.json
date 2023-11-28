@@ -626,7 +626,13 @@
           "DisplayItemTypesExplanation": "Affichez chaque type d'objet séparément dans la pile d'objets, triés par leur type d'objets.",
           "ConfigureOverrideSecondaryCurrencies": "Configurer les devises secondaires prioritaires",
           "OverrideSecondaryCurrencies": "Remplacer les devises secondaires",
-          "OverrideSecondaryCurrenciesExplanation": "Configurer les dérogations à la devise secondaire de cette pile d'articles."
+          "OverrideSecondaryCurrenciesExplanation": "Configurer les dérogations à la devise secondaire de cette pile d'articles.",
+          "CanStackItems": "Peut empiler les objets",
+          "CanStackItemsYes": "Oui, empiler les objets (sauf si l'objet indique le contraire)",
+          "CanStackItemsNo": "No, empiler les objets (sauf si l'objet indique le contraire)",
+          "CanStackItemsYesAlways": "Oui, toujours empiler les objets",
+          "CanStackItemsNoAlways": "Non, ne jamais empiler les objets",
+          "CanStackItemsExplanation": "Avec ce paramètre, les éléments ajoutés à la pile d'objets s'empilent avec les objets similaires. Ce paramètre peut également être contrôlé pour chaque objet dans sa configuration. Remarque : ce paramètre dépend également du système, car certains objets n'ont pas de quantité et ne peuvent donc jamais être empilés."
         },
         "Other": {
           "Title": "Autres paramètres",
@@ -718,7 +724,9 @@
           "LogMerchantActivity": "Enregistrer l'activité du commerçant",
           "ClearMerchantLog": "Effacer le journal du marchand",
           "ClearMerchantLogExplanation": "Cette opération efface les journaux du marchand et supprime toutes les entrées. Cette opération ne peut être annulée.",
-          "LogMerchantActivityExplanation": "Lorsqu'elle est activée, cette fonction permet au marchand d'enregistrer des événements tels que l'achat et la vente d'objets, et la mise à jour par les MJ du statut (quantité, visibilité et mise en vente) des objets."
+          "LogMerchantActivityExplanation": "Lorsqu'elle est activée, cette fonction permet au marchand d'enregistrer des événements tels que l'achat et la vente d'objets, et la mise à jour par les MJ du statut (quantité, visibilité et mise en vente) des objets.",
+          "HideTokenWhenClosed": "Cacher le jeton lorsqu'il est fermé",
+          "HideTokenWhenClosedExplanation": "Lorsque cette option est activée, le(s) jeton(s) de ce commerçant est (sont) masqué(s) à la fermeture."
         },
         "Sharing": {
           "Title": "Paramètres de partage",
