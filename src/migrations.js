@@ -226,7 +226,7 @@ const migrations = {
         }
 
         const update = {
-          _id: token.id, actorLink: false, actorId: tokenActor.id, [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
+          _id: token.id, actorId: tokenActor.id, [CONSTANTS.ACTOR_DELTA_PROPERTY]: {
             items: []
           }, ...flagData
         }
@@ -237,10 +237,6 @@ const migrations = {
         }
 
         updates.push(update);
-
-        await token.update({
-          actorLink: true
-        });
       }
 
       await scene.updateEmbeddedDocuments("Token", updates);
