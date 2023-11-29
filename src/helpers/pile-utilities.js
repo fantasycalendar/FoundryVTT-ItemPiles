@@ -198,10 +198,11 @@ export function getItemPileTokens(filter = false) {
     tokens.filter(token => {
       if (mappedValidTokens[scene.id] && mappedValidTokens[scene.id].includes(token)) return false;
       try {
-        return filter ? filter(token) : false;
+        if (filter) filter(token);
       } catch (err) {
         return true;
       }
+      return false;
     })
   ]).filter(([_, tokens]) => tokens.length);
 
