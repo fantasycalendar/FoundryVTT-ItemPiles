@@ -246,6 +246,13 @@
       "ClearMerchantLog": {
         "Title": "Wyczyścić dziennik kupca?",
         "Content": "Czy na pewno chcesz wyczyścić dziennik kupca \"{actor_name}\"?"
+      },
+      "GiveItems": {
+        "Title": "Przekazywanie przedmiotów",
+        "Header": "Przekazywany przedmiot: {item_name}",
+        "SelectPlaceholder": "Wybierz postać, do której chcesz przekazać przedmiot",
+        "ContentMultipleQuantity": "Masz {quantity} szt. tego przedmiotu, ile chcesz przekazać?",
+        "Submit": "Przekaż"
       }
     },
     "Items": "Przedmioty",

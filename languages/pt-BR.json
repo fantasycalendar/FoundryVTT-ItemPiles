@@ -135,6 +135,13 @@
       "ClearMerchantLog": {
         "Title": "Limpar Registro do Comerciante?",
         "Content": "Tem certeza de que deseja limpar o registro do comerciante \"{actor_name}\"?"
+      },
+      "GiveItems": {
+        "Header": "Dando Itens: {item_name}",
+        "ContentMultipleQuantity": "Você possui {quantity} deste item, quantos você deseja dar?",
+        "Submit": "Enviar",
+        "Title": "Dando Itens",
+        "SelectPlaceholder": "Escolha o personagem para enviar o item"
       }
     },
     "Currencies": "Moedas",
@@ -473,7 +480,13 @@
           "DisplayItemTypesExplanation": "Exiba cada tipo de item separadamente na pilha de itens, ordenados por tipo de item.",
           "OverrideSecondaryCurrenciesExplanation": "Configure as substituições de moeda secundária do item pile.",
           "OverrideSecondaryCurrencies": "Substituir Moedas Secundárias",
-          "ConfigureOverrideSecondaryCurrencies": "Configurar moedas secundárias de substituição"
+          "ConfigureOverrideSecondaryCurrencies": "Configurar moedas secundárias de substituição",
+          "CanStackItems": "Pode Empilhar Itens",
+          "CanStackItemsYesAlways": "Sim, empilhar sempre os itens",
+          "CanStackItemsExplanation": "Com essa configuração, os itens adicionados à pilha de itens serão empilhados com itens semelhantes. Isso também pode ser controlado por item em sua configuração. Observação: Isso depende do sistema, pois alguns itens não têm quantidade e, portanto, nunca podem ser empilhados.",
+          "CanStackItemsYes": "Sim, empilhar itens (a menos que o item indique o contrário)",
+          "CanStackItemsNo": "Não, empilhar itens (a menos que o item indique o contrário)",
+          "CanStackItemsNoAlways": "Não, nunca empilhar itens"
         },
         "SingleItem": {
           "DisplayOneContainerWarning": "Aviso! Você tem \"Exibir imagem de item único\" e \"É contêiner\" ativados. Nesse caso, as imagens do contêiner têm prioridade.",
@@ -560,7 +573,9 @@
           "LogMerchantActivity": "Registro de Atividade do Comerciante",
           "ClearMerchantLog": "Limpar Registros do Comerciante",
           "ClearMerchantLogExplanation": "Isso irá limpar os registros do comerciante, removendo todas as entradas. Esta ação não pode ser desfeita.",
-          "LogMerchantActivityExplanation": "Quando ativado, isso faz com que o comerciante registre eventos como compra e venda de itens, e MJs atualizem o status (quantidade, visibilidade e disponibilidade para venda) dos itens."
+          "LogMerchantActivityExplanation": "Quando ativado, isso faz com que o comerciante registre eventos como compra e venda de itens, e MJs atualizem o status (quantidade, visibilidade e disponibilidade para venda) dos itens.",
+          "HideTokenWhenClosedExplanation": "Quando isso está ativado, o(s) token(s) deste comerciante são ocultados quando fechados.",
+          "HideTokenWhenClosed": "Ocultar Token Quando Fechado"
         },
         "Title": "Configuração do Item Pile: {actor_name}",
         "Configure": "Item Pile",
