@@ -187,7 +187,7 @@ export function getItemPileTokens(filter = false) {
   const validTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [
     scene,
     tokens.filter((token) => {
-      return filter ? !filter(token) : true;
+      return filter ? filter(token) : true;
     })
   ]).filter(([_, tokens]) => tokens.length);
 
