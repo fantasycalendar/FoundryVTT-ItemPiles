@@ -35,6 +35,7 @@ import bladeRunner from "./systems/blade-runner.js";
 import alienrpg from "./systems/alienrpg.js";
 import pirateborg from "./systems/pirateborg.js";
 import starwarsffg from "./systems/starwarsffg.js";
+import demonlord from "./systems/demonlord.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -148,7 +149,10 @@ export const SYSTEMS = {
     },
     "starwarsffg": {
       "latest": starwarsffg
-    }
+    },
+    "demonlord": {
+      "latest": demonlord
+    },
     // ↑ ADD SYSTEMS HERE ↑
   },
 
