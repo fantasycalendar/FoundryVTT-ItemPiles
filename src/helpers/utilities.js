@@ -3,6 +3,7 @@ import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import { getItemFlagData } from "./pile-utilities.js";
 import { deletedActorCache } from "./caches.js";
+import { SYSTEMS } from "../systems.js";
 
 export function getActor(target) {
   if (target instanceof Actor) return target;
@@ -166,9 +167,10 @@ export function getItemTypesThatCanStack() {
     itemTypesWithQuantities = new Set();
 
     if (game.system.id === "custom-system-builder") {
+      const quantityAttribute = game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE.split(".").pop();
       const itemTemplates = game.items
         .filter(_i => _i?.templateSystem?.isTemplate && _i?.templateSystem?.getKeys)
-        .filter(_i => _i.templateSystem.getKeys().has(_i.system.body.contents));
+        .filter(_i => _i.templateSystem.getKeys().has(quantityAttribute));
       for (const item of itemTemplates) {
         itemTypesWithQuantities.add(item.name);
       }

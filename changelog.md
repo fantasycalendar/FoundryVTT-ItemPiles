@@ -1,5 +1,18 @@
 # Item Piles Changelog
 
+## Version 2.8.5
+
+- Finally ACTUALLY fixed quantity not showing up properly on the Custom System Builder system
+- Fixed missing location on the trade button in the bottom left
+
+## Version 2.8.4
+
+- Added support for the Shadow of the Demonlord system (thank you to brantai on github!)
+- Updated French, German, Portuguese (Brazil), and Polish localization (thank you everyone for contributing on weblate!)
+- Fixed minor Simple Calendar incompatibility
+- Fixed faulty migration code causing errors with other modules
+- Fixed migration being loud when it should have been silent (it logged to console)
+
 ## Version 2.8.3
 
 - Fixed Custom System Builder item quantity not working properly
