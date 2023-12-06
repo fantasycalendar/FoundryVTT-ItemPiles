@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.8.6
+
+- Fixed characters being able to buy things from merchants they could not afford
+
 ## Version 2.8.5
 
 - Finally ACTUALLY fixed quantity not showing up properly on the Custom System Builder system

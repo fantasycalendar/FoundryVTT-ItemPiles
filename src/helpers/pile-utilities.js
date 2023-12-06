@@ -750,7 +750,6 @@ export function getPriceArray(totalCost, currencies) {
     return [{
       ...primaryCurrency,
       cost: totalCost,
-      quantity: totalCost,
       baseCost: totalCost,
       maxCurrencyCost: totalCost,
       string: primaryCurrency.abbreviation.replace('{#}', totalCost),
@@ -775,7 +774,6 @@ export function getPriceArray(totalCost, currencies) {
       prices.push({
         ...currency,
         cost: Math.round(numCurrency),
-        quantity: Math.round(numCurrency),
         baseCost: Math.round(numCurrency),
         maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
         string: currency.abbreviation.replace("{#}", numCurrency),
@@ -799,7 +797,6 @@ export function getPriceArray(totalCost, currencies) {
     prices.push({
       ...primaryCurrency,
       cost: cost,
-      quantity: cost,
       baseCost: cost,
       maxCurrencyCost: totalCost,
       string: primaryCurrency.abbreviation.replace('{#}', cost),
@@ -818,7 +815,6 @@ export function getPriceArray(totalCost, currencies) {
     prices.push({
       ...currency,
       cost: Math.round(numCurrency),
-      quantity: Math.round(numCurrency),
       baseCost: Math.round(numCurrency),
       maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
       string: currency.abbreviation.replace("{#}", numCurrency),
@@ -828,7 +824,12 @@ export function getPriceArray(totalCost, currencies) {
 
   prices.sort((a, b) => b.exchangeRate - a.exchangeRate);
 
-  return prices;
+  return prices.map(price => {
+    if (price?.quantity === undefined) {
+      price.quantity = price.cost;
+    }
+    return price;
+  });
 }
 
 export function getPriceFromString(str, currencyList = false) {
