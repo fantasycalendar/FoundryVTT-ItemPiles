@@ -3,7 +3,6 @@ import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import { getItemFlagData } from "./pile-utilities.js";
 import { deletedActorCache } from "./caches.js";
-import { SYSTEMS } from "../systems.js";
 
 export function getActor(target) {
   if (target instanceof Actor) return target;
@@ -54,9 +53,12 @@ export function getUuid(target) {
  * @param {Item|Object} findItem
  * @param {boolean/object} actorFlagData
  * @param {boolean} ignoreVault
+ * @param {boolean} returnOne
  * @returns {*}
  */
-export function findSimilarItem(items, findItem, actorFlagData = false, ignoreVault = false) {
+export function findSimilarItem(items, findItem, {
+  flagData = false, ignoreVault = false, returnOne = true
+} = {}) {
 
   const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 
@@ -72,7 +74,7 @@ export function findSimilarItem(items, findItem, actorFlagData = false, ignoreVa
     }
   }
 
-  const actorIsVault = actorFlagData ? actorFlagData?.enabled && actorFlagData?.type === CONSTANTS.PILE_TYPES.VAULT : false;
+  const actorIsVault = flagData ? flagData?.enabled && flagData?.type === CONSTANTS.PILE_TYPES.VAULT : false;
 
   const filteredItems = items
     .filter(item => {
@@ -121,7 +123,7 @@ export function findSimilarItem(items, findItem, actorFlagData = false, ignoreVa
     distanceItems.sort((a, b) => a.distance - b.distance);
     distanceItems = distanceItems.filter(item => {
       return item.distance === 0 && {
-        "default": actorFlagData?.canStackItems ?? true,
+        "default": flagData?.canStackItems ?? true,
         "yes": true,
         "no": false
       }[getItemFlagData(item)?.canStack ?? "default"];
@@ -131,7 +133,7 @@ export function findSimilarItem(items, findItem, actorFlagData = false, ignoreVa
 
   }
 
-  return sortedItems?.[0] ?? false;
+  return returnOne ? sortedItems?.[0] ?? false : sortedItems;
 
 }
 

@@ -57,11 +57,15 @@
 			<DropZone callback={(dropData) => handleDropData(dropData, key, data)}>
 				<div class="drop-item">
 					<img src={pileData[key]?.data?.img ?? "icons/svg/coins.svg"} class="drop-item-custom-image"/>
-					<span class:item-piles-clickable-link={!!pileData[key]?.data} on:click={() => { previewDocument(key); }}>
+					<span class:item-piles-clickable-link={!!pileData[key]?.data}
+					      on:click={() => { previewDocument(key); }}>
 						{pileData[key]?.data?.name ?? "Drop item to add"}
 					</span>
 					<i
-						on:click|stopPropagation={() => { pileData[key] = {}; }}
+						on:click|stopPropagation={() => {
+                            delete pileData[key];
+                            pileData[key] = false;
+                        }}
 						class="fas fa-times drop-item-remove item-piles-clickable-red item-piles-clickable-link"
 					></i>
 				</div>

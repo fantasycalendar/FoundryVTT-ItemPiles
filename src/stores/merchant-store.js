@@ -121,10 +121,7 @@ export default class MerchantStore extends ItemPileStore {
 				return this.isMerchant ? (column?.buying ?? true) : (column?.selling ?? true);
 			})
 			.map(column => ({
-				label: localize(column.label),
-				component: CustomColumn,
-				data: column,
-				sortMethod: (a, b, inverse) => {
+				label: localize(column.label), component: CustomColumn, data: column, sortMethod: (a, b, inverse) => {
 					const path = column.path;
 					const AProp = getProperty(b.item, path);
 					const BProp = getProperty(a.item, path);
@@ -139,15 +136,12 @@ export default class MerchantStore extends ItemPileStore {
 		const columns = [];
 
 		columns.push({
-			label: "Type",
-			component: ItemEntry
+			label: "Type", component: ItemEntry
 		});
 
 		if (pileData.displayQuantity !== "alwaysno") {
 			columns.push({
-				label: "Quantity",
-				component: QuantityColumn,
-				sortMethod: (a, b, inverse) => {
+				label: "Quantity", component: QuantityColumn, sortMethod: (a, b, inverse) => {
 					return (get(b.quantity) - get(a.quantity)) * (inverse ? -1 : 1);
 				}
 			})
@@ -155,9 +149,7 @@ export default class MerchantStore extends ItemPileStore {
 
 		columns.push(...customColumns)
 		columns.push({
-			label: "Price",
-			component: PriceSelector,
-			sortMethod: (a, b, inverse) => {
+			label: "Price", component: PriceSelector, sortMethod: (a, b, inverse) => {
 				const APrice = get(a.prices).find(price => price.primary);
 				const BPrice = get(b.prices).find(price => price.primary);
 				if (!APrice) return 1;
@@ -166,8 +158,7 @@ export default class MerchantStore extends ItemPileStore {
 			}
 		})
 		columns.push({
-			label: false,
-			component: EntryButtons
+			label: false, component: EntryButtons
 		});
 
 		this.itemColumns.set(columns);
@@ -190,12 +181,7 @@ export default class MerchantStore extends ItemPileStore {
 
 	visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
 		const itemIsFree = !!get(entry.prices).find(price => price.free);
-		return super.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData)
-			&& (
-				actorIsMerchant
-					? !(pileData?.hideItemsWithZeroCost && itemIsFree)
-					: !(recipientPileData?.hideItemsWithZeroCost && itemIsFree)
-			);
+		return super.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) && (actorIsMerchant ? !(pileData?.hideItemsWithZeroCost && itemIsFree) : !(recipientPileData?.hideItemsWithZeroCost && itemIsFree));
 	}
 
 	itemSortFunction(a, b) {
@@ -283,32 +269,21 @@ export default class MerchantStore extends ItemPileStore {
 
 	tradeItem(pileItem, selling) {
 		if (get(pileItem.itemFlagData).notForSale && !game.user.isGM) return;
-		TradeMerchantItemDialog.show(
-			pileItem,
-			this.actor,
-			this.recipient,
-			{ selling }
-		);
+		TradeMerchantItemDialog.show(pileItem, this.actor, this.recipient, { selling });
 	}
 
 	async updateOpenCloseStatus() {
 		const pileData = get(this.pileData);
 		if (pileData.openTimes.status === "auto") {
 			if (game.modules.get('foundryvtt-simple-calendar')?.active && pileData.openTimes.enabled) {
-
 				const isClosed = PileUtilities.isMerchantClosed(this.actor, { pileData });
-
 				this.closed.set(isClosed);
-
 			} else if (isResponsibleGM()) {
 				pileData.openTimes.status = "open";
 				await PileUtilities.updateItemPileData(this.actor, pileData);
 			}
-
 		} else if (!pileData.openTimes.status.startsWith("auto")) {
-
 			this.closed.set(pileData.openTimes.status === "closed");
-
 		}
 	}
 
@@ -330,8 +305,7 @@ export default class MerchantStore extends ItemPileStore {
 			let instigator;
 			if (log.actor !== undefined) {
 				instigator = game.i18n.format("ITEM-PILES.Merchant.LogUserActor", {
-					actor_name: log.actor || "Unknown character",
-					user_name: game.users.get(log.user)?.name ?? "unknown user",
+					actor_name: log.actor || "Unknown character", user_name: game.users.get(log.user)?.name ?? "unknown user",
 				})
 			} else {
 				instigator = game.users.get(log.user)?.name ?? "unknown user";
@@ -350,9 +324,7 @@ export default class MerchantStore extends ItemPileStore {
 
 			} else if (log.sold !== undefined) {
 
-				const quantity = Math.abs(log.qty) > 1
-					? game.i18n.format("ITEM-PILES.Merchant.LogQuantity", { quantity: Math.abs(log.qty) })
-					: "";
+				const quantity = Math.abs(log.qty) > 1 ? game.i18n.format("ITEM-PILES.Merchant.LogQuantity", { quantity: Math.abs(log.qty) }) : "";
 
 				const action = localize("ITEM-PILES.Merchant." + (log.sold ? "LogSold" : "LogBought"));
 
@@ -456,9 +428,7 @@ class PileMerchantItem extends PileItem {
 		const itemFlagDataQuantity = itemFlagData.displayQuantity;
 
 		const itemInfiniteQuantity = {
-			"default": pileData.infiniteQuantity,
-			"yes": true,
-			"no": false
+			"default": pileData.infiniteQuantity, "yes": true, "no": false
 		}[isMerchant ? (itemFlagData.infiniteQuantity ?? "default") : "no"];
 
 		this.infiniteQuantity.set(itemInfiniteQuantity)
@@ -468,9 +438,7 @@ class PileMerchantItem extends PileItem {
 		}
 
 		const itemDisplayQuantity = {
-			"default": merchantDisplayQuantity === "yes",
-			"yes": true,
-			"no": false
+			"default": merchantDisplayQuantity === "yes", "yes": true, "no": false
 		}[itemFlagDataQuantity ?? "default"];
 
 		if (merchantDisplayQuantity.startsWith("always")) {
@@ -505,11 +473,7 @@ class PileMerchantItem extends PileItem {
 
 		this.prices.set(priceData);
 
-		this.quantityForPrice.set(
-			game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE
-				? getProperty(this.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1
-				: 1
-		);
+		this.quantityForPrice.set(game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE ? getProperty(this.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1 : 1);
 
 	}
 
@@ -537,11 +501,7 @@ class PileMerchantItem extends PileItem {
 		const pileFlagData = get(this.store.pileData);
 		if (pileFlagData.logMerchantActivity) {
 			await PileUtilities.updateMerchantLog(this.store.actor, {
-				type: "event",
-				user: game.user.id,
-				item: this.item.name,
-				property,
-				value: !itemFlagData[property]
+				type: "event", user: game.user.id, item: this.item.name, property, value: !itemFlagData[property]
 			});
 		}
 	}
@@ -557,10 +517,7 @@ class PileMerchantItem extends PileItem {
 		}
 		if (pileFlagData.logMerchantActivity) {
 			PileUtilities.updateMerchantLog(this.store.actor, {
-				type: "event",
-				user: game.user.id,
-				item: this.item.name,
-				qty: roll.total
+				type: "event", user: game.user.id, item: this.item.name, qty: roll.total
 			});
 		}
 		return this.item.update(Utilities.setItemQuantity(baseData, roll.total));

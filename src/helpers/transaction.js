@@ -25,18 +25,14 @@ export default class Transaction {
 	}
 
 	async appendItemChanges(items, {
-		remove = false,
-		type = "item",
-		keepIfZero = false,
-		onlyDelta = false,
+		remove = false, type = "item", keepIfZero = false, onlyDelta = false,
 	} = {}) {
 
 		for (let data of items) {
 
 			let item = data.item ?? data;
 
-			type = PileUtilities.isItemCurrency(item, { target: this.actor })
-				? "currency" : type;
+			type = PileUtilities.isItemCurrency(item, { target: this.actor }) ? "currency" : type;
 
 			let flags = data.flags ?? false;
 			let itemData = item instanceof Item ? item.toObject() : foundry.utils.duplicate(item);
@@ -46,7 +42,9 @@ export default class Transaction {
 			const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
 			let itemId = itemData._id ?? itemData.id;
 			const actorHasItem = this.actor.items.get(itemId);
-			const actorExistingItem = actorHasItem || Utilities.findSimilarItem(this.actor.items, itemData, PileUtilities.getActorFlagData(this.actor), type === "currency");
+			const actorExistingItem = actorHasItem || Utilities.findSimilarItem(this.actor.items, itemData, {
+				flagData: PileUtilities.getActorFlagData(this.actor), ignoreVault: type === "currency"
+			});
 			const canItemStack = PileUtilities.canItemStack(actorExistingItem || itemData, this.actor);
 
 			if (!canItemStack) {
@@ -89,9 +87,7 @@ export default class Transaction {
 						this.itemsToUpdate.push(update);
 					}
 				}
-				this.itemDeltas.set(actorExistingItem.id,
-					(this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity
-				);
+				this.itemDeltas.set(actorExistingItem.id, (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity);
 			} else {
 				if (!itemData._id) {
 					itemData._id = randomID();
@@ -125,16 +121,12 @@ export default class Transaction {
 				if (!onlyDelta) {
 					acc[attribute.path] = incomingQuantity
 				}
-				this.attributeDeltas.set(attribute.path,
-					(this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : acc[attribute.path]) + incomingQuantity
-				);
+				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : acc[attribute.path]) + incomingQuantity);
 			} else {
 				if (!onlyDelta) {
 					acc[attribute.path] += incomingQuantity
 				}
-				this.attributeDeltas.set(attribute.path,
-					(this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity
-				);
+				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity);
 			}
 			this.attributeTypeMap.set(attribute.path, type)
 			return acc;
@@ -164,11 +156,9 @@ export default class Transaction {
 
 		this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
 			const item = this.actor.items.get(id).toObject();
-			const existingFlags = getItemFlagData(item);
-			setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(
-				existingFlags,
-				this.itemFlagMap.get(id) ?? {}
-			));
+			const itemFlagData = getItemFlagData(item);
+			const existingFlagData = this.itemFlagMap.get(id) ? getProperty(this.itemFlagMap.get(id), CONSTANTS.SIMPLE_FLAGS.ITEM) : {};
+			setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(itemFlagData, existingFlagData));
 			const type = this.itemTypeMap.get(id);
 			Utilities.setItemQuantity(item, quantity, true);
 			return { item, quantity, type };
@@ -217,11 +207,9 @@ export default class Transaction {
 		}
 
 		return {
-			attributeDeltas: this.attributeDeltas,
-			itemDeltas: this.itemDeltas.concat(itemsCreated.map(item => {
+			attributeDeltas: this.attributeDeltas, itemDeltas: this.itemDeltas.concat(itemsCreated.map(item => {
 				return {
-					item,
-					quantity: PileUtilities.canItemStack(item) ? Utilities.getItemQuantity(item) : 1
+					item, quantity: PileUtilities.canItemStack(item) ? Utilities.getItemQuantity(item) : 1
 				}
 			}))
 		}

@@ -20,9 +20,10 @@ export async function initializeCompendiumCache() {
 		}
 	}
 
-	Hooks.on("updateCompendium", updateCache);
-
-	updateCache();
+	setTimeout(async () => {
+		await updateCache();
+		Hooks.on("updateCompendium", updateCache);
+	}, 250);
 
 }
 

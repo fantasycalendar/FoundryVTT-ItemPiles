@@ -353,11 +353,6 @@ export class VaultStore extends ItemPileStore {
 
 		const gridData = get(this.gridData);
 
-		let flagData = PileUtilities.getItemFlagData(itemData);
-		setProperty(flagData, "x", x);
-		setProperty(flagData, "y", y);
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
-
 		if (!this.hasSimilarItem(itemData) && !vaultExpander && !gridData?.freeSpaces) {
 			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
 			return false;

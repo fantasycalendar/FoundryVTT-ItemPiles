@@ -201,10 +201,7 @@
 
 		const hitApps = Object.values(ui.windows)
 			.sort((a, b) => b.position.zIndex - a.position.zIndex)
-			.filter(app => {
-				return (app instanceof ActorSheet || app instanceof ItemPileInventoryApp || app instanceof VaultApp)
-					&& isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect());
-			});
+			.filter(app => isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect()));
 
 		let dropData = {
 			type: "Item",
@@ -213,16 +210,17 @@
 
 		if (hitApps.length) {
 			if (hitApps[0] === application) return;
-			dropData.target = hitApps[0].actor;
-			if (hitApps[0] instanceof VaultApp) {
-				return hitApps[0].store.onDropData(dropData);
+			if(hitApps[0].actor) {
+				dropData.target = hitApps[0].actor;
 			}
-		} else {
-
-			const position = Helpers.getCanvasMouse().getLocalPosition(canvas.app.stage);
-			dropData.x = position.x;
-			dropData.y = position.y;
+			if (hitApps[0].onDropData) {
+				return hitApps[0].onDropData(dropData);
+			}
 		}
+
+		const position = Helpers.getCanvasMouse().getLocalPosition(canvas.app.stage);
+		dropData.x = position.x;
+		dropData.y = position.y;
 
 		Hooks.call("dropCanvasData", canvas, dropData);
 
@@ -238,7 +236,6 @@
 
 	const applicationHeight = application.position.stores.height;
 	const applicationWidth = application.position.stores.width;
-	const applicationLeft = application.position.stores.left;
 	const defaultWidth = get(application.position.stores.width);
 
 	$: {

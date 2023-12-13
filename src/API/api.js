@@ -2076,8 +2076,8 @@ class API {
     return PileUtilities.getActorItems(target);
   }
 
-  static findSimilarItem(itemsToSearch, itemToFind) {
-    return Utilities.findSimilarItem(itemsToSearch, itemToFind);
+  static findSimilarItem(itemsToSearch, itemToFind, options = {}) {
+    return Utilities.findSimilarItem(itemsToSearch, itemToFind, options);
   }
 
   /**
@@ -2356,6 +2356,10 @@ class API {
 
   }
 
+  static canItemFitInVault(item, vaultActor) {
+    return PileUtilities.canItemFitInVault(item, vaultActor);
+  }
+
   static async registerItemPileType(type, label, flags = []) {
     game.i18n.translations['ITEM-PILES'].Types[type] = "Custom: " + label;
     CONSTANTS.CUSTOM_PILE_TYPES[type] = flags;
@@ -2365,8 +2369,8 @@ class API {
     return PileUtilities.isItemInvalid(item.parent, item);
   }
 
-  static canItemStack(item) {
-    return PileUtilities.canItemStack(item);
+  static canItemStack(item, actor = false) {
+    return PileUtilities.canItemStack(item, actor);
   }
 
   static getVaultGridData(vaultActor) {

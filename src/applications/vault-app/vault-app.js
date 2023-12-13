@@ -40,6 +40,10 @@ export default class VaultApp extends SvelteApplication {
 
 	}
 
+	onDropData(data) {
+		return this.store.onDropData(data);
+	}
+
 	/** @inheritdoc */
 	static get defaultOptions() {
 		return foundry.utils.mergeObject(super.defaultOptions, {

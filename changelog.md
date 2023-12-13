@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 2.8.7
+
+- Added API endpoint on custom item pile types to support item & actor drag and drop fields
+- Fixed flags sometimes not transferring correctly with items when added to item piles
+- Minor changes to support Item Piles: Auctioneer's imminent release
+
 ## Version 2.8.6
 
 - Fixed characters being able to buy things from merchants they could not afford

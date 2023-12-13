@@ -17,10 +17,38 @@ export default class SimpleCalendarPlugin extends BasePlugin {
       weekday: window.SimpleCalendar.api.getCurrentWeekday(),
       timestamp: window.SimpleCalendar.api.dateToTimestamp({})
     }
+    previousState.time = Number(previousState.dateTime.hour.toString() + "." + previousState.dateTime.minute.toString());
+
     Hooks.on(window.SimpleCalendar.Hooks.DateTimeChange, () => {
       ItemPileStore.notifyAllOfChanges("updateOpenCloseStatus");
       this.handleTimePassed();
     });
+
+    const debounceCollectAllMerchants = foundry.utils.debounce(() => {
+      this.collectAllMerchants();
+    }, 200);
+
+    Hooks.on("updateActor", () => {
+      debounceCollectAllMerchants();
+    })
+
+    Hooks.on("updateToken", () => {
+      debounceCollectAllMerchants();
+    })
+
+    this.collectAllMerchants();
+
+  }
+
+  collectAllMerchants() {
+    this.actors = PileUtilities.getItemPileActors((actor) => {
+      return PileUtilities.isItemPileMerchant(actor);
+    });
+
+    const { validTokensOnScenes } = PileUtilities.getItemPileTokens((token) => {
+      return PileUtilities.isItemPileMerchant(token);
+    });
+    this.validTokensOnScenes = validTokensOnScenes;
   }
 
   async handleTimePassed() {
@@ -30,6 +58,7 @@ export default class SimpleCalendarPlugin extends BasePlugin {
       weekday: window.SimpleCalendar.api.getCurrentWeekday(),
       timestamp: window.SimpleCalendar.api.dateToTimestamp({})
     }
+    newState.time = Number(newState.dateTime.hour.toString() + "." + newState.dateTime.minute.toString());
 
     const currentCalendar = window.SimpleCalendar.api.getCurrentCalendar();
     const numWeekdays = currentCalendar.weekdays.length;
@@ -91,10 +120,9 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 
   async hideMerchantTokens() {
 
-    const actors = PileUtilities.getItemPileActors((actor) => {
-      if (!PileUtilities.isItemPileMerchant(actor)) return false;
-      const flags = PileUtilities.getActorFlagData(actor);
-      return flags.hideTokenWhenClosed && PileUtilities.isMerchantClosed(actor);
+    const actors = this.actors.filter((actor) => {
+      const pileData = PileUtilities.getActorFlagData(actor);
+      return pileData.hideTokenWhenClosed && PileUtilities.isMerchantClosed(actor, { pileData });
     });
 
     const actorTokens = actors.map(actor => actor.getActiveTokens())
@@ -105,46 +133,23 @@ export default class SimpleCalendarPlugin extends BasePlugin {
         return acc;
       }, {});
 
-    const { validTokensOnScenes } = PileUtilities.getItemPileTokens((token) => {
-      if (!PileUtilities.isItemPileMerchant(token)) return false;
-      const flags = PileUtilities.getActorFlagData(token);
-      return flags.hideTokenWhenClosed && PileUtilities.isMerchantClosed(token);
+    const validTokensOnScenes = this.validTokensOnScenes.filter((token) => {
+      const pileData = PileUtilities.getActorFlagData(token);
+      return pileData.hideTokenWhenClosed && PileUtilities.isMerchantClosed(token, { pileData });
     });
-
-    await Actor.updateDocuments(actors.map(actor => {
-      const flags = PileUtilities.getActorFlagData(actor);
-      const closed = PileUtilities.isMerchantClosed(actor);
-      if (flags.openTimes.status !== "auto") {
-        flags.openTimes.status = closed ? "closed" : "open";
-      }
-      const cleanFlags = PileUtilities.cleanFlagData(flags);
-      return {
-        _id: actor.id,
-        [CONSTANTS.FLAGS.PILE]: cleanFlags,
-        hidden: closed
-      }
-    }));
 
     for (const [sceneId, tokens] of validTokensOnScenes) {
       const scene = game.scenes.get(sceneId);
 
       const updates = tokens.map(token => {
-        const flags = PileUtilities.getActorFlagData(token);
-        const closed = PileUtilities.isMerchantClosed(token);
-        if (flags.openTimes.status !== "auto") {
-          flags.openTimes.status = closed ? "closed" : "open";
-        }
-        const cleanFlags = PileUtilities.cleanFlagData(flags);
         return {
           _id: token.id,
-          [CONSTANTS.FLAGS.PILE]: cleanFlags,
-          hidden: closed
+          hidden: PileUtilities.isMerchantClosed(token)
         }
       }).concat(actorTokens.map(token => {
-        const closed = PileUtilities.isMerchantClosed(token);
         return {
           _id: token.id,
-          hidden: closed
+          hidden: PileUtilities.isMerchantClosed(token)
         }
       }))
 
@@ -154,17 +159,17 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 
   async refreshMerchantInventories(newState, previousState, categories, notes) {
 
-    const actors = PileUtilities.getItemPileActors((actor) => {
-      if (!PileUtilities.isItemPileMerchant(actor)) return false;
+    const actors = this.actors.filter((actor) => {
       const flags = PileUtilities.getActorFlagData(actor);
       return merchantRefreshFilter(flags, newState, previousState, categories);
     });
 
-    const { validTokensOnScenes } = PileUtilities.getItemPileTokens((token) => {
-      if (!PileUtilities.isItemPileMerchant(token)) return false;
-      const flags = PileUtilities.getActorFlagData(token);
-      return merchantRefreshFilter(flags, newState, previousState, categories);
-    });
+    const validTokensOnScenes = this.validTokensOnScenes.map(([scene, tokens]) => {
+      return [scene, tokens.filter(token => {
+        const flags = PileUtilities.getActorFlagData(token);
+        return merchantRefreshFilter(flags, newState, previousState, categories);
+      })]
+    }).filter(([_, tokens]) => tokens.length);
 
     previousState = newState;
 
@@ -226,16 +231,14 @@ function merchantRefreshFilter(flags, newState, previousState, categories) {
 
   const openingTime = Number(openHour.toString() + "." + openMinute.toString());
   const closingTime = Number(closeHour.toString() + "." + closeMinute.toString());
-  const previousTime = Number(previousState.dateTime.hour.toString() + "." + previousState.dateTime.minute.toString());
-  const currentTime = Number(newState.dateTime.hour.toString() + "." + newState.dateTime.minute.toString());
 
   const wasOpen = openingTime > closingTime
-    ? (previousTime >= openingTime || previousTime <= closingTime)
-    : (previousTime >= openingTime && previousTime <= closingTime);
+    ? (previousState.time >= openingTime || previousState.time <= closingTime)
+    : (previousState.time >= openingTime && previousState.time <= closingTime);
 
   const isOpen = openingTime > closingTime
-    ? (currentTime >= openingTime || currentTime <= closingTime)
-    : (currentTime >= openingTime && currentTime <= closingTime);
+    ? (newState.time >= openingTime || newState.time <= closingTime)
+    : (newState.time >= openingTime && newState.time <= closingTime);
 
   const allWeekdays = window.SimpleCalendar.api.getAllWeekdays();
   const dayLength = SimpleCalendar.api.timestampPlusInterval(0, { day: 1 });

@@ -1,7 +1,7 @@
 /** @module item_piles_constants */
 const module_name = "item-piles";
 const module_path = `modules/${module_name}/`;
-const baseFlag = `flags.${module_name}.`
+const baseFlag = `flags.${module_name}`
 
 const CONSTANTS = {
 
@@ -11,18 +11,33 @@ const CONSTANTS = {
 	ACTOR_DELTA_PROPERTY: "actorData",
 
 	FLAGS: {
-		VERSION: baseFlag + "version",
-		PILE: baseFlag + "data",
-		ITEM: baseFlag + "item",
-		NO_VERSION: baseFlag + "-=version",
-		NO_PILE: baseFlag + "-=data",
-		NO_ITEM: baseFlag + "-=item",
-		LOG: baseFlag + "log",
-		SHARING: baseFlag + "sharing",
-		PUBLIC_TRADE_ID: baseFlag + "publicTradeId",
-		TRADE_USERS: baseFlag + "tradeUsers",
-		TEMPORARY_ITEM: baseFlag + "temporary_item",
-		CUSTOM_CATEGORY: baseFlag + "item.customCategory"
+		VERSION: `${baseFlag}.version`,
+		PILE: `${baseFlag}.data`,
+		ITEM: `${baseFlag}.item`,
+		NO_VERSION: `${baseFlag}.-=version`,
+		NO_PILE: `${baseFlag}.-=data`,
+		NO_ITEM: `${baseFlag}.-=item`,
+		LOG: `${baseFlag}.log`,
+		SHARING: `${baseFlag}.sharing`,
+		PUBLIC_TRADE_ID: `${baseFlag}.publicTradeId`,
+		TRADE_USERS: `${baseFlag}.tradeUsers`,
+		TEMPORARY_ITEM: `${baseFlag}.temporary_item`,
+		CUSTOM_CATEGORY: `${baseFlag}.item.customCategory`
+	},
+
+	SIMPLE_FLAGS: {
+		VERSION: `${module_name}.version`,
+		PILE: `${module_name}.data`,
+		ITEM: `${module_name}.item`,
+		NO_VERSION: `${module_name}.-=version`,
+		NO_PILE: `${module_name}.-=data`,
+		NO_ITEM: `${module_name}.-=item`,
+		LOG: `${module_name}.log`,
+		SHARING: `${module_name}.sharing`,
+		PUBLIC_TRADE_ID: `${module_name}.publicTradeId`,
+		TRADE_USERS: `${module_name}.tradeUsers`,
+		TEMPORARY_ITEM: `${module_name}.temporary_item`,
+		CUSTOM_CATEGORY: `${module_name}.item.customCategory`
 	},
 
 	ITEM_DEFAULTS: {
