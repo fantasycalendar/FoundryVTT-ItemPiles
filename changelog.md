@@ -3,6 +3,8 @@
 ## Version 2.8.7
 
 - Added API endpoint on custom item pile types to support item & actor drag and drop fields
+- Improved performance of the Simple Calendar integration when refreshing merchants
+- Fixed compendium updates sometimes causing item piles to duplicate items in its currency backup compendium
 - Fixed flags sometimes not transferring correctly with items when added to item piles
 - Minor changes to support Item Piles: Auctioneer's imminent release
 
