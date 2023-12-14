@@ -93,3 +93,14 @@ jobs:
           git checkout stash module.json
           git commit -m "${{github.event.release.tag_name}} manifest"
           git push -f
+
+      - name: Publish to Foundry Admin
+        if: "!github.event.release.prerelease"
+        run: npx @ghost-fvtt/foundry-publish
+        env:
+          FVTT_MANIFEST_PATH: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.json
+          FVTT_PACKAGE_ID: ${{ secrets.FVTT_PACKAGE_ID }}
+          FVTT_USERNAME: ${{ secrets.FVTT_USERNAME }}
+          FVTT_PASSWORD: ${{ secrets.FVTT_PASSWORD }}
+          FVTT_CHANGELOG_URL: ${{ github.event.release.html_url }}
+          FVTT_USE_NEW_PACKAGE_ADMINISTRATION_INTERFACE: true
