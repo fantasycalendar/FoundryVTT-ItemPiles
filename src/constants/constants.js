@@ -65,6 +65,7 @@ const CONSTANTS = {
 		y: null,
 		width: 1,
 		height: 1,
+		vaultImage: "",
 		canStack: "default"
 	},
 
@@ -196,6 +197,8 @@ const module = prefix(CONSTANTS.MODULE_NAME);
 CONSTANTS.HOOKS = {
 	READY: module`ready`,
 	RESET_SETTINGS: module`resetSettings`,
+	DRAG_DOCUMENT: module`onDragDocument`,
+	DROP_DOCUMENT: module`onDropDocument`,
 	PRE_TRANSFER_EVERYTHING: module`preTransferEverything`,
 	TRANSFER_EVERYTHING: module`transferEverything`,
 	PRE_RENDER_SHEET: module`preRenderActorSheet`,

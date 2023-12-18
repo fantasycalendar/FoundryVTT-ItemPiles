@@ -1,35 +1,35 @@
 <script>
 
-  import CONSTANTS from "../../../constants/constants.js";
-  import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-  import DropZone from "../../components/DropZone.svelte";
+	import CONSTANTS from "../../../constants/constants.js";
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import DropZone from "../../components/DropZone.svelte";
 
-  export let pileData;
+	export let pileData;
 
-  const flags = Object.entries(CONSTANTS.CUSTOM_PILE_TYPES[pileData.type]);
-  for (const [key, data] of flags) {
-    if (pileData[key] === undefined) {
-      pileData[key] = data.value;
-    }
-  }
+	const flags = Object.entries(CONSTANTS.CUSTOM_PILE_TYPES[pileData.type]);
+	for (const [key, data] of flags) {
+		if (pileData[key] === undefined) {
+			pileData[key] = data.value;
+		}
+	}
 
-  async function handleDropData(dropData, key, data) {
-    if (!data.type.implementation) {
-      return;
-    }
-    const doc = await data.type.implementation.fromDropData(dropData);
-    pileData[key] = {
-      data: doc.toObject(),
-      uuid: dropData.uuid
-    }
-  }
+	async function handleDropData(dropData, key, data) {
+		if (!data.type.implementation) {
+			return;
+		}
+		const doc = await data.type.implementation.fromDropData(dropData);
+		pileData[key] = {
+			data: doc.toObject(),
+			uuid: dropData.uuid
+		}
+	}
 
-  async function previewDocument(key) {
-    if (!pileData[key].uuid) return;
-    const doc = fromUuidSync(pileData[key].uuid);
-    if (!doc) return;
-    doc.sheet.render(true);
-  }
+	async function previewDocument(key) {
+		if (!pileData[key].uuid) return;
+		const doc = fromUuidSync(pileData[key].uuid);
+		if (!doc) return;
+		doc.sheet.render(true);
+	}
 
 </script>
 
@@ -53,13 +53,15 @@
 			{:else}
 				<input type="text" bind:value={pileData[key]}/>
 			{/if}
-		{:else if data.type === Item}
+		{:else if data.type === Item || data.type === Actor}
 			<DropZone callback={(dropData) => handleDropData(dropData, key, data)}>
 				<div class="drop-item">
-					<img src={pileData[key]?.data?.img ?? "icons/svg/coins.svg"} class="drop-item-custom-image"/>
+					<img
+						src={pileData[key]?.data?.img ?? data.type === Actor ? "icons/svg/cowled.svg.svg" : "icons/svg/coins.svg"}
+						class="drop-document-custom-image"/>
 					<span class:item-piles-clickable-link={!!pileData[key]?.data}
 					      on:click={() => { previewDocument(key); }}>
-						{pileData[key]?.data?.name ?? "Drop item to add"}
+						{pileData[key]?.data?.name ?? `Drop ${data.type.prototype.constructor.name.toLowerCase()} to add`}
 					</span>
 					<i
 						on:click|stopPropagation={() => {
@@ -95,7 +97,7 @@
       flex: 1;
     }
 
-    .drop-item-custom-image {
+    .drop-document-custom-image {
       max-width: 35px;
       min-width: 35px;
       border: 1px solid rgba(0, 0, 0, 0.4);

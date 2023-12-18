@@ -54,6 +54,22 @@ export default function registerLibwrappers() {
 		return wrapped(forced, options, ...args);
 	}, "MIXED");
 
+	libWrapper.register(CONSTANTS.MODULE_NAME, "DragDrop.prototype.callback", function (wrapped, event, type) {
+		const result = wrapped(event, type)
+		const hookType = {
+			"dragstart": CONSTANTS.HOOKS.DRAG_DOCUMENT,
+			"drop": CONSTANTS.HOOKS.DROP_DOCUMENT,
+		}[type] ?? false;
+		if (hookType) {
+			try {
+				const value = JSON.parse(event.dataTransfer.getData("text/plain"));
+				Hooks.callAll(hookType, value);
+			} catch (err) {
+			}
+		}
+		return result;
+	}, "WRAPPER")
+
 	if (SYSTEMS.DATA.SHEET_OVERRIDES) {
 		SYSTEMS.DATA.SHEET_OVERRIDES();
 	}

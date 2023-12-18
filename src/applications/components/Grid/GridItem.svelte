@@ -3,7 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { get, writable } from 'svelte/store';
 	import { styleFromObject } from '../../../helpers/helpers.js';
-	import { calcPosition, getCollisions, snapOnMove } from './grid-utils.js';
+	import { calcPosition, getCollisions, isPlacementValid, snapOnMove } from './grid-utils.js';
 
 	export let item;
 	export let options;
@@ -57,6 +57,7 @@
 
 	let active = false;
 	let splitting = false;
+	let validPlacement = false;
 	let collisions = [];
 	let pointerOffset = { left: 0, top: 0 };
 
@@ -148,6 +149,11 @@
 
 		if (!splitting) {
 			collisions = getCollisions({ id: item.id, transform: previewTransform }, items);
+			validPlacement = !outOfBounds && isPlacementValid({
+				id: item.id,
+				item: item,
+				transform: previewTransform
+			}, collisions, items, options);
 		}
 
 	}
@@ -198,6 +204,7 @@
 		window.removeEventListener('touchmove', move);
 		window.removeEventListener('touchend', moveEnd);
 
+		const origItemTransform = get(transformStore);
 		const finalTransform = get(previewTransform);
 
 		const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
@@ -231,24 +238,45 @@
 			return;
 		}
 
+		if (!validPlacement) {
+			return;
+		}
+		validPlacement = false;
+
 		if (collisions.length) {
 
 			if (item.item.areItemsSimilar(collisions[0].item) && !globalThis.keyboard.downKeys.has("ControlLeft")) {
 				return collisions[0].item.merge(item.item);
 			}
 
-			const offset = collisions.reduce((acc, collision) => {
-				const trans = get(collision.transform);
-				if (trans.x < acc.x) acc.x = trans.x;
-				if (trans.y < acc.y) acc.y = trans.y;
-				return acc;
-			}, { x: finalTransform.x, y: finalTransform.y });
 			for (const collision of collisions) {
+
+				const collisionTransform = get(collision.transform);
+
+				const delta = {
+					x: finalTransform.x - origItemTransform.x,
+					y: finalTransform.y - origItemTransform.y
+				}
+
+				const offset = {
+					x: (collisionTransform.x - finalTransform.x),
+					y: (collisionTransform.y - finalTransform.y)
+				}
+
+				if (
+					(delta.x >= -Math.floor(origItemTransform.w / 2) && delta.x < origItemTransform.w)
+					&&
+					(delta.y >= -Math.floor(origItemTransform.h / 2) && delta.y < origItemTransform.h)
+				) {
+					return false;
+				}
+
 				collision.transform.update(trans => {
-					trans.x = transform.x + (trans.x - offset.x);
-					trans.y = transform.y + (trans.y - offset.y);
+					trans.x = origItemTransform.x + offset.x;
+					trans.y = origItemTransform.y + offset.y;
 					return trans;
 				});
+
 			}
 		}
 
@@ -258,7 +286,7 @@
 			return trans;
 		});
 
-		dispatch("itemchange", { items: collisions.concat(item) });
+		dispatch("itemchange", { items: collisions.concat([item]) });
 
 	}
 
@@ -292,6 +320,9 @@
 		});
 	}
 
+	$: itemClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
+	$: collisionClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
+
 </script>
 
 <div
@@ -309,9 +340,9 @@
 </div>
 
 {#if active}
-	<div style={ghostStyle} class={collisions.length ? options.collisionClass : options.previewClass}></div>
+	<div style={ghostStyle} class={collisionClass}></div>
 
 	{#if collisions.length}
-		<div style={style} class={collisions.length ? options.collisionClass : options.previewClass}></div>
+		<div style={style} class={itemClass}></div>
 	{/if}
 {/if}

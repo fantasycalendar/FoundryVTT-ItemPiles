@@ -71,10 +71,6 @@ Hooks.once("ready", () => {
 			}
 		}
 
-		if (!Helpers.isGMConnected()) {
-			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoGMsConnected"), true)
-		}
-
 		Socket.initialize();
 		PrivateAPI.initialize();
 		TradeAPI.initialize();
@@ -103,7 +99,7 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
 		if (SYSTEMS.DATA.SYSTEM_HOOKS) {
 			SYSTEMS.DATA.SYSTEM_HOOKS();
 		}
-		// game.itempiles.API.renderItemPileInterface(game.actors.getName("Merchant"));
+		// game.itempiles.API.renderItemPileInterface(game.actors.getName("Gamemaster's Vault"));
 		// new SettingsShim().render(true);
 		applySystemSpecificStyles();
 	}, 500);

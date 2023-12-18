@@ -8,18 +8,20 @@
 
 	const name = item.name;
 	const img = item.img;
+	const flagData = item.itemFlagData;
 	const quantity = item.quantity;
 	const canStack = item.canStack;
 	const style = item.style;
 
 	$: styling = Helpers.styleFromObject($style);
+	$: displayImage = $flagData.vaultImage || $img;
 
 </script>
 
 <div class="grid-item" data-fast-tooltip={$name}
      data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0">
-	{#if $img}
-		<img src={$img} alt={$name}/>
+	{#if displayImage}
+		<img src={displayImage}/>
 	{/if}
 	{#if styling}
 		<div class="grid-item-ghost" style={styling}></div>

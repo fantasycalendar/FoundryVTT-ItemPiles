@@ -54,6 +54,12 @@ export function canItemStack(item, targetActor) {
 	}[itemFlagData?.canStack ?? "default"] && !(actorFlagData.type === CONSTANTS.PILE_TYPES.VAULT && itemFlagData.vaultExpander);
 }
 
+/**
+ *
+ * @param item
+ * @param data
+ * @returns {Object<CONSTANTS.ITEM_DEFAULTS>}
+ */
 export function getItemFlagData(item, data = false) {
 	return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, { ...CONSTANTS.ITEM_DEFAULTS }, data);
 }
@@ -688,8 +694,7 @@ export function getPriceArray(totalCost, currencies) {
 			cost: totalCost,
 			baseCost: totalCost,
 			maxCurrencyCost: totalCost,
-			string: primaryCurrency.abbreviation.replace('{#}', totalCost),
-			secondary: false
+			string: primaryCurrency.abbreviation.replace('{#}', totalCost)
 		}]
 	}
 
@@ -703,6 +708,8 @@ export function getPriceArray(totalCost, currencies) {
 
 		for (const currency of currencies) {
 
+			if (currency.secondary) continue;
+
 			const numCurrency = Math.floor(cost / currency.exchangeRate);
 
 			cost = cost - (numCurrency * currency.exchangeRate);
@@ -712,8 +719,7 @@ export function getPriceArray(totalCost, currencies) {
 				cost: Math.round(numCurrency),
 				baseCost: Math.round(numCurrency),
 				maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
-				string: currency.abbreviation.replace("{#}", numCurrency),
-				secondary: false
+				string: currency.abbreviation.replace("{#}", numCurrency)
 			});
 
 		}
@@ -735,14 +741,13 @@ export function getPriceArray(totalCost, currencies) {
 			cost: cost,
 			baseCost: cost,
 			maxCurrencyCost: totalCost,
-			string: primaryCurrency.abbreviation.replace('{#}', cost),
-			secondary: false
+			string: primaryCurrency.abbreviation.replace('{#}', cost)
 		});
 	}
 
 	for (const currency of currencies) {
 
-		if (currency === primaryCurrency && skipPrimary) continue;
+		if ((currency === primaryCurrency && skipPrimary) || currency.secondary) continue;
 
 		const numCurrency = Math.floor(Helpers.roundToDecimals(fraction / currency.exchangeRate, decimals));
 
@@ -753,8 +758,7 @@ export function getPriceArray(totalCost, currencies) {
 			cost: Math.round(numCurrency),
 			baseCost: Math.round(numCurrency),
 			maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
-			string: currency.abbreviation.replace("{#}", numCurrency),
-			secondary: false
+			string: currency.abbreviation.replace("{#}", numCurrency)
 		});
 	}
 
@@ -977,7 +981,7 @@ export function getPriceData({
 	}
 
 	// If the item has custom prices, we include them here
-	if (secondaryPrices) {
+	if (secondaryPrices?.length) {
 
 		if (!priceData.length) {
 			priceData.push({
@@ -1265,12 +1269,14 @@ export function getPaymentData({
 
 	if (paymentData.totalCurrencyCost && !seller && !buyer) {
 
-		paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies);
+		paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies)
+			.filter(currency => !currency.secondary);
 
 	} else if (paymentData.totalCurrencyCost) {
 
 		// The price array that we need to fill
-		const prices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies);
+		const prices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies)
+			.filter(currency => !currency.secondary);
 
 		// This is the target price amount we need to hit
 		let priceLeft = paymentData.totalCurrencyCost;
@@ -1500,13 +1506,17 @@ export function getVaultGridData(vaultActor, flagData = false) {
 	let enabledCols = vaultFlags.cols;
 	let enabledRows = vaultFlags.rows;
 
+	const allItems = vaultItems.map(item => ({
+		item,
+		itemFlagData: getItemFlagData(item),
+		quantity: Utilities.getItemQuantity(item)
+	}))
+
 	if (vaultFlags.vaultExpansion) {
 
-		const vaultExpanders = vaultItems.filter(item => {
-			return getItemFlagData(item).vaultExpander;
-		}).map(item => ({
-			itemFlagData: getItemFlagData(item), quantity: Utilities.getItemQuantity(item)
-		}))
+		const vaultExpanders = allItems.filter(({ itemFlagData }) => {
+			return itemFlagData.vaultExpander;
+		});
 
 		const expansions = vaultExpanders.reduce((acc, item) => {
 			acc.cols += (item.itemFlagData.addsCols ?? 0) * item.quantity;
@@ -1524,6 +1534,36 @@ export function getVaultGridData(vaultActor, flagData = false) {
 	enabledCols = Math.min(enabledCols, vaultFlags.cols);
 	enabledRows = Math.min(enabledRows, vaultFlags.rows);
 
+	const regularItems = allItems.filter(({ itemFlagData }) => {
+		return !vaultFlags.vaultExpansion || !itemFlagData.vaultExpander;
+	});
+	const grid = Array.from(Array(enabledCols).keys()).map(() => {
+		return Array.from(Array(enabledRows).keys()).map(() => {
+			return null;
+		})
+	});
+
+	for (const item of regularItems) {
+		for (let width = 0; width < item.itemFlagData.width; width++) {
+			const x = Math.max(0, Math.min(item.itemFlagData.x + width, enabledCols - 1));
+			const y = Math.max(0, Math.min(item.itemFlagData.y, enabledRows - 1));
+			grid[x][y] = true;
+		}
+		for (let height = 0; height < item.itemFlagData.height; height++) {
+			const x = Math.max(0, Math.min(item.itemFlagData.x, enabledCols - 1));
+			const y = Math.max(0, Math.min(item.itemFlagData.y + height, enabledRows - 1));
+			grid[x][y] = true;
+		}
+	}
+
+	let freeCells = [];
+	for (let x = 0; x < enabledCols; x++) {
+		for (let y = 0; y < enabledRows; y++) {
+			if (grid[x][y]) continue;
+			freeCells.push({ x, y });
+		}
+	}
+
 	return {
 		totalSpaces: Math.max(0, (vaultFlags.cols * vaultFlags.rows)),
 		enabledSpaces: Math.max(0, (enabledCols * enabledRows)),
@@ -1531,8 +1571,57 @@ export function getVaultGridData(vaultActor, flagData = false) {
 		enabledCols: enabledCols,
 		enabledRows: enabledRows,
 		cols: vaultFlags.cols,
-		rows: vaultFlags.rows
+		rows: vaultFlags.rows,
+		items: regularItems,
+		grid,
+		freeCells
 	}
+
+}
+
+export function canItemFitInVault(item, vaultActor, position = null) {
+	if (!isItemPileVault(vaultActor)) return false;
+	if (Utilities.findSimilarItem(vaultActor.items, item) && canItemStack(item, vaultActor)) {
+		return true;
+	}
+	const gridData = getVaultGridData(vaultActor);
+	return getNewItemsVaultPosition(item, gridData, position);
+}
+
+export function getNewItemsVaultPosition(item, gridData, position = null) {
+
+	const itemFlagData = getItemFlagData(item);
+	const { grid, freeCells, enabledCols, enabledRows } = gridData;
+	const validCells = freeCells.filter(cell => {
+		return ((cell.x + itemFlagData.width) <= enabledCols)
+			&& ((cell.y + itemFlagData.height) <= enabledRows);
+	})
+
+	if (!validCells.length) return false;
+
+	if (itemFlagData.width === 1 && itemFlagData.height === 1) {
+		return validCells[0];
+	}
+
+	const cellsToCheck = position ? validCells.sort((a, b) => {
+		const distA = (new Ray(a, position)).distance;
+		const distB = (new Ray(b, position)).distance;
+		return ((distA - distB) * 1000) + (itemFlagData.width >= itemFlagData.height ? b.x - a.x : b.y - a.y);
+	}) : validCells;
+
+	cellLoop:
+		for (const { x, y } of cellsToCheck) {
+			for (let width = 0; width < itemFlagData.width; width++) {
+				for (let height = 0; height < itemFlagData.height; height++) {
+					if (grid[x + width][y + height]) {
+						continue cellLoop;
+					}
+				}
+			}
+			return { x, y };
+		}
+
+	return false;
 
 }
 
@@ -1561,15 +1650,6 @@ export function getVaultAccess(vaultActor, { flagData = false, hasRecipient = fa
 		canDepositCurrencies: vaultActor.isOwner && hasRecipient
 	});
 
-}
-
-export function canItemFitInVault(item, vaultActor, quantity = 1) {
-	if (!isItemPileVault(vaultActor)) return false;
-	if (Utilities.findSimilarItem(vaultActor.items, item) && canItemStack(item, vaultActor)) {
-		return true;
-	}
-	const gridData = getVaultGridData(vaultActor);
-	return gridData.freeSpaces >= quantity;
 }
 
 export async function updateVaultLog(itemPile, {

@@ -301,7 +301,7 @@ export class VaultStore extends ItemPileStore {
 
 		const dragPosition = get(this.dragPosition);
 		const { x, y } = dragPosition;
-		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false });
 
 		if (data.type === "Actor" && game.user.isGM) {
 			const oldHeight = this.mainContainer.getBoundingClientRect().height;
@@ -351,11 +351,19 @@ export class VaultStore extends ItemPileStore {
 			return false;
 		}
 
-		const gridData = get(this.gridData);
-
-		if (!this.hasSimilarItem(itemData) && !vaultExpander && !gridData?.freeSpaces) {
-			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
-			return false;
+		let validPosition = null;
+		let similarItem = this.getSimilarItem(itemData);
+		if (!vaultExpander) {
+			if (similarItem && PileUtilities.canItemStack(item, this.actor)) {
+				const { x, y } = PileUtilities.getItemFlagData(similarItem);
+				validPosition = { x, y };
+			} else {
+				validPosition = PileUtilities.canItemFitInVault(itemData, this.actor, { x, y });
+				if (!validPosition) {
+					Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
+					return false;
+				}
+			}
 		}
 
 		return PrivateAPI._depositWithdrawItem({
@@ -365,7 +373,7 @@ export class VaultStore extends ItemPileStore {
 				item: itemData,
 				quantity: 1
 			},
-			gridPosition: { x, y }
+			gridPosition: validPosition
 		});
 
 	}
@@ -381,6 +389,8 @@ export class VaultItem extends PileItem {
 		});
 		this.x = 0;
 		this.y = 0;
+		this.w = 1;
+		this.h = 1;
 		this.style = writable({});
 	}
 
@@ -413,6 +423,8 @@ export class VaultItem extends PileItem {
 			}
 			this.x = transform.x;
 			this.y = transform.y;
+			this.w = transform.w;
+			this.h = transform.h;
 		});
 		this.subscribeTo(this.quantity, () => {
 			const itemFlagData = get(this.itemFlagData);
@@ -492,7 +504,10 @@ export class VaultItem extends PileItem {
 			skipVaultLogging: true
 		});
 
-		return game.itempiles.API.addItems(this.store.actor, [{ id: this.id, quantity: Math.abs(itemDelta[0].quantity) }], {
+		return game.itempiles.API.addItems(this.store.actor, [{
+			id: this.id,
+			quantity: Math.abs(itemDelta[0].quantity)
+		}], {
 			interactionId: this.store.interactionId,
 			skipVaultLogging: true
 		})

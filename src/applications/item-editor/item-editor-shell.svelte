@@ -11,6 +11,7 @@
 	import { get, writable } from "svelte/store";
 	import SETTINGS from "../../constants/settings.js";
 	import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
+	import FilePicker from "../components/FilePicker.svelte";
 
 	const { application } = getContext('#external');
 
@@ -91,6 +92,24 @@
 							<p>{localize("ITEM-PILES.Applications.ItemEditor.HiddenExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.hidden}/>
+					</div>
+
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.CanStack")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.CanStackExplanation")}</p>
+						</label>
+						<select style="flex: 0 1 auto;" bind:value={itemFlagData.canStack}>
+							<option value="default">
+								{localize("ITEM-PILES.Applications.ItemEditor.CanStackDefault")}
+							</option>
+							<option value="yes">
+								{localize("ITEM-PILES.Applications.ItemEditor.CanStackYes")}
+							</option>
+							<option value="no">
+								{localize("ITEM-PILES.Applications.ItemEditor.CanStackNo")}
+							</option>
+						</select>
 					</div>
 
 					<div class="form-group">
@@ -250,21 +269,32 @@
 				{#if activeTab === 'vault'}
 
 					<div class="form-group">
-						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.CanStack")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.CanStackExplanation")}</p>
+						<label style="flex:6;">
+							{localize("ITEM-PILES.Applications.ItemEditor.GridSize")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GridSizeExplanation")}</p>
 						</label>
-						<select style="flex: 0 1 auto;" bind:value={itemFlagData.canStack}>
-							<option value="default">
-								{localize("ITEM-PILES.Applications.ItemEditor.CanStackDefault")}
-							</option>
-							<option value="yes">
-								{localize("ITEM-PILES.Applications.ItemEditor.CanStackYes")}
-							</option>
-							<option value="no">
-								{localize("ITEM-PILES.Applications.ItemEditor.CanStackNo")}
-							</option>
-						</select>
+						<div class="item-piles-grid-columns" style="flex: 3;">
+							<div style="text-align: center; font-size: 0.7rem;">
+								<i>{localize("ITEM-PILES.Applications.ItemEditor.GridWidth")}</i>
+								<i>{localize("ITEM-PILES.Applications.ItemEditor.GridHeight")}</i>
+							</div>
+							<div style="align-items: center;">
+								<input style="text-align: right;" type="number" placeholder="Enter a number..."
+								       bind:value={itemFlagData.width}/>
+								<span style="flex: 0;">x</span>
+								<input type="number" placeholder="Enter a number..." bind:value={itemFlagData.height}/>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.VaultImage")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultImageExplanation")}</p>
+						</label>
+						<div class="form-fields">
+							<FilePicker bind:value={itemFlagData.vaultImage} placeholder="path/image.png" type="imagevideo"/>
+						</div>
 					</div>
 
 					<div class="form-group">
@@ -274,7 +304,6 @@
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.vaultExpander}/>
 					</div>
-
 
 					<div class="form-group">
 						<label style="flex:6;">

@@ -428,6 +428,12 @@
     background-color: rgb(33, 202, 33);
   }
 
+  &-grid-item-invalid-collision {
+    opacity: 0.35;
+    border-radius: 0.25rem;
+    background-color: rgb(202, 33, 33);
+  }
+
   &-grid-item-hover > div {
     &:after {
       content: '';
@@ -886,7 +892,7 @@
     vertical-align: center;
   }
 
-  .character-header {
+  .item-piles-character-header {
 
     display: inline-flex;
     flex-direction: row;

@@ -3,6 +3,8 @@
 - [Generic](#Generic)
   - [item-piles-ready](#item-piles-ready)
   - [item-piles-resetSettings](#item-piles-resetSettings)
+  - [item-piles-onDragDocument](#item-piles-onDragDocument)
+  - [item-piles-onDropDocument](#item-piles-onDropDocument)
 
 - [Specific](#Specific)
   - [item-piles-preTransferEverything](#item-piles-preTransferEverything)
@@ -105,6 +107,22 @@ Called when the module is ready.
 
 You can call this to reset all the Item Piles system specific settings.
 
+### item-piles-onDragDocument
+
+Called when any document begins being dragged - at least by native Foundry code.
+
+| Param | Type                | Description                                                        |
+|-------|---------------------|--------------------------------------------------------------------|
+| data  | <code>Object</code> | An object containing the type and UUID of the object being dragged |
+
+### item-piles-onDropDocument
+
+Called when any document stops being dragged and is dropped - at least by native Foundry code.
+
+| Param | Type                | Description                                                        |
+|-------|---------------------|--------------------------------------------------------------------|
+| data  | <code>Object</code> | An object containing the type and UUID of the object being dropped |
+
 ---
 
 ## Specific
@@ -148,10 +166,10 @@ Called after all items and attributes have been transferred from the source to t
 
 Called before an item piles related interface has begun rendering.
 
-| Param            | Type                                     | Description                                                                                     |
-|------------------|------------------------------------------|-------------------------------------------------------------------------------------------------|
-| source           | <code>Actor/TokenDocument</code>         | The item pile actor                                                                             |
-| inspectingTarget | <code>Actor/TokenDocument,Boolean</code> | The actor/token that started to render the interface                                            |
+| Param            | Type                                     | Description                                          |
+|------------------|------------------------------------------|------------------------------------------------------|
+| source           | <code>Actor/TokenDocument</code>         | The item pile actor                                  |
+| inspectingTarget | <code>Actor/TokenDocument,Boolean</code> | The actor/token that started to render the interface |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -187,12 +205,12 @@ and merchants.
 
 Called before an item piles related interface is closed.
 
-| Param         | Type                                     | Description                                                       |
-|---------------|------------------------------------------|-------------------------------------------------------------------|
-| app           | <code>SvelteApplication</code>           | The application to be closed                                      |
-| source        | <code>Actor/TokenDocument</code>         | The item pile actor                                               |
-| recipient     | <code>Actor/TokenDocument,Boolean</code> | The actor that was involved in opening the interface              |
-| options       | <code>object</code>                      | An object containing options regarding how to close the interface |
+| Param     | Type                                     | Description                                                       |
+|-----------|------------------------------------------|-------------------------------------------------------------------|
+| app       | <code>SvelteApplication</code>           | The application to be closed                                      |
+| source    | <code>Actor/TokenDocument</code>         | The item pile actor                                               |
+| recipient | <code>Actor/TokenDocument,Boolean</code> | The actor that was involved in opening the interface              |
+| options   | <code>object</code>                      | An object containing options regarding how to close the interface |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -200,12 +218,12 @@ If the hook returns `false`, the action is interrupted.
 
 Called after an item piles related interface is closed.
 
-| Param         | Type                                     | Description                                                       |
-|---------------|------------------------------------------|-------------------------------------------------------------------|
-| app           | <code>SvelteApplication</code>           | The application that was closed                                   |
-| source        | <code>Actor/TokenDocument</code>         | The item pile actor                                               |
-| recipient     | <code>Actor/TokenDocument,Boolean</code> | The actor that was involved in opening the interface              |
-| options       | <code>object</code>                      | An object containing options regarding how to close the interface |
+| Param     | Type                                     | Description                                                       |
+|-----------|------------------------------------------|-------------------------------------------------------------------|
+| app       | <code>SvelteApplication</code>           | The application that was closed                                   |
+| source    | <code>Actor/TokenDocument</code>         | The item pile actor                                               |
+| recipient | <code>Actor/TokenDocument,Boolean</code> | The actor that was involved in opening the interface              |
+| options   | <code>object</code>                      | An object containing options regarding how to close the interface |
 
 ## Item Piles
 
@@ -507,10 +525,10 @@ Called after the content of an item pile has been split.
 
 Called before resolving a click on an item pile token
 
-| Param            | Type                            | Description                                                    |
-|------------------|---------------------------------|----------------------------------------------------------------|
+| Param            | Type                       | Description                                                    |
+|------------------|----------------------------|----------------------------------------------------------------|
 | target           | <code>TokenDocument</code> | The item pile token that was clicked                           |
-| interactingActor | <code>Actor</code>             | The actor of the user that interacted with the item pile token |
+| interactingActor | <code>Actor</code>         | The actor of the user that interacted with the item pile token |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -652,13 +670,13 @@ If the hook returns `false`, the action is interrupted.
 
 Called after items have been transferred from the source to the target.
 
-| Param           | Type                             | Description                                                                                                                   |
-|-----------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| source          | <code>Actor/TokenDocument</code> | The source that transferred items                                                                                             |
-| target          | <code>Actor/TokenDocument</code> | The target that received the items                                                                                            |
-| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                               |
-| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                 |
-| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                     |
+| Param         | Type                             | Description                                                                                     |
+|---------------|----------------------------------|-------------------------------------------------------------------------------------------------|
+| source        | <code>Actor/TokenDocument</code> | The source that transferred items                                                               |
+| target        | <code>Actor/TokenDocument</code> | The target that received the items                                                              |
+| itemDeltas    | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target |
+| userId        | <code>string</code>              | The ID of the user that initiated this action                                                   |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                       |
 
 ---
 
@@ -682,13 +700,13 @@ If the hook returns `false`, the action is interrupted.
 
 Called after all items has been transferred from the source to the target.
 
-| Param           | Type                             | Description                                                                                                                   |
-|-----------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| source          | <code>Actor/TokenDocument</code> | The source that transferred all of its items                                                                                  |
-| target          | <code>Actor/TokenDocument</code> | The target that received all of the items                                                                                     |
-| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                               |
-| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                 |
-| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                     |
+| Param         | Type                             | Description                                                                                     |
+|---------------|----------------------------------|-------------------------------------------------------------------------------------------------|
+| source        | <code>Actor/TokenDocument</code> | The source that transferred all of its items                                                    |
+| target        | <code>Actor/TokenDocument</code> | The target that received all of the items                                                       |
+| itemDeltas    | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target |
+| userId        | <code>string</code>              | The ID of the user that initiated this action                                                   |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                       |
 
 ---
 
@@ -742,12 +760,12 @@ Called before a trade between a merchant and an actor has been finalized.
 
 Called before the user has sent the request to give an item to another user's actor.
 
-| Param        | Type                | Description                                                  |
-|--------------|---------------------|--------------------------------------------------------------|
-| source       | <code>Actor</code>  | The source actor that will give the item                     |
-| target       | <code>Actor</code>  | The target actor that will receive the item                  |
-| item         | <code>Object</code> | The item data to be given                                    |
-| sourceUserId | <code>string</code> | The ID of the user that initiated this action                |
+| Param        | Type                | Description                                      |
+|--------------|---------------------|--------------------------------------------------|
+| source       | <code>Actor</code>  | The source actor that will give the item         |
+| target       | <code>Actor</code>  | The target actor that will receive the item      |
+| item         | <code>Object</code> | The item data to be given                        |
+| sourceUserId | <code>string</code> | The ID of the user that initiated this action    |
 | targetUserId | <code>string</code> | The ID of the user that will receive the request |
 
 If the hook returns `false`, the action is interrupted.
@@ -758,8 +776,8 @@ If the hook returns `false`, the action is interrupted.
 
 Called after a user gave an item to another user's actor.
 
-| Param         | Type                        | Description                                     |
-|---------------|-----------------------------|-------------------------------------------------|
+| Param        | Type                | Description                                     |
+|--------------|---------------------|-------------------------------------------------|
 | source       | <code>Actor</code>  | The source actor that gave the item             |
 | target       | <code>Actor</code>  | The target actor that received the item         |
 | item         | <code>Object</code> | The item data that was given                    |
@@ -947,12 +965,12 @@ Called after currencies were added to the target. Not called in the case of a tr
 
 Called before currencies were removed from the target. Not called in the case of a transfer.
 
-| Param         | Type                             | Description                                                                                                     |
-|---------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| target        | <code>Actor/TokenDocument</code> | The target that will have its currencies removed                                                                |
+| Param         | Type                             | Description                                                                                                                  |
+|---------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| target        | <code>Actor/TokenDocument</code> | The target that will have its currencies removed                                                                             |
 | actorUpdates  | <code>object</code>              | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
-| itemsToUpdate | <code>array</code>               | An array of objects each containing the item id and the quantity that was updated                               |
-| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                       |
+| itemsToUpdate | <code>array</code>               | An array of objects each containing the item id and the quantity that was updated                                            |
+| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                    |
 
 If the hook returns `false`, the action is interrupted.
 

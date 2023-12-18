@@ -423,16 +423,16 @@ export default class PrivateAPI {
 			purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: targetActor
 		});
 
-		const itemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")
+		const itemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item" && currency.quantity)
 			.map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
 
-		const attributesToRemove = paymentData.finalPrices.filter(currency => currency.type === "attribute")
+		const attributesToRemove = paymentData.finalPrices.filter(currency => currency.type === "attribute" && currency.quantity)
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
-		const itemsToAdd = paymentData.buyerChange.filter(currency => currency.type === "item")
+		const itemsToAdd = paymentData.buyerChange.filter(currency => currency.type === "item" && currency.quantity)
 			.map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
 
-		const attributesToAdd = paymentData.buyerChange.filter(currency => currency.type === "attribute")
+		const attributesToAdd = paymentData.buyerChange.filter(currency => currency.type === "attribute" && currency.quantity)
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
 		await transaction.appendItemChanges(itemsToRemove, { remove: true, type: "currency" });
@@ -487,16 +487,16 @@ export default class PrivateAPI {
 			purchaseData: [{ cost: overallCost, quantity: 1 }], buyer: sourceActor
 		});
 
-		const sourceItemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item")
+		const sourceItemsToRemove = paymentData.finalPrices.filter(currency => currency.type === "item" && currency.quantity)
 			.map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
 
-		const sourceAttributesToRemove = paymentData.finalPrices.filter(currency => currency.type === "attribute")
+		const sourceAttributesToRemove = paymentData.finalPrices.filter(currency => currency.type === "attribute" && currency.quantity)
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
-		const sourceItemsToAdd = paymentData.buyerChange.filter(currency => currency.type === "item")
+		const sourceItemsToAdd = paymentData.buyerChange.filter(currency => currency.type === "item" && currency.quantity)
 			.map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
 
-		const sourceAttributesToAdd = paymentData.buyerChange.filter(currency => currency.type === "attribute")
+		const sourceAttributesToAdd = paymentData.buyerChange.filter(currency => currency.type === "attribute" && currency.quantity)
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
 		const sourceTransaction = new Transaction(sourceActor);
@@ -1849,12 +1849,12 @@ export default class PrivateAPI {
 
 		if (!PileUtilities.isValidItemPile(pileDocument)) return;
 
-		const pileToken = pileDocument.object;
-
-		if (!Helpers.isGMConnected()) {
+		if (PileUtilities.isItemPileLootable(pileDocument) && !Helpers.isGMConnected()) {
 			Helpers.custom_warning(`Item Piles requires a GM to be connected for players to be able to loot item piles.`, true)
 			return;
 		}
+
+		const pileToken = pileDocument.object;
 
 		Helpers.debug(`Clicked: ${pileDocument.uuid}`);
 

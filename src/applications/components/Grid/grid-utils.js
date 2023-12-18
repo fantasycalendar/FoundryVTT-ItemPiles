@@ -2,8 +2,8 @@ import { clamp } from "../../../helpers/helpers";
 import { get } from "svelte/store";
 
 export function isItemColliding(item, otherItem) {
-	const transform = get(item.transform);
-	const otherTransform = get(otherItem.transform);
+	const transform = item.transform?.subscribe ? get(item.transform) : item.transform;
+	const otherTransform = otherItem.transform?.subscribe ? get(otherItem.transform) : otherItem.transform;
 	return (
 		item.id !== otherItem.id &&
 		transform.x <= otherTransform.x + otherTransform.w - 1 &&
@@ -14,7 +14,9 @@ export function isItemColliding(item, otherItem) {
 }
 
 export function getCollisions(originalItem, items) {
-	return items.filter((item) => isItemColliding(originalItem, item));
+	return items.filter((item) => {
+		return isItemColliding(originalItem, item)
+	});
 }
 
 export function coordinate2position(coordinate, cellSize, gap) {
@@ -53,4 +55,71 @@ export function calcPosition(transform, options) {
 		width: coordinate2size(transform.w, gridSize, gap),
 		height: coordinate2size(transform.h, gridSize, gap)
 	};
+}
+
+export function isPlacementValid(item, collisions, items, options) {
+	if (!collisions.length) return true;
+
+	const finalTransform = get(item.transform);
+	const origItemTransform = get(item.item.transform);
+
+	const newItemPlacement = {
+		id: item.id,
+		transform: finalTransform
+	};
+
+	const itemWithinBounds = (finalTransform.x + (finalTransform.w - 1)) < options.cols
+		&& (finalTransform.y + (finalTransform.h - 1)) < options.rows
+		&& (finalTransform.x) >= 0
+		&& (finalTransform.y) >= 0;
+
+	if (!itemWithinBounds) return false;
+
+	const assumedCollisionMovement = collisions.map(collision => {
+
+		const collisionTransform = get(collision.transform);
+
+		const delta = {
+			x: finalTransform.x - origItemTransform.x,
+			y: finalTransform.y - origItemTransform.y
+		}
+
+		const offset = {
+			x: (collisionTransform.x - finalTransform.x),
+			y: (collisionTransform.y - finalTransform.y)
+		}
+
+		if (
+			(delta.x >= -Math.floor(origItemTransform.w / 2) && delta.x < origItemTransform.w)
+			&&
+			(delta.y >= -Math.floor(origItemTransform.h / 2) && delta.y < origItemTransform.h)
+		) {
+			return false;
+		}
+
+		return {
+			id: collision.id,
+			transform: {
+				...collisionTransform,
+				x: origItemTransform.x + offset.x,
+				y: origItemTransform.y + offset.x,
+			}
+		};
+	});
+
+	if (!assumedCollisionMovement.every(entry => {
+		return entry
+			&& (entry.transform.x + (entry.transform.w - 1)) < options.cols
+			&& (entry.transform.y + (entry.transform.h - 1)) < options.rows
+			&& (entry.transform.x) >= 0
+			&& (entry.transform.y) >= 0
+	})) return false;
+
+	const itemsSansCollisions = items.filter(i => {
+		return i.id !== item.id && !assumedCollisionMovement.some(coll => coll.id === i.id);
+	}).concat([newItemPlacement])
+
+	return assumedCollisionMovement.every(collision => {
+		return !getCollisions(collision, itemsSansCollisions).length;
+	});
 }

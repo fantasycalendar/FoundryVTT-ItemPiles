@@ -157,7 +157,7 @@
 
 				<div class="col item-piles-flexcol">
 
-					<div class="character-header item-piles-bottom-divider">
+					<div class="item-piles-character-header item-piles-bottom-divider">
 						<img src="{store.leftTraderActor.img}">
 						<h2 class="character-name">
 							<div>{store.leftTraderActor.name}</div>
@@ -243,7 +243,7 @@
 
 				<div class="col item-piles-flexcol">
 
-					<div class="character-header trader item-piles-bottom-divider">
+					<div class="item-piles-character-header trader item-piles-bottom-divider">
 						<div>
 							<i
 								class="fas accepted-icon"

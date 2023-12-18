@@ -8,9 +8,6 @@
 	import { get, writable } from 'svelte/store';
 	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
-	import ItemPileInventoryApp from "../item-pile-inventory-app/item-pile-inventory-app.js";
-	import VaultApp from "./vault-app.js";
-
 	import Grid from '../components/Grid/Grid.svelte';
 	import CurrencyList from '../components/CurrencyList.svelte';
 	import DropZone from '../components/DropZone.svelte';
@@ -23,8 +20,8 @@
 	import { VaultStore } from "../../stores/vault-store.js";
 	import Tabs from "../components/Tabs.svelte";
 	import VaultExpanderEntry from "./VaultExpanderEntry.svelte";
-	import vault from "../item-pile-config/settings/vault.svelte";
 	import { FloatingElement } from "../components/FloatingElement/FloatingElement.js";
+	import * as PileUtilities from "../../helpers/pile-utilities.js";
 
 	const { application } = getContext('#external');
 
@@ -70,22 +67,49 @@
 		if (FloatingElement.id === application.id || !isCoordinateWithinPosition(clientX, clientY, rect)) {
 			return onDragLeave();
 		}
-		const x = (clientX - rect.left) - (gridData.gridSize / 2); //x position within the element.
-		const y = (clientY - rect.top) - (gridData.gridSize / 2);  //y position within the element.
-		dragPositionStore.set({
-			...snapOnMove(x, y, { w: 1, h: 1 }, { ...gridData }),
-			w: 1,
-			h: 1,
-			active: true
+		dragPositionStore.update(data => {
+			const x = (clientX - rect.left) - ((gridData.gridSize * data.w) / 2); //x position within the element.
+			const y = (clientY - rect.top) - ((gridData.gridSize * data.h) / 2);  //y position within the element.
+			return {
+				...data,
+				...snapOnMove(x, y, { w: data.w, h: data.h }, { ...gridData }),
+				active: true
+			};
 		});
 	}
 
 	async function onDragLeave() {
-		dragPositionStore.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+		dragPositionStore.update(data => {
+			return { ...data, active: false };
+		});
 	}
+
+	const dragHookId = Hooks.on(CONSTANTS.HOOKS.DRAG_DOCUMENT, async (dropData) => {
+		if(dropData.type !== "Item") return;
+		const item = await Item.implementation.fromDropData(dropData);
+		const flags = PileUtilities.getItemFlagData(item);
+		dragPositionStore.update(data => {
+			return {
+				...data,
+				w: flags.width,
+				h: flags.height
+			}
+		});
+	})
+	const dropHookId = Hooks.on(CONSTANTS.HOOKS.DROP_DOCUMENT, () => {
+		dragPositionStore.update(data => {
+			return {
+				...data,
+				w: 1,
+				h: 1
+			}
+		});
+	})
 
 	onDestroy(() => {
 		store.onDestroy();
+		Hooks.off(CONSTANTS.HOOKS.DRAG_DOCUMENT, dragHookId);
+		Hooks.off(CONSTANTS.HOOKS.DROP_DOCUMENT, dropHookId);
 	});
 
 	function doubleClickItem(event) {
@@ -142,14 +166,15 @@
 	function beginSplitItem(event) {
 
 		const { item, splitStart, x, y } = event.detail;
+		const { w, h } = item.item;
 
 		FloatingElement.create({
 			id: application.id,
 			x,
 			y,
 			style: {
-				width: gridData.gridSize + "px",
-				height: gridData.gridSize + "px",
+				width: (gridData.gridSize * w) + "px",
+				height: (gridData.gridSize * h) + "px",
 				opacity: 0.7,
 			},
 			component: VaultItemEntry,
@@ -159,21 +184,22 @@
 		splitStart({
 			pageX: x,
 			pageY: y,
-			offsetX: Math.floor(gridData.gridSize / 2),
-			offsetY: Math.floor(gridData.gridSize / 2)
+			offsetX: Math.floor((gridData.gridSize * w) / 2),
+			offsetY: Math.floor((gridData.gridSize * h) / 2)
 		});
 
 	}
 
 	function itemBeginDrag(event) {
 		const { x, y, item } = event.detail;
+		const { w, h } = item.item;
 		FloatingElement.create({
 			id: application.id,
 			x,
 			y,
 			style: {
-				width: gridData.gridSize + "px",
-				height: gridData.gridSize + "px",
+				width: (gridData.gridSize * w) + "px",
+				height: (gridData.gridSize * h) + "px",
 				opacity: 0.7,
 			},
 			component: VaultItemEntry,
@@ -293,8 +319,10 @@
               activeClass: "item-piles-grid-item-active",
               previewClass: "item-piles-grid-item-preview",
               collisionClass: "item-piles-grid-item-collision",
+              invalidCollisionClass: "item-piles-grid-item-invalid-collision",
               hoverClass: "item-piles-grid-item-hover",
               highlightClass: "item-piles-grid-item-highlight",
+              invalidPlacementClass: "item-piles-grid-item-invalid",
               dimClass: "item-piles-grid-item-dim",
               backgroundGrid: true,
               highlightItems: !!$searchStore

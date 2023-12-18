@@ -1,5 +1,14 @@
 # Item Piles Changelog
 
+## Version 2.8.8
+
+- Added support for asymmetrical item sizes in vaults
+- Added setting to items for overriding its image when it is in a vault
+- Tweaked Item Piles slightly more forgiving with its "must have a GM connected" warning message
+- Fixed buying items sometimes not giving the correct change to the buyer
+- Fixed updating the name and image of items would sometimes not update them in item piles
+- Fixed styling conflicts in Alien RPG when trading with other users
+
 ## Version 2.8.7
 
 - Added API endpoint on custom item pile types to support item & actor drag and drop fields

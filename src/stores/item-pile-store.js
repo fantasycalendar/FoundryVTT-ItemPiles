@@ -339,9 +339,9 @@ export default class ItemPileStore {
 		pileItem.unsubscribe();
 	}
 
-	hasSimilarItem(item) {
+	getSimilarItem(item) {
 		const items = get(this.allItems).map(item => item.item);
-		return !!Utilities.findSimilarItem(items, item, get(this.pileData));
+		return Utilities.findSimilarItem(items, item, get(this.pileData));
 	}
 
 	delete() {

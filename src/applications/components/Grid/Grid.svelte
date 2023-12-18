@@ -22,6 +22,7 @@
 		activeClass: "",
 		previewClass: "",
 		collisionClass: "",
+		invalidCollisionClass: "",
 		hoverClass: "",
 		highlightClass: "",
 		highlightItems: false
@@ -123,7 +124,8 @@
 			{#each Array(options.rows) as _, rowIndex (rowIndex)}
 				{#each Array(options.cols) as _, colIndex (colIndex)}
 					<div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
-					     style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}"></div>
+					     style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}">
+					</div>
 				{/each}
 			{/each}
 		</div>
@@ -151,6 +153,7 @@
     position: absolute;
     margin: -1px;
     pointer-events: none;
+	  z-index: -1;
 
     > div {
       border-radius: 0.25rem;
