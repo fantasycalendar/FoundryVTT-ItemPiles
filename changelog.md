@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.8.10
+
+- Fixed non-stackable items with more than one quantity being added to item piles would incorrectly remove any extra quantity from the item
+- Fixed vault items larger than 1x1 not swapping correctly when dropped on other items of a similar size
+- Fixed vault currencies not being able to be deposited or withdrawn
+- Fixed setting item piles' currencies directly not working correctly
+
 ## Version 2.8.9
 
 - Minor fix to vault expanders not being able to be added to vaults

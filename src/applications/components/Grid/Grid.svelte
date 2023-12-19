@@ -125,6 +125,7 @@
 				{#each Array(options.cols) as _, colIndex (colIndex)}
 					<div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
 					     style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}">
+						<!--{colIndex} {rowIndex}-->
 					</div>
 				{/each}
 			{/each}
@@ -154,6 +155,7 @@
     margin: -1px;
     pointer-events: none;
 	  z-index: -1;
+	  /*color: red;*/
 
     > div {
       border-radius: 0.25rem;

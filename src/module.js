@@ -99,7 +99,7 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
 		if (SYSTEMS.DATA.SYSTEM_HOOKS) {
 			SYSTEMS.DATA.SYSTEM_HOOKS();
 		}
-		// game.itempiles.API.renderItemPileInterface(game.actors.getName("Gamemaster's Vault"));
+		//game.itempiles.API.renderItemPileInterface(game.actors.getName("Gamemaster's Vault"));
 		// new SettingsShim().render(true);
 		applySystemSpecificStyles();
 	}, 500);

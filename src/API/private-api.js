@@ -1625,14 +1625,13 @@ export default class PrivateAPI {
 
 		let itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
 		if (itemQuantity > 1 && PileUtilities.canItemStack(dropData.itemData.item, vaultActor)) {
-			const quantity = await DropItemDialog.show(item, vaultActor, {
+			dropData.itemData.quantity = await DropItemDialog.show(item, vaultActor, {
 				localizationTitle: localization
 			});
-			Utilities.setItemQuantity(dropData.itemData.item, quantity);
-			dropData.itemData.quantity = quantity;
 		} else {
 			dropData.itemData.quantity = 1;
 		}
+		Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);
 
 		let flagData = PileUtilities.getItemFlagData(dropData.itemData.item);
 		if (!sourceIsVault && targetIsVault) {
@@ -1693,7 +1692,6 @@ export default class PrivateAPI {
 		if (PileUtilities.canItemStack(dropData.itemData.item, targetActor)) {
 			if (hotkeyActionState.forceDropOneItem) {
 
-				Utilities.setItemQuantity(dropData.itemData.item, 1);
 				dropData.itemData.quantity = 1;
 
 			} else {
@@ -1706,11 +1704,12 @@ export default class PrivateAPI {
 					if (!quantity) return;
 				}
 
-				Utilities.setItemQuantity(dropData.itemData.item, Number(quantity));
 				dropData.itemData.quantity = Number(quantity);
 
 			}
 		}
+
+		Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);
 
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_DROP, dropData.source, dropData.target, dropData.position, dropData.itemData);
 		if (hookResult === false) return;

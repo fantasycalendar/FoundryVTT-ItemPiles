@@ -16,8 +16,12 @@
 	const targetCurrencyData = PileUtilities.getCurrencyList(targetActor);
 
 	const currencies = PileUtilities.getActorCurrencies(sourceActor, {
-		currencyList: targetActor ? targetCurrencyData.currencies : false,
+		currencyList: targetCurrencyData.currencies,
 		getAll: settings?.unlimitedCurrencies
+	});
+
+	const existingCurrencies = settings.existingCurrencies ?? PileUtilities.getActorCurrencies(sourceActor, {
+		currencyList: targetCurrencyData.currencies
 	});
 
 	let attributes = currencies.filter(entry => entry.type === "attribute")
@@ -26,9 +30,9 @@
 			return currency;
 		});
 
-	if (settings?.existingCurrencies) {
+	if (settings?.unlimitedCurrencies) {
 		attributes.forEach(currency => {
-			const existingCurrency = settings?.existingCurrencies.find(existingCurrency => existingCurrency.id === currency.id);
+			const existingCurrency = existingCurrencies.find(existingCurrency => existingCurrency.name === currency.name && existingCurrency.img === currency.img);
 			if (existingCurrency) {
 				currency.currentQuantity = existingCurrency.quantity;
 			}
@@ -37,20 +41,21 @@
 
 	let items = currencies.filter(entry => entry.type !== "attribute")
 		.map(currency => {
-			currency.create = !currency.id;
+			currency.create = !existingCurrencies.some(existingCurrency => existingCurrency.name === currency.name && existingCurrency.img === currency.img);
 			currency.id = currency.id ?? randomID();
 			currency.currentQuantity = 0;
 			return currency;
 		});
 
-	if (settings?.existingCurrencies) {
+	if (settings?.unlimitedCurrencies) {
 		items.forEach(currency => {
-			const existingCurrency = settings?.existingCurrencies.find(existingCurrency => existingCurrency.id === currency.id);
+			const existingCurrency = existingCurrencies.find(existingCurrency => existingCurrency.name === currency.name && existingCurrency.img === currency.img);
 			if (existingCurrency) {
 				currency.currentQuantity = existingCurrency.quantity;
 			}
 		});
 	}
+
 
 	let form;
 

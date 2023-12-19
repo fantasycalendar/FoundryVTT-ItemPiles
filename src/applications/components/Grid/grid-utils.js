@@ -6,10 +6,10 @@ export function isItemColliding(item, otherItem) {
 	const otherTransform = otherItem.transform?.subscribe ? get(otherItem.transform) : otherItem.transform;
 	return (
 		item.id !== otherItem.id &&
-		transform.x <= otherTransform.x + otherTransform.w - 1 &&
-		transform.y <= otherTransform.y + otherTransform.h - 1 &&
-		transform.x + transform.w - 1 >= otherTransform.x &&
-		transform.y + transform.h - 1 >= otherTransform.y
+		transform.x + (transform.w - 1) >= otherTransform.x &&
+		transform.y + (transform.h - 1) >= otherTransform.y &&
+		transform.x <= otherTransform.x + (otherTransform.w - 1) &&
+		transform.y <= otherTransform.y + (otherTransform.h - 1)
 	);
 }
 
@@ -102,7 +102,7 @@ export function isPlacementValid(item, collisions, items, options) {
 			transform: {
 				...collisionTransform,
 				x: origItemTransform.x + offset.x,
-				y: origItemTransform.y + offset.x,
+				y: origItemTransform.y + offset.y,
 			}
 		};
 	});
@@ -119,7 +119,7 @@ export function isPlacementValid(item, collisions, items, options) {
 		return i.id !== item.id && !assumedCollisionMovement.some(coll => coll.id === i.id);
 	}).concat([newItemPlacement])
 
-	return assumedCollisionMovement.every(collision => {
-		return !getCollisions(collision, itemsSansCollisions).length;
+	return assumedCollisionMovement.every(movedBox => {
+		return !getCollisions(movedBox, itemsSansCollisions).length;
 	});
 }
