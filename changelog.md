@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.8.9
+
+- Minor fix to vault expanders not being able to be added to vaults
+
 ## Version 2.8.8
 
 - Added support for asymmetrical item sizes in vaults

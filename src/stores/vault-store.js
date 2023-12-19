@@ -351,12 +351,12 @@ export class VaultStore extends ItemPileStore {
 			return false;
 		}
 
-		let validPosition = null;
+		let validPosition = { x: 0, y: 0 };
 		let similarItem = this.getSimilarItem(itemData);
 		if (!vaultExpander) {
 			if (similarItem && PileUtilities.canItemStack(item, this.actor)) {
 				const { x, y } = PileUtilities.getItemFlagData(similarItem);
-				validPosition = { x, y };
+				validPosition = { x: Math.max(x, 0), y: Math.max(y, 0) };
 			} else {
 				validPosition = PileUtilities.canItemFitInVault(itemData, this.actor, { x, y });
 				if (!validPosition) {

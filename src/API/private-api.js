@@ -1636,8 +1636,8 @@ export default class PrivateAPI {
 
 		let flagData = PileUtilities.getItemFlagData(dropData.itemData.item);
 		if (!sourceIsVault && targetIsVault) {
-			setProperty(flagData, "x", dropData.gridPosition.x);
-			setProperty(flagData, "y", dropData.gridPosition.y);
+			setProperty(flagData, "x", dropData.gridPosition?.x ?? 0);
+			setProperty(flagData, "y", dropData.gridPosition?.y ?? 0);
 		}
 		setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
 
