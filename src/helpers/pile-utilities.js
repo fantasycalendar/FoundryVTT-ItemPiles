@@ -40,19 +40,24 @@ export function migrateFlagData(document, data = false) {
 
 export function canItemStack(item, targetActor) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	if (isItemCurrency(itemData, { target: targetActor })) return true;
-	if (!Utilities.isItemStackable(itemData)) return false;
 	const itemFlagData = getItemFlagData(itemData);
 	const actorFlagData = getActorFlagData(targetActor);
+	if (actorFlagData.type === CONSTANTS.PILE_TYPES.VAULT && itemFlagData.vaultExpander) {
+		return false;
+	}
+	if (isItemCurrency(itemData, { target: targetActor })) return true;
 	if (typeof actorFlagData.canStackItems === "boolean") {
 		actorFlagData.canStackItems = "yes";
 	}
+	if (!Utilities.isItemStackable(itemData)) return false;
 	if (actorFlagData.canStackItems === "always" || actorFlagData.canStackItems === "alwaysno") {
 		return actorFlagData.canStackItems === "always";
 	}
 	return {
-		"default": actorFlagData.canStackItems === "yes", "yes": true, "no": false
-	}[itemFlagData?.canStack ?? "default"] && !(actorFlagData.type === CONSTANTS.PILE_TYPES.VAULT && itemFlagData.vaultExpander);
+		"default": actorFlagData.canStackItems === "yes",
+		"yes": true,
+		"no": false
+	}[itemFlagData?.canStack ?? "default"];
 }
 
 /**
