@@ -42,7 +42,7 @@ export function canItemStack(item, targetActor) {
 	const itemData = item instanceof Item ? item.toObject() : item;
 	const itemFlagData = getItemFlagData(itemData);
 	const actorFlagData = getActorFlagData(targetActor);
-	if (actorFlagData.type === CONSTANTS.PILE_TYPES.VAULT && itemFlagData.vaultExpander) {
+	if (actorFlagData.enabled && actorFlagData.type === CONSTANTS.PILE_TYPES.VAULT && itemFlagData.vaultExpander) {
 		return false;
 	}
 	if (isItemCurrency(itemData, { target: targetActor })) return true;
