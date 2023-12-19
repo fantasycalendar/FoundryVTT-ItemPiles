@@ -99,6 +99,7 @@ jobs:
         run: npx @ghost-fvtt/foundry-publish
         env:
           FVTT_MANIFEST_URL: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.json
+          FVTT_MANIFEST_PATH: "module.json"
           FVTT_PACKAGE_ID: ${{ secrets.FVTT_PACKAGE_ID }}
           FVTT_USERNAME: ${{ secrets.FVTT_USERNAME }}
           FVTT_PASSWORD: ${{ secrets.FVTT_PASSWORD }}
