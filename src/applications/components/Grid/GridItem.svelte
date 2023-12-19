@@ -216,8 +216,8 @@
 			dispatch("itemstopdrag", {
 				item,
 				outOfBounds: !active,
-				x: pageX - pointerOffset.internalLeft,
-				y: pageY - pointerOffset.internalTop,
+				x: pageX,
+				y: pageY,
 				gridX: finalTransform.x,
 				gridY: finalTransform.y,
 				splitting

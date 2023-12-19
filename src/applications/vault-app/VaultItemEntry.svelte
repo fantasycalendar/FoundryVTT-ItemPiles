@@ -36,7 +36,6 @@
   .grid-item {
     width: 100%;
     height: 100%;
-    background-color: rgb(56, 56, 56);
     transition: transform 2s, top 2s, left 2s;
     border-radius: 0.25rem;
     position: relative;

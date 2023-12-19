@@ -51,7 +51,7 @@
 	let element;
 
 	function onDragOverEvent(event) {
-		onDragOver(event.clientX, event.clientY);
+		onDragOver(event.clientX, event.clientY, true);
 	}
 
 	$: {
@@ -62,14 +62,14 @@
 		}
 	}
 
-	async function onDragOver(clientX, clientY) {
+	async function onDragOver(clientX, clientY, offset = false) {
 		const rect = element.getBoundingClientRect();
 		if (FloatingElement.id === application.id || !isCoordinateWithinPosition(clientX, clientY, rect)) {
 			return onDragLeave();
 		}
 		dragPositionStore.update(data => {
-			const x = (clientX - rect.left) - ((gridData.gridSize * data.w) / 2); //x position within the element.
-			const y = (clientY - rect.top) - ((gridData.gridSize * data.h) / 2);  //y position within the element.
+			const x = (clientX - rect.left) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize/2); //x position within the element.
+			const y = (clientY - rect.top) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize/2);  //y position within the element.
 			return {
 				...data,
 				...snapOnMove(x, y, { w: data.w, h: data.h }, { ...gridData }),
@@ -205,6 +205,10 @@
 			component: VaultItemEntry,
 			componentData: { entry: item }
 		})
+		Hooks.callAll(CONSTANTS.HOOKS.DRAG_DOCUMENT, {
+			type: "Item",
+			uuid: item.item.item.uuid
+		})
 	}
 
 	function itemStopDrag(event) {
@@ -241,6 +245,9 @@
 			}
 			if (hitApps[0].onDropData) {
 				return hitApps[0].onDropData(dropData);
+			}
+			if (hitApps[0]._handleDroppedEntry) {
+				return hitApps[0]._handleDroppedEntry(document.elementFromPoint(x, y), dropData);
 			}
 		}
 

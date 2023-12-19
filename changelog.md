@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.8.11
+
+- Tweaked styles of vaults and remove item backgrounds to support transparent images
+- Fixed item-based currencies to be excluded from the stackable property (currencies can always stack)
+- Fixed drag and dropping from other item piles into vaults not showing a proper item size preview
+- Fixed issue where larger items would sometimes be able to be dropped on top of other large items
+
 ## Version 2.8.10
 
 - Fixed non-stackable items with more than one quantity being added to item piles would incorrectly remove any extra quantity from the item

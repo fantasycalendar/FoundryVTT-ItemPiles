@@ -5,9 +5,11 @@ import { getActiveApps } from '../../helpers/helpers';
 export default class ItemEditor extends SvelteApplication {
 
 	constructor(item = false, options) {
+		let title = game.i18n.format("ITEM-PILES.Applications.ItemEditor.Title", { item_name: item.name })
+		if (options.extraTitle) title += options.extraTitle;
 		super({
 			id: `item-pile-item-editor-${item.id}-${randomID()}`,
-			title: game.i18n.format("ITEM-PILES.Applications.ItemEditor.Title", { item_name: item.name }),
+			title,
 			svelte: {
 				class: ItemEditorShell,
 				target: document.body,

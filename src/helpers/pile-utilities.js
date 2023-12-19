@@ -40,6 +40,7 @@ export function migrateFlagData(document, data = false) {
 
 export function canItemStack(item, targetActor) {
 	const itemData = item instanceof Item ? item.toObject() : item;
+	if (isItemCurrency(itemData, { target: targetActor })) return true;
 	if (!Utilities.isItemStackable(itemData)) return false;
 	const itemFlagData = getItemFlagData(itemData);
 	const actorFlagData = getActorFlagData(targetActor);
@@ -1546,13 +1547,10 @@ export function getVaultGridData(vaultActor, flagData = false) {
 	for (const item of regularItems) {
 		for (let width = 0; width < item.itemFlagData.width; width++) {
 			const x = Math.max(0, Math.min(item.itemFlagData.x + width, enabledCols - 1));
-			const y = Math.max(0, Math.min(item.itemFlagData.y, enabledRows - 1));
-			grid[x][y] = true;
-		}
-		for (let height = 0; height < item.itemFlagData.height; height++) {
-			const x = Math.max(0, Math.min(item.itemFlagData.x, enabledCols - 1));
-			const y = Math.max(0, Math.min(item.itemFlagData.y + height, enabledRows - 1));
-			grid[x][y] = true;
+			for (let height = 0; height < item.itemFlagData.height; height++) {
+				const y = Math.max(0, Math.min(item.itemFlagData.y + height, enabledRows - 1));
+				grid[x][y] = item.item.name;
+			}
 		}
 	}
 

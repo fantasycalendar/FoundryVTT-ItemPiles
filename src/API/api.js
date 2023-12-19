@@ -2090,7 +2090,7 @@ class API {
 	 *
 	 * @returns {Array<object>}                       An array of objects containing the data about each currency
 	 */
-	static getActorCurrencies(target, { getAll = false, secondary = True } = {}) {
+	static getActorCurrencies(target, { getAll = false, secondary = true } = {}) {
 		return PileUtilities.getActorCurrencies(target, { getAll, secondary });
 	}
 

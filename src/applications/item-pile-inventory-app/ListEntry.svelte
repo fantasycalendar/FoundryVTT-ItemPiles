@@ -2,6 +2,7 @@
 
 	import { fade } from 'svelte/transition';
 	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import CONSTANTS from "../../constants/constants.js";
 
 	export let store;
 	export let entry;
@@ -20,10 +21,12 @@
 	const editQuantities = store.editQuantities;
 
 	function dragStart(event) {
-		event.dataTransfer.setData('text/plain', JSON.stringify({
+		const data = {
 			type: "Item",
 			uuid: entry.item.uuid
-		}));
+		};
+		Hooks.callAll(CONSTANTS.HOOKS.DRAG_DOCUMENT, data)
+		event.dataTransfer.setData('text/plain', JSON.stringify(data));
 	}
 
 </script>
