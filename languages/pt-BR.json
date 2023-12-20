@@ -215,7 +215,7 @@
       "GiveItemNoGM": "Não há GM ativo para receber você dando este item.",
       "GiveItemDeclined": "{user_name} recusou sua oferta de item.",
       "NoPlayersActive": "Nenhum jogador está ativo para fazer esta ação",
-      "VaultFull": "Este cofre está cheio!",
+      "VaultFull": "Este item não cabe neste cofre!",
       "NoGMsConnected": "AVISO - Sem GMs conectados - As Pilhas de Itens requerem que um GM esteja conectado para que os jogadores possam utilizar a maioria dos recursos do módulo.",
       "NoGMsConnectedAction": "AVISO - Não foi possível executar \"{action}\" porque nenhum GM está ativo.",
       "VaultItemNotExpander": "Esse item não é um expansor de cofre"
@@ -380,8 +380,8 @@
         "QuantityForPrice": "Quantidade por preço",
         "QuantityForPriceExplanation": "Isso configura quanto deste item deve-se obter ao comprar este item.",
         "CanStack": "Pode empilhar",
-        "CanStackExplanation": "Isso configura se este item será empilhado com outros itens semelhantes quando adicionado a um cofre.",
-        "CanStackDefault": "Padrão para configuração do cofre",
+        "CanStackExplanation": "Isso configura se este item se empilhará com outros itens que são semelhantes a ele.",
+        "CanStackDefault": "Padrão para a configuração de pilha do item",
         "CanStackYes": "Sim, pode sempre empilhar",
         "CanStackNo": "Não, não pode empilhar",
         "VaultExpander": "Expansor de cofre",
@@ -392,7 +392,13 @@
         "KeepZeroExplanation": "Quando totalmente esgotado, o comerciante não remove este item, mas o define para não ser vendido.",
         "KeepZero": "Manter quantidade zero",
         "KeepOnMerchant": "Manter Comerciante",
-        "KeepOnMerchantExplanation": "Quando os itens são limpos na guia de preenchimento de itens dos comerciantes ou pela integração do inventário de atualização do Simple Calendar (consulte a configuração do comerciante na parte inferior), esse item sempre permanecerá."
+        "KeepOnMerchantExplanation": "Quando os itens são limpos na guia de preenchimento de itens dos comerciantes ou pela integração do inventário de atualização do Simple Calendar (consulte a configuração do comerciante na parte inferior), esse item sempre permanecerá.",
+        "GridSize": "Tamanho da Grade",
+        "GridSizeExplanation": "Isso configura quantos espaços da grade este item ocupa.",
+        "VaultImage": "Imagem do Cofre",
+        "VaultImageExplanation": "Isso substitui a imagem do item quando exibida em um cofre.",
+        "GridWidth": "Largura",
+        "GridHeight": "Altura"
       },
       "DropCurrencies": {
         "Title": "Descartando moedas",
