@@ -25,6 +25,7 @@ import { setupPlugins } from "./plugins/main.js";
 import { setupCaches } from "./helpers/caches.js";
 import { initializeCompendiumCache } from "./helpers/compendium-utilities.js";
 import { SYSTEMS } from "./systems.js";
+import Transaction from "./helpers/transaction.js";
 
 Hooks.once("init", async () => {
 	registerSettings();
@@ -42,6 +43,7 @@ Hooks.once("init", async () => {
 		pile_types: CONSTANTS.PILE_TYPES,
 		pile_flag_defaults: CONSTANTS.PILE_DEFAULTS,
 		item_flag_defaults: CONSTANTS.ITEM_DEFAULTS,
+		Transaction,
 		apps: {
 			ItemPileConfig,
 			ItemEditor

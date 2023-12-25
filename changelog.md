@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 2.8.13
+- Tweaked override currencies on item piles cause buying/transferring these currencies to fully remove themselves from inventories when used up
+- Fixed being able to add items with 0 quantity to item piles
+
+## Version 2.8.12
+
+- Minor hotfix to make vault expanders forced non-stackable
+
 ## Version 2.8.11
 
 - Tweaked styles of vaults and remove item backgrounds to support transparent images

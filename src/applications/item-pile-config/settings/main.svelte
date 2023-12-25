@@ -144,14 +144,6 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.CanStackItems")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.CanStackItemsExplanation")}</p>
 	</label>
-	<input bind:checked={pileData.canStackItems} type="checkbox"/>
-</div>
-
-<div class="form-group">
-	<label>
-		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.CanStackItems")}</span>
-		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.CanStackItemsExplanation")}</p>
-	</label>
 	<div class="break"></div>
 	<select bind:value={pileData.canStackItems} style="flex:4;">
 		<option value="yes">

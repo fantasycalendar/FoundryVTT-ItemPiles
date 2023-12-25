@@ -110,8 +110,8 @@ export default class PrivateAPI {
 		const itemPileConfig = foundry.utils.mergeObject(
 			foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
 			foundry.utils.mergeObject(
-				getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {},
-				foundry.utils.deepClone(getProperty(sourceActor, CONSTANTS.FLAGS.PILE) ?? {})
+				foundry.utils.getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {},
+				foundry.utils.deepClone(foundry.utils.getProperty(sourceActor, CONSTANTS.FLAGS.PILE) ?? {})
 			)
 		)
 		if (!itemPileConfig?.enabled) return;
@@ -151,7 +151,7 @@ export default class PrivateAPI {
 	}
 
 	static _onPreUpdateToken(doc, changes) {
-		if (!hasProperty(changes, "actorLink")) return;
+		if (!foundry.utils.hasProperty(changes, "actorLink")) return;
 		if (!PileUtilities.isValidItemPile(doc)) return;
 		const flagData = PileUtilities.getActorFlagData(doc);
 		const cleanFlagData = PileUtilities.cleanFlagData(flagData);
@@ -805,7 +805,7 @@ export default class PrivateAPI {
 
 		const sourceAttributes = PileUtilities.getActorCurrencies(sourceActor).filter(entry => entry.type === "attribute");
 		const attributesToTransfer = sourceAttributes.filter(attribute => {
-			return hasProperty(targetActor, attribute.data.path);
+			return foundry.utils.hasProperty(targetActor, attribute.data.path);
 		}).map(attribute => attribute.data.path);
 
 		const sourceTransaction = new Transaction(sourceActor);
@@ -942,14 +942,14 @@ export default class PrivateAPI {
 	 */
 	static async _dropItems({
 		userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false, elevation = false
-	} = {}) {
+	                        } = {}) {
 
 		let itemsDropped;
 
 		// If there's a source of the item (it wasn't dropped from the item bar)
 		if (sourceUuid) {
 
-			setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
+			foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
 
 			// If there's a target token, add the item to it, otherwise create a new pile at the drop location
 			if (targetUuid) {
@@ -988,16 +988,16 @@ export default class PrivateAPI {
 	}
 
 	static async _createItemPile({
-		sceneId = null,
-		position = false,
-		actor = false,
-		createActor = false,
-		items = false,
-		tokenOverrides = {},
-		actorOverrides = {},
-		itemPileFlags = {},
-		folders = false,
-	} = {}) {
+		                             sceneId = null,
+		                             position = false,
+		                             actor = false,
+		                             createActor = false,
+		                             items = false,
+		                             tokenOverrides = {},
+		                             actorOverrides = {},
+		                             itemPileFlags = {},
+		                             folders = false,
+	                             } = {}) {
 
 		let returns = {};
 
@@ -1149,8 +1149,8 @@ export default class PrivateAPI {
 					data.items[index] = await Item.implementation.create(data.items[index], { temporary: true });
 				}
 
-				const overrideImage = getProperty(overrideData, "texture.src") ?? getProperty(overrideData, "img");
-				const overrideScale = getProperty(overrideData, "texture.scaleX") ?? getProperty(overrideData, "texture.scaleY") ?? getProperty(overrideData, "scale");
+				const overrideImage = foundry.utils.getProperty(overrideData, "texture.src") ?? foundry.utils.getProperty(overrideData, "img");
+				const overrideScale = foundry.utils.getProperty(overrideData, "texture.scaleX") ?? foundry.utils.getProperty(overrideData, "texture.scaleY") ?? foundry.utils.getProperty(overrideData, "scale");
 
 				const scale = PileUtilities.getItemPileTokenScale(pileActor, data, overrideScale);
 
@@ -1228,8 +1228,8 @@ export default class PrivateAPI {
 
 			let specificTokenSettings = Helpers.isFunction(tokenSettings) ? await tokenSettings(target) : foundry.utils.deepClone(tokenSettings);
 
-			const overrideImage = getProperty(specificTokenSettings, "texture.src") ?? getProperty(specificTokenSettings, "img");
-			const overrideScale = getProperty(specificTokenSettings, "texture.scaleX") ?? getProperty(specificTokenSettings, "texture.scaleY") ?? getProperty(specificTokenSettings, "scale");
+			const overrideImage = foundry.utils.getProperty(specificTokenSettings, "texture.src") ?? foundry.utils.getProperty(specificTokenSettings, "img");
+			const overrideScale = foundry.utils.getProperty(specificTokenSettings, "texture.scaleX") ?? foundry.utils.getProperty(specificTokenSettings, "texture.scaleY") ?? foundry.utils.getProperty(specificTokenSettings, "scale");
 
 			const scale = PileUtilities.getItemPileTokenScale(target, data, overrideScale);
 
@@ -1624,10 +1624,15 @@ export default class PrivateAPI {
 		const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
 
 		let itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
-		if (itemQuantity > 1 && PileUtilities.canItemStack(dropData.itemData.item, vaultActor)) {
-			dropData.itemData.quantity = await DropItemDialog.show(item, vaultActor, {
-				localizationTitle: localization
-			});
+		if (PileUtilities.canItemStack(dropData.itemData.item, vaultActor)) {
+			if (itemQuantity > 1) {
+				dropData.itemData.quantity = await DropItemDialog.show(item, vaultActor, {
+					localizationTitle: localization
+				});
+			} else if (!itemQuantity || itemQuantity <= 0) {
+				Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.ItemNoQuantity"), true);
+				return;
+			}
 		} else {
 			dropData.itemData.quantity = 1;
 		}
@@ -1635,10 +1640,10 @@ export default class PrivateAPI {
 
 		let flagData = PileUtilities.getItemFlagData(dropData.itemData.item);
 		if (!sourceIsVault && targetIsVault) {
-			setProperty(flagData, "x", dropData.gridPosition?.x ?? 0);
-			setProperty(flagData, "y", dropData.gridPosition?.y ?? 0);
+			foundry.utils.setProperty(flagData, "x", dropData.gridPosition?.x ?? 0);
+			foundry.utils.setProperty(flagData, "y", dropData.gridPosition?.y ?? 0);
 		}
-		setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
+		foundry.utils.setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
 
 		if (sourceActor) {
 			return game.itempiles.API.transferItems(sourceActor, targetActor, [dropData.itemData], { interactionId: dropData.interactionId });
@@ -1689,22 +1694,26 @@ export default class PrivateAPI {
 			}
 		}
 
+		dropData.itemData.quantity = 1;
+
 		if (PileUtilities.canItemStack(dropData.itemData.item, targetActor)) {
-			if (hotkeyActionState.forceDropOneItem) {
 
-				dropData.itemData.quantity = 1;
+			let itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
 
-			} else {
+			if (!itemQuantity || itemQuantity <= 0) {
+				Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.ItemNoQuantity"), true);
+				return;
+			}
 
-				let quantity = Utilities.getItemQuantity(dropData.itemData.item) ?? 1;
+			if (!hotkeyActionState.forceDropOneItem) {
 
 				if (!dropData.skipCheck) {
-					const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
-					quantity = await DropItemDialog.show(item, dropData.target, { unlimitedQuantity: !dropData.source && game.user.isGM });
-					if (!quantity) return;
+					const item = await Item.implementation.create(dropData.itemData.item, {temporary: true});
+					itemQuantity = await DropItemDialog.show(item, dropData.target, {unlimitedQuantity: !dropData.source && game.user.isGM});
+					if (!itemQuantity) return;
 				}
 
-				dropData.itemData.quantity = Number(quantity);
+				dropData.itemData.quantity = Number(itemQuantity);
 
 			}
 		}
@@ -1777,13 +1786,18 @@ export default class PrivateAPI {
 
 		if (user?.active || gms.length || game.user.isGM) {
 
-			if (!options?.skipQuantityDialog) {
-				if (PileUtilities.canItemStack(dropData.itemData.item)) {
+			dropData.itemData.quantity = 1;
+
+			if (PileUtilities.canItemStack(dropData.itemData.item)) {
+				let itemQuantity = Utilities.getItemQuantity(item);
+				if ((!itemQuantity || itemQuantity <= 0)) {
+					Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.ItemNoQuantity"), true);
+					return;
+				}
+				if (!options?.skipQuantityDialog) {
 					dropData.itemData.quantity = await DropItemDialog.show(item, dropData.target.actor, {
 						localizationTitle: "GiveItem"
 					});
-				} else {
-					dropData.itemData.quantity = 1;
 				}
 			}
 
@@ -1984,7 +1998,7 @@ export default class PrivateAPI {
 		for (const [uuid, transaction] of transactionMap) {
 
 			if (pileData.shareItemsEnabled) {
-				await transaction.appendItemChanges(deepClone(preparedData).itemDeltas.filter(delta => delta.type === "item").map(delta => {
+				await transaction.appendItemChanges(foundry.utils.deepClone(preparedData).itemDeltas.filter(delta => delta.type === "item").map(delta => {
 					delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
 						players: numPlayers, shareData: shareData, floor: true
 					});
@@ -1993,14 +2007,14 @@ export default class PrivateAPI {
 			}
 
 			if (pileData.shareCurrenciesEnabled || pileData.splitAllEnabled) {
-				await transaction.appendItemChanges(deepClone(preparedData).itemDeltas.filter(delta => delta.type === "currency").map(delta => {
+				await transaction.appendItemChanges(foundry.utils.deepClone(preparedData).itemDeltas.filter(delta => delta.type === "currency").map(delta => {
 					delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
 						players: numPlayers, shareData: shareData, floor: true
 					});
 					return delta;
 				}), { type: "currency" });
 
-				await transaction.appendActorChanges(Object.entries(deepClone(preparedData).attributeDeltas).map(entry => {
+				await transaction.appendActorChanges(Object.entries(foundry.utils.deepClone(preparedData).attributeDeltas).map(entry => {
 					let [path] = entry;
 					const quantity = SharingUtilities.getAttributeSharesLeftForActor(itemPileActor, path, transaction.actor, {
 						players: numPlayers, shareData: shareData, floor: true
@@ -2183,7 +2197,7 @@ export default class PrivateAPI {
 				if (itemFlagData.isService) continue;
 				const item = entry.item.toObject();
 				if (buyerHidesNewItems) {
-					setProperty(item, CONSTANTS.FLAGS.ITEM + '.hidden', true);
+					foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM + '.hidden', true);
 				}
 				await buyerTransaction.appendItemChanges([{
 					item: item, quantity: entry.quantity
@@ -2263,17 +2277,17 @@ export default class PrivateAPI {
 	}
 
 	static async _rollItemTable({
-		table = "",
-		timesToRoll = "1",
-		resetTable = true,
-		normalizeTable = false,
-		displayChat = false,
-		rollData = {},
-		customCategory = false,
-		targetActor = false,
-		removeExistingActorItems = false,
-		userId = false,
-	} = {}) {
+		                            table = "",
+		                            timesToRoll = "1",
+		                            resetTable = true,
+		                            normalizeTable = false,
+		                            displayChat = false,
+		                            rollData = {},
+		                            customCategory = false,
+		                            targetActor = false,
+		                            removeExistingActorItems = false,
+		                            userId = false,
+	                            } = {}) {
 
 		let items = await PileUtilities.rollTable({
 			tableUuid: table,

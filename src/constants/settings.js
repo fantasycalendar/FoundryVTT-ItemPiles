@@ -147,9 +147,6 @@ const SETTINGS = {
 			config: false,
 			system: true,
 			default: SYSTEMS.DATA.ITEM_SIMILARITIES,
-			onChange: () => {
-				refreshItemTypesThatCanStack();
-			},
 			type: Array
 		},
 

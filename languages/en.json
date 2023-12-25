@@ -36,7 +36,8 @@
       "PileLocked": "This container is locked and cannot be opened - you can't drop items in it.",
       "DropNoToken": "You don't have a token on this scene, so you can't drop any items here.",
       "NoVaultAccess": "You don't have permission to view this vault.",
-      "NoVaultAccessActor": "{actor_name} doesn't have permission to view this vault."
+      "NoVaultAccessActor": "{actor_name} doesn't have permission to view this vault.",
+      "ItemNoQuantity": "{item_name} has 0 quantity, so you can't transfer this item!"
     },
     "Warnings": {
       "NoGMsConnected": "WARNING - No GMs connected - Item Piles requires a GM to be connected for players to be able to utilize most of the module's features.",

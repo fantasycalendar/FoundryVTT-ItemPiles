@@ -32,7 +32,7 @@ export default class Transaction {
 
 			let item = data.item ?? data;
 
-			type = PileUtilities.isItemCurrency(item, { target: this.actor }) ? "currency" : type;
+			type = PileUtilities.isItemCurrency(item) ? "currency" : type;
 
 			let flags = data.flags ?? false;
 			let itemData = item instanceof Item ? item.toObject() : foundry.utils.duplicate(item);

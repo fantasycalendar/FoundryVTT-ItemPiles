@@ -56,7 +56,7 @@ export default class ChatAPI {
 
 	static _disableTradingButton(publicTradeId) {
 		const message = Array.from(game.messages).find(message => {
-			return getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID) === publicTradeId;
+			return foundry.utils.getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID) === publicTradeId;
 		});
 		if (!message) return;
 		const update = this._replaceChatContent(message);
@@ -67,15 +67,15 @@ export default class ChatAPI {
 		if (!game.user.isGM) return;
 
 		const messages = Array.from(game.messages).filter(message => {
-			return getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+			return foundry.utils.getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
 		});
 
 		if (!messages.length) return;
 		const updates = [];
 		for (let message of messages) {
 			const update = this._replaceChatContent(message);
-			const tradeId = getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
-			const tradeUsers = getProperty(message, CONSTANTS.FLAGS.TRADE_USERS);
+			const tradeId = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+			const tradeUsers = foundry.utils.getProperty(message, CONSTANTS.FLAGS.TRADE_USERS);
 			const bothUsersActive = tradeUsers.filter(userId => game.users.get(userId).active).length === tradeUsers.length;
 			if (!bothUsersActive) {
 				updates.push(update);
@@ -95,7 +95,7 @@ export default class ChatAPI {
 	}
 
 	static _replaceChatContent(message) {
-		const tradeId = getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
+		const tradeId = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
 		const stringToFind = `data-trade-id="${tradeId}"`;
 		let content = message.content;
 		content = content.replace(stringToFind, "");
@@ -272,7 +272,7 @@ export default class ChatAPI {
 		messages.reverse()
 
 		for (const message of messages) {
-			const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
+			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
 			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
 				return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
 			}
@@ -323,7 +323,7 @@ export default class ChatAPI {
 
 	static async _updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId) {
 
-		const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
+		const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
 
 		const newItems = this._matchEntries(flags.items, items);
 		const newCurrencies = this._matchEntries(flags.currencies, currencies);
@@ -455,7 +455,7 @@ export default class ChatAPI {
 		messages.reverse();
 
 		for (const message of messages) {
-			const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
+			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
 			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
 				return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
 			}
@@ -507,7 +507,7 @@ export default class ChatAPI {
 			.reverse();
 
 		for (const message of messages) {
-			const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
+			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
 			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceActor.uuid && flags.target === targetActor.uuid && message.isAuthor) {
 				return this._updateExistingGiveMessage(message, sourceActor, targetActor, items)
 			}
@@ -538,7 +538,7 @@ export default class ChatAPI {
 
 	static async _updateExistingGiveMessage(message, sourceActor, targetActor, items) {
 
-		const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
+		const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
 
 		const newItems = this._matchEntries(flags.items, items);
 
@@ -558,7 +558,7 @@ export default class ChatAPI {
 
 	static async _updateExistingMerchantMessage(message, sourceActor, targetActor, incomingPriceInformation, interactionId) {
 
-		const flags = getProperty(message, CONSTANTS.FLAGS.PILE);
+		const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
 
 		const newPriceInformation = flags.priceInformation
 			.map(priceInformation => {

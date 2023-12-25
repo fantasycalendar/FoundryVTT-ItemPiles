@@ -24,7 +24,7 @@ This constant contains every flag property that items or item piles can have.
 
 ```js
 // Logs the selected token's item piles flags
-console.log(getProperty(token.actor, game.itempiles.flags.PILE));
+console.log(foundry.utils.getProperty(token.actor, game.itempiles.flags.PILE));
 ```
 
 ## Pile Flag Defaults

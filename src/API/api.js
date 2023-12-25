@@ -39,6 +39,7 @@ class API {
 				}
 			}
 			delete currency["quantity"];
+			currency.secondary = false;
 			return currency;
 		}));
 	}
@@ -1214,7 +1215,10 @@ class API {
 			} else if (itemData.item) {
 				item = itemData.item instanceof Item ? itemData.item.toObject() : itemData.item;
 				if (itemData.flags) {
-					setProperty(item, "flags", foundry.utils.mergeObject(getProperty(item, "flags") ?? {}, getProperty(itemData, "flags")));
+					foundry.utils.setProperty(item, "flags", foundry.utils.mergeObject(
+						foundry.utils.getProperty(item, "flags") ?? {},
+						foundry.utils.getProperty(itemData, "flags"))
+					);
 				}
 			} else if (itemData.id) {
 				item = target.items.get(itemData.id);
@@ -1248,7 +1252,7 @@ class API {
 	/**
 	 * Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
 	 *
-	 * @param {Actor/Token/TokenDocument} target                  The target to remove a items from
+	 * @param {Actor/Token/TokenDocument} target                  The target to remove items from
 	 * @param {Array} items                                       An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of
 	 * @param {object} options                                    Options to pass to the function
 	 * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
@@ -1347,7 +1351,7 @@ class API {
 			return {
 				_id: item._id,
 				quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(itemData), 0),
-				flags: getProperty(itemData, "flags")
+				flags: foundry.utils.getProperty(itemData, "flags")
 			}
 		});
 
@@ -1425,9 +1429,6 @@ class API {
 
 		Object.entries(attributes).forEach(entry => {
 			const [attribute, quantity] = entry;
-			if (!hasProperty(targetActor, attribute)) {
-				throw Helpers.custom_error(`setAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
-			}
 			if (!Helpers.isRealNumber(quantity)) {
 				throw Helpers.custom_error(`setAttributes | Attribute "${attribute}" must be of type number`);
 			}
@@ -1464,9 +1465,6 @@ class API {
 
 		Object.entries(attributes).forEach(entry => {
 			const [attribute, quantity] = entry;
-			if (!hasProperty(targetActor, attribute)) {
-				throw Helpers.custom_error(`addAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
-			}
 			if (!Helpers.isRealNumber(quantity) && quantity > 0) {
 				throw Helpers.custom_error(`addAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
 			}
@@ -1507,15 +1505,12 @@ class API {
 				if (typeof attribute !== "string") {
 					throw Helpers.custom_error(`removeAttributes | Each attribute in the array must be of type string`);
 				}
-				if (!hasProperty(targetActor, attribute)) {
-					throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
-				}
-				attributesToSend[attribute] = Number(getProperty(targetActor, attribute));
+				attributesToSend[attribute] = Number(foundry.utils.getProperty(targetActor, attribute));
 			});
 		} else {
 			Object.entries(attributes).forEach(entry => {
 				const [attribute, quantity] = entry;
-				if (!hasProperty(targetActor, attribute)) {
+				if (!foundry.utils.hasProperty(targetActor, attribute)) {
 					throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
 				}
 				if (!Helpers.isRealNumber(quantity) && quantity > 0) {
@@ -1563,21 +1558,15 @@ class API {
 				if (typeof attribute !== "string") {
 					throw Helpers.custom_error(`transferAttributes | Each attribute in the array must be of type string`);
 				}
-				if (!hasProperty(sourceActor, attribute)) {
+				if (!foundry.utils.hasProperty(sourceActor, attribute)) {
 					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
-				}
-				if (!hasProperty(targetActor, attribute)) {
-					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
 				}
 			});
 		} else {
 			Object.entries(attributes).forEach(entry => {
 				const [attribute, quantity] = entry;
-				if (!hasProperty(sourceActor, attribute)) {
+				if (!foundry.utils.hasProperty(sourceActor, attribute)) {
 					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
-				}
-				if (!hasProperty(targetActor, attribute)) {
-					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
 				}
 				if (!Helpers.isRealNumber(quantity) && quantity > 0) {
 					throw Helpers.custom_error(`transferAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
@@ -2359,6 +2348,10 @@ class API {
 
 	static canItemFitInVault(item, vaultActor) {
 		return PileUtilities.canItemFitInVault(item, vaultActor);
+	}
+
+	static fitItemsIntoVault(items, vaultActor) {
+		return PileUtilities.fitItemsIntoVault(items, vaultActor);
 	}
 
 	static async registerItemPileType(type, label, flags = []) {

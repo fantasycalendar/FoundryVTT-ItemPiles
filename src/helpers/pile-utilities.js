@@ -45,12 +45,12 @@ export function canItemStack(item, targetActor) {
 	if (actorFlagData.enabled && actorFlagData.type === CONSTANTS.PILE_TYPES.VAULT && itemFlagData.vaultExpander) {
 		return false;
 	}
-	if (isItemCurrency(itemData, { target: targetActor })) return true;
+	if (isItemCurrency(itemData)) return true;
 	if (typeof actorFlagData.canStackItems === "boolean") {
 		actorFlagData.canStackItems = "yes";
 	}
 	if (!Utilities.isItemStackable(itemData)) return false;
-	if (actorFlagData.canStackItems === "always" || actorFlagData.canStackItems === "alwaysno") {
+	if (actorFlagData.canStackItems.includes("always")) {
 		return actorFlagData.canStackItems === "always";
 	}
 	return {
@@ -1583,12 +1583,45 @@ export function getVaultGridData(vaultActor, flagData = false) {
 }
 
 export function canItemFitInVault(item, vaultActor, position = null) {
-	if (!isItemPileVault(vaultActor)) return false;
+	if (!isItemPileVault(vaultActor)) return true;
 	if (Utilities.findSimilarItem(vaultActor.items, item) && canItemStack(item, vaultActor)) {
 		return true;
 	}
 	const gridData = getVaultGridData(vaultActor);
 	return getNewItemsVaultPosition(item, gridData, position);
+}
+
+export function fitItemsIntoVault(items, vaultActor) {
+	if (!isItemPileVault(vaultActor)) return true;
+	const vaultItems = Array.from(vaultActor.items);
+	const gridData = getVaultGridData(vaultActor);
+	const newItemData = [];
+	for(const item of items){
+		const itemData = item instanceof Item ? item.toObject() : item;
+		const newPosition = canItemFitInVault(itemData, vaultActor);
+		if(typeof newPosition === "boolean"){
+			if (!newPosition) return false;
+			newItemData.push(itemData);
+			continue;
+		}
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", newPosition.x);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", newPosition.y);
+		newItemData.push(itemData);
+		vaultItems.push(itemData);
+		const flagData = getItemFlagData(itemData);
+		for (let width = 0; width < flagData.width; width++) {
+			const x = Math.max(0, Math.min(flagData.x + width, gridData.enabledCols - 1));
+			for (let height = 0; height < flagData.height; height++) {
+				const y = Math.max(0, Math.min(flagData.y + height, gridData.enabledRows - 1));
+				gridData.grid[x][y] = item.name;
+				const indexToDelete = gridData.freeCells.indexOf({ x, y });
+				if(indexToDelete > -1) {
+					gridData.freeCells.splice(indexToDelete, 1);
+				}
+			}
+		}
+	}
+	return newItemData;
 }
 
 export function getNewItemsVaultPosition(item, gridData, position = null) {
