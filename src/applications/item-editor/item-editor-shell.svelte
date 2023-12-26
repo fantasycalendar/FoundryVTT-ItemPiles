@@ -299,6 +299,16 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.VaultImageRotated")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultImageRotatedExplanation")}</p>
+						</label>
+						<div class="form-fields">
+							<FilePicker bind:value={itemFlagData.vaultImageFlipped} placeholder="path/image.png" type="imagevideo"/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label style="flex:4;">
 							{localize("ITEM-PILES.Applications.ItemEditor.VaultExpander")}<br>
 							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultExpanderExplanation")}</p>
 						</label>

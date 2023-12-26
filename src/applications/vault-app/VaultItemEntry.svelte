@@ -4,6 +4,8 @@
 
 	export let entry;
 
+	let imageElem;
+
 	const item = entry.item;
 
 	const name = item.name;
@@ -12,16 +14,45 @@
 	const quantity = item.quantity;
 	const canStack = item.canStack;
 	const style = item.style;
+	const transform = entry.transform;
+	let imageStyle = "";
+	let loaded = false;
 
 	$: styling = Helpers.styleFromObject($style);
-	$: displayImage = $flagData.vaultImage || $img;
+	$: displayImage = ($flagData.flipped ? $flagData.vaultImageFlipped || $flagData.vaultImage : $flagData.vaultImage) || $img;
+	$: imageLoaded($flagData, $transform)
+
+	function imageLoaded(flagData, transform){
+		if (!flagData.vaultImageFlipped){
+			getImageDimensions(transform)
+		}else{
+			imageStyle = ""
+		}
+	}
+
+	function getImageDimensions(transform) {
+		if (!loaded) return;
+		const { flipped, w, h } = transform;
+		imageStyle = `transform: rotate(${flipped ? "90deg" : "0deg"})`
+		const naturalWidth = imageElem.naturalWidth;
+		const naturalHeight = imageElem.naturalHeight;
+		if (w === h || !flipped) {
+			imageStyle = "; object-fit: cover; min-width: 100%; min-height: 100%;"
+			return;
+		}
+		const scale = naturalWidth / naturalHeight;
+		imageStyle += ` scale(${scale});`;
+	}
 
 </script>
 
 <div class="grid-item" data-fast-tooltip={$name}
      data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0">
 	{#if displayImage}
-		<img src={displayImage}/>
+		<img src={displayImage} style={imageStyle} bind:this={imageElem} on:load={() => {
+			loaded = true;
+			imageLoaded($flagData, $transform)
+		}}/>
 	{/if}
 	{#if styling}
 		<div class="grid-item-ghost" style={styling}></div>
@@ -36,7 +67,6 @@
   .grid-item {
     width: 100%;
     height: 100%;
-    transition: transform 2s, top 2s, left 2s;
     border-radius: 0.25rem;
     position: relative;
 
@@ -49,10 +79,6 @@
     img {
       position: absolute;
       flex-shrink: 0;
-      min-width: 100%;
-      min-height: 100%;
-      object-fit: cover;
-      transition: transform 2s, opacity 2s;
       border: 0;
     }
 

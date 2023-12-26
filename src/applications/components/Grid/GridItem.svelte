@@ -3,7 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { get, writable } from 'svelte/store';
 	import { styleFromObject } from '../../../helpers/helpers.js';
-	import { calcPosition, getCollisions, isPlacementValid, snapOnMove } from './grid-utils.js';
+	import { calcPosition, coordinate2size, getCollisions, isPlacementValid, snapOnMove } from './grid-utils.js';
 
 	export let item;
 	export let options;
@@ -15,18 +15,14 @@
 	let itemRef = HTMLElement;
 	const transformStore = item.transform;
 	const previewTransform = writable({});
-	const tooltip = item.name;
 
 	$: transform = $transformStore;
-	$: gridTransform = calcPosition(transform, options);
-	$: snappedGridTransform = calcPosition({
-		...snapOnMove($previewTransform.left, $previewTransform.top, transform, options),
-		w: transform.w,
-		h: transform.h,
+	$: gridTransform = calcPosition($transformStore, options);
+	$: ghostGridTransform = calcPosition({
+		...snapOnMove($previewTransform.left, $previewTransform.top, $previewTransform, options),
+		w: $previewTransform.w,
+		h: $previewTransform.h,
 	}, options);
-	$: {
-		if (!active) $previewTransform = $transformStore;
-	}
 
 	let classes = "";
 	$: {
@@ -47,10 +43,10 @@
 
 	$: ghostStyle = styleFromObject({
 		"position": "absolute",
-		"left": snappedGridTransform.left + "px",
-		"top": snappedGridTransform.top + "px",
-		"width": snappedGridTransform.width + "px",
-		"height": snappedGridTransform.height + "px",
+		"left": ghostGridTransform.left + "px",
+		"top": ghostGridTransform.top + "px",
+		"width": ghostGridTransform.width + "px",
+		"height": ghostGridTransform.height + "px",
 		"opacity": "0.75",
 		"z-index": "5"
 	});
@@ -87,6 +83,8 @@
 			top: event.pageY - gridTransform.top,
 			internalLeft: event.offsetX,
 			internalTop: event.offsetY,
+			origInternalLeft: event.offsetX,
+			origInternalTop: event.offsetY,
 		};
 
 		dispatch("itembegindrag", {
@@ -102,6 +100,8 @@
 		window.addEventListener('touchmove', move, { passive: false });
 		window.addEventListener('touchend', moveEnd, { passive: false });
 
+		$previewTransform = $transformStore;
+
 	}
 
 	function splitStart(event) {
@@ -114,6 +114,8 @@
 			top: event.pageY - gridTransform.top,
 			internalLeft: event.offsetX,
 			internalTop: event.offsetY,
+			origInternalLeft: event.offsetX,
+			origInternalTop: event.offsetY,
 		};
 
 		// Setup events for when item is moved and dropped
@@ -124,27 +126,42 @@
 
 	}
 
+	let lastMoveEvent = false;
 	function move(event) {
+
+		if(!event) event = lastMoveEvent;
+		lastMoveEvent = event;
 
 		const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
 
 		active = true;
 
-		const { left, top, outOfBounds } = constrainToContainer(
-			pageX - pointerOffset.left,
-			pageY - pointerOffset.top
-		);
-		active = !outOfBounds;
-		dispatch("itemmove", {
-			x: pageX - pointerOffset.internalLeft,
-			y: pageY - pointerOffset.internalTop
-		});
-		previewTransform.set({
-			...transform,
-			...gridTransform,
-			...snapOnMove(left, top, transform, options),
-			left,
-			top,
+		let outOfBounds = false;
+
+		previewTransform.update(data => {
+
+			const unsnappedData = calcPosition(data, options);
+
+			const { left, top, outOfBounds } = constrainToContainer(
+				pageX - pointerOffset.left,
+				pageY - pointerOffset.top,
+				unsnappedData.width,
+				unsnappedData.height
+			);
+
+			active = !outOfBounds;
+
+			dispatch("itemmove", {
+				x: pageX - pointerOffset.internalLeft,
+				y: pageY - pointerOffset.internalTop
+			});
+
+			return {
+				...data,
+				...snapOnMove(left, top, unsnappedData, options),
+				left,
+				top
+			};
 		});
 
 		if (!splitting) {
@@ -158,9 +175,8 @@
 
 	}
 
-	function constrainToContainer(left, top) {
+	function constrainToContainer(left, top, width, height) {
 
-		let outOfBounds = false;
 		const parentRect = gridContainer.getBoundingClientRect();
 		const relativeRect = {
 			left: (parentRect.left - parentRect.x),
@@ -168,29 +184,23 @@
 			right: (parentRect.right - parentRect.x),
 			bottom: (parentRect.bottom - parentRect.y),
 		}
+
+		const outOfBounds = (left < relativeRect.left && left < (relativeRect.left - width / 2))
+			|| (top < relativeRect.top && top < (relativeRect.top - height / 2))
+			|| ((left + width) > relativeRect.right && (left + width) > (relativeRect.right + width / 2))
+			|| ((top + height) > relativeRect.bottom && (top + height) > (relativeRect.bottom + height / 2));
+
 		if (left < relativeRect.left) {
-			if (left < (relativeRect.left - gridTransform.width / 2)) {
-				outOfBounds = true;
-			}
 			left = relativeRect.left;
 		}
 		if (top < relativeRect.top) {
-			if (top < (relativeRect.top - gridTransform.height / 2)) {
-				outOfBounds = true;
-			}
 			top = relativeRect.top;
 		}
-		if ((left + gridTransform.width) > relativeRect.right) {
-			if ((left + gridTransform.width) > (relativeRect.right + gridTransform.width / 2)) {
-				outOfBounds = true;
-			}
-			left = relativeRect.right - gridTransform.width;
+		if ((left + width) > relativeRect.right) {
+			left = relativeRect.right - width;
 		}
-		if ((top + gridTransform.height) > relativeRect.bottom) {
-			if ((top + gridTransform.height) > (relativeRect.bottom + gridTransform.height / 2)) {
-				outOfBounds = true;
-			}
-			top = relativeRect.bottom - gridTransform.height;
+		if ((top + height) > relativeRect.bottom) {
+			top = relativeRect.bottom - height;
 		}
 
 		return { left, top, outOfBounds };
@@ -233,7 +243,7 @@
 		}
 
 		if (foundry.utils.isEmpty(finalTransform)
-			|| (finalTransform.x === transform.x && finalTransform.y === transform.y)
+			|| (finalTransform.x === transform.x && finalTransform.y === transform.y && finalTransform.w === transform.w && finalTransform.h === transform.h)
 		) {
 			return;
 		}
@@ -251,29 +261,9 @@
 
 			for (const collision of collisions) {
 
-				const collisionTransform = get(collision.transform);
-
-				const delta = {
-					x: finalTransform.x - origItemTransform.x,
-					y: finalTransform.y - origItemTransform.y
-				}
-
-				const offset = {
-					x: (collisionTransform.x - finalTransform.x),
-					y: (collisionTransform.y - finalTransform.y)
-				}
-
-				if (
-					(delta.x >= -Math.floor(origItemTransform.w / 2) && delta.x < origItemTransform.w)
-					&&
-					(delta.y >= -Math.floor(origItemTransform.h / 2) && delta.y < origItemTransform.h)
-				) {
-					return false;
-				}
-
 				collision.transform.update(trans => {
-					trans.x = origItemTransform.x + offset.x;
-					trans.y = origItemTransform.y + offset.y;
+					trans.x = origItemTransform.x;
+					trans.y = origItemTransform.y;
 					return trans;
 				});
 
@@ -283,6 +273,9 @@
 		transformStore.update(trans => {
 			trans.x = finalTransform.x;
 			trans.y = finalTransform.y;
+			trans.w = finalTransform.w;
+			trans.h = finalTransform.h;
+			trans.flipped = finalTransform.flipped;
 			return trans;
 		});
 
@@ -323,7 +316,34 @@
 	$: itemClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
 	$: collisionClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
 
+	function keydown(event) {
+		if (event.key !== "r" || !active || (item.item.w === 1 && item.item.h === 1)) return;
+		previewTransform.update(data => {
+			const { w, h } = data;
+			const width = coordinate2size(Math.floor(h/2)+1, options.gridSize, options.gap);
+			const height = coordinate2size(Math.floor(w/2)+1, options.gridSize, options.gap);
+			pointerOffset.top -= (width - height);
+			pointerOffset.left -= (height - width);
+			dispatch("itemflipped", {
+				item,
+				target: itemRef,
+				h: w,
+				w: h,
+				flipped: !data.flipped
+			});
+			return {
+				...data,
+				w: h,
+				h: w,
+				flipped: !data.flipped
+			}
+		});
+		move();
+	}
+
 </script>
+
+<svelte:window on:keydown={keydown}/>
 
 <div
 	bind:this={itemRef}

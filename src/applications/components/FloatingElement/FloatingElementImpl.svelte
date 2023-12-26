@@ -1,7 +1,5 @@
 <script>
 
-
-	import { current_component } from 'svelte/internal';
 	import { styleFromObject } from "../../../helpers/helpers.js";
 
 	export let position;
@@ -9,13 +7,12 @@
 	export let style;
 	export let component;
 	export let componentData;
-	const local = current_component;
 
 	$: elementStyle = styleFromObject({
 		"left": $position.x + "px",
 		"top": $position.y + "px",
 		"z-index": zIndex,
-		...style
+		...$style
 	});
 
 </script>

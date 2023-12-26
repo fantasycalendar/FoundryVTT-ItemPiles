@@ -67,6 +67,7 @@ const CONSTANTS = {
 		height: 1,
 		flipped: false,
 		vaultImage: "",
+		vaultImageFlipped: "",
 		canStack: "default"
 	},
 

@@ -862,16 +862,16 @@ export function getCostOfItem(item, defaultCurrencies = false) {
 }
 
 export function getPriceData({
-	cost = false,
-	item = false,
-	seller = false,
-	buyer = false,
-	sellerFlagData = false,
-	buyerFlagData = false,
-	itemFlagData = false,
-	quantity = 1,
-	secondaryPrices = false
-} = {}) {
+	                             cost = false,
+	                             item = false,
+	                             seller = false,
+	                             buyer = false,
+	                             sellerFlagData = false,
+	                             buyerFlagData = false,
+	                             itemFlagData = false,
+	                             quantity = 1,
+	                             secondaryPrices = false
+                             } = {}) {
 
 	let priceData = [];
 
@@ -1158,8 +1158,12 @@ export function getPriceData({
 }
 
 export function getPaymentData({
-	purchaseData = [], seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false
-} = {}) {
+	                               purchaseData = [],
+	                               seller = false,
+	                               buyer = false,
+	                               sellerFlagData = false,
+	                               buyerFlagData = false
+                               } = {}) {
 
 	buyerFlagData = getActorFlagData(buyer, buyerFlagData);
 	if (!isItemPileMerchant(buyer, buyerFlagData)) {
@@ -1182,21 +1186,21 @@ export function getPaymentData({
 	const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 
 	const paymentData = purchaseData.map(data => {
-			const prices = getPriceData({
-				cost: data.cost,
-				item: data.item,
-				secondaryPrices: data.secondaryPrices,
-				seller,
-				buyer,
-				sellerFlagData,
-				buyerFlagData,
-				itemFlagData: data.itemFlagData,
-				quantity: data.quantity || 1
-			})[data.paymentIndex || 0];
-			return {
-				...prices, item: data.item
-			};
-		})
+		const prices = getPriceData({
+			cost: data.cost,
+			item: data.item,
+			secondaryPrices: data.secondaryPrices,
+			seller,
+			buyer,
+			sellerFlagData,
+			buyerFlagData,
+			itemFlagData: data.itemFlagData,
+			quantity: data.quantity || 1
+		})[data.paymentIndex || 0];
+		return {
+			...prices, item: data.item
+		};
+	})
 		.reduce((priceData, priceGroup) => {
 
 			if (!priceGroup.maxQuantity && (buyer || seller)) {
@@ -1596,16 +1600,17 @@ export function fitItemsIntoVault(items, vaultActor) {
 	const vaultItems = Array.from(vaultActor.items);
 	const gridData = getVaultGridData(vaultActor);
 	const newItemData = [];
-	for(const item of items){
+	for (const item of items) {
 		const itemData = item instanceof Item ? item.toObject() : item;
 		const newPosition = canItemFitInVault(itemData, vaultActor);
-		if(typeof newPosition === "boolean"){
+		if (typeof newPosition === "boolean") {
 			if (!newPosition) return false;
 			newItemData.push(itemData);
 			continue;
 		}
 		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", newPosition.x);
 		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", newPosition.y);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".flipped", newPosition.flipped);
 		newItemData.push(itemData);
 		vaultItems.push(itemData);
 		const flagData = getItemFlagData(itemData);
@@ -1615,7 +1620,7 @@ export function fitItemsIntoVault(items, vaultActor) {
 				const y = Math.max(0, Math.min(flagData.y + height, gridData.enabledRows - 1));
 				gridData.grid[x][y] = item.name;
 				const indexToDelete = gridData.freeCells.indexOf({ x, y });
-				if(indexToDelete > -1) {
+				if (indexToDelete > -1) {
 					gridData.freeCells.splice(indexToDelete, 1);
 				}
 			}
@@ -1624,38 +1629,52 @@ export function fitItemsIntoVault(items, vaultActor) {
 	return newItemData;
 }
 
+export function getVaultItemDimensions(item, itemFlagData = false){
+	let { width, height, flipped } = itemFlagData || getItemFlagData(item);
+	return {
+		width: flipped ? height : width,
+		height: flipped ? width : height
+	}
+}
+
 export function getNewItemsVaultPosition(item, gridData, position = null) {
 
 	const itemFlagData = getItemFlagData(item);
+	let flipped = position?.flipped ?? false;
 	const { grid, freeCells, enabledCols, enabledRows } = gridData;
-	const validCells = freeCells.filter(cell => {
-		return ((cell.x + itemFlagData.width) <= enabledCols)
-			&& ((cell.y + itemFlagData.height) <= enabledRows);
-	})
+	const loops = Number(itemFlagData.width > 1 || itemFlagData.height > 1);
+	for (let i = 0; i <= loops; i++) {
 
-	if (!validCells.length) return false;
+		const { width, height } = getVaultItemDimensions(item, { ...itemFlagData, flipped });
 
-	if (itemFlagData.width === 1 && itemFlagData.height === 1) {
-		return validCells[0];
-	}
+		const validCells = freeCells.filter(cell => {
+			return ((cell.x + width) <= enabledCols)
+				&& ((cell.y + height) <= enabledRows);
+		});
 
-	const cellsToCheck = position ? validCells.sort((a, b) => {
-		const distA = (new Ray(a, position)).distance;
-		const distB = (new Ray(b, position)).distance;
-		return ((distA - distB) * 1000) + (itemFlagData.width >= itemFlagData.height ? b.x - a.x : b.y - a.y);
-	}) : validCells;
+		if (width === 1 && height === 1 && validCells.length) {
+			return validCells[0];
+		}
 
-	cellLoop:
-		for (const { x, y } of cellsToCheck) {
-			for (let width = 0; width < itemFlagData.width; width++) {
-				for (let height = 0; height < itemFlagData.height; height++) {
-					if (grid[x + width][y + height]) {
-						continue cellLoop;
+		const cellsToCheck = position ? validCells.sort((a, b) => {
+			const distA = (new Ray(a, position)).distance;
+			const distB = (new Ray(b, position)).distance;
+			return ((distA - distB) * 1000) + (width >= height ? b.x - a.x : b.y - a.y);
+		}) : validCells;
+
+		cellLoop:
+			for (const { x, y } of cellsToCheck) {
+				for (let w = 0; w < width; w++) {
+					for (let h = 0; h < height; h++) {
+						if (grid[x + w][y + h]) {
+							continue cellLoop;
+						}
 					}
 				}
+				return { x, y, flipped };
 			}
-			return { x, y };
-		}
+		flipped = !flipped;
+	}
 
 	return false;
 
@@ -1765,14 +1784,14 @@ export function clearActorLog(actor) {
  * @returns {Promise<[object]>}
  */
 export async function rollTable({
-	tableUuid,
-	formula = "1",
-	resetTable = true,
-	normalize = false,
-	displayChat = false,
-	rollData = {},
-	customCategory = false
-} = {}) {
+	                                tableUuid,
+	                                formula = "1",
+	                                resetTable = true,
+	                                normalize = false,
+	                                displayChat = false,
+	                                rollData = {},
+	                                customCategory = false
+                                } = {}) {
 
 	const rolledItems = [];
 

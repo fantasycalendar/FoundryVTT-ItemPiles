@@ -50,6 +50,7 @@ export function snapOnMove(left, top, transform, options) {
 export function calcPosition(transform, options) {
 	const { gridSize, gap } = options;
 	return {
+		...transform,
 		left: coordinate2position(transform.x, gridSize, gap),
 		top: coordinate2position(transform.y, gridSize, gap),
 		width: coordinate2size(transform.w, gridSize, gap),
@@ -79,21 +80,7 @@ export function isPlacementValid(item, collisions, items, options) {
 
 		const collisionTransform = get(collision.transform);
 
-		const delta = {
-			x: finalTransform.x - origItemTransform.x,
-			y: finalTransform.y - origItemTransform.y
-		}
-
-		const offset = {
-			x: (collisionTransform.x - finalTransform.x),
-			y: (collisionTransform.y - finalTransform.y)
-		}
-
-		if (
-			(delta.x >= -Math.floor(origItemTransform.w / 2) && delta.x < origItemTransform.w)
-			&&
-			(delta.y >= -Math.floor(origItemTransform.h / 2) && delta.y < origItemTransform.h)
-		) {
+		if(finalTransform.w !== collisionTransform.w || finalTransform.h !== collisionTransform.h){
 			return false;
 		}
 
@@ -101,8 +88,8 @@ export function isPlacementValid(item, collisions, items, options) {
 			id: collision.id,
 			transform: {
 				...collisionTransform,
-				x: origItemTransform.x + offset.x,
-				y: origItemTransform.y + offset.y,
+				x: origItemTransform.x,
+				y: origItemTransform.y,
 			}
 		};
 	});

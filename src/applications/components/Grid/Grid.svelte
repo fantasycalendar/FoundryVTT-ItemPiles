@@ -65,6 +65,10 @@
 		dispatch('doubleclick', { ...event.detail });
 	}
 
+	function itemFlippedEvent(event) {
+		dispatch('itemflipped', { ...event.detail });
+	}
+
 	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
 	$: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
 
@@ -112,6 +116,7 @@
 				on:itemmove={itemMove}
 				on:itemhoverleave={itemHoverLeaveEvent}
 				on:itemrightclick={itemRightClickEvent}
+				on:itemflipped={itemFlippedEvent}
 			>
 				<slot {item}/>
 			</GridItem>

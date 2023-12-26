@@ -186,7 +186,8 @@ export class VaultStore extends ItemPileStore {
 			return {
 				_id: item.id,
 				[CONSTANTS.FLAGS.ITEM + ".x"]: transform.x,
-				[CONSTANTS.FLAGS.ITEM + ".y"]: transform.y
+				[CONSTANTS.FLAGS.ITEM + ".y"]: transform.y,
+				[CONSTANTS.FLAGS.ITEM + ".flipped"]: transform.flipped,
 			}
 		});
 
@@ -270,24 +271,38 @@ export class VaultStore extends ItemPileStore {
 
 		const itemsToUpdate = allItems
 			.map(item => {
+
+				let freeCells = [];
 				for (let x = 0; x < gridData.enabledCols; x++) {
 					for (let y = 0; y < gridData.enabledRows; y++) {
-						if (!grid[x][y]) {
-							grid[x][y] = item.id;
-							item.transform.update(trans => {
-								trans.x = x;
-								trans.y = y;
-								return trans;
-							});
-							return {
-								id: item.id,
-								transform: item.transform,
-								highlight: search && highlightedItems.includes(item.id),
-								item
-							};
-						}
+						if (grid[x][y]) continue;
+						freeCells.push({ x, y });
 					}
 				}
+
+				const position = PileUtilities.getNewItemsVaultPosition(item.item, { ...gridData, grid, freeCells });
+				if (!position) return false;
+				const itemFlagData = get(item.itemFlagData);
+				let { width, height } = PileUtilities.getVaultItemDimensions(item.item, itemFlagData);
+				for (let w = 0; w < width; w++) {
+					const x = Math.max(0, Math.min(position.x + w, gridData.enabledCols - 1));
+					for (let h = 0; h < height; h++) {
+						const y = Math.max(0, Math.min(position.y + h, gridData.enabledRows - 1));
+						grid[x][y] = item.id;
+					}
+				}
+				item.transform.update(trans => {
+					trans.x = position.x;
+					trans.y = position.y;
+					trans.flipped = position.flipped;
+					return trans;
+				});
+				return {
+					id: item.id,
+					transform: item.transform,
+					highlight: search && highlightedItems.includes(item.id),
+					item
+				};
 			})
 			.filter(Boolean)
 
@@ -300,8 +315,8 @@ export class VaultStore extends ItemPileStore {
 	async onDropData(data, event, isExpander) {
 
 		const dragPosition = get(this.dragPosition);
-		const { x, y } = dragPosition;
-		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false });
+		const { x, y, flipped } = dragPosition;
+		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, flipped: false, active: false });
 
 		if (data.type === "Actor" && game.user.isGM) {
 			const oldHeight = this.mainContainer.getBoundingClientRect().height;
@@ -358,13 +373,17 @@ export class VaultStore extends ItemPileStore {
 				const { x, y } = PileUtilities.getItemFlagData(similarItem);
 				validPosition = { x: Math.max(x, 0), y: Math.max(y, 0) };
 			} else {
-				validPosition = PileUtilities.canItemFitInVault(itemData, this.actor, { x, y });
+				validPosition = PileUtilities.canItemFitInVault(itemData, this.actor, { x, y, flipped });
 				if (!validPosition) {
 					Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
 					return false;
 				}
 			}
 		}
+
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", validPosition.x);
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", validPosition.y);
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".flipped", validPosition.flipped);
 
 		return PrivateAPI._depositWithdrawItem({
 			source,
@@ -385,12 +404,13 @@ export class VaultItem extends PileItem {
 	setupStores(...args) {
 		super.setupStores(...args);
 		this.transform = writable({
-			x: 0, y: 0, w: 1, h: 1
+			x: 0, y: 0, w: 1, h: 1, flipped: false
 		});
 		this.x = 0;
 		this.y = 0;
 		this.w = 1;
 		this.h = 1;
+		this.flipped = false;
 		this.style = writable({});
 	}
 
@@ -413,8 +433,13 @@ export class VaultItem extends PileItem {
 			if (setup) {
 				helpers.debug("itemFlagData", data);
 			}
+			const { width, height } = PileUtilities.getVaultItemDimensions(this.item, data);
 			this.transform.set({
-				x: data.x, y: data.y, w: data.width ?? 1, h: data.height ?? 1
+				x: data.x,
+				y: data.y,
+				w: width,
+				h: height,
+				flipped: data.flipped ?? false
 			});
 		});
 		this.subscribeTo(this.transform, (transform) => {
@@ -425,6 +450,7 @@ export class VaultItem extends PileItem {
 			this.y = transform.y;
 			this.w = transform.w;
 			this.h = transform.h;
+			this.flipped = transform.flipped;
 		});
 		this.subscribeTo(this.quantity, () => {
 			const itemFlagData = get(this.itemFlagData);
@@ -469,7 +495,7 @@ export class VaultItem extends PileItem {
 		}], { interactionId: this.store.interactionId });
 	}
 
-	async split(x, y) {
+	async split(x, y, flipped) {
 
 		let quantity = await DropItemDialog.show(this.item, this.store.actor, {
 			localizationTitle: "SplitItem",
@@ -486,6 +512,7 @@ export class VaultItem extends PileItem {
 		const flagData = PileUtilities.getItemFlagData(this.item);
 		setProperty(flagData, "x", x);
 		setProperty(flagData, "y", y);
+		setProperty(flagData, "flipped", flipped);
 		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
 
 		await game.itempiles.API.addItems(this.store.actor, [{
