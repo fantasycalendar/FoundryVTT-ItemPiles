@@ -3,7 +3,14 @@
 	import { createEventDispatcher } from 'svelte';
 	import { get, writable } from 'svelte/store';
 	import { styleFromObject } from '../../../helpers/helpers.js';
-	import { calcPosition, coordinate2size, getCollisions, isPlacementValid, snapOnMove } from './grid-utils.js';
+	import {
+		calcPosition,
+		coordinate2size,
+		getCollisions,
+		isPlacementValid,
+		snapOnMove,
+		swapItemTransform
+	} from '../../../helpers/grid-utils.js';
 
 	export let item;
 	export let options;
@@ -77,15 +84,7 @@
 			itemRef.setPointerCapture(event.pointerId);
 		}
 
-		// Get offset for pointer within the grid item
-		pointerOffset = {
-			left: event.pageX - gridTransform.left,
-			top: event.pageY - gridTransform.top,
-			internalLeft: event.offsetX,
-			internalTop: event.offsetY,
-			origInternalLeft: event.offsetX,
-			origInternalTop: event.offsetY,
-		};
+		enableMoveEvents(event);
 
 		dispatch("itembegindrag", {
 			item,
@@ -94,29 +93,27 @@
 			y: event.pageY - pointerOffset.internalTop
 		});
 
-		// Setup events for when item is moved and dropped
-		window.addEventListener('pointermove', move, { passive: false });
-		window.addEventListener('pointerup', moveEnd, { passive: false });
-		window.addEventListener('touchmove', move, { passive: false });
-		window.addEventListener('touchend', moveEnd, { passive: false });
-
-		$previewTransform = $transformStore;
-
 	}
 
 	function splitStart(event) {
 
 		splitting = true;
 
+		enableMoveEvents(event);
+
+	}
+
+	function enableMoveEvents(event) {
+
 		// Get offset for pointer within the grid item
 		pointerOffset = {
 			left: event.pageX - gridTransform.left,
 			top: event.pageY - gridTransform.top,
 			internalLeft: event.offsetX,
-			internalTop: event.offsetY,
-			origInternalLeft: event.offsetX,
-			origInternalTop: event.offsetY,
+			internalTop: event.offsetY
 		};
+
+		$previewTransform = $transformStore;
 
 		// Setup events for when item is moved and dropped
 		window.addEventListener('pointermove', move, { passive: false });
@@ -127,9 +124,10 @@
 	}
 
 	let lastMoveEvent = false;
+
 	function move(event) {
 
-		if(!event) event = lastMoveEvent;
+		if (!event) event = lastMoveEvent;
 		lastMoveEvent = event;
 
 		const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
@@ -248,9 +246,8 @@
 			return;
 		}
 
-		if (!validPlacement) {
-			return;
-		}
+		if (!validPlacement) return;
+
 		validPlacement = false;
 
 		if (collisions.length) {
@@ -260,13 +257,9 @@
 			}
 
 			for (const collision of collisions) {
-
 				collision.transform.update(trans => {
-					trans.x = origItemTransform.x;
-					trans.y = origItemTransform.y;
-					return trans;
+					return swapItemTransform(origItemTransform, finalTransform, trans);
 				});
-
 			}
 		}
 
@@ -320,8 +313,8 @@
 		if (event.key !== "r" || !active || (item.item.w === 1 && item.item.h === 1)) return;
 		previewTransform.update(data => {
 			const { w, h } = data;
-			const width = coordinate2size(Math.floor(h/2)+1, options.gridSize, options.gap);
-			const height = coordinate2size(Math.floor(w/2)+1, options.gridSize, options.gap);
+			const width = coordinate2size(Math.floor(h / 2) + 1, options.gridSize, options.gap);
+			const height = coordinate2size(Math.floor(w / 2) + 1, options.gridSize, options.gap);
 			pointerOffset.top -= (width - height);
 			pointerOffset.left -= (height - width);
 			dispatch("itemflipped", {

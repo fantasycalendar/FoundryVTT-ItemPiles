@@ -13,7 +13,7 @@
 	import DropZone from '../components/DropZone.svelte';
 	import VaultItemEntry from './VaultItemEntry.svelte';
 
-	import { coordinate2size, snapOnMove } from '../components/Grid/grid-utils';
+	import { coordinate2size, snapOnMove } from '../../helpers/grid-utils.js';
 	import * as Helpers from "../../helpers/helpers.js";
 	import { isCoordinateWithinPosition } from "../../helpers/helpers.js";
 
@@ -69,8 +69,8 @@
 			return onDragLeave();
 		}
 		dragPositionStore.update(data => {
-			const x = (clientX - rect.left) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize/2); //x position within the element.
-			const y = (clientY - rect.top) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize/2);  //y position within the element.
+			const x = (clientX - rect.left) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize / 2); //x position within the element.
+			const y = (clientY - rect.top) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize / 2);  //y position within the element.
 			return {
 				...data,
 				...snapOnMove(x, y, { w: data.w, h: data.h }, { ...gridData }),
@@ -86,7 +86,7 @@
 	}
 
 	const dragHookId = Hooks.on(CONSTANTS.HOOKS.DRAG_DOCUMENT, async (dropData) => {
-		if(dropData.type !== "Item") return;
+		if (dropData.type !== "Item") return;
 		const item = await Item.implementation.fromDropData(dropData);
 		const flags = PileUtilities.getItemFlagData(item);
 		const { width, height } = PileUtilities.getVaultItemDimensions(item, flags);
@@ -182,7 +182,8 @@
 				opacity: 0.7
 			},
 			component: VaultItemEntry,
-			componentData: { entry: item }
+			componentData: { entry: item },
+			context: { store }
 		});
 
 		splitStart({
@@ -207,7 +208,8 @@
 				opacity: 0.7,
 			},
 			component: VaultItemEntry,
-			componentData: { entry: item }
+			componentData: { entry: item },
+			context: { store }
 		})
 		Hooks.callAll(CONSTANTS.HOOKS.DRAG_DOCUMENT, {
 			type: "Item",
@@ -244,7 +246,7 @@
 
 		if (hitApps.length) {
 			if (hitApps[0] === application) return;
-			if(hitApps[0].actor) {
+			if (hitApps[0].actor) {
 				dropData.target = hitApps[0].actor;
 			}
 			if (hitApps[0].onDropData) {
@@ -293,11 +295,12 @@
 			application.position.stores.width.set(defaultWidth);
 		}
 	}
+
 	function keydown(event) {
 		if (event.key !== "r") return;
 		dragPositionStore.update(data => {
 			const { w, h } = data;
-			if(data.active && w !== h) {
+			if (data.active && w !== h) {
 				data.w = h;
 				data.h = w;
 				data.flipped = !data.flipped;

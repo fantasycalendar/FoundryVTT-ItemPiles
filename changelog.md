@@ -1,6 +1,7 @@
 # Item Piles Changelog
 
 ## Version 2.8.13
+- Added the ability to rotate vault items of non-uniform sizes, at the cost of being able to swap vault item positions when drag & dropping
 - Tweaked override currencies on item piles cause buying/transferring these currencies to fully remove themselves from inventories when used up
 - Fixed being able to add items with 0 quantity to item piles
 

@@ -1,13 +1,17 @@
 <script>
 
 	import * as Helpers from "../../helpers/helpers.js";
+	import { getContext } from "svelte";
+	import { coordinate2size } from "../../helpers/grid-utils.js";
 
 	export let entry;
 
-	let imageElem;
+	const store = getContext("store");
+	const gridDataStore = store.gridData;
+
+	$: gridData = $gridDataStore;
 
 	const item = entry.item;
-
 	const name = item.name;
 	const img = item.img;
 	const flagData = item.itemFlagData;
@@ -15,33 +19,25 @@
 	const canStack = item.canStack;
 	const style = item.style;
 	const transform = entry.transform;
-	let imageStyle = "";
-	let loaded = false;
+	let containerStyle = "";
 
 	$: styling = Helpers.styleFromObject($style);
 	$: displayImage = ($flagData.flipped ? $flagData.vaultImageFlipped || $flagData.vaultImage : $flagData.vaultImage) || $img;
 	$: imageLoaded($flagData, $transform)
 
-	function imageLoaded(flagData, transform){
-		if (!flagData.vaultImageFlipped){
+	function imageLoaded(flagData, transform) {
+		if (!flagData.vaultImageFlipped) {
 			getImageDimensions(transform)
-		}else{
-			imageStyle = ""
+		} else {
+			containerStyle = ""
 		}
 	}
 
 	function getImageDimensions(transform) {
-		if (!loaded) return;
-		const { flipped, w, h } = transform;
-		imageStyle = `transform: rotate(${flipped ? "90deg" : "0deg"})`
-		const naturalWidth = imageElem.naturalWidth;
-		const naturalHeight = imageElem.naturalHeight;
-		if (w === h || !flipped) {
-			imageStyle = "; object-fit: cover; min-width: 100%; min-height: 100%;"
-			return;
-		}
-		const scale = naturalWidth / naturalHeight;
-		imageStyle += ` scale(${scale});`;
+		let { w, h, flipped } = transform;
+		const width = coordinate2size(!flipped ? w : h, gridData.gridSize, gridData.gap);
+		const height = coordinate2size(!flipped ? h : w, gridData.gridSize, gridData.gap);
+		containerStyle = `transform: rotate(${flipped ? "90deg" : "0deg"}); min-width: ${width}px; max-width: ${width}px; min-height: ${height}px; max-height: ${height}px;`;
 	}
 
 </script>
@@ -49,10 +45,9 @@
 <div class="grid-item" data-fast-tooltip={$name}
      data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0">
 	{#if displayImage}
-		<img src={displayImage} style={imageStyle} bind:this={imageElem} on:load={() => {
-			loaded = true;
-			imageLoaded($flagData, $transform)
-		}}/>
+		<div class="grid-item-image-container" style={containerStyle}>
+			<img src={displayImage}/>
+		</div>
 	{/if}
 	{#if styling}
 		<div class="grid-item-ghost" style={styling}></div>
@@ -80,7 +75,17 @@
       position: absolute;
       flex-shrink: 0;
       border: 0;
+	    object-fit: cover;
+	    width: 100%;
+	    min-height: 100%;
     }
+
+	  .grid-item-image-container {
+		  width: 100%;
+		  height: 100%;
+      align-items: center;
+      display: flex;
+	  }
 
     span {
       position: absolute;

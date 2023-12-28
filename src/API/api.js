@@ -1193,7 +1193,6 @@ class API {
 	 * @param {Actor/TokenDocument/Token} target                  The target to add an item to
 	 * @param {Array} items                                       An array of objects, with the key "item" being an item object or an Item class (the foundry class), with an optional key of "quantity" being the amount of the item to add
 	 * @param {object} options                                    Options to pass to the function
-	 * @param {boolean} [options.mergeSimilarItems=true]          Whether to merge similar items based on their name and type
 	 * @param {boolean} [options.removeExistingActorItems=false]  Whether to remove the actor's existing items before adding the new ones
 	 * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
 	 * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
@@ -1201,10 +1200,11 @@ class API {
 	 * @returns {Promise<array>}                                  An array of objects, each containing the item that was added or updated, and the quantity that was added
 	 */
 	static addItems(target, items, {
-		mergeSimilarItems = true, removeExistingActorItems = false, skipVaultLogging = false, interactionId = false
+		removeExistingActorItems = false, skipVaultLogging = false, interactionId = false
 	} = {}) {
-		const targetUuid = Utilities.getUuid(target);
-		if (!targetUuid) throw Helpers.custom_error(`addItems | Could not determine the UUID, please provide a valid target`)
+		const targetActor = Utilities.getActor(target);
+		if (!targetActor) throw Helpers.custom_error(`addItems | Could not determine the target actor, please provide a valid target`)
+		const targetUuid = Utilities.getUuid(targetActor);
 
 		const itemsToAdd = []
 		items.forEach(itemData => {
@@ -1233,14 +1233,14 @@ class API {
 				Utilities.setItemQuantity(item, itemData.quantity, true);
 			}
 
-			const existingItems = mergeSimilarItems ? Utilities.findSimilarItem(itemsToAdd, item) : false;
-			if (existingItems && PileUtilities.canItemStack(item, target)) {
-				Utilities.setItemQuantity(existingItems, Utilities.getItemQuantity(existingItems) + Utilities.getItemQuantity(item));
-			} else {
-				itemsToAdd.push(item);
-			}
+			itemsToAdd.push(item);
 
 		});
+
+		if(PileUtilities.isItemPileVault(targetActor)) {
+			const canItemsFit = PileUtilities.fitItemsIntoVault(itemsToAdd, targetActor);
+			if(!canItemsFit) throw Helpers.custom_error(`addItems | The vault actor cannot fit these items`, true);
+		}
 
 		if (interactionId && typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
 
@@ -1320,8 +1320,9 @@ class API {
 	 */
 	static transferItems(source, target, items, { skipVaultLogging = false, interactionId = false } = {}) {
 
-		const sourceUuid = Utilities.getUuid(source);
-		if (!sourceUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid source`)
+		const sourceActor = Utilities.getActor(source);
+		if (!sourceActor) throw Helpers.custom_error(`transferItems | Could not determine the source actor, please provide a valid source`);
+		const sourceUuid = Utilities.getUuid(sourceActor);
 
 		const sourceActorItems = PileUtilities.getActorItems(source, { getItemCurrencies: true });
 
@@ -1349,14 +1350,31 @@ class API {
 			}
 
 			return {
-				_id: item._id,
+				id: item._id,
 				quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(itemData), 0),
 				flags: foundry.utils.getProperty(itemData, "flags")
 			}
 		});
 
-		const targetUuid = Utilities.getUuid(target);
-		if (!targetUuid) throw Helpers.custom_error(`transferItems | Could not determine the UUID, please provide a valid target`)
+		const targetActor = Utilities.getActor(target);
+		if (!targetActor) throw Helpers.custom_error(`transferItems | Could not determine the target, please provide a valid target`);
+		const targetUuid = Utilities.getUuid(targetActor);
+
+		if(PileUtilities.isItemPileVault(targetActor)) {
+			const itemsToFit = items.reduce((acc, data) => {
+				const item = sourceActor.items.get(data.id);
+				if(PileUtilities.canItemStack(item, targetActor)){
+					acc.push(item);
+				}else{
+					for(let i = 0; i < data.quantity; i++) {
+						acc.push(item);
+					}
+				}
+				return acc;
+			}, [])
+			const canItemsFit = PileUtilities.fitItemsIntoVault(itemsToFit, targetActor);
+			if(!canItemsFit) throw Helpers.custom_error(`transferItems | The target vault actor cannot fit these items`, true);
+		}
 
 		if (interactionId) {
 			if (typeof interactionId !== "string") throw Helpers.custom_error(`transferItems | interactionId must be of type string`);
@@ -1386,11 +1404,13 @@ class API {
 		interactionId = false
 	} = {}) {
 
-		const sourceUuid = Utilities.getUuid(source);
-		if (!sourceUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid source`)
+		const sourceActor = Utilities.getActor(source);
+		if (!sourceActor) throw Helpers.custom_error(`transferAllItems | Could not determine the source actor, please provide a valid source`)
+		const sourceUuid = Utilities.getUuid(sourceActor);
 
-		const targetUuid = Utilities.getUuid(target);
-		if (!targetUuid) throw Helpers.custom_error(`transferAllItems | Could not determine the UUID, please provide a valid target`)
+		const targetActor = Utilities.getActor(target);
+		if (!targetActor) throw Helpers.custom_error(`transferAllItems | Could not determine the target actor, please provide a valid target`)
+		const targetUuid = Utilities.getUuid(targetActor);
 
 		if (itemFilters) {
 			if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`transferAllItems | itemFilters must be of type array`);
@@ -1402,6 +1422,12 @@ class API {
 
 		if (interactionId) {
 			if (typeof interactionId !== "string") throw Helpers.custom_error(`transferAllItems | interactionId must be of type string`);
+		}
+
+		if(PileUtilities.isItemPileVault(targetActor)) {
+			const sourceActorItems = PileUtilities.getActorItems(source, { getItemCurrencies: true });
+			const canItemsFit = PileUtilities.fitItemsIntoVault(sourceActorItems, targetActor, { itemFilters });
+			if(!canItemsFit) throw Helpers.custom_error(`transferItems | The target vault actor cannot fit these items`, true);
 		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, {
@@ -1424,8 +1450,6 @@ class API {
 
 		const targetUuid = Utilities.getUuid(target);
 		if (!targetUuid) throw Helpers.custom_error(`setAttributes | Could not determine the UUID, please provide a valid target`);
-
-		const targetActor = Utilities.getActor(target);
 
 		Object.entries(attributes).forEach(entry => {
 			const [attribute, quantity] = entry;
@@ -1460,8 +1484,6 @@ class API {
 
 		const targetUuid = Utilities.getUuid(target);
 		if (!targetUuid) throw Helpers.custom_error(`addAttributes | Could not determine the UUID, please provide a valid target`);
-
-		const targetActor = Utilities.getActor(target);
 
 		Object.entries(attributes).forEach(entry => {
 			const [attribute, quantity] = entry;
@@ -1633,11 +1655,13 @@ class API {
 		interactionId = false
 	} = {}) {
 
-		const sourceUuid = Utilities.getUuid(source);
-		if (!sourceUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid source`);
+		const sourceActor = Utilities.getActor(source);
+		if (!sourceActor) throw Helpers.custom_error(`transferEverything | Could not determine the source actor, please provide a valid source`);
+		const sourceUuid = Utilities.getUuid(sourceActor);
 
-		const targetUuid = Utilities.getUuid(target);
-		if (!targetUuid) throw Helpers.custom_error(`transferEverything | Could not determine the UUID, please provide a valid target`);
+		const targetActor = Utilities.getActor(target);
+		if (!targetActor) throw Helpers.custom_error(`transferEverything | Could not determine the target actor, please provide a valid target`);
+		const targetUuid = Utilities.getUuid(targetActor);
 
 		if (itemFilters) {
 			if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`transferEverything | itemFilters must be of type array`);
@@ -1645,6 +1669,12 @@ class API {
 				if (typeof entry?.path !== "string") throw Helpers.custom_error(`transferEverything | each entry in the itemFilters must have a "path" property that is of type string`);
 				if (typeof entry?.filter !== "string") throw Helpers.custom_error(`transferEverything | each entry in the itemFilters must have a "filter" property that is of type string`);
 			})
+		}
+
+		if(PileUtilities.isItemPileVault(targetActor)) {
+			const sourceActorItems = PileUtilities.getActorItems(source, { getItemCurrencies: true });
+			const canItemsFit = PileUtilities.fitItemsIntoVault(sourceActorItems, targetActor, { itemFilters });
+			if(!canItemsFit) throw Helpers.custom_error(`transferEverything | The target vault actor cannot fit these items`, true);
 		}
 
 		if (interactionId) {
@@ -2299,7 +2329,7 @@ class API {
 			throw Helpers.custom_error(`tradeItems | Could not determine the UUID of the buyer, please provide a valid actor or token`, true);
 		}
 
-		const itemsToSell = items.map(data => {
+		let itemsToSell = items.map(data => {
 
 			data = foundry.utils.mergeObject({
 				item: "", quantity: 1, paymentIndex: 0
@@ -2341,6 +2371,22 @@ class API {
 			};
 
 		});
+
+		if(PileUtilities.isItemPileVault(buyerActor)) {
+			const items = itemsToSell.reduce((acc, data) => {
+				const item = sellerActor.items.get(data.id);
+				if(PileUtilities.canItemStack(item, buyerActor)){
+					acc.push(item);
+				}else{
+					for(let i = 0; i < data.quantity; i++) {
+						acc.push(item);
+					}
+				}
+				return acc;
+			}, []);
+			const canItemsFit = PileUtilities.fitItemsIntoVault(items, buyerActor);
+			if(!canItemsFit) throw Helpers.custom_error(`tradeItems | The vault buyer actor cannot fit these items`, true);
+		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEMS, sellerUuid, buyerUuid, itemsToSell, game.user.id, { interactionId });
 

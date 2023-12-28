@@ -9,13 +9,12 @@ import * as CompendiumUtilities from "./compendium-utilities.js";
 
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
-	const defaultFlags = foundry.utils.duplicate(defaults);
-	const flags = existing || (getProperty(inDocument, flag) ?? {});
-	let data = { ...flags };
+	const defaultFlags = foundry.utils.deepClone(defaults);
+	let flags = foundry.utils.deepClone(existing || (getProperty(inDocument, flag) ?? {}));
 	if (flag === CONSTANTS.FLAGS.PILE) {
-		data = migrateFlagData(inDocument, data);
+		flags = migrateFlagData(inDocument, flags);
 	}
-	return foundry.utils.mergeObject(defaultFlags, data);
+	return foundry.utils.mergeObject(defaultFlags, flags);
 }
 
 export function migrateFlagData(document, data = false) {
@@ -38,6 +37,17 @@ export function migrateFlagData(document, data = false) {
 
 }
 
+export function areItemsColliding(itemA, itemB){
+	const itemAFlags = getItemFlagData(itemA);
+	const itemBFlags = getItemFlagData(itemB);
+	return (
+		itemAFlags.x + (itemAFlags.width - 1) >= itemBFlags.x &&
+		itemAFlags.y + (itemAFlags.height - 1) >= itemBFlags.y &&
+		itemAFlags.x <= itemBFlags.x + (itemBFlags.width - 1) &&
+		itemAFlags.y <= itemBFlags.y + (itemBFlags.height - 1)
+	);
+}
+
 export function canItemStack(item, targetActor) {
 	const itemData = item instanceof Item ? item.toObject() : item;
 	const itemFlagData = getItemFlagData(itemData);
@@ -54,9 +64,7 @@ export function canItemStack(item, targetActor) {
 		return actorFlagData.canStackItems === "always";
 	}
 	return {
-		"default": actorFlagData.canStackItems === "yes",
-		"yes": true,
-		"no": false
+		"default": actorFlagData.canStackItems === "yes", "yes": true, "no": false
 	}[itemFlagData?.canStack ?? "default"];
 }
 
@@ -1517,9 +1525,7 @@ export function getVaultGridData(vaultActor, flagData = false) {
 	let enabledRows = vaultFlags.rows;
 
 	const allItems = vaultItems.map(item => ({
-		item,
-		itemFlagData: getItemFlagData(item),
-		quantity: Utilities.getItemQuantity(item)
+		item, itemFlagData: getItemFlagData(item), quantity: Utilities.getItemQuantity(item)
 	}))
 
 	if (vaultFlags.vaultExpansion) {
@@ -1586,34 +1592,40 @@ export function getVaultGridData(vaultActor, flagData = false) {
 
 }
 
-export function canItemFitInVault(item, vaultActor, position = null) {
+export function canItemFitInVault(item, vaultActor, { position = null, items = null }={}) {
 	if (!isItemPileVault(vaultActor)) return true;
-	if (Utilities.findSimilarItem(vaultActor.items, item) && canItemStack(item, vaultActor)) {
-		return true;
+	items ??= vaultActor.items;
+	const similarItem = Utilities.findSimilarItem(items, item);
+	if (similarItem && canItemStack(item, vaultActor)) {
+		const itemFlagData = getItemFlagData(similarItem);
+		if (!position || areItemsColliding(position, itemFlagData)) {
+			return {
+				x: itemFlagData.x,
+				y: itemFlagData.y,
+				flipped: itemFlagData.flipped
+			}
+		}
 	}
 	const gridData = getVaultGridData(vaultActor);
-	return getNewItemsVaultPosition(item, gridData, position);
+	return getNewItemsVaultPosition(item, gridData, { position, items });
 }
 
-export function fitItemsIntoVault(items, vaultActor) {
-	if (!isItemPileVault(vaultActor)) return true;
-	const vaultItems = Array.from(vaultActor.items);
+export function fitItemsIntoVault(items, vaultActor, { itemFilters = false }={}) {
+	if (!isItemPileVault(vaultActor)) return items;
+	const vaultItems = getActorItems(vaultActor, { itemFilters });
 	const gridData = getVaultGridData(vaultActor);
 	const newItemData = [];
 	for (const item of items) {
-		const itemData = item instanceof Item ? item.toObject() : item;
-		const newPosition = canItemFitInVault(itemData, vaultActor);
-		if (typeof newPosition === "boolean") {
-			if (!newPosition) return false;
-			newItemData.push(itemData);
-			continue;
-		}
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", newPosition.x);
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", newPosition.y);
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".flipped", newPosition.flipped);
+		const itemData = foundry.utils.deepClone(item instanceof Item ? item.toObject() : item);
+		const flagData = getItemFlagData(itemData);
+		const newPosition = canItemFitInVault(itemData, vaultActor, { items: vaultItems });
+		if (!newPosition) return false;
+		setProperty(flagData, "x", newPosition.x);
+		setProperty(flagData, "y", newPosition.y);
+		setProperty(flagData, "flipped", newPosition.flipped);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
 		newItemData.push(itemData);
 		vaultItems.push(itemData);
-		const flagData = getItemFlagData(itemData);
 		for (let width = 0; width < flagData.width; width++) {
 			const x = Math.max(0, Math.min(flagData.x + width, gridData.enabledCols - 1));
 			for (let height = 0; height < flagData.height; height++) {
@@ -1629,27 +1641,39 @@ export function fitItemsIntoVault(items, vaultActor) {
 	return newItemData;
 }
 
-export function getVaultItemDimensions(item, itemFlagData = false){
-	let { width, height, flipped } = itemFlagData || getItemFlagData(item);
+export function getVaultItemDimensions(item, itemFlagData = false) {
+	let { width, height, flipped } = getItemFlagData(item, itemFlagData);
 	return {
-		width: flipped ? height : width,
-		height: flipped ? width : height
+		width: flipped ? height : width, height: flipped ? width : height
 	}
 }
 
-export function getNewItemsVaultPosition(item, gridData, position = null) {
+export function getNewItemsVaultPosition(item, gridData, { position = null }={}) {
 
 	const itemFlagData = getItemFlagData(item);
 	let flipped = position?.flipped ?? false;
 	const { grid, freeCells, enabledCols, enabledRows } = gridData;
+
+	if (position) {
+		let fitsInPosition = true;
+		const { width, height } = getVaultItemDimensions(item, { ...itemFlagData, flipped });
+		for (let w = 0; w < width; w++) {
+			for (let h = 0; h < height; h++) {
+				fitsInPosition = !grid[position.x + w][position.y + h];
+				if (!fitsInPosition) break;
+			}
+			if (!fitsInPosition) break;
+		}
+		if (fitsInPosition) return position;
+	}
+
 	const loops = Number(itemFlagData.width > 1 || itemFlagData.height > 1);
 	for (let i = 0; i <= loops; i++) {
 
 		const { width, height } = getVaultItemDimensions(item, { ...itemFlagData, flipped });
 
 		const validCells = freeCells.filter(cell => {
-			return ((cell.x + width) <= enabledCols)
-				&& ((cell.y + height) <= enabledRows);
+			return ((cell.x + width) <= enabledCols) && ((cell.y + height) <= enabledRows);
 		});
 
 		if (width === 1 && height === 1 && validCells.length) {

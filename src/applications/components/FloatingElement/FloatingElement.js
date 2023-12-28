@@ -8,7 +8,7 @@ export class FloatingElement {
 	static positionStore = writable(false);
 	static styleStore = writable({});
 
-	static create({ id, x, y, zIndex = Number.MAX_SAFE_INTEGER - 100, style = {}, component, componentData } = {}) {
+	static create({ id, x, y, zIndex = Number.MAX_SAFE_INTEGER - 100, style = {}, context = {}, component, componentData } = {}) {
 
 		if (this.element) return this.element;
 
@@ -23,7 +23,8 @@ export class FloatingElement {
 				style: this.styleStore,
 				zIndex,
 				component,
-				componentData
+				componentData,
+				context
 			}
 		});
 

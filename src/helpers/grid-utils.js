@@ -1,4 +1,4 @@
-import { clamp } from "../../../helpers/helpers";
+import { clamp } from "./helpers.js";
 import { get } from "svelte/store";
 
 export function isItemColliding(item, otherItem) {
@@ -58,11 +58,48 @@ export function calcPosition(transform, options) {
 	};
 }
 
+export function swapItemTransform(originalTransform, finalTransform, transform) {
+
+	const shouldFlip = originalTransform.flipped !== finalTransform.flipped;
+	const delta = {
+		x: transform.x - finalTransform.x,
+		y: transform.y - finalTransform.y,
+	}
+	if (shouldFlip) {
+
+		if (!originalTransform.flipped && finalTransform.flipped) {
+			delta.x -= finalTransform.w;
+			delta.x += transform.w;
+			const { x, y } = delta;
+			delta.x = y;
+			delta.y = x * -1;
+		} else if(originalTransform.flipped && !finalTransform.flipped) {
+			delta.y -= finalTransform.h;
+			delta.y += transform.h;
+			const { x, y } = delta;
+			delta.x = y * -1;
+			delta.y = x;
+		}
+
+		const { w, h } = transform;
+		transform.w = shouldFlip ? h : w;
+		transform.h = shouldFlip ? w : h;
+		transform.flipped = shouldFlip ? !transform.flipped : transform.flipped;
+
+	}
+
+	transform.x = originalTransform.x + delta.x;
+	transform.y = originalTransform.y + delta.y;
+
+	return transform;
+
+}
+
 export function isPlacementValid(item, collisions, items, options) {
 	if (!collisions.length) return true;
 
-	const finalTransform = get(item.transform);
-	const origItemTransform = get(item.item.transform);
+	const finalTransform = foundry.utils.deepClone(get(item.transform));
+	const origItemTransform = foundry.utils.deepClone(get(item.item.transform));
 
 	const newItemPlacement = {
 		id: item.id,
@@ -77,20 +114,10 @@ export function isPlacementValid(item, collisions, items, options) {
 	if (!itemWithinBounds) return false;
 
 	const assumedCollisionMovement = collisions.map(collision => {
-
-		const collisionTransform = get(collision.transform);
-
-		if(finalTransform.w !== collisionTransform.w || finalTransform.h !== collisionTransform.h){
-			return false;
-		}
-
+		const collisionTransform = foundry.utils.deepClone(get(collision.transform));
 		return {
 			id: collision.id,
-			transform: {
-				...collisionTransform,
-				x: origItemTransform.x,
-				y: origItemTransform.y,
-			}
+			transform: swapItemTransform(origItemTransform, finalTransform, collisionTransform)
 		};
 	});
 

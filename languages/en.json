@@ -450,6 +450,8 @@
         "GridSizeExplanation": "This configures how many grid spaces this item takes up.",
         "VaultImage": "Vault Image",
         "VaultImageExplanation": "This overrides the item's image when displayed in a vault.",
+        "VaultImageRotated": "Rotated Vault Image",
+        "VaultImageRotatedExplanation": "This overrides the item's image when displayed in a vault while it is rotated.",
         "GridWidth": "Width",
         "GridHeight": "Height",
         "VaultExpander": "Vault Expander",
