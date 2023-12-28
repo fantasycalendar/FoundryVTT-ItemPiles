@@ -170,7 +170,7 @@
 			}, collisions, items, options);
 			for (const otherItem of items) {
 				if (otherItem.id === item.id) continue;
-				const isActive = collisions.indexOf(otherItem) > -1 && validPlacement;
+				const isActive = collisions.indexOf(otherItem) > -1;
 				otherItem.active.set(isActive);
 				if (isActive) {
 					otherItem.ghostTransform.update(() => {

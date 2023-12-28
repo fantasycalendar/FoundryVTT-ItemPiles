@@ -134,7 +134,7 @@ export class VaultStore extends ItemPileStore {
 			});
 
 			return {
-				...PileUtilities.getVaultGridData(this.actor, pileData), ...access,
+				...PileUtilities.getVaultGridData(this.actor, { flagData: pileData }), ...access,
 				canEditCurrencies: game.user.isGM,
 				fullAccess: game.user.isGM || Object.values(access).every(Boolean),
 				gridSize: 40,
@@ -387,6 +387,31 @@ export class VaultStore extends ItemPileStore {
 
 	}
 
+	async sortItemsOnGrid() {
+
+		const gridItems = get(this.gridItems).map(item => item.item).sort((a, b) => {
+			return b.size - a.size;
+		}).map(item => item.item);
+
+		const result = PileUtilities.fitItemsIntoVault(gridItems, this.actor, { existingItems: [], mergeItems: false });
+
+		if(!result) {
+			return Helpers.custom_warning("Failed to sort items")
+		}
+
+		const { updates, deletions } = result;
+
+		const itemUpdates = updates.map(item => ({
+			_id: item._id,
+			[game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE]: Utilities.getItemQuantity(item),
+			[CONSTANTS.FLAGS.ITEM]: PileUtilities.cleanItemFlagData(PileUtilities.getItemFlagData(item))
+		}))
+
+		await this.actor.updateEmbeddedDocuments("Item", itemUpdates);
+		await this.actor.deleteEmbeddedDocuments("Item", deletions);
+
+	}
+
 }
 
 export class VaultItem extends PileItem {
@@ -405,6 +430,7 @@ export class VaultItem extends PileItem {
 		this.w = 1;
 		this.h = 1;
 		this.flipped = false;
+		this.size = 1;
 		this.style = writable({});
 	}
 
@@ -431,6 +457,7 @@ export class VaultItem extends PileItem {
 			this.transform.set({
 				x: data.x, y: data.y, w: width, h: height, flipped: data.flipped ?? false
 			});
+			this.size = width * height;
 		});
 		this.subscribeTo(this.transform, (transform) => {
 			if (setup) {

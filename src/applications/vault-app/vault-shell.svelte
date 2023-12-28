@@ -415,6 +415,10 @@
 
 			<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
 
+				<div>
+					<button type="button" class="item-piles-small-button" on:click={() => store.sortItemsOnGrid()}>Sort Items</button>
+				</div>
+
 				<CurrencyList {currencies}
 				              options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
 				              style="align-items: center;">
