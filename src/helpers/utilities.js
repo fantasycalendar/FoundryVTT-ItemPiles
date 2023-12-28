@@ -1,9 +1,7 @@
 import * as Helpers from "./helpers.js";
 import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
-import { areItemsColliding, getItemFlagData } from "./pile-utilities.js";
 import { deletedActorCache } from "./caches.js";
-import { isItemColliding } from "./grid-utils.js";
 
 export function getActor(target) {
 	if (target instanceof Actor) return target;

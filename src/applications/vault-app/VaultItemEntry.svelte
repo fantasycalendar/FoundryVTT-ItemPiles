@@ -2,7 +2,7 @@
 
 	import * as Helpers from "../../helpers/helpers.js";
 	import { getContext } from "svelte";
-	import { coordinate2size } from "../../helpers/grid-utils.js";
+	import { coordinate2size } from "../components/Grid/grid-utils.js";
 
 	export let entry;
 

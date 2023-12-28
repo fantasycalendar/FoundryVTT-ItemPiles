@@ -3,7 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { styleFromObject } from '../../../helpers/helpers';
-	import { calcPosition } from '../../../helpers/grid-utils.js';
+	import { calcPosition } from './grid-utils.js';
 	import GridItem from './GridItem.svelte';
 
 	export let gridContainer = HTMLDivElement;

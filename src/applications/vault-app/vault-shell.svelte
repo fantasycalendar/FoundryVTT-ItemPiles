@@ -13,7 +13,7 @@
 	import DropZone from '../components/DropZone.svelte';
 	import VaultItemEntry from './VaultItemEntry.svelte';
 
-	import { coordinate2size, snapOnMove } from '../../helpers/grid-utils.js';
+	import { coordinate2size, snapOnMove } from '../components/Grid/grid-utils.js';
 	import * as Helpers from "../../helpers/helpers.js";
 	import { isCoordinateWithinPosition } from "../../helpers/helpers.js";
 

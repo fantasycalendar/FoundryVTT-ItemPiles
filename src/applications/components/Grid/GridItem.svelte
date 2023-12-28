@@ -1,7 +1,7 @@
 <script>
 
 	import { createEventDispatcher } from 'svelte';
-	import { get, writable } from 'svelte/store';
+	import { get } from 'svelte/store';
 	import { styleFromObject } from '../../../helpers/helpers.js';
 	import {
 		calcPosition,
@@ -10,7 +10,7 @@
 		isPlacementValid,
 		snapOnMove,
 		swapItemTransform
-	} from '../../../helpers/grid-utils.js';
+	} from './grid-utils.js';
 
 	export let item;
 	export let options;
@@ -21,8 +21,10 @@
 
 	let itemRef = HTMLElement;
 	const transformStore = item.transform;
-	const previewTransform = writable({});
+	const previewTransform = item.ghostTransform;
+	const activeStore = item.active;
 
+	$: active = $activeStore;
 	$: transform = $transformStore;
 	$: gridTransform = calcPosition($transformStore, options);
 	$: ghostGridTransform = calcPosition({
@@ -58,7 +60,6 @@
 		"z-index": "5"
 	});
 
-	let active = false;
 	let splitting = false;
 	let validPlacement = false;
 	let collisions = [];
@@ -132,8 +133,6 @@
 
 		const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
 
-		active = true;
-
 		let outOfBounds = false;
 
 		previewTransform.update(data => {
@@ -147,7 +146,7 @@
 				unsnappedData.height
 			);
 
-			active = !outOfBounds;
+			activeStore.set(!outOfBounds);
 
 			dispatch("itemmove", {
 				x: pageX - pointerOffset.internalLeft,
@@ -162,15 +161,26 @@
 			};
 		});
 
+		collisions = getCollisions({ id: item.id, transform: previewTransform }, items);
 		if (!splitting) {
-			collisions = getCollisions({ id: item.id, transform: previewTransform }, items);
 			validPlacement = !outOfBounds && isPlacementValid({
 				id: item.id,
 				item: item,
 				transform: previewTransform
 			}, collisions, items, options);
+			for (const otherItem of items) {
+				if (otherItem.id === item.id) continue;
+				const isActive = collisions.indexOf(otherItem) > -1 && validPlacement;
+				otherItem.active.set(isActive);
+				if (isActive) {
+					otherItem.ghostTransform.update(() => {
+						return calcPosition(swapItemTransform(transform, get(previewTransform), get(otherItem.transform)), options);
+					});
+				}
+			}
+		} else {
+			activeStore.set(!collisions.length);
 		}
-
 	}
 
 	function constrainToContainer(left, top, width, height) {
@@ -219,7 +229,7 @@
 
 		if (event.button === 2) {
 			dispatch("itemstopdrag", { cancelled: true });
-			active = false;
+			activeStore.set(false);
 		} else {
 			dispatch("itemstopdrag", {
 				item,
@@ -233,7 +243,10 @@
 		}
 
 		if (!active) return;
-		active = false;
+
+		for (const otherItem of items) {
+			otherItem.active.set(false);
+		}
 
 		if (splitting) {
 			splitting = false;

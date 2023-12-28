@@ -243,7 +243,12 @@ export class VaultStore extends ItemPileStore {
 				if (item) {
 					allItems.splice(allItems.indexOf(item), 1);
 					existingItems.push({
-						id: item.id, transform: item.transform, highlight: search && highlightedItems.includes(item.id), item,
+						id: item.id,
+						active: item.active,
+						transform: item.transform,
+						ghostTransform: item.ghostTransform,
+						highlight: search && highlightedItems.includes(item.id),
+						item,
 					});
 				}
 				return item?.id ?? null;
@@ -285,7 +290,12 @@ export class VaultStore extends ItemPileStore {
 					return trans;
 				});
 				return {
-					id: item.id, transform: item.transform, highlight: search && highlightedItems.includes(item.id), item
+					id: item.id,
+					active: item.active,
+					transform: item.transform,
+					ghostTransform: item.ghostTransform,
+					highlight: search && highlightedItems.includes(item.id),
+					item
 				};
 			})
 			.filter(Boolean)
@@ -386,6 +396,10 @@ export class VaultItem extends PileItem {
 		this.transform = writable({
 			x: 0, y: 0, w: 1, h: 1, flipped: false
 		});
+		this.ghostTransform = writable({
+			x: 0, y: 0, w: 1, h: 1, flipped: false
+		});
+		this.active = writable(false);
 		this.x = 0;
 		this.y = 0;
 		this.w = 1;
