@@ -1843,11 +1843,11 @@ export async function rollTable({
 	if (game.modules.get("better-rolltables")?.active) {
 		results = (await game.betterTables.roll(table)).itemsData.map(result => {
 			return {
-				documentCollection: result.compendiumName || result.documentName,
-				documentId: result.item.id,
-				text: result.item.text || result.item.name,
-				img: result.item.img,
-				quantity: result.quantity
+				documentCollection: result.documentCollection,
+				documentId: result.documentId,
+				text: result.text || result.name,
+				img: result.img,
+				quantity: 1
 			}
 		})
 	} else {
