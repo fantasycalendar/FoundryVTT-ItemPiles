@@ -778,6 +778,47 @@ export function getPriceArray(totalCost, currencies) {
 	});
 }
 
+export function getCurrenciesAbbreviations() {
+	// Retrieve all the primary abbreviations for the check
+	let primaryAbbreviationsArray = game.itempiles.API.CURRENCIES
+	.filter(currency => currency.abbreviation)
+	.map(currency => {
+		return currency.abbreviation?.replace("{#}", "");
+	});
+	let secondaryAbbreviationsArray = game.itempiles.API.SECONDARY_CURRENCIES
+	.filter(currency => currency.abbreviation)
+	.map(currency => {
+		return currency.abbreviation?.replace("{#}", "");
+	});
+	let allAbbreviationsArray =  primaryAbbreviationsArray.concat(secondaryAbbreviationsArray);
+	return allAbbreviationsArray;
+}
+
+export function getStringFromCurrencies(currencies) {
+	let allAbbreviationsArray = getCurrenciesAbbreviations();
+
+	let priceString  = currencies
+	.filter(price => price.cost)
+	.map(price => {
+		let cost = price.cost;
+		let abbreviation = price.abbreviation;
+		if(!Helpers.isRealNumber(cost) || !abbreviation) {
+			Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, false);
+			return "";
+		}
+		if(!allAbbreviationsArray.includes(abbreviation?.replace("{#}", ""))) {
+			Helpers.custom_error(`getStringFromCurrencies | The currency abbreviation '${abbreviation?.replace("{#}", "")}' is not registered`, false);
+			return "";
+		}
+		if (price.percent && abbreviation.includes("%")) {
+			abbreviation = abbreviation.replaceAll("%", "")
+		}
+		return abbreviation.replace("{#}", price.cost)
+	}).join(" ");
+	
+	return priceString ? priceString.trim() : "";
+}
+
 export function getPriceFromString(str, currencyList = false) {
 
 	if (!currencyList) {

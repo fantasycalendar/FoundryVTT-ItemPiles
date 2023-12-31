@@ -1658,6 +1658,54 @@ class API {
 	}
 
 	/**
+	 * Return all th registered currencies abbreviations
+	 * @returns {Array<string>}                                 An array of string containing the abbreviation for each currency registered
+	 */
+	static getCurrenciesAbbreviations() {
+		return PileUtilities.getCurrenciesAbbreviations();
+	}
+
+	/**
+	 * Turns an array containing the data and quantities for each currency into a string of currencies
+	 *
+	 * @param {Array<object>} currencies                      An array of object containing the data and quantity for each currency
+|    * @param {number} currencies[].cost                      The cost of the currency
+|    * @param {string} currencies[].denom                     The abbreviation of the currency, which are usually {#}GP, which when {#} is replaced with the number it becomes 5GP.  
+	 * @param {string} currencies[].percent                   The cost of  the currency is in percentage (for work the 'abbreviation' property must includes '%' substring)
+	 * @returns {string}                                      An array of object containing the data and quantity for each currency
+	 */
+	static getStringFromCurrencies(currencies) {
+		if (!currencies) {
+			throw Helpers.custom_error(`getStringFromCurrencies | currencies must be defined`, true);
+		}
+		if (typeof currencies === "string") {
+			throw Helpers.custom_error(`getStringFromCurrencies | currencies can't be of type string`, true);
+		}
+		if (!Array.isArray(currencies)) {
+			throw Helpers.custom_error(`getStringFromCurrencies | currencies must be of type array`, true);
+		}
+		if (currencies.length === 0) {
+			throw Helpers.custom_error(`getStringFromCurrencies | currencies must be a not empty array`, true);
+		}
+		currencies.forEach(currency => {
+			if (typeof currency !== "object") {
+				throw Helpers.custom_error("setCurrencies | each entry in inCurrencies must be of type object");
+			}
+			if (typeof currency.cost !== "number") {
+				throw Helpers.custom_error("getStringFromCurrencies | currency.cost must be of type number");
+			}
+			// Is optional
+			// if (typeof currency.percent !== "boolean") {
+			// 	throw Helpers.custom_error("getStringFromCurrencies | currency.percent must be of type boolean");
+			// }
+			if (typeof currency.abbreviation !== "string") {
+				throw Helpers.custom_error("getStringFromCurrencies | currency.abbreviation must be of type string");
+			}
+		});
+		return PileUtilities.getStringFromCurrencies(currencies);
+	}
+
+	/**
 	 * Turns a string of currencies into an array containing the data and quantities for each currency
 	 *
 	 * @param {string} currencies                               A string of currencies to convert (eg, "5gp 25sp")
