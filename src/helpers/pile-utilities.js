@@ -778,34 +778,45 @@ export function getPriceArray(totalCost, currencies) {
 	});
 }
 
+export function getCurrenciesAbbreviations() {
+	// Retrieve all the primary abbreviations for the check
+	let primaryAbbreviationsArray = game.itempiles.API.CURRENCIES
+	.filter(currency => currency.abbreviation)
+	.map(currency => {
+		return currency.abbreviation?.replace("{#}", "");
+	});
+	let secondaryAbbreviationsArray = game.itempiles.API.SECONDARY_CURRENCIES
+	.filter(currency => currency.abbreviation)
+	.map(currency => {
+		return currency.abbreviation?.replace("{#}", "");
+	});
+	let allAbbreviationsArray =  primaryAbbreviationsArray.concat(secondaryAbbreviationsArray);
+	return allAbbreviationsArray;
+}
+
 export function getStringFromCurrencies(currencies) {
-	let priceString = "";
-	if (!currencies) {
-		throw Helpers.custom_error(`getStringFromCurrencies | currencies must be defined`, true);
-	}
-	if (typeof currencies === "string") {
-		throw Helpers.custom_error(`getStringFromCurrencies | currencies can't be of type string`, true);
-	}
-	if (!Array.isArray(currencies)) {
-        throw Helpers.custom_error(`getStringFromCurrencies | currencies must be of type array`, true);
-    }
-	if (currencies.length === 0) {
-		throw Helpers.custom_error(`getStringFromCurrencies | currencies must be a not empty array`, true);
-	}
-	for(const currency of currencies){
-		if (typeof currency !== "object") {
-			throw Helpers.custom_error(`getStringFromCurrencies | currency element must be of type object ${currency}`, true);
+	let allAbbreviationsArray = getCurrenciesAbbreviations();
+
+	let priceString  = currencies
+	.filter(price => price.cost)
+	.map(price => {
+		let cost = price.cost;
+		let abbreviation = price.abbreviation;
+		if(!Helpers.isRealNumber(cost) || !abbreviation) {
+			Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, false);
+			return "";
 		}
-		const value = currency.value;
-		const denom = currency.denom;
-		if(Helpers.isRealNumber(value) && denom?.length > 0) {
-			priceString = priceString + value + "" + denom + " "
-		} else {
-			Helpers.custom_warning(`getStringFromCurrencies | The currency element is not valid with value '${value}' and denomination '${denom}'`, false);
+		if(!allAbbreviationsArray.includes(abbreviation?.replace("{#}", ""))) {
+			Helpers.custom_error(`getStringFromCurrencies | The currency abbreviation '${abbreviation?.replace("{#}", "")}' is not registered`, false);
+			return "";
 		}
-	}
-	priceString = priceString.trim();
-	return priceString;
+		if (price.percent && abbreviation.includes("%")) {
+			abbreviation = abbreviation.replaceAll("%", "")
+		}
+		return abbreviation.replace("{#}", price.cost)
+	}).join(" ");
+	
+	return priceString ? priceString.trim() : "";
 }
 
 export function getPriceFromString(str, currencyList = false) {

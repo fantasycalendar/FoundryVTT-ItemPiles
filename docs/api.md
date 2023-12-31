@@ -65,6 +65,7 @@
   * [removeCurrencies](#removeCurrencies)
   * [transferCurrencies](#transferCurrencies)
   * [transferAllCurrencies](#transferAllCurrencies)
+  * [getCurrenciesAbbreviations](#getCurrenciesAbbreviations)
   * [getStringFromCurrencies](#getStringFromcurrencies)
   * [getCurrenciesFromString](#getCurrenciesFromString)
   * [calculateCurrencies](#calculateCurrencies)
@@ -929,21 +930,34 @@ Transfers all currencies between the source and the target.
 
 ---
 
-### getStringFromCurrencies
+### getCurrenciesAbbreviations
 
-`game.itempiles.API.getStringFromCurrencies(currencies)` ⇒ `object`
+`game.itempiles.API.getCurrenciesAbbreviations()` ⇒ `Array.<string>`
 
 Turns an array containing the data and quantities for each currency into a string of currencies
 
-**NOTE:** This is a utility method for use the other currencies api methods based on a string input.
+**NOTE:** This is just a utility method for module intercompatibility to use the other currencies api methods based on a string input.
+
+**Returns**: `Array.<string>` - An array of string containing the abbreviation for each currency registered (eg, ["GP","SP"])
+
+---
+
+### getStringFromCurrencies
+
+`game.itempiles.API.getStringFromCurrencies(currencies)` ⇒ `string`
+
+Turns an array containing the data and quantities for each currency into a string of currencies
+
+**NOTE:** This is just a utility method for module intercompatibility to use the other currencies api methods based on a string input.
 
 **Returns**: `string` - A string of currencies to add (eg, "5gp 25sp")
 
-| Param              | Type     | Default | Description                                    |
-|--------------------|----------|---------|------------------------------------------------|
-| currencies         | `Array`  |         | An array of object containing the data and quantity for each currency |
-| currencies[].value | `number` |         | The quantity of the currency         |
-| currencies[].denom | `string` |         | The denomination of the currency     |
+| Param                     | Type     | Default | Description                                    |
+|---------------------------|----------|---------|------------------------------------------------|
+| currencies                | `Array`  |         | An array of object containing the data and quantity for each currency |
+| currencies[].cost         | `number` |         | The quantity of the currency         |
+| currencies[].abbreviation | `string` |         | The abbreviation of the currency, which are usually {#}GP, which when {#} is replaced with the number it becomes 5GP.     |
+| currencies[].percent      | `boolean`|         | The cost of the currency is in percentage (NOTE: for work the 'abbreviation' property must includes '%' substring)  |
 
 ---
 
