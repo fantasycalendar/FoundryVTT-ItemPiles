@@ -65,7 +65,7 @@
   * [removeCurrencies](#removeCurrencies)
   * [transferCurrencies](#transferCurrencies)
   * [transferAllCurrencies](#transferAllCurrencies)
-  * [getStringFromCurrencies](#getstringFromcurrencies)
+  * [getStringFromCurrencies](#getStringFromcurrencies)
   * [getCurrenciesFromString](#getCurrenciesFromString)
   * [calculateCurrencies](#calculateCurrencies)
   * [getPaymentData](#getPaymentData)
