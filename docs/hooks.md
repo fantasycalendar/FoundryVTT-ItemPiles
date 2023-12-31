@@ -16,6 +16,7 @@
   - [item-piles-openInterface](#item-piles-openInterface)
   - [item-piles-preCloseInterface](#item-piles-preCloseInterface)
   - [item-piles-closeInterface](#item-piles-closeInterface)
+  - [item-piles-closeInterface](#item-piles-renderVaultGridItem)
 
 - [Item Piles](#Item-Piles)
   - [item-piles-preCreateItemPile](#item-piles-preCreateItemPile)
@@ -224,6 +225,17 @@ Called after an item piles related interface is closed.
 | source    | <code>Actor/TokenDocument</code>         | The item pile actor                                               |
 | recipient | <code>Actor/TokenDocument,Boolean</code> | The actor that was involved in opening the interface              |
 | options   | <code>object</code>                      | An object containing options regarding how to close the interface |
+
+### item-piles-renderVaultGridItem
+
+Called when an element in a vault grid is rendered.
+
+**Note:** This is called when the element is rendered, but _also_ when the item document is updated.
+
+| Param   | Type                     | Description                 |
+|---------|--------------------------|-----------------------------|
+| element | <code>HTMLElement</code> | The vault item HTML element |
+| item    | <code>Item</code>        | The vault item document     |
 
 ## Item Piles
 

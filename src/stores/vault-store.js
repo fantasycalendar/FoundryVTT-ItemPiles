@@ -387,17 +387,17 @@ export class VaultStore extends ItemPileStore {
 
 	}
 
-	async sortItemsOnGrid() {
+	async sortItemsOnGrid(event) {
+
+		const mergeItems = event.ctrlKey;
 
 		const gridItems = get(this.gridItems).map(item => item.item).sort((a, b) => {
 			return b.size - a.size;
 		}).map(item => item.item);
 
-		const result = PileUtilities.fitItemsIntoVault(gridItems, this.actor, { existingItems: [], mergeItems: false });
+		const result = PileUtilities.fitItemsIntoVault(gridItems, this.actor, { existingItems: [], mergeItems });
 
-		if(!result) {
-			return Helpers.custom_warning("Failed to sort items")
-		}
+		if (!result) return Helpers.custom_warning("ITEM-PILES.Warnings.CantSortVault", true);
 
 		const { updates, deletions } = result;
 
@@ -457,7 +457,7 @@ export class VaultItem extends PileItem {
 			this.transform.set({
 				x: data.x, y: data.y, w: width, h: height, flipped: data.flipped ?? false
 			});
-			this.size = width * height;
+			this.size = Math.max(width, height);
 		});
 		this.subscribeTo(this.transform, (transform) => {
 			if (setup) {

@@ -58,14 +58,15 @@
 	$: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxSellerItemQuantity);
 	$: itemName = localize($itemNameStore) + ($itemQuantityForPriceStore > 1 ? ` (${$itemQuantityForPriceStore})` : "");
 
-	function submit() {
-		game.itempiles.API.tradeItems(seller, buyer, [{
+	async function submit() {
+		const result = await game.itempiles.API.tradeItems(seller, buyer, [{
 			item: item.item,
 			paymentIndex: get(selectedPriceGroup),
 			quantity: get(quantityToBuy),
 		}], {
 			interactionId: store.interactionId
 		});
+		if(!result) return;
 		application.options.resolve();
 		application.close();
 	}

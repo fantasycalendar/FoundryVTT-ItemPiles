@@ -1237,9 +1237,9 @@ class API {
 
 		});
 
-		if(PileUtilities.isItemPileVault(targetActor)) {
+		if (PileUtilities.isItemPileVault(targetActor)) {
 			const canItemsFit = PileUtilities.fitItemsIntoVault(itemsToAdd, targetActor);
-			if(!canItemsFit) throw Helpers.custom_error(`addItems | The vault actor cannot fit these items`, true);
+			if (!canItemsFit) throw Helpers.custom_error(`addItems | The vault actor ${targetActor.name} cannot fit these items`, true);
 		}
 
 		if (interactionId && typeof interactionId !== "string") throw Helpers.custom_error(`addItems | interactionId must be of type string`);
@@ -1360,20 +1360,20 @@ class API {
 		if (!targetActor) throw Helpers.custom_error(`transferItems | Could not determine the target, please provide a valid target`);
 		const targetUuid = Utilities.getUuid(targetActor);
 
-		if(PileUtilities.isItemPileVault(targetActor)) {
+		if (PileUtilities.isItemPileVault(targetActor)) {
 			const itemsToFit = items.reduce((acc, data) => {
 				const item = sourceActor.items.get(data.id);
-				if(PileUtilities.canItemStack(item, targetActor)){
+				if (PileUtilities.canItemStack(item, targetActor)) {
 					acc.push(item);
-				}else{
-					for(let i = 0; i < data.quantity; i++) {
+				} else {
+					for (let i = 0; i < data.quantity; i++) {
 						acc.push(item);
 					}
 				}
 				return acc;
 			}, [])
 			const canItemsFit = PileUtilities.fitItemsIntoVault(itemsToFit, targetActor);
-			if(!canItemsFit) throw Helpers.custom_error(`transferItems | The target vault actor cannot fit these items`, true);
+			if (!canItemsFit) throw Helpers.custom_error(`transferItems | The target vault actor ${targetActor.name} cannot fit these items`, true);
 		}
 
 		if (interactionId) {
@@ -1424,10 +1424,10 @@ class API {
 			if (typeof interactionId !== "string") throw Helpers.custom_error(`transferAllItems | interactionId must be of type string`);
 		}
 
-		if(PileUtilities.isItemPileVault(targetActor)) {
-			const sourceActorItems = PileUtilities.getActorItems(source, { getItemCurrencies: true });
+		if (PileUtilities.isItemPileVault(targetActor)) {
+			const sourceActorItems = PileUtilities.getActorItems(sourceActor, { getItemCurrencies: true });
 			const canItemsFit = PileUtilities.fitItemsIntoVault(sourceActorItems, targetActor, { itemFilters });
-			if(!canItemsFit) throw Helpers.custom_error(`transferItems | The target vault actor cannot fit these items`, true);
+			if (!canItemsFit) throw Helpers.custom_error(`transferAllItems | The target vault actor ${targetActor.name} cannot fit these items`, true);
 		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_ALL_ITEMS, sourceUuid, targetUuid, game.user.id, {
@@ -1671,10 +1671,10 @@ class API {
 			})
 		}
 
-		if(PileUtilities.isItemPileVault(targetActor)) {
-			const sourceActorItems = PileUtilities.getActorItems(source, { getItemCurrencies: true });
+		if (PileUtilities.isItemPileVault(targetActor)) {
+			const sourceActorItems = PileUtilities.getActorItems(sourceActor, { getItemCurrencies: true });
 			const canItemsFit = PileUtilities.fitItemsIntoVault(sourceActorItems, targetActor, { itemFilters });
-			if(!canItemsFit) throw Helpers.custom_error(`transferEverything | The target vault actor cannot fit these items`, true);
+			if (!canItemsFit) throw Helpers.custom_error(`transferEverything | The target vault actor ${targetActor.name} cannot fit these items`, true);
 		}
 
 		if (interactionId) {
@@ -2372,20 +2372,20 @@ class API {
 
 		});
 
-		if(PileUtilities.isItemPileVault(buyerActor)) {
+		if (PileUtilities.isItemPileVault(buyerActor)) {
 			const items = itemsToSell.reduce((acc, data) => {
 				const item = sellerActor.items.get(data.id);
-				if(PileUtilities.canItemStack(item, buyerActor)){
+				if (PileUtilities.canItemStack(item, buyerActor)) {
 					acc.push(item);
-				}else{
-					for(let i = 0; i < data.quantity; i++) {
+				} else {
+					for (let i = 0; i < data.quantity; i++) {
 						acc.push(item);
 					}
 				}
 				return acc;
 			}, []);
 			const canItemsFit = PileUtilities.fitItemsIntoVault(items, buyerActor);
-			if(!canItemsFit) throw Helpers.custom_error(`tradeItems | The vault buyer actor cannot fit these items`, true);
+			if (!canItemsFit) throw Helpers.custom_error(`tradeItems | The vault buyer actor ${buyerActor.name} cannot fit these items`, true);
 		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEMS, sellerUuid, buyerUuid, itemsToSell, game.user.id, { interactionId });

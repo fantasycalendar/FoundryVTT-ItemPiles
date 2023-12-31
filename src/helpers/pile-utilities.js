@@ -870,16 +870,16 @@ export function getCostOfItem(item, defaultCurrencies = false) {
 }
 
 export function getPriceData({
-	                             cost = false,
-	                             item = false,
-	                             seller = false,
-	                             buyer = false,
-	                             sellerFlagData = false,
-	                             buyerFlagData = false,
-	                             itemFlagData = false,
-	                             quantity = 1,
-	                             secondaryPrices = false
-                             } = {}) {
+	cost = false,
+	item = false,
+	seller = false,
+	buyer = false,
+	sellerFlagData = false,
+	buyerFlagData = false,
+	itemFlagData = false,
+	quantity = 1,
+	secondaryPrices = false
+} = {}) {
 
 	let priceData = [];
 
@@ -1166,12 +1166,12 @@ export function getPriceData({
 }
 
 export function getPaymentData({
-	                               purchaseData = [],
-	                               seller = false,
-	                               buyer = false,
-	                               sellerFlagData = false,
-	                               buyerFlagData = false
-                               } = {}) {
+	purchaseData = [],
+	seller = false,
+	buyer = false,
+	sellerFlagData = false,
+	buyerFlagData = false
+} = {}) {
 
 	buyerFlagData = getActorFlagData(buyer, buyerFlagData);
 	if (!isItemPileMerchant(buyer, buyerFlagData)) {
@@ -1194,21 +1194,21 @@ export function getPaymentData({
 	const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 
 	const paymentData = purchaseData.map(data => {
-		const prices = getPriceData({
-			cost: data.cost,
-			item: data.item,
-			secondaryPrices: data.secondaryPrices,
-			seller,
-			buyer,
-			sellerFlagData,
-			buyerFlagData,
-			itemFlagData: data.itemFlagData,
-			quantity: data.quantity || 1
-		})[data.paymentIndex || 0];
-		return {
-			...prices, item: data.item
-		};
-	})
+			const prices = getPriceData({
+				cost: data.cost,
+				item: data.item,
+				secondaryPrices: data.secondaryPrices,
+				seller,
+				buyer,
+				sellerFlagData,
+				buyerFlagData,
+				itemFlagData: data.itemFlagData,
+				quantity: data.quantity || 1
+			})[data.paymentIndex || 0];
+			return {
+				...prices, item: data.item
+			};
+		})
 		.reduce((priceData, priceGroup) => {
 
 			if (!priceGroup.maxQuantity && (buyer || seller)) {
@@ -1597,8 +1597,12 @@ export function getVaultItemDimensions(item, itemFlagData = false) {
 	}
 }
 
-export function fitItemsIntoVault(items, vaultActor, { mergeItems = true, existingItems = false, itemFilters = false } = {}) {
-	if (!isItemPileVault(vaultActor)) return items;
+export function fitItemsIntoVault(items, vaultActor, {
+	mergeItems = true,
+	existingItems = false,
+	itemFilters = false
+} = {}) {
+	if (!isItemPileVault(vaultActor)) return { updates: items, deletions: [] };
 	const vaultItems = existingItems || getActorItems(vaultActor, { itemFilters });
 	const gridData = getVaultGridData(vaultActor, { items: existingItems });
 	const updates = [];
@@ -1608,12 +1612,12 @@ export function fitItemsIntoVault(items, vaultActor, { mergeItems = true, existi
 		const itemData = foundry.utils.deepClone(item instanceof Item ? item.toObject() : item);
 		const flagData = getItemFlagData(itemData);
 		const newPosition = canItemFitInVault(itemData, vaultActor, { gridData, items: vaultItems, mergeItems });
-		if(typeof newPosition === "string") {
-			deletions.push(newPosition);
-			const update = updates.find(item => item._id === newPosition)
-			Utilities.setItemQuantity(update, Utilities.getItemQuantity(update) + Utilities.getItemQuantity(itemData));
+		if (typeof newPosition === "string") {
+			deletions.push(item._id);
+			const update = updates.find(update => update._id === newPosition);
+			if (update) Utilities.setItemQuantity(update, (Utilities.getItemQuantity(update) ?? 1) + Utilities.getItemQuantity(itemData));
 			continue;
-		}else if (!newPosition){
+		} else if (!newPosition) {
 			return false;
 		}
 		setProperty(flagData, "x", newPosition.x);
@@ -1641,15 +1645,20 @@ export function fitItemsIntoVault(items, vaultActor, { mergeItems = true, existi
 	}
 }
 
-export function canItemFitInVault(item, vaultActor, { mergeItems = true, gridData = false, position = null, items = null } = {}) {
+export function canItemFitInVault(item, vaultActor, {
+	mergeItems = true,
+	gridData = false,
+	position = null,
+	items = null
+} = {}) {
 	if (!isItemPileVault(vaultActor)) return true;
 	const vaultItems = items ?? getActorItems(vaultActor);
 	if (mergeItems && canItemStack(item, vaultActor)) {
 		const similarItem = Utilities.findSimilarItem(vaultItems, item);
-		if(similarItem){
+		if (similarItem) {
 			const itemFlagData = getItemFlagData(similarItem);
 			if (!position || areItemsColliding(position, itemFlagData)) {
-				return similarItem.id;
+				return similarItem.id ?? similarItem._id;
 			}
 		}
 	}
@@ -1819,14 +1828,14 @@ export function clearActorLog(actor) {
  * @returns {Promise<[object]>}
  */
 export async function rollTable({
-	                                tableUuid,
-	                                formula = "1",
-	                                resetTable = true,
-	                                normalize = false,
-	                                displayChat = false,
-	                                rollData = {},
-	                                customCategory = false
-                                } = {}) {
+	tableUuid,
+	formula = "1",
+	resetTable = true,
+	normalize = false,
+	displayChat = false,
+	rollData = {},
+	customCategory = false
+} = {}) {
 
 	const rolledItems = [];
 

@@ -46,6 +46,7 @@
       "NoPlayersActive": "No players are active to do this action",
       "NoGMsConnectedAction": "WARNING - Could not execute \"{action}\" because no GMs are active.",
       "VaultFull": "This item can't fit into this vault!",
+      "CantSortVault": "Failed to sort items - either there are simply too many items, or something went wrong",
       "VaultItemNotExpander": "That item is not a vault expander"
     },
     "Inspect": {
@@ -196,6 +197,7 @@
       "ExpandsRows": "{rows} rows",
       "Withdraw": "Withdraw",
       "Deposit": "Deposit",
+      "SortItems": "Sort Items",
       "LogUserActor": "{actor_name} ({user_name})",
       "Deposited": "deposited",
       "Withdrew": "withdrew",

@@ -1,7 +1,8 @@
 <script>
 
+	import CONSTANTS from "../../constants/constants.js";
 	import * as Helpers from "../../helpers/helpers.js";
-	import { getContext } from "svelte";
+	import { getContext, onMount } from "svelte";
 	import { coordinate2size } from "../components/Grid/grid-utils.js";
 
 	export let entry;
@@ -12,6 +13,7 @@
 	$: gridData = $gridDataStore;
 
 	const item = entry.item;
+	const doc = item.itemDocument;
 	const name = item.name;
 	const img = item.img;
 	const flagData = item.itemFlagData;
@@ -23,9 +25,13 @@
 
 	$: styling = Helpers.styleFromObject($style);
 	$: displayImage = ($flagData.flipped ? $flagData.vaultImageFlipped || $flagData.vaultImage : $flagData.vaultImage) || $img;
-	$: imageLoaded($flagData, $transform)
+	$: imageChanged($flagData, $transform);
+	$: {
+		$doc;
+		callRenderedHook();
+	}
 
-	function imageLoaded(flagData, transform) {
+	function imageChanged(flagData, transform) {
 		if (!flagData.vaultImageFlipped) {
 			getImageDimensions(transform)
 		} else {
@@ -40,20 +46,34 @@
 		containerStyle = `transform: rotate(${flipped ? "90deg" : "0deg"}); min-width: ${width}px; max-width: ${width}px; min-height: ${height}px; max-height: ${height}px;`;
 	}
 
+	let element = false;
+
+	function callRenderedHook() {
+		if (!element) return;
+		Hooks.callAll(CONSTANTS.HOOKS.RENDER_VAULT_GRID_ITEM, element, item.item);
+	}
+
+	onMount(() => {
+		callRenderedHook();
+	});
+
 </script>
 
-<div class="grid-item" data-fast-tooltip={$name}
-     data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0">
+<div bind:this={element}
+     class="grid-item"
+     data-fast-tooltip={$name} data-fast-tooltip-activation-speed="0"
+     data-fast-tooltip-deactivation-speed="0"
+>
 	{#if displayImage}
 		<div class="grid-item-image-container" style={containerStyle}>
-			<img src={displayImage}/>
+			<img class="grid-item-image" src={displayImage}/>
 		</div>
 	{/if}
 	{#if styling}
 		<div class="grid-item-ghost" style={styling}></div>
 	{/if}
 	{#if canStack && $quantity > 1}
-		<span>{$quantity}</span>
+		<span class="grid-item-quantity">{$quantity}</span>
 	{/if}
 </div>
 
@@ -71,23 +91,23 @@
     overflow: hidden;
     border: 1px solid black;
 
-    img {
+    .grid-item-image {
       position: absolute;
       flex-shrink: 0;
       border: 0;
-	    object-fit: cover;
-	    width: 100%;
-	    min-height: 100%;
+      object-fit: cover;
+      width: 100%;
+      min-height: 100%;
     }
 
-	  .grid-item-image-container {
-		  width: 100%;
-		  height: 100%;
+    .grid-item-image-container {
+      width: 100%;
+      height: 100%;
       align-items: center;
       display: flex;
-	  }
+    }
 
-    span {
+    .grid-item-quantity {
       position: absolute;
       bottom: 0;
       right: 3px;

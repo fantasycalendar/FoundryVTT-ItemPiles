@@ -20,6 +20,7 @@
 	const dispatch = createEventDispatcher();
 
 	let itemRef = HTMLElement;
+	let dragged = false;
 	const transformStore = item.transform;
 	const previewTransform = item.ghostTransform;
 	const activeStore = item.active;
@@ -28,10 +29,13 @@
 	$: transform = $transformStore;
 	$: gridTransform = calcPosition($transformStore, options);
 	$: ghostGridTransform = calcPosition({
-		...snapOnMove($previewTransform.left, $previewTransform.top, $previewTransform, options),
+		...snapOnMove($previewTransform.left, $previewTransform.top, $previewTransform, options, false),
 		w: $previewTransform.w,
 		h: $previewTransform.h,
 	}, options);
+	$: {
+		if (!$activeStore) collisions = [];
+	}
 
 	let classes = "";
 	$: {
@@ -94,6 +98,10 @@
 			y: event.pageY - pointerOffset.internalTop
 		});
 
+		dragged = true;
+
+		move(event);
+
 	}
 
 	function splitStart(event) {
@@ -128,8 +136,9 @@
 
 	function move(event) {
 
-		if (!event) event = lastMoveEvent;
-		lastMoveEvent = event;
+		if (!event && lastMoveEvent) event = lastMoveEvent;
+		if (event) lastMoveEvent = event;
+		if (!event) return;
 
 		const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
 
@@ -242,6 +251,8 @@
 			})
 		}
 
+		dragged = false;
+
 		if (!active) return;
 
 		for (const otherItem of items) {
@@ -323,13 +334,9 @@
 	$: collisionClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
 
 	function keydown(event) {
-		if (event.key !== "r" || !active || (item.item.w === 1 && item.item.h === 1)) return;
+		if (event.key !== "r" || !active || !dragged || (item.item.w === item.item.h)) return;
 		previewTransform.update(data => {
 			const { w, h } = data;
-			const width = coordinate2size(Math.floor(h / 2) + 1, options.gridSize, options.gap);
-			const height = coordinate2size(Math.floor(w / 2) + 1, options.gridSize, options.gap);
-			pointerOffset.top -= (width - height);
-			pointerOffset.left -= (height - width);
 			dispatch("itemflipped", {
 				item,
 				target: itemRef,
@@ -337,6 +344,10 @@
 				w: h,
 				flipped: !data.flipped
 			});
+			const width = coordinate2size(h / 2, options.gridSize, options.gap);
+			const height = coordinate2size(w / 2, options.gridSize, options.gap);
+			pointerOffset.top -= (width - height);
+			pointerOffset.left -= (height - width);
 			return {
 				...data,
 				w: h,

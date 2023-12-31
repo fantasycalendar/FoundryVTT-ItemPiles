@@ -31,20 +31,20 @@ export function position2coordinate(position, cellSize, size, gap) {
 	return Math.round(position / (cellSize + gap));
 }
 
-export function snapOnMove(left, top, transform, options) {
-	const { gridSize, gap, cols, enabledCols, rows, enabledRows } = options;
+export function snapOnMove(left, top, transform, options, doClamp = true) {
+	const { gridSize, gap, enabledCols, enabledRows } = options;
 	const { w, h } = transform;
 
 	const width = w * gridSize;
 	const height = h * gridSize;
 
-	let x = position2coordinate(left, gridSize, width, gap);
-	let y = position2coordinate(top, gridSize, height, gap);
+	const x = position2coordinate(left, gridSize, width, gap);
+	const y = position2coordinate(top, gridSize, height, gap);
 
-	x = clamp(x, 0, Math.min(cols, enabledCols) - w);
-	y = clamp(y, 0, Math.min(rows, enabledRows) - h);
-
-	return { x, y };
+	return {
+		x: doClamp ? clamp(x, 0, enabledCols - w) : x,
+		y: doClamp ? clamp(y, 0, enabledRows - h) : y
+	};
 }
 
 export function calcPosition(transform, options) {
@@ -75,7 +75,7 @@ export function swapItemTransform(originalTransform, finalTransform, transform) 
 			const { x, y } = delta;
 			delta.x = y;
 			delta.y = x * -1;
-		} else if(originalTransform.flipped && !finalTransform.flipped) {
+		} else if (originalTransform.flipped && !finalTransform.flipped) {
 			delta.y -= finalTransform.h;
 			delta.y += newTransform.h;
 			const { x, y } = delta;

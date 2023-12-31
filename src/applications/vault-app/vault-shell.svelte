@@ -266,21 +266,21 @@
 	}
 
 	function itemMove(event) {
-		const { x, y } = event.detail;
 		if (!FloatingElement.id) return;
+		const { x, y } = event.detail;
 		FloatingElement.positionStore.set({ x, y });
 	}
 
 	function itemFlipped(event) {
+		if (!FloatingElement.id) return;
 		const item = event.detail.item.item;
 		const { flipped } = event.detail;
 		const rotation = item.flipped ? (flipped ? "0deg" : "-90deg") : (flipped ? "90deg" : "0deg");
 		FloatingElement.styleStore.update(style => {
-			return {
-				...style,
+			return foundry.utils.mergeObject(style, {
 				"transform": `rotate(${rotation})`,
 				"transition": "transform 150ms"
-			}
+			});
 		});
 	}
 
@@ -415,8 +415,10 @@
 
 			<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
 
-				<div>
-					<button type="button" class="item-piles-small-button" on:click={() => store.sortItemsOnGrid()}>Sort Items</button>
+				<div style="flex: 0 1 auto;">
+					<button type="button" class="item-piles-small-button" on:click={(event) => store.sortItemsOnGrid(event)}>
+						{localize("ITEM-PILES.Vault.SortItems")}
+					</button>
 				</div>
 
 				<CurrencyList {currencies}
