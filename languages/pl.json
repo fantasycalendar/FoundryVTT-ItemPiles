@@ -33,7 +33,7 @@
       "NoPlayersActive": "Nie ma żadnych aktywnych graczy aby dokonać tej akcji",
       "GiveItemNoGM": "Nie ma żadnego aktywnego GM'a który mógłby dostać twój przedmiot.",
       "NoGMsConnectedAction": "UWAGA - Nie można wykonać \"{action}\", ponieważ żaden GM nie jest aktywny.",
-      "VaultFull": "Ten skarbiec jest pełny!",
+      "VaultFull": "Ten przedmiot nie mieści się w tym skarbcu!",
       "VaultItemNotExpander": "Ten przedmiot nie jest rozszerzeniem skarbca",
       "NoGMsConnected": "UWAGA - Brak podłączonych GMów - Item Piles wymaga GMa, aby gracze mogli korzystać z większości funkcji modułu."
     },
@@ -237,7 +237,7 @@
       },
       "GiveItemUserNotActive": {
         "Content": "\"{actor_name}\" jest własnością gracza \"{user_name}\" ale nie są oni aktywni, więc nie możesz dać im tego przedmiotu.",
-        "Title": "Otrzymany przedmiot"
+        "Title": "Przedmiot przekazania"
       },
       "ClearAllServices": {
         "Title": "Wyczyść wszystkie usługi aktora",
@@ -281,7 +281,7 @@
       "NeedsCapacity": "Ten skarbiec ma całkowitą pojemność {total_capacity}, ale żaden z nich nie jest dostępny, póki nie zostaną dodane rozszerzenia skarbca",
       "CapacityLeft": "Ten skarbiec ma pojemność {capacity}, z maksymalną {total_capacity}, przeciągnij i upuść rozszerzenia skarbca, aby zwiększyć pojemność",
       "CapacityFull": "Ten skarbiec osiągnął swoją maksymalną pojemność {total_capacity}",
-      "Withdraw": "Wypłać"
+      "Withdraw": "Odwołanie"
     },
     "Applications": {
       "WithdrawItem": {
@@ -395,8 +395,8 @@
         "DropMeClickMe": "Kliknij, aby dodać atrybut lub przeciągnij i upuść przedmiot, aby dodać",
         "SelectPreset": "Wybór presetu cenowego",
         "CanStack": "Możliwość układania w stos",
-        "CanStackExplanation": "To konfiguruje, czy ten przedmiot będzie układał się w stos z innymi podobnymi przedmiotami, gdy zostanie dodany do skarbca.",
-        "CanStackDefault": "Domyślnie ustawienie skarbca",
+        "CanStackExplanation": "Konfiguruje to, czy ten przedmiot będzie układany w stos z innymi przedmiotami, które są do niego podobne.",
+        "CanStackDefault": "Domyślne ustawienia elementów stosu",
         "CanStackNo": "Nie, nie można układać w stos",
         "VaultExpander": "Rozszerzenie skarbca",
         "VaultExpanderExplanation": "Kiedy to jest włączone, ten przedmiot nie działa jak normalny przedmiot w skarbcu, zamiast tego zwiększa liczbę dostępnych slotów, jak określono poniżej.",
@@ -412,7 +412,13 @@
         "InfiniteQuantityNo": "Nie, standardowa ilość",
         "ServiceExplanation": "Powoduje to, że ten przedmiot nie dodaje się do inwentarza kupca. Usługa \"item\" może nadal mieć ilość, ale jeśli się skończy, nie zostanie usunięta z kupca, ale zamiast tego ustawiona na nie do sprzedaży.",
         "KeepOnMerchantExplanation": "Gdy przedmioty zostaną wyczyszczone w zakładce wypełnij przedmioty sprzedawców lub przez integrację Simple Calendar odświeżającą zapasy (patrz konfiguracja kupca na dole), ten przedmiot zawsze pozostanie.",
-        "KeepOnMerchant": "Zachowaj kupca"
+        "KeepOnMerchant": "Zachowaj kupca",
+        "GridSize": "Rozmiar Siatki",
+        "GridSizeExplanation": "Konfiguruje liczbę miejsc w siatce zajmowanych przez ten przedmiot.",
+        "VaultImage": "Wizerunek Skarbca",
+        "VaultImageExplanation": "To zastępuje domyślny obraz wyświetlany w skarbcu.",
+        "GridWidth": "Szerokość",
+        "GridHeight": "Wysokość"
       },
       "FilterEditor": {
         "Explanation": "Tutaj możesz zdefiniować wiele typów filtrów, które wykluczą pewne typy przedmiotów. Na podstawie podanej ścieżki atrybutu, stos przedmiotów mógłby znaleźć \"typ\" przedmiotu i na podstawie filtrów, ukrywa te przedmioty w UI inwentarza stosu przedmiotów.",
@@ -532,7 +538,9 @@
           "LogMerchantActivity": "Dziennik aktywności kupca",
           "ClearMerchantLog": "Wyczyść dziennik kupca",
           "ClearMerchantLogExplanation": "Spowoduje to wyczyszczenie dzienników kupca, usuwając wszystkie wpisy. Nie można tego cofnąć.",
-          "LogMerchantActivityExplanation": "Po włączeniu tej funkcji kupiec rejestruje zdarzenia, takie jak kupno i sprzedaż przedmiotów, a GM aktualizuje status (ilość, widoczność i sprzedaż) przedmiotów."
+          "LogMerchantActivityExplanation": "Po włączeniu tej funkcji kupiec rejestruje zdarzenia, takie jak kupno i sprzedaż przedmiotów, a GM aktualizuje status (ilość, widoczność i sprzedaż) przedmiotów.",
+          "HideTokenWhenClosed": "Ukryj Token po Zamknięciu",
+          "HideTokenWhenClosedExplanation": "Gdy ta opcja jest włączona, token(y) tego sprzedawcy są ukrywane po zamknięciu."
         },
         "Main": {
           "DeleteWhenEmpty": "Usuń, gdy jest pusty",
@@ -562,7 +570,13 @@
           "DeleteWhenEmptyDefault": "Domyślne ustawienie modułu",
           "OverrideSecondaryCurrencies": "Zastąp waluty dodatkowe",
           "OverrideSecondaryCurrenciesExplanation": "Skonfiguruj nadpisania waluty dodatkowej dla tego stosu pozycji.",
-          "ConfigureOverrideSecondaryCurrencies": "Konfiguracja zastępowania walut dodatkowych"
+          "ConfigureOverrideSecondaryCurrencies": "Konfiguracja zastępowania walut dodatkowych",
+          "CanStackItemsNo": "Nie układaj przedmiotów (chyba że przedmiot mówi inaczej)",
+          "CanStackItems": "Może Łączyć Przedmioty w Stosy",
+          "CanStackItemsExplanation": "Z tym ustawieniem, przedmioty dodane do stosu przedmiotów będą układane w stos z podobnymi przedmiotami. Można to również kontrolować dla poszczególnych przedmiotów w ich konfiguracji. Uwaga: Zależy to również od systemu, ponieważ niektóre przedmioty nie mają ilości, więc nigdy nie mogą być układane w stosy.",
+          "CanStackItemsYes": "Tak, układaj przedmioty (chyba że przedmiot mówi inaczej)",
+          "CanStackItemsNoAlways": "Nie, nigdy nie układaj w stos przedmiotów",
+          "CanStackItemsYesAlways": "Tak, zawsze układaj przedmioty w stosy"
         },
         "Container": {
           "Title": "Ustawienia kontenera",
@@ -745,7 +759,7 @@
       "PricePresets": {
         "Label": "Skonfiguruj ustawienia wstępne cen",
         "Hint": "Tutaj możesz skonfigurować niestandardowe, wstępnie ustawione cen, które następnie możesz łatwo zaimportować do przedmiotów.",
-        "Title": "Ustawienia cen"
+        "Title": "Wstępne ustawienia cen"
       },
       "CustomItemCategories": {
         "Title": "Kategorie przedmiotów niestandardowych",

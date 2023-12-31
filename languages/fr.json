@@ -568,12 +568,18 @@
         "QuantityForPriceExplanation": "Cela permet de configurer le nombre d'exemplaires de cet objet que l'on doit obtenir lors de l'achat de cet objet.",
         "QuantityForPrice": "Quantité pour le prix",
         "CanStack": "Peut s'empiler",
-        "CanStackDefault": "Valeur par défaut des paramètres du coffre",
-        "CanStackExplanation": "Cette option permet de configurer l'empilement de l'élément avec d'autres éléments similaires lorsqu'il est ajouté à un coffre.",
+        "CanStackDefault": "Valeur par défaut du réglage de la pile d'objets",
+        "CanStackExplanation": "Cela permet de configurer l'empilement d'objet avec d'autres objets qui lui sont similaires.",
         "CanStackYes": "Oui, peut toujours s'empiler",
         "CanStackNo": "Non, ne peut pas s'empiler",
         "KeepOnMerchant": "Conserver chez le marchand",
-        "KeepOnMerchantExplanation": "Lorsque les articles sont effacés dans l'onglet \"Remplir les articles\" des marchands ou par l'intégration de l'actualisation de l'inventaire de Simple Calendar (voir la configuration du marchand au bas de la page), cet article sera toujours présent."
+        "KeepOnMerchantExplanation": "Lorsque les articles sont effacés dans l'onglet \"Remplir les articles\" des marchands ou par l'intégration de l'actualisation de l'inventaire de Simple Calendar (voir la configuration du marchand au bas de la page), cet article sera toujours présent.",
+        "VaultImage": "Image du coffre fort",
+        "GridWidth": "Largeur",
+        "GridHeight": "Hauteur",
+        "GridSize": "Taille d'une case",
+        "GridSizeExplanation": "Cela permet de configurer le nombre d'espaces de la grille occupés par cet objet.",
+        "VaultImageExplanation": "Cela remplace l'image de l'objet lorsqu'il est affiché dans un coffre-fort."
       },
       "TradeMerchantItem": {
         "TheyCantAfford": "Ils ne peuvent pas se permettre ce prix",
@@ -1058,7 +1064,7 @@
       "GiveItemDeclined": "{user_name} a décliné votre offre.",
       "NoPlayersActive": "Aucun joueur actif pour effectuer cette action",
       "NoGMsConnectedAction": "WARNING - Impossible d'exécuter \"{action}\" car aucun MJ n'est actif.",
-      "VaultFull": "Ce coffre-fort est plein !",
+      "VaultFull": "Cet objet ne peut pas être placé dans ce coffre-fort !",
       "NoGMsConnected": "ATTENTION - Pas de MJ connecté - Item Piles nécessite qu'un MJ soit connecté pour que les joueurs puissent utiliser la plupart des fonctionnalités du module.",
       "VaultItemNotExpander": "Cet objet n'est pas une extension de coffre-fort"
     },
