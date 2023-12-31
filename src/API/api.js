@@ -1658,6 +1658,19 @@ class API {
 	}
 
 	/**
+	 * Turns an array containing the data and quantities for each currency into a string of currencies
+	 *
+	 * @param {Array<object>} currencies                       An array of object containing the data and quantity for each currency
+|    * @param {number} currencies[].value                      The quantity of the currency
+|    * @param {string} currencies[].denom                      The denomination of the currency  
+	 *
+	 * @returns {string}                                       An array of object containing the data and quantity for each currency
+	 */
+	static getStringFromCurrencies(currencies) {
+		return PileUtilities.getStringFromCurrencies(currencies);
+	}
+
+	/**
 	 * Turns a string of currencies into an array containing the data and quantities for each currency
 	 *
 	 * @param {string} currencies                               A string of currencies to convert (eg, "5gp 25sp")

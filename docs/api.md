@@ -65,6 +65,7 @@
   * [removeCurrencies](#removeCurrencies)
   * [transferCurrencies](#transferCurrencies)
   * [transferAllCurrencies](#transferAllCurrencies)
+  * [getStringFromCurrencies](#getstringfromcurrencies)
   * [getCurrenciesFromString](#getCurrenciesFromString)
   * [calculateCurrencies](#calculateCurrencies)
   * [getPaymentData](#getPaymentData)
@@ -925,6 +926,24 @@ Transfers all currencies between the source and the target.
 | target                  | `Actor/Token/TokenDocument` |         | The actor to receive all the currencies   |
 | options                 | `object`                    |         | Options to pass to the function           |
 | [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action         |
+
+---
+
+### getStringFromCurrencies
+
+`game.itempiles.API.getStringFromCurrencies(currencies)` ⇒ `object`
+
+Turns an array containing the data and quantities for each currency into a string of currencies
+
+**NOTE:** This is a utility method for use the other currencies api methods based on a string input.
+
+**Returns**: `string` - A string of currencies to add (eg, "5gp 25sp")
+
+| Param              | Type     | Default | Description                                    |
+|--------------------|----------|---------|------------------------------------------------|
+| currencies         | `Array`  |         | An array of object containing the data and quantity for each currency |
+| currencies[].value | `number` |         | The quantity of the currency         |
+| currencies[].denom | `string` |         | The denomination of the currency     |
 
 ---
 

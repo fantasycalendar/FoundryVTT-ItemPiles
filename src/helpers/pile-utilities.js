@@ -778,6 +778,36 @@ export function getPriceArray(totalCost, currencies) {
 	});
 }
 
+export function getStringFromCurrencies(currencies) {
+	let priceString = "";
+	if (!currencies) {
+		throw Helpers.custom_error(`getStringFromCurrencies | currencies must be defined`, true);
+	}
+	if (typeof currencies === "string") {
+		throw Helpers.custom_error(`getStringFromCurrencies | currencies can't be of type string`, true);
+	}
+	if (!Array.isArray(currencies)) {
+        throw Helpers.custom_error(`getStringFromCurrencies | currencies must be of type array`, true);
+    }
+	if (currencies.length === 0) {
+		throw Helpers.custom_error(`getStringFromCurrencies | currencies must be a not empty array`, true);
+	}
+	for(const currency of currencies){
+		if (typeof currency !== "object") {
+			throw Helpers.custom_error(`getStringFromCurrencies | currency element must be of type object ${currency}`, true);
+		}
+		const value = currency.value;
+		const denom = currency.denom;
+		if(Helpers.isRealNumber(value) && denom?.length > 0) {
+			priceString = priceString + value + "" + denom + " "
+		} else {
+			Helpers.custom_warning(`getStringFromCurrencies | The currency element is not valid with value '${value}' and denomination '${denom}'`, false);
+		}
+	}
+	priceString = priceString.trim();
+	return priceString;
+}
+
 export function getPriceFromString(str, currencyList = false) {
 
 	if (!currencyList) {
