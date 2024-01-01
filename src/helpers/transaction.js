@@ -38,7 +38,7 @@ export default class Transaction {
 
 			let flags = data.item ? data.flags ?? false : false;
 			let itemData = item instanceof Item ? item.toObject() : foundry.utils.deepClone(item);
-			if(flags){
+			if (flags) {
 				setProperty(itemData, "flags", flags);
 			}
 			if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
@@ -48,14 +48,22 @@ export default class Transaction {
 			let itemId = itemData._id ?? itemData.id;
 			let actorHasItem = false;
 			let actorExistingItem = false;
-			if(this.actorFlags.type === CONSTANTS.PILE_TYPES.VAULT && type !== "currency" && !remove){
+			if (this.actorFlags.type === CONSTANTS.PILE_TYPES.VAULT && type !== "currency" && !remove) {
 				const actorExistingItems = Utilities.findSimilarItem(this.actor.items, itemData, {
 					returnOne: false
 				});
 				actorExistingItem = actorExistingItems.find(item => {
-					return areItemsColliding(item, itemData) && PileUtilities.canItemStack(item, this.actor);
+					return PileUtilities.canItemStack(item, this.actor) && (
+						(
+							foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x") === undefined
+							&&
+							foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y") === undefined
+						)
+						||
+						areItemsColliding(item, itemData)
+					)
 				});
-			}else{
+			} else {
 				actorHasItem = this.actor.items.get(itemId);
 				actorExistingItem = actorHasItem || Utilities.findSimilarItem(this.actor.items, itemData);
 			}
