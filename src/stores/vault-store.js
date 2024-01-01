@@ -27,7 +27,7 @@ export class VaultStore extends ItemPileStore {
 		this.visibleLogItems = writable(18);
 		this.highlightedGridItems = writable([]);
 		this.vaultExpanderItems = writable([]);
-		this.dragPosition = writable({ x: 0, y: 0, w: 1, h: 1, active: false, });
+		this.dragPosition = writable({ x: 0, y: 0, w: 1, h: 1, active: false, flipped: false });
 		this.mainContainer = false;
 	}
 
@@ -49,7 +49,7 @@ export class VaultStore extends ItemPileStore {
 		this.visibleLogItems.set(18);
 		this.highlightedGridItems.set([]);
 		this.vaultExpanderItems.set([]);
-		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, });
+		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false, flipped: false });
 
 		this.refreshGridDebounce = foundry.utils.debounce(() => {
 			this.refreshGrid();
@@ -59,6 +59,7 @@ export class VaultStore extends ItemPileStore {
 	setupSubscriptions() {
 		super.setupSubscriptions();
 		this.subscribeTo(this.pileData, () => {
+			this.refreshAppSize();
 			this.refreshGridDebounce();
 			this.processLogEntries();
 		});
@@ -86,30 +87,22 @@ export class VaultStore extends ItemPileStore {
 			let instigator = log.actor || "Unknown character";
 			if (pileData.vaultLogType === "user_actor") {
 				instigator = game.i18n.format("ITEM-PILES.Vault.LogUserActor", {
-					actor_name: log.actor || "Unknown character",
-					user_name: game.users.get(log.user)?.name ?? "unknown user",
+					actor_name: log.actor || "Unknown character", user_name: game.users.get(log.user)?.name ?? "unknown user",
 				})
 			} else if (pileData.vaultLogType === "user") {
 				instigator = game.users.get(log.user)?.name ?? "unknown user";
 			}
 
-			const quantity = Math.abs(log.qty) > 1
-				? game.i18n.format("ITEM-PILES.Vault.LogQuantity", { quantity: Math.abs(log.qty) })
-				: "";
+			const quantity = Math.abs(log.qty) > 1 ? game.i18n.format("ITEM-PILES.Vault.LogQuantity", { quantity: Math.abs(log.qty) }) : "";
 
 			if (!log.action) {
 				log.action = log.qty > 0 ? "deposited" : "withdrew";
 			}
 
-			const action = log.action === "withdrew" || log.action === "deposited"
-				? game.i18n.localize("ITEM-PILES.Vault." + (log.action.slice(0, 1).toUpperCase() + log.action.slice(1)))
-				: log.action;
+			const action = log.action === "withdrew" || log.action === "deposited" ? game.i18n.localize("ITEM-PILES.Vault." + (log.action.slice(0, 1).toUpperCase() + log.action.slice(1))) : log.action;
 
 			log.text = game.i18n.format("ITEM-PILES.Vault.LogEntry", {
-				instigator,
-				action: `<span>${action}</span>`,
-				quantity: quantity,
-				item_name: `<strong>${log.name}</strong>`,
+				instigator, action: `<span>${action}</span>`, quantity: quantity, item_name: `<strong>${log.name}</strong>`,
 			})
 			log.visible = true;
 
@@ -137,13 +130,11 @@ export class VaultStore extends ItemPileStore {
 		this.gridData.update(() => {
 
 			const access = PileUtilities.getVaultAccess(this.actor, {
-				flagData: pileData,
-				hasRecipient: !!this.recipient
+				flagData: pileData, hasRecipient: !!this.recipient
 			});
 
 			return {
-				...PileUtilities.getVaultGridData(this.actor, pileData),
-				...access,
+				...PileUtilities.getVaultGridData(this.actor, { flagData: pileData }), ...access,
 				canEditCurrencies: game.user.isGM,
 				fullAccess: game.user.isGM || Object.values(access).every(Boolean),
 				gridSize: 40,
@@ -164,8 +155,7 @@ export class VaultStore extends ItemPileStore {
 			acc.rows += get(item.itemFlagData).addsRows * get(item.quantity);
 			return acc;
 		}, {
-			cols: pileData.baseExpansionCols ?? 0,
-			rows: pileData.baseExpansionRows ?? 0
+			cols: pileData.baseExpansionCols ?? 0, rows: pileData.baseExpansionRows ?? 0
 		});
 
 		const enabledCols = Math.min(pileData.cols, expansions.cols);
@@ -186,7 +176,8 @@ export class VaultStore extends ItemPileStore {
 			return {
 				_id: item.id,
 				[CONSTANTS.FLAGS.ITEM + ".x"]: transform.x,
-				[CONSTANTS.FLAGS.ITEM + ".y"]: transform.y
+				[CONSTANTS.FLAGS.ITEM + ".y"]: transform.y,
+				[CONSTANTS.FLAGS.ITEM + ".flipped"]: transform.flipped,
 			}
 		});
 
@@ -253,7 +244,9 @@ export class VaultStore extends ItemPileStore {
 					allItems.splice(allItems.indexOf(item), 1);
 					existingItems.push({
 						id: item.id,
+						active: item.active,
 						transform: item.transform,
+						ghostTransform: item.ghostTransform,
 						highlight: search && highlightedItems.includes(item.id),
 						item,
 					});
@@ -270,24 +263,40 @@ export class VaultStore extends ItemPileStore {
 
 		const itemsToUpdate = allItems
 			.map(item => {
+
+				let freeCells = [];
 				for (let x = 0; x < gridData.enabledCols; x++) {
 					for (let y = 0; y < gridData.enabledRows; y++) {
-						if (!grid[x][y]) {
-							grid[x][y] = item.id;
-							item.transform.update(trans => {
-								trans.x = x;
-								trans.y = y;
-								return trans;
-							});
-							return {
-								id: item.id,
-								transform: item.transform,
-								highlight: search && highlightedItems.includes(item.id),
-								item
-							};
-						}
+						if (grid[x][y]) continue;
+						freeCells.push({ x, y });
 					}
 				}
+
+				const position = PileUtilities.getNewItemsVaultPosition(item.item, { ...gridData, grid, freeCells });
+				if (!position) return false;
+				const itemFlagData = get(item.itemFlagData);
+				let { width, height } = PileUtilities.getVaultItemDimensions(item.item, itemFlagData);
+				for (let w = 0; w < width; w++) {
+					const x = Math.max(0, Math.min(position.x + w, gridData.enabledCols - 1));
+					for (let h = 0; h < height; h++) {
+						const y = Math.max(0, Math.min(position.y + h, gridData.enabledRows - 1));
+						grid[x][y] = item.id;
+					}
+				}
+				item.transform.update(trans => {
+					trans.x = position.x;
+					trans.y = position.y;
+					trans.flipped = position.flipped;
+					return trans;
+				});
+				return {
+					id: item.id,
+					active: item.active,
+					transform: item.transform,
+					ghostTransform: item.ghostTransform,
+					highlight: search && highlightedItems.includes(item.id),
+					item
+				};
 			})
 			.filter(Boolean)
 
@@ -297,21 +306,25 @@ export class VaultStore extends ItemPileStore {
 
 	}
 
+	refreshAppSize() {
+		if (!this.mainContainer) return;
+		const oldHeight = this.mainContainer.getBoundingClientRect().height;
+		setTimeout(() => {
+			const newHeight = this.mainContainer.getBoundingClientRect().height - oldHeight;
+			this.application.position.stores.height.update((height) => {
+				return height + newHeight;
+			});
+		}, 10);
+	}
+
 	async onDropData(data, event, isExpander) {
 
-		const dragPosition = get(this.dragPosition);
-		const { x, y } = dragPosition;
-		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, active: false });
+		let validPosition = get(this.dragPosition);
+		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, flipped: false, active: false });
 
 		if (data.type === "Actor" && game.user.isGM) {
-			const oldHeight = this.mainContainer.getBoundingClientRect().height;
 			const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
-			if (!this.recipient) {
-				setTimeout(() => {
-					const newHeight = this.mainContainer.getBoundingClientRect().height - oldHeight;
-					this.application.position.stores.height.set(get(this.application.position.stores.height) + newHeight);
-				});
-			}
+			this.refreshAppSize();
 			this.updateRecipient(newRecipient);
 			this.refreshFreeSpaces();
 			return;
@@ -351,14 +364,10 @@ export class VaultStore extends ItemPileStore {
 			return false;
 		}
 
-		let validPosition = { x: 0, y: 0 };
-		let similarItem = this.getSimilarItem(itemData);
+		const similarItem = this.getSimilarItem(itemData);
 		if (!vaultExpander) {
-			if (similarItem && PileUtilities.canItemStack(item, this.actor)) {
-				const { x, y } = PileUtilities.getItemFlagData(similarItem);
-				validPosition = { x: Math.max(x, 0), y: Math.max(y, 0) };
-			} else {
-				validPosition = PileUtilities.canItemFitInVault(itemData, this.actor, { x, y });
+			if (!similarItem || !PileUtilities.canItemStack(item, this.actor)) {
+				validPosition = PileUtilities.canItemFitInVault(itemData, this.actor, validPosition);
 				if (!validPosition) {
 					Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
 					return false;
@@ -366,15 +375,40 @@ export class VaultStore extends ItemPileStore {
 			}
 		}
 
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", validPosition.x);
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", validPosition.y);
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".flipped", validPosition.flipped);
+
 		return PrivateAPI._depositWithdrawItem({
-			source,
-			target,
-			itemData: {
-				item: itemData,
-				quantity: 1
-			},
-			gridPosition: validPosition
+			source, target, itemData: {
+				item: itemData, quantity: 1
+			}, gridPosition: validPosition
 		});
+
+	}
+
+	async sortItemsOnGrid(event) {
+
+		const mergeItems = event.ctrlKey;
+
+		const gridItems = get(this.gridItems).map(item => item.item).sort((a, b) => {
+			return b.size - a.size;
+		}).map(item => item.item);
+
+		const result = PileUtilities.fitItemsIntoVault(gridItems, this.actor, { existingItems: [], mergeItems });
+
+		if (!result) return Helpers.custom_warning("ITEM-PILES.Warnings.CantSortVault", true);
+
+		const { updates, deletions } = result;
+
+		const itemUpdates = updates.map(item => ({
+			_id: item._id,
+			[game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE]: Utilities.getItemQuantity(item),
+			[CONSTANTS.FLAGS.ITEM]: PileUtilities.cleanItemFlagData(PileUtilities.getItemFlagData(item))
+		}))
+
+		await this.actor.updateEmbeddedDocuments("Item", itemUpdates);
+		await this.actor.deleteEmbeddedDocuments("Item", deletions);
 
 	}
 
@@ -385,12 +419,18 @@ export class VaultItem extends PileItem {
 	setupStores(...args) {
 		super.setupStores(...args);
 		this.transform = writable({
-			x: 0, y: 0, w: 1, h: 1
+			x: 0, y: 0, w: 1, h: 1, flipped: false
 		});
+		this.ghostTransform = writable({
+			x: 0, y: 0, w: 1, h: 1, flipped: false
+		});
+		this.active = writable(false);
 		this.x = 0;
 		this.y = 0;
 		this.w = 1;
 		this.h = 1;
+		this.flipped = false;
+		this.size = 1;
 		this.style = writable({});
 	}
 
@@ -413,9 +453,11 @@ export class VaultItem extends PileItem {
 			if (setup) {
 				helpers.debug("itemFlagData", data);
 			}
+			const { width, height } = PileUtilities.getVaultItemDimensions(this.item, data);
 			this.transform.set({
-				x: data.x, y: data.y, w: data.width ?? 1, h: data.height ?? 1
+				x: data.x, y: data.y, w: width, h: height, flipped: data.flipped ?? false
 			});
+			this.size = Math.max(width, height);
 		});
 		this.subscribeTo(this.transform, (transform) => {
 			if (setup) {
@@ -425,6 +467,7 @@ export class VaultItem extends PileItem {
 			this.y = transform.y;
 			this.w = transform.w;
 			this.h = transform.h;
+			this.flipped = transform.flipped;
 		});
 		this.subscribeTo(this.quantity, () => {
 			const itemFlagData = get(this.itemFlagData);
@@ -451,8 +494,7 @@ export class VaultItem extends PileItem {
 								num_items: Math.abs(slotsLeft)
 							})
 						}
-					},
-					modal: true
+					}, modal: true
 				});
 			}
 		}
@@ -464,34 +506,32 @@ export class VaultItem extends PileItem {
 			});
 		}
 		return game.itempiles.API.transferItems(this.store.actor, this.store.recipient, [{
-			_id: this.id,
-			quantity
+			_id: this.id, quantity
 		}], { interactionId: this.store.interactionId });
 	}
 
-	async split(x, y) {
+	async split(x, y, flipped) {
 
 		let quantity = await DropItemDialog.show(this.item, this.store.actor, {
-			localizationTitle: "SplitItem",
-			quantityAdjustment: -1
+			localizationTitle: "SplitItem", quantityAdjustment: -1
 		});
 
 		await game.itempiles.API.removeItems(this.store.actor, [{
-			_id: this.id,
-			quantity
+			_id: this.id, quantity
 		}], { interactionId: this.store.interactionId });
 
 		const itemData = this.item.toObject();
 
-		const flagData = PileUtilities.getItemFlagData(this.item);
-		setProperty(flagData, "x", x);
-		setProperty(flagData, "y", y);
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
+		const flags = PileUtilities.getItemFlagData(this.item);
+		itemData._id = randomID();
+		setProperty(flags, "x", x);
+		setProperty(flags, "y", y);
+		setProperty(flags, "flipped", flipped);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
 
 		await game.itempiles.API.addItems(this.store.actor, [{
-			item: itemData,
-			quantity
-		}], { interactionId: this.store.interactionId });
+			item: itemData, quantity
+		}], { interactionId: this.store.interactionId, skipVaultLogging: true });
 
 	}
 
@@ -500,23 +540,19 @@ export class VaultItem extends PileItem {
 		const itemDelta = await game.itempiles.API.removeItems(this.store.actor, [{
 			_id: itemToMerge.id
 		}], {
-			interactionId: this.store.interactionId,
-			skipVaultLogging: true
+			interactionId: this.store.interactionId, skipVaultLogging: true
 		});
 
 		return game.itempiles.API.addItems(this.store.actor, [{
-			id: this.id,
-			quantity: Math.abs(itemDelta[0].quantity)
+			id: this.id, quantity: Math.abs(itemDelta[0].quantity)
 		}], {
-			interactionId: this.store.interactionId,
-			skipVaultLogging: true
+			interactionId: this.store.interactionId, skipVaultLogging: true
 		})
 
 	}
 
 	areItemsSimilar(itemToCompare) {
-		return !Utilities.areItemsDifferent(this.item, itemToCompare.item)
-			&& PileUtilities.canItemStack(itemToCompare.item, this.store.actor);
+		return !Utilities.areItemsDifferent(this.item, itemToCompare.item) && PileUtilities.canItemStack(itemToCompare.item, this.store.actor);
 	}
 
 }

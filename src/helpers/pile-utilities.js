@@ -9,13 +9,12 @@ import * as CompendiumUtilities from "./compendium-utilities.js";
 
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
-	const defaultFlags = foundry.utils.duplicate(defaults);
-	const flags = existing || (getProperty(inDocument, flag) ?? {});
-	let data = { ...flags };
+	const defaultFlags = foundry.utils.deepClone(defaults);
+	let flags = foundry.utils.deepClone(existing || (getProperty(inDocument, flag) ?? {}));
 	if (flag === CONSTANTS.FLAGS.PILE) {
-		data = migrateFlagData(inDocument, data);
+		flags = migrateFlagData(inDocument, flags);
 	}
-	return foundry.utils.mergeObject(defaultFlags, data);
+	return foundry.utils.mergeObject(defaultFlags, flags);
 }
 
 export function migrateFlagData(document, data = false) {
@@ -38,6 +37,17 @@ export function migrateFlagData(document, data = false) {
 
 }
 
+export function areItemsColliding(itemA, itemB) {
+	const itemAFlags = getItemFlagData(itemA);
+	const itemBFlags = getItemFlagData(itemB);
+	return (
+		itemAFlags.x + (itemAFlags.width - 1) >= itemBFlags.x &&
+		itemAFlags.y + (itemAFlags.height - 1) >= itemBFlags.y &&
+		itemAFlags.x <= itemBFlags.x + (itemBFlags.width - 1) &&
+		itemAFlags.y <= itemBFlags.y + (itemBFlags.height - 1)
+	);
+}
+
 export function canItemStack(item, targetActor) {
 	const itemData = item instanceof Item ? item.toObject() : item;
 	const itemFlagData = getItemFlagData(itemData);
@@ -54,9 +64,7 @@ export function canItemStack(item, targetActor) {
 		return actorFlagData.canStackItems === "always";
 	}
 	return {
-		"default": actorFlagData.canStackItems === "yes",
-		"yes": true,
-		"no": false
+		"default": actorFlagData.canStackItems === "yes", "yes": true, "no": false
 	}[itemFlagData?.canStack ?? "default"];
 }
 
@@ -1199,7 +1207,11 @@ export function getPriceData({
 }
 
 export function getPaymentData({
-	purchaseData = [], seller = false, buyer = false, sellerFlagData = false, buyerFlagData = false
+	purchaseData = [],
+	seller = false,
+	buyer = false,
+	sellerFlagData = false,
+	buyerFlagData = false
 } = {}) {
 
 	buyerFlagData = getActorFlagData(buyer, buyerFlagData);
@@ -1541,29 +1553,28 @@ export async function updateMerchantLog(itemPile, activityData = {}) {
 
 /* ---------------------- VAULT FUNCTIONS ---------------------- */
 
-export function getVaultGridData(vaultActor, flagData = false) {
+export function getVaultGridData(vaultActor, { flagData = false, items = false } = {}) {
 
 	const vaultFlags = getActorFlagData(vaultActor, flagData);
 
 	const vaultItems = getActorItems(vaultActor);
-	const validVaultItems = vaultItems.filter(item => {
-		return !getItemFlagData(item).vaultExpander;
-	});
 
 	let enabledCols = vaultFlags.cols;
 	let enabledRows = vaultFlags.rows;
 
-	const allItems = vaultItems.map(item => ({
-		item,
-		itemFlagData: getItemFlagData(item),
-		quantity: Utilities.getItemQuantity(item)
-	}))
+	const regularItems = (items || vaultItems).map(item => ({
+		item, itemFlagData: getItemFlagData(item), quantity: Utilities.getItemQuantity(item)
+	})).filter(({ itemFlagData }) => {
+		return !itemFlagData.vaultExpander || !vaultFlags.vaultExpansion;
+	});
+
+	const vaultExpanders = vaultItems.map(item => ({
+		item, itemFlagData: getItemFlagData(item), quantity: Utilities.getItemQuantity(item)
+	})).filter(({ itemFlagData }) => {
+		return itemFlagData.vaultExpander && vaultFlags.vaultExpansion;
+	});
 
 	if (vaultFlags.vaultExpansion) {
-
-		const vaultExpanders = allItems.filter(({ itemFlagData }) => {
-			return itemFlagData.vaultExpander;
-		});
 
 		const expansions = vaultExpanders.reduce((acc, item) => {
 			acc.cols += (item.itemFlagData.addsCols ?? 0) * item.quantity;
@@ -1581,9 +1592,6 @@ export function getVaultGridData(vaultActor, flagData = false) {
 	enabledCols = Math.min(enabledCols, vaultFlags.cols);
 	enabledRows = Math.min(enabledRows, vaultFlags.rows);
 
-	const regularItems = allItems.filter(({ itemFlagData }) => {
-		return !vaultFlags.vaultExpansion || !itemFlagData.vaultExpander;
-	});
 	const grid = Array.from(Array(enabledCols).keys()).map(() => {
 		return Array.from(Array(enabledRows).keys()).map(() => {
 			return null;
@@ -1611,7 +1619,7 @@ export function getVaultGridData(vaultActor, flagData = false) {
 	return {
 		totalSpaces: Math.max(0, (vaultFlags.cols * vaultFlags.rows)),
 		enabledSpaces: Math.max(0, (enabledCols * enabledRows)),
-		freeSpaces: Math.max(0, (enabledCols * enabledRows) - validVaultItems.length),
+		freeSpaces: Math.max(0, (enabledCols * enabledRows) - regularItems.length),
 		enabledCols: enabledCols,
 		enabledRows: enabledRows,
 		cols: vaultFlags.cols,
@@ -1623,80 +1631,135 @@ export function getVaultGridData(vaultActor, flagData = false) {
 
 }
 
-export function canItemFitInVault(item, vaultActor, position = null) {
-	if (!isItemPileVault(vaultActor)) return true;
-	if (Utilities.findSimilarItem(vaultActor.items, item) && canItemStack(item, vaultActor)) {
-		return true;
+export function getVaultItemDimensions(item, itemFlagData = false) {
+	let { width, height, flipped } = getItemFlagData(item, itemFlagData);
+	return {
+		width: flipped ? height : width, height: flipped ? width : height
 	}
-	const gridData = getVaultGridData(vaultActor);
-	return getNewItemsVaultPosition(item, gridData, position);
 }
 
-export function fitItemsIntoVault(items, vaultActor) {
-	if (!isItemPileVault(vaultActor)) return true;
-	const vaultItems = Array.from(vaultActor.items);
-	const gridData = getVaultGridData(vaultActor);
-	const newItemData = [];
-	for(const item of items){
-		const itemData = item instanceof Item ? item.toObject() : item;
-		const newPosition = canItemFitInVault(itemData, vaultActor);
-		if(typeof newPosition === "boolean"){
-			if (!newPosition) return false;
-			newItemData.push(itemData);
-			continue;
-		}
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", newPosition.x);
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", newPosition.y);
-		newItemData.push(itemData);
-		vaultItems.push(itemData);
+export function fitItemsIntoVault(items, vaultActor, {
+	mergeItems = true,
+	existingItems = false,
+	itemFilters = false
+} = {}) {
+	if (!isItemPileVault(vaultActor)) return { updates: items, deletions: [] };
+	const vaultItems = existingItems || getActorItems(vaultActor, { itemFilters });
+	const gridData = getVaultGridData(vaultActor, { items: existingItems });
+	const updates = [];
+	const deletions = [];
+	for (let i = 0; i < items.length; i++) {
+		const item = items[i];
+		const itemData = foundry.utils.deepClone(item instanceof Item ? item.toObject() : item);
 		const flagData = getItemFlagData(itemData);
-		for (let width = 0; width < flagData.width; width++) {
-			const x = Math.max(0, Math.min(flagData.x + width, gridData.enabledCols - 1));
-			for (let height = 0; height < flagData.height; height++) {
-				const y = Math.max(0, Math.min(flagData.y + height, gridData.enabledRows - 1));
+		const newPosition = canItemFitInVault(itemData, vaultActor, { gridData, items: vaultItems, mergeItems });
+		if (typeof newPosition === "string") {
+			deletions.push(item._id);
+			const update = updates.find(update => update._id === newPosition);
+			if (update) Utilities.setItemQuantity(update, (Utilities.getItemQuantity(update) ?? 1) + Utilities.getItemQuantity(itemData));
+			continue;
+		} else if (!newPosition) {
+			return false;
+		}
+		setProperty(flagData, "x", newPosition.x);
+		setProperty(flagData, "y", newPosition.y);
+		setProperty(flagData, "flipped", newPosition.flipped);
+		const { width, height } = getVaultItemDimensions(item, flagData);
+		for (let w = 0; w < width; w++) {
+			const x = Math.max(0, Math.min(newPosition.x + w, gridData.enabledCols - 1));
+			for (let h = 0; h < height; h++) {
+				const y = Math.max(0, Math.min(newPosition.y + h, gridData.enabledRows - 1));
 				gridData.grid[x][y] = item.name;
-				const indexToDelete = gridData.freeCells.indexOf({ x, y });
-				if(indexToDelete > -1) {
+				const indexToDelete = gridData.freeCells.findIndex(pos => pos.x === x && pos.y === y);
+				if (indexToDelete > -1) {
 					gridData.freeCells.splice(indexToDelete, 1);
 				}
 			}
 		}
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
+		updates.push(itemData);
+		vaultItems.push(itemData);
 	}
-	return newItemData;
+	return {
+		updates,
+		deletions
+	}
 }
 
-export function getNewItemsVaultPosition(item, gridData, position = null) {
+export function canItemFitInVault(item, vaultActor, {
+	mergeItems = true,
+	gridData = false,
+	position = null,
+	items = null
+} = {}) {
+	if (!isItemPileVault(vaultActor)) return true;
+	const vaultItems = items ?? getActorItems(vaultActor);
+	if (mergeItems && canItemStack(item, vaultActor)) {
+		const similarItem = Utilities.findSimilarItem(vaultItems, item);
+		if (similarItem) {
+			const itemFlagData = getItemFlagData(similarItem);
+			if (!position || areItemsColliding(position, itemFlagData)) {
+				return similarItem.id ?? similarItem._id;
+			}
+		}
+	}
+	const vaultGridData = gridData ?? getVaultGridData(vaultActor);
+	return getNewItemsVaultPosition(item, vaultGridData, { position, items });
+}
+
+export function getNewItemsVaultPosition(item, gridData, { position = null } = {}) {
 
 	const itemFlagData = getItemFlagData(item);
+	let flipped = position?.flipped ?? false;
 	const { grid, freeCells, enabledCols, enabledRows } = gridData;
-	const validCells = freeCells.filter(cell => {
-		return ((cell.x + itemFlagData.width) <= enabledCols)
-			&& ((cell.y + itemFlagData.height) <= enabledRows);
-	})
 
-	if (!validCells.length) return false;
-
-	if (itemFlagData.width === 1 && itemFlagData.height === 1) {
-		return validCells[0];
+	if (position) {
+		let fitsInPosition = true;
+		const { width, height } = getVaultItemDimensions(item, { ...itemFlagData, flipped });
+		for (let w = 0; w < width; w++) {
+			for (let h = 0; h < height; h++) {
+				fitsInPosition = !grid[position.x + w][position.y + h];
+				if (!fitsInPosition) break;
+			}
+			if (!fitsInPosition) break;
+		}
+		if (fitsInPosition) return position;
+	} else {
+		position = { x: 0, y: 0 };
 	}
 
-	const cellsToCheck = position ? validCells.sort((a, b) => {
-		const distA = (new Ray(a, position)).distance;
-		const distB = (new Ray(b, position)).distance;
-		return ((distA - distB) * 1000) + (itemFlagData.width >= itemFlagData.height ? b.x - a.x : b.y - a.y);
-	}) : validCells;
+	const loops = Number(itemFlagData.width > 1 || itemFlagData.height > 1);
+	for (let i = 0; i <= loops; i++) {
 
-	cellLoop:
-		for (const { x, y } of cellsToCheck) {
-			for (let width = 0; width < itemFlagData.width; width++) {
-				for (let height = 0; height < itemFlagData.height; height++) {
-					if (grid[x + width][y + height]) {
-						continue cellLoop;
+		const { width, height } = getVaultItemDimensions(item, { ...itemFlagData, flipped });
+
+		const validCells = freeCells.filter(cell => {
+			return ((cell.x + width) <= enabledCols) && ((cell.y + height) <= enabledRows);
+		});
+
+		const cellsToCheck = validCells.sort((a, b) => {
+			const distA = (new Ray(a, position)).distance;
+			const distB = (new Ray(b, position)).distance;
+			return distA - distB;
+		});
+
+		if (width === 1 && height === 1 && cellsToCheck.length) {
+			return cellsToCheck[0];
+		}
+
+		cellLoop:
+			for (const { x, y } of cellsToCheck) {
+				for (let w = 0; w < width; w++) {
+					for (let h = 0; h < height; h++) {
+						if (grid[x + w][y + h]) {
+							continue cellLoop;
+						}
 					}
 				}
+				return { x, y, flipped };
 			}
-			return { x, y };
-		}
+		flipped = !flipped;
+	}
 
 	return false;
 

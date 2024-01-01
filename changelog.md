@@ -1,7 +1,15 @@
 # Item Piles Changelog
 
 ## Version 2.8.13
+
+- Added the ability to rotate vault items of non-uniform sizes
+- Added button to vault to sort the items within the vault, sorting large to small - hold control to merge similar items as well
+- Added `game.itempies.API.getStringFromCurrencies` (thanks to p4535992 on github!)
+- Updated French, Portuguese (Brazil), and Polish localization (thanks Marc Feuillen, ltsoares, and Lioheart on weblate!)
 - Tweaked override currencies on item piles cause buying/transferring these currencies to fully remove themselves from inventories when used up
+- Tweaked various API methods to throw an error if the items to be added cannot fit inside the target vault
+- Fixed better rolltables not working after update (thanks Pantus on github!)
+- Fixed trading window in Alien RPG displaying some of its native character sheet elements due to over-eager CSS styles on the system's behalf
 - Fixed being able to add items with 0 quantity to item piles
 
 ## Version 2.8.12

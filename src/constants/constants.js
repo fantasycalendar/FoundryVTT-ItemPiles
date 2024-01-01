@@ -67,6 +67,7 @@ const CONSTANTS = {
 		height: 1,
 		flipped: false,
 		vaultImage: "",
+		vaultImageFlipped: "",
 		canStack: "default"
 	},
 
@@ -208,6 +209,7 @@ CONSTANTS.HOOKS = {
 	OPEN_INTERFACE: module`openInterface`,
 	PRE_CLOSE_INTERFACE: module`preCloseInterface`,
 	CLOSE_INTERFACE: module`closeInterface`,
+	RENDER_VAULT_GRID_ITEM: module`renderVaultGridItem`,
 	PILE: {
 		PRE_CREATE: module`preCreateItemPile`,
 		CREATE: module`createItemPile`,

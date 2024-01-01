@@ -159,7 +159,7 @@
 
 					<div class="item-piles-character-header item-piles-bottom-divider">
 						<img src="{store.leftTraderActor.img}">
-						<h2 class="character-name">
+						<h2 class="item-piles-character-name">
 							<div>{store.leftTraderActor.name}</div>
 						</h2>
 						<div>
@@ -252,7 +252,7 @@
 								class:fa-user-times={!$rightTraderAccepted}
 							></i>
 						</div>
-						<h2 class="character-name">
+						<h2 class="item-piles-character-name">
 							{store.rightTraderActor.name}
 						</h2>
 						<img src="{store.rightTraderActor.img}">

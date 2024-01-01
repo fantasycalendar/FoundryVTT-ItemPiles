@@ -1,7 +1,7 @@
 <script>
 	import CONSTANTS from '../../constants/constants.js';
 
-	import { getContext, onDestroy } from 'svelte';
+	import { getContext, onDestroy, setContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
 	import { TJSContextMenu } from "@typhonjs-fvtt/svelte-standard/application";
@@ -13,7 +13,7 @@
 	import DropZone from '../components/DropZone.svelte';
 	import VaultItemEntry from './VaultItemEntry.svelte';
 
-	import { snapOnMove } from '../components/Grid/grid-utils';
+	import { coordinate2size, snapOnMove } from '../components/Grid/grid-utils.js';
 	import * as Helpers from "../../helpers/helpers.js";
 	import { isCoordinateWithinPosition } from "../../helpers/helpers.js";
 
@@ -31,6 +31,8 @@
 
 	export let store = VaultStore.make(application, actor, recipient);
 
+	setContext("store", store);
+
 	const currencies = store.allCurrencies;
 	const pileDataStore = store.pileData;
 	const gridDataStore = store.gridData;
@@ -41,7 +43,6 @@
 	const vaultLog = store.vaultLog;
 	const visibleLogItems = store.visibleLogItems;
 	const recipientDocument = store.recipientDocument;
-	const numCurrencies = store.numCurrencies;
 	const dragPositionStore = store.dragPosition;
 
 	$: pileData = $pileDataStore;
@@ -68,8 +69,8 @@
 			return onDragLeave();
 		}
 		dragPositionStore.update(data => {
-			const x = (clientX - rect.left) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize/2); //x position within the element.
-			const y = (clientY - rect.top) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize/2);  //y position within the element.
+			const x = (clientX - rect.left) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize / 2); //x position within the element.
+			const y = (clientY - rect.top) - (offset ? ((gridData.gridSize * data.w) / 2) : gridData.gridSize / 2);  //y position within the element.
 			return {
 				...data,
 				...snapOnMove(x, y, { w: data.w, h: data.h }, { ...gridData }),
@@ -85,14 +86,16 @@
 	}
 
 	const dragHookId = Hooks.on(CONSTANTS.HOOKS.DRAG_DOCUMENT, async (dropData) => {
-		if(dropData.type !== "Item") return;
+		if (dropData.type !== "Item") return;
 		const item = await Item.implementation.fromDropData(dropData);
 		const flags = PileUtilities.getItemFlagData(item);
+		const { width, height } = PileUtilities.getVaultItemDimensions(item, flags);
 		dragPositionStore.update(data => {
 			return {
 				...data,
-				w: flags.width,
-				h: flags.height
+				w: width,
+				h: height,
+				flipped: flags.flipped
 			}
 		});
 	})
@@ -101,7 +104,8 @@
 			return {
 				...data,
 				w: 1,
-				h: 1
+				h: 1,
+				flipped: false
 			}
 		});
 	})
@@ -173,12 +177,13 @@
 			x,
 			y,
 			style: {
-				width: (gridData.gridSize * w) + "px",
-				height: (gridData.gridSize * h) + "px",
-				opacity: 0.7,
+				width: coordinate2size(w, gridData.gridSize, gridData.gap) + "px",
+				height: coordinate2size(h, gridData.gridSize, gridData.gap) + "px",
+				opacity: 0.7
 			},
 			component: VaultItemEntry,
-			componentData: { entry: item }
+			componentData: { entry: item },
+			context: { store }
 		});
 
 		splitStart({
@@ -198,12 +203,13 @@
 			x,
 			y,
 			style: {
-				width: (gridData.gridSize * w) + "px",
-				height: (gridData.gridSize * h) + "px",
+				width: coordinate2size(w, gridData.gridSize, gridData.gap) + "px",
+				height: coordinate2size(h, gridData.gridSize, gridData.gap) + "px",
 				opacity: 0.7,
 			},
 			component: VaultItemEntry,
-			componentData: { entry: item }
+			componentData: { entry: item },
+			context: { store }
 		})
 		Hooks.callAll(CONSTANTS.HOOKS.DRAG_DOCUMENT, {
 			type: "Item",
@@ -240,7 +246,7 @@
 
 		if (hitApps.length) {
 			if (hitApps[0] === application) return;
-			if(hitApps[0].actor) {
+			if (hitApps[0].actor) {
 				dropData.target = hitApps[0].actor;
 			}
 			if (hitApps[0].onDropData) {
@@ -260,9 +266,22 @@
 	}
 
 	function itemMove(event) {
-		const { x, y } = event.detail;
 		if (!FloatingElement.id) return;
+		const { x, y } = event.detail;
 		FloatingElement.positionStore.set({ x, y });
+	}
+
+	function itemFlipped(event) {
+		if (!FloatingElement.id) return;
+		const item = event.detail.item.item;
+		const { flipped } = event.detail;
+		const rotation = item.flipped ? (flipped ? "0deg" : "-90deg") : (flipped ? "90deg" : "0deg");
+		FloatingElement.styleStore.update(style => {
+			return foundry.utils.mergeObject(style, {
+				"transform": `rotate(${rotation})`,
+				"transition": "transform 150ms"
+			});
+		});
 	}
 
 	let activeTab = writable("vault");
@@ -277,9 +296,24 @@
 		}
 	}
 
+	function keydown(event) {
+		if (event.key !== "r") return;
+		dragPositionStore.update(data => {
+			const { w, h } = data;
+			if (data.active && w !== h) {
+				data.w = h;
+				data.h = w;
+				data.flipped = !data.flipped;
+			}
+			return data;
+		})
+	}
+
 </script>
 
 <svelte:options accessors={true}/>
+
+<svelte:window on:keydown={keydown}/>
 
 <ApplicationShell bind:elementRoot>
 
@@ -341,6 +375,7 @@
 				      on:itemmove={itemMove}
 				      on:rightclick={rightClickItem}
 				      on:doubleclick={doubleClickItem}
+				      on:itemflipped={itemFlipped}
 				      let:item
 				>
 					<VaultItemEntry entry={item}/>
@@ -379,6 +414,12 @@
 			{/if}
 
 			<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
+
+				<div style="flex: 0 1 auto;">
+					<button type="button" class="item-piles-small-button" on:click={(event) => store.sortItemsOnGrid(event)}>
+						{localize("ITEM-PILES.Vault.SortItems")}
+					</button>
+				</div>
 
 				<CurrencyList {currencies}
 				              options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}

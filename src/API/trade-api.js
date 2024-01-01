@@ -67,7 +67,7 @@ export default class TradeAPI {
 		const actorOwner = game.users.find(user => user.character === actor && user !== game.user);
 		if (actorOwner) {
 
-			const doContinue = TJSDialog.confirm({
+			const doContinue = await TJSDialog.confirm({
 				title: game.i18n.localize("ITEM-PILES.Trade.Title"), content: {
 					class: CustomDialog, props: {
 						header: game.i18n.localize("ITEM-PILES.Trade.Title"),

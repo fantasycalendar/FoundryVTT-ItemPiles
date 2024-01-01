@@ -1,33 +1,79 @@
 <script>
 
+	import CONSTANTS from "../../constants/constants.js";
 	import * as Helpers from "../../helpers/helpers.js";
+	import { getContext, onMount } from "svelte";
+	import { coordinate2size } from "../components/Grid/grid-utils.js";
 
 	export let entry;
 
-	const item = entry.item;
+	const store = getContext("store");
+	const gridDataStore = store.gridData;
 
+	$: gridData = $gridDataStore;
+
+	const item = entry.item;
+	const doc = item.itemDocument;
 	const name = item.name;
 	const img = item.img;
 	const flagData = item.itemFlagData;
 	const quantity = item.quantity;
 	const canStack = item.canStack;
 	const style = item.style;
+	const transform = entry.transform;
+	let containerStyle = "";
 
 	$: styling = Helpers.styleFromObject($style);
-	$: displayImage = $flagData.vaultImage || $img;
+	$: displayImage = ($flagData.flipped ? $flagData.vaultImageFlipped || $flagData.vaultImage : $flagData.vaultImage) || $img;
+	$: imageChanged($flagData, $transform);
+	$: {
+		$doc;
+		callRenderedHook();
+	}
+
+	function imageChanged(flagData, transform) {
+		if (!flagData.vaultImageFlipped) {
+			getImageDimensions(transform)
+		} else {
+			containerStyle = ""
+		}
+	}
+
+	function getImageDimensions(transform) {
+		let { w, h, flipped } = transform;
+		const width = coordinate2size(!flipped ? w : h, gridData.gridSize, gridData.gap);
+		const height = coordinate2size(!flipped ? h : w, gridData.gridSize, gridData.gap);
+		containerStyle = `transform: rotate(${flipped ? "90deg" : "0deg"}); min-width: ${width}px; max-width: ${width}px; min-height: ${height}px; max-height: ${height}px;`;
+	}
+
+	let element = false;
+
+	function callRenderedHook() {
+		if (!element) return;
+		Hooks.callAll(CONSTANTS.HOOKS.RENDER_VAULT_GRID_ITEM, element, item.item);
+	}
+
+	onMount(() => {
+		callRenderedHook();
+	});
 
 </script>
 
-<div class="grid-item" data-fast-tooltip={$name}
-     data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0">
+<div bind:this={element}
+     class="grid-item"
+     data-fast-tooltip={$name} data-fast-tooltip-activation-speed="0"
+     data-fast-tooltip-deactivation-speed="0"
+>
 	{#if displayImage}
-		<img src={displayImage}/>
+		<div class="grid-item-image-container" style={containerStyle}>
+			<img class="grid-item-image" src={displayImage}/>
+		</div>
 	{/if}
 	{#if styling}
 		<div class="grid-item-ghost" style={styling}></div>
 	{/if}
 	{#if canStack && $quantity > 1}
-		<span>{$quantity}</span>
+		<span class="grid-item-quantity">{$quantity}</span>
 	{/if}
 </div>
 
@@ -36,7 +82,6 @@
   .grid-item {
     width: 100%;
     height: 100%;
-    transition: transform 2s, top 2s, left 2s;
     border-radius: 0.25rem;
     position: relative;
 
@@ -46,17 +91,23 @@
     overflow: hidden;
     border: 1px solid black;
 
-    img {
+    .grid-item-image {
       position: absolute;
       flex-shrink: 0;
-      min-width: 100%;
-      min-height: 100%;
-      object-fit: cover;
-      transition: transform 2s, opacity 2s;
       border: 0;
+      object-fit: cover;
+      width: 100%;
+      min-height: 100%;
     }
 
-    span {
+    .grid-item-image-container {
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      display: flex;
+    }
+
+    .grid-item-quantity {
       position: absolute;
       bottom: 0;
       right: 3px;

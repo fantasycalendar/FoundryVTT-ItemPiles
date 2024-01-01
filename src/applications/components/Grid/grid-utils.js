@@ -1,4 +1,4 @@
-import { clamp } from "../../../helpers/helpers";
+import { clamp } from "../../../helpers/helpers.js";
 import { get } from "svelte/store";
 
 export function isItemColliding(item, otherItem) {
@@ -31,25 +31,26 @@ export function position2coordinate(position, cellSize, size, gap) {
 	return Math.round(position / (cellSize + gap));
 }
 
-export function snapOnMove(left, top, transform, options) {
-	const { gridSize, gap, cols, enabledCols, rows, enabledRows } = options;
+export function snapOnMove(left, top, transform, options, doClamp = true) {
+	const { gridSize, gap, enabledCols, enabledRows } = options;
 	const { w, h } = transform;
 
 	const width = w * gridSize;
 	const height = h * gridSize;
 
-	let x = position2coordinate(left, gridSize, width, gap);
-	let y = position2coordinate(top, gridSize, height, gap);
+	const x = position2coordinate(left, gridSize, width, gap);
+	const y = position2coordinate(top, gridSize, height, gap);
 
-	x = clamp(x, 0, Math.min(cols, enabledCols) - w);
-	y = clamp(y, 0, Math.min(rows, enabledRows) - h);
-
-	return { x, y };
+	return {
+		x: doClamp ? clamp(x, 0, enabledCols - w) : x,
+		y: doClamp ? clamp(y, 0, enabledRows - h) : y
+	};
 }
 
 export function calcPosition(transform, options) {
 	const { gridSize, gap } = options;
 	return {
+		...transform,
 		left: coordinate2position(transform.x, gridSize, gap),
 		top: coordinate2position(transform.y, gridSize, gap),
 		width: coordinate2size(transform.w, gridSize, gap),
@@ -57,11 +58,50 @@ export function calcPosition(transform, options) {
 	};
 }
 
+export function swapItemTransform(originalTransform, finalTransform, transform) {
+
+	const newTransform = { ...transform };
+
+	const shouldFlip = originalTransform.flipped !== finalTransform.flipped;
+	const delta = {
+		x: newTransform.x - finalTransform.x,
+		y: newTransform.y - finalTransform.y,
+	}
+	if (shouldFlip) {
+
+		if (!originalTransform.flipped && finalTransform.flipped) {
+			delta.x -= finalTransform.w;
+			delta.x += newTransform.w;
+			const { x, y } = delta;
+			delta.x = y;
+			delta.y = x * -1;
+		} else if (originalTransform.flipped && !finalTransform.flipped) {
+			delta.y -= finalTransform.h;
+			delta.y += newTransform.h;
+			const { x, y } = delta;
+			delta.x = y * -1;
+			delta.y = x;
+		}
+
+		const { w, h } = newTransform;
+		newTransform.w = shouldFlip ? h : w;
+		newTransform.h = shouldFlip ? w : h;
+		newTransform.flipped = shouldFlip ? !newTransform.flipped : newTransform.flipped;
+
+	}
+
+	newTransform.x = originalTransform.x + delta.x;
+	newTransform.y = originalTransform.y + delta.y;
+
+	return newTransform;
+
+}
+
 export function isPlacementValid(item, collisions, items, options) {
 	if (!collisions.length) return true;
 
-	const finalTransform = get(item.transform);
-	const origItemTransform = get(item.item.transform);
+	const finalTransform = foundry.utils.deepClone(get(item.transform));
+	const origItemTransform = foundry.utils.deepClone(get(item.item.transform));
 
 	const newItemPlacement = {
 		id: item.id,
@@ -76,34 +116,10 @@ export function isPlacementValid(item, collisions, items, options) {
 	if (!itemWithinBounds) return false;
 
 	const assumedCollisionMovement = collisions.map(collision => {
-
-		const collisionTransform = get(collision.transform);
-
-		const delta = {
-			x: finalTransform.x - origItemTransform.x,
-			y: finalTransform.y - origItemTransform.y
-		}
-
-		const offset = {
-			x: (collisionTransform.x - finalTransform.x),
-			y: (collisionTransform.y - finalTransform.y)
-		}
-
-		if (
-			(delta.x >= -Math.floor(origItemTransform.w / 2) && delta.x < origItemTransform.w)
-			&&
-			(delta.y >= -Math.floor(origItemTransform.h / 2) && delta.y < origItemTransform.h)
-		) {
-			return false;
-		}
-
+		const collisionTransform = foundry.utils.deepClone(get(collision.transform));
 		return {
 			id: collision.id,
-			transform: {
-				...collisionTransform,
-				x: origItemTransform.x + offset.x,
-				y: origItemTransform.y + offset.y,
-			}
+			transform: swapItemTransform(origItemTransform, finalTransform, collisionTransform)
 		};
 	});
 

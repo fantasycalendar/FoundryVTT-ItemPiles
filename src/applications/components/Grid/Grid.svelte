@@ -3,7 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { styleFromObject } from '../../../helpers/helpers';
-	import { calcPosition } from './grid-utils';
+	import { calcPosition } from './grid-utils.js';
 	import GridItem from './GridItem.svelte';
 
 	export let gridContainer = HTMLDivElement;
@@ -65,6 +65,10 @@
 		dispatch('doubleclick', { ...event.detail });
 	}
 
+	function itemFlippedEvent(event) {
+		dispatch('itemflipped', { ...event.detail });
+	}
+
 	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
 	$: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
 
@@ -112,6 +116,7 @@
 				on:itemmove={itemMove}
 				on:itemhoverleave={itemHoverLeaveEvent}
 				on:itemrightclick={itemRightClickEvent}
+				on:itemflipped={itemFlippedEvent}
 			>
 				<slot {item}/>
 			</GridItem>
