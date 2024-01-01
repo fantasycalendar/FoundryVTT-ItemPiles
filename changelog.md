@@ -10,6 +10,7 @@
 - Tweaked various API methods to throw an error if the items to be added cannot fit inside the target vault
 - Fixed better rolltables not working after update (thanks Pantus on github!)
 - Fixed trading window in Alien RPG displaying some of its native character sheet elements due to over-eager CSS styles on the system's behalf
+- Fixed not being able to trade currencies when trading user to user
 - Fixed being able to add items with 0 quantity to item piles
 
 ## Version 2.8.12

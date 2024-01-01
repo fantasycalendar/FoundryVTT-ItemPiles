@@ -391,6 +391,21 @@ export class VaultStore extends ItemPileStore {
 
 		const mergeItems = event.ctrlKey;
 
+		if (mergeItems) {
+			const doMerge = await TJSDialog.confirm({
+				title: "Item Piles",
+				content: {
+					class: CustomDialog,
+					props: {
+						header: game.i18n.localize("ITEM-PILES.Dialogs.SortMergeVaultItems.Title"),
+						content: game.i18n.localize("ITEM-PILES.Dialogs.SortMergeVaultItems.Content")
+					}
+				},
+				modal: true
+			});
+			if (!doMerge) return;
+		}
+
 		const gridItems = get(this.gridItems).map(item => item.item).sort((a, b) => {
 			return b.size - a.size;
 		}).map(item => item.item);

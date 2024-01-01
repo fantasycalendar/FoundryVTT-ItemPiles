@@ -198,6 +198,7 @@
       "Withdraw": "Withdraw",
       "Deposit": "Deposit",
       "SortItems": "Sort Items",
+      "SortItemsTooltip": "Sort items - hold Ctrl to merge similar items",
       "LogUserActor": "{actor_name} ({user_name})",
       "Deposited": "deposited",
       "Withdrew": "withdrew",
@@ -282,6 +283,10 @@
       "ClearMerchantLog": {
         "Title": "Clear Merchant Log?",
         "Content": "Are you sure you want to clear the log of the merchant \"{actor_name}\"?"
+      },
+      "SortMergeVaultItems": {
+        "Title": "Sort & Merge Similar Items?",
+        "Content": "Are you sure you want to merge similar items while sorting them? The merge cannot be undone."
       }
     },
     "Applications": {

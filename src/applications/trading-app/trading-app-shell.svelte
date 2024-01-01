@@ -113,7 +113,7 @@
 		if (!currenciesToAdd || (foundry.utils.isEmpty(currenciesToAdd.attributes) && !currenciesToAdd.items.length)) return;
 
 		currenciesToAdd.items.forEach(item => {
-			const itemData = store.leftTraderActor.items.get(item._id).toObject();
+			const itemData = store.leftTraderActor.items.get(item.item._id).toObject();
 			store.addItem(itemData, { quantity: item.quantity, currency: true })
 		});
 
