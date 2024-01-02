@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 2.8.14
+
+- Fixed issue with not being able to drop items into vault
+- Fixed minor issue with some items not landing where they were dropped into vaults
+
 ## Version 2.8.13
 
 - Added the ability to rotate vault items of non-uniform sizes

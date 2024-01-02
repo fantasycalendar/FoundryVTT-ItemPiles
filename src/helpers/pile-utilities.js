@@ -789,41 +789,41 @@ export function getPriceArray(totalCost, currencies) {
 export function getCurrenciesAbbreviations() {
 	// Retrieve all the primary abbreviations for the check
 	let primaryAbbreviationsArray = game.itempiles.API.CURRENCIES
-	.filter(currency => currency.abbreviation)
-	.map(currency => {
-		return currency.abbreviation?.replace("{#}", "");
-	});
+		.filter(currency => currency.abbreviation)
+		.map(currency => {
+			return currency.abbreviation?.replace("{#}", "");
+		});
 	let secondaryAbbreviationsArray = game.itempiles.API.SECONDARY_CURRENCIES
-	.filter(currency => currency.abbreviation)
-	.map(currency => {
-		return currency.abbreviation?.replace("{#}", "");
-	});
-	let allAbbreviationsArray =  primaryAbbreviationsArray.concat(secondaryAbbreviationsArray);
+		.filter(currency => currency.abbreviation)
+		.map(currency => {
+			return currency.abbreviation?.replace("{#}", "");
+		});
+	let allAbbreviationsArray = primaryAbbreviationsArray.concat(secondaryAbbreviationsArray);
 	return allAbbreviationsArray;
 }
 
 export function getStringFromCurrencies(currencies) {
 	let allAbbreviationsArray = getCurrenciesAbbreviations();
 
-	let priceString  = currencies
-	.filter(price => price.cost)
-	.map(price => {
-		let cost = price.cost;
-		let abbreviation = price.abbreviation;
-		if(!Helpers.isRealNumber(cost) || !abbreviation) {
-			Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, false);
-			return "";
-		}
-		if(!allAbbreviationsArray.includes(abbreviation?.replace("{#}", ""))) {
-			Helpers.custom_error(`getStringFromCurrencies | The currency abbreviation '${abbreviation?.replace("{#}", "")}' is not registered`, false);
-			return "";
-		}
-		if (price.percent && abbreviation.includes("%")) {
-			abbreviation = abbreviation.replaceAll("%", "")
-		}
-		return abbreviation.replace("{#}", price.cost)
-	}).join(" ");
-	
+	let priceString = currencies
+		.filter(price => price.cost)
+		.map(price => {
+			let cost = price.cost;
+			let abbreviation = price.abbreviation;
+			if (!Helpers.isRealNumber(cost) || !abbreviation) {
+				Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, false);
+				return "";
+			}
+			if (!allAbbreviationsArray.includes(abbreviation?.replace("{#}", ""))) {
+				Helpers.custom_error(`getStringFromCurrencies | The currency abbreviation '${abbreviation?.replace("{#}", "")}' is not registered`, false);
+				return "";
+			}
+			if (price.percent && abbreviation.includes("%")) {
+				abbreviation = abbreviation.replaceAll("%", "")
+			}
+			return abbreviation.replace("{#}", price.cost)
+		}).join(" ");
+
 	return priceString ? priceString.trim() : "";
 }
 
@@ -1599,10 +1599,11 @@ export function getVaultGridData(vaultActor, { flagData = false, items = false }
 	});
 
 	for (const item of regularItems) {
-		for (let width = 0; width < item.itemFlagData.width; width++) {
-			const x = Math.max(0, Math.min(item.itemFlagData.x + width, enabledCols - 1));
-			for (let height = 0; height < item.itemFlagData.height; height++) {
-				const y = Math.max(0, Math.min(item.itemFlagData.y + height, enabledRows - 1));
+		const { width, height } = getVaultItemDimensions(item.item, item.itemFlagData);
+		for (let w = 0; w < width; w++) {
+			const x = Math.max(0, Math.min(item.itemFlagData.x + w, enabledCols - 1));
+			for (let h = 0; h < height; h++) {
+				const y = Math.max(0, Math.min(item.itemFlagData.y + h, enabledRows - 1));
 				grid[x][y] = item.item.name;
 			}
 		}
@@ -1688,7 +1689,7 @@ export function fitItemsIntoVault(items, vaultActor, {
 
 export function canItemFitInVault(item, vaultActor, {
 	mergeItems = true,
-	gridData = false,
+	gridData = null,
 	position = null,
 	items = null
 } = {}) {
@@ -1718,7 +1719,7 @@ export function getNewItemsVaultPosition(item, gridData, { position = null } = {
 		const { width, height } = getVaultItemDimensions(item, { ...itemFlagData, flipped });
 		for (let w = 0; w < width; w++) {
 			for (let h = 0; h < height; h++) {
-				fitsInPosition = !grid[position.x + w][position.y + h];
+				fitsInPosition = position.x + w < enabledCols && position.y + h < enabledRows && !grid[position.x + w][position.y + h];
 				if (!fitsInPosition) break;
 			}
 			if (!fitsInPosition) break;

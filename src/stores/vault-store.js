@@ -367,7 +367,7 @@ export class VaultStore extends ItemPileStore {
 		const similarItem = this.getSimilarItem(itemData);
 		if (!vaultExpander) {
 			if (!similarItem || !PileUtilities.canItemStack(item, this.actor)) {
-				validPosition = PileUtilities.canItemFitInVault(itemData, this.actor, validPosition);
+				validPosition = PileUtilities.canItemFitInVault(itemData, this.actor, { position: validPosition });
 				if (!validPosition) {
 					Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultFull"), true)
 					return false;
