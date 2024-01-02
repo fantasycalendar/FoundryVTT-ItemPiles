@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.8.15
+
+- Fixed players not being able to sort vaults
+
 ## Version 2.8.14
 
 - Fixed issue with not being able to drop items into vault

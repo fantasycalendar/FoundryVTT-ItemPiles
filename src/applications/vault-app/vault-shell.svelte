@@ -415,12 +415,14 @@
 
 			<div class="item-piles-flexrow" style="margin-top: 0.25rem; flex:0 1 auto;">
 
-				<div style="flex: 0 1 auto;">
-					<button type="button" class="item-piles-small-button" on:click={(event) => store.sortItemsOnGrid(event)}
-					        data-tooltip={localize("ITEM-PILES.Vault.SortItemsTooltip")}>
-						{localize("ITEM-PILES.Vault.SortItems")}
-					</button>
-				</div>
+				{#if gridData.canOrganize}
+					<div style="flex: 0 1 auto;">
+						<button type="button" class="item-piles-small-button" on:click={(event) => store.sortItemsOnGrid(event)}
+						        data-tooltip={localize("ITEM-PILES.Vault.SortItemsTooltip")}>
+							{localize("ITEM-PILES.Vault.SortItems")}
+						</button>
+					</div>
+				{/if}
 
 				<CurrencyList {currencies}
 				              options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}

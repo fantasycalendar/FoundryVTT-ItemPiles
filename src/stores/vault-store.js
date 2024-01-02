@@ -422,8 +422,10 @@ export class VaultStore extends ItemPileStore {
 			[CONSTANTS.FLAGS.ITEM]: PileUtilities.cleanItemFlagData(PileUtilities.getItemFlagData(item))
 		}))
 
-		await this.actor.updateEmbeddedDocuments("Item", itemUpdates);
-		await this.actor.deleteEmbeddedDocuments("Item", deletions);
+		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, this.actor.uuid, {
+			itemsToUpdate: itemUpdates,
+			itemsToDelete: deletions
+		});
 
 	}
 
