@@ -2,7 +2,8 @@
 
 ## Version 2.8.15
 
-- Fixed players not being able to sort vaults
+- Fixed non-stackable items being fully deleted when added to vaults even though they may have quantity in the origin character inventory
+- Fixed players not being able to sort vaults when they have permission to organize the vault
 
 ## Version 2.8.14
 

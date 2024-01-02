@@ -942,7 +942,7 @@ export default class PrivateAPI {
 	 */
 	static async _dropItems({
 		userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false, elevation = false
-	                        } = {}) {
+	} = {}) {
 
 		let itemsDropped;
 
@@ -988,16 +988,16 @@ export default class PrivateAPI {
 	}
 
 	static async _createItemPile({
-		                             sceneId = null,
-		                             position = false,
-		                             actor = false,
-		                             createActor = false,
-		                             items = false,
-		                             tokenOverrides = {},
-		                             actorOverrides = {},
-		                             itemPileFlags = {},
-		                             folders = false,
-	                             } = {}) {
+		sceneId = null,
+		position = false,
+		actor = false,
+		createActor = false,
+		items = false,
+		tokenOverrides = {},
+		actorOverrides = {},
+		itemPileFlags = {},
+		folders = false,
+	} = {}) {
 
 		let returns = {};
 
@@ -1643,7 +1643,7 @@ export default class PrivateAPI {
 			foundry.utils.setProperty(flagData, "x", dropData.gridPosition?.x ?? 0);
 			foundry.utils.setProperty(flagData, "y", dropData.gridPosition?.y ?? 0);
 		}
-		foundry.utils.setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
+		foundry.utils.setProperty(dropData.itemData, "flags", flagData);
 
 		if (sourceActor) {
 			return game.itempiles.API.transferItems(sourceActor, targetActor, [dropData.itemData], { interactionId: dropData.interactionId });
@@ -1708,8 +1708,8 @@ export default class PrivateAPI {
 			if (!hotkeyActionState.forceDropOneItem) {
 
 				if (!dropData.skipCheck) {
-					const item = await Item.implementation.create(dropData.itemData.item, {temporary: true});
-					itemQuantity = await DropItemDialog.show(item, dropData.target, {unlimitedQuantity: !dropData.source && game.user.isGM});
+					const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+					itemQuantity = await DropItemDialog.show(item, dropData.target, { unlimitedQuantity: !dropData.source && game.user.isGM });
 					if (!itemQuantity) return;
 				}
 
@@ -2277,17 +2277,17 @@ export default class PrivateAPI {
 	}
 
 	static async _rollItemTable({
-		                            table = "",
-		                            timesToRoll = "1",
-		                            resetTable = true,
-		                            normalizeTable = false,
-		                            displayChat = false,
-		                            rollData = {},
-		                            customCategory = false,
-		                            targetActor = false,
-		                            removeExistingActorItems = false,
-		                            userId = false,
-	                            } = {}) {
+		table = "",
+		timesToRoll = "1",
+		resetTable = true,
+		normalizeTable = false,
+		displayChat = false,
+		rollData = {},
+		customCategory = false,
+		targetActor = false,
+		removeExistingActorItems = false,
+		userId = false,
+	} = {}) {
 
 		let items = await PileUtilities.rollTable({
 			tableUuid: table,

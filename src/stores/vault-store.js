@@ -381,7 +381,7 @@ export class VaultStore extends ItemPileStore {
 
 		return PrivateAPI._depositWithdrawItem({
 			source, target, itemData: {
-				item: itemData, quantity: 1
+				item: itemData,
 			}, gridPosition: validPosition
 		});
 
@@ -544,7 +544,7 @@ export class VaultItem extends PileItem {
 		setProperty(flags, "x", x);
 		setProperty(flags, "y", y);
 		setProperty(flags, "flipped", flipped);
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
+		setProperty(itemData, "flags", flags);
 
 		await game.itempiles.API.addItems(this.store.actor, [{
 			item: itemData, quantity

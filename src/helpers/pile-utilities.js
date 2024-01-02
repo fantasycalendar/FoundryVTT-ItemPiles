@@ -1719,7 +1719,9 @@ export function getNewItemsVaultPosition(item, gridData, { position = null } = {
 		const { width, height } = getVaultItemDimensions(item, { ...itemFlagData, flipped });
 		for (let w = 0; w < width; w++) {
 			for (let h = 0; h < height; h++) {
-				fitsInPosition = position.x + w < enabledCols && position.y + h < enabledRows && !grid[position.x + w][position.y + h];
+				fitsInPosition = (position.x + w) < enabledCols
+					&& (position.y + h) < enabledRows
+					&& !grid[position.x + w][position.y + h];
 				if (!fitsInPosition) break;
 			}
 			if (!fitsInPosition) break;
