@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.8.16
+
+- Fixed items that were linked with the item linking module losing their links
+
 ## Version 2.8.15
 
 - Fixed non-stackable items being fully deleted when added to vaults even though they may have quantity in the origin character inventory

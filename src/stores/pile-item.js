@@ -8,6 +8,7 @@ import * as Helpers from "../helpers/helpers.js";
 import { Plugins } from "../plugins/main.js";
 import { SYSTEMS } from "../systems.js";
 import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
+import { updateItemData } from "../helpers/pile-utilities.js";
 
 class PileBaseItem {
 
@@ -200,10 +201,9 @@ export class PileItem extends PileBaseItem {
 	}
 
 	async updateFlags() {
-		await this.item.update({
-			[CONSTANTS.FLAGS.ITEM]: get(this.itemFlagData),
-			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
-		})
+		await PileUtilities.updateItemData(this.item, {
+			flags: get(this.itemFlagData)
+		});
 	}
 
 	preview() {

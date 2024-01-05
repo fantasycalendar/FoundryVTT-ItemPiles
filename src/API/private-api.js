@@ -1097,7 +1097,7 @@ export default class PrivateAPI {
 					}
 				})
 
-				await game.settings.set(CONSTANTS.MODULE_NAME, "defaultItemPileActorID", pileActor.id);
+				await game.settings.set(CONSTANTS.MODULE_NAME, SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID, pileActor.id);
 
 			}
 

@@ -100,39 +100,38 @@ export default class Transaction {
 						this.itemsToUpdate.push(update);
 					}
 
+					this.itemDeltas.set(actorExistingItem.id, (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity);
+
 				} else if (remove) {
 
 					this.itemsToForceDelete.add(actorExistingItem.id);
+					this.itemDeltas.set(actorExistingItem.id, (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity);
 
 				} else {
 
-					itemData._id = randomID();
+					if (!itemData._id) {
+						itemData._id = randomID();
+					}
 					Utilities.setItemQuantity(itemData, incomingQuantity);
 					this.itemsToCreate.push(itemData);
 					this.itemTypeMap.set(itemData._id, type)
 
 				}
 
-				this.itemDeltas.set(actorExistingItem.id, (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity);
-
 			} else {
-
-				if (!itemData._id || !canItemStack) {
-					itemData._id = randomID();
-				}
-
 				const existingItemCreation = Utilities.findSimilarItem(this.itemsToCreate, itemData);
 				if (existingItemCreation && canItemStack) {
 					const newQuantity = Utilities.getItemQuantity(existingItemCreation) + incomingQuantity;
 					Utilities.setItemQuantity(existingItemCreation, newQuantity);
 				} else {
+					if (!itemData._id) {
+						itemData._id = randomID();
+					}
 					Utilities.setItemQuantity(itemData, incomingQuantity);
 					this.itemsToCreate.push(itemData);
 					this.itemTypeMap.set(itemData._id, type)
 				}
-
 			}
-
 		}
 	}
 
@@ -142,7 +141,7 @@ export default class Transaction {
 		}
 		this.actorUpdates = attributes.reduce((acc, attribute) => {
 			const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
-			acc[attribute.path] = acc[attribute.path] ?? Number(getProperty(this.actor, attribute.path) ?? 0);
+			acc[attribute.path] = acc[attribute.path] ?? Number(foundry.utils.getProperty(this.actor, attribute.path) ?? 0);
 			if (set) {
 				if (!onlyDelta) {
 					acc[attribute.path] = incomingQuantity
@@ -165,7 +164,7 @@ export default class Transaction {
 			if (this.attributeDeltas.get(entry[0]) === 0) {
 				this.attributeDeltas.delete(entry[0]);
 			}
-			return Number(getProperty(this.actor, entry[0])) !== entry[1];
+			return Number(foundry.utils.getProperty(this.actor, entry[0])) !== entry[1];
 		}))
 		this.itemsToCreate = this.itemsToCreate.filter(item => {
 			return !PileUtilities.canItemStack(item, this.actor) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
