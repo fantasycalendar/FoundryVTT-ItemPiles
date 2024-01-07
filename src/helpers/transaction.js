@@ -26,7 +26,7 @@ export default class Transaction {
 	}
 
 	async appendItemChanges(items, {
-		remove = false, type = "item", keepIfZero = false, onlyDelta = false,
+		set = false, remove = false, type = "item", keepIfZero = false, onlyDelta = false,
 	} = {}) {
 
 		for (let data of items) {
@@ -135,7 +135,8 @@ export default class Transaction {
 		}
 	}
 
-	async appendActorChanges(attributes, { set = false, remove = false, type = "attribute", onlyDelta = false } = {}) {
+	async appendActorChanges(attributes, { 
+		set = false, remove = false, type = "attribute", onlyDelta = false } = {}) {
 		if (!Array.isArray(attributes)) {
 			attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
 		}

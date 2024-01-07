@@ -837,7 +837,7 @@ export function getPriceFromString(str, currencyList = false) {
 		currencyList = getCurrencyList()
 	}
 
-	const currencies = foundry.utils.duplicate(currencyList)
+	let currencies = foundry.utils.duplicate(currencyList)
 		.map(currency => {
 			currency.quantity = 0
 			currency.identifier = currency.abbreviation.toLowerCase().replace("{#}", "").trim()
@@ -849,10 +849,14 @@ export function getPriceFromString(str, currencyList = false) {
 	const splitBy = new RegExp("(.*?) *(" + sortedCurrencies.join("|") + ")", "g");
 
 	const parts = [...str.split(",").join("").split(" ").join("").trim().toLowerCase().matchAll(splitBy)];
-
+	const identifierFilter = [];
 	let overallCost = 0;
 	for (const part of parts) {
 		for (const currency of currencies) {
+
+			if(part[2]) {
+				identifierFilter.push(part[2]);
+			}
 
 			if (part[2] !== currency.identifier) continue;
 
@@ -870,8 +874,11 @@ export function getPriceFromString(str, currencyList = false) {
 			}
 		}
 	}
+	
+	// Maybe there is a better method for this ?
+	currencies = currencies.filter(currency => identifierFilter.includes(currency.identifier));
 
-	if (!currencies.some(currency => currency.quantity)) {
+	if (!currencies.some(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0)) {
 		try {
 			const roll = new Roll(str).evaluate({ async: false });
 			if (roll.total) {

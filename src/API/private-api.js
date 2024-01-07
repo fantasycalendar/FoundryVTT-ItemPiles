@@ -368,7 +368,7 @@ export default class PrivateAPI {
 		const transaction = new Transaction(targetActor);
 
 		const currenciesToUpdate = PileUtilities.getPriceFromString(currencies).currencies
-			.filter(currency => currency.quantity);
+			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0);
 
 		const itemsToUpdate2 = currenciesToUpdate.filter(currency => currency.type === "item")
 			.map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
@@ -376,7 +376,7 @@ export default class PrivateAPI {
 		const attributesToUpdate = currenciesToUpdate.filter(currency => currency.type === "attribute")
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
-		await transaction.appendItemChanges(itemsToUpdate2, { type: "currency" });
+		await transaction.appendItemChanges(itemsToUpdate2, { type: "currency", set: true });
 		await transaction.appendActorChanges(attributesToUpdate, { type: "currency", set: true });
 
 		const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
@@ -416,7 +416,7 @@ export default class PrivateAPI {
 		const transaction = new Transaction(targetActor);
 
 		const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
-			.filter(currency => currency.quantity);
+			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 
 		const itemsToAdd = currenciesToAdd.filter(currency => currency.type === "item")
 			.map(currency => ({ item: currency.data.item, quantity: currency.quantity }));

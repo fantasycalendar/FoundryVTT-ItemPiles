@@ -1817,7 +1817,7 @@ class API {
 		let secondaryPrices = false;
 		if (typeof price === "string") {
 			const priceData = PileUtilities.getPriceFromString(price)
-			const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+			const currenciesToRemove = priceData.currencies.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 			if (!currenciesToRemove.length) {
 				throw Helpers.custom_error(`getPaymentData | Could not determine currencies to remove with string "${price}"`);
 			}
@@ -1866,7 +1866,7 @@ class API {
 		}
 
 		const currenciesToUpdate = PileUtilities.getPriceFromString(currencies).currencies
-			.filter(currency => currency.quantity);
+			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0);
 
 		if (!currenciesToUpdate.length) {
 			throw Helpers.custom_error(`updateCurrency | Could not determine currencies to update with string "${currencies}"`);
@@ -1897,7 +1897,7 @@ class API {
 		}
 
 		const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
-			.filter(currency => currency.quantity);
+			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 
 		if (!currenciesToAdd.length) {
 			throw Helpers.custom_error(`addCurrency | Could not determine currencies to add with string "${currencies}"`);
@@ -1928,7 +1928,7 @@ class API {
 		let secondaryPrices = false;
 		if (typeof currencies === "string") {
 			const priceData = PileUtilities.getPriceFromString(currencies)
-			const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+			const currenciesToRemove = priceData.currencies.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 			if (!currenciesToRemove.length) {
 				throw Helpers.custom_error(`removeCurrencies | Could not determine currencies to remove with string "${currencies}"`);
 			}
@@ -1980,7 +1980,7 @@ class API {
 		let secondaryPrices = false;
 		if (typeof currencies === "string") {
 			const priceData = PileUtilities.getPriceFromString(currencies)
-			const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+			const currenciesToRemove = priceData.currencies.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 			if (!currenciesToRemove.length) {
 				throw Helpers.custom_error(`transferCurrencies | Could not determine currencies to remove with string "${currencies}"`);
 			}
