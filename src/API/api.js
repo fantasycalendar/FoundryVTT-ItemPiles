@@ -1846,6 +1846,37 @@ class API {
 	}
 
 	/**
+	 * Update currencies to the target
+	 *
+	 * @param {Actor/Token/TokenDocument} target                The actor to update the currencies to
+	 * @param {string} currencies                               A string of currencies to update (eg, "5gp 25sp")
+	 * @param {object} options                                  Options to pass to the function
+	 * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
+	 *
+	 * @returns {Promise<object>}                               An object containing the items and attributes update to the target
+	 */
+	static updateCurrencies(target, currencies, { interactionId = false } = {}) {
+
+		const targetActor = Utilities.getActor(target);
+		const targetUuid = Utilities.getUuid(targetActor);
+		if (!targetUuid) throw Helpers.custom_error(`updateCurrency | Could not determine the UUID, please provide a valid target`);
+
+		if (typeof currencies !== "string") {
+			throw Helpers.custom_error(`updateCurrency | currencies must be of type string`)
+		}
+
+		const currenciesToUpdate = PileUtilities.getPriceFromString(currencies).currencies
+			.filter(currency => currency.quantity);
+
+		if (!currenciesToUpdate.length) {
+			throw Helpers.custom_error(`updateCurrency | Could not determine currencies to update with string "${currencies}"`);
+		}
+
+		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.UPDATE_CURRENCIES, targetUuid, currencies, game.user.id, { interactionId });
+
+	}
+
+	/**
 	 * Adds currencies to the target
 	 *
 	 * @param {Actor/Token/TokenDocument} target                The actor to add the currencies to

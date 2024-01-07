@@ -814,7 +814,11 @@ export function getStringFromCurrencies(currencies) {
 				Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, false);
 				return "";
 			}
-			if (!allAbbreviationsArray.includes(abbreviation?.replace("{#}", ""))) {
+			// Check abbreviation by case unsensitive...
+			const indexAbbreviation = allAbbreviationsArray.findIndex(a => {
+				return a?.replace("{#}", "")?.toLowerCase() === abbreviation?.replace("{#}", "")?.toLowerCase();
+			});
+			if (indexAbbreviation === -1) {
 				Helpers.custom_error(`getStringFromCurrencies | The currency abbreviation '${abbreviation?.replace("{#}", "")}' is not registered`, false);
 				return "";
 			}
