@@ -371,7 +371,7 @@ export default class PrivateAPI {
 			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0);
 
 		const itemsToUpdate2 = currenciesToUpdate.filter(currency => currency.type === "item")
-			.map(currency => ({ item: currency.data.item, quantity: currency.quantity }));
+			.map(currency => ({ item: currency.data.item, quantity: 1, cost: currency.quantity }));
 
 		const attributesToUpdate = currenciesToUpdate.filter(currency => currency.type === "attribute")
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));

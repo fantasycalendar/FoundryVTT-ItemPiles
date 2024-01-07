@@ -40,7 +40,12 @@ export default class Transaction {
 			if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
 				itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
 			}
-			const incomingQuantity = Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
+			const incomingQuantity = set
+				? Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData))
+				: Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
+			const incomingCost = set 
+				?  Math.abs(data.cost ?? Utilities.getItemCost(itemData))
+				:  Math.abs(data.cost ?? Utilities.getItemCost(itemData)) * (remove ? -1 : 1);
 			let itemId = itemData._id ?? itemData.id;
 			let actorHasItem = false;
 			let actorExistingItem = false;
@@ -59,7 +64,8 @@ export default class Transaction {
 						areItemsColliding(item, itemData)
 					)
 				});
-			} else {
+			} 
+			else {
 				actorHasItem = this.actor.items.get(itemId);
 				actorExistingItem = actorHasItem || Utilities.findSimilarItem(this.actor.items, itemData);
 			}
@@ -77,10 +83,12 @@ export default class Transaction {
 			if (actorExistingItem) {
 
 				const itemQuantity = Utilities.getItemQuantity(actorExistingItem);
+				const itemCost = Utilities.getItemCost(actorExistingItem);
 
 				if (itemQuantity > 1 || canItemStack) {
 
 					const newQuantity = itemQuantity + incomingQuantity;
+					const newCost = itemCost + incomingCost;
 
 					const existingItemUpdate = remove
 						? this.itemsToUpdate.find(item => item._id === itemId)
@@ -90,11 +98,15 @@ export default class Transaction {
 						Utilities.setItemQuantity(existingItemUpdate, newQuantity);
 						if (keepIfZero && type !== "currency") {
 							setProperty(existingItemUpdate, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
+						} else if(keepIfZero && type === "currency"){
+							Utilities.setItemCost(existingItemUpdate, newCost);
 						}
 					} else {
 						const update = Utilities.setItemQuantity(actorExistingItem.toObject(), newQuantity);
 						if (keepIfZero && type !== "currency") {
 							setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
+						} else if(keepIfZero && type === "currency"){
+							Utilities.setItemCost(update, newCost);
 						}
 						this.itemTypeMap.set(actorExistingItem.id, type)
 						this.itemsToUpdate.push(update);
@@ -113,6 +125,7 @@ export default class Transaction {
 						itemData._id = randomID();
 					}
 					Utilities.setItemQuantity(itemData, incomingQuantity);
+					Utilities.setItemCost(itemData, incomingCost);
 					this.itemsToCreate.push(itemData);
 					this.itemTypeMap.set(itemData._id, type)
 
@@ -123,11 +136,15 @@ export default class Transaction {
 				if (existingItemCreation && canItemStack) {
 					const newQuantity = Utilities.getItemQuantity(existingItemCreation) + incomingQuantity;
 					Utilities.setItemQuantity(existingItemCreation, newQuantity);
+
+					const newCost = Utilities.getItemCost(existingItemCreation) + incomingCost;
+					Utilities.setItemCost(existingItemCreation, newCost);
 				} else {
 					if (!itemData._id) {
 						itemData._id = randomID();
 					}
 					Utilities.setItemQuantity(itemData, incomingQuantity);
+					Utilities.setItemCost(itemData, incomingCost);
 					this.itemsToCreate.push(itemData);
 					this.itemTypeMap.set(itemData._id, type)
 				}
