@@ -81,6 +81,8 @@
 - [Currencies][#Currencies]
   - [item-piles-preTransferCurrencies](#item-piles-preTransferCurrencies)
   - [item-piles-transferCurrencies](#item-piles-transferCurrencies)
+  - [item-piles-preUpdateCurrencies](#item-piles-preUpdateCurrencies)
+  - [item-piles-updateCurrencies](#item-piles-updateCurrencies)
   - [item-piles-preAddCurrencies](#item-piles-preAddCurrencies)
   - [item-piles-addCurrencies](#item-piles-addCurrencies)
   - [item-piles-preRemoveCurrencies](#item-piles-preRemoveCurrencies)
@@ -943,17 +945,47 @@ Called after all attributes' values was transferred from the source to the targe
 
 ## Currencies
 
+### item-piles-preUpdateCurrencies
+
+Called before currencies are updated to an actor. Not called in the case of a transfer.
+
+| Param         | Type                                  | Description                                                                                                                  |
+|---------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| target        | <code>Actor/TokenDocument/UUID</code> | The target that will have currencies added to it                                                                             |
+| actorUpdates  | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
+| itemsToCreate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was added                                              |
+| itemsToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
+| interactionId | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
+
+If the hook returns `false`, the action is interrupted.
+
+---
+
+### item-piles-updateCurrencies
+
+Called after currencies were updated to the target. Not called in the case of a transfer.
+
+| Param           | Type                                  | Description                                                                                                     |
+|-----------------|---------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were added to                                                                       |
+| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                               |
+| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
+| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                   |
+| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                       |
+
+---
+
 ### item-piles-preAddCurrencies
 
 Called before currencies are added to an actor. Not called in the case of a transfer.
 
-| Param         | Type                             | Description                                                                                                                  |
-|---------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| target        | <code>Actor/TokenDocument</code> | The target that will have currencies added to it                                                                             |
-| actorUpdates  | <code>object</code>              | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
-| itemsToCreate | <code>array</code>               | An array of objects each containing the item id and the quantity that was added                                              |
-| itemsToUpdate | <code>array</code>               | An array of objects each containing the item id and the quantity that was updated                                            |
-| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                    |
+| Param         | Type                                  | Description                                                                                                                  |
+|---------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| target        | <code>Actor/TokenDocument/UUID</code> | The target that will have currencies added to it                                                                             |
+| actorUpdates  | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
+| itemsToCreate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was added                                              |
+| itemsToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
+| interactionId | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -963,13 +995,13 @@ If the hook returns `false`, the action is interrupted.
 
 Called after currencies were added to the target. Not called in the case of a transfer.
 
-| Param           | Type                             | Description                                                                                                     |
-|-----------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| target          | <code>Actor/TokenDocument</code> | The target whose currencies were added to                                                                       |
-| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed                               |
-| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
-| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                   |
-| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                       |
+| Param           | Type                                  | Description                                                                                                     |
+|-----------------|---------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were added to                                                                       |
+| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                               |
+| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
+| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                   |
+| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                       |
 
 ---
 
@@ -977,12 +1009,12 @@ Called after currencies were added to the target. Not called in the case of a tr
 
 Called before currencies were removed from the target. Not called in the case of a transfer.
 
-| Param         | Type                             | Description                                                                                                                  |
-|---------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| target        | <code>Actor/TokenDocument</code> | The target that will have its currencies removed                                                                             |
-| actorUpdates  | <code>object</code>              | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
-| itemsToUpdate | <code>array</code>               | An array of objects each containing the item id and the quantity that was updated                                            |
-| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                    |
+| Param         | Type                                  | Description                                                                                                                  |
+|---------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| target        | <code>Actor/TokenDocument/UUID</code> | The target that will have its currencies removed                                                                             |
+| actorUpdates  | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
+| itemsToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
+| interactionId | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -992,13 +1024,13 @@ If the hook returns `false`, the action is interrupted.
 
 Called after currencies was removed from the target. Not called in the case of a transfer.
 
-| Param           | Type                             | Description                                                                                                     |
-|-----------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| target          | <code>Actor/TokenDocument</code> | The target whose currencies were removed from                                                                   |
-| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed                               |
-| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
-| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                   |
-| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                       |
+| Param           | Type                                  | Description                                                                                                     |
+|-----------------|---------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were removed from                                                                   |
+| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                               |
+| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
+| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                   |
+| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                       |
 
 ---
 
