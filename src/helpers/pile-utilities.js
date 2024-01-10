@@ -855,7 +855,7 @@ export function getPriceFromString(str, currencyList = false) {
 		for (const currency of currencies) {
 
 			if(part[2]) {
-				identifierFilter.push(part[2]);
+				identifierFilter.push(part[2]?.toLowerCase());
 			}
 
 			if (part[2] !== currency.identifier) continue;
@@ -876,7 +876,7 @@ export function getPriceFromString(str, currencyList = false) {
 	}
 	
 	// Maybe there is a better method for this ?
-	currencies = currencies.filter(currency => identifierFilter.includes(currency.identifier));
+	currencies = currencies.filter(currency => identifierFilter.includes(currency.identifier?.toLowerCase()));
 
 	if (!currencies.some(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0)) {
 		try {

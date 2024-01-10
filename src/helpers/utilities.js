@@ -245,7 +245,7 @@ export function hasItemCost(item) {
 }
 
 /**
- * Returns a given item's quantity
+ * Returns a given item's cost/price
  *
  * @param {Object} itemData
  * @param {Number} cost
