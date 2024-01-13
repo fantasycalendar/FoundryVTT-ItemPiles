@@ -43,9 +43,9 @@ export default class Transaction {
 			const incomingQuantity = set
 				? Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData))
 				: Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
-			const incomingCost = set 
-				?  Math.abs(data.cost ?? Utilities.getItemCost(itemData))
-				:  Math.abs(data.cost ?? Utilities.getItemCost(itemData)) * (remove ? -1 : 1);
+			// Remove is ignored because when you remove a item the cost cannot change
+			const incomingCost = Math.abs(data.cost ?? Utilities.getItemCost(itemData));
+			
 			let itemId = itemData._id ?? itemData.id;
 			let actorHasItem = false;
 			let actorExistingItem = false;
