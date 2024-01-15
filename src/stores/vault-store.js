@@ -319,6 +319,8 @@ export class VaultStore extends ItemPileStore {
 
 	async onDropData(data, event, isExpander) {
 
+		debugger;
+
 		let validPosition = get(this.dragPosition);
 		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, flipped: false, active: false });
 
