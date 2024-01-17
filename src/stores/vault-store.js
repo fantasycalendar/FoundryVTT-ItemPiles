@@ -319,8 +319,6 @@ export class VaultStore extends ItemPileStore {
 
 	async onDropData(data, event, isExpander) {
 
-		debugger;
-
 		let validPosition = get(this.dragPosition);
 		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, flipped: false, active: false });
 
@@ -546,7 +544,7 @@ export class VaultItem extends PileItem {
 		setProperty(flags, "x", x);
 		setProperty(flags, "y", y);
 		setProperty(flags, "flipped", flipped);
-		setProperty(itemData, "flags", flags);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
 
 		await game.itempiles.API.addItems(this.store.actor, [{
 			item: itemData, quantity

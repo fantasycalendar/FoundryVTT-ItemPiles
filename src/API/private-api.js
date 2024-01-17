@@ -1642,7 +1642,7 @@ export default class PrivateAPI {
 			foundry.utils.setProperty(flagData, "x", dropData.gridPosition?.x ?? 0);
 			foundry.utils.setProperty(flagData, "y", dropData.gridPosition?.y ?? 0);
 		}
-		foundry.utils.setProperty(dropData.itemData, "flags", flagData);
+		foundry.utils.setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
 
 		if (sourceActor) {
 			return game.itempiles.API.transferItems(sourceActor, targetActor, [dropData.itemData], { interactionId: dropData.interactionId });
