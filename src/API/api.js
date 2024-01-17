@@ -1215,9 +1215,9 @@ class API {
 			} else if (itemData.item) {
 				item = itemData.item instanceof Item ? itemData.item.toObject() : itemData.item;
 				if (itemData.flags) {
-					foundry.utils.setProperty(item, "flags", foundry.utils.mergeObject(
-						foundry.utils.getProperty(item, "flags") ?? {},
-						foundry.utils.getProperty(itemData, "flags"))
+					foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(
+						foundry.utils.getProperty(item, CONSTANTS.FLAGS.ITEM) ?? {},
+						foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM))
 					);
 				}
 			} else if (itemData.id) {
@@ -1352,7 +1352,7 @@ class API {
 			return {
 				id: item._id,
 				quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(itemData), 0),
-				flags: foundry.utils.getProperty(itemData, "flags")
+				flags: foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM)
 			}
 		});
 
@@ -1700,7 +1700,7 @@ class API {
 	 *
 	 * @param {Array<object>} currencies                      An array of object containing the data and quantity for each currency
 |    * @param {number} currencies[].cost                      The cost of the currency
-|    * @param {string} currencies[].denom                     The abbreviation of the currency, which are usually {#}GP, which when {#} is replaced with the number it becomes 5GP.  
+|    * @param {string} currencies[].denom                     The abbreviation of the currency, which are usually {#}GP, which when {#} is replaced with the number it becomes 5GP.
 	 * @param {string} currencies[].percent                   The cost of  the currency is in percentage (for work the 'abbreviation' property must includes '%' substring)
 	 * @returns {string}                                      An array of object containing the data and quantity for each currency
 	 */

@@ -544,7 +544,7 @@ export class VaultItem extends PileItem {
 		setProperty(flags, "x", x);
 		setProperty(flags, "y", y);
 		setProperty(flags, "flipped", flipped);
-		setProperty(itemData, "flags", flags);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
 
 		await game.itempiles.API.addItems(this.store.actor, [{
 			item: itemData, quantity

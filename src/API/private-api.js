@@ -1671,8 +1671,9 @@ export default class PrivateAPI {
 
 		const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
 
-		let itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
+		dropData.itemData.quantity = 1;
 		if (PileUtilities.canItemStack(dropData.itemData.item, vaultActor)) {
+			const itemQuantity = Utilities.getItemQuantity(dropData.itemData.item);
 			if (itemQuantity > 1) {
 				dropData.itemData.quantity = await DropItemDialog.show(item, vaultActor, {
 					localizationTitle: localization
@@ -1681,8 +1682,6 @@ export default class PrivateAPI {
 				Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Errors.ItemNoQuantity"), true);
 				return;
 			}
-		} else {
-			dropData.itemData.quantity = 1;
 		}
 		Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);
 
@@ -1691,7 +1690,7 @@ export default class PrivateAPI {
 			foundry.utils.setProperty(flagData, "x", dropData.gridPosition?.x ?? 0);
 			foundry.utils.setProperty(flagData, "y", dropData.gridPosition?.y ?? 0);
 		}
-		foundry.utils.setProperty(dropData.itemData, "flags", flagData);
+		foundry.utils.setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
 
 		if (sourceActor) {
 			return game.itempiles.API.transferItems(sourceActor, targetActor, [dropData.itemData], { interactionId: dropData.interactionId });

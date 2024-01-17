@@ -231,9 +231,6 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 function merchantRefreshFilter(flags, newState, previousState, categories) {
 
 	const openTimesEnabled = flags.openTimes.enabled;
-
-	if (!openTimesEnabled) return false;
-
 	const openTimes = flags.openTimes.open;
 	const closeTimes = flags.openTimes.close;
 
@@ -253,23 +250,17 @@ function merchantRefreshFilter(flags, newState, previousState, categories) {
 		? (newState.time >= openingTime || newState.time <= closingTime)
 		: (newState.time >= openingTime && newState.time <= closingTime);
 
-	const allWeekdays = window.SimpleCalendar.api.getAllWeekdays();
 	const dayLength = SimpleCalendar.api.timestampPlusInterval(0, { day: 1 });
-
 	const daysPassed = Math.floor((newState.timestamp - previousState.timestamp) / dayLength);
 
-	const currentWeekday = newState.weekday;
+	const allWeekdays = new Set(window.SimpleCalendar.api.getAllWeekdays());
 
-	const shouldRefreshOnCurrentWeekday = flags.refreshItemsDays.includes(currentWeekday.name);
-	const shouldRefreshPastWeekday = flags.refreshItemsDays.length > 0 && daysPassed >= allWeekdays.length;
+	const shouldRefreshOnCurrentWeekday = flags.refreshItemsDays.includes(newState.weekday);
+	const shouldRefreshPastWeekday = flags.refreshItemsDays.length > 0 && daysPassed >= allWeekdays.size;
 
-	const shouldRefresh = (
-		flags.refreshItemsOnOpen ||
-		shouldRefreshOnCurrentWeekday ||
-		shouldRefreshPastWeekday ||
-		categories.intersection(new Set(flags.refreshItemsHolidays)).size > 0
-	);
-
-	return (!wasOpen && isOpen) && shouldRefresh;
+	return (flags.refreshItemsOnOpen && !wasOpen && isOpen && openTimesEnabled)
+		|| shouldRefreshPastWeekday
+		|| shouldRefreshOnCurrentWeekday
+		|| categories.intersection(new Set(flags.refreshItemsHolidays)).size > 0;
 
 }

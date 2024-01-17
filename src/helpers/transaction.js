@@ -1,6 +1,5 @@
 import * as Utilities from "./utilities.js";
 import * as PileUtilities from "./pile-utilities.js";
-import { areItemsColliding, getItemFlagData } from "./pile-utilities.js";
 import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
@@ -61,7 +60,7 @@ export default class Transaction {
 							foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y") === undefined
 						)
 						||
-						areItemsColliding(item, itemData)
+						PileUtilities.areItemsColliding(item, itemData)
 					)
 				});
 			} 
@@ -199,8 +198,8 @@ export default class Transaction {
 
 		this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
 			const item = this.actor.items.get(id).toObject();
-			const existingFlagData = getItemFlagData(item);
-			const newFlagData = this.itemFlagMap.get(id) ?? {};
+			const existingFlagData = PileUtilities.cleanItemFlagData(PileUtilities.getItemFlagData(item));
+			const newFlagData = PileUtilities.cleanItemFlagData(this.itemFlagMap.get(id) ?? {});
 			setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(existingFlagData, newFlagData));
 			const type = this.itemTypeMap.get(id);
 			Utilities.setItemQuantity(item, quantity, true);

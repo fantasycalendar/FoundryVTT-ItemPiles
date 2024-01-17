@@ -1,5 +1,15 @@
 # Item Piles Changelog
 
+## Version 2.8.18
+
+- Fixed items sometimes losing their flags when added vaults
+
+## Version 2.8.17
+
+- Fixed swapping items in vaults would sometimes allow you to swap items so that one ended up outside the bounds of the vault
+- Fixed merchants sometimes not refreshing their inventories when integrated with Simple Calendar
+- Fixed users not being able to drop unstackable items into vaults
+
 ## Version 2.8.16
 
 - Fixed items that were linked with the item linking module losing their links

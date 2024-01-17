@@ -1964,7 +1964,7 @@ export async function rollTable({
 		if (existingItem) {
 			existingItem.quantity += Math.max(newItem.quantity, 1);
 		} else {
-			setProperty(newItem, "flags", newItem.item.flags);
+			setProperty(newItem, CONSTANTS.FLAGS.ITEM, getProperty(newItem.item, CONSTANTS.FLAGS.ITEM));
 			if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
 				setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
 			}
@@ -2055,7 +2055,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 			if (existingItem) {
 				existingItem.quantity += Math.max(newItem.quantity, 1);
 			} else {
-				setProperty(newItem, "flags", newItem.item.flags);
+				setProperty(newItem, CONSTANTS.FLAGS.ITEM, cleanItemFlagData(getProperty(newItem.item.flags, CONSTANTS.FLAGS.ITEM)));
 				if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
 					setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
 				}

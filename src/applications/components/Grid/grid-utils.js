@@ -108,8 +108,8 @@ export function isPlacementValid(item, collisions, items, options) {
 		transform: finalTransform
 	};
 
-	const itemWithinBounds = (finalTransform.x + (finalTransform.w - 1)) < options.cols
-		&& (finalTransform.y + (finalTransform.h - 1)) < options.rows
+	const itemWithinBounds = (finalTransform.x + (finalTransform.w - 1)) < options.enabledCols
+		&& (finalTransform.y + (finalTransform.h - 1)) < options.enabledRows
 		&& (finalTransform.x) >= 0
 		&& (finalTransform.y) >= 0;
 
@@ -125,8 +125,8 @@ export function isPlacementValid(item, collisions, items, options) {
 
 	if (!assumedCollisionMovement.every(entry => {
 		return entry
-			&& (entry.transform.x + (entry.transform.w - 1)) < options.cols
-			&& (entry.transform.y + (entry.transform.h - 1)) < options.rows
+			&& (entry.transform.x + (entry.transform.w - 1)) < options.enabledCols
+			&& (entry.transform.y + (entry.transform.h - 1)) < options.enabledRows
 			&& (entry.transform.x) >= 0
 			&& (entry.transform.y) >= 0
 	})) return false;
