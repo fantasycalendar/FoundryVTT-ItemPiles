@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.8.18
+
+- Fixed items sometimes losing their flags when added vaults
+
 ## Version 2.8.17
 
 - Fixed swapping items in vaults would sometimes allow you to swap items so that one ended up outside the bounds of the vault
