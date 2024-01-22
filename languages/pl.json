@@ -26,7 +26,8 @@
       "PileLocked": "Ten pojemnik jest zamknięty i nie można go otworzyć - nie możesz upuszczać przedmioty do niego.",
       "NoTokenFound": "Nie udało się znaleźć tokenu ani postaci, która by cię reprezentowała.",
       "NoVaultAccess": "Nie masz uprawnień do wyświetlania tego sejfu.",
-      "NoVaultAccessActor": "{actor_name} nie ma uprawnień do wyświetlania tego sejfu."
+      "NoVaultAccessActor": "{actor_name} nie ma uprawnień do wyświetlania tego sejfu.",
+      "ItemNoQuantity": "{item_name} ma ilość 0, więc nie możesz przenieść tego przedmiotu!"
     },
     "Warnings": {
       "GiveItemDeclined": "{user_name} odrzucił twoją ofertę.",
@@ -35,7 +36,8 @@
       "NoGMsConnectedAction": "UWAGA - Nie można wykonać \"{action}\", ponieważ żaden GM nie jest aktywny.",
       "VaultFull": "Ten przedmiot nie mieści się w tym skarbcu!",
       "VaultItemNotExpander": "Ten przedmiot nie jest rozszerzeniem skarbca",
-      "NoGMsConnected": "UWAGA - Brak podłączonych GMów - Item Piles wymaga GMa, aby gracze mogli korzystać z większości funkcji modułu."
+      "NoGMsConnected": "UWAGA - Brak podłączonych GMów - Item Piles wymaga GMa, aby gracze mogli korzystać z większości funkcji modułu.",
+      "CantSortVault": "Nie udało się posortować elementów - albo jest ich po prostu za dużo, albo coś poszło nie tak"
     },
     "Inspect": {
       "Title": "Przeglądanie Zawartości Stosu",
@@ -253,6 +255,10 @@
         "SelectPlaceholder": "Wybierz postać, do której chcesz przekazać przedmiot",
         "ContentMultipleQuantity": "Masz {quantity} szt. tego przedmiotu, ile chcesz przekazać?",
         "Submit": "Przekaż"
+      },
+      "SortMergeVaultItems": {
+        "Title": "Sortowanie i łączenie podobnych elementów?",
+        "Content": "Czy na pewno chcesz scalić podobne przedmioty podczas ich sortowania? Scalenia nie można cofnąć."
       }
     },
     "Items": "Przedmioty",
@@ -281,7 +287,9 @@
       "NeedsCapacity": "Ten skarbiec ma całkowitą pojemność {total_capacity}, ale żaden z nich nie jest dostępny, póki nie zostaną dodane rozszerzenia skarbca",
       "CapacityLeft": "Ten skarbiec ma pojemność {capacity}, z maksymalną {total_capacity}, przeciągnij i upuść rozszerzenia skarbca, aby zwiększyć pojemność",
       "CapacityFull": "Ten skarbiec osiągnął swoją maksymalną pojemność {total_capacity}",
-      "Withdraw": "Odwołanie"
+      "Withdraw": "Odwołanie",
+      "SortItemsTooltip": "Sortowanie przedmiotów - przytrzymaj klawisz Ctrl, aby scalić podobne przedmioty",
+      "SortItems": "Sortuj przedmioty"
     },
     "Applications": {
       "WithdrawItem": {
@@ -418,7 +426,9 @@
         "VaultImage": "Wizerunek Skarbca",
         "VaultImageExplanation": "To zastępuje domyślny obraz wyświetlany w skarbcu.",
         "GridWidth": "Szerokość",
-        "GridHeight": "Wysokość"
+        "GridHeight": "Wysokość",
+        "VaultImageRotated": "Obrócony obraz skarbca",
+        "VaultImageRotatedExplanation": "Zastępuje to obraz przedmiotu wyświetlany w skarbcu, gdy jest on obrócony."
       },
       "FilterEditor": {
         "Explanation": "Tutaj możesz zdefiniować wiele typów filtrów, które wykluczą pewne typy przedmiotów. Na podstawie podanej ścieżki atrybutu, stos przedmiotów mógłby znaleźć \"typ\" przedmiotu i na podstawie filtrów, ukrywa te przedmioty w UI inwentarza stosu przedmiotów.",
