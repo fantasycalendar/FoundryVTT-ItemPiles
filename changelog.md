@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.8.20
+
+- Reverted some changes that caused errors in some systems with item based currencies
+
 ## Version 2.8.19
 
 - Added several currency related methods and hooks (thank you p4535992 on GitHub!)
