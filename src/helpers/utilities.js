@@ -214,17 +214,50 @@ export function hasItemQuantity(item) {
  * @param {Boolean} requiresExistingQuantity
  * @returns {Object}
  */
-export function setItemQuantity(itemData, quantity, requiresExistingQuantity = false) {
+export function setItemQuantity(item, quantity, requiresExistingQuantity = false) {
+	const itemData = item instanceof Item ? item.toObject() : item;
 	if (!requiresExistingQuantity || getItemTypesThatCanStack().has(itemData.type) || hasItemQuantity(itemData)) {
 		setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity);
 	}
 	return itemData;
 }
 
-
+/**
+ * Returns a given item's cost/price
+ *
+ * @param {Item/Object} item
+ * @returns {number}
+ */
 export function getItemCost(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
 	return getProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE) ?? 0;
+}
+
+/**
+ * Returns whether an item has the cost/price property
+ *
+ * @param {Item/Object} item
+ * @returns {Boolean}
+ */
+export function hasItemCost(item) {
+	const itemData = item instanceof Item ? item.toObject() : item;
+	return hasProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
+}
+
+/**
+ * Returns a given item's cost/price
+ *
+ * @param {Object} itemData
+ * @param {Number} cost
+ * @param {Boolean} requiresExistingCost
+ * @returns {Object}
+ */
+export function setItemCost(item, cost, requiresExistingCost = false) {
+	const itemData = item instanceof Item ? item.toObject() : item;
+	if (!requiresExistingCost || hasItemCost(itemData)) {
+		setProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
+	}
+	return itemData
 }
 
 /**

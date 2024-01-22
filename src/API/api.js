@@ -1817,7 +1817,7 @@ class API {
 		let secondaryPrices = false;
 		if (typeof price === "string") {
 			const priceData = PileUtilities.getPriceFromString(price)
-			const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+			const currenciesToRemove = priceData.currencies.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 			if (!currenciesToRemove.length) {
 				throw Helpers.custom_error(`getPaymentData | Could not determine currencies to remove with string "${price}"`);
 			}
@@ -1846,6 +1846,37 @@ class API {
 	}
 
 	/**
+	 * Update currencies to the target
+	 *
+	 * @param {Actor/Token/TokenDocument} target                The actor to update the currencies to
+	 * @param {string} currencies                               A string of currencies to update (eg, "5gp 25sp")
+	 * @param {object} options                                  Options to pass to the function
+	 * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
+	 *
+	 * @returns {Promise<object>}                               An object containing the items and attributes update to the target
+	 */
+	static updateCurrencies(target, currencies, { interactionId = false } = {}) {
+
+		const targetActor = Utilities.getActor(target);
+		const targetUuid = Utilities.getUuid(targetActor);
+		if (!targetUuid) throw Helpers.custom_error(`updateCurrency | Could not determine the UUID, please provide a valid target`);
+
+		if (typeof currencies !== "string") {
+			throw Helpers.custom_error(`updateCurrency | currencies must be of type string`)
+		}
+
+		const currenciesToUpdate = PileUtilities.getPriceFromString(currencies).currencies
+			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0);
+
+		if (!currenciesToUpdate.length) {
+			throw Helpers.custom_error(`updateCurrency | Could not determine currencies to update with string "${currencies}"`);
+		}
+
+		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.UPDATE_CURRENCIES, targetUuid, currencies, game.user.id, { interactionId });
+
+	}
+
+	/**
 	 * Adds currencies to the target
 	 *
 	 * @param {Actor/Token/TokenDocument} target                The actor to add the currencies to
@@ -1866,7 +1897,7 @@ class API {
 		}
 
 		const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
-			.filter(currency => currency.quantity);
+			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 
 		if (!currenciesToAdd.length) {
 			throw Helpers.custom_error(`addCurrency | Could not determine currencies to add with string "${currencies}"`);
@@ -1897,7 +1928,7 @@ class API {
 		let secondaryPrices = false;
 		if (typeof currencies === "string") {
 			const priceData = PileUtilities.getPriceFromString(currencies)
-			const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+			const currenciesToRemove = priceData.currencies.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 			if (!currenciesToRemove.length) {
 				throw Helpers.custom_error(`removeCurrencies | Could not determine currencies to remove with string "${currencies}"`);
 			}
@@ -1949,7 +1980,7 @@ class API {
 		let secondaryPrices = false;
 		if (typeof currencies === "string") {
 			const priceData = PileUtilities.getPriceFromString(currencies)
-			const currenciesToRemove = priceData.currencies.filter(currency => currency.quantity);
+			const currenciesToRemove = priceData.currencies.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 			if (!currenciesToRemove.length) {
 				throw Helpers.custom_error(`transferCurrencies | Could not determine currencies to remove with string "${currencies}"`);
 			}

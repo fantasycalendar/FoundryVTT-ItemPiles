@@ -61,6 +61,7 @@
   * [transferAttributes](#transferAttributes)
   * [transferAllAttributes](#transferAllAttributes)
   * [transferEverything](#transferEverything)
+  * [updateCurrencies](#updateCurrencies)
   * [addCurrencies](#addCurrencies)
   * [removeCurrencies](#removeCurrencies)
   * [transferCurrencies](#transferCurrencies)
@@ -859,6 +860,39 @@ Transfers all items and attributes between the source and the target.
 
 ---
 
+### updateCurrencies
+
+`game.itempiles.API.updateCurrencies(target, currencies, options)` ⇒ `Promise<object>`
+
+Updates currencies to the target. 
+It differs from the add and remove operations in that it "sets" the currency of the target with the passed value.
+This is useful in cases where you want to pre-fill something with a specific amount of currency.
+
+**Returns**: `Promise<object>` - An object containing the items and attributes added to the target
+
+| Param                   | Type                             | Default | Description                                    |
+|-------------------------|----------------------------------|---------|------------------------------------------------|
+| target                  | `Actor/TokenDocument/Token/UUID` |         | The target to add the currencies to            |
+| currencies              | `string`                         |         | A string of currencies to add (eg, "5gp 25sp") |
+| options                 | `object`                         |         | Options to pass to the function                |
+| [options.interactionId] | `string/boolean`                 | `false` | The interaction ID of this action              |
+
+#### Example
+
+```javascript
+
+const tokenOrActor = game.actors.getName("Bharash");
+
+// Set the value on the GP currency with the quantity 10 to the target
+game.itempiles.API.updateCurrencies(tokenOrActor, "10gp");
+
+// Set the value on the GP currency with the quantity 10 and on the SP currency with the quantity 5 to the target
+game.itempiles.API.updateCurrencies(tokenOrActor, "10gp 5sp");
+
+```
+
+---
+
 ### addCurrencies
 
 `game.itempiles.API.addCurrencies(target, currencies, options)` ⇒ `Promise<object>`
@@ -867,12 +901,26 @@ Adds currencies to the target
 
 **Returns**: `Promise<object>` - An object containing the items and attributes added to the target
 
-| Param                   | Type                        | Default | Description                                    |
-|-------------------------|-----------------------------|---------|------------------------------------------------|
-| target                  | `Actor/TokenDocument/Token` |         | The target to add the currencies to            |
-| currencies              | `string`                    |         | A string of currencies to add (eg, "5gp 25sp") |
-| options                 | `object`                    |         | Options to pass to the function                |
-| [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action              |
+| Param                   | Type                             | Default | Description                                    |
+|-------------------------|----------------------------------|---------|------------------------------------------------|
+| target                  | `Actor/TokenDocument/Token/UUID` |         | The target to add the currencies to            |
+| currencies              | `string`                         |         | A string of currencies to add (eg, "5gp 25sp") |
+| options                 | `object`                         |         | Options to pass to the function                |
+| [options.interactionId] | `string/boolean`                 | `false` | The interaction ID of this action              |
+
+#### Example
+
+```javascript
+
+const tokenOrActor = game.actors.getName("Bharash");
+
+// Add 10 GP to the target
+game.itempiles.API.addCurrencies(tokenOrActor, "10gp");
+
+// Add 10 GP and 5 SP to the target
+game.itempiles.API.removeCurrencies(tokenOrActor, "10gp 5sp");
+
+```
 
 ---
 
@@ -884,13 +932,27 @@ Removes currencies from the target
 
 **Returns**: `Promise<array>` - An object containing the items and attributes removed from the target
 
-| Param                   | Type                        | Default | Description                                       |
-|-------------------------|-----------------------------|---------|---------------------------------------------------|
-| target                  | `Actor/Token/TokenDocument` |         | The target to remove currencies from              |
-| currencies              | `string`                    |         | A string of currencies to remove (eg, "5gp 25sp") |
-| options                 | `object`                    |         | Options to pass to the function                   |
-| [options.change]        | `boolean`                   | `true`  | Whether the actor can get change back             |
-| [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                 |
+| Param                   | Type                             | Default | Description                                       |
+|-------------------------|----------------------------------|---------|---------------------------------------------------|
+| target                  | `Actor/Token/TokenDocument/UUID` |         | The target to remove currencies from              |
+| currencies              | `string`                         |         | A string of currencies to remove (eg, "5gp 25sp") |
+| options                 | `object`                         |         | Options to pass to the function                   |
+| [options.change]        | `boolean`                        | `true`  | Whether the actor can get change back             |
+| [options.interactionId] | `string/boolean`                 | `false` | The interaction ID of this action                 |
+
+#### Example
+
+```javascript
+
+const tokenOrActor = game.actors.getName("Bharash");
+
+// Remove 10 GP from the target
+game.itempiles.API.removeCurrencies(tokenOrActor, "10gp");
+
+// Remove 10 GP and 5 SP from the target
+game.itempiles.API.removeCurrencies(tokenOrActor, "10gp 5sp");
+
+```
 
 ---
 
@@ -999,15 +1061,32 @@ Turns a string of currencies or a number into an object containing payment data,
 
 **Returns**: `object` - An object containing the price data
 
-| Param              | Type                               | Default | Description                                                |
-|--------------------|------------------------------------|---------|------------------------------------------------------------|
-| price              | `string/number`                    |         | A string of currencies to add (eg, "5gp 25sp") or a number |
-| options            | `object`                           |         | Options to pass to the function                            |
-| [options.quantity] | `number`                           | `1`     | The number of this to buy                                  |
-| [options.target]   | `string/Actor/TokenDocument/Token` | `false` | The target whose currencies to check against               |
+| Param              | Type                             | Default | Description                                                |
+|--------------------|----------------------------------|---------|------------------------------------------------------------|
+| price              | `string/number`                  |         | A string of currencies to add (eg, "5gp 25sp") or a number |
+| options            | `object`                         |         | Options to pass to the function                            |
+| [options.quantity] | `number`                         | `1`     | The number of this to buy                                  |
+| [options.target]   | `Actor/TokenDocument/Token/UUID` | `false` | The target whose currencies to check against               |
 
 **Previously (now deprecated):**
 `game.itempiles.API.getPaymentDataFromString`
+
+#### Example
+
+```javascript
+
+// The actor/token can afford a 10 GP item ?
+
+const tokenOrActor = game.actors.getName("Bharash");
+const currencies = {
+  cost: 10,
+  abbreviation: "GP",
+};
+const currencyS = game.itempiles.API.getStringFromCurrencies(currencies);
+const currencyData = game.itempiles.API.getPaymentData(currencyS, { target: tokenOrActor });
+return currencyData.canBuy; // true or false
+
+```
 
 ---
 

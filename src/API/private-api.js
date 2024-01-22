@@ -359,6 +359,54 @@ export default class PrivateAPI {
 		return itemDeltas;
 	}
 
+	static async _updateCurrencies(targetUuid, currencies, userId, {
+		skipVaultLogging = false, interactionId = false
+	} = {}) {
+
+		const targetActor = Utilities.getActor(targetUuid);
+
+		const transaction = new Transaction(targetActor);
+
+		const currenciesToUpdate = PileUtilities.getPriceFromString(currencies).currencies
+			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0);
+
+		const itemsToUpdate2 = currenciesToUpdate.filter(currency => currency.type === "item")
+			.map(currency => ({ item: currency.data.item, quantity: 1, cost: currency.quantity }));
+
+		const attributesToUpdate = currenciesToUpdate.filter(currency => currency.type === "attribute")
+			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+		await transaction.appendItemChanges(itemsToUpdate2, { type: "currency", set: true });
+		await transaction.appendActorChanges(attributesToUpdate, { type: "currency", set: true });
+
+		const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
+
+		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_UPDATE, targetActor, actorUpdates, itemsToCreate, itemsToUpdate, interactionId);
+		if (hookResult === false) return false; // Call pre-hook to allow user to interrupt it
+
+		const { itemDeltas, attributeDeltas } = await transaction.commit(); // Actually update the items to the actor
+
+		await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.UPDATE, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+
+		await this._executeItemPileMacro(targetUuid, {
+			action: "updateCurrencies",
+			target: targetUuid,
+			items: itemDeltas,
+			attributes: attributeDeltas,
+			userId: userId,
+			interactionId: interactionId
+		});
+
+		if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
+			await PileUtilities.updateVaultLog(targetActor, {
+				userId, items: itemDeltas, attributes: attributeDeltas, withdrawal: false
+			});
+		}
+
+		return { itemDeltas, attributeDeltas };
+
+	}
+
 	static async _addCurrencies(targetUuid, currencies, userId, {
 		skipVaultLogging = false, interactionId = false
 	} = {}) {
@@ -368,7 +416,7 @@ export default class PrivateAPI {
 		const transaction = new Transaction(targetActor);
 
 		const currenciesToAdd = PileUtilities.getPriceFromString(currencies).currencies
-			.filter(currency => currency.quantity);
+			.filter(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity > 0);
 
 		const itemsToAdd = currenciesToAdd.filter(currency => currency.type === "item")
 			.map(currency => ({ item: currency.data.item, quantity: currency.quantity }));

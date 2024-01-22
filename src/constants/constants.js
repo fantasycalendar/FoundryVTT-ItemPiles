@@ -259,6 +259,8 @@ CONSTANTS.HOOKS = {
 	CURRENCY: {
 		PRE_TRANSFER: module`preTransferCurrencies`,
 		TRANSFER: module`transferCurrencies`,
+		PRE_UPDATE: module`preUpdateCurrencies`,
+		UPDATE: module`updateCurrencies`,
 		PRE_ADD: module`preAddCurrencies`,
 		ADD: module`addCurrencies`,
 		PRE_REMOVE: module`preRemoveCurrencies`,
