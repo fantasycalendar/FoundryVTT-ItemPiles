@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.8.19
+
+- Fixed merchant populate items table rolling not working
+
 ## Version 2.8.18
 
 - Fixed items sometimes losing their flags when added vaults
