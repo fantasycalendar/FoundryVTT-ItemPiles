@@ -2,6 +2,12 @@
 
 ## Version 2.8.19
 
+- Added several currency related methods and hooks (thank you p4535992 on GitHub!)
+  - Added method `game.itempiles.API.updateCurrencies()`
+  - Added hook `item-piles-preUpdateCurrencies`
+  - Added hook `item-piles-updateCurrencies`
+- Updated Polish localization (thank you Lioheart on weblate!)
+- Updated SWADE system config (thank you kristianserrano on GitHub!)
 - Fixed merchant populate items table rolling not working
 
 ## Version 2.8.18
