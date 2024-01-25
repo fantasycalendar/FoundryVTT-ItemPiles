@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+**Are you on the latest version of Item Piles?**
+Yes / No
+
 **Have you tried to reset Item Piles' system settings?**
 Yes / No
 
