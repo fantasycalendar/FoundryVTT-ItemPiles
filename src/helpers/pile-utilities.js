@@ -825,7 +825,11 @@ export function getStringFromCurrencies(currencies) {
 			if (price.percent && abbreviation.includes("%")) {
 				abbreviation = abbreviation.replaceAll("%", "")
 			}
-			return abbreviation.replace("{#}", price.cost)
+			if(abbreviation.includes("{#}")) {
+				return abbreviation.replace("{#}", price.cost)
+			} else {
+				return price.cost+abbreviation;
+			}
 		}).join(" ");
 
 	return priceString ? priceString.trim() : "";
