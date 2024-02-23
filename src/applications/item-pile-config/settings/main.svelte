@@ -39,8 +39,10 @@
 		pileData.overrideCurrencies = pileData?.overrideCurrencies || foundry.utils.deepClone(game.itempiles.API.CURRENCIES);
 		return CurrenciesEditor.show(
 			pileData.overrideCurrencies,
-			{ id: `currencies-item-pile-config-${pileActor.id}` },
-			{ title: game.i18n.format("ITEM-PILES.Applications.CurrenciesEditor.TitleActor", { actor_name: pileActor.name }), }
+			{
+				id: `currencies-item-pile-config-${pileActor.id}`,
+				title: game.i18n.format("ITEM-PILES.Applications.CurrenciesEditor.TitleActor", { actor_name: pileActor.name })
+			},
 		).then((result) => {
 			pileData.overrideCurrencies = result;
 		});
@@ -50,8 +52,10 @@
 		pileData.overrideSecondaryCurrencies = pileData?.overrideSecondaryCurrencies || foundry.utils.deepClone(game.itempiles.API.SECONDARY_CURRENCIES);
 		return SecondaryCurrenciesEditor.show(
 			pileData.overrideSecondaryCurrencies,
-			{ id: `secondary-currencies-item-pile-config-${pileActor.id}` },
-			{ title: game.i18n.format("ITEM-PILES.Applications.SecondaryCurrenciesEditor.TitleActor", { actor_name: pileActor.name }), }
+			{
+				id: `secondary-currencies-item-pile-config-${pileActor.id}`,
+				title: game.i18n.format("ITEM-PILES.Applications.SecondaryCurrenciesEditor.TitleActor", { actor_name: pileActor.name })
+			},
 		).then((result) => {
 			pileData.overrideSecondaryCurrencies = result;
 		});
@@ -61,10 +65,25 @@
 		pileData.overrideItemFilters = pileData?.overrideItemFilters || foundry.utils.deepClone(game.itempiles.API.ITEM_FILTERS);
 		return ItemFiltersEditor.show(
 			pileData.overrideItemFilters,
-			{ id: `item-filters-item-pile-config-${pileActor.id}` },
-			{ title: game.i18n.format("ITEM-PILES.Applications.FilterEditor.TitleActor", { actor_name: pileActor.name }), }
+			{
+				id: `item-filters-item-pile-config-${pileActor.id}`,
+				title: game.i18n.format("ITEM-PILES.Applications.FilterEditor.TitleActor", { actor_name: pileActor.name })
+			}
 		).then((result) => {
 			pileData.overrideItemFilters = result;
+		});
+	}
+
+	async function showRequiredItemPropertiesEditor() {
+		return ItemFiltersEditor.show(
+			pileData?.requiredItemProperties,
+			{
+				id: `required-item-properties-item-pile-config-${pileActor.id}`,
+				localization: "RequiredItemPropertiesEditor",
+				title: game.i18n.format("ITEM-PILES.Applications.RequiredItemPropertiesEditor.TitleActor", { actor_name: pileActor.name }),
+			},
+		).then((result) => {
+			pileData.requiredItemProperties = result;
 		});
 	}
 
@@ -215,5 +234,19 @@
 	<button disabled={!$hasOverrideItemFilters} on:click={() => { showItemFiltersEditor() }}
 	        style="flex:4;" type="button">
 		{localize("ITEM-PILES.Applications.ItemPileConfig.Main.ConfigureOverrideItemFilters")}
+	</button>
+</div>
+
+<div class="form-group">
+	<label style="flex:4;">
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.RequiredItemProperties")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.RequiredItemPropertiesExplanation")}</p>
+	</label>
+</div>
+
+<div class="form-group">
+	<button on:click={() => { showRequiredItemPropertiesEditor() }}
+	        style="flex:4;" type="button">
+		{localize("ITEM-PILES.Applications.ItemPileConfig.Main.ConfigureRequiredItemProperties")}
 	</button>
 </div>

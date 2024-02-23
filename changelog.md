@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 2.8.21
+
+- Added Required Item Properties setting to item piles - you can now configure which items are valid to be transferred to item piles or sold to merchants
+- Fixed issues with sorting vaults placing items in strange positions
+- Fixed compatibility with Better Rolltables
+- Fixed vault styles not being editable
+
 ## Version 2.8.20
 
 - Reverted some changes that caused errors in some systems with item based currencies

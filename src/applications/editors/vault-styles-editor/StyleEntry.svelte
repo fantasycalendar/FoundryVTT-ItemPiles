@@ -22,7 +22,7 @@
 			width: 400,
 			left: application.position.left + 405,
 			top: event.clientY - 75,
-			readOnly: true
+			readOnly: false
 		});
 
 		style.set(newStyles || oldStyle);

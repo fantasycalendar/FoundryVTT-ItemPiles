@@ -12,6 +12,7 @@ import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as helpers from "../helpers/helpers.js";
 import * as Helpers from "../helpers/helpers.js";
 import { SYSTEMS } from "../systems.js";
+import { isItemValidBasedOnProperties } from "../helpers/pile-utilities.js";
 
 export class VaultStore extends ItemPileStore {
 
@@ -234,34 +235,53 @@ export class VaultStore extends ItemPileStore {
 		const gridData = get(this.gridData);
 		const allItems = [...get(this.validGridItems)];
 		const existingItems = [];
+		const invalidItems = [];
 
 		const grid = Array.from(Array(gridData.enabledCols).keys()).map((_, x) => {
 			return Array.from(Array(gridData.enabledRows).keys()).map((_, y) => {
-				const item = allItems.find(item => {
-					return item.x === x && item.y === y
-				});
-				if (item) {
-					allItems.splice(allItems.indexOf(item), 1);
-					existingItems.push({
-						id: item.id,
-						active: item.active,
-						transform: item.transform,
-						ghostTransform: item.ghostTransform,
-						highlight: search && highlightedItems.includes(item.id),
-						item,
-					});
-				}
-				return item?.id ?? null;
+				return null;
 			});
 		});
 
+		itemLoop:
+			for (const item of allItems) {
+
+				for (let w = 0; w < item.w; w++) {
+					const x = Math.max(0, Math.min(item.x + w, gridData.enabledCols - 1));
+					for (let h = 0; h < item.h; h++) {
+						const y = Math.max(0, Math.min(item.y + h, gridData.enabledRows - 1));
+						if (grid[x][y]) {
+							invalidItems.push(item);
+							continue itemLoop;
+						}
+					}
+				}
+
+				for (let w = 0; w < item.w; w++) {
+					const x = Math.max(0, Math.min(item.x + w, gridData.enabledCols - 1));
+					for (let h = 0; h < item.h; h++) {
+						const y = Math.max(0, Math.min(item.y + h, gridData.enabledRows - 1));
+						grid[x][y] = item.id;
+					}
+				}
+
+				existingItems.push({
+					id: item.id,
+					active: item.active,
+					transform: item.transform,
+					ghostTransform: item.ghostTransform,
+					highlight: search && highlightedItems.includes(item.id),
+					item,
+				});
+
+			}
+
 		helpers.debug("grid", grid);
-
 		helpers.debug("existingItems", existingItems);
-
 		helpers.debug("allItems", allItems);
+		helpers.debug("invalidItems", invalidItems);
 
-		const itemsToUpdate = allItems
+		const itemsToUpdate = invalidItems
 			.map(item => {
 
 				let freeCells = [];
@@ -331,7 +351,7 @@ export class VaultStore extends ItemPileStore {
 		}
 
 		if (data.type !== "Item") {
-			Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
+			Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.DroppedIsNotItem", { type: data.type }), true)
 			return false;
 		}
 
@@ -344,16 +364,21 @@ export class VaultStore extends ItemPileStore {
 			throw Helpers.custom_error("Something went wrong when dropping this item!")
 		}
 
+		if (!isItemValidBasedOnProperties(this.actor, itemData) && !game.user.isGM) {
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultInvalidItemDropped"), true)
+			return false;
+		}
+
 		const source = (data.uuid ? fromUuidSync(data.uuid) : false)?.parent ?? false;
 		const target = this.actor;
 
 		if (source === target) {
-			Helpers.custom_warning(`You can't drop items into the vault that originate from the vault!`, true)
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultSameItemOrigin"), true)
 			return false;
 		}
 
 		if (!source && !game.user.isGM) {
-			Helpers.custom_warning(`Only GMs can drop items from the sidebar!`, true)
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultNoGmItemSidebar"), true)
 			return false;
 		}
 
@@ -408,9 +433,11 @@ export class VaultStore extends ItemPileStore {
 
 		const gridItems = get(this.gridItems).map(item => item.item).sort((a, b) => {
 			return b.size - a.size;
-		}).map(item => item.item);
+		});
 
-		const result = PileUtilities.fitItemsIntoVault(gridItems, this.actor, { existingItems: [], mergeItems });
+		const items = gridItems.map(item => item.item);
+
+		const result = PileUtilities.fitItemsIntoVault(items, this.actor, { existingItems: [], mergeItems });
 
 		if (!result) return Helpers.custom_warning("ITEM-PILES.Warnings.CantSortVault", true);
 
@@ -420,7 +447,19 @@ export class VaultStore extends ItemPileStore {
 			_id: item._id,
 			[game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE]: Utilities.getItemQuantity(item),
 			[CONSTANTS.FLAGS.ITEM]: PileUtilities.cleanItemFlagData(PileUtilities.getItemFlagData(item))
-		}))
+		}));
+
+		for (const gridItem of gridItems) {
+			const update = updates.find(item => item._id === gridItem.id);
+			if (!gridItem) continue;
+			const flagData = PileUtilities.getItemFlagData(update);
+			gridItem.transform.update(val => {
+				val.x = flagData.x;
+				val.y = flagData.y;
+				val.flipped = flagData.flipped;
+				return val;
+			});
+		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, this.actor.uuid, {
 			itemsToUpdate: itemUpdates,

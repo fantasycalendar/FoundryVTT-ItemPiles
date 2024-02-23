@@ -47,12 +47,12 @@
 
 	<form autocomplete=off bind:this={form} on:submit|preventDefault={updateSettings}>
 
-		<p>{localize("ITEM-PILES.Applications.FilterEditor.Explanation")}</p>
+		<p>{localize(`ITEM-PILES.Applications.${application.options?.localization || "FilterEditor"}.Explanation`)}</p>
 
 		<table>
 			<tr>
-				<th>{localize("ITEM-PILES.Applications.FilterEditor.Path")}</th>
-				<th>{localize("ITEM-PILES.Applications.FilterEditor.Filters")}</th>
+				<th>{localize(`ITEM-PILES.Applications.${application.options?.localization || "FilterEditor"}.Path`)}</th>
+				<th>{localize(`ITEM-PILES.Applications.${application.options?.localization || "FilterEditor"}.Filters`)}</th>
 				<th class="custom-small"><a class="item-piles-clickable" on:click={add}><i class="fas fa-plus"></i></a></th>
 			</tr>
 			{#each $itemFilters as { path, filters }, index (index)}

@@ -1,7 +1,7 @@
 import CONSTANTS from "../constants/constants.js";
 import { SYSTEMS } from "../systems.js";
 import SETTINGS from "../constants/settings.js";
-import { cachedActorCurrencies, cachedCurrencyList, cachedFilterList } from "./caches.js";
+import { cachedActorCurrencies, cachedCurrencyList, cachedFilterList, cachedRequiredPropertiesList } from "./caches.js";
 import { hotkeyActionState } from "../hotkeys.js";
 import * as Utilities from "./utilities.js"
 import * as Helpers from "./helpers.js";
@@ -316,6 +316,19 @@ export function getActorItemFilters(target, pileData = false) {
 	return itemFilters;
 }
 
+export function getActorRequiredItemProperties(target, pileData = false) {
+	if (!target) return [];
+	const targetUuid = Utilities.getUuid(target);
+	if (cachedRequiredPropertiesList.has(targetUuid)) {
+		return cachedRequiredPropertiesList.get(targetUuid)
+	}
+	const targetActor = Utilities.getActor(target);
+	pileData = getActorFlagData(targetActor, pileData);
+	const itemFilters = isValidItemPile(targetActor, pileData) ? cleanItemFilters(pileData.requiredItemProperties) : [];
+	cachedRequiredPropertiesList.set(targetUuid, itemFilters);
+	return itemFilters;
+}
+
 export function cleanItemFilters(itemFilters) {
 	return itemFilters ? foundry.utils.duplicate(itemFilters).map(filter => {
 		filter.path = filter.path.trim();
@@ -344,6 +357,18 @@ export function isItemInvalid(targetActor, item, itemFilters = false) {
 		}
 	}
 	return false;
+}
+
+export function isItemValidBasedOnProperties(targetActor, item) {
+	const pileItemRequiredProperties = getActorRequiredItemProperties(targetActor);
+	const itemData = item instanceof Item ? item.toObject() : item;
+	for (const filter of pileItemRequiredProperties) {
+		if (!hasProperty(itemData, filter.path)) return false;
+		const attributeValue = getProperty(itemData, filter.path);
+		if (!filter.filters.has(attributeValue)) return false;
+	}
+	return true;
+
 }
 
 export async function checkItemType(targetActor, item, {
@@ -866,7 +891,7 @@ export function getPriceFromString(str, currencyList = false) {
 	for (const part of parts) {
 		for (const currency of currencies) {
 
-			if(part[2]) {
+			if (part[2]) {
 				identifierFilter.push(part[2]?.toLowerCase());
 			}
 
@@ -886,7 +911,7 @@ export function getPriceFromString(str, currencyList = false) {
 			}
 		}
 	}
-	
+
 	// Maybe there is a better method for this ?
 	currencies = currencies.filter(currency => identifierFilter.includes(currency.identifier?.toLowerCase()));
 
@@ -1928,17 +1953,15 @@ export async function rollTable({
 		return [];
 	}
 
-	let results;
+	let results = [];
 	if (game.modules.get("better-rolltables")?.active) {
-		results = (await game.betterTables.roll(table)).itemsData.map(result => {
-			return {
-				documentCollection: result.documentCollection,
-				documentId: result.documentId,
-				text: result.text || result.name,
-				img: result.img,
-				quantity: 1
-			}
-		})
+		results = (await game.modules.get("better-rolltables").api.roll(table)).itemsData.map(result => ({
+			documentCollection: result.documentCollection,
+			documentId: result.documentId,
+			text: result.text || result.name,
+			img: result.img,
+			quantity: 1
+		}));
 	} else {
 		results = (await table.drawMany(roll.total, { displayChat, recursive: true })).results;
 	}
