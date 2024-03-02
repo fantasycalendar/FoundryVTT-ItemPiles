@@ -791,12 +791,20 @@ export function getCurrenciesAbbreviations() {
 	let primaryAbbreviationsArray = game.itempiles.API.CURRENCIES
 		.filter(currency => currency.abbreviation)
 		.map(currency => {
-			return currency.abbreviation?.replace("{#}", "");
+			if(currency.abbreviation?.includes("{#}")) {
+				return currency.abbreviation?.replace("{#}", "");
+			} else {
+				return currency.abbreviation || "";
+			}
 		});
 	let secondaryAbbreviationsArray = game.itempiles.API.SECONDARY_CURRENCIES
 		.filter(currency => currency.abbreviation)
 		.map(currency => {
-			return currency.abbreviation?.replace("{#}", "");
+			if(currency.abbreviation?.includes("{#}")) {
+				return currency.abbreviation?.replace("{#}", "");
+			} else {
+				return currency.abbreviation || "";
+			}
 		});
 	let allAbbreviationsArray = primaryAbbreviationsArray.concat(secondaryAbbreviationsArray);
 	return allAbbreviationsArray;
@@ -811,7 +819,7 @@ export function getStringFromCurrencies(currencies) {
 			let cost = price.cost;
 			let abbreviation = price.abbreviation;
 			if (!Helpers.isRealNumber(cost) || !abbreviation) {
-				Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, false);
+				Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, true);
 				return "";
 			}
 			// Check abbreviation by case unsensitive...
@@ -819,7 +827,7 @@ export function getStringFromCurrencies(currencies) {
 				return a?.replace("{#}", "")?.toLowerCase() === abbreviation?.replace("{#}", "")?.toLowerCase();
 			});
 			if (indexAbbreviation === -1) {
-				Helpers.custom_error(`getStringFromCurrencies | The currency abbreviation '${abbreviation?.replace("{#}", "")}' is not registered`, false);
+				Helpers.custom_error(`getStringFromCurrencies | The currency abbreviation '${abbreviation?.replace("{#}", "")}' is not registered`, true);
 				return "";
 			}
 			if (price.percent && abbreviation.includes("%")) {
