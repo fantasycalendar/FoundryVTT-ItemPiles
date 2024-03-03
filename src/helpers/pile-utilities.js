@@ -816,7 +816,7 @@ export function getCurrenciesAbbreviations() {
 	let primaryAbbreviationsArray = game.itempiles.API.CURRENCIES
 		.filter(currency => currency.abbreviation)
 		.map(currency => {
-			if(currency.abbreviation?.includes("{#}")) {
+			if (currency.abbreviation?.includes("{#}")) {
 				return currency.abbreviation?.replace("{#}", "");
 			} else {
 				return currency.abbreviation || "";
@@ -825,7 +825,7 @@ export function getCurrenciesAbbreviations() {
 	let secondaryAbbreviationsArray = game.itempiles.API.SECONDARY_CURRENCIES
 		.filter(currency => currency.abbreviation)
 		.map(currency => {
-			if(currency.abbreviation?.includes("{#}")) {
+			if (currency.abbreviation?.includes("{#}")) {
 				return currency.abbreviation?.replace("{#}", "");
 			} else {
 				return currency.abbreviation || "";
@@ -858,10 +858,10 @@ export function getStringFromCurrencies(currencies) {
 			if (price.percent && abbreviation.includes("%")) {
 				abbreviation = abbreviation.replaceAll("%", "")
 			}
-			if(abbreviation.includes("{#}")) {
+			if (abbreviation.includes("{#}")) {
 				return abbreviation.replace("{#}", price.cost)
 			} else {
-				return price.cost+abbreviation;
+				return price.cost + abbreviation;
 			}
 		}).join(" ");
 
@@ -2040,6 +2040,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 		}
 
 		let tableItems = [];
+		const customCategory = table?.customCategory ?? false;
 
 		if (table.addAll) {
 
@@ -2052,7 +2053,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 					const subTable = await getTable(rollResult);
 					items.push(...(await rollMerchantTables({
 						tableData: [{
-							uuid: subTable.uuid, addAll: false, timesToRoll: roll.total, customCategory: table.customCategory
+							uuid: subTable.uuid, addAll: false, timesToRoll: roll.total, customCategory: customCategory
 						}], actor
 					})))
 					continue;
@@ -2061,7 +2062,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				if (!item) continue;
 				const quantity = roll.total * Math.max(Utilities.getItemQuantity(item), 1);
 				tableItems.push({
-					...rollResult, customCategory: table.customCategory, item, quantity
+					...rollResult, customCategory: customCategory, item, quantity
 				})
 			}
 
@@ -2074,12 +2075,12 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 			}
 
 			tableItems = await rollTable({
-				tableUuid: table.uuid, formula: roll.total
+				tableUuid: table.uuid, formula: roll.total, customCategory: customCategory
 			})
 
 			tableItems.forEach(item => {
-				if (table.customCategory) {
-					setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table.customCategory);
+				if (table?.customCategory) {
+					setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table?.customCategory);
 				}
 			});
 
@@ -2094,8 +2095,8 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
 					setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
 				}
-				if (newItem.customCategory) {
-					setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, newItem.customCategory);
+				if (newItem?.customCategory) {
+					setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, newItem?.customCategory);
 				}
 				items.push({
 					...newItem, quantity: newItem.quantity

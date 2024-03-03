@@ -8,6 +8,7 @@
 - Fixed compatibility with Better Rolltables
 - Fixed vault styles not being editable
 - Fixed merchant activity log events being incorrectly displayed
+- Fixed custom categories not being applied on items when populating merchants
 
 ## Version 2.8.20
 
