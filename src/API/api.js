@@ -2476,7 +2476,7 @@ class API {
 
 	/**
 	 * Retrieve all system item types that can be stacked
-	 * @returns {Set<string>}                       The items that can be stacked on this system
+	 * @returns {Set<string>}                       The items type that can be stacked on this system
 	 */
 	static getItemTypesThatCanStack() {
 		return Utilities.getItemTypesThatCanStack();

@@ -1250,7 +1250,7 @@ Trades multiple items between one actor to another, and currencies and/or change
 
 Retrieve all system item types that can be stacked
 
-**Returns**: `Set<string>` - The items that were created and the attributes that were changed
+**Returns**: `Set<string>` - The items type that can be stacked on this system
 
 | Param           | Type                                                                         | Default | Description                                                                                                                                                                                                                                                                                                                   |
 |-----------------|------------------------------------------------------------------------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
