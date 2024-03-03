@@ -533,9 +533,12 @@ export function getItemPileName(target, { data = false, items = false, currencie
 }
 
 export function shouldEvaluateChange(target, changes) {
-	const flags = getActorFlagData(target, getProperty(changes, CONSTANTS.FLAGS.PILE) ?? {});
+	const baseFlags = getProperty(changes, CONSTANTS.FLAGS.PILE) ?? false;
+	const flags = getActorFlagData(target, baseFlags ? foundry.utils.deepClone(baseFlags) : baseFlags);
 	if (!isValidItemPile(target, flags)) return false;
-	return (flags.type === CONSTANTS.PILE_TYPES.CONTAINER && (flags.closedImage || flags.emptyImage || flags.openedImage || flags.lockedImage)) || flags.displayOne || flags.showItemName || flags.overrideSingleItemScale;
+	return (flags.type === CONSTANTS.PILE_TYPES.CONTAINER
+			&& (flags.closedImage || flags.emptyImage || flags.openedImage || flags.lockedImage))
+		|| flags.displayOne || flags.showItemName || flags.overrideSingleItemScale;
 }
 
 function getRelevantTokensAndActor(target) {

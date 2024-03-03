@@ -10,6 +10,7 @@
 - Fixed merchant activity log events being incorrectly displayed
 - Fixed custom categories not being applied on items when populating merchants
 - Fixed issue with item piles not updating the amount of visible currency when taking 1 unit of currency at a time
+- Fixed containers not updating image when the contents of the item pile changed
 
 ## Version 2.8.20
 
