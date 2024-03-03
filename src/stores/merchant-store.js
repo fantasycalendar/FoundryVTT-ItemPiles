@@ -319,8 +319,8 @@ export default class MerchantStore extends ItemPileStore {
 			if (log.property) {
 
 				const properties = {
-					"notForSale": ["ITEM-PILES.Merchant.LogSetForSale", "ITEM-PILES.Merchant.LogSetNotForSale"],
-					"hidden": ["ITEM-PILES.Merchant.LogSetVisible", "ITEM-PILES.Merchant.LogSetHidden"]
+					"notForSale": ["ITEM-PILES.Merchant.LogSetNotForSale", "ITEM-PILES.Merchant.LogSetForSale"],
+					"hidden": ["ITEM-PILES.Merchant.LogSetHidden", "ITEM-PILES.Merchant.LogSetVisible"]
 				}
 
 				log.text = localize(properties[log.property][Number(log.value)], { instigator, item: log.item });

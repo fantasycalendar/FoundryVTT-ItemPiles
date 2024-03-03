@@ -7,6 +7,7 @@
 - Fixed issue with dropping multiple items sometimes only resulting in one item being dropped
 - Fixed compatibility with Better Rolltables
 - Fixed vault styles not being editable
+- Fixed merchant activity log events being incorrectly displayed
 
 ## Version 2.8.20
 
