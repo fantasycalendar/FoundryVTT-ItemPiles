@@ -9,6 +9,7 @@
 - Fixed vault styles not being editable
 - Fixed merchant activity log events being incorrectly displayed
 - Fixed custom categories not being applied on items when populating merchants
+- Fixed issue with item piles not updating the amount of visible currency when taking 1 unit of currency at a time
 
 ## Version 2.8.20
 

@@ -260,8 +260,12 @@ export class PileAttribute extends PileBaseItem {
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
 			if (hasProperty(data, this.path)) {
-				this.quantity.set(Number(getProperty(data, this.path) ?? 0));
-				this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
+				const newQuantity = Number(getProperty(data, this.path) ?? 0);
+				this.quantity.set(newQuantity);
+				this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), newQuantity));
+				if (!this.toShare) {
+					this.quantityLeft.set(newQuantity);
+				}
 				this.store.refreshItems();
 			}
 		});
