@@ -2474,6 +2474,14 @@ class API {
 
 	}
 
+	/**
+	 * Retrieve all system item types that can be stacked
+	 * @returns {Set<string>}                       The items that can be stacked on this system
+	 */
+	static getItemTypesThatCanStack() {
+		return Utilities.getItemTypesThatCanStack();
+	}
+
 	static canItemFitInVault(item, vaultActor) {
 		return PileUtilities.canItemFitInVault(item, vaultActor);
 	}
