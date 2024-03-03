@@ -889,6 +889,9 @@ game.itempiles.API.updateCurrencies(tokenOrActor, "10gp");
 // Set the value on the GP currency with the quantity 10 and on the SP currency with the quantity 5 to the target
 game.itempiles.API.updateCurrencies(tokenOrActor, "10gp 5sp");
 
+// Set the value on the GP currency with the quantity 1d4 and on the SP currency with the quantity 1d3 to the target
+game.itempiles.API.updateCurrencies(actor, "1d4gp 1d3sp")
+
 ```
 
 ---
@@ -918,7 +921,10 @@ const tokenOrActor = game.actors.getName("Bharash");
 game.itempiles.API.addCurrencies(tokenOrActor, "10gp");
 
 // Add 10 GP and 5 SP to the target
-game.itempiles.API.removeCurrencies(tokenOrActor, "10gp 5sp");
+game.itempiles.API.addCurrencies(tokenOrActor, "10gp 5sp");
+
+// Add 1d4 GP to the target
+game.itempiles.API.addCurrencies(tokenOrActor, "1d4gp");
 
 ```
 
@@ -951,6 +957,9 @@ game.itempiles.API.removeCurrencies(tokenOrActor, "10gp");
 
 // Remove 10 GP and 5 SP from the target
 game.itempiles.API.removeCurrencies(tokenOrActor, "10gp 5sp");
+
+// Remove 1d4 GP from the target
+game.itempiles.API.removeCurrencies(tokenOrActor, "1d4gp");
 
 ```
 

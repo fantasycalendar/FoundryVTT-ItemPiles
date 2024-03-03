@@ -1724,6 +1724,9 @@ class API {
 			if (typeof currency.cost !== "number") {
 				throw Helpers.custom_error("getStringFromCurrencies | currency.cost must be of type number");
 			}
+			if (currency.cost < 0) {
+				throw Helpers.custom_error("getStringFromCurrencies | currency.cost cannot be a negative number");
+			}
 			// Is optional
 			// if (typeof currency.percent !== "boolean") {
 			// 	throw Helpers.custom_error("getStringFromCurrencies | currency.percent must be of type boolean");
