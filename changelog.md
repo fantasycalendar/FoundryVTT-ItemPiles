@@ -4,6 +4,7 @@
 
 - Added Required Item Properties setting to item piles - you can now configure which items are valid to be transferred to item piles or sold to merchants
 - Fixed issues with sorting vaults placing items in strange positions
+- Fixed issue with dropping multiple items sometimes only resulting in one item being dropped
 - Fixed compatibility with Better Rolltables
 - Fixed vault styles not being editable
 

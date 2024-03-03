@@ -1849,6 +1849,7 @@ export default class PrivateAPI {
 			}
 
 			Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);
+			foundry.utils.setProperty(dropData.itemData, "quantity", dropData.itemData.quantity);
 
 			if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, sourceActor, targetActor, dropData.itemData, user.id) === false) {
 				return;
@@ -1860,7 +1861,7 @@ export default class PrivateAPI {
 						source_actor_name: sourceActor.name, target_actor_name: targetActor.name, item_name: item.name
 					}));
 					Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, sourceActor, targetActor, dropData.itemData, game.user.id);
-					return this._transferItems(sourceUuid, targetUuid, [dropData.itemData.item], game.user.id)
+					return this._transferItems(sourceUuid, targetUuid, [dropData.itemData], game.user.id)
 				}
 			}
 
