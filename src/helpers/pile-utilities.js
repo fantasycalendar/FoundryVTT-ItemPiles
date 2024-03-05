@@ -347,17 +347,28 @@ export function cleanItemFilters(itemFilters) {
 }
 
 export function isItemInvalid(targetActor, item, itemFilters = false) {
-	const pileItemFilters = itemFilters ? itemFilters : getActorItemFilters(targetActor)
+	const pileItemFilters = itemFilters ? itemFilters : getActorItemFilters(targetActor);
 	const itemData = item instanceof Item ? item.toObject() : item;
 	for (const filter of pileItemFilters) {
-		if (!hasProperty(itemData, filter.path)) continue;
-		const attributeValue = getProperty(itemData, filter.path);
-		if (filter.filters.has(attributeValue)) {
-			return attributeValue;
+	  const isNegationFilter = filter.path.startsWith('!');
+	  const normalizedPath = isNegationFilter ? filter.path.substring(1) : filter.path;
+	  
+	  if (!hasProperty(itemData, normalizedPath)) {
+		if (isNegationFilter) {
+		  return true; 
 		}
+		continue;
+	  }
+	  
+	  const attributeValue = getProperty(itemData, normalizedPath);
+	  const doesFilterMatch = filter.filters.has(attributeValue);
+	  
+	  if ((isNegationFilter && !doesFilterMatch) || (!isNegationFilter && doesFilterMatch)) {
+		return true;
+	  }
 	}
 	return false;
-}
+  }
 
 export function isItemValidBasedOnProperties(targetActor, item) {
 	const pileItemRequiredProperties = getActorRequiredItemProperties(targetActor);
