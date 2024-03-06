@@ -1,7 +1,7 @@
 export default {
     "VERSION": "1.0.0",
 
-    "ACTOR_CLASS_TYPE": "character",
+    "ACTOR_CLASS_TYPE": "Player",
 
     "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
 
