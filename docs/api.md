@@ -46,6 +46,7 @@
   * [isItemPileVault](#isItemPileVault)
   * [isItemPileMerchant](#isItemPileMerchant)
   * [isItemPileAuctioneer](#isItemPileAuctioneer)
+  * [isItemPileEmpty](#isItemPileEmpty)
   * [updateItemPile](#updateItemPile)
   * [deleteItemPile](#deleteItemPile)
   * [splitItemPileContents](#splitItemPileContents)
@@ -631,6 +632,19 @@ Whether an item pile is a auctioneer. If it is not enabled, it is always false.
 | [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
 
 ---
+
+### isItemPileEmpty
+
+`game.itempiles.API.isItemPileEmpty(target)` ⇒ `boolean`
+
+Whether an item pile is a empty pile. If it is not enabled, it is always false.
+
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+
+---
+
 
 ### updateItemPile
 

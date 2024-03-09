@@ -1046,19 +1046,14 @@ class API {
 		return PileUtilities.isItemPileAuctioneer(target, data);
 	}
 
+	/**
+	 * Whether an item pile is empty. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @return {boolean}
+	 */
 	static isItemPileEmpty(target) {
-	
-		const targetActor = Utilities.getActor(target);
-		if (!targetActor) return false;
-	
-		const validItemPile = isValidItemPile(targetActor);
-		if (!validItemPile) return false;
-	
-		const hasNoItems = getActorItems(targetActor).length === 0;
-		const hasNoAttributes = getActorCurrencies(targetActor).length === 0;
-	
-		return validItemPile && hasNoItems && hasNoAttributes;
-	
+		return PileUtilities.isItemPileEmpty(target);
 	}
 
 	/**
@@ -2553,14 +2548,6 @@ class API {
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEMS, sellerUuid, buyerUuid, itemsToSell, game.user.id, { interactionId });
 
-	}
-
-	/**
-	 * Retrieve all system item types that can be stacked
-	 * @returns {Set<string>}                       The items type that can be stacked on this system
-	 */
-	static getItemTypesThatCanStack() {
-		return Utilities.getItemTypesThatCanStack();
 	}
 
 	static canItemFitInVault(item, vaultActor) {
