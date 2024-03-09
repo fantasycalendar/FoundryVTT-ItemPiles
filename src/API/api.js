@@ -951,33 +951,114 @@ class API {
 	 * Whether an item pile is locked. If it is not enabled or not a container, it is always false.
 	 *
 	 * @param {Token/TokenDocument} target
-	 *
+	 * @param {Object/boolean} [data=false] data existing flags data to use
 	 * @return {boolean}
 	 */
-	static isItemPileLocked(target) {
-		return PileUtilities.isItemPileLocked(target);
+	static isItemPileLocked(target, data = false) {
+		return PileUtilities.isItemPileLocked(target, data);
 	}
 
 	/**
 	 * Whether an item pile is closed. If it is not enabled or not a container, it is always false.
 	 *
 	 * @param {Token/TokenDocument} target
-	 *
+	 * @param {Object/boolean} [data=false] data existing flags data to use
 	 * @return {boolean}
 	 */
-	static isItemPileClosed(target) {
-		return PileUtilities.isItemPileClosed(target);
+	static isItemPileClosed(target, data = false) {
+		return PileUtilities.isItemPileClosed(target, data);
 	}
 
+	/**
+	 * Whether an item pile is a valid item pile. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isValidItemPile(target, data = false) {
+		return PileUtilities.isValidItemPile(target, data);
+	}
+	
+    /**
+	 * Whether an item pile is a regular item pile. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isRegularItemPile(target, data = false) {
+		return PileUtilities.isRegularItemPile(target, data);
+	}
+	
 	/**
 	 * Whether an item pile is a container. If it is not enabled, it is always false.
 	 *
 	 * @param {Token/TokenDocument} target
-	 *
+	 * @param {Object/boolean} [data=false] data existing flags data to use
 	 * @return {boolean}
 	 */
-	static isItemPileContainer(target) {
-		return PileUtilities.isItemPileContainer(target);
+	static isItemPileContainer(target, data = false) {
+		return PileUtilities.isItemPileContainer(target, data);
+	}
+	
+	/**
+	 * Whether an item pile is a lootable. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isItemPileLootable(target, data = false) {
+		return PileUtilities.isItemPileLootable(target, data);
+	}
+	
+	/**
+	 * Whether an item pile is a vault. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isItemPileVault(target, data = false) {
+		return PileUtilities.isItemPileVault(target, data);
+	}
+	
+	/**
+	 * Whether an item pile is a merchant. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isItemPileMerchant(target, data = false) {
+		return PileUtilities.isItemPileMerchant(target, data);
+	}
+	
+	/**
+	 * Whether an item pile is a merchant. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isItemPileAuctioneer(target, data = false) {
+		return PileUtilities.isItemPileAuctioneer(target, data);
+	}
+
+	static isItemPileEmpty(target) {
+	
+		const targetActor = Utilities.getActor(target);
+		if (!targetActor) return false;
+	
+		const validItemPile = isValidItemPile(targetActor);
+		if (!validItemPile) return false;
+	
+		const hasNoItems = getActorItems(targetActor).length === 0;
+		const hasNoAttributes = getActorCurrencies(targetActor).length === 0;
+	
+		return validItemPile && hasNoItems && hasNoAttributes;
+	
 	}
 
 	/**

@@ -75,7 +75,8 @@ const CONSTANTS = {
 		PILE: "pile",
 		CONTAINER: "container",
 		MERCHANT: "merchant",
-		VAULT: "vault"
+		VAULT: "vault",
+		AUCTIONEER: "auctioneer",
 	},
 
 	VAULT_LOGGING_TYPES: {

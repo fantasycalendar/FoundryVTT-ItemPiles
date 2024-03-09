@@ -39,7 +39,13 @@
   * [rattleItemPile](#rattleItemPile)
   * [isItemPileLocked](#isItemPileLocked)
   * [isItemPileClosed](#isItemPileClosed)
+  * [isValidItemPile](#isValidItemPile)
+  * [isRegularItemPile](#isRegularItemPile)
   * [isItemPileContainer](#isItemPileContainer)
+  * [isItemPileLootable](#isItemPileLootable)
+  * [isItemPileVault](#isItemPileVault)
+  * [isItemPileMerchant](#isItemPileMerchant)
+  * [isItemPileAuctioneer](#isItemPileAuctioneer)
   * [updateItemPile](#updateItemPile)
   * [deleteItemPile](#deleteItemPile)
   * [splitItemPileContents](#splitItemPileContents)
@@ -516,9 +522,10 @@ Causes the item pile to play a sound as it was attempted to be opened, but was l
 
 Whether an item pile is locked. If it is not enabled or not a container, it is always false.
 
-| Param  | Type                  |
-|--------|-----------------------|
-| target | `Token/TokenDocument` |
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
 
 ---
 
@@ -528,9 +535,36 @@ Whether an item pile is locked. If it is not enabled or not a container, it is a
 
 Whether an item pile is closed. If it is not enabled or not a container, it is always false.
 
-| Param  | Type                  |
-|--------|-----------------------|
-| target | `Token/TokenDocument` |
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+
+---
+
+### isValidItemPile
+
+`game.itempiles.API.isValidItemPile(target)` ⇒ `boolean`
+
+Whether an item pile is a valid item pile. If it is not enabled, it is always false.
+
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+
+---
+
+### isRegularItemPile
+
+`game.itempiles.API.isRegularItemPile(target)` ⇒ `boolean`
+
+Whether an item pile is a regular item pile. If it is not enabled, it is always false.
+
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
 
 ---
 
@@ -540,9 +574,62 @@ Whether an item pile is closed. If it is not enabled or not a container, it is a
 
 Whether an item pile is a container. If it is not enabled, it is always false.
 
-| Param  | Type                  |
-|--------|-----------------------|
-| target | `Token/TokenDocument` |
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+
+---
+
+### isItemPileLootable
+
+`game.itempiles.API.isItemPileLootable(target)` ⇒ `boolean`
+
+Whether an item pile is a lootable. If it is not enabled, it is always false.
+
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+
+---
+
+### isItemPileVault
+
+`game.itempiles.API.isItemPileVault(target)` ⇒ `boolean`
+
+Whether an item pile is a vault. If it is not enabled, it is always false.
+
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+
+---
+
+### isItemPileMerchant
+
+`game.itempiles.API.isItemPileMerchant(target)` ⇒ `boolean`
+
+Whether an item pile is a merchant. If it is not enabled, it is always false.
+
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+
+---
+
+### isItemPileAuctioneer
+
+`game.itempiles.API.isItemPileAuctioneer(target)` ⇒ `boolean`
+
+Whether an item pile is a auctioneer. If it is not enabled, it is always false.
+
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
 
 ---
 
