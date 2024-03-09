@@ -1047,7 +1047,7 @@ class API {
 	}
 
 	/**
-	 * Whether an item pile is empty. If it is not enabled, it is always false.
+	 * Whether an item pile is empty pile. If it is not enabled, it is always false.
 	 *
 	 * @param {Token/TokenDocument} target
 	 * @return {boolean}
