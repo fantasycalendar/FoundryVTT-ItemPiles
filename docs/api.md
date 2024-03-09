@@ -89,7 +89,6 @@
   * [rollItemTable](#rollItemTable)
   * [getPricesForItem](#getPricesForItem)
   * [tradeItems](#tradeItems)
-  * [getItemTypesThatCanStack](#getItemTypesThatCanStack)
 
 ## System settings methods
 
@@ -1331,15 +1330,5 @@ Trades multiple items between one actor to another, and currencies and/or change
 | items           | `Array<Object<{item: Item/string, quantity: number, paymentIndex: number}>>` |         | An array of objects containing the item or the id of the                                                                                              item to be sold, the quantity to be sold, and the payment                                                                                              index to be used |
 | [interactionId] | `string/boolean`                                                             | `false` | The ID of this interaction                                                                                                                                                                                                                                                                                                    |
 
-### getItemTypesThatCanStack
-
-`game.itempiles.API.getItemTypesThatCanStack()` ⇒ `Set<string>`
-
-Retrieve all system item types that can be stacked
-
-**Returns**: `Set<string>` - The items type that can be stacked on this system
-
-| Param           | Type                                                                         | Default | Description                                                                                                                                                                                                                                                                                                                   |
-|-----------------|------------------------------------------------------------------------------|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 
