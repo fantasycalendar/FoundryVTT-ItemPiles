@@ -15,6 +15,7 @@
 	import CategorizedItemList from "./CategorizedItemList.svelte";
 	import * as Helpers from "../../helpers/helpers.js";
 	import { getSourceActorFromDropData } from "../../helpers/utilities.js";
+	import { isItemValidBasedOnProperties } from "../../helpers/pile-utilities.js";
 
 	const { application } = getContext('#external');
 
@@ -67,7 +68,7 @@
 		}
 
 		if (data.type !== "Item") {
-			Helpers.custom_warning(`You can't drop documents of type "${data.type}" into this Item Piles vault!`, true)
+			Helpers.custom_warning(localize("ITEM-PILES.Warnings.DroppedIsNotItem", { type: data.type }), true)
 			return false;
 		}
 
@@ -77,6 +78,11 @@
 		if (!itemData) {
 			console.error(data);
 			throw Helpers.custom_error("Something went wrong when dropping this item!")
+		}
+
+		if (!isItemValidBasedOnProperties(this.actor, itemData) && !game.user.isGM) {
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultInvalidItemDropped"), true)
+			return false;
 		}
 
 		const source = getSourceActorFromDropData(data);

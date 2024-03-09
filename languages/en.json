@@ -41,13 +41,18 @@
     },
     "Warnings": {
       "NoGMsConnected": "WARNING - No GMs connected - Item Piles requires a GM to be connected for players to be able to utilize most of the module's features.",
+      "TransactionNoGMConnected": "No GM is connected - current transaction has been cancelled, nothing has been added, removed, or transferred",
       "GiveItemNoGM": "There is no GM active to receive you giving this item.",
       "GiveItemDeclined": "{user_name} declined your item offer.",
       "NoPlayersActive": "No players are active to do this action",
       "NoGMsConnectedAction": "WARNING - Could not execute \"{action}\" because no GMs are active.",
       "VaultFull": "This item can't fit into this vault!",
       "CantSortVault": "Failed to sort items - either there are simply too many items, or something went wrong",
-      "VaultItemNotExpander": "That item is not a vault expander"
+      "VaultItemNotExpander": "That item is not a vault expander",
+      "DroppedIsNotItem": "You can't drop documents of type \"{type}\" into this item pile!",
+      "VaultInvalidItemDropped": "You cannot drop this type of item into this vault!",
+      "VaultSameItemOrigin": "You can't drop items into the vault that originate from the vault!",
+      "VaultNoGmItemSidebar": "Only GMs can drop items from the sidebar!"
     },
     "Inspect": {
       "Title": "Inspecting Pile Contents",
@@ -471,7 +476,15 @@
         "TitleActor": "Item Piles Filters Editor: {actor_name}",
         "Explanation": "Here you can define multiple types of filters that will exclude certain types of items. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the filters, it hides those items in the item pile inventory UI.",
         "Filters": "Filters",
-        "Path": "Attribute path",
+        "Path": "Property path",
+        "AddNew": "Add new filter"
+      },
+      "RequiredItemPropertiesEditor": {
+        "Title": "Item Piles - Required Item Properties Editor",
+        "TitleActor": "Item Piles - Required Item Properties Editor: {actor_name}",
+        "Explanation": "Here you can define multiple types of required item properties that items transferred to this item pile must have. Based on the attribute path given, the item pile could find the \"type\" of an item and based on the requirements, it would prevent transferring items that do not match these properties to this item pile.",
+        "Filters": "Required Properties",
+        "Path": "Property path",
         "AddNew": "Add new filter"
       },
       "SimilaritiesEditor": {
@@ -556,7 +569,10 @@
           "ConfigureOverrideSecondaryCurrencies": "Configure Override Secondary Currencies",
           "OverrideItemFilters": "Override Item Filters",
           "OverrideItemFiltersExplanation": "Configure if this pile should be able to transfer other types items than the default.",
-          "ConfigureOverrideItemFilters": "Configure Override Item Filters"
+          "ConfigureOverrideItemFilters": "Configure Override Item Filters",
+          "RequiredItemProperties": "Required Item Properties",
+          "RequiredItemPropertiesExplanation": "Configure if this item pile should require items that are transferred to it must have certain properties.",
+          "ConfigureRequiredItemProperties": "Configure Required Item Properties"
         },
         "Other": {
           "Title": "Other Settings",

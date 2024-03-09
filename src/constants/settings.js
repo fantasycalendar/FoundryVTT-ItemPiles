@@ -171,7 +171,8 @@ const SETTINGS = {
 			label: "ITEM-PILES.Settings.CssVariables.Label",
 			hint: "ITEM-PILES.Settings.CssVariables.Hint",
 			icon: "fa-solid fa-wand-magic-sparkles",
-			application: "styles", applicationOptions: {
+			application: "styles",
+			applicationOptions: {
 				readOnly: true,
 				variables: true
 			},

@@ -102,6 +102,7 @@ const CONSTANTS = {
 		overrideItemFilters: false,
 		overrideCurrencies: false,
 		overrideSecondaryCurrencies: false,
+		requiredItemProperties: [],
 
 		// Token settings
 		displayOne: false,
