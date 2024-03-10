@@ -36,6 +36,7 @@ import alienrpg from "./systems/alienrpg.js";
 import pirateborg from "./systems/pirateborg.js";
 import starwarsffg from "./systems/starwarsffg.js";
 import demonlord from "./systems/demonlord.js";
+import dnd5e241 from "./systems/dnd5e-2.4.1.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -44,173 +45,174 @@ import demonlord from "./systems/demonlord.js";
  */
 export const SYSTEMS = {
 
-  SUPPORTED_SYSTEMS: {
-    // ↓ ADD SYSTEMS HERE ↓
-    "alienrpg": {
-      "latest": alienrpg
-    },
-    "dnd4e": {
-      "latest": dnd4e
-    },
-    "dnd5e": {
-      "latest": dnd5e,
-      "2.0.3": dnd5e203,
-    },
-    "pf1": {
-      "latest": pf1
-    },
-    "pf2e": {
-      "latest": pf2e
-    },
-    "ds4": {
-      "latest": ds4
-    },
-    "d35e": {
-      "latest": d35e
-    },
-    "blade-runner": {
-      "latest": bladeRunner
-    },
-    "sfrpg": {
-      "latest": sfrpg
-    },
-    "swade": {
-      "latest": swade
-    },
-    "tormenta20": {
-      "latest": tormenta20
-    },
-    "wfrp4e": {
-      "latest": wfrp4e
-    },
-    "splittermond": {
-      "latest": splittermond
-    },
-    "forbidden-lands": {
-      "latest": forbiddenLands
-    },
-    "icrpg": {
-      "latest": icrpg
-    },
-    "icrpgme": {
-      "latest": icrpgme
-    },
-    "swse": {
-      "latest": swse
-    },
-    "sw5e": {
-      "latest": sw5e,
-      "2.0.3.2.3.8": sw5e203
-    },
-    "fallout": {
-      "latest": fallout
-    },
-    "cyberpunk-red-core": {
-      "latest": cyberpunkRedCore
-    },
-    "knave": {
-      "latest": knave
-    },
-    "t2k4e": {
-      "latest": t2k4e
-    },
-    "yzecoriolis": {
-      "latest": yzecoriolis
-    },
-    "kamigakari": {
-      "latest": kamigakari
-    },
-    "wwn": {
-      "latest": wwn
-    },
-    "symbaroum": {
-      "latest": symbaroum
-    },
-    "cyphersystem": {
-      "latest": cyphersystem
-    },
-    "ptu": {
-      "latest": ptu
-    },
-    "dcc": {
-      "latest": dcc
-    },
-    "a5e": {
-      "latest": a5e
-    },
-    "dark-heresy": {
-      "latest": darkHeresy2e
-    },
-    "naheulbeuk": {
-      "latest": naheulbeuk
-    },
-    "pirateborg": {
-      "latest": pirateborg
-    },
-    "starwarsffg": {
-      "latest": starwarsffg
-    },
-    "demonlord": {
-      "latest": demonlord
-    },
-    // ↑ ADD SYSTEMS HERE ↑
-  },
+	SUPPORTED_SYSTEMS: {
+		// ↓ ADD SYSTEMS HERE ↓
+		"alienrpg": {
+			"latest": alienrpg
+		},
+		"dnd4e": {
+			"latest": dnd4e
+		},
+		"dnd5e": {
+			"latest": dnd5e,
+			"2.4.1": dnd5e241,
+			"2.0.3": dnd5e203,
+		},
+		"pf1": {
+			"latest": pf1
+		},
+		"pf2e": {
+			"latest": pf2e
+		},
+		"ds4": {
+			"latest": ds4
+		},
+		"d35e": {
+			"latest": d35e
+		},
+		"blade-runner": {
+			"latest": bladeRunner
+		},
+		"sfrpg": {
+			"latest": sfrpg
+		},
+		"swade": {
+			"latest": swade
+		},
+		"tormenta20": {
+			"latest": tormenta20
+		},
+		"wfrp4e": {
+			"latest": wfrp4e
+		},
+		"splittermond": {
+			"latest": splittermond
+		},
+		"forbidden-lands": {
+			"latest": forbiddenLands
+		},
+		"icrpg": {
+			"latest": icrpg
+		},
+		"icrpgme": {
+			"latest": icrpgme
+		},
+		"swse": {
+			"latest": swse
+		},
+		"sw5e": {
+			"latest": sw5e,
+			"2.0.3.2.3.8": sw5e203
+		},
+		"fallout": {
+			"latest": fallout
+		},
+		"cyberpunk-red-core": {
+			"latest": cyberpunkRedCore
+		},
+		"knave": {
+			"latest": knave
+		},
+		"t2k4e": {
+			"latest": t2k4e
+		},
+		"yzecoriolis": {
+			"latest": yzecoriolis
+		},
+		"kamigakari": {
+			"latest": kamigakari
+		},
+		"wwn": {
+			"latest": wwn
+		},
+		"symbaroum": {
+			"latest": symbaroum
+		},
+		"cyphersystem": {
+			"latest": cyphersystem
+		},
+		"ptu": {
+			"latest": ptu
+		},
+		"dcc": {
+			"latest": dcc
+		},
+		"a5e": {
+			"latest": a5e
+		},
+		"dark-heresy": {
+			"latest": darkHeresy2e
+		},
+		"naheulbeuk": {
+			"latest": naheulbeuk
+		},
+		"pirateborg": {
+			"latest": pirateborg
+		},
+		"starwarsffg": {
+			"latest": starwarsffg
+		},
+		"demonlord": {
+			"latest": demonlord
+		},
+		// ↑ ADD SYSTEMS HERE ↑
+	},
 
-  DEFAULT_SETTINGS: {
-    ACTOR_CLASS_TYPE: "",
-    ITEM_QUANTITY_ATTRIBUTE: "",
-    ITEM_PRICE_ATTRIBUTE: "",
-    QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
-    ITEM_FILTERS: [],
-    ITEM_SIMILARITIES: [],
-    VAULT_STYLES: [],
-    CSS_VARIABLES: [],
-    UNSTACKABLE_ITEM_TYPES: [],
-    CURRENCIES: [],
-    SECONDARY_CURRENCIES: [],
-    PILE_DEFAULTS: {},
-    TOKEN_FLAG_DEFAULTS: {},
-    CURRENCY_DECIMAL_DIGITS: 0.00001,
-    SOFT_MIGRATIONS: {}
-  },
+	DEFAULT_SETTINGS: {
+		ACTOR_CLASS_TYPE: "",
+		ITEM_QUANTITY_ATTRIBUTE: "",
+		ITEM_PRICE_ATTRIBUTE: "",
+		QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
+		ITEM_FILTERS: [],
+		ITEM_SIMILARITIES: [],
+		VAULT_STYLES: [],
+		CSS_VARIABLES: [],
+		UNSTACKABLE_ITEM_TYPES: [],
+		CURRENCIES: [],
+		SECONDARY_CURRENCIES: [],
+		PILE_DEFAULTS: {},
+		TOKEN_FLAG_DEFAULTS: {},
+		CURRENCY_DECIMAL_DIGITS: 0.00001,
+		SOFT_MIGRATIONS: {}
+	},
 
-  get HAS_SYSTEM_SUPPORT() {
-    return !!this.SUPPORTED_SYSTEMS?.[game.system.id.toLowerCase()];
-  },
+	get HAS_SYSTEM_SUPPORT() {
+		return !!this.SUPPORTED_SYSTEMS?.[game.system.id.toLowerCase()];
+	},
 
-  _currentSystem: false,
+	_currentSystem: false,
 
-  get DATA() {
+	get DATA() {
 
-    if (this._currentSystem) return this._currentSystem;
+		if (this._currentSystem) return this._currentSystem;
 
-    const system = this.SUPPORTED_SYSTEMS?.[game.system.id.toLowerCase()];
-    if (!system) return this.DEFAULT_SETTINGS;
+		const system = this.SUPPORTED_SYSTEMS?.[game.system.id.toLowerCase()];
+		if (!system) return this.DEFAULT_SETTINGS;
 
-    if (system[game.system.version]) {
-      this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[game.system.version]);
-      return this._currentSystem;
-    }
+		if (system[game.system.version]) {
+			this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[game.system.version]);
+			return this._currentSystem;
+		}
 
-    const versions = Object.keys(system);
-    if (versions.length === 1) {
-      this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[versions[0]]);
-      return this._currentSystem;
-    }
+		const versions = Object.keys(system);
+		if (versions.length === 1) {
+			this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[versions[0]]);
+			return this._currentSystem;
+		}
 
-    versions.sort((a, b) => {
-      return a === "latest" || b === "latest" ? -Infinity : (isNewerVersion(b, a) ? -1 : 1);
-    });
-    const version = versions.find(version => {
-      return version === "latest" || !isNewerVersion(game.system.version, version);
-    });
+		versions.sort((a, b) => {
+			return a === "latest" || b === "latest" ? -Infinity : (isNewerVersion(b, a) ? -1 : 1);
+		});
+		const version = versions.find(version => {
+			return version === "latest" || !isNewerVersion(game.system.version, version);
+		});
 
-    this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[version]);
+		this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[version]);
 
-    return this._currentSystem;
-  },
+		return this._currentSystem;
+	},
 
-  addSystem(data) {
-    this.SUPPORTED_SYSTEMS[game.system.id.toLowerCase()] = { latest: data };
-  }
+	addSystem(data) {
+		this.SUPPORTED_SYSTEMS[game.system.id.toLowerCase()] = { latest: data };
+	}
 };
