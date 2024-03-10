@@ -156,9 +156,9 @@ export const SYSTEMS = {
 		"demonlord": {
 			"latest": demonlord
 		},
-         "shadowdark": {
-             "latest": shadowdark
-         },
+		"shadowdark": {
+			"latest": shadowdark
+		},
 		// ↑ ADD SYSTEMS HERE ↑
 	},
 
