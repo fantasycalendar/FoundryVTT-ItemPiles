@@ -132,6 +132,10 @@ export function refreshItemTypesThatCanStack() {
 	getItemTypesThatCanStack();
 }
 
+/**
+ * Retrieve all system item types that can be stacked
+ * @returns {Set<string>}                       The items type that can be stacked on this system
+ */
 export function getItemTypesThatCanStack() {
 	if (!itemTypesWithQuantities) {
 

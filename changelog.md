@@ -1,8 +1,18 @@
 # Item Piles Changelog
 
-## Version 2.8.21
+## Version 2.9.0
 
+- Added formal support for D&D5e 3.0.x - moving/buying/trading containers is still not supported
 - Added Required Item Properties setting to item piles - you can now configure which items are valid to be transferred to item piles or sold to merchants
+- Added various API methods (thank you to p4535992 on github!)
+  - `game.itempiles.API.isValidItemPile`
+  - `game.itempiles.API.isRegularItemPile`
+  - `game.itempiles.API.isItemPileLootable`
+  - `game.itempiles.API.isItemPileVault`
+  - `game.itempiles.API.isItemPileMerchant`
+  - `game.itempiles.API.isItemPileAuctioneer` (requires the Item Piles: Auctioneer module)
+  - `game.itempiles.API.isItemPileEmpty`
+- Updated Polish and Chinese (simplified) localizations (thank you Lioheart and hmqgg on weblate!)
 - Fixed issues with sorting vaults placing items in strange positions
 - Fixed issue with dropping multiple items sometimes only resulting in one item being dropped
 - Fixed compatibility with Better Rolltables

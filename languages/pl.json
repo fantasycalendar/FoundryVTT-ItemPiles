@@ -37,7 +37,12 @@
       "VaultFull": "Ten przedmiot nie mieści się w tym skarbcu!",
       "VaultItemNotExpander": "Ten przedmiot nie jest rozszerzeniem skarbca",
       "NoGMsConnected": "UWAGA - Brak podłączonych GMów - Item Piles wymaga GMa, aby gracze mogli korzystać z większości funkcji modułu.",
-      "CantSortVault": "Nie udało się posortować elementów - albo jest ich po prostu za dużo, albo coś poszło nie tak"
+      "CantSortVault": "Nie udało się posortować elementów - albo jest ich po prostu za dużo, albo coś poszło nie tak",
+      "VaultInvalidItemDropped": "Nie można wrzucać tego typu przedmiotów do tego skarbca!",
+      "VaultNoGmItemSidebar": "Tylko GM może upuszczać przedmioty z paska bocznego!",
+      "TransactionNoGMConnected": "Żaden GM nie jest połączony - bieżąca transakcja została anulowana, nic nie zostało dodane, usunięte ani przeniesione",
+      "DroppedIsNotItem": "Nie można wrzucać dokumentów typu \"{type}\" do tego stosu przedmiotów!",
+      "VaultSameItemOrigin": "Nie można wrzucać do skarbca przedmiotów, które pochodzą ze skarbca!"
     },
     "Inspect": {
       "Title": "Przeglądanie Zawartości Stosu",
@@ -432,7 +437,7 @@
       },
       "FilterEditor": {
         "Explanation": "Tutaj możesz zdefiniować wiele typów filtrów, które wykluczą pewne typy przedmiotów. Na podstawie podanej ścieżki atrybutu, stos przedmiotów mógłby znaleźć \"typ\" przedmiotu i na podstawie filtrów, ukrywa te przedmioty w UI inwentarza stosu przedmiotów.",
-        "Path": "Ścieżka atrybutu",
+        "Path": "Ścieżka właściwości",
         "Title": "Edytor filtrów Item Piles",
         "Filters": "Filtry",
         "TitleActor": "Edytor filtrów Item Piles: {actor_name}",
@@ -586,7 +591,10 @@
           "CanStackItemsExplanation": "Z tym ustawieniem, przedmioty dodane do stosu przedmiotów będą układane w stos z podobnymi przedmiotami. Można to również kontrolować dla poszczególnych przedmiotów w ich konfiguracji. Uwaga: Zależy to również od systemu, ponieważ niektóre przedmioty nie mają ilości, więc nigdy nie mogą być układane w stosy.",
           "CanStackItemsYes": "Tak, układaj przedmioty (chyba że przedmiot mówi inaczej)",
           "CanStackItemsNoAlways": "Nie, nigdy nie układaj w stos przedmiotów",
-          "CanStackItemsYesAlways": "Tak, zawsze układaj przedmioty w stosy"
+          "CanStackItemsYesAlways": "Tak, zawsze układaj przedmioty w stosy",
+          "ConfigureRequiredItemProperties": "Skonfiguruj wymagane właściwości przedmiotu",
+          "RequiredItemProperties": "Wymagane właściwości przedmiotu",
+          "RequiredItemPropertiesExplanation": "Skonfiguruj, czy ten stos przedmiotów powinien wymagać, aby przenoszone do niego przedmioty miały określone właściwości."
         },
         "Container": {
           "Title": "Ustawienia kontenera",
@@ -720,6 +728,14 @@
         "Explanation": "W tym miejscu można określić, które waluty dodatkowe mogą być podnoszone i upuszczane przez postacie.",
         "Title": "Edytor walut drugorzędnych",
         "TitleActor": "Edytor walut drugorzędnych: {actor_name}"
+      },
+      "RequiredItemPropertiesEditor": {
+        "Title": "Item Piles - Edytor wymaganych właściwości przedmiotów",
+        "TitleActor": "Item Piles - Wymagany edytor właściwości przedmiotów: {actor_name}",
+        "Filters": "Wymagane właściwości",
+        "Path": "Ścieżka właściwości",
+        "AddNew": "Dodaj nowy filtr",
+        "Explanation": "W tym miejscu można zdefiniować wiele typów wymaganych właściwości przedmiotów, które muszą mieć przedmioty przeniesione do tego stosu przedmiotów. W oparciu o podaną ścieżkę atrybutów, stos przedmiotów może znaleźć \"typ\" przedmiotu i w oparciu o wymagania, uniemożliwi przeniesienie przedmiotów, które nie pasują do tych właściwości do tego stosu przedmiotów."
       }
     },
     "Settings": {
