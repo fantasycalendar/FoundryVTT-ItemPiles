@@ -1,6 +1,6 @@
 # Item Piles Changelog
 
-## Version 2.8.21
+## Version 2.9.0
 
 - Added formal support for D&D5e 3.0.x - moving/buying/trading containers is still not supported
 - Added Required Item Properties setting to item piles - you can now configure which items are valid to be transferred to item piles or sold to merchants
