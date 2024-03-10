@@ -1,0 +1,20 @@
+{
+  "ITEM-PILES": {
+    "Currencies": "Monete",
+    "Currency": "Valuta",
+    "ContextMenu": {
+      "ShowToPlayers": "Mostra ai giocatori",
+      "RequestTrade": "Richiedi Trattativa"
+    },
+    "Types": {
+      "pile": "Pila di oggetti",
+      "container": "Contenitore",
+      "merchant": "Mercante",
+      "vault": "Volta"
+    },
+    "Items": "Oggetti",
+    "HeaderButtons": {
+      "ShowToPlayers": "Mostra ai Giocatori"
+    }
+  }
+}
