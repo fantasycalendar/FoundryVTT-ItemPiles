@@ -15,7 +15,7 @@ export default {
   "ITEM_FILTERS": [
     {
       "path": "type",
-      "filters": "script,Spell"
+      "filters": "Ancestry,Background,Boon,Class Ability,Class,Deity,Effect,Language,NPC Attack,NPC Special Attack,NPC Spell,NPC Feature,Property,Spell,Talent"
     },
   ],
 
