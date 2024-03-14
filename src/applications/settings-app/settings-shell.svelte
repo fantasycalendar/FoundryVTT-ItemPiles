@@ -184,6 +184,12 @@
           }}/>
 					<Setting key={SETTINGS.ACTOR_CLASS_TYPE} bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}"
 					         options={game.system.template.Actor.types}/>
+					<Setting key={SETTINGS.ITEM_CLASS_LOOT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_LOOT_TYPE]}"
+					         options={game.system.template.Item.types}/>
+					<Setting key={SETTINGS.ITEM_CLASS_WEAPON_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_WEAPON_TYPE]}"
+					         options={game.system.template.Item.types}/>
+					<Setting key={SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE]}"
+					         options={game.system.template.Item.types}/>							 							 
 					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
 					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>

@@ -26,6 +26,33 @@ class API {
 	}
 
 	/**
+	 * The item class type is the type of item that will be used for the default loot item
+	 *
+	 * @returns {string}
+	 */
+	static get ITEM_CLASS_LOOT_TYPE() {
+		return Helpers.getSetting(SETTINGS.ITEM_CLASS_LOOT_TYPE);
+	}
+
+	/**
+	 * The item class type is the type of item that will be used for the default weapon item
+	 *
+	 * @returns {string}
+	 */
+	static get ITEM_CLASS_WEAPON_TYPE() {
+		return Helpers.getSetting(SETTINGS.ITEM_CLASS_WEAPON_TYPE);
+	}
+
+	/**
+	 * The item class type is the type of item that will be used for the default equipment item
+	 *
+	 * @returns {string}
+	 */
+	static get ITEM_CLASS_EQUIPMENT_TYPE() {
+		return Helpers.getSetting(SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE);
+	}
+
+	/**
 	 * The currencies used in this system
 	 *
 	 * @returns {Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>}
@@ -378,6 +405,9 @@ class API {
 	 * @param {Object<{
 	 *   VERSION: string,
 	 *   ACTOR_CLASS_TYPE: string,
+	 *   ITEM_CLASS_LOOT_TYPE: string,
+	 *   ITEM_CLASS_WEAPON_TYPE: string,
+	 *   ITEM_CLASS_EQUIPMENT_TYPE: string,
 	 *   ITEM_QUANTITY_ATTRIBUTE: string,
 	 *   ITEM_PRICE_ATTRIBUTE: string,
 	 *   QUANTITY_FOR_PRICE_ATTRIBUTE: string,
@@ -412,6 +442,9 @@ class API {
 		const data = foundry.utils.mergeObject({
 			VERSION: "",
 			ACTOR_CLASS_TYPE: "",
+			ITEM_CLASS_LOOT_TYPE: "",
+			ITEM_CLASS_WEAPON_TYPE: "",
+			ITEM_CLASS_EQUIPMENT_TYPE: "",
 			ITEM_QUANTITY_ATTRIBUTE: "",
 			ITEM_PRICE_ATTRIBUTE: "",
 			QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
@@ -435,6 +468,18 @@ class API {
 
 		if (typeof data["ACTOR_CLASS_TYPE"] !== "string") {
 			throw Helpers.custom_error("addSystemIntegration | data.ACTOR_CLASS_TYPE must be of type string");
+		}
+
+		if (data["ITEM_CLASS_LOOT_TYPE"] && typeof data["ITEM_CLASS_LOOT_TYPE"] !== "string") {
+			throw Helpers.custom_error("addSystemIntegration | data.ITEM_CLASS_LOOT_TYPE must be of type string");
+		}
+
+		if (data["ITEM_CLASS_WEAPON_TYPE"] && typeof data["ITEM_CLASS_WEAPON_TYPE"] !== "string") {
+			throw Helpers.custom_error("addSystemIntegration | data.ITEM_CLASS_WEAPON_TYPE must be of type string");
+		}
+
+		if (data["ITEM_CLASS_EQUIPMENT_TYPE"] && typeof data["ITEM_CLASS_EQUIPMENT_TYPE"] !== "string") {
+			throw Helpers.custom_error("addSystemIntegration | data.ITEM_CLASS_EQUIPMENT_TYPE must be of type string");
 		}
 
 		if (typeof data["ITEM_QUANTITY_ATTRIBUTE"] !== "string") {
