@@ -74,7 +74,7 @@ export default {
                     return currency.data.path.toLowerCase().endsWith(costDenomination);
                 });
 
-            totalCost += subCost * currencyDenomination?.exchangeRate ?? 1;
+            totalCost += subCost * currencyDenomination?.exchangeRate ?? 0;
         }
 
         return totalCost;
