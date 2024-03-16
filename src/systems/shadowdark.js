@@ -1,15 +1,12 @@
 export default {
 
-    "VERSION": "1.0.0",
+    "VERSION": "1.0.2",
 
     // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
     "ACTOR_CLASS_TYPE": "Player",
 
     // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
     "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
-
-    // The item price attribute is the path to the attribute on each item that determine how much it costs
-    "ITEM_PRICE_ATTRIBUTE": "system.cost",
 
     // Item filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
     "ITEM_FILTERS": [
@@ -27,37 +24,37 @@ export default {
     // In the case of items, it is recommended you export the item with `.toObject()` and strip out any module data
     "CURRENCIES": [
         {
-            type: "attribute",
-            name: "SHADOWDARK.CurrencyGP",
-            img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
-            abbreviation: "{#}GP",
-            data: {
-                path: "system.coins.gp",
+            "type": "attribute",
+            "name": "Gold Pieces",
+            "img": "icons/commodities/currency/coin-embossed-crown-gold.webp",
+            "abbreviation": "{#}GP",
+            "data": {
+                "path": "system.coins.gp",
             },
-            primary: true,
-            exchangeRate: 1
+            "primary": true,
+            "exchangeRate": 1
         },
         {
-            type: "attribute",
-            name: "SHADOWDARK.CurrencySP",
-            img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
-            abbreviation: "{#}SP",
-            data: {
-                path: "system.coins.sp",
+            "type": "attribute",
+            "name": "Silver Pieces",
+            "img": "icons/commodities/currency/coin-engraved-moon-silver.webp",
+            "abbreviation": "{#}SP",
+            "data": {
+                "path": "system.coins.sp",
             },
-            primary: false,
-            exchangeRate: 0.1
+            "primary": false,
+            "exchangeRate": 0.1
         },
         {
-            type: "attribute",
-            name: "SHADOWDARK.CurrencyCP",
-            img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
-            abbreviation: "{#}CP",
-            data: {
-                path: "system.coins.cp",
+            "type": "attribute",
+            "name": "Copper Pieces",
+            "img": "icons/commodities/currency/coin-engraved-waves-copper.webp",
+            "abbreviation": "{#}CP",
+            "data": {
+                "path": "system.coins.cp",
             },
-            primary: false,
-            exchangeRate: 0.01
+            "primary": false,
+            "exchangeRate": 0.01
         }
     ],
 
@@ -81,5 +78,5 @@ export default {
         }
 
         return totalCost;
-    },
+    }
 }
