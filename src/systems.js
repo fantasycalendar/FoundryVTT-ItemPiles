@@ -13,6 +13,7 @@ import wfrp4e from "./systems/wfrp4e.js";
 import splittermond from "./systems/splittermond.js";
 import forbiddenLands from "./systems/forbidden-lands.js";
 import icrpg from "./systems/icrpg.js";
+import shadowdark from "./systems/shadowdark.js";
 import swse from "./systems/swse.js";
 import sw5e from "./systems/sw5e.js";
 import sw5e203 from "./systems/sw5e-2.0.3.2.3.8.js";
@@ -154,6 +155,9 @@ export const SYSTEMS = {
 		},
 		"demonlord": {
 			"latest": demonlord
+		},
+		"shadowdark": {
+			"latest": shadowdark
 		},
 		// ↑ ADD SYSTEMS HERE ↑
 	},
