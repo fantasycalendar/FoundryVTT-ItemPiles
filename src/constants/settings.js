@@ -34,6 +34,9 @@ const SETTINGS = {
 	CURRENCY_DECIMAL_DIGITS: "currencyDecimalDigits",
 	ITEM_FILTERS: "itemFilters",
 	ACTOR_CLASS_TYPE: "actorClassType",
+	ITEM_CLASS_LOOT_TYPE: "itemClassLootType",
+    ITEM_CLASS_WEAPON_TYPE: "itemClassWeaponType", 
+	ITEM_CLASS_EQUIPMENT_TYPE: "itemClassEquipmentType",
 	ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
 	ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
 	QUANTITY_FOR_PRICE_ATTRIBUTE: "quantityForPriceAttribute",
@@ -205,6 +208,36 @@ const SETTINGS = {
 			config: false,
 			system: true,
 			default: SYSTEMS.DATA.ACTOR_CLASS_TYPE,
+			type: String
+		},
+
+		[SETTINGS.ITEM_CLASS_LOOT_TYPE]: {
+			name: "ITEM-PILES.Settings.ItemLootClass.Title",
+			hint: "ITEM-PILES.Settings.ItemLootClass.Hint",
+			scope: "world",
+			config: false,
+			system: true,
+			default: SYSTEMS.DATA.ITEM_CLASS_LOOT_TYPE,
+			type: String
+		},
+
+		[SETTINGS.ITEM_CLASS_LOOT_TYPE]: {
+			name: "ITEM-PILES.Settings.ItemWeaponClass.Title",
+			hint: "ITEM-PILES.Settings.ItemWeaponClass.Hint",
+			scope: "world",
+			config: false,
+			system: true,
+			default: SYSTEMS.DATA.ITEM_CLASS_WEAPON_TYPE,
+			type: String
+		},
+
+		[SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE]: {
+			name: "ITEM-PILES.Settings.ItemEquipmentClass.Title",
+			hint: "ITEM-PILES.Settings.ItemEquipmentClass.Hint",
+			scope: "world",
+			config: false,
+			system: true,
+			default: SYSTEMS.DATA.ITEM_CLASS_EQUIPMENT_TYPE,
 			type: String
 		},
 
