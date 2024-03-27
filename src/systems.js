@@ -1,5 +1,6 @@
 // ↓ IMPORT SYSTEMS HERE ↓
 import dnd4e from "./systems/dnd4e.js";
+import dnd4e0443 from "./systems/dnd4e-0.4.43.js";
 import dnd5e from "./systems/dnd5e.js";
 import dnd5e203 from "./systems/dnd5e-2.0.3.js";
 import pf1 from "./systems/pf1.js";
@@ -52,7 +53,8 @@ export const SYSTEMS = {
 			"latest": alienrpg
 		},
 		"dnd4e": {
-			"latest": dnd4e
+			"latest": dnd4e,
+			"0.4.43": dnd4e0443,
 		},
 		"dnd5e": {
 			"latest": dnd5e,
