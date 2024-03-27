@@ -5,6 +5,15 @@ export default {
   // The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
   "ACTOR_CLASS_TYPE": "creature",
 
+	// The item class type is the type of item that will be used for the default loot item
+	"ITEM_CLASS_LOOT_TYPE": "",
+
+	// The item class type is the type of item that will be used for the default weapon item
+	"ITEM_CLASS_WEAPON_TYPE": "", 
+
+	// The item class type is the type of item that will be used for the default equipment item
+	"ITEM_CLASS_EQUIPMENT_TYPE": "",
+
   // The item quantity attribute is the path to the attribute on items that denote how many of that item that exists
   "ITEM_QUANTITY_ATTRIBUTE": "system.quantity",
 

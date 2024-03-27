@@ -773,6 +773,18 @@
         "Title": "Actor class type",
         "Hint": "This setting defines the type of actor that will be used for the default item pile actor that is created on first item drop. In the case of D&D5e, this is \"character\", as it does not have a dedicated loot actor type."
       },
+      "ItemLootClass": {
+        "Title": "Item Loot class type",
+        "Hint": "The item class type is the type of item that will be used for the default loot item."
+      },
+      "ItemWeaponClass": {
+        "Title": "Item Weapon class type",
+        "Hint": "The item class type is the type of item that will be used for the default weapon item."
+      },
+      "ItemEquipmentClass": {
+        "Title": "Item Equipment class type",
+        "Hint": "The item class type is the type of item that will be used for the default equipment item."
+      },
       "Quantity": {
         "Title": "Item quantity attribute",
         "Hint": "Here you can configure what the attribute path is for each item's quantity. For example, in D&D5e system, each item's quantity is stored in the item's \"item.system.quantity\" attribute, so you'd put \"system.quantity\" in this setting."

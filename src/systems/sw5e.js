@@ -3,6 +3,15 @@ export default {
 
 	ACTOR_CLASS_TYPE: "character",
 
+	// The item class type is the type of item that will be used for the default loot item
+	"ITEM_CLASS_LOOT_TYPE": "loot",
+
+	// The item class type is the type of item that will be used for the default weapon item
+	"ITEM_CLASS_WEAPON_TYPE": "weapon", 
+
+	// The item class type is the type of item that will be used for the default equipment item
+	"ITEM_CLASS_EQUIPMENT_TYPE": "equipment",
+
 	ITEM_QUANTITY_ATTRIBUTE: "system.quantity",
 
 	ITEM_PRICE_ATTRIBUTE: "system.price.value",
