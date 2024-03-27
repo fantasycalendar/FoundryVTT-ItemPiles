@@ -31,6 +31,9 @@ class API {
 	 * @returns {string}
 	 */
 	static get ITEM_CLASS_LOOT_TYPE() {
+		if(!SETTINGS.ITEM_CLASS_LOOT_TYPE) {
+			Helpers.custom_warning("The system setting 'ITEM_CLASS_LOOT_TYPE' is not present", true);
+		}
 		return Helpers.getSetting(SETTINGS.ITEM_CLASS_LOOT_TYPE);
 	}
 
@@ -40,6 +43,9 @@ class API {
 	 * @returns {string}
 	 */
 	static get ITEM_CLASS_WEAPON_TYPE() {
+		if(!SETTINGS.ITEM_CLASS_WEAPON_TYPE) {
+			Helpers.custom_warning("The system setting 'ITEM_CLASS_WEAPON_TYPE' is not present", true);
+		}
 		return Helpers.getSetting(SETTINGS.ITEM_CLASS_WEAPON_TYPE);
 	}
 
@@ -49,6 +55,9 @@ class API {
 	 * @returns {string}
 	 */
 	static get ITEM_CLASS_EQUIPMENT_TYPE() {
+		if(!SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE) {
+			Helpers.custom_warning("The system setting 'ITEM_CLASS_EQUIPMENT_TYPE' is not present", true);
+		}
 		return Helpers.getSetting(SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE);
 	}
 
