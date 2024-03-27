@@ -781,7 +781,7 @@
         "Title": "Item Weapon class type",
         "Hint": "The item class type is the type of item that will be used for the default weapon item."
       },
-      "ItemEquipment": {
+      "ItemEquipmentClass": {
         "Title": "Item Equipment class type",
         "Hint": "The item class type is the type of item that will be used for the default equipment item."
       },
