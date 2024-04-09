@@ -8,7 +8,7 @@ export default {
 	"ACTOR_CLASS_TYPE": "character",
 
 	// The item class type is the type of item that will be used for the default loot item
-	"ITEM_CLASS_LOOT_TYPE": "",
+	"ITEM_CLASS_LOOT_TYPE": "cargo",
 
 	// The item class type is the type of item that will be used for the default weapon item
 	"ITEM_CLASS_WEAPON_TYPE": "", 
