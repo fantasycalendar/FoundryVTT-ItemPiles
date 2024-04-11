@@ -1964,7 +1964,13 @@ export async function rollTable({
 
 	let results = [];
 	if (game.modules.get("better-rolltables")?.active) {
-		results = (await game.modules.get("better-rolltables").api.roll(table)).itemsData.map(result => ({
+		const brtOptions = {
+			rollsAmount: roll.total,
+			roll: undefined,
+			displayChat: displayChat, 
+			recursive: true
+		}
+		results = (await game.modules.get("better-rolltables").api.roll(table,brtOptions)).itemsData.map(result => ({
 			documentCollection: result.documentCollection,
 			documentId: result.documentId,
 			text: result.text || result.name,
@@ -2003,8 +2009,13 @@ export async function rollTable({
 	const items = [];
 
 	rolledItems.forEach(newItem => {
-
-		const existingItem = items.find((item) => item.documentId === newItem.documentId);
+		const existingItem = items.find((item) => {
+			if (item.documentId && newItem.documentId) {
+				return item.documentId === newItem.documentId;
+			} else {
+				return item._id === newItem._id;
+			}
+		});
 		if (existingItem) {
 			existingItem.quantity += Math.max(newItem.quantity, 1);
 		} else {
@@ -2096,7 +2107,13 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 		}
 
 		tableItems.forEach(newItem => {
-			const existingItem = items.find((item) => item.documentId === newItem.documentId);
+			const existingItem = items.find((item) => {
+                if (item.documentId && newItem.documentId) {
+                    return item.documentId === newItem.documentId;
+                } else {
+                    return item._id === newItem._id;
+                }
+            });
 			if (existingItem) {
 				existingItem.quantity += Math.max(newItem.quantity, 1);
 			} else {
