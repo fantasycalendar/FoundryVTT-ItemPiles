@@ -1,6 +1,6 @@
 export default {
 
-	"VERSION": "1.0.4",
+	"VERSION": "1.0.5",
 
 	// The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
 	"ACTOR_CLASS_TYPE": "Player Character",
@@ -48,7 +48,7 @@ export default {
 	"CURRENCIES": [
 		{
 			type: "attribute",
-			name: "DND4EBETA.CurrencyAD",
+			name: "DND4E.CurrencyAD",
 			img: "icons/commodities/gems/gem-faceted-round-white.webp",
 			abbreviation: "{#}AD",
 			data: {
@@ -59,7 +59,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.CurrencyPP",
+			name: "DND4E.CurrencyPP",
 			img: "icons/commodities/currency/coin-inset-snail-silver.webp",
 			abbreviation: "{#}PP",
 			data: {
@@ -70,7 +70,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.CurrencyGP",
+			name: "DND4E.CurrencyGP",
 			img: "icons/commodities/currency/coin-embossed-crown-gold.webp",
 			abbreviation: "{#}GP",
 			data: {
@@ -81,7 +81,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.CurrencySP",
+			name: "DND4E.CurrencySP",
 			img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
 			abbreviation: "{#}SP",
 			data: {
@@ -92,7 +92,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.CurrencyCP",
+			name: "DND4E.CurrencyCP",
 			img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
 			abbreviation: "{#}CP",
 			data: {
@@ -103,7 +103,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.RitualCompAR",
+			name: "DND4E.RitualCompAR",
 			img: "icons/commodities/materials/bowl-powder-teal.webp",
 			abbreviation: "{#}AR",
 			data: {
@@ -114,7 +114,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.RitualCompMS",
+			name: "DND4E.RitualCompMS",
 			img: "icons/commodities/materials/bowl-liquid-white.webp",
 			abbreviation: "{#}MS",
 			data: {
@@ -125,7 +125,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.RitualCompRH",
+			name: "DND4E.RitualCompRH",
 			img: "icons/commodities/materials/plant-sprout-seed-brown-green.webp",
 			abbreviation: "{#}RH",
 			data: {
@@ -136,7 +136,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.RitualCompSI",
+			name: "DND4E.RitualCompSI",
 			img: "icons/commodities/materials/bowl-liquid-red.webp",
 			abbreviation: "{#}SI",
 			data: {
@@ -147,7 +147,7 @@ export default {
 		},
 		{
 			type: "attribute",
-			name: "DND4EBETA.RitualCompRS",
+			name: "DND4E.RitualCompRS",
 			img: "icons/commodities/gems/gem-faceted-cushion-teal.webp",
 			abbreviation: "{#}RS",
 			data: {
