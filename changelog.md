@@ -1,5 +1,15 @@
 # Item Piles Changelog
 
+## Version 2.9.1
+
+- Added support for the Shadowdark system (thank you mrstarbuck007 on github!)
+- Added additional settings for item types (thank you p4535992 on github!)
+- Tweaked currency settings to update cached item if the currency names or images were updated
+- Updated D&D4e system support (thank you EndlesNights on github!)
+- Fixed Better Rolltables compatibility (thank you p4535992 on github!)
+- Fixed trying to open merchant columns settings after they had broken would throw error and prevent fixing the error
+- Fixed Simple Calendar integration not hiding tokens of closed merchants that were set to hide
+
 ## Version 2.9.0
 
 - Added formal support for D&D5e 3.0.x - moving/buying/trading containers is still not supported

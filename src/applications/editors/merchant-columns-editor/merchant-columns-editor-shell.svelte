@@ -63,10 +63,6 @@
 		form.requestSubmit();
 	}
 
-	function preventDefault(event) {
-		event.preventDefault();
-	}
-
 </script>
 
 <svelte:options accessors={true}/>

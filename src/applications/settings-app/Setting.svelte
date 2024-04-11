@@ -4,6 +4,7 @@
 	export let key;
 	export let data;
 	export let disabled = false;
+	export let options = [];
 
 </script>
 
@@ -26,7 +27,7 @@
 		{:else if data.choices}
 
 			<div class="choice-container">
-				<select name={data.key} bind:value={data.value} disabled={disabled}>
+				<select name={key} bind:value={data.value} disabled={disabled}>
 					{#each Object.entries(data.choices) as [key, choice], index (index)}
 						{#if data.type === Number}
 							<option value="{index}">{localize(choice)}</option>
@@ -52,9 +53,18 @@
 		{:else}
 
 			<div class="item-pile-setting-container">
-				<input type="text" bind:value={data.value} disabled={disabled}/>
-				{#if data.localize}
-					<input type="text" disabled value={localize(data.value)}/>
+
+				{#if options.length}
+					<select name="{key}" bind:value={data.value} disabled={disabled}>
+						{#each options as option}
+							<option value={option === "None" ? "" : option}>{option}</option>
+						{/each}
+					</select>
+				{:else}
+					<input type="text" bind:value={data.value} disabled={disabled}/>
+					{#if data.localize}
+						<input type="text" disabled value={localize(data.value)}/>
+					{/if}
 				{/if}
 			</div>
 

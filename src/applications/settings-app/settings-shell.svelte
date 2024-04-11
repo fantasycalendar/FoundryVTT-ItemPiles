@@ -57,6 +57,15 @@
 		for (let [key, setting] of settingsToUpdate) {
 			await helpers.setSetting(key, setting.value);
 		}
+		const currencies = settings[SETTINGS.CURRENCIES].value.concat(settings[SETTINGS.SECONDARY_CURRENCIES].value)
+		for (const currency of currencies) {
+			if (!currency.data?.uuid) continue;
+			const actualItem = await fromUuid(currency.data?.uuid);
+			await actualItem.update({
+				name: currency.name,
+				img: currency.img
+			});
+		}
 		application.close();
 	}
 
@@ -101,7 +110,7 @@
 		{ value: "system", label: localize("ITEM-PILES.Applications.Settings.System"), hidden: !userCanChangeSettings },
 	];
 
-	let activeTab = tabs[0].value;
+	let activeTab = application?.options?.tab ?? tabs[0].value;
 
 </script>
 
@@ -183,13 +192,13 @@
             getSettings();
           }}/>
 					<Setting key={SETTINGS.ACTOR_CLASS_TYPE} bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}"
-					         options={game.system.template.Actor.types}/>
+					         options={["None", ...game.system.template.Actor.types]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_LOOT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_LOOT_TYPE]}"
-					         options={game.system.template.Item.types}/>
+					         options={["None", ...game.system.template.Item.types]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_WEAPON_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_WEAPON_TYPE]}"
-					         options={game.system.template.Item.types}/>
+					         options={["None", ...game.system.template.Item.types]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE]}"
-					         options={game.system.template.Item.types}/>							 							 
+					         options={["None", ...game.system.template.Item.types]}/>
 					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
 					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>

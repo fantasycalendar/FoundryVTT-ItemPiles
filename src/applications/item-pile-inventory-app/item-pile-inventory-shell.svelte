@@ -220,7 +220,7 @@
 
   .item-piles-items-list {
     max-height: 500px;
-    overflow-y: scroll;
+    overflow-y: auto;
     display: block;
     padding-right: 5px;
 

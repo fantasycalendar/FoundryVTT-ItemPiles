@@ -3,7 +3,7 @@ import { getActiveApps } from '../../helpers/helpers';
 import SettingsShell from './settings-shell.svelte';
 import SETTINGS from "../../constants/settings.js";
 
-class SettingsApp extends SvelteApplication {
+export class SettingsApp extends SvelteApplication {
 
 	static get defaultOptions() {
 		return foundry.utils.mergeObject(super.defaultOptions, {
@@ -99,7 +99,7 @@ class SettingsApp extends SvelteApplication {
 	}
 }
 
-export default class SettingsShim extends FormApplication {
+export class SettingsShim extends FormApplication {
 
 	/**
 	 * @inheritDoc

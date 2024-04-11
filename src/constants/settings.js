@@ -35,7 +35,7 @@ const SETTINGS = {
 	ITEM_FILTERS: "itemFilters",
 	ACTOR_CLASS_TYPE: "actorClassType",
 	ITEM_CLASS_LOOT_TYPE: "itemClassLootType",
-    ITEM_CLASS_WEAPON_TYPE: "itemClassWeaponType", 
+	ITEM_CLASS_WEAPON_TYPE: "itemClassWeaponType",
 	ITEM_CLASS_EQUIPMENT_TYPE: "itemClassEquipmentType",
 	ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
 	ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
@@ -221,7 +221,7 @@ const SETTINGS = {
 			type: String
 		},
 
-		[SETTINGS.ITEM_CLASS_LOOT_TYPE]: {
+		[SETTINGS.ITEM_CLASS_WEAPON_TYPE]: {
 			name: "ITEM-PILES.Settings.ItemWeaponClass.Title",
 			hint: "ITEM-PILES.Settings.ItemWeaponClass.Hint",
 			scope: "world",

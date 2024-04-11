@@ -135,25 +135,34 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 
 		const actors = this.actors.filter((actor) => {
 			const pileData = PileUtilities.getActorFlagData(actor);
-			return pileData.hideTokenWhenClosed && PileUtilities.isMerchantClosed(actor, { pileData });
+			return pileData.hideTokenWhenClosed;
 		});
 
-		const actorTokens = actors.map(actor => actor.getActiveTokens())
+		const validTokensOnScenes = actors.map(actor => actor.getActiveTokens())
 			.deepFlatten()
 			.reduce((acc, token) => {
-				if (!acc[token.parent.id]) acc[token.parent.id] = [];
-				acc[token.parent.id].push(token);
+				const tokenDocument = token.document;
+				const sceneId = tokenDocument.parent.id;
+				if (!acc[sceneId]) acc[sceneId] = [];
+				acc[sceneId].push(tokenDocument);
 				return acc;
 			}, {});
 
-		const validTokensOnScenes = this.validTokensOnScenes.filter((token) => {
+		this.validTokensOnScenes.filter((token) => {
 			const pileData = PileUtilities.getActorFlagData(token);
-			return pileData.hideTokenWhenClosed && PileUtilities.isMerchantClosed(token, { pileData });
+			return pileData.hideTokenWhenClosed;
+		}).forEach(([sceneId, token]) => {
+			if (validTokensOnScenes[sceneId].length) {
+				if (!validTokensOnScenes[sceneId].find(t => t === token)) return;
+				validTokensOnScenes[sceneId].push(token)
+			} else {
+				validTokensOnScenes[sceneId] = [token]
+			}
 		});
 
-		for (const [sceneId, tokens] of validTokensOnScenes) {
+		for (const [sceneId, tokens] of Object.entries(validTokensOnScenes)) {
 			const scene = game.scenes.get(sceneId);
-			const updates = Object.values(tokens.concat(actorTokens).reduce((acc, token) => {
+			const updates = Object.values(tokens.reduce((acc, token) => {
 				if (!acc[token.id]) {
 					acc[token.id] = {
 						_id: token.id,

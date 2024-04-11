@@ -74,13 +74,13 @@
 	}
 
 	async function showMerchantColumns() {
-		const data = pileData.merchantColumns || [];
+		const data = Array.isArray(pileData.merchantColumns) ? pileData.merchantColumns : [];
 		return MerchantColumnsEditor.show(
 			data,
 			{ id: `merchant-columns-item-pile-config-${pileActor.id}` },
 			{ title: localize("ITEM-PILES.Applications.MerchantColumnsEditor.TitleActor", { actor_name: pileActor.name }), }
 		).then((result) => {
-			pileData.merchantColumns = result || [];
+			pileData.merchantColumns = Array.isArray(result.merchantColumns) ? result.merchantColumns : [];
 		});
 	}
 
@@ -292,7 +292,7 @@
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideTokenWhenClosed")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.HideTokenWhenClosedExplanation")}</p>
 	</label>
-	<input bind:checked={pileData.openTimes.hideTokenWhenClosed} type="checkbox"/>
+	<input bind:checked={pileData.hideTokenWhenClosed} type="checkbox"/>
 </div>
 
 <div class="form-group">

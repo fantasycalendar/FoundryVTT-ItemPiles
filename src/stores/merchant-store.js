@@ -115,8 +115,8 @@ export default class MerchantStore extends ItemPileStore {
 	}
 
 	setupColumns(pileData) {
-
-		const customColumns = foundry.utils.deepClone(pileData.merchantColumns ?? [])
+		const merchantColumns = Array.isArray(pileData?.merchantColumns) ? pileData.merchantColumns : [];
+		const customColumns = foundry.utils.deepClone(merchantColumns)
 			.filter(column => {
 				return this.isMerchant ? (column?.buying ?? true) : (column?.selling ?? true);
 			})
