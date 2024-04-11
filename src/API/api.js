@@ -1088,6 +1088,12 @@ class API {
 	 * @return {boolean}
 	 */
 	static isItemPileAuctioneer(target, data = false) {
+		if(!game.modules.get("item_piles_auctioneer")?.active) {
+			let word = "install and activate";
+			if (game.modules.get('item_piles_auctioneer')) word = "activate";
+			Helpers.custom_warning(`This api method from Item Piles requires the 'item_piles_auctioneer' module. Please ${word} it.`, true);
+			return false;
+		}
 		return PileUtilities.isItemPileAuctioneer(target, data);
 	}
 
