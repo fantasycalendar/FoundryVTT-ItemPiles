@@ -135,6 +135,12 @@ export function isItemPileAuctioneer(target, data = false) {
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.AUCTIONEER;
 }
 
+export function isItemPileBanker(target, data = false) {
+	const targetActor = Utilities.getActor(target);
+	const pileData = getActorFlagData(targetActor, data);
+	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.BANKER;
+}
+
 export function isItemPileClosed(target, data = false) {
 	const targetActor = Utilities.getActor(target);
 	const pileData = getActorFlagData(targetActor, data);
@@ -2044,6 +2050,12 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 		const flagData = getActorFlagData(actor);
 		tableData = flagData.tablesForPopulate;
 	} else if (!tableData && !actor) {
+		Helpers.custom_warning(" rollMerchantTables | " + game.i18n.localize("ITEM-PILES.Errors.NoRollTableAndNoActorIsPresent"), false);
+		return [];
+	}
+
+	if (tableData?.length === 0) {
+		Helpers.custom_warning(" rollMerchantTables | " + game.i18n.format("ITEM-PILES.Errors.NoRollTableIsPresent", { actorName: actor.name }), false);
 		return [];
 	}
 

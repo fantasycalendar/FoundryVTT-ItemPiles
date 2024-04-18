@@ -160,6 +160,22 @@
 
 <div class="form-group">
 	<label>
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OnCreateTokenRollTable")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OnCreateTokenRollTableExplanation")}</p>
+	</label>
+	<input bind:checked={pileData.onCreateTokenRollTable} type="checkbox"/>
+</div>
+
+<div class="form-group">
+	<label>
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OnCreateTokenRollTableNoMerchant")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.OnCreateTokenRollTableExplanationNoMerchant")}</p>
+	</label>
+	<input bind:checked={pileData.onCreateTokenRollTableNoMerchant} type="checkbox"/>
+</div>
+
+<div class="form-group">
+	<label>
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.CanStackItems")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.CanStackItemsExplanation")}</p>
 	</label>

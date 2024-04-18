@@ -22,7 +22,9 @@ const CONSTANTS = {
 		PUBLIC_TRADE_ID: `${baseFlag}.publicTradeId`,
 		TRADE_USERS: `${baseFlag}.tradeUsers`,
 		TEMPORARY_ITEM: `${baseFlag}.temporary_item`,
-		CUSTOM_CATEGORY: `${baseFlag}.item.customCategory`
+		CUSTOM_CATEGORY: `${baseFlag}.item.customCategory`,
+		ON_CREATE_TOKEN_ROLL_TABLE: `${baseFlag}.onCreateTokenRollTable`,
+		ON_CREATE_TOKEN_ROLL_TABLE_NO_MERCHANT: `${baseFlag}.onCreateTokenRollTableNoMerchant`
 	},
 
 	SIMPLE_FLAGS: {
@@ -37,7 +39,9 @@ const CONSTANTS = {
 		PUBLIC_TRADE_ID: `${module_name}.publicTradeId`,
 		TRADE_USERS: `${module_name}.tradeUsers`,
 		TEMPORARY_ITEM: `${module_name}.temporary_item`,
-		CUSTOM_CATEGORY: `${module_name}.item.customCategory`
+		CUSTOM_CATEGORY: `${module_name}.item.customCategory`,
+		ON_CREATE_TOKEN_ROLL_TABLE: `${baseFlag}.onCreateTokenRollTable`,
+		ON_CREATE_TOKEN_ROLL_TABLE_NO_MERCHANT: `${baseFlag}.onCreateTokenRollTableNoMerchant`
 	},
 
 	ITEM_DEFAULTS: {
@@ -77,6 +81,7 @@ const CONSTANTS = {
 		MERCHANT: "merchant",
 		VAULT: "vault",
 		AUCTIONEER: "auctioneer",
+		BANKER: "banker"
 	},
 
 	VAULT_LOGGING_TYPES: {
@@ -98,6 +103,8 @@ const CONSTANTS = {
 		canInspectItems: true,
 		displayItemTypes: false,
 		description: "",
+		onCreateTokenRollTable: false,
+		onCreateTokenRollTableNoMerchant: false,
 
 		// Overrides
 		overrideItemFilters: false,

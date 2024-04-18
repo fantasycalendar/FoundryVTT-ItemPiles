@@ -34,6 +34,14 @@
 		pileData.deleteWhenEmpty = !!pileData?.deleteWhenEmpty;
 	}
 
+	if (typeof pileData?.onCreateTokenRollTable === "boolean") {
+		pileData.onCreateTokenRollTable = !!pileData?.onCreateTokenRollTable;
+	}
+
+	if (typeof pileData?.onCreateTokenRollTableNoMerchant === "boolean") {
+		pileData.onCreateTokenRollTableNoMerchant = !!pileData?.onCreateTokenRollTableNoMerchant;
+	}
+
 	let pileEnabled = writable(pileData.enabled);
 
 	$: pileData.enabled = $pileEnabled;

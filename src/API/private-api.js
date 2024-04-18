@@ -1062,6 +1062,8 @@ export default class PrivateAPI {
 				pileDataDefaults.showItemName = true;
 				pileDataDefaults.overrideSingleItemScale = true;
 				pileDataDefaults.singleItemScale = 0.75;
+				pileDataDefaults.onCreateTokenRollTable = false;
+				pileDataDefaults.onCreateTokenRollTableNoMerchant = false;
 			}
 
 			pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
@@ -1114,6 +1116,8 @@ export default class PrivateAPI {
 					pileDataDefaults.showItemName = true;
 					pileDataDefaults.overrideSingleItemScale = true;
 					pileDataDefaults.singleItemScale = 0.75;
+					pileDataDefaults.onCreateTokenRollTable = false;
+					pileDataDefaults.onCreateTokenRollTableNoMerchant = false;
 				}
 
 				pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
