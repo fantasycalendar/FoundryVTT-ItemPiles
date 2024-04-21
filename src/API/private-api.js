@@ -1491,44 +1491,48 @@ export default class PrivateAPI {
 	 * @return {Promise<boolean>}
 	 */
 	static async _refreshInventoryOnCreate(tokenDocument) {
-		if (!PileUtilities.isItemPileContainer(tokenDocument)) {
-			const pileData = PileUtilities.getActorFlagData(tokenDocument.actor, false, true);
+		
+		const pileData = PileUtilities.getActorFlagData(tokenDocument.actor, false, true);
 
-			const rollTableOnDrop = pileData.onCreateTokenRollTable;
-			const rollTableOnDropNoMerchant = pileData.onCreateTokenRollTableNoMerchant;
-			
-			if(rollTableOnDrop) {
-				if(PileUtilities.isItemPileMerchant(tokenDocument)) {
+		const rollTableOnDrop = pileData.onCreateTokenRollTable;
+		const rollTableOnDropNoMerchant = pileData.onCreateTokenRollTableNoMerchant;
 
-					// Make sure to not destroy anything important on the original actor...
-					await tokenDocument.update({ actorLink: false });
+		const isValid = PileUtilities.isValidItemPile(tokenDocument,pileData);
 
-					await this._refreshMerchantInventory(tokenDocument.uuid, {
-						removeExistingActorItems: true, 
-						ignoreCheckItemPilesType: false
-					});
-					
-					Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop for merchant'`);
-				
-				} else if(rollTableOnDropNoMerchant) {
-					if(!PileUtilities.isValidItemPile(tokenDocument)) {
-
-						// Make sure to not destroy anything important on the original actor...
-						await tokenDocument.update({ actorLink: false });
-
-						await this._refreshMerchantInventory(tokenDocument.uuid, {
-							removeExistingActorItems: true, 
-							ignoreCheckItemPilesType: true
-						});
-					} else {
-						Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} because is a valid item pile`);
-					}
-				}
-			} else {
-				Helpers.debug(`Cannot Initialized item pile with uuid ${tokenDocument.uuid} because is not a container`);
-			}
+		if(isValid && !PileUtilities.isItemPileMerchant(tokenDocument, pileData)) {
+			Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' the type is not supported only Merchant is supported`);
 			return false;
 		}
+		
+		if(rollTableOnDrop) {
+			if(isValid) {
+				// Make sure to not destroy anything important on the original actor...
+				await tokenDocument.update({ actorLink: false });
+
+				await this._refreshMerchantInventory(tokenDocument.uuid, {
+					removeExistingActorItems: true, 
+					ignoreCheckItemPilesType: false
+				});
+				
+				Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop'`);
+			
+			} else if(rollTableOnDropNoMerchant) {
+				
+				// Make sure to not destroy anything important on the original actor...
+				await tokenDocument.update({ actorLink: false });
+
+				await this._refreshMerchantInventory(tokenDocument.uuid, {
+					removeExistingActorItems: true, 
+					ignoreCheckItemPilesType: true
+				});
+				
+			} else {
+				Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} because is a valid item pile`);
+			}
+		} else {
+			Helpers.debug(`Cannot Initialized item pile with uuid ${tokenDocument.uuid} because is not a container`);
+		}
+		return false;
 	}
 
 	/**

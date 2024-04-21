@@ -560,7 +560,7 @@
           "OnCreateTokenRollTable": "Refresh the inventory on the token when created",
           "OnCreateTokenRollTableExplanation": "With this setting, when the actor token is created on the canvas it will refresh the inventory on the token based on some rollTable. NOTE: You must set at least have one roll table set , and if the actor is set to be a merchant by default all the old items are removed so be aware...",
           "OnCreateTokenRollTableNoMerchant": "Refresh the inventory on the token when created even if is not a enabled items piles",
-          "OnCreateTokenRollTableExplanationNoMerchant": "With this setting, the effect of the setting 'Refresh the inventory on the token when created' is been applied even if this is not a item piles. NOTE: for security reason any explicit item piles type Container, Vault, Banker, Auctioneer are excluded",        
+          "OnCreateTokenRollTableExplanationNoMerchant": "With this setting, the effect of the setting 'Refresh the inventory on the token when created' is been applied even if this is not a item piles.",        
           "CanStackItems": "Can Stack Items",
           "CanStackItemsExplanation": "With this setting, items added to the item pile will stack with similar items. This can also be controlled per-item in their configuration. Note: This is dependent on the system as well, since some items do not have quantity so they can never be stacked.",
           "CanStackItemsYes": "Yes, stack items (unless item says otherwise)",
