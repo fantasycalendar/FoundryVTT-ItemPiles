@@ -162,6 +162,7 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static _onCreateToken(doc) {
+		this._refreshInventoryOnCreate(doc);
 		if (!PileUtilities.isValidItemPile(doc)) return;
 		const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
 		Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CREATE, doc, itemPileConfig);
@@ -1489,6 +1490,53 @@ export default class PrivateAPI {
 	 * @param {TokenDocument} tokenDocument
 	 * @return {Promise<boolean>}
 	 */
+	static async _refreshInventoryOnCreate(tokenDocument) {
+		if (!PileUtilities.isItemPileContainer(tokenDocument)) {
+			const pileData = PileUtilities.getActorFlagData(tokenDocument.actor, false, true);
+
+			const rollTableOnDrop = pileData.onCreateTokenRollTable;
+			const rollTableOnDropNoMerchant = pileData.onCreateTokenRollTableNoMerchant;
+			
+			if(rollTableOnDrop) {
+				if(PileUtilities.isItemPileMerchant(tokenDocument)) {
+
+					// Make sure to not destroy anything important on the original actor...
+					await tokenDocument.update({ actorLink: false });
+
+					await this._refreshMerchantInventory(tokenDocument.uuid, {
+						removeExistingActorItems: true, 
+						ignoreCheckItemPilesType: false
+					});
+					
+					Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop for merchant'`);
+				
+				} else if(rollTableOnDropNoMerchant) {
+					if(!PileUtilities.isValidItemPile(tokenDocument)) {
+
+						// Make sure to not destroy anything important on the original actor...
+						await tokenDocument.update({ actorLink: false });
+
+						await this._refreshMerchantInventory(tokenDocument.uuid, {
+							removeExistingActorItems: true, 
+							ignoreCheckItemPilesType: true
+						});
+					} else {
+						Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} because is a valid item pile`);
+					}
+				}
+			} else {
+				Helpers.debug(`Cannot Initialized item pile with uuid ${tokenDocument.uuid} because is not a container`);
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Pre-loads all images and sounds related to a given token document on the client-side.
+	 *
+	 * @param {TokenDocument} tokenDocument
+	 * @return {Promise<boolean>}
+	 */
 	static async _preloadItemPileFiles(tokenDocument) {
 
 		if (!PileUtilities.isItemPileContainer(tokenDocument)) return false;
@@ -2363,14 +2411,24 @@ export default class PrivateAPI {
 
 	}
 
+	/**
+	 * 
+	 * @param {string} merchantUuid 
+	 * @param {Object} options
+	 * @param {boolean} [options.removeExistingActorItems=false]
+	 * @param {boolean} [options.ignoreCheckItemPilesType=false]
+	 * @param {string|boolean} [options.userId=false]
+	 * @returns 
+	 */
 	static async _refreshMerchantInventory(merchantUuid, {
 		removeExistingActorItems = false,
+		ignoreCheckItemPilesType = false,
 		userId = false
 	} = {}) {
 
 		const merchant = Utilities.getActor(merchantUuid);
 
-		const items = await PileUtilities.rollMerchantTables({ actor: merchant });
+		const items = await PileUtilities.rollMerchantTables({ actor: merchant, ignoreCheckItemPilesType:ignoreCheckItemPilesType });
 
 		const itemsToAdd = items.map((item) => {
 			const actualItem = item.item.toObject();

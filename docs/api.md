@@ -785,7 +785,7 @@ Refreshes the merchant's inventory, potentially removing existing items and popu
 | target                              | `Actor/TokenDocument/Token/String` |         | The merchant actor to refresh the inventory of                                 |
 | options                             | `object`                           |         | Options to pass to the function                                                |
 | [options.removeExistingActorItems]  | `boolean`                          | `true`  | Whether to clear the merchant's existing inventory before adding the new items |
-| [options.ignoreCheckOnMerchantType] | `boolean`                         | `false` | Populate this target with the same roll tables set on the merchant settings, but on actor with the merchant type disabled |
+| [options.ignoreCheckItemPilesType] | `boolean`                         | `false` | Populate this target with the same roll tables set on the merchant settings, but on a actor/token with item piles disabled. This is useful for as a alternative for populate NPC on the canvas |
 
 ---
 

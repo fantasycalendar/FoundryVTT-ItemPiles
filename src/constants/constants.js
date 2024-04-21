@@ -40,8 +40,8 @@ const CONSTANTS = {
 		TRADE_USERS: `${module_name}.tradeUsers`,
 		TEMPORARY_ITEM: `${module_name}.temporary_item`,
 		CUSTOM_CATEGORY: `${module_name}.item.customCategory`,
-		ON_CREATE_TOKEN_ROLL_TABLE: `${baseFlag}.onCreateTokenRollTable`,
-		ON_CREATE_TOKEN_ROLL_TABLE_NO_MERCHANT: `${baseFlag}.onCreateTokenRollTableNoMerchant`
+		ON_CREATE_TOKEN_ROLL_TABLE: `${module_name}.onCreateTokenRollTable`,
+		ON_CREATE_TOKEN_ROLL_TABLE_NO_MERCHANT: `${module_name}.onCreateTokenRollTableNoMerchant`
 	},
 
 	ITEM_DEFAULTS: {

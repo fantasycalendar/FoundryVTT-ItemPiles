@@ -2274,10 +2274,10 @@ class API {
 	 * @param {Actor/Token/TokenDocument} target                  The merchant actor to refresh the inventory of
 	 * @param {object} options                                    Options to pass to the function
 	 * @param {boolean} [options.removeExistingActorItems=true]   Whether to clear the merchant's existing inventory before adding the new items
-	 * @param {boolean} [options.ignoreCheckOnMerchantType=false] Populate this target with the same roll tables set on the merchant settings, but on actor with the merchant type disabled
+	 * @param {boolean} [options.ignoreCheckItemPilesType=false]  Populate this target with the same roll tables set on the merchant settings, but on a actor/token with item piles disabled. This is useful for as a alternative for populate NPC on the canvas
 	 * @returns {Promise<boolean|*>}
 	 */
-	static async refreshMerchantInventory(target, { removeExistingActorItems = true, ignoreCheckOnMerchantType = false } = {}) {
+	static async refreshMerchantInventory(target, { removeExistingActorItems = true, ignoreCheckItemPilesType = false } = {}) {
 
 		if (target) {
 			target = Utilities.getActor(target);
@@ -2288,7 +2288,7 @@ class API {
 
 		const targetUuid = Utilities.getUuid(target);
 
-		if (!ignoreCheckOnMerchantType && !PileUtilities.isItemPileMerchant(target)) {
+		if (!ignoreCheckItemPilesType && !PileUtilities.isItemPileMerchant(target)) {
 			throw Helpers.custom_error(`refreshMerchantInventory | target of uuid ${targetUuid} is not a merchant`);
 		}
 
@@ -2298,6 +2298,7 @@ class API {
 
 		const items = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REFRESH_MERCHANT_INVENTORY, targetUuid, {
 			removeExistingActorItems,
+			ignoreCheckItemPilesType,
 			userId: game.user.id
 		});
 

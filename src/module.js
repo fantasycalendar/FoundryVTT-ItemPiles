@@ -86,41 +86,6 @@ Hooks.once("ready", () => {
 
 		Hooks.callAll(CONSTANTS.HOOKS.READY);
 
-		/**
-		 * Do something when create a token on the canvas
-		 * @param {TokenDocument} tokenDocument
-		 */
-		Hooks.on("createToken", async (tokenDocument) => {
-			if (!tokenDocument instanceof TokenDocument) {
-				return;
-			}
-			const rollTableOnDrop = foundry.utils.get(tokenDocument, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAGS.ON_CREATE_TOKEN_ROLL_TABLE}`);
-			const rollTableOnDropNoMerchant = foundry.utils.get(tokenDocument, `flags.${CONSTANTS.MODULE_NAME}.${CONSTANTS.FLAGS.ON_CREATE_TOKEN_ROLL_TABLE_NO_MERCHANT}`);
-			
-			if(rollTableOnDrop) {
-				if(API.isItemPileMerchant(tokenDocument)) {
-					await API.refreshMerchantInventory(tokenDocument, {
-						removeExistingActorItems: true, 
-						ignoreCheckOnMerchantType: false
-					});
-				} else if(rollTableOnDropNoMerchant) {
-					if(API.isItemPileAuctioneer(tokenDocument) || 
-						API.isItemPileVault(tokenDocument) || 
-						API.isItemPileBanker(tokenDocument)) {
-						return;
-					}
-
-					// Make sure to not destroy anything important on the original actor...
-					await tokenDocument.update({ actorLink: false });
-
-					await API.refreshMerchantInventory(tokenDocument, {
-						removeExistingActorItems: true, 
-						ignoreCheckOnMerchantType: true
-					});
-				}
-			}
-		});
-
 	}, 100);
 
 });

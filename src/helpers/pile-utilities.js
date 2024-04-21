@@ -80,14 +80,15 @@ export function getItemFlagData(item, data = false) {
 
 /**
  *
- * @param target
- * @param data
+ * @param {Actor|Token|TokenDocument|string} target   The target 
+ * @param {Object} data                               Override standard flags with customized ones
+ * @param {boolean} ignoreToken                       Retrieve the flags from the actor document not the token document
  * @returns {Object<CONSTANTS.PILE_DEFAULTS>}
  */
-export function getActorFlagData(target, data = false) {
+export function getActorFlagData(target, data = false, ignoreToken = false) {
 	const defaults = foundry.utils.mergeObject({ ...CONSTANTS.PILE_DEFAULTS }, { ...(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {}) });
 	target = Utilities.getActor(target);
-	if (target?.token) {
+	if (!ignoreToken && target?.token) {
 		target = target.token;
 	}
 	return getFlagData(target, CONSTANTS.FLAGS.PILE, defaults, data);
@@ -2042,12 +2043,19 @@ export async function rollTable({
 
 }
 
-export async function rollMerchantTables({ tableData = false, actor = false } = {}) {
+/**
+ * @param {Object} options
+ * @param {string|string[]|boolean} [options.tableData=false] The array of uuids of the tables to use
+ * @param {string|boolean} [options.actor=false]              The actor to use
+ * @param {boolean} [options.ignoreCheckItemPilesType=false]  The we should ignore the check fot itempiles and use the actor flags instead the flags token
+ * @returns 
+ */
+export async function rollMerchantTables({ tableData = false, actor = false, ignoreCheckItemPilesType = false } = {}) {
 
 	if (tableData && !Array.isArray(tableData)) {
 		tableData = [tableData]
 	} else if (!tableData && actor) {
-		const flagData = getActorFlagData(actor);
+		const flagData = getActorFlagData(actor, false, ignoreCheckItemPilesType);
 		tableData = flagData.tablesForPopulate;
 	} else if (!tableData && !actor) {
 		Helpers.custom_warning(" rollMerchantTables | " + game.i18n.localize("ITEM-PILES.Errors.NoRollTableAndNoActorIsPresent"), false);
