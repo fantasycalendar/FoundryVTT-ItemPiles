@@ -12,6 +12,8 @@
   * [License](README.md#license)
   * [Credits](README.md#credits)
 
+* [Common User Issues](#common-issues.md)
+
 * [Contributing to Item Piles](contributing-to-item-piles.md)
 
 * [Creating item piles](creating-item-piles.md)
