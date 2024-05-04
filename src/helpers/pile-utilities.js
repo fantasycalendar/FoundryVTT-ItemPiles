@@ -1970,12 +1970,15 @@ export async function rollTable({
 	}
 
 	let results = [];
-	if (game.modules.get("better-rolltables")?.active) {
+	const betterRollTablesActive = game.modules.get('better-rolltables')?.active;
+	if (betterRollTablesActive) {
 		const brtOptions = {
 			rollsAmount: roll.total,
 			roll: undefined,
 			displayChat: displayChat, 
-			recursive: true
+			recursive: true,
+			rollAsTableType: "loot",
+			rollAsTableTypeAllTheTables: true
 		}
 		results = (await game.modules.get("better-rolltables").api.roll(table,brtOptions)).itemsData.map(result => ({
 			documentCollection: result.documentCollection,

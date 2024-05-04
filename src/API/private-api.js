@@ -1496,7 +1496,7 @@ export default class PrivateAPI {
 
 		const rollTableOnDrop = pileData.onCreateTokenRollTable;
 		const rollTableOnDropNoMerchant = pileData.onCreateTokenRollTableNoMerchant;
-
+		const betterRollTablesActive = game.modules.get('better-rolltables')?.active;
 		const isValid = PileUtilities.isValidItemPile(tokenDocument,pileData);
 
 		if(isValid && !PileUtilities.isItemPileMerchant(tokenDocument, pileData)) {
@@ -1514,18 +1514,52 @@ export default class PrivateAPI {
 					ignoreCheckItemPilesType: false
 				});
 				
-				Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop'`);
+				Helpers.debug(`Roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' for merchant`);
 			
 			} else if(rollTableOnDropNoMerchant) {
 				
-				// Make sure to not destroy anything important on the original actor...
-				await tokenDocument.update({ actorLink: false });
+				if(betterRollTablesActive) {
+					const options = {
+						brtTypes: ['none','better','loot'] // TODO not sure how manage this the right way wait for community feed back
+					}
+					const merchant = Utilities.getActor(tokenDocument.uuid);
+					const brtActorList = await game.modules.get('better-rolltables').api.retrieveActorList(merchant, options);
+					const rollTablesToRoll = [];
+					for(const rollTableData of brtActorList.rollTableList)  {
+						rollTablesToRoll.push(rollTableData.rollTable);
+					}
 
-				await this._refreshMerchantInventory(tokenDocument.uuid, {
-					removeExistingActorItems: true, 
-					ignoreCheckItemPilesType: true
-				});
-				
+					const items = await PileUtilities.rollMerchantTables({
+						tableData: rollTablesToRoll,
+						actor: merchant, 
+						ignoreCheckItemPilesType:true });
+			
+					const itemsToAdd = items.map((item) => {
+						const actualItem =  item.item.toObject();
+						return Utilities.setItemQuantity(actualItem, item.quantity);
+					});
+					
+					await PrivateAPI._addItems(tokenDocument.uuid, itemsToAdd, null, { removeExistingActorItems:true });
+					Helpers.debug(`Roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' for NO merchant with BRT`);
+				} else {
+					// TODO Explained here https://github.com/fantasycalendar/FoundryVTT-ItemPiles/pull/562
+					// The issue 482 is more complicated because the mechanism for choosing tables is only on 
+					// the merchant sheet panel O.O, i avoided on the code level with a "trick". The "trick" is to use
+					// the current rolltables flags through the merchant sheet and then disable the item piles
+					// and drop as a standard npc, the is the optioon to use the new actor list from BRT as alternative
+					/*
+					// Make sure to not destroy anything important on the original actor...
+					await tokenDocument.update({ actorLink: false });
+
+					await this._refreshMerchantInventory(tokenDocument.uuid, {
+						removeExistingActorItems: true, 
+						ignoreCheckItemPilesType: true
+					});
+
+					Helpers.debug(`Roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' for NO merchant with ITEM PILES`);
+					*/
+					Helpers.custom_error(`Cannot Roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' for NO merchant with ITEM PILES`);
+				}
 			} else {
 				Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} because is a valid item pile`);
 			}
