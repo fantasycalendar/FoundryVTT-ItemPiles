@@ -1081,7 +1081,7 @@ class API {
 	}
 	
 	/**
-	 * Whether an item pile is a merchant. If it is not enabled, it is always false.
+	 * Whether an item pile is a auctioneer. If it is not enabled, it is always false.
 	 *
 	 * @param {Token/TokenDocument} target
 	 * @param {Object/boolean} [data=false] data existing flags data to use
@@ -1095,6 +1095,23 @@ class API {
 			return false;
 		}
 		return PileUtilities.isItemPileAuctioneer(target, data);
+	}
+
+	/**
+	 * Whether an item pile is a banker. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isItemPileBanker(target, data = false) {
+		if(!game.modules.get("item_piles_bankers")?.active) {
+			let word = "install and activate";
+			if (game.modules.get('item_piles_bankers')) word = "activate";
+			Helpers.custom_warning(`This api method from Item Piles requires the 'item_piles_bankers' module. Please ${word} it.`, true);
+			return false;
+		}
+		return PileUtilities.isItemPileBanker(target, data);
 	}
 
 	/**
@@ -2257,9 +2274,10 @@ class API {
 	 * @param {Actor/Token/TokenDocument} target                  The merchant actor to refresh the inventory of
 	 * @param {object} options                                    Options to pass to the function
 	 * @param {boolean} [options.removeExistingActorItems=true]   Whether to clear the merchant's existing inventory before adding the new items
+	 * @param {boolean} [options.ignoreCheckItemPilesType=false]  Populate this target with the same roll tables set on the merchant settings, but on a actor/token with item piles disabled. This is useful for as a alternative for populate NPC on the canvas
 	 * @returns {Promise<boolean|*>}
 	 */
-	static async refreshMerchantInventory(target, { removeExistingActorItems = true } = {}) {
+	static async refreshMerchantInventory(target, { removeExistingActorItems = true, ignoreCheckItemPilesType = false } = {}) {
 
 		if (target) {
 			target = Utilities.getActor(target);
@@ -2270,7 +2288,7 @@ class API {
 
 		const targetUuid = Utilities.getUuid(target);
 
-		if (!PileUtilities.isItemPileMerchant(target)) {
+		if (!ignoreCheckItemPilesType && !PileUtilities.isItemPileMerchant(target)) {
 			throw Helpers.custom_error(`refreshMerchantInventory | target of uuid ${targetUuid} is not a merchant`);
 		}
 
@@ -2280,6 +2298,7 @@ class API {
 
 		const items = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.REFRESH_MERCHANT_INVENTORY, targetUuid, {
 			removeExistingActorItems,
+			ignoreCheckItemPilesType,
 			userId: game.user.id
 		});
 

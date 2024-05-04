@@ -46,6 +46,7 @@
   * [isItemPileVault](#isItemPileVault)
   * [isItemPileMerchant](#isItemPileMerchant)
   * [isItemPileAuctioneer](#isItemPileAuctioneer)
+  * [isItemPileBanker](#isItemPileBanker)
   * [isItemPileEmpty](#isItemPileEmpty)
   * [updateItemPile](#updateItemPile)
   * [deleteItemPile](#deleteItemPile)
@@ -633,6 +634,19 @@ Whether an item pile is a auctioneer. If it is not enabled, it is always false.
 
 ---
 
+### isItemPileBanker
+
+`game.itempiles.API.isItemPileBanker(target)` ⇒ `boolean`
+
+Whether an item pile is a banker. If it is not enabled, it is always false.
+
+| Param              | Type                          | Default | Description                   |
+|--------------------|-------------------------------|---------|-------------------------------|
+| target             | `Token/TokenDocument`         |         | Target token to check         |
+| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+
+---
+
 ### isItemPileEmpty
 
 `game.itempiles.API.isItemPileEmpty(target)` ⇒ `boolean`
@@ -766,11 +780,12 @@ Refreshes the merchant's inventory, potentially removing existing items and popu
 
 **Returns**: `Promise<Array<Item>>` - An array of object containing the item data and their quantity
 
-| Param                              | Type                               | Default | Description                                                                    |
-|------------------------------------|------------------------------------|---------|--------------------------------------------------------------------------------|
-| target                             | `Actor/TokenDocument/Token/String` |         | The merchant actor to refresh the inventory of                                 |
-| options                            | `object`                           |         | Options to pass to the function                                                |
-| [options.removeExistingActorItems] | `boolean`                          | `true`  | Whether to clear the merchant's existing inventory before adding the new items |
+| Param                               | Type                               | Default | Description                                                                    |
+|-------------------------------------|------------------------------------|---------|--------------------------------------------------------------------------------|
+| target                              | `Actor/TokenDocument/Token/String` |         | The merchant actor to refresh the inventory of                                 |
+| options                             | `object`                           |         | Options to pass to the function                                                |
+| [options.removeExistingActorItems]  | `boolean`                          | `true`  | Whether to clear the merchant's existing inventory before adding the new items |
+| [options.ignoreCheckItemPilesType] | `boolean`                         | `false` | Populate this target with the same roll tables set on the merchant settings, but on a actor/token with item piles disabled. This is useful for as a alternative for populate NPC on the canvas |
 
 ---
 

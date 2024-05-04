@@ -113,3 +113,4 @@ Hooks.on(CONSTANTS.HOOKS.RESET_SETTINGS, async () => {
 	}
 	checkSystem();
 })
+

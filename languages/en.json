@@ -37,7 +37,9 @@
       "DropNoToken": "You don't have a token on this scene, so you can't drop any items here.",
       "NoVaultAccess": "You don't have permission to view this vault.",
       "NoVaultAccessActor": "{actor_name} doesn't have permission to view this vault.",
-      "ItemNoQuantity": "{item_name} has 0 quantity, so you can't transfer this item!"
+      "ItemNoQuantity": "{item_name} has 0 quantity, so you can't transfer this item!",
+      "NoRollTableAndNoActorIsPresent": "No actor or any tables is present",
+      "NoRollTableIsPresent": "No tables is been set on the actor {actorName}"
     },
     "Warnings": {
       "NoGMsConnected": "WARNING - No GMs connected - Item Piles requires a GM to be connected for players to be able to utilize most of the module's features.",
@@ -555,6 +557,10 @@
           "DeleteWhenEmptyDefault": "Default module setting",
           "DeleteWhenEmptyYes": "Yes, delete when empty",
           "DeleteWhenEmptyNo": "No, don't delete when empty",
+          "OnCreateTokenRollTable": "Refresh the inventory on the token when created",
+          "OnCreateTokenRollTableExplanation": "With this setting, when the actor token is created on the canvas it will refresh the inventory on the token based on some rollTable. NOTE: You must set at least have one roll table set , and if the actor is set to be a merchant by default all the old items are removed so be aware...",
+          "OnCreateTokenRollTableNoMerchant": "Refresh the inventory on the token when created even if is not a enabled items piles",
+          "OnCreateTokenRollTableExplanationNoMerchant": "With this setting, the effect of the setting 'Refresh the inventory on the token when created' is been applied even if this is not a item piles.",        
           "CanStackItems": "Can Stack Items",
           "CanStackItemsExplanation": "With this setting, items added to the item pile will stack with similar items. This can also be controlled per-item in their configuration. Note: This is dependent on the system as well, since some items do not have quantity so they can never be stacked.",
           "CanStackItemsYes": "Yes, stack items (unless item says otherwise)",

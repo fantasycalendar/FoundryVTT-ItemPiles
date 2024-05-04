@@ -162,6 +162,7 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static _onCreateToken(doc) {
+		this._refreshInventoryOnCreate(doc);
 		if (!PileUtilities.isValidItemPile(doc)) return;
 		const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
 		Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CREATE, doc, itemPileConfig);
@@ -1062,6 +1063,8 @@ export default class PrivateAPI {
 				pileDataDefaults.showItemName = true;
 				pileDataDefaults.overrideSingleItemScale = true;
 				pileDataDefaults.singleItemScale = 0.75;
+				pileDataDefaults.onCreateTokenRollTable = false;
+				pileDataDefaults.onCreateTokenRollTableNoMerchant = false;
 			}
 
 			pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
@@ -1114,6 +1117,8 @@ export default class PrivateAPI {
 					pileDataDefaults.showItemName = true;
 					pileDataDefaults.overrideSingleItemScale = true;
 					pileDataDefaults.singleItemScale = 0.75;
+					pileDataDefaults.onCreateTokenRollTable = false;
+					pileDataDefaults.onCreateTokenRollTableNoMerchant = false;
 				}
 
 				pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
@@ -1477,6 +1482,91 @@ export default class PrivateAPI {
 				await PileUtilities.updateItemPileData(uuid);
 			});
 		})(targetUuid);
+	}
+
+	/**
+	 * Pre-loads all images and sounds related to a given token document on the client-side.
+	 *
+	 * @param {TokenDocument} tokenDocument
+	 * @return {Promise<boolean>}
+	 */
+	static async _refreshInventoryOnCreate(tokenDocument) {
+		
+		const pileData = PileUtilities.getActorFlagData(tokenDocument.actor, false, true);
+
+		const rollTableOnDrop = pileData.onCreateTokenRollTable;
+		const rollTableOnDropNoMerchant = pileData.onCreateTokenRollTableNoMerchant;
+		const betterRollTablesActive = game.modules.get('better-rolltables')?.active;
+		const isValid = PileUtilities.isValidItemPile(tokenDocument,pileData);
+
+		if(isValid && !PileUtilities.isItemPileMerchant(tokenDocument, pileData)) {
+			Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' the type is not supported only Merchant is supported`);
+			return false;
+		}
+		
+		if(rollTableOnDrop) {
+			if(isValid) {
+				// Make sure to not destroy anything important on the original actor...
+				await tokenDocument.update({ actorLink: false });
+
+				await this._refreshMerchantInventory(tokenDocument.uuid, {
+					removeExistingActorItems: true, 
+					ignoreCheckItemPilesType: false
+				});
+				
+				Helpers.debug(`Roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' for merchant`);
+			
+			} else if(rollTableOnDropNoMerchant) {
+				
+				if(betterRollTablesActive) {
+					const options = {
+						brtTypes: ['none','better','loot'] // TODO not sure how manage this the right way wait for community feed back
+					}
+					const merchant = Utilities.getActor(tokenDocument.uuid);
+					const brtActorList = await game.modules.get('better-rolltables').api.retrieveActorList(merchant, options);
+					const rollTablesToRoll = [];
+					for(const rollTableData of brtActorList.rollTableList)  {
+						rollTablesToRoll.push(rollTableData.rollTable);
+					}
+
+					const items = await PileUtilities.rollMerchantTables({
+						tableData: rollTablesToRoll,
+						actor: merchant, 
+						ignoreCheckItemPilesType:true });
+			
+					const itemsToAdd = items.map((item) => {
+						const actualItem =  item.item.toObject();
+						return Utilities.setItemQuantity(actualItem, item.quantity);
+					});
+					
+					await PrivateAPI._addItems(tokenDocument.uuid, itemsToAdd, null, { removeExistingActorItems:true });
+					Helpers.debug(`Roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' for NO merchant with BRT`);
+				} else {
+					// TODO Explained here https://github.com/fantasycalendar/FoundryVTT-ItemPiles/pull/562
+					// The issue 482 is more complicated because the mechanism for choosing tables is only on 
+					// the merchant sheet panel O.O, i avoided on the code level with a "trick". The "trick" is to use
+					// the current rolltables flags through the merchant sheet and then disable the item piles
+					// and drop as a standard npc, the is the optioon to use the new actor list from BRT as alternative
+					/*
+					// Make sure to not destroy anything important on the original actor...
+					await tokenDocument.update({ actorLink: false });
+
+					await this._refreshMerchantInventory(tokenDocument.uuid, {
+						removeExistingActorItems: true, 
+						ignoreCheckItemPilesType: true
+					});
+
+					Helpers.debug(`Roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' for NO merchant with ITEM PILES`);
+					*/
+					Helpers.custom_error(`Cannot Roll tables on create token on item pile with uuid ${tokenDocument.uuid} with 'Roll Table on Drop' for NO merchant with ITEM PILES`);
+				}
+			} else {
+				Helpers.debug(`Cannot roll tables on create token on item pile with uuid ${tokenDocument.uuid} because is a valid item pile`);
+			}
+		} else {
+			Helpers.debug(`Cannot Initialized item pile with uuid ${tokenDocument.uuid} because is not a container`);
+		}
+		return false;
 	}
 
 	/**
@@ -2359,14 +2449,24 @@ export default class PrivateAPI {
 
 	}
 
+	/**
+	 * 
+	 * @param {string} merchantUuid 
+	 * @param {Object} options
+	 * @param {boolean} [options.removeExistingActorItems=false]
+	 * @param {boolean} [options.ignoreCheckItemPilesType=false]
+	 * @param {string|boolean} [options.userId=false]
+	 * @returns 
+	 */
 	static async _refreshMerchantInventory(merchantUuid, {
 		removeExistingActorItems = false,
+		ignoreCheckItemPilesType = false,
 		userId = false
 	} = {}) {
 
 		const merchant = Utilities.getActor(merchantUuid);
 
-		const items = await PileUtilities.rollMerchantTables({ actor: merchant });
+		const items = await PileUtilities.rollMerchantTables({ actor: merchant, ignoreCheckItemPilesType:ignoreCheckItemPilesType });
 
 		const itemsToAdd = items.map((item) => {
 			const actualItem = item.item.toObject();
