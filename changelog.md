@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.9.2
+
+- Fixed rolltables not applying custom categories to items properly
+
 ## Version 2.9.1
 
 - Added support for the Shadowdark system (thank you mrstarbuck007 on github!)
