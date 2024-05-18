@@ -39,6 +39,8 @@ import pirateborg from "./systems/pirateborg.js";
 import starwarsffg from "./systems/starwarsffg.js";
 import demonlord from "./systems/demonlord.js";
 import dnd5e241 from "./systems/dnd5e-2.4.1.js";
+import dragonbane from "./systems/dragonbane.js";
+import twodsix from "./systems/twodsix.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -160,6 +162,12 @@ export const SYSTEMS = {
 		},
 		"shadowdark": {
 			"latest": shadowdark
+		},
+		"dragonbane": {
+			"latest": dragonbane
+		},
+		"twodsix": {
+			"latest": twodsix
 		},
 		// ↑ ADD SYSTEMS HERE ↑
 	},
