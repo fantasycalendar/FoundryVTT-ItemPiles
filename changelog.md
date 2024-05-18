@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 2.9.2
+
+- Fixed merchant columns not being editable in newer versions of D&D 5e
+
 ## Version 2.9.1
 
 - Added support for the Shadowdark system (thank you mrstarbuck007 on github!)

@@ -5,7 +5,15 @@
 	export let required = false;
 
 	const id = "property-list-" + randomID();
-	const templates = foundry.utils.deepClone(game.system.template[templateType]);
+
+	const templates = Object.values(CONFIG?.[templateType]?.dataModels ?? []).length
+		? {
+			...Object.fromEntries(Object.entries(CONFIG?.[templateType]?.dataModels).map(model => {
+				return [model[0], model[1].schema.initial()]
+			})),
+			types: Object.keys(CONFIG?.[templateType]?.dataModels),
+		}
+		: foundry.utils.deepClone(game.system.template[templateType]);
 	const templateObject = {
 		name: "",
 		type: "",
