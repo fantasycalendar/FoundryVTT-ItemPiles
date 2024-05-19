@@ -1967,10 +1967,10 @@ export async function rollTable({
 		const brtOptions = {
 			rollsAmount: roll.total,
 			roll: undefined,
-			displayChat: displayChat, 
+			displayChat: displayChat,
 			recursive: true
 		}
-		results = (await game.modules.get("better-rolltables").api.roll(table,brtOptions)).itemsData.map(result => ({
+		results = (await game.modules.get("better-rolltables").api.roll(table, brtOptions)).itemsData.map(result => ({
 			documentCollection: result.documentCollection,
 			documentId: result.documentId,
 			text: result.text || result.name,
@@ -2019,12 +2019,14 @@ export async function rollTable({
 		if (existingItem) {
 			existingItem.quantity += Math.max(newItem.quantity, 1);
 		} else {
-			setProperty(newItem, CONSTANTS.FLAGS.ITEM, getProperty(newItem.item, CONSTANTS.FLAGS.ITEM));
-			if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
-				setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
-			}
+			const flags = getProperty(newItem.item, CONSTANTS.FLAGS.ITEM) ?? {};
 			if (customCategory) {
 				setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, customCategory);
+				setProperty(flags, "customCategory", customCategory);
+			}
+			setProperty(newItem, CONSTANTS.FLAGS.ITEM, flags);
+			if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
+				setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
 			}
 			items.push({
 				...newItem
@@ -2108,24 +2110,27 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 
 		tableItems.forEach(newItem => {
 			const existingItem = items.find((item) => {
-                if (item.documentId && newItem.documentId) {
-                    return item.documentId === newItem.documentId;
-                } else {
-                    return item._id === newItem._id;
-                }
-            });
+				if (item.documentId && newItem.documentId) {
+					return item.documentId === newItem.documentId;
+				} else {
+					return item._id === newItem._id;
+				}
+			});
 			if (existingItem) {
 				existingItem.quantity += Math.max(newItem.quantity, 1);
 			} else {
-				setProperty(newItem, CONSTANTS.FLAGS.ITEM, cleanItemFlagData(getProperty(newItem.item, CONSTANTS.FLAGS.ITEM) ?? {}));
+				const flags = cleanItemFlagData(getProperty(newItem.item, CONSTANTS.FLAGS.ITEM) ?? {});
+				if (newItem?.customCategory) {
+					setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, newItem?.customCategory);
+					setProperty(flags, "customCategory", newItem?.customCategory);
+				}
+				setProperty(newItem, CONSTANTS.FLAGS.ITEM, flags);
 				if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
 					setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
 				}
-				if (newItem?.customCategory) {
-					setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, newItem?.customCategory);
-				}
 				items.push({
-					...newItem, quantity: newItem.quantity
+					...newItem,
+					quantity: newItem.quantity
 				});
 			}
 		})

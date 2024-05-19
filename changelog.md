@@ -3,6 +3,7 @@
 ## Version 2.9.2
 
 - Fixed merchant columns not being editable in newer versions of D&D 5e
+- Fixed rolltables not applying custom categories to items properly
 
 ## Version 2.9.1
 

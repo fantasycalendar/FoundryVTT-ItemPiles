@@ -80,7 +80,7 @@
 			{ id: `merchant-columns-item-pile-config-${pileActor.id}` },
 			{ title: localize("ITEM-PILES.Applications.MerchantColumnsEditor.TitleActor", { actor_name: pileActor.name }), }
 		).then((result) => {
-			pileData.merchantColumns = Array.isArray(result.merchantColumns) ? result.merchantColumns : [];
+			pileData.merchantColumns = Array.isArray(result) ? result : [];
 		});
 	}
 
