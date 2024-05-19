@@ -52,7 +52,7 @@ export default {
 			img: "icons/commodities/currency/coin-engraved-moon-silver.webp",
 			abbreviation: "{#}SC",
 			data: {
-				path: "system.currency.gs",
+				path: "system.currency.sc",
 			},
 			primary: false,
 			exchangeRate: 0.1
@@ -63,7 +63,7 @@ export default {
 			img: "icons/commodities/currency/coin-engraved-waves-copper.webp",
 			abbreviation: "{#}CC",
 			data: {
-				path: "system.currency.gc",
+				path: "system.currency.cc",
 			},
 			primary: false,
 			exchangeRate: 0.01
