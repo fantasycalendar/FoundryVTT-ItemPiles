@@ -881,6 +881,18 @@
         "Title": "Waluty drugorzędne",
         "Label": "Konfiguracja walut dodatkowych",
         "Hint": "To ustawienie definiuje waluty dodatkowe, podobne do zwykłych walut, ale od nich niezależne. Nie mogą one mieć kursów wymiany ani być podzielone na inne waluty niestandardowe."
+      },
+      "ItemWeaponClass": {
+        "Title": "Typ klasy broni przedmiotu",
+        "Hint": "Typ klasy przedmiotu to typ przedmiotu, który będzie używany dla domyślnego przedmiotu broni."
+      },
+      "ItemEquipmentClass": {
+        "Title": "Typ klasy wyposażenia",
+        "Hint": "Typ klasy przedmiotu to typ przedmiotu, który będzie używany dla domyślnego elementu wyposażenia."
+      },
+      "ItemLootClass": {
+        "Title": "Typ klasy łupu przedmiotu",
+        "Hint": "Typ klasy przedmiotu to typ przedmiotu, który będzie używany jako domyślny przedmiot łupu."
       }
     },
     "HUD": {
