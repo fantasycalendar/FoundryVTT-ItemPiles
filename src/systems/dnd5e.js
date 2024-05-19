@@ -12,7 +12,7 @@ export default {
 	"ITEM_CLASS_LOOT_TYPE": "loot",
 
 	// The item class type is the type of item that will be used for the default weapon item
-	"ITEM_CLASS_WEAPON_TYPE": "weapon", 
+	"ITEM_CLASS_WEAPON_TYPE": "weapon",
 
 	// The item class type is the type of item that will be used for the default equipment item
 	"ITEM_CLASS_EQUIPMENT_TYPE": "equipment",
@@ -51,6 +51,19 @@ export default {
 			}
 		}
 		return itemData;
+	},
+
+	"ITEM_TYPE_HANDLERS": {
+		"container": {
+			"transfer": ({ item, items }) => {
+				for (const containedItem of item.system.contents.contents) {
+					items.push(containedItem.toObject());
+				}
+			},
+			"groupDisplay": ({ item }) => {
+				return item.system.contents.contents;
+			}
+		}
 	},
 
 	// This function is an optional system handler that specifically transforms an item's price into a more unified numeric format

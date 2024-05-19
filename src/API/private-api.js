@@ -250,7 +250,16 @@ export default class PrivateAPI {
 		const targetActor = Utilities.getActor(targetUuid);
 
 		const sourceTransaction = new Transaction(sourceActor);
+		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+			for (const itemData of items) {
+				const item = sourceActor.items.get(itemData._id ?? itemData.id);
+				const handler = SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[item.type]?.["transfer"];
+				if (!handler) continue;
+				handler({ actor: sourceActor, item, items });
+			}
+		}
 		await sourceTransaction.appendItemChanges(items, { remove: true });
+
 		const sourceUpdates = sourceTransaction.prepare();
 
 		const targetTransaction = new Transaction(targetActor);
@@ -965,7 +974,9 @@ export default class PrivateAPI {
 		if (!foundry.utils.isEmpty(actorUpdates)) {
 			await actor.update(actorUpdates);
 		}
-		const createdItems = itemsToCreate.length ? await actor.createEmbeddedDocuments("Item", itemsToCreate) : [];
+		const createdItems = itemsToCreate.length
+			? await actor.createEmbeddedDocuments("Item", itemsToCreate, { keepId: true, keepEmbeddedIds: true })
+			: [];
 		if (itemsToUpdate.length) await actor.updateEmbeddedDocuments("Item", itemsToUpdate);
 		if (itemsToDelete.length) await actor.deleteEmbeddedDocuments("Item", itemsToDelete);
 		return createdItems.map(item => item.toObject());

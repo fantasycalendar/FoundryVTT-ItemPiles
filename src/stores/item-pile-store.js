@@ -8,6 +8,7 @@ import * as Helpers from "../helpers/helpers.js";
 import { InterfaceTracker } from "../socket.js";
 import { PileAttribute, PileItem } from "./pile-item.js";
 import DropCurrencyDialog from "../applications/dialogs/drop-currency-dialog/drop-currency-dialog.js";
+import { SYSTEMS } from "../systems.js";
 
 const __STORES__ = new Map();
 
@@ -182,7 +183,31 @@ export default class ItemPileStore {
 
 		const pileData = PileUtilities.isValidItemPile(this.actor) || !this.recipient ? get(this.pileData) : get(this.recipientPileData);
 
-		PileUtilities.getActorItems(this.actor, { itemFilters: pileData.overrideItemFilters }).map(item => {
+		const pileItems = PileUtilities.getActorItems(this.actor, { itemFilters: pileData.overrideItemFilters });
+
+		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+
+			const groupedItems = pileItems.filter(item => {
+				return SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[item.type]?.["groupDisplay"];
+			}).map(item => {
+				return [item, SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[item.type]?.["groupDisplay"]({ item, items: pileItems })];
+			});
+
+
+			// TODO @wasp: Continue this
+			groupedItems.forEach(([item, subItems]) => {
+				pileItems.splice(pileItems.indexOf(item), 1);
+				const pileItemClass = new this.ItemClass(this, item);
+				items.push(pileItemClass);
+				pileItemClass.subItems = subItems.map(subItem => {
+					pileItems.splice(pileItems.indexOf(subItem), 1);
+					return new this.ItemClass(this, subItem)
+				})
+			});
+
+		}
+
+		pileItems.forEach(item => {
 			items.push(new this.ItemClass(this, item));
 		});
 

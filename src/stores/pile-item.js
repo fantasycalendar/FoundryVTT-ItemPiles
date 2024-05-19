@@ -71,6 +71,7 @@ export class PileItem extends PileBaseItem {
 		this.abbreviation = writable("");
 		this.identifier = randomID();
 		this.itemFlagData = writable(PileUtilities.getItemFlagData(this.item));
+		this.subItems = [];
 	}
 
 	setupSubscriptions() {

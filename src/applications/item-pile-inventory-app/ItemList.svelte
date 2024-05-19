@@ -18,6 +18,11 @@
 
 		{#each $items as item (item.identifier)}
 			<ListEntry {store} bind:entry={item}/>
+			<div style="padding-left: 1rem;">
+				{#each item.subItems as subItem}
+					<ListEntry {store} bind:entry={subItem}/>
+				{/each}
+			</div>
 		{/each}
 
 	</div>
