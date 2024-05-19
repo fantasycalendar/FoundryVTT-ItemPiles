@@ -14,7 +14,8 @@ After you've forked it, you can now edit it [directly on GitHub](https://docs.gi
 
 ### Running your fork locally
 
-Once you have gotten your fork cloned locally to your computer, you need to put it into the `modules` folder under your Foundry data. The folder **must** be named `item-piles` for the next steps to work.
+Once you have gotten your fork cloned locally to your computer, you need to put it into the `modules` folder under your Foundry data. The folder
+**must** be named `item-piles` for the next steps to work.
 
 In order to actually get it running, you need to run `npm install` in your code editor's terminal while in the `item-piles`. You can open the terminal by pressing Ctrl/Cmd + \` and then typing running the command. This will install all the prerequisite files for Item Piles to function.
 
@@ -30,22 +31,25 @@ I welcome all systems, but with me having to manually add support myself has bec
 
 ### Adding system support through a pull request
 
-**Note:** You will need to follow the [Setting up your environment](#setting-up-your-environment) section above if you wish to go for this way.
+**Note:
+** You will need to follow the [Setting up your environment](#setting-up-your-environment) section above if you wish to go for this way.
 
 In Item Piles, every single system has its own file, named after the system ID in its `system.json` file. [You can find them all here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/tree/master/src/systems).
 
 Taking [D&D5e's file](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/blob/master/src/systems/dnd5e.js) as an example, you can see it is a `.js` file containing a single object, that has a few properties. These properties are what determines system support.
 
-- `VERSION` is the version of the **Item Piles support**. This means that you can change the file, then increment this version to make Item Piles recognize that something has changed to update the user's Item Piles system data.
+- `VERSION` is the version of the **Item Piles support
+  **. This means that you can change the file, then increment this version to make Item Piles recognize that something has changed to update the user's Item Piles system data.
 - `ACTOR_CLASS_TYPE` is the name of the type of actor that will be used for the default item pile.
 - `ITEM_QUANTITY_ATTRIBUTE` determines which property the system uses to determine the quantity of items. If there is none, you can remove this.
 - `ITEM_PRICE_ATTRIBUTE` is the property on items that determine its price. If there is none, you can remove this.
-- `ITEM_FILTERS` is an array of objects that determine which items are **not** physical items that can be picked up, like spells, talents, etc. Each entry in this array must be an object that contains a `path` property pointing at a property that is shared across all items, such as `type`, and a `filters` property, which is a comma-delimited string that contains what should be considered as not an item.
+- `ITEM_FILTERS` is an array of objects that determine which items are **not
+  ** physical items that can be picked up, like spells, talents, etc. Each entry in this array must be an object that contains a `path` property pointing at a property that is shared across all items, such as `type`, and a `filters` property, which is a comma-delimited string that contains what should be considered as not an item.
 - `ITEM_SIMILARITIES` is an array that contains all the item properties (dot-notated path, such as `type`, `name`, etc) that will be considered when comparing items and determining if they are the same item.
 
 There are a few more, you can read the documentation about them all [here](https://fantasycomputer.works/FoundryVTT-ItemPiles/#/api?id=addsystemintegration). This is a function, yes, but the input content is the same as the system support `.js` file.
 
-Once this file has been added, it can be imported and added to the [systems.js](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/blob/master/src/systems.js) file. Anytime Item Piles loads in a system that has an ID that matches it in this file, it will be automatically loaded.
+Once this file has been added, it can be imported and added to the [_index.js](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/blob/master/src/systems/_index.js) file. Anytime Item Piles loads in a system that has an ID that matches it in this file, it will be automatically loaded.
 
 ### Adding system support through a module or directly from the system
 

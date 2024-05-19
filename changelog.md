@@ -2,7 +2,10 @@
 
 ## Version 2.9.2
 
-- Fixed merchant columns not being editable in newer versions of D&D 5e
+- Added support for the following systems (thank you xdy on github!):
+  - [Twodsix - Cepheus & Traveller (Unofficial)](https://foundryvtt.com/packages/twodsix)
+  - [Dragonbane - Drakar och Demoner](https://foundryvtt.com/packages/dragonbane)
+- Fixed merchant columns not being editable in newer versions of D&D 5e (thank you OlavStornes on github!)
 - Fixed rolltables not applying custom categories to items properly
 
 ## Version 2.9.1
