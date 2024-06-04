@@ -2,6 +2,7 @@ import * as Helpers from "./helpers.js";
 import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import { deletedActorCache } from "./caches.js";
+import { SYSTEMS } from "../systems.js";
 
 export function getActor(target) {
 	if (target instanceof Actor) return target;
@@ -13,6 +14,7 @@ export function getActor(target) {
 		}
 	}
 	targetDoc = getDocument(targetDoc);
+	if (targetDoc instanceof Item && targetDoc.parent instanceof Actor) return targetDoc.parent;
 	return targetDoc?.character ?? targetDoc?.actor ?? targetDoc;
 }
 
@@ -375,8 +377,8 @@ export async function runMacro(macroId, macroData) {
 export function getOwnedCharacters(user = false) {
 	user = user || game.user;
 	return game.actors.filter(actor => {
-		return actor.ownership?.[user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER && actor.prototypeToken.actorLink;
-	})
+			return actor.ownership?.[user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER && actor.prototypeToken.actorLink;
+		})
 		.sort((a, b) => {
 			return b._stats.modifiedTime - a._stats.modifiedTime;
 		});
@@ -421,4 +423,12 @@ export function getSourceActorFromDropData(dropData) {
 		return game.actors.get(dropData.actorId);
 	}
 	return false;
+}
+
+export function hasItemTypeHandler(handler, itemType = "GLOBAL") {
+	return !!SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];
+}
+
+export function getItemTypeHandler(handler, itemType = "GLOBAL") {
+	return SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];
 }

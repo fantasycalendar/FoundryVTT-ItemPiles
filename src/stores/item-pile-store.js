@@ -185,31 +185,30 @@ export default class ItemPileStore {
 
 		const pileItems = PileUtilities.getActorItems(this.actor, { itemFilters: pileData.overrideItemFilters });
 
-		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
-
-			const groupedItems = pileItems.filter(item => {
-				return SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[item.type]?.["groupDisplay"];
-			}).map(item => {
-				return [item, SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[item.type]?.["groupDisplay"]({ item, items: pileItems })];
-			});
-
-
-			// TODO @wasp: Continue this
-			groupedItems.forEach(([item, subItems]) => {
-				pileItems.splice(pileItems.indexOf(item), 1);
-				const pileItemClass = new this.ItemClass(this, item);
-				items.push(pileItemClass);
-				pileItemClass.subItems = subItems.map(subItem => {
-					pileItems.splice(pileItems.indexOf(subItem), 1);
-					return new this.ItemClass(this, subItem)
-				})
-			});
-
-		}
-
 		pileItems.forEach(item => {
 			items.push(new this.ItemClass(this, item));
 		});
+
+		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+
+			const groupedItems = items.filter(item => {
+				return Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, item.type);
+			});
+
+			groupedItems.forEach((containerPileItem) => {
+				PileUtilities.getCurrenciesInItem(containerPileItem.item, {
+					forActor: this.recipient,
+					getAll: false
+				}).forEach(currency => {
+					if (currency.type !== "item") {
+						const currencyPileItem = new this.AttributeClass(this, currency, true, !!currency?.secondary, containerPileItem)
+						currencyPileItem.containerID.set(containerPileItem.item.id);
+						attributes.push(currencyPileItem);
+					}
+				});
+			});
+
+		}
 
 		PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
 			if (currency.type === "item") {
@@ -269,13 +268,52 @@ export default class ItemPileStore {
 
 	refreshItems() {
 		const allItems = get(this.allItems);
+		const allAttributes = get(this.attributes);
 		const pileData = get(this.pileData);
 		const recipientPileData = this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {}
 		const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
 
-		const visibleItems = allItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
-		const itemCurrencies = allItems.filter(entry => entry.isCurrency && !entry.isSecondaryCurrency);
-		const secondaryItemCurrencies = allItems.filter(entry => entry.isSecondaryCurrency);
+		const groupedItems = allItems
+			.map(item => {
+				item.subItems.set([]);
+				return item;
+			})
+			.reduce((acc, item) => {
+				const containerID = get(item.containerID);
+				if (containerID) {
+					const container = allItems.find(pileItem => pileItem.id === containerID)
+					if (container) {
+						container.subItems.update(subItems => {
+							subItems.push(item);
+							return subItems
+						});
+						return acc;
+					}
+				}
+				acc.push(item);
+				return acc;
+			}, []);
+
+		const groupedAttributes = allAttributes
+			.reduce((acc, item) => {
+				const containerID = get(item.containerID);
+				if (containerID) {
+					const container = allItems.find(pileItem => pileItem.id === containerID)
+					if (container) {
+						container.subItems.update(subItems => {
+							subItems.push(item);
+							return subItems
+						});
+						return acc;
+					}
+				}
+				acc.push(item);
+				return acc;
+			}, []);
+
+		const visibleItems = groupedItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
+		const itemCurrencies = groupedItems.filter(entry => entry.isCurrency && !entry.isSecondaryCurrency);
+		const secondaryItemCurrencies = groupedItems.filter(entry => entry.isSecondaryCurrency);
 
 		this.visibleItems.set(visibleItems);
 
@@ -284,8 +322,8 @@ export default class ItemPileStore {
 		this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
 		this.items.set(items.sort((a, b) => this.itemSortFunction(a, b)));
 
-		const currencies = get(this.attributes).filter(entry => !entry.isSecondaryCurrency).concat(itemCurrencies);
-		const secondaryCurrencies = get(this.attributes).filter(entry => entry.isSecondaryCurrency).concat(secondaryItemCurrencies);
+		const currencies = groupedAttributes.filter(entry => !entry.isSecondaryCurrency).concat(itemCurrencies);
+		const secondaryCurrencies = groupedAttributes.filter(entry => entry.isSecondaryCurrency).concat(secondaryItemCurrencies);
 
 		this.numCurrencies.set(currencies.concat(secondaryCurrencies).filter(entry => get(entry.quantity) > 0).length);
 

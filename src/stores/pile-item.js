@@ -4,16 +4,16 @@ import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
-import * as Helpers from "../helpers/helpers.js";
 import { Plugins } from "../plugins/main.js";
 import { SYSTEMS } from "../systems.js";
 import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
-import { updateItemData } from "../helpers/pile-utilities.js";
 
 class PileBaseItem {
 
-	constructor(store, data, isCurrency = false, isSecondaryCurrency = false) {
+	constructor(store, data, isCurrency = false, isSecondaryCurrency = false, parent = false) {
 		this.store = store;
+		this.parent = parent?.item || store.actor;
+		this.parentDoc = parent?.itemDocument || store.document;
 		this.subscriptions = [];
 		this.isCurrency = isCurrency;
 		this.isSecondaryCurrency = isSecondaryCurrency;
@@ -28,6 +28,8 @@ class PileBaseItem {
 		this.filtered = writable(true);
 		this.presentFromTheStart = writable(false);
 		this.rarityColor = writable(false);
+		this.containerID = writable("");
+		this.subItems = writable([]);
 	}
 
 	setupSubscriptions() {
@@ -71,7 +73,6 @@ export class PileItem extends PileBaseItem {
 		this.abbreviation = writable("");
 		this.identifier = randomID();
 		this.itemFlagData = writable(PileUtilities.getItemFlagData(this.item));
-		this.subItems = [];
 	}
 
 	setupSubscriptions() {
@@ -111,6 +112,12 @@ export class PileItem extends PileBaseItem {
 			}
 			if (Plugins["rarity-colors"].data) {
 				this.rarityColor.set(Plugins["rarity-colors"].data.getItemColor(this.item));
+			}
+			if (Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED)) {
+				this.containerID.set(Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED)({ item: this.item }));
+			}
+			if (Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, this.item.type)) {
+
 			}
 		});
 
@@ -171,7 +178,9 @@ export class PileItem extends PileBaseItem {
 		if (quantity === 0 && !presentFromTheStart) {
 			this.filtered.set(true);
 		} else if (search) {
-			this.filtered.set(!name.toLowerCase().includes(search.toLowerCase()));
+			const nameIsInSearchQuery = name.toLowerCase().includes(search.toLowerCase());
+			const subItemNamesMatchQuery = get(this.subItems).some(item => get(item.filtered));
+			this.filtered.set(!(nameIsInSearchQuery || subItemNamesMatchQuery));
 		} else {
 			this.filtered.set(!presentFromTheStart && quantity === 0);
 		}
@@ -234,7 +243,7 @@ export class PileAttribute extends PileBaseItem {
 		this.img = writable(this.attribute.img);
 		this.abbreviation = writable(this.attribute.abbreviation);
 		this.identifier = randomID()
-		const startingQuantity = Number(getProperty(this.store.actor, this.path) ?? 0);
+		const startingQuantity = Number(getProperty(this.parent, this.path) ?? 0);
 		this.presentFromTheStart.set(startingQuantity > 0);
 		this.quantity.set(startingQuantity);
 		this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -247,26 +256,30 @@ export class PileAttribute extends PileBaseItem {
 		this.subscribeTo(this.store.pileData, this.setupProperties.bind(this));
 
 		this.subscribeTo(this.store.shareData, (val) => {
+			const quantity = get(this.quantity);
 			if (!this.toShare) {
-				this.quantityLeft.set(get(this.quantity));
+				this.quantityLeft.set(quantity);
 				return;
 			}
 			const quantityLeft = SharingUtilities.getAttributeSharesLeftForActor(this.store.actor, this.path, this.store.recipient);
-			this.quantityLeft.set(quantityLeft);
+			this.quantityLeft.set(Math.min(quantity, quantityLeft));
 		});
 
-		this.subscribeTo(this.store.document, () => {
-			const { data } = this.store.document.updateOptions;
+		this.subscribeTo(this.parentDoc, () => {
+			const { data } = this.parentDoc.updateOptions;
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
 			if (hasProperty(data, this.path)) {
 				const newQuantity = Number(getProperty(data, this.path) ?? 0);
 				this.quantity.set(newQuantity);
-				this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), newQuantity));
 				if (!this.toShare) {
 					this.quantityLeft.set(newQuantity);
+				} else {
+					const quantityLeft = SharingUtilities.getAttributeSharesLeftForActor(this.store.actor, this.path, this.store.recipient);
+					this.quantityLeft.set(Math.min(newQuantity, quantityLeft));
 				}
+				this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), newQuantity));
 				this.store.refreshItems();
 			}
 		});
@@ -287,7 +300,9 @@ export class PileAttribute extends PileBaseItem {
 		if (quantity === 0 && !presentFromTheStart) {
 			this.filtered.set(true);
 		} else if (search) {
-			this.filtered.set(!name.toLowerCase().includes(search.toLowerCase()));
+			const nameIsInSearchQuery = name.toLowerCase().includes(search.toLowerCase());
+			const subItemNamesMatchQuery = get(this.subItems).some(item => get(item.filtered));
+			this.filtered.set(!(nameIsInSearchQuery || subItemNamesMatchQuery));
 		} else {
 			this.filtered.set(!presentFromTheStart && quantity === 0);
 		}
@@ -296,7 +311,7 @@ export class PileAttribute extends PileBaseItem {
 	take() {
 		const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft));
 		return game.itempiles.API.transferAttributes(
-			this.store.actor,
+			this.parent,
 			this.store.recipient,
 			{ [this.path]: quantity },
 			{ interactionId: this.store.interactionId }
@@ -304,7 +319,7 @@ export class PileAttribute extends PileBaseItem {
 	}
 
 	updateQuantity() {
-		return this.store.actor.update({
+		return this.parent.update({
 			[this.path]: get(this.quantity)
 		});
 	}

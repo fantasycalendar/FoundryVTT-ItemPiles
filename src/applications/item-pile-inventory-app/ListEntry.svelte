@@ -31,7 +31,7 @@
 
 </script>
 
-<div class="item-piles-flexrow item-piles-item-row item-piles-even-color"
+<div class="item-piles-flexrow item-piles-item-row"
      class:item-piles-disabled={!$editQuantities && (!$quantityLeft || !$quantity)}
      draggable={!!entry.id}
      on:dragstart={(event) => { dragStart(event) }}
@@ -49,7 +49,7 @@
 			>
 				{$name}
 			</p>
-			{#if !$editQuantities && entry.canStack && !currency}
+			{#if !$editQuantities && (entry.canStack || !entry.id) && ($pileData.shareCurrenciesEnabled || !currency)}
 				<span class="item-piles-small-text">(x{$quantity})</span>
 			{/if}
 		</div>

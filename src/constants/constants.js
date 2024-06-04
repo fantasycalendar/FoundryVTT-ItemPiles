@@ -40,6 +40,13 @@ const CONSTANTS = {
 		CUSTOM_CATEGORY: `${module_name}.item.customCategory`
 	},
 
+	ITEM_TYPE_METHODS: {
+		HAS_CURRENCY: "hasCurrency",
+		CONTENTS: "contents",
+		TRANSFER: "transfer",
+		IS_CONTAINED: "isContained",
+	},
+
 	ITEM_DEFAULTS: {
 		// Merchants
 		hidden: false,

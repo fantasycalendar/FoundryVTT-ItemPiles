@@ -2,7 +2,7 @@
 
 	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
 	import { fade } from 'svelte/transition';
-	import ListEntry from "./ListEntry.svelte";
+	import ListGroupEntry from "./ListGroupEntry.svelte";
 
 	export let store;
 	const items = store.items;
@@ -16,13 +16,8 @@
 
 		<div class="item-piles-flexrow"><h3>{localize("ITEM-PILES.Items")}</h3></div>
 
-		{#each $items as item (item.identifier)}
-			<ListEntry {store} bind:entry={item}/>
-			<div style="padding-left: 1rem;">
-				{#each item.subItems as subItem}
-					<ListEntry {store} bind:entry={subItem}/>
-				{/each}
-			</div>
+		{#each $items as item, index (item.identifier)}
+			<ListGroupEntry {item} {index} {store}/>
 		{/each}
 
 	</div>
