@@ -104,7 +104,7 @@ export async function checkSystem() {
 		if (SYSTEMS.DATA.SOFT_MIGRATIONS[currentVersion + "-" + newVersion]) {
 			Helpers.debug(`Applying soft migration for ${game.system.title}`);
 			await applySoftMigration(currentVersion + "-" + newVersion);
-		} else if (isNewerVersion(newVersion, currentVersion)) {
+		} else if (foundry.utils.isNewerVersion(newVersion, currentVersion)) {
 			Helpers.debug(`Applying system settings for ${game.system.title}`)
 			await applyDefaultSettings();
 		}

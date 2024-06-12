@@ -11,6 +11,8 @@ import PrivateAPI from "./private-api.js";
 import { SYSTEMS } from "../systems.js";
 import ItemPileConfig from "../applications/item-pile-config/item-pile-config.js";
 
+const { hasProperty, getProperty, setProperty } = foundry.utils;
+
 class API {
 	/**
 	 * @class API
@@ -1342,9 +1344,9 @@ class API {
 			} else if (itemData.item) {
 				item = itemData.item instanceof Item ? itemData.item.toObject() : itemData.item;
 				if (itemData.flags) {
-					foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(
-						foundry.utils.getProperty(item, CONSTANTS.FLAGS.ITEM) ?? {},
-						foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM))
+					setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(
+						getProperty(item, CONSTANTS.FLAGS.ITEM) ?? {},
+						getProperty(itemData, CONSTANTS.FLAGS.ITEM))
 					);
 				}
 			} else if (itemData.id) {
@@ -1479,7 +1481,7 @@ class API {
 			return {
 				id: item._id,
 				quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(itemData), 0),
-				flags: foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM)
+				flags: getProperty(itemData, CONSTANTS.FLAGS.ITEM)
 			}
 		});
 
@@ -1654,12 +1656,12 @@ class API {
 				if (typeof attribute !== "string") {
 					throw Helpers.custom_error(`removeAttributes | Each attribute in the array must be of type string`);
 				}
-				attributesToSend[attribute] = Number(foundry.utils.getProperty(targetActor, attribute));
+				attributesToSend[attribute] = Number(getProperty(targetActor, attribute));
 			});
 		} else {
 			Object.entries(attributes).forEach(entry => {
 				const [attribute, quantity] = entry;
-				if (!foundry.utils.hasProperty(targetActor, attribute)) {
+				if (!hasProperty(targetActor, attribute)) {
 					throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
 				}
 				if (!Helpers.isRealNumber(quantity) && quantity > 0) {
@@ -1707,14 +1709,14 @@ class API {
 				if (typeof attribute !== "string") {
 					throw Helpers.custom_error(`transferAttributes | Each attribute in the array must be of type string`);
 				}
-				if (!foundry.utils.hasProperty(sourceActor, attribute)) {
+				if (!hasProperty(sourceActor, attribute)) {
 					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
 				}
 			});
 		} else {
 			Object.entries(attributes).forEach(entry => {
 				const [attribute, quantity] = entry;
-				if (!foundry.utils.hasProperty(sourceActor, attribute)) {
+				if (!hasProperty(sourceActor, attribute)) {
 					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
 				}
 				if (!Helpers.isRealNumber(quantity) && quantity > 0) {

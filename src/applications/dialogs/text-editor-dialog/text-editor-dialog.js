@@ -7,7 +7,7 @@ export default class TextEditorDialog extends SvelteApplication {
 	constructor(text, options) {
 		super({
 			title: game.i18n.localize("ITEM-PILES.Dialogs.TextEditor.Title"),
-			id: `item-piles-text-editor${options?.id ? "-" + options.id : ""}-${randomID()}`,
+			id: `item-piles-text-editor${options?.id ? "-" + options.id : ""}-${foundry.utils.randomID()}`,
 			svelte: {
 				class: TextEditorDialogShell,
 				target: document.body,

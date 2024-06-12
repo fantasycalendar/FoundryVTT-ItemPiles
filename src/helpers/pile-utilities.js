@@ -8,6 +8,9 @@ import * as Helpers from "./helpers.js";
 import * as CompendiumUtilities from "./compendium-utilities.js";
 
 
+const { hasProperty, getProperty, setProperty } = foundry.utils;
+
+
 function getFlagData(inDocument, flag, defaults, existing = false) {
 	const defaultFlags = foundry.utils.deepClone(defaults);
 	let flags = foundry.utils.deepClone(existing || (getProperty(inDocument, flag) ?? {}));
@@ -639,8 +642,11 @@ export async function updateItemPileData(target, flagData, tokenData) {
 	flagData = cleanFlagData(flagData);
 
 	const updates = documentTokens.map(tokenDocument => {
-		const overrideImage = getProperty(tokenData, "texture.src") ?? getProperty(tokenData, "img");
-		const overrideScale = getProperty(tokenData, "texture.scaleX") ?? getProperty(tokenData, "texture.scaleY") ?? getProperty(tokenData, "scale");
+		const overrideImage = getProperty(tokenData, "texture.src") 
+				?? getProperty(tokenData, "img");
+		const overrideScale = getProperty(tokenData, "texture.scaleX") 
+				?? getProperty(tokenData, "texture.scaleY") 
+				?? getProperty(tokenData, "scale");
 		const scale = getItemPileTokenScale(tokenDocument, pileData, overrideScale);
 		const newTokenData = foundry.utils.mergeObject(tokenData, {
 			"texture.src": getItemPileTokenImage(tokenDocument, pileData, overrideImage),
@@ -2235,12 +2241,9 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				tableUuid: table.uuid, formula: roll.total, customCategory: customCategory
 			})
 
-			tableItems.forEach(item => {
-				if (table?.customCategory) {
-					setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table?.customCategory);
-				}
-			});
-
+			if (table?.customCategory) {
+				tableItems.forEach(item => setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table?.customCategory));
+			}
 		}
 
 		tableItems.forEach(newItem => {

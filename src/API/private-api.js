@@ -19,6 +19,9 @@ import { hotkeyActionState } from "../hotkeys.js";
 
 const preloadedFiles = new Set();
 
+const { hasProperty, getProperty, setProperty, debounce } = foundry.utils;
+
+
 export default class PrivateAPI {
 
 	/**
@@ -110,8 +113,8 @@ export default class PrivateAPI {
 		const itemPileConfig = foundry.utils.mergeObject(
 			foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
 			foundry.utils.mergeObject(
-				foundry.utils.getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {},
-				foundry.utils.deepClone(foundry.utils.getProperty(sourceActor, CONSTANTS.FLAGS.PILE) ?? {})
+				getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {},
+				foundry.utils.deepClone(getProperty(sourceActor, CONSTANTS.FLAGS.PILE) ?? {})
 			)
 		)
 		if (!itemPileConfig?.enabled) return;
@@ -151,7 +154,7 @@ export default class PrivateAPI {
 	}
 
 	static _onPreUpdateToken(doc, changes) {
-		if (!foundry.utils.hasProperty(changes, "actorLink")) return;
+		if (!hasProperty(changes, "actorLink")) return;
 		if (!PileUtilities.isValidItemPile(doc)) return;
 		const flagData = PileUtilities.getActorFlagData(doc);
 		const cleanFlagData = PileUtilities.cleanFlagData(flagData);
@@ -853,7 +856,7 @@ export default class PrivateAPI {
 
 		const sourceAttributes = PileUtilities.getActorCurrencies(sourceActor).filter(entry => entry.type === "attribute");
 		const attributesToTransfer = sourceAttributes.filter(attribute => {
-			return foundry.utils.hasProperty(targetActor, attribute.data.path);
+			return hasProperty(targetActor, attribute.data.path);
 		}).map(attribute => attribute.data.path);
 
 		const sourceTransaction = new Transaction(sourceActor);
@@ -997,7 +1000,7 @@ export default class PrivateAPI {
 		// If there's a source of the item (it wasn't dropped from the item bar)
 		if (sourceUuid) {
 
-			foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
+			setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
 
 			// If there's a target token, add the item to it, otherwise create a new pile at the drop location
 			if (targetUuid) {
@@ -1197,8 +1200,8 @@ export default class PrivateAPI {
 					data.items[index] = await Item.implementation.create(data.items[index], { temporary: true });
 				}
 
-				const overrideImage = foundry.utils.getProperty(overrideData, "texture.src") ?? foundry.utils.getProperty(overrideData, "img");
-				const overrideScale = foundry.utils.getProperty(overrideData, "texture.scaleX") ?? foundry.utils.getProperty(overrideData, "texture.scaleY") ?? foundry.utils.getProperty(overrideData, "scale");
+				const overrideImage = getProperty(overrideData, "texture.src") ?? getProperty(overrideData, "img");
+				const overrideScale = getProperty(overrideData, "texture.scaleX") ?? getProperty(overrideData, "texture.scaleY") ?? getProperty(overrideData, "scale");
 
 				const scale = PileUtilities.getItemPileTokenScale(pileActor, data, overrideScale);
 
@@ -1276,8 +1279,8 @@ export default class PrivateAPI {
 
 			let specificTokenSettings = Helpers.isFunction(tokenSettings) ? await tokenSettings(target) : foundry.utils.deepClone(tokenSettings);
 
-			const overrideImage = foundry.utils.getProperty(specificTokenSettings, "texture.src") ?? foundry.utils.getProperty(specificTokenSettings, "img");
-			const overrideScale = foundry.utils.getProperty(specificTokenSettings, "texture.scaleX") ?? foundry.utils.getProperty(specificTokenSettings, "texture.scaleY") ?? foundry.utils.getProperty(specificTokenSettings, "scale");
+			const overrideImage = getProperty(specificTokenSettings, "texture.src") ?? getProperty(specificTokenSettings, "img");
+			const overrideScale = getProperty(specificTokenSettings, "texture.scaleX") ?? getProperty(specificTokenSettings, "texture.scaleY") ?? getProperty(specificTokenSettings, "scale");
 
 			const scale = PileUtilities.getItemPileTokenScale(target, data, overrideScale);
 
@@ -1687,10 +1690,10 @@ export default class PrivateAPI {
 
 		let flagData = PileUtilities.getItemFlagData(dropData.itemData.item);
 		if (!sourceIsVault && targetIsVault) {
-			foundry.utils.setProperty(flagData, "x", dropData.gridPosition?.x ?? 0);
-			foundry.utils.setProperty(flagData, "y", dropData.gridPosition?.y ?? 0);
+			setProperty(flagData, "x", dropData.gridPosition?.x ?? 0);
+			setProperty(flagData, "y", dropData.gridPosition?.y ?? 0);
 		}
-		foundry.utils.setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
+		setProperty(dropData.itemData, CONSTANTS.FLAGS.ITEM, flagData);
 
 		if (sourceActor) {
 			return game.itempiles.API.transferItems(sourceActor, targetActor, [dropData.itemData], { interactionId: dropData.interactionId });
@@ -1849,7 +1852,7 @@ export default class PrivateAPI {
 			}
 
 			Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);
-			foundry.utils.setProperty(dropData.itemData, "quantity", dropData.itemData.quantity);
+			setProperty(dropData.itemData, "quantity", dropData.itemData.quantity);
 
 			if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, sourceActor, targetActor, dropData.itemData, user.id) === false) {
 				return;
@@ -2245,7 +2248,7 @@ export default class PrivateAPI {
 				if (itemFlagData.isService) continue;
 				const item = entry.item.toObject();
 				if (buyerHidesNewItems) {
-					foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM + '.hidden', true);
+					setProperty(item, CONSTANTS.FLAGS.ITEM + '.hidden', true);
 				}
 				await buyerTransaction.appendItemChanges([{
 					item: item, quantity: entry.quantity

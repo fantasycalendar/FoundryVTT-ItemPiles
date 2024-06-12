@@ -6,6 +6,8 @@ export function getActivePlayers(onlyActive = false) {
 	return Array.from(game.users).filter(u => (u.active || !onlyActive) && u.character);
 }
 
+const { hasProperty, getProperty, setProperty } = foundry.utils;
+
 /**
  * Gets the players that can interact with this item pile
  *

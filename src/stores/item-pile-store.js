@@ -11,13 +11,15 @@ import DropCurrencyDialog from "../applications/dialogs/drop-currency-dialog/dro
 
 const __STORES__ = new Map();
 
+const { hasProperty, getProperty, setProperty } = foundry.utils;
+
 export default class ItemPileStore {
 
 	constructor(application, source, recipient = false, { recipientPileData = false } = {}) {
 
 		this.subscriptions = [];
 
-		this.interactionId = randomID();
+		this.interactionId = foundry.utils.randomID();
 		this.application = application;
 
 		this.uuid = Utilities.getUuid(source);

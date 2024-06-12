@@ -5,6 +5,8 @@ import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
 
+const { hasProperty, getProperty, setProperty } = foundry.utils;
+
 export default class Transaction {
 
 	constructor(actor) {
@@ -53,9 +55,9 @@ export default class Transaction {
 				actorExistingItem = actorExistingItems.find(item => {
 					return PileUtilities.canItemStack(item, this.actor) && (
 						(
-							foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x") === undefined
+							getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x") === undefined
 							&&
-							foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y") === undefined
+							getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y") === undefined
 						)
 						||
 						PileUtilities.areItemsColliding(item, itemData)
@@ -112,7 +114,7 @@ export default class Transaction {
 				} else {
 
 					if (!itemData._id) {
-						itemData._id = randomID();
+						itemData._id = foundry.utils.randomID();
 					}
 					Utilities.setItemQuantity(itemData, incomingQuantity);
 					this.itemsToCreate.push(itemData);
@@ -127,7 +129,7 @@ export default class Transaction {
 					Utilities.setItemQuantity(existingItemCreation, newQuantity);
 				} else {
 					if (!itemData._id) {
-						itemData._id = randomID();
+						itemData._id = foundry.utils.randomID();
 					}
 					Utilities.setItemQuantity(itemData, incomingQuantity);
 					this.itemsToCreate.push(itemData);
@@ -145,7 +147,7 @@ export default class Transaction {
 		}
 		this.actorUpdates = attributes.reduce((acc, attribute) => {
 			const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
-			acc[attribute.path] = acc[attribute.path] ?? Number(foundry.utils.getProperty(this.actor, attribute.path) ?? 0);
+			acc[attribute.path] = acc[attribute.path] ?? Number(getProperty(this.actor, attribute.path) ?? 0);
 			if (set) {
 				if (!onlyDelta) {
 					acc[attribute.path] = incomingQuantity
@@ -168,7 +170,7 @@ export default class Transaction {
 			if (this.attributeDeltas.get(entry[0]) === 0) {
 				this.attributeDeltas.delete(entry[0]);
 			}
-			return Number(foundry.utils.getProperty(this.actor, entry[0])) !== entry[1];
+			return Number(getProperty(this.actor, entry[0])) !== entry[1];
 		}))
 		this.itemsToCreate = this.itemsToCreate.filter(item => {
 			return !PileUtilities.canItemStack(item, this.actor) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"

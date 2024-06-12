@@ -14,6 +14,8 @@ import QuantityColumn from "../applications/merchant-app/components/QuantityColu
 import PriceSelector from "../applications/components/PriceSelector.svelte";
 import EntryButtons from "../applications/merchant-app/components/EntryButtons.svelte";
 
+const { hasProperty, getProperty, setProperty } = foundry.utils;
+
 export default class MerchantStore extends ItemPileStore {
 
 	constructor(...args) {

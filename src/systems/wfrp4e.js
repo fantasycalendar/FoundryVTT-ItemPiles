@@ -36,7 +36,7 @@ export default {
 	// This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
 	"ITEM_COST_TRANSFORMER": (item) => {
 		let overallCost = 0;
-		const prices = getProperty(item, "system.price");
+		const prices = foundry.utils.getProperty(item, "system.price");
 		overallCost += (Number(prices?.["gc"]) ?? 0) * 240;
 		overallCost += (Number(prices?.["ss"]) ?? 0) * 12;
 		overallCost += (Number(prices?.["bp"]) ?? 0) * 1;

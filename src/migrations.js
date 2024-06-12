@@ -4,6 +4,8 @@ import * as PileUtilities from "./helpers/pile-utilities.js";
 import SETTINGS from "./constants/settings.js";
 import { findOrCreateItemInCompendium } from "./helpers/compendium-utilities.js";
 
+const { hasProperty, getProperty, setProperty, isNewerVersion } = foundry.utils;
+
 export default async function runMigrations() {
 
   for (const version of Object.keys(migrations)) {

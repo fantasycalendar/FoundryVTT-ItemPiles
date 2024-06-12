@@ -47,7 +47,7 @@ export default {
 	"ITEM_COST_TRANSFORMER": (item, currencies) => {
 		let overallCost = 0;
 		currencies.forEach((currency, index) => {
-			let denominationCost = Number(getProperty(item, currency.data.path.replace("system.currency.", "system.value.")));
+			let denominationCost = Number(foundry.utils.getProperty(item, currency.data.path.replace("system.currency.", "system.value.")));
 			if (!isNaN(denominationCost)) {
 				overallCost += denominationCost * currency.exchangeRate;
 			}

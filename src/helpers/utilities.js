@@ -3,6 +3,8 @@ import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import { deletedActorCache } from "./caches.js";
 
+const { hasProperty, getProperty, setProperty } = foundry.utils;
+
 export function getActor(target) {
 	if (target instanceof Actor) return target;
 	let targetDoc = target;

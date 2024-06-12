@@ -12,7 +12,7 @@ export const debounceManager = {
 		if (this.debounces[id]) {
 			return this.debounces[id];
 		}
-		this.debounces[id] = debounce(function (...args) {
+		this.debounces[id] = foundry.utils.debounce(function (...args) {
 			delete debounceManager.debounces[id];
 			return method(...args);
 		}, 250);

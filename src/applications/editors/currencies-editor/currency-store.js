@@ -13,7 +13,7 @@ export default class CurrencyStore {
 			return {
 				...entry,
 				index,
-				id: entry.data?.path ?? entry.data?._id ?? randomID()
+				id: entry.data?.path ?? entry.data?._id ?? foundry.utils.randomID()
 			}
 		}));
 	}
@@ -86,7 +86,7 @@ export default class CurrencyStore {
 				Helpers.custom_notify(`Updated item data for ${localize(currencies[index].name)} (item name ${itemData.name})`)
 			} else {
 				currencies.push(foundry.utils.mergeObject({
-					id: randomID(),
+					id: foundry.utils.randomID(),
 					type: "item",
 					name: itemData.name,
 					img: itemData.img,
@@ -116,7 +116,7 @@ export default class CurrencyStore {
 			const items = Array.from(game.items);
 			item = Utilities.findSimilarItem(items, itemData);
 			if (!item) {
-				setProperty(itemData, CONSTANTS.FLAGS.TEMPORARY_ITEM, true);
+				foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.TEMPORARY_ITEM, true);
 				item = await Item.implementation.create(itemData);
 				Helpers.custom_notify(`An item has been created for ${item.name} - drag and drop it into the list to update the stored item data`)
 			}

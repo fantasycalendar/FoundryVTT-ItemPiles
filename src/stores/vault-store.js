@@ -14,6 +14,8 @@ import * as Helpers from "../helpers/helpers.js";
 import { SYSTEMS } from "../systems.js";
 import { isItemValidBasedOnProperties } from "../helpers/pile-utilities.js";
 
+const { hasProperty, getProperty, setProperty } = foundry.utils;
+
 export class VaultStore extends ItemPileStore {
 
 	constructor(...args) {
@@ -400,9 +402,9 @@ export class VaultStore extends ItemPileStore {
 			}
 		}
 
-		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", validPosition.x);
-		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", validPosition.y);
-		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".flipped", validPosition.flipped);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", validPosition.x);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", validPosition.y);
+		setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".flipped", validPosition.flipped);
 
 		return PrivateAPI._depositWithdrawItem({
 			source, target, itemData: {
@@ -579,7 +581,7 @@ export class VaultItem extends PileItem {
 		const itemData = this.item.toObject();
 
 		const flags = PileUtilities.getItemFlagData(this.item);
-		itemData._id = randomID();
+		itemData._id = foundry.utils.randomID();
 		setProperty(flags, "x", x);
 		setProperty(flags, "y", y);
 		setProperty(flags, "flipped", flipped);

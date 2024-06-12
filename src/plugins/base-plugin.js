@@ -26,7 +26,7 @@ export default class BasePlugin {
 			return;
 		}
 
-		if (isNewerVersion(this.minVersion, game.modules.get(this.pluginName).version)) {
+		if (foundry.utils.isNewerVersion(this.minVersion, game.modules.get(this.pluginName).version)) {
 			if (this.minVersionError) {
 				throw Helpers.custom_error(this.minVersionError);
 			}
