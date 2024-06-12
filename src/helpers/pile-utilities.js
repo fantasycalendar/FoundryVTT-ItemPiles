@@ -7,9 +7,11 @@ import * as Utilities from "./utilities.js"
 import * as Helpers from "./helpers.js";
 import * as CompendiumUtilities from "./compendium-utilities.js";
 
-
 const { hasProperty, getProperty, setProperty } = foundry.utils;
 
+export function getPileDefaults() {
+	return foundry.utils.mergeObject({}, CONSTANTS.PILE_DEFAULTS, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
+}
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
 	const defaultFlags = foundry.utils.deepClone(defaults);
@@ -90,7 +92,7 @@ export function getItemFlagData(item, data = false) {
  * @returns {Object<CONSTANTS.PILE_DEFAULTS>}
  */
 export function getActorFlagData(target, data = false) {
-	const defaults = foundry.utils.mergeObject({ ...CONSTANTS.PILE_DEFAULTS }, { ...(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {}) });
+	const defaults = getPileDefaults();
 	target = Utilities.getActor(target);
 	if (target?.token) {
 		target = target.token;
@@ -639,7 +641,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
 	const pileData = { data: flagData, items, currencies };
 
-	flagData = cleanFlagData(flagData);
+	// This seems to do more damage than good, especially when open/closing stores with the button
+	// flagData = cleanFlagData(flagData);
 
 	const updates = documentTokens.map(tokenDocument => {
 		const overrideImage = getProperty(tokenData, "texture.src") 
@@ -678,8 +681,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
 	return true;
 }
 
-export function cleanFlagData(flagData) {
-	const defaults = foundry.utils.mergeObject({ ...CONSTANTS.PILE_DEFAULTS }, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
+export function cleanFlagData(flagData, addRemoveFlags = false) {
+	const defaults = getPileDefaults();
 	const defaultKeys = Object.keys(defaults);
 	const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, defaults)));
 	const toRemove = new Set(defaultKeys.filter(key => !difference.has(key)));
@@ -691,13 +694,13 @@ export function cleanFlagData(flagData) {
 		for (const key of Object.keys(flagData)) {
 			if (!baseKeys.has(key)) {
 				delete flagData[key];
-				flagData["-=" + key] = null;
+				if (addRemoveFlags) flagData["-=" + key] = null;
 			}
 		}
 	}
 	for (const key of toRemove) {
 		delete flagData[key];
-		flagData["-=" + key] = null;
+		if (addRemoveFlags) flagData["-=" + key] = null;
 	}
 	return flagData;
 }

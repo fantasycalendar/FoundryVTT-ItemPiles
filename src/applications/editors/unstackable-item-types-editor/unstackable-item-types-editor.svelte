@@ -16,7 +16,7 @@
 	const itemFilters = (getSetting(SETTINGS.ITEM_FILTERS).find(filter => filter.path === "type")?.filters ?? "").split(',');
 
 	const unstackableItemTypesStore = writable(data);
-	let systemTypes = game.system.template.Item.types.filter(type => !itemFilters.includes(type));
+	let systemTypes = Object.keys(game.system.documentTypes.Item).filter(type => !itemFilters.includes(type));
 	let unusedTypes = [];
 
 	$: {

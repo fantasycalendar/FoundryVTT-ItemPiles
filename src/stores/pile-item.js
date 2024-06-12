@@ -10,7 +10,7 @@ import { SYSTEMS } from "../systems.js";
 import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
 import { updateItemData } from "../helpers/pile-utilities.js";
 
-const { hasProperty } = foundry.utils;
+const { hasProperty, getProperty } = foundry.utils;
 
 class PileBaseItem {
 

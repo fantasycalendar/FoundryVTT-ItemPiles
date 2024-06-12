@@ -13,7 +13,8 @@
 			})),
 			types: Object.keys(CONFIG?.[templateType]?.dataModels),
 		}
-		: foundry.utils.deepClone(game.system.template[templateType]);
+		: foundry.utils.deepClone(game.system.documentTypes[templateType]);
+
 	const templateObject = {
 		name: "",
 		type: "",

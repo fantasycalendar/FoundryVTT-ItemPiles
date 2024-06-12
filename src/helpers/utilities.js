@@ -154,7 +154,7 @@ export function getItemTypesThatCanStack() {
 		}
 
 		const unstackableItemTypes = Helpers.getSetting(SETTINGS.UNSTACKABLE_ITEM_TYPES);
-		const types = new Set(Object.keys(CONFIG?.Item?.dataModels ?? {}).concat(game.system.template.Item.types));
+		const types = new Set(Object.keys(CONFIG?.Item?.dataModels ?? {}).concat(game.system.documentTypes.Item.types));
 		itemTypesWithQuantities = new Set([...itemTypesWithQuantities, ...types.filter(type => {
 			let itemTemplate = {};
 			if (CONFIG?.Item?.dataModels?.[type]?.defineSchema !== undefined) {
@@ -163,12 +163,12 @@ export function getItemTypesThatCanStack() {
 						return [key, schema.fields ?? true]
 					})
 				itemTemplate.system = Object.fromEntries(itemTemplate.system);
-			} else if (game.system?.template?.Item?.[type]) {
-				itemTemplate.system = foundry.utils.deepClone(game.system.template.Item[type]);
-				if (itemTemplate.system?.templates?.length) {
-					const templates = foundry.utils.duplicate(itemTemplate.system.templates);
+			} else if (game.system?.documentTypes?.Item?.[type]) {
+				itemTemplate.system = foundry.utils.deepClone(game.system.documentTypes.Item[type]);
+				if (itemTemplate.system?.documentTypes?.length) {
+					const templates = foundry.utils.duplicate(itemTemplate.system.documentTypes);
 					for (let template of templates) {
-						itemTemplate.system = foundry.utils.mergeObject(itemTemplate.system, foundry.utils.duplicate(game.system.template.Item.templates[template]));
+						itemTemplate.system = foundry.utils.mergeObject(itemTemplate.system, foundry.utils.duplicate(game.system.documentTypes.Item.templates[template]));
 					}
 				}
 			}
@@ -180,8 +180,8 @@ export function getItemTypesThatCanStack() {
 
 export function isItemStackable(itemData) {
 	getItemTypesThatCanStack();
-	if (game.system.id === "custom-system-builder" && itemData?.system?.template) {
-		const templateItem = game.items.get(itemData?.system?.template);
+	if (game.system.id === "custom-system-builder" && itemData?.system?.documentTypes) {
+		const templateItem = game.items.get(itemData?.system?.documentTypes);
 		if (templateItem) {
 			return itemTypesWithQuantities.has(templateItem.name)
 		}
