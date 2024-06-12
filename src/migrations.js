@@ -4,8 +4,6 @@ import * as PileUtilities from "./helpers/pile-utilities.js";
 import SETTINGS from "./constants/settings.js";
 import { findOrCreateItemInCompendium } from "./helpers/compendium-utilities.js";
 
-const { hasProperty, getProperty, setProperty, isNewerVersion } = foundry.utils;
-
 export default async function runMigrations() {
 
   for (const version of Object.keys(migrations)) {
@@ -20,16 +18,16 @@ export default async function runMigrations() {
 
 function getItemPileActorsOfLowerVersion(version) {
   return PileUtilities.getItemPileActors((actor) => {
-    const actorFlagVersion = getProperty(actor, CONSTANTS.FLAGS.VERSION) || "1.0.0";
-    return getProperty(actor, CONSTANTS.FLAGS.PILE)?.enabled && isNewerVersion(version, actorFlagVersion);
+    const actorFlagVersion = foundry.utils.getProperty(actor, CONSTANTS.FLAGS.VERSION) || "1.0.0";
+    return foundry.utils.getProperty(actor, CONSTANTS.FLAGS.PILE)?.enabled && foundry.utils.isNewerVersion(version, actorFlagVersion);
   })
 }
 
 function getItemPileTokensOfLowerVersion(version) {
   return PileUtilities.getItemPileTokens((token) => {
     try {
-      const actorFlagVersion = getProperty(token, CONSTANTS.FLAGS.VERSION) || "1.0.0";
-      return token.actor && isNewerVersion(version, actorFlagVersion);
+      const actorFlagVersion = foundry.utils.getProperty(token, CONSTANTS.FLAGS.VERSION) || "1.0.0";
+      return token.actor && foundry.utils.isNewerVersion(version, actorFlagVersion);
     } catch (err) {
       return false;
     }
@@ -38,8 +36,8 @@ function getItemPileTokensOfLowerVersion(version) {
 
 function filterValidItems(items, version) {
   return items.filter(item => {
-    const itemFlagVersion = getProperty(item, CONSTANTS.FLAGS.VERSION);
-    return (itemFlagVersion && isNewerVersion(version, itemFlagVersion)) || (!itemFlagVersion && hasProperty(item, CONSTANTS.FLAGS.ITEM));
+    const itemFlagVersion = foundry.utils.getProperty(item, CONSTANTS.FLAGS.VERSION);
+    return (itemFlagVersion && foundry.utils.isNewerVersion(version, itemFlagVersion)) || (!itemFlagVersion && foundry.utils.hasProperty(item, CONSTANTS.FLAGS.ITEM));
   });
 }
 
@@ -55,7 +53,7 @@ function getActorValidItems(actor, version) {
 async function updateActors(version, callback) {
 
   const actorUpdates = getItemPileActorsOfLowerVersion(version).map(actor => {
-    let flags = getProperty(actor, CONSTANTS.FLAGS.PILE);
+    let flags = foundry.utils.getProperty(actor, CONSTANTS.FLAGS.PILE);
     const flagData = {
       [CONSTANTS.FLAGS.PILE]: callback(flags, actor), [CONSTANTS.FLAGS.VERSION]: version
     }
@@ -108,7 +106,7 @@ async function updateItems(version, callback) {
   const gameItems = filterValidItems(game.items, version);
 
   const gameItemUpdates = gameItems.map(item => {
-    const flags = getProperty(item, CONSTANTS.FLAGS.ITEM);
+    const flags = foundry.utils.getProperty(item, CONSTANTS.FLAGS.ITEM);
     if (!flags) return false;
     return PileUtilities.updateItemData(item, {
       flags: callback(flags)
@@ -133,7 +131,7 @@ async function updateItems(version, callback) {
         [CONSTANTS.FLAGS.VERSION]: version
       },
       items: itemPileItems.map(item => {
-        const flags = getProperty(item, CONSTANTS.FLAGS.ITEM);
+        const flags = foundry.utils.getProperty(item, CONSTANTS.FLAGS.ITEM);
         if (!flags) return false;
         return PileUtilities.updateItemData(item, {
           flags: callback(flags)
@@ -168,7 +166,7 @@ async function updateItems(version, callback) {
           [CONSTANTS.FLAGS.VERSION]: version
         },
         items: itemPileItems.map(item => {
-          const flags = getProperty(item, CONSTANTS.FLAGS.ITEM);
+          const flags = foundry.utils.getProperty(item, CONSTANTS.FLAGS.ITEM);
           if (!flags) return false;
           return PileUtilities.updateItemData(item, {
             flags: callback(flags)
@@ -294,7 +292,7 @@ const migrations = {
           price.data = { uuid: compendiumItemUuid };
         }
       }
-      setProperty(itemData, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData, { addRemoveFlag: true }));
+      foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData, { addRemoveFlag: true }));
       return findOrCreateItemInCompendium(itemData);
     }
 

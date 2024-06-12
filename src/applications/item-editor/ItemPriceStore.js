@@ -32,14 +32,14 @@ export default class ItemPriceStore {
 
 		this.itemDoc.subscribe((item, changes) => {
 			const { data } = changes;
-			if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
+			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
 				const newData = foundry.utils.getProperty(data, CONSTANTS.FLAGS.ITEM);
 				const oldData = get(this.data);
 				this.data.set(foundry.utils.mergeObject(oldData, newData));
 			}
 			this.price.set(getItemCost(this.item));
 			const quantityForPriceProp = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE;
-			if (quantityForPriceProp && hasProperty(data, quantityForPriceProp)) {
+			if (quantityForPriceProp && foundry.utils.hasProperty(data, quantityForPriceProp)) {
 				this.quantityForPrice.set(foundry.utils.getProperty(item, quantityForPriceProp))
 			}
 		});

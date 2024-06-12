@@ -6,8 +6,6 @@ export function getActivePlayers(onlyActive = false) {
 	return Array.from(game.users).filter(u => (u.active || !onlyActive) && u.character);
 }
 
-const { hasProperty, getProperty, setProperty } = foundry.utils;
-
 /**
  * Gets the players that can interact with this item pile
  *
@@ -72,7 +70,7 @@ export function canItemPileBeSplit(target) {
  */
 export function getItemPileSharingData(target) {
 	const targetActor = Utilities.getActor(target);
-	return foundry.utils.duplicate(getProperty(targetActor, CONSTANTS.FLAGS.SHARING) ?? {});
+	return foundry.utils.duplicate(foundry.utils.getProperty(targetActor, CONSTANTS.FLAGS.SHARING) ?? {});
 }
 
 /**
@@ -319,7 +317,7 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 
 	let previouslyTaken = 0;
 	let recipientUuid = Utilities.getUuid(recipient);
-	currentQuantity = currentQuantity ?? Number(getProperty(pile, path) ?? 0);
+	currentQuantity = currentQuantity ?? Number(foundry.utils.getProperty(pile, path) ?? 0);
 	let totalShares = currentQuantity;
 
 	shareData = shareData ?? getItemPileSharingData(pile);

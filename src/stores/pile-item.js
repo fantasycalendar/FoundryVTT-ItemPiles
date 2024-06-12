@@ -10,8 +10,6 @@ import { SYSTEMS } from "../systems.js";
 import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
 import { updateItemData } from "../helpers/pile-utilities.js";
 
-const { hasProperty, getProperty } = foundry.utils;
-
 class PileBaseItem {
 
 	constructor(store, data, isCurrency = false, isSecondaryCurrency = false) {
@@ -105,7 +103,7 @@ export class PileItem extends PileBaseItem {
 				const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
 				this.currentQuantity.set(quantity);
 			}
-			if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
+			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
 				this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
 				this.updateCategory();
 				this.store.refreshItems();
@@ -235,7 +233,7 @@ export class PileAttribute extends PileBaseItem {
 		this.img = writable(this.attribute.img);
 		this.abbreviation = writable(this.attribute.abbreviation);
 		this.identifier = foundry.utils.randomID()
-		const startingQuantity = Number(getProperty(this.store.actor, this.path) ?? 0);
+		const startingQuantity = Number(foundry.utils.getProperty(this.store.actor, this.path) ?? 0);
 		this.presentFromTheStart.set(startingQuantity > 0);
 		this.quantity.set(startingQuantity);
 		this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -261,8 +259,8 @@ export class PileAttribute extends PileBaseItem {
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
-			if (hasProperty(data, this.path)) {
-				const newQuantity = Number(getProperty(data, this.path) ?? 0);
+			if (foundry.utils.hasProperty(data, this.path)) {
+				const newQuantity = Number(foundry.utils.getProperty(data, this.path) ?? 0);
 				this.quantity.set(newQuantity);
 				this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), newQuantity));
 				if (!this.toShare) {

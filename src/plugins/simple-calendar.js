@@ -75,9 +75,9 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 		const numWeekdays = currentCalendar.weekdays.length;
 
 		const notes = window.SimpleCalendar.api.getNotes()
-			.filter(note => getProperty(note, "flags.foundryvtt-simple-calendar.noteData.categories")?.length)
+			.filter(note => foundry.utils.getProperty(note, "flags.foundryvtt-simple-calendar.noteData.categories")?.length)
 			.map(note => {
-				const flags = getProperty(note, "flags.foundryvtt-simple-calendar.noteData");
+				const flags = foundry.utils.getProperty(note, "flags.foundryvtt-simple-calendar.noteData");
 				let timestampData = {
 					year: flags.startDate.year,
 					month: flags.startDate.month,

@@ -3,8 +3,6 @@ import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import { deletedActorCache } from "./caches.js";
 
-const { hasProperty, getProperty, setProperty } = foundry.utils;
-
 export function getActor(target) {
 	if (target instanceof Actor) return target;
 	let targetDoc = target;
@@ -66,7 +64,7 @@ export function findSimilarItem(items, findItem, {
 
 	let hasUniqueKey = false;
 	for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
-		if (getProperty(findItemData, prop)) {
+		if (foundry.utils.getProperty(findItemData, prop)) {
 			hasUniqueKey = true;
 			break;
 		}
@@ -75,7 +73,7 @@ export function findSimilarItem(items, findItem, {
 	const filteredItems = items
 		.filter(item => {
 			for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
-				if (getProperty(item?.item ?? item, prop)) {
+				if (foundry.utils.getProperty(item?.item ?? item, prop)) {
 					return false;
 				}
 			}
@@ -87,7 +85,7 @@ export function findSimilarItem(items, findItem, {
 				return true;
 			}
 
-			if (!itemSimilarities.some(path => hasProperty(findItem, path))) {
+			if (!itemSimilarities.some(path => foundry.utils.hasProperty(findItem, path))) {
 				return false;
 			}
 
@@ -111,7 +109,8 @@ export function findSimilarItem(items, findItem, {
 export function areItemsDifferent(itemA, itemB) {
 	const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 	for (const path of itemSimilarities) {
-		if (getProperty(itemA, path) !== getProperty(itemB, path) || (!hasProperty(itemA, path) ^ !hasProperty(itemB, path))) {
+		if (foundry.utils.getProperty(itemA, path) !== foundry.utils.getProperty(itemB, path)
+			|| (!foundry.utils.hasProperty(itemA, path) ^ !foundry.utils.hasProperty(itemB, path))) {
 			return true;
 		}
 	}
@@ -120,9 +119,9 @@ export function areItemsDifferent(itemA, itemB) {
 
 export function setSimilarityProperties(obj, item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	setProperty(obj, "_id", itemData._id);
+	foundry.utils.setProperty(obj, "_id", itemData._id);
 	game.itempiles.API.ITEM_SIMILARITIES.forEach(prop => {
-		setProperty(obj, prop, getProperty(itemData, prop));
+		foundry.utils.setProperty(obj, prop, foundry.utils.getProperty(itemData, prop));
 	})
 	return obj;
 }
@@ -197,7 +196,7 @@ export function isItemStackable(itemData) {
  */
 export function getItemQuantity(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return Number(getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+	return Number(foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
 }
 
 
@@ -209,7 +208,7 @@ export function getItemQuantity(item) {
  */
 export function hasItemQuantity(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return hasProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE);
+	return foundry.utils.hasProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE);
 }
 
 /**
@@ -223,7 +222,7 @@ export function hasItemQuantity(item) {
 export function setItemQuantity(item, quantity, requiresExistingQuantity = false) {
 	const itemData = item instanceof Item ? item.toObject() : item;
 	if (!requiresExistingQuantity || getItemTypesThatCanStack().has(itemData.type) || hasItemQuantity(itemData)) {
-		setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity);
+		foundry.utils.setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity);
 	}
 	return itemData;
 }
@@ -236,7 +235,7 @@ export function setItemQuantity(item, quantity, requiresExistingQuantity = false
  */
 export function getItemCost(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return getProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE) ?? 0;
+	return foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE) ?? 0;
 }
 
 /**
@@ -247,7 +246,7 @@ export function getItemCost(item) {
  */
 export function hasItemCost(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return hasProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
+	return foundry.utils.hasProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
 }
 
 /**
@@ -261,7 +260,7 @@ export function hasItemCost(item) {
 export function setItemCost(item, cost, requiresExistingCost = false) {
 	const itemData = item instanceof Item ? item.toObject() : item;
 	if (!requiresExistingCost || hasItemCost(itemData)) {
-		setProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
+		foundry.utils.setProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
 	}
 	return itemData
 }
