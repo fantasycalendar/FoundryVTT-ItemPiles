@@ -1963,7 +1963,6 @@ class API {
 			purchaseData: [{ cost: overallCost, quantity, secondaryPrices }],
 			buyer: targetActor
 		});
-
 	}
 
 	/**

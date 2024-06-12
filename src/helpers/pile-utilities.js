@@ -971,7 +971,7 @@ export function getPriceFromString(str, currencyList = false) {
 			if (part[2] !== currency.identifier) continue;
 
 			try {
-				const roll = new Roll(part[1]).evaluate({ async: false })
+				const roll = new Roll(part[1]).evaluateSync()
 				currency.quantity = roll.total;
 				if (roll.total !== Number(part[1])) {
 					currency.roll = roll;
@@ -990,7 +990,7 @@ export function getPriceFromString(str, currencyList = false) {
 
 	if (!currencies.some(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0)) {
 		try {
-			const roll = new Roll(str).evaluate({ async: false });
+			const roll = new Roll(str).evaluateSync();
 			if (roll.total) {
 				const primaryCurrency = currencies.find(currency => currency.primary);
 				primaryCurrency.quantity = roll.total;
@@ -1005,7 +1005,6 @@ export function getPriceFromString(str, currencyList = false) {
 	}
 
 	return { currencies, overallCost };
-
 }
 
 export function getCostOfItem(item, defaultCurrencies = false) {
@@ -1028,7 +1027,6 @@ export function getCostOfItem(item, defaultCurrencies = false) {
 	}
 
 	return Math.max(0, overallCost);
-
 }
 
 export function getPriceData({
@@ -2094,7 +2092,7 @@ export async function rollTable({
 		}
 	}
 
-	const roll = new Roll(formula.toString(), rollData).evaluate({ async: false });
+	const roll = await new Roll(formula.toString(), rollData).evaluate({ allowInteractive: false });
 	if (roll.total <= 0) {
 		return [];
 	}
@@ -2204,7 +2202,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 		if (table.addAll) {
 
 			for (const [itemId, formula] of Object.entries(table.items)) {
-				const roll = new Roll(formula).evaluate({ async: false });
+				const roll = await new Roll(formula).evaluate({ allowInteractive: false });
 				if (roll.total <= 0) continue;
 				const rollResult = rollableTable.results.get(itemId).toObject();
 				const potentialPack = game.packs.get(rollResult.documentCollection);
@@ -2227,7 +2225,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 
 		} else {
 
-			const roll = new Roll((table.timesToRoll ?? "1").toString()).evaluate({ async: false });
+			const roll = await new Roll((table.timesToRoll ?? "1").toString()).evaluate({ allowInteractive: false });
 
 			if (roll.total <= 0) {
 				continue;
