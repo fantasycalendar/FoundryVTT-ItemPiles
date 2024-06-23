@@ -191,13 +191,13 @@ export class PileItem extends PileBaseItem {
 		return game.itempiles.API.removeItems(this.store.actor, [this.id]);
 	}
 
-	updateQuantity(quantity, add = false) {
-		let total = typeof quantity === "string" ? (new Roll(quantity).evaluate({ async: false })).total : quantity;
+	async updateQuantity(quantity, add = false) {
+		let total = typeof quantity === "string" ? (await new Roll(quantity).evaluate({ allowInteractive: false })).total : quantity;
 		if (add) {
 			total += get(this.quantity);
 		}
 		this.quantity.set(total);
-		return this.item.update(Utilities.setItemQuantity({}, total));
+		return await this.item.update(Utilities.setItemQuantity({}, total));
 	}
 
 	async updateFlags() {

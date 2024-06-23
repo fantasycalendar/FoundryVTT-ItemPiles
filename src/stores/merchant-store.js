@@ -511,10 +511,10 @@ class PileMerchantItem extends PileItem {
 		}
 	}
 
-	updateQuantity(quantity) {
+	async updateQuantity(quantity) {
 		const pileFlagData = get(this.store.pileData);
 		const itemFlagData = get(this.itemFlagData);
-		const roll = new Roll(quantity).evaluate({ async: false });
+		const roll = await new Roll(quantity).evaluate({ allowInteractive: false });
 		this.quantity.set(roll.total);
 		const baseData = {};
 		if (itemFlagData.isService || pileFlagData.keepZeroQuantity || itemFlagData.keepZeroQuantity) {
@@ -525,7 +525,7 @@ class PileMerchantItem extends PileItem {
 				type: "event", user: game.user.id, item: this.item.name, qty: roll.total
 			});
 		}
-		return this.item.update(Utilities.setItemQuantity(baseData, roll.total));
+		return await this.item.update(Utilities.setItemQuantity(baseData, roll.total));
 	}
 
 }
