@@ -31,8 +31,8 @@ I welcome all systems, but with me having to manually add support myself has bec
 
 ### Adding system support through a pull request
 
-**Note:
-** You will need to follow the [Setting up your environment](#setting-up-your-environment) section above if you wish to go for this way.
+**Note:**
+You will need to follow the [Setting up your environment](#setting-up-your-environment) section above if you wish to go for this way.
 
 In Item Piles, every single system has its own file, named after the system ID in its `system.json` file. [You can find them all here](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/tree/master/src/systems).
 
