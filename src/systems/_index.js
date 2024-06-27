@@ -1,46 +1,45 @@
 // ↓ IMPORT SYSTEMS HERE ↓
-import dnd4e from "dnd4e.js";
-import dnd4e0443 from "dnd4e-0.4.43.js";
-import dnd5e from "dnd5e.js";
-import dnd5e203 from "dnd5e-2.0.3.js";
-import pf1 from "pf1.js";
-import pf2e from "pf2e.js";
-import ds4 from "ds4.js";
-import d35e from "d35e.js";
-import sfrpg from "sfrpg.js";
-import swade from "swade.js";
-import tormenta20 from "tormenta20.js";
-import wfrp4e from "wfrp4e.js";
-import splittermond from "splittermond.js";
-import forbiddenLands from "forbidden-lands.js";
-import icrpg from "icrpg.js";
-import shadowdark from "shadowdark.js";
-import swse from "swse.js";
-import sw5e from "sw5e.js";
-import sw5e203 from "sw5e-2.0.3.2.3.8.js";
-import fallout from "fallout.js";
-import cyberpunkRedCore from "cyberpunk-red-core.js";
-import knave from "knave.js";
-import t2k4e from "t2k4e.js";
-import yzecoriolis from "yzecoriolis.js";
-import kamigakari from "kamigakari.js";
-import symbaroum from "symbaroum.js";
-import wwn from "wwn.js";
-import cyphersystem from "cyphersystem.js";
-import ptu from "ptu.js";
-import dcc from "dcc.js";
-import a5e from "a5e.js";
-import darkHeresy2e from "dark-heresy.js";
-import naheulbeuk from "naheulbeuk.js";
-import icrpgme from "icrpgme.js";
-import bladeRunner from "blade-runner.js";
-import alienrpg from "alienrpg.js";
-import pirateborg from "pirateborg.js";
-import starwarsffg from "starwarsffg.js";
-import demonlord from "demonlord.js";
-import dnd5e241 from "dnd5e-2.4.1.js";
-import dragonbane from "dragonbane.js";
-import twodsix from "twodsix.js";
+import dnd4e from "./dnd4e.js";
+import dnd4e0443 from "./dnd4e-0.4.43.js";
+import dnd5e from "./dnd5e.js";
+import dnd5e203 from "./dnd5e-2.0.3.js";
+import pf1 from "./pf1.js";
+import pf2e from "./pf2e.js";
+import ds4 from "./ds4.js";
+import d35e from "./d35e.js";
+import sfrpg from "./sfrpg.js";
+import swade from "./swade.js";
+import tormenta20 from "./tormenta20.js";
+import wfrp4e from "./wfrp4e.js";
+import splittermond from "./splittermond.js";
+import forbiddenLands from "./forbidden-lands.js";
+import icrpg from "./icrpg.js";
+import shadowdark from "./shadowdark.js";
+import swse from "./swse.js";
+import sw5e from "./sw5e.js";
+import sw5e203 from "./sw5e-2.0.3.2.3.8.js";
+import fallout from "./fallout.js";
+import cyberpunkRedCore from "./cyberpunk-red-core.js";
+import knave from "./knave.js";
+import t2k4e from "./t2k4e.js";
+import yzecoriolis from "./yzecoriolis.js";
+import kamigakari from "./kamigakari.js";
+import symbaroum from "./symbaroum.js";
+import wwn from "./wwn.js";
+import cyphersystem from "./cyphersystem.js";
+import ptu from "./ptu.js";
+import dcc from "./dcc.js";
+import a5e from "./a5e.js";
+import darkHeresy2e from "./dark-heresy.js";
+import naheulbeuk from "./naheulbeuk.js";
+import icrpgme from "./icrpgme.js";
+import bladeRunner from "./blade-runner.js";
+import alienrpg from "./alienrpg.js";
+import pirateborg from "./pirateborg.js";
+import starwarsffg from "./starwarsffg.js";
+import demonlord from "./demonlord.js";
+import dnd5e241 from "./dnd5e-2.4.1.js";
+import dragonbane from "./dragonbane.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -163,9 +162,6 @@ export default {
 	},
 	"dragonbane": {
 		"latest": dragonbane
-	},
-	"twodsix": {
-		"latest": twodsix
-	},
+	}
 	// ↑ ADD SYSTEMS HERE ↑
 }
