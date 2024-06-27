@@ -1081,7 +1081,7 @@ class API {
 	}
 
 	/**
-	 * Whether an item pile is a merchant. If it is not enabled, it is always false.
+	 * Whether an item pile is an auctioneer. If it is not enabled, it is always false.
 	 *
 	 * @param {Token/TokenDocument} target
 	 * @param {Object/boolean} [data=false] data existing flags data to use
@@ -1095,6 +1095,23 @@ class API {
 			return false;
 		}
 		return PileUtilities.isItemPileAuctioneer(target, data);
+	}
+
+	/**
+	 * Whether an item pile is a banker. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isItemPileBanker(target, data = false) {
+		if (!game.modules.get("item_piles_bankers")?.active) {
+			let word = "install and activate";
+			if (game.modules.get('item_piles_bankers')) word = "activate";
+			Helpers.custom_warning(`This api method from Item Piles requires the 'item_piles_bankers' module. Please ${word} it.`, true);
+			return false;
+		}
+		return PileUtilities.isItemPileBanker(target, data);
 	}
 
 	/**

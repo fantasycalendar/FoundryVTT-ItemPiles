@@ -137,7 +137,13 @@ export function isItemPileMerchant(target, data = false) {
 export function isItemPileAuctioneer(target, data = false) {
 	const targetActor = Utilities.getActor(target);
 	const pileData = getActorFlagData(targetActor, data);
-	return pileData?.enabled && pileData?.type === "auctioneer";
+	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.AUCTIONEER;
+}
+
+export function isItemPileBanker(target, data = false) {
+	const targetActor = Utilities.getActor(target);
+	const pileData = getActorFlagData(targetActor, data);
+	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.BANKER;
 }
 
 export function isItemPileClosed(target, data = false) {

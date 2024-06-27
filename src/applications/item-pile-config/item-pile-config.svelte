@@ -168,7 +168,7 @@
 							<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.TypeExplanation")}</p>
 						</label>
 						<select style="flex:4;" bind:value={pileData.type}>
-							{#each Object.values(CONSTANTS.PILE_TYPES) as type}
+							{#each CONSTANTS.DEFAULT_PILE_TYPES as type}
 								<option value={type}>
 									{localize(`ITEM-PILES.Types.${type}`)}
 								</option>

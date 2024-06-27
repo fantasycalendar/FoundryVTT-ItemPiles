@@ -193,7 +193,11 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.ADD, targetUuid, itemDeltas, userId, interactionId);
 
 		await this._executeItemPileMacro(targetUuid, {
-			action: "addItems", target: targetUuid, items: itemDeltas, userId: userId, interactionId: interactionId
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.ADD_ITEMS,
+			target: targetUuid,
+			items: itemDeltas,
+			userId: userId,
+			interactionId: interactionId
 		});
 
 		if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
@@ -224,7 +228,11 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.REMOVE, targetUuid, itemDeltas, userId, interactionId);
 
 		await this._executeItemPileMacro(targetUuid, {
-			action: "removeItems", target: targetUuid, items: itemDeltas, userId: userId, interactionId: interactionId
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.REMOVE_ITEMS,
+			target: targetUuid,
+			items: itemDeltas,
+			userId: userId,
+			interactionId: interactionId
 		});
 
 		const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(targetUuid);
@@ -266,7 +274,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.TRANSFER, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
 
 		const macroData = {
-			action: "transferItems",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRANSFER_ITEMS,
 			source: sourceUuid,
 			target: targetUuid,
 			items: itemDeltas,
@@ -331,7 +339,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, userId, interactionId);
 
 		const macroData = {
-			action: "transferAllItems",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRANSFER_ALL_ITEMS,
 			source: sourceUuid,
 			target: targetUuid,
 			items: itemDeltas,
@@ -389,7 +397,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.UPDATE, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
 		await this._executeItemPileMacro(targetUuid, {
-			action: "updateCurrencies",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.UPDATE_CURRENCIES,
 			target: targetUuid,
 			items: itemDeltas,
 			attributes: attributeDeltas,
@@ -437,7 +445,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.ADD, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
 		await this._executeItemPileMacro(targetUuid, {
-			action: "addCurrencies",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.ADD_CURRENCIES,
 			target: targetUuid,
 			items: itemDeltas,
 			attributes: attributeDeltas,
@@ -498,7 +506,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.REMOVE, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
 		await this._executeItemPileMacro(targetUuid, {
-			action: "removeCurrencies",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.REMOVE_CURRENCIES,
 			target: targetUuid,
 			items: itemDeltas,
 			attributes: attributeDeltas,
@@ -574,7 +582,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.TRANSFER, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
 		const macroData = {
-			action: "transferCurrencies",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRANSFER_CURRENCIES,
 			source: sourceUuid,
 			target: targetUuid,
 			items: itemDeltas,
@@ -650,7 +658,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.CURRENCY.TRANSFER_ALL, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
 		const macroData = {
-			action: "transferAllCurrencies",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRANSFER_ALL_CURRENCIES,
 			source: sourceUuid,
 			target: targetUuid,
 			items: itemDeltas,
@@ -696,7 +704,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.SET, targetUuid, attributeDeltas, userId, interactionId);
 
 		await this._executeItemPileMacro(targetUuid, {
-			action: "setAttributes",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.SET_ATTRIBUTES,
 			target: targetUuid,
 			attributes: attributeDeltas,
 			userId: userId,
@@ -725,7 +733,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.ADD, targetUuid, attributeDeltas, userId, interactionId);
 
 		await this._executeItemPileMacro(targetUuid, {
-			action: "addAttributes",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.ADD_ATTRIBUTES,
 			target: targetUuid,
 			attributes: attributeDeltas,
 			userId: userId,
@@ -760,7 +768,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.REMOVE, targetUuid, attributeDeltas, userId, interactionId);
 
 		await this._executeItemPileMacro(targetUuid, {
-			action: "removeAttributes",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.REMOVE_ATTRIBUTES,
 			target: targetUuid,
 			attributes: attributeDeltas,
 			userId: userId,
@@ -806,7 +814,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
 
 		const macroData = {
-			action: "transferAttributes",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRANSFER_ATTRIBUTES,
 			source: sourceUuid,
 			target: targetUuid,
 			attributes: attributeDeltas,
@@ -873,7 +881,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER_ALL, sourceUuid, targetUuid, attributeDeltas, userId, interactionId);
 
 		const macroData = {
-			action: "transferAllAttributes",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRANSFER_ALL_ATTRIBUTES,
 			source: sourceUuid,
 			target: targetUuid,
 			attributes: attributeDeltas,
@@ -886,7 +894,6 @@ export default class PrivateAPI {
 		const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
 
 		const itemPileUuid = sourceIsItemPile ? sourceUuid : targetUuid;
-		const itemPile = sourceIsItemPile ? Utilities.getToken(sourceUuid) : Utilities.getToken(targetUuid);
 
 		const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
 		if (shouldBeDeleted) {
@@ -936,7 +943,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.TRANSFER_EVERYTHING, sourceUuid, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
 		const macroData = {
-			action: "transferEverything",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRANSFER_EVERYTHING,
 			source: sourceUuid,
 			target: targetUuid,
 			items: itemDeltas,
@@ -1399,22 +1406,22 @@ export default class PrivateAPI {
 		if (PileUtilities.isItemPileContainer(targetActor, data)) {
 			if (diff?.closed === true) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: "closeItemPile", source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
 				});
 			}
 			if (diff?.locked === true) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: "lockItemPile", source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.LOCK_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
 				});
 			}
 			if (diff?.locked === false) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: "unlockItemPile", source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.UNLOCK_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
 				});
 			}
 			if (diff?.closed === false) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: "openItemPile", source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
 				});
 			}
 		}
@@ -1535,11 +1542,11 @@ export default class PrivateAPI {
 
 		const target = Utilities.getToken(targetUuid);
 
-		if (!PileUtilities.isValidItemPile(target)) return false;
+		if (!PileUtilities.isValidItemPile(target)) return;
 
 		const pileData = PileUtilities.getActorFlagData(target);
 
-		if (!pileData.macro) return false;
+		if (!pileData.macro) return;
 
 		// Reformat macro data to contain useful information
 		if (macroData.source) {
@@ -2094,7 +2101,7 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.SPLIT_INVENTORY, itemPileUuid, pileDeltas, actorDeltas, userId, instigator);
 
 		await this._executeItemPileMacro(itemPileUuid, {
-			action: "splitInventory", source: itemPileUuid, target: actorUuids, transfers: {
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.SPLIT_INVENTORY, source: itemPileUuid, target: actorUuids, transfers: {
 				pileDeltas, actorDeltas
 			}, userId: userId, instigator: instigator
 		});
@@ -2130,6 +2137,11 @@ export default class PrivateAPI {
 
 		const hookResult = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_INTERFACE, target, inspectingTarget)
 		if (hookResult === false) return;
+
+		const result = await this._executeItemPileMacro(targetUuid, {
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.RENDER_INTERFACE, target: targetUuid, userId: game.user.id
+		});
+		if (result === false) return;
 
 		if (PileUtilities.isItemPileVault(target)) {
 			return BankVaultApp.show(target, inspectingTarget)
@@ -2284,7 +2296,7 @@ export default class PrivateAPI {
 		const itemPileActorUuid = sellerIsMerchant ? sellerUuid : buyerUuid;
 
 		await this._executeItemPileMacro(itemPileActorUuid, {
-			action: "tradeItems",
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRADE_ITEMS,
 			source: sellerUuid,
 			target: buyerUuid,
 			sourceIsMerchant: sellerIsMerchant,

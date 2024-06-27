@@ -41,6 +41,7 @@ Hooks.once("init", async () => {
 		pile_types: CONSTANTS.PILE_TYPES,
 		pile_flag_defaults: CONSTANTS.PILE_DEFAULTS,
 		item_flag_defaults: CONSTANTS.ITEM_DEFAULTS,
+		macro_execution_types: CONSTANTS.MACRO_EXECUTION_TYPES,
 		Transaction,
 		apps: {
 			ItemPileConfig,
