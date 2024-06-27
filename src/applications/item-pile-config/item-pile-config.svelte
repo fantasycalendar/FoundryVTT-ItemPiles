@@ -1,12 +1,12 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import CONSTANTS from "../../constants/constants.js";
 	import * as Helpers from "../../helpers/helpers.js";
 
 	import Tabs from "../components/Tabs.svelte";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import { writable } from "svelte/store";
 
 	import MerchantApp from "../merchant-app/merchant-app.js";
@@ -168,7 +168,7 @@
 							<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Other.TypeExplanation")}</p>
 						</label>
 						<select style="flex:4;" bind:value={pileData.type}>
-							{#each Object.values(CONSTANTS.PILE_TYPES) as type}
+							{#each CONSTANTS.DEFAULT_PILE_TYPES as type}
 								<option value={type}>
 									{localize(`ITEM-PILES.Types.${type}`)}
 								</option>

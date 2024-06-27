@@ -70,7 +70,7 @@ export function canItemPileBeSplit(target) {
  */
 export function getItemPileSharingData(target) {
 	const targetActor = Utilities.getActor(target);
-	return foundry.utils.duplicate(getProperty(targetActor, CONSTANTS.FLAGS.SHARING) ?? {});
+	return foundry.utils.duplicate(foundry.utils.getProperty(targetActor, CONSTANTS.FLAGS.SHARING) ?? {});
 }
 
 /**
@@ -139,8 +139,8 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
 
 	if (sourceIsItemPile) {
 
-		if (PileUtilities.isItemPileEmpty(sourceIsItemPile)) {
-			return clearItemPileSharingData(sourceIsItemPile);
+		if (PileUtilities.isItemPileEmpty(sourceActor)) {
+			return clearItemPileSharingData(sourceActor);
 		}
 
 		const sharingData = addToItemPileSharingData(sourceActor, targetActor.uuid, { items, attributes });
@@ -317,7 +317,7 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 
 	let previouslyTaken = 0;
 	let recipientUuid = Utilities.getUuid(recipient);
-	currentQuantity = currentQuantity ?? Number(getProperty(pile, path) ?? 0);
+	currentQuantity = currentQuantity ?? Number(foundry.utils.getProperty(pile, path) ?? 0);
 	let totalShares = currentQuantity;
 
 	shareData = shareData ?? getItemPileSharingData(pile);

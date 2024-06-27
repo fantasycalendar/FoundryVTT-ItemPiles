@@ -1,9 +1,9 @@
 <script>
 
 	import { fade } from 'svelte/transition';
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import DropZone from "../components/DropZone.svelte";
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import * as Helpers from "../../helpers/helpers.js";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
 	import ItemPileSocket from "../../socket.js";
@@ -57,7 +57,7 @@
 			validItem._id = item._id;
 		}
 
-		const itemToSend = await Item.implementation.create(validItem, { temporary: true });
+		const itemToSend = new Item.implementation(validItem);
 
 		return store.addItem(itemToSend, { uuid: data.uuid, quantity: 1, currency: isCurrency });
 

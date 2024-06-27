@@ -1,5 +1,5 @@
 import GiveItemsShell from "./give-items-shell.svelte";
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { TJSDialog } from '#runtime/svelte/application';
 import { getActiveApps } from "../../../helpers/helpers";
 
 export default class GiveItems extends TJSDialog {
@@ -12,7 +12,7 @@ export default class GiveItems extends TJSDialog {
 	constructor(item, options = {}) {
 		super({
 			title: game.i18n.localize(`ITEM-PILES.Dialogs.GiveItems.Title`),
-			id: `item-pile-give-items-${item.id}-${randomID()}`,
+			id: `item-pile-give-items-${item.id}-${foundry.utils.randomID()}`,
 			content: {
 				class: GiveItemsShell,
 				props: {

@@ -3,7 +3,7 @@ import SETTINGS from "./constants/settings.js";
 import * as Helpers from "./helpers/helpers.js";
 import { SYSTEMS } from "./systems.js";
 import { SettingsShim, SettingsApp } from "./applications/settings-app/settings-app.js";
-import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+import { TJSDialog } from "#runtime/svelte/application";
 import CustomDialog from "./applications/components/CustomDialog.svelte";
 
 export function registerSettings() {
@@ -104,7 +104,7 @@ export async function checkSystem() {
 		if (SYSTEMS.DATA.SOFT_MIGRATIONS[currentVersion + "-" + newVersion]) {
 			Helpers.debug(`Applying soft migration for ${game.system.title}`);
 			await applySoftMigration(currentVersion + "-" + newVersion);
-		} else if (isNewerVersion(newVersion, currentVersion)) {
+		} else if (foundry.utils.isNewerVersion(newVersion, currentVersion)) {
 			Helpers.debug(`Applying system settings for ${game.system.title}`)
 			await applyDefaultSettings();
 		}
@@ -118,14 +118,4 @@ export async function checkSystem() {
 	}
 
 	return applyDefaultSettings();
-}
-
-export function applyShims() {
-
-	if (game.release.generation !== 11) return;
-
-	CONSTANTS.ACTOR_DELTA_PROPERTY = "delta";
-
-	Object.freeze(CONSTANTS);
-
 }

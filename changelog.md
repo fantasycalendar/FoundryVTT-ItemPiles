@@ -1,12 +1,18 @@
 # Item Piles Changelog
 
-## Version 2.9.2
+## Version 3.0.0
 
+- Updated module to be compatible with Foundry v12 (thank you to NeilWhite on github!)
+- Updated the TyphonJS Runtime Library version - thank you, Michael, for your continued support!
 - Added support for the following systems (thank you xdy on github!):
   - [Twodsix - Cepheus & Traveller (Unofficial)](https://foundryvtt.com/packages/twodsix)
   - [Dragonbane - Drakar och Demoner](https://foundryvtt.com/packages/dragonbane)
-- Fixed merchant columns not being editable in newer versions of D&D 5e (thank you OlavStornes on github!)
+- Added the `game.itempiles.macro_execution_types` constants - see docs for more info
+  - For the above, added `game.itempiles.macro_execution_types.RENDER_INTERFACE`, which means that macros that are attached to item piles will execute its macro when the item piles interface is rendered
+- Fixed merchant columns not being editable in newer versions of D&D 5e
 - Fixed rolltables not applying custom categories to items properly
+- Fixed issue with merchant treating all items as unique and never stacking them
+- Fixed issue with the search bar disappearing when searching for items in item piles
 
 ## Version 2.9.1
 

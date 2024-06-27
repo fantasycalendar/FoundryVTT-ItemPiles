@@ -2,8 +2,8 @@
 
 	import { get, writable } from "svelte/store";
 	import { getContext } from "svelte";
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { localize } from '#runtime/svelte/helper';
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 
 	const { application } = getContext('#external');
 

@@ -1,7 +1,7 @@
 <script>
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import { get, writable } from "svelte/store";
 	import SETTINGS from "../../../constants/settings.js";
 	import { getSetting } from "../../../helpers/helpers.js";
@@ -16,7 +16,7 @@
 	const itemFilters = (getSetting(SETTINGS.ITEM_FILTERS).find(filter => filter.path === "type")?.filters ?? "").split(',');
 
 	const unstackableItemTypesStore = writable(data);
-	let systemTypes = game.system.template.Item.types.filter(type => !itemFilters.includes(type));
+	let systemTypes = Object.keys(game.system.documentTypes.Item).filter(type => !itemFilters.includes(type));
 	let unusedTypes = [];
 
 	$: {

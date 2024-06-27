@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+import { localize } from "#runtime/svelte/helper";
 import { PileItem } from "./pile-item.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
@@ -123,8 +123,8 @@ export default class MerchantStore extends ItemPileStore {
 			.map(column => ({
 				label: localize(column.label), component: CustomColumn, data: column, sortMethod: (a, b, inverse) => {
 					const path = column.path;
-					const AProp = getProperty(b.item, path);
-					const BProp = getProperty(a.item, path);
+					const AProp = foundry.utils.getProperty(b.item, path);
+					const BProp = foundry.utils.getProperty(a.item, path);
 					if (!column?.mapping?.[AProp] || !column?.mapping?.[BProp]) {
 						return (AProp > BProp ? 1 : -1) * (inverse ? -1 : 1);
 					}
@@ -478,7 +478,7 @@ class PileMerchantItem extends PileItem {
 
 		this.prices.set(priceData);
 
-		this.quantityForPrice.set(game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE ? getProperty(this.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1 : 1);
+		this.quantityForPrice.set(game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE ? foundry.utils.getProperty(this.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1 : 1);
 
 	}
 
@@ -511,10 +511,10 @@ class PileMerchantItem extends PileItem {
 		}
 	}
 
-	updateQuantity(quantity) {
+	async updateQuantity(quantity) {
 		const pileFlagData = get(this.store.pileData);
 		const itemFlagData = get(this.itemFlagData);
-		const roll = new Roll(quantity).evaluate({ async: false });
+		const roll = await new Roll(quantity).evaluate({ allowInteractive: false });
 		this.quantity.set(roll.total);
 		const baseData = {};
 		if (itemFlagData.isService || pileFlagData.keepZeroQuantity || itemFlagData.keepZeroQuantity) {
@@ -525,7 +525,7 @@ class PileMerchantItem extends PileItem {
 				type: "event", user: game.user.id, item: this.item.name, qty: roll.total
 			});
 		}
-		return this.item.update(Utilities.setItemQuantity(baseData, roll.total));
+		return await this.item.update(Utilities.setItemQuantity(baseData, roll.total));
 	}
 
 }

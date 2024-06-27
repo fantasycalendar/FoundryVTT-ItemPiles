@@ -1,5 +1,5 @@
 import * as Utilities from "../../helpers/utilities.js";
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import ItemPileConfigShell from './item-pile-config.svelte';
 import { getActiveApps } from "../../helpers/helpers.js";
 
@@ -8,7 +8,7 @@ export default class ItemPileConfig extends SvelteApplication {
 	constructor(pileActor, options = {}) {
 
 		super({
-			id: `item-pile-config-${pileActor.id}-${randomID()}`,
+			id: `item-pile-config-${pileActor.id}-${foundry.utils.randomID()}`,
 			title: game.i18n.format("ITEM-PILES.Applications.ItemPileConfig.Title", { actor_name: pileActor.name }),
 			svelte: {
 				class: ItemPileConfigShell,

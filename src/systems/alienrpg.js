@@ -19,7 +19,7 @@ export default {
 		"filters": "talent,planet-system,skill-stunts,agenda,specialty,critical-injury"
 	}],
 	"ITEM_COST_TRANSFORMER": (item) => {
-		let overallCost = getProperty(item, "system.attributes.cost.value");
+		let overallCost = foundry.utils.getProperty(item, "system.attributes.cost.value");
 		if (overallCost) {
 			overallCost = overallCost.replace("$", "").replace(",", "");
 		}

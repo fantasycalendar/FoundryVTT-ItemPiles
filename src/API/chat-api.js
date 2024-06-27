@@ -213,7 +213,7 @@ export default class ChatAPI {
 		const formattedCurrencies = [];
 		const currencyList = PileUtilities.getActorCurrencies(itemPile, { getAll: true });
 		for (const itemData of items) {
-			const tempItem = await Item.implementation.create(itemData.item, { temporary: true });
+			const tempItem = new Item.implementation(itemData.item);
 			const data = {
 				name: game.i18n.localize(tempItem.name),
 				img: tempItem.img ?? itemData?.item?.img ?? "",
@@ -288,7 +288,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -367,7 +367,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name })
@@ -389,7 +389,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -432,7 +432,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: isPrivate ? CONST.CHAT_MESSAGE_TYPES.WHISPER : CONST.CHAT_MESSAGE_TYPES.OTHER,
+			type: isPrivate ? CONST.CHAT_MESSAGE_STYLES.WHISPER : CONST.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -448,7 +448,7 @@ export default class ChatAPI {
 
 		const now = (+new Date());
 
-		priceInformation.id = randomID();
+		priceInformation.id = foundry.utils.randomID();
 
 		// Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
 		const messages = Array.from(game.messages).filter(message => (now - message.timestamp) <= (10800000)).slice(-10);
@@ -478,7 +478,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -522,7 +522,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -629,7 +629,7 @@ export default class ChatAPI {
 				if (mode === 2) {
 					chatData.whisper.push(userId);
 				}
-				chatData.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
+				chatData.type = CONST.CHAT_MESSAGE_STYLES.WHISPER;
 			}
 
 		}

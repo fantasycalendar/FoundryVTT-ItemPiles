@@ -1,6 +1,6 @@
 <script>
 
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 
 	export let item;
 	export let data;
@@ -9,7 +9,7 @@
 
 	let text;
 
-	$: value = data.path ? getProperty($doc, data.path) ?? "" : "";
+	$: value = data.path ? foundry.utils.getProperty($doc, data.path) ?? "" : "";
 	$: {
 		let localized = localize(`${data.mapping?.[value] ?? value}`);
 		text = data.formatting ? data.formatting.replace("{#}", localized) : localized;

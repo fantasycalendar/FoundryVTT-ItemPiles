@@ -1,4 +1,4 @@
-import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+import { TJSDialog } from "#runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import { TradePromptDialog, TradeRequestDialog } from "../applications/trade-dialogs/trade-dialogs.js";
 
@@ -87,8 +87,8 @@ export default class TradeAPI {
 			}
 		}
 
-		const privateTradeId = randomID();
-		const publicTradeId = randomID();
+		const privateTradeId = foundry.utils.randomID();
+		const publicTradeId = foundry.utils.randomID();
 
 		// Spawn a cancel dialog
 		const cancelDialog = new Dialog({
@@ -172,8 +172,8 @@ export default class TradeAPI {
 		}
 
 		// Complete the private and public trade IDs
-		const fullPrivateTradeId = privateTradeId + randomID();
-		const fullPublicTradeId = publicTradeId + randomID();
+		const fullPrivateTradeId = privateTradeId + foundry.utils.randomID();
+		const fullPublicTradeId = publicTradeId + foundry.utils.randomID();
 
 		const tradingUser = game.users.get(tradingUserId);
 		const tradingActor = Utilities.getActor(tradingActorUuid);

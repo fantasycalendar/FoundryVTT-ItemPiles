@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import ItemPileConfig from "../item-pile-config/item-pile-config";
 import MerchantAppShell from "./merchant-app-shell.svelte";
 import * as Helpers from "../../helpers/helpers.js";
@@ -12,7 +12,7 @@ export default class MerchantApp extends SvelteApplication {
 	constructor(merchant, recipient = false, options = {}, dialogData = {}) {
 		super({
 			title: `Merchant: ${merchant.name}`,
-			id: `item-pile-merchant-${merchant.id}-${randomID()}`,
+			id: `item-pile-merchant-${merchant.id}-${foundry.utils.randomID()}`,
 			svelte: {
 				class: MerchantAppShell,
 				target: document.body,

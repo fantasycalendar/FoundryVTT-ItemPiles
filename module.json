@@ -4,11 +4,10 @@
   "description": "This module adds the ability for items to be dropped onto the ground, and then picked up.",
   "version": "100.0.0",
   "library": "false",
-  "minimumCoreVersion": "11",
   "compatibility": {
     "minimum": "11",
-    "verified": "11",
-    "maximum": "11"
+    "verified": "12",
+    "maximum": "12"
   },
   "authors": [
     {

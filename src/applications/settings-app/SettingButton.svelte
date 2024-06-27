@@ -1,5 +1,5 @@
 <script>
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import { getContext } from 'svelte';
 	import editors from "../editors/index.js";
 	import { openEditor } from "../../helpers/helpers.js";

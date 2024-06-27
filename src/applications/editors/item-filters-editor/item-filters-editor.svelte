@@ -1,10 +1,10 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 
 	import { getSetting } from "../../../helpers/helpers.js";
 	import SETTINGS from "../../../constants/settings.js";
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import { get, writable } from "svelte/store";
 
 	const { application } = getContext('#external');

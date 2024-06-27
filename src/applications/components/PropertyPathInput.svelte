@@ -4,7 +4,7 @@
 	export let templateType;
 	export let required = false;
 
-	const id = "property-list-" + randomID();
+	const id = "property-list-" + foundry.utils.randomID();
 
 	const templates = Object.values(CONFIG?.[templateType]?.dataModels ?? []).length
 		? {
@@ -13,7 +13,8 @@
 			})),
 			types: Object.keys(CONFIG?.[templateType]?.dataModels),
 		}
-		: foundry.utils.deepClone(game.system.template[templateType]);
+		: foundry.utils.deepClone(game.system.documentTypes[templateType]);
+
 	const templateObject = {
 		name: "",
 		type: "",
@@ -36,10 +37,10 @@
 	let suggestions = [];
 	$: {
 		let trimmedValue = value.trim();
-		let options = getProperty(templateObject, trimmedValue);
+		let options = foundry.utils.getProperty(templateObject, trimmedValue);
 		if (!options) {
 			trimmedValue = trimmedValue.split(".").slice(0, -1).join(".")
-			options = getProperty(templateObject, trimmedValue);
+			options = foundry.utils.getProperty(templateObject, trimmedValue);
 		}
 		suggestions = options ? Object.keys(options).map(t => trimmedValue + "." + t).sort() : Object.keys(templateObject);
 	}

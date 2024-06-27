@@ -12,7 +12,7 @@ export const debounceManager = {
 		if (this.debounces[id]) {
 			return this.debounces[id];
 		}
-		this.debounces[id] = debounce(function (...args) {
+		this.debounces[id] = foundry.utils.debounce(function (...args) {
 			delete debounceManager.debounces[id];
 			return method(...args);
 		}, 250);
@@ -357,7 +357,5 @@ export function isCoordinateWithinPosition(x, y, position) {
 
 
 export function getCanvasMouse() {
-	return game.release.generation === 11
-		? canvas.app.renderer.plugins.interaction.pointer
-		: canvas.app.renderer.plugins.interaction.mouse;
+	return canvas.app.renderer.plugins.interaction.pointer;
 }

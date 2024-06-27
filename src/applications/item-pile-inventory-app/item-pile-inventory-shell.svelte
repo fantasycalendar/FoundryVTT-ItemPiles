@@ -1,8 +1,8 @@
 <script>
 	import { getContext, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+	import { localize } from '#runtime/svelte/helper';
+	import { ApplicationShell } from '#runtime/svelte/component/core';
 
 	import ItemList from "./ItemList.svelte";
 	import CurrencyList from "./CurrencyList.svelte";
@@ -40,7 +40,7 @@
 
 	$: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
 	$: hasItems = $numItems > 0;
-	$: showSearchBar = $numItems >= 8;
+	$: showSearchBar = $items.length >= 8;
 	$: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
 	$: {
 		$shareData;

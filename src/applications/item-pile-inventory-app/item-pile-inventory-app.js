@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import ItemPileInventoryShell from "./item-pile-inventory-shell.svelte";
 import * as Utilities from "../../helpers/utilities.js";
 import ItemPileConfig from "../item-pile-config/item-pile-config.js";
@@ -19,7 +19,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 	 */
 	constructor(actor, recipient, options = {}, dialogData = {}) {
 		super({
-			id: `item-pile-inventory-${actor?.token?.id ?? actor.id}-${randomID()}`,
+			id: `item-pile-inventory-${actor?.token?.id ?? actor.id}-${foundry.utils.randomID()}`,
 			title: actor.name,
 			svelte: {
 				class: ItemPileInventoryShell,

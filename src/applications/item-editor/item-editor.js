@@ -1,5 +1,5 @@
 import ItemEditorShell from './item-editor-shell.svelte';
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import { getActiveApps } from '../../helpers/helpers';
 
 export default class ItemEditor extends SvelteApplication {
@@ -8,7 +8,7 @@ export default class ItemEditor extends SvelteApplication {
 		let title = game.i18n.format("ITEM-PILES.Applications.ItemEditor.Title", { item_name: item.name })
 		if (options.extraTitle) title += options.extraTitle;
 		super({
-			id: `item-pile-item-editor-${item.id}-${randomID()}`,
+			id: `item-pile-item-editor-${item.id}-${foundry.utils.randomID()}`,
 			title,
 			svelte: {
 				class: ItemEditorShell,

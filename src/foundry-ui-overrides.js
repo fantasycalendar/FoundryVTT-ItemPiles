@@ -36,7 +36,7 @@ function handleTokenBorders(token) {
 function hideTemporaryItems(sidebar) {
 	if (sidebar.tabName !== "items") return;
 	Array.from(game.items).filter(item => {
-			return getProperty(item.toObject(), CONSTANTS.FLAGS.TEMPORARY_ITEM);
+			return foundry.utils.getProperty(item.toObject(), CONSTANTS.FLAGS.TEMPORARY_ITEM);
 		})
 		.forEach(item => {
 			const element = sidebar.element.find(`.directory-item[data-document-id="${item.id}"]`);
@@ -130,7 +130,7 @@ function insertItemHeaderButtons(itemSheet, buttons) {
 		class: "item-piles-config-button",
 		onclick: async (event) => {
 			if (game.modules.get("item-linking")?.active && !event.ctrlKey) {
-				const linkedItemUuid = getProperty(obj, "flags.item-linking.baseItem") ?? false;
+				const linkedItemUuid = foundry.utils.getProperty(obj, "flags.item-linking.baseItem") ?? false;
 				if (linkedItemUuid) {
 					obj = await fromUuid(linkedItemUuid);
 					return ItemEditor.show(obj, {
