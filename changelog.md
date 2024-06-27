@@ -9,6 +9,7 @@
 - Fixed merchant columns not being editable in newer versions of D&D 5e
 - Fixed rolltables not applying custom categories to items properly
 - Fixed issue with merchant treating all items as unique and never stacking them
+- Fixed issue with the search bar disappearing when searching for items in item piles
 
 ## Version 2.9.1
 

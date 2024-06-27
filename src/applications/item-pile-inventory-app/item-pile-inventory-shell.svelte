@@ -40,7 +40,7 @@
 
 	$: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
 	$: hasItems = $numItems > 0;
-	$: showSearchBar = $numItems >= 8;
+	$: showSearchBar = $items.length >= 8;
 	$: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
 	$: {
 		$shareData;
