@@ -667,7 +667,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
 	});
 
 	if (canvas.scene && !foundry.utils.isEmpty(updates)) {
-		await canvas.scene.updateEmbeddedDocuments("Token", updates);
+		await canvas.scene.updateEmbeddedDocuments("Token", updates, { animate: false });
 	}
 
 	if (documentActor) {

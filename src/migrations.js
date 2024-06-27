@@ -90,7 +90,7 @@ async function updateTokens(version, callback) {
 		}));
 		if (updates.length) {
 			Helpers.debug(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
-			await scene.updateEmbeddedDocuments("Token", updates);
+			await scene.updateEmbeddedDocuments("Token", updates, { animate: false });
 		}
 	}
 
@@ -179,7 +179,7 @@ async function updateItems(version, callback) {
 			Helpers.debug(`Item Piles | Migrating ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);
 		}
 
-		await scene.updateEmbeddedDocuments("Token", updates.map(data => data.update));
+		await scene.updateEmbeddedDocuments("Token", updates.map(data => data.update), { animate: false });
 
 		for (const { token, itemUpdates } of updates) {
 			await token.actor.updateEmbeddedDocuments("Item", itemUpdates);
@@ -239,7 +239,7 @@ const migrations = {
 				updates.push(update);
 			}
 
-			await scene.updateEmbeddedDocuments("Token", updates);
+			await scene.updateEmbeddedDocuments("Token", updates, { animate: false });
 			await scene.deleteEmbeddedDocuments("Token", deletions);
 
 			Helpers.debug(`Item Piles | Fixing ${updates.length} tokens on scene "${sceneId}" to version ${version}...`);

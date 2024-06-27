@@ -1320,7 +1320,7 @@ export default class PrivateAPI {
 
 		for (const [sceneId, updateData] of Object.entries(tokenUpdateGroups)) {
 			const scene = game.scenes.get(sceneId);
-			await scene.updateEmbeddedDocuments("Token", updateData);
+			await scene.updateEmbeddedDocuments("Token", updateData, { animate: false });
 		}
 
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.TURN_INTO, tokenUpdateGroups, actorUpdateGroups);
@@ -1369,7 +1369,7 @@ export default class PrivateAPI {
 
 		for (const [sceneId, updateData] of Object.entries(tokenUpdateGroups)) {
 			const scene = game.scenes.get(sceneId);
-			await scene.updateEmbeddedDocuments("Token", updateData);
+			await scene.updateEmbeddedDocuments("Token", updateData, { animate: false });
 		}
 
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.REVERT_FROM, tokenUpdateGroups, actorUpdateGroups);

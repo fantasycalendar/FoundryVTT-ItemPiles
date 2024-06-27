@@ -173,7 +173,7 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 			}, {}));
 			if (updates.length) {
 				debug(`Hid ${updates.length} merchant tokens on ${scene.name}`);
-				await scene.updateEmbeddedDocuments("Token", updates);
+				await scene.updateEmbeddedDocuments("Token", updates, { animate: false });
 			}
 		}
 	}
