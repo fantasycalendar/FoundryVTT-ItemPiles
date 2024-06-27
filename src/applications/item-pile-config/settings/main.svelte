@@ -3,7 +3,7 @@
 	import { CurrenciesEditor, SecondaryCurrenciesEditor } from "../../editors/currencies-editor/currencies-editor.js";
 	import ItemFiltersEditor from "../../editors/item-filters-editor/item-filters-editor.js";
 	import MacroSelector from "../../components/MacroSelector.svelte";
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import * as Helpers from "../../../helpers/helpers.js";
 	import SETTINGS from "../../../constants/settings.js";
 	import TextEditorDialog from "../../dialogs/text-editor-dialog/text-editor-dialog.js";

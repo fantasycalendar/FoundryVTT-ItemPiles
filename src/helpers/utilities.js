@@ -162,10 +162,10 @@ export function getItemTypesThatCanStack() {
 						return [key, schema.fields ?? true]
 					})
 				itemTemplate.system = Object.fromEntries(itemTemplate.system);
-			} else if (game.system?.documentTypes?.Item?.[type]) {
-				itemTemplate.system = foundry.utils.deepClone(game.system.documentTypes.Item[type]);
-				if (itemTemplate.system?.documentTypes?.length) {
-					const templates = foundry.utils.duplicate(itemTemplate.system.documentTypes);
+			} else if (game.system?.templates?.Item?.[type]) {
+				itemTemplate.system = foundry.utils.deepClone(game.system.templates.Item[type]);
+				if (itemTemplate.system?.templates?.length) {
+					const templates = foundry.utils.duplicate(itemTemplate.system.templates);
 					for (let template of templates) {
 						itemTemplate.system = foundry.utils.mergeObject(itemTemplate.system, foundry.utils.duplicate(game.system.documentTypes.Item.templates[template]));
 					}
@@ -376,8 +376,8 @@ export async function runMacro(macroId, macroData) {
 export function getOwnedCharacters(user = false) {
 	user = user || game.user;
 	return game.actors.filter(actor => {
-		return actor.ownership?.[user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER && actor.prototypeToken.actorLink;
-	})
+			return actor.ownership?.[user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER && actor.prototypeToken.actorLink;
+		})
 		.sort((a, b) => {
 			return b._stats.modifiedTime - a._stats.modifiedTime;
 		});

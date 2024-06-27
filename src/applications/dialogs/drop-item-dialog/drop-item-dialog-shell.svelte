@@ -1,9 +1,9 @@
 <script>
 	import { getContext } from "svelte";
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import * as Utilities from "../../../helpers/utilities.js";
 	import * as PileUtilities from "../../../helpers/pile-utilities.js";
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import SliderInput from "../../components/SliderInput.svelte";
 
 	const { application } = getContext('#external');

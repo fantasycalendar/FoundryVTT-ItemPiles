@@ -1,4 +1,4 @@
-import { SvelteApplication } from "@typhonjs-fvtt/runtime/svelte/application";
+import { SvelteApplication } from "#runtime/svelte/application";
 import { getActiveApps } from "../../../helpers/helpers";
 import TextEditorDialogShell from "./text-editor-dialog-shell.svelte";
 

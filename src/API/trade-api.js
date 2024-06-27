@@ -1,4 +1,4 @@
-import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+import { TJSDialog } from "#runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import { TradePromptDialog, TradeRequestDialog } from "../applications/trade-dialogs/trade-dialogs.js";
 

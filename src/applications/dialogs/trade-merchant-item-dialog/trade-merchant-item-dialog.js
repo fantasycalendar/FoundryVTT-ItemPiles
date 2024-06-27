@@ -1,5 +1,5 @@
 import TradeMerchantItemDialogShell from "./trade-merchant-item-dialog-shell.svelte";
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import { get } from "svelte/store";
 import { getActiveApps } from "../../../helpers/helpers";
 

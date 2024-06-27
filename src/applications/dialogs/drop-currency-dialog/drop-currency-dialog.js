@@ -1,5 +1,5 @@
 import DropCurrencyDialogShell from "./drop-currency-dialog-shell.svelte";
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import { getActiveApps } from "../../../helpers/helpers";
 
 export default class DropCurrencyDialog extends SvelteApplication {

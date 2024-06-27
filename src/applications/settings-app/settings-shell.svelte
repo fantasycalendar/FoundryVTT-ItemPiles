@@ -2,8 +2,8 @@
 	import SETTINGS from "../../constants/settings.js";
 
 	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+	import { localize } from '#runtime/svelte/helper';
+	import { ApplicationShell } from '#runtime/svelte/component/core';
 
 	import * as helpers from "../../helpers/helpers.js"
 	import { applyDefaultSettings } from "../../settings.js";
@@ -11,7 +11,7 @@
 	import Setting from "./Setting.svelte";
 	import SettingButton from "./SettingButton.svelte";
 	import Tabs from "../components/Tabs.svelte";
-	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import { TJSDialog } from "#runtime/svelte/application";
 	import CustomDialog from "../components/CustomDialog.svelte";
 
 	const { application } = getContext('#external');

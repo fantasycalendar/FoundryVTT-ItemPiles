@@ -1,6 +1,6 @@
 <script>
 
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import { custom_notify } from "../../helpers/helpers.js";
 	import { writable } from "svelte/store";
 

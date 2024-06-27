@@ -1,5 +1,5 @@
 import * as Utilities from "../../helpers/utilities.js";
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import ItemPileConfigShell from './item-pile-config.svelte';
 import { getActiveApps } from "../../helpers/helpers.js";
 

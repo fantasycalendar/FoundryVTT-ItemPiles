@@ -1,14 +1,12 @@
 import { get, writable } from "svelte/store";
 import * as Utilities from "../helpers/utilities.js";
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
+import { TJSDocument } from "#runtime/svelte/store/fvtt/document";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
-import * as Helpers from "../helpers/helpers.js";
 import { Plugins } from "../plugins/main.js";
 import { SYSTEMS } from "../systems.js";
 import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
-import { updateItemData } from "../helpers/pile-utilities.js";
 
 class PileBaseItem {
 
@@ -93,17 +91,17 @@ export class PileItem extends PileBaseItem {
 		});
 
 		this.subscribeTo(this.itemDocument, () => {
-			const { data } = this.itemDocument.updateOptions;
+			const { renderData } = this.itemDocument.updateOptions;
 			const itemData = CompendiumUtilities.findSimilarItemInCompendiumSync(this.item);
 			this.name.set(itemData?.name ?? this.item.name);
 			this.img.set(itemData?.img ?? this.item.img);
 			this.similarities = Utilities.setSimilarityProperties({}, this.item);
-			if (PileUtilities.canItemStack(this.item, this.store.actor) && Utilities.hasItemQuantity(data)) {
-				this.quantity.set(Utilities.getItemQuantity(data));
+			if (PileUtilities.canItemStack(this.item, this.store.actor) && Utilities.hasItemQuantity(renderData)) {
+				this.quantity.set(Utilities.getItemQuantity(renderData));
 				const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
 				this.currentQuantity.set(quantity);
 			}
-			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
+			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.ITEM)) {
 				this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
 				this.updateCategory();
 				this.store.refreshItems();
@@ -255,12 +253,12 @@ export class PileAttribute extends PileBaseItem {
 		});
 
 		this.subscribeTo(this.store.document, () => {
-			const { data } = this.store.document.updateOptions;
+			const { renderData } = this.store.document.updateOptions;
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
-			if (foundry.utils.hasProperty(data, this.path)) {
-				const newQuantity = Number(foundry.utils.getProperty(data, this.path) ?? 0);
+			if (foundry.utils.hasProperty(renderData, this.path)) {
+				const newQuantity = Number(foundry.utils.getProperty(renderData, this.path) ?? 0);
 				this.quantity.set(newQuantity);
 				this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), newQuantity));
 				if (!this.toShare) {

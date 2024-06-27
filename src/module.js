@@ -4,7 +4,6 @@ import CONSTANTS from "./constants/constants.js";
 import registerUIOverrides from "./foundry-ui-overrides.js";
 import registerLibwrappers from "./libwrapper.js";
 import {
-	applyShims,
 	applySystemSpecificStyles,
 	checkSystem,
 	patchCurrencySettings,
@@ -33,7 +32,6 @@ Hooks.once("init", async () => {
 	registerLibwrappers();
 	registerUIOverrides();
 	setupCaches();
-	applyShims();
 	setupPlugins("init");
 
 	game.itempiles = {

@@ -8,7 +8,7 @@ const CONSTANTS = {
 	MODULE_NAME: module_name,
 	PATH: module_path,
 
-	ACTOR_DELTA_PROPERTY: "actorData",
+	ACTOR_DELTA_PROPERTY: "delta",
 
 	FLAGS: {
 		VERSION: `${baseFlag}.version`,
@@ -76,7 +76,6 @@ const CONSTANTS = {
 		CONTAINER: "container",
 		MERCHANT: "merchant",
 		VAULT: "vault",
-		AUCTIONEER: "auctioneer",
 	},
 
 	VAULT_LOGGING_TYPES: {
@@ -287,5 +286,7 @@ CONSTANTS.HOOKS = {
 		COMPLETE: module`tradeComplete`
 	}
 }
+
+Object.freeze(CONSTANTS);
 
 export default CONSTANTS;

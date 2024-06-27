@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import { getActiveApps } from '../../helpers/helpers';
 import SettingsShell from './settings-shell.svelte';
 import SETTINGS from "../../constants/settings.js";

@@ -1,10 +1,10 @@
 <script>
 
 	import Tabs from "../components/Tabs.svelte";
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import SliderInput from "../components/SliderInput.svelte";
 	import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
-	import { TJSProseMirror } from "@typhonjs-fvtt/svelte-standard/component";
+	import { TJSProseMirror } from "#standard/component";
 
 	export let store;
 

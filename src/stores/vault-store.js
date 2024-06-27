@@ -6,7 +6,7 @@ import * as Utilities from "../helpers/utilities.js";
 import PrivateAPI from "../API/private-api.js";
 import ItemPileSocket from "../socket.js";
 import DropItemDialog from "../applications/dialogs/drop-item-dialog/drop-item-dialog.js";
-import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+import { TJSDialog } from "#runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as helpers from "../helpers/helpers.js";
@@ -66,8 +66,8 @@ export class VaultStore extends ItemPileStore {
 		});
 
 		this.subscribeTo(this.document, () => {
-			const { data } = this.document.updateOptions;
-			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.LOG)) {
+			const { renderData } = this.document.updateOptions;
+			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.LOG)) {
 				this.processLogEntries();
 			}
 		});

@@ -1,5 +1,5 @@
 import UserSelectDialogShell from "./user-select-dialog-shell.svelte";
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 
 export default class UserSelectDialog extends SvelteApplication {
 

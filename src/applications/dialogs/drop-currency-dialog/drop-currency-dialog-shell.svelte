@@ -1,6 +1,6 @@
 <script>
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { localize } from '#runtime/svelte/helper';
 	import { getContext } from "svelte";
 	import * as PileUtilities from "../../../helpers/pile-utilities.js";
 	import { abbreviateNumbers } from "../../../helpers/helpers.js";

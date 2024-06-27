@@ -1,6 +1,6 @@
 <script>
 
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import { getSourceActorFromDropData } from "../../helpers/utilities.js";
 
 	export let actor;

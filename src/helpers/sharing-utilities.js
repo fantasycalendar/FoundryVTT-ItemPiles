@@ -139,8 +139,8 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
 
 	if (sourceIsItemPile) {
 
-		if (PileUtilities.isItemPileEmpty(sourceIsItemPile)) {
-			return clearItemPileSharingData(sourceIsItemPile);
+		if (PileUtilities.isItemPileEmpty(sourceActor)) {
+			return clearItemPileSharingData(sourceActor);
 		}
 
 		const sharingData = addToItemPileSharingData(sourceActor, targetActor.uuid, { items, attributes });

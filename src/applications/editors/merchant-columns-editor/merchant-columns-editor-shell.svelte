@@ -1,7 +1,7 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { localize } from '#runtime/svelte/helper';
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import { get, writable } from "svelte/store";
 	import PropertyPathInput from "../../components/PropertyPathInput.svelte";
 	import StringListEditor from "../string-list-editor/string-list-editor.js";
@@ -129,7 +129,7 @@
 		</div>
 
 		<footer class="item-piles-top-divider">
-			<button on:click|once={requestSubmit} type="button">
+			<button on:click={requestSubmit} type="button">
 				<i class="far fa-save"></i> { localize("Save") }
 			</button>
 			<button on:click|once={() => { application.close(); }} type="button">

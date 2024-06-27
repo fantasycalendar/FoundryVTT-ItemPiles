@@ -1,7 +1,7 @@
 <script>
 
 	import CONSTANTS from "../../../constants/constants.js";
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import DropZone from "../../components/DropZone.svelte";
 
 	export let pileData;

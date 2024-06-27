@@ -11,7 +11,7 @@ import Transaction from "../helpers/transaction.js";
 import ItemPileStore from "../stores/item-pile-store.js";
 import MerchantApp from "../applications/merchant-app/merchant-app.js";
 import { SYSTEMS } from "../systems.js";
-import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+import { TJSDialog } from "#runtime/svelte/application";
 import CustomDialog from "../applications/components/CustomDialog.svelte";
 import ReceiveItemsShell from "../applications/dialogs/receive-items-dialog/receive-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
@@ -1162,7 +1162,7 @@ export default class PrivateAPI {
 		if (items) {
 			for (let i = 0; i < items.length; i++) {
 				let itemData = items[i]?.item ?? items[i];
-				itemData = await Item.implementation.create(itemData, { temporary: true });
+				itemData = new Item.implementation(itemData);
 				itemData = itemData.toObject();
 				if (SYSTEMS.DATA.ITEM_TRANSFORMER) {
 					itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
@@ -1194,14 +1194,14 @@ export default class PrivateAPI {
 				const data = { data: pileData, items: [...items] };
 
 				for (let index = 0; index < data.items.length; index++) {
-					data.items[index] = await Item.implementation.create(data.items[index], { temporary: true });
+					data.items[index] = new Item.implementation(data.items[index]);
 				}
 
-				const overrideImage = foundry.utils.getProperty(overrideData, "texture.src") 
-						?? foundry.utils.getProperty(overrideData, "img");
-				const overrideScale = foundry.utils.getProperty(overrideData, "texture.scaleX") 
-						?? foundry.utils.getProperty(overrideData, "texture.scaleY") 
-						?? foundry.utils.getProperty(overrideData, "scale");
+				const overrideImage = foundry.utils.getProperty(overrideData, "texture.src")
+					?? foundry.utils.getProperty(overrideData, "img");
+				const overrideScale = foundry.utils.getProperty(overrideData, "texture.scaleX")
+					?? foundry.utils.getProperty(overrideData, "texture.scaleY")
+					?? foundry.utils.getProperty(overrideData, "scale");
 
 				const scale = PileUtilities.getItemPileTokenScale(pileActor, data, overrideScale);
 
@@ -1279,11 +1279,11 @@ export default class PrivateAPI {
 
 			let specificTokenSettings = Helpers.isFunction(tokenSettings) ? await tokenSettings(target) : foundry.utils.deepClone(tokenSettings);
 
-			const overrideImage = foundry.utils.getProperty(specificTokenSettings, "texture.src") 
-					?? foundry.utils.getProperty(specificTokenSettings, "img");
+			const overrideImage = foundry.utils.getProperty(specificTokenSettings, "texture.src")
+				?? foundry.utils.getProperty(specificTokenSettings, "img");
 			const overrideScale = foundry.utils.getProperty(specificTokenSettings, "texture.scaleX")
-					?? foundry.utils.getProperty(specificTokenSettings, "texture.scaleY") 
-					?? foundry.utils.getProperty(specificTokenSettings, "scale");
+				?? foundry.utils.getProperty(specificTokenSettings, "texture.scaleY")
+				?? foundry.utils.getProperty(specificTokenSettings, "scale");
 
 			const scale = PileUtilities.getItemPileTokenScale(target, data, overrideScale);
 
@@ -1675,7 +1675,7 @@ export default class PrivateAPI {
 		if (!validItem) return;
 		dropData.itemData.item = validItem;
 
-		const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+		const item = new Item.implementation(dropData.itemData.item);
 
 		dropData.itemData.quantity = 1;
 		if (PileUtilities.canItemStack(dropData.itemData.item, vaultActor)) {
@@ -1761,7 +1761,7 @@ export default class PrivateAPI {
 			if (!hotkeyActionState.forceDropOneItem) {
 
 				if (!dropData.skipCheck) {
-					const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+					const item = new Item.implementation(dropData.itemData.item);
 					itemQuantity = await DropItemDialog.show(item, dropData.target, { unlimitedQuantity: !dropData.source && game.user.isGM });
 					if (!itemQuantity) return;
 				}
@@ -1826,7 +1826,7 @@ export default class PrivateAPI {
 			});
 		}
 
-		const item = await Item.implementation.create(dropData.itemData.item, { temporary: true });
+		const item = new Item.implementation(dropData.itemData.item);
 
 		if (!sourceActor && game.user.isGM) {
 			Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemAdded", {
@@ -1882,7 +1882,7 @@ export default class PrivateAPI {
 		const sourceActor = Utilities.getActor(sourceUuid);
 		const targetActor = Utilities.getActor(targetUuid);
 
-		const item = await Item.implementation.create(itemData.item, { temporary: true });
+		const item = new Item.implementation(itemData.item);
 
 		const accepted = await TJSDialog.confirm({
 			title: "Item Piles - " + game.i18n.localize("ITEM-PILES.Dialogs.ReceiveItem.Title"), content: {
@@ -1952,7 +1952,7 @@ export default class PrivateAPI {
 			}
 		}
 
-		validTokens = validTokens.filter(token => token.owner && token.document !== pileDocument).filter(token => {
+		validTokens = validTokens.filter(token => token.isOwner && token.document !== pileDocument).filter(token => {
 			return Utilities.tokens_close_enough(pileToken, token, maxDistance) || game.user.isGM;
 		});
 

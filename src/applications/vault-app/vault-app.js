@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import VaultShell from "./vault-shell.svelte";
 import * as Utilities from "../../helpers/utilities.js";
 import ItemPileConfig from "../item-pile-config/item-pile-config.js";

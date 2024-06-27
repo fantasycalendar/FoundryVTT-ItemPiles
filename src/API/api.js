@@ -1024,8 +1024,8 @@ class API {
 	static isValidItemPile(target, data = false) {
 		return PileUtilities.isValidItemPile(target, data);
 	}
-	
-    /**
+
+	/**
 	 * Whether an item pile is a regular item pile. If it is not enabled, it is always false.
 	 *
 	 * @param {Token/TokenDocument} target
@@ -1035,7 +1035,7 @@ class API {
 	static isRegularItemPile(target, data = false) {
 		return PileUtilities.isRegularItemPile(target, data);
 	}
-	
+
 	/**
 	 * Whether an item pile is a container. If it is not enabled, it is always false.
 	 *
@@ -1046,7 +1046,7 @@ class API {
 	static isItemPileContainer(target, data = false) {
 		return PileUtilities.isItemPileContainer(target, data);
 	}
-	
+
 	/**
 	 * Whether an item pile is a lootable. If it is not enabled, it is always false.
 	 *
@@ -1057,7 +1057,7 @@ class API {
 	static isItemPileLootable(target, data = false) {
 		return PileUtilities.isItemPileLootable(target, data);
 	}
-	
+
 	/**
 	 * Whether an item pile is a vault. If it is not enabled, it is always false.
 	 *
@@ -1068,7 +1068,7 @@ class API {
 	static isItemPileVault(target, data = false) {
 		return PileUtilities.isItemPileVault(target, data);
 	}
-	
+
 	/**
 	 * Whether an item pile is a merchant. If it is not enabled, it is always false.
 	 *
@@ -1079,7 +1079,7 @@ class API {
 	static isItemPileMerchant(target, data = false) {
 		return PileUtilities.isItemPileMerchant(target, data);
 	}
-	
+
 	/**
 	 * Whether an item pile is a merchant. If it is not enabled, it is always false.
 	 *
@@ -1088,7 +1088,7 @@ class API {
 	 * @return {boolean}
 	 */
 	static isItemPileAuctioneer(target, data = false) {
-		if(!game.modules.get("item_piles_auctioneer")?.active) {
+		if (!game.modules.get("item_piles_auctioneer")?.active) {
 			let word = "install and activate";
 			if (game.modules.get('item_piles_auctioneer')) word = "activate";
 			Helpers.custom_warning(`This api method from Item Piles requires the 'item_piles_auctioneer' module. Please ${word} it.`, true);
@@ -2242,7 +2242,7 @@ class API {
 
 		if (items) {
 			for (const entry of items) {
-				entry.item = targetActor ? targetActor.items.get(entry.item._id) : await Item.implementation.create(entry.item, { temporary: true });
+				entry.item = targetActor ? targetActor.items.get(entry.item._id) : new Item.implementation(entry.item);
 			}
 		}
 

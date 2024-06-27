@@ -1,7 +1,7 @@
 <script>
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import { getContext } from "svelte";
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import { get } from "svelte/store";
 	import * as PileUtilities from "../../../helpers/pile-utilities.js";
 	import PriceSelector from "../../components/PriceSelector.svelte";

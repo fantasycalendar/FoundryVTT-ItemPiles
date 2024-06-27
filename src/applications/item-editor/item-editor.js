@@ -1,5 +1,5 @@
 import ItemEditorShell from './item-editor-shell.svelte';
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import { getActiveApps } from '../../helpers/helpers';
 
 export default class ItemEditor extends SvelteApplication {

@@ -1,9 +1,12 @@
 # Item Piles Changelog
 
-## Version 2.9.2
+## Version 3.0.0
 
+- Updated module to be compatible with Foundry v12 (thank you to NeilWhite on github!)
+- Updated the TyphonJS Runtime Library version - thank you, Michael, for your continued support!
 - Fixed merchant columns not being editable in newer versions of D&D 5e
 - Fixed rolltables not applying custom categories to items properly
+- Fixed issue with merchant treating all items as unique and never stacking them
 
 ## Version 2.9.1
 

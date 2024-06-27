@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+import { localize } from "#runtime/svelte/helper";
 import { PileItem } from "./pile-item.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";

@@ -1,5 +1,5 @@
 import DropItemDialogShell from "./drop-item-dialog-shell.svelte";
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import { getActiveApps } from "../../../helpers/helpers";
 
 export default class DropItemDialog extends SvelteApplication {

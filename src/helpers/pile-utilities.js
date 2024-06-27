@@ -137,7 +137,7 @@ export function isItemPileMerchant(target, data = false) {
 export function isItemPileAuctioneer(target, data = false) {
 	const targetActor = Utilities.getActor(target);
 	const pileData = getActorFlagData(targetActor, data);
-	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.AUCTIONEER;
+	return pileData?.enabled && pileData?.type === "auctioneer";
 }
 
 export function isItemPileClosed(target, data = false) {
@@ -643,11 +643,11 @@ export async function updateItemPileData(target, flagData, tokenData) {
 	// flagData = cleanFlagData(flagData);
 
 	const updates = documentTokens.map(tokenDocument => {
-		const overrideImage = foundry.utils.getProperty(tokenData, "texture.src") 
-				?? foundry.utils.getProperty(tokenData, "img");
-		const overrideScale = foundry.utils.getProperty(tokenData, "texture.scaleX") 
-				?? foundry.utils.getProperty(tokenData, "texture.scaleY") 
-				?? foundry.utils.getProperty(tokenData, "scale");
+		const overrideImage = foundry.utils.getProperty(tokenData, "texture.src")
+			?? foundry.utils.getProperty(tokenData, "img");
+		const overrideScale = foundry.utils.getProperty(tokenData, "texture.scaleX")
+			?? foundry.utils.getProperty(tokenData, "texture.scaleY")
+			?? foundry.utils.getProperty(tokenData, "scale");
 		const scale = getItemPileTokenScale(tokenDocument, pileData, overrideScale);
 		const newTokenData = foundry.utils.mergeObject(tokenData, {
 			"texture.src": getItemPileTokenImage(tokenDocument, pileData, overrideImage),
@@ -2008,7 +2008,7 @@ export async function updateVaultLog(itemPile, {
 				date
 			});
 		} else {
-			const item = await Item.implementation.create(itemData.item, { temporary: true });
+			const item = new Item.implementation(itemData.item);
 			formattedItems.push({
 				actor: actor?.name ?? false,
 				user: userId,

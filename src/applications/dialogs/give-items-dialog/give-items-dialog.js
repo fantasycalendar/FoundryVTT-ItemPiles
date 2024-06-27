@@ -1,5 +1,5 @@
 import GiveItemsShell from "./give-items-shell.svelte";
-import { TJSDialog } from '@typhonjs-fvtt/runtime/svelte/application';
+import { TJSDialog } from '#runtime/svelte/application';
 import { getActiveApps } from "../../../helpers/helpers";
 
 export default class GiveItems extends TJSDialog {

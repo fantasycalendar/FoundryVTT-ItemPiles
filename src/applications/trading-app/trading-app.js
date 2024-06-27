@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import TradingAppShell from "./trading-app-shell.svelte";
 import ItemPileSocket from "../../socket.js";
 

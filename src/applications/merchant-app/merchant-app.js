@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import ItemPileConfig from "../item-pile-config/item-pile-config";
 import MerchantAppShell from "./merchant-app-shell.svelte";
 import * as Helpers from "../../helpers/helpers.js";
