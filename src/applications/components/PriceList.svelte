@@ -32,7 +32,7 @@
 		.concat(secondaryCurrencies)
 		.map(currency => {
 			return {
-				id: randomID(),
+				id: foundry.utils.randomID(),
 				quantity: 1,
 				fixed: true,
 				percent: false,
@@ -53,7 +53,7 @@
 
 	function addAttribute() {
 		prices = [...prices, {
-			id: randomID(),
+			id: foundry.utils.randomID(),
 			type: "attribute",
 			name: "New Attribute",
 			img: "",
@@ -69,7 +69,7 @@
 
 	function addPreset(index) {
 		const preset = foundry.utils.duplicate(presetPrices[index]);
-		preset.id = randomID();
+		preset.id = foundry.utils.randomID();
 		prices = [...prices, preset];
 	}
 
@@ -111,7 +111,7 @@
 			Helpers.custom_notify(`Updated item data for ${localize(prices[index].name)} (item name ${itemData.name})`)
 		} else {
 			prices = [...prices, {
-				id: randomID(),
+				id: foundry.utils.randomID(),
 				type: "item",
 				name: itemData.name,
 				img: itemData.img,

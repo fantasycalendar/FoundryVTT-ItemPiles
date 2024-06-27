@@ -15,7 +15,7 @@ export default class TradeMerchantItemDialog extends SvelteApplication {
 	 */
 	constructor(item, seller, buyer, settings = {}, options = {}) {
 		super({
-			id: `item-pile-buy-item-dialog-${item.id}-${seller.id}-${buyer.id}-${randomID()}`,
+			id: `item-pile-buy-item-dialog-${item.id}-${seller.id}-${buyer.id}-${foundry.utils.randomID()}`,
 			title: game.i18n.format("ITEM-PILES.Applications.TradeMerchantItem.Title", { item_name: get(item.name) }),
 			svelte: {
 				class: TradeMerchantItemDialogShell,

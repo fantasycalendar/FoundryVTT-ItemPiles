@@ -1197,8 +1197,11 @@ export default class PrivateAPI {
 					data.items[index] = await Item.implementation.create(data.items[index], { temporary: true });
 				}
 
-				const overrideImage = foundry.utils.getProperty(overrideData, "texture.src") ?? foundry.utils.getProperty(overrideData, "img");
-				const overrideScale = foundry.utils.getProperty(overrideData, "texture.scaleX") ?? foundry.utils.getProperty(overrideData, "texture.scaleY") ?? foundry.utils.getProperty(overrideData, "scale");
+				const overrideImage = foundry.utils.getProperty(overrideData, "texture.src") 
+						?? foundry.utils.getProperty(overrideData, "img");
+				const overrideScale = foundry.utils.getProperty(overrideData, "texture.scaleX") 
+						?? foundry.utils.getProperty(overrideData, "texture.scaleY") 
+						?? foundry.utils.getProperty(overrideData, "scale");
 
 				const scale = PileUtilities.getItemPileTokenScale(pileActor, data, overrideScale);
 
@@ -1276,8 +1279,11 @@ export default class PrivateAPI {
 
 			let specificTokenSettings = Helpers.isFunction(tokenSettings) ? await tokenSettings(target) : foundry.utils.deepClone(tokenSettings);
 
-			const overrideImage = foundry.utils.getProperty(specificTokenSettings, "texture.src") ?? foundry.utils.getProperty(specificTokenSettings, "img");
-			const overrideScale = foundry.utils.getProperty(specificTokenSettings, "texture.scaleX") ?? foundry.utils.getProperty(specificTokenSettings, "texture.scaleY") ?? foundry.utils.getProperty(specificTokenSettings, "scale");
+			const overrideImage = foundry.utils.getProperty(specificTokenSettings, "texture.src") 
+					?? foundry.utils.getProperty(specificTokenSettings, "img");
+			const overrideScale = foundry.utils.getProperty(specificTokenSettings, "texture.scaleX")
+					?? foundry.utils.getProperty(specificTokenSettings, "texture.scaleY") 
+					?? foundry.utils.getProperty(specificTokenSettings, "scale");
 
 			const scale = PileUtilities.getItemPileTokenScale(target, data, overrideScale);
 

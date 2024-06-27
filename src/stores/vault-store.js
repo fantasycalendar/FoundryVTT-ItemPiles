@@ -67,7 +67,7 @@ export class VaultStore extends ItemPileStore {
 
 		this.subscribeTo(this.document, () => {
 			const { data } = this.document.updateOptions;
-			if (hasProperty(data, CONSTANTS.FLAGS.LOG)) {
+			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.LOG)) {
 				this.processLogEntries();
 			}
 		});
@@ -382,7 +382,7 @@ export class VaultStore extends ItemPileStore {
 			return false;
 		}
 
-		const vaultExpander = getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
+		const vaultExpander = foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
 
 		if (isExpander && !vaultExpander) {
 			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultItemNotExpander"), true)
@@ -499,7 +499,7 @@ export class VaultItem extends PileItem {
 				this.style.set({ "box-shadow": `inset 0px 0px 7px 0px ${rarityColor}` });
 			} else {
 				this.style.set(SYSTEMS.DATA?.VAULT_STYLES ? SYSTEMS.DATA?.VAULT_STYLES.filter(style => {
-					return getProperty(this.item, style.path) === style.value;
+					return foundry.utils.getProperty(this.item, style.path) === style.value;
 				}).reduce((acc, style) => {
 					return foundry.utils.mergeObject(acc, style.styling);
 				}, {}) : {});
@@ -579,11 +579,11 @@ export class VaultItem extends PileItem {
 		const itemData = this.item.toObject();
 
 		const flags = PileUtilities.getItemFlagData(this.item);
-		itemData._id = randomID();
-		setProperty(flags, "x", x);
-		setProperty(flags, "y", y);
-		setProperty(flags, "flipped", flipped);
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
+		itemData._id = foundry.utils.randomID();
+		foundry.utils.setProperty(flags, "x", x);
+		foundry.utils.setProperty(flags, "y", y);
+		foundry.utils.setProperty(flags, "flipped", flipped);
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM, flags);
 
 		await game.itempiles.API.addItems(this.store.actor, [{
 			item: itemData, quantity

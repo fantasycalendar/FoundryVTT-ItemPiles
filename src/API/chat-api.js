@@ -448,7 +448,7 @@ export default class ChatAPI {
 
 		const now = (+new Date());
 
-		priceInformation.id = randomID();
+		priceInformation.id = foundry.utils.randomID();
 
 		// Get all messages younger than 3 hours, and grab the last 10, then reverse them (latest to oldest)
 		const messages = Array.from(game.messages).filter(message => (now - message.timestamp) <= (10800000)).slice(-10);

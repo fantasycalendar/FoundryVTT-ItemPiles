@@ -37,7 +37,7 @@ export default {
 
 	// This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
 	"ITEM_COST_TRANSFORMER": (item) => {
-		const itemCost = getProperty(item, "system.price");
+		const itemCost = foundry.utils.getProperty(item, "system.price");
 		const { copperValue } = new game.pf2e.Coins(itemCost?.value ?? {});
 		return copperValue / 100;
 	},

@@ -218,10 +218,10 @@ export const SYSTEMS = {
 		}
 
 		versions.sort((a, b) => {
-			return a === "latest" || b === "latest" ? -Infinity : (isNewerVersion(b, a) ? -1 : 1);
+			return a === "latest" || b === "latest" ? -Infinity : (foundry.utils.isNewerVersion(b, a) ? -1 : 1);
 		});
 		const version = versions.find(version => {
-			return version === "latest" || !isNewerVersion(game.system.version, version);
+			return version === "latest" || !foundry.utils.isNewerVersion(game.system.version, version);
 		});
 
 		this._currentSystem = foundry.utils.mergeObject(this.DEFAULT_SETTINGS, system[version]);

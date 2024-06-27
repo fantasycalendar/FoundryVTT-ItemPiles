@@ -42,7 +42,7 @@
 	let items = currencies.filter(entry => entry.type !== "attribute")
 		.map(currency => {
 			currency.create = !existingCurrencies.some(existingCurrency => existingCurrency.name === currency.name && existingCurrency.img === currency.img);
-			currency.id = currency.id ?? randomID();
+			currency.id = currency.id ?? foundry.utils.randomID();
 			currency.currentQuantity = 0;
 			return currency;
 		});

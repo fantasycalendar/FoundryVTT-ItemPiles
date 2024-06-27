@@ -192,13 +192,13 @@
             getSettings();
           }}/>
 					<Setting key={SETTINGS.ACTOR_CLASS_TYPE} bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}"
-					         options={["None", ...game.system.template.Actor.types]}/>
+					         options={["None", ...Object.keys(game.system.documentTypes.Actor)]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_LOOT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_LOOT_TYPE]}"
-					         options={["None", ...game.system.template.Item.types]}/>
+					         options={["None", ...Object.keys(game.system.documentTypes.Item)]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_WEAPON_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_WEAPON_TYPE]}"
-					         options={["None", ...game.system.template.Item.types]}/>
+					         options={["None", ...Object.keys(game.system.documentTypes.Item)]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE]}"
-					         options={["None", ...game.system.template.Item.types]}/>
+					         options={["None", ...Object.keys(game.system.documentTypes.Item)]}/>
 					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
 					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>

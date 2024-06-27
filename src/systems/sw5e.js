@@ -33,7 +33,7 @@ export default {
 				delete itemData.system[key];
 			}
 		});
-		setProperty(
+		foundry.utils.setProperty(
 			itemData,
 			"system.attunement",
 			Math.min(

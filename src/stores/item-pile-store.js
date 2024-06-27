@@ -17,7 +17,7 @@ export default class ItemPileStore {
 
 		this.subscriptions = [];
 
-		this.interactionId = randomID();
+		this.interactionId = foundry.utils.randomID();
 		this.application = application;
 
 		this.uuid = Utilities.getUuid(source);
@@ -149,11 +149,11 @@ export default class ItemPileStore {
 
 		this.subscribeTo(this.document, () => {
 			const { data } = this.document.updateOptions;
-			if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
+			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
 				this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
 				this.refreshItems();
 			}
-			if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
+			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.PILE)) {
 				this.pileData.set(PileUtilities.getActorFlagData(this.actor));
 				this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
 				this.refreshItems();
@@ -165,11 +165,11 @@ export default class ItemPileStore {
 		if (this.recipientDocument) {
 			this.subscribeTo(this.recipientDocument, () => {
 				const { data } = this.document.updateOptions;
-				if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
+				if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
 					this.recipientShareData.set(SharingUtilities.getItemPileSharingData(this.recipient));
 					this.refreshItems();
 				}
-				if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
+				if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.PILE)) {
 					this.recipientPileData.set(PileUtilities.getActorFlagData(this.recipient));
 					this.recipientCurrencies.set(PileUtilities.getActorCurrencies(this.recipient, { getAll: true }));
 					this.refreshItems();

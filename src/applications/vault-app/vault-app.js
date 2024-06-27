@@ -19,7 +19,7 @@ export default class VaultApp extends SvelteApplication {
 	 */
 	constructor(actor, recipient, options = {}, dialogData = {}) {
 		super({
-			id: `item-pile-vault-${actor?.token?.id ?? actor.id}-${randomID()}`,
+			id: `item-pile-vault-${actor?.token?.id ?? actor.id}-${foundry.utils.randomID()}`,
 			title: actor.name,
 			svelte: {
 				class: VaultShell,

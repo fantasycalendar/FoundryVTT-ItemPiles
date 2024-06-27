@@ -26,7 +26,7 @@ export default {
 				delete itemData.system[key];
 			}
 		});
-		setProperty(itemData, "system.attunement", false);
+		foundry.utils.setProperty(itemData, "system.attunement", false);
 		return itemData;
 	},
 

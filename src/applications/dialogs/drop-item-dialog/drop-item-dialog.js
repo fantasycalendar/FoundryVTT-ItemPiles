@@ -15,7 +15,7 @@ export default class DropItemDialog extends SvelteApplication {
 	}) {
 		super({
 			title: game.i18n.localize(`ITEM-PILES.Applications.${options.localizationTitle}.Title`),
-			id: `item-pile-drop-item-${item.id}${target ? "-" + target.id : ""}-${randomID()}`,
+			id: `item-pile-drop-item-${item.id}${target ? "-" + target.id : ""}-${foundry.utils.randomID()}`,
 			svelte: {
 				class: DropItemDialogShell,
 				target: document.body,

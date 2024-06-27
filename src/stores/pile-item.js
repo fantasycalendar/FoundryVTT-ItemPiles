@@ -69,7 +69,7 @@ export class PileItem extends PileBaseItem {
 		this.name = writable(itemData?.name ?? this.item.name);
 		this.img = writable(itemData?.img ?? this.item.img);
 		this.abbreviation = writable("");
-		this.identifier = randomID();
+		this.identifier = foundry.utils.randomID();
 		this.itemFlagData = writable(PileUtilities.getItemFlagData(this.item));
 	}
 
@@ -103,7 +103,7 @@ export class PileItem extends PileBaseItem {
 				const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
 				this.currentQuantity.set(quantity);
 			}
-			if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
+			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
 				this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
 				this.updateCategory();
 				this.store.refreshItems();
@@ -191,13 +191,13 @@ export class PileItem extends PileBaseItem {
 		return game.itempiles.API.removeItems(this.store.actor, [this.id]);
 	}
 
-	updateQuantity(quantity, add = false) {
-		let total = typeof quantity === "string" ? (new Roll(quantity).evaluate({ async: false })).total : quantity;
+	async updateQuantity(quantity, add = false) {
+		let total = typeof quantity === "string" ? (await new Roll(quantity).evaluate({ allowInteractive: false })).total : quantity;
 		if (add) {
 			total += get(this.quantity);
 		}
 		this.quantity.set(total);
-		return this.item.update(Utilities.setItemQuantity({}, total));
+		return await this.item.update(Utilities.setItemQuantity({}, total));
 	}
 
 	async updateFlags() {
@@ -232,8 +232,8 @@ export class PileAttribute extends PileBaseItem {
 		this.name = writable(this.attribute.name);
 		this.img = writable(this.attribute.img);
 		this.abbreviation = writable(this.attribute.abbreviation);
-		this.identifier = randomID()
-		const startingQuantity = Number(getProperty(this.store.actor, this.path) ?? 0);
+		this.identifier = foundry.utils.randomID()
+		const startingQuantity = Number(foundry.utils.getProperty(this.store.actor, this.path) ?? 0);
 		this.presentFromTheStart.set(startingQuantity > 0);
 		this.quantity.set(startingQuantity);
 		this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -259,8 +259,8 @@ export class PileAttribute extends PileBaseItem {
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
-			if (hasProperty(data, this.path)) {
-				const newQuantity = Number(getProperty(data, this.path) ?? 0);
+			if (foundry.utils.hasProperty(data, this.path)) {
+				const newQuantity = Number(foundry.utils.getProperty(data, this.path) ?? 0);
 				this.quantity.set(newQuantity);
 				this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), newQuantity));
 				if (!this.toShare) {
