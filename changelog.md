@@ -7,6 +7,7 @@
 - Added support for the [Dragonbane - Drakar och Demoner](https://foundryvtt.com/packages/dragonbane) system (thank you xdy on github!)
 - Added the `game.itempiles.macro_execution_types` constants - see docs for more info
   - For the above, added `game.itempiles.macro_execution_types.RENDER_INTERFACE`, which means that macros that are attached to item piles will execute its macro when the item piles interface is rendered
+- Added item price modifiers on items, so items can decide how much they will deviate from the base price
 - Fixed merchant columns not being editable in newer versions of D&D 5e
 - Fixed rolltables not applying custom categories to items properly
 - Fixed issue with merchant treating all items as unique and never stacking them

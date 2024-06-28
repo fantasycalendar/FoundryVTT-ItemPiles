@@ -748,6 +748,10 @@ export function getMerchantModifiersForActor(merchant, {
 		if (!itemFlagData) {
 			itemFlagData = getItemFlagData(item);
 		}
+
+		buyPriceModifier *= itemFlagData.buyPriceModifier ?? 1.0;
+		sellPriceModifier *= itemFlagData.sellPriceModifier ?? 1.0;
+
 		const itemTypePriceModifier = itemTypePriceModifiers
 			.sort((a, b) => a.type === "custom" && b.type !== "custom"
 				? -1
@@ -759,10 +763,10 @@ export function getMerchantModifiersForActor(merchant, {
 			});
 		if (itemTypePriceModifier) {
 			buyPriceModifier = itemTypePriceModifier.override
-				? itemTypePriceModifier.buyPriceModifier
+				? itemTypePriceModifier.buyPriceModifier ?? buyPriceModifier
 				: buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
 			sellPriceModifier = itemTypePriceModifier.override
-				? itemTypePriceModifier.sellPriceModifier
+				? itemTypePriceModifier.sellPriceModifier ?? sellPriceModifier
 				: sellPriceModifier * itemTypePriceModifier.sellPriceModifier;
 		}
 	}
