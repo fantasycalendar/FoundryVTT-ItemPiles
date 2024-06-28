@@ -1,6 +1,6 @@
 export default {
 
-	"VERSION": "1.0.2",
+	"VERSION": "1.0.3",
 
 	// The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
 	"ACTOR_CLASS_TYPE": "character",
@@ -9,7 +9,7 @@ export default {
 	"ITEM_CLASS_LOOT_TYPE": "",
 
 	// The item class type is the type of item that will be used for the default weapon item
-	"ITEM_CLASS_WEAPON_TYPE": "", 
+	"ITEM_CLASS_WEAPON_TYPE": "",
 
 	// The item class type is the type of item that will be used for the default equipment item
 	"ITEM_CLASS_EQUIPMENT_TYPE": "",
@@ -18,7 +18,7 @@ export default {
 	"ITEM_QUANTITY_ATTRIBUTE": "system.qtd",
 
 	// The item price attribute is the path to the attribute on each item that determine how much it costs
-	"ITEM_PRICE_ATTRIBUTE": "system.price.gc",
+	"ITEM_PRICE_ATTRIBUTE": "system.preco",
 
 	// Item types and the filters actively remove items from the item pile inventory UI that users cannot loot, such as spells, feats, and classes
 	"ITEM_FILTERS": [
