@@ -55,6 +55,8 @@ const CONSTANTS = {
 		macro: "",
 		customCategory: "",
 		prices: [],
+		buyPriceModifier: 1,
+		sellPriceModifier: 1,
 
 		// Vaults
 		vaultExpander: false,
