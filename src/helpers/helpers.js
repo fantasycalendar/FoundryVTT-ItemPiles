@@ -357,5 +357,5 @@ export function isCoordinateWithinPosition(x, y, position) {
 
 
 export function getCanvasMouse() {
-	return canvas.app.renderer.plugins.interaction.pointer;
+	return canvas?.app?.renderer?.plugins?.interaction?.pointer ?? canvas?.app?.renderer?.events?.pointer;
 }

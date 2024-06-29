@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Verison 3.0.1
+
+- Added Russian localization (thank you VirusNik21 on github!)
+- Fixed players being unable to open item piles due to error
+-
+
 ## Version 3.0.0
 
 - Updated module to be compatible with Foundry v12 (thank you to NeilWhite on github!)

@@ -2139,7 +2139,10 @@ export default class PrivateAPI {
 		if (hookResult === false) return;
 
 		const result = await this._executeItemPileMacro(targetUuid, {
-			action: CONSTANTS.MACRO_EXECUTION_TYPES.RENDER_INTERFACE, target: targetUuid, userId: game.user.id
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.RENDER_INTERFACE,
+			source: inspectingTarget?.uuid ?? false,
+			target: targetUuid,
+			userId: game.user.id
 		});
 		if (result === false) return;
 
