@@ -5,6 +5,7 @@ on:
     types: [ published ]
 
 env:
+  package_name: Item Piles
   package_id: item-piles
 
 jobs:
@@ -74,7 +75,7 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
 
       - name: Send package to foundry
-        if: false #"!github.event.release.prerelease"
+        if: "!github.event.release.prerelease"
         run: |
           HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST 'https://api.foundryvtt.com/_api/packages/release_version/' \
           --header 'Authorization: ${{ secrets.PACKAGE_TOKEN }}' \
@@ -104,14 +105,23 @@ jobs:
             exit 1
           fi
 
-      - name: Discord notification
+      - name: FC Discord notification
         if: "!github.event.release.prerelease"
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DISCORD_USERNAME: Item Piles Releases
+          DISCORD_USERNAME: ${{env.package_name}} Version ${{github.event.release.tag_name}}
         uses: Ilshidur/action-discord@master
         with:
-          args: "**Item Piles Version ${{github.event.release.tag_name}}**\n${{github.event.release.body}}"
+          args: "${{github.event.release.body}}"
+
+      - name: JB2A Discord notification
+        if: "!github.event.release.prerelease"
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.JB2A_WEBHOOK_URL }}
+          DISCORD_USERNAME: ${{env.package_name}} Version ${{github.event.release.tag_name}}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "${{github.event.release.body}}"
 
       #  OR create a pre-release for this specific version
       - name: Update Release with Files
