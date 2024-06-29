@@ -104,6 +104,14 @@ jobs:
             exit 1
           fi
 
+      - name: Discord notification
+        if: "!github.event.release.prerelease"
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed.'
+
       #  OR create a pre-release for this specific version
       - name: Update Release with Files
         if: "github.event.release.prerelease"
