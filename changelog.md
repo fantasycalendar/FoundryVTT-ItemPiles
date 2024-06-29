@@ -4,7 +4,6 @@
 
 - Added Russian localization (thank you VirusNik21 on github!)
 - Fixed players being unable to open item piles due to error
--
 
 ## Version 3.0.0
 
