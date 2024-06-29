@@ -74,7 +74,7 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
 
       - name: Send package to foundry
-        if: "!github.event.release.prerelease"
+        if: false #"!github.event.release.prerelease"
         run: |
           HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST 'https://api.foundryvtt.com/_api/packages/release_version/' \
           --header 'Authorization: ${{ secrets.PACKAGE_TOKEN }}' \
@@ -108,9 +108,10 @@ jobs:
         if: "!github.event.release.prerelease"
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: Item Piles Releases
         uses: Ilshidur/action-discord@master
         with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed.'
+          args: "**Item Piles Version ${{github.event.release.tag_name}}**\n${{github.event.release.body}}"
 
       #  OR create a pre-release for this specific version
       - name: Update Release with Files
