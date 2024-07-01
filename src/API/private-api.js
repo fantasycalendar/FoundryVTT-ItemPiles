@@ -1810,7 +1810,7 @@ export default class PrivateAPI {
 
 		const actorOwners = Object.entries(targetActor.ownership)
 			.filter(entry => {
-				return entry[0] !== "default" && entry[1] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+				return entry[0] !== "default" && entry[1] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
 			})
 			.map(entry => game.users.get(entry[0]))
 			.sort(user => user.isGM ? 1 : -1);

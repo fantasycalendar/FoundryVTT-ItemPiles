@@ -133,6 +133,16 @@ export function refreshItemTypesThatCanStack() {
 	getItemTypesThatCanStack();
 }
 
+
+export function getDocumentTemplates(templateType) {
+	return foundry.utils.mergeObject(
+		game.model[templateType],
+		Object.fromEntries(Object.entries(CONFIG[templateType]?.dataModels ?? {}).map(([k, v]) => [k, v.schema.getInitialValue()])),
+		{ inplace: false },
+	);
+}
+
+
 /**
  * Retrieve all system item types that can be stacked
  * @returns {Set<string>}                       The items type that can be stacked on this system
@@ -153,22 +163,16 @@ export function getItemTypesThatCanStack() {
 		}
 
 		const unstackableItemTypes = Helpers.getSetting(SETTINGS.UNSTACKABLE_ITEM_TYPES);
-		const types = new Set(Object.keys(CONFIG?.Item?.dataModels ?? {}).concat(game.system.documentTypes.Item.types));
+		const templates = getDocumentTemplates("Item");
+		const types = new Set(Object.keys(templates));
 		itemTypesWithQuantities = new Set([...itemTypesWithQuantities, ...types.filter(type => {
-			let itemTemplate = {};
-			if (CONFIG?.Item?.dataModels?.[type]?.defineSchema !== undefined) {
-				itemTemplate.system = Object.entries(CONFIG.Item.dataModels[type].defineSchema())
-					.map(([key, schema]) => {
-						return [key, schema.fields ?? true]
-					})
-				itemTemplate.system = Object.fromEntries(itemTemplate.system);
-			} else if (game.system?.templates?.Item?.[type]) {
-				itemTemplate.system = foundry.utils.deepClone(game.system.templates.Item[type]);
-				if (itemTemplate.system?.templates?.length) {
-					const templates = foundry.utils.duplicate(itemTemplate.system.templates);
-					for (let template of templates) {
-						itemTemplate.system = foundry.utils.mergeObject(itemTemplate.system, foundry.utils.duplicate(game.system.documentTypes.Item.templates[template]));
-					}
+			let itemTemplate = {
+				system: foundry.utils.deepClone(templates[type])
+			};
+			if (itemTemplate.system?.templates?.length) {
+				const templates = foundry.utils.duplicate(itemTemplate.system.templates);
+				for (let template of templates) {
+					itemTemplate.system = foundry.utils.mergeObject(itemTemplate.system, foundry.utils.duplicate(game.system.documentTypes.Item.templates[template]));
 				}
 			}
 			return hasItemQuantity(itemTemplate);
@@ -354,7 +358,7 @@ export async function runMacro(macroId, macroData) {
 			throw Helpers.custom_error(`The "${packArray[3]}" macro was not found in Compendium ${packArray[1]}.${packArray[2]}`);
 		}
 		macro = new Macro(findMacro?.toObject());
-		macro.ownership.default = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+		macro.ownership.default = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
 	} else {
 		macro = game.macros.getName(macroId);
 		if (!macro) {
@@ -376,7 +380,7 @@ export async function runMacro(macroId, macroData) {
 export function getOwnedCharacters(user = false) {
 	user = user || game.user;
 	return game.actors.filter(actor => {
-			return actor.ownership?.[user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER && actor.prototypeToken.actorLink;
+			return actor.ownership?.[user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER && actor.prototypeToken.actorLink;
 		})
 		.sort((a, b) => {
 			return b._stats.modifiedTime - a._stats.modifiedTime;

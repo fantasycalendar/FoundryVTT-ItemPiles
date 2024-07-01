@@ -4,6 +4,8 @@
 
 - Fixed opening item pile interfaces would spawn duplicate windows instead of focusing existing interfaces
 - Fixed item piles chat messages not working in v11
+- Fixed errors when trying to get document templates in v12 (fixes merchant columns & item pile system settings)
+- Fixed deprecation warnings surrounding `CONST.DOCUMENT_PERMISSION_LEVELS`
 
 ## Version 3.0.1
 
