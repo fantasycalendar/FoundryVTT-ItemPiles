@@ -51,6 +51,7 @@ Hooks.once("init", async () => {
 	window.ItemPiles = {
 		API: API
 	};
+	CONSTANTS.IS_V12 = game.release.generation >= 12;
 
 });
 

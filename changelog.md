@@ -1,6 +1,11 @@
 # Item Piles Changelog
 
-## Verison 3.0.1
+## Version 3.0.2
+
+- Fixed opening item pile interfaces would spawn duplicate windows instead of focusing existing interfaces
+- Fixed item piles chat messages not working in v11
+
+## Version 3.0.1
 
 - Added Russian localization (thank you VirusNik21 on github!)
 - Fixed players being unable to open item piles due to error

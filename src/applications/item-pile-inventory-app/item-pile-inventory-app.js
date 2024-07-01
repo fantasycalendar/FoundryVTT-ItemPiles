@@ -19,7 +19,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 	 */
 	constructor(actor, recipient, options = {}, dialogData = {}) {
 		super({
-			id: `item-pile-inventory-${actor?.token?.id ?? actor.id}-${foundry.utils.randomID()}`,
+			id: `item-pile-inventory-${actor?.token?.uuid ?? actor.uuid}-${foundry.utils.randomID()}`,
 			title: actor.name,
 			svelte: {
 				class: ItemPileInventoryShell,
@@ -50,8 +50,8 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 		});
 	}
 
-	static getActiveApps(id) {
-		return Helpers.getActiveApps(`item-pile-inventory-${id}`);
+	static getActiveApps(source) {
+		return Helpers.getActiveApps(`item-pile-inventory-${source?.token?.uuid ?? source.uuid}`);
 	}
 
 	static async show(source, recipient = false, options = {}, dialogData = {}) {
@@ -59,7 +59,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 		recipient = Utilities.getActor(recipient);
 		const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, source, recipient, options, dialogData);
 		if (result === false) return;
-		const apps = this.getActiveApps(source?.token?.uuid ?? source.uuid);
+		const apps = this.getActiveApps(source);
 		if (apps.length) {
 			for (let app of apps) {
 				app.render(false, { focus: true });

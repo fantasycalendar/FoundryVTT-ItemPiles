@@ -8,6 +8,8 @@ import TradeAPI from "./trade-api.js";
 
 export default class ChatAPI {
 
+	static CHAT_MESSAGE_STYLES = CONSTANTS.IS_V12 ? CONST.CHAT_MESSAGE_STYLES : CONST.CHAT_MESSAGE_TYPES;
+
 	static initialize() {
 
 		Helpers.hooks.on("preCreateChatMessage", this._preCreateChatMessage.bind(this));
@@ -288,7 +290,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -367,7 +369,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name })
@@ -389,7 +391,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -432,7 +434,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: isPrivate ? CONST.CHAT_MESSAGE_STYLES.WHISPER : CONST.CHAT_MESSAGE_STYLES.OTHER,
+			type: isPrivate ? CONST.CHAT_MESSAGE_STYLES.WHISPER : ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -478,7 +480,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -522,7 +524,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
