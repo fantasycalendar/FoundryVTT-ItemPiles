@@ -52,6 +52,7 @@ Hooks.once("init", async () => {
 		API: API
 	};
 	CONSTANTS.IS_V12 = game.release.generation >= 12;
+	Object.freeze(CONSTANTS);
 
 });
 

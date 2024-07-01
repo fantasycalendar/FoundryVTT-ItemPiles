@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.0.3
+
+- Minor fix to latest release
+
 ## Version 3.0.2
 
 - Fixed opening item pile interfaces would spawn duplicate windows instead of focusing existing interfaces

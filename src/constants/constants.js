@@ -324,6 +324,4 @@ CONSTANTS.HOOKS = {
 	}
 }
 
-Object.freeze(CONSTANTS);
-
 export default CONSTANTS;
