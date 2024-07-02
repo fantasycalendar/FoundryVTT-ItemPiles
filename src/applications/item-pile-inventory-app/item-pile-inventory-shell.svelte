@@ -27,6 +27,7 @@
 
 	// Stores
 	let canBeSplit = false;
+	let num_players = 0;
 	let searchStore = store.search;
 	let editQuantities = store.editQuantities;
 	let pileData = store.pileData;
@@ -47,9 +48,8 @@
 		$items;
 		$currencies;
 		canBeSplit = SharingUtilities.canItemPileBeSplit(actor);
+		num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 	}
-
-	let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 
 	async function dropData(event) {
 
@@ -183,7 +183,8 @@
 				{/if}
 
 				{#if $pileData.splitAllEnabled}
-					<button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty || !canBeSplit}">
+					<button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty || !canBeSplit}"
+					        data-tooltip={num_players === 0 && !isPileEmpty ? localize("ITEM-PILES.Inspect.SplitNoPlayers") : ""}>
 						<i class="fas fa-handshake"></i>
 						{#if $pileData.shareItemsEnabled}
 							{localize("ITEM-PILES.Inspect.SplitAll", { num_players })}

@@ -19,7 +19,7 @@ export default class VaultApp extends SvelteApplication {
 	 */
 	constructor(actor, recipient, options = {}, dialogData = {}) {
 		super({
-			id: `item-pile-vault-${actor?.token?.uuid ?? actor.uuid}-${foundry.utils.randomID()}`,
+			id: `item-pile-vault-${actor?.token?.id ?? actor.id}-${foundry.utils.randomID()}`,
 			title: actor.name,
 			svelte: {
 				class: VaultShell,
@@ -60,7 +60,7 @@ export default class VaultApp extends SvelteApplication {
 	}
 
 	static getActiveApps(source) {
-		return Helpers.getActiveApps(`item-pile-vault-${source?.token?.uuid ?? source.uuid}`);
+		return Helpers.getActiveApps(`item-pile-vault-${source?.token?.id ?? source.id}`);
 	}
 
 	static async show(source, recipient = false, options = {}, dialogData = {}) {

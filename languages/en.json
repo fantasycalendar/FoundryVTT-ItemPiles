@@ -70,7 +70,8 @@
       "AddCurrency": "Add currency",
       "SplitAll": "Split {num_players} ways",
       "SplitItems": "Split items {num_players} ways",
-      "SplitCurrencies": "Split currency {num_players} ways"
+      "SplitCurrencies": "Split currency {num_players} ways",
+      "SplitNoPlayers": "No characters were found to split the contents with."
     },
     "Trade": {
       "Title": "Item Piles: Trading",
@@ -536,7 +537,7 @@
       "ItemPileConfig": {
         "Title": "Item Pile Configuration: {actor_name}",
         "Configure": "Item Pile",
-        "Update": "Update Item Pile",
+        "Update": "Update",
         "Main": {
           "Title": "Main Settings",
           "EnabledPile": "Enabled",

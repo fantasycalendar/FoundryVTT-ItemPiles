@@ -10,6 +10,7 @@ import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 import { SYSTEMS } from "../systems.js";
 import ItemPileConfig from "../applications/item-pile-config/item-pile-config.js";
+import { getCharactersForItemPile } from "../helpers/sharing-utilities.js";
 
 class API {
 	/**
@@ -1202,9 +1203,12 @@ class API {
 			throw Helpers.custom_error("SplitItemPileContents | instigator must be of type TokenDocument or Actor")
 		}
 
-		const actorUuids = (targets || SharingUtilities.getPlayersForItemPile(itemPileActor)
-			.map(u => u.character))
+		const actorUuids = (targets || SharingUtilities.getCharactersForItemPile(itemPileActor))
 			.map(actor => Utilities.getUuid(actor));
+
+		if (!actorUuids.length) {
+			throw Helpers.custom_error("SplitItemPileContents | Could not find any characters to split item piles' content with")
+		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_PILE, itemPileUuid, actorUuids, game.user.id, instigator);
 

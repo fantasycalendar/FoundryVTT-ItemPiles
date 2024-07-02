@@ -20,6 +20,16 @@ export function getPlayersForItemPile(target) {
 }
 
 /**
+ * Gets the characters for each player
+ *
+ * @param {Actor|TokenDocument|String} target
+ * @returns {Array<User>}
+ */
+export function getCharactersForItemPile(target) {
+	return getPlayersForItemPile(target).map(player => Utilities.getUserCharacter(player));
+}
+
+/**
  * Determines whether a pile can be split
  *
  * @param target
@@ -28,7 +38,8 @@ export function getPlayersForItemPile(target) {
 export function canItemPileBeSplit(target) {
 	const pileData = PileUtilities.getActorFlagData(target);
 	const shareData = getItemPileSharingData(target);
-	const playerActors = getPlayersForItemPile(target).map(player => Utilities.getUserCharacter(player));
+	const playerActors = getCharactersForItemPile(target);
+	if (!playerActors.length) return false;
 	const items = pileData.shareItemsEnabled ? PileUtilities.getActorItems(target) : [];
 	const currencies = pileData.shareCurrenciesEnabled || pileData.splitAllEnabled ? PileUtilities.getActorCurrencies(target) : [];
 	for (const item of items) {
@@ -300,7 +311,7 @@ export function getItemSharesLeftForActor(pile, item, recipient, {
 
 	players = players ?? getPlayersForItemPile(pile).length;
 	let totalActorShare = totalShares / players;
-	if (!Number.isInteger(totalActorShare) && !floor) {
+	if (totalActorShare && !Number.isInteger(totalActorShare) && !floor) {
 		totalActorShare += 1;
 	}
 
@@ -333,7 +344,7 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 
 	players = players ?? getPlayersForItemPile(pile).length;
 	let totalActorShare = totalShares / players;
-	if (!Number.isInteger(totalActorShare) && !floor) {
+	if (totalActorShare && !Number.isInteger(totalActorShare) && !floor) {
 		totalActorShare += 1;
 	}
 

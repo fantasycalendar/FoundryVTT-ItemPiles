@@ -12,7 +12,7 @@ export default class MerchantApp extends SvelteApplication {
 	constructor(merchant, recipient = false, options = {}, dialogData = {}) {
 		super({
 			title: `Merchant: ${merchant.name}`,
-			id: `item-pile-merchant-${merchant.uuid}-${foundry.utils.randomID()}`,
+			id: `item-pile-merchant-${merchant.id}-${foundry.utils.randomID()}`,
 			svelte: {
 				class: MerchantAppShell,
 				target: document.body,
@@ -41,7 +41,7 @@ export default class MerchantApp extends SvelteApplication {
 	}
 
 	static getActiveApp(source) {
-		return Helpers.getActiveApps(`item-pile-merchant-${source.uuid}`, true);
+		return Helpers.getActiveApps(`item-pile-merchant-${source.id}`, true);
 	}
 
 	static async show(merchant, recipient = false, options = {}, dialogData = {}) {

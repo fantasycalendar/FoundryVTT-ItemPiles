@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.0.4
+
+- Fixed errors when duplicating item piles and trying to open their interfaces
+- Fixed issue with trying to split an item pile among 0 players
+
 ## Version 3.0.3
 
 - Minor fix to latest release

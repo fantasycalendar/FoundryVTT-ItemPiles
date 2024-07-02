@@ -377,8 +377,7 @@ export async function runMacro(macroId, macroData) {
 
 }
 
-export function getOwnedCharacters(user = false) {
-	user = user || game.user;
+export function getOwnedCharacters(user = game.user) {
 	return game.actors.filter(actor => {
 			return actor.ownership?.[user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER && actor.prototypeToken.actorLink;
 		})
@@ -387,8 +386,7 @@ export function getOwnedCharacters(user = false) {
 		});
 }
 
-export function getUserCharacter(user = false) {
-	user = user || game.user;
+export function getUserCharacter(user = game.user) {
 	return user.character || (user.isGM ? false : (getOwnedCharacters(user)?.[0] ?? false));
 }
 
@@ -415,7 +413,14 @@ export async function createFoldersFromNames(folders, type = "Actor") {
 export function getSourceActorFromDropData(dropData) {
 	if (dropData.uuid) {
 		const doc = fromUuidSync(dropData.uuid);
-		return doc instanceof Actor ? doc : doc.parent;
+		if (doc instanceof Actor) {
+			return doc;
+		} else if (doc instanceof TokenDocument) {
+			return doc.actor;
+		} else if (doc instanceof Item) {
+			return doc.parent
+		}
+		return false;
 	} else if (dropData.tokenId) {
 		if (dropData.sceneId) {
 			const uuid = `Scene.${dropData.sceneId}.Token.${dropData.tokenId}`;

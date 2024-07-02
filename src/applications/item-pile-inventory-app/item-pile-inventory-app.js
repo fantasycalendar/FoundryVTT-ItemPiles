@@ -13,13 +13,12 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 	 *
 	 * @param actor
 	 * @param recipient
-	 * @param overrides
 	 * @param options
 	 * @param dialogData
 	 */
 	constructor(actor, recipient, options = {}, dialogData = {}) {
 		super({
-			id: `item-pile-inventory-${actor?.token?.uuid ?? actor.uuid}-${foundry.utils.randomID()}`,
+			id: `item-pile-inventory-${actor?.token?.id ?? actor.id}-${foundry.utils.randomID()}`,
 			title: actor.name,
 			svelte: {
 				class: ItemPileInventoryShell,
@@ -51,7 +50,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 	}
 
 	static getActiveApps(source) {
-		return Helpers.getActiveApps(`item-pile-inventory-${source?.token?.uuid ?? source.uuid}`);
+		return Helpers.getActiveApps(`item-pile-inventory-${source?.token?.id ?? source.id}`);
 	}
 
 	static async show(source, recipient = false, options = {}, dialogData = {}) {

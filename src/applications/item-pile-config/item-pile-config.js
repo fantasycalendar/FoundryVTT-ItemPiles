@@ -8,7 +8,7 @@ export default class ItemPileConfig extends SvelteApplication {
 	constructor(pileActor, options = {}) {
 
 		super({
-			id: `item-pile-config-${pileActor.uuid}-${foundry.utils.randomID()}`,
+			id: `item-pile-config-${pileActor.id}-${foundry.utils.randomID()}`,
 			title: game.i18n.format("ITEM-PILES.Applications.ItemPileConfig.Title", { actor_name: pileActor.name }),
 			svelte: {
 				class: ItemPileConfigShell,
@@ -32,7 +32,7 @@ export default class ItemPileConfig extends SvelteApplication {
 	}
 
 	static getActiveApp(source) {
-		return getActiveApps(`item-pile-config-${source.uuid}`, true)
+		return getActiveApps(`item-pile-config-${source.id}`, true)
 	}
 
 	static async show(target, options = {}, dialogData = {}) {

@@ -8,7 +8,7 @@ export default class ItemEditor extends SvelteApplication {
 		let title = game.i18n.format("ITEM-PILES.Applications.ItemEditor.Title", { item_name: item.name })
 		if (options.extraTitle) title += options.extraTitle;
 		super({
-			id: `item-pile-item-editor-${item.uuid}-${foundry.utils.randomID()}`,
+			id: `item-pile-item-editor-${item.id}${item.parent ? "-" + item.parent.id : ""}-${foundry.utils.randomID()}`,
 			title,
 			svelte: {
 				class: ItemEditorShell,
@@ -31,7 +31,7 @@ export default class ItemEditor extends SvelteApplication {
 	}
 
 	static getActiveApp(item) {
-		return getActiveApps(`item-pile-item-editor-${item.uuid}`, true);
+		return getActiveApps(`item-pile-item-editor-${item.id}${item.parent ? "-" + item.parent.id : ""}`, true);
 	}
 
 	static async show(item = false, options = {}, dialogData = {}) {
