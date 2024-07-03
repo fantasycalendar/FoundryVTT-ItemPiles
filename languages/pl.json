@@ -60,7 +60,8 @@
       "SplitCurrencies": "Podziel walutę na {num_players} graczy",
       "SplitAll": "Podziel na {num_players} graczy",
       "Owner": "Jako właściciel tego Stosu Przedmiotów, możesz modyfikować jego zawartość.",
-      "SplitItems": "Podziel przedmioty na {num_players} graczy"
+      "SplitItems": "Podziel przedmioty na {num_players} graczy",
+      "SplitNoPlayers": "Nie znaleziono żadnych postaci, którymi można by podzielić zawartość."
     },
     "Trade": {
       "Title": "Item Piles: Wymiany",
@@ -638,7 +639,7 @@
           "RestrictAccess": "Ograniczenie dostępu do skarbca",
           "RestrictAccessExplanation": "Domyślnie każdy może uzyskać dostęp do skarbców, jeśli widzi je na pasku bocznym lub może przejść obok nich na scenie. Gdy to ustawienie jest włączone, skarbiec będzie widoczny tylko dla właściciela postaci skarbca lub użytkowników/postaci skonfigurowanych w Edytorze dostępu (patrz poniżej)."
         },
-        "Update": "Uaktualnij Item Pile",
+        "Update": "Uaktualnij",
         "SingleItem": {
           "Title": "Ustawienia pojedynczej pozycji",
           "DisplayOne": "Wyświetlanie obrazu pojedynczego przedmiotu",
