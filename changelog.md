@@ -4,6 +4,7 @@
 
 - Fixed issue in Foundry v11 that would cause item piles to not refresh when items and currencies were taken from them, allowing users to take multiple items
 - Fixed bug with giving item always giving 1 item
+- Updated Polish localization (thank you Lioheart on weblate!)
 
 ## Version 3.0.4
 
