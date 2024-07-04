@@ -60,7 +60,8 @@
       "SplitCurrencies": "Podziel walutę na {num_players} graczy",
       "SplitAll": "Podziel na {num_players} graczy",
       "Owner": "Jako właściciel tego Stosu Przedmiotów, możesz modyfikować jego zawartość.",
-      "SplitItems": "Podziel przedmioty na {num_players} graczy"
+      "SplitItems": "Podziel przedmioty na {num_players} graczy",
+      "SplitNoPlayers": "Nie znaleziono żadnych postaci, którymi można by podzielić zawartość."
     },
     "Trade": {
       "Title": "Item Piles: Wymiany",
@@ -433,7 +434,9 @@
         "GridWidth": "Szerokość",
         "GridHeight": "Wysokość",
         "VaultImageRotated": "Obrócony obraz skarbca",
-        "VaultImageRotatedExplanation": "Zastępuje to obraz przedmiotu wyświetlany w skarbcu, gdy jest on obrócony."
+        "VaultImageRotatedExplanation": "Zastępuje to obraz przedmiotu wyświetlany w skarbcu, gdy jest on obrócony.",
+        "PriceModifierTitle": "Modyfikatory cen kupna i sprzedaży",
+        "PriceModifierExplanation": "Pozwala skonfigurować modyfikatory kosztu zakupu i sprzedaży przedmiotu. Mnoży to cenę bazową przedmiotu przed wszelkimi innymi modyfikatorami ceny. Jeśli modyfikator ceny sprzedaży sprzedawcy wynosi 50%, modyfikator ceny sprzedaży przedmiotu musiałby wynosić 200%, aby zniwelować modyfikator sprzedawcy."
       },
       "FilterEditor": {
         "Explanation": "Tutaj możesz zdefiniować wiele typów filtrów, które wykluczą pewne typy przedmiotów. Na podstawie podanej ścieżki atrybutu, stos przedmiotów mógłby znaleźć \"typ\" przedmiotu i na podstawie filtrów, ukrywa te przedmioty w UI inwentarza stosu przedmiotów.",
@@ -636,7 +639,7 @@
           "RestrictAccess": "Ograniczenie dostępu do skarbca",
           "RestrictAccessExplanation": "Domyślnie każdy może uzyskać dostęp do skarbców, jeśli widzi je na pasku bocznym lub może przejść obok nich na scenie. Gdy to ustawienie jest włączone, skarbiec będzie widoczny tylko dla właściciela postaci skarbca lub użytkowników/postaci skonfigurowanych w Edytorze dostępu (patrz poniżej)."
         },
-        "Update": "Uaktualnij Item Pile",
+        "Update": "Uaktualnij",
         "SingleItem": {
           "Title": "Ustawienia pojedynczej pozycji",
           "DisplayOne": "Wyświetlanie obrazu pojedynczego przedmiotu",
