@@ -66,7 +66,8 @@ export class VaultStore extends ItemPileStore {
 		});
 
 		this.subscribeTo(this.document, () => {
-			const { renderData } = this.document.updateOptions;
+			const updateData = this.document.updateOptions;
+			const renderData = updateData?.renderData ?? updateData?.data ?? {};
 			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.LOG)) {
 				this.processLogEntries();
 			}

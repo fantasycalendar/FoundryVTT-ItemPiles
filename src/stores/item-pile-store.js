@@ -148,9 +148,11 @@ export default class ItemPileStore {
 	setupSubscriptions() {
 
 		this.subscribeTo(this.document, () => {
-			const { renderData } = this.document.updateOptions;
+			const updateData = this.document.updateOptions;
+			const renderData = updateData?.renderData ?? updateData?.data ?? {};
 			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.SHARING)) {
 				this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
+				13
 				this.refreshItems();
 			}
 			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.PILE)) {
@@ -164,7 +166,8 @@ export default class ItemPileStore {
 
 		if (this.recipientDocument) {
 			this.subscribeTo(this.recipientDocument, () => {
-				const { renderData } = this.document.updateOptions;
+				const updateData = this.document.updateOptions;
+				const renderData = updateData?.renderData ?? updateData?.data ?? {};
 				if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.SHARING)) {
 					this.recipientShareData.set(SharingUtilities.getItemPileSharingData(this.recipient));
 					this.refreshItems();

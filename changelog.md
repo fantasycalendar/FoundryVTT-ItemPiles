@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.0.5
+
+- Fixed issue in Foundry v11 that would cause item piles to not refresh when items and currencies were taken from them, allowing users to take multiple items
+- Fixed bug with giving item always giving 1 item
+
 ## Version 3.0.4
 
 - Fixed random-ish errors when duplicating item piles and then trying to open their interfaces

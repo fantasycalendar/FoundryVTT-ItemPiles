@@ -1846,8 +1846,6 @@ export default class PrivateAPI {
 
 		if (user?.active || gms.length || game.user.isGM) {
 
-			dropData.itemData.quantity = 1;
-
 			if (PileUtilities.canItemStack(dropData.itemData.item)) {
 				let itemQuantity = Utilities.getItemQuantity(item);
 				if ((!itemQuantity || itemQuantity <= 0)) {
@@ -1858,7 +1856,11 @@ export default class PrivateAPI {
 					dropData.itemData.quantity = await DropItemDialog.show(item, dropData.target.actor, {
 						localizationTitle: "GiveItem"
 					});
+				} else if (!dropData.itemData.quantity) {
+					dropData.itemData.quantity = 1;
 				}
+			} else {
+				dropData.itemData.quantity = 1;
 			}
 
 			Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);

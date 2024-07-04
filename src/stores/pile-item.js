@@ -91,7 +91,8 @@ export class PileItem extends PileBaseItem {
 		});
 
 		this.subscribeTo(this.itemDocument, () => {
-			const { renderData } = this.itemDocument.updateOptions;
+			const updateData = this.itemDocument.updateOptions;
+			const renderData = updateData?.renderData ?? updateData?.data ?? {};
 			const itemData = CompendiumUtilities.findSimilarItemInCompendiumSync(this.item);
 			this.name.set(itemData?.name ?? this.item.name);
 			this.img.set(itemData?.img ?? this.item.img);
@@ -253,7 +254,8 @@ export class PileAttribute extends PileBaseItem {
 		});
 
 		this.subscribeTo(this.store.document, () => {
-			const { renderData } = this.store.document.updateOptions;
+			const updateData = this.store.document.updateOptions;
+			const renderData = updateData?.renderData ?? updateData?.data ?? {};
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
