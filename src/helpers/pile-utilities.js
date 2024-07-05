@@ -1153,6 +1153,7 @@ export function getPriceData({
 
 		// Base prices is the displayed price, without quantity taken into account
 		const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
+		const basePrices = getPriceArray(baseCost, defaultCurrencies);
 
 		// Prices is the cost with the amount of quantity taken into account, which may change the number of the different
 		// types of currencies it costs (eg, an item wouldn't cost 1 gold and 100 silver, it would cost 11 gold
