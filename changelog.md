@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 3.0.6
+
+- Fixed very specific game crash surrounding currency rounding when buying multiple items with discounts with a specific currency setup
+- Fixed giving multiple quantity of a single item would always give just 1
+- Fixed Item Pile data resetting upon token updates
+
 ## Version 3.0.5
 
 - Fixed issue in Foundry v11 that would cause item piles to not refresh when items and currencies were taken from them, allowing users to take multiple items

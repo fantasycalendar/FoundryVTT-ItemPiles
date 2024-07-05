@@ -87,10 +87,11 @@ export function getItemFlagData(item, data = false) {
  *
  * @param target
  * @param data
+ * @param useDefaults
  * @returns {Object<CONSTANTS.PILE_DEFAULTS>}
  */
-export function getActorFlagData(target, data = false) {
-	const defaults = getPileDefaults();
+export function getActorFlagData(target, { data = false, useDefaults = true } = {}) {
+	const defaults = useDefaults ? getPileDefaults() : {};
 	target = Utilities.getActor(target);
 	if (target?.token) {
 		target = target.token;
@@ -100,62 +101,62 @@ export function getActorFlagData(target, data = false) {
 
 export function isValidItemPile(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return targetActor && pileData?.enabled;
 }
 
 export function isRegularItemPile(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return targetActor && pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.PILE;
 }
 
 export function isItemPileContainer(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER;
 }
 
 export function isItemPileLootable(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return targetActor && pileData?.enabled && (pileData?.type === CONSTANTS.PILE_TYPES.PILE || pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER);
 }
 
 export function isItemPileVault(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.VAULT;
 }
 
 export function isItemPileMerchant(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.MERCHANT;
 }
 
 export function isItemPileAuctioneer(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.AUCTIONEER;
 }
 
 export function isItemPileBanker(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.BANKER;
 }
 
 export function isItemPileClosed(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
 	return pileData.closed;
 }
 
 export function isItemPileLocked(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
 	return pileData.locked;
 }
@@ -313,7 +314,7 @@ export function getCurrencyList(target = false, pileData = false) {
 			return cachedCurrencyList.get(targetUuid)
 		}
 		const targetActor = Utilities.getActor(target);
-		pileData = getActorFlagData(targetActor, pileData);
+		pileData = getActorFlagData(targetActor, { data: pileData });
 	}
 
 	const primaryCurrencies = (pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES);
@@ -341,7 +342,7 @@ export function getActorItemFilters(target, pileData = false) {
 		return cachedFilterList.get(targetUuid)
 	}
 	const targetActor = Utilities.getActor(target);
-	pileData = getActorFlagData(targetActor, pileData);
+	pileData = getActorFlagData(targetActor, { data: pileData });
 	const itemFilters = isValidItemPile(targetActor, pileData) && pileData?.overrideItemFilters
 		? cleanItemFilters(pileData.overrideItemFilters)
 		: cleanItemFilters(game.itempiles.API.ITEM_FILTERS);
@@ -356,7 +357,7 @@ export function getActorRequiredItemProperties(target, pileData = false) {
 		return cachedRequiredPropertiesList.get(targetUuid)
 	}
 	const targetActor = Utilities.getActor(target);
-	pileData = getActorFlagData(targetActor, pileData);
+	pileData = getActorFlagData(targetActor, { data: pileData });
 	const itemFilters = isValidItemPile(targetActor, pileData)
 		? cleanItemFilters(pileData.requiredItemProperties)
 		: [];
@@ -481,7 +482,7 @@ export function getItemPileTokenImage(token, {
 
 	const pileDocument = Utilities.getDocument(token);
 
-	const itemPileData = getActorFlagData(pileDocument, data);
+	const itemPileData = getActorFlagData(pileDocument, { data });
 
 	const originalImg = overrideImage ?? (pileDocument instanceof TokenDocument
 		? pileDocument.texture.src
@@ -532,7 +533,7 @@ export function getItemPileTokenScale(target, {
 
 	const pileDocument = Utilities.getDocument(target);
 
-	let itemPileData = getActorFlagData(pileDocument, data);
+	let itemPileData = getActorFlagData(pileDocument, { data });
 
 	const baseScale = overrideScale ?? (pileDocument instanceof TokenDocument
 		? pileDocument.texture.scaleX
@@ -559,7 +560,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
 	const pileDocument = Utilities.getDocument(target);
 
-	const itemPileData = getActorFlagData(pileDocument, data);
+	const itemPileData = getActorFlagData(pileDocument, { data });
 
 	let name = overrideName ?? (pileDocument instanceof TokenDocument
 		? pileDocument.name
@@ -633,7 +634,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
 	if (!target) return;
 
-	if (!flagData) flagData = getActorFlagData(target);
+	flagData = getActorFlagData(target, { data: flagData });
 	if (!tokenData) tokenData = {};
 	tokenData = foundry.utils.mergeObject(tokenData, {});
 
@@ -645,8 +646,10 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
 	const pileData = { data: flagData, items, currencies };
 
-	// This seems to do more damage than good, especially when open/closing stores with the button
-	// flagData = cleanFlagData(flagData);
+	const freshFlagData = getActorFlagData(target, { useDefaults: false });
+	const cleanedFlagData = cleanFlagData(flagData);
+	const cleanFreshFlagData = cleanFlagData(freshFlagData);
+	const combinedFreshFlagData = cleanFlagData(foundry.utils.mergeObject(cleanedFlagData, cleanFreshFlagData), { addRemoveFlag: true });
 
 	const updates = documentTokens.map(tokenDocument => {
 		const overrideImage = foundry.utils.getProperty(tokenData, "texture.src")
@@ -662,13 +665,12 @@ export async function updateItemPileData(target, flagData, tokenData) {
 			"name": getItemPileName(tokenDocument, pileData, tokenData?.name),
 		});
 		const data = {
-			"_id": tokenDocument.id, ...newTokenData
+			"_id": tokenDocument.id,
+			[CONSTANTS.FLAGS.PILE]: combinedFreshFlagData,
+			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+			...newTokenData
 		};
-		if (!tokenDocument.actorLink && (tokenDocument.actor === documentActor || !documentActor)) {
-			data[CONSTANTS.FLAGS.PILE] = flagData;
-			data[CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
-			documentActor = false;
-		}
+		if (!tokenDocument.actorLink) documentActor = false;
 		return data;
 	});
 
@@ -678,7 +680,8 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
 	if (documentActor) {
 		await documentActor.update({
-			[CONSTANTS.FLAGS.PILE]: flagData, [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+			[CONSTANTS.FLAGS.PILE]: combinedFreshFlagData,
+			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
 		});
 	}
 
@@ -688,8 +691,9 @@ export async function updateItemPileData(target, flagData, tokenData) {
 export function cleanFlagData(flagData, { addRemoveFlag = false } = {}) {
 	const defaults = getPileDefaults();
 	const defaultKeys = Object.keys(defaults);
+	const newKeys = new Set(Object.keys(flagData));
 	const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, defaults)));
-	const toRemove = new Set(defaultKeys.filter(key => !difference.has(key)));
+	const toRemove = new Set(defaultKeys.filter(key => !difference.has(key) && newKeys.has(key)));
 	if (flagData.enabled) {
 		toRemove.delete("type")
 	}
@@ -742,7 +746,7 @@ export function getMerchantModifiersForActor(merchant, {
 
 	let {
 		buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, actorPriceModifiers
-	} = getActorFlagData(merchant, pileFlagData);
+	} = getActorFlagData(merchant, { data: pileFlagData });
 
 	if (item) {
 		if (!itemFlagData) {
@@ -1060,12 +1064,12 @@ export function getPriceData({
 
 	let priceData = [];
 
-	buyerFlagData = getActorFlagData(buyer, buyerFlagData);
+	buyerFlagData = getActorFlagData(buyer, { data: buyerFlagData });
 	if (!isItemPileMerchant(buyer, buyerFlagData)) {
 		buyerFlagData = false;
 	}
 
-	sellerFlagData = getActorFlagData(seller, sellerFlagData);
+	sellerFlagData = getActorFlagData(seller, { data: sellerFlagData });
 	if (!isItemPileMerchant(seller, sellerFlagData)) {
 		sellerFlagData = false;
 	}
@@ -1149,11 +1153,11 @@ export function getPriceData({
 
 		// Base prices is the displayed price, without quantity taken into account
 		const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
-		const basePrices = getPriceArray(baseCost, defaultCurrencies);
 
 		// Prices is the cost with the amount of quantity taken into account, which may change the number of the different
 		// types of currencies it costs (eg, an item wouldn't cost 1 gold and 100 silver, it would cost 11 gold
-		let totalCost = Helpers.roundToDecimals(overallCost * modifier * quantity, decimals);
+		let totalCost = baseCost * quantity;
+
 		let prices = getPriceArray(totalCost, defaultCurrencies);
 
 		if (baseCost) {
@@ -1382,12 +1386,12 @@ export function getPaymentData({
 	buyerFlagData = false
 } = {}) {
 
-	buyerFlagData = getActorFlagData(buyer, buyerFlagData);
+	buyerFlagData = getActorFlagData(buyer, { data: buyerFlagData });
 	if (!isItemPileMerchant(buyer, buyerFlagData)) {
 		buyerFlagData = false;
 	}
 
-	sellerFlagData = getActorFlagData(seller, sellerFlagData);
+	sellerFlagData = getActorFlagData(seller, { data: sellerFlagData });
 	if (!isItemPileMerchant(seller, sellerFlagData)) {
 		sellerFlagData = false;
 	}
@@ -1745,7 +1749,7 @@ export async function updateMerchantLog(itemPile, activityData = {}) {
 
 export function getVaultGridData(vaultActor, { flagData = false, items = false } = {}) {
 
-	const vaultFlags = getActorFlagData(vaultActor, flagData);
+	const vaultFlags = getActorFlagData(vaultActor, { data: flagData });
 
 	const vaultItems = getActorItems(vaultActor);
 
@@ -1967,7 +1971,7 @@ export function getNewItemsVaultPosition(item, gridData, { position = null } = {
 
 export function getVaultAccess(vaultActor, { flagData = false, hasRecipient = false } = {}) {
 
-	const vaultFlags = getActorFlagData(vaultActor, flagData);
+	const vaultFlags = getActorFlagData(vaultActor, { data: flagData });
 
 	const vaultAccess = vaultFlags.vaultAccess.filter(access => {
 		return fromUuidSync(access.uuid)?.isOwner;
