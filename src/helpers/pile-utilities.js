@@ -630,11 +630,11 @@ function getRelevantTokensAndActor(target) {
 
 }
 
-export async function updateItemPileData(target, flagData, tokenData) {
+export async function updateItemPileData(target, newFlags, tokenData) {
 
 	if (!target) return;
 
-	flagData = getActorFlagData(target, { data: flagData });
+	const flagData = getActorFlagData(target, { data: newFlags });
 	if (!tokenData) tokenData = {};
 	tokenData = foundry.utils.mergeObject(tokenData, {});
 
@@ -649,7 +649,7 @@ export async function updateItemPileData(target, flagData, tokenData) {
 	const freshFlagData = getActorFlagData(target, { useDefaults: false });
 	const cleanedFlagData = cleanFlagData(flagData);
 	const cleanFreshFlagData = cleanFlagData(freshFlagData);
-	const combinedFreshFlagData = cleanFlagData(foundry.utils.mergeObject(cleanedFlagData, cleanFreshFlagData), { addRemoveFlag: true });
+	const combinedFreshFlagData = cleanFlagData(foundry.utils.mergeObject(cleanFreshFlagData, cleanedFlagData), { addRemoveFlag: true });
 
 	const updates = documentTokens.map(tokenDocument => {
 		const overrideImage = foundry.utils.getProperty(tokenData, "texture.src")

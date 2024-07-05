@@ -37,12 +37,12 @@ export default class GiveItems extends TJSDialog {
 		})
 	}
 
-	static getActiveApps(id) {
-		return getActiveApps(`item-pile-give-items-${id}`);
+	static getActiveApps(item) {
+		return getActiveApps(`item-pile-give-items-${item.id}`);
 	}
 
 	static async show(item, options = {}) {
-		const apps = this.getActiveApps(item.id);
+		const apps = this.getActiveApps(item);
 		if (apps.length) {
 			for (let app of apps) {
 				app.render(false, { focus: true });

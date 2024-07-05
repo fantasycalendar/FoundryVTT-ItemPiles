@@ -4,7 +4,8 @@
 
 - Fixed very specific game crash surrounding currency rounding when buying multiple items with discounts with a specific currency setup
 - Fixed giving multiple quantity of a single item would always give just 1
-- Fixed Item Pile data resetting upon token updates
+- Fixed item pile data resetting upon token updates
+- Fixed item pile interfaces not reopening after changing their item pile type
 
 ## Version 3.0.5
 

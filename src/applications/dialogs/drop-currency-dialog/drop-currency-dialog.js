@@ -13,8 +13,9 @@ export default class DropCurrencyDialog extends SvelteApplication {
 	 */
 	constructor(sourceActor, targetActor, settings = {}, options = {}) {
 		const localization = settings.localization || "DropCurrencies";
+		const id = sourceActor ? (sourceActor.id + (targetActor ? "-" + targetActor.id : "")) : "";
 		super({
-			id: `item-pile-drop-currency-${sourceActor ? (sourceActor.id + (targetActor ? "-" + targetActor.id : "")) : ""}-${foundry.utils.randomID()}`,
+			id: `item-pile-drop-currency-${id}-${foundry.utils.randomID()}`,
 			title: settings.title ?? game.i18n.localize(`ITEM-PILES.Applications.${localization}.Title`),
 			svelte: {
 				class: DropCurrencyDialogShell,
@@ -39,13 +40,14 @@ export default class DropCurrencyDialog extends SvelteApplication {
 		})
 	}
 
-	static getActiveApps(id) {
+	static getActiveApps(sourceActor, targetActor) {
+		const id = sourceActor ? (sourceActor.id + (targetActor ? "-" + targetActor.id : "")) : "";
 		return getActiveApps(`item-pile-drop-currency-${id}`);
 	}
 
 	static async show(sourceActor, targetActor, settings = {}, options = {}) {
 		if (sourceActor) {
-			const apps = this.getActiveApps(targetActor ? sourceActor.uuid + "-" + targetActor.uuid : sourceActor.uuid);
+			const apps = this.getActiveApps(sourceActor, targetActor);
 			if (apps.length) {
 				for (let app of apps) {
 					app.render(false, { focus: true });

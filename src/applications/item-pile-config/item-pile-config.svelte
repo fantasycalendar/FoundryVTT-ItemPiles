@@ -77,22 +77,22 @@
 				let apps = [];
 				switch (currentData.type) {
 					case CONSTANTS.PILE_TYPES.MERCHANT:
-						if (MerchantApp.getActiveApp(pileActor.uuid)) {
-							promises.push(MerchantApp.getActiveApp(pileActor.uuid).close());
+						if (MerchantApp.getActiveApp(pileActor)) {
+							promises.push(MerchantApp.getActiveApp(pileActor).close());
 						}
-						if (MerchantApp.getActiveApp(pileActor?.token?.uuid)) {
-							promises.push(MerchantApp.getActiveApp(pileActor?.token?.uuid).close());
+						if (MerchantApp.getActiveApp(pileActor)) {
+							promises.push(MerchantApp.getActiveApp(pileActor).close());
 						}
 						break;
 
 					case CONSTANTS.PILE_TYPES.VAULT:
-						apps = VaultApp.getActiveApps(pileActor.uuid)
-							.concat(VaultApp.getActiveApps(pileActor?.token?.uuid));
+						apps = VaultApp.getActiveApps(pileActor)
+							.concat(VaultApp.getActiveApps(pileActor));
 						break;
 
 					default:
-						apps = ItemPileInventoryApp.getActiveApps(pileActor.uuid)
-							.concat(ItemPileInventoryApp.getActiveApps(pileActor?.token?.uuid));
+						apps = ItemPileInventoryApp.getActiveApps(pileActor)
+							.concat(ItemPileInventoryApp.getActiveApps(pileActor));
 						break;
 				}
 

@@ -50,7 +50,8 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 	}
 
 	static getActiveApps(source) {
-		return Helpers.getActiveApps(`item-pile-inventory-${source?.token?.id ?? source.id}`);
+		const id = typeof source === "string" ? source : source?.token?.id ?? source?.id;
+		return Helpers.getActiveApps(`item-pile-inventory-${id}`);
 	}
 
 	static async show(source, recipient = false, options = {}, dialogData = {}) {

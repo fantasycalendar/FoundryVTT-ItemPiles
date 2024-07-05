@@ -45,7 +45,7 @@ export default class TradeMerchantItemDialog extends SvelteApplication {
 	}
 
 	static async show(item, seller, buyer, settings = {}, options = {}) {
-		const apps = this.getActiveApps(item.uuid + "-" + seller.uuid + "-" + buyer.uuid);
+		const apps = this.getActiveApps(item.id + "-" + seller.id + "-" + buyer.id);
 		if (apps.length) {
 			for (let app of apps) {
 				app.render(false, { focus: true });

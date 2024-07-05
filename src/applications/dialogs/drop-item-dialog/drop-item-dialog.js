@@ -13,9 +13,10 @@ export default class DropItemDialog extends SvelteApplication {
 	constructor(item, target, options = {
 		localizationTitle: "DropItem"
 	}) {
+		const id = item.id + (target ? "-" + target.id : "");
 		super({
 			title: game.i18n.localize(`ITEM-PILES.Applications.${options.localizationTitle}.Title`),
-			id: `item-pile-drop-item-${item.id}${target ? "-" + target.id : ""}-${foundry.utils.randomID()}`,
+			id: `item-pile-drop-item-${id}-${foundry.utils.randomID()}`,
 			svelte: {
 				class: DropItemDialogShell,
 				target: document.body,
@@ -39,7 +40,8 @@ export default class DropItemDialog extends SvelteApplication {
 		})
 	}
 
-	static getActiveApps(id) {
+	static getActiveApps(item, target) {
+		const id = item.id + (target ? "-" + target.id : "");
 		return getActiveApps(`item-pile-drop-item-${id}`);
 	}
 
@@ -47,7 +49,7 @@ export default class DropItemDialog extends SvelteApplication {
 		if (!options?.localizationTitle) {
 			options.localizationTitle = "DropItem";
 		}
-		const apps = this.getActiveApps(item.uuid + (target ? "-" + target.uuid : ""));
+		const apps = this.getActiveApps(item, target);
 		if (apps.length) {
 			for (let app of apps) {
 				app.render(false, { focus: true });
