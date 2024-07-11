@@ -119,6 +119,5 @@
   "manifest": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/releases/latest/download/manifest.json",
   "download": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/releases/latest/download/module.zip",
   "readme": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/blob/master/README.md",
-  "bugs": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues",
-  "allowBugReporter": true
+  "bugs": "https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues"
 }
