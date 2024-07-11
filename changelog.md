@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 3.0.7
+
+- Tweaked `game.itempiles.API.createItemPile` with `createActor` set to `true` have the default item piles' settings
+- Fixed item pile containers not respecting open/close/lock/unlock settings
+- Fixed minor `module.json` manifest warning
+
 ## Version 3.0.6
 
 - Fixed very specific game crash surrounding currency rounding when buying multiple items with discounts with a specific currency setup

@@ -1060,15 +1060,14 @@ export default class PrivateAPI {
 
 		if (createActor) {
 
-			let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
+			const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
+			const defaultItemPileActor = game.actors.get(defaultItemPileId);
 
+			let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
 			pileDataDefaults.enabled = true;
-			if (foundry.utils.isEmpty(itemPileFlags)) {
-				pileDataDefaults.deleteWhenEmpty = true;
-				pileDataDefaults.displayOne = true;
-				pileDataDefaults.showItemName = true;
-				pileDataDefaults.overrideSingleItemScale = true;
-				pileDataDefaults.singleItemScale = 0.75;
+			if (foundry.utils.isEmpty(itemPileFlags) && defaultItemPileActor) {
+				const defaultItemPileSettings = PileUtilities.getActorFlagData(defaultItemPileActor);
+				itemPileFlags = foundry.utils.mergeObject(pileDataDefaults, defaultItemPileSettings);
 			}
 
 			pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
@@ -1106,7 +1105,8 @@ export default class PrivateAPI {
 
 		} else if (!actor) {
 
-			pileActor = game.actors.get(Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID));
+			const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
+			let pileActor = game.actors.get(defaultItemPileId);
 
 			if (!pileActor) {
 

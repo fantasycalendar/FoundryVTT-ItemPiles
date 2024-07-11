@@ -634,7 +634,7 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 
 	if (!target) return;
 
-	const flagData = getActorFlagData(target, { data: newFlags });
+	const flagData = getActorFlagData(target, { data: foundry.utils.deepClone(newFlags) });
 	if (!tokenData) tokenData = {};
 	tokenData = foundry.utils.mergeObject(tokenData, {});
 
@@ -646,10 +646,9 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 
 	const pileData = { data: flagData, items, currencies };
 
-	const freshFlagData = getActorFlagData(target, { useDefaults: false });
-	const cleanedFlagData = cleanFlagData(flagData);
-	const cleanFreshFlagData = cleanFlagData(freshFlagData);
-	const combinedFreshFlagData = cleanFlagData(foundry.utils.mergeObject(cleanFreshFlagData, cleanedFlagData), { addRemoveFlag: true });
+	const currentFlagData = getActorFlagData(target, { useDefaults: false });
+
+	const cleanedFlagData = cleanFlagData(flagData, { addRemoveFlag: true, existingData: currentFlagData });
 
 	const updates = documentTokens.map(tokenDocument => {
 		const overrideImage = foundry.utils.getProperty(tokenData, "texture.src")
@@ -666,7 +665,7 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 		});
 		const data = {
 			"_id": tokenDocument.id,
-			[CONSTANTS.FLAGS.PILE]: combinedFreshFlagData,
+			[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
 			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
 			...newTokenData
 		};
@@ -680,7 +679,7 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 
 	if (documentActor) {
 		await documentActor.update({
-			[CONSTANTS.FLAGS.PILE]: combinedFreshFlagData,
+			[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
 			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
 		});
 	}
@@ -688,12 +687,13 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 	return true;
 }
 
-export function cleanFlagData(flagData, { addRemoveFlag = false } = {}) {
+export function cleanFlagData(flagData, { addRemoveFlag = false, existingData = false } = {}) {
 	const defaults = getPileDefaults();
 	const defaultKeys = Object.keys(defaults);
 	const newKeys = new Set(Object.keys(flagData));
 	const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, defaults)));
 	const toRemove = new Set(defaultKeys.filter(key => !difference.has(key) && newKeys.has(key)));
+	const existingDataKeys = existingData ? new Set(Object.keys(existingData)) : false;
 	if (flagData.enabled) {
 		toRemove.delete("type")
 	}
@@ -702,13 +702,17 @@ export function cleanFlagData(flagData, { addRemoveFlag = false } = {}) {
 		for (const key of Object.keys(flagData)) {
 			if (!baseKeys.has(key)) {
 				delete flagData[key];
-				if (addRemoveFlag) flagData["-=" + key] = null;
+				if (addRemoveFlag && (!existingDataKeys || existingDataKeys.has(key))) {
+					flagData["-=" + key] = null;
+				}
 			}
 		}
 	}
 	for (const key of toRemove) {
 		delete flagData[key];
-		if (addRemoveFlag) flagData["-=" + key] = null;
+		if (addRemoveFlag && (!existingDataKeys || existingDataKeys.has(key))) {
+			flagData["-=" + key] = null;
+		}
 	}
 	return flagData;
 }
