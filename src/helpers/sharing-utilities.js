@@ -348,7 +348,7 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 
 	let previouslyTaken = 0;
 	let recipientUuid = Utilities.getUuid(recipient);
-	let currentQuantity = Number(getProperty(pile, path) ?? 0);
+	let currentQuantity = Number(foundry.utils.getProperty(pile, path) ?? 0);
 
 	if (getAll && SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
 		const items = PileUtilities.getActorItems(pile);

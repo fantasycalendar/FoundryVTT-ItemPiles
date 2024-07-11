@@ -117,8 +117,9 @@ export class PileItem extends PileBaseItem {
 			if (Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED)) {
 				this.containerID.set(Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED)({ item: this.item }));
 			}
-			if (Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, this.item.type)) {
-
+			if (!foundry.utils.isEmpty(renderData) && Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, this.item.type)) {
+				this.store.populateItems();
+				this.store.refreshItems();
 			}
 		});
 
@@ -243,7 +244,7 @@ export class PileAttribute extends PileBaseItem {
 		this.name = writable(this.attribute.name);
 		this.img = writable(this.attribute.img);
 		this.abbreviation = writable(this.attribute.abbreviation);
-		this.identifier = randomID()
+		this.identifier = foundry.utils.randomID();
 		const startingQuantity = Number(foundry.utils.getProperty(this.parent, this.path) ?? 0);
 		this.presentFromTheStart.set(startingQuantity > 0);
 		this.quantity.set(startingQuantity);

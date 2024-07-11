@@ -345,7 +345,7 @@ export function getCurrenciesInItem(targetItem, {
 
 	currencies = currencies.map(currency => {
 		currency.quantity = currency.type === "attribute"
-			? getProperty(itemDocument, currency.path)
+			? foundry.utils.getProperty(itemDocument, currency.path)
 			: Utilities.getItemQuantity(currency.item);
 		return currency;
 	});

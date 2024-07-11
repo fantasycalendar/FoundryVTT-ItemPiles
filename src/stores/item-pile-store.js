@@ -181,14 +181,35 @@ export default class ItemPileStore {
 			});
 		}
 
-		const items = [];
-		const attributes = [];
+		this.subscribeTo(this.allItems, () => {
+			this.refreshItems();
+		});
+		this.subscribeTo(this.attributes, () => {
+			this.refreshItems();
+		});
+
+		const filterDebounce = foundry.utils.debounce(() => {
+			this.refreshItems();
+		}, this.searchDelay);
+		this.subscribeTo(this.search, (val) => {
+			filterDebounce()
+		});
+
+		this.populateItems();
+
+	}
+
+	populateItems() {
+
+		const items = get(this.allItems);
+		const attributes = get(this.attributes);
 
 		const pileData = PileUtilities.isValidItemPile(this.actor) || !this.recipient ? get(this.pileData) : get(this.recipientPileData);
 
 		const pileItems = PileUtilities.getActorItems(this.actor, { itemFilters: pileData.overrideItemFilters });
 
 		pileItems.forEach(item => {
+			if (items.some(existingItem => existingItem.item === item)) return;
 			items.push(new this.ItemClass(this, item));
 		});
 
@@ -204,6 +225,7 @@ export default class ItemPileStore {
 					getAll: false
 				}).forEach(currency => {
 					if (currency.type !== "item") {
+						if (attributes.some(existingAttribute => existingAttribute.path === currency.path && existingAttribute.parent === containerPileItem.item)) return;
 						const currencyPileItem = new this.AttributeClass(this, currency, true, !!currency?.secondary, containerPileItem)
 						currencyPileItem.containerID.set(containerPileItem.item.id);
 						attributes.push(currencyPileItem);
@@ -215,29 +237,17 @@ export default class ItemPileStore {
 
 		PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
 			if (currency.type === "item") {
-				if (!currency.item) return
+				if (!currency.item) return;
+				if (items.some(existingItem => existingItem.item === currency.item)) return;
 				items.push(new this.ItemClass(this, currency.item, true, !!currency?.secondary));
 			} else {
+				if (attributes.some(existingAttribute => existingAttribute.path === currency.path)) return;
 				attributes.push(new this.AttributeClass(this, currency, true, !!currency?.secondary));
 			}
 		});
 
 		this.allItems.set(items);
 		this.attributes.set(attributes);
-
-		this.subscribeTo(this.allItems, () => {
-			this.refreshItems();
-		});
-		this.subscribeTo(this.attributes, () => {
-			this.refreshItems();
-		});
-
-		const filterDebounce = foundry.utils.debounce(() => {
-			this.refreshItems();
-		}, this.searchDelay);
-		this.subscribeTo(this.search, (val) => {
-			filterDebounce()
-		});
 
 	}
 
@@ -284,11 +294,11 @@ export default class ItemPileStore {
 			.reduce((acc, item) => {
 				const containerID = get(item.containerID);
 				if (containerID) {
-					const container = allItems.find(pileItem => pileItem.id === containerID)
+					const container = allItems.find(pileItem => pileItem.id === containerID);
 					if (container) {
 						container.subItems.update(subItems => {
 							subItems.push(item);
-							return subItems
+							return subItems;
 						});
 						return acc;
 					}
@@ -305,7 +315,13 @@ export default class ItemPileStore {
 					if (container) {
 						container.subItems.update(subItems => {
 							subItems.push(item);
-							return subItems
+							subItems.sort((a, b) => {
+								if (a?.attribute?.exchangeRate && b?.attribute?.exchangeRate) {
+									return (b?.attribute?.exchangeRate ?? 0) - (a?.attribute?.exchangeRate ?? 0);
+								}
+								return (get(b.name) > get(a.name) ? -1 : 1);
+							})
+							return subItems;
 						});
 						return acc;
 					}

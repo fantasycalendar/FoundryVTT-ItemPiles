@@ -15,7 +15,7 @@
 <ListEntry bind:entry={item} {store} divider/>
 {#if $subItems.length}
 	<div class="item-piles-item-sublist">
-		{#each $subItems as subItem}
+		{#each $subItems as subItem (subItem.identifier)}
 			<div class="item-piles-tree-branch-right-arm"></div>
 			<ListEntry {store} bind:entry={subItem}/>
 		{/each}
