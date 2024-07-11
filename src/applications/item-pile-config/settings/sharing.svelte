@@ -1,7 +1,7 @@
 <script>
 
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
-	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import { localize } from "#runtime/svelte/helper";
+	import { TJSDialog } from "#runtime/svelte/application";
 	import CustomDialog from "../../components/CustomDialog.svelte";
 	import * as SharingUtilities from "../../../helpers/sharing-utilities.js";
 

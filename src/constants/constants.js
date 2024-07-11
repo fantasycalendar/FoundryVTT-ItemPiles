@@ -7,8 +7,9 @@ const CONSTANTS = {
 
 	MODULE_NAME: module_name,
 	PATH: module_path,
+	IS_V12: false,
 
-	ACTOR_DELTA_PROPERTY: "actorData",
+	ACTOR_DELTA_PROPERTY: "delta",
 
 	FLAGS: {
 		VERSION: `${baseFlag}.version`,
@@ -62,6 +63,8 @@ const CONSTANTS = {
 		macro: "",
 		customCategory: "",
 		prices: [],
+		buyPriceModifier: 1,
+		sellPriceModifier: 1,
 
 		// Vaults
 		vaultExpander: false,
@@ -84,12 +87,38 @@ const CONSTANTS = {
 		MERCHANT: "merchant",
 		VAULT: "vault",
 		AUCTIONEER: "auctioneer",
+		BANKER: "banker"
 	},
 
 	VAULT_LOGGING_TYPES: {
 		USER_ACTOR: "user_actor",
 		USER: "user",
 		ACTOR: "actor",
+	},
+
+	MACRO_EXECUTION_TYPES: {
+		TRADE_ITEMS: "tradeItems",
+		ADD_ITEMS: "addItems",
+		REMOVE_ITEMS: "removeItems",
+		TRANSFER_ITEMS: "transferItems",
+		TRANSFER_ALL_ITEMS: "transferAllItems",
+		UPDATE_CURRENCIES: "updateCurrencies",
+		ADD_CURRENCIES: "addCurrencies",
+		REMOVE_CURRENCIES: "removeCurrencies",
+		TRANSFER_CURRENCIES: "transferCurrencies",
+		TRANSFER_ALL_CURRENCIES: "transferAllCurrencies",
+		SET_ATTRIBUTES: "setAttributes",
+		ADD_ATTRIBUTES: "addAttributes",
+		REMOVE_ATTRIBUTES: "removeAttributes",
+		TRANSFER_ATTRIBUTES: "transferAttributes",
+		TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes",
+		TRANSFER_EVERYTHING: "transferEverything",
+		CLOSE_ITEM_PILE: "closeItemPile",
+		LOCK_ITEM_PILE: "lockItemPile",
+		UNLOCK_ITEM_PILE: "unlockItemPile",
+		OPEN_ITEM_PILE: "openItemPile",
+		SPLIT_INVENTORY: "splitInventory",
+		RENDER_INTERFACE: "renderInterface"
 	},
 
 	CUSTOM_PILE_TYPES: {},
@@ -198,6 +227,13 @@ const CONSTANTS = {
 		vaultLogType: "user_actor"
 	}
 }
+
+CONSTANTS.DEFAULT_PILE_TYPES = [
+	CONSTANTS.PILE_TYPES.PILE,
+	CONSTANTS.PILE_TYPES.CONTAINER,
+	CONSTANTS.PILE_TYPES.MERCHANT,
+	CONSTANTS.PILE_TYPES.VAULT
+]
 
 CONSTANTS.ITEM_FORCED_UNIQUE_KEYS = ["vaultExpander"]
 	.map(val => CONSTANTS.FLAGS.ITEM + "." + val);

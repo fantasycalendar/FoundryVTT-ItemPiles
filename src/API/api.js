@@ -416,7 +416,6 @@ class API {
 	 *   UNSTACKABLE_ITEM_TYPES: Array<string>,
 	 *   PILE_DEFAULTS: Object,
 	 *   TOKEN_FLAG_DEFAULTS: Object,
-	 *   ITEM_TYPE_HANDLERS: Object,
 	 *   ITEM_TRANSFORMER: undefined/Function,
 	 *   PRICE_MODIFIER_TRANSFORMER: undefined/Function,
 	 *   SYSTEM_HOOKS: undefined/Function,
@@ -454,7 +453,6 @@ class API {
 			UNSTACKABLE_ITEM_TYPES: [],
 			PILE_DEFAULTS: {},
 			TOKEN_FLAG_DEFAULTS: {},
-			ITEM_TYPE_HANDLERS: {},
 			ITEM_TRANSFORMER: null,
 			PRICE_MODIFIER_TRANSFORMER: null,
 			SYSTEM_HOOKS: null,
@@ -551,29 +549,6 @@ class API {
 
 		if (typeof data['TOKEN_FLAG_DEFAULTS'] !== "object") {
 			throw Helpers.custom_error("addSystemIntegration | data.TOKEN_FLAG_DEFAULTS must be of type object");
-		}
-
-		if (typeof data['ITEM_TYPE_HANDLERS'] !== "object") {
-			throw Helpers.custom_error("addSystemIntegration | data.ITEM_TYPE_HANDLERS must be of type object");
-		} else {
-			const itemTypes = new Set(Object.keys(CONFIG?.Item?.dataModels ?? {}).concat(game.system.template.Item.types));
-			const methodNames = new Set(Object.values(CONSTANTS.ITEM_TYPE_METHODS));
-			for (const [itemType, obj] of Object.entries(data['ITEM_TYPE_HANDLERS'])) {
-				if (!itemTypes.has(itemType)) {
-					throw Helpers.custom_error(`addSystemIntegration | Each key of data.ITEM_TYPE_HANDLERS must be a valid item type, ${itemType} is not`);
-				}
-				if (typeof obj !== "object") {
-					throw Helpers.custom_error(`addSystemIntegration | Each value of data.ITEM_TYPE_HANDLERS must be of type Object`);
-				}
-				for (const [key, value] of Object.entries(obj)) {
-					if (!methodNames.has(key)) {
-						throw Helpers.custom_error(`addSystemIntegration | Each key within the item type Object in data.ITEM_TYPE_HANDLERS must be one of: ${Array.from(methodNames).join(", ")}`);
-					}
-					if (!Helpers.isFunction(value)) {
-						throw Helpers.custom_error(`addSystemIntegration | Each value within the item type Object in data.ITEM_TYPE_HANDLERS must be of type function`);
-					}
-				}
-			}
 		}
 
 		if (!Array.isArray(data['ITEM_SIMILARITIES'])) {
@@ -688,9 +663,7 @@ class API {
 			return [cat, cat];
 		});
 		return Object.fromEntries(systemTypes.concat(customItemPilesCategories)
-			.sort((a, b) => a[1] > b[1]
-				? 1
-				: -1));
+			.sort((a, b) => a[1] > b[1] ? 1 : -1));
 	}
 
 	/* ================= ITEM PILE METHODS ================= */
@@ -778,9 +751,7 @@ class API {
 		if (items) {
 			if (!Array.isArray(items)) items = [items]
 			items = items.map(item => {
-				return item instanceof Item
-					? item.toObject()
-					: item;
+				return item instanceof Item ? item.toObject() : item;
 			})
 		}
 
@@ -851,9 +822,7 @@ class API {
 	static openItemPile(target, interactingToken = false) {
 		const targetActor = Utilities.getActor(target);
 		if (!PileUtilities.isItemPileContainer(target)) return false;
-		const interactingTokenDocument = interactingToken
-			? Utilities.getActor(interactingToken)
-			: false;
+		const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
 		const pileData = PileUtilities.getActorFlagData(targetActor);
 		const wasLocked = pileData.locked;
 		const wasClosed = pileData.closed;
@@ -886,9 +855,7 @@ class API {
 	static closeItemPile(target, interactingToken = false) {
 		const targetActor = Utilities.getActor(target);
 		if (!PileUtilities.isItemPileContainer(target)) return false;
-		const interactingTokenDocument = interactingToken
-			? Utilities.getActor(interactingToken)
-			: false;
+		const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
 		const pileData = PileUtilities.getActorFlagData(targetActor);
 
 		const wasOpen = !pileData.closed;
@@ -919,9 +886,7 @@ class API {
 	static async toggleItemPileClosed(target, interactingToken = false) {
 		const targetActor = Utilities.getActor(target);
 		if (!PileUtilities.isItemPileContainer(target)) return false;
-		const interactingTokenDocument = interactingToken
-			? Utilities.getActor(interactingToken)
-			: false;
+		const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
 		const pileData = PileUtilities.getActorFlagData(targetActor);
 		if (pileData.closed) {
 			await this.openItemPile(targetActor, interactingTokenDocument);
@@ -942,9 +907,7 @@ class API {
 	static lockItemPile(target, interactingToken = false) {
 		const targetActor = Utilities.getActor(target);
 		if (!PileUtilities.isItemPileContainer(target)) return false;
-		const interactingTokenDocument = interactingToken
-			? Utilities.getActor(interactingToken)
-			: false;
+		const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
 		const pileData = PileUtilities.getActorFlagData(targetActor);
 		const wasClosed = pileData.closed;
 		pileData.closed = true;
@@ -976,9 +939,7 @@ class API {
 	static unlockItemPile(target, interactingToken = false) {
 		const targetActor = Utilities.getActor(target);
 		if (!PileUtilities.isItemPileContainer(target)) return false;
-		const interactingTokenDocument = interactingToken
-			? Utilities.getActor(interactingToken)
-			: false;
+		const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
 		const pileData = PileUtilities.getActorFlagData(targetActor);
 		pileData.locked = false;
 		Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_UNLOCK, targetActor, pileData, interactingTokenDocument);
@@ -996,9 +957,7 @@ class API {
 	static toggleItemPileLocked(target, interactingToken = false) {
 		const targetActor = Utilities.getActor(target);
 		if (!PileUtilities.isItemPileContainer(target)) return false;
-		const interactingTokenDocument = interactingToken
-			? Utilities.getActor(interactingToken)
-			: false;
+		const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
 		const pileData = PileUtilities.getActorFlagData(targetActor);
 		if (pileData.locked) {
 			return this.unlockItemPile(targetActor, interactingTokenDocument);
@@ -1017,9 +976,7 @@ class API {
 	static rattleItemPile(target, interactingToken = false) {
 		const targetActor = Utilities.getActor(target);
 		if (!PileUtilities.isItemPileContainer(target)) return false;
-		const interactingTokenDocument = interactingToken
-			? Utilities.getActor(interactingToken)
-			: false;
+		const interactingTokenDocument = interactingToken ? Utilities.getActor(interactingToken) : false;
 		const pileData = PileUtilities.getActorFlagData(targetActor);
 
 		Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_RATTLE, targetActor, pileData, interactingTokenDocument);
@@ -1166,9 +1123,7 @@ class API {
 		const targetUuid = Utilities.getUuid(target);
 		if (!targetUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`);
 
-		const interactingTokenUuid = interactingToken
-			? Utilities.getUuid(interactingToken)
-			: false;
+		const interactingTokenUuid = interactingToken ? Utilities.getUuid(interactingToken) : false;
 		if (interactingToken && !interactingTokenUuid) throw Helpers.custom_error(`updateItemPile | Could not determine the UUID, please provide a valid target`);
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.UPDATE_PILE, targetUuid, newData, {
@@ -1339,14 +1294,10 @@ class API {
 			}
 
 			const oldBuyPriceModifier = actorPriceModifiers[actorPriceModifierIndex]?.buyPriceModifier ?? flagData?.buyPriceModifier ?? 1;
-			const newBuyPriceModifier = Math.max(0, priceModifier.relative
-				? oldBuyPriceModifier + priceModifier.buyPriceModifier
-				: priceModifier.buyPriceModifier ?? oldBuyPriceModifier);
+			const newBuyPriceModifier = Math.max(0, priceModifier.relative ? oldBuyPriceModifier + priceModifier.buyPriceModifier : priceModifier.buyPriceModifier ?? oldBuyPriceModifier);
 
 			const oldSellPriceModifier = actorPriceModifiers[actorPriceModifierIndex]?.sellPriceModifier ?? flagData?.sellPriceModifier ?? 0.5;
-			const newSellPriceModifier = Math.max(0, priceModifier.relative
-				? oldSellPriceModifier + priceModifier.sellPriceModifier
-				: priceModifier.sellPriceModifier ?? oldSellPriceModifier);
+			const newSellPriceModifier = Math.max(0, priceModifier.relative ? oldSellPriceModifier + priceModifier.sellPriceModifier : priceModifier.sellPriceModifier ?? oldSellPriceModifier);
 
 			actorPriceModifiers[actorPriceModifierIndex] = foundry.utils.mergeObject(actorPriceModifiers[actorPriceModifierIndex], {
 				actorUuid: priceModifier.actorUuid,
@@ -1389,9 +1340,7 @@ class API {
 			if (itemData instanceof Item) {
 				item = itemData.toObject();
 			} else if (itemData.item) {
-				item = itemData.item instanceof Item
-					? itemData.item.toObject()
-					: itemData.item;
+				item = itemData.item instanceof Item ? itemData.item.toObject() : itemData.item;
 				if (itemData.flags) {
 					foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(
 						foundry.utils.getProperty(item, CONSTANTS.FLAGS.ITEM) ?? {},
@@ -1430,7 +1379,7 @@ class API {
 	/**
 	 * Subtracts the quantity of items on an actor. If the quantity of an item reaches 0, the item is removed from the actor.
 	 *
-	 * @param {Actor/TokenDocument/Token} target                  The target to remove items from
+	 * @param {Actor/Token/TokenDocument} target                  The target to remove items from
 	 * @param {Array} items                                       An array of objects each containing the item id (key "_id") and the quantity to remove (key "quantity"), or Items (the foundry class) or strings of IDs to remove all quantities of
 	 * @param {object} options                                    Options to pass to the function
 	 * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
@@ -1449,9 +1398,7 @@ class API {
 
 			let item;
 			if (typeof itemData === "string" || itemData._id) {
-				const itemId = typeof itemData === "string"
-					? itemData
-					: itemData._id;
+				const itemId = typeof itemData === "string" ? itemData : itemData._id;
 				item = targetActorItems.find(actorItem => actorItem.id === itemId);
 				if (!item) {
 					throw Helpers.custom_error(`removeItems | Could not find item with id "${itemId}" on target "${targetUuid}"`)
@@ -1489,8 +1436,8 @@ class API {
 	/**
 	 * Transfers items from the source to the target, subtracting a number of quantity from the source's item and adding it to the target's item, deleting items from the source if their quantity reaches 0
 	 *
-	 * @param {Actor/TokenDocument/Token} source              The source to transfer the items from
-	 * @param {Actor/TokenDocument/Token} target              The target to transfer the items to
+	 * @param {Actor/Token/TokenDocument} source              The source to transfer the items from
+	 * @param {Actor/Token/TokenDocument} target              The target to transfer the items to
 	 * @param {Array} items                                   An array of objects each containing the item id (key "_id") and the quantity to transfer (key "quantity"), or Items (the foundry class) or strings of IDs to transfer all quantities of
 	 * @param {object} options                                Options to pass to the function
 	 * @param {boolean} [options.skipVaultLogging=false]      Whether to skip logging this action to the target actor if it is a vault
@@ -1510,9 +1457,7 @@ class API {
 
 			let item;
 			if (typeof itemData === "string" || itemData._id) {
-				const itemId = typeof itemData === "string"
-					? itemData
-					: itemData._id;
+				const itemId = typeof itemData === "string" ? itemData : itemData._id;
 				item = sourceActorItems.find(actorItem => actorItem.id === itemId);
 				if (!item) {
 					throw Helpers.custom_error(`transferItems | Could not find item with id "${itemId}" on target "${sourceUuid}"`)
@@ -1571,8 +1516,8 @@ class API {
 	/**
 	 * Transfers all items between the source and the target.
 	 *
-	 * @param {Actor/TokenDocument/Token} source                The actor to transfer all items from
-	 * @param {Actor/TokenDocument/Token} target                The actor to receive all the items
+	 * @param {Actor/Token/TokenDocument} source                The actor to transfer all items from
+	 * @param {Actor/Token/TokenDocument} target                The actor to receive all the items
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {Array/boolean} [options.itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
 	 * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
@@ -1618,9 +1563,9 @@ class API {
 	}
 
 	/**
-	 * Sets attributes on a document
+	 * Sets attributes on an actor
 	 *
-	 * @param {Document} target                                   The target whose attribute will have their quantity set
+	 * @param {Actor/Token/TokenDocument} target                  The target whose attribute will have their quantity set
 	 * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to set
 	 * @param {object} options                                    Options to pass to the function
 	 * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
@@ -1651,12 +1596,12 @@ class API {
 	}
 
 	/**
-	 * Adds attributes on a document
+	 * Adds attributes on an actor
 	 *
-	 * @param {Document} target                                   The target whose attribute will have a set quantity added to it
+	 * @param {Actor/Token/TokenDocument} target                  The target whose attribute will have a set quantity added to it
 	 * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to add
 	 * @param {object} options                                    Options to pass to the function
-	 * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target document if it is a vault
+	 * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
 	 * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
 	 *
 	 * @returns {Promise<object>}                                 An array containing a key value pair of the attribute path and the quantity of that attribute that was added
@@ -1686,12 +1631,12 @@ class API {
 	}
 
 	/**
-	 * Subtracts attributes on the target document
+	 * Subtracts attributes on the target
 	 *
-	 * @param {Document} target                                 The target whose attributes will be subtracted from
+	 * @param {Token/TokenDocument} target                      The target whose attributes will be subtracted from
 	 * @param {Array/object} attributes                         This can be either an array of attributes to subtract (to zero out a given attribute), or an object with each key being an attribute path, and its value being the quantity to subtract
 	 * @param {object} options                                  Options to pass to the function
-	 * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target document if it is a vault
+	 * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
 	 * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
 	 *
 	 * @returns {Promise<object>}                               An array containing a key value pair of the attribute path and the quantity of that attribute that was removed
@@ -1701,7 +1646,7 @@ class API {
 		const targetUuid = Utilities.getUuid(target);
 		if (!targetUuid) throw Helpers.custom_error(`removeAttributes | Could not determine the UUID, please provide a valid target`);
 
-		const targetDocument = Utilities.getDocument(target);
+		const targetActor = Utilities.getActor(target);
 
 		let attributesToSend = {};
 		if (Array.isArray(attributes)) {
@@ -1709,13 +1654,13 @@ class API {
 				if (typeof attribute !== "string") {
 					throw Helpers.custom_error(`removeAttributes | Each attribute in the array must be of type string`);
 				}
-				attributesToSend[attribute] = Number(foundry.utils.getProperty(targetDocument, attribute));
+				attributesToSend[attribute] = Number(foundry.utils.getProperty(targetActor, attribute));
 			});
 		} else {
 			Object.entries(attributes).forEach(entry => {
 				const [attribute, quantity] = entry;
-				if (!foundry.utils.hasProperty(targetDocument, attribute)) {
-					throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target document with UUID "${targetUuid}"`);
+				if (!foundry.utils.hasProperty(targetActor, attribute)) {
+					throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
 				}
 				if (!Helpers.isRealNumber(quantity) && quantity > 0) {
 					throw Helpers.custom_error(`removeAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
@@ -1738,8 +1683,8 @@ class API {
 	/**
 	 * Transfers a set quantity of an attribute from a source to a target, removing it or subtracting from the source and adds it the target
 	 *
-	 * @param {Document} source                                 The source to transfer the attribute from
-	 * @param {Document} target                                 The target to transfer the attribute to
+	 * @param {Actor/Token/TokenDocument} source                The source to transfer the attribute from
+	 * @param {Actor/Token/TokenDocument} target                The target to transfer the attribute to
 	 * @param {Array/object} attributes                         This can be either an array of attributes to transfer (to transfer all of a given attribute), or an object with each key being an attribute path, and its value being the quantity to transfer
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
@@ -1751,32 +1696,26 @@ class API {
 
 		const sourceUuid = Utilities.getUuid(source);
 		if (!sourceUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid source`);
-		const sourceDocument = Utilities.getDocument(source);
+		const sourceActor = Utilities.getActor(source);
 
 		const targetUuid = Utilities.getUuid(target);
 		if (!targetUuid) throw Helpers.custom_error(`transferAttributes | Could not determine the UUID, please provide a valid target`);
-		const targetDocument = Utilities.getDocument(target);
+		const targetActor = Utilities.getActor(target);
 
 		if (Array.isArray(attributes)) {
 			attributes.forEach(attribute => {
 				if (typeof attribute !== "string") {
 					throw Helpers.custom_error(`transferAttributes | Each attribute in the array must be of type string`);
 				}
-				if (!foundry.utils.hasProperty(sourceDocument, attribute)) {
-					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source document with UUID "${targetUuid}"`);
-				}
-				if (!foundry.utils.hasProperty(targetDocument, attribute)) {
-					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target document with UUID "${targetUuid}"`);
+				if (!foundry.utils.hasProperty(sourceActor, attribute)) {
+					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
 				}
 			});
 		} else {
 			Object.entries(attributes).forEach(entry => {
 				const [attribute, quantity] = entry;
-				if (!foundry.utils.hasProperty(sourceDocument, attribute)) {
-					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source document with UUID "${targetUuid}"`);
-				}
-				if (!foundry.utils.hasProperty(targetDocument, attribute)) {
-					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on target document with UUID "${targetUuid}"`);
+				if (!foundry.utils.hasProperty(sourceActor, attribute)) {
+					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
 				}
 				if (!Helpers.isRealNumber(quantity) && quantity > 0) {
 					throw Helpers.custom_error(`transferAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
@@ -1798,8 +1737,8 @@ class API {
 	/**
 	 * Transfers all dynamic attributes from a source to a target, removing it or subtracting from the source and adding them to the target
 	 *
-	 * @param {Document} source                                 The source to transfer the attributes from
-	 * @param {Document} target                                 The target to transfer the attributes to
+	 * @param {Actor/Token/TokenDocument} source                The source to transfer the attributes from
+	 * @param {Actor/Token/TokenDocument} target                The target to transfer the attributes to
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
 	 * @param {string/boolean} [options.interactionId=false]    The interaction ID of this action
@@ -1828,8 +1767,8 @@ class API {
 	/**
 	 * Transfers all items and attributes between the source and the target.
 	 *
-	 * @param {Document} source                                 The document to transfer all items and attributes from
-	 * @param {Document} target                                 The document to receive all the items and attributes
+	 * @param {Actor/Token/TokenDocument} source                The actor to transfer all items and attributes from
+	 * @param {Actor/Token/TokenDocument} target                The actor to receive all the items and attributes
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {Array/boolean} [options.itemFilters=false]       Array of item types disallowed - will default to module settings if none provided
 	 * @param {boolean} [options.skipVaultLogging=false]        Whether to skip logging this action to the target actor if it is a vault
@@ -1843,13 +1782,13 @@ class API {
 		interactionId = false
 	} = {}) {
 
-		const sourceDocument = Utilities.getDocument(source);
-		if (!sourceDocument) throw Helpers.custom_error(`transferEverything | Could not determine the source document, please provide a valid source`);
-		const sourceUuid = Utilities.getUuid(sourceDocument);
+		const sourceActor = Utilities.getActor(source);
+		if (!sourceActor) throw Helpers.custom_error(`transferEverything | Could not determine the source actor, please provide a valid source`);
+		const sourceUuid = Utilities.getUuid(sourceActor);
 
-		const targetDocument = Utilities.getDocument(target);
-		if (!targetDocument) throw Helpers.custom_error(`transferEverything | Could not determine the target document, please provide a valid target`);
-		const targetUuid = Utilities.getUuid(targetDocument);
+		const targetActor = Utilities.getActor(target);
+		if (!targetActor) throw Helpers.custom_error(`transferEverything | Could not determine the target actor, please provide a valid target`);
+		const targetUuid = Utilities.getUuid(targetActor);
 
 		if (itemFilters) {
 			if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`transferEverything | itemFilters must be of type array`);
@@ -1859,10 +1798,10 @@ class API {
 			})
 		}
 
-		if (PileUtilities.isItemPileVault(targetDocument)) {
-			const sourceDocumentItems = PileUtilities.getActorItems(sourceDocument, { getItemCurrencies: true });
-			const canItemsFit = PileUtilities.fitItemsIntoVault(sourceDocumentItems, targetDocument, { itemFilters });
-			if (!canItemsFit) throw Helpers.custom_error(`transferEverything | The target vault actor ${targetDocument.name} cannot fit these items`, true);
+		if (PileUtilities.isItemPileVault(targetActor)) {
+			const sourceActorItems = PileUtilities.getActorItems(sourceActor, { getItemCurrencies: true });
+			const canItemsFit = PileUtilities.fitItemsIntoVault(sourceActorItems, targetActor, { itemFilters });
+			if (!canItemsFit) throw Helpers.custom_error(`transferEverything | The target vault actor ${targetActor.name} cannot fit these items`, true);
 		}
 
 		if (interactionId) {
@@ -1963,9 +1902,7 @@ class API {
 			: secondCurrencies;
 
 		const totalCost = typeof secondCurrencies === "string"
-			? firstCurrenciesData.overallCost + (secondCurrenciesData.overallCost * (subtract
-			? -1
-			: 1))
+			? firstCurrenciesData.overallCost + (secondCurrenciesData.overallCost * (subtract ? -1 : 1))
 			: firstCurrenciesData.overallCost * secondCurrencies;
 
 		const differenceCost = PileUtilities.getPriceArray(totalCost);
@@ -1979,9 +1916,7 @@ class API {
 			.reduce((acc, currency, index) => {
 				if (!currency.secondary) return acc;
 				const quantity = typeof secondCurrencies === "string"
-					? currency.quantity + (secondCurrenciesData.currencies[index].quantity * (subtract
-					? -1
-					: 1))
+					? currency.quantity + (secondCurrenciesData.currencies[index].quantity * (subtract ? -1 : 1))
 					: Math.round(currency.quantity * secondCurrencies);
 				if (quantity <= 0) return acc;
 				return acc + currency.abbreviation.replace("{#}", quantity) + " ";
@@ -2043,7 +1978,7 @@ class API {
 	/**
 	 * Update currencies to the target
 	 *
-	 * @param {Actor/TokenDocument/Token} target                The actor to update the currencies to
+	 * @param {Actor/Token/TokenDocument} target                The actor to update the currencies to
 	 * @param {string} currencies                               A string of currencies to update (eg, "5gp 25sp")
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
@@ -2074,7 +2009,7 @@ class API {
 	/**
 	 * Adds currencies to the target
 	 *
-	 * @param {Actor/TokenDocument/Token} target                The actor to add the currencies to
+	 * @param {Actor/Token/TokenDocument} target                The actor to add the currencies to
 	 * @param {string} currencies                               A string of currencies to add (eg, "5gp 25sp")
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
@@ -2105,7 +2040,7 @@ class API {
 	/**
 	 * Removes currencies from the target
 	 *
-	 * @param {Actor/TokenDocument/Token} target                The actor to remove currencies from
+	 * @param {Actor/Token/TokenDocument} target                The actor to remove currencies from
 	 * @param {string} currencies                               A string of currencies to remove (eg, "5gp 25sp")
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {boolean} [options.change=true]                   Whether the actor can get change back
@@ -2152,8 +2087,8 @@ class API {
 	/**
 	 * Transfers currencies between the source and the target.
 	 *
-	 * @param {Actor/TokenDocument/Token} source                The document to transfer currencies from
-	 * @param {Actor/TokenDocument/Token} target                The document to receive the currencies
+	 * @param {Actor/Token/TokenDocument} source                The actor to transfer currencies from
+	 * @param {Actor/Token/TokenDocument} target                The actor to receive the currencies
 	 * @param {string} currencies                               A string of currencies to transfer (eg, "5gp 25sp")
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {boolean} [options.change=true]                   Whether the source actor can get change back
@@ -2163,12 +2098,12 @@ class API {
 	 */
 	static transferCurrencies(source, target, currencies, { change = true, interactionId = false } = {}) {
 
-		const sourceDocument = Utilities.getDocument(source);
-		const sourceUuid = Utilities.getUuid(sourceDocument);
+		const sourceActor = Utilities.getActor(source);
+		const sourceUuid = Utilities.getUuid(sourceActor);
 		if (!sourceUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid source`);
 
-		const targetDocument = Utilities.getDocument(target);
-		const targetUuid = Utilities.getUuid(targetDocument);
+		const targetActor = Utilities.getActor(target);
+		const targetUuid = Utilities.getUuid(targetActor);
 		if (!targetUuid) throw Helpers.custom_error(`transferCurrencies | Could not determine the UUID, please provide a valid target`);
 
 		let overallCost;
@@ -2186,15 +2121,15 @@ class API {
 		}
 
 		const paymentData = PileUtilities.getPaymentData({
-			purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: sourceDocument
+			purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: sourceActor
 		});
 
 		if (!paymentData.canBuy) {
-			throw Helpers.custom_error(`transferCurrencies | ${sourceDocument.name} cannot afford to transfer "${currencies}"`);
+			throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}"`);
 		}
 
 		if (!change && paymentData.buyerChange.length) {
-			throw Helpers.custom_error(`transferCurrencies | ${sourceDocument.name} cannot afford to transfer "${currencies}" without receiving change!`);
+			throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}" without receiving change!`);
 		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_CURRENCIES, sourceUuid, targetUuid, currencies, game.user.id, { interactionId });
@@ -2204,8 +2139,8 @@ class API {
 	/**
 	 * Transfers all currencies between the source and the target.
 	 *
-	 * @param {Actor/TokenDocument/Token} source                The actor to transfer all currencies from
-	 * @param {Actor/TokenDocument/Token} target                The actor to receive all the currencies
+	 * @param {Actor/Token/TokenDocument} source                The actor to transfer all currencies from
+	 * @param {Actor/Token/TokenDocument} target                The actor to receive all the currencies
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
 	 *
@@ -2310,7 +2245,7 @@ class API {
 			for (const entry of items) {
 				entry.item = targetActor
 					? targetActor.items.get(entry.item._id)
-					: await Item.implementation.create(entry.item, { temporary: true });
+					: new Item.implementation(entry.item);
 			}
 		}
 
@@ -2321,7 +2256,7 @@ class API {
 	/**
 	 * Refreshes the merchant's inventory, potentially removing existing items and populating it based on its item tables
 	 *
-	 * @param {Document} target                  The merchant actor to refresh the inventory of
+	 * @param {Actor/Token/TokenDocument} target                  The merchant actor to refresh the inventory of
 	 * @param {object} options                                    Options to pass to the function
 	 * @param {boolean} [options.removeExistingActorItems=true]   Whether to clear the merchant's existing inventory before adding the new items
 	 * @returns {Promise<boolean|*>}
@@ -2432,9 +2367,7 @@ class API {
 			throw Helpers.custom_error("renderItemPileInterface | You cannot force users to use both their default character and a specific character to inspect the pile")
 		}
 
-		const inspectingTargetUuid = inspectingTarget
-			? Utilities.getUuid(inspectingTarget)
-			: false;
+		const inspectingTargetUuid = inspectingTarget ? Utilities.getUuid(inspectingTarget) : false;
 		if (inspectingTarget && !inspectingTargetUuid) throw Helpers.custom_error(`renderItemPileInterface | Could not determine the UUID, please provide a valid inspecting target`);
 
 		if (!Array.isArray(userIds)) {
@@ -2445,9 +2378,7 @@ class API {
 			}
 		} else {
 			userIds = userIds.map(user => {
-				return user instanceof User
-					? user.id
-					: user;
+				return user instanceof User ? user.id : user;
 			})
 		}
 
@@ -2509,9 +2440,7 @@ class API {
 			}
 		} else {
 			userIds = userIds.map(user => {
-				return user instanceof User
-					? user.id
-					: user;
+				return user instanceof User ? user.id : user;
 			})
 		}
 
@@ -2588,8 +2517,8 @@ class API {
 	/**
 	 * Trades multiple items between one actor to another, and currencies and/or change is exchanged between them
 	 *
-	 * @param {Document} seller                                                    The actor that is selling the item
-	 * @param {Document} buyer                                                     The actor that is buying the item
+	 * @param {Actor/Token/TokenDocument} seller                                                    The actor that is selling the item
+	 * @param {Actor/Token/TokenDocument} buyer                                                     The actor that is buying the item
 	 * @param {Array<Object<{ item: Item/string, quantity: number, paymentIndex: number }>>} items  An array of objects containing the item or the id of the
 	 *                                                                                              item to be sold, the quantity to be sold, and the payment
 	 *                                                                                              index to be used
@@ -2628,9 +2557,7 @@ class API {
 					throw Helpers.custom_error(`tradeItems | Could not find item on seller with identifier "${data.item}"`);
 				}
 			} else {
-				actorItem = sellerActor.items.get(data.item instanceof Item
-					? data.item.id
-					: data.item._id) || sellerActor.items.getName(data.item.name);
+				actorItem = sellerActor.items.get(data.item instanceof Item ? data.item.id : data.item._id) || sellerActor.items.getName(data.item.name);
 				if (!actorItem) {
 					throw Helpers.custom_error(`tradeItems | Could not find provided item on seller`);
 				}

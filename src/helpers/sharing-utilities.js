@@ -21,6 +21,16 @@ export function getPlayersForItemPile(target) {
 }
 
 /**
+ * Gets the characters for each player
+ *
+ * @param {Actor|TokenDocument|String} target
+ * @returns {Array<User>}
+ */
+export function getCharactersForItemPile(target) {
+	return getPlayersForItemPile(target).map(player => Utilities.getUserCharacter(player));
+}
+
+/**
  * Determines whether a pile can be split
  *
  * @param target
@@ -29,10 +39,13 @@ export function getPlayersForItemPile(target) {
 export function canItemPileBeSplit(target) {
 	const pileData = PileUtilities.getActorFlagData(target);
 	const shareData = getItemPileSharingData(target);
-	const playerActors = getPlayersForItemPile(target).map(player => Utilities.getUserCharacter(player));
+	const playerActors = getCharactersForItemPile(target);
+	if (!playerActors.length) return false;
 	const pileItems = PileUtilities.getActorItems(target);
 	const items = pileData.shareItemsEnabled ? pileItems : [];
-	const currencies = pileData.shareCurrenciesEnabled || pileData.splitAllEnabled ? PileUtilities.getActorCurrencies(target, { secondary: false }) : [];
+	const currencies = pileData.shareCurrenciesEnabled || pileData.splitAllEnabled
+		? PileUtilities.getActorCurrencies(target, { secondary: false })
+		: [];
 	for (const item of items) {
 		if (playerActors.every(character => getItemSharesLeftForActor(target, item, character, {
 			shareData,
@@ -88,7 +101,7 @@ export function canItemPileBeSplit(target) {
  */
 export function getItemPileSharingData(target) {
 	const targetActor = Utilities.getActor(target);
-	return foundry.utils.duplicate(getProperty(targetActor, CONSTANTS.FLAGS.SHARING) ?? {});
+	return foundry.utils.duplicate(foundry.utils.getProperty(targetActor, CONSTANTS.FLAGS.SHARING) ?? {});
 }
 
 /**
@@ -157,8 +170,8 @@ export async function setItemPileSharingData(sourceUuid, targetUuid, { items = [
 
 	if (sourceIsItemPile) {
 
-		if (PileUtilities.isItemPileEmpty(sourceIsItemPile)) {
-			return clearItemPileSharingData(sourceIsItemPile);
+		if (PileUtilities.isItemPileEmpty(sourceActor)) {
+			return clearItemPileSharingData(sourceActor);
 		}
 
 		const sharingData = addToItemPileSharingData(sourceActor, targetActor.uuid, { items, attributes });
@@ -318,7 +331,7 @@ export function getItemSharesLeftForActor(pile, item, recipient, {
 
 	players = players ?? getPlayersForItemPile(pile).length;
 	let totalActorShare = totalShares / players;
-	if (!Number.isInteger(totalActorShare) && !floor) {
+	if (totalActorShare && !Number.isInteger(totalActorShare) && !floor) {
 		totalActorShare += 1;
 	}
 
@@ -341,10 +354,9 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 		const items = PileUtilities.getActorItems(pile);
 		for (const item of items) {
 			if (!Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, item.type)) continue;
-			currentQuantity += Number(getProperty(item, path) ?? 0);
+			currentQuantity += Number(foundry.utils.getProperty(item, path) ?? 0);
 		}
 	}
-
 	let totalShares = currentQuantity;
 
 	shareData = shareData ?? getItemPileSharingData(pile);
@@ -360,7 +372,7 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 
 	players = players ?? getPlayersForItemPile(pile).length;
 	let totalActorShare = totalShares / players;
-	if (!Number.isInteger(totalActorShare) && !floor) {
+	if (totalActorShare && !Number.isInteger(totalActorShare) && !floor) {
 		totalActorShare += 1;
 	}
 

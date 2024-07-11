@@ -1,7 +1,7 @@
 <script>
 
 	import { fade } from 'svelte/transition';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import CONSTANTS from "../../constants/constants.js";
 
 	export let store;

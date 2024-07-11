@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import ItemPileInventoryShell from "./item-pile-inventory-shell.svelte";
 import * as Utilities from "../../helpers/utilities.js";
 import ItemPileConfig from "../item-pile-config/item-pile-config.js";
@@ -13,13 +13,12 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 	 *
 	 * @param actor
 	 * @param recipient
-	 * @param overrides
 	 * @param options
 	 * @param dialogData
 	 */
 	constructor(actor, recipient, options = {}, dialogData = {}) {
 		super({
-			id: `item-pile-inventory-${actor?.token?.id ?? actor.id}-${randomID()}`,
+			id: `item-pile-inventory-${actor?.token?.id ?? actor.id}-${foundry.utils.randomID()}`,
 			title: actor.name,
 			svelte: {
 				class: ItemPileInventoryShell,
@@ -50,7 +49,8 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 		});
 	}
 
-	static getActiveApps(id) {
+	static getActiveApps(source) {
+		const id = typeof source === "string" ? source : source?.token?.id ?? source?.id;
 		return Helpers.getActiveApps(`item-pile-inventory-${id}`);
 	}
 
@@ -59,7 +59,7 @@ export default class ItemPileInventoryApp extends SvelteApplication {
 		recipient = Utilities.getActor(recipient);
 		const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, source, recipient, options, dialogData);
 		if (result === false) return;
-		const apps = this.getActiveApps(source?.token?.uuid ?? source.uuid);
+		const apps = this.getActiveApps(source);
 		if (apps.length) {
 			for (let app of apps) {
 				app.render(false, { focus: true });

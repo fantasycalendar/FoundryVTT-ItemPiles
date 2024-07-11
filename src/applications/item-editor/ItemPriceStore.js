@@ -1,4 +1,4 @@
-import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
+import { TJSDocument } from "#runtime/svelte/store/fvtt/document";
 import { get, writable } from "svelte/store";
 import CONSTANTS from "../../constants/constants.js";
 import * as PileUtilities from "../../helpers/pile-utilities.js";
@@ -16,14 +16,14 @@ export default class ItemPriceStore {
 		const quantityForPriceProp = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE;
 
 		this.price = writable(0);
-		this.quantityForPrice = writable(getProperty(item, quantityForPriceProp) ?? 1);
+		this.quantityForPrice = writable(foundry.utils.getProperty(item, quantityForPriceProp) ?? 1);
 
 		const data = PileUtilities.getItemFlagData(this.item);
 
 		data.prices.forEach(group => {
 			group.forEach(price => {
 				if (!price.id) {
-					price.id = randomID();
+					price.id = foundry.utils.randomID();
 				}
 			});
 		});
@@ -32,15 +32,15 @@ export default class ItemPriceStore {
 
 		this.itemDoc.subscribe((item, changes) => {
 			const { data } = changes;
-			if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
-				const newData = getProperty(data, CONSTANTS.FLAGS.ITEM);
+			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
+				const newData = foundry.utils.getProperty(data, CONSTANTS.FLAGS.ITEM);
 				const oldData = get(this.data);
 				this.data.set(foundry.utils.mergeObject(oldData, newData));
 			}
 			this.price.set(getItemCost(this.item));
 			const quantityForPriceProp = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE;
-			if (quantityForPriceProp && hasProperty(data, quantityForPriceProp)) {
-				this.quantityForPrice.set(getProperty(item, quantityForPriceProp))
+			if (quantityForPriceProp && foundry.utils.hasProperty(data, quantityForPriceProp)) {
+				this.quantityForPrice.set(foundry.utils.getProperty(item, quantityForPriceProp))
 			}
 		});
 

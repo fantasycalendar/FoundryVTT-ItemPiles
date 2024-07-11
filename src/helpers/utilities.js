@@ -66,7 +66,7 @@ export function findSimilarItem(items, findItem, {
 
 	let hasUniqueKey = false;
 	for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
-		if (getProperty(findItemData, prop)) {
+		if (foundry.utils.getProperty(findItemData, prop)) {
 			hasUniqueKey = true;
 			break;
 		}
@@ -75,7 +75,7 @@ export function findSimilarItem(items, findItem, {
 	const filteredItems = items
 		.filter(item => {
 			for (let prop of CONSTANTS.ITEM_FORCED_UNIQUE_KEYS) {
-				if (getProperty(item?.item ?? item, prop)) {
+				if (foundry.utils.getProperty(item?.item ?? item, prop)) {
 					return false;
 				}
 			}
@@ -87,7 +87,7 @@ export function findSimilarItem(items, findItem, {
 				return true;
 			}
 
-			if (!itemSimilarities.some(path => hasProperty(findItem, path))) {
+			if (!itemSimilarities.some(path => foundry.utils.hasProperty(findItem, path))) {
 				return false;
 			}
 
@@ -111,7 +111,8 @@ export function findSimilarItem(items, findItem, {
 export function areItemsDifferent(itemA, itemB) {
 	const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 	for (const path of itemSimilarities) {
-		if (getProperty(itemA, path) !== getProperty(itemB, path) || (!hasProperty(itemA, path) ^ !hasProperty(itemB, path))) {
+		if (foundry.utils.getProperty(itemA, path) !== foundry.utils.getProperty(itemB, path)
+			|| (!foundry.utils.hasProperty(itemA, path) ^ !foundry.utils.hasProperty(itemB, path))) {
 			return true;
 		}
 	}
@@ -120,9 +121,9 @@ export function areItemsDifferent(itemA, itemB) {
 
 export function setSimilarityProperties(obj, item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	setProperty(obj, "_id", itemData._id);
+	foundry.utils.setProperty(obj, "_id", itemData._id);
 	game.itempiles.API.ITEM_SIMILARITIES.forEach(prop => {
-		setProperty(obj, prop, getProperty(itemData, prop));
+		foundry.utils.setProperty(obj, prop, foundry.utils.getProperty(itemData, prop));
 	})
 	return obj;
 }
@@ -133,6 +134,16 @@ export function refreshItemTypesThatCanStack() {
 	itemTypesWithQuantities = false;
 	getItemTypesThatCanStack();
 }
+
+
+export function getDocumentTemplates(templateType) {
+	return foundry.utils.mergeObject(
+		game.model[templateType],
+		Object.fromEntries(Object.entries(CONFIG[templateType]?.dataModels ?? {}).map(([k, v]) => [k, v.schema.getInitialValue()])),
+		{ inplace: false },
+	);
+}
+
 
 /**
  * Retrieve all system item types that can be stacked
@@ -154,22 +165,16 @@ export function getItemTypesThatCanStack() {
 		}
 
 		const unstackableItemTypes = Helpers.getSetting(SETTINGS.UNSTACKABLE_ITEM_TYPES);
-		const types = new Set(Object.keys(CONFIG?.Item?.dataModels ?? {}).concat(game.system.template.Item.types));
+		const templates = getDocumentTemplates("Item");
+		const types = new Set(Object.keys(templates));
 		itemTypesWithQuantities = new Set([...itemTypesWithQuantities, ...types.filter(type => {
-			let itemTemplate = {};
-			if (CONFIG?.Item?.dataModels?.[type]?.defineSchema !== undefined) {
-				itemTemplate.system = Object.entries(CONFIG.Item.dataModels[type].defineSchema())
-					.map(([key, schema]) => {
-						return [key, schema.fields ?? true]
-					})
-				itemTemplate.system = Object.fromEntries(itemTemplate.system);
-			} else if (game.system?.template?.Item?.[type]) {
-				itemTemplate.system = foundry.utils.deepClone(game.system.template.Item[type]);
-				if (itemTemplate.system?.templates?.length) {
-					const templates = foundry.utils.duplicate(itemTemplate.system.templates);
-					for (let template of templates) {
-						itemTemplate.system = foundry.utils.mergeObject(itemTemplate.system, foundry.utils.duplicate(game.system.template.Item.templates[template]));
-					}
+			let itemTemplate = {
+				system: foundry.utils.deepClone(templates[type])
+			};
+			if (itemTemplate.system?.templates?.length) {
+				const templates = foundry.utils.duplicate(itemTemplate.system.templates);
+				for (let template of templates) {
+					itemTemplate.system = foundry.utils.mergeObject(itemTemplate.system, foundry.utils.duplicate(game.system.documentTypes.Item.templates[template]));
 				}
 			}
 			return hasItemQuantity(itemTemplate);
@@ -180,8 +185,8 @@ export function getItemTypesThatCanStack() {
 
 export function isItemStackable(itemData) {
 	getItemTypesThatCanStack();
-	if (game.system.id === "custom-system-builder" && itemData?.system?.template) {
-		const templateItem = game.items.get(itemData?.system?.template);
+	if (game.system.id === "custom-system-builder" && itemData?.system?.documentTypes) {
+		const templateItem = game.items.get(itemData?.system?.documentTypes);
 		if (templateItem) {
 			return itemTypesWithQuantities.has(templateItem.name)
 		}
@@ -197,7 +202,7 @@ export function isItemStackable(itemData) {
  */
 export function getItemQuantity(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return Number(getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+	return Number(foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
 }
 
 
@@ -209,7 +214,7 @@ export function getItemQuantity(item) {
  */
 export function hasItemQuantity(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return hasProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE);
+	return foundry.utils.hasProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE);
 }
 
 /**
@@ -223,7 +228,7 @@ export function hasItemQuantity(item) {
 export function setItemQuantity(item, quantity, requiresExistingQuantity = false) {
 	const itemData = item instanceof Item ? item.toObject() : item;
 	if (!requiresExistingQuantity || getItemTypesThatCanStack().has(itemData.type) || hasItemQuantity(itemData)) {
-		setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity);
+		foundry.utils.setProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, quantity);
 	}
 	return itemData;
 }
@@ -236,7 +241,7 @@ export function setItemQuantity(item, quantity, requiresExistingQuantity = false
  */
 export function getItemCost(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return getProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE) ?? 0;
+	return foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE) ?? 0;
 }
 
 /**
@@ -247,7 +252,7 @@ export function getItemCost(item) {
  */
 export function hasItemCost(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return hasProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
+	return foundry.utils.hasProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE);
 }
 
 /**
@@ -261,7 +266,7 @@ export function hasItemCost(item) {
 export function setItemCost(item, cost, requiresExistingCost = false) {
 	const itemData = item instanceof Item ? item.toObject() : item;
 	if (!requiresExistingCost || hasItemCost(itemData)) {
-		setProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
+		foundry.utils.setProperty(itemData, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
 	}
 	return itemData
 }
@@ -355,7 +360,7 @@ export async function runMacro(macroId, macroData) {
 			throw Helpers.custom_error(`The "${packArray[3]}" macro was not found in Compendium ${packArray[1]}.${packArray[2]}`);
 		}
 		macro = new Macro(findMacro?.toObject());
-		macro.ownership.default = CONST.DOCUMENT_PERMISSION_LEVELS.OWNER;
+		macro.ownership.default = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
 	} else {
 		macro = game.macros.getName(macroId);
 		if (!macro) {
@@ -374,18 +379,16 @@ export async function runMacro(macroId, macroData) {
 
 }
 
-export function getOwnedCharacters(user = false) {
-	user = user || game.user;
+export function getOwnedCharacters(user = game.user) {
 	return game.actors.filter(actor => {
-			return actor.ownership?.[user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER && actor.prototypeToken.actorLink;
+			return actor.ownership?.[user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER && actor.prototypeToken.actorLink;
 		})
 		.sort((a, b) => {
 			return b._stats.modifiedTime - a._stats.modifiedTime;
 		});
 }
 
-export function getUserCharacter(user = false) {
-	user = user || game.user;
+export function getUserCharacter(user = game.user) {
 	return user.character || (user.isGM ? false : (getOwnedCharacters(user)?.[0] ?? false));
 }
 
@@ -412,7 +415,14 @@ export async function createFoldersFromNames(folders, type = "Actor") {
 export function getSourceActorFromDropData(dropData) {
 	if (dropData.uuid) {
 		const doc = fromUuidSync(dropData.uuid);
-		return doc instanceof Actor ? doc : doc.parent;
+		if (doc instanceof Actor) {
+			return doc;
+		} else if (doc instanceof TokenDocument) {
+			return doc.actor;
+		} else if (doc instanceof Item) {
+			return doc.parent
+		}
+		return false;
 	} else if (dropData.tokenId) {
 		if (dropData.sceneId) {
 			const uuid = `Scene.${dropData.sceneId}.Token.${dropData.tokenId}`;

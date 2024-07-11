@@ -69,10 +69,10 @@ export default {
 
     // This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
     "ITEM_COST_TRANSFORMER": (item, currencies) => {
-        const cost = getProperty(item, "system.cost") ?? {};
+        const cost = foundry.utils.getProperty(item, "system.cost") ?? {};
         let totalCost = 0;
         for (const costDenomination in cost) {
-            const subCost = Number(getProperty(cost, costDenomination)) ?? 0;
+            const subCost = Number(foundry.utils.getProperty(cost, costDenomination)) ?? 0;
             if (subCost === 0) {
                 continue;
             }

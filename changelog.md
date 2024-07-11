@@ -1,16 +1,61 @@
 # Item Piles Changelog
 
-## Version 2.10.0
+## Version 3.0.7
 
 - Added support for "container" type items in D&D5e - this is a custom implementation, so other systems' containers will not work out of the box
   - Splitting currencies in item piles takes into account across all currencies across containers in the pile
   - Added tree-like display for items in containers
-- Fixed issue with merchant treating all items as unique and never stacking them
+- Tweaked `game.itempiles.API.createItemPile` with `createActor` set to `true` have the default item piles' settings
+- Fixed item pile containers not respecting open/close/lock/unlock settings
+- Fixed minor `module.json` manifest warning
 
-## Version 2.9.2
+## Version 3.0.6
 
+- Fixed very specific game crash surrounding currency rounding when buying multiple items with discounts with a specific currency setup
+- Fixed giving multiple quantity of a single item would always give just 1
+- Fixed item pile data resetting upon token updates
+- Fixed item pile interfaces not reopening after changing their item pile type
+
+## Version 3.0.5
+
+- Fixed issue in Foundry v11 that would cause item piles to not refresh when items and currencies were taken from them, allowing users to take multiple items
+- Fixed bug with giving item always giving 1 item
+- Updated Polish localization (thank you Lioheart on weblate!)
+
+## Version 3.0.4
+
+- Fixed random-ish errors when duplicating item piles and then trying to open their interfaces
+- Fixed issue with trying to split an item pile among 0 players
+
+## Version 3.0.3
+
+- Minor fix to latest release
+
+## Version 3.0.2
+
+- Fixed opening item pile interfaces would spawn duplicate windows instead of focusing existing interfaces
+- Fixed item piles chat messages not working in v11
+- Fixed errors when trying to get document templates in v12 (fixes merchant columns & item pile system settings)
+- Fixed deprecation warnings surrounding `CONST.DOCUMENT_PERMISSION_LEVELS`
+
+## Version 3.0.1
+
+- Added Russian localization (thank you VirusNik21 on github!)
+- Fixed players being unable to open item piles due to error
+
+## Version 3.0.0
+
+- Updated module to be compatible with Foundry v12 (thank you to NeilWhite on github!)
+- Updated the TyphonJS Runtime Library version - thank you, Michael, for your continued support!
+- Updated the Tormenta20 system configuration to fix its currency issues
+- Added support for the [Dragonbane - Drakar och Demoner](https://foundryvtt.com/packages/dragonbane) system (thank you xdy on github!)
+- Added the `game.itempiles.macro_execution_types` constants - see docs for more info
+  - For the above, added `game.itempiles.macro_execution_types.RENDER_INTERFACE`, which means that macros that are attached to item piles will execute its macro when the item piles interface is rendered
+- Added item price modifiers on items, so items can decide how much they will deviate from the base price
 - Fixed merchant columns not being editable in newer versions of D&D 5e
 - Fixed rolltables not applying custom categories to items properly
+- Fixed issue with merchant treating all items as unique and never stacking them
+- Fixed issue with the search bar disappearing when searching for items in item piles
 
 ## Version 2.9.1
 

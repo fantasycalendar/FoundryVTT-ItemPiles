@@ -2,8 +2,8 @@
 	import SETTINGS from "../../constants/settings.js";
 
 	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+	import { localize } from '#runtime/svelte/helper';
+	import { ApplicationShell } from '#runtime/svelte/component/core';
 
 	import * as helpers from "../../helpers/helpers.js"
 	import { applyDefaultSettings } from "../../settings.js";
@@ -11,8 +11,9 @@
 	import Setting from "./Setting.svelte";
 	import SettingButton from "./SettingButton.svelte";
 	import Tabs from "../components/Tabs.svelte";
-	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import { TJSDialog } from "#runtime/svelte/application";
 	import CustomDialog from "../components/CustomDialog.svelte";
+	import { getDocumentTemplates } from "../../helpers/utilities.js";
 
 	const { application } = getContext('#external');
 
@@ -192,13 +193,13 @@
             getSettings();
           }}/>
 					<Setting key={SETTINGS.ACTOR_CLASS_TYPE} bind:data="{settings[SETTINGS.ACTOR_CLASS_TYPE]}"
-					         options={["None", ...game.system.template.Actor.types]}/>
+					         options={["None", ...Object.keys(getDocumentTemplates("Actor"))]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_LOOT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_LOOT_TYPE]}"
-					         options={["None", ...game.system.template.Item.types]}/>
+					         options={["None", ...Object.keys(getDocumentTemplates("Item"))]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_WEAPON_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_WEAPON_TYPE]}"
-					         options={["None", ...game.system.template.Item.types]}/>
+					         options={["None", ...Object.keys(getDocumentTemplates("Item"))]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE]}"
-					         options={["None", ...game.system.template.Item.types]}/>
+					         options={["None", ...Object.keys(getDocumentTemplates("Item"))]}/>
 					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
 					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>

@@ -4,6 +4,10 @@ on:
   release:
     types: [ published ]
 
+env:
+  package_name: Item Piles
+  package_id: item-piles
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -62,6 +66,62 @@ jobs:
           artifacts: './module.json, ./module.zip'
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
+
+      - name: Get Compatibility
+        if: "!github.event.release.prerelease"
+        run: |
+          echo 'COMPATIBILITY<<EOF' >> $GITHUB_ENV
+          cat module.json | jq .compatibility >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+      - name: Send package to foundry
+        if: "!github.event.release.prerelease"
+        run: |
+          HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST 'https://api.foundryvtt.com/_api/packages/release_version/' \
+          --header 'Authorization: ${{ secrets.PACKAGE_TOKEN }}' \
+          --header 'Content-Type: application/json' \
+          --data '{
+              "id": "${{env.package_id}}",
+              "release": {
+                  "version": "${{ github.event.release.tag_name }}",
+                  "manifest": "https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/module.json",
+                  "notes": "https://github.com/${{github.repository}}/releases/tag/${{github.event.release.tag_name}}",
+                  "compatibility": ${{ env.COMPATIBILITY }}
+              }
+          }')
+          
+          # extract the body
+          HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+          
+          # extract the status
+          HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          
+          # print the body
+          echo "$HTTP_BODY"
+          
+          # example using the status
+          if [ ! $HTTP_STATUS -eq 200  ]; then
+            echo "Error [HTTP status: $HTTP_STATUS]"
+            exit 1
+          fi
+
+      - name: FC Discord notification
+        if: "!github.event.release.prerelease"
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_USERNAME: ${{env.package_name}} Version ${{github.event.release.tag_name}}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "${{github.event.release.body}}"
+
+      - name: JB2A Discord notification
+        if: "!github.event.release.prerelease"
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.JB2A_WEBHOOK_URL }}
+          DISCORD_USERNAME: ${{env.package_name}} Version ${{github.event.release.tag_name}}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: "${{github.event.release.body}}"
 
       #  OR create a pre-release for this specific version
       - name: Update Release with Files

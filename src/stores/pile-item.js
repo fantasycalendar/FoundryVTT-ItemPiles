@@ -1,6 +1,6 @@
 import { get, writable } from "svelte/store";
 import * as Utilities from "../helpers/utilities.js";
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
+import { TJSDocument } from "#runtime/svelte/store/fvtt/document";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as SharingUtilities from "../helpers/sharing-utilities.js";
 import CONSTANTS from "../constants/constants.js";
@@ -71,7 +71,7 @@ export class PileItem extends PileBaseItem {
 		this.name = writable(itemData?.name ?? this.item.name);
 		this.img = writable(itemData?.img ?? this.item.img);
 		this.abbreviation = writable("");
-		this.identifier = randomID();
+		this.identifier = foundry.utils.randomID();
 		this.itemFlagData = writable(PileUtilities.getItemFlagData(this.item));
 	}
 
@@ -95,17 +95,18 @@ export class PileItem extends PileBaseItem {
 		});
 
 		this.subscribeTo(this.itemDocument, () => {
-			const { data } = this.itemDocument.updateOptions;
+			const updateData = this.itemDocument.updateOptions;
+			const renderData = updateData?.renderData ?? updateData?.data ?? {};
 			const itemData = CompendiumUtilities.findSimilarItemInCompendiumSync(this.item);
 			this.name.set(itemData?.name ?? this.item.name);
 			this.img.set(itemData?.img ?? this.item.img);
 			this.similarities = Utilities.setSimilarityProperties({}, this.item);
-			if (PileUtilities.canItemStack(this.item, this.store.actor) && Utilities.hasItemQuantity(data)) {
-				this.quantity.set(Utilities.getItemQuantity(data));
+			if (PileUtilities.canItemStack(this.item, this.store.actor) && Utilities.hasItemQuantity(renderData)) {
+				this.quantity.set(Utilities.getItemQuantity(renderData));
 				const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
 				this.currentQuantity.set(quantity);
 			}
-			if (hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
+			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.ITEM)) {
 				this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
 				this.updateCategory();
 				this.store.refreshItems();
@@ -201,8 +202,8 @@ export class PileItem extends PileBaseItem {
 		return game.itempiles.API.removeItems(this.store.actor, [this.id]);
 	}
 
-	updateQuantity(quantity, add = false) {
-		let total = typeof quantity === "string" ? (new Roll(quantity).evaluate({ async: false })).total : quantity;
+	async updateQuantity(quantity, add = false) {
+		let total = typeof quantity === "string" ? (await new Roll(quantity).evaluate({ allowInteractive: false })).total : quantity;
 		if (add) {
 			total += get(this.quantity);
 		}
@@ -243,7 +244,7 @@ export class PileAttribute extends PileBaseItem {
 		this.img = writable(this.attribute.img);
 		this.abbreviation = writable(this.attribute.abbreviation);
 		this.identifier = randomID()
-		const startingQuantity = Number(getProperty(this.parent, this.path) ?? 0);
+		const startingQuantity = Number(foundry.utils.getProperty(this.parent, this.path) ?? 0);
 		this.presentFromTheStart.set(startingQuantity > 0);
 		this.quantity.set(startingQuantity);
 		this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -266,12 +267,13 @@ export class PileAttribute extends PileBaseItem {
 		});
 
 		this.subscribeTo(this.parentDoc, () => {
-			const { data } = this.parentDoc.updateOptions;
+			const updateData = this.parentDoc.updateOptions;
+			const renderData = updateData?.renderData ?? updateData?.data ?? {};
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
-			if (hasProperty(data, this.path)) {
-				const newQuantity = Number(getProperty(data, this.path) ?? 0);
+			if (foundry.utils.hasProperty(renderData, this.path)) {
+				const newQuantity = Number(foundry.utils.getProperty(renderData, this.path) ?? 0);
 				this.quantity.set(newQuantity);
 				if (!this.toShare) {
 					this.quantityLeft.set(newQuantity);

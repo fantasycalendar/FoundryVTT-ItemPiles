@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { TJSDocument } from '@typhonjs-fvtt/runtime/svelte/store';
+import { TJSDocument } from "#runtime/svelte/store/fvtt/document";
 import CONSTANTS from "../constants/constants.js";
 import * as Utilities from "../helpers/utilities.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
@@ -18,7 +18,7 @@ export default class ItemPileStore {
 
 		this.subscriptions = [];
 
-		this.interactionId = randomID();
+		this.interactionId = foundry.utils.randomID();
 		this.application = application;
 
 		this.uuid = Utilities.getUuid(source);
@@ -149,12 +149,14 @@ export default class ItemPileStore {
 	setupSubscriptions() {
 
 		this.subscribeTo(this.document, () => {
-			const { data } = this.document.updateOptions;
-			if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
+			const updateData = this.document.updateOptions;
+			const renderData = updateData?.renderData ?? updateData?.data ?? {};
+			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.SHARING)) {
 				this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
+				13
 				this.refreshItems();
 			}
-			if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
+			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.PILE)) {
 				this.pileData.set(PileUtilities.getActorFlagData(this.actor));
 				this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
 				this.refreshItems();
@@ -165,12 +167,13 @@ export default class ItemPileStore {
 
 		if (this.recipientDocument) {
 			this.subscribeTo(this.recipientDocument, () => {
-				const { data } = this.document.updateOptions;
-				if (hasProperty(data, CONSTANTS.FLAGS.SHARING)) {
+				const updateData = this.document.updateOptions;
+				const renderData = updateData?.renderData ?? updateData?.data ?? {};
+				if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.SHARING)) {
 					this.recipientShareData.set(SharingUtilities.getItemPileSharingData(this.recipient));
 					this.refreshItems();
 				}
-				if (hasProperty(data, CONSTANTS.FLAGS.PILE)) {
+				if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.PILE)) {
 					this.recipientPileData.set(PileUtilities.getActorFlagData(this.recipient));
 					this.recipientCurrencies.set(PileUtilities.getActorCurrencies(this.recipient, { getAll: true }));
 					this.refreshItems();

@@ -102,6 +102,7 @@ Item Piles is designed to work in all systems, but may require some setup for it
 - [Pirate Borg](https://foundryvtt.com/packages/pirateborg)
 - [Star Wars FFG](https://foundryvtt.com/packages/starwarsffg)
 - [Shadow of the Demonlord](https://foundryvtt.com/packages/demonlord)
+- [Dragonbane - Drakar och Demoner](https://foundryvtt.com/packages/dragonbane)
 
 ## Externally support systems
 

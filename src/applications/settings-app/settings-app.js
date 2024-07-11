@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import { getActiveApps } from '../../helpers/helpers';
 import SettingsShell from './settings-shell.svelte';
 import SETTINGS from "../../constants/settings.js";
@@ -7,7 +7,7 @@ export class SettingsApp extends SvelteApplication {
 
 	static get defaultOptions() {
 		return foundry.utils.mergeObject(super.defaultOptions, {
-			id: `item-piles-application-system-settings-${randomID()}`,
+			id: `item-piles-application-system-settings-${foundry.utils.randomID()}`,
 			title: "Item Piles Module Configuration",
 			width: 600,
 			svelte: {

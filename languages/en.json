@@ -70,7 +70,8 @@
       "AddCurrency": "Add currency",
       "SplitAll": "Split {num_players} ways",
       "SplitItems": "Split items {num_players} ways",
-      "SplitCurrencies": "Split currency {num_players} ways"
+      "SplitCurrencies": "Split currency {num_players} ways",
+      "SplitNoPlayers": "No characters were found to split the contents with."
     },
     "Trade": {
       "Title": "Item Piles: Trading",
@@ -469,7 +470,9 @@
         "VaultExpander": "Vault Expander",
         "VaultExpanderExplanation": "When this is enabled, this item does not act as a normal item in a vault, it instead increases the number of available slots, as determined below.",
         "ExpandColumnsRows": "Column & Rows Expansion",
-        "ExpandColumnsRowsExplanation": "When the above setting is enabled, this sets how many columns and/or rows becomes available in the vault. This cannot extend beyond the capacity of the vault."
+        "ExpandColumnsRowsExplanation": "When the above setting is enabled, this sets how many columns and/or rows becomes available in the vault. This cannot extend beyond the capacity of the vault.",
+        "PriceModifierTitle": "Buy and Sell Price Modifiers",
+        "PriceModifierExplanation": "This configures the modifiers for the cost this item when bought and sold. This multiplies the base price of the item before any other price modifiers. If the sell price modifier of the merchant is 50%, the sell price modifier of the item would have to be 200% in order to nullify the merchant modifier."
       },
       "FilterEditor": {
         "Title": "Item Piles Filters Editor",
@@ -534,7 +537,7 @@
       "ItemPileConfig": {
         "Title": "Item Pile Configuration: {actor_name}",
         "Configure": "Item Pile",
-        "Update": "Update Item Pile",
+        "Update": "Update",
         "Main": {
           "Title": "Main Settings",
           "EnabledPile": "Enabled",

@@ -1,8 +1,8 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import SliderInput from "../../components/SliderInput.svelte";
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import { getSourceActorFromDropData, getUuid } from "../../../helpers/utilities.js";
 	import { get, writable } from "svelte/store";
 

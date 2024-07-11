@@ -4,7 +4,6 @@ import CONSTANTS from "./constants/constants.js";
 import registerUIOverrides from "./foundry-ui-overrides.js";
 import registerLibwrappers from "./libwrapper.js";
 import {
-	applyShims,
 	applySystemSpecificStyles,
 	checkSystem,
 	patchCurrencySettings,
@@ -33,7 +32,6 @@ Hooks.once("init", async () => {
 	registerLibwrappers();
 	registerUIOverrides();
 	setupCaches();
-	applyShims();
 	setupPlugins("init");
 
 	game.itempiles = {
@@ -43,6 +41,7 @@ Hooks.once("init", async () => {
 		pile_types: CONSTANTS.PILE_TYPES,
 		pile_flag_defaults: CONSTANTS.PILE_DEFAULTS,
 		item_flag_defaults: CONSTANTS.ITEM_DEFAULTS,
+		macro_execution_types: CONSTANTS.MACRO_EXECUTION_TYPES,
 		Transaction,
 		apps: {
 			ItemPileConfig,
@@ -52,6 +51,8 @@ Hooks.once("init", async () => {
 	window.ItemPiles = {
 		API: API
 	};
+	CONSTANTS.IS_V12 = game.release.generation >= 12;
+	Object.freeze(CONSTANTS);
 
 });
 

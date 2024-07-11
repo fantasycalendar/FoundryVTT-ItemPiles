@@ -1,8 +1,8 @@
 <script>
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import { get, writable } from "svelte/store";
 	import { onDestroy } from "svelte";
-	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import { TJSDialog } from "#runtime/svelte/application";
 	import CustomDialog from "../components/CustomDialog.svelte";
 	import ItemEntry from "./components/ItemEntry.svelte";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";

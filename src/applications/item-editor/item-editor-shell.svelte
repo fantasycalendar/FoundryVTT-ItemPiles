@@ -1,17 +1,18 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import * as Helpers from "../../helpers/helpers.js";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
 	import ItemPriceStore from "./ItemPriceStore.js";
 	import Tabs from "../components/Tabs.svelte";
 	import PriceList from "../components/PriceList.svelte";
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/core";
 	import MacroSelector from "../components/MacroSelector.svelte";
 	import { get, writable } from "svelte/store";
 	import SETTINGS from "../../constants/settings.js";
 	import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
 	import FilePicker from "../components/FilePicker.svelte";
+	import SliderInput from "../components/SliderInput.svelte";
 
 	const { application } = getContext('#external');
 
@@ -228,6 +229,28 @@
 							<input type="number" bind:value={$quantityForPrice}/>
 						</div>
 					{/if}
+
+					<div class="form-group slider-group">
+						<label style="flex:3;">
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.PriceModifierTitle")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceModifierExplanation")}</p>
+						</label>
+					</div>
+
+					<div class="form-group slider-group">
+						<label style="flex:3;">
+							<!-- I know, this is a merchant localization, but there's no change to these -->
+							<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.BuyPriceModifier")}</span>
+						</label>
+						<SliderInput bind:value={itemFlagData.buyPriceModifier} style="flex:4;"/>
+					</div>
+
+					<div class="form-group slider-group">
+						<label style="flex:3;">
+							<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.SellPriceModifier")}</span>
+						</label>
+						<SliderInput bind:value={itemFlagData.sellPriceModifier} style="flex:4;"/>
+					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">

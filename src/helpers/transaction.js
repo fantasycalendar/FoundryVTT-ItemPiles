@@ -92,12 +92,12 @@ export default class Transaction {
 					if (existingItemUpdate) {
 						Utilities.setItemQuantity(existingItemUpdate, newQuantity);
 						if (keepIfZero && type !== "currency") {
-							setProperty(existingItemUpdate, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
+							foundry.utils.setProperty(existingItemUpdate, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
 						}
 					} else {
 						const update = Utilities.setItemQuantity(documentExistingItem.toObject(), newQuantity);
 						if (keepIfZero && type !== "currency") {
-							setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
+							foundry.utils.setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
 						}
 						this.itemTypeMap.set(documentExistingItem.id, type)
 						this.itemsToUpdate.push(update);
@@ -113,7 +113,7 @@ export default class Transaction {
 				} else {
 
 					if (!itemData._id) {
-						itemData._id = randomID();
+						itemData._id = foundry.utils.randomID();
 					}
 					Utilities.setItemQuantity(itemData, incomingQuantity);
 					this.itemsToCreate.push(itemData);
@@ -128,7 +128,7 @@ export default class Transaction {
 					Utilities.setItemQuantity(existingItemCreation, newQuantity);
 				} else {
 					if (!itemData._id) {
-						itemData._id = randomID();
+						itemData._id = foundry.utils.randomID();
 					}
 					Utilities.setItemQuantity(itemData, incomingQuantity);
 					this.itemsToCreate.push(itemData);
@@ -224,7 +224,7 @@ export default class Transaction {
 			const item = this.document.items.get(id).toObject();
 			const existingFlagData = PileUtilities.cleanItemFlagData(PileUtilities.getItemFlagData(item));
 			const newFlagData = PileUtilities.cleanItemFlagData(this.itemFlagMap.get(id) ?? {});
-			setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(existingFlagData, newFlagData));
+			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(existingFlagData, newFlagData));
 			const type = this.itemTypeMap.get(id);
 			Utilities.setItemQuantity(item, quantity, true);
 			return { item, quantity, type };

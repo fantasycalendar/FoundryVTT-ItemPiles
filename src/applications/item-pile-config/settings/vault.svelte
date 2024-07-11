@@ -1,8 +1,8 @@
 <script>
 
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import VaultAccessEditor from "../../editors/vault-access-editor/vault-access-editor.js";
-	import { TJSDialog } from "@typhonjs-fvtt/runtime/svelte/application";
+	import { TJSDialog } from "#runtime/svelte/application";
 	import CustomDialog from "../../components/CustomDialog.svelte";
 	import * as PileUtilities from "../../../helpers/pile-utilities.js";
 	import CONSTANTS from "../../../constants/constants.js";

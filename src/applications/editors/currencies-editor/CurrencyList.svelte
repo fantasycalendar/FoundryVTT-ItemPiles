@@ -2,7 +2,7 @@
 	import FilePicker from "../../components/FilePicker.svelte";
 	import DropZone from "../../components/DropZone.svelte";
 	import * as Helpers from "../../../helpers/helpers.js";
-	import { applyStyles } from '@typhonjs-fvtt/runtime/svelte/action';
+	import { applyStyles } from '#runtime/svelte/action/dom';
 
 	export let store;
 

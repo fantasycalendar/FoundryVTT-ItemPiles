@@ -17,7 +17,7 @@
 
 	let currentCustomCategories = writable(Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES))));
 
-	const id = randomID();
+	const id = foundry.utils.randomID();
 
 </script>
 

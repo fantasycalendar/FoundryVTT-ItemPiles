@@ -2,7 +2,7 @@
 	import { getContext } from "svelte";
 	import * as Utilities from "../../../helpers/utilities.js";
 	import * as PileUtilities from "../../../helpers/pile-utilities.js";
-	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+	import { localize } from "#runtime/svelte/helper";
 	import SliderInput from "../../components/SliderInput.svelte";
 	import Select from 'svelte-select';
 

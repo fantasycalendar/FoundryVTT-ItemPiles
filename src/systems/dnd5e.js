@@ -45,7 +45,7 @@ export default {
 				delete itemData.system[key];
 			}
 		});
-		setProperty(itemData, "system.attunement", Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData?.system?.attunement ?? 0));
+		foundry.utils.setProperty(itemData, "system.attunement", Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData?.system?.attunement ?? 0));
 		if (itemData.type === "spell") {
 			try {
 				const scroll = await Item.implementation.createScrollFromSpell(itemData);
@@ -77,8 +77,8 @@ export default {
 
 	// This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
 	"ITEM_COST_TRANSFORMER": (item, currencies) => {
-		const overallCost = Number(getProperty(item, "system.price.value")) ?? 0;
-		const priceDenomination = getProperty(item, "system.price.denomination");
+		const overallCost = Number(foundry.utils.getProperty(item, "system.price.value")) ?? 0;
+		const priceDenomination = foundry.utils.getProperty(item, "system.price.denomination");
 		if (priceDenomination) {
 			const currencyDenomination = currencies
 				.filter(currency => currency.type === "attribute")

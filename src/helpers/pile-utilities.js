@@ -14,10 +14,13 @@ import * as Helpers from "./helpers.js";
 import * as CompendiumUtilities from "./compendium-utilities.js";
 import { getDocument } from "./utilities.js";
 
+export function getPileDefaults() {
+	return foundry.utils.mergeObject({}, CONSTANTS.PILE_DEFAULTS, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
+}
 
 function getFlagData(inDocument, flag, defaults, existing = false) {
 	const defaultFlags = foundry.utils.deepClone(defaults);
-	let flags = foundry.utils.deepClone(existing || (getProperty(inDocument, flag) ?? {}));
+	let flags = foundry.utils.deepClone(existing || (foundry.utils.getProperty(inDocument, flag) ?? {}));
 	if (flag === CONSTANTS.FLAGS.PILE) {
 		flags = migrateFlagData(inDocument, flags);
 	}
@@ -26,7 +29,7 @@ function getFlagData(inDocument, flag, defaults, existing = false) {
 
 export function migrateFlagData(document, data = false) {
 
-	let flags = data || getProperty(document, CONSTANTS.FLAGS.PILE);
+	let flags = data || foundry.utils.getProperty(document, CONSTANTS.FLAGS.PILE);
 
 	if (flags.type) {
 		return flags;
@@ -91,10 +94,11 @@ export function getItemFlagData(item, data = false) {
  *
  * @param target
  * @param data
+ * @param useDefaults
  * @returns {Object<CONSTANTS.PILE_DEFAULTS>}
  */
-export function getActorFlagData(target, data = false) {
-	const defaults = foundry.utils.mergeObject({ ...CONSTANTS.PILE_DEFAULTS }, { ...(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {}) });
+export function getActorFlagData(target, { data = false, useDefaults = true } = {}) {
+	const defaults = useDefaults ? getPileDefaults() : {};
 	target = Utilities.getActor(target);
 	if (target?.token) {
 		target = target.token;
@@ -104,56 +108,62 @@ export function getActorFlagData(target, data = false) {
 
 export function isValidItemPile(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return targetActor && pileData?.enabled;
 }
 
 export function isRegularItemPile(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return targetActor && pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.PILE;
 }
 
 export function isItemPileContainer(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER;
 }
 
 export function isItemPileLootable(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return targetActor && pileData?.enabled && (pileData?.type === CONSTANTS.PILE_TYPES.PILE || pileData?.type === CONSTANTS.PILE_TYPES.CONTAINER);
 }
 
 export function isItemPileVault(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.VAULT;
 }
 
 export function isItemPileMerchant(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.MERCHANT;
 }
 
 export function isItemPileAuctioneer(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.AUCTIONEER;
+}
+
+export function isItemPileBanker(target, data = false) {
+	const targetActor = Utilities.getActor(target);
+	const pileData = getActorFlagData(targetActor, { data });
+	return pileData?.enabled && pileData?.type === CONSTANTS.PILE_TYPES.BANKER;
 }
 
 export function isItemPileClosed(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
 	return pileData.closed;
 }
 
 export function isItemPileLocked(target, data = false) {
 	const targetActor = Utilities.getActor(target);
-	const pileData = getActorFlagData(targetActor, data);
+	const pileData = getActorFlagData(targetActor, { data });
 	if (!pileData?.enabled || pileData?.type !== CONSTANTS.PILE_TYPES.CONTAINER) return false;
 	return pileData.locked;
 }
@@ -199,7 +209,7 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
 export function getItemPileActors(filter = false) {
 	return Array.from(game.actors).filter((a) => {
-		return getProperty(a, CONSTANTS.FLAGS.PILE)?.enabled && (filter
+		return foundry.utils.getProperty(a, CONSTANTS.FLAGS.PILE)?.enabled && (filter
 			? filter(a)
 			: true);
 	});
@@ -209,7 +219,7 @@ export function getItemPileTokens(filter = false) {
 
 	const allTokensOnScenes = Array.from(game.scenes)
 		.map(scene => ([scene.id, Array.from(scene.tokens).filter(t => {
-			return getProperty(t, CONSTANTS.FLAGS.PILE)?.enabled && !t.actorLink;
+			return foundry.utils.getProperty(t, CONSTANTS.FLAGS.PILE)?.enabled && !t.actorLink;
 		})]))
 		.filter(([_, tokens]) => tokens.length)
 
@@ -282,7 +292,7 @@ export function getActorCurrencies(target, {
 
 	currencies = currencies.map(currency => {
 		currency.quantity = currency.type === "attribute"
-			? getProperty(actor, currency.path)
+			? foundry.utils.getProperty(actor, currency.path)
 			: Utilities.getItemQuantity(currency.item);
 		return currency;
 	});
@@ -365,7 +375,7 @@ export function getCurrencyList(target = false, pileData = false) {
 			return cachedCurrencyList.get(targetUuid)
 		}
 		const targetActor = Utilities.getActor(target);
-		pileData = getActorFlagData(targetActor, pileData);
+		pileData = getActorFlagData(targetActor, { data: pileData });
 	}
 
 	const primaryCurrencies = (pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES);
@@ -393,7 +403,7 @@ export function getActorItemFilters(target, pileData = false) {
 		return cachedFilterList.get(targetUuid)
 	}
 	const targetActor = Utilities.getActor(target);
-	pileData = getActorFlagData(targetActor, pileData);
+	pileData = getActorFlagData(targetActor, { data: pileData });
 	const itemFilters = isValidItemPile(targetActor, pileData) && pileData?.overrideItemFilters
 		? cleanItemFilters(pileData.overrideItemFilters)
 		: cleanItemFilters(game.itempiles.API.ITEM_FILTERS);
@@ -408,7 +418,7 @@ export function getActorRequiredItemProperties(target, pileData = false) {
 		return cachedRequiredPropertiesList.get(targetUuid)
 	}
 	const targetActor = Utilities.getActor(target);
-	pileData = getActorFlagData(targetActor, pileData);
+	pileData = getActorFlagData(targetActor, { data: pileData });
 	const itemFilters = isValidItemPile(targetActor, pileData)
 		? cleanItemFilters(pileData.requiredItemProperties)
 		: [];
@@ -445,8 +455,8 @@ export function isItemInvalid(targetActor, item, itemFilters = false) {
 		? item.toObject()
 		: item;
 	for (const filter of pileItemFilters) {
-		if (!hasProperty(itemData, filter.path)) continue;
-		const attributeValue = getProperty(itemData, filter.path);
+		if (!foundry.utils.hasProperty(itemData, filter.path)) continue;
+		const attributeValue = foundry.utils.getProperty(itemData, filter.path);
 		if (filter.filters.has(attributeValue)) {
 			return attributeValue;
 		}
@@ -460,8 +470,8 @@ export function isItemValidBasedOnProperties(targetActor, item) {
 		? item.toObject()
 		: item;
 	for (const filter of pileItemRequiredProperties) {
-		if (!hasProperty(itemData, filter.path)) return false;
-		const attributeValue = getProperty(itemData, filter.path);
+		if (!foundry.utils.hasProperty(itemData, filter.path)) return false;
+		const attributeValue = foundry.utils.getProperty(itemData, filter.path);
 		if (!filter.filters.has(attributeValue)) return false;
 	}
 	return true;
@@ -533,7 +543,7 @@ export function getItemPileTokenImage(token, {
 
 	const pileDocument = Utilities.getDocument(token);
 
-	const itemPileData = getActorFlagData(pileDocument, data);
+	const itemPileData = getActorFlagData(pileDocument, { data });
 
 	const originalImg = overrideImage ?? (pileDocument instanceof TokenDocument
 		? pileDocument.texture.src
@@ -584,7 +594,7 @@ export function getItemPileTokenScale(target, {
 
 	const pileDocument = Utilities.getDocument(target);
 
-	let itemPileData = getActorFlagData(pileDocument, data);
+	let itemPileData = getActorFlagData(pileDocument, { data });
 
 	const baseScale = overrideScale ?? (pileDocument instanceof TokenDocument
 		? pileDocument.texture.scaleX
@@ -611,7 +621,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 
 	const pileDocument = Utilities.getDocument(target);
 
-	const itemPileData = getActorFlagData(pileDocument, data);
+	const itemPileData = getActorFlagData(pileDocument, { data });
 
 	let name = overrideName ?? (pileDocument instanceof TokenDocument
 		? pileDocument.name
@@ -644,7 +654,7 @@ export function getItemPileName(target, { data = false, items = false, currencie
 }
 
 export function shouldEvaluateChange(target, changes) {
-	const baseFlags = getProperty(changes, CONSTANTS.FLAGS.PILE) ?? false;
+	const baseFlags = foundry.utils.getProperty(changes, CONSTANTS.FLAGS.PILE) ?? false;
 	const flags = getActorFlagData(target, baseFlags
 		? foundry.utils.deepClone(baseFlags)
 		: baseFlags);
@@ -681,11 +691,11 @@ function getRelevantTokensAndActor(target) {
 
 }
 
-export async function updateItemPileData(target, flagData, tokenData) {
+export async function updateItemPileData(target, newFlags, tokenData) {
 
 	if (!target) return;
 
-	if (!flagData) flagData = getActorFlagData(target);
+	const flagData = getActorFlagData(target, { data: foundry.utils.deepClone(newFlags) });
 	if (!tokenData) tokenData = {};
 	tokenData = foundry.utils.mergeObject(tokenData, {});
 
@@ -697,11 +707,16 @@ export async function updateItemPileData(target, flagData, tokenData) {
 
 	const pileData = { data: flagData, items, currencies };
 
-	flagData = cleanFlagData(flagData);
+	const currentFlagData = getActorFlagData(target, { useDefaults: false });
+
+	const cleanedFlagData = cleanFlagData(flagData, { addRemoveFlag: true, existingData: currentFlagData });
 
 	const updates = documentTokens.map(tokenDocument => {
-		const overrideImage = getProperty(tokenData, "texture.src") ?? getProperty(tokenData, "img");
-		const overrideScale = getProperty(tokenData, "texture.scaleX") ?? getProperty(tokenData, "texture.scaleY") ?? getProperty(tokenData, "scale");
+		const overrideImage = foundry.utils.getProperty(tokenData, "texture.src")
+			?? foundry.utils.getProperty(tokenData, "img");
+		const overrideScale = foundry.utils.getProperty(tokenData, "texture.scaleX")
+			?? foundry.utils.getProperty(tokenData, "texture.scaleY")
+			?? foundry.utils.getProperty(tokenData, "scale");
 		const scale = getItemPileTokenScale(tokenDocument, pileData, overrideScale);
 		const newTokenData = foundry.utils.mergeObject(tokenData, {
 			"texture.src": getItemPileTokenImage(tokenDocument, pileData, overrideImage),
@@ -710,34 +725,36 @@ export async function updateItemPileData(target, flagData, tokenData) {
 			"name": getItemPileName(tokenDocument, pileData, tokenData?.name),
 		});
 		const data = {
-			"_id": tokenDocument.id, ...newTokenData
+			"_id": tokenDocument.id,
+			[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
+			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+			...newTokenData
 		};
-		if (!tokenDocument.actorLink && (tokenDocument.actor === documentActor || !documentActor)) {
-			data[CONSTANTS.FLAGS.PILE] = flagData;
-			data[CONSTANTS.FLAGS.VERSION] = Helpers.getModuleVersion();
-			documentActor = false;
-		}
+		if (!tokenDocument.actorLink) documentActor = false;
 		return data;
 	});
 
 	if (canvas.scene && !foundry.utils.isEmpty(updates)) {
-		await canvas.scene.updateEmbeddedDocuments("Token", updates);
+		await canvas.scene.updateEmbeddedDocuments("Token", updates, { animate: false });
 	}
 
 	if (documentActor) {
 		await documentActor.update({
-			[CONSTANTS.FLAGS.PILE]: flagData, [CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+			[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
+			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
 		});
 	}
 
 	return true;
 }
 
-export function cleanFlagData(flagData) {
-	const defaults = foundry.utils.mergeObject({ ...CONSTANTS.PILE_DEFAULTS }, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
+export function cleanFlagData(flagData, { addRemoveFlag = false, existingData = false } = {}) {
+	const defaults = getPileDefaults();
 	const defaultKeys = Object.keys(defaults);
+	const newKeys = new Set(Object.keys(flagData));
 	const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, defaults)));
-	const toRemove = new Set(defaultKeys.filter(key => !difference.has(key)));
+	const toRemove = new Set(defaultKeys.filter(key => !difference.has(key) && newKeys.has(key)));
+	const existingDataKeys = existingData ? new Set(Object.keys(existingData)) : false;
 	if (flagData.enabled) {
 		toRemove.delete("type")
 	}
@@ -746,13 +763,17 @@ export function cleanFlagData(flagData) {
 		for (const key of Object.keys(flagData)) {
 			if (!baseKeys.has(key)) {
 				delete flagData[key];
-				flagData["-=" + key] = null;
+				if (addRemoveFlag && (!existingDataKeys || existingDataKeys.has(key))) {
+					flagData["-=" + key] = null;
+				}
 			}
 		}
 	}
 	for (const key of toRemove) {
 		delete flagData[key];
-		flagData["-=" + key] = null;
+		if (addRemoveFlag && (!existingDataKeys || existingDataKeys.has(key))) {
+			flagData["-=" + key] = null;
+		}
 	}
 	return flagData;
 }
@@ -773,8 +794,8 @@ export function cleanItemFlagData(flagData, { addRemoveFlag = false } = {}) {
 export function updateItemData(item, update, { returnUpdate = false, version = false } = {}) {
 	const flagData = cleanItemFlagData(foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {}));
 	const updates = foundry.utils.mergeObject(update?.data ?? {}, {});
-	setProperty(updates, CONSTANTS.FLAGS.ITEM, flagData)
-	setProperty(updates, CONSTANTS.FLAGS.VERSION, version || Helpers.getModuleVersion())
+	foundry.utils.setProperty(updates, CONSTANTS.FLAGS.ITEM, flagData)
+	foundry.utils.setProperty(updates, CONSTANTS.FLAGS.VERSION, version || Helpers.getModuleVersion())
 	if (returnUpdate) {
 		updates["_id"] = item?.id ?? item?._id;
 		return updates;
@@ -790,12 +811,16 @@ export function getMerchantModifiersForActor(merchant, {
 
 	let {
 		buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, actorPriceModifiers
-	} = getActorFlagData(merchant, pileFlagData);
+	} = getActorFlagData(merchant, { data: pileFlagData });
 
 	if (item) {
 		if (!itemFlagData) {
 			itemFlagData = getItemFlagData(item);
 		}
+
+		buyPriceModifier *= itemFlagData.buyPriceModifier ?? 1.0;
+		sellPriceModifier *= itemFlagData.sellPriceModifier ?? 1.0;
+
 		const itemTypePriceModifier = itemTypePriceModifiers
 			.sort((a, b) => a.type === "custom" && b.type !== "custom"
 				? -1
@@ -807,10 +832,10 @@ export function getMerchantModifiersForActor(merchant, {
 			});
 		if (itemTypePriceModifier) {
 			buyPriceModifier = itemTypePriceModifier.override
-				? itemTypePriceModifier.buyPriceModifier
+				? itemTypePriceModifier.buyPriceModifier ?? buyPriceModifier
 				: buyPriceModifier * itemTypePriceModifier.buyPriceModifier;
 			sellPriceModifier = itemTypePriceModifier.override
-				? itemTypePriceModifier.sellPriceModifier
+				? itemTypePriceModifier.sellPriceModifier ?? sellPriceModifier
 				: sellPriceModifier * itemTypePriceModifier.sellPriceModifier;
 		}
 	}
@@ -1032,7 +1057,7 @@ export function getPriceFromString(str, currencyList = false) {
 			if (part[2] !== currency.identifier) continue;
 
 			try {
-				const roll = new Roll(part[1]).evaluate({ async: false })
+				const roll = new Roll(part[1]).evaluateSync()
 				currency.quantity = roll.total;
 				if (roll.total !== Number(part[1])) {
 					currency.roll = roll;
@@ -1051,7 +1076,7 @@ export function getPriceFromString(str, currencyList = false) {
 
 	if (!currencies.some(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0)) {
 		try {
-			const roll = new Roll(str).evaluate({ async: false });
+			const roll = new Roll(str).evaluateSync();
 			if (roll.total) {
 				const primaryCurrency = currencies.find(currency => currency.primary);
 				primaryCurrency.quantity = roll.total;
@@ -1066,7 +1091,6 @@ export function getPriceFromString(str, currencyList = false) {
 	}
 
 	return { currencies, overallCost };
-
 }
 
 export function getCostOfItem(item, defaultCurrencies = false) {
@@ -1089,7 +1113,6 @@ export function getCostOfItem(item, defaultCurrencies = false) {
 	}
 
 	return Math.max(0, overallCost);
-
 }
 
 export function getPriceData({
@@ -1106,20 +1129,20 @@ export function getPriceData({
 
 	let priceData = [];
 
-	buyerFlagData = getActorFlagData(buyer, buyerFlagData);
+	buyerFlagData = getActorFlagData(buyer, { data: buyerFlagData });
 	if (!isItemPileMerchant(buyer, buyerFlagData)) {
 		buyerFlagData = false;
 	}
 
-	sellerFlagData = getActorFlagData(seller, sellerFlagData);
+	sellerFlagData = getActorFlagData(seller, { data: sellerFlagData });
 	if (!isItemPileMerchant(seller, sellerFlagData)) {
 		sellerFlagData = false;
 	}
 
 	if (cost && !item) {
 		item = {};
-		setProperty(item, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
-		setProperty(item, CONSTANTS.FLAGS.ITEM, CONSTANTS.ITEM_DEFAULTS);
+		foundry.utils.setProperty(item, game.itempiles.API.ITEM_PRICE_ATTRIBUTE, cost);
+		foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, CONSTANTS.ITEM_DEFAULTS);
 	}
 
 	itemFlagData = itemFlagData || getItemFlagData(item);
@@ -1199,7 +1222,8 @@ export function getPriceData({
 
 		// Prices is the cost with the amount of quantity taken into account, which may change the number of the different
 		// types of currencies it costs (eg, an item wouldn't cost 1 gold and 100 silver, it would cost 11 gold
-		let totalCost = Helpers.roundToDecimals(overallCost * modifier * quantity, decimals);
+		let totalCost = baseCost * quantity;
+
 		let prices = getPriceArray(totalCost, defaultCurrencies);
 
 		if (baseCost) {
@@ -1357,7 +1381,7 @@ export function getPriceData({
 			}
 
 			if (price.type === "attribute") {
-				const attributeQuantity = Number(getProperty(buyer, price.data.path));
+				const attributeQuantity = Number(foundry.utils.getProperty(buyer, price.data.path));
 				price.buyerQuantity = attributeQuantity;
 
 				if (price.percent) {
@@ -1428,12 +1452,12 @@ export function getPaymentData({
 	buyerFlagData = false
 } = {}) {
 
-	buyerFlagData = getActorFlagData(buyer, buyerFlagData);
+	buyerFlagData = getActorFlagData(buyer, { data: buyerFlagData });
 	if (!isItemPileMerchant(buyer, buyerFlagData)) {
 		buyerFlagData = false;
 	}
 
-	sellerFlagData = getActorFlagData(seller, sellerFlagData);
+	sellerFlagData = getActorFlagData(seller, { data: sellerFlagData });
 	if (!isItemPileMerchant(seller, sellerFlagData)) {
 		sellerFlagData = false;
 	}
@@ -1519,7 +1543,7 @@ export function getPaymentData({
 				const itemQuantity = Utilities.getItemQuantity(priceGroup.item);
 
 				const quantityPerPrice = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE
-					? getProperty(priceGroup.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1
+					? foundry.utils.getProperty(priceGroup.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1
 					: 1;
 
 				const requiredQuantity = Math.floor(priceGroup.quantity * quantityPerPrice);
@@ -1768,7 +1792,7 @@ export function isMerchantClosed(merchant, { pileData = false } = {}) {
 
 	const currentDate = window.SimpleCalendar.api.currentDateTime();
 	const notes = window.SimpleCalendar.api.getNotesForDay(currentDate.year, currentDate.month, currentDate.day);
-	const categories = new Set(notes.map(note => getProperty(note, "flags.foundryvtt-simple-calendar.noteData.categories") ?? []).deepFlatten());
+	const categories = new Set(notes.map(note => foundry.utils.getProperty(note, "flags.foundryvtt-simple-calendar.noteData.categories") ?? []).deepFlatten());
 
 	return isClosed || categories.intersection(new Set(pileData.closedHolidays ?? [])).size > 0;
 
@@ -1791,7 +1815,7 @@ export async function updateMerchantLog(itemPile, activityData = {}) {
 
 export function getVaultGridData(vaultActor, { flagData = false, items = false } = {}) {
 
-	const vaultFlags = getActorFlagData(vaultActor, flagData);
+	const vaultFlags = getActorFlagData(vaultActor, { data: flagData });
 
 	const vaultItems = getActorItems(vaultActor);
 
@@ -1905,9 +1929,9 @@ export function fitItemsIntoVault(items, vaultActor, {
 		} else if (!newPosition) {
 			return false;
 		}
-		setProperty(flagData, "x", newPosition.x);
-		setProperty(flagData, "y", newPosition.y);
-		setProperty(flagData, "flipped", newPosition.flipped);
+		foundry.utils.setProperty(flagData, "x", newPosition.x);
+		foundry.utils.setProperty(flagData, "y", newPosition.y);
+		foundry.utils.setProperty(flagData, "flipped", newPosition.flipped);
 		const { width, height } = getVaultItemDimensions(item, flagData);
 		for (let w = 0; w < width; w++) {
 			const x = Math.max(0, Math.min(newPosition.x + w, gridData.enabledCols - 1));
@@ -1920,7 +1944,7 @@ export function fitItemsIntoVault(items, vaultActor, {
 				}
 			}
 		}
-		setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM, flagData);
 		updates.push(itemData);
 		vaultItems.push(itemData);
 	}
@@ -2013,7 +2037,7 @@ export function getNewItemsVaultPosition(item, gridData, { position = null } = {
 
 export function getVaultAccess(vaultActor, { flagData = false, hasRecipient = false } = {}) {
 
-	const vaultFlags = getActorFlagData(vaultActor, flagData);
+	const vaultFlags = getActorFlagData(vaultActor, { data: flagData });
 
 	const vaultAccess = vaultFlags.vaultAccess.filter(access => {
 		return fromUuidSync(access.uuid)?.isOwner;
@@ -2064,7 +2088,7 @@ export async function updateVaultLog(itemPile, {
 				date
 			});
 		} else {
-			const item = await Item.implementation.create(itemData.item, { temporary: true });
+			const item = new Item.implementation(itemData.item);
 			formattedItems.push({
 				actor: actor?.name ?? false,
 				user: userId,
@@ -2106,7 +2130,7 @@ export async function updateVaultLog(itemPile, {
 }
 
 export function getActorLog(actor) {
-	return getProperty(Utilities.getActor(actor), CONSTANTS.FLAGS.LOG) || [];
+	return foundry.utils.getProperty(Utilities.getActor(actor), CONSTANTS.FLAGS.LOG) || [];
 }
 
 export function clearActorLog(actor) {
@@ -2155,7 +2179,7 @@ export async function rollTable({
 		}
 	}
 
-	const roll = new Roll(formula.toString(), rollData).evaluate({ async: false });
+	const roll = await new Roll(formula.toString(), rollData).evaluate({ allowInteractive: false });
 	if (roll.total <= 0) {
 		return [];
 	}
@@ -2217,14 +2241,14 @@ export async function rollTable({
 		if (existingItem) {
 			existingItem.quantity += Math.max(newItem.quantity, 1);
 		} else {
-			const flags = getProperty(newItem.item, CONSTANTS.FLAGS.ITEM) ?? {};
+			const flags = foundry.utils.getProperty(newItem.item, CONSTANTS.FLAGS.ITEM) ?? {};
 			if (customCategory) {
-				setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, customCategory);
-				setProperty(flags, "customCategory", customCategory);
+				foundry.utils.setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, customCategory);
+				foundry.utils.setProperty(flags, "customCategory", customCategory);
 			}
-			setProperty(newItem, CONSTANTS.FLAGS.ITEM, flags);
-			if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
-				setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
+			foundry.utils.setProperty(newItem, CONSTANTS.FLAGS.ITEM, flags);
+			if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !foundry.utils.getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
+				foundry.utils.setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
 			}
 			items.push({
 				...newItem
@@ -2265,7 +2289,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 		if (table.addAll) {
 
 			for (const [itemId, formula] of Object.entries(table.items)) {
-				const roll = new Roll(formula).evaluate({ async: false });
+				const roll = await new Roll(formula).evaluate({ allowInteractive: false });
 				if (roll.total <= 0) continue;
 				const rollResult = rollableTable.results.get(itemId).toObject();
 				const potentialPack = game.packs.get(rollResult.documentCollection);
@@ -2288,7 +2312,7 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 
 		} else {
 
-			const roll = new Roll((table.timesToRoll ?? "1").toString()).evaluate({ async: false });
+			const roll = await new Roll((table.timesToRoll ?? "1").toString()).evaluate({ allowInteractive: false });
 
 			if (roll.total <= 0) {
 				continue;
@@ -2298,12 +2322,9 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				tableUuid: table.uuid, formula: roll.total, customCategory: customCategory
 			})
 
-			tableItems.forEach(item => {
-				if (table?.customCategory) {
-					setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table?.customCategory);
-				}
-			});
-
+			if (table?.customCategory) {
+				tableItems.forEach(item => foundry.utils.setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table?.customCategory));
+			}
 		}
 
 		tableItems.forEach(newItem => {
@@ -2317,14 +2338,14 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 			if (existingItem) {
 				existingItem.quantity += Math.max(newItem.quantity, 1);
 			} else {
-				const flags = cleanItemFlagData(getProperty(newItem.item, CONSTANTS.FLAGS.ITEM) ?? {});
+				const flags = cleanItemFlagData(foundry.utils.getProperty(newItem.item, CONSTANTS.FLAGS.ITEM) ?? {});
 				if (newItem?.customCategory) {
-					setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, newItem?.customCategory);
-					setProperty(flags, "customCategory", newItem?.customCategory);
+					foundry.utils.setProperty(newItem, CONSTANTS.FLAGS.CUSTOM_CATEGORY, newItem?.customCategory);
+					foundry.utils.setProperty(flags, "customCategory", newItem?.customCategory);
 				}
-				setProperty(newItem, CONSTANTS.FLAGS.ITEM, flags);
-				if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
-					setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
+				foundry.utils.setProperty(newItem, CONSTANTS.FLAGS.ITEM, flags);
+				if (game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE && !foundry.utils.getProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE)) {
+					foundry.utils.setProperty(newItem, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE, Utilities.getItemQuantity(newItem.item));
 				}
 				items.push({
 					...newItem,

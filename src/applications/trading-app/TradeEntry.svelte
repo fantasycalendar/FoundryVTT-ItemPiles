@@ -13,7 +13,7 @@
 		if (!canPreview || !data.id) return;
 		const item = store.leftTraderActor.items.get(data.id) ?? store.rightTraderActor.items.get(data.id);
 		if (!item) return;
-		if (game.user.isGM || item.ownership[game.user.id] === CONST.DOCUMENT_PERMISSION_LEVELS.OWNER) {
+		if (game.user.isGM || item.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
 			return item.sheet.render(true);
 		}
 		const cls = item._getSheetClass()

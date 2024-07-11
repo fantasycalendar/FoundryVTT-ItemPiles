@@ -1,8 +1,8 @@
 <script>
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
+	import { localize } from '#runtime/svelte/helper';
 	import { getContext } from "svelte";
-	import { ApplicationShell } from "@typhonjs-fvtt/runtime/svelte/component/core";
-	import { TJSProseMirror } from '@typhonjs-fvtt/svelte-standard/component';
+	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { TJSProseMirror } from '#standard/component';
 
 	const { application } = getContext('#external');
 

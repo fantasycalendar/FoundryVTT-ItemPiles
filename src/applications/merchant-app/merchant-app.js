@@ -1,4 +1,4 @@
-import { SvelteApplication } from '@typhonjs-fvtt/runtime/svelte/application';
+import { SvelteApplication } from '#runtime/svelte/application';
 import ItemPileConfig from "../item-pile-config/item-pile-config";
 import MerchantAppShell from "./merchant-app-shell.svelte";
 import * as Helpers from "../../helpers/helpers.js";
@@ -12,7 +12,7 @@ export default class MerchantApp extends SvelteApplication {
 	constructor(merchant, recipient = false, options = {}, dialogData = {}) {
 		super({
 			title: `Merchant: ${merchant.name}`,
-			id: `item-pile-merchant-${merchant.id}-${randomID()}`,
+			id: `item-pile-merchant-${merchant.id}-${foundry.utils.randomID()}`,
 			svelte: {
 				class: MerchantAppShell,
 				target: document.body,
@@ -40,8 +40,8 @@ export default class MerchantApp extends SvelteApplication {
 		});
 	}
 
-	static getActiveApp(id) {
-		return Helpers.getActiveApps(`item-pile-merchant-${id}`, true);
+	static getActiveApp(source) {
+		return Helpers.getActiveApps(`item-pile-merchant-${source.id}`, true);
 	}
 
 	static async show(merchant, recipient = false, options = {}, dialogData = {}) {
@@ -49,7 +49,7 @@ export default class MerchantApp extends SvelteApplication {
 		const recipientActor = Utilities.getActor(recipient);
 		const result = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_OPEN_INTERFACE, merchantActor, recipientActor, options, dialogData);
 		if (result === false) return;
-		const app = this.getActiveApp(merchant.uuid);
+		const app = this.getActiveApp(merchant);
 		if (app) return app.render(false, { focus: true });
 		return new Promise((resolve) => {
 			options.resolve = resolve;

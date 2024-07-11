@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store';
 import * as Utilities from "../../../helpers/utilities.js";
 import CONSTANTS from "../../../constants/constants.js";
 import * as Helpers from "../../../helpers/helpers.js";
-import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
+import { localize } from "#runtime/svelte/helper";
 import * as CompendiumUtilities from "../../../helpers/compendium-utilities.js";
 
 export default class CurrencyStore {
@@ -13,7 +13,7 @@ export default class CurrencyStore {
 			return {
 				...entry,
 				index,
-				id: entry.data?.path ?? entry.data?._id ?? randomID()
+				id: entry.data?.path ?? entry.data?._id ?? foundry.utils.randomID()
 			}
 		}));
 	}
@@ -86,7 +86,7 @@ export default class CurrencyStore {
 				Helpers.custom_notify(`Updated item data for ${localize(currencies[index].name)} (item name ${itemData.name})`)
 			} else {
 				currencies.push(foundry.utils.mergeObject({
-					id: randomID(),
+					id: foundry.utils.randomID(),
 					type: "item",
 					name: itemData.name,
 					img: itemData.img,
@@ -116,8 +116,8 @@ export default class CurrencyStore {
 			const items = Array.from(game.items);
 			item = Utilities.findSimilarItem(items, itemData);
 			if (!item) {
-				setProperty(itemData, CONSTANTS.FLAGS.TEMPORARY_ITEM, true);
-				item = await Item.implementation.create(itemData);
+				foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.TEMPORARY_ITEM, true);
+				item = new Item.implementation(itemData);
 				Helpers.custom_notify(`An item has been created for ${item.name} - drag and drop it into the list to update the stored item data`)
 			}
 		}

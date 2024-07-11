@@ -12,7 +12,7 @@ Example:
 
 ```js
 Hooks.once(game.itempiles.hooks.READY, () => {
-  /// Called once Item Piles is ready to be used
+	/// Called once Item Piles is ready to be used
 });
 ```
 
@@ -48,9 +48,9 @@ Example:
 
 ```js
 game.itempiles.API.turnTokensIntoItemPiles(token, {
-  pileSettings: {
-    type: game.itempiles.pile_types.CONTAINER
-  }
+	pileSettings: {
+		type: game.itempiles.pile_types.CONTAINER
+	}
 });
 ```
 
@@ -59,3 +59,9 @@ game.itempiles.API.turnTokensIntoItemPiles(token, {
 `game.itempiles.item_flag_defaults`
 
 This constant contains every flag that can be potentially set on items themselves.
+
+## Macro Execution Types
+
+`game.itempiles.macro_execution_types`
+
+This constant contains every type of action that macro can have when executed through item piles. 

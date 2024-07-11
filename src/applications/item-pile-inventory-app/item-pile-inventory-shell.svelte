@@ -1,8 +1,8 @@
 <script>
 	import { getContext, onDestroy } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { localize } from '@typhonjs-fvtt/runtime/svelte/helper';
-	import { ApplicationShell } from '@typhonjs-fvtt/runtime/svelte/component/core';
+	import { localize } from '#runtime/svelte/helper';
+	import { ApplicationShell } from '#runtime/svelte/component/core';
 
 	import ItemList from "./ItemList.svelte";
 	import CurrencyList from "./CurrencyList.svelte";
@@ -27,6 +27,7 @@
 
 	// Stores
 	let canBeSplit = false;
+	let num_players = 0;
 	let searchStore = store.search;
 	let editQuantities = store.editQuantities;
 	let pileData = store.pileData;
@@ -40,16 +41,15 @@
 
 	$: isPileEmpty = $numItems === 0 && $numCurrencies === 0;
 	$: hasItems = $numItems > 0;
-	$: showSearchBar = $numItems >= 8;
+	$: showSearchBar = $items.length >= 8;
 	$: isContainer = PileUtilities.isItemPileContainer(actor, $pileData)
 	$: {
 		$shareData;
 		$items;
 		$currencies;
 		canBeSplit = SharingUtilities.canItemPileBeSplit(actor);
+		num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 	}
-
-	let num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 
 	async function dropData(event) {
 
@@ -183,7 +183,8 @@
 				{/if}
 
 				{#if $pileData.splitAllEnabled}
-					<button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty || !canBeSplit}">
+					<button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty || !canBeSplit}"
+					        data-tooltip={num_players === 0 && !isPileEmpty ? localize("ITEM-PILES.Inspect.SplitNoPlayers") : ""}>
 						<i class="fas fa-handshake"></i>
 						{#if $pileData.shareItemsEnabled}
 							{localize("ITEM-PILES.Inspect.SplitAll", { num_players })}
