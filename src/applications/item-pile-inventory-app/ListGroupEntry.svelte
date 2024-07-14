@@ -12,7 +12,7 @@
 {#if index !== 0}
 	<div class="item-piles-item-divider"></div>
 {/if}
-<ListEntry bind:entry={item} {store} divider/>
+<ListEntry bind:entry={item} {store}/>
 {#if $subItems.length}
 	<div class="item-piles-item-sublist">
 		{#each $subItems as subItem (subItem.identifier)}
