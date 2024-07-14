@@ -1106,7 +1106,7 @@ export default class PrivateAPI {
 		} else if (!actor) {
 
 			const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
-			let pileActor = game.actors.get(defaultItemPileId);
+			pileActor = game.actors.get(defaultItemPileId);
 
 			if (!pileActor) {
 
