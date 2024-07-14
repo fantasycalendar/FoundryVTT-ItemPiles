@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.0.8
+
+- Fixed not being able to drop items onto scenes
+
 ## Version 3.0.7
 
 - Tweaked `game.itempiles.API.createItemPile` with `createActor` set to `true` have the default item piles' settings
