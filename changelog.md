@@ -2,7 +2,7 @@
 
 ## Version 3.0.8
 
-- Fixed not being able to drop items onto scenes
+- Fixed not being able to drop items onto scenes (thanks diwako on github!)
 
 ## Version 3.0.7
 
