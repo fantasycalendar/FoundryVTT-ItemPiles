@@ -15,6 +15,10 @@
     "Items": "Oggetti",
     "HeaderButtons": {
       "ShowToPlayers": "Mostra ai Giocatori"
+    },
+    "Notifications": {
+      "UpdateItemPileSuccess": "Item Pile aggiornato con successo.",
+      "UpdateMerchantSuccess": "Mercante Aggiornato con Successo."
     }
   }
 }
