@@ -4,6 +4,7 @@
 
 - Added support for secretly giving items to others via the right-click context menu on items on the D&D5e system
 - Fixed some systems not allowing players to preview items by clicking on the names in item piles when the player had no permissions configured on the item pile
+- Fixed item pile on interact macros not working when utilizing module or system macro compendiums
 
 ## Version 3.0.8
 
