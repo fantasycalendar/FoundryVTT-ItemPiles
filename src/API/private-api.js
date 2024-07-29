@@ -1875,13 +1875,13 @@ export default class PrivateAPI {
 					Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
 						source_actor_name: sourceActor.name, target_actor_name: targetActor.name, item_name: item.name
 					}));
-					Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, sourceActor, targetActor, dropData.itemData, game.user.id);
+					Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, sourceActor, targetActor, dropData.itemData, game.user.id, game.user.id, dropData?.secret);
 					return this._transferItems(sourceUuid, targetUuid, [dropData.itemData], game.user.id)
 				}
 			}
 
 			return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS, [user ? user.id : gms[0]], {
-				userId: game.user.id, sourceUuid, targetUuid, itemData: dropData.itemData
+				userId: game.user.id, sourceUuid, targetUuid, itemData: dropData.itemData, secret: dropData?.secret
 			});
 		}
 	}
@@ -1911,10 +1911,10 @@ export default class PrivateAPI {
 
 	}
 
-	static async _giveItemsResponse({ userId, accepted, sourceUuid, targetUuid, itemData } = {}) {
+	static async _giveItemsResponse({ userId, accepted, sourceUuid, targetUuid, itemData, secret } = {}) {
 		const user = game.users.get(userId);
 		if (accepted) {
-			await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.GIVE, sourceUuid, targetUuid, itemData, game.user.id, userId)
+			await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.GIVE, sourceUuid, targetUuid, itemData, game.user.id, userId, secret)
 			await PrivateAPI._removeItems(sourceUuid, [itemData], game.user.id);
 			return Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.GiveItemAccepted", { user_name: user.name }));
 		}

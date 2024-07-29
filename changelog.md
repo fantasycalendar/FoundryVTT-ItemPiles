@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.0.9
+
+- Added support for secretly giving items to others via the right-click context menu on items on the D&D5e system
+
 ## Version 3.0.8
 
 - Fixed not being able to drop items onto scenes (thanks diwako on github!)
