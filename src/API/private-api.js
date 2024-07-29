@@ -151,11 +151,12 @@ export default class PrivateAPI {
 	}
 
 	static _onPreUpdateToken(doc, changes) {
-		if (!foundry.utils.hasProperty(changes, "actorLink")) return;
+		const diff = foundry.utils.diffObject(doc, changes);
+		if (!foundry.utils.hasProperty(diff, "actorLink")) return;
 		if (!PileUtilities.isValidItemPile(doc)) return;
 		const flagData = PileUtilities.getActorFlagData(doc);
 		const cleanFlagData = PileUtilities.cleanFlagData(flagData);
-		changes[CONSTANTS.FLAGS.PILE] = doc.actorLink ? cleanFlagData : null;
+		changes[CONSTANTS.FLAGS.PILE] = diff.actorLink ? cleanFlagData : null;
 	}
 
 	/**
@@ -1477,7 +1478,8 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static async _evaluateItemPileChange(doc, changes = {}, force = false) {
-		const duplicatedChanges = foundry.utils.deepClone(changes);
+		const diff = foundry.utils.diffObject(doc, changes);
+		const duplicatedChanges = foundry.utils.deepClone(diff);
 		const target = doc?.token ?? doc;
 		if (!Helpers.isResponsibleGM()) return;
 		if (!force && !PileUtilities.shouldEvaluateChange(target, duplicatedChanges)) return;
