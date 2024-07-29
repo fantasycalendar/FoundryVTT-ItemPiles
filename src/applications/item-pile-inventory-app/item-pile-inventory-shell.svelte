@@ -176,13 +176,13 @@
 			{/if}
 
 			<footer class="sheet-footer item-piles-flexrow item-piles-top-divider">
-				{#if editQuantities}
+				{#if editQuantities && !$deleted}
 					<button type="button" on:click={() => { store.update() }}>
 						<i class="fas fa-save"></i> {localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
 					</button>
 				{/if}
 
-				{#if $pileData.splitAllEnabled}
+				{#if $pileData.splitAllEnabled && !$deleted}
 					<button type="button" on:click={() => { store.splitAll() }} disabled="{isPileEmpty || !canBeSplit}"
 					        data-tooltip={num_players === 0 && !isPileEmpty ? localize("ITEM-PILES.Inspect.SplitNoPlayers") : ""}>
 						<i class="fas fa-handshake"></i>
@@ -194,13 +194,13 @@
 					</button>
 				{/if}
 
-				{#if store.recipient && $pileData.takeAllEnabled}
+				{#if store.recipient && $pileData.takeAllEnabled && !$deleted}
 					<button type="submit" on:click={() => { store.takeAll() }} disabled="{isPileEmpty}">
 						<i class="fas fa-fist-raised"></i> {localize("ITEM-PILES.Inspect.TakeAll")}
 					</button>
 				{/if}
 
-				{#if isContainer && !application.options.remote}
+				{#if isContainer && !application.options.remote && !$deleted}
 					<button type="submit" on:click={() => { store.closeContainer(); application.close(); }}>
 						<i class="fas fa-box"></i> {localize("ITEM-PILES.Inspect.Close")}
 					</button>
