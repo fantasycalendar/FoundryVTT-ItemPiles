@@ -3,6 +3,7 @@
 ## Version 3.0.9
 
 - Added support for secretly giving items to others via the right-click context menu on items on the D&D5e system
+- Fixed some systems not allowing players to preview items by clicking on the names in item piles when the player had no permissions configured on the item pile
 
 ## Version 3.0.8
 
