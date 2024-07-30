@@ -267,6 +267,7 @@
         "Header": "Giving Item: {item_name}",
         "SelectPlaceholder": "Pick character to send item to",
         "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to give away?",
+        "Secret": "Give without letting others know (except GMs)",
         "Submit": "Send"
       },
       "ReceiveItem": {

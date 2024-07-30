@@ -1,5 +1,15 @@
 # Item Piles Changelog
 
+## Version 3.0.9
+
+- Added support for secretly giving items to others via the right-click context menu on items on the D&D5e system
+- Fixed some systems not allowing players to preview items by clicking on the names in item piles when the player had no permissions configured on the item pile
+- Fixed item pile on interact macros not working when utilizing module or system macro compendiums
+- Fixed updating item piles tokens would sometimes reset it to a default non-item pile token
+- Fixed item piles not being deleted after being emptied even though they were configured to be deleted
+- Fixed being unable to switch inspecting character in item piles
+- Fixed some interfaces being broken when other modules were active due to them declaring global CSS classes
+
 ## Version 3.0.8
 
 - Fixed not being able to drop items onto scenes (thanks diwako on github!)

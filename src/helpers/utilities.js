@@ -353,7 +353,9 @@ export async function runMacro(macroId, macroData) {
 		if (!compendium) {
 			throw Helpers.custom_error(`Compendium ${packArray[1]}.${packArray[2]} was not found`);
 		}
-		let findMacro = (await compendium.getDocuments()).find(m => m.name === packArray[3] || m.id === packArray[3])
+		let findMacro = (await compendium.getDocuments()).find(m => {
+			return m.name === packArray[3] || m.id === packArray[3] || m.id === packArray[4];
+		})
 		if (!findMacro) {
 			throw Helpers.custom_error(`The "${packArray[3]}" macro was not found in Compendium ${packArray[1]}.${packArray[2]}`);
 		}

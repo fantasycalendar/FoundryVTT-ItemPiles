@@ -151,11 +151,12 @@ export default class PrivateAPI {
 	}
 
 	static _onPreUpdateToken(doc, changes) {
-		if (!foundry.utils.hasProperty(changes, "actorLink")) return;
+		const diff = foundry.utils.diffObject(doc, changes);
+		if (!foundry.utils.hasProperty(diff, "actorLink")) return;
 		if (!PileUtilities.isValidItemPile(doc)) return;
 		const flagData = PileUtilities.getActorFlagData(doc);
 		const cleanFlagData = PileUtilities.cleanFlagData(flagData);
-		changes[CONSTANTS.FLAGS.PILE] = doc.actorLink ? cleanFlagData : null;
+		changes[CONSTANTS.FLAGS.PILE] = diff.actorLink ? cleanFlagData : null;
 	}
 
 	/**
@@ -1477,7 +1478,8 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static async _evaluateItemPileChange(doc, changes = {}, force = false) {
-		const duplicatedChanges = foundry.utils.deepClone(changes);
+		const diff = foundry.utils.diffObject(doc, changes);
+		const duplicatedChanges = foundry.utils.deepClone(diff);
 		const target = doc?.token ?? doc;
 		if (!Helpers.isResponsibleGM()) return;
 		if (!force && !PileUtilities.shouldEvaluateChange(target, duplicatedChanges)) return;
@@ -1875,13 +1877,13 @@ export default class PrivateAPI {
 					Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
 						source_actor_name: sourceActor.name, target_actor_name: targetActor.name, item_name: item.name
 					}));
-					Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, sourceActor, targetActor, dropData.itemData, game.user.id);
+					Hooks.callAll(CONSTANTS.HOOKS.ITEM.GIVE, sourceActor, targetActor, dropData.itemData, game.user.id, game.user.id, dropData?.secret);
 					return this._transferItems(sourceUuid, targetUuid, [dropData.itemData], game.user.id)
 				}
 			}
 
 			return ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.GIVE_ITEMS, [user ? user.id : gms[0]], {
-				userId: game.user.id, sourceUuid, targetUuid, itemData: dropData.itemData
+				userId: game.user.id, sourceUuid, targetUuid, itemData: dropData.itemData, secret: dropData?.secret
 			});
 		}
 	}
@@ -1911,10 +1913,10 @@ export default class PrivateAPI {
 
 	}
 
-	static async _giveItemsResponse({ userId, accepted, sourceUuid, targetUuid, itemData } = {}) {
+	static async _giveItemsResponse({ userId, accepted, sourceUuid, targetUuid, itemData, secret } = {}) {
 		const user = game.users.get(userId);
 		if (accepted) {
-			await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.GIVE, sourceUuid, targetUuid, itemData, game.user.id, userId)
+			await ItemPileSocket.callHook(CONSTANTS.HOOKS.ITEM.GIVE, sourceUuid, targetUuid, itemData, game.user.id, userId, secret)
 			await PrivateAPI._removeItems(sourceUuid, [itemData], game.user.id);
 			return Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.GiveItemAccepted", { user_name: user.name }));
 		}
