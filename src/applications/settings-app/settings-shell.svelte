@@ -126,9 +126,10 @@
 			<Tabs bind:activeTab {tabs}/>
 		{/if}
 
-		<section class="tab-body">
+		<section class="item-piles-tab-body">
 
-			<div class="tab flex" class:active={activeTab === 'local'} data-scope="primary" data-tab="local">
+			<div class="item-piles-tab" class:active={activeTab === 'local'} data-scope="primary"
+			     data-tab="local">
 
 				<Setting bind:data="{settings[SETTINGS.INVERT_SHEET_OPEN]}" key={SETTINGS.INVERT_SHEET_OPEN}/>
 				<Setting bind:data="{settings[SETTINGS.HIDE_ACTOR_HEADER_TEXT]}" key={SETTINGS.HIDE_ACTOR_HEADER_TEXT}/>
@@ -162,7 +163,7 @@
 			</div>
 
 			{#if userCanChangeSettings}
-				<div class="tab flex" class:active={activeTab === 'module'} data-scope="primary" data-tab="module">
+				<div class="item-piles-tab" class:active={activeTab === 'module'}>
 					<Setting key={SETTINGS.ENABLE_DROPPING_ITEMS} bind:data="{settings[SETTINGS.ENABLE_DROPPING_ITEMS]}"/>
 					<Setting key={SETTINGS.ENABLE_GIVING_ITEMS} bind:data="{settings[SETTINGS.ENABLE_GIVING_ITEMS]}"/>
 					<Setting key={SETTINGS.ENABLE_TRADING} bind:data="{settings[SETTINGS.ENABLE_TRADING]}"/>
@@ -176,12 +177,12 @@
 					<SettingButton key={SETTINGS.CUSTOM_ITEM_CATEGORIES} bind:data="{settings[SETTINGS.CUSTOM_ITEM_CATEGORIES]}"/>
 				</div>
 
-				<div class="tab flex" class:active={activeTab === 'styles'} data-scope="primary" data-tab="styles">
+				<div class="item-piles-tab" class:active={activeTab === 'styles'}>
 					<SettingButton key={SETTINGS.CSS_VARIABLES} bind:data="{settings[SETTINGS.CSS_VARIABLES]}"/>
 					<SettingButton key={SETTINGS.VAULT_STYLES} bind:data="{settings[SETTINGS.VAULT_STYLES]}"/>
 				</div>
 
-				<div class="tab flex" class:active={activeTab === 'system'} data-scope="primary" data-tab="system">
+				<div class="item-piles-tab" class:active={activeTab === 'system'}>
 					<SettingButton data={{
             name: "ITEM-PILES.Settings.Reset.Title",
             hint: "ITEM-PILES.Settings.Reset.Hint",
@@ -283,11 +284,19 @@
     }
   }
 
-  .tab-body {
+  .item-piles-tab-body {
     max-height: 729px;
     min-height: 729px;
     overflow-y: scroll;
     padding: 5px;
+
+    .item-piles-tab {
+      display: none;
+
+      &.active {
+        display: block;
+      }
+    }
   }
 
   footer {
@@ -295,5 +304,6 @@
     margin-top: 0.5rem;
     padding-top: 0.5rem;
   }
+
 
 </style>

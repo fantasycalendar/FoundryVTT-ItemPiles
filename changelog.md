@@ -8,6 +8,7 @@
 - Fixed updating item piles tokens would sometimes reset it to a default non-item pile token
 - Fixed item piles not being deleted after being emptied even though they were configured to be deleted
 - Fixed being unable to switch inspecting character in item piles
+- Fixed some interfaces being broken when other modules were active due to them declaring global CSS classes
 
 ## Version 3.0.8
 
