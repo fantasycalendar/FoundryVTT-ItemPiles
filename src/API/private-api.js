@@ -16,6 +16,7 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import ReceiveItemsShell from "../applications/dialogs/receive-items-dialog/receive-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 import { hotkeyActionState } from "../hotkeys.js";
+import { getCurrenciesInItem } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -258,7 +259,16 @@ export default class PrivateAPI {
 		const targetActor = Utilities.getActor(targetUuid);
 
 		const sourceTransaction = new Transaction(sourceActor);
+		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+			for (const itemData of items) {
+				const item = sourceActor.items.get(itemData._id ?? itemData.id);
+				const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
+				if (!handler) continue;
+				handler({ actor: sourceActor, item, items });
+			}
+		}
 		await sourceTransaction.appendItemChanges(items, { remove: true });
+
 		const sourceUpdates = sourceTransaction.prepare();
 
 		const targetTransaction = new Transaction(targetActor);
@@ -385,7 +395,7 @@ export default class PrivateAPI {
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
 		await transaction.appendItemChanges(itemsToUpdate2, { type: "currency", set: true });
-		await transaction.appendActorChanges(attributesToUpdate, { type: "currency", set: true });
+		await transaction.appendDocumentChanges(attributesToUpdate, { type: "currency", set: true });
 
 		const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
 
@@ -433,7 +443,7 @@ export default class PrivateAPI {
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
 		await transaction.appendItemChanges(itemsToAdd, { type: "currency" });
-		await transaction.appendActorChanges(attributesToAdd, { type: "currency" });
+		await transaction.appendDocumentChanges(attributesToAdd, { type: "currency" });
 
 		const { actorUpdates, itemsToCreate, itemsToUpdate } = transaction.prepare(); // Prepare data
 
@@ -492,9 +502,9 @@ export default class PrivateAPI {
 			.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
 
 		await transaction.appendItemChanges(itemsToRemove, { remove: true, type: "currency" });
-		await transaction.appendActorChanges(attributesToRemove, { remove: true, type: "currency" });
+		await transaction.appendDocumentChanges(attributesToRemove, { remove: true, type: "currency" });
 		await transaction.appendItemChanges(itemsToAdd, { type: "currency" });
-		await transaction.appendActorChanges(attributesToAdd, { type: "currency" });
+		await transaction.appendDocumentChanges(attributesToAdd, { type: "currency" });
 
 		const { actorUpdates, itemsToUpdate } = transaction.prepare(); // Prepare data
 
@@ -557,9 +567,9 @@ export default class PrivateAPI {
 
 		const sourceTransaction = new Transaction(sourceActor);
 		await sourceTransaction.appendItemChanges(sourceItemsToRemove, { remove: true, type: "currency" });
-		await sourceTransaction.appendActorChanges(sourceAttributesToRemove, { remove: true, type: "currency" });
+		await sourceTransaction.appendDocumentChanges(sourceAttributesToRemove, { remove: true, type: "currency" });
 		await sourceTransaction.appendItemChanges(sourceItemsToAdd, { type: "currency" });
-		await sourceTransaction.appendActorChanges(sourceAttributesToAdd, { type: "currency" });
+		await sourceTransaction.appendDocumentChanges(sourceAttributesToAdd, { type: "currency" });
 		const sourceUpdates = sourceTransaction.prepare();
 
 		const targetItemsToAdd = paymentData.sellerReceive.filter(currency => currency.type === "item")
@@ -570,7 +580,7 @@ export default class PrivateAPI {
 
 		const targetTransaction = new Transaction(targetActor);
 		await targetTransaction.appendItemChanges(targetItemsToAdd, { type: "currency" });
-		await targetTransaction.appendActorChanges(targetAttributesToAdd, { type: "currency" });
+		await targetTransaction.appendDocumentChanges(targetAttributesToAdd, { type: "currency" });
 		const targetUpdates = targetTransaction.prepare();
 
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
@@ -641,12 +651,12 @@ export default class PrivateAPI {
 
 		const sourceTransaction = new Transaction(sourceActor);
 		await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true, type: "currency" });
-		await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
+		await sourceTransaction.appendDocumentChanges(attributesToTransfer, { remove: true, type: "currency" });
 		const sourceUpdates = sourceTransaction.prepare();
 
 		const targetTransaction = new Transaction(targetActor);
 		await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
-		await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
+		await targetTransaction.appendDocumentChanges(sourceUpdates.attributeDeltas);
 		const targetUpdates = targetTransaction.prepare();
 
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_TRANSFER_ALL, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
@@ -690,13 +700,13 @@ export default class PrivateAPI {
 
 	static async _setAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {
 
-		const targetActor = Utilities.getActor(targetUuid);
+		const targetDocument = Utilities.document(targetUuid);
 
-		const transaction = new Transaction(targetActor);
-		await transaction.appendActorChanges(attributes, { set: true });
+		const transaction = new Transaction(targetDocument);
+		await transaction.appendDocumentChanges(attributes, { set: true });
 		const { actorUpdates } = transaction.prepare();
 
-		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_SET, targetActor, actorUpdates, interactionId);
+		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_SET, targetDocument, actorUpdates, interactionId);
 		if (hookResult === false) return false;
 
 		const { attributeDeltas } = await transaction.commit();
@@ -719,13 +729,13 @@ export default class PrivateAPI {
 		skipVaultLogging = false, interactionId = false
 	} = {}) {
 
-		const targetActor = Utilities.getActor(targetUuid);
+		const targetDocument = Utilities.getDocument(targetUuid);
 
-		const transaction = new Transaction(targetActor);
-		await transaction.appendActorChanges(attributes);
+		const transaction = new Transaction(targetDocument);
+		await transaction.appendDocumentChanges(attributes);
 		const { actorUpdates } = transaction.prepare();
 
-		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_ADD, targetActor, actorUpdates, interactionId);
+		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_ADD, targetDocument, actorUpdates, interactionId);
 		if (hookResult === false) return false;
 
 		const { attributeDeltas } = await transaction.commit();
@@ -740,6 +750,7 @@ export default class PrivateAPI {
 			interactionId: interactionId
 		});
 
+		const targetActor = Utilities.getActor(targetUuid);
 		if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
 			await PileUtilities.updateVaultLog(targetActor, {
 				userId, attributes: attributeDeltas, withdrawal: false
@@ -754,13 +765,13 @@ export default class PrivateAPI {
 		skipVaultLogging = false, interactionId = false
 	} = {}) {
 
-		const targetActor = Utilities.getActor(targetUuid);
+		const targetDocument = Utilities.getDocument(targetUuid);
 
-		const transaction = new Transaction(targetActor);
-		await transaction.appendActorChanges(attributes, { remove: true });
+		const transaction = new Transaction(targetDocument);
+		await transaction.appendDocumentChanges(attributes, { remove: true });
 		const { actorUpdates } = transaction.prepare();
 
-		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_REMOVE, targetActor, actorUpdates, interactionId);
+		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_REMOVE, targetDocument, actorUpdates, interactionId);
 		if (hookResult === false) return false;
 
 		const { attributeDeltas } = await transaction.commit();
@@ -780,6 +791,7 @@ export default class PrivateAPI {
 			await this._deleteItemPile(targetUuid);
 		}
 
+		const targetActor = Utilities.getActor(targetUuid);
 		if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
 			await PileUtilities.updateVaultLog(targetActor, {
 				userId, attributes: attributeDeltas, withdrawal: true
@@ -794,18 +806,20 @@ export default class PrivateAPI {
 		skipVaultLogging = false, interactionId = false
 	} = {}) {
 
-		const sourceActor = Utilities.getActor(sourceUuid);
-		const targetActor = Utilities.getActor(targetUuid);
+		const sourceDocument = Utilities.getDocument(sourceUuid);
+		const targetDocument = Utilities.getDocument(targetUuid);
 
-		const sourceTransaction = new Transaction(sourceActor);
-		await sourceTransaction.appendActorChanges(attributes, { remove: true });
+		const sourceTransaction = new Transaction(sourceDocument);
+		await sourceTransaction.appendDocumentChanges(attributes, { remove: true });
 		const sourceUpdates = sourceTransaction.prepare();
 
-		const targetTransaction = new Transaction(targetActor);
-		await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
+		const targetTransaction = new Transaction(targetDocument);
+		await targetTransaction.appendDocumentChanges(sourceUpdates.attributeDeltas);
 		const targetUpdates = targetTransaction.prepare();
 
-		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
+		debugger;
+
+		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER, sourceDocument, sourceUpdates.actorUpdates, targetDocument, targetUpdates.actorUpdates, interactionId);
 		if (hookResult === false) return false;
 
 		await sourceTransaction.commit();
@@ -823,6 +837,9 @@ export default class PrivateAPI {
 		};
 		await this._executeItemPileMacro(sourceUuid, macroData);
 		await this._executeItemPileMacro(targetUuid, macroData);
+
+		const sourceActor = Utilities.getActor(sourceUuid);
+		const targetActor = Utilities.getActor(targetUuid);
 
 		const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
 
@@ -856,23 +873,23 @@ export default class PrivateAPI {
 		skipVaultLogging = false, interactionId = false
 	} = {}) {
 
-		const sourceActor = Utilities.getActor(sourceUuid);
-		const targetActor = Utilities.getActor(targetUuid);
+		const sourceDocument = Utilities.getDocument(sourceUuid);
+		const targetDocument = Utilities.getDocument(targetUuid);
 
-		const sourceAttributes = PileUtilities.getActorCurrencies(sourceActor).filter(entry => entry.type === "attribute");
+		const sourceAttributes = PileUtilities.getActorCurrencies(sourceDocument).filter(entry => entry.type === "attribute");
 		const attributesToTransfer = sourceAttributes.filter(attribute => {
 			return foundry.utils.hasProperty(targetActor, attribute.data.path);
 		}).map(attribute => attribute.data.path);
 
-		const sourceTransaction = new Transaction(sourceActor);
-		await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true });
+		const sourceTransaction = new Transaction(sourceDocument);
+		await sourceTransaction.appendDocumentChanges(attributesToTransfer, { remove: true });
 		const sourceUpdates = sourceTransaction.prepare();
 
-		const targetTransaction = new Transaction(targetActor);
-		await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
+		const targetTransaction = new Transaction(targetDocument);
+		await targetTransaction.appendDocumentChanges(sourceUpdates.attributeDeltas);
 		const targetUpdates = targetTransaction.prepare();
 
-		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, sourceActor, sourceUpdates.actorUpdates, targetActor, targetUpdates.actorUpdates, interactionId);
+		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER_ALL, sourceDocument, sourceUpdates.actorUpdates, targetDocument, targetUpdates.actorUpdates, interactionId);
 		if (hookResult === false) return false;
 
 		await sourceTransaction.commit();
@@ -890,6 +907,9 @@ export default class PrivateAPI {
 		};
 		await this._executeItemPileMacro(sourceUuid, macroData);
 		await this._executeItemPileMacro(targetUuid, macroData);
+
+		const sourceActor = Utilities.getActor(sourceUuid);
+		const targetActor = Utilities.getActor(targetUuid);
 
 		const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
 
@@ -926,12 +946,12 @@ export default class PrivateAPI {
 		await sourceTransaction.appendItemChanges(itemCurrenciesToTransfer, {
 			remove: true, type: "currency"
 		});
-		await sourceTransaction.appendActorChanges(attributesToTransfer, { remove: true, type: "currency" });
+		await sourceTransaction.appendDocumentChanges(attributesToTransfer, { remove: true, type: "currency" });
 		const sourceUpdates = sourceTransaction.prepare();
 
 		const targetTransaction = new Transaction(targetActor);
 		await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
-		await targetTransaction.appendActorChanges(sourceUpdates.attributeDeltas);
+		await targetTransaction.appendDocumentChanges(sourceUpdates.attributeDeltas);
 		const targetUpdates = targetTransaction.prepare();
 
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_TRANSFER_EVERYTHING, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);
@@ -965,16 +985,18 @@ export default class PrivateAPI {
 
 	}
 
-	static async _commitActorChanges(actorUuid, {
-		actorUpdates = {}, itemsToUpdate = [], itemsToDelete = [], itemsToCreate = []
+	static async _commitDocumentChanges(documentUuid, {
+		documentChanges = {}, itemsToUpdate = [], itemsToDelete = [], itemsToCreate = []
 	} = {}) {
-		const actor = Utilities.getActor(actorUuid);
-		if (!foundry.utils.isEmpty(actorUpdates)) {
-			await actor.update(actorUpdates);
+		const targetDocument = Utilities.getDocument(documentUuid);
+		if (!foundry.utils.isEmpty(documentChanges)) {
+			await targetDocument.update(documentChanges);
 		}
-		const createdItems = itemsToCreate.length ? await actor.createEmbeddedDocuments("Item", itemsToCreate) : [];
-		if (itemsToUpdate.length) await actor.updateEmbeddedDocuments("Item", itemsToUpdate);
-		if (itemsToDelete.length) await actor.deleteEmbeddedDocuments("Item", itemsToDelete);
+		const createdItems = itemsToCreate.length
+			? await targetDocument.createEmbeddedDocuments("Item", itemsToCreate, { keepId: true, keepEmbeddedIds: true })
+			: [];
+		if (itemsToUpdate.length) await targetDocument.updateEmbeddedDocuments("Item", itemsToUpdate);
+		if (itemsToDelete.length) await targetDocument.deleteEmbeddedDocuments("Item", itemsToDelete);
 		return createdItems.map(item => item.toObject());
 	}
 
@@ -2050,7 +2072,21 @@ export default class PrivateAPI {
 				...attribute, quantity: Math.floor(attribute.quantity / numPlayers) * numPlayers
 			}
 		});
-		await tempPileTransaction.appendActorChanges(attributes, { remove: true, type: "currency" });
+		await tempPileTransaction.appendDocumentChanges(attributes, { remove: true, type: "currency" });
+
+		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+			for (const item of items) {
+				if (!Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, item.type)) continue;
+				const itemCurrencies = PileUtilities.getCurrenciesInItem(item, { forActor: itemPileActor });
+
+				const attributes = itemCurrencies.filter(entry => entry.type === "attribute").map(attribute => {
+					return {
+						...attribute, quantity: Math.floor(attribute.quantity / numPlayers) * numPlayers
+					}
+				});
+				await tempPileTransaction.appendEmbeddedChanges(item, attributes, { remove: true, type: "currency" });
+			}
+		}
 
 		const preparedData = tempPileTransaction.prepare();
 
@@ -2060,9 +2096,11 @@ export default class PrivateAPI {
 
 		for (const [uuid, transaction] of transactionMap) {
 
+			const clonedData = foundry.utils.deepClone(preparedData);
+
 			if (pileData.shareItemsEnabled) {
-				await transaction.appendItemChanges(foundry.utils.deepClone(preparedData).itemDeltas.filter(delta => delta.type === "item").map(delta => {
-					delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
+				await transaction.appendItemChanges(clonedData.itemDeltas.filter(delta => delta.type === "item").map(delta => {
+					delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.document, {
 						players: numPlayers, shareData: shareData, floor: true
 					});
 					return delta;
@@ -2070,24 +2108,27 @@ export default class PrivateAPI {
 			}
 
 			if (pileData.shareCurrenciesEnabled || pileData.splitAllEnabled) {
-				await transaction.appendItemChanges(foundry.utils.deepClone(preparedData).itemDeltas.filter(delta => delta.type === "currency").map(delta => {
-					delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.actor, {
+				await transaction.appendItemChanges(clonedData.itemDeltas.filter(delta => delta.type === "currency").map(delta => {
+					delta.quantity = SharingUtilities.getItemSharesLeftForActor(itemPileActor, delta.item, transaction.document, {
 						players: numPlayers, shareData: shareData, floor: true
 					});
 					return delta;
 				}), { type: "currency" });
 
-				await transaction.appendActorChanges(Object.entries(foundry.utils.deepClone(preparedData).attributeDeltas).map(entry => {
+				await transaction.appendDocumentChanges(Object.entries(clonedData.attributeDeltas).map(entry => {
 					let [path] = entry;
-					const quantity = SharingUtilities.getAttributeSharesLeftForActor(itemPileActor, path, transaction.actor, {
+					const quantity = SharingUtilities.getAttributeSharesLeftForActor(itemPileActor, path, transaction.document, {
 						players: numPlayers, shareData: shareData, floor: true
 					});
 					return { path, quantity };
 				}));
+
 			}
 		}
 
 		const actorPreparedData = Object.fromEntries(transactionMap.map(entry => [entry[0], entry[1].prepare()]));
+
+		debugger;
 
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_SPLIT_INVENTORY, itemPileActor, preparedData, actorPreparedData, userId, instigator);
 		if (hookResult === false) return false;
@@ -2196,7 +2237,7 @@ export default class PrivateAPI {
 		for (const payment of itemPrices.sellerReceive) {
 			if (!payment.quantity) continue;
 			if (payment.type === "attribute") {
-				await sellerTransaction.appendActorChanges([{
+				await sellerTransaction.appendDocumentChanges([{
 					path: payment.data.path, quantity: payment.quantity
 				}], { type: payment.isCurrency ? "currency" : payment.type });
 			} else {
@@ -2212,7 +2253,7 @@ export default class PrivateAPI {
 			}
 			const onlyDelta = (sellerInfiniteCurrencies && entry.isCurrency) || (sellerInfiniteQuantity && !entry.isCurrency);
 			if (entry.type === "attribute") {
-				await sellerTransaction.appendActorChanges([{
+				await sellerTransaction.appendDocumentChanges([{
 					path: entry.data.path, quantity: entry.quantity
 				}], {
 					remove: true, type: entry.isCurrency ? "currency" : entry.type, onlyDelta
@@ -2247,7 +2288,7 @@ export default class PrivateAPI {
 			}
 			const onlyDelta = (buyerInfiniteCurrencies && price.isCurrency) || (buyerInfiniteQuantity && !price.isCurrency);
 			if (price.type === "attribute") {
-				await buyerTransaction.appendActorChanges([{
+				await buyerTransaction.appendDocumentChanges([{
 					path: price.data.path, quantity: price.quantity
 				}], { remove: true, type: price.isCurrency ? "currency" : price.type, onlyDelta });
 			} else {
@@ -2260,7 +2301,7 @@ export default class PrivateAPI {
 		for (const entry of itemPrices.buyerReceive) {
 			if (!entry.quantity) continue;
 			if (entry.type === "attribute") {
-				await buyerTransaction.appendActorChanges([{
+				await buyerTransaction.appendDocumentChanges([{
 					path: entry.data.path, quantity: entry.quantity
 				}], { type: entry.type });
 			} else {
@@ -2279,7 +2320,7 @@ export default class PrivateAPI {
 		for (const change of itemPrices.buyerChange) {
 			if (!change.quantity) continue;
 			if (change.type === "attribute") {
-				await buyerTransaction.appendActorChanges([{
+				await buyerTransaction.appendDocumentChanges([{
 					path: change.data.path, quantity: change.quantity
 				}], { type: "currency" });
 			} else {

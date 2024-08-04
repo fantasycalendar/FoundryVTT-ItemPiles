@@ -201,22 +201,27 @@ export default class MerchantStore extends ItemPileStore {
 
 	createItem(item) {
 		if (PileUtilities.isItemInvalid(this.actor, item)) return;
-		const items = get(this.allItems);
-		const itemClass = new this.ItemClass(this, item);
-		itemClass.refreshPriceData();
-		items.push(itemClass);
-		this.allItems.set(items);
+		this.allItems.update(items => {
+			const itemClass = new this.ItemClass(this, item);
+			itemClass.refreshPriceData();
+			items.push(itemClass);
+			return items;
+		})
 		this.refreshItems();
 	}
 
 	deleteItem(item) {
 		if (PileUtilities.isItemInvalid(this.actor, item)) return;
-		const items = get(this.allItems);
-		const pileItem = items.find(pileItem => pileItem.id === item.id);
-		if (!pileItem) return;
-		pileItem.unsubscribe();
-		items.splice(items.indexOf(pileItem), 1);
-		this.allItems.set(items);
+		let refresh = false;
+		this.allItems.update(items => {
+			const pileItem = items.find(pileItem => pileItem.id === item.id);
+			if (!pileItem) return items;
+			refresh = true;
+			pileItem.unsubscribe();
+			items.splice(items.indexOf(pileItem), 1);
+			return items;
+		});
+		if (!refresh) return;
 		this.refreshItems();
 	}
 

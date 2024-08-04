@@ -7,15 +7,16 @@ import CONSTANTS from "../constants/constants.js";
 
 export default class Transaction {
 
-	constructor(actor) {
-		this.actor = actor;
-		this.actorFlags = PileUtilities.getActorFlagData(this.actor);
+	constructor(document) {
+		this.document = document;
+		this.documentFlags = PileUtilities.getActorFlagData(this.document);
 		this.itemsToCreate = [];
+		this.itemUpdates = {};
 		this.itemsToUpdate = [];
 		this.itemsToDelete = [];
 		this.itemsToForceDelete = new Set();
 		this.itemsToNotDelete = new Set();
-		this.actorUpdates = {};
+		this.documentChanges = {};
 		this.attributeDeltas = new Map();
 		this.attributeTypeMap = new Map();
 		this.itemDeltas = new Map();
@@ -44,14 +45,14 @@ export default class Transaction {
 				: Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
 
 			let itemId = itemData._id ?? itemData.id;
-			let actorHasItem = false;
-			let actorExistingItem = false;
-			if (this.actorFlags.type === CONSTANTS.PILE_TYPES.VAULT && type !== "currency" && !remove) {
-				const actorExistingItems = Utilities.findSimilarItem(this.actor.items, itemData, {
+			let documentHasItem = false;
+			let documentExistingItem = false;
+			if (this.documentFlags.type === CONSTANTS.PILE_TYPES.VAULT && type !== "currency" && !remove) {
+				const documentExistingItems = Utilities.findSimilarItem(this.document.items, itemData, {
 					returnOne: false
 				});
-				actorExistingItem = actorExistingItems.find(item => {
-					return PileUtilities.canItemStack(item, this.actor) && (
+				documentExistingItem = documentExistingItems.find(item => {
+					return PileUtilities.canItemStack(item, this.document) && (
 						(
 							foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x") === undefined
 							&&
@@ -62,11 +63,11 @@ export default class Transaction {
 					)
 				});
 			} else {
-				actorHasItem = this.actor.items.get(itemId);
-				actorExistingItem = actorHasItem || Utilities.findSimilarItem(this.actor.items, itemData);
+				documentHasItem = this.document.items.get(itemId);
+				documentExistingItem = documentHasItem || Utilities.findSimilarItem(this.document.items, itemData);
 			}
 
-			const canItemStack = PileUtilities.canItemStack(actorExistingItem || itemData, this.actor);
+			const canItemStack = PileUtilities.canItemStack(documentExistingItem || itemData, this.document);
 
 			if (remove && (keepIfZero || type === "currency")) {
 				this.itemsToNotDelete.add(item.id);
@@ -76,9 +77,9 @@ export default class Transaction {
 				this.itemFlagMap.set(itemId, flags);
 			}
 
-			if (actorExistingItem) {
+			if (documentExistingItem) {
 
-				const itemQuantity = Utilities.getItemQuantity(actorExistingItem);
+				const itemQuantity = Utilities.getItemQuantity(documentExistingItem);
 
 				if (itemQuantity > 1 || canItemStack) {
 
@@ -94,20 +95,20 @@ export default class Transaction {
 							foundry.utils.setProperty(existingItemUpdate, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
 						}
 					} else {
-						const update = Utilities.setItemQuantity(actorExistingItem.toObject(), newQuantity);
+						const update = Utilities.setItemQuantity(documentExistingItem.toObject(), newQuantity);
 						if (keepIfZero && type !== "currency") {
 							foundry.utils.setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
 						}
-						this.itemTypeMap.set(actorExistingItem.id, type)
+						this.itemTypeMap.set(documentExistingItem.id, type)
 						this.itemsToUpdate.push(update);
 					}
 
-					this.itemDeltas.set(actorExistingItem.id, (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity);
+					this.itemDeltas.set(documentExistingItem.id, (this.itemDeltas.has(documentExistingItem.id) ? this.itemDeltas.get(documentExistingItem.id) : 0) + incomingQuantity);
 
 				} else if (remove) {
 
-					this.itemsToForceDelete.add(actorExistingItem.id);
-					this.itemDeltas.set(actorExistingItem.id, (this.itemDeltas.has(actorExistingItem.id) ? this.itemDeltas.get(actorExistingItem.id) : 0) + incomingQuantity);
+					this.itemsToForceDelete.add(documentExistingItem.id);
+					this.itemDeltas.set(documentExistingItem.id, (this.itemDeltas.has(documentExistingItem.id) ? this.itemDeltas.get(documentExistingItem.id) : 0) + incomingQuantity);
 
 				} else {
 
@@ -137,15 +138,15 @@ export default class Transaction {
 		}
 	}
 
-	async appendActorChanges(attributes, {
+	async appendDocumentChanges(attributes, {
 		set = false, remove = false, type = "attribute", onlyDelta = false
 	} = {}) {
 		if (!Array.isArray(attributes)) {
 			attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
 		}
-		this.actorUpdates = attributes.reduce((acc, attribute) => {
+		this.documentChanges = attributes.reduce((acc, attribute) => {
 			const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
-			acc[attribute.path] = acc[attribute.path] ?? Number(foundry.utils.getProperty(this.actor, attribute.path) ?? 0);
+			acc[attribute.path] = acc[attribute.path] ?? Number(foundry.utils.getProperty(this.document, attribute.path) ?? 0);
 			if (set) {
 				if (!onlyDelta) {
 					acc[attribute.path] = incomingQuantity
@@ -159,19 +160,55 @@ export default class Transaction {
 			}
 			this.attributeTypeMap.set(attribute.path, type)
 			return acc;
-		}, this.actorUpdates);
+		}, this.documentChanges);
+	}
+
+	async appendEmbeddedChanges(item, attributes, {
+		set = false, remove = false, type = "attribute", onlyDelta = false
+	} = {}) {
+
+		if (!Array.isArray(attributes)) {
+			attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
+		}
+
+		this.itemUpdates = attributes.reduce((acc, attribute) => {
+			const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
+			const itemIdPath = item.id + "-" + attribute.path;
+
+			acc[item.id] = {
+				[attribute.path]: acc[item.id]?.[attribute.path] ?? Number(foundry.utils.getProperty(item, attribute.path) ?? 0)
+			};
+
+			if (set) {
+				if (!onlyDelta) {
+					acc[item.id][attribute.path] = incomingQuantity;
+				}
+				this.attributeDeltas.set(attribute.path, this.attributeDeltas.has(attribute.path)
+					? this.attributeDeltas.get(attribute.path)
+					: foundry.utils.getProperty(acc[item.id], attribute.path) + incomingQuantity
+				);
+			} else {
+				if (!onlyDelta) {
+					acc[item.id][attribute.path] = acc[item.id][attribute.path] + incomingQuantity;
+				}
+				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity);
+			}
+
+			return acc;
+		}, this.itemUpdates);
+
 	}
 
 	prepare() {
 
-		this.actorUpdates = Object.fromEntries(Object.entries(this.actorUpdates).filter(entry => {
+		this.documentChanges = Object.fromEntries(Object.entries(this.documentChanges).filter(entry => {
 			if (this.attributeDeltas.get(entry[0]) === 0) {
 				this.attributeDeltas.delete(entry[0]);
 			}
-			return Number(foundry.utils.getProperty(this.actor, entry[0])) !== entry[1];
+			return Number(foundry.utils.getProperty(this.document, entry[0])) !== entry[1];
 		}))
 		this.itemsToCreate = this.itemsToCreate.filter(item => {
-			return !PileUtilities.canItemStack(item, this.actor) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
+			return !PileUtilities.canItemStack(item, this.document) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
 		});
 		this.itemsToDelete = this.itemsToUpdate.filter(item => {
 			return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
@@ -184,7 +221,7 @@ export default class Transaction {
 		}
 
 		this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
-			const item = this.actor.items.get(id).toObject();
+			const item = this.document.items.get(id).toObject();
 			const existingFlagData = PileUtilities.cleanItemFlagData(PileUtilities.getItemFlagData(item));
 			const newFlagData = PileUtilities.cleanItemFlagData(this.itemFlagMap.get(id) ?? {});
 			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(existingFlagData, newFlagData));
@@ -196,18 +233,29 @@ export default class Transaction {
 		this.itemsToUpdate = this.itemsToUpdate
 			.filter(item => Utilities.getItemQuantity(item) > 0 || this.itemsToNotDelete.has(item._id) || this.itemTypeMap.get(item._id) === "currency")
 			.filter(itemData => {
-				const item = this.actor.items.get(itemData._id)
+				const item = this.document.items.get(itemData._id)
 				return Utilities.getItemQuantity(item) !== Utilities.getItemQuantity(itemData);
 			});
+
+		Object.entries(this.itemUpdates).forEach(([id, update]) => {
+			update["_id"] = id;
+			const existingUpdateIndex = this.itemsToUpdate.findIndex(existingUpdate => existingUpdate["_id"] === update["_id"]);
+			if (existingUpdateIndex > -1) {
+				this.itemsToUpdate[existingUpdateIndex] = foundry.utils.mergeObject(this.itemsToUpdate[existingUpdateIndex], update);
+			} else {
+				this.itemsToUpdate.push(update);
+			}
+		});
+
 		this.attributeDeltas = Object.fromEntries(this.attributeDeltas);
 		this.preCommitted = true;
 		return {
-			actorUpdates: this.actorUpdates,
+			documentChanges: this.documentChanges,
 			itemsToCreate: this.itemsToCreate,
 			itemsToDelete: this.itemsToDelete,
 			itemsToUpdate: this.itemsToUpdate,
 			attributeDeltas: this.attributeDeltas,
-			itemDeltas: this.itemDeltas,
+			itemDeltas: this.itemDeltas
 		}
 	}
 
@@ -218,17 +266,17 @@ export default class Transaction {
 		}
 
 		let itemsCreated;
-		const actorUuid = Utilities.getUuid(this.actor);
-		if (this.actor.isOwner) {
-			itemsCreated = await PrivateAPI._commitActorChanges(actorUuid, {
-				actorUpdates: this.actorUpdates,
+		const documentUuid = Utilities.getUuid(this.document);
+		if (this.document.isOwner) {
+			itemsCreated = await PrivateAPI._commitDocumentChanges(documentUuid, {
+				documentChanges: this.documentChanges,
 				itemsToUpdate: this.itemsToUpdate,
 				itemsToDelete: this.itemsToDelete,
 				itemsToCreate: this.itemsToCreate
 			})
 		} else {
-			itemsCreated = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, actorUuid, {
-				actorUpdates: this.actorUpdates,
+			itemsCreated = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_DOCUMENT_CHANGES, documentUuid, {
+				documentChanges: this.documentChanges,
 				itemsToUpdate: this.itemsToUpdate,
 				itemsToDelete: this.itemsToDelete,
 				itemsToCreate: this.itemsToCreate

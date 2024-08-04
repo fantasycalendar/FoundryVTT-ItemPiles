@@ -187,12 +187,12 @@ export class VaultStore extends ItemPileStore {
 
 		const actorUuid = Utilities.getUuid(this.actor);
 		if (this.actor.isOwner) {
-			return PrivateAPI._commitActorChanges(actorUuid, {
+			return PrivateAPI._commitDocumentChanges(actorUuid, {
 				itemsToUpdate,
 			});
 		}
 
-		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, actorUuid, {
+		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_DOCUMENT_CHANGES, actorUuid, {
 			itemsToUpdate,
 		});
 	}
@@ -462,7 +462,7 @@ export class VaultStore extends ItemPileStore {
 			});
 		}
 
-		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_ACTOR_CHANGES, this.actor.uuid, {
+		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_DOCUMENT_CHANGES, this.actor.uuid, {
 			itemsToUpdate: itemUpdates,
 			itemsToDelete: deletions
 		});

@@ -44,6 +44,7 @@ class DebouncedCache extends Map {
 
 export const deletedActorCache = new DebouncedCache(5000);
 export const cachedActorCurrencies = new DebouncedCache();
+export const cachedCurrenciesInItem = new DebouncedCache();
 export const cachedFilterList = new DebouncedCache();
 export const cachedRequiredPropertiesList = new DebouncedCache();
 export const cachedCurrencyList = new DebouncedCache();

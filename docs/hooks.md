@@ -612,12 +612,12 @@ Called after an item has been dropped on the canvas.
 
 Called before an item is added to the target. This is not called in any transfers.
 
-| Param         | Type                             | Description                                                                               |
-|---------------|----------------------------------|-------------------------------------------------------------------------------------------|
-| target        | <code>Actor/TokenDocument</code> | The target that is going to receive the items                                             |
-| itemsToCreate | <code>array</code>               | An array of objects each containing the item and the quantity that is going to be created |
-| itemsToUpdate | <code>array</code>               | An array of objects each containing the item and the quantity that is going to be updated |
-| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                 |
+| Param                  | Type                             | Description                                                                               |
+|------------------------|----------------------------------|-------------------------------------------------------------------------------------------|
+| target                 | <code>Actor/TokenDocument</code> | The target that is going to receive the items                                             |
+| itemsToCreate          | <code>array</code>               | An array of objects each containing the item and the quantity that is going to be created |
+| itemQuantitiesToUpdate | <code>array</code>               | An array of objects each containing the item and the quantity that is going to be updated |
+| interactionId          | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                 |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -640,12 +640,12 @@ Called after an item has been added to the target. This is not called in any tra
 
 Called before an item is removed from the target. This is not called in any transfers.
 
-| Param         | Type                             | Description                                                                               |
-|---------------|----------------------------------|-------------------------------------------------------------------------------------------|
-| target        | <code>Actor/TokenDocument</code> | The target that is going to have items removed                                            |
-| itemsToDelete | <code>array</code>               | An array of objects each containing the item id that is going to be deleted               |
-| itemsToUpdate | <code>array</code>               | An array of objects each containing the item and the quantity that is going to be updated |
-| interactionId | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                 |
+| Param                  | Type                             | Description                                                                               |
+|------------------------|----------------------------------|-------------------------------------------------------------------------------------------|
+| target                 | <code>Actor/TokenDocument</code> | The target that is going to have items removed                                            |
+| itemsToDelete          | <code>array</code>               | An array of objects each containing the item id that is going to be deleted               |
+| itemQuantitiesToUpdate | <code>array</code>               | An array of objects each containing the item and the quantity that is going to be updated |
+| interactionId          | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                 |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -949,13 +949,13 @@ Called after all attributes' values was transferred from the source to the targe
 
 Called before currencies are updated to an actor. Not called in the case of a transfer.
 
-| Param         | Type                                  | Description                                                                                                                  |
-|---------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| target        | <code>Actor/TokenDocument/UUID</code> | The target that will have currencies added to it                                                                             |
-| actorUpdates  | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
-| itemsToCreate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was added                                              |
-| itemsToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
-| interactionId | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
+| Param                  | Type                                  | Description                                                                                                                  |
+|------------------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| target                 | <code>Actor/TokenDocument/UUID</code> | The target that will have currencies added to it                                                                             |
+| actorUpdates           | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
+| itemsToCreate          | <code>array</code>                    | An array of objects each containing the item id and the quantity that was added                                              |
+| itemQuantitiesToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
+| interactionId          | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -979,13 +979,13 @@ Called after currencies were updated to the target. Not called in the case of a 
 
 Called before currencies are added to an actor. Not called in the case of a transfer.
 
-| Param         | Type                                  | Description                                                                                                                  |
-|---------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| target        | <code>Actor/TokenDocument/UUID</code> | The target that will have currencies added to it                                                                             |
-| actorUpdates  | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
-| itemsToCreate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was added                                              |
-| itemsToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
-| interactionId | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
+| Param                  | Type                                  | Description                                                                                                                  |
+|------------------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| target                 | <code>Actor/TokenDocument/UUID</code> | The target that will have currencies added to it                                                                             |
+| actorUpdates           | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
+| itemsToCreate          | <code>array</code>                    | An array of objects each containing the item id and the quantity that was added                                              |
+| itemQuantitiesToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
+| interactionId          | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
 
 If the hook returns `false`, the action is interrupted.
 
@@ -1009,12 +1009,12 @@ Called after currencies were added to the target. Not called in the case of a tr
 
 Called before currencies were removed from the target. Not called in the case of a transfer.
 
-| Param         | Type                                  | Description                                                                                                                  |
-|---------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| target        | <code>Actor/TokenDocument/UUID</code> | The target that will have its currencies removed                                                                             |
-| actorUpdates  | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
-| itemsToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
-| interactionId | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
+| Param                  | Type                                  | Description                                                                                                                  |
+|------------------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
+| target                 | <code>Actor/TokenDocument/UUID</code> | The target that will have its currencies removed                                                                             |
+| actorUpdates           | <code>object</code>                   | An object, where the keys are the attribute that is going to be updated, the value being the quantity is going to be changed |
+| itemQuantitiesToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                            |
+| interactionId          | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                    |
 
 If the hook returns `false`, the action is interrupted.
 

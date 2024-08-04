@@ -16,7 +16,7 @@
 	const currentQuantity = entry.currentQuantity;
 	const pileData = store.pileData;
 
-	$: canInspectItems = entry.id && $pileData.canInspectItems;
+	$: canInspectItems = entry.item && ($pileData.canInspectItems || store.actor.isOwner);
 
 	const editQuantities = store.editQuantities;
 
@@ -31,9 +31,9 @@
 
 </script>
 
-<div class="item-piles-flexrow item-piles-item-row item-piles-even-color"
+<div class="item-piles-flexrow item-piles-item-row"
      class:item-piles-disabled={!$editQuantities && (!$quantityLeft || !$quantity)}
-     draggable={!!entry.id}
+     draggable={!!entry.item}
      on:dragstart={(event) => { dragStart(event) }}
      transition:fade={{duration: 250}}>
 
@@ -49,7 +49,7 @@
 			>
 				{$name}
 			</p>
-			{#if !$editQuantities && entry.canStack && !currency}
+			{#if !$editQuantities && (entry.canStack || !entry.id) && ($pileData.shareCurrenciesEnabled || !currency)}
 				<span class="item-piles-small-text">(x{$quantity})</span>
 			{/if}
 		</div>
