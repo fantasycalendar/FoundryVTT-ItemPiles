@@ -670,7 +670,7 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 			...newTokenData
 		};
 		if (!tokenDocument.actorLink) documentActor = false;
-		return data;
+		return foundry.utils.mergeObject({}, data);
 	});
 
 	if (canvas.scene && !foundry.utils.isEmpty(updates)) {

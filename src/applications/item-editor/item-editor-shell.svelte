@@ -71,9 +71,9 @@
     { value: "vault", label: localize("ITEM-PILES.Applications.ItemEditor.Vault") },
   ]}/>
 
-		<section class="tab-body">
+		<section class="item-piles-tab-body">
 
-			<div class="tab flex">
+			<div class="item-piles-tab">
 
 				{#if activeTab === 'general'}
 

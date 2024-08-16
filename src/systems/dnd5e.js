@@ -12,7 +12,7 @@ export default {
 	"ITEM_CLASS_LOOT_TYPE": "loot",
 
 	// The item class type is the type of item that will be used for the default weapon item
-	"ITEM_CLASS_WEAPON_TYPE": "weapon", 
+	"ITEM_CLASS_WEAPON_TYPE": "weapon",
 
 	// The item class type is the type of item that will be used for the default equipment item
 	"ITEM_CLASS_EQUIPMENT_TYPE": "equipment",
@@ -248,6 +248,7 @@ export default {
 						},
 						source: item.parent.uuid,
 						target: result.target,
+						secret: result.secret,
 					}, { skipQuantityDialog: true })
 				},
 				condition: !game.itempiles.API.isItemInvalid(item)
