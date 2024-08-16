@@ -3,6 +3,7 @@
 ## Version 3.0.9
 
 - Added support for secretly giving items to others via the right-click context menu on items on the D&D5e system
+- Fixed the above-mentioned give dialog to have player owned characters visible in the dropdown list
 - Fixed some systems not allowing players to preview items by clicking on the names in item piles when the player had no permissions configured on the item pile
 - Fixed item pile on interact macros not working when utilizing module or system macro compendiums
 - Fixed updating item piles tokens would sometimes reset it to a default non-item pile token
