@@ -267,6 +267,7 @@
         "Header": "Dando Item: {item_name}",
         "SelectPlaceholder": "Escolha o personagem para enviar o item",
         "ContentMultipleQuantity": "Você tem {quantity} deste item. Quantos você quer dar?",
+        "Secret": "Dar o(s) item(s) sem que outros saibam (exceto MJs)",
         "Submit": "Enviar"
       },
       "ReceiveItem": {
