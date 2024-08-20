@@ -37,11 +37,12 @@ export default {
 
 	// This function is an optional system handler that specifically transforms an item when it is added to actors
 	"ITEM_TRANSFORMER": async (itemData) => {
-		["equipped", "proficient", "prepared", "attuned"].forEach(key => {
+		["equipped", "proficient", "prepared"].forEach(key => {
 			if (itemData?.system?.[key] !== undefined) {
 				delete itemData.system[key];
 			}
 		});
+		foundry.utils.setProperty(itemData, "system.attunement", Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData?.system?.attunement ?? 0));
 		if (itemData.type === "spell") {
 			try {
 				const scroll = await Item.implementation.createScrollFromSpell(itemData);
