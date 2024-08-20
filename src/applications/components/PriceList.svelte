@@ -167,13 +167,13 @@
 	<div class="table-container item-piles-top-divider">
 		<div class="item-piles-sortable-list-columns header">
 			<div></div>
-			<div>Name</div>
-			<div>Cost</div>
-			<div>Fixed</div>
+			<div>{localize("ITEM-PILES.General.Name")}</div>
+			<div>{localize("ITEM-PILES.General.Cost")}</div>
+			<div>{localize("ITEM-PILES.General.Fixed")}</div>
 			<div>%</div>
-			<div>Short</div>
-			<div>Icon</div>
-			<div>Data</div>
+			<div>{localize("ITEM-PILES.General.Short")}</div>
+			<div>{localize("ITEM-PILES.General.Icon")}</div>
+			<div>{localize("ITEM-PILES.General.Data")}</div>
 			<div>
 				{#if remove}
 					<a class="item-piles-clickable-red" on:click={() => remove()}><i class="fas fa-times"></i></a>

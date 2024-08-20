@@ -107,16 +107,19 @@ export default class PrivateAPI {
 	static _onPreCreateToken(doc, data) {
 		const docData = foundry.utils.deepClone(data);
 		const sourceActor = game.actors.get(doc.actorId);
-		const itemPileConfig = foundry.utils.mergeObject(
+		let itemPileConfig = foundry.utils.mergeObject(
 			foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
-			foundry.utils.mergeObject(
-				foundry.utils.getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {},
-				foundry.utils.deepClone(foundry.utils.getProperty(sourceActor, CONSTANTS.FLAGS.PILE) ?? {})
-			)
+			foundry.utils.getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {}
 		)
+		if (doc.isLinked || !foundry.utils.hasProperty(docData, CONSTANTS.FLAGS.PILE)) {
+			itemPileConfig = foundry.utils.mergeObject(
+				itemPileConfig,
+				foundry.utils.deepClone(foundry.utils.getProperty(sourceActor, CONSTANTS.FLAGS.PILE) ?? {})
+			);
+		}
 		if (!itemPileConfig?.enabled) return;
 		if (!doc.isLinked) {
-			docData[`${CONSTANTS.ACTOR_DELTA_PROPERTY}.flags.${CONSTANTS.MODULE_NAME}.-=sharing`] = null;
+			Utilities.deleteProperty(docData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.SHARING);
 		}
 		if (itemPileConfig.closedImage.includes("*")) {
 			itemPileConfig.closedImage = Helpers.random_array_element(itemPileConfig.closedImages);
@@ -134,7 +137,6 @@ export default class PrivateAPI {
 			itemPileConfig.lockedImage = Helpers.random_array_element(itemPileConfig.lockedImages);
 			itemPileConfig.lockedImages = [];
 		}
-		docData[CONSTANTS.FLAGS.PILE] = PileUtilities.cleanFlagData(itemPileConfig);
 		const targetItems = PileUtilities.getActorItems(doc.actor, {
 			itemFilters: itemPileConfig?.overrideItemFilters
 		});
@@ -143,10 +145,18 @@ export default class PrivateAPI {
 		});
 		const pileData = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
 		const scale = PileUtilities.getItemPileTokenScale(doc, pileData);
-		docData["texture.src"] = PileUtilities.getItemPileTokenImage(doc, pileData);
-		docData["texture.scaleX"] = scale;
-		docData["texture.scaleY"] = scale;
-		docData["name"] = PileUtilities.getItemPileName(doc, pileData);
+		foundry.utils.setProperty(docData, "texture.src", PileUtilities.getItemPileTokenImage(doc, pileData));
+		foundry.utils.setProperty(docData, "texture.scaleX", scale);
+		foundry.utils.setProperty(docData, "texture.scaleY", scale);
+		foundry.utils.setProperty(docData, "name", PileUtilities.getItemPileName(doc, pileData));
+		const cleanItemPileConfig = PileUtilities.cleanFlagData(itemPileConfig);
+		Utilities.deleteProperty(docData, CONSTANTS.FLAGS.PILE);
+		foundry.utils.setProperty(docData, CONSTANTS.FLAGS.PILE, cleanItemPileConfig);
+		if (!doc.isLinked) {
+			Utilities.deleteProperty(docData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE);
+			foundry.utils.setProperty(docData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE, cleanItemPileConfig);
+		}
+
 		doc.updateSource(docData);
 	}
 
@@ -1155,6 +1165,8 @@ export default class PrivateAPI {
 
 				await game.settings.set(CONSTANTS.MODULE_NAME, SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID, pileActor.id);
 
+			} else {
+
 			}
 
 		} else {
@@ -1187,13 +1199,15 @@ export default class PrivateAPI {
 
 		if (position && sceneId) {
 
-			let overrideData = foundry.utils.mergeObject({
-				...position, ...tokenOverrides, ...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
-			}, {});
-
 			let pileData = PileUtilities.getActorFlagData(pileActor);
 			pileData.enabled = true;
 			pileData = foundry.utils.mergeObject(pileData, itemPileFlags);
+
+			let overrideData = foundry.utils.mergeObject({
+				...position,
+				...tokenOverrides,
+				...Helpers.getSetting(SETTINGS.TOKEN_FLAG_DEFAULTS)
+			}, {});
 
 			if (!pileActor.prototypeToken.actorLink) {
 
@@ -1217,7 +1231,7 @@ export default class PrivateAPI {
 					"texture.src": PileUtilities.getItemPileTokenImage(pileActor, data, overrideImage),
 					"texture.scaleX": scale,
 					"texture.scaleY": scale,
-					"name": PileUtilities.getItemPileName(pileActor, data, overrideData?.name),
+					"name": PileUtilities.getItemPileName(pileActor, data, overrideData?.name)
 				});
 
 			}
@@ -1225,7 +1239,15 @@ export default class PrivateAPI {
 			const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CREATE, overrideData, items);
 			if (hookResult === false) return false;
 
-			const tokenData = await pileActor.getTokenDocument(overrideData);
+			const tokenData = (await pileActor.getTokenDocument(overrideData)).toObject();
+
+			const cleanItemPileConfig = PileUtilities.cleanFlagData(pileData);
+			Utilities.deleteProperty(tokenData, CONSTANTS.FLAGS.PILE);
+			foundry.utils.setProperty(tokenData, CONSTANTS.FLAGS.PILE, cleanItemPileConfig);
+			if (!pileActor.prototypeToken.actorLink) {
+				Utilities.deleteProperty(tokenData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE);
+				foundry.utils.setProperty(tokenData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE, cleanItemPileConfig);
+			}
 
 			const scene = game.scenes.get(sceneId);
 

@@ -2262,7 +2262,10 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 			})
 
 			if (table?.customCategory) {
-				tableItems.forEach(item => foundry.utils.setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table?.customCategory));
+				tableItems = tableItems.map(item => {
+					foundry.utils.setProperty(item, "customCategory", table?.customCategory)
+					return item;
+				});
 			}
 		}
 

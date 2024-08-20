@@ -40,7 +40,7 @@
 		{#if playerActors.length > 1}
 			{#if !changingActor}
 				<a class='item-piles-highlight' on:click={() => { changingActor = true }} class:active={!changingActor}>
-					Change.
+					{localize("ITEM-PILES.Inspect.Change")}
 				</a>
 			{:else}
 				<select

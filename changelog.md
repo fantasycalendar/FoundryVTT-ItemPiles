@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 3.0.10
+
+- Updated Portuguese (Brazil) localization (thank you Kharmans on github!)
+- Added missing localization entries in some interfaces
+- Fixed custom categories not being applied to items when created through merchant populate items
+- Fixed item piles sometimes resetting their item pile flags when first created
+
 ## Version 3.0.9
 
 - Added support for secretly giving items to others via the right-click context menu on items on the D&D5e system

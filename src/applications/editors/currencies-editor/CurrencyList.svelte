@@ -3,6 +3,7 @@
 	import DropZone from "../../components/DropZone.svelte";
 	import * as Helpers from "../../../helpers/helpers.js";
 	import { applyStyles } from '#runtime/svelte/action/dom';
+	import { localize } from "@typhonjs-fvtt/runtime/svelte/helper";
 
 	export let store;
 
@@ -38,25 +39,27 @@
 <DropZone bind:isHovering={isHovering} callback={dropData}>
 	<div class="item-piles-sortable-list-columns header" use:applyStyles={style}>
 		{#if !store.secondary}
-			<div style="justify-content:flex-start;">Primary</div>
+			<div style="justify-content:flex-start;">{localize("ITEM-PILES.General.Primary")}</div>
 		{/if}
-		<div>Name</div>
+		<div>{localize("ITEM-PILES.General.Name")}</div>
 		{#if !store.secondary}
-			<div>Exchange</div>
+			<div>{localize("ITEM-PILES.General.Exchange")}</div>
 		{/if}
-		<div>Short</div>
-		<div>Icon</div>
-		<div>Data</div>
+		<div>{localize("ITEM-PILES.General.Short")}</div>
+		<div>{localize("ITEM-PILES.General.Icon")}</div>
+		<div>{localize("ITEM-PILES.General.Data")}</div>
 		<div><a on:click={() => store.addAttribute()}><i class="fas fa-plus"></i></a></div>
 	</div>
 	<div class="table-container">
 		{#if isHovering}
-			<div class="drop-to-add">Drop to add</div>
+			<div class="drop-to-add">
+				{localize("ITEM-PILES.Applications.CurrenciesEditor.Drop")}
+			</div>
 		{/if}
 		{#if !currencies.length}
 			<div class="item-piles-sortable-list-columns">
 				<div class="full-span" class:invisible={isHovering}>
-					Drop an item or click the plus button to get started!
+					{localize("ITEM-PILES.Applications.CurrenciesEditor.CreateNew")}
 				</div>
 			</div>
 		{/if}

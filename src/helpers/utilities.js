@@ -434,3 +434,22 @@ export function getSourceActorFromDropData(dropData) {
 	}
 	return false;
 }
+
+export function deleteProperty(object, key) {
+	if (!key || !object) return false;
+	if (key in object) return true;
+	let target = object;
+	const keys = key.split('.');
+	for (let index = 0; index < keys.length; index++) {
+		const p = keys[index];
+		if (!target || (typeof target !== "object")) return false;
+		if (index === keys.length - 1 && p in target) {
+			delete target[p];
+		} else if (p in target) {
+			target = target[p];
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
