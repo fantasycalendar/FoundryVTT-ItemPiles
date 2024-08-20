@@ -6,9 +6,9 @@ import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
 import TradeAPI from "./trade-api.js";
 
-export default class ChatAPI {
+let CHAT_MESSAGE_STYLES = false;
 
-	static CHAT_MESSAGE_STYLES = CONSTANTS.IS_V12 ? CONST.CHAT_MESSAGE_TYPES : CONST.CHAT_MESSAGE_STYLES;
+export default class ChatAPI {
 
 	static initialize() {
 
@@ -28,6 +28,9 @@ export default class ChatAPI {
 			await Helpers.wait(25);
 			$(this).parent()[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
 		});
+
+		CHAT_MESSAGE_STYLES = CONSTANTS.IS_V12 ? CONST.CHAT_MESSAGE_STYLES : CONST.CHAT_MESSAGE_TYPES;
+
 	}
 
 	static _preCreateChatMessage(chatMessage) {
@@ -292,7 +295,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -371,7 +374,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name })
@@ -393,7 +396,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -436,7 +439,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: isPrivate ? ChatAPI.CHAT_MESSAGE_STYLES.WHISPER : ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: isPrivate && CONSTANTS.IS_V12 ? CHAT_MESSAGE_STYLES.WHISPER : CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -482,7 +485,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -528,7 +531,7 @@ export default class ChatAPI {
 
 		const chatData = {
 			user: user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: user.name }),
@@ -547,7 +550,9 @@ export default class ChatAPI {
 				.map(user => user.id);
 			chatData.whisper.push(userId);
 			chatData.whisper.push(targetUserId);
-			chatData.type = ChatAPI.CHAT_MESSAGE_STYLES.WHISPER;
+			if (CONSTANTS.IS_V12) {
+				chatData.type = CHAT_MESSAGE_STYLES.WHISPER;
+			}
 		}
 
 		return this._createNewChatMessage(user.id, chatData)
@@ -647,12 +652,14 @@ export default class ChatAPI {
 				if (mode === 2) {
 					chatData.whisper.push(userId);
 				}
-				chatData.type = ChatAPI.CHAT_MESSAGE_STYLES.WHISPER;
+				if (CONSTANTS.IS_V12) {
+					chatData.type = CHAT_MESSAGE_STYLES.WHISPER;
+				}
 			}
 
 		}
 
-		if (chatData.whisper.length) {
+		if (chatData?.whisper?.length) {
 			chatData.whisper = Array.from(new Set(chatData.whisper));
 		}
 
