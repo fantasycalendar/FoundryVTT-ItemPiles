@@ -650,7 +650,9 @@ export default class ChatAPI {
 				chatData.type = ChatAPI.CHAT_MESSAGE_STYLES.WHISPER;
 			}
 
-		} else if (chatData.whisper.length) {
+		}
+
+		if (chatData.whisper.length) {
 			chatData.whisper = Array.from(new Set(chatData.whisper));
 		}
 

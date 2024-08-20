@@ -7,6 +7,7 @@
 - Fixed custom categories not being applied to items when created through merchant populate items
 - Fixed item piles sometimes resetting their item pile flags when first created
 - Fixed versions of D&D5e 3.2.0 and onwards keeping item attunement when transferred between actors, will now clear attunement properly
+- Fixed chat messages not showing up properly when setting configured to be private or blind
 
 ## Version 3.0.9
 
