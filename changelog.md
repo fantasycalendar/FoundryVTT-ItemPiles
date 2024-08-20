@@ -3,6 +3,7 @@
 ## Version 3.0.11
 
 - Added `ITEM-PILES.Trade` localization for compatibility with Rest Recovery
+- Updated Portuguese (Brazil) localization (thank you Kharmans on github!)
 - Fixed Foundry v11 issues with chat messages that fixed in 3.0.10
 
 ## Version 3.0.10
