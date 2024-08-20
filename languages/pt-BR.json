@@ -8,6 +8,7 @@
       "RequestTrade": "Solicitar Negociação"
     },
     "HeaderButtons": {
+      "Configure": "Configurar",
       "ShowToPlayers": "Mostrar aos Jogadores"
     },
     "Types": {
@@ -57,6 +58,7 @@
     "Inspect": {
       "Title": "Inspecionando Conteúdo da Pilha",
       "AsActor": "Você está inspecionando esta pilha como {actorName}.",
+      "Change": "Mudar",
       "Owner": "Como dono desta Pilha de Itens, você pode editar seu conteúdo.",
       "Empty": "Esta pilha está vazia.",
       "Destroyed": "Esta pilha de itens não existe mais e está destruída.",
@@ -210,6 +212,16 @@
       "Withdrew": "retirado",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "LogQuantity": "{quantity} x "
+    },
+    "General": {
+      "Primary": "Primário",
+      "Exchange": "Câmbio",
+      "Name": "Nome",
+      "Cost": "Custo",
+      "Fixed": "Fixo",
+      "Short": "Curto",
+      "Icon": "Ícone",
+      "Data": "Dados"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -401,7 +413,9 @@
         "Exchange": "Intercâmbio",
         "Data": "Caminho",
         "Icon": "Ícone",
-        "AddNew": "Adicionar nova moeda"
+        "AddNew": "Adicionar nova moeda",
+        "CreateNew": "Solte um item ou clique no botão de adição para começar!",
+        "Drop": "Solte para adicionar"
       },
       "SecondaryCurrenciesEditor": {
         "Title": "Editor de Moedas Secundárias do Item Piles",
