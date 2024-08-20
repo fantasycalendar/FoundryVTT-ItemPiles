@@ -2,7 +2,7 @@
 
 ## Version 3.0.10
 
-- Updated Portuguese (Brazil) localization (thank you Kharmans on github!)
+- Updated Portuguese (Brazil) and Polish localization (thank you Kharmans and Lioheart on github!)
 - Added missing localization entries in some interfaces
 - Fixed custom categories not being applied to items when created through merchant populate items
 - Fixed item piles sometimes resetting their item pile flags when first created
