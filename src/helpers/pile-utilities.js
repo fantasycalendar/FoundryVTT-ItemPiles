@@ -82,11 +82,18 @@ export function canItemStack(item, targetActor) {
 /**
  *
  * @param item
- * @param data
+ * @param options
+ * @param useDefaults.data
+ * @param useDefaults.useDefaults
  * @returns {Object<CONSTANTS.ITEM_DEFAULTS>}
  */
-export function getItemFlagData(item, data = false) {
-	return getFlagData(Utilities.getDocument(item), CONSTANTS.FLAGS.ITEM, { ...CONSTANTS.ITEM_DEFAULTS }, data);
+export function getItemFlagData(item, { data = false, useDefaults = true } = {}) {
+	return getFlagData(
+		Utilities.getDocument(item),
+		CONSTANTS.FLAGS.ITEM,
+		{ ...(useDefaults ? CONSTANTS.ITEM_DEFAULTS : {}) },
+		data
+	);
 }
 
 /**
@@ -795,7 +802,7 @@ export function cleanItemFlagData(flagData, { addRemoveFlag = false } = {}) {
 	const toRemove = new Set(defaults.filter(key => !difference.has(key)));
 	for (const key of toRemove) {
 		delete flagData[key];
-		if (!addRemoveFlag) {
+		if (addRemoveFlag) {
 			flagData["-=" + key] = null;
 		}
 	}

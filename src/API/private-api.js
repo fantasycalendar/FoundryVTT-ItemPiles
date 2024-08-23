@@ -277,7 +277,11 @@ export default class PrivateAPI {
 				if (!handler) continue;
 				handler({ item, items: newItems });
 			}
-			items = items.concat(newItems);
+			items = items.concat(newItems.map(item => ({
+				_id: item._id,
+				flags: undefined,
+				quantity: Utilities.getItemQuantity(item)
+			})));
 		}
 		await sourceTransaction.appendItemChanges(items, { remove: true });
 
@@ -1034,10 +1038,15 @@ export default class PrivateAPI {
 		let itemsDropped;
 
 		foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity ?? 1);
-		const items = [itemData.item];
+		const containerItems = [itemData.item];
 		const item = fromUuidSync(itemData.uuid);
 		const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
-		if (handler) handler({ item, items });
+		if (handler) handler({ item, items: containerItems });
+		const items = containerItems.map(item => ({
+			item,
+			flags: undefined,
+			quantity: Utilities.getItemQuantity(item)
+		}));
 
 		// If there's a source of the item (it wasn't dropped from the item bar)
 		if (sourceUuid) {
@@ -1067,7 +1076,7 @@ export default class PrivateAPI {
 				itemsDropped = await this._addItems(targetUuid, items, userId);
 			} else {
 				targetUuid = await this._createItemPile({
-					sceneId, position, items, tokenOverrides: { elevation: elevation || 0 }
+					sceneId, position, items: items.map(data => data.item), tokenOverrides: { elevation: elevation || 0 }
 				});
 			}
 

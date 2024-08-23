@@ -44,8 +44,6 @@ export default class Transaction {
 				? Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData))
 				: Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
 
-			console.log(itemData.name, incomingQuantity);
-
 			let itemId = itemData._id ?? itemData.id;
 			let documentHasItem = false;
 			let documentExistingItem = false;
@@ -211,6 +209,11 @@ export default class Transaction {
 		}))
 		this.itemsToCreate = this.itemsToCreate.filter(item => {
 			return !PileUtilities.canItemStack(item, this.document) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
+		}).map(item => {
+			const flagData = PileUtilities.getItemFlagData(item);
+			Utilities.deleteProperty(item, CONSTANTS.FLAGS.ITEM);
+			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData));
+			return item;
 		});
 		this.itemsToDelete = this.itemsToUpdate.filter(item => {
 			return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
@@ -224,9 +227,10 @@ export default class Transaction {
 
 		this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
 			const item = this.document.items.get(id).toObject();
-			const existingFlagData = PileUtilities.cleanItemFlagData(PileUtilities.getItemFlagData(item));
-			const newFlagData = PileUtilities.cleanItemFlagData(this.itemFlagMap.get(id) ?? {});
-			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(existingFlagData, newFlagData));
+			const existingFlagData = PileUtilities.getItemFlagData(item);
+			const newFlagData = this.itemFlagMap.get(id) ?? {};
+			Utilities.deleteProperty(item, CONSTANTS.FLAGS.ITEM);
+			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(existingFlagData, PileUtilities.cleanItemFlagData(newFlagData)));
 			const type = this.itemTypeMap.get(id);
 			Utilities.setItemQuantity(item, quantity, true);
 			return { item, quantity, type };
