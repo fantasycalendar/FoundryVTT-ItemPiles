@@ -53,10 +53,32 @@ export default class ItemPriceStore {
 		return new this(item);
 	}
 
-	removeGroup(groupIndex) {
-		const data = get(this.data);
-		data.prices.splice(groupIndex, 1);
-		this.data.set(data);
+	addPurchaseGroup() {
+		this.data.update(data => {
+			data.prices.push([]);
+			return data;
+		})
+	}
+
+	removePurchaseGroup(groupIndex) {
+		this.data.update(data => {
+			data.prices.splice(groupIndex, 1);
+			return data;
+		})
+	}
+
+	addSellGroup() {
+		this.data.update(data => {
+			data.sellPrices.push([]);
+			return data;
+		})
+	}
+
+	removeSellGroup(groupIndex) {
+		this.data.update(data => {
+			data.sellPrices.splice(groupIndex, 1);
+			return data;
+		})
 	}
 
 	export() {

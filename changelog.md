@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 3.0.12
+
+- Added support for currency exchange in custom item purchase prices
+- Added option for a custom sell price on items
+- Added detection for when the GM is unresponsive for item piles to make changes for players
+- Fixed localization issue with `ITEM-PILES.Trade`, now moved to `ITEM-PILES.PlayerList.TradeButton`
+
 ## Version 3.0.11
 
 - Added `ITEM-PILES.Trade` localization for compatibility with Rest Recovery
