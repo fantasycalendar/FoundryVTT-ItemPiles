@@ -2,7 +2,7 @@
 
 	import { localize } from '#runtime/svelte/helper';
 	import { fade } from 'svelte/transition';
-	import ListEntry from "./ListEntry.svelte";
+	import ListGroupEntry from "./ListGroupEntry.svelte";
 
 	export let store;
 	const numItems = store.numItems;
@@ -16,14 +16,14 @@
 
 	<div in:fade|local={{duration: 150}}>
 
-		{#each $categories as category, index (category.type)}
+		{#each $categories as category (category.type)}
 			<div class="item-group-type item-piles-flexrow">
 				<h3>{localize(category.label)}</h3>
 			</div>
 
 			<div class="item-piles-items-list">
-				{#each $itemsPerCategory[category.type].items as item (item.id)}
-					<ListEntry {store} bind:entry={item}/>
+				{#each $itemsPerCategory[category.type].items as item, index (item.identifier)}
+					<ListGroupEntry {item} {index} {store}/>
 				{/each}
 			</div>
 		{/each}
