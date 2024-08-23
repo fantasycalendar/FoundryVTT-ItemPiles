@@ -153,7 +153,6 @@ export default class ItemPileStore {
 			const renderData = updateData?.renderData ?? updateData?.data ?? {};
 			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.SHARING)) {
 				this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
-				13
 				this.refreshItems();
 			}
 			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.PILE)) {

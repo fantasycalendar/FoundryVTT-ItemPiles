@@ -16,7 +16,6 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import ReceiveItemsShell from "../applications/dialogs/receive-items-dialog/receive-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 import { hotkeyActionState } from "../hotkeys.js";
-import { getCurrenciesInItem } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -271,12 +270,14 @@ export default class PrivateAPI {
 
 		const sourceTransaction = new Transaction(sourceActor);
 		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+			const newItems = [];
 			for (const itemData of items) {
 				const item = sourceActor.items.get(itemData._id ?? itemData.id);
 				const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
 				if (!handler) continue;
-				handler({ actor: sourceActor, item, items });
+				handler({ item, items: newItems });
 			}
+			items = items.concat(newItems);
 		}
 		await sourceTransaction.appendItemChanges(items, { remove: true });
 
@@ -828,8 +829,6 @@ export default class PrivateAPI {
 		await targetTransaction.appendDocumentChanges(sourceUpdates.attributeDeltas);
 		const targetUpdates = targetTransaction.prepare();
 
-		debugger;
-
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ATTRIBUTE.PRE_TRANSFER, sourceDocument, sourceUpdates.actorUpdates, targetDocument, targetUpdates.actorUpdates, interactionId);
 		if (hookResult === false) return false;
 
@@ -1211,6 +1210,16 @@ export default class PrivateAPI {
 				}
 				items[i] = itemData;
 			}
+			if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+				const newItems = [];
+				for (const itemData of items) {
+					const item = new Item.implementation(itemData);
+					const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
+					if (!handler) continue;
+					handler({ item, items: newItems });
+				}
+				items = items.concat(newItems);
+			}
 		} else {
 			items = []
 		}
@@ -1279,7 +1288,7 @@ export default class PrivateAPI {
 				new Promise(async (resolve) => {
 					await Helpers.wait(250);
 					await Helpers.hooks.runWithout(async () => {
-						await tokenDocument.actor.createEmbeddedDocuments("Item", items);
+						await tokenDocument.actor.createEmbeddedDocuments("Item", items, { keepId: true });
 					});
 					resolve();
 				});
@@ -1291,7 +1300,7 @@ export default class PrivateAPI {
 
 			if (items.length && !pileActor.prototypeToken.actorLink) {
 				await Helpers.hooks.runWithout(async () => {
-					await pileActor.createEmbeddedDocuments("Item", items);
+					await pileActor.createEmbeddedDocuments("Item", items, { keepId: true });
 				});
 			}
 
@@ -2151,8 +2160,6 @@ export default class PrivateAPI {
 		}
 
 		const actorPreparedData = Object.fromEntries(transactionMap.map(entry => [entry[0], entry[1].prepare()]));
-
-		debugger;
 
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_SPLIT_INVENTORY, itemPileActor, preparedData, actorPreparedData, userId, instigator);
 		if (hookResult === false) return false;

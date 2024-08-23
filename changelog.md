@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 3.1.0
+
+- Added support for "container" type items in D&D5e - this is a custom implementation, so other systems' containers will not work out of the box
+  - Splitting currencies in item piles takes into account across all currencies across containers in the pile
+  - Added tree-like display for items in containers
+
 ## Version 3.0.11
 
 - Added `ITEM-PILES.Trade` localization for compatibility with Rest Recovery
@@ -32,9 +38,6 @@
 
 ## Version 3.0.7
 
-- Added support for "container" type items in D&D5e - this is a custom implementation, so other systems' containers will not work out of the box
-  - Splitting currencies in item piles takes into account across all currencies across containers in the pile
-  - Added tree-like display for items in containers
 - Tweaked `game.itempiles.API.createItemPile` with `createActor` set to `true` have the default item piles' settings
 - Fixed item pile containers not respecting open/close/lock/unlock settings
 - Fixed minor `module.json` manifest warning

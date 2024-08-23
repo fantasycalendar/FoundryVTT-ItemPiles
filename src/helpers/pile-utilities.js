@@ -12,7 +12,6 @@ import { hotkeyActionState } from "../hotkeys.js";
 import * as Utilities from "./utilities.js"
 import * as Helpers from "./helpers.js";
 import * as CompendiumUtilities from "./compendium-utilities.js";
-import { getDocument } from "./utilities.js";
 
 export function getPileDefaults() {
 	return foundry.utils.mergeObject({}, CONSTANTS.PILE_DEFAULTS, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
@@ -551,7 +550,11 @@ export function getItemPileTokenImage(token, {
 
 	if (!isValidItemPile(pileDocument, itemPileData) || !isItemPileLootable(pileDocument, itemPileData)) return originalImg;
 
-	items = items || getActorItems(pileDocument);
+	items = (items || getActorItems(pileDocument)).filter(itemData => {
+		const method = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+		if (!method) return true;
+		return !method({ item: itemData });
+	});
 	currencies = currencies || getActorCurrencies(pileDocument);
 
 	const numItems = items.length + currencies.length;
@@ -604,7 +607,11 @@ export function getItemPileTokenScale(target, {
 		return baseScale;
 	}
 
-	items = items || getActorItems(pileDocument);
+	items = (items || getActorItems(pileDocument)).filter(itemData => {
+		const method = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+		if (!method) return true;
+		return !method({ item: itemData });
+	});
 	currencies = currencies || getActorCurrencies(pileDocument);
 
 	const numItems = items.length + currencies.length;
@@ -631,7 +638,11 @@ export function getItemPileName(target, { data = false, items = false, currencie
 		return name;
 	}
 
-	items = items || getActorItems(pileDocument);
+	items = (items || getActorItems(pileDocument)).filter(itemData => {
+		const method = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+		if (!method) return true;
+		return !method({ item: itemData });
+	});
 	currencies = currencies || getActorCurrencies(pileDocument);
 
 	const numItems = items.length + currencies.length;
