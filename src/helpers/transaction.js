@@ -44,6 +44,8 @@ export default class Transaction {
 				? Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData))
 				: Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
 
+			console.log(itemData.name, incomingQuantity);
+
 			let itemId = itemData._id ?? itemData.id;
 			let documentHasItem = false;
 			let documentExistingItem = false;

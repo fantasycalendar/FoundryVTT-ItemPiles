@@ -1033,16 +1033,21 @@ export default class PrivateAPI {
 
 		let itemsDropped;
 
+		foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity ?? 1);
+		const items = [itemData.item];
+		const item = fromUuidSync(itemData.uuid);
+		const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
+		if (handler) handler({ item, items });
+
 		// If there's a source of the item (it wasn't dropped from the item bar)
 		if (sourceUuid) {
 
-			foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData.quantity);
-
 			// If there's a target token, add the item to it, otherwise create a new pile at the drop location
 			if (targetUuid) {
-				itemsDropped = await this._transferItems(sourceUuid, targetUuid, [itemData.item], userId);
+				itemsDropped = await this._transferItems(sourceUuid, targetUuid, items, userId);
 			} else {
-				itemsDropped = (await this._removeItems(sourceUuid, [itemData.item], userId)).map(item => {
+
+				itemsDropped = (await this._removeItems(sourceUuid, items, userId)).map(item => {
 					item.quantity = Math.abs(item.quantity)
 					Utilities.setItemQuantity(item.item, Math.abs(item.quantity), true);
 					return item;
@@ -1050,7 +1055,7 @@ export default class PrivateAPI {
 				targetUuid = await this._createItemPile({
 					sceneId, position, items: itemsDropped, tokenOverrides: {
 						elevation: elevation || fromUuidSync(sourceUuid)?.elevation || 0
-					}
+					}, checkContainers: false
 				})
 			}
 
@@ -1059,10 +1064,10 @@ export default class PrivateAPI {
 
 			// If there's a target token, add the item to it, otherwise create a new pile at the drop location
 			if (targetUuid) {
-				itemsDropped = await this._addItems(targetUuid, [itemData], userId);
+				itemsDropped = await this._addItems(targetUuid, items, userId);
 			} else {
 				targetUuid = await this._createItemPile({
-					sceneId, position, items: [itemData], tokenOverrides: { elevation: elevation || 0 }
+					sceneId, position, items, tokenOverrides: { elevation: elevation || 0 }
 				});
 			}
 
@@ -1083,7 +1088,7 @@ export default class PrivateAPI {
 		tokenOverrides = {},
 		actorOverrides = {},
 		itemPileFlags = {},
-		folders = false,
+		folders = false
 	} = {}) {
 
 		let returns = {};
@@ -1186,8 +1191,6 @@ export default class PrivateAPI {
 
 				await game.settings.set(CONSTANTS.MODULE_NAME, SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID, pileActor.id);
 
-			} else {
-
 			}
 
 		} else {
@@ -1209,16 +1212,6 @@ export default class PrivateAPI {
 					itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
 				}
 				items[i] = itemData;
-			}
-			if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
-				const newItems = [];
-				for (const itemData of items) {
-					const item = new Item.implementation(itemData);
-					const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
-					if (!handler) continue;
-					handler({ item, items: newItems });
-				}
-				items = items.concat(newItems);
 			}
 		} else {
 			items = []
@@ -1660,7 +1653,7 @@ export default class PrivateAPI {
 
 		const dropData = {
 			source: false, target: data?.target ?? false, elevation: data?.elevation, itemData: {
-				item: itemData, quantity: 1,
+				item: itemData, quantity: 1, uuid: data?.uuid
 			}, position: false
 		};
 

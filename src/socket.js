@@ -236,7 +236,13 @@ const Requests = {
 			return false;
 		}
 		Requests._addTimeout(handler);
-		const result = await method();
+		let result;
+		try {
+			result = await method();
+		} catch (err) {
+			Requests._clearPendingTimeout(handler);
+			return false;
+		}
 		Requests._clearPendingTimeout(handler);
 		Requests._unresponsiveGM = false;
 		Requests._lastGmUnresponsiveTimestamp = false;

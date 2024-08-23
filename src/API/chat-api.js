@@ -439,7 +439,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: isPrivate && CONSTANTS.IS_V12 ? CHAT_MESSAGE_STYLES.WHISPER : CHAT_MESSAGE_STYLES.OTHER,
+			type: isPrivate && !CONSTANTS.IS_V12 ? CHAT_MESSAGE_STYLES.WHISPER : CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
