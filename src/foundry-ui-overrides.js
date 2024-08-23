@@ -109,7 +109,9 @@ function insertActorHeaderButtons(actorSheet, buttons) {
 	let obj = actorSheet?.object ?? actorSheet?.actor;
 
 	buttons.unshift({
-		label: Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "" : "Configure",
+		label: Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT)
+			? ""
+			: game.i18n.localize("ITEM-PILES.HeaderButtons.Configure"),
 		icon: "fas fa-box-open",
 		class: "item-piles-config-button",
 		onclick: () => {
@@ -125,7 +127,7 @@ function insertItemHeaderButtons(itemSheet, buttons) {
 	let obj = itemSheet?.object ?? itemSheet?.item;
 
 	buttons.unshift({
-		label: Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "" : "Configure",
+		label: !Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? game.i18n.localize("ITEM-PILES.HeaderButtons.Configure") : "",
 		icon: "fas fa-box-open",
 		class: "item-piles-config-button",
 		onclick: async (event) => {

@@ -1,5 +1,35 @@
 # Item Piles Changelog
 
+## Version 3.0.11
+
+- Added `ITEM-PILES.Trade` localization for compatibility with Rest Recovery
+- Updated Portuguese (Brazil) localization (thank you Kharmans on github!)
+- Fixed Foundry v11 issues with chat messages that fixed in 3.0.10
+
+## Version 3.0.10
+
+- Updated Portuguese (Brazil) and Polish localization (thank you Kharmans and Lioheart on github!)
+- Added missing localization entries in some interfaces
+- Fixed custom categories not being applied to items when created through merchant populate items
+- Fixed item piles sometimes resetting their item pile flags when first created
+- Fixed versions of D&D5e 3.2.0 and onwards keeping item attunement when transferred between actors, will now clear attunement properly
+- Fixed chat messages not showing up properly when setting configured to be private or blind
+
+## Version 3.0.9
+
+- Added support for secretly giving items to others via the right-click context menu on items on the D&D5e system
+- Fixed the above-mentioned give dialog to have player owned characters visible in the dropdown list
+- Fixed some systems not allowing players to preview items by clicking on the names in item piles when the player had no permissions configured on the item pile
+- Fixed item pile on interact macros not working when utilizing module or system macro compendiums
+- Fixed updating item piles tokens would sometimes reset it to a default non-item pile token
+- Fixed item piles not being deleted after being emptied even though they were configured to be deleted
+- Fixed being unable to switch inspecting character in item piles
+- Fixed some interfaces being broken when other modules were active due to them declaring global CSS classes
+
+## Version 3.0.8
+
+- Fixed not being able to drop items onto scenes (thanks diwako on github!)
+
 ## Version 3.0.7
 
 - Added support for "container" type items in D&D5e - this is a custom implementation, so other systems' containers will not work out of the box

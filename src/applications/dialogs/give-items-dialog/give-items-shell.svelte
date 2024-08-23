@@ -17,23 +17,26 @@
 	const canItemStack = PileUtilities.canItemStack(item);
 
 	let quantity = 1;
+	let secret = false;
 	let selectedActor = localStorage.getItem("item-piles-give-item") ?? false;
 
 	let items = Array.from(game.actors)
 		.filter(actor => {
-			return (actor.type === "character" || actor.type === "npc")
-				&& actor !== item.parent
-				&& !PileUtilities.isValidItemPile(actor)
-				&& (game.user.isGM || (actor.ownership["default"] >= 1 || actor.ownership[game.user.id] >= 1))
+			return game.user.isGM || (actor.ownership["default"] >= 1 || actor.ownership[game.user.id] >= 1);
+		})
+		.concat(game.users.map(user => user.character).filter(Boolean))
+		.filter(actor => actor !== item.parent)
+		.filter((actor, index, self) => {
+			return index === self.findIndex(a => a.uuid === actor.uuid)
 		})
 		.map(actor => ({
 			value: actor.uuid,
 			label: actor.name,
 			actor,
-			group: actor.hasPlayerOwner ? "Player Characters" : "Other Characters"
+			group: actor.hasPlayerOwner ? "Player Characters" : "Unassigned Characters"
 		}))
 		.sort((a, b) => {
-			return a.name > b.name ? ((b.actor.hasPlayerOwner - a.actor.hasPlayerOwner) - 1) : ((b.actor.hasPlayerOwner - a.actor.hasPlayerOwner) + 1);
+			return (a.group >= b.group ? 100000 : -100000) + (a.label >= b.label ? 1 : -1);
 		});
 
 	if (selectedActor && !items.some(data => data.value === selectedActor)) {
@@ -48,7 +51,7 @@
 
 	function submit() {
 		localStorage.setItem("item-piles-give-item", selectedActor.value)
-		application.options.resolve({ quantity, target: selectedActor.value });
+		application.options.resolve({ quantity, secret, target: selectedActor.value });
 		application.close();
 	}
 
@@ -73,7 +76,6 @@
 		<SliderInput min={1} max={sliderQuantity} maxInput={sliderQuantity} divideBy={1} bind:value={quantity}/>
 	{/if}
 
-
 	<div class="form-group">
 		<Select
 			--background="rgba(0, 0, 0, 0.05)"
@@ -97,6 +99,11 @@
 		></Select>
 	</div>
 
+	<div class="form-group item-piles-flexrow">
+		<input id="item-piles-give-item-secret" type="checkbox" bind:checked={secret}/>
+		<label for="item-piles-give-item-secret">{localize("ITEM-PILES.Dialogs.GiveItems.Secret")}</label>
+	</div>
+
 	<footer class="sheet-footer item-piles-flexrow" style="margin-top: 0.25rem;">
 		<button disabled={!selectedActor} on:click|once={requestSubmit} type="button">
 			<i class="fas fa-box"></i>
@@ -109,8 +116,3 @@
 	</footer>
 
 </form>
-
-<style lang="scss">
-
-
-</style>

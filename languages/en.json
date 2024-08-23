@@ -7,7 +7,9 @@
       "ShowToPlayers": "Show To Players",
       "RequestTrade": "Request Trade"
     },
+    "Trade": "Trade",
     "HeaderButtons": {
+      "Configure": "Configure",
       "ShowToPlayers": "Show To Players"
     },
     "Types": {
@@ -57,6 +59,7 @@
     "Inspect": {
       "Title": "Inspecting Pile Contents",
       "AsActor": "You're inspecting this pile as {actorName}.",
+      "Change": "Change",
       "Owner": "As an owner of this Item Pile, you can edit the item pile's contents.",
       "Empty": "This pile is empty.",
       "Destroyed": "This pile no longer exists and lies barren.",
@@ -211,6 +214,16 @@
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "LogQuantity": "{quantity} x "
     },
+    "General": {
+      "Primary": "Primary",
+      "Exchange": "Exchange",
+      "Name": "Name",
+      "Cost": "Cost",
+      "Fixed": "Fixed",
+      "Short": "Short",
+      "Icon": "Icon",
+      "Data": "Data"
+    },
     "Dialogs": {
       "TypeWarning": {
         "Title": "Item Type Warning",
@@ -267,6 +280,7 @@
         "Header": "Giving Item: {item_name}",
         "SelectPlaceholder": "Pick character to send item to",
         "ContentMultipleQuantity": "You have {quantity} of this item, how many do you want to give away?",
+        "Secret": "Give without letting others know (except GMs)",
         "Submit": "Send"
       },
       "ReceiveItem": {
@@ -400,7 +414,9 @@
         "Exchange": "Exchange",
         "Data": "Data",
         "Icon": "Icon",
-        "AddNew": "Add new currency"
+        "AddNew": "Add new currency",
+        "CreateNew": "Drop an item or click the plus button to get started!",
+        "Drop": "Drop to add"
       },
       "SecondaryCurrenciesEditor": {
         "Title": "Item Piles Secondary Currencies Editor",

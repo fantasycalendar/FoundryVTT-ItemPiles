@@ -10,19 +10,22 @@
 	let editQuantities = store.editQuantities;
 
 	let changingActor = false;
-	let playerActors = game.actors.filter(actor => actor.isOwner && actor !== store.pileActor && actor.prototypeToken.actorLink);
+	let playerActors = game.actors.filter(actor => actor.isOwner && actor !== store.actor && actor.prototypeToken.actorLink);
 	let recipientUuid = Utilities.getUuid(store.recipient);
 	const recipientDoc = store.recipientDocument;
 
 	$: {
 		$recipientDoc;
-		recipientUuid = store.recipient ? Utilities.getUuid(store.recipient) : false;
+		if (!changingActor) {
+			recipientUuid = store.recipient ? Utilities.getUuid(store.recipient) : false;
+		}
 	}
 
 	function changeRecipientActor() {
-		store.recipient = playerActors.find(actor => Utilities.getUuid(actor) === recipientUuid);
-		store.update();
+		const newRecipient = playerActors.find(actor => Utilities.getUuid(actor) === recipientUuid);
 		changingActor = false;
+		if (recipientUuid === store.recipient.uuid) return;
+		store.updateRecipient(newRecipient)
 	}
 
 </script>
@@ -37,7 +40,7 @@
 		{#if playerActors.length > 1}
 			{#if !changingActor}
 				<a class='item-piles-highlight' on:click={() => { changingActor = true }} class:active={!changingActor}>
-					Change.
+					{localize("ITEM-PILES.Inspect.Change")}
 				</a>
 			{:else}
 				<select

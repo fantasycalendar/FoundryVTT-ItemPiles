@@ -2,6 +2,7 @@
 
 	import * as Helpers from "../../helpers/helpers.js";
 	import SETTINGS from "../../constants/settings.js";
+	import { SYSTEMS } from "../../systems.js";
 
 	export let store;
 	export let data;
@@ -13,11 +14,19 @@
 		if (!canPreview || !data.id) return;
 		const item = store.leftTraderActor.items.get(data.id) ?? store.rightTraderActor.items.get(data.id);
 		if (!item) return;
-		if (game.user.isGM || item.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
+		if (SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER) {
+			if (!SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER(item)) {
+				return;
+			}
+		}
+		if (game.user.isGM || item.ownership[game.user.id] === 3) {
 			return item.sheet.render(true);
 		}
-		const cls = item._getSheetClass()
-		const sheet = new cls(item, { editable: false })
+		const itemData = item.toObject();
+		itemData.ownership[game.user.id] = 1;
+		const newItem = new Item.implementation(itemData);
+		const cls = newItem._getSheetClass();
+		const sheet = new cls(newItem, { editable: false });
 		return sheet._render(true);
 	}
 

@@ -6,9 +6,9 @@ import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as Utilities from "../helpers/utilities.js";
 import TradeAPI from "./trade-api.js";
 
-export default class ChatAPI {
+let CHAT_MESSAGE_STYLES = false;
 
-	static CHAT_MESSAGE_STYLES = CONSTANTS.IS_V12 ? CONST.CHAT_MESSAGE_STYLES : CONST.CHAT_MESSAGE_TYPES;
+export default class ChatAPI {
 
 	static initialize() {
 
@@ -28,6 +28,9 @@ export default class ChatAPI {
 			await Helpers.wait(25);
 			$(this).parent()[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
 		});
+
+		CHAT_MESSAGE_STYLES = CONSTANTS.IS_V12 ? CONST.CHAT_MESSAGE_STYLES : CONST.CHAT_MESSAGE_TYPES;
+
 	}
 
 	static _preCreateChatMessage(chatMessage) {
@@ -152,12 +155,14 @@ export default class ChatAPI {
 	 * @param target
 	 * @param item
 	 * @param userId
+	 * @param targetUserId
+	 * @param secret
 	 * @returns {Promise}
 	 */
-	static async _outputGiveItem(source, target, item, userId) {
+	static async _outputGiveItem(source, target, item, userId, targetUserId, secret) {
 		if (game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
 		const [itemData, itemCurrencies] = await this._formatItemData(source, [item]);
-		return this._giveChatMessage(source, target, itemData.concat(itemCurrencies), userId);
+		return this._giveChatMessage(source, target, itemData.concat(itemCurrencies), userId, targetUserId, secret);
 	}
 
 	/**
@@ -290,7 +295,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -369,7 +374,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name })
@@ -391,7 +396,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -434,7 +439,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(game.user.id, {
 			user: game.user.id,
-			type: isPrivate ? CONST.CHAT_MESSAGE_STYLES.WHISPER : ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: isPrivate && CONSTANTS.IS_V12 ? CHAT_MESSAGE_STYLES.WHISPER : CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -480,7 +485,7 @@ export default class ChatAPI {
 
 		return this._createNewChatMessage(userId, {
 			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
@@ -495,7 +500,7 @@ export default class ChatAPI {
 
 	}
 
-	static async _giveChatMessage(source, target, items) {
+	static async _giveChatMessage(source, target, items, userId, targetUserId, secret) {
 
 		const now = (+new Date());
 
@@ -510,7 +515,7 @@ export default class ChatAPI {
 
 		for (const message of messages) {
 			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
-			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceActor.uuid && flags.target === targetActor.uuid && message.isAuthor) {
+			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceActor.uuid && flags.target === targetActor.uuid && message.isAuthor && (flags.secret === undefined || flags.secret === secret)) {
 				return this._updateExistingGiveMessage(message, sourceActor, targetActor, items)
 			}
 		}
@@ -522,19 +527,35 @@ export default class ChatAPI {
 			items: items
 		});
 
-		return this._createNewChatMessage(game.user.id, {
-			user: game.user.id,
-			type: ChatAPI.CHAT_MESSAGE_STYLES.OTHER,
+		const user = game.users.get(userId);
+
+		const chatData = {
+			user: user.id,
+			type: CHAT_MESSAGE_STYLES.OTHER,
 			content: chatCardHtml,
 			flavor: "Item Piles",
-			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
+			speaker: ChatMessage.getSpeaker({ alias: user.name }),
 			[CONSTANTS.FLAGS.PILE]: {
 				version: Helpers.getModuleVersion(),
 				source: sourceActor.uuid,
 				target: targetActor.uuid,
-				items: items
+				items: items,
+				secret
 			}
-		})
+		}
+
+		if (secret) {
+			chatData.whisper = Array.from(game.users)
+				.filter(user => user.isGM)
+				.map(user => user.id);
+			chatData.whisper.push(userId);
+			chatData.whisper.push(targetUserId);
+			if (CONSTANTS.IS_V12) {
+				chatData.type = CHAT_MESSAGE_STYLES.WHISPER;
+			}
+		}
+
+		return this._createNewChatMessage(user.id, chatData)
 
 	}
 
@@ -631,9 +652,15 @@ export default class ChatAPI {
 				if (mode === 2) {
 					chatData.whisper.push(userId);
 				}
-				chatData.type = CONST.CHAT_MESSAGE_STYLES.WHISPER;
+				if (CONSTANTS.IS_V12) {
+					chatData.type = CHAT_MESSAGE_STYLES.WHISPER;
+				}
 			}
 
+		}
+
+		if (chatData?.whisper?.length) {
+			chatData.whisper = Array.from(new Set(chatData.whisper));
 		}
 
 		return ChatMessage.create(chatData);

@@ -1,6 +1,5 @@
 import GiveItems from "../applications/dialogs/give-items-dialog/give-items-dialog.js";
 import PrivateAPI from "../API/private-api.js";
-import CONSTANTS from "../constants/constants.js";
 
 export default {
 
@@ -36,15 +35,14 @@ export default {
 		}
 	],
 
-	"UNSTACKABLE_ITEM_TYPES": ["container"],
-
 	// This function is an optional system handler that specifically transforms an item when it is added to actors
 	"ITEM_TRANSFORMER": async (itemData) => {
-		["equipped", "proficient", "prepared", "attuned"].forEach(key => {
+		["equipped", "proficient", "prepared"].forEach(key => {
 			if (itemData?.system?.[key] !== undefined) {
 				delete itemData.system[key];
 			}
 		});
+		foundry.utils.setProperty(itemData, "system.attunement", Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData?.system?.attunement ?? 0));
 		if (itemData.type === "spell") {
 			try {
 				const scroll = await Item.implementation.createScrollFromSpell(itemData);
@@ -53,25 +51,6 @@ export default {
 			}
 		}
 		return itemData;
-	},
-
-	"ITEM_TYPE_HANDLERS": {
-		"GLOBAL": {
-			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED]: ({ item }) => {
-				return item.system.container;
-			}
-		},
-		"container": {
-			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
-			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
-				return item.system.contents.contents;
-			},
-			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
-				for (const containedItem of item.system.contents.contents) {
-					items.push(containedItem.toObject());
-				}
-			}
-		}
 	},
 
 	// This function is an optional system handler that specifically transforms an item's price into a more unified numeric format

@@ -260,7 +260,8 @@
         "Header": "Przekazywany przedmiot: {item_name}",
         "SelectPlaceholder": "Wybierz postać, do której chcesz przekazać przedmiot",
         "ContentMultipleQuantity": "Masz {quantity} szt. tego przedmiotu, ile chcesz przekazać?",
-        "Submit": "Przekaż"
+        "Submit": "Przekaż",
+        "Secret": "Dawanie bez informowania innych (z wyjątkiem MG)"
       },
       "SortMergeVaultItems": {
         "Title": "Sortowanie i łączenie podobnych elementów?",

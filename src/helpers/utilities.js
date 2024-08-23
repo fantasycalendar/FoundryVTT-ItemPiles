@@ -355,7 +355,9 @@ export async function runMacro(macroId, macroData) {
 		if (!compendium) {
 			throw Helpers.custom_error(`Compendium ${packArray[1]}.${packArray[2]} was not found`);
 		}
-		let findMacro = (await compendium.getDocuments()).find(m => m.name === packArray[3] || m.id === packArray[3])
+		let findMacro = (await compendium.getDocuments()).find(m => {
+			return m.name === packArray[3] || m.id === packArray[3] || m.id === packArray[4];
+		})
 		if (!findMacro) {
 			throw Helpers.custom_error(`The "${packArray[3]}" macro was not found in Compendium ${packArray[1]}.${packArray[2]}`);
 		}
@@ -435,9 +437,31 @@ export function getSourceActorFromDropData(dropData) {
 	return false;
 }
 
+
+export function deleteProperty(object, key) {
+	if (!key || !object) return false;
+	if (key in object) return true;
+	let target = object;
+	const keys = key.split('.');
+	for (let index = 0; index < keys.length; index++) {
+		const p = keys[index];
+		if (!target || (typeof target !== "object")) return false;
+		if (index === keys.length - 1 && p in target) {
+			delete target[p];
+		} else if (p in target) {
+			target = target[p];
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+
 export function hasItemTypeHandler(handler, itemType = "GLOBAL") {
 	return !!SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];
 }
+
 
 export function getItemTypeHandler(handler, itemType = "GLOBAL") {
 	return SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];

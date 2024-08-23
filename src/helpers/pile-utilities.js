@@ -731,7 +731,7 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 			...newTokenData
 		};
 		if (!tokenDocument.actorLink) documentActor = false;
-		return data;
+		return foundry.utils.mergeObject({}, data);
 	});
 
 	if (canvas.scene && !foundry.utils.isEmpty(updates)) {
@@ -2323,7 +2323,10 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 			})
 
 			if (table?.customCategory) {
-				tableItems.forEach(item => foundry.utils.setProperty(item, CONSTANTS.FLAGS.CUSTOM_CATEGORY, table?.customCategory));
+				tableItems = tableItems.map(item => {
+					foundry.utils.setProperty(item, "customCategory", table?.customCategory)
+					return item;
+				});
 			}
 		}
 
