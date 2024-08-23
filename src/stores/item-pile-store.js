@@ -8,6 +8,7 @@ import * as Helpers from "../helpers/helpers.js";
 import { InterfaceTracker } from "../socket.js";
 import { PileAttribute, PileItem } from "./pile-item.js";
 import DropCurrencyDialog from "../applications/dialogs/drop-currency-dialog/drop-currency-dialog.js";
+import { SYSTEMS } from "../systems.js";
 
 const __STORES__ = new Map();
 
@@ -152,7 +153,6 @@ export default class ItemPileStore {
 			const renderData = updateData?.renderData ?? updateData?.data ?? {};
 			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.SHARING)) {
 				this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
-				13
 				this.refreshItems();
 			}
 			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.PILE)) {
@@ -180,27 +180,6 @@ export default class ItemPileStore {
 			});
 		}
 
-		const items = [];
-		const attributes = [];
-
-		const pileData = PileUtilities.isValidItemPile(this.actor) || !this.recipient ? get(this.pileData) : get(this.recipientPileData);
-
-		PileUtilities.getActorItems(this.actor, { itemFilters: pileData.overrideItemFilters }).map(item => {
-			items.push(new this.ItemClass(this, item));
-		});
-
-		PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
-			if (currency.type === "item") {
-				if (!currency.item) return
-				items.push(new this.ItemClass(this, currency.item, true, !!currency?.secondary));
-			} else {
-				attributes.push(new this.AttributeClass(this, currency, true, !!currency?.secondary));
-			}
-		});
-
-		this.allItems.set(items);
-		this.attributes.set(attributes);
-
 		this.subscribeTo(this.allItems, () => {
 			this.refreshItems();
 		});
@@ -214,6 +193,60 @@ export default class ItemPileStore {
 		this.subscribeTo(this.search, (val) => {
 			filterDebounce()
 		});
+
+		this.populateItems();
+
+	}
+
+	populateItems() {
+
+		const items = get(this.allItems);
+		const attributes = get(this.attributes);
+
+		const pileData = PileUtilities.isValidItemPile(this.actor) || !this.recipient ? get(this.pileData) : get(this.recipientPileData);
+
+		const pileItems = PileUtilities.getActorItems(this.actor, { itemFilters: pileData.overrideItemFilters });
+
+		pileItems.forEach(item => {
+			if (items.some(existingItem => existingItem.item === item)) return;
+			items.push(new this.ItemClass(this, item));
+		});
+
+		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+
+			const groupedItems = items.filter(item => {
+				return Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, item.type);
+			});
+
+			groupedItems.forEach((containerPileItem) => {
+				PileUtilities.getCurrenciesInItem(containerPileItem.item, {
+					forActor: this.recipient,
+					getAll: false
+				}).forEach(currency => {
+					if (currency.type !== "item") {
+						if (attributes.some(existingAttribute => existingAttribute.path === currency.path && existingAttribute.parent === containerPileItem.item)) return;
+						const currencyPileItem = new this.AttributeClass(this, currency, true, !!currency?.secondary, containerPileItem)
+						currencyPileItem.containerID.set(containerPileItem.item.id);
+						attributes.push(currencyPileItem);
+					}
+				});
+			});
+
+		}
+
+		PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
+			if (currency.type === "item") {
+				if (!currency.item) return;
+				if (items.some(existingItem => existingItem.item === currency.item)) return;
+				items.push(new this.ItemClass(this, currency.item, true, !!currency?.secondary));
+			} else {
+				if (attributes.some(existingAttribute => existingAttribute.path === currency.path)) return;
+				attributes.push(new this.AttributeClass(this, currency, true, !!currency?.secondary));
+			}
+		});
+
+		this.allItems.set(items);
+		this.attributes.set(attributes);
 
 	}
 
@@ -247,13 +280,58 @@ export default class ItemPileStore {
 
 	refreshItems() {
 		const allItems = get(this.allItems);
+		const allAttributes = get(this.attributes);
 		const pileData = get(this.pileData);
 		const recipientPileData = this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {}
 		const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
 
-		const visibleItems = allItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
-		const itemCurrencies = allItems.filter(entry => entry.isCurrency && !entry.isSecondaryCurrency);
-		const secondaryItemCurrencies = allItems.filter(entry => entry.isSecondaryCurrency);
+		const groupedItems = allItems
+			.map(item => {
+				item.subItems.set([]);
+				return item;
+			})
+			.reduce((acc, item) => {
+				const containerID = get(item.containerID);
+				if (containerID) {
+					const container = allItems.find(pileItem => pileItem.id === containerID);
+					if (container) {
+						container.subItems.update(subItems => {
+							subItems.push(item);
+							return subItems;
+						});
+						return acc;
+					}
+				}
+				acc.push(item);
+				return acc;
+			}, []);
+
+		const groupedAttributes = allAttributes
+			.reduce((acc, item) => {
+				const containerID = get(item.containerID);
+				if (containerID) {
+					const container = allItems.find(pileItem => pileItem.id === containerID)
+					if (container) {
+						container.subItems.update(subItems => {
+							subItems.push(item);
+							subItems.sort((a, b) => {
+								if (a?.attribute?.exchangeRate && b?.attribute?.exchangeRate) {
+									return (b?.attribute?.exchangeRate ?? 0) - (a?.attribute?.exchangeRate ?? 0);
+								}
+								return (get(b.name) > get(a.name) ? -1 : 1);
+							})
+							return subItems;
+						});
+						return acc;
+					}
+				}
+				acc.push(item);
+				return acc;
+			}, []);
+
+		const visibleItems = groupedItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
+		const itemCurrencies = groupedItems.filter(entry => entry.isCurrency && !entry.isSecondaryCurrency);
+		const secondaryItemCurrencies = groupedItems.filter(entry => entry.isSecondaryCurrency);
 
 		this.visibleItems.set(visibleItems);
 
@@ -262,8 +340,8 @@ export default class ItemPileStore {
 		this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
 		this.items.set(items.sort((a, b) => this.itemSortFunction(a, b)));
 
-		const currencies = get(this.attributes).filter(entry => !entry.isSecondaryCurrency).concat(itemCurrencies);
-		const secondaryCurrencies = get(this.attributes).filter(entry => entry.isSecondaryCurrency).concat(secondaryItemCurrencies);
+		const currencies = groupedAttributes.filter(entry => !entry.isSecondaryCurrency).concat(itemCurrencies);
+		const secondaryCurrencies = groupedAttributes.filter(entry => entry.isSecondaryCurrency).concat(secondaryItemCurrencies);
 
 		this.numCurrencies.set(currencies.concat(secondaryCurrencies).filter(entry => get(entry.quantity) > 0).length);
 

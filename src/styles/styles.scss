@@ -671,6 +671,35 @@
 
 }
 
+.item-piles-item-sublist {
+  display: grid;
+  grid-template-columns: 28px auto;
+  background-color: rgba(255, 255, 255, 0.25);
+  border-radius: 5px;
+
+  .item-piles-tree-branch-right-arm {
+    position: relative;
+    top: -60%;
+    left: 50%;
+    width: 35%;
+    height: 110%;
+    border-left: 1px solid var(--item-piles-border-dark-primary);
+    border-bottom: 1px solid var(--item-piles-border-dark-primary);
+
+    &:first-child {
+      overflow: hidden;
+      top: calc(-0.25rem + 1px);
+      height: 60%;
+    }
+  }
+}
+
+.item-piles-item-divider {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  margin-bottom: 0.1rem;
+  padding-bottom: 0.1rem;
+}
+
 /* ----------------------- CONFIG ----------------------- */
 
 

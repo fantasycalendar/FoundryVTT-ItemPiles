@@ -2,6 +2,7 @@ import * as Helpers from "./helpers.js";
 import CONSTANTS from "../constants/constants.js";
 import SETTINGS from "../constants/settings.js";
 import { deletedActorCache } from "./caches.js";
+import { SYSTEMS } from "../systems.js";
 
 export function getActor(target) {
 	if (target instanceof Actor) return target;
@@ -13,6 +14,7 @@ export function getActor(target) {
 		}
 	}
 	targetDoc = getDocument(targetDoc);
+	if (targetDoc instanceof Item && targetDoc.parent instanceof Actor) return targetDoc.parent;
 	return targetDoc?.character ?? targetDoc?.actor ?? targetDoc;
 }
 
@@ -435,6 +437,7 @@ export function getSourceActorFromDropData(dropData) {
 	return false;
 }
 
+
 export function deleteProperty(object, key) {
 	if (!key || !object) return false;
 	if (key in object) return true;
@@ -452,4 +455,14 @@ export function deleteProperty(object, key) {
 		}
 	}
 	return true;
+}
+
+
+export function hasItemTypeHandler(handler, itemType = "GLOBAL") {
+	return !!SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];
+}
+
+
+export function getItemTypeHandler(handler, itemType = "GLOBAL") {
+	return SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];
 }

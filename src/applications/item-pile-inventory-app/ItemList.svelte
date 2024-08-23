@@ -2,7 +2,7 @@
 
 	import { localize } from '#runtime/svelte/helper';
 	import { fade } from 'svelte/transition';
-	import ListEntry from "./ListEntry.svelte";
+	import ListGroupEntry from "./ListGroupEntry.svelte";
 
 	export let store;
 	const items = store.items;
@@ -16,8 +16,8 @@
 
 		<div class="item-piles-flexrow"><h3>{localize("ITEM-PILES.Items")}</h3></div>
 
-		{#each $items as item (item.identifier)}
-			<ListEntry {store} bind:entry={item}/>
+		{#each $items as item, index (item.identifier)}
+			<ListGroupEntry {item} {index} {store}/>
 		{/each}
 
 	</div>

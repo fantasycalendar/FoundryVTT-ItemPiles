@@ -10,7 +10,6 @@ import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 import { SYSTEMS } from "../systems.js";
 import ItemPileConfig from "../applications/item-pile-config/item-pile-config.js";
-import { getCharactersForItemPile } from "../helpers/sharing-utilities.js";
 
 class API {
 	/**
@@ -1082,23 +1081,6 @@ class API {
 	}
 
 	/**
-	 * Whether an item pile is an auctioneer. If it is not enabled, it is always false.
-	 *
-	 * @param {Token/TokenDocument} target
-	 * @param {Object/boolean} [data=false] data existing flags data to use
-	 * @return {boolean}
-	 */
-	static isItemPileAuctioneer(target, data = false) {
-		if (!game.modules.get("item_piles_auctioneer")?.active) {
-			let word = "install and activate";
-			if (game.modules.get('item_piles_auctioneer')) word = "activate";
-			Helpers.custom_warning(`This api method from Item Piles requires the 'item_piles_auctioneer' module. Please ${word} it.`, true);
-			return false;
-		}
-		return PileUtilities.isItemPileAuctioneer(target, data);
-	}
-
-	/**
 	 * Whether an item pile is a banker. If it is not enabled, it is always false.
 	 *
 	 * @param {Token/TokenDocument} target
@@ -1113,6 +1095,23 @@ class API {
 			return false;
 		}
 		return PileUtilities.isItemPileBanker(target, data);
+	}
+
+	/**
+	 * Whether an item pile is a merchant. If it is not enabled, it is always false.
+	 *
+	 * @param {Token/TokenDocument} target
+	 * @param {Object/boolean} [data=false] data existing flags data to use
+	 * @return {boolean}
+	 */
+	static isItemPileAuctioneer(target, data = false) {
+		if (!game.modules.get("item_piles_auctioneer")?.active) {
+			let word = "install and activate";
+			if (game.modules.get('item_piles_auctioneer')) word = "activate";
+			Helpers.custom_warning(`This api method from Item Piles requires the 'item_piles_auctioneer' module. Please ${word} it.`, true);
+			return false;
+		}
+		return PileUtilities.isItemPileAuctioneer(target, data);
 	}
 
 	/**
@@ -1203,12 +1202,9 @@ class API {
 			throw Helpers.custom_error("SplitItemPileContents | instigator must be of type TokenDocument or Actor")
 		}
 
-		const actorUuids = (targets || SharingUtilities.getCharactersForItemPile(itemPileActor))
+		const actorUuids = (targets || SharingUtilities.getPlayersForItemPile(itemPileActor)
+			.map(u => u.character))
 			.map(actor => Utilities.getUuid(actor));
-
-		if (!actorUuids.length) {
-			throw Helpers.custom_error("SplitItemPileContents | Could not find any characters to split item piles' content with")
-		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SPLIT_PILE, itemPileUuid, actorUuids, game.user.id, instigator);
 
@@ -1984,6 +1980,7 @@ class API {
 			purchaseData: [{ cost: overallCost, quantity, secondaryPrices }],
 			buyer: targetActor
 		});
+
 	}
 
 	/**
@@ -2263,7 +2260,9 @@ class API {
 
 		if (items) {
 			for (const entry of items) {
-				entry.item = targetActor ? targetActor.items.get(entry.item._id) : new Item.implementation(entry.item);
+				entry.item = targetActor
+					? targetActor.items.get(entry.item._id)
+					: new Item.implementation(entry.item);
 			}
 		}
 
