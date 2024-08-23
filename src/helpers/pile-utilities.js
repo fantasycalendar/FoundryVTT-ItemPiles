@@ -1,7 +1,13 @@
 import CONSTANTS from "../constants/constants.js";
 import { SYSTEMS } from "../systems.js";
 import SETTINGS from "../constants/settings.js";
-import { cachedActorCurrencies, cachedCurrencyList, cachedFilterList, cachedRequiredPropertiesList } from "./caches.js";
+import {
+	cachedActorCurrencies,
+	cachedCurrenciesInItem,
+	cachedCurrencyList,
+	cachedFilterList,
+	cachedRequiredPropertiesList
+} from "./caches.js";
 import { hotkeyActionState } from "../hotkeys.js";
 import * as Utilities from "./utilities.js"
 import * as Helpers from "./helpers.js";
@@ -301,6 +307,60 @@ export function getActorCurrencies(target, {
 	return currencies;
 }
 
+export function getCurrenciesInItem(targetItem, {
+	forActor = false, currencyList = false, getAll = false, secondary = true
+} = {}) {
+
+	const itemDocument = Utilities.getDocument(targetItem);
+	const itemUuid = Utilities.getUuid(itemDocument);
+	const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, itemDocument.type);
+	const subItems = handler
+		? handler({ item: itemDocument })
+		: [];
+	const cached = cachedCurrenciesInItem.get(itemUuid)
+	currencyList = cached
+		? false
+		: currencyList || getCurrencyList(forActor || itemDocument.parent);
+
+	let currencies = cached || (currencyList.map((currency, index) => {
+		if (currency.type === "attribute" || !currency.type) {
+			const path = currency?.data?.path ?? currency?.path;
+			return {
+				...currency, quantity: 0, path: path, id: path, index
+			}
+		}
+		const itemData = CompendiumUtilities.getItemFromCache(currency.data.uuid) || currency.data.item || false;
+		if (!itemData) return false;
+		const item = Utilities.findSimilarItem(subItems, itemData);
+		// If the item exists on the actor, use the item's ID, so that we can match it against the actual item on the actor
+		currency.data.item = itemData;
+		currency.data.item._id = item?.id ?? itemData._id;
+		return {
+			...currency, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
+		}
+	})).filter(Boolean);
+
+	cachedCurrenciesInItem.set(itemUuid, currencies);
+
+	currencies = currencies.map(currency => {
+		currency.quantity = currency.type === "attribute"
+			? foundry.utils.getProperty(itemDocument, currency.path)
+			: Utilities.getItemQuantity(currency.item);
+		return currency;
+	});
+
+	if (!getAll) {
+		currencies = currencies.filter(currency => currency.quantity > 0);
+	}
+
+	if (!secondary) {
+		currencies = currencies.filter(currency => !currency.secondary);
+	}
+
+	return currencies;
+
+}
+
 export function getActorPrimaryCurrency(target) {
 	const actor = Utilities.getActor(target);
 	return getActorCurrencies(actor, { getAll: true }).find(currency => currency.primary);
@@ -490,7 +550,11 @@ export function getItemPileTokenImage(token, {
 
 	if (!isValidItemPile(pileDocument, itemPileData) || !isItemPileLootable(pileDocument, itemPileData)) return originalImg;
 
-	items = items || getActorItems(pileDocument);
+	items = (items || getActorItems(pileDocument)).filter(itemData => {
+		const method = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+		if (!method) return true;
+		return !method({ item: itemData });
+	});
 	currencies = currencies || getActorCurrencies(pileDocument);
 
 	const numItems = items.length + currencies.length;
@@ -543,7 +607,11 @@ export function getItemPileTokenScale(target, {
 		return baseScale;
 	}
 
-	items = items || getActorItems(pileDocument);
+	items = (items || getActorItems(pileDocument)).filter(itemData => {
+		const method = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+		if (!method) return true;
+		return !method({ item: itemData });
+	});
 	currencies = currencies || getActorCurrencies(pileDocument);
 
 	const numItems = items.length + currencies.length;
@@ -570,7 +638,11 @@ export function getItemPileName(target, { data = false, items = false, currencie
 		return name;
 	}
 
-	items = items || getActorItems(pileDocument);
+	items = (items || getActorItems(pileDocument)).filter(itemData => {
+		const method = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+		if (!method) return true;
+		return !method({ item: itemData });
+	});
 	currencies = currencies || getActorCurrencies(pileDocument);
 
 	const numItems = items.length + currencies.length;

@@ -67,7 +67,7 @@ export default class ItemPileSocket {
 		TRANSFER_ATTRIBUTES: "transferAttributes",
 		TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes",
 		TRANSFER_EVERYTHING: "transferEverything",
-		COMMIT_ACTOR_CHANGES: "commitActorChanges",
+		COMMIT_DOCUMENT_CHANGES: "commitActorChanges",
 		ROLL_ITEM_TABLE: "rollItemTable",
 		REFRESH_MERCHANT_INVENTORY: "refreshMerchantInventory",
 
@@ -120,7 +120,7 @@ export default class ItemPileSocket {
 		[this.HANDLERS.TRANSFER_ATTRIBUTES]: (...args) => PrivateAPI._transferAttributes(...args),
 		[this.HANDLERS.TRANSFER_ALL_ATTRIBUTES]: (...args) => PrivateAPI._transferAllAttributes(...args),
 		[this.HANDLERS.TRANSFER_EVERYTHING]: (...args) => PrivateAPI._transferEverything(...args),
-		[this.HANDLERS.COMMIT_ACTOR_CHANGES]: (...args) => PrivateAPI._commitActorChanges(...args),
+		[this.HANDLERS.COMMIT_DOCUMENT_CHANGES]: (...args) => PrivateAPI._commitDocumentChanges(...args),
 		[this.HANDLERS.ROLL_ITEM_TABLE]: (...args) => PrivateAPI._rollItemTable(...args),
 		[this.HANDLERS.REFRESH_MERCHANT_INVENTORY]: (...args) => PrivateAPI._refreshMerchantInventory(...args),
 

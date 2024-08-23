@@ -1,6 +1,7 @@
 import CONSTANTS from "../constants/constants.js";
 import * as Utilities from "./utilities.js"
 import * as PileUtilities from "./pile-utilities.js"
+import { SYSTEMS } from "../systems.js";
 
 export function getActivePlayers(onlyActive = false) {
 	return Array.from(game.users).filter(u => (u.active || !onlyActive) && u.character);
@@ -40,8 +41,11 @@ export function canItemPileBeSplit(target) {
 	const shareData = getItemPileSharingData(target);
 	const playerActors = getCharactersForItemPile(target);
 	if (!playerActors.length) return false;
-	const items = pileData.shareItemsEnabled ? PileUtilities.getActorItems(target) : [];
-	const currencies = pileData.shareCurrenciesEnabled || pileData.splitAllEnabled ? PileUtilities.getActorCurrencies(target) : [];
+	const pileItems = PileUtilities.getActorItems(target);
+	const items = pileData.shareItemsEnabled ? pileItems : [];
+	const currencies = pileData.shareCurrenciesEnabled || pileData.splitAllEnabled
+		? PileUtilities.getActorCurrencies(target, { secondary: false })
+		: [];
 	for (const item of items) {
 		if (playerActors.every(character => getItemSharesLeftForActor(target, item, character, {
 			shareData,
@@ -49,6 +53,22 @@ export function canItemPileBeSplit(target) {
 			players: playerActors.length
 		}))) {
 			return true;
+		}
+	}
+	if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+		for (const item of pileItems) {
+			if (!Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, item.type)) continue;
+			const itemCurrencies = PileUtilities.getCurrenciesInItem(item, { forActor: target, secondary: false });
+			for (const currency of itemCurrencies) {
+				if (playerActors.every(character => getAttributeSharesLeftForActor(target, currency.path, character, {
+					shareData,
+					floor: true,
+					players: playerActors.length,
+					source: item
+				}))) {
+					return true;
+				}
+			}
 		}
 	}
 	for (const currency of currencies) {
@@ -320,7 +340,7 @@ export function getItemSharesLeftForActor(pile, item, recipient, {
 }
 
 export function getAttributeSharesLeftForActor(pile, path, recipient, {
-	currentQuantity = null,
+	getAll = true,
 	floor = null,
 	players = null,
 	shareData = null
@@ -328,7 +348,15 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 
 	let previouslyTaken = 0;
 	let recipientUuid = Utilities.getUuid(recipient);
-	currentQuantity = currentQuantity ?? Number(foundry.utils.getProperty(pile, path) ?? 0);
+	let currentQuantity = Number(foundry.utils.getProperty(pile, path) ?? 0);
+
+	if (getAll && SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
+		const items = PileUtilities.getActorItems(pile);
+		for (const item of items) {
+			if (!Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, item.type)) continue;
+			currentQuantity += Number(foundry.utils.getProperty(item, path) ?? 0);
+		}
+	}
 	let totalShares = currentQuantity;
 
 	shareData = shareData ?? getItemPileSharingData(pile);

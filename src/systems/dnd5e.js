@@ -1,9 +1,10 @@
 import GiveItems from "../applications/dialogs/give-items-dialog/give-items-dialog.js";
 import PrivateAPI from "../API/private-api.js";
+import CONSTANTS from "../constants/constants.js";
 
 export default {
 
-	"VERSION": "1.0.7",
+	"VERSION": "1.0.8",
 
 	// The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
 	"ACTOR_CLASS_TYPE": "character",
@@ -35,6 +36,8 @@ export default {
 		}
 	],
 
+	"UNSTACKABLE_ITEM_TYPES": ["container"],
+
 	// This function is an optional system handler that specifically transforms an item when it is added to actors
 	"ITEM_TRANSFORMER": async (itemData) => {
 		["equipped", "proficient", "prepared", "attuned"].forEach(key => {
@@ -50,6 +53,25 @@ export default {
 			}
 		}
 		return itemData;
+	},
+
+	"ITEM_TYPE_HANDLERS": {
+		"GLOBAL": {
+			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED]: ({ item }) => {
+				return item.system.container;
+			}
+		},
+		"container": {
+			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
+			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
+				return item.system.contents.contents;
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
+				for (const containedItem of item.system.contents.contents) {
+					items.push(containedItem.toObject());
+				}
+			}
+		}
 	},
 
 	// This function is an optional system handler that specifically transforms an item's price into a more unified numeric format
@@ -130,7 +152,7 @@ export default {
 	},
 
 	// Item similarities determines how item piles detect similarities and differences in the system
-	"ITEM_SIMILARITIES": ["name", "type"],
+	"ITEM_SIMILARITIES": ["name", "type", "system.container"],
 
 	// Currencies in item piles is a versatile system that can accept actor attributes (a number field on the actor's sheet) or items (actual items in their inventory)
 	// In the case of attributes, the path is relative to the "actor.system"
