@@ -999,8 +999,7 @@ export function getCurrenciesAbbreviations() {
 				return currency.abbreviation || "";
 			}
 		});
-	let allAbbreviationsArray = primaryAbbreviationsArray.concat(secondaryAbbreviationsArray);
-	return allAbbreviationsArray;
+	return primaryAbbreviationsArray.concat(secondaryAbbreviationsArray);
 }
 
 export function getStringFromCurrencies(currencies) {
@@ -1126,6 +1125,64 @@ export function getCostOfItem(item, defaultCurrencies = false) {
 	return Math.max(0, overallCost);
 }
 
+function getItemFlagPriceData(priceData, quantity, modifier, defaultCurrencies, currencyList) {
+
+	return priceData.map(priceGroup => {
+		if (!Array.isArray(priceGroup)) priceGroup = [priceGroup];
+		const itemPrices = priceGroup.map(price => {
+			const itemModifier = price.fixed
+				? 1
+				: modifier;
+			const cost = Math.round(price.quantity * itemModifier * quantity);
+			let baseCost = Math.round(price.quantity * itemModifier);
+			price.name = game.i18n.localize(price.name);
+			if (!price.data?.item) {
+				price.data.item = CompendiumUtilities.getItemFromCache(price.data.uuid);
+			}
+
+			const isRegularCurrency = currencyList.find(currency => {
+				return currency.name === price.name && currency.img === price.img && (currency.data.uuid === price.data.uuid || currency.data.path === price.data.path)
+			});
+
+			const totalCost = isRegularCurrency ? price.quantity * isRegularCurrency.exchangeRate : 0;
+
+			return {
+				...price,
+				cost,
+				baseCost: baseCost * (isRegularCurrency ? isRegularCurrency.exchangeRate : 1.0),
+				totalCost,
+				modifier: itemModifier,
+				priceString: cost
+					? price.abbreviation.replace("{#}", cost)
+					: "",
+				basePriceString: baseCost
+					? price.abbreviation.replace("{#}", baseCost)
+					: "",
+				secondary: !isRegularCurrency
+			};
+		});
+
+		const primaryPrices = itemPrices.filter(price => !price.secondary);
+		const secondaryPrices = itemPrices.filter(price => price.secondary);
+		const totalCost = primaryPrices.reduce((acc, price) => price.totalCost + acc, 0) * quantity;
+		const baseCost = primaryPrices.reduce((acc, price) => price.baseCost + acc, 0) * quantity;
+		const primaryCurrencyPrices = getPriceArray(totalCost, defaultCurrencies);
+
+		const prices = primaryCurrencyPrices.filter(price => price.cost).concat(secondaryPrices);
+
+		return {
+			prices,
+			baseCost,
+			totalCost,
+			priceString: prices.filter(price => price.string || price.priceString).map(price => price.string || price.priceString).join(" "),
+			basePriceString: prices.filter(price => price.string || price.basePriceString).map(price => price.string || price.basePriceString).join(" "),
+			maxQuantity: 0,
+			quantity: quantity,
+		}
+	});
+
+}
+
 export function getPriceData({
 	cost = false,
 	item = false,
@@ -1195,7 +1252,7 @@ export function getPriceData({
 	}
 
 	const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
-	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0;
+	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0 || itemFlagData.sellPrices.filter(priceGroup => priceGroup.length).length > 0;
 
 	const currencyList = getCurrencyList(merchant);
 	const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
@@ -1225,7 +1282,7 @@ export function getPriceData({
 	}
 
 	// If the item does include its normal cost, we calculate that here
-	if (overallCost >= smallestExchangeRate && (!itemFlagData.disableNormalCost || (merchant === buyer && buyerFlagData.onlyAcceptBasePrice))) {
+	if (overallCost >= smallestExchangeRate && !disableNormalCost) {
 
 		// Base prices is the displayed price, without quantity taken into account
 		const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
@@ -1277,7 +1334,7 @@ export function getPriceData({
 			const cost = Math.round(secondaryPrice.quantity * itemModifier * quantity);
 			const baseCost = Math.round(secondaryPrice.quantity * itemModifier);
 			secondaryPrice.name = game.i18n.localize(secondaryPrice.name);
-			if (!secondaryPrice.data?.item) {
+			if (!secondaryPrice.data?.item && secondaryPrice.data.uuid) {
 				secondaryPrice.data.item = CompendiumUtilities.getItemFromCache(secondaryPrice.data.uuid);
 			}
 			priceData[0].basePrices.push({
@@ -1314,44 +1371,12 @@ export function getPriceData({
 
 	}
 
-	// If the item has custom prices, we include them here
-	if (itemFlagData.prices.length && !(merchant === buyer && buyerFlagData.onlyAcceptBasePrice)) {
+	if (itemFlagData.prices.length && ((merchant === seller && !sellerFlagData.onlyAcceptBasePrice) || (merchant === buyer && itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice))) {
+		priceData = priceData.concat(getItemFlagPriceData(itemFlagData.prices, quantity, modifier, defaultCurrencies, currencyList));
+	}
 
-		priceData = priceData.concat(itemFlagData.prices.map(priceGroup => {
-			if (!Array.isArray(priceGroup)) priceGroup = [priceGroup];
-			const prices = priceGroup.map(price => {
-				const itemModifier = price.fixed
-					? 1
-					: modifier;
-				const cost = Math.round(price.quantity * itemModifier * quantity);
-				const baseCost = Math.round(price.quantity * itemModifier);
-				price.name = game.i18n.localize(price.name);
-				if (!price.data?.item) {
-					price.data.item = CompendiumUtilities.getItemFromCache(price.data.uuid);
-				}
-				return {
-					...price,
-					cost,
-					baseCost,
-					modifier: itemModifier,
-					priceString: cost
-						? price.abbreviation.replace("{#}", cost)
-						: "",
-					basePriceString: baseCost
-						? price.abbreviation.replace("{#}", baseCost)
-						: "",
-					secondary: true
-				};
-			});
-
-			return {
-				prices,
-				priceString: prices.filter(price => price.priceString).map(price => price.priceString).join(" "),
-				basePriceString: prices.filter(price => price.basePriceString).map(price => price.basePriceString).join(" "),
-				maxQuantity: 0,
-				quantity: quantity
-			}
-		}));
+	if (itemFlagData.sellPrices.length && merchant === buyer && !buyerFlagData.onlyAcceptBasePrice) {
+		priceData = priceData.concat(getItemFlagPriceData(itemFlagData.sellPrices, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
 	// If there's a buyer, we also calculate how many of the item the buyer can afford

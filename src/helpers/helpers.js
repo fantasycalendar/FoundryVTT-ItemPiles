@@ -97,18 +97,18 @@ export function custom_notify(message) {
 	console.log(message.replace("<br>", "\n"));
 }
 
-export function custom_warning(warning, notify = false) {
+export function custom_warning(warning, notify = false, permanent = false) {
 	warning = `Item Piles | ${warning}`;
 	if (notify) {
-		ui.notifications.warn(warning, { console: false });
+		ui.notifications.warn(warning, { console: false, permanent });
 	}
 	console.warn(warning.replace("<br>", "\n"));
 }
 
-export function custom_error(error, notify = true) {
+export function custom_error(error, notify = true, permanent = false) {
 	error = `Item Piles | ${error}`;
 	if (notify) {
-		ui.notifications.error(error, { console: false });
+		ui.notifications.error(error, { console: false, permanent });
 	}
 	return new Error(error.replace("<br>", "\n"));
 }
@@ -136,6 +136,12 @@ export function isResponsibleGM() {
 		return false;
 	}
 	return !getActiveGMs().some(other => other.id < game.user.id);
+}
+
+export function getResponsibleGM() {
+	const activeGMs = getActiveGMs();
+	if (!activeGMs.length) return false;
+	return activeGMs.sort((a, b) => b.id > a.id)?.[0];
 }
 
 export function isGMConnected() {

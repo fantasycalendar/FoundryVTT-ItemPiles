@@ -5,6 +5,11 @@
 - Added support for "container" type items in D&D5e - this is a custom implementation, so other systems' containers will not work out of the box
   - Splitting currencies in item piles takes into account across all currencies across containers in the pile
   - Added tree-like display for items in containers
+- Added support for currency exchange in custom item purchase prices
+  - If you have configured an item that costs 1 gold piece and 1 magical rock, and you only have 1 platinum piece and 1 magical rock, you now get 9 gold pieces back as change, whereas before you needed exactly 1 gold piece and 1 magical rock.
+- Added option for a custom sell price on items
+- Added detection for when the GM is unresponsive for item piles to make changes for players
+- Fixed localization issue with `ITEM-PILES.Trade`, now moved to `ITEM-PILES.PlayerList.TradeButton`
 
 ## Version 3.0.11
 

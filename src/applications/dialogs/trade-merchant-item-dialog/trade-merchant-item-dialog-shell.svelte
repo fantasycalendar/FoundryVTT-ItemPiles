@@ -58,7 +58,10 @@
 	$: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxSellerItemQuantity);
 	$: itemName = localize($itemNameStore) + ($itemQuantityForPriceStore > 1 ? ` (${$itemQuantityForPriceStore})` : "");
 
+	let submitted = false;
 	async function submit() {
+		if(submitted) return;
+		submitted = true;
 		const result = await game.itempiles.API.tradeItems(seller, buyer, [{
 			item: item.item,
 			paymentIndex: get(selectedPriceGroup),
@@ -66,7 +69,10 @@
 		}], {
 			interactionId: store.interactionId
 		});
-		if(!result) return;
+		if(!result){
+			submitted = false;
+			return;
+		}
 		application.options.resolve();
 		application.close();
 	}
@@ -171,7 +177,7 @@
 		</div>
 
 		<footer class="sheet-footer item-piles-flexrow">
-			<button disabled={!paymentData.canBuy} on:click|once={ () => { submit() } } type="button">
+			<button disabled={!paymentData.canBuy} on:click={ () => { submit() } } type="button">
 				{#if settings.selling}
 					<i class="fas fa-hand-holding-usd"></i> {localize("ITEM-PILES.Applications.TradeMerchantItem.SellItem")}
 				{:else}

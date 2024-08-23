@@ -234,7 +234,7 @@
 						        on:change={() => { addPreset(selectedPreset); selectedPreset = ""; }}>
 							<option value="">{localize("ITEM-PILES.Applications.ItemEditor.SelectPreset")}</option>
 							{#each presetPrices as price, index (index)}
-								<option value={index}>{price.name}</option>
+								<option value={index}>{localize(price.name)}</option>
 							{/each}
 						</select>
 					</div>

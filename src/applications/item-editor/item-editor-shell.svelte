@@ -48,13 +48,6 @@
 		form.requestSubmit();
 	}
 
-	function addGroup() {
-		itemFlagData.prices = [
-			...itemFlagData.prices,
-			[]
-		]
-	}
-
 	let activeTab = "general";
 
 </script>
@@ -68,7 +61,7 @@
 		<Tabs bind:activeTab tabs={[
     { value: "general", label: localize("ITEM-PILES.Applications.ItemEditor.General") },
     { value: "price", label: localize("ITEM-PILES.Applications.ItemEditor.Price") },
-    { value: "vault", label: localize("ITEM-PILES.Applications.ItemEditor.Vault") },
+    { value: "vault", label: localize("ITEM-PILES.Applications.ItemEditor.Vault") }
   ]}/>
 
 		<section class="item-piles-tab-body">
@@ -270,11 +263,19 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsAsSellOption")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsAsSellOptionExplanation")}</p>
+						</label>
+						<input type="checkbox" bind:checked={itemFlagData.purchaseOptionsAsSellOption}/>
+					</div>
+
+					<div class="form-group">
+						<label style="flex:4;">
 							{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptions")}<br>
 							<p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsExplanation")}</p>
 						</label>
 
-						<button type="button" on:click={() => { addGroup() }}>
+						<button type="button" on:click={() => { store.addPurchaseGroup() }}>
 							<i class="fas fa-plus"></i>
 							{localize("ITEM-PILES.Applications.ItemEditor.AddPurchaseOption")}
 						</button>
@@ -282,10 +283,27 @@
 
 					{#if itemFlagData.prices.length}
 						{#each itemFlagData.prices as prices, groupIndex (groupIndex)}
-							<PriceList {item} bind:prices={prices} remove={() => { store.removeGroup(groupIndex) }}/>
+							<PriceList {item} bind:prices={prices} remove={() => { store.removePurchaseGroup(groupIndex) }}/>
 						{/each}
 					{/if}
 
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.SellOptions")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.SellOptionsExplanation")}</p>
+						</label>
+
+						<button type="button" on:click={() => { store.addSellGroup() }}>
+							<i class="fas fa-plus"></i>
+							{localize("ITEM-PILES.Applications.ItemEditor.AddSellOption")}
+						</button>
+					</div>
+
+					{#if itemFlagData.sellPrices.length}
+						{#each itemFlagData.sellPrices as prices, groupIndex (groupIndex)}
+							<PriceList {item} bind:prices={prices} remove={() => { store.removeSellGroup(groupIndex) }}/>
+						{/each}
+					{/if}
 
 				{/if}
 

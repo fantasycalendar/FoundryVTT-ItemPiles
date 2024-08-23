@@ -26,7 +26,7 @@ export default class ItemEditor extends SvelteApplication {
 		return foundry.utils.mergeObject(super.defaultOptions, {
 			width: 500,
 			height: "auto",
-			classes: ["item-piles-app"]
+			classes: ["item-piles-app", "item-piles-item-app"]
 		})
 	}
 

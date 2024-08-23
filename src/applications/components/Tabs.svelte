@@ -6,6 +6,13 @@
 	export let underscore = false;
 	export let separateElements = false;
 
+	function clicked(tab) {
+		activeTab = tab.value;
+		if (tab.callback) {
+			tab.callback(tab);
+		}
+	}
+
 </script>
 
 <nav class="tabs" data-group="primary" style={$$props.style}>
@@ -13,7 +20,7 @@
 		{#if separateElements && index > 0}
 			<div style="border-right: 1px solid rgba(0,0,0,0.5); margin: 0 10px;"></div>
 		{/if}
-		<div on:click={() => { activeTab = tab.value}}
+		<div on:click={() => { clicked(tab) }}
 		     class="item item-piles-flexrow item-piles-clickable-link"
 		     class:underscore={underscore}
 		     class:active={activeTab === tab.value}

@@ -164,13 +164,13 @@ export default class ItemPileSocket {
 
 	}
 
-	static _socket;
+	static socket;
 
 	static initialize() {
 		InterfaceTracker.initialize();
-		this._socket = socketlib.registerModule(CONSTANTS.MODULE_NAME);
+		this.socket = socketlib.registerModule(CONSTANTS.MODULE_NAME);
 		for (let [key, callback] of Object.entries(this.BINDINGS)) {
-			this._socket.register(key, callback);
+			this.socket.register(key, callback);
 			debug(`Registered itemPileSocket: ${key}`);
 		}
 		debug("Registered all Item Piles sockets")
@@ -182,44 +182,82 @@ export default class ItemPileSocket {
 			Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.NoGMsConnectedAction", { action: handler }), true);
 			return false;
 		}
-		return this._socket.executeAsGM(handler, ...args);
+		return Requests.timedSocketRequest(handler, async () => this.socket.executeAsGM(handler, ...args));
 	}
 
 	static executeAsUser(handler, userId, ...args) {
-		return this._socket.executeAsUser(handler, userId, ...args);
+		return this.socket.executeAsUser(handler, userId, ...args);
 	}
 
 	static executeForAllGMs(handler, ...args) {
-		return this._socket.executeForAllGMs(handler, ...args);
+		return this.socket.executeForAllGMs(handler, ...args);
 	}
 
 	static executeForOtherGMs(handler, ...args) {
-		return this._socket.executeForOtherGMs(handler, ...args);
+		return this.socket.executeForOtherGMs(handler, ...args);
 	}
 
 	static executeForEveryone(handler, ...args) {
-		return this._socket.executeForEveryone(handler, ...args);
+		return this.socket.executeForEveryone(handler, ...args);
 	}
 
 	static executeForOthers(handler, ...args) {
-		return this._socket.executeForOthers(handler, ...args);
+		return this.socket.executeForOthers(handler, ...args);
 	}
 
 	static executeForUsers(handler, userIds, ...args) {
-		return this._socket.executeForUsers(handler, userIds, ...args);
+		return this.socket.executeForUsers(handler, userIds, ...args);
 	}
 
 	static callHook(hook, ...args) {
 		if (!Helpers.hooks.run) return;
-		return this._socket.executeForEveryone(this.HANDLERS.CALL_HOOK, hook, ...args);
+		return this.socket.executeForEveryone(this.HANDLERS.CALL_HOOK, hook, ...args);
 	}
 
 	static callHookForUsers(hook, users, ...args) {
 		if (!Helpers.hooks.run) return;
-		return this._socket.executeForUsers(this.HANDLERS.CALL_HOOK, users, hook, ...args);
+		return this.socket.executeForUsers(this.HANDLERS.CALL_HOOK, users, hook, ...args);
 	}
 
 }
+
+const Requests = {
+	_unresponsiveGM: false,
+	_lastGmUnresponsiveTimestamp: false,
+	_timers: {},
+	_defaultTimeout: 2000,
+	_unresponsiveTimeout: 10000,
+	async timedSocketRequest(handler, method) {
+		if (Requests._unresponsiveGM && Number(Date.now()) < Requests._lastGmUnresponsiveTimestamp) {
+			Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.NoResponseFromGMTimeout", {
+				user_name: Requests._unresponsiveGM,
+				time: Math.ceil((Requests._lastGmUnresponsiveTimestamp - Number(Date.now())) / 1000)
+			}), true);
+			return false;
+		}
+		Requests._addTimeout(handler);
+		const result = await method();
+		Requests._clearPendingTimeout(handler);
+		Requests._unresponsiveGM = false;
+		Requests._lastGmUnresponsiveTimestamp = false;
+		return result;
+	},
+	_addTimeout(handler) {
+		Requests._timers[handler] = setTimeout(() => {
+			const activeGM = Helpers.getResponsibleGM();
+			Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.NoResponseFromGM", {
+				user_name: activeGM.name
+			}), true, true);
+			Requests._unresponsiveGM = activeGM.name;
+			Requests._lastGmUnresponsiveTimestamp = Number(Date.now()) + Requests._unresponsiveTimeout;
+			Requests._clearPendingTimeout(handler);
+		}, Requests._defaultTimeout);
+	},
+	_clearPendingTimeout(handler) {
+		clearTimeout(Requests._timers[handler]);
+		delete Requests._timers[handler];
+	}
+};
 
 async function callHook(hook, ...args) {
 	const newArgs = [];

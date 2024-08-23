@@ -57,14 +57,20 @@ const CONSTANTS = {
 		free: false,
 		keepZeroQuantity: false,
 		disableNormalCost: false,
+		purchaseOptionsAsSellOption: false,
 		cantBeSoldToMerchants: false,
 		isService: false,
 		keepOnMerchant: false,
 		macro: "",
 		customCategory: "",
 		prices: [],
+		sellPrices: [],
 		buyPriceModifier: 1,
 		sellPriceModifier: 1,
+
+		// Crafting
+		craftingComponents: [],
+		breakdownComponents: [],
 
 		// Vaults
 		vaultExpander: false,
