@@ -34,6 +34,7 @@ export default class PrivateAPI {
 		Helpers.hooks.on("deleteActor", this._onDeleteActor.bind(this));
 		Helpers.hooks.on("preCreateToken", this._onPreCreateToken.bind(this))
 		Helpers.hooks.on("preUpdateToken", this._onPreUpdateToken.bind(this));
+		Helpers.hooks.on("updateToken", this._onUpdateToken.bind(this));
 		Helpers.hooks.on("createToken", this._onCreateToken.bind(this))
 		Helpers.hooks.on("dropCanvasData", this._dropData.bind(this));
 	}
@@ -52,9 +53,9 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static _onCreateItem(doc) {
-		if (!doc.parent) return;
+		if (!doc.parent) return true;
 		ItemPileStore.notifyChanges("createItem", doc.parent, doc);
-		if (!PileUtilities.isValidItemPile(doc.parent)) return;
+		if (!PileUtilities.isValidItemPile(doc.parent)) return true;
 		this._evaluateItemPileChange(doc.parent, {}, true);
 	}
 
@@ -62,8 +63,8 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static _onUpdateItem(doc) {
-		if (!doc.parent) return;
-		if (!PileUtilities.isValidItemPile(doc.parent)) return;
+		if (!doc.parent) return true;
+		if (!PileUtilities.isValidItemPile(doc.parent)) return true;
 		this._evaluateItemPileChange(doc.parent, {}, true);
 	}
 
@@ -71,9 +72,9 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static _onDeleteItem(doc) {
-		if (!doc.parent) return;
+		if (!doc.parent) return true;
 		ItemPileStore.notifyChanges("deleteItem", doc.parent, doc);
-		if (!PileUtilities.isValidItemPile(doc.parent)) return;
+		if (!PileUtilities.isValidItemPile(doc.parent)) return true;
 		this._evaluateItemPileChange(doc.parent, {}, true);
 	}
 
@@ -81,7 +82,7 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static _onUpdateActor(doc, changes) {
-		if (!PileUtilities.isValidItemPile(doc)) return;
+		if (!PileUtilities.isValidItemPile(doc)) return true;
 		this._evaluateItemPileChange(doc, changes);
 	}
 
@@ -90,7 +91,7 @@ export default class PrivateAPI {
 	 */
 	static _onDeleteToken(doc) {
 		ItemPileStore.notifyChanges("delete", doc.actor)
-		if (!PileUtilities.isValidItemPile(doc)) return;
+		if (!PileUtilities.isValidItemPile(doc)) return true;
 		Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.DELETE, doc);
 	}
 
@@ -117,7 +118,7 @@ export default class PrivateAPI {
 				foundry.utils.deepClone(foundry.utils.getProperty(sourceActor, CONSTANTS.FLAGS.PILE) ?? {})
 			);
 		}
-		if (!itemPileConfig?.enabled) return;
+		if (!itemPileConfig?.enabled) return true;
 		if (!doc.isLinked) {
 			Utilities.deleteProperty(docData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.SHARING);
 		}
@@ -162,18 +163,28 @@ export default class PrivateAPI {
 
 	static _onPreUpdateToken(doc, changes) {
 		const diff = foundry.utils.diffObject(doc, changes);
-		if (!foundry.utils.hasProperty(diff, "actorLink")) return;
-		if (!PileUtilities.isValidItemPile(doc)) return;
-		const flagData = PileUtilities.getActorFlagData(doc);
-		const cleanFlagData = PileUtilities.cleanFlagData(flagData);
-		changes[CONSTANTS.FLAGS.PILE] = diff.actorLink ? cleanFlagData : null;
+		if (!foundry.utils.hasProperty(diff, "actorLink")) return true;
+		if (!PileUtilities.isValidItemPile(doc)) return true;
+		const actor = Utilities.getActor(doc);
+		const changingFlags = foundry.utils.getProperty(changes, CONSTANTS.FLAGS.PILE) ?? {};
+		const flagData = foundry.utils.mergeObject(
+			PileUtilities.getActorFlagData(actor),
+			changingFlags
+		);
+		changes[CONSTANTS.FLAGS.PILE] = PileUtilities.cleanFlagData(flagData);
+	}
+
+	static _onUpdateToken(doc) {
+		if (doc.actorLink) return true;
+		if (!PileUtilities.isValidItemPile(doc)) return true;
+		ItemPileStore.notifyChanges("updateUnlinkedToken", doc.actor)
 	}
 
 	/**
 	 * @private
 	 */
 	static _onCreateToken(doc) {
-		if (!PileUtilities.isValidItemPile(doc)) return;
+		if (!PileUtilities.isValidItemPile(doc)) return true;
 		const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
 		Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CREATE, doc, itemPileConfig);
 		return this._preloadItemPileFiles(doc);

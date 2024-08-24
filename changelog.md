@@ -10,6 +10,7 @@
 - Added option for a custom sell price on items
 - Added detection for when the GM is unresponsive for item piles to make changes for players
 - Fixed localization issue with `ITEM-PILES.Trade`, now moved to `ITEM-PILES.PlayerList.TradeButton`
+- Fixed item piles interfaces of unlinked tokens not reacting to some changes to their flags
 
 ## Version 3.0.11
 

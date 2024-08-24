@@ -250,6 +250,12 @@ export default class ItemPileStore {
 
 	}
 
+	updateUnlinkedToken() {
+		this.pileData.set(PileUtilities.getActorFlagData(this.actor));
+		this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
+		this.refreshItems();
+	}
+
 	updateSource(newSource) {
 		this.uuid = Utilities.getUuid(newSource);
 		this.actor = Utilities.getActor(newSource);

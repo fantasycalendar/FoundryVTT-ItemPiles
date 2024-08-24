@@ -682,33 +682,6 @@ export function shouldEvaluateChange(target, changes) {
 		|| flags.displayOne || flags.showItemName || flags.overrideSingleItemScale;
 }
 
-function getRelevantTokensAndActor(target) {
-
-	const relevantDocument = Utilities.getDocument(target);
-
-	let documentActor;
-	let documentTokens = [];
-
-	if (relevantDocument instanceof Actor) {
-		documentActor = relevantDocument;
-		if (relevantDocument.token) {
-			documentTokens.push(relevantDocument?.token);
-		} else {
-			documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
-		}
-	} else {
-		documentActor = relevantDocument.actor;
-		if (relevantDocument.isLinked) {
-			documentTokens = canvas.tokens.placeables.filter(token => token.document.actor === documentActor).map(token => token.document);
-		} else {
-			documentTokens.push(relevantDocument);
-		}
-	}
-
-	return [documentActor, documentTokens]
-
-}
-
 export async function updateItemPileData(target, newFlags, tokenData) {
 
 	if (!target) return;
@@ -717,7 +690,8 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 	if (!tokenData) tokenData = {};
 	tokenData = foundry.utils.mergeObject(tokenData, {});
 
-	let [documentActor, documentTokens] = getRelevantTokensAndActor(target);
+	let documentActor = Utilities.getActor(target);
+	const documentTokens = documentActor.getActiveTokens();
 
 	const items = getActorItems(documentActor, { itemFilters: flagData.overrideItemFilters });
 	const actorCurrencies = (flagData.overrideCurrencies || []).concat(flagData.overrideSecondaryCurrencies || []);
@@ -727,9 +701,13 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 
 	const currentFlagData = getActorFlagData(target, { useDefaults: false });
 
-	const cleanedFlagData = cleanFlagData(flagData, { addRemoveFlag: true, existingData: currentFlagData });
+	const cleanedFlagData = cleanFlagData(flagData, {
+		addRemoveFlag: true,
+		existingData: currentFlagData
+	});
 
-	const updates = documentTokens.map(tokenDocument => {
+	const sceneUpdates = documentTokens.reduce((acc, token) => {
+		const tokenDocument = token.document;
 		const overrideImage = foundry.utils.getProperty(tokenData, "texture.src")
 			?? foundry.utils.getProperty(tokenData, "img");
 		const overrideScale = foundry.utils.getProperty(tokenData, "texture.scaleX")
@@ -748,12 +726,23 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
 			...newTokenData
 		};
-		if (!tokenDocument.actorLink) documentActor = false;
-		return foundry.utils.mergeObject({}, data);
-	});
+		if (!tokenDocument.actorLink) {
+			data[CONSTANTS.ACTOR_DELTA_PROPERTY] = {
+				[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
+				[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+			}
+		}
+		acc[tokenDocument.parent.id] ??= [];
+		acc[tokenDocument.parent.id].push(foundry.utils.mergeObject({}, data));
+		return acc;
+	}, {});
 
-	if (canvas.scene && !foundry.utils.isEmpty(updates)) {
-		await canvas.scene.updateEmbeddedDocuments("Token", updates, { animate: false });
+	if (!foundry.utils.isEmpty(sceneUpdates)) {
+		for (const [sceneId, updates] of Object.entries(sceneUpdates)) {
+			const scene = game.scenes.get(sceneId);
+			if (!scene) continue
+			await scene.updateEmbeddedDocuments("Token", updates, { animate: false });
+		}
 	}
 
 	if (documentActor) {
