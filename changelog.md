@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.1.1
+
+- Fixed localization issues in the item editor application
+
 ## Version 3.1.0
 
 - Added support for "container" type items in D&D5e - this is a custom implementation, so other systems' containers will not work out of the box

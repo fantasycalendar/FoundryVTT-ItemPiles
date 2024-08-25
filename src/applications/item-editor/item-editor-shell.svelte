@@ -72,8 +72,8 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.CustomCategory")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.CustomCategoryExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.CustomCategory")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.CustomCategoryExplanation")}</p>
 						</label>
 						<div style="flex: 4;">
 							<CustomCategoryInput bind:value={itemFlagData.customCategory} placeholder={item.type}/>
@@ -82,110 +82,110 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.Hidden")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.HiddenExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.Hidden")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.HiddenExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.hidden}/>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.CanStack")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.CanStackExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.CanStack")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.CanStackExplanation")}</p>
 						</label>
 						<select style="flex: 0 1 auto;" bind:value={itemFlagData.canStack}>
 							<option value="default">
-								{localize("ITEM-PILES.Applications.ItemEditor.CanStackDefault")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.CanStackDefault")}
 							</option>
 							<option value="yes">
-								{localize("ITEM-PILES.Applications.ItemEditor.CanStackYes")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.CanStackYes")}
 							</option>
 							<option value="no">
-								{localize("ITEM-PILES.Applications.ItemEditor.CanStackNo")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.CanStackNo")}
 							</option>
 						</select>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.NotForSale")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.NotForSaleExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.NotForSale")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.NotForSaleExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.notForSale}/>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.CantBeSoldToMerchants")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.CantBeSoldToMerchantsExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.CantBeSoldToMerchants")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.CantBeSoldToMerchantsExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.cantBeSoldToMerchants}/>
 					</div>
 
 					<div class="form-group">
 						<label>
-							{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantity")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.InfiniteQuantity")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.InfiniteQuantityExplanation")}</p>
 						</label>
 						<select style="flex: 0 1 auto;" bind:value={itemFlagData.infiniteQuantity}>
 							<option value="default">
-								{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityDefault")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.InfiniteQuantityDefault")}
 							</option>
 							<option value="yes">
-								{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityYes")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.InfiniteQuantityYes")}
 							</option>
 							<option value="no">
-								{localize("ITEM-PILES.Applications.ItemEditor.InfiniteQuantityNo")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.InfiniteQuantityNo")}
 							</option>
 						</select>
 					</div>
 
 					<div class="form-group">
 						<label>
-							<span>{localize("ITEM-PILES.Applications.ItemEditor.KeepZero")}</span>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.KeepZeroExplanation")}</p>
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.KeepZero")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.KeepZeroExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.keepZeroQuantity}/>
 					</div>
 
 					<div class="form-group">
 						<label>
-							<span>{localize("ITEM-PILES.Applications.ItemEditor.KeepOnMerchant")}</span>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.KeepOnMerchantExplanation")}</p>
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.KeepOnMerchant")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.KeepOnMerchantExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.keepOnMerchant}/>
 					</div>
 
 					<div class="form-group">
 						<label>
-							{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantity")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.DisplayQuantity")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.DisplayQuantityExplanation")}</p>
 						</label>
 						<select style="flex: 0 1 auto;" bind:value={itemFlagData.displayQuantity}>
 							<option value="default">
-								{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityDefault")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.DisplayQuantityDefault")}
 							</option>
 							<option value="yes">
-								{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityYes")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.DisplayQuantityYes")}
 							</option>
 							<option value="no">
-								{localize("ITEM-PILES.Applications.ItemEditor.DisplayQuantityNo")}
+								{localize("ITEM-PILES.Applications.ItemEditor.GeneralTab.DisplayQuantityNo")}
 							</option>
 						</select>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.Service")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.ServiceExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.Service")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.ServiceExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.isService}/>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">
-							<span>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseMacro")}</span>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseMacroExplanation")}</p>
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.PurchaseMacro")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.PurchaseMacroExplanation")}</p>
 						</label>
 					</div>
 					<div class="form-group">
@@ -200,8 +200,8 @@
 						{#if game.system.id !== "wfrp4e"}
 							<div class="form-group">
 								<label style="flex:4;">
-									{localize("ITEM-PILES.Applications.ItemEditor.BasePrice")}<br>
-									<p>{localize("ITEM-PILES.Applications.ItemEditor.BasePriceExplanation")}</p>
+									{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.BasePrice")}<br>
+									<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.BasePriceExplanation")}</p>
 								</label>
 								<input type="text" bind:value={$price} on:change={() => {
                 const forceNumber = game.system.id === "dnd5e";
@@ -216,8 +216,8 @@
 
 						<div class="form-group">
 							<label style="flex:4;">
-								{localize("ITEM-PILES.Applications.ItemEditor.QuantityForPrice")}<br>
-								<p>{localize("ITEM-PILES.Applications.ItemEditor.QuantityForPriceExplanation")}</p>
+								{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.QuantityForPrice")}<br>
+								<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.QuantityForPriceExplanation")}</p>
 							</label>
 							<input type="number" bind:value={$quantityForPrice}/>
 						</div>
@@ -225,8 +225,8 @@
 
 					<div class="form-group slider-group">
 						<label style="flex:3;">
-							<span>{localize("ITEM-PILES.Applications.ItemEditor.PriceModifierTitle")}</span>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceModifierExplanation")}</p>
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.PriceModifierTitle")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.PriceModifierExplanation")}</p>
 						</label>
 					</div>
 
@@ -247,37 +247,37 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.Free")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.FreeExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.Free")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.FreeExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.free}/>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.DisableNormalCost")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.DisableNormalCostExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.DisableNormalCost")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.DisableNormalCostExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.disableNormalCost}/>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsAsSellOption")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsAsSellOptionExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.PurchaseOptionsAsSellOption")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.PurchaseOptionsAsSellOptionExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.purchaseOptionsAsSellOption}/>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptions")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.PurchaseOptionsExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.PurchaseOptions")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.PurchaseOptionsExplanation")}</p>
 						</label>
 
 						<button type="button" on:click={() => { store.addPurchaseGroup() }}>
 							<i class="fas fa-plus"></i>
-							{localize("ITEM-PILES.Applications.ItemEditor.AddPurchaseOption")}
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.AddPurchaseOption")}
 						</button>
 					</div>
 
@@ -289,13 +289,13 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.SellOptions")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.SellOptionsExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.SellOptions")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.SellOptionsExplanation")}</p>
 						</label>
 
 						<button type="button" on:click={() => { store.addSellGroup() }}>
 							<i class="fas fa-plus"></i>
-							{localize("ITEM-PILES.Applications.ItemEditor.AddSellOption")}
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.AddSellOption")}
 						</button>
 					</div>
 
@@ -311,13 +311,13 @@
 
 					<div class="form-group">
 						<label style="flex:6;">
-							{localize("ITEM-PILES.Applications.ItemEditor.GridSize")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.GridSizeExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.GridSize")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.GridSizeExplanation")}</p>
 						</label>
 						<div class="item-piles-grid-columns" style="flex: 3;">
 							<div style="text-align: center; font-size: 0.7rem;">
-								<i>{localize("ITEM-PILES.Applications.ItemEditor.GridWidth")}</i>
-								<i>{localize("ITEM-PILES.Applications.ItemEditor.GridHeight")}</i>
+								<i>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.GridWidth")}</i>
+								<i>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.GridHeight")}</i>
 							</div>
 							<div style="align-items: center;">
 								<input style="text-align: right;" type="number" placeholder="Enter a number..."
@@ -330,8 +330,8 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.VaultImage")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultImageExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.VaultImage")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.VaultImageExplanation")}</p>
 						</label>
 						<div class="form-fields">
 							<FilePicker bind:value={itemFlagData.vaultImage} placeholder="path/image.png" type="imagevideo"/>
@@ -340,8 +340,8 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.VaultImageRotated")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultImageRotatedExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.VaultImageRotated")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.VaultImageRotatedExplanation")}</p>
 						</label>
 						<div class="form-fields">
 							<FilePicker bind:value={itemFlagData.vaultImageFlipped} placeholder="path/image.png" type="imagevideo"/>
@@ -350,16 +350,16 @@
 
 					<div class="form-group">
 						<label style="flex:4;">
-							{localize("ITEM-PILES.Applications.ItemEditor.VaultExpander")}<br>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultExpanderExplanation")}</p>
+							{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.VaultExpander")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.VaultExpanderExplanation")}</p>
 						</label>
 						<input type="checkbox" bind:checked={itemFlagData.vaultExpander}/>
 					</div>
 
 					<div class="form-group">
 						<label style="flex:6;">
-							<span>{localize("ITEM-PILES.Applications.ItemEditor.ExpandColumnsRows")}</span>
-							<p>{localize("ITEM-PILES.Applications.ItemEditor.ExpandColumnsRowsExplanation")}</p>
+							<span>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.ExpandColumnsRows")}</span>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.VaultTab.ExpandColumnsRowsExplanation")}</p>
 						</label>
 						<div class="item-piles-grid-columns" style="flex: 3;">
 							<div style="text-align: center; font-size: 0.7rem;">
