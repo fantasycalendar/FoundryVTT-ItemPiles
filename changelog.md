@@ -2,6 +2,7 @@
 
 ## Version 3.1.1
 
+- Updated Portuguese (Brazil) localization (thank you Kharmans on github!)
 - Fixed localization issues in the item editor application
 
 ## Version 3.1.0
