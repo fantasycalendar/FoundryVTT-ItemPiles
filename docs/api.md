@@ -68,6 +68,7 @@
   * [transferAttributes](#transferAttributes)
   * [transferAllAttributes](#transferAllAttributes)
   * [transferEverything](#transferEverything)
+  * [combineItemPiles](#combineItemPiles)
   * [updateCurrencies](#updateCurrencies)
   * [addCurrencies](#addCurrencies)
   * [removeCurrencies](#removeCurrencies)
@@ -522,10 +523,10 @@ Causes the item pile to play a sound as it was attempted to be opened, but was l
 
 Whether an item pile is locked. If it is not enabled or not a container, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -535,10 +536,10 @@ Whether an item pile is locked. If it is not enabled or not a container, it is a
 
 Whether an item pile is closed. If it is not enabled or not a container, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -548,10 +549,10 @@ Whether an item pile is closed. If it is not enabled or not a container, it is a
 
 Whether an item pile is a valid item pile. If it is not enabled, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -561,10 +562,10 @@ Whether an item pile is a valid item pile. If it is not enabled, it is always fa
 
 Whether an item pile is a regular item pile. If it is not enabled, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -574,10 +575,10 @@ Whether an item pile is a regular item pile. If it is not enabled, it is always 
 
 Whether an item pile is a container. If it is not enabled, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -587,10 +588,10 @@ Whether an item pile is a container. If it is not enabled, it is always false.
 
 Whether an item pile is a lootable. If it is not enabled, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -600,10 +601,10 @@ Whether an item pile is a lootable. If it is not enabled, it is always false.
 
 Whether an item pile is a vault. If it is not enabled, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -613,10 +614,10 @@ Whether an item pile is a vault. If it is not enabled, it is always false.
 
 Whether an item pile is a merchant. If it is not enabled, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -626,10 +627,10 @@ Whether an item pile is a merchant. If it is not enabled, it is always false.
 
 Whether an item pile is a auctioneer. If it is not enabled, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
-| [data]             | `Object/boolean`              | `false` | Existing data flags to use    |
+| Param  | Type                  | Default | Description                |
+|--------|-----------------------|---------|----------------------------|
+| target | `Token/TokenDocument` |         | Target token to check      |
+| [data] | `Object/boolean`      | `false` | Existing data flags to use |
 
 ---
 
@@ -639,12 +640,11 @@ Whether an item pile is a auctioneer. If it is not enabled, it is always false.
 
 Whether an item pile is a empty pile. If it is not enabled, it is always false.
 
-| Param              | Type                          | Default | Description                   |
-|--------------------|-------------------------------|---------|-------------------------------|
-| target             | `Token/TokenDocument`         |         | Target token to check         |
+| Param  | Type                  | Default | Description           |
+|--------|-----------------------|---------|-----------------------|
+| target | `Token/TokenDocument` |         | Target token to check |
 
 ---
-
 
 ### updateItemPile
 
@@ -951,13 +951,33 @@ Transfers all items and attributes between the source and the target.
 
 **Returns**: `Promise<object>` - An object containing all items and attributes transferred to the target
 
-| Param                   | Type                        | Default | Description                                                                       |
-|-------------------------|-----------------------------|---------|-----------------------------------------------------------------------------------|
-| source                  | `Actor/Token/TokenDocument` |         | The actor to transfer all items and attributes from                               |
-| target                  | `Actor/Token/TokenDocument` |         | The actor to receive all the items and attributes                                 |
-| options                 | `object`                    |         | Options to pass to the function                                                   |
-| [options.itemFilters]   | `Array/boolean`             | `false` | Array of item types disallowed - will default to module settings if none provided |
-| [options.interactionId] | `string/boolean`            | `false` | The ID of this interaction                                                        |
+| Param                      | Type                        | Default | Description                                                                       |
+|----------------------------|-----------------------------|---------|-----------------------------------------------------------------------------------|
+| source                     | `Actor/Token/TokenDocument` |         | The actor to transfer all items and attributes from                               |
+| target                     | `Actor/Token/TokenDocument` |         | The actor to receive all the items and attributes                                 |
+| options                    | `object`                    |         | Options to pass to the function                                                   |
+| [options.itemFilters]      | `Array/boolean`             | `false` | Array of item types disallowed - will default to module settings if none provided |
+| [options.skipVaultLogging] | `boolean`                   | `false` | Whether to skip logging this action to the target actor if it is a vault          |
+| [options.interactionId]    | `string/boolean`            | `false` | The ID of this interaction                                                        |
+
+---
+
+### combineItemPiles
+
+`game.itempiles.API.combineItemPiles(target, sources, options)` ⇒ `Promise<object>`
+
+Transfers all items and attributes between the source and the target.
+
+**Returns**: `Promise<object>` - An object containing all items and attributes transferred to the target
+
+| Param                         | Type                        | Default | Description                                                                       |
+|-------------------------------|-----------------------------|---------|-----------------------------------------------------------------------------------|
+| target                        | `Actor/Token/TokenDocument` |         | The actor to transfer items and currencies to                                     |
+| sources                       | `Actor/Token/TokenDocument` |         | The actors to transfer items and currencies from                                  |
+| options                       | `object`                    |         | Options to pass to the function                                                   |
+| [options.itemFilters]         | `Array/boolean`             | `false` | Array of item types disallowed - will default to module settings if none provided |
+| [options.targetItemPileFlags] | `object/boolean`            | `false` | Item pile flags to set on the target as a part of this transfer                   |
+| [options.interactionId]       | `string/boolean`            | `false` | The ID of this interaction                                                        |
 
 ---
 
@@ -965,7 +985,7 @@ Transfers all items and attributes between the source and the target.
 
 `game.itempiles.API.updateCurrencies(target, currencies, options)` ⇒ `Promise<object>`
 
-Updates currencies to the target. 
+Updates currencies to the target.
 It differs from the add and remove operations in that it "sets" the currency of the target with the passed value.
 This is useful in cases where you want to pre-fill something with a specific amount of currency.
 
@@ -1108,9 +1128,11 @@ Transfers all currencies between the source and the target.
 
 Turns an array containing the data and quantities for each currency into a string of currencies
 
-**NOTE:** This is just a utility method for module intercompatibility to use the other currencies api methods based on a string input.
+**NOTE:
+** This is just a utility method for module intercompatibility to use the other currencies api methods based on a string input.
 
-**Returns**: `Array.<string>` - An array of string containing the abbreviation for each currency registered (eg, ["GP","SP"])
+**Returns
+**: `Array.<string>` - An array of string containing the abbreviation for each currency registered (eg, ["GP","SP"])
 
 ---
 
@@ -1120,16 +1142,17 @@ Turns an array containing the data and quantities for each currency into a strin
 
 Turns an array containing the data and quantities for each currency into a string of currencies
 
-**NOTE:** This is just a utility method for module intercompatibility to use the other currencies api methods based on a string input.
+**NOTE:
+** This is just a utility method for module intercompatibility to use the other currencies api methods based on a string input.
 
 **Returns**: `string` - A string of currencies to add (eg, "5gp 25sp")
 
-| Param                     | Type     | Default | Description                                    |
-|---------------------------|----------|---------|------------------------------------------------|
-| currencies                | `Array`  |         | An array of object containing the data and quantity for each currency |
-| currencies[].cost         | `number` |         | The quantity of the currency         |
-| currencies[].abbreviation | `string` |         | The abbreviation of the currency, which are usually {#}GP, which when {#} is replaced with the number it becomes 5GP.     |
-| currencies[].percent      | `boolean`|         | The cost of the currency is in percentage (NOTE: for work the 'abbreviation' property must includes '%' substring)  |
+| Param                     | Type      | Default | Description                                                                                                           |
+|---------------------------|-----------|---------|-----------------------------------------------------------------------------------------------------------------------|
+| currencies                | `Array`   |         | An array of object containing the data and quantity for each currency                                                 |
+| currencies[].cost         | `number`  |         | The quantity of the currency                                                                                          |
+| currencies[].abbreviation | `string`  |         | The abbreviation of the currency, which are usually {#}GP, which when {#} is replaced with the number it becomes 5GP. |
+| currencies[].percent      | `boolean` |         | The cost of the currency is in percentage (NOTE: for work the 'abbreviation' property must includes '%' substring)    |
 
 ---
 
@@ -1189,8 +1212,8 @@ Turns a string of currencies or a number into an object containing payment data,
 
 const tokenOrActor = game.actors.getName("Bharash");
 const currencies = {
-  cost: 10,
-  abbreviation: "GP",
+	cost: 10,
+	abbreviation: "GP",
 };
 const currencyS = game.itempiles.API.getStringFromCurrencies(currencies);
 const currencyData = game.itempiles.API.getPaymentData(currencyS, { target: tokenOrActor });

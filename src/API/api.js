@@ -1832,6 +1832,71 @@ class API {
 	}
 
 	/**
+	 * Combines several item piles into a single item pile by transferring
+	 *
+	 * @param {Actor/Token/TokenDocument} target                    The actor to transfer items and currencies to
+	 * @param {Array<Actor/Token/TokenDocument>} sources            The actors to transfer items and currencies from
+	 * @param {object} options                                      Options to pass to the function
+	 * @param {Array/boolean} [options.itemFilters=false]           Array of item types disallowed - will default to module settings if none provided
+	 * @param {object/boolean} [options.targetItemPileFlags=false]  Item pile flags to set on the target as a part of this transfer
+	 * @param {string/boolean} [options.interactionId=false]        The ID of this interaction
+	 *
+	 * @returns {Promise<object>}                                   An object containing all items and attributes transferred to the target
+	 */
+	static combineItemPiles(target, sources, {
+		itemFilters = false,
+		targetItemPileFlags = false,
+		interactionId = false
+	} = {}) {
+
+		const targetActor = Utilities.getActor(target);
+		if (!targetActor) throw Helpers.custom_error(`combineItemPiles | Could not determine the target actor, please provide a valid target`);
+		const targetUuid = Utilities.getUuid(targetActor);
+
+		if (!Array.isArray(sources)) {
+			try {
+				sources = Array.from(sources);
+			} catch (err) {
+				throw Helpers.custom_error(`combineItemPiles | sources must be of type array or set`);
+			}
+		}
+
+		const sourceActors = sources.map(Utilities.getActor);
+		if (!sourceActors.every(Boolean) || !sourceActors.length) throw Helpers.custom_error(`combineItemPiles | Could not determine one of the source actors, please provide valid sources`);
+		if (!sourceActors.every(actor => PileUtilities.isValidItemPile(actor))) throw Helpers.custom_error(`combineItemPiles | One or more of the source actors are not item piles`);
+		const sourceUuids = sourceActors.map(Utilities.getUuid);
+
+		if (sourceActors.find(actor => actor === targetActor)) {
+			throw Helpers.custom_error(`combineItemPiles | Sources may not contain the target`);
+		}
+
+		if (itemFilters) {
+			if (!Array.isArray(itemFilters)) throw Helpers.custom_error(`combineItemPiles | itemFilters must be of type array`);
+			itemFilters.forEach(entry => {
+				if (typeof entry?.path !== "string") throw Helpers.custom_error(`combineItemPiles | each entry in the itemFilters must have a "path" property that is of type string`);
+				if (typeof entry?.filter !== "string") throw Helpers.custom_error(`combineItemPiles | each entry in the itemFilters must have a "filter" property that is of type string`);
+			})
+		}
+
+		if (targetItemPileFlags && typeof targetItemPileFlags !== "object") throw Helpers.custom_error(`combineItemPiles | options.targetItemPileFlags must be of type object`);
+
+		if (PileUtilities.isItemPileVault(targetActor)) {
+			const sourceActorItems = sourceActors.map(sourceActor => PileUtilities.getActorItems(sourceActor, { getItemCurrencies: true }));
+			const canItemsFit = PileUtilities.fitItemsIntoVault(sourceActorItems, targetActor, { itemFilters });
+			if (!canItemsFit) throw Helpers.custom_error(`combineItemPiles | The target vault actor ${targetActor.name} cannot fit these items`);
+		}
+
+		if (interactionId) {
+			if (typeof interactionId !== "string") throw Helpers.custom_error(`combineItemPiles | interactionId must be of type string`);
+		}
+
+		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMBINE_ITEM_PILES, targetUuid, sourceUuids, game.user.id, {
+			itemFilters, interactionId
+		});
+
+	}
+
+	/**
 	 * Return all th registered currencies abbreviations
 	 * @returns {Array<string>}                                 An array of string containing the abbreviation for each currency registered
 	 */
