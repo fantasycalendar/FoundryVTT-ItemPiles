@@ -4,6 +4,7 @@
 
 - Updated Portuguese (Brazil) localization (thank you Kharmans on github!)
 - Fixed localization issues in the item editor application
+- Fixed issue with the API throwing an error when editing attribute quantities
 
 ## Version 3.1.0
 

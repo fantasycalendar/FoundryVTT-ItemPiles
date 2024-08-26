@@ -727,7 +727,7 @@ export default class PrivateAPI {
 
 	static async _setAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {
 
-		const targetDocument = Utilities.document(targetUuid);
+		const targetDocument = Utilities.getDocument(targetUuid);
 
 		const transaction = new Transaction(targetDocument);
 		await transaction.appendDocumentChanges(attributes, { set: true });
