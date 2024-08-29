@@ -67,6 +67,7 @@ export default class ItemPileSocket {
 		TRANSFER_ATTRIBUTES: "transferAttributes",
 		TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes",
 		TRANSFER_EVERYTHING: "transferEverything",
+		COMBINE_ITEM_PILES: "combineItemPiles",
 		COMMIT_DOCUMENT_CHANGES: "commitActorChanges",
 		ROLL_ITEM_TABLE: "rollItemTable",
 		REFRESH_MERCHANT_INVENTORY: "refreshMerchantInventory",
@@ -120,6 +121,7 @@ export default class ItemPileSocket {
 		[this.HANDLERS.TRANSFER_ATTRIBUTES]: (...args) => PrivateAPI._transferAttributes(...args),
 		[this.HANDLERS.TRANSFER_ALL_ATTRIBUTES]: (...args) => PrivateAPI._transferAllAttributes(...args),
 		[this.HANDLERS.TRANSFER_EVERYTHING]: (...args) => PrivateAPI._transferEverything(...args),
+		[this.HANDLERS.COMBINE_ITEM_PILES]: (...args) => PrivateAPI._combineItemPiles(...args),
 		[this.HANDLERS.COMMIT_DOCUMENT_CHANGES]: (...args) => PrivateAPI._commitDocumentChanges(...args),
 		[this.HANDLERS.ROLL_ITEM_TABLE]: (...args) => PrivateAPI._rollItemTable(...args),
 		[this.HANDLERS.REFRESH_MERCHANT_INVENTORY]: (...args) => PrivateAPI._refreshMerchantInventory(...args),
@@ -228,6 +230,8 @@ const Requests = {
 	_defaultTimeout: 2000,
 	_unresponsiveTimeout: 10000,
 	async timedSocketRequest(handler, method) {
+		const activeGM = Helpers.getResponsibleGM();
+		if (activeGM === game.user) return method();
 		if (Requests._unresponsiveGM && Number(Date.now()) < Requests._lastGmUnresponsiveTimestamp) {
 			Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.NoResponseFromGMTimeout", {
 				user_name: Requests._unresponsiveGM,
@@ -241,6 +245,7 @@ const Requests = {
 			result = await method();
 		} catch (err) {
 			Requests._clearPendingTimeout(handler);
+			console.error(err);
 			return false;
 		}
 		Requests._clearPendingTimeout(handler);

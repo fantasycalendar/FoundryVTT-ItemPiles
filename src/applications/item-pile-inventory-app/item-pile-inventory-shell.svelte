@@ -91,7 +91,7 @@
 			source: source,
 			target: store.actor,
 			itemData: {
-				item: itemData, quantity: 1
+				item: itemData, quantity: 1, uuid: data.uuid
 			},
 			skipCheck: true
 		});

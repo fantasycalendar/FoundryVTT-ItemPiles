@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 3.1.1
+
+- Updated PF1e system support (thank you Mana!)
+- Updated Portuguese (Brazil) localization (thank you Kharmans on github!)
+- Fixed localization issues in the item editor application
+- Fixed issue with the API throwing an error when editing attribute quantities
+
 ## Version 3.1.0
 
 - Added support for "container" type items in D&D5e - this is a custom implementation, so other systems' containers will not work out of the box
@@ -7,7 +14,8 @@
   - Added tree-like display for items in containers
 - Added support for currency exchange in custom item purchase prices
   - If you have configured an item that costs 1 gold piece and 1 magical rock, and you only have 1 platinum piece and 1 magical rock, you now get 9 gold pieces back as change, whereas before you needed exactly 1 gold piece and 1 magical rock.
-- Added option for a custom sell price on items
+- Added option for a custom sell price on items, similar to custom purchase price
+- Added `game.itempiles.API.combineItemPiles` which allows you to combine several item piles' inventory into a single item pile
 - Added detection for when the GM is unresponsive for item piles to make changes for players
 - Fixed localization issue with `ITEM-PILES.Trade`, now moved to `ITEM-PILES.PlayerList.TradeButton`
 - Fixed item piles interfaces of unlinked tokens not reacting to some changes to their flags

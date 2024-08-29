@@ -4,6 +4,7 @@ import dnd4e0443 from "./dnd4e-0.4.43.js";
 import dnd5e from "./dnd5e.js";
 import dnd5e203 from "./dnd5e-2.0.3.js";
 import pf1 from "./pf1.js";
+import pf1_9 from "./pf1-9.0.js";
 import pf2e from "./pf2e.js";
 import ds4 from "./ds4.js";
 import d35e from "./d35e.js";
@@ -40,6 +41,7 @@ import starwarsffg from "./starwarsffg.js";
 import demonlord from "./demonlord.js";
 import dnd5e241 from "./dnd5e-2.4.1.js";
 import dragonbane from "./dragonbane.js";
+import vaarfeu from "./vaarfeu.js";
 // ↑ IMPORT SYSTEMS HERE ↑
 
 /**
@@ -61,7 +63,8 @@ export default {
 		"2.0.3": dnd5e203,
 	},
 	"pf1": {
-		"latest": pf1
+		"latest": pf1,
+		"9.6": pf1_9
 	},
 	"pf2e": {
 		"latest": pf2e
@@ -162,6 +165,9 @@ export default {
 	},
 	"dragonbane": {
 		"latest": dragonbane
-	}
+	},
+	"vaarfeu": {
+		"latest": vaarfeu
+	}	
 	// ↑ ADD SYSTEMS HERE ↑
 }

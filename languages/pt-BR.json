@@ -7,6 +7,9 @@
       "ShowToPlayers": "Mostrar aos Jogadores",
       "RequestTrade": "Solicitar Negociação"
     },
+    "PlayerList": {
+      "TradeButton": "Trocar"
+    },
     "HeaderButtons": {
       "Configure": "Configurar",
       "ShowToPlayers": "Mostrar aos Jogadores"
@@ -42,6 +45,8 @@
     },
     "Warnings": {
       "NoGMsConnected": "AVISO - Nenhum MJ conectado - O Item Piles requer um MJ conectado para que os jogadores possam utilizar a maioria das funcionalidades do módulo.",
+      "NoResponseFromGM": "AVISO - MJ \"{user_name}\" não respondeu à solicitação - Item Piles exigem que um MJ esteja conectado e responda para que os jogadores possam utilizar a maioria dos recursos do módulo.",
+      "NoResponseFromGMTimeout": "AVISO - MJ \"{user_name}\" não respondeu à última solicitação - aguarde {time} segundos antes de fazer outra solicitação com o Item Piles.",
       "TransactionNoGMConnected": "Nenhum MJ está conectado - a transação atual foi cancelada, nada foi adicionado, removido ou transferido.",
       "GiveItemNoGM": "Não há MJ ativo para receber o item que você está tentando dar.",
       "GiveItemDeclined": "{user_name} recusou a oferta do seu item.",
@@ -469,11 +474,16 @@
           "FreeExplanation": "Quando ativado, este item não custará dinheiro para ser comprado do comerciante.",
           "DisableNormalCost": "Desativar Custo Normal",
           "DisableNormalCostExplanation": "Quando ativado, o item não pode ser comprado com a moeda principal e deve ser adquirido com uma das opções de compra abaixo.",
+          "PurchaseOptionsAsSellOption": "Opção de Compra como Opção de Venda",
+          "PurchaseOptionsAsSellOptionExplanation": "Quando ativado, as opções de compra abaixo podem ser usadas ao vender o item de volta a um comerciante. Por padrão, apenas as opções de venda abaixo podem ser usadas.",
           "PurchaseOptions": "Opções de Compra",
           "PurchaseOptionsExplanation": "Aqui você pode configurar as formas alternativas de compra deste item. Cada grupo representa uma maneira diferente pela qual um personagem pode comprar este item de outros.",
+          "SellOptions": "Opções de Venda",
+          "SellOptionsExplanation": "Aqui você pode configurar as formas alternativas de vender este item. Cada grupo representa uma maneira diferente de um personagem vender este item aos comerciantes.",
           "CantBeSoldToMerchants": "Não Pode Ser Vendido Para Comerciantes",
           "CantBeSoldToMerchantsExplanation": "Quando ativado, este item não pode ser vendido de volta aos comerciantes, apenas comprado.",
           "AddPurchaseOption": "Adicionar Opção de Compra",
+          "AddSellOption": "Adicionar Opção de Venda",
           "DropMeClickMe": "Clique para adicionar um atributo ou arraste e solte um item para adicionar",
           "PricePreset": "Ou selecione um preço predefinido:",
           "SelectPreset": "Selecione predefinição de preço"
@@ -667,6 +677,8 @@
           "HideItemsWithZeroCostExplanation": "Quando ativado, isso faz com que os clientes não possam comprar ou vender itens que tenham custo zero (gratuito).",
           "OnlyAcceptBasePrice": "Aceitar Apenas o Preço Base",
           "OnlyAcceptBasePriceExplanation": "Quando ativado, todos os itens vendidos a este comerciante devem usar o preço base, e não quaisquer preços personalizados.",
+          "OnlyAcceptCustomPrices": "Aceitar Apenas Preços Personalizados",
+          "OnlyAcceptCustomPricesExplanation": "Quando ativado, todos os itens vendidos a este comerciante devem usar os preços personalizados desse item (se houver), e não as moedas normais. Se o item não tiver um preço personalizado, ele não poderá ser vendido.",
           "OpenTimes": "Horários Abertos",
           "OpenTimesExplanation": "Quando ativado, o comerciante só pode interagir com os jogadores em determinados horários do dia.",
           "OpenStatus": "Status Aberto",
@@ -757,7 +769,7 @@
       "PricePresetEditor": {
         "Title": "Editor de Predefinições de Preços",
         "Update": "Atualizar Predefinições",
-        "Explanation": "Aqui você pode criar vários preços predefinidos que podem ser facilmente usados ​​nos preços personalizados dos itens."
+        "Explanation": "Aqui você pode criar vários preços predefinidos que podem ser facilmente usados nos preços personalizados dos itens."
       }
     },
     "HUD": {
@@ -851,7 +863,7 @@
         "Hint": "Aqui você pode configurar quais tipos de itens são considerados únicos, não importa o que aconteça. Os tipos aqui configurados não podem ser empilhados e só podem ter uma quantidade de 1."
       },
       "CssVariables": {
-        "Title": "Estilos de Variáveis ​​CSS",
+        "Title": "Estilos de Variáveis CSS",
         "Label": "Configurar Estilos de Variáveis ​​CSS",
         "Hint": "Isso permite que você configure as diversas variáveis ​​CSS que orientam as cores e outros estilos nas interfaces das pilhas de itens."
       },

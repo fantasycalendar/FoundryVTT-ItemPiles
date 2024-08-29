@@ -727,7 +727,7 @@ export default class PrivateAPI {
 
 	static async _setAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {
 
-		const targetDocument = Utilities.document(targetUuid);
+		const targetDocument = Utilities.getDocument(targetUuid);
 
 		const transaction = new Transaction(targetDocument);
 		await transaction.appendDocumentChanges(attributes, { set: true });
@@ -1006,6 +1006,98 @@ export default class PrivateAPI {
 
 		return {
 			itemsTransferred: itemDeltas, attributesTransferred: attributeDeltas
+		};
+
+	}
+
+	static async _combineItemPiles(targetUuid, sourceUuids, userId, {
+		itemFilters = false,
+		targetItemPileFlags = false,
+		interactionId
+	} = {}) {
+
+		const sourceActors = sourceUuids.map(Utilities.getActor);
+		const targetActor = Utilities.getActor(targetUuid);
+
+		const targetTransaction = new Transaction(targetActor);
+
+		const sourceTransactions = [];
+		for (const sourceActor of sourceActors) {
+
+			const itemsToTransfer = PileUtilities.getActorItems(sourceActor, { itemFilters })
+				.map(item => item.toObject());
+
+			const sourceCurrencies = PileUtilities.getActorCurrencies(sourceActor);
+
+			const itemCurrenciesToTransfer = sourceCurrencies
+				.filter(currency => currency.type === "item")
+				.map(currency => ({ id: currency.id, quantity: currency.quantity }));
+
+			const attributesToTransfer = sourceCurrencies
+				.filter(entry => entry.type === "attribute")
+				.map(currency => ({ path: currency.data.path, quantity: currency.quantity }));
+
+			const sourceTransaction = new Transaction(sourceActor);
+			await sourceTransaction.appendItemChanges(itemsToTransfer, { remove: true });
+			await sourceTransaction.appendItemChanges(itemCurrenciesToTransfer, {
+				remove: true, type: "currency"
+			});
+			await sourceTransaction.appendDocumentChanges(attributesToTransfer, { remove: true, type: "currency" });
+			const sourceUpdates = sourceTransaction.prepare();
+
+			await targetTransaction.appendItemChanges(sourceUpdates.itemDeltas);
+			await targetTransaction.appendDocumentChanges(sourceUpdates.attributeDeltas);
+
+			sourceTransactions.push({ transaction: sourceTransaction, updates: sourceUpdates });
+
+		}
+
+		const targetUpdates = targetTransaction.prepare();
+		const sourceUpdates = sourceTransactions.map(data => data.updates)
+
+		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_TRANSFER_EVERYTHING, sourceActors, sourceUpdates, targetActor, targetUpdates, interactionId);
+		if (hookResult === false) return false;
+
+		await Promise.allSettled(sourceTransactions.map(data => data.transaction.commit()));
+		const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
+
+		if (targetItemPileFlags) {
+			const flags = PileUtilities.cleanFlagData(foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, targetItemPileFlags));
+			await PileUtilities.updateItemPileData(targetActor, flags);
+		}
+
+		await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.TRANSFER_EVERYTHING, sourceUuids, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
+
+		const macroData = {
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.TRANSFER_EVERYTHING,
+			sources: sourceUuids,
+			target: targetUuid,
+			items: itemDeltas,
+			attributes: attributeDeltas,
+			userId: userId,
+			interactionId: interactionId
+		};
+		await Promise.allSettled(sourceUuids.map(uuid => this._executeItemPileMacro(uuid, { ...macroData, source: uuid })));
+		await this._executeItemPileMacro(targetUuid, { ...macroData, source: false });
+
+		const tokensToDelete = sourceUuids
+			.filter(PileUtilities.shouldItemPileBeDeleted)
+			.map(Utilities.getToken)
+			.map(Utilities.getDocument)
+			.filter(Boolean)
+			.reduce((acc, doc) => {
+				acc[doc.parent.id] ??= [];
+				acc[doc.parent.id].push(doc.id);
+				return acc;
+			}, {});
+
+		for (const [sceneId, tokenIds] of Object.entries(tokensToDelete)) {
+			const scene = game.scenes.get(sceneId);
+			if (scene) await scene.deleteEmbeddedDocuments("Token", tokenIds);
+		}
+
+		return {
+			itemsTransferred: itemDeltas, attributesTransferred: attributeDeltas, deletedTokens: tokensToDelete
 		};
 
 	}
