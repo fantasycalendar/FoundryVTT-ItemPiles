@@ -1,5 +1,12 @@
 # Item Piles Changelog
 
+## Version 3.1.2
+
+- Fixed custom purchase and sell prices not working properly
+- Fixed some more localization in the item editor application
+- Fixed dragging and dropping items onto existing item piles not working
+- Fixed item pile settings on items not being saved properly
+
 ## Version 3.1.1
 
 - Updated PF1e system support (thank you Mana!)

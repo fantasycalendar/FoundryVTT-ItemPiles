@@ -224,15 +224,16 @@
 			<div class="item-piles-sortable-list-columns" style="margin-top: 0.5rem;">
 				<div class="full-span">
 					<a class:invisible={isHovering} on:click={() => addAttribute()}>
-						{localize("ITEM-PILES.Applications.ItemEditor.DropMeClickMe")}
+						{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.DropMeClickMe")}
 					</a>
 				</div>
 				{#if presetPrices.length && presets}
 					<div class="full-span" style="margin-top:0.5rem;">
-						<span style="margin-right:0.25rem;">{localize("ITEM-PILES.Applications.ItemEditor.PricePreset")}</span>
+						<span
+							style="margin-right:0.25rem;">{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.PricePreset")}</span>
 						<select class="price-preset-selector" bind:value={selectedPreset}
 						        on:change={() => { addPreset(selectedPreset); selectedPreset = ""; }}>
-							<option value="">{localize("ITEM-PILES.Applications.ItemEditor.SelectPreset")}</option>
+							<option value="">{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.SelectPreset")}</option>
 							{#each presetPrices as price, index (index)}
 								<option value={index}>{localize(price.name)}</option>
 							{/each}

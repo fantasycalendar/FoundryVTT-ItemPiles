@@ -12,31 +12,20 @@
 
 	const store = item.store;
 	const pileData = store.pileData;
-	const displayQuantityStore = item.displayQuantity;
-	const infiniteQuantityStore = item.infiniteQuantity;
 	const quantityStore = item.quantity;
 	const itemFlagDataStore = item.itemFlagData;
 
-	$: itemFlagData = $itemFlagDataStore;
-	$: displayQuantity = $displayQuantityStore;
-	$: infiniteQuantity = $infiniteQuantityStore;
-
-	$: quantity = $quantityStore;
-	$: editQuantity = $quantityStore;
 	$: itemName = $itemNameStore + ($itemQuantityForPrice > 1 ? ` (${$itemQuantityForPrice})` : "");
-
-	const displayControlButtons = store.actor.isOwner;
-	const displayBuyButton = !!store.recipient;
 
 </script>
 
 <div class="item-piles-merchant-item-container"
-     class:merchant-item-hidden={itemFlagData.hidden}>
+     class:merchant-item-hidden={$itemFlagDataStore.hidden}>
 
 	<div
 		class="item-piles-img-container"
-		class:not-for-sale={itemFlagData.notForSale || !quantity}
-		data-fast-tooltip={itemFlagData.notForSale ? "Not for sale" : ""}
+		class:not-for-sale={$itemFlagDataStore.notForSale || !$quantityStore}
+		data-fast-tooltip={$itemFlagDataStore.notForSale ? "Not for sale" : ""}
 	>
 		<img class="item-piles-img" src={$itemImage}/>
 	</div>

@@ -799,7 +799,7 @@ export function cleanItemFlagData(flagData, { addRemoveFlag = false } = {}) {
 }
 
 export function updateItemData(item, update, { returnUpdate = false, version = false } = {}) {
-	const flagData = cleanItemFlagData(foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {}));
+	const flagData = cleanItemFlagData(foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {}), { addRemoveFlag: true });
 	const updates = foundry.utils.mergeObject(update?.data ?? {}, {});
 	foundry.utils.setProperty(updates, CONSTANTS.FLAGS.ITEM, flagData)
 	foundry.utils.setProperty(updates, CONSTANTS.FLAGS.VERSION, version || Helpers.getModuleVersion())
@@ -1247,7 +1247,7 @@ export function getPriceData({
 
 	}
 
-	const disableNormalCost = itemFlagData.disableNormalCost && !sellerFlagData.onlyAcceptBasePrice;
+	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || !sellerFlagData.onlyAcceptBasePrice);
 	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0 || itemFlagData.sellPrices.filter(priceGroup => priceGroup.length).length > 0;
 
 	const currencyList = getCurrencyList(merchant);
@@ -1367,7 +1367,7 @@ export function getPriceData({
 
 	}
 
-	if (itemFlagData.prices.length && ((merchant === seller && !sellerFlagData.onlyAcceptBasePrice) || (merchant === buyer && itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice))) {
+	if (itemFlagData.prices.length && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice))) {
 		priceData = priceData.concat(getItemFlagPriceData(itemFlagData.prices, quantity, modifier, defaultCurrencies, currencyList));
 	}
 

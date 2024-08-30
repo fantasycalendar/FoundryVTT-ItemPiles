@@ -282,7 +282,8 @@ export default class PrivateAPI {
 		const sourceTransaction = new Transaction(sourceActor);
 		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
 			const newItems = [];
-			for (const itemData of items) {
+			for (const data of items) {
+				const itemData = data?.item ?? data;
 				const item = sourceActor.items.get(itemData._id ?? itemData.id);
 				const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
 				if (!handler) continue;
