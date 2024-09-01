@@ -4,6 +4,7 @@ import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
+import container from "../applications/item-pile-config/settings/container.svelte";
 
 export default class Transaction {
 
@@ -26,8 +27,12 @@ export default class Transaction {
 	}
 
 	async appendItemChanges(items, {
-		set = false, remove = false, type = "item", keepIfZero = false, onlyDelta = false,
+		set = false, remove = false, type = "item", keepIfZero = false
 	} = {}) {
+
+		if (!remove) {
+			items = Utilities.ensureValidIds(this.document, items);
+		}
 
 		for (let data of items) {
 
@@ -173,7 +178,6 @@ export default class Transaction {
 
 		this.itemUpdates = attributes.reduce((acc, attribute) => {
 			const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
-			const itemIdPath = item.id + "-" + attribute.path;
 
 			acc[item.id] = {
 				[attribute.path]: acc[item.id]?.[attribute.path] ?? Number(foundry.utils.getProperty(item, attribute.path) ?? 0)
@@ -207,6 +211,7 @@ export default class Transaction {
 			}
 			return Number(foundry.utils.getProperty(this.document, entry[0])) !== entry[1];
 		}))
+
 		this.itemsToCreate = this.itemsToCreate.filter(item => {
 			return !PileUtilities.canItemStack(item, this.document) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
 		}).map(item => {
@@ -215,6 +220,7 @@ export default class Transaction {
 			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData));
 			return item;
 		});
+
 		this.itemsToDelete = this.itemsToUpdate.filter(item => {
 			return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
 		}).map(item => item._id).concat(Array.from(this.itemsToForceDelete));

@@ -354,7 +354,7 @@
 			</button>
 		</div>
 
-		{#each $populationTables as table}
+		{#each $populationTables.filter(table => $tables[table.uuid]) as table}
 			<div class="item-piles-item-row item-piles-even-color"
 			     style="min-height: 28px; padding: 3px 3px 3px 5px;">
 				<div class="item-piles-flexrow" style="align-items: center;">

@@ -785,13 +785,14 @@ export function cleanFlagData(flagData, { addRemoveFlag = false, existingData = 
 	return flagData;
 }
 
-export function cleanItemFlagData(flagData, { addRemoveFlag = false } = {}) {
+export function cleanItemFlagData(flagData, { addRemoveFlag = false, existingData = false } = {}) {
 	const defaults = Object.keys(CONSTANTS.ITEM_DEFAULTS);
 	const difference = new Set(Object.keys(foundry.utils.diffObject(flagData, CONSTANTS.ITEM_DEFAULTS)));
 	const toRemove = new Set(defaults.filter(key => !difference.has(key)));
+	const existingDataKeys = existingData ? new Set(Object.keys(existingData)) : false;
 	for (const key of toRemove) {
 		delete flagData[key];
-		if (addRemoveFlag) {
+		if (addRemoveFlag && (!existingDataKeys || existingDataKeys.has(key))) {
 			flagData["-=" + key] = null;
 		}
 	}
@@ -799,7 +800,8 @@ export function cleanItemFlagData(flagData, { addRemoveFlag = false } = {}) {
 }
 
 export function updateItemData(item, update, { returnUpdate = false, version = false } = {}) {
-	const flagData = cleanItemFlagData(foundry.utils.mergeObject(getItemFlagData(item), update.flags ?? {}), { addRemoveFlag: true });
+	const existingData = getItemFlagData(item, { useDefaults: false });
+	const flagData = cleanItemFlagData(update.flags ?? {}, { addRemoveFlag: true, existingData });
 	const updates = foundry.utils.mergeObject(update?.data ?? {}, {});
 	foundry.utils.setProperty(updates, CONSTANTS.FLAGS.ITEM, flagData)
 	foundry.utils.setProperty(updates, CONSTANTS.FLAGS.VERSION, version || Helpers.getModuleVersion())
@@ -1247,7 +1249,7 @@ export function getPriceData({
 
 	}
 
-	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || !sellerFlagData.onlyAcceptBasePrice);
+	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice));
 	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0 || itemFlagData.sellPrices.filter(priceGroup => priceGroup.length).length > 0;
 
 	const currencyList = getCurrencyList(merchant);

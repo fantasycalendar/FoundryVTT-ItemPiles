@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.1.3
+
+- Fixed adding container and non-stackable items into item piles from the same source would throw Foundry database errors
+- Fixed merchant populate items tab not loading if a table had been added to the merchant and subsequently deleted
+
 ## Version 3.1.2
 
 - Fixed custom purchase and sell prices not working properly

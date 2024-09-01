@@ -16,6 +16,7 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import ReceiveItemsShell from "../applications/dialogs/receive-items-dialog/receive-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 import { hotkeyActionState } from "../hotkeys.js";
+import { ensureValidIds } from "../helpers/utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -1394,7 +1395,11 @@ export default class PrivateAPI {
 				new Promise(async (resolve) => {
 					await Helpers.wait(250);
 					await Helpers.hooks.runWithout(async () => {
-						await tokenDocument.actor.createEmbeddedDocuments("Item", items, { keepId: true });
+						const newItems = Utilities.ensureValidIds(tokenDocument.actor, items);
+						await tokenDocument.actor.createEmbeddedDocuments("Item", newItems, {
+							keepId: true,
+							keepEmbeddedIds: true
+						});
 					});
 					resolve();
 				});
@@ -1406,7 +1411,8 @@ export default class PrivateAPI {
 
 			if (items.length && !pileActor.prototypeToken.actorLink) {
 				await Helpers.hooks.runWithout(async () => {
-					await pileActor.createEmbeddedDocuments("Item", items, { keepId: true });
+					const newItems = Utilities.ensureValidIds(pileActor, items);
+					await pileActor.createEmbeddedDocuments("Item", newItems, { keepId: true, keepEmbeddedIds: true });
 				});
 			}
 

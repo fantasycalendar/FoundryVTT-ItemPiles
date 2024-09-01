@@ -46,6 +46,7 @@ const CONSTANTS = {
 		CONTENTS: "contents",
 		TRANSFER: "transfer",
 		IS_CONTAINED: "isContained",
+		IS_CONTAINED_PATH: "isContainedPath",
 	},
 
 	ITEM_DEFAULTS: {

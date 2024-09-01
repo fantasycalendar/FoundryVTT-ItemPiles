@@ -466,3 +466,39 @@ export function hasItemTypeHandler(handler, itemType = "GLOBAL") {
 export function getItemTypeHandler(handler, itemType = "GLOBAL") {
 	return SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];
 }
+
+
+export function createUniqueId(actor) {
+	let newId = foundry.utils.randomID();
+	let i = 0;
+	while (i < 10) {
+		if (!actor.items.get(newId)) return newId;
+		newId = foundry.utils.randomID();
+		i++;
+	}
+	throw Helpers.custom_error(`Could not generate unique item ID for actor ${actor.uuid}!`)
+}
+
+export function ensureValidIds(actor, itemsToCreate) {
+
+	const containerIdMap = {};
+
+	return itemsToCreate.map(data => {
+		const item = data?.item ?? data;
+		const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+		if (handler && handler({ item })) {
+			const path = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
+			const containerId = foundry.utils.getProperty(item, path);
+			containerIdMap[containerId] ??= createUniqueId(actor);
+			foundry.utils.setProperty(item, path, containerIdMap[containerId]);
+			item._id = createUniqueId(actor);
+		} else if (hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, item.type)) {
+			containerIdMap[item._id] ??= createUniqueId(actor);
+			item._id = containerIdMap[item._id];
+		} else {
+			item._id = createUniqueId(actor);
+		}
+		return data;
+	});
+
+}
