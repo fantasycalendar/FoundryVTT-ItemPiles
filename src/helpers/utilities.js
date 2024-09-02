@@ -185,8 +185,8 @@ export function getItemTypesThatCanStack() {
 
 export function isItemStackable(itemData) {
 	getItemTypesThatCanStack();
-	if (game.system.id === "custom-system-builder" && itemData?.system?.documentTypes) {
-		const templateItem = game.items.get(itemData?.system?.documentTypes);
+	if (game.system.id === "custom-system-builder" && itemData?.system?.template) {
+		const templateItem = game.items.get(itemData?.system?.template);
 		if (templateItem) {
 			return itemTypesWithQuantities.has(templateItem.name)
 		}
