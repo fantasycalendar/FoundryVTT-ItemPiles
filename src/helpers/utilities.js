@@ -128,10 +128,10 @@ export function setSimilarityProperties(obj, item) {
 	return obj;
 }
 
-let itemTypesWithQuantities = false;
+let itemTypesWithQuantities;
 
 export function refreshItemTypesThatCanStack() {
-	itemTypesWithQuantities = false;
+	itemTypesWithQuantities = undefined;
 	getItemTypesThatCanStack();
 }
 
@@ -181,7 +181,7 @@ export function getItemTypesThatCanStack() {
 			return hasItemQuantity(itemTemplate);
 		})].filter(type => !unstackableItemTypes.includes(type)));
 	}
-	
+
 	return itemTypesWithQuantities;
 }
 

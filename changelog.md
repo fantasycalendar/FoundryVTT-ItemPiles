@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.1.4 Hotfix
+
+- Fixed minor issue with item quantities breaking the entire module
+
 ## Version 3.1.3
 
 - Updated Polish localization (thank you Lioheart on weblate!)
