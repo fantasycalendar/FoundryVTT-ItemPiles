@@ -150,19 +150,20 @@ export function getDocumentTemplates(templateType) {
  * @returns {Set<string>}                       The items type that can be stacked on this system
  */
 export function getItemTypesThatCanStack() {
-	if (!itemTypesWithQuantities) {
 
-		itemTypesWithQuantities = new Set();
+	itemTypesWithQuantities ??= new Set();
 
-		if (game.system.id === "custom-system-builder") {
-			const quantityAttribute = game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE.split(".").pop();
-			const itemTemplates = game.items
-				.filter(_i => _i?.templateSystem?.isTemplate && _i?.templateSystem?.getKeys)
-				.filter(_i => _i.templateSystem.getKeys().has(quantityAttribute));
-			for (const item of itemTemplates) {
-				itemTypesWithQuantities.add(item.name);
-			}
+	if (game.system.id === "custom-system-builder") {
+		const quantityAttribute = game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE.split(".").pop();
+		const itemTemplates = game.items
+			.filter(_i => _i?.templateSystem?.isTemplate && _i?.templateSystem?.getKeys)
+			.filter(_i => _i.templateSystem.getKeys().has(quantityAttribute));
+		for (const item of itemTemplates) {
+			itemTypesWithQuantities.add(item.name);
 		}
+	}
+
+	if (!itemTypesWithQuantities) {
 
 		const unstackableItemTypes = Helpers.getSetting(SETTINGS.UNSTACKABLE_ITEM_TYPES);
 		const templates = getDocumentTemplates("Item");
@@ -180,6 +181,7 @@ export function getItemTypesThatCanStack() {
 			return hasItemQuantity(itemTemplate);
 		})].filter(type => !unstackableItemTypes.includes(type)));
 	}
+	
 	return itemTypesWithQuantities;
 }
 

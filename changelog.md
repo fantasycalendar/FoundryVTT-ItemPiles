@@ -3,6 +3,7 @@
 ## Version 3.1.3
 
 - Updated Polish localization (thank you Lioheart on weblate!)
+- Fixed some issues with Custom System Builder and item pile item quantities
 - Fixed issues with merchants and custom prices utilizing secondary currencies
 - Fixed adding container and non-stackable items into item piles from the same source would throw Foundry database errors
 - Fixed merchant populate items tab not loading if a table had been added to the merchant and subsequently deleted
