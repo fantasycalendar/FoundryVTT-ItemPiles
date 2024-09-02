@@ -1138,9 +1138,9 @@ function getItemFlagPriceData(priceData, quantity, modifier, defaultCurrencies, 
 				price.data.item = CompendiumUtilities.getItemFromCache(price.data.uuid);
 			}
 
-			const isRegularCurrency = currencyList.find(currency => {
+			const isRegularCurrency = !price.secondary ? currencyList.find(currency => {
 				return currency.name === price.name && currency.img === price.img && (currency.data.uuid === price.data.uuid || currency.data.path === price.data.path)
-			});
+			}) : false;
 
 			const totalCost = isRegularCurrency ? price.quantity * isRegularCurrency.exchangeRate : 0;
 
