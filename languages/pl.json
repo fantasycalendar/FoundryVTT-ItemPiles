@@ -42,7 +42,9 @@
       "VaultNoGmItemSidebar": "Tylko GM może upuszczać przedmioty z paska bocznego!",
       "TransactionNoGMConnected": "Żaden GM nie jest połączony - bieżąca transakcja została anulowana, nic nie zostało dodane, usunięte ani przeniesione",
       "DroppedIsNotItem": "Nie można wrzucać dokumentów typu \"{type}\" do tego stosu przedmiotów!",
-      "VaultSameItemOrigin": "Nie można wrzucać do skarbca przedmiotów, które pochodzą ze skarbca!"
+      "VaultSameItemOrigin": "Nie można wrzucać do skarbca przedmiotów, które pochodzą ze skarbca!",
+      "NoResponseFromGMTimeout": "OSTRZEŻENIE - MG \"{user_name}\" nie odpowiedział na ostatnie żądanie - odczekaj {time} sekund przed wysłaniem kolejnego żądania Item Piles.",
+      "NoResponseFromGM": "OSTRZEŻENIE - MG \"{user_name}\" nie odpowiedział na żądanie - Item Piles wymagają połączenia i odpowiedzi MG, aby gracze mogli korzystać z większości funkcji modułu."
     },
     "Inspect": {
       "Title": "Przeglądanie Zawartości Stosu",
@@ -61,7 +63,8 @@
       "SplitAll": "Podziel na {num_players} graczy",
       "Owner": "Jako właściciel tego Stosu Przedmiotów, możesz modyfikować jego zawartość.",
       "SplitItems": "Podziel przedmioty na {num_players} graczy",
-      "SplitNoPlayers": "Nie znaleziono żadnych postaci, którymi można by podzielić zawartość."
+      "SplitNoPlayers": "Nie znaleziono żadnych postaci, którymi można by podzielić zawartość.",
+      "Change": "Zmiana"
     },
     "Trade": {
       "Title": "Item Piles: Wymiany",
@@ -270,7 +273,8 @@
     },
     "Items": "Przedmioty",
     "HeaderButtons": {
-      "ShowToPlayers": "Pokaż Graczom"
+      "ShowToPlayers": "Pokaż Graczom",
+      "Configure": "Konfiguracja"
     },
     "Types": {
       "pile": "Item Pile",
@@ -370,7 +374,9 @@
         "TitleActor": "Item Piles Edytor Walut: {actor_name}",
         "Title": "Item Piles Edytor walut",
         "Exchange": "Wymiana",
-        "ExplanationSmallAttributes": "W D&D5e waluty aktorów znajdują się w ścieżce atrybutów \"actor.system.currency.gp\", więc możesz dodać swoją własną walutę z nazwą \"Gold Coins\" i ścieżką atrybutów \"system.currency.gp\". Dodaj jedną z nich klikając na plus w nagłówku."
+        "ExplanationSmallAttributes": "W D&D5e waluty aktorów znajdują się w ścieżce atrybutów \"actor.system.currency.gp\", więc możesz dodać swoją własną walutę z nazwą \"Gold Coins\" i ścieżką atrybutów \"system.currency.gp\". Dodaj jedną z nich klikając na plus w nagłówku.",
+        "CreateNew": "Upuść przedmiot lub kliknij przycisk plusa, aby rozpocząć!",
+        "Drop": "Upuść, aby dodać"
       },
       "ItemEditor": {
         "Title": "Item Piles Edytor przedmiotów: {item_name}",
@@ -426,7 +432,12 @@
           "AddPurchaseOption": "Dodaj opcję zakupu",
           "DropMeClickMe": "Kliknij, aby dodać atrybut lub przeciągnij i upuść przedmiot, aby dodać",
           "PricePreset": "Można też wybrać wstępne ustawienie ceny:",
-          "SelectPreset": "Wybór presetu cenowego"
+          "SelectPreset": "Wybór presetu cenowego",
+          "PurchaseOptionsAsSellOption": "Opcja zakupu jako opcja sprzedaży",
+          "SellOptions": "Opcje sprzedaży",
+          "SellOptionsExplanation": "Tutaj można skonfigurować alternatywne sposoby sprzedaży tego przedmiotu. Każda grupa reprezentuje inny sposób, w jaki postać może sprzedać ten przedmiot kupcom.",
+          "AddSellOption": "Dodaj opcję sprzedaży",
+          "PurchaseOptionsAsSellOptionExplanation": "Gdy ta opcja jest włączona, poniższe opcje zakupu mogą być używane podczas odsprzedaży przedmiotu sprzedawcy. Domyślnie można użyć tylko poniższych opcji sprzedaży."
         },
         "VaultTab": {
           "GridSize": "Rozmiar Siatki",
@@ -565,7 +576,9 @@
           "ClearMerchantLogExplanation": "Spowoduje to wyczyszczenie dzienników kupca, usuwając wszystkie wpisy. Nie można tego cofnąć.",
           "LogMerchantActivityExplanation": "Po włączeniu tej funkcji kupiec rejestruje zdarzenia, takie jak kupno i sprzedaż przedmiotów, a GM aktualizuje status (ilość, widoczność i sprzedaż) przedmiotów.",
           "HideTokenWhenClosed": "Ukryj Token po Zamknięciu",
-          "HideTokenWhenClosedExplanation": "Gdy ta opcja jest włączona, token(y) tego sprzedawcy są ukrywane po zamknięciu."
+          "HideTokenWhenClosedExplanation": "Gdy ta opcja jest włączona, token(y) tego sprzedawcy są ukrywane po zamknięciu.",
+          "OnlyAcceptCustomPrices": "Akceptuj tylko ceny niestandardowe",
+          "OnlyAcceptCustomPricesExplanation": "Po włączeniu tej opcji wszystkie przedmioty sprzedawane temu sprzedawcy muszą używać niestandardowych cen dla tego przedmiotu (jeśli takie istnieją), a nie zwykłych walut. Jeśli przedmiot nie ma ceny niestandardowej, nie można go sprzedać."
         },
         "Main": {
           "DeleteWhenEmpty": "Usuń, gdy jest pusty",
@@ -926,6 +939,19 @@
     "VaultLog": {
       "Deposit": "{actor_name} ({user_name}) *zdeponował* {item_name} x {quantity} ({date})",
       "Withdraw": "{actor_name} ({user_name}) **wycofał** {item_name} x {quantity} ({date})"
+    },
+    "PlayerList": {
+      "TradeButton": "Handel"
+    },
+    "General": {
+      "Short": "Krótki",
+      "Primary": "Podstawowy",
+      "Exchange": "Wymiana",
+      "Name": "Nazwa",
+      "Cost": "Koszt",
+      "Fixed": "Pośrednik",
+      "Icon": "Ikona",
+      "Data": "Dane"
     }
   }
 }
