@@ -58,7 +58,7 @@ export default {
 	"ITEM_TYPE_HANDLERS": {
 		"GLOBAL": {
 			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED]: ({ item }) => {
-				const itemData = item.toObject();
+				const itemData = item instanceof Item ? item.toObject() : item;
 				return !!itemData?.system?.container;
 			},
 			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH]: "system.container"
