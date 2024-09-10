@@ -426,7 +426,7 @@
           "DisableNormalCost": "Wyłączenie kosztu normalnego",
           "DisableNormalCostExplanation": "Gdy ta opcja jest włączona, przedmiot nie może być zakupiony za walutę podstawową i musi być zakupiony za jedną z poniższych opcji zakupu.",
           "PurchaseOptions": "Opcje zakupu",
-          "PurchaseOptionsExplanation": "Tutaj możesz skonfigurować alternatywne sposoby zakupu tego przedmiotu. Każda grupa reprezentuje inny sposób, w jaki postać może kupić ten przedmiot od innych",
+          "PurchaseOptionsExplanation": "Tutaj można skonfigurować alternatywne sposoby zakupu tego przedmiotu. Każda grupa reprezentuje inny sposób, w jaki postać może kupić ten przedmiot od kupców.",
           "CantBeSoldToMerchants": "Nie można sprzedać kupcom",
           "CantBeSoldToMerchantsExplanation": "Gdy jest włączona, ten przedmiot nie może być odsprzedany kupcom, tylko kupiony.",
           "AddPurchaseOption": "Dodaj opcję zakupu",
