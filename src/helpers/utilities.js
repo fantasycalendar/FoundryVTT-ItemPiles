@@ -487,6 +487,7 @@ export function ensureValidIds(actor, itemsToCreate) {
 
 	return itemsToCreate.map(data => {
 		const item = data?.item ?? data;
+		if (!item.system || !item.type) return data;
 		const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
 		if (handler && handler({ item })) {
 			const path = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
