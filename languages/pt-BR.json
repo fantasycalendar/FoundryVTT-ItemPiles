@@ -5,7 +5,8 @@
     "Currency": "Moeda",
     "ContextMenu": {
       "ShowToPlayers": "Mostrar aos Jogadores",
-      "RequestTrade": "Solicitar Negociação"
+      "RequestTrade": "Solicitar Negociação",
+      "GiveToCharacter": "Dar ao Personagem"
     },
     "PlayerList": {
       "TradeButton": "Trocar"
