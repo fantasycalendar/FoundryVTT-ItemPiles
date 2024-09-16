@@ -247,7 +247,7 @@ export default {
 
 		Hooks.on("dnd5e.getItemContextOptions", (item, options) => {
 			options.push({
-				name: "Give to character",
+				name: game.i18n.localize("ITEM-PILES.ContextMenu.GiveToCharacter"),
 				icon: "<i class='fa fa-user'></i>",
 				callback: async () => {
 					const result = await GiveItems.show(item);

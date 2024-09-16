@@ -403,6 +403,7 @@ export async function createFoldersFromNames(folders, type = "Actor") {
 		if (!actualFolder) {
 			const folderData = { name: folder, type, sorting: 'a' };
 			if (lastFolder) {
+				folderData.folder = lastFolder.id;
 				folderData.parent = lastFolder.id;
 			}
 			actualFolder = await Folder.create(folderData);

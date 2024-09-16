@@ -517,6 +517,7 @@
         "Title": "编辑货币",
         "Content": "作为 GM，你可以在这个物品堆上更新货币：",
         "Submit": "提交",
+        "NoCurrency": "{actor_name} 没有可用的货币…",
         "Secondary": "次要货币："
       },
       "UnstackableItemTypesEditor": {

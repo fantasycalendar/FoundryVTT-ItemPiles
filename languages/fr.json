@@ -887,6 +887,7 @@
         "Content": "En tant que MJ, vous pouvez mettre à jour les devises de cette pile d'objets :",
         "Submit": "Soumettre",
         "Title": "Modifier les devises",
+        "NoCurrency": "{actor_name} n'a pas de devises valables...",
         "Secondary": "Devises secondaires :"
       },
       "CustomItemCategoriesEditor": {

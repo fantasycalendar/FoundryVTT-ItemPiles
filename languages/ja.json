@@ -913,6 +913,7 @@
         "Submit": "送信",
         "Title": "通貨を編集",
         "Content": "GMとして、このアイテムの山の金額を更新できます：",
+        "NoCurrency": "{actor_name}には有効な硬貨がありません...",
         "Secondary": "補助通貨："
       },
       "WithdrawItem": {

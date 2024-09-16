@@ -567,6 +567,7 @@
         "Title": "Editovat měny",
         "Content": "Jako GM můžete aktualizovat měny v této kupě položek:",
         "Secondary": "Sekundární měny:",
+        "NoCurrency": "{actor_name} nemá žádnou platnou měnu...",
         "Submit": "Potvrdit"
       },
       "DropCurrencies": {

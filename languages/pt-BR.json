@@ -359,6 +359,7 @@
         "Title": "Editando Moedas",
         "Content": "Como MJ, você pode atualizar as moedas nesta pilha de itens:",
         "Secondary": "Moedas Secundárias:",
+        "NoCurrency": "{actor_name} não tem moedas válidas.",
         "Submit": "Enviar"
       },
       "DropCurrencies": {

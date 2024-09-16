@@ -5,7 +5,8 @@
     "Currency": "Currency",
     "ContextMenu": {
       "ShowToPlayers": "Show To Players",
-      "RequestTrade": "Request Trade"
+      "RequestTrade": "Request Trade",
+      "GiveToCharacter": "Give To Character"
     },
     "PlayerList": {
       "TradeButton": "Trade"
@@ -359,6 +360,7 @@
         "Title": "Editing Currencies",
         "Content": "As a GM, you can update the currencies on this item pile:",
         "Secondary": "Secondary Currencies:",
+        "NoCurrency": "{actor_name} has no valid currencies...",
         "Submit": "Submit"
       },
       "DropCurrencies": {

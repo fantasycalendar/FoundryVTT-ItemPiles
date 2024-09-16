@@ -17,6 +17,7 @@ import ReceiveItemsShell from "../applications/dialogs/receive-items-dialog/rece
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 import { hotkeyActionState } from "../hotkeys.js";
 import { ensureValidIds } from "../helpers/utilities.js";
+import { getPileActorDefaults } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -1211,17 +1212,7 @@ export default class PrivateAPI {
 
 		if (createActor) {
 
-			const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
-			const defaultItemPileActor = game.actors.get(defaultItemPileId);
-
-			let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
-			pileDataDefaults.enabled = true;
-			if (foundry.utils.isEmpty(itemPileFlags) && defaultItemPileActor) {
-				const defaultItemPileSettings = PileUtilities.getActorFlagData(defaultItemPileActor);
-				itemPileFlags = foundry.utils.mergeObject(pileDataDefaults, defaultItemPileSettings);
-			}
-
-			pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+			const pileDataDefaults = PileUtilities.getPileActorDefaults({ ...itemPileFlags, enabled: true });
 
 			const actorData = {
 				name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"

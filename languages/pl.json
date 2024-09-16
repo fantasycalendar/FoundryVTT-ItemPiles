@@ -346,6 +346,7 @@
         "Title": "Edycja walut",
         "Content": "Jako GM możesz zaktualizować waluty na tym stosie przedmiotów:",
         "Submit": "Wyślij",
+        "NoCurrency": "{aktor_name} nie ma ważnych walut...",
         "Secondary": "Waluty dodatkowe:"
       },
       "TradeMerchantItem": {

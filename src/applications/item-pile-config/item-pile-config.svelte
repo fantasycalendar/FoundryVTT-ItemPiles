@@ -28,7 +28,12 @@
 
 	let form;
 
-	let pileData = PileUtilities.getActorFlagData(pileActor);
+	let pileData = PileUtilities.getActorFlagData(pileActor, { useDefaults: false });
+	if (foundry.utils.isEmpty(pileData)) {
+		pileData = PileUtilities.getPileActorDefaults();
+	} else {
+		pileData = PileUtilities.getActorFlagData(pileActor);
+	}
 
 	if (typeof pileData?.deleteWhenEmpty === "boolean") {
 		pileData.deleteWhenEmpty = !!pileData?.deleteWhenEmpty;

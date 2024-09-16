@@ -1,5 +1,16 @@
 # Item Piles Changelog
 
+## Version 3.1.5
+
+- Added missing localization for "Give To Character" item right click menu in D&D5e
+- Updated Polish localization (thank you Lioheart on weblate!)
+- Tweaked item piles config UI to have the Default Item Piles' configuration, unless it already has some item pile configuration
+- Fixed issue with secondary currencies throwing errors when being added to vaults
+- Fixed folders being created out of place when using the `folder` parameter in `game.itempiles.API.createItemPile()`
+- Fixed missing localization in the edit currencies dialog
+
+Next update will not have v11 support.
+
 ## Version 3.1.4 Hotfix
 
 - Fixed minor issue with item quantities breaking the entire module
@@ -34,7 +45,8 @@
 - Added support for currency exchange in custom item purchase prices
   - If you have configured an item that costs 1 gold piece and 1 magical rock, and you only have 1 platinum piece and 1 magical rock, you now get 9 gold pieces back as change, whereas before you needed exactly 1 gold piece and 1 magical rock.
 - Added option for a custom sell price on items, similar to custom purchase price
-- Added `game.itempiles.API.combineItemPiles` which allows you to combine several item piles' inventory into a single item pile
+- Added
+  `game.itempiles.API.combineItemPiles` which allows you to combine several item piles' inventory into a single item pile
 - Added detection for when the GM is unresponsive for item piles to make changes for players
 - Fixed localization issue with `ITEM-PILES.Trade`, now moved to `ITEM-PILES.PlayerList.TradeButton`
 - Fixed item piles interfaces of unlinked tokens not reacting to some changes to their flags
@@ -116,7 +128,8 @@
 - Updated the Tormenta20 system configuration to fix its currency issues
 - Added support for the [Dragonbane - Drakar och Demoner](https://foundryvtt.com/packages/dragonbane) system (thank you xdy on github!)
 - Added the `game.itempiles.macro_execution_types` constants - see docs for more info
-  - For the above, added `game.itempiles.macro_execution_types.RENDER_INTERFACE`, which means that macros that are attached to item piles will execute its macro when the item piles interface is rendered
+  - For the above, added
+    `game.itempiles.macro_execution_types.RENDER_INTERFACE`, which means that macros that are attached to item piles will execute its macro when the item piles interface is rendered
 - Added item price modifiers on items, so items can decide how much they will deviate from the base price
 - Fixed merchant columns not being editable in newer versions of D&D 5e
 - Fixed rolltables not applying custom categories to items properly
@@ -275,7 +288,8 @@
   - `game.itempiles.API.getItemQuantity()`
   - `game.itempiles.API.calculateCurrencies()` which can be used to calculate different currency strings;
     - `game.itempiles.API.calculateCurrencies("10gp", "5gp")` would result in 5GP (wow, impressive right?)
-    - `game.itempiles.API.calculateCurrencies("9gp 4sp 9cp", "5sp 4cp")` would result in `8GP 9SP 4CP`, which is a bit more impressive
+    - `game.itempiles.API.calculateCurrencies("9gp 4sp 9cp", "5sp 4cp")` would result in
+      `8GP 9SP 4CP`, which is a bit more impressive
     - `game.itempiles.API.calculateCurrencies("9gp 4sp 9cp", "5sp 4cp", false)` would result in `10GP 3CP`
     - `game.itempiles.API.calculateCurrencies("9gp", 0.5)` would result in `4GP 5EP`
 - Deprecated `game.itempiles.API.getPaymentDataFromString()` in favor of `game.itempiles.API.getPaymentData()`
@@ -294,7 +308,8 @@
 
 - Added "Send To Character" when right-clicking items in your inventory in D&D5e - a much faster way to send items between characters
 - Added Merchant price modifier support for "group" type actors in D&D5e - adding a group to a merchant's price modifiers will apply the price modifiers to anyone belonging to that group actor (thanks to Paith on discord for the idea!)
-- Added `game.itempiles.API.refreshMerchantInventory()`, which can be called to manually refresh a merchant's inventory based on its configured tables
+- Added
+  `game.itempiles.API.refreshMerchantInventory()`, which can be called to manually refresh a merchant's inventory based on its configured tables
 - Added `PRICE_MODIFIER_TRANSFORMER` and `SYSTEM_HOOKS` to `game.itempiles.API.addSystemIntegration()`
 - Updated Chinese and Czech localization (thank you EternalRider and Mortan on weblate!)
 
@@ -330,7 +345,8 @@
 ## Version 2.7.17
 
 - Fixed services would not stack and instead duplicate when added to merchants - if you still want non-stacking services, set them as non-stacking in the service's settings
-- Fixed services not being removed by the Simple Calendar during refreshes - if you want to keep them, turn on `Keep On Merchant`
+- Fixed services not being removed by the Simple Calendar during refreshes - if you want to keep them, turn on
+  `Keep On Merchant`
 
 ## Version 2.7.16
 
@@ -396,7 +412,8 @@
 ## Version 2.7.7
 
 - Added item quantity to the populate items tab of merchants
-- Added `game.itempiles.API.getMerchantPriceModifiers` and `game.itempiles.API.updateMerchantPriceModifiers` (see API docs)
+- Added `game.itempiles.API.getMerchantPriceModifiers` and
+  `game.itempiles.API.updateMerchantPriceModifiers` (see API docs)
 - Tweaked merchant populate items menu tables dropdown to recursively find every table under the configured tables folder
 - Tweaked merchant populate items to recursively roll all tables within tables, including tables in compendiums
 - Tweaked merchant populate items table behavior - if an item has quantity, item piles will assume that its quantity is how many one will get when buying 1 quantity of the item
@@ -464,7 +481,8 @@
 
 ## Version 2.6.14
 
-- Added `game.itempiles.API.unrenderItemPileInterface` which can be used to remotely close item pile interfaces for players
+- Added
+  `game.itempiles.API.unrenderItemPileInterface` which can be used to remotely close item pile interfaces for players
 - Fixed opening document sheets in compendiums would throw error and fail to open (Foundry v11)
 - Fixed hovering over vault items sometimes throwing errors in the console
 - Fixed not having any hotkeys configured would throw errors when opening item pile UIs
@@ -517,7 +535,8 @@
 - Fixed merchant open/close time not evaluating the first time you open the shop, so players could access the shop when it should have been closed
 - Fixed merchant tables not saving their roll formula
 - Fixed merchant buy/sell/service tables being crunched up into a small space when too few items had been added, which made it impossible to select a different price on items with more than one price
-- Fixed issues with creating new item piles on some systems (like Starfinder), caused by item piles trying to create items on the new item pile with `Item`s instead of the item's data
+- Fixed issues with creating new item piles on some systems (like Starfinder), caused by item piles trying to create items on the new item pile with
+  `Item`s instead of the item's data
 - Fixed split currencies button being incorrectly disabled
 
 ## Version 2.6.7
@@ -559,7 +578,8 @@
 - Updated Portuguese (Brazil) and French localization (thank you eunaumtenhoid and rectulo on Weblate!)
 - Added `PILE_DEFAULTS` and `TOKEN_FLAG_DEFAULT` system specific settings
 - Tweaked the way default item pile data is applied, in the case of merchant columns
-- Fixed `game.itempiles.API.createItemPile` not respecting an overriding `texture.src`, `texture.scaleX`, and `texture.scaleY` property on the token data
+- Fixed `game.itempiles.API.createItemPile` not respecting an overriding `texture.src`, `texture.scaleX`, and
+  `texture.scaleY` property on the token data
 - Fixed populate items not having scroll bars when enough items was added to the merchant
 - Fixed item piles created in PF2e would not be scaled appropriately due to overriding system flags
 
@@ -617,7 +637,9 @@
 
 ## Version 2.5.2
 
-- Tweaked the way rendering item piles work - if the actor sheet is rendered without holding the actor sheet hotkey, it will render the item pile UI - if you call `ActorSheet#render` you can add `{ bypassItemPiles: true }` to the secondary options to prevent the item piles UI from opening, and instead open the actor sheet
+- Tweaked the way rendering item piles work - if the actor sheet is rendered without holding the actor sheet hotkey, it will render the item pile UI - if you call
+  `ActorSheet#render` you can add
+  `{ bypassItemPiles: true }` to the secondary options to prevent the item piles UI from opening, and instead open the actor sheet
 - Fixed `Split x ways` sometimes being able to be clicked when the item pile has nothing to be split
 
 ## Version 2.5.1
@@ -626,7 +648,8 @@
 
 ## Version 2.5.0
 
-- Added support for `quantity per price` - this per item setting allows you to configure how many of the item is received when paying its price
+- Added support for
+  `quantity per price` - this per item setting allows you to configure how many of the item is received when paying its price
 - Updated PF2e's system settings to account for the above
 - Updated Polish localization (thank you Leoheart on weblate!)
 - Updated WFRP4e system settings to take into account the multiple currencies on prices for items
@@ -651,8 +674,10 @@
 ## Version 2.4.17
 
 - Updates to German localization - thank you blueacousticmusic!
-- Added `x[quantity]` to the name of new pile-type item pile tokens, so you know how many of that item was dropped on the ground
-- Changed `Infinite Quantity` on items to be a multi-choice option whether to defer to the owner's setting, or whether to have infinite quantity
+- Added
+  `x[quantity]` to the name of new pile-type item pile tokens, so you know how many of that item was dropped on the ground
+- Changed
+  `Infinite Quantity` on items to be a multi-choice option whether to defer to the owner's setting, or whether to have infinite quantity
 - Dropping items now always prompts whether to create an item pile or not
 - Dropping items from the sidebar or compendiums should now allow you to change the dropped quantity
 - Fixed issue with items not being passed properly to macros being called when buying from and selling to merchants (thank you FeistyMango!)
@@ -706,7 +731,8 @@
 - Updated German localization (thanks blueacousticmusic on Weblate!)
 - Added further Simple Calendar support; merchants can now be closed on specific weekday, and categories on notes can cause merchants to be closed (think holidays)
 - Added support for vault item styling based on item properties
-- Added `Hide Items With Zero Cost` setting to merchants, which automatically hides items in the buy/sell/service tabs if they are free
+- Added
+  `Hide Items With Zero Cost` setting to merchants, which automatically hides items in the buy/sell/service tabs if they are free
 - Tweaked `Buy Items` tab to be hidden if the merchant has no visible items for sale, and the customer can sell items
 - Fixed disabled elements being blue due to styling being incorrect
 - Fixed item-based currencies would show up in the vault grids
@@ -776,14 +802,16 @@
 - Added chat message for when users give each other items
 - Added `game.itempiles.API.addSystemIntegration()` for systems to integrate into item piles more readily
 - Added support for `true` and `false` values in system item filters
-- Added `change` as a secondary argument to `game.itempiles.API.removeCurrencies()` and `game.itempiles.API.transferCurrencies()` so that the currency removal/transfer can handle converting currencies into change to cover the full transfer
+- Added `change` as a secondary argument to `game.itempiles.API.removeCurrencies()` and
+  `game.itempiles.API.transferCurrencies()` so that the currency removal/transfer can handle converting currencies into change to cover the full transfer
 - Added more hooks:
   - `item-piles-preClickItemPile`
   - `item-piles-preGiveItem`
   - `item-piles-giveItem`
 - Added more item piles constants and useful info in `game.itempiles`
 - Updated DnD5e system support to support the new 2.1.0 update
-- Tweaked `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
+- Tweaked
+  `game.itempiles.api.turnTokensIntoItemPiles` to use the default item pile's settings when converting tokens into item piles
 - Tweaked item piles containers to be the only tokens that get the additional buttons in its token HUD
 - Tweaked the item similarities setting - a lack of them will now treat every item as distinct items rather than the same
 - Fixed GMs still being able to drop items on the canvas when the setting was not enabled
@@ -849,7 +877,8 @@
 
 ## Version 2.3.3
 
-- Reworked the `Populate Items` tab in merchants - you can now add all items on rollable tables to populate a merchant's inventory, rolling for the quantity of each item
+- Reworked the
+  `Populate Items` tab in merchants - you can now add all items on rollable tables to populate a merchant's inventory, rolling for the quantity of each item
 - Added "Show To Which Players" dialog when "Show to players" is clicked on item piles and merchants
 - Added `Hide header button` client setting
 - Fixed `Split currency x ways` not working when "Sharing Enabled: Currencies" was disabled
@@ -885,7 +914,8 @@
 - Fixed spectating users would cause the trade to be cancelled when closing the trade window
 - Fixed spectating users would not see newly added items in trades
 - Fixed users not being able to spectate trades after they reconnect
-- Fixed `turnTokensToItemPiles` would make every token be updated to use the image of the last token passed to the function
+- Fixed
+  `turnTokensToItemPiles` would make every token be updated to use the image of the last token passed to the function
 - Updated German localization (Thanks IrishWolf!)
 
 ## Version 2.2.13
@@ -1097,7 +1127,8 @@
 
 ## Version 1.4.6
 
-- Adjusted API to use native foundry `Item#fromDropData` instead of my own implementation (Thank you, TheGiddyLimit on GitHub!)
+- Adjusted API to use native foundry
+  `Item#fromDropData` instead of my own implementation (Thank you, TheGiddyLimit on GitHub!)
 - Fixed issue relating to some systems not generating a new ID for items, which caused false-positives when trying to find similar items on actors that were the source of said items
 - Fixed issue where systems would override core functions on items that modify names and other data, Item Piles will now always call the system's Item specific functions
   - Fixes issue with PF1 items sometimes showing up as identified when they were unidentified
@@ -1203,7 +1234,8 @@
 
 ## Version 1.2.6
 
-- Added `Item Filters` setting - now you can more accurately filter items you do not want to show up in item piles, such as natural weapons
+- Added
+  `Item Filters` setting - now you can more accurately filter items you do not want to show up in item piles, such as natural weapons
 - Updated all supported systems to support the above and added migrations to convert existing settings to the new system
   - Reset your Item Piles module settings to ensure you have the latest system configurations
 - Removed `Item Type Attribute` and `Item Type Filters` as the above feature covers these cases
@@ -1244,7 +1276,8 @@
 - Added setting to hide the "Item Piles" text in the actor header - useful if you have too many modules, and the header
   is getting crowded
 - Added support for the Tormenta 20 system: <https://foundryvtt.com/packages/tormenta20>
-- Tweaked `game.itempiles.API.turnTokensIntoItemPiles` to turn tokens into item piles without having the "Display Single Item
+- Tweaked
+  `game.itempiles.API.turnTokensIntoItemPiles` to turn tokens into item piles without having the "Display Single Item
   Image" setting turned on
 - API changes:
   - Changed: `game.itempiles.API.addItems`
@@ -1301,9 +1334,11 @@
   - `item-piles-preOpenItemPileInventory` - Called locally before an item pile's inventory is opened
   - `item-piles-openItemPileInventory` - Called locally after an item pile's inventory has been opened
 - API changes:
-  - Changed `game.itempiles.API.turnTokenIntoItemPile` to `game.itempiles.API.turnTokensIntoItemPiles`, now can take array of
+  - Changed `game.itempiles.API.turnTokenIntoItemPile` to
+    `game.itempiles.API.turnTokensIntoItemPiles`, now can take array of
     tokens to turn into piles
-  - Changed `game.itempiles.API.revertTokenFromItemPile` to `game.itempiles.API.revertTokensFromItemPiles`, now can take array
+  - Changed `game.itempiles.API.revertTokenFromItemPile` to
+    `game.itempiles.API.revertTokensFromItemPiles`, now can take array
     of tokens to revert
 - Improved token detection when multiple owned tokens are interacting with item piles, it should now more reliably pick
   sane tokens.
@@ -1330,8 +1365,9 @@
 
 - Added API endpoints:
   - `game.itempiles.API.getActorItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
-  - `game.itempiles.API.getActorItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and
-    can transfer
+  -
+  `game.itempiles.API.getActorItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and
+  can transfer
 - Updated japanese localization
 - Fixed item piles not respecting item type filters
 - Fixed issue with `game.itempiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile

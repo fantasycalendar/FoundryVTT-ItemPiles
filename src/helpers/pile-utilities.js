@@ -17,6 +17,19 @@ export function getPileDefaults() {
 	return foundry.utils.mergeObject({}, CONSTANTS.PILE_DEFAULTS, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
 }
 
+export function getPileActorDefaults(itemPileFlags = {}) {
+	const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
+	const defaultItemPileActor = game.actors.get(defaultItemPileId);
+
+	let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
+	if (foundry.utils.isEmpty(itemPileFlags) && defaultItemPileActor) {
+		const defaultItemPileSettings = getActorFlagData(defaultItemPileActor);
+		itemPileFlags = foundry.utils.mergeObject(pileDataDefaults, defaultItemPileSettings);
+	}
+
+	return foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+}
+
 function getFlagData(inDocument, flag, defaults, existing = false) {
 	const defaultFlags = foundry.utils.deepClone(defaults);
 	let flags = foundry.utils.deepClone(existing || (foundry.utils.getProperty(inDocument, flag) ?? {}));
