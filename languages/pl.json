@@ -4,7 +4,8 @@
     "Currency": "Waluta",
     "ContextMenu": {
       "ShowToPlayers": "Pokaż Graczom",
-      "RequestTrade": "Poproś o Wymianę"
+      "RequestTrade": "Poproś o Wymianę",
+      "GiveToCharacter": "Przekaż postaci"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile zaktualizowany pomyślnie.",
