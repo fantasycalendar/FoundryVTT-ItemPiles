@@ -12,6 +12,7 @@ assignees: ''
 - [ ] I have tried to clear my cache (Ctrl / Cmd + F5)
 - [ ] I have checked the console for errors (F12 to open, Console tab)
 - [ ] I have tried to reset Item Piles' system settings
+- [ ] I have reproduced this bug with only item piles & its dependency modules enabled
 
 **Describe the bug**
 A clear and concise description of what the bug is.
