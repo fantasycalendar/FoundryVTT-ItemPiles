@@ -1078,7 +1078,7 @@ export function getPriceFromString(str, currencyList = false) {
 			if (part[2] !== currency.identifier) continue;
 
 			try {
-				const roll = new Roll(part[1]).evaluateSync()
+				const roll = new Roll(part[1]).evaluateSync();
 				currency.quantity = roll.total;
 				if (roll.total !== Number(part[1])) {
 					currency.roll = roll;
