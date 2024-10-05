@@ -4,7 +4,8 @@
     "Currency": "Valuta",
     "ContextMenu": {
       "ShowToPlayers": "Mostra ai giocatori",
-      "RequestTrade": "Richiedi Trattativa"
+      "RequestTrade": "Richiedi Trattativa",
+      "GiveToCharacter": "Dai al Personaggio"
     },
     "Types": {
       "pile": "Pila di oggetti",
@@ -14,11 +15,217 @@
     },
     "Items": "Oggetti",
     "HeaderButtons": {
-      "ShowToPlayers": "Mostra ai Giocatori"
+      "ShowToPlayers": "Mostra ai Giocatori",
+      "Configure": "Configura"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile aggiornato con successo.",
-      "UpdateMerchantSuccess": "Mercante Aggiornato con Successo."
+      "UpdateMerchantSuccess": "Mercante Aggiornato con Successo.",
+      "ItemTransferred": "{item_name} di {source_actor_name} è stato dato a {target_actor_name}.",
+      "SystemSupportFound": "Supporto di sistema trovato! Applicazione delle impostazioni di sistema predefinite a Item Piles...",
+      "GiveItemAccepted": "{user_name} ha accettato la tua offerta di oggetti.",
+      "ShownToPlayers": "Mostra {actor_name} ai giocatori",
+      "ItemAdded": "{item_name} è stato aggiunto a {target_actor_name}."
+    },
+    "PlayerList": {
+      "TradeButton": "Scambia"
+    },
+    "Settings": {
+      "ItemFilters": {
+        "Hint": "Qui puoi configurare quali oggetti vengono ignorati e non elencati nelle finestre di dialogo della pila di oggetti."
+      },
+      "PricePresets": {
+        "Hint": "Qui puoi configurare prezzi preimpostati personalizzati che potrai poi importare facilmente sugli articoli."
+      },
+      "CustomItemCategories": {
+        "Hint": "Qui puoi configurare le categorie di articoli personalizzati che vengono mostrati come suggerimenti nell'editor degli articoli."
+      },
+      "Reset": {
+        "Title": "Ripristina le impostazioni specifiche del sistema sui valori predefiniti"
+      },
+      "EnableGivingItems": {
+        "Title": "Abilita Donazione Oggetti",
+        "Hint": "Ciò consente agli utenti di rilasciare oggetti su altri token per darglielo: con questa opzione disabilitata, gli utenti non possono dare oggetti ad altri utenti."
+      },
+      "Configure": {
+        "Hint": "È possibile configurare Item Piles in questa finestra di dialogo.",
+        "Label": "Configura Modulo",
+        "Title": "Configurazione Modulo"
+      },
+      "OutputToChat": {
+        "Hint": "Ogni volta che un giocatore raccoglie oggetti da una pila di oggetti, verrà inviato un messaggio che mostra cosa è stato raccolto."
+      },
+      "PopulationTablesFolder": {
+        "AllTables": "Tutte le Tabelle"
+      },
+      "CssVariables": {
+        "Title": "Stili Variabili CSS"
+      }
+    },
+    "Inspect": {
+      "TakeAll": "Prendi Tutti gli Oggetti",
+      "Change": "Cambia",
+      "Owner": "Come proprietario di questa pila di oggetti, puoi modificarne il contenuto.",
+      "Take": "Prendi",
+      "Close": "Chiudi Coperchio",
+      "NoneLeft": "Nessuno rimasto...",
+      "AddCurrency": "Aggiungi valuta",
+      "SplitAll": "Dividi in {num_players}",
+      "SplitCurrencies": "Dividi valuta in {num_players}",
+      "Empty": "Questa pila è vuota.",
+      "Destroyed": "Questa pila non esiste più e risulta inutile.",
+      "Title": "Ispezione del contenuto della pila",
+      "AsActor": "Stai ispezionando questa pila come {actorName}.",
+      "Leave": "Lascia",
+      "NoShareLeft": "Nessuna condivisione rimasta...",
+      "OpenSheet": "Apri Scheda",
+      "SplitItems": "Dividi Oggetti in {num_players}",
+      "SplitNoPlayers": "Nessun personaggio con cui dividere il contenuto."
+    },
+    "Trade": {
+      "AddCurrency": {
+        "Content": "Aggiungi valute allo scambio attivo con {trader_actor_name}",
+        "Label": "Aggiorna Valute",
+        "Title": "Aggiungi Valute"
+      },
+      "Between": "Scambia tra {actor_1} e {actor_2}",
+      "Over": "Questo scambio non è più attivo.",
+      "GMAddCurrency": "Aggiungi Valute (Modalità GM)",
+      "DragDrop": "Trascina e rilascia gli oggetti per iniziare a commerciare",
+      "Prompt": {
+        "User": "Seleziona con quale utente vuoi commerciare:",
+        "Title": "Item Piles: Invia Richiesta Scambio",
+        "PickToken": "Scegli il token selezionato",
+        "PickedActor": "Il personaggio che rappresenterai nel commercio:",
+        "PickActor": "Seleziona quale personaggio rappresenterai nel commercio:",
+        "DropActor": "Trascina e rilascia qui il personaggio",
+        "Label": "Invia richiesta commercio"
+      },
+      "Request": {
+        "AcceptQuery": "Accetti?",
+        "Title": "Item Piles: Richiesta Commercio"
+      },
+      "OngoingRequest": {
+        "Content": "Aspetta risposta da {user_name}...",
+        "Label": "Annulla richiesta di scambio"
+      },
+      "Title": "Item Piles: Commercio",
+      "CancelledRequest": {
+        "Content": "La richiesta di scambio è stata annullata da {user_name}."
+      },
+      "Accept": "Accetta",
+      "Decline": "Rifiuta",
+      "Private": "Rendi questa trattativa privata",
+      "NoActiveUsers": {
+        "Title": "Item Piles: Nessun Utente Attivo",
+        "Content": "Nessun giocatore è attivo, quindi non hai nessuno con cui commerciare."
+      },
+      "Closed": {
+        "Title": "Commercio Chiuso",
+        "You": "Hai chiuso la finestra di scambio, quindi lo scambio è stato annullato."
+      }
+    },
+    "Merchant": {
+      "Title": "Mercante: {actor_name}",
+      "LogBought": "comprato",
+      "Sell": "Vendi",
+      "Settings": "Impostazioni",
+      "LogSold": "venduto",
+      "Buy": "Compra",
+      "RemoveItem": "Rimuovi",
+      "MerchantClosed": "Il commerciante è chiuso, controlla più tardi.",
+      "ItemFree": "Gratis",
+      "Service": "Servizio",
+      "BuyItems": "Compra Oggetti",
+      "SellItems": "Vendi Oggetti",
+      "PopulateItems": "Aggiungi Oggetti",
+      "AllTypes": "Tutti i tipi",
+      "BuyServices": "Compra Servizi",
+      "Open": "Aperto",
+      "Closed": "Chiuso",
+      "Hours": "Ore",
+      "Minutes": "Minuti",
+      "Description": "Descrizione",
+      "OpenCloseAuto": "Automatico",
+      "Override": "Sostituisci",
+      "AddItem": "Aggiungi",
+      "LogQuantity": "{quantity} x "
+    },
+    "Vault": {
+      "ExpandsCols": "{cols} colonne",
+      "ExpandsRows": "{rows} righe",
+      "Withdraw": "Ritira",
+      "Deposit": "Deposita",
+      "SortItems": "Ordina Oggetti",
+      "Deposited": "depositato",
+      "LogQuantity": "{quantity} x ",
+      "Withdrew": "ritirato",
+      "LogEntry": "{instigator} {action} {quantity}{item_name}",
+      "SortItemsTooltip": "Ordina Oggetti - tieni premuto Ctrl per unire elementi simili",
+      "LogUserActor": "{actor_name} ({user_name})"
+    },
+    "Dialogs": {
+      "ResetSettings": {
+        "Title": "Ripristina Impostazioni Modulo",
+        "Confirm": "Ripristina Impostazioni Modulo"
+      },
+      "ResetSharingData": {
+        "Title": "Reimposta i dati di condivisione"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "Dare Oggetto"
+      },
+      "GiveItems": {
+        "Title": "Dona Oggetti",
+        "SelectPlaceholder": "Scegli il personaggio a cui inviare l'oggetto",
+        "Header": "Dona Oggetto: {item_name}",
+        "Secret": "Dona senza farlo sapere agli altri (tranne i GM)",
+        "Submit": "Invia"
+      },
+      "TypeWarning": {
+        "Title": "Avviso Tipo Oggetto"
+      },
+      "NewSystemVersion": {
+        "Confirm": "Aggiorna Impostazioni",
+        "Content2": "Non farlo potrebbe danneggiare Item Piles: reimposta le impostazioni specifiche del sistema del modulo per risolvere il problema.",
+        "Content": "Le impostazioni predefinite per il sistema che stai utilizzando con Item Piles sono state aggiornate. Desideri sovrascrivere le impostazioni specifiche del tuo sistema con quelle aggiornate?"
+      }
+    },
+    "Applications": {
+      "GiveItem": {
+        "Title": "Dona Oggetto",
+        "Header": "Stai donando: {item_name}"
+      },
+      "Settings": {
+        "Title": "Configurazione Modulo Item Piles",
+        "Styles": "Impostazioni Stile",
+        "System": "Impostazioni Specifiche Sistema",
+        "Module": "Impostazioni Modulo",
+        "Local": "Impostazioni Locali"
+      },
+      "VaultAccessEditor": {
+        "Character": "Giocatore/Personaggio"
+      },
+      "ItemPileConfig": {
+        "Vault": {
+          "Access": "Accesso a personaggi e giocatori"
+        },
+        "Merchant": {
+          "ActorPriceModifiersExplanation": "Qui puoi configurare se determinati personaggi specifici debbano avere modificatori di prezzo diversi rispetto ai modificatori di prezzo sopra.",
+          "ItemTypeModifiersExplanation": "In questa finestra di dialogo puoi configurare i modificatori di prezzo per i singoli tipi di articoli."
+        }
+      }
+    },
+    "Warnings": {
+      "GiveItemNoGM": "Non c'è nessun GM attivo per ricevere questo oggetto da te."
+    },
+    "General": {
+      "Primary": "Primario",
+      "Name": "Nome",
+      "Cost": "Costo",
+      "Fixed": "Fissato",
+      "Icon": "Icona",
+      "Exchange": "Scambio"
     }
   }
 }
