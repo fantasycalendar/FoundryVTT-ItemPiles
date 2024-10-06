@@ -7,6 +7,7 @@
 - Updated Italian, Polish, and Portuguese localization (thank you, Gregory Warn, Lioheart, and Eduadro on weblate!)
 - Fixed property lookup with item filters and required item properties not handling arrays well
 - Fixed editing unlinked item pile actors would not transfer the configuration to the prototype token of the item pile
+- Added missing "Sort By" localization
 
 ## Version 3.1.5
 

@@ -50,7 +50,7 @@
 	{/if}
 	<select bind:value={$sortTypeStore} style="flex:0 1 auto; margin-left: 0.4rem; height: 26px;">
 		{#each $sortTypesStore as column, index}
-			<option value={index}>Sort by: {localize(column.label)}</option>
+			<option value={index}>{localize("ITEM-PILES.Merchant.SortBy")} {localize(column.label)}</option>
 		{/each}
 	</select>
 </div>
