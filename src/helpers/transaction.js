@@ -4,7 +4,6 @@ import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
-import container from "../applications/item-pile-config/settings/container.svelte";
 
 export default class Transaction {
 
@@ -29,10 +28,6 @@ export default class Transaction {
 	async appendItemChanges(items, {
 		set = false, remove = false, type = "item", keepIfZero = false
 	} = {}) {
-
-		if (!remove) {
-			items = Utilities.ensureValidIds(this.document, items);
-		}
 
 		for (let data of items) {
 
@@ -220,6 +215,8 @@ export default class Transaction {
 			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData));
 			return item;
 		});
+
+		this.itemsToCreate = Utilities.ensureValidIds(this.document, this.itemsToCreate);
 
 		this.itemsToDelete = this.itemsToUpdate.filter(item => {
 			return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";

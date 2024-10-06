@@ -181,7 +181,9 @@ export default class MerchantStore extends ItemPileStore {
 
 	visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
 		const itemIsFree = !!get(entry.prices).find(price => price.free);
+		const itemIsContained = get(entry.containerID);
 		return super.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData)
+			&& !itemIsContained
 			&& (
 				actorIsMerchant
 					? !(pileData?.hideItemsWithZeroCost && itemIsFree)

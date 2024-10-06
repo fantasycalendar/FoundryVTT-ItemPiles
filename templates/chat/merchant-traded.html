@@ -9,12 +9,14 @@
 	</div>
 
 	<ul>
-		{{#each priceInformation as |bought basePriceString|}}
+		{{#each priceInformation as |bought|}}
 		{{#each bought.buyerReceive as |item id|}}
 		<li>
 			<img src="{{item.img}}" data-fast-tooltip="{{item.name}}" height="16"/>
 			<label>{{item.name}} <small>(x{{item.quantity}})</small></label>
+			{{#unless item.contained}}
 			<label class="item-piles-chat-price">{{bought.basePriceString}}</label>
+			{{/unless}}
 		</li>
 		{{/each}}
 		{{/each}}

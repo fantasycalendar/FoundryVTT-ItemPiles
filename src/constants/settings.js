@@ -46,7 +46,6 @@ const SETTINGS = {
 	TOKEN_FLAG_DEFAULTS: "tokenFlagDefaults",
 
 	// Hidden settings
-	DEFAULT_ITEM_PILE_JOURNAL_ID: "defaultItemPileJournalID",
 	DEFAULT_ITEM_PILE_ACTOR_ID: "defaultItemPileActorID",
 	SYSTEM_FOUND: "systemFound",
 	SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
@@ -311,13 +310,6 @@ const SETTINGS = {
 		},
 
 		[SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID]: {
-			scope: "world",
-			config: false,
-			default: "",
-			type: String
-		},
-
-		[SETTINGS.DEFAULT_ITEM_PILE_JOURNAL_ID]: {
 			scope: "world",
 			config: false,
 			default: "",

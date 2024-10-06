@@ -109,7 +109,9 @@
           }}/>
 				{:else}
 					<small>
-						{localize(...paymentData.reason)}
+						{#each paymentData.reason ?? [] as reason}
+							<p style="margin:0;">{localize(...reason)}</p>
+						{/each}
 					</small>
 				{/if}
 			</div>

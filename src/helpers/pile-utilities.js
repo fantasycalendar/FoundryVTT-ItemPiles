@@ -460,10 +460,19 @@ export function cleanItemFilters(itemFilters) {
 					}
 					return str;
 				});
-			filter.filters = new Set(filter.filters)
 			return filter;
 		})
 		: [];
+}
+
+function doesPropertyMatch(propertyValue, filterValue) {
+	if (Array.isArray(propertyValue)) {
+		return propertyValue.some(value => doesPropertyMatch(value, filterValue));
+	}
+	if (Utilities.isRealNumber(propertyValue) && Utilities.isRealNumber(Number(filterValue))) {
+		return Math.abs(propertyValue - Number(filterValue)) < Number.EPSILON;
+	}
+	return propertyValue === filterValue;
 }
 
 export function isItemInvalid(targetActor, item, itemFilters = false) {
@@ -475,10 +484,10 @@ export function isItemInvalid(targetActor, item, itemFilters = false) {
 		: item;
 	for (const filter of pileItemFilters) {
 		if (!foundry.utils.hasProperty(itemData, filter.path)) continue;
-		const attributeValue = foundry.utils.getProperty(itemData, filter.path);
-		if (filter.filters.has(attributeValue)) {
-			return attributeValue;
-		}
+		const propertyValue = foundry.utils.getProperty(itemData, filter.path);
+		const filterValues = Array.isArray(filter.filters) ? filter.filters : Array.from(filter.filters);
+		const foundFilterValue = filterValues.find(filterValue => doesPropertyMatch(propertyValue, filterValue));
+		if (foundFilterValue) return foundFilterValue;
 	}
 	return false;
 }
@@ -490,8 +499,12 @@ export function isItemValidBasedOnProperties(targetActor, item) {
 		: item;
 	for (const filter of pileItemRequiredProperties) {
 		if (!foundry.utils.hasProperty(itemData, filter.path)) return false;
-		const attributeValue = foundry.utils.getProperty(itemData, filter.path);
-		if (!filter.filters.has(attributeValue)) return false;
+
+		const propertyValue = foundry.utils.getProperty(itemData, filter.path);
+		const filterValues = Array.isArray(filter.filters) ? filter.filters : Array.from(filter.filters);
+
+		const matchFound = filterValues.some(filterValue => doesPropertyMatch(propertyValue, filterValue));
+		if (!matchFound) return false;
 	}
 	return true;
 
@@ -761,7 +774,11 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 	if (documentActor) {
 		await documentActor.update({
 			[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
-			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion()
+			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+			prototypeToken: {
+				[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
+				[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
+			}
 		});
 	}
 
@@ -1534,16 +1551,18 @@ export function getPaymentData({
 				quantity: data.quantity || 1
 			})[data.paymentIndex || 0];
 			return {
-				...prices, item: data.item
+				...prices,
+				item: data.item
 			};
 		})
 		.reduce((priceData, priceGroup) => {
 
+			priceData.reasons = [];
+
 			if (!priceGroup.maxQuantity && (buyer || seller)) {
 				priceData.canBuy = false;
-				priceData.reason = ["ITEM-PILES.Applications.TradeMerchantItem." + (buyer === merchant
-					? "TheyCantAfford"
-					: "YouCantAfford")];
+				const reason = (buyer === merchant ? "TheyCantAfford" : "YouCantAfford");
+				priceData.reason.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
 				return priceData;
 			}
 
@@ -1578,39 +1597,48 @@ export function getPaymentData({
 
 					if (existingPrice.buyerQuantity < 0) {
 						priceData.canBuy = false;
-						priceData.reason = ["ITEM-PILES.Applications.TradeMerchantItem." + (buyer === merchant
-							? "TheyCantAfford"
-							: "YouCantAfford")];
+						const reason = (buyer === merchant ? "TheyCantAfford" : "YouCantAfford");
+						priceData.reasons.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
 					}
 				}
 			}
 
 			if (priceGroup.item) {
 
-				const itemQuantity = Utilities.getItemQuantity(priceGroup.item);
-
-				const quantityPerPrice = game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE
-					? foundry.utils.getProperty(priceGroup.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1
-					: 1;
-
-				const requiredQuantity = Math.floor(priceGroup.quantity * quantityPerPrice);
-
-				if (requiredQuantity > itemQuantity && requiredQuantity > (priceGroup.maxQuantity * quantityPerPrice)) {
-					priceData.canBuy = false;
-					priceData.reason = [`ITEM-PILES.Applications.TradeMerchantItem.${buyer === merchant
-						? "You"
-						: "They"}LackQuantity`, {
-						quantity: itemQuantity, requiredQuantity
-					}];
+				let items = [{ item: priceGroup.item, contained: false }];
+				const itemTypeHandler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, priceGroup.item.type);
+				if (itemTypeHandler) {
+					const containedItems = [];
+					itemTypeHandler({ item: priceGroup.item, items: containedItems, raw: true })
+					items = items.concat(containedItems.map(item => ({ item, contained: true })))
 				}
 
-				priceData.buyerReceive.push({
-					type: "item",
-					name: priceGroup.item.name,
-					img: priceGroup.item.img,
-					quantity: requiredQuantity,
-					item: priceGroup.item,
-				});
+				for (const itemData of items) {
+
+					const itemQuantity = Utilities.getItemQuantity(itemData.item);
+
+					const quantityPerPrice = foundry.utils.getProperty(itemData.item, game.itempiles.API.QUANTITY_FOR_PRICE_ATTRIBUTE) ?? 1;
+
+					const requiredQuantity = Math.floor(priceGroup.quantity * quantityPerPrice);
+
+					if (requiredQuantity > itemQuantity && requiredQuantity > (priceGroup.maxQuantity * quantityPerPrice)) {
+						priceData.canBuy = false;
+						const reason = buyer === merchant ? "You" : "They";
+						priceData.reasons.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}LackQuantity`, {
+							quantity: itemQuantity,
+							requiredQuantity
+						}]);
+					}
+
+					priceData.buyerReceive.push({
+						type: "item",
+						name: itemData.item.name,
+						img: itemData.item.img,
+						quantity: requiredQuantity,
+						item: itemData.item,
+						contained: itemData.contained
+					});
+				}
 			}
 
 			return priceData;
@@ -1845,7 +1873,7 @@ export function isMerchantClosed(merchant, { pileData = false } = {}) {
 
 }
 
-export async function updateMerchantLog(itemPile, activityData = {}) {
+export async function updateMerchantLog(itemPile, activityData) {
 
 	const vaultLog = getActorLog(itemPile);
 

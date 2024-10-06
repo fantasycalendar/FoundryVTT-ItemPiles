@@ -9,13 +9,10 @@
 	export let noItemsLabel = "ITEM-PILES.Merchant.NoItemsForSale";
 	export let services = false;
 
-	const pileData = store.pileData;
 	const searchStore = store.search;
 	const visibleItemsStore = store.visibleItems;
-	const itemsStore = store.items;
 	const itemsPerCategoryStore = store.itemsPerCategory;
 	const categoryStore = store.categories;
-	const priceModifiersPerType = store.priceModifiersPerType;
 	const itemCategoriesStore = store.itemCategories;
 	const typeFilterStore = store.typeFilter;
 	const sortTypesStore = store.sortTypes;
@@ -26,7 +23,7 @@
 
 	$: categoryDropDown = $itemCategoriesStore.filter(category => category.service === services);
 	$: categories = $categoryStore.filter(category => category.service === services);
-	$: items = $itemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
+	$: items = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
 	$: visibleItems = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
 
 	let columns = [];

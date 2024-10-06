@@ -506,3 +506,7 @@ export function ensureValidIds(actor, itemsToCreate) {
 	});
 
 }
+
+export function isRealNumber(inNumber) {
+	return !isNaN(inNumber) && typeof inNumber === "number" && isFinite(inNumber);
+}

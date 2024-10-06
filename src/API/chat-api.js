@@ -550,7 +550,7 @@ export default class ChatAPI {
 				.map(user => user.id);
 			chatData.whisper.push(userId);
 			chatData.whisper.push(targetUserId);
-			if (CONSTANTS.IS_V12) {
+			if (!CONSTANTS.IS_V12) {
 				chatData.type = CHAT_MESSAGE_STYLES.WHISPER;
 			}
 		}
@@ -652,7 +652,7 @@ export default class ChatAPI {
 				if (mode === 2) {
 					chatData.whisper.push(userId);
 				}
-				if (CONSTANTS.IS_V12) {
+				if (!CONSTANTS.IS_V12) {
 					chatData.type = CHAT_MESSAGE_STYLES.WHISPER;
 				}
 			}

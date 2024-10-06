@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 3.1.6
+
+- Improved D&D5e support for merchants by allowing them to buy and sell both containers and the items they contain
+  - This does not prevent players from selling containers and their contents, and the sell price only takes the container's price into consideration
+- Updated Italian, Polish, and Portuguese localization (thank you, Gregory Warn, Lioheart, and Eduadro on weblate!)
+- Fixed property lookup with item filters and required item properties not handling arrays well
+- Fixed editing unlinked item pile actors would not transfer the configuration to the prototype token of the item pile
+
 ## Version 3.1.5
 
 - Added missing localization for "Give To Character" item right click menu in D&D5e

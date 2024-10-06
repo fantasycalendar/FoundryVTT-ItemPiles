@@ -68,9 +68,9 @@ export default {
 			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
 				return item.system.contents.contents;
 			},
-			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
+			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items, raw = false } = {}) => {
 				for (const containedItem of item.system.contents.contents) {
-					items.push(containedItem.toObject());
+					items.push(raw ? containedItem : containedItem.toObject());
 				}
 			}
 		}
