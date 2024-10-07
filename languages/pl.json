@@ -183,7 +183,8 @@
       "LogSetVisible": "{instigator} ustaw <strong>{item}</strong> jako <span>widoczny</span>",
       "LogTransaction": "{instigator} {action} {quantity}{item} na {price}",
       "LogSetNotForSale": "{instigator} ustaw <strong>{item}</strong> <span>nie na sprzedaż</span>",
-      "LogSetHidden": "{instigator} ustaw <strong>{item}</strong> jako <span>ukryty</span>"
+      "LogSetHidden": "{instigator} ustaw <strong>{item}</strong> jako <span>ukryty</span>",
+      "SortBy": "Sortuj według:"
     },
     "Dialogs": {
       "TypeWarning": {
