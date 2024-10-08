@@ -1,0 +1,35 @@
+{
+  "ITEM-PILES": {
+    "Items": "物品",
+    "ContextMenu": {
+      "ShowToPlayers": "向玩家展示",
+      "RequestTrade": "要求交易",
+      "GiveToCharacter": "交給角色"
+    },
+    "PlayerList": {
+      "TradeButton": "交易"
+    },
+    "HeaderButtons": {
+      "ShowToPlayers": "向玩家們展示",
+      "Configure": "配置"
+    },
+    "Notifications": {
+      "SystemSupportFound": "找到系統支援！正在應用預設設定至本模組...",
+      "ItemAdded": "{item_name}已添加至{target_actor_name}。",
+      "UpdateItemPileSuccess": "成功更新本物品堆。",
+      "UpdateMerchantSuccess": "成功更新本商人。",
+      "ItemTransferred": "{source_actor_name}的{item_name}已交給{target_actor_name}。",
+      "GiveItemAccepted": "{user_name}接受了你的物品提議。",
+      "ShownToPlayers": "展示{actor_name}至玩家們",
+      "CreatedJournal": "創建了物品堆保險庫紀錄日誌。"
+    },
+    "Currencies": "貨幣",
+    "Currency": "貨幣",
+    "Types": {
+      "pile": "物品堆",
+      "container": "容器",
+      "merchant": "商人",
+      "vault": "保險庫"
+    }
+  }
+}
