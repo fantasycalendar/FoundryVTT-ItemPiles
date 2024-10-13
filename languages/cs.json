@@ -4,10 +4,12 @@
     "Currency": "Měna",
     "ContextMenu": {
       "ShowToPlayers": "Ukázat hráčům",
-      "RequestTrade": "Požádat o obchod"
+      "RequestTrade": "Požádat o obchod",
+      "GiveToCharacter": "Dát postavě"
     },
     "HeaderButtons": {
-      "ShowToPlayers": "Ukázat hráčům"
+      "ShowToPlayers": "Ukázat hráčům",
+      "Configure": "Konfigurace"
     },
     "Types": {
       "pile": "Kupa položek",
@@ -35,7 +37,8 @@
       "PileLocked": "Tento kontejner je uzamčen a nemůže být otevřen - nemůžeš do něj vkládat položky.",
       "DropNoToken": "Nemáš token v této scéně, takže zde nemůžeš odložit žádné položky.",
       "NoVaultAccess": "Nemáš oprávnění zobrazit tento trezor.",
-      "NoVaultAccessActor": "{actor_name} nemá oprávnění zobrazit tento trezor."
+      "NoVaultAccessActor": "{actor_name} nemá oprávnění zobrazit tento trezor.",
+      "ItemNoQuantity": "{item_name} má množství 0, nemůžete tedy tento předmět převést!"
     },
     "Warnings": {
       "NoGMsConnected": "VAROVÁNÍ - GM není připojen - Item Piles požadují připojení GM aby hráči mohli využít většinu funkcí modulu.",
@@ -43,8 +46,16 @@
       "GiveItemDeclined": "{user_name} odmítl vaši nabídku.",
       "NoPlayersActive": "Žádní hráči nejsou aktivní, aby udělali tuto akci",
       "NoGMsConnectedAction": "VAROVÁNÍ - Nelze provést \"{action}\" protože žádný GM není aktivní.",
-      "VaultFull": "Tento trezor je plný!",
-      "VaultItemNotExpander": "Tato položka není rozšířením trezoru"
+      "VaultFull": "Tento předmět se do úložiště nevejde!",
+      "VaultItemNotExpander": "Tato položka není rozšířením trezoru",
+      "NoResponseFromGM": "VAROVÁNÍ - PJ \"{user_name}\" nereaguje na nabídku - Item Piles požaduje aby PJ byl připojen a reagoval, aby hráči mohli využít většinu funkcí modulu.",
+      "CantSortVault": "Nepodařilo se uspořádat předměty - buď je tam jednoduše příliš mnoho předmětů, nebo se něco pokazilo",
+      "VaultInvalidItemDropped": "Nemůžete vložit tento typ předmětu do tohoto úložiště!",
+      "VaultSameItemOrigin": "Nemůžete umístit předmět do úložiště který pochází z úložiště!",
+      "DroppedIsNotItem": "Nemůžete vložit dokument typu \"{type}\" do této kupy položek!",
+      "VaultNoGmItemSidebar": "Pouze PJ může vložit předmět z postranního panelu!",
+      "NoResponseFromGMTimeout": "VAROVÁNÍ - PJ \"{user_name}\" nereagoval na poslední žádost - prosím počkejte {time} sekund než uděláte další žádost v Item Piles.",
+      "TransactionNoGMConnected": "Žádný PJ není připojen - současná transakce byla stornována, nic nebylo přidáno, odstraněno nebo převedeno."
     },
     "Inspect": {
       "Title": "Průzkum obsahu kupy",
@@ -62,7 +73,9 @@
       "SplitAll": "Rozdělit na {num_players} dílů",
       "SplitItems": "Rozdělit položky pro {num_players}",
       "SplitCurrencies": "Rozdělit peníze pro {num_players}",
-      "AsActor": "Zkoumáš tuto kupu jako {actorName}."
+      "AsActor": "Zkoumáš tuto kupu jako {actorName}.",
+      "Change": "Změna",
+      "SplitNoPlayers": "Nebyly nalezeny žádné postavy, s nimiž by obsah mohl být rozdělen."
     },
     "Trade": {
       "Title": "Item Piles: Obchod",
@@ -180,7 +193,8 @@
       "LogSetForSale": "{instigator} nastavil <strong>{item}</strong> <span>Na prodej</span",
       "LogSetNotForSale": "{instigator} nastavil <strong>{item}</strong> <span>Ne k prodeji</span",
       "LogSetVisible": "{instigator} nastavil <strong>{item}</strong> na <span>Viditelný</span",
-      "LogTransaction": "{instigator} {action} {quantity}{item} za {price}"
+      "LogTransaction": "{instigator} {action} {quantity}{item} za {price}",
+      "SortBy": "Třízeno podle:"
     },
     "Items": "Položky",
     "Settings": {
@@ -326,6 +340,18 @@
       "PreloadFiles": {
         "Title": "Předběžné načtení souborů",
         "Hint": "Způsobí, že se soubory (obrázky a zvuky) Kup předem načtou, což vede k bezproblémovému zážitku."
+      },
+      "ItemLootClass": {
+        "Title": "Typ třídy kořisti předmětu",
+        "Hint": "Třída typu předmětu je typ předmětu, který bude použit pro výchozí předmět kořisti."
+      },
+      "ItemWeaponClass": {
+        "Title": "Typ třídy předmětu zbraně",
+        "Hint": "Typ třídy předmětu je typ předmětu, který bude použit jako výchozí předmět zbraně."
+      },
+      "ItemEquipmentClass": {
+        "Title": "Typ třídy předmětu Vybavení",
+        "Hint": "Typ třídy předmětu je typ předmětu, který bude použit jako výchozí předmět Vybavení."
       }
     },
     "Applications": {
@@ -390,7 +416,11 @@
           "LogMerchantActivity": "Protokol aktivit obchodníka",
           "LogMerchantActivityExplanation": "Pokud je tato funkce povolena, obchodník zaznamenává události, jako je nákup a prodej položek a aktualizace stavu (množství, viditelnost a prodej) položek GM.",
           "ClearMerchantLog": "Vyčistit protokol obchodníka",
-          "ClearMerchantLogExplanation": "Tímto se vymaže protokol obchodníka a odstraní se všechny záznamy. Tuto akci nelze vrátit zpět."
+          "ClearMerchantLogExplanation": "Tímto se vymaže protokol obchodníka a odstraní se všechny záznamy. Tuto akci nelze vrátit zpět.",
+          "HideTokenWhenClosedExplanation": "Když je toto povoleno, token(y) tohoto obchodníka bude skryt, když je zavřeno.",
+          "OnlyAcceptCustomPricesExplanation": "Když je povoleno, všechny předměty prodané tomuto obchodníkovi musí použít smluvní cenu pro daný předmět (existuje-li), a nikoliv běžné měny. Pokud předmět nemá smluvní cenu, nemůže být prodán.",
+          "HideTokenWhenClosed": "Skrýt token při zavření",
+          "OnlyAcceptCustomPrices": "Akceptovat pouze smluvní ceny"
         },
         "Vault": {
           "CanStackItemsExplanation": "Když je toto povoleno, položky přidané do trezoru se budou slučovat s podobnými předměty. Toto může být také řízeno po položkách v jejich konfiguraci.",
@@ -420,7 +450,7 @@
           "LoggingFormatActor": "Zobraz pouze jméno postavy"
         },
         "Configure": "Kupa položek",
-        "Update": "Aktualizace Kupy položek",
+        "Update": "Aktualizace",
         "Main": {
           "Title": "Hlavní nastavení",
           "EnabledPile": "Povoleno",
@@ -449,7 +479,16 @@
           "EditDescriptionExplanation": "Tento popis se zobrazuje v relevantním rozhraní když je Kupa položek zobrazena",
           "DeleteWhenEmptyYes": "Ano, smazat, když je prázdné",
           "OverrideSecondaryCurrencies": "Přepsat druhotné měny",
-          "OverrideItemFiltersExplanation": "Upraví zda tato Kupa může být schopna převádět jiné typy položek, než výchozí."
+          "OverrideItemFiltersExplanation": "Upraví zda tato Kupa může být schopna převádět jiné typy položek, než výchozí.",
+          "RequiredItemProperties": "Požadované vlastnosti předmětu",
+          "RequiredItemPropertiesExplanation": "Nastavte, zda tato kupa položek má vyžadovat, aby do ní přenášené předměty měly určité vlastnosti.",
+          "CanStackItems": "Může slučovat předměty",
+          "CanStackItemsExplanation": "S tímto nastavením předmět přidaný na kupu položek bude sloučen s podobnými předměty. Toto může být také řízeno po položkách v jejich konfiguraci. Poznámka: Toto je rovněž závislé na systému, neboť některé předměty nemají množství a tak nemohou být nikdy slučovány.",
+          "CanStackItemsNo": "Ne, neslučovat předměty (pokud předmět neříká jinak)",
+          "CanStackItemsYesAlways": "Ano, vždy slučovat předměty",
+          "CanStackItemsNoAlways": "Ne, nikdy neslučovat předměty",
+          "CanStackItemsYes": "Ano, slučovat předměty (pokud předmět neříká jinak)",
+          "ConfigureRequiredItemProperties": "Konfigurace požadovaných vlastností předmětu"
         },
         "Other": {
           "Title": "Jiná nastavení",
@@ -627,7 +666,9 @@
         "Exchange": "Směna",
         "Data": "Data",
         "Icon": "Ikona",
-        "AddNew": "Přidat novou měnu"
+        "AddNew": "Přidat novou měnu",
+        "Drop": "Vložte pro přidání",
+        "CreateNew": "Pro start vložte předmět nebo klikněte na tlačítko plus!"
       },
       "SecondaryCurrenciesEditor": {
         "Title": "Item Piles Editor druhotných měn",
@@ -688,20 +729,35 @@
           "AddPurchaseOption": "Přidat nákupní možnost",
           "DropMeClickMe": "Klikněte pro přidání atributu nebo přetáhněte položku k přidání",
           "PricePreset": "Nebo vyberte předvolbu ceny:",
-          "SelectPreset": "Výběr předvolby ceny"
+          "SelectPreset": "Výběr předvolby ceny",
+          "SellOptions": "Prodejní možnosti",
+          "AddSellOption": "Přidat prodejní možnost",
+          "PurchaseOptionsAsSellOption": "Nákupní možnosti jako Prodejní možnosti",
+          "PurchaseOptionsAsSellOptionExplanation": "Když je toto povoleno, nákupní možnosti níže mohou být použity při prodeji předmětu zpět obchodníkovi. Jako výchozí můžou být použity pouze prodejní možnosti níže.",
+          "SellOptionsExplanation": "Zde můžete konfigurovat alternativní cesty k prodeji tohoto předmětu. Každá skupina reprezentuje odlišnou cestu jíž postava může prodat tento předmět obchodníkům."
         },
         "VaultTab": {
           "VaultExpander": "Rozšiřovač trezoru",
           "VaultExpanderExplanation": "Když je povoleno, tento předmět se nechová jako běžná položka v trezoru. Namísto toho zvýší množství dostupných slotů, jak je stanoveno níže.",
           "ExpandColumnsRows": "Rozšíření sloupců a řádků",
-          "ExpandColumnsRowsExplanation": "Pokud je výše uvedené nastavení povoleno, nastavuje, kolik sloupců a/nebo řádků bude v trezoru k dispozici. Tato hodnota nesmí přesáhnout kapacitu trezoru."
+          "ExpandColumnsRowsExplanation": "Pokud je výše uvedené nastavení povoleno, nastavuje, kolik sloupců a/nebo řádků bude v trezoru k dispozici. Tato hodnota nesmí přesáhnout kapacitu trezoru.",
+          "GridSize": "Velikost mřížky",
+          "GridSizeExplanation": "Tímto se nastaví, kolik políček mřížky tento předmět zabírá.",
+          "VaultImageRotatedExplanation": "Toto překreslí obrázek předmětu, když je zobrazen v úložišti zatímco je pootočen.",
+          "GridHeight": "Výška",
+          "PriceModifierTitle": "Nákupní a prodejní modifikátory ceny",
+          "VaultImage": "Obrázek v úložišti",
+          "VaultImageExplanation": "Toto překreslí obrázek předmětu, když je zobrazen v úložišti.",
+          "VaultImageRotated": "Pootočený obrázek v úložišti",
+          "GridWidth": "Šířka",
+          "PriceModifierExplanation": "Toto nastavuje modifikátory pro cenu tohoto předmětu když je nakupován nebo prodáván. Toto násobí základní cenu předmětu před ostatními modifikátory. Když je modifikátor prodejní ceny obchodníka 50%, prodejní modifikátor předmětu by měl být 200% aby se vynuloval vliv obchodníkova modifikátoru."
         }
       },
       "FilterEditor": {
         "Title": "Item Piles Editor filtrů",
         "TitleActor": "Item Piles Editor filtrů: {actor_name}",
         "Filters": "Filtry",
-        "Path": "Cesta k atributu",
+        "Path": "Cesta k vlastnostem",
         "AddNew": "Přidat nový filtr",
         "Explanation": "Zde můžete definovat několik typů filtrů, které vyloučí určité typy položek. Na základě zadané cesty k atributu může kupa položek najít \"typ\" položky a na základě filtrů tyto položky skrýt v uživatelském rozhraní inventáře kupy položek."
       },
@@ -748,6 +804,14 @@
         "Override": "Přepsat",
         "Explanation": "Zde můžete definovat nákupní a prodejní modifikátor ceny pro tohoto obchodníka vztažený ke konkrétní postavě. \"Override\" nastavení znamená že dojde k přepsání normálních cenových modifikátorů, včetně specifických cenových modifikátorů pro typ položky.",
         "DragDrop": "Přetáhněte postavu k jejímu přidání do seznamu"
+      },
+      "RequiredItemPropertiesEditor": {
+        "Title": "Item Piles - Editor vlastností požadovaného předmětu",
+        "Filters": "Požadované vlastnosti",
+        "Path": "Cesta k vlastnostem",
+        "TitleActor": "Item Piles - Editor požadovaných vlastností předmětu: {actor_name}",
+        "AddNew": "Přidat nový filtr",
+        "Explanation": "Zde můžete definovat více typů požadovaných vlastností předmětu které musí mít položky přenášené na tuto kupu položek. Na základě zadané cesty atributů, kupa položek může najít \"typ\" předmětu a na základě požadavků by zabránila přenosu položek, které tyto vlastnosti nesplňují na tuto kupu položek."
       }
     },
     "Vault": {
@@ -766,7 +830,9 @@
       "Withdrew": "vyjmuto",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "LogQuantity": "{quantity} x ",
-      "NeedsCapacity": "Tento trezor má celkovou kapacitu {total_capacity}, ale bez přidání rozšiřovačů nic z toho není dostupné"
+      "NeedsCapacity": "Tento trezor má celkovou kapacitu {total_capacity}, ale bez přidání rozšiřovačů nic z toho není dostupné",
+      "SortItemsTooltip": "Setřídit předměty - držte Ctrl pro sloučení podobných předmětů",
+      "SortItems": "Setřídit předměty"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -839,6 +905,18 @@
       "ClearMerchantLog": {
         "Title": "Vymazat Protokol obchodníka?",
         "Content": "Jste si jistí, že chcete vymazat protokol obchodníka \"{actor_name}\"?"
+      },
+      "GiveItems": {
+        "Header": "Předáván předmět: {item_name}",
+        "Title": "Předávání předmětů",
+        "Secret": "Dát bez informování ostatních (mimo PJ)",
+        "SelectPlaceholder": "Zvolte postavu jíž chcete zaslat předmět",
+        "ContentMultipleQuantity": "Máte {quantity} tohoto předmětu, kolik chcete dát pryč?",
+        "Submit": "Odeslat"
+      },
+      "SortMergeVaultItems": {
+        "Content": "Jste si jistí, že chcete sloužit podobné předměty při jejich třízení? Sloužení nemůže být vráceno.",
+        "Title": "Setřídit a sloučit podobné předměty?"
       }
     },
     "HUD": {
@@ -862,6 +940,19 @@
     "VaultLog": {
       "Withdraw": "{actor_name} ({user_name}) **vyjmul** {item_name} x {quantity} ({date})",
       "Deposit": "{actor_name} ({user_name}) *uložil* {item_name} x {quantity} ({date})"
+    },
+    "General": {
+      "Short": "Krátce",
+      "Cost": "Cena",
+      "Fixed": "Pevně",
+      "Icon": "Ikona",
+      "Data": "Data",
+      "Name": "Jméno",
+      "Primary": "Primárně",
+      "Exchange": "Výměna"
+    },
+    "PlayerList": {
+      "TradeButton": "Obchod"
     }
   }
 }
