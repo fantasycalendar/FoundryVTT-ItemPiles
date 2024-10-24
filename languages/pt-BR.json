@@ -1,12 +1,12 @@
 {
   "ITEM-PILES": {
-    "Items": "Items",
+    "Items": "Itens",
     "Currencies": "Moedas",
     "Currency": "Moeda",
     "ContextMenu": {
       "ShowToPlayers": "Mostrar aos Jogadores",
       "RequestTrade": "Solicitar Negociação",
-      "GiveToCharacter": "Transferir Item"
+      "GiveToCharacter": "Dar ao Personagem"
     },
     "PlayerList": {
       "TradeButton": "Trocar"
