@@ -22,10 +22,11 @@
       "UpdateItemPileSuccess": "Item Pile aggiornato con successo.",
       "UpdateMerchantSuccess": "Mercante Aggiornato con Successo.",
       "ItemTransferred": "{item_name} di {source_actor_name} è stato dato a {target_actor_name}.",
-      "SystemSupportFound": "Supporto di sistema trovato! Applicazione delle impostazioni di sistema predefinite a Item Piles...",
+      "SystemSupportFound": "Supporto di sistema trovato! Applicazione delle impostazioni di sistema predefinite a Item Piles",
       "GiveItemAccepted": "{user_name} ha accettato la tua offerta di oggetti.",
       "ShownToPlayers": "Mostra {actor_name} ai giocatori",
-      "ItemAdded": "{item_name} è stato aggiunto a {target_actor_name}."
+      "ItemAdded": "{item_name} è stato aggiunto a {target_actor_name}.",
+      "CreatedJournal": "Creato il diario di Item Piles Vault Log ."
     },
     "PlayerList": {
       "TradeButton": "Scambia"
@@ -60,6 +61,36 @@
       },
       "CssVariables": {
         "Title": "Stili Variabili CSS"
+      },
+      "CurrencyDecimalDigits": {
+        "Title": "Cifre Decimali Valuta"
+      },
+      "ShowTradeButton": {
+        "Title": "Mostra Pulsante Commercio"
+      },
+      "Debug": {
+        "Title": "Abilita debugging"
+      },
+      "Quantity": {
+        "Title": "Attributo quantità articolo"
+      },
+      "Price": {
+        "Title": "Attributo prezzo articolo"
+      },
+      "QuantityForPrice": {
+        "Title": "Quantità di articoli per l'attributo prezzo"
+      },
+      "Currencies": {
+        "Label": "Configura valute",
+        "Title": "Valute"
+      },
+      "HideTokenBorder": {
+        "HideEveryone": "Nascosto a tutti",
+        "HidePlayers": "Nascosto ai giocatori"
+      },
+      "SecondaryCurrencies": {
+        "Title": "Valute secondarie",
+        "Label": "Configura Valute secondarie"
       }
     },
     "Inspect": {
@@ -103,7 +134,9 @@
       },
       "Request": {
         "AcceptQuery": "Accetti?",
-        "Title": "Item Piles: Richiesta Commercio"
+        "Title": "Item Piles: Richiesta Commercio",
+        "PrivateContent": "{trading_actor_name} (utente {trading_user_name}) desidera commerciare <strong>privatamente</strong> con te.",
+        "Content": "{trading_actor_name} (utente {trading_user_name}) vuole commerciare con te."
       },
       "OngoingRequest": {
         "Content": "Aspetta risposta da {user_name}...",
@@ -122,8 +155,19 @@
       },
       "Closed": {
         "Title": "Commercio Chiuso",
-        "You": "Hai chiuso la finestra di scambio, quindi lo scambio è stato annullato."
-      }
+        "You": "Hai chiuso la finestra di scambio, quindi lo scambio è stato annullato.",
+        "Them": "L'utente \"{user_name}\" ha chiuso la finestra di scambio, quindi lo scambio è stato annullato.",
+        "Someone": "Uno degli utenti ha chiuso la finestra di scambio, quindi lo scambio è stato annullato."
+      },
+      "UserActiveCharacterWarning": "Hai scelto l'attore \"{actor_name}\" che è il personaggio assegnato al giocatore \"{player_name}\", che è <strong>attivo</strong>.<br><br>Sei sicuro di volerlo fare?",
+      "SameActor": "Entrambi gli utenti non possono scegliere lo stesso personaggio: non è possibile effettuare scambi dallo stesso personaggio. Smettila.",
+      "Disconnected": "Uno degli utenti è stato disconnesso, quindi lo scambio è stato annullato.",
+      "UserCharacterWarning": "Hai scelto l'attore \"{actor_name}\" che è il personaggio assegnato al giocatore \"{player_name}\".<br><br>Sei sicuro di volerlo fare?",
+      "ActorOwnerWarning": "Non possiedi questo personaggio, quindi non puoi commerciare con lui.",
+      "PrivateExplanation": "Non viene pubblicata alcuna scheda chat e nessuno può assistere",
+      "Mute": "Silenzia",
+      "AutoDecline": "Non hai risposto alla richiesta di scambio abbastanza velocemente, quindi è stata rifiutata automaticamente.",
+      "Declined": "L'altro utente ha rifiutato la richiesta di scambio."
     },
     "Merchant": {
       "Title": "Mercante: {actor_name}",
@@ -149,7 +193,44 @@
       "OpenCloseAuto": "Automatico",
       "Override": "Sostituisci",
       "AddItem": "Aggiungi",
-      "LogQuantity": "{quantity} x "
+      "LogQuantity": "{quantity} x ",
+      "TableCustomCategory": "Aggiungi articoli alla categoria personalizzata:",
+      "LogSetNotForSale": "{instigator} imposta <strong>{item}</strong> <span>da non vendere</span",
+      "LogSetVisible": "{instigator} imposta <strong>{item}</strong> come <span>visibile</span",
+      "LogSetHidden": "{instigator} imposta <strong>{item}</strong> come <span>nascosto</span",
+      "NoMatchFound": "Niente corrisponde alla tua ricerca",
+      "NoItemsForSale": "Il commerciante non ha nulla in vendita",
+      "NoItemsToSell": "Non hai nulla da vendere a questo commerciante",
+      "EditTypePrices": "Modifica i modificatori di costo per tipo",
+      "EditTypePricesExplanation": "Attiva/disattiva la visibilità dei dispositivi di scorrimento per tipo nella scheda Articoli acquistati",
+      "BuyNoItems": "Il commerciante non ha articoli",
+      "CurrentItems": "Articoli attuali",
+      "CurrentServices": "Servizi attuali",
+      "NoRollTables": "Non esistono tabelle su cui tirare, creane una per iniziare",
+      "ClearAllItems": "Cancella tutti gli elementi del personaggio",
+      "ClearAllServices": "Cancella tutti i servizi del personaggio",
+      "RollableTables": "Tabelle su cui tirare",
+      "RollAllTables": "Tira su Tutte le Tabelle",
+      "AddTable": "Aggiungi Tabella",
+      "ShoppingAs": "Acquista come {actorName}",
+      "LogSearch": "Ricerca Registro:",
+      "ToolTipRemoveTable": "Rimuovi Tabella",
+      "TooltipRollTable": "Tira su Tabella",
+      "TableTimesToRoll": "Numero Tiri su tabella:",
+      "ToolTipRemoveAllRolledItems": "Rimuovi tutti gli articoli tirati",
+      "LogTransaction": "{instigator} {action} {quantity}{item} per {price}",
+      "LogSetQuantity": "{instigator} imposta <strong>{item}</strong> <span>quantità</span> a {quantity}",
+      "Log": "Registro Attività",
+      "OpenTimes": "Orari di apertura",
+      "RolledTimes": "Tirato {rolls} volte",
+      "ClickRoll": "Clicca su Tira per iniziare",
+      "KeepRolled": "Mantieni tirato",
+      "TooltipConfigureTable": "Configura Tabella",
+      "TableAddAllItems": "Aggiungi tutti gli elementi:",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "SortBy": "Ordina per:",
+      "AddAll": "Aggiungi Tutti gli Articoli",
+      "LogSetForSale": "{instigator} imposta <strong>{item}</strong> <span>da vendere</span"
     },
     "Vault": {
       "ExpandsCols": "{cols} colonne",
@@ -162,46 +243,121 @@
       "Withdrew": "ritirato",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "SortItemsTooltip": "Ordina Oggetti - tieni premuto Ctrl per unire elementi simili",
-      "LogUserActor": "{actor_name} ({user_name})"
+      "LogUserActor": "{actor_name} ({user_name})",
+      "VaultTab": "Deposito",
+      "CapacityFull": "Questo deposito ha raggiunto la sua capacità massima di {total_capacity}",
+      "ExpandersTab": "Espansori",
+      "LogTab": "Registri",
+      "NeedsCapacity": "Questo deposito ha una capacità totale di {total_capacity}, ma nulla sarà disponibile finché non verranno aggiunti gli espansori del deposito",
+      "CapacityLeft": "Questo deposito ha una capacità di {capacity}, con un massimo di {total_capacity}, trascina e rilascia gli espansori del deposito per aumentare la capacità",
+      "ViewingAs": "Visualizza come {actor_name}"
     },
     "Dialogs": {
       "ResetSettings": {
         "Title": "Ripristina Impostazioni Modulo",
-        "Confirm": "Ripristina Impostazioni Modulo"
+        "Confirm": "Ripristina Impostazioni Modulo",
+        "Content": "Sei sicuro di voler ripristinare tutte le impostazioni del modulo Item Piles sui valori predefiniti del sistema corrente? <strong>QUESTO NON PUÒ ESSERE ANNULLATO!</strong>"
       },
       "ResetSharingData": {
-        "Title": "Reimposta i dati di condivisione"
+        "Title": "Reimposta i dati di condivisione",
+        "Content": "Ciò ripristinerà tutta la cronologia dei giocatori che hanno preso la loro quota da questa pila.<br><br>Sei sicuro di volerlo fare?",
+        "Confirm": "Reimposta i dati di condivisione"
       },
       "GiveItemUserNotActive": {
-        "Title": "Dare Oggetto"
+        "Title": "Dare Oggetto",
+        "Content": "\"{actor_name}\" è di proprietà del giocatore \"{user_name}\" ma non è attivo, quindi non puoi dargli questo oggetto."
       },
       "GiveItems": {
         "Title": "Dona Oggetti",
         "SelectPlaceholder": "Scegli il personaggio a cui inviare l'oggetto",
         "Header": "Dona Oggetto: {item_name}",
         "Secret": "Dona senza farlo sapere agli altri (tranne i GM)",
-        "Submit": "Invia"
+        "Submit": "Invia",
+        "ContentMultipleQuantity": "Hai {quantity} di questo articolo, quanti vuoi regalare?"
       },
       "TypeWarning": {
-        "Title": "Avviso Tipo Oggetto"
+        "Title": "Avviso Tipo Oggetto",
+        "SellContent": "Stai tentando di vendere un articolo del tipo (\"{type}\") che normalmente il commerciante non accetta. Sei sicuro di volerlo fare?",
+        "DropContent": "Stai rilasciando un elemento di un tipo (\"{type}\") che normalmente non è consentito rilasciare. Sei sicuro di volerlo fare?",
+        "TradeContent": "Stai tentando di scambiare un oggetto di un tipo (\"{tipo}\") che normalmente non può essere scambiato. Sei sicuro di volerlo fare?"
       },
       "NewSystemVersion": {
         "Confirm": "Aggiorna Impostazioni",
         "Content2": "Non farlo potrebbe danneggiare Item Piles: reimposta le impostazioni specifiche del sistema del modulo per risolvere il problema.",
-        "Content": "Le impostazioni predefinite per il sistema che stai utilizzando con Item Piles sono state aggiornate. Desideri sovrascrivere le impostazioni specifiche del tuo sistema con quelle aggiornate?"
+        "Content": "Le impostazioni predefinite per il sistema che stai utilizzando con Item Piles sono state aggiornate. Desideri sovrascrivere le impostazioni specifiche del tuo sistema con quelle aggiornate?",
+        "Title": "Nuova Versione Sistema"
+      },
+      "ClearAllItems": {
+        "Content": "Verranno cancellati tutti gli articoli del commerciante. Sei sicuro di volerlo fare?",
+        "Title": "Cancella tutti gli elementi del personaggio"
+      },
+      "NoSystemFound": {
+        "Content": "Questo sistema non è attualmente completamente supportato. Ciò significa che il modulo non sa come gestire al meglio gli elementi di questo sistema, ma può comunque funzionare in modo limitato.<br><br>Puoi configurare tu stesso le impostazioni del modulo, ma richiede un po' di know-how tecnico. <br><br>Se hai domande, invia un ping a <strong>Wasp#2005</strong> nella sezione Discord di Foundry.",
+        "Title": "Sistema non riconosciuto"
+      },
+      "ReceiveItem": {
+        "Ignore": "Ignora utente",
+        "Header": "Item Piles: Ricezione Oggetto",
+        "Content": "{source_actor_name} vuole regalare un oggetto a {target_actor_name}, accetti?",
+        "Title": "Ricezione Oggetto"
+      },
+      "ClearAllServices": {
+        "Content": "Verranno cancellati tutti i servizi del commerciante. Sei sicuro di volerlo fare?",
+        "Title": "Cancella tutti i servizi dei personaggi"
+      },
+      "RemoveMerchantTable": {
+        "Content": "Sei sicuro di voler rimuovere la tabella \"{table_name}\" da questo commerciante? Ciò non è annullabile.",
+        "Title": "Rimuovi Tabella Mercante"
+      },
+      "CantRemoveVaultExpander": {
+        "Content": "Non puoi rimuovere questo espansore, gli oggetti nel deposito non entrerebbero senza di esso. Rimuovi {num_items} elementi prima di provare a rimuovere questo espansore!",
+        "Title": "Impossibile rimuovere l'espansore"
+      },
+      "TextEditor": {
+        "Title": "Editor Testo"
+      },
+      "LinkedActorWarning": {
+        "Title": "Item Piles & Personaggio Collegato",
+        "Content": "Sei sicuro di voler trasformare questo <strong>attore collegato</strong> in una pila di oggetti? Il token di questo attore è collegato e tutti i token di questo attore condivideranno il suo inventario e le sue valute."
+      },
+      "ClearMerchantLog": {
+        "Title": "Cancella registro del commerciante?",
+        "Content": "Sei sicuro di voler cancellare il registro del commerciante \"{actor_name}\"?"
+      },
+      "SortMergeVaultItems": {
+        "Content": "Sei sicuro di voler unire elementi simili mentre li ordini? L'unione non può essere annullata.",
+        "Title": "Ordinare e unire elementi simili?"
+      },
+      "UserSelect": {
+        "Title": "Seleziona Utente",
+        "Content": "Mostrare a quali utenti?"
+      },
+      "ClearVaultLog": {
+        "Title": "Cancellare registro del deposito?",
+        "Content": "Sei sicuro di voler cancellare il registro del deposito \"{actor_name}\"?"
       }
     },
     "Applications": {
       "GiveItem": {
         "Title": "Dona Oggetto",
-        "Header": "Stai donando: {item_name}"
+        "Header": "Stai donando: {item_name}",
+        "Content": "Vuoi dare questo oggetto a \"{target_name}\"?",
+        "ContentMultipleQuantity": "Hai {quantità} di questo articolo, quanti ne vuoi regalare?",
+        "Submit": "Dai",
+        "ContentInfiniteQuantity": "Quanti ne vuoi dare a \"{target_name}\"?"
       },
       "Settings": {
         "Title": "Configurazione Modulo Item Piles",
         "Styles": "Impostazioni Stile",
         "System": "Impostazioni Specifiche Sistema",
         "Module": "Impostazioni Modulo",
-        "Local": "Impostazioni Locali"
+        "Local": "Impostazioni Locali",
+        "Export": "Esporta Impostazioni",
+        "Import": "Importa Impostazioni",
+        "MoreToCome": "E con altre opzioni di configurazione in arrivo...",
+        "Request": "Richiedi nuove funzionalità qui.",
+        "Submit": "Conferma Impostazioni",
+        "Donate": "Se ti piace questo modulo, considera una donazione per mantenerlo attivo!"
       },
       "VaultAccessEditor": {
         "Character": "Giocatore/Personaggio"
@@ -214,10 +370,141 @@
           "ActorPriceModifiersExplanation": "Qui puoi configurare se determinati personaggi specifici debbano avere modificatori di prezzo diversi rispetto ai modificatori di prezzo sopra.",
           "ItemTypeModifiersExplanation": "In questa finestra di dialogo puoi configurare i modificatori di prezzo per i singoli tipi di articoli."
         }
+      },
+      "DropItem": {
+        "Header": "Stai lasciando: {item_name}",
+        "ContentMultipleQuantity": "Hai {quantità} di questo articolo, quanti ne vuoi rilasciare?",
+        "Submit": "Aggiungi alla pila",
+        "SubmitNoTarget": "Crea nuova pila",
+        "ContentInfiniteQuantity": "Quanti ne vuoi lasciare?",
+        "Title": "Oggetto da lasciare",
+        "Content": "Stai aggiungendo questo oggetto alla pila di oggetti \"{target_name}\"."
+      },
+      "DepositItem": {
+        "Title": "Deposita oggetto",
+        "Submit": "Deposita",
+        "Header": "Stai depositando: {item_name}",
+        "Content": "Vuoi depositare questo oggetto in \"{target_name}\"?",
+        "ContentInfiniteQuantity": "Quanti ne vuoi depositare?",
+        "ContentMultipleQuantity": "Hai {quantità} di questo articolo, quanti vuoi depositare?"
+      },
+      "WithdrawItem": {
+        "Header": "Stai ritirando: {item_name}",
+        "ContentMultipleQuantity": "C'è {quantity} di questo articolo, quanti ne vuoi ritirare?",
+        "Content": "Vuoi ritirare questo elemento da \"{target_name}\"?",
+        "Title": "Ritira l'articolo",
+        "Submit": "Ritira"
+      },
+      "SplitItem": {
+        "ContentMultipleQuantity": "C'è {quantità} di questo articolo, quanti ne vuoi nel nuovo stack?",
+        "Header": "Stai dividendo una pila di {item_name}",
+        "Content": "Vuoi dividere questo elemento in pila?",
+        "Submit": "Dividi Pila",
+        "Title": "Dividi Pila Oggetti"
+      },
+      "EditCurrencies": {
+        "Content": "Come DM, puoi aggiornare le valute su questa pila di oggetti:",
+        "Secondary": "Valute secondarie:",
+        "NoCurrency": "{actor_name} non ha valute valide",
+        "Submit": "Approva",
+        "Title": "Modifica Valute"
+      },
+      "DropCurrencies": {
+        "NoCurrency": "{actor_name} non ha valute valide...",
+        "Submit": "Aggiungi",
+        "Content": "Puoi aggiungere le seguenti valute a questa pila di oggetti:",
+        "Title": "Rilascia Valuta"
+      },
+      "DepositCurrencies": {
+        "Title": "Deposita Valute",
+        "Content": "Puoi depositare le seguenti valute in questo deposito:",
+        "Submit": "Deposita",
+        "NoCurrency": "{actor_name} non ha valute da depositare."
+      },
+      "WithdrawCurrencies": {
+        "Title": "Ritira l'articolo",
+        "NoCurrency": "Non ci sono valute da prelevare.",
+        "Submit": "Preleva",
+        "Content": "Puoi prelevare le seguenti valute da questo deposito:"
+      },
+      "TradeMerchantItem": {
+        "Change": "Cambia",
+        "TheyCantAfford": "Non possono permettersi questo prezzo",
+        "YouLackQuantity": "Non hai abbastanza di questo articolo da vendere, hai {quantity}, ma richiedi {requiredQuantity}",
+        "TheyLackQuantity": "Non hanno abbastanza di questo articolo da vendere, hanno {quantity}, ma richiedono {requiredQuantity}",
+        "BuyItem": "Acquista Oggetto",
+        "Title": "Articolo di scambio: {item_name}",
+        "YouPay": "Paga",
+        "Quantity": "Quantità",
+        "TheyReceive": "Ricevono",
+        "YouReceive": "Ricevi",
+        "SellItem": "Vendi Oggetto",
+        "MaxQuantity": "Max {quantity}",
+        "YouCantAfford": "Non puoi permetterti questo prezzo"
+      },
+      "CurrenciesEditor": {
+        "Explanation": "Qui puoi definire quali valute sui personaggi possono essere raccolte dalle pile di oggetti, come le valute.",
+        "Exchange": "Cambio",
+        "AddNew": "Aggiungi nuova valuta",
+        "ExplanationSmallItems": "In altri sistemi, potrebbero essere elementi effettivi sull'attore: in questo caso, puoi trascinare e rilasciare elementi su questo elenco per aggiungerli alle valute.",
+        "DragDrop": "Trascina e rilascia un elemento per aggiungerlo all'elenco",
+        "Name": "Nome Valuta",
+        "Data": "Dati",
+        "CreateNew": "Rilascia oggetto o clicca sul pulsante più per iniziare!",
+        "Icon": "Icona",
+        "Drop": "Rilascia per aggiungere",
+        "ExplanationSmallAttributes": "In D&D5e, le valute esistono sugli attori nel percorso dell'attributo \"actor.system.currency.gp\", quindi dovresti aggiungere la tua con il nome \"Gold Coins\" e il percorso dell'attributo \"system.currency.gp\". Aggiungine uno facendo clic sul segno più nell'intestazione.",
+        "Title": "Editor Valute Item Piles",
+        "TitleActor": "Editor Valute Item Piles: {actor_name}"
+      },
+      "ItemEditor": {
+        "Title": "Editor elementi pile di articoli: {item_name}",
+        "General": "Impostazioni Generali",
+        "Vault": "Impostazioni Deposito",
+        "Update": "Aggiorna elemento",
+        "GeneralTab": {
+          "NotForSale": "L'articolo non è in vendita",
+          "CustomCategory": "Categoria di articoli personalizzati",
+          "CustomCategoryExplanation": "Se non è vuoto, questo elemento verrà elencato con un tipo diverso da quello che è.",
+          "NotForSaleExplanation": "Se abilitato, questo articolo non è in vendita e non può essere acquistato. Viene comunque visualizzato nell'elenco degli articoli del commerciante, a meno che l'articolo non sia anch'esso nascosto.",
+          "HiddenExplanation": "Se abilitato, questo articolo non viene visualizzato negli elenchi di articoli del commerciante.",
+          "Hidden": "L'articolo è nascosto"
+        },
+        "Price": "Impostazioni Prezzo"
+      },
+      "FilterEditor": {
+        "Filters": "Filtri",
+        "Path": "Percorso proprietà",
+        "AddNew": "Aggiungi nuovo filtro"
+      },
+      "SecondaryCurrenciesEditor": {
+        "Explanation": "Qui puoi definire quali valute secondarie possono essere raccolte e rilasciate dai personaggi.",
+        "Title": "Editor delle valute secondarie delle pile di articoli",
+        "TitleActor": "Editor valute secondarie pile di articoli: {actor_name}"
+      },
+      "CustomItemCategoriesEditor": {
+        "Category": "Categoria"
+      },
+      "UnstackableItemTypesEditor": {
+        "Type": "Tipo Articolo"
       }
     },
     "Warnings": {
-      "GiveItemNoGM": "Non c'è nessun GM attivo per ricevere questo oggetto da te."
+      "GiveItemNoGM": "Non c'è nessun GM attivo per ricevere questo oggetto da te.",
+      "NoResponseFromGM": "ATTENZIONE - Il DM \"{user_name}\" non ha risposto alla richiesta - Item Piles richiede che un DM sia connesso e risponda affinché i giocatori possano utilizzare la maggior parte delle funzionalità del modulo.",
+      "NoGMsConnected": "ATTENZIONE - Nessun GM connesso - Item Piles richiede la connessione di un DM affinché i giocatori possano utilizzare la maggior parte delle funzionalità del modulo.",
+      "GiveItemDeclined": "{user_name} ha rifiutato la tua offerta sull'articolo.",
+      "NoPlayersActive": "Nessun giocatore è attivo per eseguire questa azione",
+      "CantSortVault": "Impossibile ordinare gli elementi - semplicemente ci sono troppi elementi oppure qualcosa è andato storto",
+      "VaultFull": "Questo oggetto non può entrare in questo caveau!",
+      "VaultItemNotExpander": "Quell'oggetto non è un espansore del vault",
+      "DroppedIsNotItem": "Non puoi inserire documenti di tipo \"{type}\" in questa pila di oggetti!",
+      "VaultInvalidItemDropped": "Non puoi depositare questo tipo di oggetto in questo caveau!",
+      "VaultNoGmItemSidebar": "Solo i DM possono rilasciare oggetti dalla barra laterale!",
+      "NoResponseFromGMTimeout": "ATTENZIONE: il DM \"{user_name}\" non ha risposto all'ultima richiesta: attendi {time} secondi prima di effettuare un'altra richiesta di Item Piles.",
+      "TransactionNoGMConnected": "Nessun DM è connesso: la transazione corrente è stata annullata, nulla è stato aggiunto, rimosso o trasferito",
+      "NoGMsConnectedAction": "ATTENZIONE - Impossibile eseguire \"{action}\" perché nessun GM è attivo.",
+      "VaultSameItemOrigin": "Non puoi rilasciare nel caveau oggetti che provengono dal caveau!"
     },
     "General": {
       "Primary": "Primario",
@@ -225,7 +512,29 @@
       "Cost": "Costo",
       "Fixed": "Fissato",
       "Icon": "Icona",
-      "Exchange": "Scambio"
+      "Exchange": "Scambio",
+      "Short": "Breve",
+      "Data": "Dati"
+    },
+    "Errors": {
+      "DisallowedItemTrade": "Non puoi scambiare elementi \"{type}\"",
+      "PileTooFar": "Sei troppo lontano per interagire con questa pila.",
+      "NoSourceDrop": "Non puoi rilasciare oggetti dalla barra degli oggetti a meno che tu non sia un GM.",
+      "NoTokenFound": "Impossibile trovare un token o un personaggio che ti rappresenti.",
+      "PileLocked": "Questo contenitore è chiuso a chiave e non può essere aperto - non puoi depositarvi oggetti.",
+      "NoVaultAccess": "Non hai l'autorizzazione per visualizzare questo deposito.",
+      "DropNoToken": "Non hai un token su questa scena, quindi non puoi rilasciare alcun oggetto qui.",
+      "DisallowedItemDrop": "Non puoi eliminare elementi \"{type}\"",
+      "DisallowedItemSell": "Questo commerciante non accetta articoli \"{type}\"",
+      "NoVaultAccessActor": "{actor_name} non dispone dell'autorizzazione per visualizzare questo vault.",
+      "ItemNoQuantity": "{item_name} ha 0 quantità, quindi non puoi trasferire questo articolo!"
+    },
+    "Chat": {
+      "SpectateDisabled": "Commercio Concluso",
+      "PrivateTrade": "Commercio Privato"
+    },
+    "HUD": {
+      "Configure": "Configura Pila"
     }
   }
 }
