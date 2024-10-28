@@ -22,7 +22,7 @@
       "vault": "Vault"
     },
     "Notifications": {
-      "SystemSupportFound": "System support found! Applying default system settings to Item Piles...",
+      "SystemSupportFound": "System support found! Applying default system settings to Item Piles",
       "UpdateItemPileSuccess": "Item Pile successfully updated.",
       "UpdateMerchantSuccess": "Merchant successfully updated.",
       "ItemTransferred": "{source_actor_name}'s {item_name} was given to {target_actor_name}.",
@@ -361,7 +361,7 @@
         "Title": "Editing Currencies",
         "Content": "As a GM, you can update the currencies on this item pile:",
         "Secondary": "Secondary Currencies:",
-        "NoCurrency": "{actor_name} has no valid currencies...",
+        "NoCurrency": "{actor_name} has no valid currencies",
         "Submit": "Submit"
       },
       "DropCurrencies": {
@@ -571,7 +571,7 @@
       "ItemPileConfig": {
         "Title": "Item Pile Configuration: {actor_name}",
         "Configure": "Item Pile",
-        "Update": "Update",
+        "Update": "Config Update",
         "Main": {
           "Title": "Main Settings",
           "EnabledPile": "Enabled",
