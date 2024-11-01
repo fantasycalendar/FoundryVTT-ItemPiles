@@ -291,7 +291,8 @@ export default class PrivateAPI {
 				if (!handler) continue;
 				handler({ item, items: newItems });
 			}
-			items = items.concat(newItems.map(item => ({
+			const uniqueIds = new Set(items.map(i => i.id ?? i._id));
+			items = items.concat(newItems.filter(i => !uniqueIds.has(i._id ?? i.id)).map(item => ({
 				_id: item._id,
 				flags: undefined,
 				quantity: Utilities.getItemQuantity(item)
