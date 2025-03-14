@@ -105,14 +105,20 @@
 					promises.push(app.close());
 				}
 
-				if (promises.length || pileActor?.sheet.rendered) {
-					await Promise.allSettled(promises);
-					if (data.enabled) {
-						pileActor?.sheet.close();
-						game.itempiles.API.renderItemPileInterface(pileActor);
-					} else if (!data.enabled) {
-						pileActor?.sheet.render(true, { bypassItemPiles: true });
+				console.log("is it rendered? ", pileActor.sheet.rendered)
+				console.log("is it the same actor? ", game.actors.getName("Akra (Dragonborn Cleric)") === pileActor, game.actors.getName("Akra (Dragonborn Cleric)").id, pileActor.id)
+				console.log("is it the same sheet? ", game.actors.getName("Akra (Dragonborn Cleric)").sheet === pileActor.sheet, game.actors.getName("Akra (Dragonborn Cleric)").sheet.id, pileActor.sheet.id)
+				console.log("calling .close() on: ", pileActor.sheet.id)
+
+				debugger;
+				await Promise.allSettled(promises);
+				if (data.enabled) {
+					if (pileActor?.sheet) {
+						pileActor.sheet.close();
 					}
+					game.itempiles.API.renderItemPileInterface(pileActor);
+				} else if (!data.enabled && pileActor?.sheet) {
+					pileActor.sheet.render(true, { bypassItemPiles: true });
 				}
 			}
 		});
