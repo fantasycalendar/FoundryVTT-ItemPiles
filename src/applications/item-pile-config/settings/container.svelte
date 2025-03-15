@@ -1,6 +1,6 @@
 <script>
 
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import FilePicker from "../../components/FilePicker.svelte";
 
 	export let pileData;

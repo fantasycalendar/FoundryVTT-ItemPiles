@@ -83,7 +83,7 @@ export default ({ mode }) => {
 		},
 
 		build: {
-			outDir: '../',
+			outDir: '../dist',
 			emptyOutDir: false,
 			sourcemap: s_SOURCEMAPS,
 			brotliSize: true,

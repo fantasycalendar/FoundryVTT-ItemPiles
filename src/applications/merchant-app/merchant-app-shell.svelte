@@ -1,6 +1,6 @@
 <script>
 	import { getContext, onDestroy } from 'svelte';
-	import { ApplicationShell } from '#runtime/svelte/component/core';
+	import { ApplicationShell } from '#runtime/svelte/component/application';
 	import MerchantStore from "../../stores/merchant-store.js";
 	import * as Helpers from "../../helpers/helpers.js";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";

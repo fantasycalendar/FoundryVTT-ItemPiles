@@ -1,12 +1,12 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import CONSTANTS from "../../constants/constants.js";
 	import * as Helpers from "../../helpers/helpers.js";
 
 	import Tabs from "../components/Tabs.svelte";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
 	import { writable } from "svelte/store";
 
 	import MerchantApp from "../merchant-app/merchant-app.js";
@@ -105,15 +105,10 @@
 					promises.push(app.close());
 				}
 
-				console.log("is it rendered? ", pileActor.sheet.rendered)
-				console.log("is it the same actor? ", game.actors.getName("Akra (Dragonborn Cleric)") === pileActor, game.actors.getName("Akra (Dragonborn Cleric)").id, pileActor.id)
-				console.log("is it the same sheet? ", game.actors.getName("Akra (Dragonborn Cleric)").sheet === pileActor.sheet, game.actors.getName("Akra (Dragonborn Cleric)").sheet.id, pileActor.sheet.id)
-				console.log("calling .close() on: ", pileActor.sheet.id)
-
-				debugger;
 				await Promise.allSettled(promises);
 				if (data.enabled) {
 					if (pileActor?.sheet) {
+						pileActor.sheet._state = 2;
 						pileActor.sheet.close();
 					}
 					game.itempiles.API.renderItemPileInterface(pileActor);

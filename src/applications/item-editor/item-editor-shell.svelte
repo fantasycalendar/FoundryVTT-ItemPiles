@@ -1,12 +1,12 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import * as Helpers from "../../helpers/helpers.js";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
 	import ItemPriceStore from "./ItemPriceStore.js";
 	import Tabs from "../components/Tabs.svelte";
 	import PriceList from "../components/PriceList.svelte";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
 	import MacroSelector from "../components/MacroSelector.svelte";
 	import { get, writable } from "svelte/store";
 	import SETTINGS from "../../constants/settings.js";

@@ -1,7 +1,7 @@
 <script>
 
 	import ItemEditor from "../../item-editor/item-editor.js";
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 
 	export let item;
 

@@ -1,5 +1,5 @@
 <script>
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import { get, writable } from "svelte/store";
 	import { onDestroy } from "svelte";
 	import { TJSDialog } from "#runtime/svelte/application";

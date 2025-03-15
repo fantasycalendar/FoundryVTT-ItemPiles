@@ -40,10 +40,10 @@
     }
   ],
   "esmodules": [
-    "module.js"
+    "dist/item-piles.js"
   ],
   "styles": [
-    "style.css"
+    "dist/item-piles.css"
   ],
   "languages": [
     {

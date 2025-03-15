@@ -1,10 +1,10 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 
 	import { getSetting } from "../../../helpers/helpers.js";
 	import SETTINGS from "../../../constants/settings.js";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
 	import { get, writable } from "svelte/store";
 
 	const { application } = getContext('#external');

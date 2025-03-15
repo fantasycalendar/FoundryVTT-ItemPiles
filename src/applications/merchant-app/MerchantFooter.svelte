@@ -1,7 +1,7 @@
 <script>
 
 	import CurrencyList from "../components/CurrencyList.svelte";
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import { writable } from "svelte/store";
 
 	export let store;

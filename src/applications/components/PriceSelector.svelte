@@ -1,8 +1,9 @@
 <script>
 
 	import { writable } from "svelte/store";
-	import { localize } from '#runtime/svelte/helper';
-	import { TJSMenu, TJSToggleLabel } from '#standard/component';
+	import { localize } from '#runtime/util/i18n';
+	import { TJSMenu } from '#standard/component/menu';
+	import { TJSToggleLabel } from '#standard/component/label';
 
 	export let item;
 	export let standalone = false;

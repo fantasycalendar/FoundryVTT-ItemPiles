@@ -1,6 +1,6 @@
 <script>
 
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import MerchantItemEntry from "./MerchantItemEntry.svelte";
 	import CategoryHeader from "./components/CategoryHeader.svelte";
 	import { get } from "svelte/store";

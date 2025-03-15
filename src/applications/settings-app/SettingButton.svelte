@@ -1,5 +1,5 @@
 <script>
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import { getContext } from 'svelte';
 	import editors from "../editors/index.js";
 	import { openEditor } from "../../helpers/helpers.js";
