@@ -1,12 +1,12 @@
 {
   "ITEM-PILES": {
-    "Items": "Items",
+    "Items": "Itens",
     "Currencies": "Moedas",
     "Currency": "Moeda",
     "ContextMenu": {
       "ShowToPlayers": "Mostrar aos Jogadores",
       "RequestTrade": "Solicitar Negociação",
-      "GiveToCharacter": "Transferir Item"
+      "GiveToCharacter": "Dar ao Personagem"
     },
     "PlayerList": {
       "TradeButton": "Trocar"
@@ -28,7 +28,7 @@
       "ItemTransferred": "{item_name} de {source_actor_name} foi dado para {target_actor_name}.",
       "ItemAdded": "{item_name} foi adicionado a {target_actor_name}.",
       "GiveItemAccepted": "{user_name} aceitou sua oferta de item.",
-      "ShownToPlayers": "Exibindo {actor_name} para os jogadores.",
+      "ShownToPlayers": "Exibindo {actor_name} para os jogadores",
       "CreatedJournal": "Criado Diário de Registro de Cofre do Item Piles."
     },
     "Errors": {
@@ -48,14 +48,14 @@
       "NoGMsConnected": "AVISO - Nenhum MJ conectado - O Item Piles requer um MJ conectado para que os jogadores possam utilizar a maioria das funcionalidades do módulo.",
       "NoResponseFromGM": "AVISO - MJ \"{user_name}\" não respondeu à solicitação - Item Piles exigem que um MJ esteja conectado e responda para que os jogadores possam utilizar a maioria dos recursos do módulo.",
       "NoResponseFromGMTimeout": "AVISO - MJ \"{user_name}\" não respondeu à última solicitação - aguarde {time} segundos antes de fazer outra solicitação com o Item Piles.",
-      "TransactionNoGMConnected": "Nenhum MJ está conectado - a transação atual foi cancelada, nada foi adicionado, removido ou transferido.",
+      "TransactionNoGMConnected": "Nenhum MJ está conectado - a transação atual foi cancelada, nada foi adicionado, removido ou transferido",
       "GiveItemNoGM": "Não há MJ ativo para receber o item que você está tentando dar.",
       "GiveItemDeclined": "{user_name} recusou a oferta do seu item.",
-      "NoPlayersActive": "Não há jogadores ativos para realizar esta ação.",
+      "NoPlayersActive": "Não há jogadores ativos para realizar esta ação",
       "NoGMsConnectedAction": "AVISO - Não foi possível executar \"{action}\" porque não há MJs ativos.",
       "VaultFull": "Este item não cabe neste cofre!",
-      "CantSortVault": "Falha ao organizar itens - ou há muitos itens, ou algo deu errado.",
-      "VaultItemNotExpander": "Este item não é um expansor de cofre.",
+      "CantSortVault": "Falha ao organizar itens - ou há muitos itens, ou algo deu errado",
+      "VaultItemNotExpander": "Este item não é um expansor de cofre",
       "DroppedIsNotItem": "Você não pode soltar documentos do tipo \"{type}\" nesta pilha de itens!",
       "VaultInvalidItemDropped": "Você não pode soltar este tipo de item neste cofre!",
       "VaultSameItemOrigin": "Você não pode soltar itens no cofre que se originam do próprio cofre!",
@@ -197,7 +197,8 @@
       "LogSetNotForSale": "{instigator} definiu o <strong>{item}</strong> <span>não disponível para venda</span",
       "LogSetVisible": "{instigator} definiu o <strong>{item}</strong> como <span>visível</span",
       "LogSetHidden": "{instigator} definiu o <strong>{item}</strong> como <span>oculto</span",
-      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}"
+      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}",
+      "SortBy": "Ordenar por:"
     },
     "Vault": {
       "VaultTab": "Cofre",
@@ -585,7 +586,7 @@
           "MacroExplanation": "Nome da macro a ser executada quando interagirem com esta pilha.",
           "MacroPlaceholder": "Inserir nome da macro",
           "EditDescription": "Editar Descrição",
-          "EditDescriptionExplanation": "Esta descrição é mostrada nas interfaces relevantes quando a pilha de itens é visualizada.",
+          "EditDescriptionExplanation": "Esta descrição é mostrada nas interfaces relevantes quando a pilha de itens é visualizada",
           "DeleteWhenEmpty": "Excluir Quando Vazio",
           "DeleteWhenEmptyExplanation": "Faz com que esta pilha de itens seja excluída automaticamente quando estiver vazia.",
           "DeleteWhenEmptyDefault": "Configuração padrão do módulo",
@@ -656,9 +657,9 @@
         "Merchant": {
           "Title": "Configurações do Comerciante",
           "Enabled": "É Comerciante",
-          "EnabledExplanation": "Os jogadores não podem pegar itens de comerciantes, mas devem comprá-los.",
+          "EnabledExplanation": "Os jogadores não podem pegar itens de comerciantes, mas devem comprá-los",
           "MerchantImage": "Imagem do Comerciante",
-          "MerchantImageExplanation": "Esta é a imagem que será exibida na interface do comerciante.",
+          "MerchantImageExplanation": "Esta é a imagem que será exibida na interface do comerciante",
           "InfiniteQuantity": "Quantidade Infinita",
           "InfiniteQuantityExplanation": "Quando ativado, este comerciante não ficará sem itens.",
           "InfiniteCurrency": "Moedas Infinitas",

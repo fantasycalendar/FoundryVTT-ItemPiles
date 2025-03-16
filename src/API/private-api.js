@@ -1689,23 +1689,16 @@ export default class PrivateAPI {
 	}
 
 	/**
-	 * This executes any macro that is configured on the item pile, providing the macro with extra data relating to the
-	 * action that prompted the execution (if the advanced-macros module is installed)
+	 * This method will resolve any uuids and replace them with their corresponding documents.
+	 * If the macroData has already been marked as reformatted, nothing will be done.
 	 *
-	 * @param {String} targetUuid
 	 * @param {Object} macroData
-	 * @return {Promise/Boolean}
+	 * @return {Promise}
 	 */
-	static async _executeItemPileMacro(targetUuid, macroData) {
-
-		const target = Utilities.getToken(targetUuid);
-
-		if (!PileUtilities.isValidItemPile(target)) return;
-
-		const pileData = PileUtilities.getActorFlagData(target);
-
-		if (!pileData.macro) return;
-
+	static async _reformatMacroData(macroData) {
+		if (macroData.reformatted) {
+			return;
+		}
 		// Reformat macro data to contain useful information
 		if (macroData.source) {
 			macroData.source = fromUuidSync(macroData.source);
@@ -1737,9 +1730,31 @@ export default class PrivateAPI {
 			}
 
 		}
+		macroData.reformatted = true;
+	}
+
+	/**
+	 * This executes any macro that is configured on the item pile, providing the macro with extra data relating to the
+	 * action that prompted the execution (if the advanced-macros module is installed)
+	 *
+	 * @param {String} targetUuid
+	 * @param {Object} macroData
+	 * @return {Promise/Boolean}
+	 */
+	static async _executeItemPileMacro(targetUuid, macroData) {
+
+		const target = Utilities.getToken(targetUuid);
+
+		if (!PileUtilities.isValidItemPile(target)) return;
+
+		const pileData = PileUtilities.getActorFlagData(target);
+
+		if (!pileData.macro) return;
+
+		// Reformat macro data to contain useful information
+		await this._reformatMacroData(macroData);
 
 		return Utilities.runMacro(pileData.macro, macroData)
-
 	}
 
 	/**
