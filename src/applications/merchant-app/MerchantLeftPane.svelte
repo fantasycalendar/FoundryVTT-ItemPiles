@@ -67,7 +67,7 @@
 						options={{ editable: false, secrets: game.user.isGM }}
 						style={{"display": "block"}}
 					/>
-					{#if game.user.isGM && !description}
+					{#if game.user.isGM}
 						<button type="button"
 						        style="flex:1;"
 						        on:click={() => { showDescriptionEditor() }}

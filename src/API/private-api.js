@@ -1965,7 +1965,7 @@ export default class PrivateAPI {
 					if (!itemQuantity) return;
 				}
 
-				dropData.itemData.quantity = Number(itemQuantity);
+				dropData.itemData.quantity = Utilities.sanitizeNumber(itemQuantity);
 
 			}
 		}
@@ -2609,6 +2609,7 @@ export default class PrivateAPI {
 
 		const itemsToAdd = items.map((item) => {
 			const actualItem = item.item.toObject();
+			foundry.utils.setProperty(actualItem, "flags", item.flags);
 			return Utilities.setItemQuantity(actualItem, item.quantity);
 		});
 

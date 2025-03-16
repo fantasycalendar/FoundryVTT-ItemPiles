@@ -8,6 +8,9 @@
       "RequestTrade": "Request Trade",
       "GiveToCharacter": "Give To Character"
     },
+    "Hints": {
+      "CtrlClear": "Control + click to clear"
+    },
     "PlayerList": {
       "TradeButton": "Trade"
     },

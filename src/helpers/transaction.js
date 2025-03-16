@@ -184,7 +184,7 @@ export default class Transaction {
 				}
 				this.attributeDeltas.set(attribute.path, this.attributeDeltas.has(attribute.path)
 					? this.attributeDeltas.get(attribute.path)
-					: foundry.utils.getProperty(acc[item.id], attribute.path) + incomingQuantity
+					: Utilities.sanitizeNumber(foundry.utils.getProperty(acc[item.id], attribute.path)) + incomingQuantity
 				);
 			} else {
 				if (!onlyDelta) {

@@ -45,6 +45,13 @@ export function getUuid(target) {
 	return document?.uuid ?? false;
 }
 
+export function sanitizeNumber(quantity) {
+	if (typeof quantity === "string") {
+		quantity = quantity.replaceAll(/[^\d.]+/g, "") ?? 0;
+	}
+	return Number(quantity) ?? 0;
+}
+
 /**
  * Find and retrieves an item in a list of items
  *
@@ -204,7 +211,7 @@ export function isItemStackable(itemData) {
  */
 export function getItemQuantity(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return Number(foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+	return sanitizeNumber(foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE));
 }
 
 
@@ -492,9 +499,17 @@ export function ensureValidIds(actor, itemsToCreate) {
 		const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
 		if (handler && handler({ item })) {
 			const path = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
-			const containerId = foundry.utils.getProperty(item, path);
+
+			const idRetrieverHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_RETRIEVER);
+			const containerId = idRetrieverHandler ? idRetrieverHandler({ item }) : foundry.utils.getProperty(item, path);
 			containerIdMap[containerId] ??= createUniqueId(actor);
-			foundry.utils.setProperty(item, path, containerIdMap[containerId]);
+
+			const idGeneratorHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR);
+			const newContainerId = idGeneratorHandler
+				? idGeneratorHandler({ actor, containerId: containerIdMap[containerId] })
+				: containerIdMap[containerId];
+			foundry.utils.setProperty(item, path, newContainerId);
+
 			item._id = createUniqueId(actor);
 		} else if (hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, item.type)) {
 			containerIdMap[item._id] ??= createUniqueId(actor);

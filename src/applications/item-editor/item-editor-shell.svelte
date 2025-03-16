@@ -13,6 +13,7 @@
 	import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
 	import FilePicker from "../components/FilePicker.svelte";
 	import SliderInput from "../components/SliderInput.svelte";
+	import * as Utilities from "../../helpers/utilities.js";
 
 	const { application } = getContext('#external');
 
@@ -205,9 +206,9 @@
 								</label>
 								<input type="text" bind:value={$price} on:change={() => {
                 const forceNumber = game.system.id === "dnd5e";
-								const isPriceNumber = !isNaN(Number($price));
+								const isPriceNumber = !isNaN(Utilities.sanitizeNumber($price));
                 $price = isPriceNumber || forceNumber
-                	? Math.max(0, isPriceNumber ? Number($price) : oldPrice)
+                	? Math.max(0, isPriceNumber ? Utilities.sanitizeNumber($price) : oldPrice)
                 	: $price;
                 oldPrice = $price;
               }}/>

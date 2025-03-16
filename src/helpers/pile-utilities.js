@@ -311,7 +311,7 @@ export function getActorCurrencies(target, {
 
 	currencies = currencies.map(currency => {
 		currency.quantity = currency.type === "attribute"
-			? foundry.utils.getProperty(actor, currency.path)
+			? Utilities.sanitizeNumber(foundry.utils.getProperty(actor, currency.path))
 			: Utilities.getItemQuantity(currency.item);
 		return currency;
 	});
@@ -364,7 +364,7 @@ export function getCurrenciesInItem(targetItem, {
 
 	currencies = currencies.map(currency => {
 		currency.quantity = currency.type === "attribute"
-			? foundry.utils.getProperty(itemDocument, currency.path)
+			? Utilities.sanitizeNumber(foundry.utils.getProperty(itemDocument, currency.path))
 			: Utilities.getItemQuantity(currency.item);
 		return currency;
 	});
@@ -906,18 +906,19 @@ export function getMerchantModifiersForActor(merchant, {
 }
 
 function getSmallestExchangeRate(currencies) {
-	return currencies.length > 1
+	return currencies.filter(currency => !currency.secondary).length > 1
 		? Math.min(...currencies.filter(currency => !currency.secondary).map(currency => currency.exchangeRate))
 		: (Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001);
 }
 
 function getDecimalDifferenceBetweenExchangeRates(currencies) {
-	const largest = Math.max(...currencies.map(curr => curr.exchangeRate));
-	const smallest = Math.min(...currencies.map(curr => curr.exchangeRate));
+	const smallest = Math.min(...currencies.filter(currency => !currency.secondary).map(curr => curr.exchangeRate));
+	if (smallest >= 1) {
+		return 0;
+	}
+	const largest = Math.max(...currencies.filter(currency => !currency.secondary).map(curr => curr.exchangeRate));
 	const difference = (smallest / largest);
-	return difference.toString().includes(".")
-		? difference.toString().split(".")[1].length
-		: 0;
+	return difference.toString().split(".")[1].length;
 }
 
 export function getPriceArray(totalCost, currencies) {
@@ -1448,7 +1449,7 @@ export function getPriceData({
 			}
 
 			if (price.type === "attribute") {
-				const attributeQuantity = Number(foundry.utils.getProperty(buyer, price.data.path));
+				const attributeQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(buyer, price.data.path));
 				price.buyerQuantity = attributeQuantity;
 
 				if (price.percent) {

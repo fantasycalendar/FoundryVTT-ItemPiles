@@ -47,6 +47,8 @@ const CONSTANTS = {
 		TRANSFER: "transfer",
 		IS_CONTAINED: "isContained",
 		IS_CONTAINED_PATH: "isContainedPath",
+		CONTAINER_ID_GENERATOR: "containerIdGenerator",
+		CONTAINER_ID_RETRIEVER: "containerIdRetriever"
 	},
 
 	ITEM_DEFAULTS: {
