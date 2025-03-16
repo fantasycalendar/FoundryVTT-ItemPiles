@@ -1,7 +1,7 @@
 <script>
 
 	import CONSTANTS from "../../../constants/constants.js";
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import DropZone from "../../components/DropZone.svelte";
 
 	export let pileData;

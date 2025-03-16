@@ -65,10 +65,10 @@ export class VaultStore extends ItemPileStore {
 			this.processLogEntries();
 		});
 
-		this.subscribeTo(this.document, () => {
-			const updateData = this.document.updateOptions;
-			const renderData = updateData?.renderData ?? updateData?.data ?? {};
-			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.LOG)) {
+		this.subscribeTo(this.document, (doc, update) => {
+			if (update.action.includes("delete")) return;
+			const updateData = update.data?.[0] ?? {};
+			if (foundry.utils.hasProperty(updateData, CONSTANTS.FLAGS.LOG)) {
 				this.processLogEntries();
 			}
 		});
@@ -217,12 +217,12 @@ export class VaultStore extends ItemPileStore {
 
 	createItem(...args) {
 		super.createItem(...args);
-		this.refreshGrid();
+		this.refreshItems();
 	}
 
 	deleteItem(...args) {
 		super.deleteItem(...args);
-		this.refreshGrid();
+		this.refreshItems();
 	}
 
 	refreshGrid() {

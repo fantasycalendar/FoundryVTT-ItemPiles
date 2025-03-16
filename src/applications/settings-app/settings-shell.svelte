@@ -2,8 +2,8 @@
 	import SETTINGS from "../../constants/settings.js";
 
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
-	import { ApplicationShell } from '#runtime/svelte/component/core';
+	import { localize } from '#runtime/util/i18n';
+	import { ApplicationShell } from '#runtime/svelte/component/application';
 
 	import * as helpers from "../../helpers/helpers.js"
 	import { applyDefaultSettings } from "../../settings.js";

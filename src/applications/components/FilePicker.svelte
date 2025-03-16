@@ -1,4 +1,6 @@
 <script>
+	import { localize } from "#runtime/util/i18n";
+
 	export let value;
 	export let type;
 	export let placeholder = "";
@@ -7,7 +9,11 @@
 
 	let filePicker = false;
 
-	function handleClick() {
+	function handleClick(ev) {
+		if (ev.ctrlKey) {
+			value = "";
+			return;
+		}
 		if (!filePicker) {
 			filePicker = new FilePicker({
 				type: type,
@@ -33,7 +39,8 @@
 	{#if showInput}
 		<input type="text" placeholder="{placeholder}" bind:value="{value}"/>
 	{/if}
-	<button on:click={handleClick} type="button"><i class="fas fa-file-import"></i></button>
+	<button on:click={handleClick} type="button" title="{localize('ITEM-PILES.Hints.CtrlClear')}"><i
+		class="fas fa-file-import"></i></button>
 </div>
 
 <style lang="scss">

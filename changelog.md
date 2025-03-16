@@ -1,5 +1,19 @@
 # Item Piles Changelog
 
+## Version 3.2.0
+
+- Updated minimum version of Foundry for Item Piles to v12
+- Updated TJS Svelte & Vite versions
+- Updated Italian, German, French, Japanese, Russian, Polish, Portuguese, Chinese (Traditional), and Czech localization (thank you, Rectulo, Gregory Warn, Lioheart, Eduadro, and Glassryo on weblate!)
+- Fixed D&D 5e 4.x.x compatibility issues
+- Fixed double formatting of macro data when running macros through item piles (thanks matthewbstroud on Github!)
+- Fixed merchant change calculation not working when the difference in currency decimals exceeded the smallest exchange rate number of decimals
+- Fixed players not being able to preview some items on merchants if the items were utilizing AppV2 interfaces (thanks kgar for the tip!)
+- Fixed sorting vault items sometimes tripping over itself trying to update deleted items
+- Fixed `refreshMerchantInventory` not applying custom categories to items added through tables with custom category
+- Fixed some systems that store currencies as strings with symbols (like AlienRPG) sometimes displaying as NaN
+- Fixed Advanced 5th Edition not working very well with its containers
+
 ## Version 3.1.6
 
 - Improved D&D5e support for merchants by allowing them to buy and sell both containers and the items they contain

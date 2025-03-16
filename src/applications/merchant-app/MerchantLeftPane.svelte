@@ -1,10 +1,10 @@
 <script>
 
 	import Tabs from "../components/Tabs.svelte";
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import SliderInput from "../components/SliderInput.svelte";
 	import TextEditorDialog from "../dialogs/text-editor-dialog/text-editor-dialog.js";
-	import { TJSProseMirror } from "#standard/component";
+	import { TJSProseMirror } from "#standard/component/fvtt/editor";
 
 	export let store;
 
@@ -67,7 +67,7 @@
 						options={{ editable: false, secrets: game.user.isGM }}
 						style={{"display": "block"}}
 					/>
-					{#if game.user.isGM && !description}
+					{#if game.user.isGM}
 						<button type="button"
 						        style="flex:1;"
 						        on:click={() => { showDescriptionEditor() }}

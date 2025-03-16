@@ -1,6 +1,6 @@
 <script>
 
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import VaultAccessEditor from "../../editors/vault-access-editor/vault-access-editor.js";
 	import { TJSDialog } from "#runtime/svelte/application";
 	import CustomDialog from "../../components/CustomDialog.svelte";

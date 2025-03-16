@@ -3,10 +3,10 @@
 
 	import { getContext, onDestroy, setContext } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { ApplicationShell } from '#runtime/svelte/component/core';
-	import { TJSContextMenu } from "#standard/application";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
+	import { TJSContextMenu } from "#standard/application/menu";
 	import { get, writable } from 'svelte/store';
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 
 	import Grid from '../components/Grid/Grid.svelte';
 	import CurrencyList from '../components/CurrencyList.svelte';

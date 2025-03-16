@@ -2,7 +2,7 @@
 
 	import MerchantItemTab from "./MerchantItemTab.svelte";
 	import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import MerchantFooter from "./MerchantFooter.svelte";
 	import { writable } from "svelte/store";
 	import MerchantActivityLog from "./MerchantActivityLog.svelte";

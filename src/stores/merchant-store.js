@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { localize } from "#runtime/svelte/helper";
+import { localize } from "#runtime/util/i18n";
 import { PileItem } from "./pile-item.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";

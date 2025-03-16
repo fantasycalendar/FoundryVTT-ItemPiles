@@ -1,5 +1,5 @@
 <script>
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import { get, writable } from "svelte/store";
 	import { onDestroy } from "svelte";
 	import { TJSDialog } from "#runtime/svelte/application";
@@ -364,21 +364,18 @@
 					<button class="item-piles-rolled-item-button"
 					        on:click={() => { removeTable(table.uuid) }}
 					        data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
-					        data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-trash" style="color:#de0e0e;"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 					        on:click={() => { table.open = !table.open; }}
 					        data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipConfigureTable")}
-					        data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					>
 						<i class="fas fa-cog"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 					        on:click={() => { table.open = false; evaluateTable(table, keepRolled); }}
 					        data-fast-tooltip={localize("ITEM-PILES.Merchant.TooltipRollTable")}
-					        data-fast-tooltip-direction={TooltipManager.TOOLTIP_DIRECTIONS.UP}
 					        style="margin-right:0;">
 						<i class="fas fa-dice-d20"></i>
 					</button>
@@ -398,8 +395,11 @@
 								<input style="width:15px; height:15px; margin:0; flex:0;" id={"table-id-"+table.uuid}
 								       bind:checked={table.addAll}
 								       on:change={() => {
-                           if(!table.addAll) return;
-                           table.items = Object.fromEntries($tables[table.uuid].items.map(item => [item.id, "1d4"]));
+                           if(!table.addAll){
+															table.items = [];
+															return;
+                           }
+                           table.items = Object.fromEntries($tables[table.uuid].items.map(item => [item.id, table.timesToRoll]));
                          }}
 								       type="checkbox"/>
 							</div>

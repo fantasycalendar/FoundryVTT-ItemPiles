@@ -311,7 +311,7 @@ export function getActorCurrencies(target, {
 
 	currencies = currencies.map(currency => {
 		currency.quantity = currency.type === "attribute"
-			? foundry.utils.getProperty(actor, currency.path)
+			? Utilities.sanitizeNumber(foundry.utils.getProperty(actor, currency.path))
 			: Utilities.getItemQuantity(currency.item);
 		return currency;
 	});
@@ -364,7 +364,7 @@ export function getCurrenciesInItem(targetItem, {
 
 	currencies = currencies.map(currency => {
 		currency.quantity = currency.type === "attribute"
-			? foundry.utils.getProperty(itemDocument, currency.path)
+			? Utilities.sanitizeNumber(foundry.utils.getProperty(itemDocument, currency.path))
 			: Utilities.getItemQuantity(currency.item);
 		return currency;
 	});
@@ -906,15 +906,19 @@ export function getMerchantModifiersForActor(merchant, {
 }
 
 function getSmallestExchangeRate(currencies) {
-	return currencies.length > 1
+	return currencies.filter(currency => !currency.secondary).length > 1
 		? Math.min(...currencies.filter(currency => !currency.secondary).map(currency => currency.exchangeRate))
 		: (Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001);
 }
 
-function getExchangeRateDecimals(smallestExchangeRate) {
-	return smallestExchangeRate.toString().includes(".")
-		? smallestExchangeRate.toString().split(".")[1].length
-		: 0;
+function getDecimalDifferenceBetweenExchangeRates(currencies) {
+	const smallest = Math.min(...currencies.filter(currency => !currency.secondary).map(curr => curr.exchangeRate));
+	if (smallest >= 1) {
+		return 0;
+	}
+	const largest = Math.max(...currencies.filter(currency => !currency.secondary).map(curr => curr.exchangeRate));
+	const difference = (smallest / largest);
+	return difference.toString().split(".")[1].length;
 }
 
 export function getPriceArray(totalCost, currencies) {
@@ -963,7 +967,7 @@ export function getPriceArray(totalCost, currencies) {
 
 	}
 
-	const decimals = getExchangeRateDecimals(smallestExchangeRate);
+	const decimals = getDecimalDifferenceBetweenExchangeRates(currencies);
 
 	let fraction = Helpers.roundToDecimals(totalCost % 1, decimals);
 	let cost = Math.round(totalCost - fraction);
@@ -1289,7 +1293,7 @@ export function getPriceData({
 	// In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
 	// to it, in order have a stable form of exchange calculation
 	const smallestExchangeRate = getSmallestExchangeRate(defaultCurrencies);
-	const decimals = getExchangeRateDecimals(smallestExchangeRate);
+	const decimals = getDecimalDifferenceBetweenExchangeRates(defaultCurrencies);
 
 	let overallCost = getCostOfItem(item, defaultCurrencies);
 
@@ -1445,7 +1449,7 @@ export function getPriceData({
 			}
 
 			if (price.type === "attribute") {
-				const attributeQuantity = Number(foundry.utils.getProperty(buyer, price.data.path));
+				const attributeQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(buyer, price.data.path));
 				price.buyerQuantity = attributeQuantity;
 
 				if (price.percent) {
@@ -1531,8 +1535,7 @@ export function getPaymentData({
 		: buyer;
 	const currencyList = getCurrencyList(merchant);
 	const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
-	const smallestExchangeRate = getSmallestExchangeRate(currencies)
-	const decimals = getExchangeRateDecimals(smallestExchangeRate);
+	const decimals = getDecimalDifferenceBetweenExchangeRates(currencies);
 
 	const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
 

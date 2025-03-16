@@ -1,8 +1,8 @@
 <script>
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import { getContext } from "svelte";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
-	import { TJSProseMirror } from '#standard/component';
+	import { ApplicationShell } from "#runtime/svelte/component/application";
+	import { TJSProseMirror } from "#standard/component/fvtt/editor";
 
 	const { application } = getContext('#external');
 

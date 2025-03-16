@@ -1,6 +1,6 @@
 <script>
-	import { ApplicationShell } from "#runtime/svelte/component/core";
-	import { localize } from '#runtime/svelte/helper';
+	import { ApplicationShell } from "#runtime/svelte/component/application";
+	import { localize } from '#runtime/util/i18n';
 	import { getContext } from "svelte";
 	import * as PileUtilities from "../../../helpers/pile-utilities.js";
 	import { abbreviateNumbers } from "../../../helpers/helpers.js";

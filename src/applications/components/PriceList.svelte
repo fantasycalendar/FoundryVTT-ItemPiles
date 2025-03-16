@@ -1,5 +1,5 @@
 <script>
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import FilePicker from "./FilePicker.svelte";
 	import { flip } from "svelte/animate";
 	import { dndzone, SOURCES, TRIGGERS } from 'svelte-dnd-action';

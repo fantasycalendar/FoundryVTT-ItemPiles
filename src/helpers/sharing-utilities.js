@@ -348,13 +348,13 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 
 	let previouslyTaken = 0;
 	let recipientUuid = Utilities.getUuid(recipient);
-	let currentQuantity = Number(foundry.utils.getProperty(pile, path) ?? 0);
+	let currentQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(pile, path) ?? 0);
 
 	if (getAll && SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
 		const items = PileUtilities.getActorItems(pile);
 		for (const item of items) {
 			if (!Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, item.type)) continue;
-			currentQuantity += Number(foundry.utils.getProperty(item, path) ?? 0);
+			currentQuantity += Utilities.sanitizeNumber(foundry.utils.getProperty(item, path) ?? 0);
 		}
 	}
 	let totalShares = currentQuantity;

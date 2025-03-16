@@ -5,7 +5,7 @@
 	import PriceModifiersEditor from "../../editors/price-modifiers-editor/price-modifiers-editor.js";
 	import FilePicker from "../../components/FilePicker.svelte";
 	import SliderInput from "../../components/SliderInput.svelte";
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import MerchantColumnsEditor from "../../editors/merchant-columns-editor/merchant-columns-editor.js";
 	import { TJSDialog } from "#runtime/svelte/application";
 	import CustomDialog from "../../components/CustomDialog.svelte";

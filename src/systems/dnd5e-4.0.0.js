@@ -4,7 +4,7 @@ import CONSTANTS from "../constants/constants.js";
 
 export default {
 
-	"VERSION": "1.0.8",
+	"VERSION": "1.0.9",
 
 	// The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
 	"ACTOR_CLASS_TYPE": "character",
@@ -28,7 +28,7 @@ export default {
 	"ITEM_FILTERS": [
 		{
 			"path": "type",
-			"filters": "spell,feat,class,subclass,background"
+			"filters": "background,class,facility,feat,race,spell,subclass"
 		},
 		{
 			"path": "system.type.value",

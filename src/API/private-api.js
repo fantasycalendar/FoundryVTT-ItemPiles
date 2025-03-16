@@ -1080,7 +1080,10 @@ export default class PrivateAPI {
 			userId: userId,
 			interactionId: interactionId
 		};
-		await Promise.allSettled(sourceUuids.map(uuid => this._executeItemPileMacro(uuid, { ...macroData, source: uuid })));
+		await Promise.allSettled(sourceUuids.map(uuid => this._executeItemPileMacro(uuid, {
+			...macroData,
+			source: uuid
+		})));
 		await this._executeItemPileMacro(targetUuid, { ...macroData, source: false });
 
 		const tokensToDelete = sourceUuids
@@ -1113,7 +1116,10 @@ export default class PrivateAPI {
 			await targetDocument.update(documentChanges);
 		}
 		const createdItems = itemsToCreate.length
-			? await targetDocument.createEmbeddedDocuments("Item", itemsToCreate, { keepId: true, keepEmbeddedIds: true })
+			? await targetDocument.createEmbeddedDocuments("Item", itemsToCreate, {
+				keepId: true,
+				keepEmbeddedIds: true
+			})
 			: [];
 		if (itemsToUpdate.length) await targetDocument.updateEmbeddedDocuments("Item", itemsToUpdate);
 		if (itemsToDelete.length) await targetDocument.deleteEmbeddedDocuments("Item", itemsToDelete);
@@ -1182,7 +1188,10 @@ export default class PrivateAPI {
 				itemsDropped = await this._addItems(targetUuid, items, userId);
 			} else {
 				targetUuid = await this._createItemPile({
-					sceneId, position, items: items.map(data => data.item), tokenOverrides: { elevation: elevation || 0 }
+					sceneId,
+					position,
+					items: items.map(data => data.item),
+					tokenOverrides: { elevation: elevation || 0 }
 				});
 			}
 
@@ -1215,7 +1224,9 @@ export default class PrivateAPI {
 			const pileDataDefaults = PileUtilities.getPileActorDefaults({ ...itemPileFlags, enabled: true });
 
 			const actorData = {
-				name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
+				name: actor || "New Item Pile",
+				type: Helpers.getSetting("actorClassType"),
+				img: "icons/svg/item-bag.svg"
 			};
 
 			if (folders) {
@@ -1563,22 +1574,30 @@ export default class PrivateAPI {
 		if (PileUtilities.isItemPileContainer(targetActor, data)) {
 			if (diff?.closed === true) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE,
+					source: interactingTokenUuid,
+					target: targetUuid
 				});
 			}
 			if (diff?.locked === true) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: CONSTANTS.MACRO_EXECUTION_TYPES.LOCK_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.LOCK_ITEM_PILE,
+					source: interactingTokenUuid,
+					target: targetUuid
 				});
 			}
 			if (diff?.locked === false) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: CONSTANTS.MACRO_EXECUTION_TYPES.UNLOCK_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.UNLOCK_ITEM_PILE,
+					source: interactingTokenUuid,
+					target: targetUuid
 				});
 			}
 			if (diff?.closed === false) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE,
+					source: interactingTokenUuid,
+					target: targetUuid
 				});
 			}
 		}
@@ -1761,10 +1780,12 @@ export default class PrivateAPI {
 	 * This handles any dropped data onto the canvas or a set item pile
 	 *
 	 * @param {canvas} canvas
-	 * @param {Object} data
+	 * @param {Object} userDropData
 	 * @return {Promise}
 	 */
-	static async _dropData(canvas, data) {
+	static async _dropData(canvas, userDropData) {
+
+		const data = foundry.utils.deepClone(userDropData);
 
 		if (data.type !== "Item") return;
 
@@ -1800,21 +1821,19 @@ export default class PrivateAPI {
 
 		} else {
 
-			const position = canvas.grid.getTopLeft(data.x, data.y);
-			x = position[0];
-			y = position[1];
+			const { x, y } = canvas.grid.getTopLeftPoint(data);
 
 			droppableDocuments = Utilities.getTokensAtLocation({ x, y })
 				.map(token => Utilities.getDocument(token));
 
-			if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get("midi-qol", "DragDropTarget")) {
-				Helpers.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items");
-				return;
-			}
-
 			if (!droppableDocuments.length) {
 				dropData.position = { x, y };
 			}
+		}
+
+		if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get("midi-qol", "DragDropTarget")) {
+			Helpers.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items with item piles");
+			return;
 		}
 
 		const droppableItemPiles = droppableDocuments.filter(token => PileUtilities.isValidItemPile(token));
@@ -1946,7 +1965,7 @@ export default class PrivateAPI {
 					if (!itemQuantity) return;
 				}
 
-				dropData.itemData.quantity = Number(itemQuantity);
+				dropData.itemData.quantity = Utilities.sanitizeNumber(itemQuantity);
 
 			}
 		}
@@ -2293,9 +2312,14 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.SPLIT_INVENTORY, itemPileUuid, pileDeltas, actorDeltas, userId, instigator);
 
 		await this._executeItemPileMacro(itemPileUuid, {
-			action: CONSTANTS.MACRO_EXECUTION_TYPES.SPLIT_INVENTORY, source: itemPileUuid, target: actorUuids, transfers: {
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.SPLIT_INVENTORY,
+			source: itemPileUuid,
+			target: actorUuids,
+			transfers: {
 				pileDeltas, actorDeltas
-			}, userId: userId, instigator: instigator
+			},
+			userId: userId,
+			instigator: instigator
 		});
 
 		const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
@@ -2532,7 +2556,9 @@ export default class PrivateAPI {
 		await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
 
 		return {
-			itemDeltas: buyerTransactionData.itemDeltas, attributeDeltas: buyerTransactionData.attributeDeltas, itemPrices
+			itemDeltas: buyerTransactionData.itemDeltas,
+			attributeDeltas: buyerTransactionData.attributeDeltas,
+			itemPrices
 		};
 
 	}
@@ -2583,6 +2609,7 @@ export default class PrivateAPI {
 
 		const itemsToAdd = items.map((item) => {
 			const actualItem = item.item.toObject();
+			foundry.utils.setProperty(actualItem, "flags", item.flags);
 			return Utilities.setItemQuantity(actualItem, item.quantity);
 		});
 

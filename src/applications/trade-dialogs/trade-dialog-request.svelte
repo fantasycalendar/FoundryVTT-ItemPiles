@@ -1,12 +1,12 @@
 <script>
 
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import { getContext } from "svelte";
 	import { tweened } from 'svelte/motion';
 	import { linear } from 'svelte/easing';
 	import * as Helpers from "../../helpers/helpers.js";
 	import ActorDropSelect from "./ActorDropSelect.svelte";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
 
 	const { application } = getContext('#external');
 

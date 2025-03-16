@@ -1,7 +1,7 @@
 <script>
 
 	import { fade } from 'svelte/transition';
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import CONSTANTS from "../../constants/constants.js";
 
 	export let store;

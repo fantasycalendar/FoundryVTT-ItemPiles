@@ -8,6 +8,9 @@
       "RequestTrade": "Request Trade",
       "GiveToCharacter": "Give To Character"
     },
+    "Hints": {
+      "CtrlClear": "Control + click to clear"
+    },
     "PlayerList": {
       "TradeButton": "Trade"
     },
@@ -248,7 +251,7 @@
       },
       "NoSystemFound": {
         "Title": "System Not Recognized",
-        "Content": "This system is not currently fully supported. This means that the module does not know how to best handle this system's items, but can still operate in a limited fashion.<br><br>You can configure the module's settings yourself, but it requires a bit of technical know-how.<br><br>If you have any questions, ping <strong>Wasp#2005</strong> on the Foundry discord."
+        "Content": "<strong>This system is not supported.</strong><br><br>This means that the module does not know how to best handle this system's items, but can still operate in a limited fashion.<br><br>You can configure the module's settings yourself, but it requires a bit of technical know-how.<br><br>If you have any questions, take a screenshot of the dialog that opens after you close this, and ask for assistance in your system's channel on the Foundry discord."
       },
       "NewSystemVersion": {
         "Title": "New System Version",
