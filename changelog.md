@@ -12,6 +12,7 @@
 - Fixed sorting vault items sometimes tripping over itself trying to update deleted items
 - Fixed `refreshMerchantInventory` not applying custom categories to items added through tables with custom category
 - Fixed some systems that store currencies as strings with symbols (like AlienRPG) sometimes displaying as NaN
+- Fixed Advanced 5th Edition not working very well with its containers
 
 ## Version 3.1.6
 
