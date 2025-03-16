@@ -338,8 +338,8 @@
       "Withdrew": "ritirato",
       "LogEntry": "{instigator} {action} {quantity}{item_name}",
       "SortItemsTooltip": "Ordina Oggetti - tieni premuto Ctrl per unire elementi simili",
-      "LogUserActor": "{actor_name} ({user_name})",
-      "VaultTab": "Caveau",
+      "LogUserActor": "{actor_name} ({user_name
+      "VaultTab": "Deposito",
       "CapacityFull": "Questo deposito ha raggiunto la sua capacità massima di {total_capacity}",
       "ExpandersTab": "Espansori",
       "LogTab": "Registri",
