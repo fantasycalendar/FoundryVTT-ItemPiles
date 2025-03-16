@@ -1806,9 +1806,7 @@ export default class PrivateAPI {
 
 		} else {
 
-			const position = canvas.grid.getTopLeft(data.x, data.y);
-			x = position[0];
-			y = position[1];
+			const { x, y } = canvas.grid.getTopLeftPoint(data);
 
 			droppableDocuments = Utilities.getTokensAtLocation({ x, y })
 				.map(token => Utilities.getDocument(token));

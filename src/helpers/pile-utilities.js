@@ -911,9 +911,12 @@ function getSmallestExchangeRate(currencies) {
 		: (Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001);
 }
 
-function getExchangeRateDecimals(smallestExchangeRate) {
-	return smallestExchangeRate.toString().includes(".")
-		? smallestExchangeRate.toString().split(".")[1].length
+function getDecimalDifferenceBetweenExchangeRates(currencies) {
+	const largest = Math.max(...currencies.map(curr => curr.exchangeRate));
+	const smallest = Math.min(...currencies.map(curr => curr.exchangeRate));
+	const difference = (smallest / largest);
+	return difference.toString().includes(".")
+		? difference.toString().split(".")[1].length
 		: 0;
 }
 
@@ -963,7 +966,7 @@ export function getPriceArray(totalCost, currencies) {
 
 	}
 
-	const decimals = getExchangeRateDecimals(smallestExchangeRate);
+	const decimals = getDecimalDifferenceBetweenExchangeRates(currencies);
 
 	let fraction = Helpers.roundToDecimals(totalCost % 1, decimals);
 	let cost = Math.round(totalCost - fraction);
@@ -1289,7 +1292,7 @@ export function getPriceData({
 	// In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
 	// to it, in order have a stable form of exchange calculation
 	const smallestExchangeRate = getSmallestExchangeRate(defaultCurrencies);
-	const decimals = getExchangeRateDecimals(smallestExchangeRate);
+	const decimals = getDecimalDifferenceBetweenExchangeRates(defaultCurrencies);
 
 	let overallCost = getCostOfItem(item, defaultCurrencies);
 
@@ -1531,8 +1534,7 @@ export function getPaymentData({
 		: buyer;
 	const currencyList = getCurrencyList(merchant);
 	const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
-	const smallestExchangeRate = getSmallestExchangeRate(currencies)
-	const decimals = getExchangeRateDecimals(smallestExchangeRate);
+	const decimals = getDecimalDifferenceBetweenExchangeRates(currencies);
 
 	const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
 

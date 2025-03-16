@@ -60,7 +60,8 @@ export default {
 		"GLOBAL": {
 			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED]: ({ item }) => {
 				return item.system.container;
-			}
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH]: "system.container"
 		},
 		"container": {
 			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
