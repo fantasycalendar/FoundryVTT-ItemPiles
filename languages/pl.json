@@ -13,7 +13,7 @@
       "ShownToPlayers": "Pokazuję {actor_name} graczom",
       "ItemTransferred": "{target_actor_name} dostał {item_name} od {source_actor_name}.",
       "GiveItemAccepted": "{user_name} zaakceptował twoją ofertę.",
-      "SystemSupportFound": "Ten system jest wspierany przez Item Piles! Ustawiam domyślne ustawienia...",
+      "SystemSupportFound": "Znaleziono wsparcie systemowe! Stosowanie domyślnych ustawień systemu do Item Piles",
       "ItemAdded": "{item_name} został dodany do {target_actor_name}.",
       "CreatedJournal": "Utworzono dziennik Item Piles Vault Log."
     },
@@ -183,7 +183,8 @@
       "LogSetVisible": "{instigator} ustaw <strong>{item}</strong> jako <span>widoczny</span>",
       "LogTransaction": "{instigator} {action} {quantity}{item} na {price}",
       "LogSetNotForSale": "{instigator} ustaw <strong>{item}</strong> <span>nie na sprzedaż</span>",
-      "LogSetHidden": "{instigator} ustaw <strong>{item}</strong> jako <span>ukryty</span>"
+      "LogSetHidden": "{instigator} ustaw <strong>{item}</strong> jako <span>ukryty</span>",
+      "SortBy": "Sortuj według:"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -347,7 +348,7 @@
         "Title": "Edycja walut",
         "Content": "Jako GM możesz zaktualizować waluty na tym stosie przedmiotów:",
         "Submit": "Wyślij",
-        "NoCurrency": "{aktor_name} nie ma ważnych walut...",
+        "NoCurrency": "{actor_name} nie ma ważnych walut",
         "Secondary": "Waluty dodatkowe:"
       },
       "TradeMerchantItem": {
@@ -661,7 +662,7 @@
           "RestrictAccess": "Ograniczenie dostępu do skarbca",
           "RestrictAccessExplanation": "Domyślnie każdy może uzyskać dostęp do skarbców, jeśli widzi je na pasku bocznym lub może przejść obok nich na scenie. Gdy to ustawienie jest włączone, skarbiec będzie widoczny tylko dla właściciela postaci skarbca lub użytkowników/postaci skonfigurowanych w Edytorze dostępu (patrz poniżej)."
         },
-        "Update": "Uaktualnij",
+        "Update": "Aktualizuj konfigurację",
         "SingleItem": {
           "Title": "Ustawienia pojedynczej pozycji",
           "DisplayOne": "Wyświetlanie obrazu pojedynczego przedmiotu",
