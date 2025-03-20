@@ -22,7 +22,7 @@
       "vault": "Cofre"
     },
     "Notifications": {
-      "SystemSupportFound": "Suporte do sistema encontrado! Aplicando configurações padrão do sistema ao Item Piles...",
+      "SystemSupportFound": "Suporteao sistema encontrado! Aplicando configurações padrão do sistema ao Item Piles",
       "UpdateItemPileSuccess": "Pilha de Itens atualizada com sucesso.",
       "UpdateMerchantSuccess": "Comerciante atualizado com sucesso.",
       "ItemTransferred": "{item_name} de {source_actor_name} foi dado para {target_actor_name}.",
@@ -361,7 +361,7 @@
         "Title": "Editando Moedas",
         "Content": "Como MJ, você pode atualizar as moedas nesta pilha de itens:",
         "Secondary": "Moedas Secundárias:",
-        "NoCurrency": "{actor_name} não tem moedas válidas.",
+        "NoCurrency": "{actor_name} não tem moedas válidas",
         "Submit": "Enviar"
       },
       "DropCurrencies": {
@@ -571,7 +571,7 @@
       "ItemPileConfig": {
         "Title": "Configurações da Pilha de Itens: {actor_name}",
         "Configure": "Pilha de Item",
-        "Update": "Atualizar",
+        "Update": "Atualizar Config.",
         "Main": {
           "Title": "Configurações Principais",
           "EnabledPile": "Habilitado",
