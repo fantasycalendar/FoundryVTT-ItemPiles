@@ -232,9 +232,9 @@ export class PileItem extends PileBaseItem {
 		const itemData = this.item.toObject();
 		itemData.ownership[game.user.id] = 1;
 		const newItem = new Item.implementation(itemData);
-		const cls = newItem._getSheetClass();
+		newItem.document = newItem;
 		const sheet = new cls(newItem, { editable: false });
-		return sheet._render(true);
+		return sheet?._render ? sheet._render(true) : sheet.render(true);
 	}
 }
 
