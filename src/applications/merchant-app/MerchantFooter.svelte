@@ -36,7 +36,7 @@
 			</a>
 		</div>
 		<CurrencyList currencies={merchantCurrencies}
-		              options={{ abbreviations: $currencies.length === 1, imgSize: 18, abbreviateNumbers: $merchantCurrencies.length > 1  }}
+		              options={{ abbreviations: $merchantCurrencies.length === 1, imgSize: 18, abbreviateNumbers: $merchantCurrencies.length > 1  }}
 		              class="item-piles-currency-list"/>
 	</div>
 {/if}

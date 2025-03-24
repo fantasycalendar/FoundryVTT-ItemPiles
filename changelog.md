@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Verison 3.2.3
+
+- Fixed merchants with non-infinite currencies not rendering
+
 ## Version 3.2.2
 
 - ACTUALLY fixed players not being able to preview some items on merchants if the items were utilizing AppV2 interfaces (thanks kgar for the tip!)
