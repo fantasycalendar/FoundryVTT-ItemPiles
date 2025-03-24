@@ -1,6 +1,6 @@
 # Item Piles Changelog
 
-## Verison 3.2.3
+## Version 3.2.3
 
 - Fixed merchants with non-infinite currencies not rendering
 
