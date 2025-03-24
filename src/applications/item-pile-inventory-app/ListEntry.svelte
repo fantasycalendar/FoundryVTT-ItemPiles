@@ -3,12 +3,14 @@
 	import { fade } from 'svelte/transition';
 	import { localize } from '#runtime/util/i18n';
 	import CONSTANTS from "../../constants/constants.js";
+	import { onMount } from "svelte";
 
 	export let store;
 	export let entry;
 	export let currency = false;
 
 	const name = entry.name;
+	const doc = entry.itemDocument;
 	const img = entry.img;
 	const rarityColor = entry.rarityColor;
 	const quantityLeft = entry.quantityLeft;
@@ -16,7 +18,13 @@
 	const currentQuantity = entry.currentQuantity;
 	const pileData = store.pileData;
 
+	let element = false;
+
 	$: canInspectItems = entry.item && ($pileData.canInspectItems || store.actor.isOwner);
+	$: {
+		$doc;
+		entry.rendered(element);
+	}
 
 	const editQuantities = store.editQuantities;
 
@@ -29,35 +37,47 @@
 		event.dataTransfer.setData('text/plain', JSON.stringify(data));
 	}
 
+	onMount(() => {
+		entry.rendered(element);
+	});
+
 </script>
 
-<div class="item-piles-flexrow item-piles-item-row"
+<div bind:this={element}
+     class="item-piles-flexrow item-piles-item-row"
      class:item-piles-disabled={!$editQuantities && (!$quantityLeft || !$quantity)}
      draggable={!!entry.item}
      on:dragstart={(event) => { dragStart(event) }}
      transition:fade={{duration: 250}}>
 
-	<div class="item-piles-img-container">
-		<img class="item-piles-img" src="{$img}"/>
-	</div>
+	<div
+		on:mouseleave={() => { entry.mouseLeave(element) }}
+		on:mouseenter={() => { entry.mouseEnter(element) }}
+		style="display: flex; flex: 1 0 auto;"
+	>
+		<div class="item-piles-img-container">
+			<img class="item-piles-img" src="{$img}"/>
+		</div>
 
-	<div class="item-piles-name">
-		<div class="item-piles-name-container">
-			<p class:item-piles-clickable-link="{canInspectItems}"
-			   on:click={() => { entry.preview() }}
-			   style="color: {$rarityColor || 'inherit'};"
-			>
-				{$name}
-			</p>
-			{#if !$editQuantities && (entry.canStack || !entry.id) && ($pileData.shareCurrenciesEnabled || !currency)}
-				<span class="item-piles-small-text">(x{$quantity})</span>
-			{/if}
+		<div class="item-piles-name"
+		>
+			<div class="item-piles-name-container">
+				<p class:item-piles-clickable-link="{canInspectItems}"
+				   on:click={() => { entry.preview() }}
+				   style="color: {$rarityColor || 'inherit'};"
+				>
+					{$name}
+				</p>
+				{#if !$editQuantities && (entry.canStack || !entry.id) && ($pileData.shareCurrenciesEnabled || !currency)}
+					<span class="item-piles-small-text">(x{$quantity})</span>
+				{/if}
+			</div>
 		</div>
 	</div>
 
 	{#if entry.canStack || !entry.id}
 
-		<div class="item-piles-quantity-container" style="flex:2.5;">
+		<div class="item-piles-quantity-container" style="flex: 0 1 150px;">
 
 			{#if $editQuantities}
 

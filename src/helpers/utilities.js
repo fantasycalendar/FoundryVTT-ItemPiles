@@ -491,34 +491,55 @@ export function createUniqueId(actor) {
 
 export function ensureValidIds(actor, itemsToCreate) {
 
-	const containerIdMap = {};
+	const sortedItems = itemsToCreate.sort((a, b) => {
+		return (hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, b.type) - hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, a.type));
+	});
 
-	return itemsToCreate.map(data => {
-		const item = data?.item ?? data;
-		if (!item.system || !item.type) return data;
+	let itemsInContainers = sortedItems.reduce((acc, item) => {
 		const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+
 		if (handler && handler({ item })) {
+
 			const path = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
 
 			const idRetrieverHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_RETRIEVER);
 			const containerId = idRetrieverHandler ? idRetrieverHandler({ item }) : foundry.utils.getProperty(item, path);
-			containerIdMap[containerId] ??= createUniqueId(actor);
+			if (acc[containerId]) {
+				acc[containerId].items.push(item);
 
-			const idGeneratorHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR);
-			const newContainerId = idGeneratorHandler
-				? idGeneratorHandler({ actor, containerId: containerIdMap[containerId] })
-				: containerIdMap[containerId];
-			foundry.utils.setProperty(item, path, newContainerId);
+				const idGeneratorHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR);
+				const newContainerId = idGeneratorHandler
+					? idGeneratorHandler({ actor, containerId: acc[containerId].item._id })
+					: acc[containerId].item._id;
+				foundry.utils.setProperty(item, path, newContainerId);
+			} else {
+				foundry.utils.setProperty(item, path, "");
+				acc[item._id] = {
+					item,
+					items: []
+				}
+			}
 
-			item._id = createUniqueId(actor);
-		} else if (hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, item.type)) {
-			containerIdMap[item._id] ??= createUniqueId(actor);
-			item._id = containerIdMap[item._id];
 		} else {
-			item._id = createUniqueId(actor);
+			acc[item._id] = {
+				item,
+				items: []
+			}
 		}
-		return data;
-	});
+
+		item._id = createUniqueId(actor);
+
+		return acc;
+	}, {});
+
+	const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_TRANSFORMER);
+	if (handler) {
+		handler({ actor, map: itemsInContainers });
+	}
+
+	return Object.values(itemsInContainers).reduce((acc, data) => {
+		return acc.concat([data.item, ...data.items]);
+	}, []);
 
 }
 

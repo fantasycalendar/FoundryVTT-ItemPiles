@@ -1,36 +1,34 @@
 <script>
 	import { fade } from 'svelte/transition';
+	import { onMount } from "svelte";
 
 	export let item;
 	export let index;
 	export let columns;
 
-	const itemName = item.name;
-	const itemImage = item.img;
+	const doc = item.itemDocument;
+	const itemFlagData = item.itemFlagData;
 
-	const store = item.store;
-	const itemStore = item.itemDocument;
-	const pileData = store.pileData;
-	const displayQuantityStore = item.displayQuantity;
-	const quantityStore = item.quantity;
-	const itemFlagDataStore = item.itemFlagData;
+	let element = false;
 
-	$: itemFlagData = $itemFlagDataStore;
-	$: displayQuantity = $displayQuantityStore;
-	$: quantity = $quantityStore;
-	$: editQuantity = $quantityStore;
-	let showEditQuantity = false;
+	$: {
+		$doc;
+		item.rendered(element);
+	}
 
-	const displayControlButtons = store.actor.isOwner;
-	const displayBuyButton = !!store.recipient;
+	onMount(() => {
+		item.rendered(element);
+	});
 
 </script>
 
 <div class="item-piles-flexrow item-piles-item-row"
+     bind:this={element}
      class:item-piles-child-even-color={index%2===0}
      class:item-piles-child-odd-color={index%2===1}
-     class:merchant-item-hidden={itemFlagData.hidden}
-     style="flex: 1 0 auto;"
+     class:merchant-item-hidden={$itemFlagData.hidden}
+     on:mouseover={() => { item.mouseEnter(element) }}
+     on:mouseleave={() => { item.mouseLeave(element) }}
      transition:fade|local={{duration: 250}}>
 
 	{#each columns as column}
@@ -59,6 +57,7 @@
     margin: 0;
     overflow: visible;
     display: contents;
+    flex: 1 0 auto;
 
     & > * {
       padding: 0 10px;

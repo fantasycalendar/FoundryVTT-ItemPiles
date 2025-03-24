@@ -53,9 +53,22 @@ class PileBaseItem {
 
 	preview() {
 	}
+
+	rendered(element) {
+	}
+
+	mouseEnter(element) {
+	}
+
+	mouseLeave(element) {
+	}
 }
 
 export class PileItem extends PileBaseItem {
+
+	RENDER_HOOK = CONSTANTS.HOOKS.RENDER_PILE_ITEM;
+	HOVER_HOOK = CONSTANTS.HOOKS.HOVER_PILE_ITEM;
+	LEAVE_HOOK = CONSTANTS.HOOKS.LEAVE_PILE_ITEM;
 
 	setupStores(item) {
 		super.setupStores();
@@ -233,8 +246,24 @@ export class PileItem extends PileBaseItem {
 		itemData.ownership[game.user.id] = 1;
 		const newItem = new Item.implementation(itemData);
 		newItem.document = newItem;
+		const cls = newItem._getSheetClass();
 		const sheet = new cls(newItem, { editable: false });
 		return sheet?._render ? sheet._render(true) : sheet.render(true);
+	}
+
+	rendered(element) {
+		if (!element) return;
+		Hooks.callAll(this.RENDER_HOOK, element, this.item);
+	}
+
+	mouseEnter(element) {
+		if (!element) return;
+		Hooks.callAll(this.HOVER_HOOK, element, this.item);
+	}
+
+	mouseLeave(element) {
+		if (!element) return;
+		Hooks.callAll(this.LEAVE_HOOK, element, this.item);
 	}
 }
 

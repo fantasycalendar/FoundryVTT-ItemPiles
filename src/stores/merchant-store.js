@@ -381,6 +381,10 @@ export default class MerchantStore extends ItemPileStore {
 
 class PileMerchantItem extends PileItem {
 
+	RENDER_HOOK = CONSTANTS.HOOKS.RENDER_MERCHANT_ITEM;
+	HOVER_HOOK = CONSTANTS.HOOKS.HOVER_MERCHANT_ITEM;
+	LEAVE_HOOK = CONSTANTS.HOOKS.LEAVE_MERCHANT_ITEM;
+
 	setupStores(...args) {
 		super.setupStores(...args);
 		this.prices = writable([]);

@@ -473,6 +473,10 @@ export class VaultStore extends ItemPileStore {
 
 export class VaultItem extends PileItem {
 
+	RENDER_HOOK = CONSTANTS.HOOKS.RENDER_VAULT_GRID_ITEM;
+	HOVER_HOOK = CONSTANTS.HOOKS.HOVER_VAULT_GRID_ITEM;
+	LEAVE_HOOK = CONSTANTS.HOOKS.LEAVE_VAULT_GRID_ITEM;
+
 	setupStores(...args) {
 		super.setupStores(...args);
 		this.transform = writable({

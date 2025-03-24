@@ -44,20 +44,33 @@ export default {
 			},
 			[CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_RETRIEVER]: ({ item }) => {
 				return item.system.containerId.split(".").pop();
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_TRANSFORMER]: ({ actor, map }) => {
+				Object.values(map).forEach(data => {
+					data.item.system.items = data.items.reduce((acc, item) => {
+						let _id = foundry.utils.randomID();
+						acc[_id] = {
+							quantity: item.system.quantity,
+							uuid: `${actor.uuid}.Item.${item._id}`
+						}
+						return acc;
+					}, {})
+				})
 			}
 		},
 		"object": {
 			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
 			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
-				return item.containerItems;
+				return item?.containerItems ?? [];
 			},
 			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
-				for (const [_, containedData] of item.containerItems) {
+				const containerItems = item?.containerItems ?? [];
+				for (const [_, containedData] of containerItems) {
 					const item = fromUuidSync(containedData.uuid);
 					if (!item) continue;
 					items.push(item.toObject());
 				}
-			}
+			},
 		}
 	},
 

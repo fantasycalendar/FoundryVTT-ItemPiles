@@ -66,10 +66,10 @@ export default {
 		"container": {
 			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
 			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
-				return item.system.contents.contents;
+				return item.system.contents;
 			},
 			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items, raw = false } = {}) => {
-				for (const containedItem of item.system.contents.contents) {
+				for (const containedItem of item.system.contents) {
 					items.push(raw ? containedItem : containedItem.toObject());
 				}
 			}

@@ -48,7 +48,8 @@ const CONSTANTS = {
 		IS_CONTAINED: "isContained",
 		IS_CONTAINED_PATH: "isContainedPath",
 		CONTAINER_ID_GENERATOR: "containerIdGenerator",
-		CONTAINER_ID_RETRIEVER: "containerIdRetriever"
+		CONTAINER_ID_RETRIEVER: "containerIdRetriever",
+		CONTAINER_TRANSFORMER: "containerTransformer"
 	},
 
 	ITEM_DEFAULTS: {
@@ -263,7 +264,15 @@ CONSTANTS.HOOKS = {
 	OPEN_INTERFACE: module`openInterface`,
 	PRE_CLOSE_INTERFACE: module`preCloseInterface`,
 	CLOSE_INTERFACE: module`closeInterface`,
+	RENDER_PILE_ITEM: module`renderPileItem`,
+	HOVER_PILE_ITEM: module`mouseHoverPileItem`,
+	LEAVE_PILE_ITEM: module`mouseLeavePileItem`,
+	RENDER_MERCHANT_ITEM: module`renderMerchantItem`,
+	HOVER_MERCHANT_ITEM: module`mouseHoverMerchantItem`,
+	LEAVE_MERCHANT_ITEM: module`mouseLeaveMerchantItem`,
 	RENDER_VAULT_GRID_ITEM: module`renderVaultGridItem`,
+	HOVER_VAULT_GRID_ITEM: module`mouseHoverVaultGridItem`,
+	LEAVE_VAULT_GRID_ITEM: module`mouseLeaveVaultGridItem`,
 	PILE: {
 		PRE_CREATE: module`preCreateItemPile`,
 		CREATE: module`createItemPile`,

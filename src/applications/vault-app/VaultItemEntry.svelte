@@ -23,12 +23,14 @@
 	const transform = entry.transform;
 	let containerStyle = "";
 
+	let element = false;
+
 	$: styling = Helpers.styleFromObject($style);
 	$: displayImage = ($flagData.flipped ? $flagData.vaultImageFlipped || $flagData.vaultImage : $flagData.vaultImage) || $img;
 	$: imageChanged($flagData, $transform);
 	$: {
 		$doc;
-		callRenderedHook();
+		item.rendered(element);
 	}
 
 	function imageChanged(flagData, transform) {
@@ -46,15 +48,8 @@
 		containerStyle = `transform: rotate(${flipped ? "90deg" : "0deg"}); min-width: ${width}px; max-width: ${width}px; min-height: ${height}px; max-height: ${height}px;`;
 	}
 
-	let element = false;
-
-	function callRenderedHook() {
-		if (!element) return;
-		Hooks.callAll(CONSTANTS.HOOKS.RENDER_VAULT_GRID_ITEM, element, item.item);
-	}
-
 	onMount(() => {
-		callRenderedHook();
+		item.rendered(element);
 	});
 
 </script>
@@ -63,6 +58,8 @@
      class="grid-item"
      data-fast-tooltip={$name} data-fast-tooltip-activation-speed="0"
      data-fast-tooltip-deactivation-speed="0"
+     on:mouseover={() => { item.mouseEnter(element) }}
+     on:mouseleave={() => { item.mouseLeave(element) }}
 >
 	{#if displayImage}
 		<div class="grid-item-image-container" style={containerStyle}>

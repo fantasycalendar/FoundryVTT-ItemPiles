@@ -1,5 +1,24 @@
 # Item Piles Changelog
 
+## Version 3.2.2
+
+- ACTUALLY fixed players not being able to preview some items on merchants if the items were utilizing AppV2 interfaces (thanks kgar for the tip!)
+- Fixed merchant interface not working for some users
+- Added multiple new hooks relating to rendering of items in piles, merchants, and vaults - see API for more info:
+  - `item-piles-renderPileItem`
+  - `item-piles-mouseHoverPileItem`
+  - `item-piles-mouseLeavePileItem`
+  - `item-piles-renderMerchantItem`
+  - `item-piles-mouseHoverMerchantItem`
+  - `item-piles-mouseLeaveMerchantItem`
+  - `item-piles-renderVaultGridItem`
+  - `item-piles-mouseHoverVaultGridItem`
+  - `item-piles-mouseLeaveVaultGridItem`
+
+## Version 3.2.1
+
+- Fixed deployment of module
+
 ## Version 3.2.0
 
 - Updated minimum version of Foundry for Item Piles to v12
