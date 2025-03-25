@@ -8,6 +8,9 @@
       "RequestTrade": "Solicitar Negociação",
       "GiveToCharacter": "Dar ao Personagem"
     },
+    "Hints": {
+      "CtrlClear": "Control + clique para limpar"
+    },
     "PlayerList": {
       "TradeButton": "Trocar"
     },
