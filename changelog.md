@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.4
+
+- Fixed text based rollable tables populated with text-based UUIDs not being compatible with item piles' rollable table integrations - this makes Item Piles compatible with D&D5e's Dungeon Master's Guide rollable tables
+- Fixed right-click menu not working on vault items
+
 ## Version 3.2.3
 
 - Fixed merchants with non-infinite currencies not rendering

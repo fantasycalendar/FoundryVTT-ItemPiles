@@ -349,4 +349,7 @@ CONSTANTS.HOOKS = {
 	}
 }
 
+
+CONSTANTS.TABLE_UUID_REGEX = /@UUID\[(.*?)]{(.*?)}/g;
+
 export default CONSTANTS;

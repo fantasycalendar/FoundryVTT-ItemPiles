@@ -2281,19 +2281,13 @@ export async function rollTable({
 		results = (await table.drawMany(roll.total, { displayChat, recursive: true })).results;
 	}
 
-	for (const rollData of results) {
+	for (const data of results) {
+
+		const rollData = data.toObject();
 
 		let rolledQuantity = rollData?.quantity ?? 1;
 
-		let item;
-		if (rollData.documentCollection === "Item") {
-			item = game.items.get(rollData.documentId);
-		} else {
-			const compendium = game.packs.get(rollData.documentCollection);
-			if (compendium) {
-				item = await compendium.getDocument(rollData.documentId);
-			}
-		}
+		let item = await getItem(rollData);
 
 		if (item instanceof RollTable) {
 			rolledItems.push(...(await rollTable({ tableUuid: item.uuid, resetTable, normalize, displayChat })))
@@ -2383,8 +2377,9 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				const item = await getItem(rollResult);
 				if (!item) continue;
 				const quantity = roll.total * Math.max(Utilities.getItemQuantity(item), 1);
+
 				tableItems.push({
-					...rollResult, customCategory: customCategory, item, quantity
+					...(typeof rollResult === "string" ? rollResult : {}), customCategory: customCategory, item, quantity
 				})
 			}
 
@@ -2452,14 +2447,32 @@ async function getTable(tableToGet) {
 	return table;
 }
 
-async function getItem(itemToGet) {
+async function getItem(rollData) {
 	let item;
-	if (itemToGet.documentCollection === "Item") {
-		item = game.items.get(itemToGet.documentId);
+	if (typeof rollData.text === "string" && rollData.text.match(CONSTANTS.TABLE_UUID_REGEX)) {
+		const matches = [...rollData.text.matchAll(CONSTANTS.TABLE_UUID_REGEX)];
+		const firstAndLastIndex = matches.reduce((acc, elem) => {
+			acc[0] = Math.min(acc[0], elem.index)
+			acc[1] = Math.max(acc[1], elem.index + elem[0].length)
+			return acc;
+		}, [Infinity, -Infinity]);
+		const uuidNameMap = matches.map((elem) => {
+			return [elem[1], elem[2]];
+		});
+		const [uuid, name] = Helpers.random_array_element(uuidNameMap);
+		const itemName = rollData.text.replace(rollData.text.slice(...firstAndLastIndex), name);
+		item = await fromUuid(uuid)
+		const itemObj = item.toObject();
+		itemObj.name = itemName;
+		item = new Item.implementation(itemObj);
+		rollData.text = itemName;
+		rollData.img = itemObj.img;
+	} else if (rollData.documentCollection === "Item") {
+		item = game.items.get(rollData.documentId);
 	} else {
-		const compendium = game.packs.get(itemToGet.documentCollection);
+		const compendium = game.packs.get(rollData.documentCollection);
 		if (compendium) {
-			item = await compendium.getDocument(itemToGet.documentId);
+			item = await compendium.getDocument(rollData.documentId);
 		}
 	}
 	return item;

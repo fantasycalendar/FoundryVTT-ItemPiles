@@ -158,6 +158,7 @@
 			if (!contextMenu.length) return;
 
 			TJSContextMenu.create({
+				activeWindow: window,
 				x: event.detail.x,
 				y: event.detail.y,
 				zIndex: 1000000000000,
