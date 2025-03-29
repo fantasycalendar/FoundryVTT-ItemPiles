@@ -2451,7 +2451,7 @@ async function getItem(rollData) {
 	let item;
 	if (typeof rollData.text === "string" && rollData.text.match(CONSTANTS.TABLE_UUID_REGEX)) {
 		const matches = [...rollData.text.matchAll(CONSTANTS.TABLE_UUID_REGEX)];
-		const firstAndLastIndex = matches.reduce((acc, elem) => {
+		const [firstIndex, lastIndex] = matches.reduce((acc, elem) => {
 			acc[0] = Math.min(acc[0], elem.index)
 			acc[1] = Math.max(acc[1], elem.index + elem[0].length)
 			return acc;
@@ -2460,7 +2460,7 @@ async function getItem(rollData) {
 			return [elem[1], elem[2]];
 		});
 		const [uuid, name] = Helpers.random_array_element(uuidNameMap);
-		const itemName = rollData.text.replace(rollData.text.slice(...firstAndLastIndex), name);
+		const itemName = rollData.text.replace(rollData.text.slice(firstIndex, lastIndex), name);
 		item = await fromUuid(uuid)
 		const itemObj = item.toObject();
 		itemObj.name = itemName;
