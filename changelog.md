@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.5
+
+- Fixed text based rollable tables with item UUIDs not working with more than one item, whoops
+
 ## Version 3.2.4
 
 - Fixed text based rollable tables populated with text-based UUIDs not being compatible with item piles' rollable table integrations - this makes Item Piles compatible with D&D5e's Dungeon Master's Guide rollable tables

@@ -2467,6 +2467,8 @@ async function getItem(rollData) {
 		item = new Item.implementation(itemObj);
 		rollData.text = itemName;
 		rollData.img = itemObj.img;
+		rollData.documentCollection = uuid.split(".").slice(1, 3).join(".");
+		rollData.documentId = uuid.split(".")[4];
 	} else if (rollData.documentCollection === "Item") {
 		item = game.items.get(rollData.documentId);
 	} else {
