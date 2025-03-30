@@ -22,7 +22,7 @@
       "vault": "Cofre"
     },
     "Notifications": {
-      "SystemSupportFound": "Suporteao sistema encontrado! Aplicando configurações padrão do sistema ao Item Piles",
+      "SystemSupportFound": "Suporte ao sistema encontrado! Aplicando configurações padrão do sistema ao Item Piles",
       "UpdateItemPileSuccess": "Pilha de Itens atualizada com sucesso.",
       "UpdateMerchantSuccess": "Comerciante atualizado com sucesso.",
       "ItemTransferred": "{item_name} de {source_actor_name} foi dado para {target_actor_name}.",
@@ -248,7 +248,7 @@
       },
       "NoSystemFound": {
         "Title": "Sistema Não Reconhecido",
-        "Content": "Atualmente, este sistema não é totalmente suportado. Isso significa que o módulo não sabe como lidar melhor com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. <br><br>Se você tiver alguma dúvida, é só pingar o <strong>Wasp#2005</strong> no discord do Foundry."
+        "Content": "<strong>Este sistema não é suportado.</strong><br><br>Isso significa que o módulo não sabe como melhor lidar com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. <br><br>Se você tiver alguma dúvida, tire um print da cixa de diálogo que irá abrir após você fechar isto e peça por ajuda no canal do seu sistema no servidor do discord do Foundry."
       },
       "NewSystemVersion": {
         "Title": "Nova Versão do Sistema",
@@ -953,6 +953,9 @@
         "Hint": "Título da pasta para filtrar tabelas de rolagem da aba \"Itens Populares\" no comerciante.",
         "AllTables": "Todas as Tabelas"
       }
+    },
+    "Hints": {
+      "CtrlClear": "Control + Clique para limpar"
     }
   }
 }
