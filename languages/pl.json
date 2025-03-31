@@ -208,7 +208,7 @@
       },
       "NoSystemFound": {
         "Title": "Nie rozpoznano systemu",
-        "Content": "System ten nie jest obecnie w pełni obsługiwany. Oznacza to, że moduł nie wie, jak najlepiej obsługiwać elementy tego systemu, ale nadal może działać w ograniczony sposób.<br><br>Możesz samodzielnie skonfigurować ustawienia modułu, ale wymaga to trochę wiedzy technicznej.<br><br>Jeśli masz jakieś pytania, pinguj <strong>Wasp#2005</strong> na discordzie Foundry."
+        "Content": "<strong>Ten system nie jest obsługiwany.</strong><br><br>Oznacza to, że moduł nie wie, jak najlepiej obsługiwać elementy tego systemu, ale nadal może działać w ograniczony sposób.<br><br>Możesz samodzielnie skonfigurować ustawienia modułu, ale wymaga to trochę wiedzy technicznej.<br><br>Jeśli masz jakieś pytania, zrób zrzut ekranu okna dialogowego, które otworzy się po zamknięciu tego i poproś o pomoc na kanale swojego systemu na Discordzie Foundry."
       },
       "CantRemoveVaultExpander": {
         "Content": "Nie możesz usunąć tego rozszerzenia, przedmioty w skarbcu nie zmieściłyby się bez niego. Usuń {num_items} przedmiotów przed próbą usunięcia tego rozszerzenia!",
@@ -955,6 +955,9 @@
       "Fixed": "Pośrednik",
       "Icon": "Ikona",
       "Data": "Dane"
+    },
+    "Hints": {
+      "CtrlClear": "CTRL + kliknij, aby wyczyścić"
     }
   }
 }
