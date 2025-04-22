@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.6
+
+- Fixed some dropdowns not being visible outside some dialogs
+- Fixed D&D 5e v4.x.x attunement disappearing when items are transferred
+
 ## Version 3.2.5
 
 - Fixed text based rollable tables with item UUIDs not working with more than one item, whoops

@@ -45,7 +45,8 @@ export default {
 				delete itemData.system[key];
 			}
 		});
-		foundry.utils.setProperty(itemData, "system.attunement", Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData?.system?.attunement ?? 0));
+		foundry.utils.setProperty(itemData, "system.attunement", itemData?.system?.attunement ?? "");
+		foundry.utils.setProperty(itemData, "system.attuned", false);
 		if (itemData.type === "spell") {
 			try {
 				const scroll = await Item.implementation.createScrollFromSpell(itemData);
