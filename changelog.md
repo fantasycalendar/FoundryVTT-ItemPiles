@@ -2,6 +2,7 @@
 
 ## Version 3.2.6
 
+- Fixed incompatibility with BRT
 - Fixed some dropdowns not being visible outside some dialogs
 - Fixed D&D 5e v4.x.x attunement disappearing when items are transferred
 
