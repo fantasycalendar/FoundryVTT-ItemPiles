@@ -2275,7 +2275,10 @@ export async function rollTable({
 			documentId: result.documentId,
 			text: result.text || result.name,
 			img: result.img,
-			quantity: 1
+			quantity: 1,
+			toObject: function () {
+				return foundry.utils.deepClone(this);
+			}
 		}));
 	} else {
 		results = (await table.drawMany(roll.total, { displayChat, recursive: true })).results;
