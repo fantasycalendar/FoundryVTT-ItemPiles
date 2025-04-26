@@ -1,0 +1,961 @@
+{
+  "ITEM-PILES": {
+    "Items": "아이템",
+    "Currencies": "화폐",
+    "Currency": "화폐",
+    "ContextMenu": {
+      "ShowToPlayers": "플레이어에게 표시",
+      "RequestTrade": "거래 요청",
+      "GiveToCharacter": "캐릭터에게 건네기"
+    },
+    "Hints": {
+      "CtrlClear": "Ctrl + 클릭으로 초기화"
+    },
+    "PlayerList": {
+      "TradeButton": "거래"
+    },
+    "HeaderButtons": {
+      "Configure": "설정",
+      "ShowToPlayers": "플레이어에게 표시"
+    },
+    "Types": {
+      "pile": "아이템 더미",
+      "container": "보관함",
+      "merchant": "상인",
+      "vault": "금고"
+    },
+    "Notifications": {
+      "SystemSupportFound": "시스템 지원이 확인되었습니다! Item Piles에 기본 설정이 적용됩니다.",
+      "UpdateItemPileSuccess": "아이템 더미가 성공적으로 업데이트되었습니다.",
+      "UpdateMerchantSuccess": "상인이 성공적으로 업데이트되었습니다.",
+      "ItemTransferred": "{source_actor_name}의 {item_name}(이)가 {target_actor_name}에게 전달되었습니다.",
+      "ItemAdded": "{item_name}(이)가 {target_actor_name}에게 추가되었습니다.",
+      "GiveItemAccepted": "{user_name}(이)가 아이템 제공을 수락했습니다.",
+      "ShownToPlayers": "{actor_name}을(를) 플레이어에게 표시합니다.",
+      "CreatedJournal": "Item Piles 금고 기록 저널을 생성했습니다."
+    },
+    "Errors": {
+      "DisallowedItemDrop": "\"{type}\" 유형의 아이템은 버릴 수 없습니다.",
+      "DisallowedItemTrade": "\"{type}\" 유형의 아이템은 거래할 수 없습니다.",
+      "DisallowedItemSell": "이 상인은 \"{type}\" 유형의 아이템을 받지 않습니다.",
+      "NoSourceDrop": "GM이 아닌 경우 아이템 바에서 아이템을 버릴 수 없습니다.",
+      "PileTooFar": "아이템 더미와 너무 멀리 떨어져 있어 상호작용할 수 없습니다.",
+      "NoTokenFound": "당신을 대표하는 토큰이나 캐릭터를 찾을 수 없습니다.",
+      "PileLocked": "이 보관함은 잠겨 있어 열 수 없으며, 아이템을 버릴 수 없습니다.",
+      "DropNoToken": "이 장면에 토큰이 없기 때문에 아이템을 버릴 수 없습니다.",
+      "NoVaultAccess": "이 금고를 볼 수 있는 권한이 없습니다.",
+      "NoVaultAccessActor": "{actor_name}은(는) 이 금고를 볼 수 있는 권한이 없습니다.",
+      "ItemNoQuantity": "{item_name}의 수량이 0이므로 이 아이템은 전달할 수 없습니다!"
+    },
+    "Warnings": {
+      "NoGMsConnected": "경고 - 연결된 GM이 없습니다 - 대부분의 Item Piles 기능은 GM이 있어야 사용 가능합니다.",
+      "NoResponseFromGM": "경고 - GM \"{user_name}\"이(가) 요청에 응답하지 않았습니다 - 이 모듈의 대부분 기능은 GM의 응답이 필요합니다.",
+      "NoResponseFromGMTimeout": "경고 - GM \"{user_name}\"이(가) 마지막 요청에 응답하지 않았습니다 - {time}초 후에 다시 시도해 주세요.",
+      "TransactionNoGMConnected": "연결된 GM이 없으므로 거래가 취소되었습니다. 아무 아이템도 추가, 제거, 전달되지 않았습니다.",
+      "GiveItemNoGM": "이 아이템을 전달받을 GM이 활성화되어 있지 않습니다.",
+      "GiveItemDeclined": "{user_name}(이)가 아이템 제공을 거절했습니다.",
+      "NoPlayersActive": "이 작업을 수행할 수 있는 활성화된 플레이어가 없습니다.",
+      "NoGMsConnectedAction": "경고 - \"{action}\" 작업을 실행할 수 없습니다. 활성화된 GM이 없습니다.",
+      "VaultFull": "이 아이템은 금고에 더 이상 담을 수 없습니다!",
+      "CantSortVault": "아이템 정렬에 실패했습니다 - 아이템 수가 너무 많거나 문제가 발생했습니다.",
+      "VaultItemNotExpander": "이 아이템은 금고 확장 아이템이 아닙니다.",
+      "DroppedIsNotItem": "\"{type}\" 유형의 문서는 아이템 더미에 버릴 수 없습니다!",
+      "VaultInvalidItemDropped": "이 유형의 아이템은 금고에 버릴 수 없습니다!",
+      "VaultSameItemOrigin": "금고에서 나온 아이템을 다시 같은 금고에 넣을 수 없습니다!",
+      "VaultNoGmItemSidebar": "사이드바에서 아이템을 금고에 드롭할 수 있는 권한은 GM에게만 있습니다!"
+    },
+    "Inspect": {
+      "Title": "아이템 더미 내용 확인",
+      "AsActor": "{actorName}로서 이 더미를 확인하고 있습니다.",
+      "Change": "변경",
+      "Owner": "이 아이템 더미의 소유자는 내용물을 편집할 수 있습니다.",
+      "Empty": "이 더미는 비어 있습니다.",
+      "Destroyed": "이 더미는 더 이상 존재하지 않으며, 폐허로 남아 있습니다.",
+      "TakeAll": "모든 아이템 가져가기",
+      "Take": "가져가기",
+      "Close": "뚜껑 닫기",
+      "Leave": "떠나기",
+      "NoShareLeft": "남은 몫이 없습니다...",
+      "NoneLeft": "아무것도 남지 않았습니다...",
+      "OpenSheet": "시트 열기",
+      "AddCurrency": "화폐 추가",
+      "SplitAll": "{num_players}명에게 모두 나누기",
+      "SplitItems": "아이템을 {num_players}명에게 나누기",
+      "SplitCurrencies": "화폐를 {num_players}명에게 나누기",
+      "SplitNoPlayers": "내용물을 나눌 캐릭터를 찾을 수 없습니다."
+    },
+    "Trade": {
+      "Title": "아이템 거래",
+      "Accept": "수락",
+      "Decline": "거절",
+      "Mute": "알림 끄기",
+      "AutoDecline": "거래 요청에 빠르게 응답하지 않아 자동으로 거절되었습니다.",
+      "Declined": "상대방이 거래 요청을 거절했습니다.",
+      "SameActor": "양측 모두 같은 캐릭터를 선택할 수 없습니다. 같은 캐릭터와 거래할 수 없습니다.",
+      "Private": "비공개 거래로 설정",
+      "PrivateExplanation": "채팅 카드가 생성되지 않으며, 아무도 거래를 구경할 수 없습니다.",
+      "Over": "이 거래는 더 이상 활성화되어 있지 않습니다.",
+      "Between": "{actor_1}와(과) {actor_2} 간의 거래",
+      "DragDrop": "아이템을 끌어다 놓아 거래를 시작하세요",
+      "Prompt": {
+        "Title": "거래 요청 보내기",
+        "User": "거래할 대상을 선택하세요:",
+        "PickActor": "이 거래에서 대표할 캐릭터를 선택하세요:",
+        "PickedActor": "거래에서 대표할 캐릭터:",
+        "PickToken": "선택된 토큰 고르기",
+        "DropActor": "캐릭터를 이곳에 끌어다 놓기",
+        "Label": "거래 요청 보내기"
+      },
+      "NoActiveUsers": {
+        "Title": "활성화된 플레이어 없음",
+        "Content": "활성화된 플레이어가 없어서 거래할 수 없습니다."
+      },
+      "Request": {
+        "Title": "거래 요청",
+        "Content": "{trading_actor_name} (사용자 {trading_user_name})이(가) 당신과 거래를 원합니다.",
+        "PrivateContent": "{trading_actor_name} (사용자 {trading_user_name})이(가) <strong>비공개로</strong> 거래를 원합니다.",
+        "AcceptQuery": "수락하시겠습니까?"
+      },
+      "OngoingRequest": {
+        "Content": "{user_name}의 응답을 기다리는 중...",
+        "Label": "거래 요청 취소"
+      },
+      "CancelledRequest": {
+        "Content": "{user_name}이(가) 거래 요청을 취소했습니다."
+      },
+      "AddCurrency": {
+        "Title": "화폐 추가",
+        "Content": "{trader_actor_name}과의 현재 거래에 추가할 화폐:",
+        "Label": "화폐 업데이트"
+      },
+      "GMAddCurrency": "화폐 추가 (GM 모드)",
+      "Closed": {
+        "Title": "거래 종료",
+        "You": "당신이 거래 창을 닫아 거래가 취소되었습니다.",
+        "Them": "\"{user_name}\"이(가) 거래 창을 닫아 거래가 취소되었습니다.",
+        "Someone": "사용자 중 한 명이 거래 창을 닫아 거래가 취소되었습니다."
+      },
+      "Disconnected": "사용자 중 한 명의 연결이 끊어져 거래가 취소되었습니다.",
+      "UserCharacterWarning": "당신은 플레이어 \"{player_name}\"에게 할당된 캐릭터 \"{actor_name}\"을(를) 선택했습니다.<br><br>정말 이대로 진행하시겠습니까?",
+      "UserActiveCharacterWarning": "당신은 현재 <strong>활성화된</strong> 플레이어 \"{player_name}\"의 캐릭터 \"{actor_name}\"을(를) 선택했습니다.<br><br>정말 이대로 진행하시겠습니까?",
+      "ActorOwnerWarning": "이 캐릭터에 대한 소유권이 없기 때문에 거래할 수 없습니다."
+    },
+    "Merchant": {
+      "Title": "상인: {actor_name}",
+      "BuyItems": "아이템 구매",
+      "BuyServices": "서비스 구매",
+      "SellItems": "아이템 판매",
+      "PopulateItems": "아이템 채우기",
+      "AllTypes": "모든 유형",
+      "Buy": "구매",
+      "NoMatchFound": "검색 조건에 맞는 항목이 없습니다",
+      "NoItemsForSale": "이 상인은 판매할 아이템이 없습니다",
+      "NoItemsToSell": "판매할 수 있는 아이템이 없습니다",
+      "OpenTimes": "영업 시간",
+      "OpenCloseAuto": "자동",
+      "Open": "영업 중",
+      "Closed": "휴업 중",
+      "Hours": "시",
+      "Minutes": "분",
+      "MerchantClosed": "상인이 영업 중이 아닙니다. 나중에 다시 오세요.",
+      "Sell": "판매",
+      "SortBy": "정렬 기준:",
+      "Description": "설명",
+      "Settings": "설정",
+      "Override": "무시",
+      "EditTypePrices": "유형별 가격 조정",
+      "EditTypePricesExplanation": "구매 탭에서 유형별 슬라이더를 표시할지 설정합니다",
+      "BuyNoItems": "상인이 보유한 아이템이 없습니다",
+      "CurrentItems": "현재 아이템",
+      "CurrentServices": "현재 서비스",
+      "NoRollTables": "롤 테이블이 없습니다. 먼저 하나 생성해 주세요",
+      "ClickRoll": "굴리기를 클릭하여 시작",
+      "RolledTimes": "{rolls}회 굴림",
+      "KeepRolled": "굴린 결과 유지",
+      "AddAll": "모든 아이템 추가",
+      "ClearAllItems": "모든 아이템 제거",
+      "ClearAllServices": "모든 서비스 제거",
+      "AddItem": "추가",
+      "RemoveItem": "제거",
+      "ItemFree": "무료",
+      "RollableTables": "굴릴 수 있는 테이블",
+      "Service": "서비스",
+      "AddTable": "테이블 추가",
+      "RollAllTables": "모든 테이블 굴리기",
+      "ToolTipRemoveTable": "테이블 제거",
+      "TooltipConfigureTable": "테이블 설정",
+      "TooltipRollTable": "테이블 굴리기",
+      "ToolTipRemoveAllRolledItems": "모든 굴린 아이템 제거",
+      "ShoppingAs": "{actorName}으로 쇼핑 중",
+      "TableAddAllItems": "모든 아이템 추가:",
+      "TableTimesToRoll": "테이블 굴림 횟수:",
+      "TableCustomCategory": "아이템을 추가할 사용자 지정 분류:",
+      "Log": "활동 로그",
+      "LogSearch": "로그 검색:",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "LogBought": "구매함",
+      "LogSold": "판매함",
+      "LogQuantity": "{quantity}개 ",
+      "LogSetQuantity": "{instigator}(이)가 <strong>{item}</strong>의 <span>수량</span>을 {quantity}(으)로 설정함",
+      "LogSetForSale": "{instigator}(이)가 <strong>{item}</strong>을(를) <span>판매 중</span>으로 설정함",
+      "LogSetNotForSale": "{instigator}(이)가 <strong>{item}</strong>을(를) <span>판매 중지</span>로 설정함",
+      "LogSetVisible": "{instigator}(이)가 <strong>{item}</strong>을(를) <span>표시</span> 상태로 설정함",
+      "LogSetHidden": "{instigator}(이)가 <strong>{item}</strong>을(를) <span>숨김</span> 상태로 설정함",
+      "LogTransaction": "{instigator}(이)가 {quantity}{item}을(를) {price}에 {action}함"
+    },
+    "Vault": {
+      "VaultTab": "금고",
+      "ExpandersTab": "확장 슬롯",
+      "LogTab": "기록",
+      "ViewingAs": "{actor_name}로서 보기",
+      "NeedsCapacity": "이 금고의 총 수용량은 {total_capacity}이지만, 확장 아이템이 추가되기 전까지는 사용할 수 없습니다.",
+      "CapacityLeft": "이 금고는 현재 {total_capacity} 중 {capacity}의 공간이 남아 있습니다. 금고 확장 아이템을 끌어다 놓아 용량을 늘릴 수 있습니다.",
+      "CapacityFull": "이 금고는 최대 용량 {total_capacity}에 도달했습니다.",
+      "ExpandsCols": "{cols}칸 너비 확장",
+      "ExpandsRows": "{rows}칸 높이 확장",
+      "Withdraw": "인출",
+      "Deposit": "입금",
+      "SortItems": "아이템 정렬",
+      "SortItemsTooltip": "아이템 정렬 - Ctrl 키를 누르면 유사한 아이템을 병합합니다",
+      "LogUserActor": "{actor_name} ({user_name})",
+      "Deposited": "입금함",
+      "Withdrew": "인출함",
+      "LogEntry": "{instigator}(이)가 {quantity}{item_name}을(를) {action}",
+      "LogQuantity": "{quantity}개 "
+    },
+    "General": {
+      "Primary": "기본",
+      "Exchange": "교환",
+      "Name": "이름",
+      "Cost": "가격",
+      "Fixed": "고정",
+      "Short": "단축",
+      "Icon": "아이콘",
+      "Data": "데이터"
+    },
+    "Dialogs": {
+      "TypeWarning": {
+        "Title": "아이템 유형 경고",
+        "DropContent": "\"{type}\" 유형의 아이템은 일반적으로 버릴 수 없습니다. 그래도 진행하시겠습니까?",
+        "TradeContent": "\"{type}\" 유형의 아이템은 일반적으로 거래할 수 없습니다. 그래도 진행하시겠습니까?",
+        "SellContent": "이 상인은 일반적으로 \"{type}\" 유형의 아이템을 받지 않습니다. 그래도 판매하시겠습니까?"
+      },
+      "ResetSettings": {
+        "Title": "모듈 설정 초기화",
+        "Content": "Item Piles 모듈의 설정을 현재 시스템의 기본값으로 모두 초기화하시겠습니까? <strong>이 작업은 되돌릴 수 없습니다!</strong>",
+        "Confirm": "모듈 설정 초기화"
+      },
+      "LinkedActorWarning": {
+        "Title": "아이템 더미와 연결된 캐릭터",
+        "Content": "<strong>연결된 캐릭터</strong>를 아이템 더미로 전환하시겠습니까? 이 캐릭터의 토큰은 연결되어 있어, 해당 캐릭터의 모든 토큰이 동일한 인벤토리와 화폐를 공유하게 됩니다."
+      },
+      "NoSystemFound": {
+        "Title": "시스템을 인식할 수 없음",
+        "Content": "<strong>이 시스템은 지원되지 않습니다.</strong><br><br>이 모듈은 이 시스템의 아이템을 적절히 처리하는 방법을 알지 못하므로 제한된 방식으로만 작동합니다.<br><br>설정을 수동으로 구성할 수는 있으나, 약간의 기술 지식이 필요합니다.<br><br>질문이 있다면 이 대화 상자의 스크린샷을 찍고 Foundry Discord 서버의 해당 시스템 채널에 도움을 요청하세요."
+      },
+      "NewSystemVersion": {
+        "Title": "새 시스템 버전",
+        "Content": "현재 사용 중인 시스템의 Item Piles 기본 설정이 업데이트되었습니다. 이 업데이트된 설정으로 덮어쓰시겠습니까?",
+        "Content2": "덮어쓰지 않으면 Item Piles가 정상 작동하지 않을 수 있습니다. 문제 발생 시 시스템 전용 설정을 재설정해보세요.",
+        "Confirm": "설정 업데이트"
+      },
+      "ResetSharingData": {
+        "Title": "분배 기록 초기화",
+        "Content": "이 작업은 플레이어가 아이템 더미에서 가져간 몫에 대한 기록을 초기화합니다.<br><br>정말 초기화하시겠습니까?",
+        "Confirm": "분배 기록 초기화"
+      },
+      "ClearAllItems": {
+        "Title": "모든 아이템 제거",
+        "Content": "이 작업은 상인의 모든 아이템을 제거합니다. 계속하시겠습니까?"
+      },
+      "ClearAllServices": {
+        "Title": "모든 서비스 제거",
+        "Content": "이 작업은 상인의 모든 서비스를 제거합니다. 계속하시겠습니까?"
+      },
+      "GiveItemUserNotActive": {
+        "Title": "아이템 건네주기",
+        "Content": "\"{actor_name}\"은(는) 플레이어 \"{user_name}\"의 소유이지만, 현재 활성화되어 있지 않아 이 아이템을 건네줄 수 없습니다."
+      },
+      "RemoveMerchantTable": {
+        "Title": "상인 테이블 제거",
+        "Content": "\"{table_name}\" 테이블을 이 상인에게서 제거하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+      },
+      "CantRemoveVaultExpander": {
+        "Title": "확장 아이템 제거 불가",
+        "Content": "이 확장 아이템을 제거하면 금고의 아이템이 들어가지 못합니다. {num_items}개의 아이템을 먼저 제거하세요!"
+      },
+      "GiveItems": {
+        "Title": "아이템 건네주기",
+        "Header": "건네줄 아이템: {item_name}",
+        "SelectPlaceholder": "아이템을 전달할 캐릭터 선택",
+        "ContentMultipleQuantity": "이 아이템을 {quantity}개 보유 중입니다. 몇 개를 건네주겠습니까?",
+        "Secret": "다른 사람에게 알리지 않기 (GM 제외)",
+        "Submit": "전달"
+      },
+      "ReceiveItem": {
+        "Title": "아이템 받기",
+        "Header": "아이템 받기",
+        "Content": "{source_actor_name}(이)가 {target_actor_name}에게 아이템을 건네주려 합니다. 수락하시겠습니까?",
+        "Ignore": "사용자 무시"
+      },
+      "TextEditor": {
+        "Title": "텍스트 편집기"
+      },
+      "UserSelect": {
+        "Title": "사용자 선택",
+        "Content": "어떤 사용자에게 표시할까요?"
+      },
+      "ClearVaultLog": {
+        "Title": "금고 기록 초기화?",
+        "Content": "\"{actor_name}\" 금고의 기록을 정말 초기화하시겠습니까?"
+      },
+      "ClearMerchantLog": {
+        "Title": "상인 기록 초기화?",
+        "Content": "\"{actor_name}\" 상인의 기록을 정말 초기화하시겠습니까?"
+      },
+      "SortMergeVaultItems": {
+        "Title": "유사 아이템 병합 및 정렬?",
+        "Content": "정렬 시 유사한 아이템을 병합하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+      }
+    },
+    "Applications": {
+      "DropItem": {
+        "Title": "아이템 버리기",
+        "Header": "버릴 아이템: {item_name}",
+        "Content": "\"{target_name}\" 아이템 더미에 이 아이템을 추가합니다.",
+        "ContentMultipleQuantity": "이 아이템을 {quantity}개 보유 중입니다. 몇 개를 버리시겠습니까?",
+        "ContentInfiniteQuantity": "몇 개를 버리시겠습니까?",
+        "Submit": "더미에 추가",
+        "SubmitNoTarget": "새 더미 생성"
+      },
+      "GiveItem": {
+        "Title": "아이템 건네주기",
+        "Header": "건네줄 아이템: {item_name}",
+        "Content": "\"{target_name}\"에게 이 아이템을 건네주겠습니까?",
+        "ContentMultipleQuantity": "이 아이템을 {quantity}개 보유 중입니다. 몇 개를 건네주시겠습니까?",
+        "ContentInfiniteQuantity": "\"{target_name}\"에게 몇 개를 건네주시겠습니까?",
+        "Submit": "전달"
+      },
+      "DepositItem": {
+        "Title": "아이템 입금",
+        "Header": "입금할 아이템: {item_name}",
+        "Content": "\"{target_name}\"에 이 아이템을 입금하시겠습니까?",
+        "ContentMultipleQuantity": "이 아이템을 {quantity}개 보유 중입니다. 몇 개를 입금하시겠습니까?",
+        "ContentInfiniteQuantity": "몇 개를 입금하시겠습니까?",
+        "Submit": "입금"
+      },
+      "WithdrawItem": {
+        "Title": "아이템 인출",
+        "Header": "인출할 아이템: {item_name}",
+        "Content": "\"{target_name}\"에서 이 아이템을 인출하시겠습니까?",
+        "ContentMultipleQuantity": "이 아이템은 {quantity}개 있습니다. 몇 개를 인출하시겠습니까?",
+        "ContentInfiniteQuantity": "",
+        "Submit": "인출"
+      },
+      "SplitItem": {
+        "Title": "아이템 분할",
+        "Header": "{item_name} 묶음을 분할합니다",
+        "Content": "이 묶음 아이템을 분할하시겠습니까?",
+        "ContentMultipleQuantity": "이 아이템은 {quantity}개 있습니다. 새 묶음에 몇 개를 담으시겠습니까?",
+        "ContentInfiniteQuantity": "",
+        "Submit": "묶음 분할"
+      },
+      "EditCurrencies": {
+        "Title": "화폐 편집",
+        "Content": "GM 권한으로 이 아이템 더미의 화폐를 수정할 수 있습니다:",
+        "Secondary": "보조 화폐:",
+        "NoCurrency": "{actor_name}은(는) 유효한 화폐를 가지고 있지 않습니다.",
+        "Submit": "적용"
+      },
+      "DropCurrencies": {
+        "Title": "화폐 버리기",
+        "Content": "다음 화폐를 이 아이템 더미에 추가할 수 있습니다:",
+        "NoCurrency": "{actor_name}은(는) 유효한 화폐를 가지고 있지 않습니다...",
+        "Submit": "추가"
+      },
+      "DepositCurrencies": {
+        "Title": "화폐 입금",
+        "Content": "다음 화폐를 이 금고에 입금할 수 있습니다:",
+        "NoCurrency": "{actor_name}은(는) 입금할 화폐가 없습니다.",
+        "Submit": "입금"
+      },
+      "WithdrawCurrencies": {
+        "Title": "화폐 인출",
+        "Content": "다음 화폐를 이 금고에서 인출할 수 있습니다:",
+        "NoCurrency": "인출할 수 있는 화폐가 없습니다.",
+        "Submit": "인출"
+      },
+      "TradeMerchantItem": {
+        "Title": "거래 아이템: {item_name}",
+        "BuyItem": "아이템 구매",
+        "SellItem": "아이템 판매",
+        "YouPay": "당신이 지불",
+        "YouReceive": "당신이 받음",
+        "TheyReceive": "상인이 받음",
+        "Quantity": "수량",
+        "Change": "변경",
+        "YouCantAfford": "이 가격을 지불할 수 없습니다",
+        "TheyCantAfford": "상인이 이 가격을 지불할 수 없습니다",
+        "YouLackQuantity": "이 아이템을 판매하기에 수량이 부족합니다. 현재 {quantity}개 보유 중이며, {requiredQuantity}개 필요합니다.",
+        "TheyLackQuantity": "상인이 이 아이템을 판매하기에 수량이 부족합니다. 현재 {quantity}개 보유 중이며, {requiredQuantity}개 필요합니다.",
+        "MaxQuantity": "최대 {quantity}개"
+      },
+      "Settings": {
+        "Title": "Item Piles 모듈 설정",
+        "Local": "로컬 설정",
+        "Module": "모듈 설정",
+        "Styles": "스타일 설정",
+        "System": "시스템 전용 설정",
+        "Export": "설정 내보내기",
+        "Import": "설정 가져오기",
+        "Donate": "이 모듈이 마음에 드셨다면, 유지 운영을 위한 후원을 고려해 주세요!",
+        "MoreToCome": "더 많은 설정 기능이 곧 추가될 예정입니다...",
+        "Request": "새로운 기능을 요청하려면 여기를 클릭하세요.",
+        "Submit": "설정 저장"
+      },
+      "CurrenciesEditor": {
+        "Title": "화폐 편집기",
+        "TitleActor": "화폐 편집기: {actor_name}",
+        "Explanation": "여기에서 캐릭터가 아이템 더미에서 획득하거나 전달할 수 있는 화폐를 정의할 수 있습니다.",
+        "ExplanationSmallAttributes": "D&D5e에서는 화폐가 캐릭터 속성에 \"actor.system.currency.gp\"와 같이 저장되어 있습니다. \"금화\"라는 이름과 \"system.currency.gp\" 경로를 입력하여 추가할 수 있습니다. 상단의 + 버튼을 눌러 새로운 항목을 추가하세요.",
+        "ExplanationSmallItems": "다른 시스템에서는 화폐가 실제 아이템으로 존재할 수 있습니다. 이 경우 아이템을 끌어다 목록에 추가하세요.",
+        "DragDrop": "아이템을 끌어다 놓아 목록에 추가하세요",
+        "Name": "화폐 이름",
+        "Exchange": "환율",
+        "Data": "데이터",
+        "Icon": "아이콘",
+        "AddNew": "새 화폐 추가",
+        "CreateNew": "아이템을 끌어다 놓거나 + 버튼을 눌러 시작하세요!",
+        "Drop": "끌어다 놓기"
+      },
+      "SecondaryCurrenciesEditor": {
+        "Title": "Item Piles 보조 화폐 편집기",
+        "TitleActor": "Item Piles 보조 화폐 편집기: {actor_name}",
+        "Explanation": "여기에서 캐릭터가 획득하거나 버릴 수 있는 보조 화폐를 정의할 수 있습니다."
+      },
+      "ItemEditor": {
+        "Title": "아이템 편집기: {item_name}",
+        "Update": "아이템 업데이트",
+        "General": "일반 설정",
+        "Price": "가격 설정",
+        "Vault": "금고 설정",
+        "GeneralTab": {
+          "NotForSale": "판매 불가 아이템",
+          "NotForSaleExplanation": "이 항목이 활성화되면 이 아이템은 판매되지 않으며, 상인 목록에 표시되더라도 구매할 수 없습니다.",
+          "CustomCategory": "사용자 지정 아이템 분류",
+          "CustomCategoryExplanation": "빈칸이 아닌 경우, 이 아이템은 원래 유형이 아닌 사용자 지정 유형으로 분류됩니다.",
+          "Hidden": "숨겨진 아이템",
+          "HiddenExplanation": "활성화하면 상인의 아이템 목록에서 이 아이템이 표시되지 않습니다.",
+          "CanStack": "중첩 가능",
+          "CanStackExplanation": "이 설정은 해당 아이템이 유사한 다른 아이템과 중첩될 수 있는지를 결정합니다.",
+          "CanStackDefault": "아이템 더미의 기본 설정 따름",
+          "CanStackYes": "항상 중첩 가능",
+          "CanStackNo": "중첩 불가",
+          "DisplayQuantity": "수량 표시 여부",
+          "DisplayQuantityExplanation": "이 상점에서 이 아이템의 수량을 표시할지 여부를 설정합니다.",
+          "DisplayQuantityDefault": "상인의 기본 설정 따름",
+          "DisplayQuantityYes": "수량 항상 표시",
+          "DisplayQuantityNo": "수량 항상 숨기기",
+          "InfiniteQuantity": "무한 수량",
+          "InfiniteQuantityExplanation": "활성화되면, 이 아이템은 판매되어도 수량이 줄어들지 않습니다.",
+          "InfiniteQuantityDefault": "상인의 기본 설정 따름",
+          "InfiniteQuantityYes": "무한 수량",
+          "InfiniteQuantityNo": "일반 수량",
+          "KeepZero": "수량 0 상태 유지",
+          "KeepZeroExplanation": "품절 시 상인이 이 아이템을 제거하지 않고 '판매 불가' 상태로 전환합니다.",
+          "KeepOnMerchant": "상인에게 유지",
+          "KeepOnMerchantExplanation": "상인의 아이템을 초기화할 때에도 이 아이템은 유지됩니다.",
+          "PriceExplanation": "이 탭에서는 이 아이템의 가격을 설정하거나, 다른 아이템으로 구매하게 설정할 수 있습니다."
+        },
+        "PriceTab": {
+          "BasePrice": "기본 가격",
+          "BasePriceExplanation": "이 설정은 이 아이템의 일반적인 가격을 정의합니다.",
+          "QuantityForPrice": "가격당 수량",
+          "QuantityForPriceExplanation": "이 설정은 이 아이템을 구매할 때 몇 개를 받는지를 정의합니다.",
+          "Service": "서비스 아이템",
+          "ServiceExplanation": "이 설정이 활성화되면, 아이템은 구매자의 인벤토리에 추가되지 않습니다. 대신 이 '서비스'는 수량을 가질 수 있으며, 수량이 0이 되면 삭제되지 않고 '판매 불가' 상태로 전환됩니다.",
+          "PurchaseMacro": "구매 매크로",
+          "PurchaseMacroExplanation": "아이템이 구매될 때 실행할 매크로의 이름입니다.",
+          "Free": "무료 아이템",
+          "FreeExplanation": "이 설정이 활성화되면, 상인에게서 이 아이템을 무료로 구매할 수 있습니다.",
+          "DisableNormalCost": "기본 화폐 가격 비활성화",
+          "DisableNormalCostExplanation": "이 설정이 활성화되면, 이 아이템은 주 화폐로는 구매할 수 없으며, 아래의 구매 옵션을 통해서만 구매할 수 있습니다.",
+          "PurchaseOptionsAsSellOption": "구매 옵션을 판매 시에도 사용",
+          "PurchaseOptionsAsSellOptionExplanation": "이 설정이 활성화되면, 아래의 구매 옵션을 아이템을 상인에게 되팔 때에도 사용할 수 있습니다. 기본적으로는 아래의 판매 옵션만 사용됩니다.",
+          "PurchaseOptions": "구매 옵션",
+          "PurchaseOptionsExplanation": "이곳에서 이 아이템을 구매할 수 있는 다양한 방법을 설정할 수 있습니다. 각 그룹은 캐릭터가 상인에게서 이 아이템을 구매할 수 있는 하나의 방법을 나타냅니다.",
+          "SellOptions": "판매 옵션",
+          "SellOptionsExplanation": "이곳에서 이 아이템을 판매할 수 있는 다양한 방법을 설정할 수 있습니다. 각 그룹은 캐릭터가 상인에게 이 아이템을 판매할 수 있는 하나의 방법을 나타냅니다.",
+          "CantBeSoldToMerchants": "상인에게 판매 불가",
+          "CantBeSoldToMerchantsExplanation": "이 설정이 활성화되면, 이 아이템은 상인에게 되팔 수 없으며 구매만 가능합니다.",
+          "AddPurchaseOption": "구매 옵션 추가",
+          "AddSellOption": "판매 옵션 추가",
+          "DropMeClickMe": "속성을 클릭하거나 아이템을 끌어다 놓아 추가하세요",
+          "PricePreset": "또는 가격 프리셋 선택:",
+          "SelectPreset": "가격 프리셋 선택"
+        },
+        "VaultTab": {
+          "GridSize": "그리드 크기",
+          "GridSizeExplanation": "이 설정은 이 아이템이 금고 안에서 차지하는 격자 수(공간 크기)를 정의합니다.",
+          "VaultImage": "금고 전용 이미지",
+          "VaultImageExplanation": "금고 내에 표시될 때 아이템 이미지를 이 이미지로 덮어씁니다.",
+          "VaultImageRotated": "회전된 금고 이미지",
+          "VaultImageRotatedExplanation": "아이템이 회전된 상태로 금고에 표시될 때 사용할 대체 이미지입니다.",
+          "GridWidth": "가로 칸 수",
+          "GridHeight": "세로 칸 수",
+          "VaultExpander": "금고 확장 아이템",
+          "VaultExpanderExplanation": "이 설정이 활성화되면, 이 아이템은 금고 내의 일반 아이템처럼 작동하지 않고, 아래 설정에 따라 금고의 수용 슬롯을 확장합니다.",
+          "ExpandColumnsRows": "열 및 행 확장",
+          "ExpandColumnsRowsExplanation": "위 설정이 활성화된 경우, 금고에 새로 추가되는 열과 행의 수를 정의합니다. 이 확장은 금고의 최대 용량을 초과할 수 없습니다.",
+          "PriceModifierTitle": "구매 및 판매 가격 보정값",
+          "PriceModifierExplanation": "이 설정은 이 아이템을 구매하거나 판매할 때 적용할 가격 보정값을 정의합니다. 이는 다른 보정값 적용 전에 기본 가격에 곱해집니다. 예를 들어 상인의 판매 가격 보정값이 50%일 때, 이 아이템의 판매 가격 보정값이 200%이면 상인의 보정을 상쇄할 수 있습니다."
+        }
+      },
+      "FilterEditor": {
+        "Title": "Item Piles 필터 편집기",
+        "TitleActor": "Item Piles 필터 편집기: {actor_name}",
+        "Explanation": "여기에서 특정 유형의 아이템을 제외할 수 있는 다양한 필터를 정의할 수 있습니다. 지정한 속성 경로를 기준으로 아이템의 \"type\"을 식별하고, 설정된 필터에 따라 해당 아이템은 아이템 더미 인벤토리 UI에서 숨겨집니다.",
+        "Filters": "필터",
+        "Path": "속성 경로",
+        "AddNew": "새 필터 추가"
+      },
+      "RequiredItemPropertiesEditor": {
+        "Title": "Item Piles - 필수 아이템 속성 편집기",
+        "TitleActor": "Item Piles - 필수 아이템 속성 편집기: {actor_name}",
+        "Explanation": "여기에서는 이 아이템 더미에 전달될 아이템이 반드시 갖춰야 할 필수 속성들을 정의할 수 있습니다. 지정한 속성 경로를 기준으로 아이템의 \"type\"을 확인하고, 이 조건을 충족하지 않으면 해당 아이템은 아이템 더미로 전달되지 않습니다.",
+        "Filters": "필수 속성",
+        "Path": "속성 경로",
+        "AddNew": "새 필터 추가"
+      },
+      "SimilaritiesEditor": {
+        "Title": "Item Piles 유사성 판별 기준 편집기",
+        "Explanation": "여기에서는 Item Piles가 유사한 아이템을 구분할 수 있도록 도와주는 식별 기준들을 정의할 수 있습니다. 대부분의 시스템에서는 \"name\"과 \"type\" 속성만으로도 구분이 가능하지만, Pathfinder 2판처럼 임시 아이템이 영구 아이템과 같은 속성을 공유하는 경우도 있습니다. 이럴 때 예를 들어 \"system.temporary.value\"와 같은 속성을 추가하면 임시 아이템은 고유한 것으로 간주되어 별도로 처리됩니다.",
+        "Path": "속성 경로"
+      },
+      "CustomItemCategoriesEditor": {
+        "Title": "사용자 지정 아이템 분류 편집기",
+        "Explanation": "이곳에서 월드 내에서 사용할 수 있는 사용자 지정 아이템 분류 항목을 설정할 수 있습니다. 아이템에 새로운 분류를 추가하면 이 목록에 자동으로 반영됩니다.",
+        "Category": "분류"
+      },
+      "UnstackableItemTypesEditor": {
+        "Title": "중첩 불가 아이템 유형 편집기",
+        "Explanation": "여기에서는 중첩할 수 없는 아이템 유형들을 정의할 수 있습니다.",
+        "Type": "아이템 유형"
+      },
+      "VaultStylesEditor": {
+        "Title": "Item Piles 금고 스타일 편집기",
+        "Explanation": "여기에서는 금고 내 아이템에 적용할 다양한 스타일을 정의할 수 있습니다. 예를 들어 \"system.rarity\" 속성이 \"rare\"인 경우 해당 스타일을 적용하도록 설정할 수 있습니다.",
+        "Path": "속성 경로",
+        "Value": "일치하는 값",
+        "Style": "스타일 설정",
+        "AddNew": "새 스타일 규칙 추가"
+      },
+      "StylesEditor": {
+        "Title": "스타일 편집기",
+        "Style": "스타일",
+        "Variable": "변수",
+        "Value": "값"
+      },
+      "ItemTypePriceModifiersEditor": {
+        "Title": "아이템 유형별 가격 보정 편집기",
+        "TitleActor": "아이템 유형별 가격 보정 편집기: {actor_name}",
+        "Explanation": "이 상인에 대해 특정 아이템 유형별로 구매/판매 가격 보정값을 정의할 수 있습니다. \"무시\" 설정을 켜면 상인의 기본 가격 보정값을 덮어씁니다.",
+        "ItemType": "아이템 유형",
+        "Override": "무시"
+      },
+      "PriceModifiersEditor": {
+        "Title": "Item Piles 가격 보정 편집기",
+        "TitleActor": "Item Piles 가격 보정 편집기: {actor_name}",
+        "Explanation": "이 상인에 대해 특정 캐릭터(Actor)에 따라 구매/판매 가격 보정값을 정의할 수 있습니다. \"무시\" 설정을 켜면 상인의 기본 가격 보정값은 물론, 아이템 유형별 보정값도 덮어씁니다.",
+        "DragDrop": "액터를 끌어다 목록에 추가하세요",
+        "Actor": "액터",
+        "Override": "무시"
+      },
+      "ItemPileConfig": {
+        "Title": "아이템 더미 설정: {actor_name}",
+        "Configure": "아이템 더미",
+        "Update": "설정 업데이트",
+        "Main": {
+          "Title": "기본 설정",
+          "EnabledPile": "아이템 더미 활성화",
+          "EnabledPileExplanation": "이 항목이 활성화되면, 해당 객체는 아이템 더미처럼 작동합니다.",
+          "InspectItems": "아이템 정보 열람 허용",
+          "InspectItemsExplanation": "아이템 이름을 클릭하면 해당 아이템 시트가 열립니다.",
+          "DisplayItemTypes": "아이템 유형별로 분류",
+          "DisplayItemTypesExplanation": "아이템을 유형별로 나누어 정렬된 상태로 표시합니다.",
+          "Distance": "상호작용 거리",
+          "GridUnits": "격자 단위 거리 (비워두면 무제한)",
+          "Macro": "상호작용 시 실행할 매크로",
+          "MacroExplanation": "이 아이템 더미와 상호작용할 때 실행할 매크로의 이름입니다.",
+          "MacroPlaceholder": "매크로 이름 입력",
+          "EditDescription": "설명 편집",
+          "EditDescriptionExplanation": "이 설명은 아이템 더미가 열람될 때 관련 인터페이스에 표시됩니다.",
+          "DeleteWhenEmpty": "비어 있으면 삭제",
+          "DeleteWhenEmptyExplanation": "이 설정이 활성화되면, 아이템이 모두 사라졌을 때 아이템 더미도 자동으로 삭제됩니다.",
+          "DeleteWhenEmptyDefault": "모듈 기본 설정 따름",
+          "DeleteWhenEmptyYes": "예, 비면 삭제",
+          "DeleteWhenEmptyNo": "아니요, 삭제하지 않음",
+          "CanStackItems": "아이템 중첩 허용",
+          "CanStackItemsExplanation": "이 설정이 활성화되면, 추가되는 아이템은 유사한 항목과 중첩됩니다. 이 중첩 여부는 각 아이템 설정에서도 개별적으로 제어할 수 있습니다. 참고: 시스템에 따라 일부 아이템은 수량 속성이 없어 중첩이 불가능할 수 있습니다.",
+          "CanStackItemsYes": "예, 아이템 중첩 허용 (아이템 설정에 따름)",
+          "CanStackItemsNo": "아니요, 아이템 중첩 금지 (아이템 설정에 따름)",
+          "CanStackItemsYesAlways": "예, 항상 중첩",
+          "CanStackItemsNoAlways": "아니요, 절대 중첩하지 않음",
+          "OverrideCurrencies": "화폐 설정 재정의",
+          "OverrideCurrenciesExplanation": "기본 화폐 외에 다른 화폐도 이 아이템 더미에서 전달할 수 있도록 설정합니다.",
+          "ConfigureOverrideCurrencies": "화폐 재정의 설정",
+          "OverrideSecondaryCurrencies": "보조 화폐 설정 재정의",
+          "OverrideSecondaryCurrenciesExplanation": "이 아이템 더미에서 사용할 보조 화폐 설정을 구성합니다.",
+          "ConfigureOverrideSecondaryCurrencies": "보조 화폐 재정의 설정",
+          "OverrideItemFilters": "아이템 필터 재정의",
+          "OverrideItemFiltersExplanation": "기본 필터 외의 아이템 유형도 전달할 수 있도록 설정합니다.",
+          "ConfigureOverrideItemFilters": "아이템 필터 설정",
+          "RequiredItemProperties": "필수 아이템 속성",
+          "RequiredItemPropertiesExplanation": "이 아이템 더미에 전달되는 아이템이 특정 속성을 반드시 갖추도록 설정할 수 있습니다.",
+          "ConfigureRequiredItemProperties": "필수 속성 설정"
+        },
+        "Other": {
+          "Title": "기타 설정",
+          "Type": "아이템 더미 유형",
+          "TypeExplanation": "이 설정은 아이템 더미가 화면에 어떻게 표시될지를 결정합니다."
+        },
+        "SingleItem": {
+          "Title": "단일 아이템 설정",
+          "DisplayOneContainerWarning": "경고! \"단일 아이템 이미지 표시\"와 \"보관함\"이 모두 활성화되어 있습니다. 이 경우 보관함 이미지가 우선 적용됩니다.",
+          "DisplayOne": "단일 아이템 이미지 표시",
+          "DisplayOneExplanation": "아이템 더미가 하나의 아이템만 포함할 경우, 해당 아이템의 이미지를 토큰 이미지로 사용합니다.",
+          "OverrideScale": "단일 아이템 토큰 크기 재정의",
+          "Scale": "단일 아이템 토큰 크기",
+          "ItemName": "아이템 이름 사용",
+          "ItemNameExplanation": "아이템 더미의 이름을 내부 아이템의 이름과 동일하게 설정합니다."
+        },
+        "Container": {
+          "Title": "보관함 설정",
+          "IsContainer": "보관함 여부",
+          "Locked": "잠금 상태",
+          "Closed": "닫힘 상태",
+          "ClosedImagePath": "닫힌 상태 이미지 경로",
+          "EmptyImagePath": "비어 있음 이미지 경로",
+          "OpenedImagePath": "열림 상태 이미지 경로",
+          "LockedImagePath": "잠금 상태 이미지 경로",
+          "CloseSoundPath": "닫힘 사운드 경로",
+          "OpenSoundPath": "열림 사운드 경로",
+          "LockedSoundPath": "잠김 사운드 경로"
+        },
+        "Sharing": {
+          "Title": "아이템 분배 설정",
+          "ShareItemsEnabled": "아이템 분배 활성화",
+          "ShareItemsEnabledExplanation": "활성화 시, 플레이어는 자신에게 할당된 몫만 가져갈 수 있습니다. 비활성화 시, 원하는 만큼 가져갈 수 있습니다.",
+          "ShareCurrenciesEnabled": "화폐 분배 활성화",
+          "ShareCurrenciesEnabledExplanation": "활성화 시, 플레이어는 자신에게 할당된 화폐 몫만 가져갈 수 있습니다. 비활성화 시, 제한 없이 가져갈 수 있습니다.",
+          "TakeAllEnabled": "\"모두 가져가기\" 버튼 사용",
+          "TakeAllEnabledExplanation": "아이템 더미를 약탈할 때 \"모두 가져가기\" 버튼이 표시됩니다. 이 기능은 위의 분배 설정이 모두 비활성화되어 있어야 작동합니다.",
+          "SplitAllEnabled": "\"플레이어에게 분배\" 버튼 사용",
+          "SplitAllEnabledExplanation": "\"[숫자]인에게 분배\" 버튼을 표시합니다. 이 버튼을 누르면 모든 플레이어(또는 아래 설정에 따라 활성 플레이어만)가 아이템 더미에서 자신의 몫을 자동으로 받습니다.",
+          "InactivePlayers": "활성 플레이어에게만 분배",
+          "InactivePlayersExplanation": "아이템 더미를 약탈할 때, 현재 활성화된 플레이어에게만 분배합니다.",
+          "ResetSharingData": "분배 기록 초기화",
+          "ResetSharingDataExplanation": "아이템 더미의 내용이 플레이어가 약탈 중일 때 수동으로 변경되었을 경우, 분배 기록이 플레이어 몫과 일치하지 않을 수 있습니다. 이 버튼을 누르면 모든 플레이어의 분배 기록을 초기화합니다."
+        },
+        "Merchant": {
+          "Title": "상인 설정",
+          "Enabled": "상인으로 설정",
+          "EnabledExplanation": "플레이어는 상인에게서 아이템을 가져갈 수 없으며, 반드시 구매해야 합니다.",
+          "MerchantImage": "상인 인터페이스 이미지",
+          "MerchantImageExplanation": "상인 인터페이스에 표시될 이미지입니다.",
+          "InfiniteQuantity": "무한 수량",
+          "InfiniteQuantityExplanation": "활성화 시, 상인은 아이템 수량이 소진되지 않습니다.",
+          "InfiniteCurrency": "무한 화폐",
+          "InfiniteCurrencyExplanation": "활성화 시, 상인에게 아이템을 판매해도 화폐가 차감되지 않습니다.",
+          "KeepZero": "수량 0 상태 유지",
+          "KeepZeroExplanation": "아이템이 모두 판매되어도, 삭제하지 않고 '판매 불가' 상태로 유지합니다.",
+          "DisplayQuantity": "아이템 수량 표시 여부",
+          "DisplayQuantityExplanation": "상점 내 아이템 수량 표시 방식을 설정합니다.",
+          "DisplayQuantityYes": "예, 수량 표시 (아이템 설정에 따름)",
+          "DisplayQuantityNo": "아니요, 수량 숨김 (아이템 설정에 따름)",
+          "DisplayQuantityYesAlways": "항상 수량 표시",
+          "DisplayQuantityNoAlways": "항상 수량 숨김",
+          "PurchaseOnly": "구매 전용",
+          "PurchaseOnlyExplanation": "활성화 시, 플레이어는 상인에게 아이템을 판매할 수 없습니다.",
+          "HideNewItems": "새로 추가된 아이템 숨김",
+          "HideNewItemsExplanation": "활성화 시, 플레이어가 상인에게 판매한 아이템은 숨겨집니다.",
+          "HideItemsWithZeroCost": "가격이 0인 아이템 숨김",
+          "HideItemsWithZeroCostExplanation": "활성화 시, 가격이 0인(무료인) 아이템은 구매/판매할 수 없습니다.",
+          "OnlyAcceptBasePrice": "기본 가격만 허용",
+          "OnlyAcceptBasePriceExplanation": "활성화 시, 모든 아이템은 사용자 지정 가격 없이 기본 가격으로만 판매 가능합니다.",
+          "OnlyAcceptCustomPrices": "사용자 지정 가격만 허용",
+          "OnlyAcceptCustomPricesExplanation": "활성화 시, 사용자 지정 가격이 없는 아이템은 판매할 수 없습니다.",
+          "OpenTimes": "영업 시간 설정",
+          "OpenTimesExplanation": "활성화 시, 상인은 특정 시간에만 플레이어와 상호작용할 수 있습니다.",
+          "OpenStatus": "영업 상태",
+          "OpenStatusExplanation": "현재 상인의 개방 상태를 설정합니다. Simple Calendar 모듈과 함께 사용 시, 자동으로 설정 가능합니다.",
+          "OpenStatusOpen": "영업 중",
+          "OpenStatusClosed": "휴업 중",
+          "OpenStatusAuto": "자동 (Simple Calendar)",
+          "HideTokenWhenClosed": "휴업 중 토큰 숨김",
+          "HideTokenWhenClosedExplanation": "활성화 시, 상인이 휴업 중일 때 토큰이 숨겨집니다.",
+          "ClosedDays": "정기 휴업일 (Simple Calendar)",
+          "ClosedDaysExplanation": "체크된 요일에는 상인이 휴업 상태가 됩니다.",
+          "ClosedHolidays": "휴일 휴업 (Simple Calendar)",
+          "ClosedHolidaysExplanation": "특정 노트 카테고리에 해당하는 휴일에는 상인이 휴업합니다.",
+          "RefreshItemsWarning": "아래 설정이 활성화되면 기존 아이템이 모두 삭제됩니다. 되돌릴 수 없습니다. 단, '서비스 아이템', '수량 0 유지', '상인 유지'로 설정된 항목은 유지됩니다.",
+          "RefreshItemsOnOpen": "영업 시작 시 아이템 초기화 (Simple Calendar)",
+          "RefreshItemsOnOpenExplanation": "캘린더 시간이 영업 시작 시간을 넘기면 상인의 인벤토리가 초기화됩니다.",
+          "RefreshItemsDays": "요일별 아이템 초기화 (Simple Calendar)",
+          "RefreshItemsDaysExplanation": "체크된 요일에 도달하면 상인의 아이템이 초기화됩니다. 영업 시간이 설정되어 있으면 해당 시점에, 없으면 자정에 초기화됩니다.",
+          "RefreshItemsHolidays": "휴일 아이템 초기화 (Simple Calendar)",
+          "RefreshItemsHolidaysExplanation": "해당 카테고리의 노트가 있는 날, 상인의 아이템이 초기화됩니다. 노트 시간이 없으면 자정에 실행됩니다.",
+          "PriceModifierTitle": "구매 및 판매 가격 보정",
+          "PriceModifierExplanation": "상점 전체에 적용되는 가격 보정값을 설정합니다. 아이템 유형별, 특정 캐릭터별로도 보정값을 설정할 수 있습니다. 200% 이상도 수동 입력으로 가능합니다.",
+          "BuyPriceModifier": "구매 가격 보정 (%)",
+          "SellPriceModifier": "판매 가격 보정 (%)",
+          "ItemTypeModifier": "아이템 유형별 가격 보정",
+          "ItemTypeModifiersExplanation": "이 창에서 아이템 유형별 개별 가격 보정을 설정할 수 있습니다.",
+          "ConfigureItemTypePriceModifiers": "아이템 유형별 가격 보정 설정",
+          "ActorPriceModifiers": "캐릭터별 가격 보정 덮어쓰기",
+          "ActorPriceModifiersExplanation": "특정 캐릭터에게만 다른 보정값을 적용할 수 있도록 설정합니다.",
+          "ConfigureActorPriceModifiers": "캐릭터별 가격 보정 설정",
+          "MerchantColumns": "상점 UI 표시 항목",
+          "MerchantColumnsExplanation": "이 상점의 UI에 표시할 항목을 설정합니다. 예: 희귀도, 속성 등",
+          "ConfigureMerchantColumns": "상점 열 구성 설정",
+          "LogMerchantActivity": "상인 활동 기록",
+          "LogMerchantActivityExplanation": "아이템 구매/판매, GM의 상태 변경(수량, 표시 여부, 판매 상태 등)을 기록합니다.",
+          "ClearMerchantLog": "상인 기록 초기화",
+          "ClearMerchantLogExplanation": "상인의 모든 활동 로그를 초기화합니다. 되돌릴 수 없습니다."
+        },
+        "Vault": {
+          "Title": "금고 설정",
+          "Layout": "레이아웃",
+          "LayoutExplanation": "금고에서 표시될 가로(열) 및 세로(행) 칸 수를 설정합니다.",
+          "Columns": "열 (가로)",
+          "Rows": "행 (세로)",
+          "EnableExpansion": "확장 아이템 허용",
+          "EnableExpansionExplanation": "활성화 시, 금고 확장 아이템을 통해 수용 공간을 늘릴 수 있습니다.",
+          "BaseExpansion": "기본 확장",
+          "BaseExpansionExplanation": "확장 아이템 없이도 기본으로 제공되는 칸 수입니다.",
+          "RestrictAccess": "금고 접근 제한",
+          "RestrictAccessExplanation": "기본적으로 금고가 보이거나 근처에 있을 경우 누구나 접근할 수 있습니다. 이 설정을 활성화하면, 오직 소유자나 접근 편집기에 지정된 사용자/캐릭터만 금고를 볼 수 있습니다.",
+          "Access": "접근 권한 설정",
+          "AccessExplanation": "이 금고에 접근하고, 인벤토리와 화폐를 조작할 수 있는 캐릭터와 플레이어를 설정합니다. 금고 캐릭터의 소유자는 항상 전체 권한을 가집니다.",
+          "ManageAccess": "접근 권한 관리",
+          "LogVaultAccess": "금고 접근 기록",
+          "LogVaultAccessExplanation": "활성화 시, 이 금고와의 상호작용 시마다 저널에 타임스탬프 로그를 남깁니다.",
+          "ClearVaultLog": "금고 로그 초기화",
+          "ClearVaultLogExplanation": "금고의 모든 로그를 삭제합니다. 되돌릴 수 없습니다.",
+          "LoggingFormat": "로그 표시 형식",
+          "LoggingFormatExplanation": "로그에 사용자명과 캐릭터명을 어떻게 표시할지 설정합니다.",
+          "LoggingFormatUserActor": "사용자명 + 캐릭터명 표시",
+          "LoggingFormatUser": "사용자명만 표시",
+          "LoggingFormatActor": "캐릭터명만 표시"
+        }
+      },
+      "VaultAccessEditor": {
+        "Title": "금고 접근 권한 편집기",
+        "TitleActor": "금고 접근 권한 편집기: {actor_name}",
+        "Explanation": "이 설정에서는 어떤 캐릭터와 플레이어가 금고의 인벤토리 및 화폐에 접근하거나 이를 수정할 수 있는지를 구성합니다. 플레이어가 금고 캐릭터의 소유자인 경우, 항상 전체 권한을 가집니다.",
+        "Character": "플레이어/캐릭터",
+        "View": "보기",
+        "Organize": "정리",
+        "Withdraw": "인출",
+        "Deposit": "입금"
+      },
+      "MerchantColumnsEditor": {
+        "Title": "상점 열 설정",
+        "TitleActor": "상점 열 설정: {actor_name}",
+        "Explanation": "이 설정은 상인 UI에서 아이템 이름, 수량, 가격 외에 표시될 열을 구성합니다.",
+        "Label": "표시 이름",
+        "PropertyPath": "속성 경로",
+        "Formatting": "표시 형식",
+        "Buying": "구매 시 표시",
+        "Selling": "판매 시 표시",
+        "ConfigureMapping": "값-라벨 매핑 설정",
+        "MappingTitle": "상점 열 매핑: {label}",
+        "MappingContent": "속성 값과 라벨 간의 매핑을 설정합니다. 이 라벨은 지역화된 문자열로도 사용할 수 있습니다."
+      },
+      "PricePresetEditor": {
+        "Title": "가격 프리셋 편집기",
+        "Update": "프리셋 업데이트",
+        "Explanation": "여기에서 여러 개의 가격 프리셋을 생성하여, 아이템의 사용자 지정 가격 설정에 쉽게 적용할 수 있습니다."
+      }
+    },
+    "HUD": {
+      "ToggleLocked": "잠금 전환",
+      "ToggleClosed": "열림/닫힘 전환",
+      "Configure": "아이템 더미 설정"
+    },
+    "Chat": {
+      "Pickup": "{name}이(가) 다음 아이템을 획득했습니다:",
+      "Split": "아이템 더미의 내용물이 {num_players}명의 플레이어에게 분배되었으며, 각자 다음을 받았습니다:",
+      "TradeComplete": "{party_1}과(와) {party_2}의 거래가 완료되었습니다.",
+      "TradeStarted": "{party_1}과(와) {party_2}이(가) 거래를 시작했습니다.",
+      "TradeStartedButton": "거래를 구경하려면 아래 버튼을 클릭하세요:",
+      "TradeSpectate": "거래 구경",
+      "SpectateDisabled": "거래 종료됨",
+      "PrivateTrade": "비공개 거래",
+      "ExpandTrade": "전체 거래 내역 보기",
+      "MerchantTraded": "{name}이(가) {merchant}에게서 다음을 구매했습니다:",
+      "GaveItems": "{source}이(가) {target}에게 다음 아이템을 건넸습니다:"
+    },
+    "VaultLog": {
+      "Withdraw": "{actor_name} ({user_name})이(가) {item_name} x{quantity}을(를) **인출함** ({date})",
+      "Deposit": "{actor_name} ({user_name})이(가) {item_name} x{quantity}을(를) *입금함* ({date})"
+    },
+    "Settings": {
+      "Configure": {
+        "Title": "모듈 설정",
+        "Label": "모듈 설정 열기",
+        "Hint": "이 창에서 Item Piles 모듈의 설정을 변경할 수 있습니다."
+      },
+      "Reset": {
+        "Title": "시스템 전용 설정 초기화",
+        "Label": "설정 초기화",
+        "Hint": "Item Piles의 설정을 현재 사용 중인 게임 시스템의 기본값으로 초기화합니다."
+      },
+      "ActorClass": {
+        "Title": "기본 액터 유형",
+        "Hint": "아이템을 처음으로 떨어뜨릴 때 생성되는 기본 아이템 더미 액터의 유형을 설정합니다. 예: D&D5e에서는 'character'를 사용합니다."
+      },
+      "ItemLootClass": {
+        "Title": "전리품 아이템 유형",
+        "Hint": "기본 전리품 아이템으로 사용할 아이템 유형을 설정합니다."
+      },
+      "ItemWeaponClass": {
+        "Title": "무기 아이템 유형",
+        "Hint": "기본 무기 아이템으로 사용할 아이템 유형을 설정합니다."
+      },
+      "ItemEquipmentClass": {
+        "Title": "장비 아이템 유형",
+        "Hint": "기본 장비 아이템으로 사용할 아이템 유형을 설정합니다."
+      },
+      "Quantity": {
+        "Title": "아이템 수량 속성",
+        "Hint": "각 아이템의 수량이 저장된 속성 경로를 설정합니다. 예: 'system.quantity'"
+      },
+      "Price": {
+        "Title": "아이템 가격 속성",
+        "Hint": "각 아이템의 가격이 저장된 속성 경로를 설정합니다. 예: 'system.price'"
+      },
+      "QuantityForPrice": {
+        "Title": "가격 기준 수량 속성",
+        "Hint": "아이템 가격당 제공되는 수량이 저장된 속성 경로를 설정합니다. 예: 'system.price.per'"
+      },
+      "Currencies": {
+        "Title": "화폐 설정",
+        "Label": "화폐 설정 열기",
+        "Hint": "캐릭터 시트의 수치로 취급되는 화폐를 설정합니다."
+      },
+      "SecondaryCurrencies": {
+        "Title": "보조 화폐 설정",
+        "Label": "보조 화폐 설정 열기",
+        "Hint": "기본 화폐와는 별도로 동작하는 보조 화폐를 설정합니다. 환율은 사용할 수 없습니다."
+      },
+      "CurrencyDecimalDigits": {
+        "Title": "화폐 소수점 자리수",
+        "Hint": "화폐가 반올림되는 최소 단위를 설정합니다. 예: 0.01이면 소수 둘째 자리까지 사용됩니다."
+      },
+      "ItemFilters": {
+        "Title": "아이템 필터",
+        "Label": "아이템 필터 설정",
+        "Hint": "아이템 더미 대화창에서 무시할 아이템을 설정합니다."
+      },
+      "ItemSimilarities": {
+        "Title": "아이템 유사성 기준",
+        "Label": "유사성 기준 설정",
+        "Hint": "시스템에서 어떤 기준으로 아이템을 동일한 것으로 간주할지를 설정합니다."
+      },
+      "UnstackableItemTypes": {
+        "Title": "중첩 불가 아이템 유형",
+        "Label": "중첩 불가 유형 설정",
+        "Hint": "이 유형의 아이템은 항상 고유하며 수량이 1만 허용됩니다."
+      },
+      "CssVariables": {
+        "Title": "CSS 변수 스타일",
+        "Label": "CSS 변수 설정",
+        "Hint": "아이템 더미 인터페이스의 색상 등 스타일을 구성하는 CSS 변수를 설정합니다."
+      },
+      "VaultStyles": {
+        "Title": "금고 스타일 규칙",
+        "Label": "금고 스타일 설정",
+        "Hint": "속성 경로와 값에 따라 아이템에 스타일을 적용하는 규칙을 설정합니다."
+      },
+      "PricePresets": {
+        "Title": "가격 프리셋",
+        "Label": "가격 프리셋 설정",
+        "Hint": "자주 사용하는 가격 프리셋을 생성하여 아이템에 손쉽게 적용할 수 있습니다."
+      },
+      "CustomItemCategories": {
+        "Title": "사용자 지정 아이템 분류",
+        "Label": "아이템 분류 설정",
+        "Hint": "아이템 편집기에서 제안으로 표시되는 사용자 지정 분류를 설정합니다."
+      },
+      "EnableDroppingItems": {
+        "Title": "아이템 바닥에 떨어뜨리기 허용",
+        "Hint": "사용자가 아이템을 바닥에 떨어뜨려 새로운 아이템 더미를 생성할 수 있도록 허용합니다."
+      },
+      "EnableGivingItems": {
+        "Title": "아이템 건네주기 허용",
+        "Hint": "토큰에 아이템을 드래그하여 다른 플레이어에게 전달할 수 있도록 허용합니다."
+      },
+      "EnableTrading": {
+        "Title": "거래 기능 사용",
+        "Hint": "활성화 시 거래 기능이 사용 가능합니다."
+      },
+      "ShowTradeButton": {
+        "Title": "거래 버튼 표시",
+        "Hint": "플레이어 목록 하단에 거래 버튼을 표시합니다."
+      },
+      "InspectItemsTrade": {
+        "Title": "거래 중 아이템 열람 허용",
+        "Hint": "거래 중 아이템을 클릭하여 시트를 열 수 있도록 합니다."
+      },
+      "OutputToChat": {
+        "Title": "채팅 메시지 출력",
+        "Hint": "아이템 더미에서 아이템을 가져갈 때 어떤 아이템을 획득했는지 채팅으로 출력합니다.",
+        "Off": "비활성화 - 메시지 출력 안 함",
+        "Public": "공개 - 모두가 볼 수 있음",
+        "SelfGM": "비공개 - GM과 사용자만 볼 수 있음",
+        "Blind": "블라인드 - GM만 볼 수 있음"
+      },
+      "HideTokenBorder": {
+        "Title": "아이템 더미 토큰 테두리 숨김",
+        "Hint": "아이템 더미에 마우스를 올렸을 때 토큰 테두리 표시 여부를 설정합니다.",
+        "HideEveryone": "모든 사용자에게 숨김",
+        "HidePlayers": "플레이어에게만 숨김",
+        "Show": "항상 표시 (기본 동작)"
+      },
+      "InvertSheetOpen": {
+        "Title": "Ctrl + 더블 클릭 동작 전환",
+        "Hint": "기본적으로 Ctrl을 누르면 액터 시트가 열립니다. 이 설정을 활성화하면 기본으로 액터 시트가 열리고, Ctrl을 누르면 인벤토리 UI가 열립니다."
+      },
+      "HideHeaderButtonText": {
+        "Title": "헤더 버튼 텍스트 숨김",
+        "Hint": "액터 및 아이템 헤더에서 'Item Piles' 텍스트를 숨깁니다."
+      },
+      "HideHeaderButton": {
+        "Title": "헤더 버튼 숨김",
+        "Hint": "'Item Piles' 버튼 자체를 숨깁니다. 설정 접근이 어려워질 수 있습니다."
+      },
+      "DeleteEmptyPiles": {
+        "Title": "빈 아이템 더미 자동 삭제",
+        "Hint": "아이템이 모두 사라지면 해당 더미를 자동으로 삭제합니다. 개별 더미에서 무시 가능."
+      },
+      "PreloadFiles": {
+        "Title": "파일 미리 불러오기",
+        "Hint": "아이템 더미의 이미지 및 사운드를 미리 로드하여 더 부드럽게 표시됩니다."
+      },
+      "Debug": {
+        "Title": "디버깅 활성화",
+        "Hint": "콘솔에 디버그 메시지를 출력합니다."
+      },
+      "DebugHooks": {
+        "Title": "후크 디버깅 활성화",
+        "Hint": "아이템 더미 관련 후크 이벤트와 내용을 콘솔에 출력합니다."
+      },
+      "PopulationTablesFolder": {
+        "Title": "\"아이템 채우기\"용 롤 테이블 폴더",
+        "Hint": "상점의 '아이템 채우기' 탭에서 사용할 롤 테이블 필터용 폴더 이름입니다.",
+        "AllTables": "모든 테이블"
+      }
+    }
+  }
+}
