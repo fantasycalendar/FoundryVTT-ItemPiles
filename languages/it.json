@@ -387,7 +387,7 @@
         "Title": "Cancella tutti gli elementi del personaggio"
       },
       "NoSystemFound": {
-        "Content": "Questo sistema non è attualmente completamente supportato. Ciò significa che il modulo non sa come gestire al meglio gli elementi di questo sistema, ma può comunque funzionare in modo limitato.<br><br>Puoi configurare tu stesso le impostazioni del modulo, ma richiede un po' di know-how tecnico. <br><br>Se hai domande, invia un ping a <strong>Wasp#2005</strong> nella sezione Discord di Foundry.",
+        "Content": "<strong>Questo sistema non è supportato.</strong><br><br>Ciò significa che il modulo non sa come gestire al meglio gli elementi di questo sistema, ma può comunque funzionare in modo limitato.<br><br>Puoi configurare tu stesso le impostazioni del modulo, ma richiede un po' di know-how tecnico. <br><br>Se hai domande, fai uno screenshot della finestra che si opre dopo che chiudi questa, e cerca assistenza nel canale del tuo sistema nella sezione Discord di Foundry.",
         "Title": "Sistema non riconosciuto"
       },
       "ReceiveItem": {
@@ -951,6 +951,9 @@
     "VaultLog": {
       "Withdraw": "{actor_name} ({user_name}) **ritirato** {item_name} x {quantity} ({date})",
       "Deposit": "{actor_name} ({user_name}) *depositato* {item_name} x {quantity} ({date})"
+    },
+    "Hints": {
+      "CtrlClear": "Control + click per cancellare"
     }
   }
 }
