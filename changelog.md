@@ -5,7 +5,7 @@
 - Added Foundry v13 support
 - Removed direct module support for most systems
   - Item Piles is now system-agnostic, each game system (or a community module) must provide its own Item Piles configuration
-  - Dedicated support for D&D 5e is available through the companion module [Item Piles: D&D 5e]()
+  - Dedicated support for D&D 5e is available through the companion module [Item Piles: D&D 5e](https://foundryvtt.com/packages/itempilesdnd5e)
   - For other systems, watch the system’s page or Discord server/channel for an Item Piles-specific module
 - Improved Item Piles specific error if SocketLib is not properly installed
 - Added deprecation warning for `window.ItemPiles.API` as it will be removed in a future major update (3.3.0), please use `game.itempiles.API` instead
