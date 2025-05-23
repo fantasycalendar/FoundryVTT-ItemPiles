@@ -254,6 +254,11 @@
     border: 1px solid var(--item-piles-border-dark-primary);
     color: var(--item-piles-text-light-highlight);
 
+    &.item-piles-v13 {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+
     &.item-piles-minimal-ui {
       padding: 2px 0 0 0;
       text-align: center;
@@ -1097,5 +1102,33 @@
     visibility: visible;
     opacity: 1;
     transition: opacity 500ms;
+  }
+}
+
+.item-piles-welcome {
+
+  border: 1px solid #555;
+  padding: 10px 12px;
+  line-height: 1.35;
+  font-size: 13px;
+  text-align: left;
+
+  border-radius: 5px;
+
+  .item-piles-divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, rgba(47, 133, 90, 0), rgba(47, 133, 90, 1), rgba(47, 133, 90, 0));
+    margin: 3px 0;
+  }
+
+  a {
+    color: #2f855a;
+    font-weight: bold;
+
+    &:hover {
+      color: #4ee196;
+      text-shadow: none;
+    }
   }
 }

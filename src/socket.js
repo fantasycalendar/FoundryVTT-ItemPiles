@@ -169,6 +169,7 @@ export default class ItemPileSocket {
 	static socket;
 
 	static initialize() {
+		if (!socketlib.registerModule) return false;
 		InterfaceTracker.initialize();
 		this.socket = socketlib.registerModule(CONSTANTS.MODULE_NAME);
 		for (let [key, callback] of Object.entries(this.BINDINGS)) {
@@ -177,6 +178,7 @@ export default class ItemPileSocket {
 		}
 		debug("Registered all Item Piles sockets")
 		this.ready = true;
+		return true;
 	}
 
 	static executeAsGM(handler, ...args) {

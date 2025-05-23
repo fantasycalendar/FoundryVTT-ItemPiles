@@ -194,7 +194,7 @@ export class PileItem extends PileBaseItem {
 			this.filtered.set(true);
 		} else if (search) {
 			const nameIsInSearchQuery = name.toLowerCase().includes(search.toLowerCase());
-			const subItemNamesMatchQuery = get(this.subItems).some(item => get(item.filtered));
+			const subItemNamesMatchQuery = get(this.subItems).some(item => !get(item.filtered));
 			this.filtered.set(!(nameIsInSearchQuery || subItemNamesMatchQuery));
 		} else {
 			this.filtered.set(!presentFromTheStart && quantity === 0);

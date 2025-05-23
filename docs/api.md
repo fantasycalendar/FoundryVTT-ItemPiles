@@ -317,7 +317,7 @@ Sets the types of items that will always be considered unique when transferring 
 
 ### addSystemIntegration
 
-`game.itempiles.API.addSystemIntegration(data)`
+`game.itempiles.API.addSystemIntegration(data, version)`
 
 A combination of all the methods above, but this integrates a system's specific settings more readily into item piles, allowing users to also change the settings afterward.
 
@@ -342,6 +342,7 @@ A combination of all the methods above, but this integrates a system's specific 
 | data.CURRENCIES                   | `Array<{ primary: boolean, type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }>, exchangeRate: number }>` | The array of currencies for this system, each entry is an object containing data for each currency                                                                                                                                                                                                                                                                                                                                                                                                |
 | data.SECONDARY_CURRENCIES         | `Array<{ type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }> }>`                                         | The array of secondary currencies for this system                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | data.CURRENCY_DECIMAL_DIGITS      | `undefined/number`                                                                                                                                                                              | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured)                                                                                                                                                                                                                                                                                                                                                                              |
+| version                           | `string`                                                                                                                                                                                        | Which game system version this configuration should be applied to  - default `latest`, but should ideally be the system version it is compatible with.                                                                                                                                                                                                                                                                                                                                            |
 
 ---
 

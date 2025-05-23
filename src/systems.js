@@ -1,8 +1,6 @@
-import SUPPORTED_SYSTEMS from "./systems/_index.js";
-
 export const SYSTEMS = {
 
-	SUPPORTED_SYSTEMS,
+	SUPPORTED_SYSTEMS: {},
 
 	DEFAULT_SETTINGS: {
 		ACTOR_CLASS_TYPE: "",
@@ -61,7 +59,7 @@ export const SYSTEMS = {
 		return this._currentSystem;
 	},
 
-	addSystem(data) {
-		this.SUPPORTED_SYSTEMS[game.system.id.toLowerCase()] = { latest: data };
+	addSystem(data, version = "latest") {
+		this.SUPPORTED_SYSTEMS[game.system.id.toLowerCase()] = { [version]: data };
 	}
 };

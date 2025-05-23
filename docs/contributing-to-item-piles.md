@@ -38,7 +38,7 @@ I welcome all systems, but it has become a time sink and a delaying factor for m
 
 Going forward, I insist everyone that wants to add support for specific systems to instead create their own system-specific Item Piles compatibility module.
 
-Please see the [Item Piles: D&D 5e](https://github.com/fantasycalendar/FoundryVTT-ItemPilesDnD5e) as an example.
+Please see the [Item Piles: D&D 5e](https://github.com/fantasycalendar/FoundryVTT-ItemPilesDnD5e) as an example. All previous integrations can be found in the [Item Piles repository](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/tree/master/systems)
 
 You will need to register a new hook on `item-piles-ready`, which then will need to call `game.itempiles.API.addSystemIntegration`. You can find more information regarding this [method here](api.md#addsystemintegration).
 

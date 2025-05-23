@@ -142,6 +142,9 @@ export default class MerchantStore extends ItemPileStore {
 		if (pileData.displayQuantity !== "alwaysno") {
 			columns.push({
 				label: "Quantity", component: QuantityColumn, sortMethod: (a, b, inverse) => {
+					if (!Utilities.isItemStackable(a.item)) {
+						return -1;
+					}
 					return (get(b.quantity) - get(a.quantity)) * (inverse ? -1 : 1);
 				}
 			})
@@ -154,7 +157,8 @@ export default class MerchantStore extends ItemPileStore {
 				const BPrice = get(b.prices).find(price => price.primary);
 				if (!APrice) return 1;
 				if (!BPrice) return -1;
-				return (BPrice.totalCost - APrice.totalCost) * (inverse ? -1 : 1);
+				if (BPrice.totalCost === APrice.totalCost) return 0;
+				return (BPrice.totalCost > APrice.totalCost ? 1 : -1) * (inverse ? -1 : 1);
 			}
 		})
 		columns.push({

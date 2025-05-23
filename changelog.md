@@ -1,5 +1,20 @@
 # Item Piles Changelog
 
+## Version 3.2.8
+
+- Added Foundry v13 support
+- Removed direct module support for most systems
+  - Item Piles is now system-agnostic, each game system (or a community module) must provide its own Item Piles configuration
+  - Dedicated support for D&D 5e is available through the companion module [Item Piles: D&D 5e]()
+  - For other systems, watch the system’s page or Discord server/channel for an Item Piles-specific module
+- Improved Item Piles specific error if SocketLib is not properly installed
+- Added deprecation warning for `window.ItemPiles.API` as it will be removed in a future major update (3.3.0), please use `game.itempiles.API` instead
+
+## Version 3.2.7
+
+- Fixed items not being sortable in merchants
+- Fixed containers not filtering based on its contents when searching
+
 ## Version 3.2.6
 
 - Fixed incompatibility with BRT
@@ -1334,40 +1349,30 @@ Next update will not have v11 support.
 
 - Now supports Foundry v0.8.9
 - Added setting to output items picked up to chat
-- Added setting to hide the "Item Piles" text in the actor header - useful if you have too many modules, and the header
-  is getting crowded
+- Added setting to hide the "Item Piles" text in the actor header - useful if you have too many modules, and the header is getting crowded
 - Added support for the Tormenta 20 system: <https://foundryvtt.com/packages/tormenta20>
 - Tweaked
-  `game.itempiles.API.turnTokensIntoItemPiles` to turn tokens into item piles without having the "Display Single Item
-  Image" setting turned on
+  `game.itempiles.API.turnTokensIntoItemPiles` to turn tokens into item piles without having the "Display Single Item Image" setting turned on
 - API changes:
   - Changed: `game.itempiles.API.addItems`
-    - This method now expects an array of objects, with item data or Item (Foundry Item class) (key `item`), and an
-      optional quantity attribute that determines how many of the item to add (key `quantity`)
+    - This method now expects an array of objects, with item data or Item (Foundry Item class) (key `item`), and an optional quantity attribute that determines how many of the item to add (key `quantity`)
     - It now returns an array of objects, with the item's data (key `item`) and the quantity added (key `quantity`)
   - Changed: `game.itempiles.API.removeItems`
-    - This method now expects an array of objects each containing the item id (key `_id`) and the quantity to
-      remove (key `quantity`), or Items (the Foundry Item class) or strings of IDs to remove all quantities of
-    - It now returns an array of objects, each containing the item that was removed or updated (key `item`), the
-      quantity that was removed (key `quantity`), and whether the item was deleted (key `deleted`)
+    - This method now expects an array of objects each containing the item id (key `_id`) and the quantity to remove (key `quantity`), or Items (the Foundry Item class) or strings of IDs to remove all quantities of
+    - It now returns an array of objects, each containing the item that was removed or updated (key `item`), the quantity that was removed (key `quantity`), and whether the item was deleted (key `deleted`)
   - Changed: `game.itempiles.API.transferItems`
-    - This method now expects an array of objects each containing the item id (key `_id`) and the quantity to
-      transfer (key `quantity`), or Items (the Foundry Item class) or strings of IDs to transfer all quantities of
-    - It now returns an array of objects, each containing the item that was added or updated (key `item`), the
-      quantity that was transferred (key `quantity`)
+    - This method now expects an array of objects each containing the item id (key `_id`) and the quantity to transfer (key `quantity`), or Items (the Foundry Item class) or strings of IDs to transfer all quantities of
+    - It now returns an array of objects, each containing the item that was added or updated (key `item`), the quantity that was transferred (key `quantity`)
 - Fixed `game.itempiles.API.transferEverything` not transferring everything from non-item pile actors
-- Fixed item and attribute transfer hooks incorrectly returning the target's final quantities, rather than the
-  transferred quantities
-- Fixed users creating item piles would cause the pile to be spawned on the scene that the GM was viewing at that given
-  moment
+- Fixed item and attribute transfer hooks incorrectly returning the target's final quantities, rather than the transferred quantities
+- Fixed users creating item piles would cause the pile to be spawned on the scene that the GM was viewing at that given moment
 - Fixed Item Pile config window would not populate some inputs correctly
 
 ## Version 1.1.3
 
 - Adjusted display one-type item piles to also take into account dynamic attributes (gold piles!)
 - Fixed prototype tokens not being updated when editing an item pile through its sheet
-- Fixed item piles with both "Is Container" and "Override single item token scale" enabled acting strange - item piles
-  will now prioritize the container images over "Display Single Item Image" when "Is Container" is enabled
+- Fixed item piles with both "Is Container" and "Override single item token scale" enabled acting strange - item piles will now prioritize the container images over "Display Single Item Image" when "Is Container" is enabled
 - Added warning to point out the above
 - Adjusted Item Pile UI to be editable even when not enabled
 
@@ -1379,10 +1384,8 @@ Next update will not have v11 support.
 ## Version 1.1.1
 
 - Added support for the Savage Worlds Adventure Edition: <https://foundryvtt.com/packages/swade>
-- Fixed linked token actors not acting like they are linked - now all tokens on the canvas with the same linked actor
-  share the same state and image
-- Fixed dynamic attributes not being treated as numbers, which caused problems in some systems (such as SWADE) if they
-  were stored as strings
+- Fixed linked token actors not acting like they are linked - now all tokens on the canvas with the same linked actor share the same state and image
+- Fixed dynamic attributes not being treated as numbers, which caused problems in some systems (such as SWADE) if they were stored as strings
 
 ## Version 1.1.0
 
@@ -1396,13 +1399,10 @@ Next update will not have v11 support.
   - `item-piles-openItemPileInventory` - Called locally after an item pile's inventory has been opened
 - API changes:
   - Changed `game.itempiles.API.turnTokenIntoItemPile` to
-    `game.itempiles.API.turnTokensIntoItemPiles`, now can take array of
-    tokens to turn into piles
+    `game.itempiles.API.turnTokensIntoItemPiles`, now can take array of tokens to turn into piles
   - Changed `game.itempiles.API.revertTokenFromItemPile` to
-    `game.itempiles.API.revertTokensFromItemPiles`, now can take array
-    of tokens to revert
-- Improved token detection when multiple owned tokens are interacting with item piles, it should now more reliably pick
-  sane tokens.
+    `game.itempiles.API.revertTokensFromItemPiles`, now can take array of tokens to revert
+- Improved token detection when multiple owned tokens are interacting with item piles, it should now more reliably pick sane tokens.
   - Now picks in order: controlled token -> last selected token -> the closest owned token.
 - Improved module speed when interacting with item piles
 - Improved item pile token image and scale updates, should be a bit more stable
@@ -1427,8 +1427,7 @@ Next update will not have v11 support.
 - Added API endpoints:
   - `game.itempiles.API.getActorItemFilters(TokenDocument|Actor)` - Returns the item type filters for a given item pile
   -
-  `game.itempiles.API.getActorItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and
-  can transfer
+  `game.itempiles.API.getActorItems(TokenDocument|Actor, Array|Boolean)` - Returns the items the item pile contains and can transfer
 - Updated japanese localization
 - Fixed item piles not respecting item type filters
 - Fixed issue with `game.itempiles.API.turnTokenIntoItemPile` not actually turning the token into an item pile

@@ -10,6 +10,7 @@ import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 import { SYSTEMS } from "../systems.js";
 import ItemPileConfig from "../applications/item-pile-config/item-pile-config.js";
+import GiveItems from "../applications/dialogs/give-items-dialog/give-items-dialog.js";
 
 class API {
 	/**
@@ -436,8 +437,9 @@ class API {
 	 *   }>,
 	 *   CURRENCY_DECIMAL_DIGITS: undefined/number
 	 * }>} inData
+	 * @param version {string} The game system version this configuration should be applied to
 	 */
-	static addSystemIntegration(inData) {
+	static addSystemIntegration(inData, version = "latest") {
 
 		const data = foundry.utils.mergeObject({
 			VERSION: "",
@@ -631,7 +633,7 @@ class API {
 
 		data['INTEGRATION'] = true;
 
-		SYSTEMS.addSystem(data);
+		SYSTEMS.addSystem(data, version);
 
 		Helpers.debug(`Registered system settings for ${game.system.id}`, data)
 
@@ -2683,6 +2685,20 @@ class API {
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEMS, sellerUuid, buyerUuid, itemsToSell, game.user.id, { interactionId });
 
+	}
+
+	static async giveItem(item) {
+		const result = await GiveItems.show(item);
+		if (!result) return;
+		return PrivateAPI._giveItem({
+			itemData: {
+				item: item.toObject(),
+				quantity: result.quantity
+			},
+			source: item.parent.uuid,
+			target: result.target,
+			secret: result.secret,
+		}, { skipQuantityDialog: true })
 	}
 
 	static canItemFitInVault(item, vaultActor) {
