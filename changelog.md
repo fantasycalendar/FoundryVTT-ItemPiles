@@ -1,6 +1,6 @@
 # Item Piles Changelog
 
-## Version 3.2.8
+## Version 3.2.7
 
 - Added Foundry v13 support
 - Removed direct module support for most systems
@@ -9,8 +9,6 @@
   - For other systems, watch the system’s page or Discord server/channel for an Item Piles-specific module
 - Improved Item Piles specific error if SocketLib is not properly installed
 - Added deprecation warning for `window.ItemPiles.API` as it will be removed in a future major update (3.3.0), please use `game.itempiles.API` instead
-
-## Version 3.2.7
 
 - Fixed items not being sortable in merchants
 - Fixed containers not filtering based on its contents when searching
