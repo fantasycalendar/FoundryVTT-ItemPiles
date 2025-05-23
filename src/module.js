@@ -176,7 +176,7 @@ async function displayChatMessage() {
   </p>
   <ul style="margin:4px 0 8px 22px;padding:0;">
     <li><strong>D&D 5e</strong>: install
-      <a href="https://foundryvtt.com/packages/item-piles-dd5e" target="_blank" style="color:#4fc3f7;">Item Piles: D&D 5e</a>.
+      <a href="https://foundryvtt.com/packages/itempilesdnd5e" target="_blank" style="color:#4fc3f7;">Item Piles: D&D 5e</a>.
     </li>
     <li><strong>Other systems</strong>: watch that system’s page or Discord for an “Item Piles” companion. The game will still load; some features may be limited until a profile appears.</li>
   </ul>
