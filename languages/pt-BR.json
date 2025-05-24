@@ -159,6 +159,7 @@
       "Minutes": "Minutos",
       "MerchantClosed": "O comerciante está fechado, volte mais tarde.",
       "Sell": "Vender",
+      "SortBy": "Ordenar por:",
       "Description": "Descrição",
       "Settings": "Configurações",
       "Override": "Sobrepor",
@@ -200,8 +201,7 @@
       "LogSetNotForSale": "{instigator} definiu o <strong>{item}</strong> <span>não disponível para venda</span",
       "LogSetVisible": "{instigator} definiu o <strong>{item}</strong> como <span>visível</span",
       "LogSetHidden": "{instigator} definiu o <strong>{item}</strong> como <span>oculto</span",
-      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}",
-      "SortBy": "Ordenar por:"
+      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}"
     },
     "Vault": {
       "VaultTab": "Cofre",
@@ -251,7 +251,7 @@
       },
       "NoSystemFound": {
         "Title": "Sistema Não Reconhecido",
-        "Content": "Atualmente, este sistema não é totalmente suportado. Isso significa que o módulo não sabe como lidar melhor com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. <br><br>Se você tiver alguma dúvida, é só pingar o <strong>Wasp#2005</strong> no discord do Foundry."
+        "Content": "<p><strong>Atualmente, este sistema não é totalmente suportado.</strong></p><p>Isso significa que o módulo não sabe como lidar melhor com os itens deste sistema, mas ainda pode operar de forma limitada.</p><p>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico.</p><p>Se você tiver alguma dúvida, faça um print da tela que irá abrir após você fechar esta tela e peça ajuda no canal do seu sistema no Discord do Foundry.</p>"
       },
       "NewSystemVersion": {
         "Title": "Nova Versão do Sistema",
