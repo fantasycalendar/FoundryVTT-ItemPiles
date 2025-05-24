@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.8
+
+- Fixed `PILE_DEFAULTS` in `game.itempiles.API.addSystemIntegration` not working correctly.
+
 ## Version 3.2.7
 
 - Added Foundry v13 support

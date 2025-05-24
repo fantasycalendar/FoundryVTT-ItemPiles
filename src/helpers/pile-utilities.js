@@ -14,7 +14,7 @@ import * as Helpers from "./helpers.js";
 import * as CompendiumUtilities from "./compendium-utilities.js";
 
 export function getPileDefaults() {
-	return foundry.utils.mergeObject({}, CONSTANTS.PILE_DEFAULTS, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
+	return foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
 }
 
 export function getPileActorDefaults(itemPileFlags = {}) {
