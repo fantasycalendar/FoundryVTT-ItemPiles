@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.9
+
+- Fixed transferring containers between item piles and actors would sometimes double the quantity of transferred items in the containers
+- Fixed merchant interface's populate items would add "undefined" items in Foundry v13
+
 ## Version 3.2.8
 
 - Fixed `PILE_DEFAULTS` in `game.itempiles.API.addSystemIntegration` not working correctly.
