@@ -418,9 +418,11 @@ class API {
 	 *   PILE_DEFAULTS: Object,
 	 *   TOKEN_FLAG_DEFAULTS: Object,
 	 *   ITEM_TRANSFORMER: undefined/Function,
+	 *   ITEM_COST_TRANSFORMER: undefined/Function,
 	 *   PRICE_MODIFIER_TRANSFORMER: undefined/Function,
 	 *   SYSTEM_HOOKS: undefined/Function,
 	 *   SHEET_OVERRIDES: undefined/Function,
+	 *   VAULT_STYLES: undefined/Array<{ path: string, value: string, styling: Object }>,
 	 *   CURRENCIES: Array<{
 	 *     primary: boolean,
 	 *     type: string ["attribute"/"item"],
@@ -441,28 +443,8 @@ class API {
 	 */
 	static addSystemIntegration(inData, version = "latest") {
 
-		const data = foundry.utils.mergeObject({
-			VERSION: "",
-			ACTOR_CLASS_TYPE: "",
-			ITEM_CLASS_LOOT_TYPE: "",
-			ITEM_CLASS_WEAPON_TYPE: "",
-			ITEM_CLASS_EQUIPMENT_TYPE: "",
-			ITEM_QUANTITY_ATTRIBUTE: "",
-			ITEM_PRICE_ATTRIBUTE: "",
-			QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
-			ITEM_FILTERS: [],
-			ITEM_SIMILARITIES: [],
-			UNSTACKABLE_ITEM_TYPES: [],
-			PILE_DEFAULTS: {},
-			TOKEN_FLAG_DEFAULTS: {},
-			ITEM_TRANSFORMER: null,
-			PRICE_MODIFIER_TRANSFORMER: null,
-			SYSTEM_HOOKS: null,
-			SHEET_OVERRIDES: null,
-			CURRENCIES: [],
-			SECONDARY_CURRENCIES: [],
-			CURRENCY_DECIMAL_DIGITS: 0.00001
-		}, inData)
+		const defaultSettings = foundry.utils.deepClone(SYSTEMS.DEFAULT_SETTINGS);
+		const data = foundry.utils.mergeObject(defaultSettings, inData, { insertKeys: false })
 
 		if (typeof data["VERSION"] !== "string") {
 			throw Helpers.custom_error("addSystemIntegration | data.VERSION must be of type string");
@@ -518,6 +500,12 @@ class API {
 			}
 		}
 
+		if (data['ITEM_COST_TRANSFORMER']) {
+			if (!Helpers.isFunction(data['ITEM_COST_TRANSFORMER'])) {
+				throw Helpers.custom_error("addSystemIntegration | data.ITEM_COST_TRANSFORMER must be of type function");
+			}
+		}
+
 		if (data['PRICE_MODIFIER_TRANSFORMER']) {
 			if (!Helpers.isFunction(data['PRICE_MODIFIER_TRANSFORMER'])) {
 				throw Helpers.custom_error("addSystemIntegration | data.PRICE_MODIFIER_TRANSFORMER must be of type function");
@@ -546,6 +534,31 @@ class API {
 		for (const key of Object.keys(data['PILE_DEFAULTS'])) {
 			if (!validKeys.has(key)) {
 				throw Helpers.custom_error(`addSystemIntegration | data.PILE_DEFAULTS contains illegal key "${key}" that is not a valid pile default`);
+			}
+		}
+
+		if (data['VAULT_STYLES']) {
+			if (typeof data['VAULT_STYLES'] !== "object") {
+				throw Helpers.custom_error("addSystemIntegration | data.VAULT_STYLES must be of type object");
+			}
+			const requiredKeys = new Set(["path", "value", "styling"]);
+			for (const [key, value] of Object.entries(data['VAULT_STYLES'])) {
+				if (!requiredKeys.has(key)) {
+					throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES contains illegal key "${key}" that is not a valid pile default`);
+				}
+				if (key === "path" && typeof value !== "string") {
+					throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES must have a "path" key with a value that is of type string!`);
+				}
+				if (key === "value" && typeof value !== "string") {
+					throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES must have a "value" key with a value that is of type string!`);
+				}
+				if (key === "styling" && typeof value !== "object") {
+					for (const stylingValue of Object.values(value)) {
+						if (typeof stylingValue !== "string") {
+							throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.styling must have a value of type string!`);
+						}
+					}
+				}
 			}
 		}
 

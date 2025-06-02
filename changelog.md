@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 3.2.10
+
+- Added `ITEM_COST_TRANSFORMER` to `game.itempiles.API.addSystemIntegration` (it was supported, but not documented)
+- Fixed more issues with the merchant's populate items would have no name if the items in the rollable table was not in a compendium
+- Removed system specific packs bundled with the module to reduce bloat
+
 ## Version 3.2.9
 
 - Fixed transferring containers between item piles and actors would sometimes double the quantity of transferred items in the containers

@@ -1147,7 +1147,7 @@ export function getCostOfItem(item, defaultCurrencies = false) {
 	let overallCost = 0;
 	let itemCost = Utilities.getItemCost(item);
 	if (SYSTEMS.DATA.ITEM_COST_TRANSFORMER) {
-		overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, defaultCurrencies);
+		overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, defaultCurrencies, SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE);
 		if (overallCost === false) {
 			Helpers.debug("failed to find price for item:", item)
 		}
@@ -2305,7 +2305,8 @@ export async function rollTable({
 		let item = await getItem(rollData);
 
 		if (item instanceof RollTable) {
-			rolledItems.push(...(await rollTable({ tableUuid: item.uuid, resetTable, normalize, displayChat })))
+			const newResults = await rollTable({ tableUuid: item.uuid, resetTable, normalize, displayChat });
+			rolledItems.push(...newResults)
 		} else if (item instanceof Item) {
 			const quantity = Math.max(Utilities.getItemQuantity(item) * rolledQuantity, 1);
 			rolledItems.push({
@@ -2426,6 +2427,11 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 					return item;
 				});
 			}
+
+			tableItems.forEach(item => {
+				item.description = (item.description ?? item.text) || item.item.name;
+				item.documentUuid = item.documentUuid ?? item.documentId;
+			});
 		}
 
 		tableItems.forEach(newItem => {
