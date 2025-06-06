@@ -538,24 +538,29 @@ class API {
 		}
 
 		if (data['VAULT_STYLES']) {
-			if (typeof data['VAULT_STYLES'] !== "object") {
+			if (!Array.isArray(data['VAULT_STYLES'])) {
 				throw Helpers.custom_error("addSystemIntegration | data.VAULT_STYLES must be of type object");
 			}
 			const requiredKeys = new Set(["path", "value", "styling"]);
-			for (const [key, value] of Object.entries(data['VAULT_STYLES'])) {
-				if (!requiredKeys.has(key)) {
-					throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES contains illegal key "${key}" that is not a valid pile default`);
-				}
-				if (key === "path" && typeof value !== "string") {
-					throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES must have a "path" key with a value that is of type string!`);
-				}
-				if (key === "value" && typeof value !== "string") {
-					throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES must have a "value" key with a value that is of type string!`);
-				}
-				if (key === "styling" && typeof value !== "object") {
-					for (const stylingValue of Object.values(value)) {
-						if (typeof stylingValue !== "string") {
-							throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.styling must have a value of type string!`);
+			for (const [index, entry] of data['VAULT_STYLES'].entries()) {
+				for (const [key, value] of Object.entries(entry)) {
+					if (!requiredKeys.has(key)) {
+						throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES.${index} contains illegal key "${key}" that is not a valid pile default`);
+					}
+					if (key === "path" && typeof value !== "string") {
+						throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index} must have a "path" key with a value that is of type string!`);
+					}
+					if (key === "value" && typeof value !== "string") {
+						throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index} must have a "value" key with a value that is of type string!`);
+					}
+					if (key === "styling") {
+						if (typeof value !== "object") {
+							throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES.${index}.styling must be of type object!`);
+						}
+						for (const stylingValue of Object.values(value)) {
+							if (typeof stylingValue !== "string") {
+								throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index}.styling must have a value of type string!`);
+							}
 						}
 					}
 				}

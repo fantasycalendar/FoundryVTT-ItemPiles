@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.11
+
+- Fixed issue with `game.itempiles.API.addSystemIntegration` throwing an error with `VAULT_STYLES` due to incorrect validation
+
 ## Version 3.2.10
 
 - Added `ITEM_COST_TRANSFORMER` to `game.itempiles.API.addSystemIntegration` (it was supported, but not documented)
