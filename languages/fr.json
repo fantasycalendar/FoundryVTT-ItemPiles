@@ -126,7 +126,7 @@
       },
       "NoSystemFound": {
         "Title": "Système non reconnu",
-        "Content": "Ce système n'est actuellement pas entièrement pris en charge. Cela signifie que le module ne sait pas comment traiter au mieux les éléments de ce système, mais qu'il peut encore fonctionner de manière limitée.<br><br>Vous pouvez configurer les paramètres du module vous-même, mais cela nécessite un peu de connaissances techniques.<br><br>Si vous avez des questions, envoyez un message à <strong>Wasp#2005</strong> sur le discord Foundry."
+        "Content": "Ce système n'est pas pris en charge. Cela signifie que le module ne sait pas comment traiter au mieux les éléments de ce système, mais qu'il peut encore fonctionner de manière limitée.<br><br>Vous pouvez configurer les paramètres du module vous-même, mais cela nécessite un peu de connaissances techniques.<br><br>Si vous avez des questions, faites une capture d'écran du dialogue qui s'ouvre après avoir fermé ceci et demandez de l'aide dans le canal de votre système sur le discord Foundry."
       },
       "SystemFound": {
         "Title": "Système reconnu",
@@ -827,7 +827,7 @@
         "Title": "Éditeur de filtres d'Item Piles",
         "TitleActor": "Éditeur de filtres d'Item Piles : {actor_name}",
         "Filters": "Filtres",
-        "Path": "Chemin d'attribut",
+        "Path": "Chemin de la propriété",
         "AddNew": "Ajouter un nouveau filtre",
         "Submit": "Soumettre les filtres"
       },
@@ -1175,6 +1175,9 @@
       "Short": "Court",
       "Icon": "Icône",
       "Data": "Données"
+    },
+    "Hints": {
+      "CtrlClear": "Ctrl+clic pour effacer"
     }
   }
 }
