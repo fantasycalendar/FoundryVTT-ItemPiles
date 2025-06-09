@@ -13,7 +13,7 @@ assignees: ''
 - [ ] I have tried to clear my cache (Ctrl / Cmd + F5)
 - [ ] I have checked the console for errors (F12 to open, Console tab)
 - [ ] I have reproduced this bug with only item piles & its dependency modules enabled
-- [ ] I acknowledge that Item Piles itself is not responsible for system-specific support - see [this page on system specific support](https://fantasycomputer.works/FoundryVTT-ItemPiles/#/contributing-to-item-piles?id=adding-system-support)
+- [ ] I acknowledge that Item Piles itself is not responsible for system-specific support - see [this page on system specific support](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/731)
 
 **Describe the bug**
 A clear and concise description of what the bug is.
