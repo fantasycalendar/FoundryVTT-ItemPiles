@@ -543,31 +543,23 @@ class API {
 			}
 			const requiredKeys = new Set(["path", "value", "styling"]);
 			for (const [index, entry] of data['VAULT_STYLES'].entries()) {
-				for (const [key, value] of Object.entries(entry)) {
-					if (!requiredKeys.has(key)) {
-						throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES.${index} contains illegal key "${key}" that is not a valid pile default`);
+				for (const key of requiredKeys) {
+					if (!entry.hasOwnProperty(key)) {
+						throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES.${index} is missing required key "${key}"`);
 					}
-					if (key === "path" && typeof value !== "string") {
-						throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index} must have a "path" key with a value that is of type string!`);
-					}
-					if (key === "value" && typeof value !== "string") {
-						throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index} must have a "value" key with a value that is of type string!`);
-					}
-					if (key === "styling") {
-						if (typeof value !== "object") {
-							throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES.${index}.styling must be of type object!`);
-						}
-						for (const stylingValue of Object.values(value)) {
-							if (typeof stylingValue !== "string") {
-								throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index}.styling must have a value of type string!`);
-							}
-						}
+				}
+				if (typeof entry["styling"] !== "object") {
+					throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES.${index}.styling must be of type object!`);
+				}
+				for (const stylingValue of Object.values(entry["styling"])) {
+					if (typeof stylingValue !== "string") {
+						throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index}.styling must have a value of type string!`);
 					}
 				}
 			}
 		}
 
-		if (typeof data['TOKEN_FLAG_DEFAULTS'] !== "object") {
+		if (data['TOKEN_FLAG_DEFAULTS'] && typeof data['TOKEN_FLAG_DEFAULTS'] !== "object") {
 			throw Helpers.custom_error("addSystemIntegration | data.TOKEN_FLAG_DEFAULTS must be of type object");
 		}
 
@@ -621,29 +613,31 @@ class API {
 			}
 		});
 
-		if (!Array.isArray(data['SECONDARY_CURRENCIES'])) {
-			throw Helpers.custom_error("addSystemIntegration | data.SECONDARY_CURRENCIES must be an array");
+		if (data['SECONDARY_CURRENCIES']) {
+			if (!Array.isArray(data['SECONDARY_CURRENCIES'])) {
+				throw Helpers.custom_error("addSystemIntegration | data.SECONDARY_CURRENCIES must be an array");
+			}
+			data['SECONDARY_CURRENCIES'].forEach(currency => {
+				if (typeof currency !== "object") {
+					throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | each entry in data.SECONDARY_CURRENCIES must be of type object");
+				}
+				if (typeof currency.name !== "string") {
+					throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.name must be of type string");
+				}
+				if (typeof currency.abbreviation !== "string") {
+					throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.abbreviation must be of type string");
+				}
+				if (typeof currency.data !== "object") {
+					throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.data must be of type object");
+				}
+				if (typeof currency.data.path !== "string" && typeof currency.data.uuid !== "string" && typeof currency.data.item !== "object") {
+					throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
+				}
+				if (currency.img && typeof currency.img !== "string") {
+					throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.img must be of type string");
+				}
+			});
 		}
-		data['SECONDARY_CURRENCIES'].forEach(currency => {
-			if (typeof currency !== "object") {
-				throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | each entry in data.SECONDARY_CURRENCIES must be of type object");
-			}
-			if (typeof currency.name !== "string") {
-				throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.name must be of type string");
-			}
-			if (typeof currency.abbreviation !== "string") {
-				throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.abbreviation must be of type string");
-			}
-			if (typeof currency.data !== "object") {
-				throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.data must be of type object");
-			}
-			if (typeof currency.data.path !== "string" && typeof currency.data.uuid !== "string" && typeof currency.data.item !== "object") {
-				throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.data must contain either \"path\" (string), \"uuid\" (string), or \"item\" (object)");
-			}
-			if (currency.img && typeof currency.img !== "string") {
-				throw Helpers.custom_error("addSystemIntegration | SECONDARY_CURRENCIES | currency.img must be of type string");
-			}
-		});
 
 		if (data["CURRENCY_DECIMAL_DIGITS"] && typeof data['CURRENCY_DECIMAL_DIGITS'] !== "number") {
 			throw Helpers.custom_error("addSystemIntegration | data.CURRENCY_DECIMAL_DIGITS must be of type number");

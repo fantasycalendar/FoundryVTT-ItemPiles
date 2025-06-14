@@ -15,8 +15,8 @@ export default function registerUIOverrides() {
 	Hooks.on("getActorDirectoryEntryContext", insertActorContextMenuItems);
 	Hooks.on("getActorContextOptions", insertActorContextMenuItems);
 	Hooks.on("getActorSheetHeaderButtons", insertActorHeaderButtons);
-	Hooks.on("getHeaderControlsApplicationV2", insertActorHeaderButtons);
 	Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
+	Hooks.on("getHeaderControlsApplicationV2", insertHeaderButtons);
 	Hooks.on("renderSidebarTab", hideTemporaryItems);
 	Hooks.on("renderTokenHUD", renderPileHUD);
 	Hooks.on("hoverToken", handleTokenBorders);
@@ -114,6 +114,16 @@ function insertActorContextMenuItems(html, menuItems) {
 				&& (game.user?.character !== actor || Array.from(game.users).find(u => u.character === actor && u.active));
 		}
 	});
+}
+
+function insertHeaderButtons(app, buttons) {
+	if (app.document instanceof foundry.documents.BaseActor) {
+		return insertActorHeaderButtons(app, buttons);
+	}
+
+	if (app.document instanceof foundry.documents.BaseItem) {
+		return insertItemHeaderButtons(app, buttons);
+	}
 }
 
 function insertActorHeaderButtons(actorSheet, buttons) {

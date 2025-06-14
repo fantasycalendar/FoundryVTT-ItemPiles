@@ -573,12 +573,12 @@
   height: 0.8rem;
   font-size: 0.5rem;
   box-shadow: 0 0 0 0 rgba(217, 49, 49, 1);
-  animation: pulse 1s infinite;
+  animation: item-piles-pulse 1s infinite;
   background-color: rgb(217, 49, 49);
   border-radius: 50%;
 }
 
-@keyframes pulse {
+@keyframes item-piles-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(217, 49, 49, 0.7);
   }

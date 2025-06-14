@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 3.2.12
+
+- Added Korean localization (thank you Jinhoon9836 on github!)
+- Updated Portuguese (Brazilian), French, Polish, Italian, and Spanish localization (thank you Kharmans, rectulo, Lioheart, and gregorywarn on [weblate](https://weblate.foundryvtt-hub.com/projects/item-piles/)!)
+- Fixed item piles specific CSS pulse animation overriding core foundry pulse animation on the pause overlay
+- Fixed `VAULT_STYLES` in `game.itempiles.API.addSystemIntegration` having too aggressive validation
+- Fixed item piles header button being added to every application when rendered
+
 ## Version 3.2.11
 
 - Fixed issue with `game.itempiles.API.addSystemIntegration` throwing an error with `VAULT_STYLES` due to incorrect validation
