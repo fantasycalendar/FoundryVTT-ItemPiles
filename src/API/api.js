@@ -10,6 +10,7 @@ import TradeAPI from "./trade-api.js";
 import PrivateAPI from "./private-api.js";
 import { SYSTEMS } from "../systems.js";
 import ItemPileConfig from "../applications/item-pile-config/item-pile-config.js";
+import GiveItems from "../applications/dialogs/give-items-dialog/give-items-dialog.js";
 
 class API {
 	/**
@@ -417,9 +418,11 @@ class API {
 	 *   PILE_DEFAULTS: Object,
 	 *   TOKEN_FLAG_DEFAULTS: Object,
 	 *   ITEM_TRANSFORMER: undefined/Function,
+	 *   ITEM_COST_TRANSFORMER: undefined/Function,
 	 *   PRICE_MODIFIER_TRANSFORMER: undefined/Function,
 	 *   SYSTEM_HOOKS: undefined/Function,
 	 *   SHEET_OVERRIDES: undefined/Function,
+	 *   VAULT_STYLES: undefined/Array<{ path: string, value: string, styling: Object }>,
 	 *   CURRENCIES: Array<{
 	 *     primary: boolean,
 	 *     type: string ["attribute"/"item"],
@@ -436,31 +439,12 @@ class API {
 	 *   }>,
 	 *   CURRENCY_DECIMAL_DIGITS: undefined/number
 	 * }>} inData
+	 * @param version {string} The game system version this configuration should be applied to
 	 */
-	static addSystemIntegration(inData) {
+	static addSystemIntegration(inData, version = "latest") {
 
-		const data = foundry.utils.mergeObject({
-			VERSION: "",
-			ACTOR_CLASS_TYPE: "",
-			ITEM_CLASS_LOOT_TYPE: "",
-			ITEM_CLASS_WEAPON_TYPE: "",
-			ITEM_CLASS_EQUIPMENT_TYPE: "",
-			ITEM_QUANTITY_ATTRIBUTE: "",
-			ITEM_PRICE_ATTRIBUTE: "",
-			QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
-			ITEM_FILTERS: [],
-			ITEM_SIMILARITIES: [],
-			UNSTACKABLE_ITEM_TYPES: [],
-			PILE_DEFAULTS: {},
-			TOKEN_FLAG_DEFAULTS: {},
-			ITEM_TRANSFORMER: null,
-			PRICE_MODIFIER_TRANSFORMER: null,
-			SYSTEM_HOOKS: null,
-			SHEET_OVERRIDES: null,
-			CURRENCIES: [],
-			SECONDARY_CURRENCIES: [],
-			CURRENCY_DECIMAL_DIGITS: 0.00001
-		}, inData)
+		const defaultSettings = foundry.utils.deepClone(SYSTEMS.DEFAULT_SETTINGS);
+		const data = foundry.utils.mergeObject(defaultSettings, inData, { insertKeys: false })
 
 		if (typeof data["VERSION"] !== "string") {
 			throw Helpers.custom_error("addSystemIntegration | data.VERSION must be of type string");
@@ -516,6 +500,12 @@ class API {
 			}
 		}
 
+		if (data['ITEM_COST_TRANSFORMER']) {
+			if (!Helpers.isFunction(data['ITEM_COST_TRANSFORMER'])) {
+				throw Helpers.custom_error("addSystemIntegration | data.ITEM_COST_TRANSFORMER must be of type function");
+			}
+		}
+
 		if (data['PRICE_MODIFIER_TRANSFORMER']) {
 			if (!Helpers.isFunction(data['PRICE_MODIFIER_TRANSFORMER'])) {
 				throw Helpers.custom_error("addSystemIntegration | data.PRICE_MODIFIER_TRANSFORMER must be of type function");
@@ -544,6 +534,36 @@ class API {
 		for (const key of Object.keys(data['PILE_DEFAULTS'])) {
 			if (!validKeys.has(key)) {
 				throw Helpers.custom_error(`addSystemIntegration | data.PILE_DEFAULTS contains illegal key "${key}" that is not a valid pile default`);
+			}
+		}
+
+		if (data['VAULT_STYLES']) {
+			if (!Array.isArray(data['VAULT_STYLES'])) {
+				throw Helpers.custom_error("addSystemIntegration | data.VAULT_STYLES must be of type object");
+			}
+			const requiredKeys = new Set(["path", "value", "styling"]);
+			for (const [index, entry] of data['VAULT_STYLES'].entries()) {
+				for (const [key, value] of Object.entries(entry)) {
+					if (!requiredKeys.has(key)) {
+						throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES.${index} contains illegal key "${key}" that is not a valid pile default`);
+					}
+					if (key === "path" && typeof value !== "string") {
+						throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index} must have a "path" key with a value that is of type string!`);
+					}
+					if (key === "value" && typeof value !== "string") {
+						throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index} must have a "value" key with a value that is of type string!`);
+					}
+					if (key === "styling") {
+						if (typeof value !== "object") {
+							throw Helpers.custom_error(`addSystemIntegration | data.VAULT_STYLES.${index}.styling must be of type object!`);
+						}
+						for (const stylingValue of Object.values(value)) {
+							if (typeof stylingValue !== "string") {
+								throw Helpers.custom_error(`addSystemIntegration | each entry in data.VAULT_STYLES.${index}.styling must have a value of type string!`);
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -631,7 +651,7 @@ class API {
 
 		data['INTEGRATION'] = true;
 
-		SYSTEMS.addSystem(data);
+		SYSTEMS.addSystem(data, version);
 
 		Helpers.debug(`Registered system settings for ${game.system.id}`, data)
 
@@ -2683,6 +2703,20 @@ class API {
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRADE_ITEMS, sellerUuid, buyerUuid, itemsToSell, game.user.id, { interactionId });
 
+	}
+
+	static async giveItem(item) {
+		const result = await GiveItems.show(item);
+		if (!result) return;
+		return PrivateAPI._giveItem({
+			itemData: {
+				item: item.toObject(),
+				quantity: result.quantity
+			},
+			source: item.parent.uuid,
+			target: result.target,
+			secret: result.secret,
+		}, { skipQuantityDialog: true })
 	}
 
 	static canItemFitInVault(item, vaultActor) {

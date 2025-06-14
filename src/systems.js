@@ -1,10 +1,9 @@
-import SUPPORTED_SYSTEMS from "./systems/_index.js";
-
 export const SYSTEMS = {
 
-	SUPPORTED_SYSTEMS,
+	SUPPORTED_SYSTEMS: {},
 
 	DEFAULT_SETTINGS: {
+		VERSION: "",
 		ACTOR_CLASS_TYPE: "",
 		ITEM_CLASS_LOOT_TYPE: "",
 		ITEM_CLASS_WEAPON_TYPE: "",
@@ -14,15 +13,20 @@ export const SYSTEMS = {
 		QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
 		ITEM_FILTERS: [],
 		ITEM_SIMILARITIES: [],
-		VAULT_STYLES: [],
-		CSS_VARIABLES: [],
 		UNSTACKABLE_ITEM_TYPES: [],
-		CURRENCIES: [],
-		SECONDARY_CURRENCIES: [],
 		PILE_DEFAULTS: {},
 		TOKEN_FLAG_DEFAULTS: {},
+		ITEM_TRANSFORMER: null,
+		PRICE_MODIFIER_TRANSFORMER: null,
+		ITEM_COST_TRANSFORMER: null,
+		SYSTEM_HOOKS: null,
+		SHEET_OVERRIDES: null,
+		CURRENCIES: [],
+		SECONDARY_CURRENCIES: [],
 		CURRENCY_DECIMAL_DIGITS: 0.00001,
-		SOFT_MIGRATIONS: {}
+		VAULT_STYLES: [],
+		CSS_VARIABLES: [],
+		SOFT_MIGRATIONS: {},
 	},
 
 	get HAS_SYSTEM_SUPPORT() {
@@ -61,7 +65,7 @@ export const SYSTEMS = {
 		return this._currentSystem;
 	},
 
-	addSystem(data) {
-		this.SUPPORTED_SYSTEMS[game.system.id.toLowerCase()] = { latest: data };
+	addSystem(data, version = "latest") {
+		this.SUPPORTED_SYSTEMS[game.system.id.toLowerCase()] = { [version]: data };
 	}
 };

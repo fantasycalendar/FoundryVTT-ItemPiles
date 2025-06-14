@@ -45,6 +45,7 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static async _onCanvasReady(canvas) {
+		if (!Helpers.getSetting("preloadFiles")) return;
 		const tokens = [...canvas.tokens.placeables].map(token => token.document);
 		for (const doc of tokens) {
 			await this._preloadItemPileFiles(doc);
@@ -189,6 +190,7 @@ export default class PrivateAPI {
 		if (!PileUtilities.isValidItemPile(doc)) return true;
 		const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
 		Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CREATE, doc, itemPileConfig);
+		if (!Helpers.getSetting("preloadFiles")) return true;
 		return this._preloadItemPileFiles(doc);
 	}
 
@@ -291,11 +293,14 @@ export default class PrivateAPI {
 				if (!handler) continue;
 				handler({ item, items: newItems });
 			}
-			items = items.concat(newItems.map(item => ({
-				_id: item._id,
-				flags: undefined,
-				quantity: Utilities.getItemQuantity(item)
-			})));
+			newItems.forEach(newItem => {
+				if (items.some(item => (item?.id ?? item?.item?._id) === newItem._id)) return;
+				items.push({
+					id: newItem._id,
+					flags: undefined,
+					quantity: Utilities.getItemQuantity(newItem)
+				})
+			})
 		}
 		await sourceTransaction.appendItemChanges(items, { remove: true });
 
@@ -1681,28 +1686,26 @@ export default class PrivateAPI {
 
 		const pileData = PileUtilities.getActorFlagData(tokenDocument);
 
-		if (Helpers.getSetting("preloadFiles")) {
-			await Promise.allSettled(Object.entries(pileData).map(entry => {
-				return new Promise(async (resolve) => {
-					const [property, filePath] = entry;
-					if (Array.isArray(filePath)) {
-						return resolve();
-					}
-					const isImage = property.toLowerCase().includes("image");
-					const isSound = property.toLowerCase().includes("sound");
-					if ((!isImage && !isSound) || (!filePath || preloadedFiles.has(filePath))) return resolve();
-					preloadedFiles.add(filePath);
-					if (isImage) {
-						await loadTexture(filePath);
-						Helpers.debug(`Preloaded image: ${filePath}`);
-					} else if (isSound) {
-						Helpers.debug(`Preloaded sound: ${filePath}`);
-						await AudioHelper.preloadSound(filePath);
-					}
-					resolve();
-				});
-			}));
-		}
+		await Promise.allSettled(Object.entries(pileData).map(entry => {
+			return new Promise(async (resolve) => {
+				const [property, filePath] = entry;
+				if (Array.isArray(filePath)) {
+					return resolve();
+				}
+				const isImage = property.toLowerCase().includes("image");
+				const isSound = property.toLowerCase().includes("sound");
+				if ((!isImage && !isSound) || (!filePath || preloadedFiles.has(filePath))) return resolve();
+				preloadedFiles.add(filePath);
+				if (isImage) {
+					await loadTexture(filePath);
+					Helpers.debug(`Preloaded image: ${filePath}`);
+				} else if (isSound) {
+					Helpers.debug(`Preloaded sound: ${filePath}`);
+					await AudioHelper.preloadSound(filePath);
+				}
+				resolve();
+			});
+		}));
 
 		Helpers.debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
 	}

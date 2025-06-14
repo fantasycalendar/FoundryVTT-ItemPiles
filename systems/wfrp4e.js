@@ -1,4 +1,4 @@
-import CONSTANTS from "../constants/constants.js";
+import CONSTANTS from "../src/constants/constants.js";
 
 export default {
 
@@ -11,7 +11,7 @@ export default {
 	"ITEM_CLASS_LOOT_TYPE": "cargo",
 
 	// The item class type is the type of item that will be used for the default weapon item
-	"ITEM_CLASS_WEAPON_TYPE": "", 
+	"ITEM_CLASS_WEAPON_TYPE": "",
 
 	// The item class type is the type of item that will be used for the default equipment item
 	"ITEM_CLASS_EQUIPMENT_TYPE": "",

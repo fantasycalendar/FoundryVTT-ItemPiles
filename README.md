@@ -14,7 +14,6 @@ Other works by us:
 - [Sequencer](https://foundryvtt.com/packages/sequencer) - Wow your players by playing visual effects on the canvas
 - [Tagger](https://foundryvtt.com/packages/tagger) - Tag objects in the scene and retrieve them with a powerful API
 - [Token Ease](https://foundryvtt.com/packages/token-ease) - Make your tokens _feel good_ to move around on the board
-- [Rest Recovery](https://foundryvtt.com/packages/rest-recovery) - Automate most D&D 5e long and short rest mechanics
 
 Like what we've done? Buy us a coffee!
 
@@ -26,17 +25,14 @@ Like what we've done? Buy us a coffee!
 
 ## What is Item Piles?
 
-Have you ever wished you could represent items in your scenes? A pile of items, something to interact with - or perhaps
-chests whose appearance changes depending on what happens to it, whether it's open, closed, full, or empty. Do you want
-an easy way to split loot between players? Do you want easy to use merchants with great UIs?
+Have you ever wished you could represent items in your scenes? A pile of items, something to interact with - or perhaps chests whose appearance changes depending on what happens to it, whether it's open, closed, full, or empty. Do you want an easy way to split loot between players? Do you want easy to use merchants with great UIs?
 
 Then you need **Item Piles**!
 
 This module features:
 
 * Dropping items on the canvas to create piles of items
-* Item piles acting as containers with the ability to switch its token image depending on its open/closed/empty state,
-  and play sounds accordingly
+* Item piles acting as containers with the ability to switch its token image depending on its open/closed/empty state, and play sounds accordingly
 * Turn characters into fully featured merchants, with complex item pricing, item quantity management, and more
 * Robust player-to-player trading features
 * Incredibly intuitive API and documentation

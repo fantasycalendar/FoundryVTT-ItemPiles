@@ -14,11 +14,9 @@ export default function registerLibwrappers() {
 		return wrapped(...args);
 	}, "MIXED");
 
-	const versionIsEleven = foundry.utils.isNewerVersion(game.version, "10.999");
-
-	const overrideMethod = versionIsEleven
-		? `DocumentDirectory.prototype._onClickEntryName`
-		: `SidebarDirectory.prototype._onClickDocumentName`;
+	const overrideMethod = CONSTANTS.IS_V13
+		? `foundry.applications.sidebar.DocumentDirectory.prototype._onClickEntryName`
+		: `DocumentDirectory.prototype._onClickEntryName`;
 
 	libWrapper.register(CONSTANTS.MODULE_NAME, overrideMethod, function (wrapped, event) {
 		event.preventDefault();
@@ -41,7 +39,11 @@ export default function registerLibwrappers() {
 		return false;
 	})
 
-	libWrapper.register(CONSTANTS.MODULE_NAME, `ActorSheet.prototype.render`, function (wrapped, forced, options, ...args) {
+	const actorSheetOverride = CONSTANTS.IS_V13
+		? `foundry.applications.sheets.ActorSheet.prototype.render`
+		: `ActorSheet.prototype.render`
+
+	libWrapper.register(CONSTANTS.MODULE_NAME, actorSheetOverride, function (wrapped, forced, options, ...args) {
 		const renderItemPileInterface = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_SHEET, this.document, forced, options) === false;
 		if (this._state > Application.RENDER_STATES.NONE) {
 			if (renderItemPileInterface) {
@@ -54,7 +56,11 @@ export default function registerLibwrappers() {
 		return wrapped(forced, options, ...args);
 	}, "MIXED");
 
-	libWrapper.register(CONSTANTS.MODULE_NAME, "DragDrop.prototype.callback", function (wrapped, event, type) {
+	const dragDrop = CONSTANTS.IS_V13
+		? "foundry.applications.ux.DragDrop.implementation"
+		: "DragDrop.prototype.callback";
+
+	libWrapper.register(CONSTANTS.MODULE_NAME, dragDrop, function (wrapped, event, type) {
 		const result = wrapped(event, type)
 		const hookType = {
 			"dragstart": CONSTANTS.HOOKS.DRAG_DOCUMENT,

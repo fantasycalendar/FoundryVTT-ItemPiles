@@ -1,6 +1,6 @@
-import GiveItems from "../applications/dialogs/give-items-dialog/give-items-dialog.js";
-import PrivateAPI from "../API/private-api.js";
-import CONSTANTS from "../constants/constants.js";
+import GiveItems from "../src/applications/dialogs/give-items-dialog/give-items-dialog.js";
+import PrivateAPI from "../src/API/private-api.js";
+import CONSTANTS from "../src/constants/constants.js";
 
 export default {
 
@@ -40,11 +40,12 @@ export default {
 
 	// This function is an optional system handler that specifically transforms an item when it is added to actors
 	"ITEM_TRANSFORMER": async (itemData) => {
-		["equipped", "proficient", "prepared", "attuned"].forEach(key => {
+		["equipped", "proficient", "prepared"].forEach(key => {
 			if (itemData?.system?.[key] !== undefined) {
 				delete itemData.system[key];
 			}
 		});
+		foundry.utils.setProperty(itemData, "system.attunement", Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData?.system?.attunement ?? 0));
 		if (itemData.type === "spell") {
 			try {
 				const scroll = await Item.implementation.createScrollFromSpell(itemData);
@@ -58,8 +59,7 @@ export default {
 	"ITEM_TYPE_HANDLERS": {
 		"GLOBAL": {
 			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED]: ({ item }) => {
-				const itemData = item instanceof Item ? item.toObject() : item;
-				return !!itemData?.system?.container;
+				return item.system.container;
 			},
 			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH]: "system.container"
 		},
@@ -68,9 +68,9 @@ export default {
 			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
 				return item.system.contents;
 			},
-			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items, raw = false } = {}) => {
+			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
 				for (const containedItem of item.system.contents) {
-					items.push(raw ? containedItem : containedItem.toObject());
+					items.push(containedItem.toObject());
 				}
 			}
 		}

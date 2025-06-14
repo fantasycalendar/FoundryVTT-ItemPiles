@@ -1,6 +1,6 @@
-import GiveItems from "../applications/dialogs/give-items-dialog/give-items-dialog.js";
-import PrivateAPI from "../API/private-api.js";
-import CONSTANTS from "../constants/constants.js";
+import GiveItems from "../src/applications/dialogs/give-items-dialog/give-items-dialog.js";
+import PrivateAPI from "../src/API/private-api.js";
+import CONSTANTS from "../src/constants/constants.js";
 
 export default {
 

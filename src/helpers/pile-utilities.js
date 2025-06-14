@@ -14,7 +14,10 @@ import * as Helpers from "./helpers.js";
 import * as CompendiumUtilities from "./compendium-utilities.js";
 
 export function getPileDefaults() {
-	return foundry.utils.mergeObject({}, CONSTANTS.PILE_DEFAULTS, Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {});
+	return foundry.utils.mergeObject(
+		foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+		foundry.utils.deepClone(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {})
+	);
 }
 
 export function getPileActorDefaults(itemPileFlags = {}) {
@@ -1144,7 +1147,7 @@ export function getCostOfItem(item, defaultCurrencies = false) {
 	let overallCost = 0;
 	let itemCost = Utilities.getItemCost(item);
 	if (SYSTEMS.DATA.ITEM_COST_TRANSFORMER) {
-		overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, defaultCurrencies);
+		overallCost = SYSTEMS.DATA.ITEM_COST_TRANSFORMER(item, defaultCurrencies, SYSTEMS.DATA.ITEM_PRICE_ATTRIBUTE);
 		if (overallCost === false) {
 			Helpers.debug("failed to find price for item:", item)
 		}
@@ -2270,16 +2273,25 @@ export async function rollTable({
 			displayChat: displayChat,
 			recursive: true
 		}
-		results = (await game.modules.get("better-rolltables").api.roll(table, brtOptions)).itemsData.map(result => ({
-			documentCollection: result.documentCollection,
-			documentId: result.documentId,
-			text: result.text || result.name,
-			img: result.img,
-			quantity: 1,
-			toObject: function () {
-				return foundry.utils.deepClone(this);
+		results = (await game.modules.get("better-rolltables").api.roll(table, brtOptions)).itemsData.map(result => {
+			const data = {
+				documentId: result.documentId,
+				text: result.description ?? (result.text || result.name),
+				img: result.img,
+				quantity: 1,
+				toObject: function () {
+					return foundry.utils.deepClone(this);
+				}
 			}
-		}));
+
+			if (result.documentUuid) {
+				data["documentUuid"] = result.documentUuid
+			} else {
+				data["documentCollection"] = result.documentCollection
+			}
+
+			return data
+		});
 	} else {
 		results = (await table.drawMany(roll.total, { displayChat, recursive: true })).results;
 	}
@@ -2293,7 +2305,8 @@ export async function rollTable({
 		let item = await getItem(rollData);
 
 		if (item instanceof RollTable) {
-			rolledItems.push(...(await rollTable({ tableUuid: item.uuid, resetTable, normalize, displayChat })))
+			const newResults = await rollTable({ tableUuid: item.uuid, resetTable, normalize, displayChat });
+			rolledItems.push(...newResults)
 		} else if (item instanceof Item) {
 			const quantity = Math.max(Utilities.getItemQuantity(item) * rolledQuantity, 1);
 			rolledItems.push({
@@ -2367,8 +2380,12 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				const roll = await new Roll(formula).evaluate({ allowInteractive: false });
 				if (roll.total <= 0) continue;
 				const rollResult = rollableTable.results.get(itemId).toObject();
-				const potentialPack = game.packs.get(rollResult.documentCollection);
-				if (rollResult.documentCollection === "RollTable" || potentialPack?.documentName === "RollTable") {
+				const potentialPack = rollResult.documentUuid
+					? await fromUuid(rollResult.documentUuid)
+					: game.packs.get(rollResult.documentCollection);
+
+				const typeIsRollTable = (rollResult.documentUuid ?? rollResult.documentCollection).includes("RollTable");
+				if (potentialPack?.documentName === "RollTable" || typeIsRollTable) {
 					const subTable = await getTable(rollResult);
 					items.push(...(await rollMerchantTables({
 						tableData: [{
@@ -2380,9 +2397,15 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				const item = await getItem(rollResult);
 				if (!item) continue;
 				const quantity = roll.total * Math.max(Utilities.getItemQuantity(item), 1);
+				const data = (typeof rollResult !== "string" ? rollResult : {});
 
 				tableItems.push({
-					...(typeof rollResult === "string" ? rollResult : {}), customCategory: customCategory, item, quantity
+					...data,
+					description: (data.description ?? data.text) || item.name,
+					documentUuid: data.documentUuid ?? data.documentId,
+					customCategory,
+					item,
+					quantity
 				})
 			}
 
@@ -2404,12 +2427,17 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 					return item;
 				});
 			}
+
+			tableItems.forEach(item => {
+				item.description = (item.description ?? item.text) || item.item.name;
+				item.documentUuid = item.documentUuid ?? item.documentId;
+			});
 		}
 
 		tableItems.forEach(newItem => {
 			const existingItem = items.find((item) => {
-				if (item.documentId && newItem.documentId) {
-					return item.documentId === newItem.documentId;
+				if (item.documentUuid && newItem.documentUuid) {
+					return item.documentUuid === newItem.documentUuid;
 				} else {
 					return item._id === newItem._id;
 				}
@@ -2439,7 +2467,9 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 
 async function getTable(tableToGet) {
 	let table;
-	if (tableToGet.documentCollection === "RollTable") {
+	if (tableToGet.documentUuid) {
+		table = await fromUuid(tableToGet.documentUuid);
+	} else if (tableToGet.documentCollection === "RollTable") {
 		table = game.tables.get(tableToGet.documentId);
 	} else {
 		const compendium = game.packs.get(tableToGet.documentCollection);
@@ -2452,8 +2482,9 @@ async function getTable(tableToGet) {
 
 async function getItem(rollData) {
 	let item;
-	if (typeof rollData.text === "string" && rollData.text.match(CONSTANTS.TABLE_UUID_REGEX)) {
-		const matches = [...rollData.text.matchAll(CONSTANTS.TABLE_UUID_REGEX)];
+	const rollDataText = rollData.description ?? rollData.text;
+	if (typeof rollDataText === "string" && rollDataText.match(CONSTANTS.TABLE_UUID_REGEX)) {
+		const matches = [...rollDataText.matchAll(CONSTANTS.TABLE_UUID_REGEX)];
 		const [firstIndex, lastIndex] = matches.reduce((acc, elem) => {
 			acc[0] = Math.min(acc[0], elem.index)
 			acc[1] = Math.max(acc[1], elem.index + elem[0].length)
@@ -2463,15 +2494,18 @@ async function getItem(rollData) {
 			return [elem[1], elem[2]];
 		});
 		const [uuid, name] = Helpers.random_array_element(uuidNameMap);
-		const itemName = rollData.text.replace(rollData.text.slice(firstIndex, lastIndex), name);
+		const itemName = rollDataText.replace(rollDataText.slice(firstIndex, lastIndex), name);
 		item = await fromUuid(uuid)
 		const itemObj = item.toObject();
 		itemObj.name = itemName;
 		item = new Item.implementation(itemObj);
-		rollData.text = itemName;
+		rollData.description = itemName;
 		rollData.img = itemObj.img;
 		rollData.documentCollection = uuid.split(".").slice(1, 3).join(".");
 		rollData.documentId = uuid.split(".")[4];
+		rollData.documentUuid = uuid;
+	} else if (rollData.documentUuid) {
+		item = await fromUuid(rollData.documentUuid);
 	} else if (rollData.documentCollection === "Item") {
 		item = game.items.get(rollData.documentId);
 	} else {

@@ -132,7 +132,7 @@
 		itemsRolled.update((items) => {
 			processedItems.forEach((newItem) => {
 				const existingItem = items.find(
-					(item) => item.documentId === newItem.documentId
+					(item) => item.documentUuid === newItem.documentUuid
 				);
 				if (existingItem) {
 					existingItem.quantity += newItem.quantity;
@@ -141,7 +141,7 @@
 				}
 			});
 			items.sort((a, b) => {
-				return a.text < b.text ? -1 : 1;
+				return a.description < b.description ? -1 : 1;
 			});
 			return items;
 		});
@@ -160,7 +160,7 @@
 	function removeItem(itemToRemove) {
 		itemsRolled.update((items) => {
 			const existingItemIndex = items.findIndex(
-				(item) => item.documentId === itemToRemove.documentId
+				(item) => item.documentUuid === itemToRemove.documentUuid
 			);
 			items.splice(existingItemIndex, 1);
 			return items;
@@ -422,7 +422,9 @@
 
 									<div class="item-piles-name item-piles-text">
 										<div class="item-piles-name-container">
-											<a class="item-piles-clickable" on:click={() => previewItem(item)}>{item.text}</a>
+											<a class="item-piles-clickable" on:click={() => previewItem(item)}>
+												{(item.description ?? item.text) || item.name}
+											</a>
 										</div>
 									</div>
 
@@ -485,7 +487,23 @@
 		</div>
 
 		{#if $itemsRolled.length}
-			{#each $itemsRolled as item (item.documentId)}
+
+			<div class="item-piles-flexrow" style="margin:5px 0;">
+
+				<button class="item-piles-button" on:click={() => addAllItems()}>
+					{localize("ITEM-PILES.Merchant.AddAll")}
+					<i class="fas fa-arrow-left"/>
+				</button>
+
+				<button class="item-piles-button"
+				        style="color:red; max-width:30px;"
+				        on:click={() => { $itemsRolled = []; }}
+				        data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
+					<i class="fas fa-trash"/>
+				</button>
+
+			</div>
+			{#each $itemsRolled as item (item.documentUuid)}
 				<div
 					class="item-piles-flexrow item-piles-item-row item-piles-even-color"
 				>
@@ -503,10 +521,9 @@
 
 					<div class="item-piles-name">
 						<div class="item-piles-name-container">
-							<a
-								class="item-piles-clickable"
-								on:click={(_) => previewItem(item)}>{item.text}</a
-							>
+							<a class="item-piles-clickable" on:click={(_) => previewItem(item)}>
+								{item.description}
+							</a>
 						</div>
 					</div>
 
@@ -538,22 +555,6 @@
 					</button>
 				</div>
 			{/each}
-
-			<div class="item-piles-flexrow" style="margin:5px 0;">
-
-				<button class="item-piles-button" on:click={() => addAllItems()}>
-					{localize("ITEM-PILES.Merchant.AddAll")}
-					<i class="fas fa-arrow-left"/>
-				</button>
-
-				<button class="item-piles-button"
-				        style="color:red; max-width:30px;"
-				        on:click={() => { $itemsRolled = []; }}
-				        data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
-					<i class="fas fa-trash"/>
-				</button>
-
-			</div>
 		{/if}
 
 	</div>
