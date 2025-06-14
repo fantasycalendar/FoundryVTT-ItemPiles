@@ -25,7 +25,7 @@
       "vault": "Cofre"
     },
     "Notifications": {
-      "SystemSupportFound": "Suporte do sistema encontrado! Aplicando configurações padrão do sistema ao Item Piles...",
+      "SystemSupportFound": "Suporte ao sistema encontrado! Aplicando configurações padrão do sistema ao Item Piles",
       "UpdateItemPileSuccess": "Pilha de Itens atualizada com sucesso.",
       "UpdateMerchantSuccess": "Comerciante atualizado com sucesso.",
       "ItemTransferred": "{item_name} de {source_actor_name} foi dado para {target_actor_name}.",
@@ -251,7 +251,7 @@
       },
       "NoSystemFound": {
         "Title": "Sistema Não Reconhecido",
-        "Content": "<p><strong>Atualmente, este sistema não é totalmente suportado.</strong></p><p>Isso significa que o módulo não sabe como lidar melhor com os itens deste sistema, mas ainda pode operar de forma limitada.</p><p>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico.</p><p>Se você tiver alguma dúvida, faça um print da tela que irá abrir após você fechar esta tela e peça ajuda no canal do seu sistema no Discord do Foundry.</p>"
+        "Content": "<strong>Este sistema não é suportado.</strong><br><br>Isso significa que o módulo não sabe como melhor lidar com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. <br><br>Se você tiver alguma dúvida, tire um print da cixa de diálogo que irá abrir após você fechar isto e peça por ajuda no canal do seu sistema no servidor do discord do Foundry."
       },
       "NewSystemVersion": {
         "Title": "Nova Versão do Sistema",
@@ -364,7 +364,7 @@
         "Title": "Editando Moedas",
         "Content": "Como MJ, você pode atualizar as moedas nesta pilha de itens:",
         "Secondary": "Moedas Secundárias:",
-        "NoCurrency": "{actor_name} não tem moedas válidas.",
+        "NoCurrency": "{actor_name} não tem moedas válidas",
         "Submit": "Enviar"
       },
       "DropCurrencies": {
@@ -574,7 +574,7 @@
       "ItemPileConfig": {
         "Title": "Configurações da Pilha de Itens: {actor_name}",
         "Configure": "Pilha de Item",
-        "Update": "Atualizar",
+        "Update": "Atualizar Config.",
         "Main": {
           "Title": "Configurações Principais",
           "EnabledPile": "Habilitado",
@@ -956,6 +956,9 @@
         "Hint": "Título da pasta para filtrar tabelas de rolagem da aba \"Itens Populares\" no comerciante.",
         "AllTables": "Todas as Tabelas"
       }
+    },
+    "Hints": {
+      "CtrlClear": "Control + Clique para limpar"
     }
   }
 }
