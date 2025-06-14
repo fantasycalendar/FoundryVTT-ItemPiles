@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.13
+
+- Actually pushed the previous update properly
+
 ## Version 3.2.12
 
 - Added Korean localization (thank you Jinhoon9836 on github!)
