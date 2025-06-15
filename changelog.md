@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.14
+
+- Added `ITEM_TYPE_HANDLERS` to `game.itempiles.API.addSystemIntegration`, whose absence broke item container behavior
+
 ## Version 3.2.13
 
 - Actually pushed the previous update properly
