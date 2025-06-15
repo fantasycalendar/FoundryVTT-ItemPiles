@@ -27,6 +27,7 @@ export const SYSTEMS = {
 		VAULT_STYLES: [],
 		CSS_VARIABLES: [],
 		SOFT_MIGRATIONS: {},
+		ITEM_TYPE_HANDLERS: {},
 	},
 
 	get HAS_SYSTEM_SUPPORT() {
