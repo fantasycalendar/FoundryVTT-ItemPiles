@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.15
+
+- Fixed `SHEET_OVERRIDES` not being called due to being called before system configuration modules had a chance to register to Item Piles
+- Fixed "Request Trade" button not having the right styling - fixes the interaction between the "Rest Recovery 5e" module and Item Piles
+
 ## Version 3.2.14
 
 - Added `ITEM_TYPE_HANDLERS` to `game.itempiles.API.addSystemIntegration`, whose absence broke item container behavior

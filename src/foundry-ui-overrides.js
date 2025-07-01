@@ -53,7 +53,7 @@ function hideTemporaryItems(sidebar) {
 
 function createTradeButton() {
 	const minimalUI = game.modules.get('minimal-ui')?.active;
-	const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "") + (CONSTANTS.IS_V13 ? "item-piles-v13" : "");
+	const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "") + (CONSTANTS.IS_V13 ? " item-piles-v13" : "");
 	const text = !minimalUI ? game.i18n.localize("ITEM-PILES.ContextMenu.RequestTrade") : "";
 	const button = $(`<button type="button" class="${classes}"><i class="fas fa-handshake"></i>${text}</button>`)
 	button.click(() => {

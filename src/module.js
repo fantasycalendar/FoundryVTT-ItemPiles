@@ -33,7 +33,6 @@ Hooks.once("init", async () => {
 	registerSettings();
 	registerHotkeysPre();
 	registerUIOverrides();
-	registerLibwrappers();
 	setupCaches();
 	setupPlugins("init");
 
@@ -119,6 +118,8 @@ Hooks.once("ready", () => {
 		ChatAPI.disablePastTradingButtons();
 
 		Hooks.callAll(CONSTANTS.HOOKS.READY);
+
+		registerLibwrappers();
 
 		displayChatMessage();
 
