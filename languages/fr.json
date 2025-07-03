@@ -126,7 +126,7 @@
       },
       "NoSystemFound": {
         "Title": "Système non reconnu",
-        "Content": "Ce système n'est pas pris en charge. Cela signifie que le module ne sait pas comment traiter au mieux les éléments de ce système, mais qu'il peut encore fonctionner de manière limitée.<br><br>Vous pouvez configurer les paramètres du module vous-même, mais cela nécessite un peu de connaissances techniques.<br><br>Si vous avez des questions, faites une capture d'écran du dialogue qui s'ouvre après avoir fermé ceci et demandez de l'aide dans le canal de votre système sur le discord Foundry."
+        "Content": "<p><strong>Ce système n'est pas pris en charge.</strong></p><p>Cela signifie que le module ne sait pas comment traiter au mieux les éléments de ce système, mais qu'il peut encore fonctionner de manière limitée.</p><p>Vous pouvez configurer les paramètres du module vous-même, mais cela nécessite un peu de connaissances techniques.</p><p>Si vous avez des questions, faites une capture d'écran du dialogue qui s'ouvre après avoir fermé ceci et demandez de l'aide dans le canal de votre système sur le discord Foundry.</p>"
       },
       "SystemFound": {
         "Title": "Système reconnu",
@@ -578,7 +578,7 @@
           "DisableNormalCost": "Désactiver le coût normal",
           "DisableNormalCostExplanation": "Si activé, cet objet ne peut pas être acheté avec des devises et doit être acheté avec une des options d'achat ci-dessous.",
           "PurchaseOptions": "Options d'achat",
-          "PurchaseOptionsExplanation": "Ici, vous pouvez configurer des coûts alternatifs pour cet objet. Chaque groupe représente une façon différente pour un PJ de se procurer l'objet",
+          "PurchaseOptionsExplanation": "Ici, vous pouvez configurer des moyens alternatifs d'acheter cet objet. Chaque groupe représente une manière différente pour un PJ d'acheter cet objet auprès de marchands.",
           "CantBeSoldToMerchants": "Ne peut être vendu à un Marchand",
           "CantBeSoldToMerchantsExplanation": "Si activé, cet objet ne peut être revendu à un marchand, seulement acheté.",
           "AddPurchaseOption": "Ajouter une option d'achat",
@@ -837,7 +837,7 @@
         "Submit": "Soumettre les modificateurs de prix",
         "TitleActor": "Éditeur de modificateurs de prix de type d'objets : {actor_name}",
         "Explanation": "Ici, vous pouvez définir le prix et les modificateurs de prix de vente pour ce marchand concernant des types d'objets spécifiques. Le paramètre \"Remplacer\" signifie qu'il remplace les modificateurs de prix normaux du marchand.",
-        "Title": "Éditeur de modificateurs de prix des piles d'objets"
+        "Title": "Éditeur de modificateurs de prix de type d'objet"
       },
       "PriceModifiersEditor": {
         "DragDrop": "Glissez/Déplacez un acteur pour l'ajouter à la liste",
@@ -846,7 +846,7 @@
         "Submit": "Soumettre les modificateurs de prix",
         "Explanation": "Ici, vous pouvez définir le prix et vendre des modificateurs de prix pour ce marchand concernant des acteurs spécifiques. Le paramètre \"Remplacer\" signifie qu'il remplace les modificateurs de prix normaux du marchand, y compris les modificateurs de prix spécifiques au type d'objet.",
         "TitleActor": "Éditeur des modificateurs de prix des piles d'objets : {actor_name}",
-        "Title": "Éditeur de modificateurs de prix des piles d'objets"
+        "Title": "Éditeur de modificateurs de prix de piles d'objets"
       },
       "PricePresetEditor": {
         "Update": "Mise à jour des préréglages",
@@ -865,7 +865,7 @@
         "Title": "Retirer l'objet",
         "Header": "Vous retirez : {item_name}",
         "ContentMultipleQuantity": "Il y a {quantity} de cet objet, combien voulez-vous en retirer ?",
-        "Submit": "Retirer",
+        "Submit": "Retrancher",
         "Content": "Voulez-vous retirer cet objet de \"{target_name}\" ?"
       },
       "DepositCurrencies": {
@@ -878,14 +878,14 @@
         "Title": "Retirer l'objet",
         "NoCurrency": "Il n'y a pas de devises à retirer.",
         "Content": "Vous pouvez retirer les devises suivantes de ce coffre-fort :",
-        "Submit": "Retirer"
+        "Submit": "Retrancher"
       },
       "VaultAccessEditor": {
         "Title": "Éditeur d'accès au coffre-fort",
         "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les devises du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
         "TitleActor": "Éditeur d'accès au coffre : {actor_name}",
         "View": "Voir",
-        "Withdraw": "Retirer",
+        "Withdraw": "Retrancher",
         "Deposit": "Dépôt",
         "Character": "Joueur/Personnage",
         "Organize": "Organiser"
@@ -1126,7 +1126,7 @@
       "TransactionNoGMConnected": "Aucun MJ n'est connecté - la transaction en cours a été annulée, rien n'a été ajouté, supprimé ou transféré.",
       "VaultInvalidItemDropped": "Vous ne pouvez pas déposer ce type d'objet dans cette réserve !",
       "VaultSameItemOrigin": "Vous ne pouvez pas déposer d'objets dans la réserve qui proviennent de la réserve !",
-      "CantSortVault": "Échec du tri des éléments - soit il y a trop d'éléments, soit il y a eu un problème.",
+      "CantSortVault": "Échec du tri des objets - soit il y a trop d'objets, soit il y a eu un problème.",
       "VaultNoGmItemSidebar": "Seuls les MJ peuvent déposer des objets à partir de la barre latérale !"
     },
     "HeaderButtons": {
@@ -1145,7 +1145,7 @@
       "CapacityFull": "Ce coffre-fort a atteint sa capacité maximale de {total_capacity}",
       "ExpandsCols": "{cols} colonnes",
       "ExpandsRows": "{rows} lignes",
-      "Withdraw": "Retirer",
+      "Withdraw": "Retrancher",
       "Deposit": "Dépôt",
       "LogUserActor": "{actor_name} ({user_name})",
       "Deposited": "a déposé",
