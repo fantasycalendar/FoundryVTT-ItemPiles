@@ -9,7 +9,7 @@
       "GiveToCharacter": "Dar ao Personagem"
     },
     "Hints": {
-      "CtrlClear": "Control + clique para limpar"
+      "CtrlClear": "Control + Clique para limpar"
     },
     "PlayerList": {
       "TradeButton": "Trocar"
@@ -956,9 +956,6 @@
         "Hint": "Título da pasta para filtrar tabelas de rolagem da aba \"Itens Populares\" no comerciante.",
         "AllTables": "Todas as Tabelas"
       }
-    },
-    "Hints": {
-      "CtrlClear": "Control + Clique para limpar"
     }
   }
 }
