@@ -6,6 +6,7 @@
 	import SETTINGS from "../../../constants/settings.js";
 	import { ApplicationShell } from "#runtime/svelte/component/application";
 	import { get, writable } from "svelte/store";
+	import PropertyPathInput from "../../components/PropertyPathInput.svelte";
 
 	const { application } = getContext('#external');
 
@@ -57,7 +58,9 @@
 			</tr>
 			{#each $itemFilters as { path, filters }, index (index)}
 				<tr>
-					<td><input type="text" required placeholder="type" bind:value="{path}"/></td>
+					<td>
+						<PropertyPathInput placeholder="type" required templateType="Item" bind:value={path}/>
+					</td>
 					<td><input type="text" required placeholder="class, spell, feat" bind:value="{filters}"/></td>
 					<td class="custom-small">
 						<button type="button" on:click={remove(index)}><i class="fas fa-times"></i></button>

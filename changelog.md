@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 3.2.16
+
+- Tweaked the item similarities setting to have the values `name` and `type` by default
+- Tweaked the item filters setting to have suggestions when configuring it
+- Tweaked item quantity property and item price property settings to have suggestions when configuring them
+- Updated Italian, Portuguese (Brazil), and French localization (thank you GregoryWarn, and rectulo on Weblate!)
+- Fixed switching item pile type on actors would cause the default actor sheet to render in addition to item piles' sheet
+
 ## Version 3.2.15
 
 - Fixed `SHEET_OVERRIDES` not being called due to being called before system configuration modules had a chance to register to Item Piles

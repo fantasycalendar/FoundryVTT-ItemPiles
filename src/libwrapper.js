@@ -45,7 +45,7 @@ export default function registerLibwrappers() {
 
 	libWrapper.register(CONSTANTS.MODULE_NAME, actorSheetOverride, function (wrapped, forced, options, ...args) {
 		const renderItemPileInterface = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_SHEET, this.document, forced, options) === false;
-		if (this._state > Application.RENDER_STATES.NONE) {
+		if (this.state > Application.RENDER_STATES.NONE) {
 			if (renderItemPileInterface) {
 				wrapped(forced, options, ...args)
 			} else {

@@ -105,7 +105,12 @@
 					promises.push(app.close());
 				}
 
+				console.log("pre promises", promises);
+
 				await Promise.allSettled(promises);
+
+
+				console.log("post promises", promises);
 				if (data.enabled) {
 					if (pileActor?.sheet) {
 						pileActor.sheet._state = 2;

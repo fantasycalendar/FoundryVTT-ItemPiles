@@ -5,6 +5,8 @@
 	export let value = "";
 	export let templateType;
 	export let required = false;
+	export let disabled = false;
+	export let placeholder = "";
 
 	const id = "property-list-" + foundry.utils.randomID();
 
@@ -41,7 +43,7 @@
 
 </script>
 
-<input bind:value list={id} required={required} type="text"/>
+<input bind:value list={id} required={required} placeholder={placeholder} disabled={disabled} type="text"/>
 <datalist id={id}>
 	{#each suggestions as suggestion}
 		<option>{suggestion}</option>
