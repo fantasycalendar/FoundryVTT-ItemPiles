@@ -2048,7 +2048,7 @@ export default class PrivateAPI {
 					return;
 				}
 				if (!options?.skipQuantityDialog) {
-					dropData.itemData.quantity = await DropItemDialog.show(item, dropData.target.actor, {
+					dropData.itemData.quantity = await DropItemDialog.show(item, targetActor, {
 						localizationTitle: "GiveItem"
 					});
 				} else if (!dropData.itemData.quantity) {
@@ -2065,7 +2065,7 @@ export default class PrivateAPI {
 				return;
 			}
 
-			if ((!user || !user?.active || user === game.user) && game.user.isGM) {
+			if ((!user || !user?.active || user === game.user) && sourceActor.isOwner && targetActor.isOwner) {
 				if (sourceActor) {
 					Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
 						source_actor_name: sourceActor.name, target_actor_name: targetActor.name, item_name: item.name

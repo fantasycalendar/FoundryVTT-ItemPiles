@@ -35,6 +35,10 @@ export default class MerchantStore extends ItemPileStore {
 		this.logSearch = writable("");
 	}
 
+	get userHasAuthority() {
+		return game.user.isGM || this.actor.isOwner;
+	}
+
 	get ItemClass() {
 		return PileMerchantItem;
 	}
@@ -344,7 +348,11 @@ export default class MerchantStore extends ItemPileStore {
 
 				const action = localize("ITEM-PILES.Merchant." + (log.sold ? "LogSold" : "LogBought"));
 
-				log.text = localize("ITEM-PILES.Merchant.LogTransaction", {
+				const localization = log.price
+					? "ITEM-PILES.Merchant.LogTransaction"
+					: "ITEM-PILES.Merchant.LogFreeTransaction";
+
+				log.text = localize(localization, {
 					instigator, quantity, item: `<strong>${log.item}</strong>`, action: `<span>${action}</span>`, price: log.price
 				});
 
@@ -380,7 +388,6 @@ export default class MerchantStore extends ItemPileStore {
 			return logs;
 		})
 	}
-
 }
 
 class PileMerchantItem extends PileItem {

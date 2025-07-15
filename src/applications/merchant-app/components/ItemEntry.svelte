@@ -33,7 +33,7 @@
 	<div class="item-piles-name item-piles-text">
 		<div class="item-piles-name-container">
 			<span style="color: {$itemRarityColor || 'inherit'};">
-				{#if $pileData.canInspectItems || game.user.isGM}
+				{#if $pileData.canInspectItems || store.userHasAuthority}
 					<a class="item-piles-clickable" on:click={() => { item.preview() }}>
 						{itemName}
 					</a>

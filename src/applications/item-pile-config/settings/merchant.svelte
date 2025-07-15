@@ -10,6 +10,10 @@
 	import { TJSDialog } from "#runtime/svelte/application";
 	import CustomDialog from "../../components/CustomDialog.svelte";
 	import * as PileUtilities from "../../../helpers/pile-utilities.js";
+	import PriceList from "../../components/PriceList.svelte";
+	import { getActorLogText } from "../../../helpers/pile-utilities.js";
+	import { downloadText } from "../../../helpers/helpers.js";
+	import * as Helpers from "../../../helpers/helpers.js";
 
 	export let pileData;
 	export let pileActor;
@@ -99,6 +103,14 @@
 		});
 		if (!doThing) return;
 		return PileUtilities.clearActorLog(pileActor);
+	}
+
+	function exportLog() {
+		const logs = PileUtilities.getActorLogText(pileActor);
+		if (!logs) {
+			return Helpers.custom_warning(localize("ITEM-PILES.Warnings.LogEmpty", { actor_name: pileActor.name }), true);
+		}
+		Helpers.downloadText(logs, `${pileActor.name}-merchant-log.txt`)
 	}
 
 </script>
@@ -200,12 +212,22 @@
 </div>
 
 <div class="form-group">
-	<label style="flex:4;">
+	<label style="flex:3.5;">
 		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClearMerchantLog")}</span>
 		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClearMerchantLogExplanation")}</p>
 	</label>
-	<button on:click={() => clearLog()} style="flex:2;" type="button">
+	<button on:click={() => clearLog()} style="flex:2.5;" type="button">
 		{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ClearMerchantLog")}
+	</button>
+</div>
+
+<div class="form-group">
+	<label style="flex:3.5;">
+		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ExportMerchantLog")}</span>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ExportMerchantLogExplanation")}</p>
+	</label>
+	<button on:click={() => exportLog()} style="flex:2.5;" type="button">
+		{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ExportMerchantLog")}
 	</button>
 </div>
 
@@ -460,6 +482,30 @@
 		</div>
 	</div>
 
+{/if}
+
+<div class="form-group">
+	<label style="flex:4;">
+		{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OverheadCostOptions")}<br>
+		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.OverheadCostOptionsExplanation")}</p>
+	</label>
+
+	<button type="button" on:click={() => {
+		pileData.overheadCost.push([]);
+		pileData.overheadCost = pileData.overheadCost;
+	}}>
+		<i class="fas fa-plus"></i>
+		{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.AddOverheadCostOption")}
+	</button>
+</div>
+
+{#if pileData.overheadCost.length}
+	{#each pileData.overheadCost as prices, groupIndex (groupIndex)}
+		<PriceList parentFlags={pileData} bind:prices={prices} options={{ showFixed: false, showPercent: false }} remove={() => {
+			pileData.overheadCost.splice(groupIndex, 1);
+			pileData.overheadCost = pileData.overheadCost;
+		}}/>
+	{/each}
 {/if}
 
 

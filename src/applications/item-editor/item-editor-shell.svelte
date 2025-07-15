@@ -24,6 +24,8 @@
 
 	let currentCustomCategories = writable(Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES))));
 
+	let parentFlags = item.parent ? PileUtilities.getActorFlagData(item.parent) : {};
+
 	const flagDataStore = store.data;
 	let price = store.price;
 	let quantityForPrice = store.quantityForPrice;
@@ -284,7 +286,7 @@
 
 					{#if itemFlagData.prices.length}
 						{#each itemFlagData.prices as prices, groupIndex (groupIndex)}
-							<PriceList {item} bind:prices={prices} remove={() => { store.removePurchaseGroup(groupIndex) }}/>
+							<PriceList {parentFlags} bind:prices={prices} remove={() => { store.removePurchaseGroup(groupIndex) }}/>
 						{/each}
 					{/if}
 
@@ -302,7 +304,26 @@
 
 					{#if itemFlagData.sellPrices.length}
 						{#each itemFlagData.sellPrices as prices, groupIndex (groupIndex)}
-							<PriceList {item} bind:prices={prices} remove={() => { store.removeSellGroup(groupIndex) }}/>
+							<PriceList {parentFlags} bind:prices={prices} remove={() => { store.removeSellGroup(groupIndex) }}/>
+						{/each}
+					{/if}
+
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.OverheadCostOptions")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.OverheadCostOptionsExplanation")}</p>
+						</label>
+
+						<button type="button" on:click={() => { store.addOverheadCostGroup() }}>
+							<i class="fas fa-plus"></i>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.AddOverheadCostOption")}
+						</button>
+					</div>
+
+					{#if itemFlagData.overheadCost.length}
+						{#each itemFlagData.overheadCost as prices, groupIndex (groupIndex)}
+							<PriceList {parentFlags} bind:prices={prices}
+							           remove={() => { store.removeOverheadCostGroup(groupIndex) }}/>
 						{/each}
 					{/if}
 

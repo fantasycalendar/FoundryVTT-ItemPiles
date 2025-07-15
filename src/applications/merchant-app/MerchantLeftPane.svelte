@@ -23,12 +23,12 @@
 			{
 				value: 'description',
 				label: `ITEM-PILES.Merchant.Description`,
-				hidden: !game.user.isGM && !description
+				hidden: !store.userHasAuthority && !description
 			},
 			{
 				value: 'settings',
 				label: `ITEM-PILES.Merchant.Settings`,
-				hidden: !game.user.isGM
+				hidden: !store.userHasAuthority
 			},
 		];
 		activeSidebarTab = activeSidebarTab || tabs.find(tab => !tab.hidden)?.value;
@@ -64,10 +64,10 @@
 				<div class="tab merchant-description" style="padding:0;">
 					<TJSProseMirror
 						content={description}
-						options={{ editable: false, secrets: game.user.isGM }}
+						options={{ editable: false, secrets: store.userHasAuthority }}
 						style={{"display": "block"}}
 					/>
-					{#if game.user.isGM}
+					{#if store.userHasAuthority}
 						<button type="button"
 						        style="flex:1;"
 						        on:click={() => { showDescriptionEditor() }}

@@ -2,11 +2,16 @@
 
 ## Version 3.2.16
 
+- Added overhead cost to merchants & items - this adds a flat cost on every item sold from the merchant
+- Added buttons for exporting merchant logs to the merchant interface & settings
+- Updated Italian, Portuguese (Brazil), and French localization (thank you GregoryWarn, and rectulo on Weblate!)
+- Tweaked some English localization
 - Tweaked the item similarities setting to have the values `name` and `type` by default
 - Tweaked the item filters setting to have suggestions when configuring it
 - Tweaked item quantity property and item price property settings to have suggestions when configuring them
-- Updated Italian, Portuguese (Brazil), and French localization (thank you GregoryWarn, and rectulo on Weblate!)
+- Tweaked merchants to allow owners (not just GMs) to open and close the merchants
 - Fixed switching item pile type on actors would cause the default actor sheet to render in addition to item piles' sheet
+- Fixed GMs selecting a token then shift double-clicking on an item pile not impersonating the token actor in the item pile's interface
 
 ## Version 3.2.15
 

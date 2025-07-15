@@ -781,6 +781,7 @@
     height: calc(100% - 70px);
     max-height: calc(100% - 70px);
     overflow-y: auto;
+    overflow-x: hidden;
 
     .item-piles-tab {
       padding: 0.25rem;

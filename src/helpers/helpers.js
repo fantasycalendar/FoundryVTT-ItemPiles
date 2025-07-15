@@ -381,3 +381,45 @@ export function deprecate(target, method, message) {
 		}
 	});
 }
+
+export function downloadText(text, filename) {
+	const a = document.createElement("a");
+	const file = new Blob([text], { type: "text/json" });
+	const url = URL.createObjectURL(file)
+	a.href = url;
+	a.download = filename;
+	a.click();
+	a.remove();
+	URL.revokeObjectURL(url);
+}
+
+export function uploadJSON() {
+	return new Promise((resolve, reject) => {
+		const input = document.createElement('input');
+		input.type = 'file';
+
+		input.onchange = e => {
+
+			input.remove();
+
+			// getting a hold of the file reference
+			const file = e.target.files[0];
+
+			const reader = new FileReader();
+			reader.addEventListener('load', async () => {
+				try {
+					const loadedData = JSON.parse(reader.result);
+					resolve(loadedData)
+				} catch (err) {
+					console.error(err);
+					reject(err);
+				}
+			});
+
+			reader.readAsText(file);
+
+		}
+
+		input.click();
+	})
+}

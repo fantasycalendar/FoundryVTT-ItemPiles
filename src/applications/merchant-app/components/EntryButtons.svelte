@@ -5,48 +5,53 @@
 
 	export let item;
 
-	const itemName = item.name;
-	const itemImage = item.img;
 	const quantity = item.quantity;
 	const store = item.store;
 	const isMerchant = store.isMerchant;
 
 	const itemFlagDataStore = item.itemFlagData;
 
-	const displayControlButtons = item.store.actor.isOwner;
-	const displayBuyButton = !!item.store.recipient;
+	const hasRecipient = !!item.store.recipient;
 
 </script>
 
 <div class="item-piles-flexrow sidebar-buttons">
-	{#if displayControlButtons && isMerchant}
+	{#if store.userHasAuthority && isMerchant}
 		{#if game.user.isGM}
         <span class="item-piles-clickable-link" on:click={() => { ItemEditor.show(item.item); }}>
           <i class="fas fa-cog"></i>
         </span>
 		{/if}
 		<span class="item-piles-clickable-link"
+		      data-tooltip="{localize('ITEM-PILES.Merchant.' + ($itemFlagDataStore.hidden ? 'SetVisible' : 'SetHidden'))}"
 		      on:click={() => { item.toggleProperty("hidden"); }}>
         <i class="fas" class:fa-eye={!$itemFlagDataStore.hidden} class:fa-eye-slash={$itemFlagDataStore.hidden}></i>
       </span>
 		<span class="item-piles-clickable-link"
+		      data-tooltip="{localize('ITEM-PILES.Merchant.' + ($itemFlagDataStore.notForSale ? 'SetForSale' : 'SetNotForSale'))}"
 		      on:click={() => { item.toggleProperty("notForSale"); }}>
         <i class="fas" class:fa-store={!$itemFlagDataStore.notForSale}
            class:fa-store-slash={$itemFlagDataStore.notForSale}></i>
       </span>
+		{#if store.recipient}
+		<span class="item-piles-clickable-link" data-tooltip="{localize('ITEM-PILES.Inspect.Take')}"
+		      on:click={() => { item.take(); }}>
+        <i class="fas fa-hand"></i>
+    </span>
+		{/if}
 	{/if}
-	{#if displayBuyButton}
+	{#if hasRecipient}
 		{#if isMerchant}
       <span
-	      class:item-piles-clickable-link={!$itemFlagDataStore.notForSale || game.user.isGM}
-	      class:item-piles-clickable-link-disabled={$quantity <= 0 || ($itemFlagDataStore.notForSale && !game.user.isGM)}
-	      class:buy-button={displayControlButtons}
+	      class:item-piles-clickable-link={!$itemFlagDataStore.notForSale || store.userHasAuthority}
+	      class:item-piles-clickable-link-disabled={$quantity <= 0 || ($itemFlagDataStore.notForSale && !store.userHasAuthority)}
+	      class:buy-button={store.userHasAuthority}
 	      on:click={() => {
-              if($quantity <= 0 || ($itemFlagDataStore.notForSale && !game.user.isGM)) return;
+              if($quantity <= 0 || ($itemFlagDataStore.notForSale && !store.userHasAuthority)) return;
               store.tradeItem(item)
             }}>
         <i class="fas fa-shopping-cart"></i>
-	      {#if !displayControlButtons} {localize("ITEM-PILES.Merchant.Buy")}{/if}
+	      {#if !store.userHasAuthority || hasRecipient} {localize("ITEM-PILES.Merchant.Buy")}{/if}
       </span>
 		{:else}
       <span

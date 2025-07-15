@@ -33,7 +33,7 @@
         {localize("ITEM-PILES.Merchant.OpenTimes")}
       </span>
 			<span style="font-style: italic;">
-        {#if game.user.isGM}
+        {#if store.userHasAuthority}
           {#if aboutTimeEnabled && $pileDataStore.openTimes.status !== "auto"}
           <a class="item-piles-right-divider" on:click={() => { store.setOpenStatus("auto"); }}>
             <i class="fas fa-clock"></i>
@@ -47,7 +47,7 @@
         {/if}
 				{openTimeText}
       </span>
-		{:else if game.user.isGM}
+		{:else if store.userHasAuthority}
 			<a style="flex:0;" on:click={() => { store.setOpenStatus($closed ? "open" : "closed"); }}>
 				<i class="fas" class:fa-door-open={!$closed} class:fa-door-closed={$closed}></i>
 				{localize(`ITEM-PILES.Merchant.${!$closed ? "Open" : "Closed"}`)}

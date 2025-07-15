@@ -8,24 +8,24 @@
 	import { getSetting } from "../../helpers/helpers.js";
 	import * as Utilities from "../../helpers/utilities.js";
 	import SETTINGS from "../../constants/settings.js";
-	import { getActorFlagData } from "../../helpers/pile-utilities.js";
 	import * as CompendiumUtilities from "../../helpers/compendium-utilities.js";
 
 	export let prices;
-	export let item;
+	export let parentFlags = {};
 	export let remove = false;
 	export let presets = true;
+	export let options = {
+		showFixed: true,
+		showPercent: true,
+	};
 
 	let currencies = getSetting(SETTINGS.CURRENCIES);
 	let secondaryCurrencies = getSetting(SETTINGS.SECONDARY_CURRENCIES);
-	if (item?.parent) {
-		const flags = getActorFlagData(item?.parent)
-		if (flags.overrideCurrencies) {
-			currencies = flags.overrideCurrencies;
-		}
-		if (flags.overrideSecondaryCurrencies) {
-			secondaryCurrencies = flags.overrideSecondaryCurrencies;
-		}
+	if (parentFlags.overrideCurrencies?.length) {
+		currencies = parentFlags.overrideCurrencies;
+	}
+	if (parentFlags.overrideSecondaryCurrencies?.length) {
+		secondaryCurrencies = parentFlags.overrideSecondaryCurrencies;
 	}
 
 	let presetPrices = currencies
@@ -160,17 +160,23 @@
 		if ((e.key === "Enter" || e.key === " ") && dragDisabled) dragDisabled = false;
 	}
 
+	let columnStyle = `grid-template-columns: 28px 1.1fr ${options.showFixed ? "35px" : ""} ${options.showPercent ? "28px" : ""} 28px 0.5fr 60px 1fr 28px;`
+
 </script>
 
 
 <DropZone bind:isHovering={isHovering} callback={dropData}>
 	<div class="table-container item-piles-top-divider">
-		<div class="item-piles-sortable-list-columns header">
+		<div class="item-piles-sortable-list-columns header" style={columnStyle}>
 			<div></div>
 			<div>{localize("ITEM-PILES.General.Name")}</div>
 			<div>{localize("ITEM-PILES.General.Cost")}</div>
-			<div>{localize("ITEM-PILES.General.Fixed")}</div>
-			<div>%</div>
+			{#if options.showFixed}
+				<div>{localize("ITEM-PILES.General.Fixed")}</div>
+			{/if}
+			{#if options.showPercent}
+				<div>%</div>
+			{/if}
 			<div>{localize("ITEM-PILES.General.Short")}</div>
 			<div>{localize("ITEM-PILES.General.Icon")}</div>
 			<div>{localize("ITEM-PILES.General.Data")}</div>
@@ -190,7 +196,7 @@
 			{/if}
 			{#each prices as price, index (price.id)}
 				<div class="item-piles-sortable-list-columns item-piles-sortable-list-entry item-piles-even-color"
-				     animate:flip="{{ duration: flipDurationMs }}">
+				     animate:flip="{{ duration: flipDurationMs }}" style={columnStyle}>
 					<div tabIndex={dragDisabled? 0 : -1}
 					     aria-label="drag-handle"
 					     style={dragDisabled ? 'cursor: grab' : 'cursor: grabbing'}
@@ -200,9 +206,13 @@
 					><i class="fas fa-bars"></i></div>
 					<div><input type="text" bind:value={price.name}/></div>
 					<div><input type="number" bind:value={price.quantity}/></div>
-					<div><input type="checkbox" bind:checked={price.fixed} min="0"
-					            max="{price.percent ? 100 : 1000000000000000}"/></div>
-					<div><input type="checkbox" bind:checked={price.percent}/></div>
+					{#if options.showFixed}
+						<div><input type="checkbox" bind:checked={price.fixed} min="0"
+						            max="{price.percent ? 100 : 1000000000000000}"/></div>
+					{/if}
+					{#if options.showPercent}
+						<div><input type="checkbox" bind:checked={price.percent}/></div>
+					{/if}
 					<div><input type="text" bind:value={price.abbreviation}/></div>
 					<div>
 						<FilePicker type="imagevideo" showImage={true} showInput={false} bind:value={price.img}/>
@@ -253,7 +263,6 @@
   }
 
   .item-piles-sortable-list-columns {
-    grid-template-columns: 28px 1.1fr 35px 28px 28px 0.5fr 60px 1fr 28px;
     min-height: 30px;
   }
 

@@ -1286,12 +1286,21 @@ export function getPriceData({
 
 	}
 
-	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice));
-	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0 || itemFlagData.sellPrices.filter(priceGroup => priceGroup.length).length > 0;
-
 	const currencyList = getCurrencyList(merchant);
 	const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
 	const defaultCurrencies = currencies.filter(currency => !currency.secondary);
+
+	let overheadCost = [];
+	if (sellerFlagData.overheadCost?.length) {
+		overheadCost = overheadCost.concat(getItemFlagPriceData(sellerFlagData.overheadCost, quantity, modifier, defaultCurrencies, currencyList));
+	}
+
+	if (itemFlagData.overheadCost?.length) {
+		overheadCost = overheadCost.concat(getItemFlagPriceData(itemFlagData.overheadCost, quantity, modifier, defaultCurrencies, currencyList));
+	}
+
+	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice));
+	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0 || itemFlagData.sellPrices.filter(priceGroup => priceGroup.length).length > 0 || overheadCost.length > 0;
 
 	// In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
 	// to it, in order have a stable form of exchange calculation
@@ -1319,8 +1328,10 @@ export function getPriceData({
 	// If the item does include its normal cost, we calculate that here
 	if (overallCost >= smallestExchangeRate && !disableNormalCost) {
 
+		let extraCost = overheadCost.map(price => price.totalCost).reduce((acc, cost) => acc + cost, 0);
+
 		// Base prices is the displayed price, without quantity taken into account
-		const baseCost = Helpers.roundToDecimals(overallCost * modifier, decimals);
+		const baseCost = Helpers.roundToDecimals((overallCost + extraCost) * modifier, decimals);
 		const basePrices = getPriceArray(baseCost, defaultCurrencies);
 
 		// Prices is the cost with the amount of quantity taken into account, which may change the number of the different
@@ -1412,6 +1423,48 @@ export function getPriceData({
 
 	if (itemFlagData.sellPrices.length && merchant === buyer && !buyerFlagData.onlyAcceptBasePrice) {
 		priceData = priceData.concat(getItemFlagPriceData(itemFlagData.sellPrices, quantity, modifier, defaultCurrencies, currencyList));
+	}
+
+	const overheadCostPrices = overheadCost.filter(price => price?.prices?.length)
+		.map(price => price.prices.filter(subPrice => subPrice.secondary)).flat()
+		.reduce((acc, price) => {
+			const index = acc.findIndex(p => p.name === price.name && p.img === price.img && (p?.data?.uuid === price?.data?.uuid || p?.data?.path === price?.data?.path));
+			if (index === -1) {
+				acc.push(price);
+			} else {
+				acc[index].baseCost += price.baseCost;
+				acc[index].cost += price.cost;
+			}
+			return acc;
+		}, [])
+		.map(price => ({
+			...price,
+			string: price.abbreviation.replace("{#}", price.cost),
+		}));
+
+	for (const price of priceData) {
+		price.basePrices = price.basePrices.concat(overheadCostPrices).reduce((acc, price) => {
+			const index = acc.findIndex(p => p.name === price.name && p.img === price.img && (p?.data?.uuid === price?.data?.uuid || p?.data?.path === price?.data?.path));
+			if (index === -1) {
+				acc.push(price);
+			} else {
+				acc[index].baseCost += price.baseCost;
+				acc[index].cost += price.cost;
+			}
+			return acc;
+		}, []);
+		price.prices = price.prices.concat(overheadCostPrices).reduce((acc, price) => {
+			const index = acc.findIndex(p => p.name === price.name && p.img === price.img && (p?.data?.uuid === price?.data?.uuid || p?.data?.path === price?.data?.path));
+			if (index === -1) {
+				acc.push(price);
+			} else {
+				acc[index].baseCost += price.baseCost;
+				acc[index].cost += price.cost;
+			}
+			return acc;
+		}, []);
+		price.basePriceString = price.basePrices.filter(price => price.cost).map(price => price.string).join(" ");
+		price.priceString = price.prices.filter(price => price.cost).map(price => price.string).join(" ");
 	}
 
 	// If there's a buyer, we also calculate how many of the item the buyer can afford
@@ -1565,11 +1618,10 @@ export function getPaymentData({
 
 			priceData.reasons = [];
 
-			if (!priceGroup.maxQuantity && (buyer || seller)) {
+			if (!priceGroup.maxQuantity && (buyer || seller) && priceData.canBuy) {
 				priceData.canBuy = false;
 				const reason = (buyer === merchant ? "TheyCantAfford" : "YouCantAfford");
 				priceData.reason.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
-				return priceData;
 			}
 
 			const primaryPrices = priceGroup.prices.filter(price => !price.secondary && price.cost);
@@ -1601,7 +1653,7 @@ export function getPaymentData({
 					existingPrice.quantity += price.cost;
 					existingPrice.buyerQuantity -= price.cost;
 
-					if (existingPrice.buyerQuantity < 0) {
+					if (existingPrice.buyerQuantity < 0 && priceData.canBuy) {
 						priceData.canBuy = false;
 						const reason = (buyer === merchant ? "TheyCantAfford" : "YouCantAfford");
 						priceData.reasons.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
@@ -1627,7 +1679,7 @@ export function getPaymentData({
 
 					const requiredQuantity = Math.floor(priceGroup.quantity * quantityPerPrice);
 
-					if (requiredQuantity > itemQuantity && requiredQuantity > (priceGroup.maxQuantity * quantityPerPrice)) {
+					if (priceData.canBuy && requiredQuantity > itemQuantity && requiredQuantity > (priceGroup.maxQuantity * quantityPerPrice)) {
 						priceData.canBuy = false;
 						const reason = buyer === merchant ? "You" : "They";
 						priceData.reasons.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}LackQuantity`, {
@@ -1655,10 +1707,23 @@ export function getPaymentData({
 			buyerReceive: [], buyerChange: [], sellerReceive: []
 		});
 
+	if (!paymentData.canBuy) {
+
+		paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost)
+			.filter(currency => !currency.secondary)
+			.concat(paymentData.otherPrices);
+
+		return {
+			...paymentData,
+			sellerReceive: paymentData.finalPrices,
+		};
+	}
+
 	if (paymentData.totalCurrencyCost && !seller && !buyer) {
 
 		paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost, recipientCurrencies)
-			.filter(currency => !currency.secondary);
+			.filter(currency => !currency.secondary)
+			.concat(paymentData.otherPrices);
 
 	} else if (paymentData.totalCurrencyCost) {
 
@@ -1674,9 +1739,7 @@ export function getPaymentData({
 		// Starting from the smallest currency increment in the price
 		for (let i = prices.length - 1, j = 0; i >= 0; i--, j++) {
 
-			const price = prices[inverse
-				? j
-				: i];
+			const price = prices[inverse ? j : i];
 
 			const buyerPrice = {
 				...price,
@@ -2212,6 +2275,19 @@ export async function updateVaultLog(itemPile, {
 
 export function getActorLog(actor) {
 	return foundry.utils.getProperty(Utilities.getActor(actor), CONSTANTS.FLAGS.LOG) || [];
+}
+
+export function getActorLogText(actor, data = false) {
+	if (!data) data = getActorLog(actor);
+	return data
+		.sort((a, b) => {
+			return b.date > a.date ? 1 : -1;
+		})
+		.map(log => {
+			const date = new Date(log.date);
+			return date.toLocaleString() + " - " + log.text.replace(/<[^>]*>/g, "");
+		})
+		.join("\n");
 }
 
 export function clearActorLog(actor) {

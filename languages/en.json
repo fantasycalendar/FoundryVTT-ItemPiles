@@ -62,7 +62,8 @@
       "DroppedIsNotItem": "You can't drop documents of type \"{type}\" into this item pile!",
       "VaultInvalidItemDropped": "You cannot drop this type of item into this vault!",
       "VaultSameItemOrigin": "You can't drop items into the vault that originate from the vault!",
-      "VaultNoGmItemSidebar": "Only GMs can drop items from the sidebar!"
+      "VaultNoGmItemSidebar": "Only GMs can drop items from the sidebar!",
+      "LogEmpty": "The log for \"{actor_name}\" is empty and has nothing to export"
     },
     "Inspect": {
       "Title": "Inspecting Pile Contents",
@@ -191,7 +192,7 @@
       "TableTimesToRoll": "Times to roll on table:",
       "TableCustomCategory": "Add items to custom category:",
       "Log": "Activity Log",
-      "LogSearch": "Log Search:",
+      "LogSearch": "Search log:",
       "LogUserActor": "{actor_name} ({user_name})",
       "LogBought": "bought",
       "LogSold": "sold",
@@ -201,7 +202,12 @@
       "LogSetNotForSale": "{instigator} set <strong>{item}</strong> <span>not for sale</span",
       "LogSetVisible": "{instigator} set <strong>{item}</strong> to <span>visible</span",
       "LogSetHidden": "{instigator} set <strong>{item}</strong> to <span>hidden</span",
-      "LogTransaction": "{instigator} {action} {quantity}{item} for {price}"
+      "LogTransaction": "{instigator} {action} {quantity}{item} for {price}",
+      "LogFreeTransaction": "{instigator} {action} {quantity}{item} for free",
+      "SetNotForSale": "Set not for sale",
+      "SetForSale": "Set for sale",
+      "SetHidden": "Hide",
+      "SetVisible": "Show"
     },
     "Vault": {
       "VaultTab": "Vault",
@@ -492,7 +498,10 @@
           "AddSellOption": "Add Selling Option",
           "DropMeClickMe": "Click to add an attribute or drag & drop an item to add",
           "PricePreset": "Or select a price preset:",
-          "SelectPreset": "Select price preset"
+          "SelectPreset": "Select price preset",
+          "AddOverheadCostOption": "Add Overhead Cost",
+          "OverheadCostOptions": "Overhead Cost Options",
+          "OverheadCostOptionsExplanation": "Here you can configure an overhead cost that is always added to the price of this item when a merchant sells it. This is affected by price modifiers."
         },
         "VaultTab": {
           "GridSize": "Grid Size",
@@ -721,7 +730,12 @@
           "LogMerchantActivity": "Log Merchant Activity",
           "LogMerchantActivityExplanation": "When enabled, this causes the merchant to log events such as buying and selling items, and GMs updating the status (quantity, visibility, and for sale) of items.",
           "ClearMerchantLog": "Clear Merchant Logs",
-          "ClearMerchantLogExplanation": "This will clear the merchant logs, removing all entries. This cannot be undone."
+          "ClearMerchantLogExplanation": "This will clear the merchant logs, removing all entries. This cannot be undone.",
+          "ExportMerchantLog": "Export Merchant Logs",
+          "ExportMerchantLogExplanation": "This will export and download a text file log of the logs, sorted in oldest to newest information.",
+          "AddOverheadCostOption": "Add Overhead Cost",
+          "OverheadCostOptions": "Overhead Cost Options",
+          "OverheadCostOptionsExplanation": "Here you can configure an overhead cost that is always added to the price of items when the merchant sells them. This is affected by price modifiers."
         },
         "Vault": {
           "Title": "Vault Settings",

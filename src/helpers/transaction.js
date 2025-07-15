@@ -212,7 +212,12 @@ export default class Transaction {
 		}).map(item => {
 			const flagData = PileUtilities.getItemFlagData(item);
 			Utilities.deleteProperty(item, CONSTANTS.FLAGS.ITEM);
-			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData));
+			const cleanFlagData = PileUtilities.cleanItemFlagData(flagData);
+			if (foundry.utils.hasProperty(cleanFlagData, "overheadCost")) {
+				delete cleanFlagData["overheadCost"];
+				cleanFlagData["-=overheadCost"] = null;
+			}
+			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, cleanFlagData);
 			return item;
 		});
 
@@ -233,7 +238,13 @@ export default class Transaction {
 			const existingFlagData = PileUtilities.getItemFlagData(item);
 			const newFlagData = this.itemFlagMap.get(id) ?? {};
 			Utilities.deleteProperty(item, CONSTANTS.FLAGS.ITEM);
-			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(existingFlagData, PileUtilities.cleanItemFlagData(newFlagData)));
+			const cleanFlagData = PileUtilities.cleanItemFlagData(newFlagData);
+			const mergedFlagData = foundry.utils.mergeObject(existingFlagData, cleanFlagData);
+			if (foundry.utils.hasProperty(mergedFlagData, "overheadCost")) {
+				delete mergedFlagData["overheadCost"];
+				mergedFlagData["-=overheadCost"] = null;
+			}
+			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, mergedFlagData);
 			const type = this.itemTypeMap.get(id);
 			Utilities.setItemQuantity(item, quantity, true);
 			return { item, quantity, type };

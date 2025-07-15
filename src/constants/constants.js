@@ -69,6 +69,7 @@ const CONSTANTS = {
 		customCategory: "",
 		prices: [],
 		sellPrices: [],
+		overheadCost: [],
 		buyPriceModifier: 1,
 		sellPriceModifier: 1,
 
@@ -224,6 +225,7 @@ const CONSTANTS = {
 		refreshItemsDays: [],
 		refreshItemsHolidays: [],
 		logMerchantActivity: false,
+		overheadCost: [],
 
 		// Vault settings
 		cols: 10,

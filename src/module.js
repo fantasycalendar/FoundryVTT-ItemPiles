@@ -2,7 +2,7 @@ import "./styles/styles.scss";
 
 import CONSTANTS from "./constants/constants.js";
 import registerUIOverrides from "./foundry-ui-overrides.js";
-import registerLibwrappers from "./libwrapper.js";
+import { registerLibwrappers, registerSystemLibwrappers } from "./libwrapper.js";
 import { applySystemSpecificStyles, checkSystem, patchCurrencySettings, registerSettings } from "./settings.js";
 import { registerHotkeysPost, registerHotkeysPre } from "./hotkeys.js";
 import Socket from "./socket.js";
@@ -35,6 +35,8 @@ Hooks.once("init", async () => {
 	registerUIOverrides();
 	setupCaches();
 	setupPlugins("init");
+
+	registerLibwrappers();
 
 	game.itempiles = {
 		API,
@@ -119,7 +121,7 @@ Hooks.once("ready", () => {
 
 		Hooks.callAll(CONSTANTS.HOOKS.READY);
 
-		registerLibwrappers();
+		registerSystemLibwrappers();
 
 		displayChatMessage();
 

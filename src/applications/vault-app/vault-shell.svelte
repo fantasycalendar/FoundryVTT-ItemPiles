@@ -128,7 +128,7 @@
 
 			if (gridData.canWithdrawItems) {
 				contextMenu.push({
-					icon: 'fas fa-hand', label: "Take", onPress: () => {
+					icon: 'fas fa-hand', label: localize('ITEM-PILES.Inspect.Take'), onPress: () => {
 						event.detail.item.item.take();
 					}
 				});
