@@ -24,10 +24,13 @@ import Transaction from "./helpers/transaction.js";
 import { SvelteApplication } from "#runtime/svelte/application";
 import { TJSPosition } from "#runtime/svelte/store/position";
 
-Hooks.once("init", async () => {
-
+Hooks.once('libWrapper.Ready', () => {
 	CONSTANTS.IS_V13 = foundry.utils.isNewerVersion(game.version, 13);
 	Object.freeze(CONSTANTS);
+	registerLibwrappers();
+})
+
+Hooks.once("init", async () => {
 
 	//CONFIG.debug.hooks = true;
 	registerSettings();
@@ -35,8 +38,6 @@ Hooks.once("init", async () => {
 	registerUIOverrides();
 	setupCaches();
 	setupPlugins("init");
-
-	registerLibwrappers();
 
 	game.itempiles = {
 		API,
