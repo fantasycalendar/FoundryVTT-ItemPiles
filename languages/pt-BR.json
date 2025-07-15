@@ -251,7 +251,7 @@
       },
       "NoSystemFound": {
         "Title": "Sistema Não Reconhecido",
-        "Content": "<strong>Este sistema não é suportado.</strong><br><br>Isso significa que o módulo não sabe como melhor lidar com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. <br><br>Se você tiver alguma dúvida, tire um print da cixa de diálogo que irá abrir após você fechar isto e peça por ajuda no canal do seu sistema no servidor do discord do Foundry."
+        "Content": "<p><strong></strong>Este sistema não é suportado.</strong></p><p>Isso significa que o módulo não sabe como melhor lidar com os itens deste sistema, mas ainda pode operar de forma limitada.</p><p>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. </p><p>Se você tiver alguma dúvida, tire um print da caixa de diálogo que irá abrir após você fechar isto e peça por ajuda no canal do seu sistema no servidor do discord do Foundry.</p>"
       },
       "NewSystemVersion": {
         "Title": "Nova Versão do Sistema",
