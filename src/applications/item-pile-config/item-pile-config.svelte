@@ -109,8 +109,7 @@
 
 				if (data.enabled) {
 					if (pileActor?.sheet) {
-						pileActor.sheet._state = 2;
-						pileActor.sheet.close();
+						pileActor.sheet.close({ force: true });
 					}
 					game.itempiles.API.renderItemPileInterface(pileActor);
 				} else if (!data.enabled && pileActor?.sheet) {
