@@ -462,7 +462,7 @@
       "CurrentServices": "Services actuels",
       "ClearAllServices": "Effacer les services sur tous les acteurs",
       "Log": "Journal d'activité",
-      "LogSearch": "Recherche de journal :",
+      "LogSearch": "Rechercher dans le journal :",
       "LogUserActor": "{actor_name} ({user_name})",
       "LogBought": "achetés",
       "LogSold": "vendu",
@@ -473,7 +473,12 @@
       "LogTransaction": "{instigator} {action} {quantity}{item} pour {price}",
       "LogSetQuantity": "{instigator} définit <strong>{item}</strong> <span>quantité</span> à {quantity}",
       "LogSetNotForSale": "{instigator} définit <strong>{item}</strong> <span>à ne pas vendre</span",
-      "SortBy": "Trier par :"
+      "SortBy": "Trier par :",
+      "LogFreeTransaction": "{instigator} {action} {quantity}{item} gratuitement",
+      "SetNotForSale": "Pas disponible à la vente",
+      "SetForSale": "Disponible à la vente",
+      "SetHidden": "Cacher",
+      "SetVisible": "Montrer"
     },
     "Applications": {
       "DropItem": {
@@ -589,7 +594,9 @@
           "SellOptionsExplanation": "Vous pouvez configurer ici les différentes façons de vendre cet objet. Chaque groupe représente une manière différente pour un personnage de vendre cet objet aux marchands.",
           "PurchaseOptionsAsSellOptionExplanation": "Lorsque cette option est activée, les options d'achat ci-dessous peuvent être utilisées lors de la revente de l'objet à un marchand. Par défaut, seules les options de vente ci-dessous peuvent être utilisées.",
           "SellOptions": "Options de vente",
-          "AddSellOption": "Ajouter une option de vente"
+          "AddSellOption": "Ajouter une option de vente",
+          "AddOverheadCostOption": "Ajouter les frais généraux",
+          "OverheadCostOptions": "Options de frais généraux"
         },
         "VaultTab": {
           "GridSize": "Taille d'une case",
@@ -1127,7 +1134,8 @@
       "VaultInvalidItemDropped": "Vous ne pouvez pas déposer ce type d'objet dans cette réserve !",
       "VaultSameItemOrigin": "Vous ne pouvez pas déposer d'objets dans la réserve qui proviennent de la réserve !",
       "CantSortVault": "Échec du tri des objets - soit il y a trop d'objets, soit il y a eu un problème.",
-      "VaultNoGmItemSidebar": "Seuls les MJ peuvent déposer des objets à partir de la barre latérale !"
+      "VaultNoGmItemSidebar": "Seuls les MJ peuvent déposer des objets à partir de la barre latérale !",
+      "LogEmpty": "Le journal concernant \"{actor_name}\" est vide et n'a rien à exporter"
     },
     "HeaderButtons": {
       "ShowToPlayers": "Montrer aux joueurs",
