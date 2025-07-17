@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 3.2.17
+
+- Fixed merchants throwing errors if an item had a price and no overhead cost
+- Added a quiet warning if updating settings after setting currencies to use items from a locked compendium instead of throwing error
+- Tweaked docs
+
 ## Version 3.2.16
 
 - Added overhead cost to merchants & items - this adds a flat cost on every item sold from the merchant
