@@ -62,7 +62,8 @@
       "DroppedIsNotItem": "Você não pode soltar documentos do tipo \"{type}\" nesta pilha de itens!",
       "VaultInvalidItemDropped": "Você não pode soltar este tipo de item neste cofre!",
       "VaultSameItemOrigin": "Você não pode soltar itens no cofre que se originam do próprio cofre!",
-      "VaultNoGmItemSidebar": "Apenas MJs podem soltar itens da barra lateral!"
+      "VaultNoGmItemSidebar": "Apenas MJs podem soltar itens da barra lateral!",
+      "LogEmpty": "O log para \"{actor_name}\" está vazio e não tem nada para exportar"
     },
     "Inspect": {
       "Title": "Inspecionando Conteúdo da Pilha",
@@ -201,7 +202,12 @@
       "LogSetNotForSale": "{instigator} definiu o <strong>{item}</strong> <span>não disponível para venda</span",
       "LogSetVisible": "{instigator} definiu o <strong>{item}</strong> como <span>visível</span",
       "LogSetHidden": "{instigator} definiu o <strong>{item}</strong> como <span>oculto</span",
-      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}"
+      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}",
+      "LogFreeTransaction": "{instigator} {action} {quantity}{item} de graça",
+      "SetNotForSale": "Não está à venda",
+      "SetForSale": "À venda",
+      "SetHidden": "Ocultar",
+      "SetVisible": "Exibir"
     },
     "Vault": {
       "VaultTab": "Cofre",
@@ -251,7 +257,7 @@
       },
       "NoSystemFound": {
         "Title": "Sistema Não Reconhecido",
-        "Content": "<strong>Este sistema não é suportado.</strong><br><br>Isso significa que o módulo não sabe como melhor lidar com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. <br><br>Se você tiver alguma dúvida, tire um print da cixa de diálogo que irá abrir após você fechar isto e peça por ajuda no canal do seu sistema no servidor do discord do Foundry."
+        "Content": "<p><strong></strong>Este sistema não é suportado.</strong></p><p>Isso significa que o módulo não sabe como melhor lidar com os itens deste sistema, mas ainda pode operar de forma limitada.</p><p>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. </p><p>Se você tiver alguma dúvida, tire um print da caixa de diálogo que irá abrir após você fechar isto e peça por ajuda no canal do seu sistema no servidor do discord do Foundry.</p>"
       },
       "NewSystemVersion": {
         "Title": "Nova Versão do Sistema",
@@ -492,7 +498,10 @@
           "AddSellOption": "Adicionar Opção de Venda",
           "DropMeClickMe": "Clique para adicionar um atributo ou arraste e solte um item para adicionar",
           "PricePreset": "Ou selecione um preço predefinido:",
-          "SelectPreset": "Selecione predefinição de preço"
+          "SelectPreset": "Selecione predefinição de preço",
+          "AddOverheadCostOption": "Adicionar Custos Indiretos",
+          "OverheadCostOptions": "Opções de Custos Indiretos",
+          "OverheadCostOptionsExplanation": "Aqui você pode configurar um custo indireto que será sempre adicionado ao preço deste item quando um comerciante o vender. Isso é afetado por modificadores de preço."
         },
         "VaultTab": {
           "GridSize": "Tamanho da Grade",
@@ -721,7 +730,12 @@
           "LogMerchantActivity": "Registrar Atividade do Comerciante",
           "LogMerchantActivityExplanation": "Quando ativado, isso faz com que o comerciante registre eventos como compra e venda de itens, e os MJs atualizem o status (quantidade, visibilidade e à venda) dos itens.",
           "ClearMerchantLog": "Limpar Registros",
-          "ClearMerchantLogExplanation": "Isso limpará os registros do comerciante, removendo todas as entradas. Isto não pode ser desfeito."
+          "ClearMerchantLogExplanation": "Isso limpará os registros do comerciante, removendo todas as entradas. Isto não pode ser desfeito.",
+          "ExportMerchantLog": "Exportar Registros do Comerciante",
+          "ExportMerchantLogExplanation": "Isso irá exportar e baixar um arquivo de texto com os registros, classificados das informações mais antigas para as mais recentes.",
+          "AddOverheadCostOption": "Adicionar Custos Indiretos",
+          "OverheadCostOptions": "Opções de Custos Indiretos",
+          "OverheadCostOptionsExplanation": "Aqui você pode configurar um custo indireto que é sempre adicionado ao preço dos itens quando o comerciante os vende. Isso é afetado pelos modificadores de preço."
         },
         "Vault": {
           "Title": "Configurações do Cofre",
