@@ -46,13 +46,9 @@ This module uses the [socketlib](https://github.com/manuelVo/foundryvtt-socketli
 
 This module uses the [libwrapper](https://github.com/ruipin/fvtt-lib-wrapper) library for wrapping core methods. It is a hard dependency, and it is recommended for the best experience and compatibility with other modules.
 
-## Optional Modules
-
-### Advanced Macros
-
-In Foundry v10, this module leverages the [Advanced Macros](https://github.com/League-of-Foundry-Developers/fvtt-advanced-macros) module so that any macros can use extra data provided by the Item Piles module. This is an optional install, but highly recommended.
-
 ## System Support
+
+### Adding Direct System Support
 
 Please see [contributing to Item Piles](contributing-to-item-piles.md#adding-system-support).
 
@@ -70,4 +66,4 @@ This package is under an [MIT](LICENSE) and the [Foundry Virtual Tabletop Limite
 - Otigon, Zhell, Gazkhan, and MrVauxs for their collective efforts surrounding macro evaluation and execution
 - Forgotten Adventures for their amazing chest sprites (not included in the module)
 - Caeora for their great maps and tokens (not included in this module)
-- The vaults feature were commissioned by TCR (The Cracked Realms) for their Westmeath server, as they are trying to create an MMORPG-feeling with DnD 5e.
+- The vaults feature was commissioned by TCR (The Cracked Realms) for their Westmeath server, as they are trying to create an MMORPG-feeling with DnD 5e.

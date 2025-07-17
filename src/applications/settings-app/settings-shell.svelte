@@ -62,10 +62,14 @@
 		for (const currency of currencies) {
 			if (!currency.data?.uuid) continue;
 			const actualItem = await fromUuid(currency.data?.uuid);
-			await actualItem.update({
-				name: currency.name,
-				img: currency.img
-			});
+			try {
+				await actualItem.update({
+					name: currency.name,
+					img: currency.img
+				});
+			} catch (err) {
+				console.warn(`Item Piles - Could not update currency ${currency.name} (${currency.data?.uuid}) - compendium is locked`);
+			}
 		}
 		application.close();
 	}

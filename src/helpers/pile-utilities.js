@@ -1207,6 +1207,7 @@ function getItemFlagPriceData(priceData, quantity, modifier, defaultCurrencies, 
 
 		return {
 			prices,
+			basePrices: getPriceArray(baseCost, defaultCurrencies),
 			baseCost,
 			totalCost,
 			priceString: prices.filter(price => price.string || price.priceString).map(price => price.string || price.priceString).join(" "),
