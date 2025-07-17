@@ -596,7 +596,8 @@
           "SellOptions": "Options de vente",
           "AddSellOption": "Ajouter une option de vente",
           "AddOverheadCostOption": "Ajouter les frais généraux",
-          "OverheadCostOptions": "Options de frais généraux"
+          "OverheadCostOptions": "Options de frais généraux",
+          "OverheadCostOptionsExplanation": "Vous pouvez configurer ici un coût de frais généraux toujours ajouté au prix de cet article lorsqu'un commerçant le vend. Ce coût est affecté par les modificateurs de prix."
         },
         "VaultTab": {
           "GridSize": "Taille d'une case",
@@ -771,7 +772,12 @@
           "HideTokenWhenClosed": "Cacher le jeton lorsqu'il est fermé",
           "HideTokenWhenClosedExplanation": "Lorsque cette option est activée, le(s) jeton(s) de ce commerçant est (sont) masqué(s) à la fermeture.",
           "OnlyAcceptCustomPricesExplanation": "Lorsque cette option est activée, tous les objets vendus à ce marchand doivent utiliser les prix personnalisés de l'objet (s'il y en a) et non les devises habituelles. Si l'article n'a pas de prix personnalisé, il ne peut pas être vendu.",
-          "OnlyAcceptCustomPrices": "Accepter uniquement des prix personnalisés"
+          "OnlyAcceptCustomPrices": "Accepter uniquement des prix personnalisés",
+          "ExportMerchantLogExplanation": "Cette opération permet d'exporter et de télécharger un fichier texte contenant les journaux, classés par ordre chronologique d'apparition des informations.",
+          "AddOverheadCostOption": "Ajouter les frais généraux",
+          "OverheadCostOptions": "Options de frais généraux",
+          "ExportMerchantLog": "Exporter les journaux des commerçants",
+          "OverheadCostOptionsExplanation": "Vous pouvez configurer ici un coût de frais généraux qui est toujours ajouté au prix des articles lorsque le commerçant les vend. Ce coût est affecté par les modificateurs de prix."
         },
         "Sharing": {
           "Title": "Paramètres de partage",
