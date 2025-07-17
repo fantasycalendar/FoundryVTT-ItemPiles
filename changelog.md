@@ -4,7 +4,8 @@
 
 - Fixed merchants throwing errors if an item had a price and no overhead cost
 - Added a quiet warning if updating settings after setting currencies to use items from a locked compendium instead of throwing error
-- Tweaked docs
+- Updated Portuguese (Brazil), French, and Polish localization (Thank you, Kharmans, rectulo, and lioheart, you people are legends!)
+- Tweaked documentation
 
 ## Version 3.2.16
 
