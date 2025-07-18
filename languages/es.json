@@ -293,8 +293,7 @@
           "DropMeClickMe": "Haga clic para agregar un atributo o arrastre y suelte un objeto para agregar",
           "PricePreset": "O seleccione un preajuste de precio existente:",
           "SelectPreset": "Seleccionar precio preestablecido"
-        },
-        "VaultTab": {}
+        }
       },
       "FilterEditor": {
         "Title": "Editor de filtros de Item Piles",

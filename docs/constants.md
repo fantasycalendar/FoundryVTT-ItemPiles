@@ -16,6 +16,8 @@ Hooks.once(game.itempiles.hooks.READY, () => {
 });
 ```
 
+All hooks can be found in [the hooks documentation](hooks.md).
+
 ## Flags
 
 `game.itempiles.flags`

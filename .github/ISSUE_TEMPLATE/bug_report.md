@@ -7,11 +7,13 @@ assignees: ''
 
 ---
 
-**Are you on the latest version of Item Piles?**
-Yes / No
+**I confirm the following:**
 
-**Have you tried to reset Item Piles' system settings?**
-Yes / No
+- [ ] I am on the latest version of Item Piles
+- [ ] I have tried to clear my cache (Ctrl / Cmd + F5)
+- [ ] I have checked the console for errors (F12 to open, Console tab)
+- [ ] I have reproduced this bug with only item piles & its dependency modules enabled
+- [ ] I acknowledge that Item Piles itself is not responsible for system-specific support - see [this page on system specific support](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues/731)
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -30,14 +32,14 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Setup:**
+**Setup**
 
 - Foundry Version: [e.g. 9.238]
 - System Version: [e.g. DND5e 1.5.7]
 - Item Piles Version: [e.g. 1.0.0]
 - Browser & version [e.g. Google Chrome 98.0.4758.82]
 
-**Active modules:**
+**Active modules**
 
 - Item Piles
 - libwrapper

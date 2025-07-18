@@ -2,8 +2,8 @@
 	import SETTINGS from "../../constants/settings.js";
 
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
-	import { ApplicationShell } from '#runtime/svelte/component/core';
+	import { localize } from '#runtime/util/i18n';
+	import { ApplicationShell } from '#runtime/svelte/component/application';
 
 	import * as helpers from "../../helpers/helpers.js"
 	import { applyDefaultSettings } from "../../settings.js";
@@ -62,10 +62,14 @@
 		for (const currency of currencies) {
 			if (!currency.data?.uuid) continue;
 			const actualItem = await fromUuid(currency.data?.uuid);
-			await actualItem.update({
-				name: currency.name,
-				img: currency.img
-			});
+			try {
+				await actualItem.update({
+					name: currency.name,
+					img: currency.img
+				});
+			} catch (err) {
+				console.warn(`Item Piles - Could not update currency ${currency.name} (${currency.data?.uuid}) - compendium is locked`);
+			}
 		}
 		application.close();
 	}
@@ -201,8 +205,10 @@
 					         options={["None", ...Object.keys(getDocumentTemplates("Item"))]}/>
 					<Setting key={SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE} bind:data="{settings[SETTINGS.ITEM_CLASS_EQUIPMENT_TYPE]}"
 					         options={["None", ...Object.keys(getDocumentTemplates("Item"))]}/>
-					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
-					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
+					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} itemAttribute
+					         bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
+					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} itemAttribute
+					         bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>
 					<SettingButton key={SETTINGS.SECONDARY_CURRENCIES} bind:data="{settings[SETTINGS.SECONDARY_CURRENCIES]}"/>
 					<Setting key={SETTINGS.CURRENCY_DECIMAL_DIGITS} bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"

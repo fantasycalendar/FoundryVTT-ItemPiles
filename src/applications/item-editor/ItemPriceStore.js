@@ -28,6 +28,14 @@ export default class ItemPriceStore {
 			});
 		});
 
+		data.sellPrices.forEach(group => {
+			group.forEach(price => {
+				if (!price.id) {
+					price.id = foundry.utils.randomID();
+				}
+			});
+		});
+
 		this.data = writable(data);
 
 		this.itemDoc.subscribe((item, changes) => {
@@ -77,6 +85,20 @@ export default class ItemPriceStore {
 	removeSellGroup(groupIndex) {
 		this.data.update(data => {
 			data.sellPrices.splice(groupIndex, 1);
+			return data;
+		})
+	}
+
+	addOverheadCostGroup() {
+		this.data.update(data => {
+			data.overheadCost.push([]);
+			return data;
+		})
+	}
+
+	removeOverheadCostGroup(groupIndex) {
+		this.data.update(data => {
+			data.overheadCost.splice(groupIndex, 1);
 			return data;
 		})
 	}

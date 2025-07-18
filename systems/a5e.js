@@ -1,4 +1,4 @@
-import CONSTANTS from "../constants/constants.js";
+import CONSTANTS from "../src/constants/constants.js";
 
 export default {
 
@@ -11,7 +11,7 @@ export default {
 	"ITEM_CLASS_LOOT_TYPE": "object",
 
 	// The item class type is the type of item that will be used for the default weapon item
-	"ITEM_CLASS_WEAPON_TYPE": "", 
+	"ITEM_CLASS_WEAPON_TYPE": "",
 
 	// The item class type is the type of item that will be used for the default equipment item
 	"ITEM_CLASS_EQUIPMENT_TYPE": "",
@@ -26,12 +26,53 @@ export default {
 	"ITEM_FILTERS": [
 		{
 			"path": "type",
-			"filters": "feature, maneuver, spell, background, culture, heritage, destiny"
+			"filters": "feature,maneuver,spell,background,culture,heritage,destiny"
 		}
 	],
 
 	// Item similarities determines how item piles detect similarities and differences in the system
 	"ITEM_SIMILARITIES": ["name", "type"],
+
+	"ITEM_TYPE_HANDLERS": {
+		"GLOBAL": {
+			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED]: ({ item }) => {
+				return item.system.containerId ? item.system.containerId : "";
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH]: "system.containerId",
+			[CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR]: ({ actor, containerId }) => {
+				return `${actor.uuid}.Item.${containerId}`;
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_RETRIEVER]: ({ item }) => {
+				return item.system.containerId.split(".").pop();
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_TRANSFORMER]: ({ actor, map }) => {
+				Object.values(map).forEach(data => {
+					data.item.system.items = data.items.reduce((acc, item) => {
+						let _id = foundry.utils.randomID();
+						acc[_id] = {
+							quantity: item.system.quantity,
+							uuid: `${actor.uuid}.Item.${item._id}`
+						}
+						return acc;
+					}, {})
+				})
+			}
+		},
+		"object": {
+			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
+			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
+				return item?.containerItems ?? [];
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
+				const containerItems = item?.containerItems ?? [];
+				for (const [_, containedData] of containerItems) {
+					const item = fromUuidSync(containedData.uuid);
+					if (!item) continue;
+					items.push(item.toObject());
+				}
+			},
+		}
+	},
 
 	// Currencies in item piles is a versatile system that can accept actor attributes (a number field on the actor's sheet) or items (actual items in their inventory)
 	// In the case of attributes, the path is relative to the "actor.system"

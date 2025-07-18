@@ -4,7 +4,8 @@
     "Currency": "Waluta",
     "ContextMenu": {
       "ShowToPlayers": "Pokaż Graczom",
-      "RequestTrade": "Poproś o Wymianę"
+      "RequestTrade": "Poproś o Wymianę",
+      "GiveToCharacter": "Przekaż postaci"
     },
     "Notifications": {
       "UpdateItemPileSuccess": "Item Pile zaktualizowany pomyślnie.",
@@ -12,7 +13,7 @@
       "ShownToPlayers": "Pokazuję {actor_name} graczom",
       "ItemTransferred": "{target_actor_name} dostał {item_name} od {source_actor_name}.",
       "GiveItemAccepted": "{user_name} zaakceptował twoją ofertę.",
-      "SystemSupportFound": "Ten system jest wspierany przez Item Piles! Ustawiam domyślne ustawienia...",
+      "SystemSupportFound": "Znaleziono wsparcie systemowe! Stosowanie domyślnych ustawień systemu do Item Piles",
       "ItemAdded": "{item_name} został dodany do {target_actor_name}.",
       "CreatedJournal": "Utworzono dziennik Item Piles Vault Log."
     },
@@ -42,7 +43,10 @@
       "VaultNoGmItemSidebar": "Tylko GM może upuszczać przedmioty z paska bocznego!",
       "TransactionNoGMConnected": "Żaden GM nie jest połączony - bieżąca transakcja została anulowana, nic nie zostało dodane, usunięte ani przeniesione",
       "DroppedIsNotItem": "Nie można wrzucać dokumentów typu \"{type}\" do tego stosu przedmiotów!",
-      "VaultSameItemOrigin": "Nie można wrzucać do skarbca przedmiotów, które pochodzą ze skarbca!"
+      "VaultSameItemOrigin": "Nie można wrzucać do skarbca przedmiotów, które pochodzą ze skarbca!",
+      "NoResponseFromGMTimeout": "OSTRZEŻENIE - MG \"{user_name}\" nie odpowiedział na ostatnie żądanie - odczekaj {time} sekund przed wysłaniem kolejnego żądania Item Piles.",
+      "NoResponseFromGM": "OSTRZEŻENIE - MG \"{user_name}\" nie odpowiedział na żądanie - Item Piles wymagają połączenia i odpowiedzi MG, aby gracze mogli korzystać z większości funkcji modułu.",
+      "LogEmpty": "Dziennik dla \"{actor_name}\" jest pusty i nie ma nic do wyeksportowania"
     },
     "Inspect": {
       "Title": "Przeglądanie Zawartości Stosu",
@@ -61,7 +65,8 @@
       "SplitAll": "Podziel na {num_players} graczy",
       "Owner": "Jako właściciel tego Stosu Przedmiotów, możesz modyfikować jego zawartość.",
       "SplitItems": "Podziel przedmioty na {num_players} graczy",
-      "SplitNoPlayers": "Nie znaleziono żadnych postaci, którymi można by podzielić zawartość."
+      "SplitNoPlayers": "Nie znaleziono żadnych postaci, którymi można by podzielić zawartość.",
+      "Change": "Zmiana"
     },
     "Trade": {
       "Title": "Item Piles: Wymiany",
@@ -169,7 +174,7 @@
       "CurrentServices": "Bieżące usługi",
       "ClearAllServices": "Wyczyść wszystkie usługi aktora",
       "Log": "Dziennik aktywności",
-      "LogSearch": "Wyszukiwanie w dzienniku:",
+      "LogSearch": "Dziennik wyszukiwania:",
       "LogUserActor": "{actor_name} ({user_name})",
       "LogBought": "zakupiony",
       "LogSold": "sprzedany",
@@ -179,7 +184,13 @@
       "LogSetVisible": "{instigator} ustaw <strong>{item}</strong> jako <span>widoczny</span>",
       "LogTransaction": "{instigator} {action} {quantity}{item} na {price}",
       "LogSetNotForSale": "{instigator} ustaw <strong>{item}</strong> <span>nie na sprzedaż</span>",
-      "LogSetHidden": "{instigator} ustaw <strong>{item}</strong> jako <span>ukryty</span>"
+      "LogSetHidden": "{instigator} ustaw <strong>{item}</strong> jako <span>ukryty</span>",
+      "SortBy": "Sortuj według:",
+      "LogFreeTransaction": "{instigator} {action} {quantity}{item} za darmo",
+      "SetNotForSale": "Zestaw nie jest na sprzedaż",
+      "SetForSale": "Zestaw na sprzedaż",
+      "SetVisible": "Pokaż",
+      "SetHidden": "Ukryj"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -203,7 +214,7 @@
       },
       "NoSystemFound": {
         "Title": "Nie rozpoznano systemu",
-        "Content": "System ten nie jest obecnie w pełni obsługiwany. Oznacza to, że moduł nie wie, jak najlepiej obsługiwać elementy tego systemu, ale nadal może działać w ograniczony sposób.<br><br>Możesz samodzielnie skonfigurować ustawienia modułu, ale wymaga to trochę wiedzy technicznej.<br><br>Jeśli masz jakieś pytania, pinguj <strong>Wasp#2005</strong> na discordzie Foundry."
+        "Content": "<p><strong>Ten system nie jest obsługiwany.</strong></p><p>Oznacza to, że moduł nie wie, jak najlepiej obsługiwać elementy tego systemu, ale nadal może działać w ograniczony sposób.</p><p>Możesz samodzielnie skonfigurować ustawienia modułu, ale wymaga to trochę wiedzy technicznej.</p><p>Jeśli masz jakieś pytania, zrób zrzut ekranu okna dialogowego, które otworzy się po zamknięciu tego i poproś o pomoc na kanale swojego systemu na Discordzie Foundry.</p>"
       },
       "CantRemoveVaultExpander": {
         "Content": "Nie możesz usunąć tego rozszerzenia, przedmioty w skarbcu nie zmieściłyby się bez niego. Usuń {num_items} przedmiotów przed próbą usunięcia tego rozszerzenia!",
@@ -270,7 +281,8 @@
     },
     "Items": "Przedmioty",
     "HeaderButtons": {
-      "ShowToPlayers": "Pokaż Graczom"
+      "ShowToPlayers": "Pokaż Graczom",
+      "Configure": "Konfiguracja"
     },
     "Types": {
       "pile": "Item Pile",
@@ -342,6 +354,7 @@
         "Title": "Edycja walut",
         "Content": "Jako GM możesz zaktualizować waluty na tym stosie przedmiotów:",
         "Submit": "Wyślij",
+        "NoCurrency": "{actor_name} nie ma ważnych walut",
         "Secondary": "Waluty dodatkowe:"
       },
       "TradeMerchantItem": {
@@ -370,7 +383,9 @@
         "TitleActor": "Item Piles Edytor Walut: {actor_name}",
         "Title": "Item Piles Edytor walut",
         "Exchange": "Wymiana",
-        "ExplanationSmallAttributes": "W D&D5e waluty aktorów znajdują się w ścieżce atrybutów \"actor.system.currency.gp\", więc możesz dodać swoją własną walutę z nazwą \"Gold Coins\" i ścieżką atrybutów \"system.currency.gp\". Dodaj jedną z nich klikając na plus w nagłówku."
+        "ExplanationSmallAttributes": "W D&D5e waluty aktorów znajdują się w ścieżce atrybutów \"actor.system.currency.gp\", więc możesz dodać swoją własną walutę z nazwą \"Gold Coins\" i ścieżką atrybutów \"system.currency.gp\". Dodaj jedną z nich klikając na plus w nagłówku.",
+        "CreateNew": "Upuść przedmiot lub kliknij przycisk plusa, aby rozpocząć!",
+        "Drop": "Upuść, aby dodać"
       },
       "ItemEditor": {
         "Title": "Item Piles Edytor przedmiotów: {item_name}",
@@ -420,13 +435,21 @@
           "DisableNormalCost": "Wyłączenie kosztu normalnego",
           "DisableNormalCostExplanation": "Gdy ta opcja jest włączona, przedmiot nie może być zakupiony za walutę podstawową i musi być zakupiony za jedną z poniższych opcji zakupu.",
           "PurchaseOptions": "Opcje zakupu",
-          "PurchaseOptionsExplanation": "Tutaj możesz skonfigurować alternatywne sposoby zakupu tego przedmiotu. Każda grupa reprezentuje inny sposób, w jaki postać może kupić ten przedmiot od innych",
+          "PurchaseOptionsExplanation": "Tutaj można skonfigurować alternatywne sposoby zakupu tego przedmiotu. Każda grupa reprezentuje inny sposób, w jaki postać może kupić ten przedmiot od kupców.",
           "CantBeSoldToMerchants": "Nie można sprzedać kupcom",
           "CantBeSoldToMerchantsExplanation": "Gdy jest włączona, ten przedmiot nie może być odsprzedany kupcom, tylko kupiony.",
           "AddPurchaseOption": "Dodaj opcję zakupu",
           "DropMeClickMe": "Kliknij, aby dodać atrybut lub przeciągnij i upuść przedmiot, aby dodać",
           "PricePreset": "Można też wybrać wstępne ustawienie ceny:",
-          "SelectPreset": "Wybór presetu cenowego"
+          "SelectPreset": "Wybór presetu cenowego",
+          "PurchaseOptionsAsSellOption": "Opcja zakupu jako opcja sprzedaży",
+          "SellOptions": "Opcje sprzedaży",
+          "SellOptionsExplanation": "Tutaj można skonfigurować alternatywne sposoby sprzedaży tego przedmiotu. Każda grupa reprezentuje inny sposób, w jaki postać może sprzedać ten przedmiot kupcom.",
+          "AddSellOption": "Dodaj opcję sprzedaży",
+          "PurchaseOptionsAsSellOptionExplanation": "Gdy ta opcja jest włączona, poniższe opcje zakupu mogą być używane podczas odsprzedaży przedmiotu sprzedawcy. Domyślnie można użyć tylko poniższych opcji sprzedaży.",
+          "AddOverheadCostOption": "Dodaj ogólne koszty",
+          "OverheadCostOptionsExplanation": "W tym miejscu można skonfigurować koszt ogólny, który jest zawsze dodawany do ceny tego przedmiotu, gdy sprzedawca go sprzedaje. Mają na to wpływ modyfikatory ceny.",
+          "OverheadCostOptions": "Opcje kosztów ogólnych"
         },
         "VaultTab": {
           "GridSize": "Rozmiar Siatki",
@@ -565,7 +588,14 @@
           "ClearMerchantLogExplanation": "Spowoduje to wyczyszczenie dzienników kupca, usuwając wszystkie wpisy. Nie można tego cofnąć.",
           "LogMerchantActivityExplanation": "Po włączeniu tej funkcji kupiec rejestruje zdarzenia, takie jak kupno i sprzedaż przedmiotów, a GM aktualizuje status (ilość, widoczność i sprzedaż) przedmiotów.",
           "HideTokenWhenClosed": "Ukryj Token po Zamknięciu",
-          "HideTokenWhenClosedExplanation": "Gdy ta opcja jest włączona, token(y) tego sprzedawcy są ukrywane po zamknięciu."
+          "HideTokenWhenClosedExplanation": "Gdy ta opcja jest włączona, token(y) tego sprzedawcy są ukrywane po zamknięciu.",
+          "OnlyAcceptCustomPrices": "Akceptuj tylko ceny niestandardowe",
+          "OnlyAcceptCustomPricesExplanation": "Po włączeniu tej opcji wszystkie przedmioty sprzedawane temu sprzedawcy muszą używać niestandardowych cen dla tego przedmiotu (jeśli takie istnieją), a nie zwykłych walut. Jeśli przedmiot nie ma ceny niestandardowej, nie można go sprzedać.",
+          "ExportMerchantLogExplanation": "Spowoduje to wyeksportowanie i pobranie pliku tekstowego dzienników, posortowanego od najstarszych do najnowszych informacji.",
+          "AddOverheadCostOption": "Dodaj koszty ogólne",
+          "OverheadCostOptions": "Opcje kosztów ogólnych",
+          "OverheadCostOptionsExplanation": "Tutaj można skonfigurować koszt ogólny, który jest zawsze dodawany do ceny przedmiotów, gdy sprzedawca je sprzedaje. Mają na to wpływ modyfikatory ceny.",
+          "ExportMerchantLog": "Eksport dzienników sprzedawców"
         },
         "Main": {
           "DeleteWhenEmpty": "Usuń, gdy jest pusty",
@@ -646,7 +676,7 @@
           "RestrictAccess": "Ograniczenie dostępu do skarbca",
           "RestrictAccessExplanation": "Domyślnie każdy może uzyskać dostęp do skarbców, jeśli widzi je na pasku bocznym lub może przejść obok nich na scenie. Gdy to ustawienie jest włączone, skarbiec będzie widoczny tylko dla właściciela postaci skarbca lub użytkowników/postaci skonfigurowanych w Edytorze dostępu (patrz poniżej)."
         },
-        "Update": "Uaktualnij",
+        "Update": "Aktualizuj konfigurację",
         "SingleItem": {
           "Title": "Ustawienia pojedynczej pozycji",
           "DisplayOne": "Wyświetlanie obrazu pojedynczego przedmiotu",
@@ -926,6 +956,22 @@
     "VaultLog": {
       "Deposit": "{actor_name} ({user_name}) *zdeponował* {item_name} x {quantity} ({date})",
       "Withdraw": "{actor_name} ({user_name}) **wycofał** {item_name} x {quantity} ({date})"
+    },
+    "PlayerList": {
+      "TradeButton": "Handel"
+    },
+    "General": {
+      "Short": "Krótki",
+      "Primary": "Podstawowy",
+      "Exchange": "Wymiana",
+      "Name": "Nazwa",
+      "Cost": "Koszt",
+      "Fixed": "Pośrednik",
+      "Icon": "Ikona",
+      "Data": "Dane"
+    },
+    "Hints": {
+      "CtrlClear": "CTRL + kliknij, aby wyczyścić"
     }
   }
 }

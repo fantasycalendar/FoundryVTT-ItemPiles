@@ -1,12 +1,12 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import CONSTANTS from "../../constants/constants.js";
 	import * as Helpers from "../../helpers/helpers.js";
 
 	import Tabs from "../components/Tabs.svelte";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
 	import { writable } from "svelte/store";
 
 	import MerchantApp from "../merchant-app/merchant-app.js";
@@ -28,7 +28,12 @@
 
 	let form;
 
-	let pileData = PileUtilities.getActorFlagData(pileActor);
+	let pileData = PileUtilities.getActorFlagData(pileActor, { useDefaults: false });
+	if (foundry.utils.isEmpty(pileData)) {
+		pileData = PileUtilities.getPileActorDefaults();
+	} else {
+		pileData = PileUtilities.getActorFlagData(pileActor);
+	}
 
 	if (typeof pileData?.deleteWhenEmpty === "boolean") {
 		pileData.deleteWhenEmpty = !!pileData?.deleteWhenEmpty;
@@ -100,14 +105,15 @@
 					promises.push(app.close());
 				}
 
-				if (promises.length || pileActor?.sheet.rendered) {
-					await Promise.allSettled(promises);
-					if (data.enabled) {
-						pileActor?.sheet.close();
-						game.itempiles.API.renderItemPileInterface(pileActor);
-					} else if (!data.enabled) {
-						pileActor?.sheet.render(true, { bypassItemPiles: true });
+				await Promise.allSettled(promises);
+
+				if (data.enabled) {
+					if (pileActor?.sheet) {
+						pileActor.sheet.close({ force: true });
 					}
+					game.itempiles.API.renderItemPileInterface(pileActor);
+				} else if (!data.enabled && pileActor?.sheet) {
+					pileActor.sheet.render(true, { bypassItemPiles: true });
 				}
 			}
 		});

@@ -5,7 +5,8 @@
     "Currency": "Devise",
     "ContextMenu": {
       "ShowToPlayers": "Montrer la pile aux joueurs",
-      "RequestTrade": "Demande d'échange"
+      "RequestTrade": "Demande d'échange",
+      "GiveToCharacter": "Donner au personnage"
     },
     "Inspect": {
       "Title": "Inspection de la pile",
@@ -23,7 +24,9 @@
       "AddCurrency": "Ajouter une devise",
       "SplitAll": "Diviser en {num_players} part",
       "SplitItems": "Diviser les objets en {num_players} part",
-      "SplitCurrencies": "Partage les devises en {num_players} part"
+      "SplitCurrencies": "Partage les devises en {num_players} part",
+      "Change": "Changer",
+      "SplitNoPlayers": "Aucun personnage n'a été trouvé avec qui répartir le contenu."
     },
     "Trade": {
       "Title": "Item Piles : Échange",
@@ -100,7 +103,8 @@
       "DisallowedItemSell": "Ce marchand n'accepte pas les \"{type}\"",
       "NoTokenFound": "N'a pas pu trouver un token ou un personnage pour vous représenter.",
       "NoVaultAccessActor": "{actor_name} n'a pas la permission de visualiser ce coffre-fort.",
-      "NoVaultAccess": "Vous n'avez pas l'autorisation de visualiser ce coffre-fort."
+      "NoVaultAccess": "Vous n'avez pas l'autorisation de visualiser ce coffre-fort.",
+      "ItemNoQuantity": "la quantité de {item_name} est à 0, de sorte que vous ne pouvez transférer cet objet !"
     },
     "Dialogs": {
       "DropTypeWarning": {
@@ -122,7 +126,7 @@
       },
       "NoSystemFound": {
         "Title": "Système non reconnu",
-        "Content": "Ce système n'est actuellement pas entièrement pris en charge. Cela signifie que le module ne sait pas comment traiter au mieux les éléments de ce système, mais qu'il peut encore fonctionner de manière limitée.<br><br>Vous pouvez configurer les paramètres du module vous-même, mais cela nécessite un peu de connaissances techniques.<br><br>Si vous avez des questions, envoyez un message à <strong>Wasp#2005</strong> sur le discord Foundry."
+        "Content": "<p><strong>Ce système n'est pas pris en charge.</strong></p><p>Cela signifie que le module ne sait pas comment traiter au mieux les éléments de ce système, mais qu'il peut encore fonctionner de manière limitée.</p><p>Vous pouvez configurer les paramètres du module vous-même, mais cela nécessite un peu de connaissances techniques.</p><p>Si vous avez des questions, faites une capture d'écran du dialogue qui s'ouvre après avoir fermé ceci et demandez de l'aide dans le canal de votre système sur le discord Foundry.</p>"
       },
       "SystemFound": {
         "Title": "Système reconnu",
@@ -191,11 +195,16 @@
         "Header": "Donne un objet : {item_name}",
         "SelectPlaceholder": "Choisir le personnage à qui envoyer l'objet",
         "Submit": "Envoyer",
-        "ContentMultipleQuantity": "Vous possédez {quantity} fois cet objet. Combien voulez-vous en donner ?"
+        "ContentMultipleQuantity": "Vous possédez {quantity} fois cet objet. Combien voulez-vous en donner ?",
+        "Secret": "Donner sans en informer les autres (sauf les MJ)"
       },
       "ClearMerchantLog": {
         "Title": "Effacer le journal du commerçant ?",
         "Content": "Êtes-vous sûr de vouloir effacer le journal du commerçant \"{actor_name}\" ?"
+      },
+      "SortMergeVaultItems": {
+        "Title": "Trier et fusionner les objets similaires ?",
+        "Content": "Êtes-vous sûr de vouloir fusionner des objets similaires tout en les triant ? La fusion ne peut pas être annulée."
       }
     },
     "CurrenciesEditor": {
@@ -399,7 +408,7 @@
       "GiveItemAccepted": "{user_name} a accepté votre offre.",
       "ShownToPlayers": "Montre {actor_name} aux joueurs",
       "CreatedJournal": "Création du journal du coffre-fort des piles d'objets.",
-      "SystemSupportFound": "Support système trouvé ! Appliquer les paramètres système par défaut aux piles d'objets...",
+      "SystemSupportFound": "Support système trouvé ! Appliquer les paramètres système par défaut à 'Item Piles'",
       "ItemAdded": "{item_name} a été ajouté à {target_actor_name}."
     },
     "Merchant": {
@@ -453,7 +462,7 @@
       "CurrentServices": "Services actuels",
       "ClearAllServices": "Effacer les services sur tous les acteurs",
       "Log": "Journal d'activité",
-      "LogSearch": "Recherche de journal :",
+      "LogSearch": "Rechercher dans le journal :",
       "LogUserActor": "{actor_name} ({user_name})",
       "LogBought": "achetés",
       "LogSold": "vendu",
@@ -463,7 +472,13 @@
       "LogSetHidden": "{instigator} définit <strong>{item}</strong> à <span>caché</span",
       "LogTransaction": "{instigator} {action} {quantity}{item} pour {price}",
       "LogSetQuantity": "{instigator} définit <strong>{item}</strong> <span>quantité</span> à {quantity}",
-      "LogSetNotForSale": "{instigator} définit <strong>{item}</strong> <span>à ne pas vendre</span"
+      "LogSetNotForSale": "{instigator} définit <strong>{item}</strong> <span>à ne pas vendre</span",
+      "SortBy": "Trier par :",
+      "LogFreeTransaction": "{instigator} {action} {quantity}{item} gratuitement",
+      "SetNotForSale": "Pas disponible à la vente",
+      "SetForSale": "Disponible à la vente",
+      "SetHidden": "Cacher",
+      "SetVisible": "Montrer"
     },
     "Applications": {
       "DropItem": {
@@ -515,7 +530,9 @@
         "Name": "Nom de la devise",
         "Exchange": "Échanger",
         "Data": "Données",
-        "Icon": "Icône"
+        "Icon": "Icône",
+        "CreateNew": "Déposez un article ou cliquez sur le bouton plus pour commencer !",
+        "Drop": "Déposer pour ajouter"
       },
       "ItemEditor": {
         "General": "Paramètres généraux",
@@ -566,13 +583,20 @@
           "DisableNormalCost": "Désactiver le coût normal",
           "DisableNormalCostExplanation": "Si activé, cet objet ne peut pas être acheté avec des devises et doit être acheté avec une des options d'achat ci-dessous.",
           "PurchaseOptions": "Options d'achat",
-          "PurchaseOptionsExplanation": "Ici, vous pouvez configurer des coûts alternatifs pour cet objet. Chaque groupe représente une façon différente pour un PJ de se procurer l'objet",
+          "PurchaseOptionsExplanation": "Ici, vous pouvez configurer des moyens alternatifs d'acheter cet objet. Chaque groupe représente une manière différente pour un PJ d'acheter cet objet auprès de marchands.",
           "CantBeSoldToMerchants": "Ne peut être vendu à un Marchand",
           "CantBeSoldToMerchantsExplanation": "Si activé, cet objet ne peut être revendu à un marchand, seulement acheté.",
           "AddPurchaseOption": "Ajouter une option d'achat",
           "DropMeClickMe": "Cliquer pour ajouter un attribut ou glisser/déposer un objet pour l'ajouter",
           "PricePreset": "Ou choisissez un préréglage de prix :",
-          "SelectPreset": "Sélectionnez un prix prédéfini"
+          "SelectPreset": "Sélectionnez un prix prédéfini",
+          "PurchaseOptionsAsSellOption": "Option d'achat comme Option de vente",
+          "SellOptionsExplanation": "Vous pouvez configurer ici les différentes façons de vendre cet objet. Chaque groupe représente une manière différente pour un personnage de vendre cet objet aux marchands.",
+          "PurchaseOptionsAsSellOptionExplanation": "Lorsque cette option est activée, les options d'achat ci-dessous peuvent être utilisées lors de la revente de l'objet à un marchand. Par défaut, seules les options de vente ci-dessous peuvent être utilisées.",
+          "SellOptions": "Options de vente",
+          "AddSellOption": "Ajouter une option de vente",
+          "AddOverheadCostOption": "Ajouter les frais généraux",
+          "OverheadCostOptions": "Options de frais généraux"
         },
         "VaultTab": {
           "GridSize": "Taille d'une case",
@@ -584,7 +608,11 @@
           "VaultExpander": "Extension de coffre",
           "VaultExpanderExplanation": "Lorsque cette option est activée, cet objet n'agit pas comme un objet normal dans un coffre, mais augmente le nombre d'emplacements disponibles, comme déterminé ci-dessous.",
           "ExpandColumnsRows": "Expansion des colonnes & lignes",
-          "ExpandColumnsRowsExplanation": "Lorsque le paramètre ci-dessus est activé, il définit le nombre de colonnes et/ou de lignes disponibles dans le coffre. Ce nombre ne peut pas dépasser la capacité du coffre."
+          "ExpandColumnsRowsExplanation": "Lorsque le paramètre ci-dessus est activé, il définit le nombre de colonnes et/ou de lignes disponibles dans le coffre. Ce nombre ne peut pas dépasser la capacité du coffre.",
+          "VaultImageRotated": "Image de la chambre forte inversée",
+          "PriceModifierTitle": "Modificateurs de prix d'achat et de vente",
+          "PriceModifierExplanation": "Cette option configure les modificateurs du coût de l'objet à l'achat et à la vente. Il multiplie le prix de base de l'objet avant tout autre modificateur de prix. Si le modificateur de prix de vente du marchand est de 50 %, le modificateur de prix de vente de l'objet devra être de 200 % pour annuler le modificateur du marchand.",
+          "VaultImageRotatedExplanation": "Cette option remplace l'image de l'objet lorsqu'il est affiché dans une réserve alors qu'elle est inversée."
         }
       },
       "TradeMerchantItem": {
@@ -644,7 +672,10 @@
           "CanStackItemsNo": "No, empiler les objets (sauf si l'objet indique le contraire)",
           "CanStackItemsYesAlways": "Oui, toujours empiler les objets",
           "CanStackItemsNoAlways": "Non, ne jamais empiler les objets",
-          "CanStackItemsExplanation": "Avec ce paramètre, les éléments ajoutés à la pile d'objets s'empilent avec les objets similaires. Ce paramètre peut également être contrôlé pour chaque objet dans sa configuration. Remarque : ce paramètre dépend également du système, car certains objets n'ont pas de quantité et ne peuvent donc jamais être empilés."
+          "CanStackItemsExplanation": "Avec ce paramètre, les éléments ajoutés à la pile d'objets s'empilent avec les objets similaires. Ce paramètre peut également être contrôlé pour chaque objet dans sa configuration. Remarque : ce paramètre dépend également du système, car certains objets n'ont pas de quantité et ne peuvent donc jamais être empilés.",
+          "ConfigureRequiredItemProperties": "Configuration des propriétés des objets requises",
+          "RequiredItemProperties": "Propriétés de l'objet requises",
+          "RequiredItemPropertiesExplanation": "Indiquer si cette pile d'objets nécessitent que les objets qui ont transférés possèdent certaines propriétés."
         },
         "Other": {
           "Title": "Autres paramètres",
@@ -661,7 +692,7 @@
           "OverrideScale": "Remplacer l'échelle des tokens d'un seul objet",
           "Scale": "Échelle de token pour un seul objet"
         },
-        "Update": "Mettre à jour la pile d'objets",
+        "Update": "Mettre à jour la config",
         "Title": "Configuration de la pile d'objets : {actor_name}",
         "Container": {
           "Title": "Paramètres du conteneur",
@@ -738,7 +769,9 @@
           "ClearMerchantLogExplanation": "Cette opération efface les journaux du marchand et supprime toutes les entrées. Cette opération ne peut être annulée.",
           "LogMerchantActivityExplanation": "Lorsqu'elle est activée, cette fonction permet au marchand d'enregistrer des événements tels que l'achat et la vente d'objets, et la mise à jour par les MJ du statut (quantité, visibilité et mise en vente) des objets.",
           "HideTokenWhenClosed": "Cacher le jeton lorsqu'il est fermé",
-          "HideTokenWhenClosedExplanation": "Lorsque cette option est activée, le(s) jeton(s) de ce commerçant est (sont) masqué(s) à la fermeture."
+          "HideTokenWhenClosedExplanation": "Lorsque cette option est activée, le(s) jeton(s) de ce commerçant est (sont) masqué(s) à la fermeture.",
+          "OnlyAcceptCustomPricesExplanation": "Lorsque cette option est activée, tous les objets vendus à ce marchand doivent utiliser les prix personnalisés de l'objet (s'il y en a) et non les devises habituelles. Si l'article n'a pas de prix personnalisé, il ne peut pas être vendu.",
+          "OnlyAcceptCustomPrices": "Accepter uniquement des prix personnalisés"
         },
         "Sharing": {
           "Title": "Paramètres de partage",
@@ -801,7 +834,7 @@
         "Title": "Éditeur de filtres d'Item Piles",
         "TitleActor": "Éditeur de filtres d'Item Piles : {actor_name}",
         "Filters": "Filtres",
-        "Path": "Chemin d'attribut",
+        "Path": "Chemin de la propriété",
         "AddNew": "Ajouter un nouveau filtre",
         "Submit": "Soumettre les filtres"
       },
@@ -811,7 +844,7 @@
         "Submit": "Soumettre les modificateurs de prix",
         "TitleActor": "Éditeur de modificateurs de prix de type d'objets : {actor_name}",
         "Explanation": "Ici, vous pouvez définir le prix et les modificateurs de prix de vente pour ce marchand concernant des types d'objets spécifiques. Le paramètre \"Remplacer\" signifie qu'il remplace les modificateurs de prix normaux du marchand.",
-        "Title": "Éditeur de modificateurs de prix des piles d'objets"
+        "Title": "Éditeur de modificateurs de prix de type d'objet"
       },
       "PriceModifiersEditor": {
         "DragDrop": "Glissez/Déplacez un acteur pour l'ajouter à la liste",
@@ -820,7 +853,7 @@
         "Submit": "Soumettre les modificateurs de prix",
         "Explanation": "Ici, vous pouvez définir le prix et vendre des modificateurs de prix pour ce marchand concernant des acteurs spécifiques. Le paramètre \"Remplacer\" signifie qu'il remplace les modificateurs de prix normaux du marchand, y compris les modificateurs de prix spécifiques au type d'objet.",
         "TitleActor": "Éditeur des modificateurs de prix des piles d'objets : {actor_name}",
-        "Title": "Éditeur de modificateurs de prix des piles d'objets"
+        "Title": "Éditeur de modificateurs de prix de piles d'objets"
       },
       "PricePresetEditor": {
         "Update": "Mise à jour des préréglages",
@@ -839,7 +872,7 @@
         "Title": "Retirer l'objet",
         "Header": "Vous retirez : {item_name}",
         "ContentMultipleQuantity": "Il y a {quantity} de cet objet, combien voulez-vous en retirer ?",
-        "Submit": "Retirer",
+        "Submit": "Retrancher",
         "Content": "Voulez-vous retirer cet objet de \"{target_name}\" ?"
       },
       "DepositCurrencies": {
@@ -852,14 +885,14 @@
         "Title": "Retirer l'objet",
         "NoCurrency": "Il n'y a pas de devises à retirer.",
         "Content": "Vous pouvez retirer les devises suivantes de ce coffre-fort :",
-        "Submit": "Retirer"
+        "Submit": "Retrancher"
       },
       "VaultAccessEditor": {
         "Title": "Éditeur d'accès au coffre-fort",
         "Explanation": "Cela permet de configurer les personnages et les joueurs qui peuvent accéder et modifier l'inventaire et les devises du coffre-fort. Si un joueur possède le personnage du coffre-fort, il a toujours un accès complet.",
         "TitleActor": "Éditeur d'accès au coffre : {actor_name}",
         "View": "Voir",
-        "Withdraw": "Retirer",
+        "Withdraw": "Retrancher",
         "Deposit": "Dépôt",
         "Character": "Joueur/Personnage",
         "Organize": "Organiser"
@@ -887,6 +920,7 @@
         "Content": "En tant que MJ, vous pouvez mettre à jour les devises de cette pile d'objets :",
         "Submit": "Soumettre",
         "Title": "Modifier les devises",
+        "NoCurrency": "{actor_name} n'a pas de devises valables",
         "Secondary": "Devises secondaires :"
       },
       "CustomItemCategoriesEditor": {
@@ -918,6 +952,14 @@
         "Explanation": "Vous pouvez définir ici les devises secondaires qui peuvent être ramassées et déposées par les personnages.",
         "Title": "Éditeur de Devises secondaires d'Item Piles",
         "TitleActor": "Éditeur de Devises secondaires d'Item Piles : {actor_name}"
+      },
+      "RequiredItemPropertiesEditor": {
+        "Filters": "Propriétés requises",
+        "Path": "Chemin de l'attribut",
+        "AddNew": "Ajouter un nouveau filtre",
+        "Title": "Item Piles - Éditeur de propriétés d'éléments requis",
+        "TitleActor": "Item Piles - Éditeur de propriétés d'objet requis : {actor-name}",
+        "Explanation": "Vous pouvez définir ici plusieurs types de propriétés d'objets requis que les articles transférés vers cette pile d'articles doivent posséder. Sur la base du chemin d'attribut donné, la pile d'objets pourra trouver le \"type\" d'un objet et, sur la base des conditions, elle empêchera le transfert d'articles qui ne correspondent pas à ces propriétés vers cette pile d'objets."
       }
     },
     "Settings": {
@@ -1063,6 +1105,18 @@
         "Label": "Configurer les devises secondaires",
         "Title": "Devises secondaires",
         "Hint": "Ce paramètre permet de définir des devises secondaires, similaires aux devises normales mais distinctes de celles-ci. Elles ne peuvent pas avoir de taux de change ni être divisées en d'autres devises personnalisées."
+      },
+      "ItemLootClass": {
+        "Title": "Objet de type butin",
+        "Hint": "Le type de classe d'objet est le type d'objet qui sera utilisé pour l'objet butin par défaut."
+      },
+      "ItemEquipmentClass": {
+        "Title": "Article de type équipement",
+        "Hint": "Le type de classe d'objet est le type d'objet qui sera utilisé pour l'objet équipement par défaut."
+      },
+      "ItemWeaponClass": {
+        "Title": "Objet de Type arme",
+        "Hint": "Le type de classe d'objet est le type d'objet qui sera utilisé pour l'objet arme par défaut."
       }
     },
     "Warnings": {
@@ -1072,10 +1126,20 @@
       "NoGMsConnectedAction": "WARNING - Impossible d'exécuter \"{action}\" car aucun MJ n'est actif.",
       "VaultFull": "Cet objet ne peut pas être placé dans ce coffre-fort !",
       "NoGMsConnected": "ATTENTION - Pas de MJ connecté - Item Piles nécessite qu'un MJ soit connecté pour que les joueurs puissent utiliser la plupart des fonctionnalités du module.",
-      "VaultItemNotExpander": "Cet objet n'est pas une extension de coffre-fort"
+      "VaultItemNotExpander": "Cet objet n'est pas une extension de coffre-fort",
+      "NoResponseFromGM": "ATTENTION - MJ \"{user_name}\" n'a pas répondu à la requête - 'Item Piles' nécessite qu'un MJ soit connecté et réponde pour que les joueurs puissent utiliser la plupart des fonctionnalités du module.",
+      "NoResponseFromGMTimeout": "ATTENTION - MJ \"{user_name}\" n'a pas répondu à la dernièredemande - attendez {time} secondes avant de faire une autre requête 'Item Piles'.",
+      "DroppedIsNotItem": "Vous ne pouvez pas déposer des documents de type \"{type}\" dans cette pile d'objets !",
+      "TransactionNoGMConnected": "Aucun MJ n'est connecté - la transaction en cours a été annulée, rien n'a été ajouté, supprimé ou transféré.",
+      "VaultInvalidItemDropped": "Vous ne pouvez pas déposer ce type d'objet dans cette réserve !",
+      "VaultSameItemOrigin": "Vous ne pouvez pas déposer d'objets dans la réserve qui proviennent de la réserve !",
+      "CantSortVault": "Échec du tri des objets - soit il y a trop d'objets, soit il y a eu un problème.",
+      "VaultNoGmItemSidebar": "Seuls les MJ peuvent déposer des objets à partir de la barre latérale !",
+      "LogEmpty": "Le journal concernant \"{actor_name}\" est vide et n'a rien à exporter"
     },
     "HeaderButtons": {
-      "ShowToPlayers": "Montrer aux joueurs"
+      "ShowToPlayers": "Montrer aux joueurs",
+      "Configure": "Configurer"
     },
     "Types": {
       "container": "Conteneur",
@@ -1089,7 +1153,7 @@
       "CapacityFull": "Ce coffre-fort a atteint sa capacité maximale de {total_capacity}",
       "ExpandsCols": "{cols} colonnes",
       "ExpandsRows": "{rows} lignes",
-      "Withdraw": "Retirer",
+      "Withdraw": "Retrancher",
       "Deposit": "Dépôt",
       "LogUserActor": "{actor_name} ({user_name})",
       "Deposited": "a déposé",
@@ -1099,11 +1163,29 @@
       "ExpandersTab": "Extensions",
       "ViewingAs": "Vu comme {actor_name}",
       "NeedsCapacity": "Ce coffre-fort a une capacité totale de {total_capacity}, mais elle n'est pas disponible tant que des extensions de coffres-forts ne sont pas ajoutées",
-      "CapacityLeft": "Ce coffre-fort a une capacité de {capacity}, avec un maximum de {total_capacity}, faites glisser et déposer des extensions de coffre-fort pour augmenter la capacité"
+      "CapacityLeft": "Ce coffre-fort a une capacité de {capacity}, avec un maximum de {total_capacity}, faites glisser et déposer des extensions de coffre-fort pour augmenter la capacité",
+      "SortItems": "Trier les objets",
+      "SortItemsTooltip": "Trier les éléments - maintenir la touche Ctrl enfoncée pour fusionner les objets similaires"
     },
     "VaultLog": {
       "Withdraw": "{actor_name} ({user_name}) **a retiré** {item_name} x {quantity} ({date})",
       "Deposit": "{actor_name} ({user_name}) *a déposé* {item_name} x {quantity} ({date})"
+    },
+    "PlayerList": {
+      "TradeButton": "Négocier"
+    },
+    "General": {
+      "Primary": "Primaire",
+      "Exchange": "Échanger",
+      "Name": "Nom",
+      "Cost": "Coût",
+      "Fixed": "Fixe",
+      "Short": "Court",
+      "Icon": "Icône",
+      "Data": "Données"
+    },
+    "Hints": {
+      "CtrlClear": "Ctrl+clic pour effacer"
     }
   }
 }

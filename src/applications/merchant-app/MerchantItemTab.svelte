@@ -1,6 +1,6 @@
 <script>
 
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import MerchantItemEntry from "./MerchantItemEntry.svelte";
 	import CategoryHeader from "./components/CategoryHeader.svelte";
 	import { get } from "svelte/store";
@@ -9,13 +9,10 @@
 	export let noItemsLabel = "ITEM-PILES.Merchant.NoItemsForSale";
 	export let services = false;
 
-	const pileData = store.pileData;
 	const searchStore = store.search;
 	const visibleItemsStore = store.visibleItems;
-	const itemsStore = store.items;
 	const itemsPerCategoryStore = store.itemsPerCategory;
 	const categoryStore = store.categories;
-	const priceModifiersPerType = store.priceModifiersPerType;
 	const itemCategoriesStore = store.itemCategories;
 	const typeFilterStore = store.typeFilter;
 	const sortTypesStore = store.sortTypes;
@@ -26,7 +23,7 @@
 
 	$: categoryDropDown = $itemCategoriesStore.filter(category => category.service === services);
 	$: categories = $categoryStore.filter(category => category.service === services);
-	$: items = $itemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
+	$: items = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
 	$: visibleItems = $visibleItemsStore.filter(item => Boolean(get(item.itemFlagData)?.isService) === services)
 
 	let columns = [];
@@ -53,7 +50,7 @@
 	{/if}
 	<select bind:value={$sortTypeStore} style="flex:0 1 auto; margin-left: 0.4rem; height: 26px;">
 		{#each $sortTypesStore as column, index}
-			<option value={index}>Sort by: {localize(column.label)}</option>
+			<option value={index}>{localize("ITEM-PILES.Merchant.SortBy")} {localize(column.label)}</option>
 		{/each}
 	</select>
 </div>

@@ -1,7 +1,7 @@
 <script>
 
 	import CurrencyList from "../components/CurrencyList.svelte";
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import { writable } from "svelte/store";
 
 	export let store;
@@ -24,7 +24,7 @@
 			{localize("ITEM-PILES.Merchant.ShoppingAs", { actorName: $recipientDocument.name })}
 		</div>
 		<CurrencyList {currencies}
-		              options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
+		              options={{ abbreviations: $currencies.length === 1, imgSize: 18, abbreviateNumbers: $currencies.length > 1 }}
 		              class="item-piles-currency-list"/>
 	</div>
 {:else if game.user.isGM && !$merchantPileData.infiniteCurrencies}
@@ -36,7 +36,7 @@
 			</a>
 		</div>
 		<CurrencyList currencies={merchantCurrencies}
-		              options={{ abbreviations: false, imgSize: 18, abbreviateNumbers: true }}
+		              options={{ abbreviations: $merchantCurrencies.length === 1, imgSize: 18, abbreviateNumbers: $merchantCurrencies.length > 1  }}
 		              class="item-piles-currency-list"/>
 	</div>
 {/if}

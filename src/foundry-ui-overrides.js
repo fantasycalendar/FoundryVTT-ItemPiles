@@ -11,9 +11,12 @@ export let fastToolTip = null;
 
 export default function registerUIOverrides() {
 	Hooks.on("renderPlayerList", addTradeButton);
+	Hooks.on("renderPlayers", addTradeButtonV13);
 	Hooks.on("getActorDirectoryEntryContext", insertActorContextMenuItems);
+	Hooks.on("getActorContextOptions", insertActorContextMenuItems);
 	Hooks.on("getActorSheetHeaderButtons", insertActorHeaderButtons);
 	Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
+	Hooks.on("getHeaderControlsApplicationV2", insertHeaderButtons);
 	Hooks.on("renderSidebarTab", hideTemporaryItems);
 	Hooks.on("renderTokenHUD", renderPileHUD);
 	Hooks.on("hoverToken", handleTokenBorders);
@@ -48,18 +51,25 @@ function hideTemporaryItems(sidebar) {
 		});
 }
 
-function addTradeButton(app, html) {
-	if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING) || !Helpers.getSetting(SETTINGS.SHOW_TRADE_BUTTON)) return;
-
+function createTradeButton() {
 	const minimalUI = game.modules.get('minimal-ui')?.active;
-	const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "");
+	const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "") + (CONSTANTS.IS_V13 ? " item-piles-v13" : "");
 	const text = !minimalUI ? game.i18n.localize("ITEM-PILES.ContextMenu.RequestTrade") : "";
 	const button = $(`<button type="button" class="${classes}"><i class="fas fa-handshake"></i>${text}</button>`)
-
 	button.click(() => {
 		game.itempiles.API.requestTrade();
 	});
-	html.append(button);
+	return button;
+}
+
+function addTradeButton(app, html) {
+	if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING) || !Helpers.getSetting(SETTINGS.SHOW_TRADE_BUTTON)) return;
+	html.append(createTradeButton());
+}
+
+function addTradeButtonV13(app, html) {
+	if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING) || !Helpers.getSetting(SETTINGS.SHOW_TRADE_BUTTON)) return;
+	$(html).find("#players-active .players-list").append(createTradeButton());
 }
 
 function insertActorContextMenuItems(html, menuItems) {
@@ -68,7 +78,8 @@ function insertActorContextMenuItems(html, menuItems) {
 		name: "Item Piles: " + game.i18n.localize("ITEM-PILES.ContextMenu.ShowToPlayers"),
 		icon: `<i class="fas fa-eye"></i>`,
 		callback: async (html) => {
-			const actorId = html[0].dataset.documentId;
+			const actualHtml = $(html)[0];
+			const actorId = actualHtml.dataset.documentId || actualHtml.dataset.entryId;
 			const actor = game.actors.get(actorId);
 			const activeUsers = Array.from(game.users).filter(u => u.active && u !== game.user).map(u => u.id);
 			if (!activeUsers.length) {
@@ -80,7 +91,8 @@ function insertActorContextMenuItems(html, menuItems) {
 			return game.itempiles.API.renderItemPileInterface(actor, { userIds: users, useDefaultCharacter: true });
 		},
 		condition: (html) => {
-			const actorId = html[0].dataset.documentId;
+			const actualHtml = $(html)[0];
+			const actorId = actualHtml.dataset.documentId || actualHtml.dataset.entryId;
 			const actor = game.actors.get(actorId);
 			return game.user.isGM && PileUtilities.isValidItemPile(actor);
 		}
@@ -88,18 +100,30 @@ function insertActorContextMenuItems(html, menuItems) {
 		name: "Item Piles: " + game.i18n.localize("ITEM-PILES.ContextMenu.RequestTrade"),
 		icon: `<i class="fas fa-handshake"></i>`,
 		callback: (html) => {
-			const actorId = html[0].dataset.documentId;
+			const actualHtml = $(html)[0];
+			const actorId = actualHtml.dataset.documentId || actualHtml.dataset.entryId;
 			const actor = game.actors.get(actorId);
 			const user = Array.from(game.users).find(u => u.character === actor && u.active);
 			return game.itempiles.API.requestTrade(user);
 		},
 		condition: (html) => {
-			const actorId = html[0].dataset.documentId;
+			const actualHtml = $(html)[0];
+			const actorId = actualHtml.dataset.documentId || actualHtml.dataset.entryId;
 			const actor = game.actors.get(actorId);
 			return Helpers.getSetting(SETTINGS.ENABLE_TRADING)
 				&& (game.user?.character !== actor || Array.from(game.users).find(u => u.character === actor && u.active));
 		}
 	});
+}
+
+function insertHeaderButtons(app, buttons) {
+	if (app.document instanceof foundry.documents.BaseActor) {
+		return insertActorHeaderButtons(app, buttons);
+	}
+
+	if (app.document instanceof foundry.documents.BaseItem) {
+		return insertItemHeaderButtons(app, buttons);
+	}
 }
 
 function insertActorHeaderButtons(actorSheet, buttons) {
@@ -108,15 +132,18 @@ function insertActorHeaderButtons(actorSheet, buttons) {
 
 	let obj = actorSheet?.object ?? actorSheet?.actor;
 
+	const method = () => {
+		ItemPileConfig.show(obj);
+	};
+
 	buttons.unshift({
 		label: Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT)
 			? ""
 			: game.i18n.localize("ITEM-PILES.HeaderButtons.Configure"),
 		icon: "fas fa-box-open",
 		class: "item-piles-config-button",
-		onclick: () => {
-			ItemPileConfig.show(obj);
-		}
+		onClick: method,
+		onclick: method
 	})
 }
 
@@ -126,22 +153,25 @@ function insertItemHeaderButtons(itemSheet, buttons) {
 
 	let obj = itemSheet?.object ?? itemSheet?.item;
 
+	const method = async (event) => {
+		if (game.modules.get("item-linking")?.active && !event.ctrlKey) {
+			const linkedItemUuid = foundry.utils.getProperty(obj, "flags.item-linking.baseItem") ?? false;
+			if (linkedItemUuid) {
+				obj = await fromUuid(linkedItemUuid);
+				return ItemEditor.show(obj, {
+					extraTitle: " - Compendium"
+				});
+			}
+		}
+		return ItemEditor.show(obj);
+	};
+
 	buttons.unshift({
 		label: !Helpers.getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? game.i18n.localize("ITEM-PILES.HeaderButtons.Configure") : "",
 		icon: "fas fa-box-open",
 		class: "item-piles-config-button",
-		onclick: async (event) => {
-			if (game.modules.get("item-linking")?.active && !event.ctrlKey) {
-				const linkedItemUuid = foundry.utils.getProperty(obj, "flags.item-linking.baseItem") ?? false;
-				if (linkedItemUuid) {
-					obj = await fromUuid(linkedItemUuid);
-					return ItemEditor.show(obj, {
-						extraTitle: " - Compendium"
-					});
-				}
-			}
-			return ItemEditor.show(obj);
-		}
+		onclick: method,
+		onClick: method,
 	})
 }
 
@@ -153,35 +183,36 @@ function renderPileHUD(app, html) {
 
 	if (!PileUtilities.isValidItemPile(document)) return;
 
-	if (PileUtilities.isItemPileContainer(document)) {
+	if (!PileUtilities.isItemPileContainer(document)) return;
 
-		const pileData = PileUtilities.getActorFlagData(document);
+	const pileData = PileUtilities.getActorFlagData(document);
 
-		const container = $(`<div class="col right" style="right:-130px;"></div>`);
+	const htmlType = CONSTANTS.IS_V13 ? "button" : "div";
+	const offset = CONSTANTS.IS_V13 ? "85" : "130";
 
-		const lock_button = $(`<div class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i class="fas fa-lock${pileData.locked ? "" : "-open"}"></i></div>`);
-		lock_button.click(async function () {
-			$(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
-			await game.itempiles.API.toggleItemPileLocked(document);
-		});
-		container.append(lock_button);
+	const container = $(`<div class="col right" style="right:-${offset}px;"></div>`);
 
-		const open_button = $(`<div class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i class="fas fa-box${pileData.closed ? "" : "-open"}"></i></div>`);
-		open_button.click(async function () {
-			$(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
-			await game.itempiles.API.toggleItemPileClosed(document);
-		});
-		container.append(open_button);
+	const lock_button = $(`<${htmlType} class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i inert class="fa-solid fa-lock${pileData.locked ? "" : "-open"}"></i></${htmlType}>`);
+	lock_button.click(async function () {
+		$(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
+		await game.itempiles.API.toggleItemPileLocked(document);
+	});
+	container.append(lock_button);
 
-		const configure_button = $(`<div class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i class="fas fa-toolbox"></i></div>`);
-		configure_button.click(async function () {
-			ItemPileConfig.show(document);
-		});
-		container.append(configure_button);
+	const open_button = $(`<${htmlType} class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i inert class="fa-solid fa-box${pileData.closed ? "" : "-open"}"></i></${htmlType}>`);
+	open_button.click(async function () {
+		$(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
+		await game.itempiles.API.toggleItemPileClosed(document);
+	});
+	container.append(open_button);
 
-		html.append(container)
+	const configure_button = $(`<${htmlType} class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i inert class="fa-solid fa-toolbox"></i></${htmlType}>`);
+	configure_button.click(async function () {
+		ItemPileConfig.show(document);
+	});
+	container.append(configure_button);
 
-	}
+	$(html).append(container);
 
 }
 

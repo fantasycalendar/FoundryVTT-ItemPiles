@@ -1,10 +1,10 @@
-import GiveItems from "../applications/dialogs/give-items-dialog/give-items-dialog.js";
-import PrivateAPI from "../API/private-api.js";
-import CONSTANTS from "../constants/constants.js";
+import GiveItems from "../src/applications/dialogs/give-items-dialog/give-items-dialog.js";
+import PrivateAPI from "../src/API/private-api.js";
+import CONSTANTS from "../src/constants/constants.js";
 
 export default {
 
-	"VERSION": "1.0.8",
+	"VERSION": "1.0.9",
 
 	// The actor class type is the type of actor that will be used for the default item pile actor that is created on first item drop.
 	"ACTOR_CLASS_TYPE": "character",
@@ -28,7 +28,7 @@ export default {
 	"ITEM_FILTERS": [
 		{
 			"path": "type",
-			"filters": "spell,feat,class,subclass,background"
+			"filters": "background,class,facility,feat,race,spell,subclass"
 		},
 		{
 			"path": "system.type.value",
@@ -45,7 +45,8 @@ export default {
 				delete itemData.system[key];
 			}
 		});
-		foundry.utils.setProperty(itemData, "system.attunement", Math.min(CONFIG.DND5E.attunementTypes.REQUIRED, itemData?.system?.attunement ?? 0));
+		foundry.utils.setProperty(itemData, "system.attunement", itemData?.system?.attunement ?? "");
+		foundry.utils.setProperty(itemData, "system.attuned", false);
 		if (itemData.type === "spell") {
 			try {
 				const scroll = await Item.implementation.createScrollFromSpell(itemData);
@@ -60,15 +61,16 @@ export default {
 		"GLOBAL": {
 			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED]: ({ item }) => {
 				return item.system.container;
-			}
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH]: "system.container"
 		},
 		"container": {
 			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
 			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
-				return item.system.contents.contents;
+				return item.system.contents;
 			},
 			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
-				for (const containedItem of item.system.contents.contents) {
+				for (const containedItem of item.system.contents) {
 					items.push(containedItem.toObject());
 				}
 			}
@@ -258,7 +260,7 @@ export default {
 
 		Hooks.on("dnd5e.getItemContextOptions", (item, options) => {
 			options.push({
-				name: "Give to character",
+				name: game.i18n.localize("ITEM-PILES.ContextMenu.GiveToCharacter"),
 				icon: "<i class='fa fa-user'></i>",
 				callback: async () => {
 					const result = await GiveItems.show(item);

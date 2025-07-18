@@ -1,6 +1,6 @@
 <script>
 	import { getContext, onDestroy } from 'svelte';
-	import { ApplicationShell } from '#runtime/svelte/component/core';
+	import { ApplicationShell } from '#runtime/svelte/component/application';
 	import MerchantStore from "../../stores/merchant-store.js";
 	import * as Helpers from "../../helpers/helpers.js";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
@@ -10,6 +10,7 @@
 	import MerchantTopBar from "./MerchantTopBar.svelte";
 	import Tabs from "../components/Tabs.svelte";
 	import { get, writable } from "svelte/store";
+	import PrivateAPI from "../../API/private-api.js";
 
 	const { application } = getContext('#external');
 
@@ -34,7 +35,7 @@
 
 	async function dropData(data) {
 
-		if (!game.user.isGM) return;
+		if (!store.userHasAuthority) return;
 
 		if (!data.type) {
 			throw Helpers.custom_error("Something went wrong when dropping this item!")
@@ -61,6 +62,14 @@
 			warningContent: "ITEM-PILES.Dialogs.TypeWarning.TradeContent"
 		});
 		if (!validItem) return;
+
+		if (item.parent && store.recipient) {
+			return PrivateAPI._giveItem({
+				source: store.recipient,
+				target: store.actor,
+				itemData: { item: validItem }
+			});
+		}
 
 		return game.itempiles.API.addItems(merchant, [{
 			item: validItem,

@@ -10,7 +10,7 @@ Remove the `userIds` portion to only show the interface for yourself.
 
 ```js
 game.itempiles.API.renderItemPileInterface(game.actors.getName("ACTOR_NAME_HERE"), {
-  userIds: game.users.map(user => user.id)
+	userIds: game.users.map(user => user.id)
 });
 ```
 
@@ -20,7 +20,13 @@ Select tokens, run macro. They can now be looted.
 
 ```js
 if (!canvas.tokens.controlled.length) return;
-game.itempiles.API.turnTokensIntoItemPiles(canvas.tokens.controlled)
+game.itempiles.API.turnTokensIntoItemPiles(canvas.tokens.controlled, {
+	pileSettings: {
+		displayOne: false,
+		showItemName: false,
+		overrideSingleItemScale: false
+	}
+});
 ```
 
 ### Revert tokens from being lootable
@@ -49,11 +55,11 @@ preserved.
 ```js
 if (!canvas.tokens.controlled.length) return;
 for (const selected_token of canvas.tokens.controlled) {
-  await game.itempiles.API.rollItemTable("MY_TABLE_NAME_HERE", {
-    timesToRoll: "1d4+1",
-    targetActor: selected_token.actor,
-    removeExistingActorItems: false
-  });
+	await game.itempiles.API.rollItemTable("MY_TABLE_NAME_HERE", {
+		timesToRoll: "1d4+1",
+		targetActor: selected_token.actor,
+		removeExistingActorItems: false
+	});
 }
 await game.itempiles.API.turnTokensIntoItemPiles(canvas.tokens.controlled);
 ```

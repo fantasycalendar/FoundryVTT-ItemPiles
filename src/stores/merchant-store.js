@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { localize } from "#runtime/svelte/helper";
+import { localize } from "#runtime/util/i18n";
 import { PileItem } from "./pile-item.js";
 import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
@@ -33,6 +33,10 @@ export default class MerchantStore extends ItemPileStore {
 		this.log = writable([]);
 		this.visibleLogItems = writable(20);
 		this.logSearch = writable("");
+	}
+
+	get userHasAuthority() {
+		return game.user.isGM || this.actor.isOwner;
 	}
 
 	get ItemClass() {
@@ -142,6 +146,9 @@ export default class MerchantStore extends ItemPileStore {
 		if (pileData.displayQuantity !== "alwaysno") {
 			columns.push({
 				label: "Quantity", component: QuantityColumn, sortMethod: (a, b, inverse) => {
+					if (!Utilities.isItemStackable(a.item)) {
+						return -1;
+					}
 					return (get(b.quantity) - get(a.quantity)) * (inverse ? -1 : 1);
 				}
 			})
@@ -154,7 +161,8 @@ export default class MerchantStore extends ItemPileStore {
 				const BPrice = get(b.prices).find(price => price.primary);
 				if (!APrice) return 1;
 				if (!BPrice) return -1;
-				return (BPrice.totalCost - APrice.totalCost) * (inverse ? -1 : 1);
+				if (BPrice.totalCost === APrice.totalCost) return 0;
+				return (BPrice.totalCost > APrice.totalCost ? 1 : -1) * (inverse ? -1 : 1);
 			}
 		})
 		columns.push({
@@ -181,7 +189,9 @@ export default class MerchantStore extends ItemPileStore {
 
 	visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData) {
 		const itemIsFree = !!get(entry.prices).find(price => price.free);
+		const itemIsContained = get(entry.containerID);
 		return super.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData)
+			&& !itemIsContained
 			&& (
 				actorIsMerchant
 					? !(pileData?.hideItemsWithZeroCost && itemIsFree)
@@ -338,7 +348,11 @@ export default class MerchantStore extends ItemPileStore {
 
 				const action = localize("ITEM-PILES.Merchant." + (log.sold ? "LogSold" : "LogBought"));
 
-				log.text = localize("ITEM-PILES.Merchant.LogTransaction", {
+				const localization = log.price
+					? "ITEM-PILES.Merchant.LogTransaction"
+					: "ITEM-PILES.Merchant.LogFreeTransaction";
+
+				log.text = localize(localization, {
 					instigator, quantity, item: `<strong>${log.item}</strong>`, action: `<span>${action}</span>`, price: log.price
 				});
 
@@ -374,10 +388,13 @@ export default class MerchantStore extends ItemPileStore {
 			return logs;
 		})
 	}
-
 }
 
 class PileMerchantItem extends PileItem {
+
+	RENDER_HOOK = CONSTANTS.HOOKS.RENDER_MERCHANT_ITEM;
+	HOVER_HOOK = CONSTANTS.HOOKS.HOVER_MERCHANT_ITEM;
+	LEAVE_HOOK = CONSTANTS.HOOKS.LEAVE_MERCHANT_ITEM;
 
 	setupStores(...args) {
 		super.setupStores(...args);

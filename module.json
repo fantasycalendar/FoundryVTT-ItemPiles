@@ -5,9 +5,9 @@
   "version": "100.0.0",
   "library": "false",
   "compatibility": {
-    "minimum": "11",
-    "verified": "12",
-    "maximum": "12"
+    "minimum": "12",
+    "verified": "13",
+    "maximum": "13"
   },
   "authors": [
     {
@@ -16,34 +16,11 @@
       "discord": "Wasp#2005"
     }
   ],
-  "packs": [
-    {
-      "label": "Item Piles: Merchant Tables",
-      "name": "item-piles-merchant-tables",
-      "path": "./packs/item-piles-merchant-tables.db",
-      "system": "dnd5e",
-      "type": "RollTable"
-    },
-    {
-      "label": "Item Piles: Custom Items",
-      "name": "item-piles-custom-items",
-      "path": "./packs/item-piles-custom-items.db",
-      "system": "dnd5e",
-      "type": "Item"
-    },
-    {
-      "label": "Item Piles: Macros",
-      "name": "item-piles-macros",
-      "path": "./packs/item-piles-macros.db",
-      "system": "dnd5e",
-      "type": "Macro"
-    }
-  ],
   "esmodules": [
-    "module.js"
+    "dist/item-piles.js"
   ],
   "styles": [
-    "style.css"
+    "dist/item-piles.css"
   ],
   "languages": [
     {
@@ -100,6 +77,11 @@
       "lang": "ru",
       "name": "Русский",
       "path": "languages/ru.json"
+    },
+    {
+      "lang": "zh-Hant",
+      "name": "漢語（正體字）",
+      "path": "languages/zh_Hant.json"
     }
   ],
   "relationships": {

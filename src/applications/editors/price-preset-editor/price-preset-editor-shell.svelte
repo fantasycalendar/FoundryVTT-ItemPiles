@@ -1,8 +1,8 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import PriceList from "../../components/PriceList.svelte";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
 
 	const { application } = getContext('#external');
 

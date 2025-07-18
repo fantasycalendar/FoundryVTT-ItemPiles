@@ -16,6 +16,8 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import ReceiveItemsShell from "../applications/dialogs/receive-items-dialog/receive-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 import { hotkeyActionState } from "../hotkeys.js";
+import { ensureValidIds } from "../helpers/utilities.js";
+import { getPileActorDefaults } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -43,6 +45,7 @@ export default class PrivateAPI {
 	 * @private
 	 */
 	static async _onCanvasReady(canvas) {
+		if (!Helpers.getSetting("preloadFiles")) return;
 		const tokens = [...canvas.tokens.placeables].map(token => token.document);
 		for (const doc of tokens) {
 			await this._preloadItemPileFiles(doc);
@@ -187,6 +190,7 @@ export default class PrivateAPI {
 		if (!PileUtilities.isValidItemPile(doc)) return true;
 		const itemPileConfig = PileUtilities.getActorFlagData(doc.actor)
 		Helpers.hooks.callAll(CONSTANTS.HOOKS.PILE.CREATE, doc, itemPileConfig);
+		if (!Helpers.getSetting("preloadFiles")) return true;
 		return this._preloadItemPileFiles(doc);
 	}
 
@@ -282,17 +286,21 @@ export default class PrivateAPI {
 		const sourceTransaction = new Transaction(sourceActor);
 		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
 			const newItems = [];
-			for (const itemData of items) {
+			for (const data of items) {
+				const itemData = data?.item ?? data;
 				const item = sourceActor.items.get(itemData._id ?? itemData.id);
 				const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
 				if (!handler) continue;
 				handler({ item, items: newItems });
 			}
-			items = items.concat(newItems.map(item => ({
-				_id: item._id,
-				flags: undefined,
-				quantity: Utilities.getItemQuantity(item)
-			})));
+			newItems.forEach(newItem => {
+				if (items.some(item => (item?.id ?? item?.item?._id) === newItem._id)) return;
+				items.push({
+					id: newItem._id,
+					flags: undefined,
+					quantity: Utilities.getItemQuantity(newItem)
+				})
+			})
 		}
 		await sourceTransaction.appendItemChanges(items, { remove: true });
 
@@ -1077,7 +1085,10 @@ export default class PrivateAPI {
 			userId: userId,
 			interactionId: interactionId
 		};
-		await Promise.allSettled(sourceUuids.map(uuid => this._executeItemPileMacro(uuid, { ...macroData, source: uuid })));
+		await Promise.allSettled(sourceUuids.map(uuid => this._executeItemPileMacro(uuid, {
+			...macroData,
+			source: uuid
+		})));
 		await this._executeItemPileMacro(targetUuid, { ...macroData, source: false });
 
 		const tokensToDelete = sourceUuids
@@ -1110,7 +1121,10 @@ export default class PrivateAPI {
 			await targetDocument.update(documentChanges);
 		}
 		const createdItems = itemsToCreate.length
-			? await targetDocument.createEmbeddedDocuments("Item", itemsToCreate, { keepId: true, keepEmbeddedIds: true })
+			? await targetDocument.createEmbeddedDocuments("Item", itemsToCreate, {
+				keepId: true,
+				keepEmbeddedIds: true
+			})
 			: [];
 		if (itemsToUpdate.length) await targetDocument.updateEmbeddedDocuments("Item", itemsToUpdate);
 		if (itemsToDelete.length) await targetDocument.deleteEmbeddedDocuments("Item", itemsToDelete);
@@ -1179,7 +1193,10 @@ export default class PrivateAPI {
 				itemsDropped = await this._addItems(targetUuid, items, userId);
 			} else {
 				targetUuid = await this._createItemPile({
-					sceneId, position, items: items.map(data => data.item), tokenOverrides: { elevation: elevation || 0 }
+					sceneId,
+					position,
+					items: items.map(data => data.item),
+					tokenOverrides: { elevation: elevation || 0 }
 				});
 			}
 
@@ -1209,20 +1226,12 @@ export default class PrivateAPI {
 
 		if (createActor) {
 
-			const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
-			const defaultItemPileActor = game.actors.get(defaultItemPileId);
-
-			let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
-			pileDataDefaults.enabled = true;
-			if (foundry.utils.isEmpty(itemPileFlags) && defaultItemPileActor) {
-				const defaultItemPileSettings = PileUtilities.getActorFlagData(defaultItemPileActor);
-				itemPileFlags = foundry.utils.mergeObject(pileDataDefaults, defaultItemPileSettings);
-			}
-
-			pileDataDefaults = foundry.utils.mergeObject(pileDataDefaults, itemPileFlags);
+			const pileDataDefaults = PileUtilities.getPileActorDefaults({ ...itemPileFlags, enabled: true });
 
 			const actorData = {
-				name: actor || "New Item Pile", type: Helpers.getSetting("actorClassType"), img: "icons/svg/item-bag.svg"
+				name: actor || "New Item Pile",
+				type: Helpers.getSetting("actorClassType"),
+				img: "icons/svg/item-bag.svg"
 			};
 
 			if (folders) {
@@ -1393,7 +1402,11 @@ export default class PrivateAPI {
 				new Promise(async (resolve) => {
 					await Helpers.wait(250);
 					await Helpers.hooks.runWithout(async () => {
-						await tokenDocument.actor.createEmbeddedDocuments("Item", items, { keepId: true });
+						const newItems = Utilities.ensureValidIds(tokenDocument.actor, items);
+						await tokenDocument.actor.createEmbeddedDocuments("Item", newItems, {
+							keepId: true,
+							keepEmbeddedIds: true
+						});
 					});
 					resolve();
 				});
@@ -1405,7 +1418,8 @@ export default class PrivateAPI {
 
 			if (items.length && !pileActor.prototypeToken.actorLink) {
 				await Helpers.hooks.runWithout(async () => {
-					await pileActor.createEmbeddedDocuments("Item", items, { keepId: true });
+					const newItems = Utilities.ensureValidIds(pileActor, items);
+					await pileActor.createEmbeddedDocuments("Item", newItems, { keepId: true, keepEmbeddedIds: true });
 				});
 			}
 
@@ -1565,22 +1579,30 @@ export default class PrivateAPI {
 		if (PileUtilities.isItemPileContainer(targetActor, data)) {
 			if (diff?.closed === true) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE,
+					source: interactingTokenUuid,
+					target: targetUuid
 				});
 			}
 			if (diff?.locked === true) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: CONSTANTS.MACRO_EXECUTION_TYPES.LOCK_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.LOCK_ITEM_PILE,
+					source: interactingTokenUuid,
+					target: targetUuid
 				});
 			}
 			if (diff?.locked === false) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: CONSTANTS.MACRO_EXECUTION_TYPES.UNLOCK_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.UNLOCK_ITEM_PILE,
+					source: interactingTokenUuid,
+					target: targetUuid
 				});
 			}
 			if (diff?.closed === false) {
 				await this._executeItemPileMacro(targetUuid, {
-					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE, source: interactingTokenUuid, target: targetUuid
+					action: CONSTANTS.MACRO_EXECUTION_TYPES.OPEN_ITEM_PILE,
+					source: interactingTokenUuid,
+					target: targetUuid
 				});
 			}
 		}
@@ -1664,50 +1686,41 @@ export default class PrivateAPI {
 
 		const pileData = PileUtilities.getActorFlagData(tokenDocument);
 
-		if (Helpers.getSetting("preloadFiles")) {
-			await Promise.allSettled(Object.entries(pileData).map(entry => {
-				return new Promise(async (resolve) => {
-					const [property, filePath] = entry;
-					if (Array.isArray(filePath)) {
-						return resolve();
-					}
-					const isImage = property.toLowerCase().includes("image");
-					const isSound = property.toLowerCase().includes("sound");
-					if ((!isImage && !isSound) || (!filePath || preloadedFiles.has(filePath))) return resolve();
-					preloadedFiles.add(filePath);
-					if (isImage) {
-						await loadTexture(filePath);
-						Helpers.debug(`Preloaded image: ${filePath}`);
-					} else if (isSound) {
-						Helpers.debug(`Preloaded sound: ${filePath}`);
-						await AudioHelper.preloadSound(filePath);
-					}
-					resolve();
-				});
-			}));
-		}
+		await Promise.allSettled(Object.entries(pileData).map(entry => {
+			return new Promise(async (resolve) => {
+				const [property, filePath] = entry;
+				if (Array.isArray(filePath)) {
+					return resolve();
+				}
+				const isImage = property.toLowerCase().includes("image");
+				const isSound = property.toLowerCase().includes("sound");
+				if ((!isImage && !isSound) || (!filePath || preloadedFiles.has(filePath))) return resolve();
+				preloadedFiles.add(filePath);
+				if (isImage) {
+					await loadTexture(filePath);
+					Helpers.debug(`Preloaded image: ${filePath}`);
+				} else if (isSound) {
+					Helpers.debug(`Preloaded sound: ${filePath}`);
+					await AudioHelper.preloadSound(filePath);
+				}
+				resolve();
+			});
+		}));
 
 		Helpers.debug(`Initialized item pile with uuid ${tokenDocument.uuid}`);
 	}
 
 	/**
-	 * This executes any macro that is configured on the item pile, providing the macro with extra data relating to the
-	 * action that prompted the execution (if the advanced-macros module is installed)
+	 * This method will resolve any uuids and replace them with their corresponding documents.
+	 * If the macroData has already been marked as reformatted, nothing will be done.
 	 *
-	 * @param {String} targetUuid
 	 * @param {Object} macroData
-	 * @return {Promise/Boolean}
+	 * @return {Promise}
 	 */
-	static async _executeItemPileMacro(targetUuid, macroData) {
-
-		const target = Utilities.getToken(targetUuid);
-
-		if (!PileUtilities.isValidItemPile(target)) return;
-
-		const pileData = PileUtilities.getActorFlagData(target);
-
-		if (!pileData.macro) return;
-
+	static async _reformatMacroData(macroData) {
+		if (macroData.reformatted) {
+			return;
+		}
 		// Reformat macro data to contain useful information
 		if (macroData.source) {
 			macroData.source = fromUuidSync(macroData.source);
@@ -1739,19 +1752,43 @@ export default class PrivateAPI {
 			}
 
 		}
+		macroData.reformatted = true;
+	}
+
+	/**
+	 * This executes any macro that is configured on the item pile, providing the macro with extra data relating to the
+	 * action that prompted the execution (if the advanced-macros module is installed)
+	 *
+	 * @param {String} targetUuid
+	 * @param {Object} macroData
+	 * @return {Promise/Boolean}
+	 */
+	static async _executeItemPileMacro(targetUuid, macroData) {
+
+		const target = Utilities.getToken(targetUuid);
+
+		if (!PileUtilities.isValidItemPile(target)) return;
+
+		const pileData = PileUtilities.getActorFlagData(target);
+
+		if (!pileData.macro) return;
+
+		// Reformat macro data to contain useful information
+		await this._reformatMacroData(macroData);
 
 		return Utilities.runMacro(pileData.macro, macroData)
-
 	}
 
 	/**
 	 * This handles any dropped data onto the canvas or a set item pile
 	 *
 	 * @param {canvas} canvas
-	 * @param {Object} data
+	 * @param {Object} userDropData
 	 * @return {Promise}
 	 */
-	static async _dropData(canvas, data) {
+	static async _dropData(canvas, userDropData) {
+
+		const data = foundry.utils.deepClone(userDropData);
 
 		if (data.type !== "Item") return;
 
@@ -1787,21 +1824,19 @@ export default class PrivateAPI {
 
 		} else {
 
-			const position = canvas.grid.getTopLeft(data.x, data.y);
-			x = position[0];
-			y = position[1];
+			const { x, y } = canvas.grid.getTopLeftPoint(data);
 
 			droppableDocuments = Utilities.getTokensAtLocation({ x, y })
 				.map(token => Utilities.getDocument(token));
 
-			if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get("midi-qol", "DragDropTarget")) {
-				Helpers.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items");
-				return;
-			}
-
 			if (!droppableDocuments.length) {
 				dropData.position = { x, y };
 			}
+		}
+
+		if (droppableDocuments.length && game.modules.get("midi-qol")?.active && game.settings.get("midi-qol", "DragDropTarget")) {
+			Helpers.custom_warning("You have Drag & Drop Targetting enabled in MidiQOL, which disables drag & drop items with item piles");
+			return;
 		}
 
 		const droppableItemPiles = droppableDocuments.filter(token => PileUtilities.isValidItemPile(token));
@@ -1933,7 +1968,7 @@ export default class PrivateAPI {
 					if (!itemQuantity) return;
 				}
 
-				dropData.itemData.quantity = Number(itemQuantity);
+				dropData.itemData.quantity = Utilities.sanitizeNumber(itemQuantity);
 
 			}
 		}
@@ -2013,7 +2048,7 @@ export default class PrivateAPI {
 					return;
 				}
 				if (!options?.skipQuantityDialog) {
-					dropData.itemData.quantity = await DropItemDialog.show(item, dropData.target.actor, {
+					dropData.itemData.quantity = await DropItemDialog.show(item, targetActor, {
 						localizationTitle: "GiveItem"
 					});
 				} else if (!dropData.itemData.quantity) {
@@ -2030,7 +2065,7 @@ export default class PrivateAPI {
 				return;
 			}
 
-			if ((!user || !user?.active || user === game.user) && game.user.isGM) {
+			if ((!user || !user?.active || user === game.user) && sourceActor.isOwner && targetActor.isOwner) {
 				if (sourceActor) {
 					Helpers.custom_notify(game.i18n.format("ITEM-PILES.Notifications.ItemTransferred", {
 						source_actor_name: sourceActor.name, target_actor_name: targetActor.name, item_name: item.name
@@ -2280,9 +2315,14 @@ export default class PrivateAPI {
 		await ItemPileSocket.callHook(CONSTANTS.HOOKS.PILE.SPLIT_INVENTORY, itemPileUuid, pileDeltas, actorDeltas, userId, instigator);
 
 		await this._executeItemPileMacro(itemPileUuid, {
-			action: CONSTANTS.MACRO_EXECUTION_TYPES.SPLIT_INVENTORY, source: itemPileUuid, target: actorUuids, transfers: {
+			action: CONSTANTS.MACRO_EXECUTION_TYPES.SPLIT_INVENTORY,
+			source: itemPileUuid,
+			target: actorUuids,
+			transfers: {
 				pileDeltas, actorDeltas
-			}, userId: userId, instigator: instigator
+			},
+			userId: userId,
+			instigator: instigator
 		});
 
 		const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
@@ -2519,7 +2559,9 @@ export default class PrivateAPI {
 		await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);
 
 		return {
-			itemDeltas: buyerTransactionData.itemDeltas, attributeDeltas: buyerTransactionData.attributeDeltas, itemPrices
+			itemDeltas: buyerTransactionData.itemDeltas,
+			attributeDeltas: buyerTransactionData.attributeDeltas,
+			itemPrices
 		};
 
 	}
@@ -2570,6 +2612,7 @@ export default class PrivateAPI {
 
 		const itemsToAdd = items.map((item) => {
 			const actualItem = item.item.toObject();
+			foundry.utils.setProperty(actualItem, "flags", item.flags);
 			return Utilities.setItemQuantity(actualItem, item.quantity);
 		});
 

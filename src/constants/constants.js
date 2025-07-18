@@ -7,7 +7,7 @@ const CONSTANTS = {
 
 	MODULE_NAME: module_name,
 	PATH: module_path,
-	IS_V12: false,
+	IS_V13: false,
 
 	ACTOR_DELTA_PROPERTY: "delta",
 
@@ -46,6 +46,10 @@ const CONSTANTS = {
 		CONTENTS: "contents",
 		TRANSFER: "transfer",
 		IS_CONTAINED: "isContained",
+		IS_CONTAINED_PATH: "isContainedPath",
+		CONTAINER_ID_GENERATOR: "containerIdGenerator",
+		CONTAINER_ID_RETRIEVER: "containerIdRetriever",
+		CONTAINER_TRANSFORMER: "containerTransformer"
 	},
 
 	ITEM_DEFAULTS: {
@@ -65,6 +69,7 @@ const CONSTANTS = {
 		customCategory: "",
 		prices: [],
 		sellPrices: [],
+		overheadCost: [],
 		buyPriceModifier: 1,
 		sellPriceModifier: 1,
 
@@ -220,6 +225,7 @@ const CONSTANTS = {
 		refreshItemsDays: [],
 		refreshItemsHolidays: [],
 		logMerchantActivity: false,
+		overheadCost: [],
 
 		// Vault settings
 		cols: 10,
@@ -260,7 +266,15 @@ CONSTANTS.HOOKS = {
 	OPEN_INTERFACE: module`openInterface`,
 	PRE_CLOSE_INTERFACE: module`preCloseInterface`,
 	CLOSE_INTERFACE: module`closeInterface`,
+	RENDER_PILE_ITEM: module`renderPileItem`,
+	HOVER_PILE_ITEM: module`mouseHoverPileItem`,
+	LEAVE_PILE_ITEM: module`mouseLeavePileItem`,
+	RENDER_MERCHANT_ITEM: module`renderMerchantItem`,
+	HOVER_MERCHANT_ITEM: module`mouseHoverMerchantItem`,
+	LEAVE_MERCHANT_ITEM: module`mouseLeaveMerchantItem`,
 	RENDER_VAULT_GRID_ITEM: module`renderVaultGridItem`,
+	HOVER_VAULT_GRID_ITEM: module`mouseHoverVaultGridItem`,
+	LEAVE_VAULT_GRID_ITEM: module`mouseLeaveVaultGridItem`,
 	PILE: {
 		PRE_CREATE: module`preCreateItemPile`,
 		CREATE: module`createItemPile`,
@@ -336,5 +350,8 @@ CONSTANTS.HOOKS = {
 		COMPLETE: module`tradeComplete`
 	}
 }
+
+
+CONSTANTS.TABLE_UUID_REGEX = /@UUID\[(.*?)]{(.*?)}/g;
 
 export default CONSTANTS;

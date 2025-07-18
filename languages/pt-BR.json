@@ -1,11 +1,15 @@
 {
   "ITEM-PILES": {
-    "Items": "Items",
+    "Items": "Itens",
     "Currencies": "Moedas",
     "Currency": "Moeda",
     "ContextMenu": {
       "ShowToPlayers": "Mostrar aos Jogadores",
-      "RequestTrade": "Solicitar Negociação"
+      "RequestTrade": "Solicitar Negociação",
+      "GiveToCharacter": "Dar ao Personagem"
+    },
+    "Hints": {
+      "CtrlClear": "Control + Clique para limpar"
     },
     "PlayerList": {
       "TradeButton": "Trocar"
@@ -21,13 +25,13 @@
       "vault": "Cofre"
     },
     "Notifications": {
-      "SystemSupportFound": "Suporte do sistema encontrado! Aplicando configurações padrão do sistema ao Item Piles...",
+      "SystemSupportFound": "Suporte ao sistema encontrado! Aplicando configurações padrão do sistema ao Item Piles",
       "UpdateItemPileSuccess": "Pilha de Itens atualizada com sucesso.",
       "UpdateMerchantSuccess": "Comerciante atualizado com sucesso.",
       "ItemTransferred": "{item_name} de {source_actor_name} foi dado para {target_actor_name}.",
       "ItemAdded": "{item_name} foi adicionado a {target_actor_name}.",
       "GiveItemAccepted": "{user_name} aceitou sua oferta de item.",
-      "ShownToPlayers": "Exibindo {actor_name} para os jogadores.",
+      "ShownToPlayers": "Exibindo {actor_name} para os jogadores",
       "CreatedJournal": "Criado Diário de Registro de Cofre do Item Piles."
     },
     "Errors": {
@@ -47,18 +51,19 @@
       "NoGMsConnected": "AVISO - Nenhum MJ conectado - O Item Piles requer um MJ conectado para que os jogadores possam utilizar a maioria das funcionalidades do módulo.",
       "NoResponseFromGM": "AVISO - MJ \"{user_name}\" não respondeu à solicitação - Item Piles exigem que um MJ esteja conectado e responda para que os jogadores possam utilizar a maioria dos recursos do módulo.",
       "NoResponseFromGMTimeout": "AVISO - MJ \"{user_name}\" não respondeu à última solicitação - aguarde {time} segundos antes de fazer outra solicitação com o Item Piles.",
-      "TransactionNoGMConnected": "Nenhum MJ está conectado - a transação atual foi cancelada, nada foi adicionado, removido ou transferido.",
+      "TransactionNoGMConnected": "Nenhum MJ está conectado - a transação atual foi cancelada, nada foi adicionado, removido ou transferido",
       "GiveItemNoGM": "Não há MJ ativo para receber o item que você está tentando dar.",
       "GiveItemDeclined": "{user_name} recusou a oferta do seu item.",
-      "NoPlayersActive": "Não há jogadores ativos para realizar esta ação.",
+      "NoPlayersActive": "Não há jogadores ativos para realizar esta ação",
       "NoGMsConnectedAction": "AVISO - Não foi possível executar \"{action}\" porque não há MJs ativos.",
       "VaultFull": "Este item não cabe neste cofre!",
-      "CantSortVault": "Falha ao organizar itens - ou há muitos itens, ou algo deu errado.",
-      "VaultItemNotExpander": "Este item não é um expansor de cofre.",
+      "CantSortVault": "Falha ao organizar itens - ou há muitos itens, ou algo deu errado",
+      "VaultItemNotExpander": "Este item não é um expansor de cofre",
       "DroppedIsNotItem": "Você não pode soltar documentos do tipo \"{type}\" nesta pilha de itens!",
       "VaultInvalidItemDropped": "Você não pode soltar este tipo de item neste cofre!",
       "VaultSameItemOrigin": "Você não pode soltar itens no cofre que se originam do próprio cofre!",
-      "VaultNoGmItemSidebar": "Apenas MJs podem soltar itens da barra lateral!"
+      "VaultNoGmItemSidebar": "Apenas MJs podem soltar itens da barra lateral!",
+      "LogEmpty": "O log para \"{actor_name}\" está vazio e não tem nada para exportar"
     },
     "Inspect": {
       "Title": "Inspecionando Conteúdo da Pilha",
@@ -155,6 +160,7 @@
       "Minutes": "Minutos",
       "MerchantClosed": "O comerciante está fechado, volte mais tarde.",
       "Sell": "Vender",
+      "SortBy": "Ordenar por:",
       "Description": "Descrição",
       "Settings": "Configurações",
       "Override": "Sobrepor",
@@ -196,7 +202,12 @@
       "LogSetNotForSale": "{instigator} definiu o <strong>{item}</strong> <span>não disponível para venda</span",
       "LogSetVisible": "{instigator} definiu o <strong>{item}</strong> como <span>visível</span",
       "LogSetHidden": "{instigator} definiu o <strong>{item}</strong> como <span>oculto</span",
-      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}"
+      "LogTransaction": "{instigator} {action} {quantity}{item} por {price}",
+      "LogFreeTransaction": "{instigator} {action} {quantity}{item} de graça",
+      "SetNotForSale": "Não está à venda",
+      "SetForSale": "À venda",
+      "SetHidden": "Ocultar",
+      "SetVisible": "Exibir"
     },
     "Vault": {
       "VaultTab": "Cofre",
@@ -246,7 +257,7 @@
       },
       "NoSystemFound": {
         "Title": "Sistema Não Reconhecido",
-        "Content": "Atualmente, este sistema não é totalmente suportado. Isso significa que o módulo não sabe como lidar melhor com os itens deste sistema, mas ainda pode operar de forma limitada.<br><br>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. <br><br>Se você tiver alguma dúvida, é só pingar o <strong>Wasp#2005</strong> no discord do Foundry."
+        "Content": "<p><strong></strong>Este sistema não é suportado.</strong></p><p>Isso significa que o módulo não sabe como melhor lidar com os itens deste sistema, mas ainda pode operar de forma limitada.</p><p>Você mesmo pode definir as configurações do módulo, mas isso requer um pouco de conhecimento técnico. </p><p>Se você tiver alguma dúvida, tire um print da caixa de diálogo que irá abrir após você fechar isto e peça por ajuda no canal do seu sistema no servidor do discord do Foundry.</p>"
       },
       "NewSystemVersion": {
         "Title": "Nova Versão do Sistema",
@@ -359,6 +370,7 @@
         "Title": "Editando Moedas",
         "Content": "Como MJ, você pode atualizar as moedas nesta pilha de itens:",
         "Secondary": "Moedas Secundárias:",
+        "NoCurrency": "{actor_name} não tem moedas válidas",
         "Submit": "Enviar"
       },
       "DropCurrencies": {
@@ -486,7 +498,10 @@
           "AddSellOption": "Adicionar Opção de Venda",
           "DropMeClickMe": "Clique para adicionar um atributo ou arraste e solte um item para adicionar",
           "PricePreset": "Ou selecione um preço predefinido:",
-          "SelectPreset": "Selecione predefinição de preço"
+          "SelectPreset": "Selecione predefinição de preço",
+          "AddOverheadCostOption": "Adicionar Custos Indiretos",
+          "OverheadCostOptions": "Opções de Custos Indiretos",
+          "OverheadCostOptionsExplanation": "Aqui você pode configurar um custo indireto que será sempre adicionado ao preço deste item quando um comerciante o vender. Isso é afetado por modificadores de preço."
         },
         "VaultTab": {
           "GridSize": "Tamanho da Grade",
@@ -568,7 +583,7 @@
       "ItemPileConfig": {
         "Title": "Configurações da Pilha de Itens: {actor_name}",
         "Configure": "Pilha de Item",
-        "Update": "Atualizar",
+        "Update": "Atualizar Config.",
         "Main": {
           "Title": "Configurações Principais",
           "EnabledPile": "Habilitado",
@@ -583,7 +598,7 @@
           "MacroExplanation": "Nome da macro a ser executada quando interagirem com esta pilha.",
           "MacroPlaceholder": "Inserir nome da macro",
           "EditDescription": "Editar Descrição",
-          "EditDescriptionExplanation": "Esta descrição é mostrada nas interfaces relevantes quando a pilha de itens é visualizada.",
+          "EditDescriptionExplanation": "Esta descrição é mostrada nas interfaces relevantes quando a pilha de itens é visualizada",
           "DeleteWhenEmpty": "Excluir Quando Vazio",
           "DeleteWhenEmptyExplanation": "Faz com que esta pilha de itens seja excluída automaticamente quando estiver vazia.",
           "DeleteWhenEmptyDefault": "Configuração padrão do módulo",
@@ -654,9 +669,9 @@
         "Merchant": {
           "Title": "Configurações do Comerciante",
           "Enabled": "É Comerciante",
-          "EnabledExplanation": "Os jogadores não podem pegar itens de comerciantes, mas devem comprá-los.",
+          "EnabledExplanation": "Os jogadores não podem pegar itens de comerciantes, mas devem comprá-los",
           "MerchantImage": "Imagem do Comerciante",
-          "MerchantImageExplanation": "Esta é a imagem que será exibida na interface do comerciante.",
+          "MerchantImageExplanation": "Esta é a imagem que será exibida na interface do comerciante",
           "InfiniteQuantity": "Quantidade Infinita",
           "InfiniteQuantityExplanation": "Quando ativado, este comerciante não ficará sem itens.",
           "InfiniteCurrency": "Moedas Infinitas",
@@ -715,7 +730,12 @@
           "LogMerchantActivity": "Registrar Atividade do Comerciante",
           "LogMerchantActivityExplanation": "Quando ativado, isso faz com que o comerciante registre eventos como compra e venda de itens, e os MJs atualizem o status (quantidade, visibilidade e à venda) dos itens.",
           "ClearMerchantLog": "Limpar Registros",
-          "ClearMerchantLogExplanation": "Isso limpará os registros do comerciante, removendo todas as entradas. Isto não pode ser desfeito."
+          "ClearMerchantLogExplanation": "Isso limpará os registros do comerciante, removendo todas as entradas. Isto não pode ser desfeito.",
+          "ExportMerchantLog": "Exportar Registros do Comerciante",
+          "ExportMerchantLogExplanation": "Isso irá exportar e baixar um arquivo de texto com os registros, classificados das informações mais antigas para as mais recentes.",
+          "AddOverheadCostOption": "Adicionar Custos Indiretos",
+          "OverheadCostOptions": "Opções de Custos Indiretos",
+          "OverheadCostOptionsExplanation": "Aqui você pode configurar um custo indireto que é sempre adicionado ao preço dos itens quando o comerciante os vende. Isso é afetado pelos modificadores de preço."
         },
         "Vault": {
           "Title": "Configurações do Cofre",

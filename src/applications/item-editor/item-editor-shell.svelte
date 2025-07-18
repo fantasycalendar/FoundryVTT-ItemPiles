@@ -1,18 +1,19 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import * as Helpers from "../../helpers/helpers.js";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
 	import ItemPriceStore from "./ItemPriceStore.js";
 	import Tabs from "../components/Tabs.svelte";
 	import PriceList from "../components/PriceList.svelte";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
 	import MacroSelector from "../components/MacroSelector.svelte";
 	import { get, writable } from "svelte/store";
 	import SETTINGS from "../../constants/settings.js";
 	import CustomCategoryInput from "../components/CustomCategoryInput.svelte";
 	import FilePicker from "../components/FilePicker.svelte";
 	import SliderInput from "../components/SliderInput.svelte";
+	import * as Utilities from "../../helpers/utilities.js";
 
 	const { application } = getContext('#external');
 
@@ -22,6 +23,8 @@
 	let store = ItemPriceStore.make(item);
 
 	let currentCustomCategories = writable(Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES))));
+
+	let parentFlags = item.parent ? PileUtilities.getActorFlagData(item.parent) : {};
 
 	const flagDataStore = store.data;
 	let price = store.price;
@@ -205,9 +208,9 @@
 								</label>
 								<input type="text" bind:value={$price} on:change={() => {
                 const forceNumber = game.system.id === "dnd5e";
-								const isPriceNumber = !isNaN(Number($price));
+								const isPriceNumber = !isNaN(Utilities.sanitizeNumber($price));
                 $price = isPriceNumber || forceNumber
-                	? Math.max(0, isPriceNumber ? Number($price) : oldPrice)
+                	? Math.max(0, isPriceNumber ? Utilities.sanitizeNumber($price) : oldPrice)
                 	: $price;
                 oldPrice = $price;
               }}/>
@@ -283,7 +286,7 @@
 
 					{#if itemFlagData.prices.length}
 						{#each itemFlagData.prices as prices, groupIndex (groupIndex)}
-							<PriceList {item} bind:prices={prices} remove={() => { store.removePurchaseGroup(groupIndex) }}/>
+							<PriceList {parentFlags} bind:prices={prices} remove={() => { store.removePurchaseGroup(groupIndex) }}/>
 						{/each}
 					{/if}
 
@@ -301,7 +304,26 @@
 
 					{#if itemFlagData.sellPrices.length}
 						{#each itemFlagData.sellPrices as prices, groupIndex (groupIndex)}
-							<PriceList {item} bind:prices={prices} remove={() => { store.removeSellGroup(groupIndex) }}/>
+							<PriceList {parentFlags} bind:prices={prices} remove={() => { store.removeSellGroup(groupIndex) }}/>
+						{/each}
+					{/if}
+
+					<div class="form-group">
+						<label style="flex:4;">
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.OverheadCostOptions")}<br>
+							<p>{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.OverheadCostOptionsExplanation")}</p>
+						</label>
+
+						<button type="button" on:click={() => { store.addOverheadCostGroup() }}>
+							<i class="fas fa-plus"></i>
+							{localize("ITEM-PILES.Applications.ItemEditor.PriceTab.AddOverheadCostOption")}
+						</button>
+					</div>
+
+					{#if itemFlagData.overheadCost.length}
+						{#each itemFlagData.overheadCost as prices, groupIndex (groupIndex)}
+							<PriceList {parentFlags} bind:prices={prices}
+							           remove={() => { store.removeOverheadCostGroup(groupIndex) }}/>
 						{/each}
 					{/if}
 

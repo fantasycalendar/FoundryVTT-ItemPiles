@@ -1,8 +1,8 @@
 <script>
 	import { getContext } from 'svelte';
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import SliderInput from "../../components/SliderInput.svelte";
-	import { ApplicationShell } from "#runtime/svelte/component/core";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
 	import { get, writable } from "svelte/store";
 	import * as Helpers from "../../../helpers/helpers.js";
 	import SETTINGS from "../../../constants/settings.js";

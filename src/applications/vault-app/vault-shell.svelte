@@ -3,10 +3,10 @@
 
 	import { getContext, onDestroy, setContext } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { ApplicationShell } from '#runtime/svelte/component/core';
-	import { TJSContextMenu } from "#standard/application";
+	import { ApplicationShell } from "#runtime/svelte/component/application";
+	import { TJSContextMenu } from "#standard/application/menu";
 	import { get, writable } from 'svelte/store';
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 
 	import Grid from '../components/Grid/Grid.svelte';
 	import CurrencyList from '../components/CurrencyList.svelte';
@@ -128,7 +128,7 @@
 
 			if (gridData.canWithdrawItems) {
 				contextMenu.push({
-					icon: 'fas fa-hand', label: "Take", onPress: () => {
+					icon: 'fas fa-hand', label: localize('ITEM-PILES.Inspect.Take'), onPress: () => {
 						event.detail.item.item.take();
 					}
 				});
@@ -158,6 +158,7 @@
 			if (!contextMenu.length) return;
 
 			TJSContextMenu.create({
+				activeWindow: window,
 				x: event.detail.x,
 				y: event.detail.y,
 				zIndex: 1000000000000,

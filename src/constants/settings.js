@@ -23,6 +23,7 @@ const SETTINGS = {
 	POPULATION_TABLES_FOLDER: "populationTablesFolder",
 	PRICE_PRESETS: "pricePresets",
 	HIDE_TOKEN_BORDER: "hideTokenBorder",
+	WELCOME_SHOWN: "welcome-shown",
 
 	// Style settings
 	CSS_VARIABLES: "cssVariables",
@@ -46,7 +47,6 @@ const SETTINGS = {
 	TOKEN_FLAG_DEFAULTS: "tokenFlagDefaults",
 
 	// Hidden settings
-	DEFAULT_ITEM_PILE_JOURNAL_ID: "defaultItemPileJournalID",
 	DEFAULT_ITEM_PILE_ACTOR_ID: "defaultItemPileActorID",
 	SYSTEM_FOUND: "systemFound",
 	SYSTEM_NOT_FOUND_WARNING_SHOWN: "systemNotFoundWarningShown",
@@ -82,6 +82,13 @@ const SETTINGS = {
 	},
 
 	DEFAULTS: () => ({
+
+		[SETTINGS.WELCOME_SHOWN]: {
+			scope: "world",
+			config: false,
+			default: false,
+			type: Boolean,
+		},
 
 		[SETTINGS.CURRENCIES]: {
 			name: "ITEM-PILES.Settings.Currencies.Title",
@@ -311,13 +318,6 @@ const SETTINGS = {
 		},
 
 		[SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID]: {
-			scope: "world",
-			config: false,
-			default: "",
-			type: String
-		},
-
-		[SETTINGS.DEFAULT_ITEM_PILE_JOURNAL_ID]: {
 			scope: "world",
 			config: false,
 			default: "",

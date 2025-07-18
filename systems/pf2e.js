@@ -1,5 +1,5 @@
 import { TJSDialog } from "#runtime/svelte/application";
-import BasicItemDialog from "../applications/components/BasicItemDialog.svelte";
+import BasicItemDialog from "../src/applications/components/BasicItemDialog.svelte";
 
 export default {
 

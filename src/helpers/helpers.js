@@ -2,6 +2,7 @@ import CONSTANTS from "../constants/constants.js";
 import ItemPileSocket from "../socket.js";
 import SETTINGS from "../constants/settings.js";
 import editors from "../applications/editors/index.js";
+import API from "../API/api.js";
 
 
 export const debounceManager = {
@@ -93,7 +94,11 @@ export function debug(msg, args = "") {
 
 export function custom_notify(message) {
 	message = `Item Piles | ${message}`;
-	ui.notifications.notify(message, { console: false });
+	if (CONSTANTS.IS_V13) {
+		ui.notifications.notify(message, "info", { console: false });
+	} else {
+		ui.notifications.notify(message, { console: false });
+	}
 	console.log(message.replace("<br>", "\n"));
 }
 
@@ -364,4 +369,57 @@ export function isCoordinateWithinPosition(x, y, position) {
 
 export function getCanvasMouse() {
 	return canvas?.app?.renderer?.plugins?.interaction?.pointer ?? canvas?.app?.renderer?.events?.pointer;
+}
+
+export function deprecate(target, method, message) {
+	return new Proxy(target, {
+		get(target, prop, receiver) {
+			if (method === prop) {
+				console.warn(message);
+			}
+			return Reflect.get(target, prop, receiver);
+		}
+	});
+}
+
+export function downloadText(text, filename) {
+	const a = document.createElement("a");
+	const file = new Blob([text], { type: "text/json" });
+	const url = URL.createObjectURL(file)
+	a.href = url;
+	a.download = filename;
+	a.click();
+	a.remove();
+	URL.revokeObjectURL(url);
+}
+
+export function uploadJSON() {
+	return new Promise((resolve, reject) => {
+		const input = document.createElement('input');
+		input.type = 'file';
+
+		input.onchange = e => {
+
+			input.remove();
+
+			// getting a hold of the file reference
+			const file = e.target.files[0];
+
+			const reader = new FileReader();
+			reader.addEventListener('load', async () => {
+				try {
+					const loadedData = JSON.parse(reader.result);
+					resolve(loadedData)
+				} catch (err) {
+					console.error(err);
+					reject(err);
+				}
+			});
+
+			reader.readAsText(file);
+
+		}
+
+		input.click();
+	})
 }

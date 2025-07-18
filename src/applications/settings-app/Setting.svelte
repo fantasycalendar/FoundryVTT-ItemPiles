@@ -1,9 +1,11 @@
 <script>
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
+	import PropertyPathInput from "../components/PropertyPathInput.svelte";
 
 	export let key;
 	export let data;
 	export let disabled = false;
+	export let itemAttribute = false;
 	export let options = [];
 
 </script>
@@ -61,7 +63,11 @@
 						{/each}
 					</select>
 				{:else}
-					<input type="text" bind:value={data.value} disabled={disabled}/>
+					{#if itemAttribute}
+						<PropertyPathInput bind:value={data.value} disabled={disabled} templateType="Item"/>
+					{:else}
+						<input type="text" bind:value={data.value} disabled={disabled}/>
+					{/if}
 					{#if data.localize}
 						<input type="text" disabled value={localize(data.value)}/>
 					{/if}

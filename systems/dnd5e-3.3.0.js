@@ -1,6 +1,6 @@
-import GiveItems from "../applications/dialogs/give-items-dialog/give-items-dialog.js";
-import PrivateAPI from "../API/private-api.js";
-import CONSTANTS from "../constants/constants.js";
+import GiveItems from "../src/applications/dialogs/give-items-dialog/give-items-dialog.js";
+import PrivateAPI from "../src/API/private-api.js";
+import CONSTANTS from "../src/constants/constants.js";
 
 export default {
 
@@ -58,17 +58,19 @@ export default {
 	"ITEM_TYPE_HANDLERS": {
 		"GLOBAL": {
 			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED]: ({ item }) => {
-				return item.system.container;
-			}
+				const itemData = item instanceof Item ? item.toObject() : item;
+				return !!itemData?.system?.container;
+			},
+			[CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH]: "system.container"
 		},
 		"container": {
 			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
 			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
-				return item.system.contents.contents;
+				return item.system.contents;
 			},
-			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
-				for (const containedItem of item.system.contents.contents) {
-					items.push(containedItem.toObject());
+			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items, raw = false } = {}) => {
+				for (const containedItem of item.system.contents) {
+					items.push(raw ? containedItem : containedItem.toObject());
 				}
 			}
 		}
@@ -257,7 +259,7 @@ export default {
 
 		Hooks.on("dnd5e.getItemContextOptions", (item, options) => {
 			options.push({
-				name: "Give to character",
+				name: game.i18n.localize("ITEM-PILES.ContextMenu.GiveToCharacter"),
 				icon: "<i class='fa fa-user'></i>",
 				callback: async () => {
 					const result = await GiveItems.show(item);

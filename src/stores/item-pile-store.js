@@ -148,14 +148,14 @@ export default class ItemPileStore {
 
 	setupSubscriptions() {
 
-		this.subscribeTo(this.document, () => {
-			const updateData = this.document.updateOptions;
-			const renderData = updateData?.renderData ?? updateData?.data ?? {};
-			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.SHARING)) {
+		this.subscribeTo(this.document, (doc, update) => {
+			if (update.action.includes("delete")) return;
+			const updateData = update.data?.[0] ?? {};
+			if (foundry.utils.hasProperty(updateData, CONSTANTS.FLAGS.SHARING)) {
 				this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
 				this.refreshItems();
 			}
-			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.PILE)) {
+			if (foundry.utils.hasProperty(updateData, CONSTANTS.FLAGS.PILE)) {
 				this.pileData.set(PileUtilities.getActorFlagData(this.actor));
 				this.pileCurrencies.set(PileUtilities.getActorCurrencies(this.actor, { getAll: true }));
 				this.refreshItems();
@@ -165,14 +165,14 @@ export default class ItemPileStore {
 		});
 
 		if (this.recipientDocument) {
-			this.subscribeTo(this.recipientDocument, () => {
-				const updateData = this.document.updateOptions;
-				const renderData = updateData?.renderData ?? updateData?.data ?? {};
-				if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.SHARING)) {
+			this.subscribeTo(this.recipientDocument, (doc, update) => {
+				if (update.action.includes("delete")) return;
+				const updateData = update.data?.[0] ?? {};
+				if (foundry.utils.hasProperty(updateData, CONSTANTS.FLAGS.SHARING)) {
 					this.recipientShareData.set(SharingUtilities.getItemPileSharingData(this.recipient));
 					this.refreshItems();
 				}
-				if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.PILE)) {
+				if (foundry.utils.hasProperty(updateData, CONSTANTS.FLAGS.PILE)) {
 					this.recipientPileData.set(PileUtilities.getActorFlagData(this.recipient));
 					this.recipientCurrencies.set(PileUtilities.getActorCurrencies(this.recipient, { getAll: true }));
 					this.refreshItems();
@@ -212,6 +212,17 @@ export default class ItemPileStore {
 			items.push(new this.ItemClass(this, item));
 		});
 
+		PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
+			if (currency.type === "item") {
+				if (!currency.item) return;
+				if (items.some(existingItem => existingItem.item === currency.item)) return;
+				items.push(new this.ItemClass(this, currency.item, true, !!currency?.secondary));
+			} else {
+				if (attributes.some(existingAttribute => existingAttribute.path === currency.path)) return;
+				attributes.push(new this.AttributeClass(this, currency, true, !!currency?.secondary));
+			}
+		});
+
 		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
 
 			const groupedItems = items.filter(item => {
@@ -233,17 +244,6 @@ export default class ItemPileStore {
 			});
 
 		}
-
-		PileUtilities.getActorCurrencies(this.actor, { forActor: this.recipient, getAll: true }).forEach(currency => {
-			if (currency.type === "item") {
-				if (!currency.item) return;
-				if (items.some(existingItem => existingItem.item === currency.item)) return;
-				items.push(new this.ItemClass(this, currency.item, true, !!currency?.secondary));
-			} else {
-				if (attributes.some(existingAttribute => existingAttribute.path === currency.path)) return;
-				attributes.push(new this.AttributeClass(this, currency, true, !!currency?.secondary));
-			}
-		});
 
 		this.allItems.set(items);
 		this.attributes.set(attributes);
@@ -299,7 +299,7 @@ export default class ItemPileStore {
 			.reduce((acc, item) => {
 				const containerID = get(item.containerID);
 				if (containerID) {
-					const container = allItems.find(pileItem => pileItem.id === containerID);
+					const container = allItems.find(pileItem => containerID.includes(pileItem.id));
 					if (container) {
 						container.subItems.update(subItems => {
 							subItems.push(item);
@@ -335,16 +335,16 @@ export default class ItemPileStore {
 				return acc;
 			}, []);
 
-		const visibleItems = groupedItems.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData));
+		const visibleItems = groupedItems
+			.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData))
+			.filter(entry => !get(entry.filtered))
+			.sort((a, b) => this.itemSortFunction(a, b));
 		const itemCurrencies = groupedItems.filter(entry => entry.isCurrency && !entry.isSecondaryCurrency);
 		const secondaryItemCurrencies = groupedItems.filter(entry => entry.isSecondaryCurrency);
 
+		this.numItems.set(visibleItems.filter(entry => get(entry.quantity) > 0).length);
 		this.visibleItems.set(visibleItems);
-
-		const items = visibleItems.filter(entry => !get(entry.filtered));
-
-		this.numItems.set(items.filter(entry => get(entry.quantity) > 0).length);
-		this.items.set(items.sort((a, b) => this.itemSortFunction(a, b)));
+		this.items.set(visibleItems);
 
 		const currencies = groupedAttributes.filter(entry => !entry.isSecondaryCurrency).concat(itemCurrencies);
 		const secondaryCurrencies = groupedAttributes.filter(entry => entry.isSecondaryCurrency).concat(secondaryItemCurrencies);
@@ -354,7 +354,7 @@ export default class ItemPileStore {
 		this.currencies.set(currencies.concat(secondaryCurrencies).filter(entry => !get(entry.filtered)));
 		this.allCurrencies.set(currencies.concat(secondaryCurrencies));
 
-		this.itemCategories.set(Object.values(visibleItems.reduce((acc, item) => {
+		this.itemCategories.set(Object.values(allItems.reduce((acc, item) => {
 			const category = get(item.category);
 			if (!acc[category.type]) {
 				acc[category.type] = { ...category };
@@ -362,7 +362,7 @@ export default class ItemPileStore {
 			return acc;
 		}, {})).sort((a, b) => a.label < b.label ? -1 : 1));
 
-		const itemsPerCategory = items
+		const itemsPerCategory = visibleItems
 			.reduce((acc, item) => {
 				const category = get(item.category);
 				if (!acc[category.type]) {
@@ -415,6 +415,7 @@ export default class ItemPileStore {
 		const items = get(this.allItems);
 		const pileItem = items.find(pileItem => pileItem.id === item.id);
 		if (!pileItem) return;
+		pileItem.unsubscribe();
 		if (get(this.editQuantities) || !InterfaceTracker.isOpened(this.application.id)) {
 			items.splice(items.indexOf(pileItem), 1);
 			this.allItems.set(items);
@@ -423,7 +424,6 @@ export default class ItemPileStore {
 			pileItem.quantity.set(0);
 			pileItem.quantityLeft.set(0);
 		}
-		pileItem.unsubscribe();
 	}
 
 	getSimilarItem(item) {

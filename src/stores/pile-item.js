@@ -53,9 +53,22 @@ class PileBaseItem {
 
 	preview() {
 	}
+
+	rendered(element) {
+	}
+
+	mouseEnter(element) {
+	}
+
+	mouseLeave(element) {
+	}
 }
 
 export class PileItem extends PileBaseItem {
+
+	RENDER_HOOK = CONSTANTS.HOOKS.RENDER_PILE_ITEM;
+	HOVER_HOOK = CONSTANTS.HOOKS.HOVER_PILE_ITEM;
+	LEAVE_HOOK = CONSTANTS.HOOKS.LEAVE_PILE_ITEM;
 
 	setupStores(item) {
 		super.setupStores();
@@ -94,19 +107,19 @@ export class PileItem extends PileBaseItem {
 			this.quantityLeft.set(quantityLeft);
 		});
 
-		this.subscribeTo(this.itemDocument, () => {
-			const updateData = this.itemDocument.updateOptions;
-			const renderData = updateData?.renderData ?? updateData?.data ?? {};
+		this.subscribeTo(this.itemDocument, (doc, update) => {
+			if (update.action.includes("delete")) return;
+			const updateData = update.data?.[0] ?? {};
 			const itemData = CompendiumUtilities.findSimilarItemInCompendiumSync(this.item);
 			this.name.set(itemData?.name ?? this.item.name);
 			this.img.set(itemData?.img ?? this.item.img);
 			this.similarities = Utilities.setSimilarityProperties({}, this.item);
-			if (PileUtilities.canItemStack(this.item, this.store.actor) && Utilities.hasItemQuantity(renderData)) {
-				this.quantity.set(Utilities.getItemQuantity(renderData));
+			if (PileUtilities.canItemStack(this.item, this.store.actor) && Utilities.hasItemQuantity(updateData)) {
+				this.quantity.set(Utilities.getItemQuantity(updateData));
 				const quantity = Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity));
 				this.currentQuantity.set(quantity);
 			}
-			if (foundry.utils.hasProperty(renderData, CONSTANTS.FLAGS.ITEM)) {
+			if (foundry.utils.hasProperty(updateData, CONSTANTS.FLAGS.ITEM)) {
 				this.itemFlagData.set(PileUtilities.getItemFlagData(this.item));
 				this.updateCategory();
 				this.store.refreshItems();
@@ -117,7 +130,7 @@ export class PileItem extends PileBaseItem {
 			if (Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED)) {
 				this.containerID.set(Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED)({ item: this.item }));
 			}
-			if (!foundry.utils.isEmpty(renderData) && Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, this.item.type)) {
+			if (!foundry.utils.isEmpty(updateData) && Utilities.hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY, this.item.type)) {
 				this.store.populateItems();
 				this.store.refreshItems();
 			}
@@ -181,7 +194,7 @@ export class PileItem extends PileBaseItem {
 			this.filtered.set(true);
 		} else if (search) {
 			const nameIsInSearchQuery = name.toLowerCase().includes(search.toLowerCase());
-			const subItemNamesMatchQuery = get(this.subItems).some(item => get(item.filtered));
+			const subItemNamesMatchQuery = get(this.subItems).some(item => !get(item.filtered));
 			this.filtered.set(!(nameIsInSearchQuery || subItemNamesMatchQuery));
 		} else {
 			this.filtered.set(!presentFromTheStart && quantity === 0);
@@ -232,9 +245,25 @@ export class PileItem extends PileBaseItem {
 		const itemData = this.item.toObject();
 		itemData.ownership[game.user.id] = 1;
 		const newItem = new Item.implementation(itemData);
+		newItem.document = newItem;
 		const cls = newItem._getSheetClass();
 		const sheet = new cls(newItem, { editable: false });
-		return sheet._render(true);
+		return sheet?._render ? sheet._render(true) : sheet.render(true);
+	}
+
+	rendered(element) {
+		if (!element) return;
+		Hooks.callAll(this.RENDER_HOOK, element, this.item);
+	}
+
+	mouseEnter(element) {
+		if (!element) return;
+		Hooks.callAll(this.HOVER_HOOK, element, this.item);
+	}
+
+	mouseLeave(element) {
+		if (!element) return;
+		Hooks.callAll(this.LEAVE_HOOK, element, this.item);
 	}
 }
 
@@ -248,7 +277,7 @@ export class PileAttribute extends PileBaseItem {
 		this.img = writable(this.attribute.img);
 		this.abbreviation = writable(this.attribute.abbreviation);
 		this.identifier = foundry.utils.randomID();
-		const startingQuantity = Number(foundry.utils.getProperty(this.parent, this.path) ?? 0);
+		const startingQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(this.parent, this.path) ?? 0);
 		this.presentFromTheStart.set(startingQuantity > 0);
 		this.quantity.set(startingQuantity);
 		this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -270,14 +299,14 @@ export class PileAttribute extends PileBaseItem {
 			this.quantityLeft.set(Math.min(quantity, quantityLeft));
 		});
 
-		this.subscribeTo(this.parentDoc, () => {
-			const updateData = this.parentDoc.updateOptions;
-			const renderData = updateData?.renderData ?? updateData?.data ?? {};
+		this.subscribeTo(this.parentDoc, (doc, update) => {
+			if (update.action.includes("delete")) return;
+			const updateData = update.data?.[0] ?? {};
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
-			if (foundry.utils.hasProperty(renderData, this.path)) {
-				const newQuantity = Number(foundry.utils.getProperty(renderData, this.path) ?? 0);
+			if (foundry.utils.hasProperty(updateData, this.path)) {
+				const newQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(updateData, this.path) ?? 0);
 				this.quantity.set(newQuantity);
 				if (!this.toShare) {
 					this.quantityLeft.set(newQuantity);

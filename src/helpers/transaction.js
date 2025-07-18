@@ -26,7 +26,7 @@ export default class Transaction {
 	}
 
 	async appendItemChanges(items, {
-		set = false, remove = false, type = "item", keepIfZero = false, onlyDelta = false,
+		set = false, remove = false, type = "item", keepIfZero = false
 	} = {}) {
 
 		for (let data of items) {
@@ -173,7 +173,6 @@ export default class Transaction {
 
 		this.itemUpdates = attributes.reduce((acc, attribute) => {
 			const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
-			const itemIdPath = item.id + "-" + attribute.path;
 
 			acc[item.id] = {
 				[attribute.path]: acc[item.id]?.[attribute.path] ?? Number(foundry.utils.getProperty(item, attribute.path) ?? 0)
@@ -185,7 +184,7 @@ export default class Transaction {
 				}
 				this.attributeDeltas.set(attribute.path, this.attributeDeltas.has(attribute.path)
 					? this.attributeDeltas.get(attribute.path)
-					: foundry.utils.getProperty(acc[item.id], attribute.path) + incomingQuantity
+					: Utilities.sanitizeNumber(foundry.utils.getProperty(acc[item.id], attribute.path)) + incomingQuantity
 				);
 			} else {
 				if (!onlyDelta) {
@@ -207,14 +206,23 @@ export default class Transaction {
 			}
 			return Number(foundry.utils.getProperty(this.document, entry[0])) !== entry[1];
 		}))
+
 		this.itemsToCreate = this.itemsToCreate.filter(item => {
 			return !PileUtilities.canItemStack(item, this.document) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
 		}).map(item => {
 			const flagData = PileUtilities.getItemFlagData(item);
 			Utilities.deleteProperty(item, CONSTANTS.FLAGS.ITEM);
-			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData));
+			const cleanFlagData = PileUtilities.cleanItemFlagData(flagData);
+			if (foundry.utils.hasProperty(cleanFlagData, "overheadCost")) {
+				delete cleanFlagData["overheadCost"];
+				cleanFlagData["-=overheadCost"] = null;
+			}
+			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, cleanFlagData);
 			return item;
 		});
+
+		this.itemsToCreate = Utilities.ensureValidIds(this.document, this.itemsToCreate);
+
 		this.itemsToDelete = this.itemsToUpdate.filter(item => {
 			return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
 		}).map(item => item._id).concat(Array.from(this.itemsToForceDelete));
@@ -230,7 +238,13 @@ export default class Transaction {
 			const existingFlagData = PileUtilities.getItemFlagData(item);
 			const newFlagData = this.itemFlagMap.get(id) ?? {};
 			Utilities.deleteProperty(item, CONSTANTS.FLAGS.ITEM);
-			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, foundry.utils.mergeObject(existingFlagData, PileUtilities.cleanItemFlagData(newFlagData)));
+			const cleanFlagData = PileUtilities.cleanItemFlagData(newFlagData);
+			const mergedFlagData = foundry.utils.mergeObject(existingFlagData, cleanFlagData);
+			if (foundry.utils.hasProperty(mergedFlagData, "overheadCost")) {
+				delete mergedFlagData["overheadCost"];
+				mergedFlagData["-=overheadCost"] = null;
+			}
+			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, mergedFlagData);
 			const type = this.itemTypeMap.get(id);
 			Utilities.setItemQuantity(item, quantity, true);
 			return { item, quantity, type };

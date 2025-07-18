@@ -2,7 +2,7 @@
 
 	import MerchantItemTab from "./MerchantItemTab.svelte";
 	import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
-	import { localize } from "#runtime/svelte/helper";
+	import { localize } from "#runtime/util/i18n";
 	import MerchantFooter from "./MerchantFooter.svelte";
 	import { writable } from "svelte/store";
 	import MerchantActivityLog from "./MerchantActivityLog.svelte";
@@ -24,7 +24,7 @@
 	<div class="merchant-tabbed-center"
 	     style="flex: 1; max-height: calc(100% - {recipientStore && $currencies.length ? '34px' : '0px'})">
 
-		{#if $closed && !game.user.isGM}
+		{#if $closed && !store.userHasAuthority}
 			<div style="display: grid; place-items: center; height:100%;">
 				<span>{localize("ITEM-PILES.Merchant.MerchantClosed")}</span>
 			</div>
@@ -58,6 +58,9 @@
 
   .merchant-tabbed-center {
     overflow: hidden;
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
   }
 
 </style>

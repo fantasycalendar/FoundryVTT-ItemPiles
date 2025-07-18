@@ -907,6 +907,7 @@
         "Title": "Währungen anpassen",
         "Content": "Als SL kannst du die Währungen dieses Stapels anpassen:",
         "Submit": "Speichern",
+        "NoCurrency": "{actor_name} besitzt keine validen Währungen...",
         "Secondary": "Sekundärwährungen:"
       },
       "CustomItemCategoriesEditor": {

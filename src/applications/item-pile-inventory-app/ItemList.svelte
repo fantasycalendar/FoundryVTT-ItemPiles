@@ -1,6 +1,6 @@
 <script>
 
-	import { localize } from '#runtime/svelte/helper';
+	import { localize } from '#runtime/util/i18n';
 	import { fade } from 'svelte/transition';
 	import ListGroupEntry from "./ListGroupEntry.svelte";
 

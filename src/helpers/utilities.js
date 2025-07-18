@@ -45,6 +45,13 @@ export function getUuid(target) {
 	return document?.uuid ?? false;
 }
 
+export function sanitizeNumber(quantity) {
+	if (typeof quantity === "string") {
+		quantity = quantity.replaceAll(/[^\d.]+/g, "") ?? 0;
+	}
+	return Number(quantity) ?? 0;
+}
+
 /**
  * Find and retrieves an item in a list of items
  *
@@ -128,10 +135,10 @@ export function setSimilarityProperties(obj, item) {
 	return obj;
 }
 
-let itemTypesWithQuantities = false;
+let itemTypesWithQuantities;
 
 export function refreshItemTypesThatCanStack() {
-	itemTypesWithQuantities = false;
+	itemTypesWithQuantities = undefined;
 	getItemTypesThatCanStack();
 }
 
@@ -150,6 +157,7 @@ export function getDocumentTemplates(templateType) {
  * @returns {Set<string>}                       The items type that can be stacked on this system
  */
 export function getItemTypesThatCanStack() {
+
 	if (!itemTypesWithQuantities) {
 
 		itemTypesWithQuantities = new Set();
@@ -180,13 +188,14 @@ export function getItemTypesThatCanStack() {
 			return hasItemQuantity(itemTemplate);
 		})].filter(type => !unstackableItemTypes.includes(type)));
 	}
+
 	return itemTypesWithQuantities;
 }
 
 export function isItemStackable(itemData) {
 	getItemTypesThatCanStack();
-	if (game.system.id === "custom-system-builder" && itemData?.system?.documentTypes) {
-		const templateItem = game.items.get(itemData?.system?.documentTypes);
+	if (game.system.id === "custom-system-builder" && itemData?.system?.template) {
+		const templateItem = game.items.get(itemData?.system?.template);
 		if (templateItem) {
 			return itemTypesWithQuantities.has(templateItem.name)
 		}
@@ -202,7 +211,7 @@ export function isItemStackable(itemData) {
  */
 export function getItemQuantity(item) {
 	const itemData = item instanceof Item ? item.toObject() : item;
-	return Number(foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE) ?? 0);
+	return sanitizeNumber(foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE));
 }
 
 
@@ -401,6 +410,7 @@ export async function createFoldersFromNames(folders, type = "Actor") {
 		if (!actualFolder) {
 			const folderData = { name: folder, type, sorting: 'a' };
 			if (lastFolder) {
+				folderData.folder = lastFolder.id;
 				folderData.parent = lastFolder.id;
 			}
 			actualFolder = await Folder.create(folderData);
@@ -465,4 +475,74 @@ export function hasItemTypeHandler(handler, itemType = "GLOBAL") {
 
 export function getItemTypeHandler(handler, itemType = "GLOBAL") {
 	return SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];
+}
+
+
+export function createUniqueId(actor) {
+	let newId = foundry.utils.randomID();
+	let i = 0;
+	while (i < 10) {
+		if (!actor.items.get(newId)) return newId;
+		newId = foundry.utils.randomID();
+		i++;
+	}
+	throw Helpers.custom_error(`Could not generate unique item ID for actor ${actor.uuid}!`)
+}
+
+export function ensureValidIds(actor, itemsToCreate) {
+
+	const sortedItems = itemsToCreate.sort((a, b) => {
+		return (hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, b.type) - hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, a.type));
+	});
+
+	let itemsInContainers = sortedItems.reduce((acc, item) => {
+		const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
+
+		if (handler && handler({ item })) {
+
+			const path = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
+
+			const idRetrieverHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_RETRIEVER);
+			const containerId = idRetrieverHandler ? idRetrieverHandler({ item }) : foundry.utils.getProperty(item, path);
+			if (acc[containerId]) {
+				acc[containerId].items.push(item);
+
+				const idGeneratorHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR);
+				const newContainerId = idGeneratorHandler
+					? idGeneratorHandler({ actor, containerId: acc[containerId].item._id })
+					: acc[containerId].item._id;
+				foundry.utils.setProperty(item, path, newContainerId);
+			} else {
+				foundry.utils.setProperty(item, path, "");
+				acc[item._id] = {
+					item,
+					items: []
+				}
+			}
+
+		} else {
+			acc[item._id] = {
+				item,
+				items: []
+			}
+		}
+
+		item._id = createUniqueId(actor);
+
+		return acc;
+	}, {});
+
+	const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_TRANSFORMER);
+	if (handler) {
+		handler({ actor, map: itemsInContainers });
+	}
+
+	return Object.values(itemsInContainers).reduce((acc, data) => {
+		return acc.concat([data.item, ...data.items]);
+	}, []);
+
+}
+
+export function isRealNumber(inNumber) {
+	return !isNaN(inNumber) && typeof inNumber === "number" && isFinite(inNumber);
 }

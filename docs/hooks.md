@@ -228,11 +228,87 @@ Called after an item piles related interface is closed.
 | recipient | <code>Actor/TokenDocument,Boolean</code> | The actor that was involved in opening the interface              |
 | options   | <code>object</code>                      | An object containing options regarding how to close the interface |
 
-### item-piles-renderVaultGridItem
+### item-piles-mouseHoverPileItem
 
-Called when an element in a vault grid is rendered.
+Called when the mouse is hovered over an item in an item-pile.
+
+| Param   | Type                     | Description                     |
+|---------|--------------------------|---------------------------------|
+| element | <code>HTMLElement</code> | The item-pile item HTML element |
+| item    | <code>Item</code>        | The item-pile item document     |
+
+### item-piles-mouseLeavePileItem
+
+Called when the mouse leaves an item in an item-pile.
+
+| Param   | Type                     | Description                     |
+|---------|--------------------------|---------------------------------|
+| element | <code>HTMLElement</code> | The item-pile item HTML element |
+| item    | <code>Item</code>        | The item-pile item document     |
+
+### item-piles-renderPileItem
+
+Called when an item is rendered in an item pile interface.
 
 **Note:** This is called when the element is rendered, but _also_ when the item document is updated.
+
+| Param   | Type                     | Description                     |
+|---------|--------------------------|---------------------------------|
+| element | <code>HTMLElement</code> | The item-pile item HTML element |
+| item    | <code>Item</code>        | The item-pile item document     |
+
+### item-piles-mouseHoverMerchantItem
+
+Called when the mouse is hovered over an item in a merchant.
+
+| Param   | Type                     | Description                    |
+|---------|--------------------------|--------------------------------|
+| element | <code>HTMLElement</code> | The merchant item HTML element |
+| item    | <code>Item</code>        | The merchant item document     |
+
+### item-piles-mouseLeaveMerchantItem
+
+Called when the mouse leaves an element in a merchant.
+
+| Param   | Type                     | Description                    |
+|---------|--------------------------|--------------------------------|
+| element | <code>HTMLElement</code> | The merchant item HTML element |
+| item    | <code>Item</code>        | The merchant item document     |
+
+### item-piles-renderMerchantItem
+
+Called when an item is rendered in a merchant interface.
+
+**Note:** This is called when the element is rendered, but _also_ when the item document is updated.
+
+| Param   | Type                     | Description                    |
+|---------|--------------------------|--------------------------------|
+| element | <code>HTMLElement</code> | The merchant item HTML element |
+| item    | <code>Item</code>        | The merchant item document     |
+
+### item-piles-mouseHoverVaultGridItem
+
+Called when the mouse is hovered over an item in a vault grid.
+
+| Param   | Type                     | Description                 |
+|---------|--------------------------|-----------------------------|
+| element | <code>HTMLElement</code> | The vault item HTML element |
+| item    | <code>Item</code>        | The vault item document     |
+
+### item-piles-mouseLeaveVaultGridItem
+
+Called when the mouse leaves an item in a vault grid.
+
+| Param   | Type                     | Description                 |
+|---------|--------------------------|-----------------------------|
+| element | <code>HTMLElement</code> | The vault item HTML element |
+| item    | <code>Item</code>        | The vault item document     |
+
+### item-piles-renderVaultGridItem
+
+Called when an item in a vault grid interface is rendered.
+
+**Note:** This is called when the item is rendered, but _also_ when the item document is updated.
 
 | Param   | Type                     | Description                 |
 |---------|--------------------------|-----------------------------|
