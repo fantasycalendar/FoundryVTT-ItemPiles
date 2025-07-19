@@ -5,3 +5,7 @@
 You will need to assign a character to the user's account, ownership of a character is not enough.
 
 You can do this through the user configuration in the player list in the bottom left of your screen in Foundry's UI.
+
+## Item Piles says my system isn't supported
+
+Please see [configuring item piles for systems](configuring-item-piles.md).

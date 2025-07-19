@@ -5,10 +5,11 @@
   * [Installation](README.md#installation)
   * [Required Modules](README.md#required-modules)
   * [Optional Modules](README.md#optional-modules)
-  * [System Support](README.md#system-support)
   * [Issues](README.md#issues)
   * [License](README.md#license)
   * [Credits](README.md#credits)
+
+* [Configuring item piles for systems](configuring-item-piles.md)
 
 * [Common User Issues](common-issues.md)
 

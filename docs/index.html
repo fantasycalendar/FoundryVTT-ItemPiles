@@ -39,6 +39,40 @@
       .markdown-section code:not([class*=lang-]):not([class*=language-]) {
           white-space: normal;
       }
+
+      .status-pill {
+          background-color: rgb(164, 164, 164);
+          border: none;
+          color: white;
+          padding: 2px 7px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          border-radius: 10px;
+          font-size: 0.85em;
+          margin: 0px 3px;
+          text-transform: uppercase;
+      }
+
+      .status-pill-primary {
+          background-color: rgb(62, 138, 204);
+      }
+
+      .status-pill-success {
+          background-color: rgb(88, 185, 87);
+      }
+
+      .status-pill-info {
+          background-color: rgb(86, 192, 224);
+      }
+
+      .status-pill-warning {
+          background-color: rgb(242, 174, 67);
+      }
+
+      .status-pill-danger {
+          background-color: rgb(219, 82, 75);
+      }
 	</style>
 
 </head>
@@ -47,24 +81,24 @@
 
 <div id="app"></div>
 <script>
-  window.$docsify = {
-    loadSidebar: "sidebar.md",
-    alias: {
-      '/.*/sidebar.md': './docs/sidebar.md'
-    },
-    auto2top: true,
-    search: {
-      noData: {
-        '/': 'No results!'
-      },
-      paths: 'auto',
-      placeholder: {
-        '/': 'Search'
-      }
-    },
-    name: "Item Piles Wiki",
-    logo: "./images/fantasycomputerworks.png"
-  }
+	window.$docsify = {
+		loadSidebar: "sidebar.md",
+		alias: {
+			'/.*/sidebar.md': './docs/sidebar.md'
+		},
+		auto2top: true,
+		search: {
+			noData: {
+				'/': 'No results!'
+			},
+			paths: 'auto',
+			placeholder: {
+				'/': 'Search'
+			}
+		},
+		name: "Item Piles Wiki",
+		logo: "./images/fantasycomputerworks.png"
+	}
 </script>
 
 <!-- Required -->

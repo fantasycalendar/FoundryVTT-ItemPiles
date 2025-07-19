@@ -46,12 +46,6 @@ This module uses the [socketlib](https://github.com/manuelVo/foundryvtt-socketli
 
 This module uses the [libwrapper](https://github.com/ruipin/fvtt-lib-wrapper) library for wrapping core methods. It is a hard dependency, and it is recommended for the best experience and compatibility with other modules.
 
-## System Support
-
-### Adding Direct System Support
-
-Please see [contributing to Item Piles](contributing-to-item-piles.md#adding-system-support).
-
 ## Issues
 
 Any issues, bugs, or feature requests are always welcome to be reported directly to the [Issue Tracker](https://github.com/fantasycalendar/FoundryVTT-ItemPiles/issues), or using the [Bug Reporter Module](https://foundryvtt.com/packages/bug-reporter/).
