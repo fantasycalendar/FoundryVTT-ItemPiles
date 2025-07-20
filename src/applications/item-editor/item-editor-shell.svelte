@@ -284,7 +284,7 @@
 						</button>
 					</div>
 
-					{#if itemFlagData.prices.length}
+					{#if itemFlagData.prices?.length}
 						{#each itemFlagData.prices as prices, groupIndex (groupIndex)}
 							<PriceList {parentFlags} bind:prices={prices} remove={() => { store.removePurchaseGroup(groupIndex) }}/>
 						{/each}
@@ -302,7 +302,7 @@
 						</button>
 					</div>
 
-					{#if itemFlagData.sellPrices.length}
+					{#if itemFlagData.sellPrices?.length}
 						{#each itemFlagData.sellPrices as prices, groupIndex (groupIndex)}
 							<PriceList {parentFlags} bind:prices={prices} remove={() => { store.removeSellGroup(groupIndex) }}/>
 						{/each}
@@ -320,7 +320,7 @@
 						</button>
 					</div>
 
-					{#if itemFlagData.overheadCost.length}
+					{#if itemFlagData.overheadCost?.length}
 						{#each itemFlagData.overheadCost as prices, groupIndex (groupIndex)}
 							<PriceList {parentFlags} bind:prices={prices}
 							           remove={() => { store.removeOverheadCostGroup(groupIndex) }}/>

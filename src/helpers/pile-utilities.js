@@ -209,7 +209,7 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
 	const target = Utilities.getToken(targetUuid);
 
-	if (!(target instanceof Token)) return false;
+	if (!(target instanceof foundry.canvas.placeables.Token)) return false;
 
 	const targetDocument = Utilities.getDocument(target);
 
@@ -1187,6 +1187,9 @@ function getItemFlagPriceData(priceData, quantity, modifier, defaultCurrencies, 
 				baseCost: baseCost * (isRegularCurrency ? isRegularCurrency.exchangeRate : 1.0),
 				totalCost,
 				modifier: itemModifier,
+				string: cost
+					? price.abbreviation.replace("{#}", baseCost)
+					: "",
 				priceString: cost
 					? price.abbreviation.replace("{#}", cost)
 					: "",
@@ -1207,7 +1210,7 @@ function getItemFlagPriceData(priceData, quantity, modifier, defaultCurrencies, 
 
 		return {
 			prices,
-			basePrices: getPriceArray(baseCost, defaultCurrencies),
+			basePrices: prices,
 			baseCost,
 			totalCost,
 			priceString: prices.filter(price => price.string || price.priceString).map(price => price.string || price.priceString).join(" "),

@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.18
+
+- Updated French localization (thanks rectulo!)
+- Fixed a minor issue with merchants not having the correct secondary price
+
 ## Version 3.2.17
 
 - Fixed merchants throwing errors if an item had a price and no overhead cost
