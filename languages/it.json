@@ -308,7 +308,7 @@
       "RollAllTables": "Tira su Tutte le Tabelle",
       "AddTable": "Aggiungi Tabella",
       "ShoppingAs": "Acquista come {actorName}",
-      "LogSearch": "Ricerca Registro:",
+      "LogSearch": "Registro Ricerca:",
       "ToolTipRemoveTable": "Rimuovi Tabella",
       "TooltipRollTable": "Tira su Tabella",
       "TableTimesToRoll": "Numero Tiri su tabella:",
@@ -325,7 +325,12 @@
       "LogUserActor": "{actor_name} ({user_name})",
       "SortBy": "Ordina per:",
       "AddAll": "Aggiungi Tutti gli Articoli",
-      "LogSetForSale": "{instigator} imposta <strong>{item}</strong> <span>da vendere</span"
+      "LogSetForSale": "{instigator} imposta <strong>{item}</strong> <span>da vendere</span",
+      "LogFreeTransaction": "{instigator} {action} {quantity}{item} gratis",
+      "SetNotForSale": "Set non in vendita",
+      "SetForSale": "Set in vendita",
+      "SetHidden": "Nascondi",
+      "SetVisible": "Mostra"
     },
     "Vault": {
       "ExpandsCols": "{cols} colonne",
@@ -387,7 +392,7 @@
         "Title": "Cancella tutti gli elementi del personaggio"
       },
       "NoSystemFound": {
-        "Content": "<strong>Questo sistema non è supportato.</strong><br><br>Ciò significa che il modulo non sa come gestire al meglio gli elementi di questo sistema, ma può comunque funzionare in modo limitato.<br><br>Puoi configurare tu stesso le impostazioni del modulo, ma richiede un po' di know-how tecnico. <br><br>Se hai domande, fai uno screenshot della finestra che si opre dopo che chiudi questa, e cerca assistenza nel canale del tuo sistema nella sezione Discord di Foundry.",
+        "Content": "<p><strong>Questo sistema non è supportato.</strong></p><p>Ciò significa che il modulo non sa come gestire al meglio gli elementi di questo sistema, ma può comunque funzionare in modo limitato.</p><p>Puoi configurare tu stesso le impostazioni del modulo, ma richiede un po' di know-how tecnico. </p><p>Se hai domande, fai uno screenshot della finestra che si opre dopo che chiudi questa, e cerca assistenza nel canale del tuo sistema nella sezione Discord di Foundry.</p>",
         "Title": "Sistema non riconosciuto"
       },
       "ReceiveItem": {
@@ -554,7 +559,12 @@
           "DisplayQuantityNo": "No, nascondi la quantità (a meno che l'articolo non dica diversamente)",
           "HideItemsWithZeroCostExplanation": "Se abilitato, ciò fa sì che i clienti non possano acquistare o vendere articoli che hanno un costo pari a zero (gratuito).",
           "OnlyAcceptBasePrice": "Accetta solo il prezzo base",
-          "OpenStatusClosed": "Chiuso"
+          "OpenStatusClosed": "Chiuso",
+          "ExportMerchantLog": "Esporta Registri Mercante",
+          "ExportMerchantLogExplanation": "Verrà esportato e scaricato un file di testo contenente il registro dei log, ordinati dalle informazioni più vecchie a quelle più recenti.",
+          "AddOverheadCostOption": "Aggiungi Costo Fisso",
+          "OverheadCostOptions": "Opzioni Costo Fisso",
+          "OverheadCostOptionsExplanation": "Qui puoi configurare un costo generale che viene sempre aggiunto al prezzo degli articoli quando il commerciante li vende. Questo è influenzato dai modificatori di prezzo."
         },
         "Update": "Aggiornamento Configurazione",
         "Main": {
@@ -803,7 +813,10 @@
           "AddSellOption": "Aggiungi Opzione Vendita",
           "DropMeClickMe": "Fare clic per aggiungere un attributo o trascinare e rilasciare un elemento da aggiungere",
           "PricePreset": "Oppure seleziona un prezzo preimpostato:",
-          "SelectPreset": "Seleziona prezzo preimpostato"
+          "SelectPreset": "Seleziona prezzo preimpostato",
+          "AddOverheadCostOption": "Aggiungi Costo Fisso",
+          "OverheadCostOptions": "Opzioni Costo Fisso",
+          "OverheadCostOptionsExplanation": "Qui puoi configurare un costo fisso che verrà sempre aggiunto al prezzo di questo articolo quando un commerciante lo vende. Questo è influenzato dai modificatori di prezzo."
         }
       },
       "FilterEditor": {
@@ -905,7 +918,8 @@
       "NoResponseFromGMTimeout": "ATTENZIONE: il DM \"{user_name}\" non ha risposto all'ultima richiesta: attendi {time} secondi prima di effettuare un'altra richiesta di Item Piles.",
       "TransactionNoGMConnected": "Nessun DM è connesso: la transazione corrente è stata annullata, nulla è stato aggiunto, rimosso o trasferito",
       "NoGMsConnectedAction": "ATTENZIONE - Impossibile eseguire \"{action}\" perché nessun GM è attivo.",
-      "VaultSameItemOrigin": "Non puoi rilasciare nel caveau oggetti che provengono dal caveau!"
+      "VaultSameItemOrigin": "Non puoi rilasciare nel caveau oggetti che provengono dal caveau!",
+      "LogEmpty": "Il registro per \"{actor_name}\" è vuoto e non ha nulla da esportare"
     },
     "General": {
       "Primary": "Primario",
