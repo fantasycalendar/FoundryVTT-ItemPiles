@@ -112,7 +112,7 @@ This is the name of this currency. This input accepts a localization string.
 
 This is the exchange rate of the _primary currency_ versus other currencies. In this case of D&D5e:
 
-- 1 platinum makes 1 gold
+- 1 platinum makes 10 gold (hence it is 10)
 - 1 gold makes 1 gold (hence it is 1)
 - 2 electrum makes 1 gold (1/2 = 0.5)
 - 10 silver makes 1 gold (1/10 = 0.1)
