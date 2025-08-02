@@ -11,6 +11,7 @@
 		snapOnMove,
 		swapItemTransform
 	} from './grid-utils.js';
+	import { hotkeyActionState } from "../../../hotkeys.js";
 
 	export let item;
 	export let options;
@@ -334,7 +335,9 @@
 	$: collisionClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
 
 	function keydown(event) {
-		if (event.key !== "r" || !active || !dragged || (item.item.w === item.item.h)) return;
+		if (!active || !dragged || (item.item.w === item.item.h)) return;
+		const shouldRotate = hotkeyActionState.shouldRotateVaultItem(event);
+		if (!shouldRotate) return;
 		previewTransform.update(data => {
 			const { w, h } = data;
 			dispatch("itemflipped", {

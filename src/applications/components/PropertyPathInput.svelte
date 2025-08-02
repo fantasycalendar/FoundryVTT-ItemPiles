@@ -17,7 +17,7 @@
 		type: "",
 		system: Object.values(templates)
 			.map(obj => {
-				if (obj['templates']) {
+				if (game.system.id === "custom-system-builder" && obj['templates']) {
 					for (const template of obj['templates']) {
 						obj = foundry.utils.mergeObject(obj, templates["templates"][template]);
 					}

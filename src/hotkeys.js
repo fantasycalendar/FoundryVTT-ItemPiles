@@ -3,10 +3,11 @@ import * as Utilities from "./helpers/utilities.js";
 import PrivateAPI from "./API/private-api.js";
 import * as Helpers from "./helpers/helpers.js";
 
-const HOTKEYS = {
+export const HOTKEYS = {
 	FORCE_DEFAULT_SHEET: "force-open-item-pile-inventory",
 	DROP: "force-drop-item",
-	DROP_ONE: "force-drop-one-item"
+	DROP_ONE: "force-drop-one-item",
+	ROTATE_VAULT_ITEM: "rotate-vault-item",
 }
 
 export const hotkeyActionState = {
@@ -31,6 +32,14 @@ export const hotkeyActionState = {
 		return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
 			return game.keyboard.downKeys.has(key);
 		});
+	},
+
+	shouldRotateVaultItem(event) {
+		return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.ROTATE_VAULT_ITEM).some(data => {
+			return data.key === event.key && (!data.modifiers.length || data.modifiers.some(modifier => {
+				return game.keyboard.downKeys.has(modifier);
+			}));
+		})
 	}
 }
 
@@ -54,6 +63,13 @@ export function registerHotkeysPre() {
 		name: "Force drop one item modifier",
 		editable: [
 			{ key: "AltLeft" },
+		]
+	});
+
+	game.keybindings.register(CONSTANTS.MODULE_NAME, HOTKEYS.ROTATE_VAULT_ITEM, {
+		name: "Rotate vault item",
+		editable: [
+			{ key: "r" },
 		]
 	});
 

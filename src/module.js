@@ -24,13 +24,9 @@ import Transaction from "./helpers/transaction.js";
 import { SvelteApplication } from "#runtime/svelte/application";
 import { TJSPosition } from "#runtime/svelte/store/position";
 
-Hooks.once('libWrapper.Ready', () => {
+Hooks.once("init", async () => {
 	CONSTANTS.IS_V13 = foundry.utils.isNewerVersion(game.version, 13);
 	Object.freeze(CONSTANTS);
-	registerLibwrappers();
-})
-
-Hooks.once("init", async () => {
 
 	//CONFIG.debug.hooks = true;
 	registerSettings();
@@ -109,6 +105,8 @@ Hooks.once("ready", () => {
 		if (!socketSuccessful) {
 			throw Helpers.custom_error(`Item Piles could not initialize the 'socketlib' module, which it depends on - please reinstall it to ensure you are on a functioning version.`)
 		}
+
+		registerLibwrappers();
 
 		PrivateAPI.initialize();
 		TradeAPI.initialize();
