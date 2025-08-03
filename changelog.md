@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.20
+
+- Fixed issue with libwrapper error due to some systems reusing the same sheet classes for different actor types
+
 ## Version 3.2.19
 
 - Added the ability to configure the rotate vault item hotkey

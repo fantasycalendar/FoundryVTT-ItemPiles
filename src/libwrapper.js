@@ -42,11 +42,16 @@ export function registerLibwrappers() {
 		return false;
 	});
 
-	const sheetOverrides = Object.keys(CONFIG.Actor.sheetClasses).map(str => {
-		return Object.keys(CONFIG.Actor.sheetClasses[str]).map(sheet => {
-			return `CONFIG.Actor.sheetClasses.${str}.["${sheet}"].cls.prototype.render`;
-		})
-	}).flat()
+	const sheetOverrides = Object.keys(CONFIG.Actor.sheetClasses).reduce((acc, str) => {
+		const sheets = Object.keys(CONFIG.Actor.sheetClasses[str]);
+		return acc.concat(
+			sheets.filter(sheet => {
+				return !acc.some(override => override.includes(`["${sheet}"]`));
+			}).map(sheet => {
+				return `CONFIG.Actor.sheetClasses.${str}.["${sheet}"].cls.prototype.render`;
+			})
+		)
+	}, []).flat();
 
 	const sheetOverrideMethod = function (wrapped, forced, options, ...args) {
 		const renderItemPileInterface = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_SHEET, this.document, forced, options) === false;
@@ -62,7 +67,11 @@ export function registerLibwrappers() {
 	};
 
 	for (const override of sheetOverrides) {
-		libWrapper.register(CONSTANTS.MODULE_NAME, override, sheetOverrideMethod, "MIXED");
+		try {
+			libWrapper.register(CONSTANTS.MODULE_NAME, override, sheetOverrideMethod, "MIXED");
+		} catch (err) {
+			Helpers.custom_warning(`Could not override "${override}" due to error:\n${err}`)
+		}
 	}
 
 	const dragDrop = CONSTANTS.IS_V13

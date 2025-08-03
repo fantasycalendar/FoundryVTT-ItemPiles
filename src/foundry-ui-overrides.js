@@ -216,7 +216,7 @@ function renderPileHUD(app, html) {
 
 }
 
-class FastTooltipManager extends TooltipManager {
+class FastTooltipManager extends (foundry?.helpers?.interaction?.TooltipManager?.implementation ?? TooltipManager) {
 
 	/**
 	 * An amount of margin which is used to offset tooltips from their anchored element.
