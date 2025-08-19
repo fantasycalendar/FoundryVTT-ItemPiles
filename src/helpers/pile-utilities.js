@@ -209,7 +209,7 @@ export function shouldItemPileBeDeleted(targetUuid) {
 
 	const target = Utilities.getToken(targetUuid);
 
-	if (!(target instanceof foundry.canvas.placeables.Token)) return false;
+	if (!(target instanceof (foundry?.canvas?.placeables?.Token ?? Token))) return false;
 
 	const targetDocument = Utilities.getDocument(target);
 
