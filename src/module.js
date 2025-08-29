@@ -23,6 +23,7 @@ import Transaction from "./helpers/transaction.js";
 
 import { SvelteApplication } from "#runtime/svelte/application";
 import { TJSPosition } from "#runtime/svelte/store/position";
+import { PileApp } from "./applications/pile-app/pile-app.js";
 
 Hooks.once('libWrapper.Ready', () => {
 	CONSTANTS.IS_V13 = foundry.utils.isNewerVersion(game.version, 13);
@@ -125,6 +126,8 @@ Hooks.once("ready", () => {
 		registerSystemLibwrappers();
 
 		displayChatMessage();
+
+		PileApp.show(fromUuidSync('Actor.fbpm4Hrm0LS1JEMQ'));
 
 	}, 100);
 
