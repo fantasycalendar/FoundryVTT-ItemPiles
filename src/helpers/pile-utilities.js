@@ -313,9 +313,11 @@ export function getActorCurrencies(target, {
 	cachedActorCurrencies.set(actorUuid, currencies);
 
 	currencies = currencies.map(currency => {
-		currency.quantity = currency.type === "attribute"
-			? Utilities.sanitizeNumber(foundry.utils.getProperty(actor, currency.path))
-			: Utilities.getItemQuantity(currency.item);
+		if (currency.item) {
+			currency.quantity = currency.type === "attribute"
+				? Utilities.sanitizeNumber(foundry.utils.getProperty(actor, currency.path))
+				: Utilities.getItemQuantity(currency.item);
+		}
 		return currency;
 	});
 
@@ -953,7 +955,7 @@ export function getPriceArray(totalCost, currencies) {
 
 	const allCommonExchangeRate = new Set(primaryCurrencies.map(currency => currency.exchangeRate));
 
-	if (primaryCurrencies.length === 1 || allCommonExchangeRate.size === primaryCurrencies.length) {
+	if (primaryCurrencies.length === 1 || allCommonExchangeRate.size === 1) {
 		return [{
 			...primaryCurrency,
 			cost: totalCost,
