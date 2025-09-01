@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.22
+
+- Fixed issue with multiple currencies with the same exchange rate
+
 ## Version 3.2.21
 
 - Fixed issue with Item Piles not working correctly in Foundry v12

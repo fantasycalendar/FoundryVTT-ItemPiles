@@ -32,7 +32,7 @@ export default class CurrencyStore {
 		if (this.secondary) return;
 		this.currencies.update(currencies => {
 			currencies.sort((a, b) => {
-				return b.exchangeRate - a.exchangeRate;
+				return (b.exchangeRate - a.exchangeRate) - (a.primary - b.primary);
 			});
 			return currencies;
 		});
