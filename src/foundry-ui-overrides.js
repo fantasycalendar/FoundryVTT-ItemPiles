@@ -192,21 +192,21 @@ function renderPileHUD(app, html) {
 
 	const container = $(`<div class="col right" style="right:-${offset}px;"></div>`);
 
-	const lock_button = $(`<${htmlType} class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i inert class="fa-solid fa-lock${pileData.locked ? "" : "-open"}"></i></${htmlType}>`);
+	const lock_button = $(`<${htmlType} class="control-icon item-piles" data-action="toggleControls" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleLocked")}"><i inert class="fa-solid fa-lock${pileData.locked ? "" : "-open"}"></i></${htmlType}>`);
 	lock_button.click(async function () {
 		$(this).find('.fas').toggleClass('fa-lock').toggleClass('fa-lock-open');
 		await game.itempiles.API.toggleItemPileLocked(document);
 	});
 	container.append(lock_button);
 
-	const open_button = $(`<${htmlType} class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i inert class="fa-solid fa-box${pileData.closed ? "" : "-open"}"></i></${htmlType}>`);
+	const open_button = $(`<${htmlType} class="control-icon item-piles" data-action="toggleControls" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.ToggleClosed")}"><i inert class="fa-solid fa-box${pileData.closed ? "" : "-open"}"></i></${htmlType}>`);
 	open_button.click(async function () {
 		$(this).find('.fas').toggleClass('fa-box').toggleClass('fa-box-open');
 		await game.itempiles.API.toggleItemPileClosed(document);
 	});
 	container.append(open_button);
 
-	const configure_button = $(`<${htmlType} class="control-icon item-piles" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i inert class="fa-solid fa-toolbox"></i></${htmlType}>`);
+	const configure_button = $(`<${htmlType} class="control-icon item-piles" data-action="close" data-fast-tooltip="${game.i18n.localize("ITEM-PILES.HUD.Configure")}"><i inert class="fa-solid fa-toolbox"></i></${htmlType}>`);
 	configure_button.click(async function () {
 		ItemPileConfig.show(document);
 	});

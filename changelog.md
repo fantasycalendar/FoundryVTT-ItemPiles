@@ -2,6 +2,7 @@
 
 ## Version 3.2.22
 
+- Fixed issue with interacting with the token HUD of Item Pile tokens that had negative elevation would double its negative elevation
 - Fixed issue with multiple currencies with the same exchange rate
 
 ## Version 3.2.21
