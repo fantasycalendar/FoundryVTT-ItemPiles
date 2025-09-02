@@ -313,10 +313,10 @@ export function getActorCurrencies(target, {
 	cachedActorCurrencies.set(actorUuid, currencies);
 
 	currencies = currencies.map(currency => {
-		if (currency.item) {
-			currency.quantity = currency.type === "attribute"
-				? Utilities.sanitizeNumber(foundry.utils.getProperty(actor, currency.path))
-				: Utilities.getItemQuantity(currency.item);
+		if (currency.type === "attribute") {
+			currency.quantity = Utilities.sanitizeNumber(foundry.utils.getProperty(actor, currency.path))
+		} else if (currency.item) {
+			currency.quantity = Utilities.getItemQuantity(currency.item);
 		}
 		return currency;
 	});

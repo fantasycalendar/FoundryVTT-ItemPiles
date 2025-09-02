@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.23
+
+- Fixed critical error with non-item-based currencies
+
 ## Version 3.2.22
 
 - Fixed issue with interacting with the token HUD of Item Pile tokens that had negative elevation would double its negative elevation
