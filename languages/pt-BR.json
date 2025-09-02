@@ -38,7 +38,7 @@
       "DisallowedItemDrop": "Você não pode descartar itens \"{type}\"",
       "DisallowedItemTrade": "Você não pode negociar itens \"{type}\"",
       "DisallowedItemSell": "Este comerciante não aceita itens \"{type}\"",
-      "NoSourceDrop": "Você não pode descartar itens da barra de itens, a menos que seja um MJ.",
+      "NoSourceDrop": "Você não pode descartar itens da barra de itens, a menos que seja um Mestre.",
       "PileTooFar": "Você está muito longe para interagir com esta pilha.",
       "NoTokenFound": "Não foi possível encontrar um token ou personagem que represente você.",
       "PileLocked": "Este recipiente está trancado e não pode ser aberto. Você não pode soltar itens nele.",
@@ -48,21 +48,21 @@
       "ItemNoQuantity": "{item_name} tem quantidade 0, então você não pode transferir este item!"
     },
     "Warnings": {
-      "NoGMsConnected": "AVISO - Nenhum MJ conectado - O Item Piles requer um MJ conectado para que os jogadores possam utilizar a maioria das funcionalidades do módulo.",
-      "NoResponseFromGM": "AVISO - MJ \"{user_name}\" não respondeu à solicitação - Item Piles exigem que um MJ esteja conectado e responda para que os jogadores possam utilizar a maioria dos recursos do módulo.",
-      "NoResponseFromGMTimeout": "AVISO - MJ \"{user_name}\" não respondeu à última solicitação - aguarde {time} segundos antes de fazer outra solicitação com o Item Piles.",
-      "TransactionNoGMConnected": "Nenhum MJ está conectado - a transação atual foi cancelada, nada foi adicionado, removido ou transferido",
-      "GiveItemNoGM": "Não há MJ ativo para receber o item que você está tentando dar.",
+      "NoGMsConnected": "AVISO - Nenhum Mestre conectado - O Item Piles requer um Mestre conectado para que os jogadores possam utilizar a maioria das funcionalidades do módulo.",
+      "NoResponseFromGM": "AVISO - Mestre \"{user_name}\" não respondeu à solicitação - Item Piles exigem que um Mestre esteja conectado e responda para que os jogadores possam utilizar a maioria dos recursos do módulo.",
+      "NoResponseFromGMTimeout": "AVISO - Mestre \"{user_name}\" não respondeu à última solicitação - aguarde {time} segundos antes de fazer outra solicitação com o Item Piles.",
+      "TransactionNoGMConnected": "Nenhum Mestre está conectado - a transação atual foi cancelada, nada foi adicionado, removido ou transferido",
+      "GiveItemNoGM": "Não há Mestre ativo para receber o item que você está tentando dar.",
       "GiveItemDeclined": "{user_name} recusou a oferta do seu item.",
       "NoPlayersActive": "Não há jogadores ativos para realizar esta ação",
-      "NoGMsConnectedAction": "AVISO - Não foi possível executar \"{action}\" porque não há MJs ativos.",
+      "NoGMsConnectedAction": "AVISO - Não foi possível executar \"{action}\" porque não há Mestres ativos.",
       "VaultFull": "Este item não cabe neste cofre!",
       "CantSortVault": "Falha ao organizar itens - ou há muitos itens, ou algo deu errado",
       "VaultItemNotExpander": "Este item não é um expansor de cofre",
       "DroppedIsNotItem": "Você não pode soltar documentos do tipo \"{type}\" nesta pilha de itens!",
       "VaultInvalidItemDropped": "Você não pode soltar este tipo de item neste cofre!",
       "VaultSameItemOrigin": "Você não pode soltar itens no cofre que se originam do próprio cofre!",
-      "VaultNoGmItemSidebar": "Apenas MJs podem soltar itens da barra lateral!",
+      "VaultNoGmItemSidebar": "Apenas Mestres podem soltar itens da barra lateral!",
       "LogEmpty": "O log para \"{actor_name}\" está vazio e não tem nada para exportar"
     },
     "Inspect": {
@@ -129,7 +129,7 @@
         "Content": "Adicione moedas à negociação ativa com {trader_actor_name}",
         "Label": "Atualizar Moedas"
       },
-      "GMAddCurrency": "Adicionar Moeda (Modo MJ)",
+      "GMAddCurrency": "Adicionar Moeda (Modo Mestre)",
       "Closed": {
         "Title": "Negociação Fechada",
         "You": "Você fechou a janela de negociação, então a negociação foi cancelada.",
@@ -295,7 +295,7 @@
         "Header": "Dando Item: {item_name}",
         "SelectPlaceholder": "Escolha o personagem para enviar o item",
         "ContentMultipleQuantity": "Você tem {quantity} deste item. Quantos você quer dar?",
-        "Secret": "Dar o(s) item(s) sem que outros saibam (exceto MJs)",
+        "Secret": "Dar o(s) item(s) sem que outros saibam (exceto Mestres)",
         "Submit": "Enviar"
       },
       "ReceiveItem": {
@@ -368,7 +368,7 @@
       },
       "EditCurrencies": {
         "Title": "Editando Moedas",
-        "Content": "Como MJ, você pode atualizar as moedas nesta pilha de itens:",
+        "Content": "Como Mestre, você pode atualizar as moedas nesta pilha de itens:",
         "Secondary": "Moedas Secundárias:",
         "NoCurrency": "{actor_name} não tem moedas válidas",
         "Submit": "Enviar"
@@ -728,7 +728,7 @@
           "MerchantColumnsExplanation": "Aqui você pode configurar as colunas específicas do sistema deste comerciante exibidas na interface do comerciante, como a raridade dos itens.",
           "ConfigureMerchantColumns": "Configurar Colunas do Comerciante",
           "LogMerchantActivity": "Registrar Atividade do Comerciante",
-          "LogMerchantActivityExplanation": "Quando ativado, isso faz com que o comerciante registre eventos como compra e venda de itens, e os MJs atualizem o status (quantidade, visibilidade e à venda) dos itens.",
+          "LogMerchantActivityExplanation": "Quando ativado, isso faz com que o comerciante registre eventos como compra e venda de itens, e os Mestres atualizem o status (quantidade, visibilidade e à venda) dos itens.",
           "ClearMerchantLog": "Limpar Registros",
           "ClearMerchantLogExplanation": "Isso limpará os registros do comerciante, removendo todas as entradas. Isto não pode ser desfeito.",
           "ExportMerchantLog": "Exportar Registros do Comerciante",
@@ -927,8 +927,8 @@
         "Hint": "Sempre que qualquer jogador pegar itens de uma pilha de itens, será enviada uma mensagem mostrando o que foi pego.",
         "Off": "Desativado - desativa mensagens",
         "Public": "Público - todos podem ver as mensagens",
-        "SelfGM": "Privado - apenas MJs e o usuário podem ver mensagens",
-        "Blind": "Cego - apenas MJs podem ver mensagens"
+        "SelfGM": "Privado - apenas Mestres e o usuário podem ver mensagens",
+        "Blind": "Cego - apenas Mestres podem ver mensagens"
       },
       "HideTokenBorder": {
         "Title": "Ocultar Bordas de Tokens de Pilhas de Itens",
