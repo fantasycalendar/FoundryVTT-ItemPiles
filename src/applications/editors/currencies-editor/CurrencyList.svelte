@@ -11,10 +11,6 @@
 	let isHovering = false;
 
 	$: currencies = $currenciesStore;
-	$: {
-		$currenciesStore;
-		store.sortCurrencies();
-	}
 
 	async function dropData(data) {
 
@@ -70,7 +66,8 @@
 				{/if}
 				<div><input type="text" bind:value={item.name}/></div>
 				{#if !store.secondary}
-					<div><input type="number" step="0.000000001" bind:value={item.exchangeRate}/></div>
+					<div><input type="number" step="0.000000001" bind:value={item.exchangeRate}
+					            on:change={() => { store.sortCurrencies() }}/></div>
 				{/if}
 				<div><input type="text" bind:value={item.abbreviation}/></div>
 				<div>

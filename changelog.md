@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.24
+
+- Fixed support for rounding up when the primary currency was that the lowest exchange rate of all currencies
+- Fixed currency editor sorting currencies by exchange rate on keydown, rather than on change
+
 ## Version 3.2.23
 
 - Fixed critical error with non-item-based currencies

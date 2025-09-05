@@ -73,10 +73,11 @@ export function wait(ms) {
 
 /**
  * @param key
+ * @param defaultValue
  * @returns {*}
  */
-export function getSetting(key) {
-	return game.settings.get(CONSTANTS.MODULE_NAME, key);
+export function getSetting(key, defaultValue = null) {
+	return game.settings.get(CONSTANTS.MODULE_NAME, key) ?? defaultValue;
 }
 
 export function setSetting(key, value) {

@@ -913,17 +913,18 @@ export function getMerchantModifiersForActor(merchant, {
 function getSmallestExchangeRate(currencies) {
 	const primaryCurrencies = currencies.filter(currency => !currency.secondary);
 	const smallestPrimaryCurrencyExchangeRate = Math.min(...primaryCurrencies.map(currency => currency.exchangeRate));
-	return primaryCurrencies.length > 1 && smallestPrimaryCurrencyExchangeRate < 1
-		? smallestPrimaryCurrencyExchangeRate
-		: (Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001);
+	const allCommonExchangeRate = new Set(primaryCurrencies.map(currency => currency.exchangeRate));
+	return (primaryCurrencies.length === 1 && smallestPrimaryCurrencyExchangeRate > 1) || (allCommonExchangeRate.size === 1 && smallestPrimaryCurrencyExchangeRate === 1)
+		? Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, 0.00001)
+		: smallestPrimaryCurrencyExchangeRate;
 }
 
 function getDecimalDifferenceBetweenExchangeRates(currencies) {
 
 	const primaryCurrencies = currencies.filter(currency => !currency.secondary);
 
-	const decimals = Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001;
-	const defaultDecimals = decimals.toString().split(".")[1].length;
+	const decimals = Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, 0.00001);
+	const defaultDecimals = decimals.toString().split(".")?.[1]?.length ?? 0;
 
 	if (primaryCurrencies.length === 1) {
 		return defaultDecimals;
@@ -932,7 +933,7 @@ function getDecimalDifferenceBetweenExchangeRates(currencies) {
 	const exchangeRates = primaryCurrencies.map(curr => curr.exchangeRate);
 
 	const uniqueExchangeRates = new Set(exchangeRates);
-	if (uniqueExchangeRates.length === primaryCurrencies.length) {
+	if (uniqueExchangeRates.size === primaryCurrencies.length) {
 		return defaultDecimals;
 	}
 
