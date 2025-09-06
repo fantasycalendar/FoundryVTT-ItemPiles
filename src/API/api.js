@@ -1911,7 +1911,7 @@ class API {
 	}
 
 	/**
-	 * Return all th registered currencies abbreviations
+	 * Return all the registered currencies abbreviations
 	 * @returns {Array<string>}                                 An array of string containing the abbreviation for each currency registered
 	 */
 	static getCurrenciesAbbreviations() {
@@ -2067,7 +2067,7 @@ class API {
 	 * @deprecated
 	 */
 	static getPaymentDataFromString(...args) {
-		Helpers.custom_warning(`game.itempiles.API.getPaymentDataFromString has been deprecated in favor of game.itempiles.API.getPaymentData`, false);
+		Helpers.custom_warning(`game.itempiles.API.getPaymentDataFromString has been deprecated in favor of game.itempiles.API.getPaymentData`, true);
 		return this.getPaymentData(...args);
 	}
 

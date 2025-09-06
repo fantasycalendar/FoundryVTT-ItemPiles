@@ -60,7 +60,7 @@
       "CantSortVault": "Falha ao organizar itens - ou há muitos itens, ou algo deu errado",
       "VaultItemNotExpander": "Este item não é um expansor de cofre",
       "DroppedIsNotItem": "Você não pode soltar documentos do tipo \"{type}\" nesta pilha de itens!",
-      "VaultInvalidItemDropped": "Você não pode soltar este tipo de item neste cofre!",
+      "ItemPileInvalidItemDropped": "Você não pode soltar este tipo de item neste cofre!",
       "VaultSameItemOrigin": "Você não pode soltar itens no cofre que se originam do próprio cofre!",
       "VaultNoGmItemSidebar": "Apenas MJs podem soltar itens da barra lateral!",
       "LogEmpty": "O log para \"{actor_name}\" está vazio e não tem nada para exportar"

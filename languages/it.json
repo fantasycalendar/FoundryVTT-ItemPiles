@@ -913,7 +913,7 @@
       "VaultFull": "Questo oggetto non può entrare in questo caveau!",
       "VaultItemNotExpander": "Quell'oggetto non è un espansore del vault",
       "DroppedIsNotItem": "Non puoi inserire documenti di tipo \"{type}\" in questa pila di oggetti!",
-      "VaultInvalidItemDropped": "Non puoi depositare questo tipo di oggetto in questo caveau!",
+      "ItemPileInvalidItemDropped": "Non puoi depositare questo tipo di oggetto in questo caveau!",
       "VaultNoGmItemSidebar": "Solo i DM possono rilasciare oggetti dalla barra laterale!",
       "NoResponseFromGMTimeout": "ATTENZIONE: il DM \"{user_name}\" non ha risposto all'ultima richiesta: attendi {time} secondi prima di effettuare un'altra richiesta di Item Piles.",
       "TransactionNoGMConnected": "Nessun DM è connesso: la transazione corrente è stata annullata, nulla è stato aggiunto, rimosso o trasferito",

@@ -10,12 +10,9 @@
 
 	import * as SharingUtilities from "../../helpers/sharing-utilities.js";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
-	import PrivateAPI from "../../API/private-api.js";
 	import ItemPileStore from "../../stores/item-pile-store.js";
 	import CategorizedItemList from "./CategorizedItemList.svelte";
-	import * as Helpers from "../../helpers/helpers.js";
-	import { getSourceActorFromDropData } from "../../helpers/utilities.js";
-	import { isItemValidBasedOnProperties } from "../../helpers/pile-utilities.js";
+	import DropZone from "../components/DropZone.svelte";
 
 	const { application } = getContext('#external');
 
@@ -51,57 +48,6 @@
 		num_players = SharingUtilities.getPlayersForItemPile(actor).length;
 	}
 
-	async function dropData(event) {
-
-		event.preventDefault();
-
-		let data;
-		try {
-			data = JSON.parse(event.dataTransfer.getData('text/plain'));
-		} catch (err) {
-			return false;
-		}
-
-		if (data.type === "Actor" && game.user.isGM) {
-			const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
-			return store.updateRecipient(newRecipient)
-		}
-
-		if (data.type !== "Item") {
-			Helpers.custom_warning(localize("ITEM-PILES.Warnings.DroppedIsNotItem", { type: data.type }), true)
-			return false;
-		}
-
-		const item = await Item.implementation.fromDropData(data);
-		const itemData = item.toObject();
-
-		if (!itemData) {
-			console.error(data);
-			throw Helpers.custom_error("Something went wrong when dropping this item!")
-		}
-
-		if (!isItemValidBasedOnProperties(this.actor, itemData) && !game.user.isGM) {
-			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultInvalidItemDropped"), true)
-			return false;
-		}
-
-		const source = getSourceActorFromDropData(data);
-
-		return PrivateAPI._dropItem({
-			source: source,
-			target: store.actor,
-			itemData: {
-				item: itemData, quantity: 1, uuid: data.uuid
-			},
-			skipCheck: true
-		});
-
-	}
-
-	function preventDefaultGM(event) {
-		if (game.user.isGM) return;
-		event.preventDefault();
-	}
 
 	function preventDefault(event) {
 		event.preventDefault();
@@ -126,8 +72,7 @@
 
 	<main in:fade={{duration: 500}}>
 
-		<div class="item-piles-item-drop-container" on:dragover={preventDefault} on:dragstart={preventDefaultGM}
-		     on:drop={dropData}>
+		<DropZone class="item-piles-item-drop-container" callback={store.onDrop.bind(store)}>
 
 			{#if $deleted}
 				<p style="text-align: center; flex: 0 1 auto;">
@@ -211,7 +156,7 @@
 				</button>
 			</footer>
 
-		</div>
+		</DropZone>
 
 	</main>
 

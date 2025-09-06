@@ -50,7 +50,7 @@
       "VaultItemNotExpander": "Tato položka není rozšířením trezoru",
       "NoResponseFromGM": "VAROVÁNÍ - PJ \"{user_name}\" nereaguje na nabídku - Item Piles požaduje aby PJ byl připojen a reagoval, aby hráči mohli využít většinu funkcí modulu.",
       "CantSortVault": "Nepodařilo se uspořádat předměty - buď je tam jednoduše příliš mnoho předmětů, nebo se něco pokazilo",
-      "VaultInvalidItemDropped": "Nemůžete vložit tento typ předmětu do tohoto úložiště!",
+      "ItemPileInvalidItemDropped": "Nemůžete vložit tento typ předmětu do tohoto úložiště!",
       "VaultSameItemOrigin": "Nemůžete umístit předmět do úložiště který pochází z úložiště!",
       "DroppedIsNotItem": "Nemůžete vložit dokument typu \"{type}\" do této kupy položek!",
       "VaultNoGmItemSidebar": "Pouze PJ může vložit předmět z postranního panelu!",

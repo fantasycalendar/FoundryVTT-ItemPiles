@@ -1065,9 +1065,9 @@ export function getStringFromCurrencies(currencies) {
 	let allAbbreviationsArray = getCurrenciesAbbreviations();
 
 	let priceString = currencies
-		.filter(price => price.cost)
+		.filter(price => price.cost || price.quantity)
 		.map(price => {
-			let cost = price.cost;
+			let cost = price.cost || price.quantity;
 			let abbreviation = price.abbreviation;
 			if (!Helpers.isRealNumber(cost) || !abbreviation) {
 				Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, true);
@@ -1085,9 +1085,9 @@ export function getStringFromCurrencies(currencies) {
 				abbreviation = abbreviation.replaceAll("%", "")
 			}
 			if (abbreviation.includes("{#}")) {
-				return abbreviation.replace("{#}", price.cost)
+				return abbreviation.replace("{#}", cost)
 			} else {
-				return price.cost + abbreviation;
+				return cost + abbreviation;
 			}
 		}).join(" ");
 
@@ -1125,17 +1125,23 @@ export function getPriceFromString(str, currencyList = false) {
 
 			if (part[2] !== currency.identifier) continue;
 
-			try {
+			let lowerCasePart = part[1].toLowerCase();
+			let total = 0;
+			if (lowerCasePart.includes("d")) {
+				let [diceQuantity, diceSize] = lowerCasePart.split("d");
+				for (let i = 0; i < diceQuantity; i++) {
+					total += Math.ceil(Math.random() * diceSize);
+				}
+				currency.quantity += total;
+			} else {
 				const roll = new Roll(part[1]).evaluateSync()
 				currency.quantity = roll.total;
 				if (roll.total !== Number(part[1])) {
-					currency.roll = roll;
+					total += roll.total;
 				}
-				if (currency.exchangeRate) {
-					overallCost += roll.total * currency.exchangeRate;
-				}
-			} catch (err) {
-
+			}
+			if (currency.exchangeRate) {
+				overallCost += total * currency.exchangeRate;
 			}
 		}
 	}
@@ -2333,11 +2339,11 @@ export function clearActorLog(actor) {
  * @param displayChat
  * @param rollData
  * @param customCategory
- * @returns {Promise<[object]>}
+ * @returns {Promise<[object{ items: [], currencies: [] }]>}
  */
 export async function rollTable({
 	tableUuid,
-	formula = "1",
+	formula = false,
 	resetTable = true,
 	normalize = false,
 	displayChat = false,
@@ -2346,6 +2352,7 @@ export async function rollTable({
 } = {}) {
 
 	const rolledItems = [];
+	let currencies = [];
 
 	const table = await fromUuid(tableUuid);
 
@@ -2363,6 +2370,8 @@ export async function rollTable({
 			await table.normalize();
 		}
 	}
+
+	formula = formula || (table?.formula ?? "1");
 
 	const roll = await new Roll(formula.toString(), rollData).evaluate({ allowInteractive: false });
 	if (roll.total <= 0) {
@@ -2410,12 +2419,17 @@ export async function rollTable({
 
 		if (item instanceof RollTable) {
 			const newResults = await rollTable({ tableUuid: item.uuid, resetTable, normalize, displayChat });
-			rolledItems.push(...newResults)
+			rolledItems.push(...newResults.items)
 		} else if (item instanceof Item) {
 			const quantity = Math.max(Utilities.getItemQuantity(item) * rolledQuantity, 1);
 			rolledItems.push({
 				...rollData, item, quantity
 			});
+		} else {
+			let nameCurrencies = getPriceFromString(rollData.name);
+			if (nameCurrencies.overallCost) {
+				currencies = nameCurrencies.currencies;
+			}
 		}
 
 	}
@@ -2448,7 +2462,7 @@ export async function rollTable({
 		}
 	})
 
-	return items;
+	return { items, currencies };
 
 }
 
@@ -2521,9 +2535,11 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				continue;
 			}
 
-			tableItems = await rollTable({
+			const result = await rollTable({
 				tableUuid: table.uuid, formula: roll.total, customCategory: customCategory
 			})
+
+			tableItems = result.items;
 
 			if (table?.customCategory) {
 				tableItems = tableItems.map(item => {
@@ -2608,15 +2624,21 @@ async function getItem(rollData) {
 		rollData.documentCollection = uuid.split(".").slice(1, 3).join(".");
 		rollData.documentId = uuid.split(".")[4];
 		rollData.documentUuid = uuid;
-	} else if (rollData.documentUuid) {
-		item = await fromUuid(rollData.documentUuid);
-	} else if (rollData.documentCollection === "Item") {
-		item = game.items.get(rollData.documentId);
-	} else {
-		const compendium = game.packs.get(rollData.documentCollection);
-		if (compendium) {
-			item = await compendium.getDocument(rollData.documentId);
+		return item;
+	}
+
+	if (CONSTANTS.IS_V13 && rollData.documentUuid) {
+		return await fromUuid(rollData.documentUuid);
+	} else if (!CONSTANTS.IS_V13) {
+		if (rollData.documentCollection === "Item") {
+			return game.items.get(rollData.documentId);
+		} else {
+			const compendium = game.packs.get(rollData.documentCollection);
+			if (compendium) {
+				return await compendium.getDocument(rollData.documentId);
+			}
 		}
 	}
-	return item;
+
+	return false;
 }

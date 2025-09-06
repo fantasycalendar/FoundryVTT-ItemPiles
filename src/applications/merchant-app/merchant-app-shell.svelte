@@ -30,20 +30,13 @@
 	});
 
 	let priceSelector = store.priceSelector;
-	let categories = store.categories;
 	let visibleItems = store.visibleItems;
 
 	async function dropData(data) {
 
-		if (!store.userHasAuthority) return;
-
-		if (!data.type) {
-			throw Helpers.custom_error("Something went wrong when dropping this item!")
-		}
-
 		if (data.type === "Actor") {
 			const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
-			store.updateRecipient(newRecipient);
+			this.updateRecipient(newRecipient);
 			if (recipientStore) {
 				return recipientStore.updateSource(newRecipient);
 			}
@@ -51,30 +44,7 @@
 			return;
 		}
 
-		if (data.type !== "Item") {
-			throw Helpers.custom_error("You must drop an item, not " + data.type.toLowerCase() + "!")
-		}
-
-		const item = await Item.implementation.fromDropData(data);
-		const validItem = await PileUtilities.checkItemType(merchant, item, {
-			errorText: "ITEM-PILES.Errors.DisallowedItemTrade",
-			warningTitle: "ITEM-PILES.Dialogs.TypeWarning.Title",
-			warningContent: "ITEM-PILES.Dialogs.TypeWarning.TradeContent"
-		});
-		if (!validItem) return;
-
-		if (item.parent && store.recipient) {
-			return PrivateAPI._giveItem({
-				source: store.recipient,
-				target: store.actor,
-				itemData: { item: validItem }
-			});
-		}
-
-		return game.itempiles.API.addItems(merchant, [{
-			item: validItem,
-			quantity: 1
-		}]);
+		return store.onDrop(data);
 
 	}
 

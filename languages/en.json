@@ -60,7 +60,8 @@
       "CantSortVault": "Failed to sort items - either there are simply too many items, or something went wrong",
       "VaultItemNotExpander": "That item is not a vault expander",
       "DroppedIsNotItem": "You can't drop documents of type \"{type}\" into this item pile!",
-      "VaultInvalidItemDropped": "You cannot drop this type of item into this vault!",
+      "DroppedFolderNotSupported": "You can't drop folders containing type \"{type}\" into this item pile!",
+      "ItemPileInvalidItemDropped": "You cannot drop this type of item into this item pile!",
       "VaultSameItemOrigin": "You can't drop items into the vault that originate from the vault!",
       "VaultNoGmItemSidebar": "Only GMs can drop items from the sidebar!",
       "LogEmpty": "The log for \"{actor_name}\" is empty and has nothing to export"

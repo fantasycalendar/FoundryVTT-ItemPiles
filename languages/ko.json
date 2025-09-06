@@ -60,7 +60,7 @@
       "CantSortVault": "아이템 정렬에 실패했습니다 - 아이템 수가 너무 많거나 문제가 발생했습니다.",
       "VaultItemNotExpander": "이 아이템은 금고 확장 아이템이 아닙니다.",
       "DroppedIsNotItem": "\"{type}\" 유형의 문서는 아이템 더미에 버릴 수 없습니다!",
-      "VaultInvalidItemDropped": "이 유형의 아이템은 금고에 버릴 수 없습니다!",
+      "ItemPileInvalidItemDropped": "이 유형의 아이템은 금고에 버릴 수 없습니다!",
       "VaultSameItemOrigin": "금고에서 나온 아이템을 다시 같은 금고에 넣을 수 없습니다!",
       "VaultNoGmItemSidebar": "사이드바에서 아이템을 금고에 드롭할 수 있는 권한은 GM에게만 있습니다!"
     },

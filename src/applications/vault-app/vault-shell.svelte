@@ -45,6 +45,9 @@
 	const recipientDocument = store.recipientDocument;
 	const dragPositionStore = store.dragPosition;
 
+	const activeTab = writable("vault");
+
+	$: tabIsExpander = $activeTab === "expanders";
 	$: pileData = $pileDataStore;
 	$: gridData = $gridDataStore;
 
@@ -251,6 +254,7 @@
 				dropData.target = hitApps[0].actor;
 			}
 			if (hitApps[0].onDropData) {
+				dropData.isExpander = tabIsExpander;
 				return hitApps[0].onDropData(dropData);
 			}
 			if (hitApps[0]._handleDroppedEntry) {
@@ -284,8 +288,6 @@
 			});
 		});
 	}
-
-	let activeTab = writable("vault");
 
 	const applicationHeight = application.position.stores.height;
 	const applicationWidth = application.position.stores.width;
@@ -350,7 +352,7 @@
 				<input type="text" bind:value={$searchStore}>
 			</div>
 
-			<DropZone callback={(data) => store.onDropData(data)} overCallback={onDragOverEvent} leaveCallback={onDragLeave}
+			<DropZone callback={store.onDrop.bind(store)} overCallback={onDragOverEvent} leaveCallback={onDragLeave}
 			          style="display: flex; flex: 1; justify-content: center; align-items: center;">
 
 				<Grid bind:items={$gridItems}
@@ -441,7 +443,7 @@
 
 		{#if $activeTab === "expanders"}
 
-			<DropZone callback={(data, event) => { store.onDropData(data, event, true) }}
+			<DropZone callback={(data) => { store.onDrop({ ...data, isExpander: true }) }}
 			          style="display: flex; flex-direction: column; flex:1;">
 
 				<div style="text-align: center;" class="item-piles-bottom-divider">

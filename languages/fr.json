@@ -1137,7 +1137,7 @@
       "NoResponseFromGMTimeout": "ATTENTION - MJ \"{user_name}\" n'a pas répondu à la dernièredemande - attendez {time} secondes avant de faire une autre requête 'Item Piles'.",
       "DroppedIsNotItem": "Vous ne pouvez pas déposer des documents de type \"{type}\" dans cette pile d'objets !",
       "TransactionNoGMConnected": "Aucun MJ n'est connecté - la transaction en cours a été annulée, rien n'a été ajouté, supprimé ou transféré.",
-      "VaultInvalidItemDropped": "Vous ne pouvez pas déposer ce type d'objet dans cette réserve !",
+      "ItemPileInvalidItemDropped": "Vous ne pouvez pas déposer ce type d'objet dans cette réserve !",
       "VaultSameItemOrigin": "Vous ne pouvez pas déposer d'objets dans la réserve qui proviennent de la réserve !",
       "CantSortVault": "Échec du tri des objets - soit il y a trop d'objets, soit il y a eu un problème.",
       "VaultNoGmItemSidebar": "Seuls les MJ peuvent déposer des objets à partir de la barre latérale !",
