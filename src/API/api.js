@@ -376,7 +376,7 @@ class API {
 		if (typeof inDefaults !== "object") {
 			throw Helpers.custom_error("setPileDefaults | inDefaults must be of type object");
 		}
-		const validKeys = new Set(Object.keys(CONSTANTS.PILE_DEFAULTS));
+		const validKeys = new Set(Object.keys(PileUtilities.getPileDefaults()));
 		for (const key of Object.keys(inDefaults)) {
 			if (!validKeys.has(key)) {
 				throw Helpers.custom_error(`setPileDefaults | ${key} is not a valid pile setting`);

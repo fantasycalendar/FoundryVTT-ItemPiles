@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 3.2.25
+
+- Added support for a `condition` property in merchant columns - the merchant column editor does not support it yet, but it will come in a future update
+- Minor fix to systems using string-based prices on items
+- Minor fix to dropping items on merchants for GMs
+
 ## Version 3.2.24
 
 - Added feature allowing folders of items to be dropped onto item piles to fill item pile with all items contained in folder

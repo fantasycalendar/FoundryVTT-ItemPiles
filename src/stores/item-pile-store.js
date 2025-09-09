@@ -198,13 +198,15 @@ export default class ItemPileStore {
 
 		const source = Utilities.getSourceActorFromDropData(data);
 
+		if (PileUtilities.isItemPileMerchant(this.actor) && !(game.user.isGM || this.actor.isOwner)) {
+			return;
+		}
 		return PrivateAPI._dropItem({
 			source: source,
-			target: store.actor,
+			target: this.actor,
 			itemData: {
 				item: itemData, quantity: 1, uuid: data.uuid
-			},
-			skipCheck: true
+			}
 		});
 	}
 

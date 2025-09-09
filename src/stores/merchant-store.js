@@ -124,18 +124,23 @@ export default class MerchantStore extends ItemPileStore {
 			.filter(column => {
 				return this.isMerchant ? (column?.buying ?? true) : (column?.selling ?? true);
 			})
-			.map(column => ({
-				label: localize(column.label), component: CustomColumn, data: column, sortMethod: (a, b, inverse) => {
-					const path = column.path;
-					const AProp = foundry.utils.getProperty(b.item, path);
-					const BProp = foundry.utils.getProperty(a.item, path);
-					if (!column?.mapping?.[AProp] || !column?.mapping?.[BProp]) {
-						return (AProp > BProp ? 1 : -1) * (inverse ? -1 : 1);
+			.map(column => {
+				return {
+					label: localize(column.label),
+					component: CustomColumn,
+					data: column,
+					sortMethod: (a, b, inverse) => {
+						const path = column.path;
+						const AProp = foundry.utils.getProperty(b.item, path);
+						const BProp = foundry.utils.getProperty(a.item, path);
+						if (!column?.mapping?.[AProp] || !column?.mapping?.[BProp]) {
+							return (AProp > BProp ? 1 : -1) * (inverse ? -1 : 1);
+						}
+						const keys = Object.keys(column.mapping);
+						return (keys.indexOf(AProp) - keys.indexOf(BProp)) * (inverse ? -1 : 1);
 					}
-					const keys = Object.keys(column.mapping);
-					return (keys.indexOf(AProp) - keys.indexOf(BProp)) * (inverse ? -1 : 1);
 				}
-			}));
+			});
 
 		const columns = [];
 

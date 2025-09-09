@@ -15,7 +15,10 @@ import * as CompendiumUtilities from "./compendium-utilities.js";
 
 export function getPileDefaults() {
 	return foundry.utils.mergeObject(
-		foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+		foundry.utils.mergeObject(
+			foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+			foundry.utils.deepClone(SYSTEMS.DATA.PILE_DEFAULTS)
+		),
 		foundry.utils.deepClone(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {})
 	);
 }
@@ -24,7 +27,7 @@ export function getPileActorDefaults(itemPileFlags = {}) {
 	const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
 	const defaultItemPileActor = game.actors.get(defaultItemPileId);
 
-	let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
+	let pileDataDefaults = getPileDefaults();
 	if (foundry.utils.isEmpty(itemPileFlags) && defaultItemPileActor) {
 		const defaultItemPileSettings = getActorFlagData(defaultItemPileActor);
 		itemPileFlags = foundry.utils.mergeObject(pileDataDefaults, defaultItemPileSettings);
@@ -1102,7 +1105,7 @@ export function getPriceFromString(str, currencyList = false) {
 		currencyList = getCurrencyList()
 	}
 
-	let currencies = foundry.utils.duplicate(currencyList)
+	const currencies = foundry.utils.deepClone(currencyList)
 		.map(currency => {
 			currency.quantity = 0
 			currency.identifier = currency.abbreviation.toLowerCase().replace("{#}", "").trim()
@@ -1114,58 +1117,34 @@ export function getPriceFromString(str, currencyList = false) {
 	const splitBy = new RegExp("(.*?) *(" + sortedCurrencies.join("|") + ")", "g");
 
 	const parts = [...str.split(",").join("").split(" ").join("").trim().toLowerCase().matchAll(splitBy)];
-	const identifierFilter = [];
+
 	let overallCost = 0;
+	let currenciesToReturn = [];
 	for (const part of parts) {
 		for (const currency of currencies) {
 
-			if (part[2]) {
-				identifierFilter.push(part[2]?.toLowerCase());
-			}
-
-			if (part[2] !== currency.identifier) continue;
+			if (part[2] !== currency.identifier || !currency.exchangeRate) continue;
 
 			let lowerCasePart = part[1].toLowerCase();
-			let total = 0;
-			if (lowerCasePart.includes("d")) {
-				let [diceQuantity, diceSize] = lowerCasePart.split("d");
+			if (lowerCasePart.startsWith("d") || lowerCasePart.match(/\d*d\d+/g)) {
+				let diceParts = lowerCasePart.split("d");
+				let diceQuantity = parseInt(diceParts[0]) || 1;
+				let diceSize = parseInt(diceParts[1]);
 				for (let i = 0; i < diceQuantity; i++) {
-					total += Math.ceil(Math.random() * diceSize);
+					let num = Math.ceil(Math.random() * diceSize);
+					currency.quantity += num;
+					overallCost += num * currency.exchangeRate;
 				}
-				currency.quantity += total;
 			} else {
 				const roll = new Roll(part[1]).evaluateSync()
 				currency.quantity = roll.total;
-				if (roll.total !== Number(part[1])) {
-					total += roll.total;
-				}
+				overallCost += roll.total * currency.exchangeRate;
 			}
-			if (currency.exchangeRate) {
-				overallCost += total * currency.exchangeRate;
-			}
+			currenciesToReturn.push(currency);
 		}
 	}
 
-	// Maybe there is a better method for this ?
-	currencies = currencies.filter(currency => identifierFilter.includes(currency.identifier?.toLowerCase()));
-
-	if (!currencies.some(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0)) {
-		try {
-			const roll = new Roll(str).evaluateSync();
-			if (roll.total) {
-				const primaryCurrency = currencies.find(currency => currency.primary);
-				primaryCurrency.quantity = roll.total;
-				if (roll.total !== Number(str)) {
-					primaryCurrency.roll = roll;
-				}
-				overallCost = roll.total;
-			}
-		} catch (err) {
-
-		}
-	}
-
-	return { currencies, overallCost };
+	return { currencies: currenciesToReturn, overallCost };
 }
 
 export function getCostOfItem(item, defaultCurrencies = false) {

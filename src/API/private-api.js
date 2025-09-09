@@ -112,7 +112,7 @@ export default class PrivateAPI {
 		const docData = foundry.utils.deepClone(data);
 		const sourceActor = game.actors.get(doc.actorId);
 		let itemPileConfig = foundry.utils.mergeObject(
-			foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+			foundry.utils.deepClone(PileUtilities.getPileDefaults()),
 			foundry.utils.getProperty(docData, CONSTANTS.FLAGS.PILE) ?? {}
 		)
 		if (doc.isLinked || !foundry.utils.hasProperty(docData, CONSTANTS.FLAGS.PILE)) {
@@ -1070,7 +1070,7 @@ export default class PrivateAPI {
 		const { itemDeltas, attributeDeltas } = await targetTransaction.commit();
 
 		if (targetItemPileFlags) {
-			const flags = PileUtilities.cleanFlagData(foundry.utils.mergeObject(CONSTANTS.PILE_DEFAULTS, targetItemPileFlags));
+			const flags = PileUtilities.cleanFlagData(foundry.utils.mergeObject(PileUtilities.getPileDefaults(), targetItemPileFlags));
 			await PileUtilities.updateItemPileData(targetActor, flags);
 		}
 
@@ -1270,7 +1270,7 @@ export default class PrivateAPI {
 
 				Helpers.custom_notify("A Default Item Pile has been added to your Actors list. You can configure the default look and behavior on it, or duplicate it to create different styles.")
 
-				let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
+				let pileDataDefaults = PileUtilities.getPileDefaults();
 
 				pileDataDefaults.enabled = true;
 				if (foundry.utils.isEmpty(itemPileFlags)) {
