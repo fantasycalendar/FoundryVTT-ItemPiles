@@ -1916,7 +1916,7 @@ export default class PrivateAPI {
 		const targetActor = Utilities.getActor(dropData.target);
 		if (sourceActor && targetActor && sourceActor === targetActor) return;
 
-		if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target)) return;
+		if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target) && !dropData.target.isOwner) return;
 
 		const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
 		if (!validItem) return;

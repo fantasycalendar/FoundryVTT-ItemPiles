@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.26
+
+- Fixed not being able to drop items into merchants
+- Fixed not being able to see the "buy items" tab in merchants when they had no items for sale
+
 ## Version 3.2.25
 
 - Added support for a `condition` property in merchant columns - the merchant column editor does not support it yet, but it will come in a future update

@@ -55,7 +55,7 @@
 		const hasItems = $visibleItems.some(item => !get(item.category).service)
 		const hasServices = $visibleItems.some(item => get(item.category).service)
 		const canSell = !$pileData.purchaseOnly && recipientStore;
-		const showBuy = hasItems || (!hasItems && !hasServices && !canSell)
+		const showBuy = hasItems || !hasServices
 		tabs = [
 			{
 				value: 'buy',
