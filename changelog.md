@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.27
+
+- Fixed item quantity numbers in Custom System Builder
+- Fixed `game.itempiles.API.rollItemTable` not working, and now supports text-type entries that contain currency text, like `10gp` or `1d6sp`
+
 ## Version 3.2.26
 
 - Fixed not being able to drop items into merchants

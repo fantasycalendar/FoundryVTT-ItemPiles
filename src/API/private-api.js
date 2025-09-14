@@ -2579,7 +2579,7 @@ export default class PrivateAPI {
 		userId = false,
 	} = {}) {
 
-		let items = await PileUtilities.rollTable({
+		let { items, currencies } = await PileUtilities.rollTable({
 			tableUuid: table,
 			formula: timesToRoll,
 			normalize: normalizeTable,
@@ -2595,6 +2595,10 @@ export default class PrivateAPI {
 				return Utilities.setItemQuantity(actualItem, item.quantity);
 			});
 			items = await this._addItems(targetActor, itemsToAdd, userId, { removeExistingActorItems });
+
+			if (currencies.length > 0) {
+				await this._addCurrencies(targetActor, PileUtilities.getStringFromCurrencies(currencies), userId)
+			}
 		}
 
 		return items;
