@@ -585,6 +585,70 @@ declare global {
       attributes: Record<string, Record<string, number>>;
     }
 
+    export declare class Transaction {
+      document: document;
+      documentFlags: unknown;
+      itemsToCreate: Item[];
+      itemUpdates: {};
+      itemsToUpdate: Item[];
+      itemsToDelete: Item[];
+      itemsToForceDelete: Set<unknown>;
+      itemsToNotDelete: Set<unknown>;
+      documentChanges: {};
+      attributeDeltas: Map<string, number>;
+      attributeTypeMap: Map<string, unknown>;
+      itemDeltas: Map<string, number>;
+      itemTypeMap: Map<string, unknown>;
+      itemFlagMap: Map<string, unknown>;
+      preCommitted: boolean;
+      constructor(document: foundry.documents.Actor);
+
+      appendItemChanges(
+        items: Iterable<Item>,
+        options: {
+          set?: boolean;
+          remove?: boolean;
+          type?: string;
+          keepIfZero?: boolean;
+        } = {}
+      ): Promise<void>;
+
+      appendDocumentChanges(
+        attributes: AttributeParam,
+        options: {
+          set?: boolean;
+          remove?: boolean;
+          type?: string;
+          onlyDelta?: boolean;
+        }
+      ): Promise<void>;
+
+      appendEmbeddedChanges(
+        item: Item,
+        attributes: AttributeParam,
+        options: {
+          set?: boolean;
+          remove?: boolean;
+          type?: string;
+          onlyDelta?: boolean;
+        }
+      ): Promise<void>;
+
+      prepare(): {
+        documentChanges: Record<string, number>;
+        itemsToCreate: Item[];
+        itemsToUpdate: Item[];
+        itemsToDelete: Item[];
+        itemDeltas: [string, number][];
+        attributeDeltas: [string, number][];
+      };
+
+      commit(): Promise<{
+        attributeDeltas: Map<string, number>;
+        itemDeltas: { item: string; quantity: number };
+      }>;
+    }
+
     /**
      * Item Piles API
      */
@@ -1528,6 +1592,580 @@ declare global {
       ): Promise<void> | undefined;
     }
   }
+
+  /**
+   * This should be the value of `game.itempiles` after initialization
+   */
+  export type ItemPilesGameInterface = {
+    Transaction: typeof ItemPiles.Transaction;
+    API: typeof ItemPiles.API;
+    CONSTANTS: {
+      MODULE_NAME: "item-piles";
+      PATH: "modules/item-piles/";
+      IS_V13: boolean;
+      ACTOR_DELTA_PROPERTY: "delta";
+      FLAGS: {
+        VERSION: "flags.item-piles.version";
+        PILE: "flags.item-piles.data";
+        ITEM: "flags.item-piles.item";
+        NO_VERSION: "flags.item-piles.-=version";
+        NO_PILE: "flags.item-piles.-=data";
+        NO_ITEM: "flags.item-piles.-=item";
+        LOG: "flags.item-piles.log";
+        SHARING: "flags.item-piles.sharing";
+        PUBLIC_TRADE_ID: "flags.item-piles.publicTradeId";
+        TRADE_USERS: "flags.item-piles.tradeUsers";
+        TEMPORARY_ITEM: "flags.item-piles.temporary_item";
+        CUSTOM_CATEGORY: "flags.item-piles.item.customCategory";
+      };
+      SIMPLE_FLAGS: {
+        VERSION: "item-piles.version";
+        PILE: "item-piles.data";
+        ITEM: "item-piles.item";
+        NO_VERSION: "item-piles.-=version";
+        NO_PILE: "item-piles.-=data";
+        NO_ITEM: "item-piles.-=item";
+        LOG: "item-piles.log";
+        SHARING: "item-piles.sharing";
+        PUBLIC_TRADE_ID: "item-piles.publicTradeId";
+        TRADE_USERS: "item-piles.tradeUsers";
+        TEMPORARY_ITEM: "item-piles.temporary_item";
+        CUSTOM_CATEGORY: "item-piles.item.customCategory";
+      };
+      ITEM_TYPE_METHODS: {
+        HAS_CURRENCY: "hasCurrency";
+        CONTENTS: "contents";
+        TRANSFER: "transfer";
+        IS_CONTAINED: "isContained";
+        IS_CONTAINED_PATH: "isContainedPath";
+        CONTAINER_ID_GENERATOR: "containerIdGenerator";
+        CONTAINER_ID_RETRIEVER: "containerIdRetriever";
+        CONTAINER_TRANSFORMER: "containerTransformer";
+      };
+      ITEM_DEFAULTS: {
+        hidden: boolean;
+        notForSale: boolean;
+        infiniteQuantity: string;
+        displayQuantity: string;
+        free: boolean;
+        keepZeroQuantity: boolean;
+        disableNormalCost: boolean;
+        purchaseOptionsAsSellOption: boolean;
+        cantBeSoldToMerchants: boolean;
+        isService: boolean;
+        keepOnMerchant: boolean;
+        macro: string;
+        customCategory: string;
+        prices: unknown[];
+        sellPrices: unknown[];
+        overheadCost: unknown[];
+        buyPriceModifier: number;
+        sellPriceModifier: number;
+        craftingComponents: unknown[];
+        breakdownComponents: unknown[];
+        vaultExpander: boolean;
+        vaultSlot: null;
+        addsCols: number;
+        addsRows: number;
+        x: null;
+        y: null;
+        width: number;
+        height: number;
+        flipped: boolean;
+        vaultImage: string;
+        vaultImageFlipped: string;
+        canStack: string;
+      };
+      PILE_TYPES: {
+        PILE: "pile";
+        CONTAINER: "container";
+        MERCHANT: "merchant";
+        VAULT: "vault";
+        AUCTIONEER: "auctioneer";
+        BANKER: "banker";
+      };
+      VAULT_LOGGING_TYPES: {
+        USER_ACTOR: "user_actor";
+        USER: "user";
+        ACTOR: "actor";
+      };
+      MACRO_EXECUTION_TYPES: {
+        TRADE_ITEMS: "tradeItems";
+        ADD_ITEMS: "addItems";
+        REMOVE_ITEMS: "removeItems";
+        TRANSFER_ITEMS: "transferItems";
+        TRANSFER_ALL_ITEMS: "transferAllItems";
+        UPDATE_CURRENCIES: "updateCurrencies";
+        ADD_CURRENCIES: "addCurrencies";
+        REMOVE_CURRENCIES: "removeCurrencies";
+        TRANSFER_CURRENCIES: "transferCurrencies";
+        TRANSFER_ALL_CURRENCIES: "transferAllCurrencies";
+        SET_ATTRIBUTES: "setAttributes";
+        ADD_ATTRIBUTES: "addAttributes";
+        REMOVE_ATTRIBUTES: "removeAttributes";
+        TRANSFER_ATTRIBUTES: "transferAttributes";
+        TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes";
+        TRANSFER_EVERYTHING: "transferEverything";
+        CLOSE_ITEM_PILE: "closeItemPile";
+        LOCK_ITEM_PILE: "lockItemPile";
+        UNLOCK_ITEM_PILE: "unlockItemPile";
+        OPEN_ITEM_PILE: "openItemPile";
+        SPLIT_INVENTORY: "splitInventory";
+        RENDER_INTERFACE: "renderInterface";
+      };
+      CUSTOM_PILE_TYPES: Record<string, string>;
+      PILE_DEFAULTS: {
+        enabled: boolean;
+        type: "pile";
+        distance: number;
+        macro: string;
+        deleteWhenEmpty: string;
+        canStackItems: "yes";
+        canInspectItems: boolean;
+        displayItemTypes: boolean;
+        description: string;
+        overrideItemFilters: boolean;
+        overrideCurrencies: boolean;
+        overrideSecondaryCurrencies: boolean;
+        requiredItemProperties: unknown[];
+        displayOne: boolean;
+        showItemName: boolean;
+        overrideSingleItemScale: boolean;
+        singleItemScale: number;
+        shareItemsEnabled: boolean;
+        shareCurrenciesEnabled: boolean;
+        takeAllEnabled: boolean;
+        splitAllEnabled: boolean;
+        activePlayers: boolean;
+        closed: boolean;
+        locked: boolean;
+        closedImage: string;
+        closedImages: unknown[];
+        emptyImage: string;
+        emptyImages: unknown[];
+        openedImage: string;
+        openedImages: unknown[];
+        lockedImage: string;
+        lockedImages: unknown[];
+        closeSound: string;
+        closeSounds: unknown[];
+        openSound: string;
+        openSounds: unknown[];
+        lockedSound: string;
+        lockedSounds: unknown[];
+        unlockedSound: string;
+        unlockedSounds: unknown[];
+        merchantImage: string;
+        infiniteQuantity: boolean;
+        infiniteCurrencies: boolean;
+        purchaseOnly: boolean;
+        hideNewItems: boolean;
+        hideItemsWithZeroCost: boolean;
+        keepZeroQuantity: boolean;
+        onlyAcceptBasePrice: boolean;
+        displayQuantity: "yes";
+        buyPriceModifier: number;
+        sellPriceModifier: number;
+        itemTypePriceModifiers: unknown[];
+        actorPriceModifiers: unknown[];
+        tablesForPopulate: unknown[];
+        merchantColumns: unknown[];
+        hideTokenWhenClosed: boolean;
+        openTimes: {
+          enabled: boolean;
+          status: "open";
+          open: {
+            hour: 9;
+            minute: number;
+          };
+          close: {
+            hour: number8;
+            minute: number;
+          };
+        };
+        closedDays: unknown[];
+        closedHolidays: unknown[];
+        refreshItemsOnOpen: boolean;
+        refreshItemsDays: unknown[];
+        refreshItemsHolidays: unknown[];
+        logMerchantActivity: boolean;
+        overheadCost: unknown[];
+        cols: numbernumber;
+        rows: 5;
+        restrictVaultAccess: boolean;
+        vaultExpansion: boolean;
+        baseExpansionCols: number;
+        baseExpansionRows: number;
+        vaultAccess: unknown[];
+        logVaultActions: boolean;
+        vaultLogType: "user_actor";
+      };
+      DEFAULT_PILE_TYPES: ["pile", "container", "merchant", "vault"];
+      ITEM_FORCED_UNIQUE_KEYS: ["flags.item-piles.item.vaultExpander"];
+      HOOKS: {
+        READY: "item-piles-ready";
+        RESET_SETTINGS: "item-piles-resetSettings";
+        DRAG_DOCUMENT: "item-piles-onDragDocument";
+        DROP_DOCUMENT: "item-piles-onDropDocument";
+        PRE_TRANSFER_EVERYTHING: "item-piles-preTransferEverything";
+        TRANSFER_EVERYTHING: "item-piles-transferEverything";
+        PRE_RENDER_SHEET: "item-piles-preRenderActorSheet";
+        PRE_RENDER_INTERFACE: "item-piles-preRenderInterface";
+        PRE_OPEN_INTERFACE: "item-piles-preOpenInterface";
+        OPEN_INTERFACE: "item-piles-openInterface";
+        PRE_CLOSE_INTERFACE: "item-piles-preCloseInterface";
+        CLOSE_INTERFACE: "item-piles-closeInterface";
+        RENDER_PILE_ITEM: "item-piles-renderPileItem";
+        HOVER_PILE_ITEM: "item-piles-mouseHoverPileItem";
+        LEAVE_PILE_ITEM: "item-piles-mouseLeavePileItem";
+        RENDER_MERCHANT_ITEM: "item-piles-renderMerchantItem";
+        HOVER_MERCHANT_ITEM: "item-piles-mouseHoverMerchantItem";
+        LEAVE_MERCHANT_ITEM: "item-piles-mouseLeaveMerchantItem";
+        RENDER_VAULT_GRID_ITEM: "item-piles-renderVaultGridItem";
+        HOVER_VAULT_GRID_ITEM: "item-piles-mouseHoverVaultGridItem";
+        LEAVE_VAULT_GRID_ITEM: "item-piles-mouseLeaveVaultGridItem";
+        PILE: {
+          PRE_CREATE: "item-piles-preCreateItemPile";
+          CREATE: "item-piles-createItemPile";
+          PRE_UPDATE: "item-piles-preUpdateItemPile";
+          UPDATE: "item-piles-updateItemPile";
+          PRE_DELETE: "item-piles-preDeleteItemPile";
+          DELETE: "item-piles-deleteItemPile";
+          PRE_CLOSE: "item-piles-preCloseItemPile";
+          CLOSE: "item-piles-closeItemPile";
+          PRE_OPEN: "item-piles-preOpenItemPile";
+          OPEN: "item-piles-openItemPile";
+          PRE_LOCK: "item-piles-preLockItemPile";
+          LOCK: "item-piles-lockItemPile";
+          PRE_UNLOCK: "item-piles-preUnlockItemPile";
+          UNLOCK: "item-piles-unlockItemPile";
+          PRE_RATTLE: "item-piles-preRattleItemPile";
+          RATTLE: "item-piles-rattleItemPile";
+          PRE_TURN_INTO: "item-piles-preTurnIntoItemPiles";
+          TURN_INTO: "item-piles-turnIntoItemPiles";
+          PRE_REVERT_FROM: "item-piles-preRevertFromItemPiles";
+          REVERT_FROM: "item-piles-revertFromItemPiles";
+          PRE_SPLIT_INVENTORY: "item-piles-preSplitItemPileContent";
+          SPLIT_INVENTORY: "item-piles-splitItemPileContent";
+          PRE_CLICK: "item-piles-preClickItemPile";
+          PRE_DIRECTORY_CLICK: "item-piles-preClickDirectoryItemPile";
+          PRE_RIGHT_CLICK_ITEM: "item-piles-preRightClickItem";
+          PRE_REFRESH_INVENTORY: "item-piles-preRefreshInventory";
+        };
+        ITEM: {
+          PRE_DROP_DETERMINED: "item-piles-preDropItemDetermined";
+          PRE_DROP: "item-piles-preDropItem";
+          DROP: "item-piles-dropItem";
+          PRE_TRANSFER: "item-piles-preTransferItems";
+          TRANSFER: "item-piles-transferItems";
+          PRE_ADD: "item-piles-preAddItems";
+          ADD: "item-piles-addItems";
+          PRE_REMOVE: "item-piles-preRemoveItems";
+          REMOVE: "item-piles-removeItems";
+          PRE_TRANSFER_ALL: "item-piles-preTransferAllItems";
+          TRANSFER_ALL: "item-piles-transferAllItems";
+          PRE_CALC_TRADE: "item-piles-preCalculateTradeItems";
+          PRE_TRADE: "item-piles-preTradeItems";
+          TRADE: "item-piles-tradeItems";
+          PRE_GIVE: "item-piles-preGiveItem";
+          GIVE: "item-piles-giveItem";
+        };
+        CURRENCY: {
+          PRE_TRANSFER: "item-piles-preTransferCurrencies";
+          TRANSFER: "item-piles-transferCurrencies";
+          PRE_UPDATE: "item-piles-preUpdateCurrencies";
+          UPDATE: "item-piles-updateCurrencies";
+          PRE_ADD: "item-piles-preAddCurrencies";
+          ADD: "item-piles-addCurrencies";
+          PRE_REMOVE: "item-piles-preRemoveCurrencies";
+          REMOVE: "item-piles-removeCurrencies";
+          PRE_TRANSFER_ALL: "item-piles-preTransferAllCurrencies";
+          TRANSFER_ALL: "item-piles-transferAllCurrencies";
+        };
+        ATTRIBUTE: {
+          PRE_TRANSFER: "item-piles-preTransferAttributes";
+          TRANSFER: "item-piles-transferAttributes";
+          PRE_SET: "item-piles-preSetAttributes";
+          SET: "item-piles-setAttributes";
+          PRE_ADD: "item-piles-preAddAttributes";
+          ADD: "item-piles-addAttributes";
+          PRE_REMOVE: "item-piles-preRemoveAttributes";
+          REMOVE: "item-piles-removeAttributes";
+          PRE_TRANSFER_ALL: "item-piles-preTransferAllAttributes";
+          TRANSFER_ALL: "item-piles-transferAllAttributes";
+        };
+        TRADE: {
+          STARTED: "item-piles-tradeStarted";
+          COMPLETE: "item-piles-tradeComplete";
+        };
+      };
+      TABLE_UUID_REGEX: {};
+    };
+    hooks: {
+      READY: "item-piles-ready";
+      RESET_SETTINGS: "item-piles-resetSettings";
+      DRAG_DOCUMENT: "item-piles-onDragDocument";
+      DROP_DOCUMENT: "item-piles-onDropDocument";
+      PRE_TRANSFER_EVERYTHING: "item-piles-preTransferEverything";
+      TRANSFER_EVERYTHING: "item-piles-transferEverything";
+      PRE_RENDER_SHEET: "item-piles-preRenderActorSheet";
+      PRE_RENDER_INTERFACE: "item-piles-preRenderInterface";
+      PRE_OPEN_INTERFACE: "item-piles-preOpenInterface";
+      OPEN_INTERFACE: "item-piles-openInterface";
+      PRE_CLOSE_INTERFACE: "item-piles-preCloseInterface";
+      CLOSE_INTERFACE: "item-piles-closeInterface";
+      RENDER_PILE_ITEM: "item-piles-renderPileItem";
+      HOVER_PILE_ITEM: "item-piles-mouseHoverPileItem";
+      LEAVE_PILE_ITEM: "item-piles-mouseLeavePileItem";
+      RENDER_MERCHANT_ITEM: "item-piles-renderMerchantItem";
+      HOVER_MERCHANT_ITEM: "item-piles-mouseHoverMerchantItem";
+      LEAVE_MERCHANT_ITEM: "item-piles-mouseLeaveMerchantItem";
+      RENDER_VAULT_GRID_ITEM: "item-piles-renderVaultGridItem";
+      HOVER_VAULT_GRID_ITEM: "item-piles-mouseHoverVaultGridItem";
+      LEAVE_VAULT_GRID_ITEM: "item-piles-mouseLeaveVaultGridItem";
+      PILE: {
+        PRE_CREATE: "item-piles-preCreateItemPile";
+        CREATE: "item-piles-createItemPile";
+        PRE_UPDATE: "item-piles-preUpdateItemPile";
+        UPDATE: "item-piles-updateItemPile";
+        PRE_DELETE: "item-piles-preDeleteItemPile";
+        DELETE: "item-piles-deleteItemPile";
+        PRE_CLOSE: "item-piles-preCloseItemPile";
+        CLOSE: "item-piles-closeItemPile";
+        PRE_OPEN: "item-piles-preOpenItemPile";
+        OPEN: "item-piles-openItemPile";
+        PRE_LOCK: "item-piles-preLockItemPile";
+        LOCK: "item-piles-lockItemPile";
+        PRE_UNLOCK: "item-piles-preUnlockItemPile";
+        UNLOCK: "item-piles-unlockItemPile";
+        PRE_RATTLE: "item-piles-preRattleItemPile";
+        RATTLE: "item-piles-rattleItemPile";
+        PRE_TURN_INTO: "item-piles-preTurnIntoItemPiles";
+        TURN_INTO: "item-piles-turnIntoItemPiles";
+        PRE_REVERT_FROM: "item-piles-preRevertFromItemPiles";
+        REVERT_FROM: "item-piles-revertFromItemPiles";
+        PRE_SPLIT_INVENTORY: "item-piles-preSplitItemPileContent";
+        SPLIT_INVENTORY: "item-piles-splitItemPileContent";
+        PRE_CLICK: "item-piles-preClickItemPile";
+        PRE_DIRECTORY_CLICK: "item-piles-preClickDirectoryItemPile";
+        PRE_RIGHT_CLICK_ITEM: "item-piles-preRightClickItem";
+        PRE_REFRESH_INVENTORY: "item-piles-preRefreshInventory";
+      };
+      ITEM: {
+        PRE_DROP_DETERMINED: "item-piles-preDropItemDetermined";
+        PRE_DROP: "item-piles-preDropItem";
+        DROP: "item-piles-dropItem";
+        PRE_TRANSFER: "item-piles-preTransferItems";
+        TRANSFER: "item-piles-transferItems";
+        PRE_ADD: "item-piles-preAddItems";
+        ADD: "item-piles-addItems";
+        PRE_REMOVE: "item-piles-preRemoveItems";
+        REMOVE: "item-piles-removeItems";
+        PRE_TRANSFER_ALL: "item-piles-preTransferAllItems";
+        TRANSFER_ALL: "item-piles-transferAllItems";
+        PRE_CALC_TRADE: "item-piles-preCalculateTradeItems";
+        PRE_TRADE: "item-piles-preTradeItems";
+        TRADE: "item-piles-tradeItems";
+        PRE_GIVE: "item-piles-preGiveItem";
+        GIVE: "item-piles-giveItem";
+      };
+      CURRENCY: {
+        PRE_TRANSFER: "item-piles-preTransferCurrencies";
+        TRANSFER: "item-piles-transferCurrencies";
+        PRE_UPDATE: "item-piles-preUpdateCurrencies";
+        UPDATE: "item-piles-updateCurrencies";
+        PRE_ADD: "item-piles-preAddCurrencies";
+        ADD: "item-piles-addCurrencies";
+        PRE_REMOVE: "item-piles-preRemoveCurrencies";
+        REMOVE: "item-piles-removeCurrencies";
+        PRE_TRANSFER_ALL: "item-piles-preTransferAllCurrencies";
+        TRANSFER_ALL: "item-piles-transferAllCurrencies";
+      };
+      ATTRIBUTE: {
+        PRE_TRANSFER: "item-piles-preTransferAttributes";
+        TRANSFER: "item-piles-transferAttributes";
+        PRE_SET: "item-piles-preSetAttributes";
+        SET: "item-piles-setAttributes";
+        PRE_ADD: "item-piles-preAddAttributes";
+        ADD: "item-piles-addAttributes";
+        PRE_REMOVE: "item-piles-preRemoveAttributes";
+        REMOVE: "item-piles-removeAttributes";
+        PRE_TRANSFER_ALL: "item-piles-preTransferAllAttributes";
+        TRANSFER_ALL: "item-piles-transferAllAttributes";
+      };
+      TRADE: {
+        STARTED: "item-piles-tradeStarted";
+        COMPLETE: "item-piles-tradeComplete";
+      };
+    };
+    flags: {
+      VERSION: "flags.item-piles.version";
+      PILE: "flags.item-piles.data";
+      ITEM: "flags.item-piles.item";
+      NO_VERSION: "flags.item-piles.-=version";
+      NO_PILE: "flags.item-piles.-=data";
+      NO_ITEM: "flags.item-piles.-=item";
+      LOG: "flags.item-piles.log";
+      SHARING: "flags.item-piles.sharing";
+      PUBLIC_TRADE_ID: "flags.item-piles.publicTradeId";
+      TRADE_USERS: "flags.item-piles.tradeUsers";
+      TEMPORARY_ITEM: "flags.item-piles.temporary_item";
+      CUSTOM_CATEGORY: "flags.item-piles.item.customCategory";
+    };
+    pile_types: {
+      PILE: "pile";
+      CONTAINER: "container";
+      MERCHANT: "merchant";
+      VAULT: "vault";
+      AUCTIONEER: "auctioneer";
+      BANKER: "banker";
+    };
+    pile_flag_defaults: {
+      enabled: boolean;
+      type: "pile";
+      distance: number;
+      macro: string;
+      deleteWhenEmpty: string;
+      canStackItems: "yes";
+      canInspectItems: boolean;
+      displayItemTypes: boolean;
+      description: string;
+      overrideItemFilters: boolean;
+      overrideCurrencies: boolean;
+      overrideSecondaryCurrencies: boolean;
+      requiredItemProperties: unknown[];
+      displayOne: boolean;
+      showItemName: boolean;
+      overrideSingleItemScale: boolean;
+      singleItemScale: number;
+      shareItemsEnabled: boolean;
+      shareCurrenciesEnabled: boolean;
+      takeAllEnabled: boolean;
+      splitAllEnabled: boolean;
+      activePlayers: boolean;
+      closed: boolean;
+      locked: boolean;
+      closedImage: string;
+      closedImages: unknown[];
+      emptyImage: string;
+      emptyImages: unknown[];
+      openedImage: string;
+      openedImages: unknown[];
+      lockedImage: string;
+      lockedImages: unknown[];
+      closeSound: string;
+      closeSounds: unknown[];
+      openSound: string;
+      openSounds: unknown[];
+      lockedSound: string;
+      lockedSounds: unknown[];
+      unlockedSound: string;
+      unlockedSounds: unknown[];
+      merchantImage: string;
+      infiniteQuantity: boolean;
+      infiniteCurrencies: boolean;
+      purchaseOnly: boolean;
+      hideNewItems: boolean;
+      hideItemsWithZeroCost: boolean;
+      keepZeroQuantity: boolean;
+      onlyAcceptBasePrice: boolean;
+      displayQuantity: "yes";
+      buyPriceModifier: number;
+      sellPriceModifier: number;
+      itemTypePriceModifiers: unknown[];
+      actorPriceModifiers: unknown[];
+      tablesForPopulate: unknown[];
+      merchantColumns: unknown[];
+      hideTokenWhenClosed: boolean;
+      openTimes: {
+        enabled: boolean;
+        status: "open";
+        open: {
+          hour: 9;
+          minute: number;
+        };
+        close: {
+          hour: number8;
+          minute: number;
+        };
+      };
+      closedDays: unknown[];
+      closedHolidays: unknown[];
+      refreshItemsOnOpen: boolean;
+      refreshItemsDays: unknown[];
+      refreshItemsHolidays: unknown[];
+      logMerchantActivity: boolean;
+      overheadCost: unknown[];
+      cols: numbernumber;
+      rows: 5;
+      restrictVaultAccess: boolean;
+      vaultExpansion: boolean;
+      baseExpansionCols: number;
+      baseExpansionRows: number;
+      vaultAccess: unknown[];
+      logVaultActions: boolean;
+      vaultLogType: string;
+    };
+    item_flag_defaults: {
+      hidden: boolean;
+      notForSale: boolean;
+      infiniteQuantity: string;
+      displayQuantity: string;
+      free: boolean;
+      keepZeroQuantity: boolean;
+      disableNormalCost: boolean;
+      purchaseOptionsAsSellOption: boolean;
+      cantBeSoldToMerchants: boolean;
+      isService: boolean;
+      keepOnMerchant: boolean;
+      macro: string;
+      customCategory: string;
+      prices: unknown[];
+      sellPrices: unknown[];
+      overheadCost: unknown[];
+      buyPriceModifier: number;
+      sellPriceModifier: number;
+      craftingComponents: unknown[];
+      breakdownComponents: unknown[];
+      vaultExpander: boolean;
+      vaultSlot: null;
+      addsCols: number;
+      addsRows: number;
+      x: null;
+      y: null;
+      width: number;
+      height: number;
+      flipped: boolean;
+      vaultImage: string;
+      vaultImageFlipped: string;
+      canStack: string;
+    };
+    macro_execution_types: {
+      TRADE_ITEMS: "tradeItems";
+      ADD_ITEMS: "addItems";
+      REMOVE_ITEMS: "removeItems";
+      TRANSFER_ITEMS: "transferItems";
+      TRANSFER_ALL_ITEMS: "transferAllItems";
+      UPDATE_CURRENCIES: "updateCurrencies";
+      ADD_CURRENCIES: "addCurrencies";
+      REMOVE_CURRENCIES: "removeCurrencies";
+      TRANSFER_CURRENCIES: "transferCurrencies";
+      TRANSFER_ALL_CURRENCIES: "transferAllCurrencies";
+      SET_ATTRIBUTES: "setAttributes";
+      ADD_ATTRIBUTES: "addAttributes";
+      REMOVE_ATTRIBUTES: "removeAttributes";
+      TRANSFER_ATTRIBUTES: "transferAttributes";
+      TRANSFER_ALL_ATTRIBUTES: "transferAllAttributes";
+      TRANSFER_EVERYTHING: "transferEverything";
+      CLOSE_ITEM_PILE: "closeItemPile";
+      LOCK_ITEM_PILE: "lockItemPile";
+      UNLOCK_ITEM_PILE: "unlockItemPile";
+      OPEN_ITEM_PILE: "openItemPile";
+      SPLIT_INVENTORY: "splitInventory";
+      RENDER_INTERFACE: "renderInterface";
+    };
+    apps: Record<string, unknown>;
+  };
 }
 
 export {};
