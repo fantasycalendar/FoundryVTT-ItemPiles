@@ -63,7 +63,7 @@ declare global {
     export type DocumentOrData<T> = T | DataProperties<T>;
 
     /**
-     * Currency definition for the Item Piles system
+     * Currency definition
      */
     export interface Currency {
       /** Currency type - either attribute or item */
@@ -303,13 +303,13 @@ declare global {
       /** Sell price modifier */
       sellPriceModifier?: number;
       /** Item type specific price modifiers */
-      itemTypePriceModifiers?: Array<{ type: string; modifier: number }>;
+      itemTypePriceModifiers?: { type: string; modifier: number }[];
       /** Actor specific price modifiers */
       actorPriceModifiers?: PriceModifier[];
       /** Tables for populating merchant inventory */
       tablesForPopulate?: string[];
       /** Merchant column configuration */
-      merchantColumns?: Array<{ label: string; path: string }>;
+      merchantColumns?: { label: string; path: string }[];
       /** Hide token when merchant is closed */
       hideTokenWhenClosed?: boolean;
       /** Open times configuration */
@@ -346,13 +346,13 @@ declare global {
       /** Base expansion rows */
       baseExpansionRows?: number;
       /** Vault access configuration */
-      vaultAccess?: Array<{
+      vaultAccess?: {
         actor: string;
         canView: boolean;
         canOrganize: boolean;
         canWithdraw: boolean;
         canDeposit: boolean;
-      }>;
+      }[];
       /** Log vault actions */
       logVaultActions?: boolean;
       /** Vault logging type */
@@ -402,13 +402,13 @@ declare global {
       /** Sheet overrides function */
       SHEET_OVERRIDES?: () => void;
       /** Vault style configurations */
-      VAULT_STYLES?: Array<{
+      VAULT_STYLES?: {
         path: string;
         value: string;
         styling: Record<string, string>;
-      }>;
+      }[];
       /** Currency configurations */
-      CURRENCIES: Array<Currency & { primary: boolean; exchangeRate: number }>;
+      CURRENCIES: Currency[];
       /** Secondary currency configurations */
       SECONDARY_CURRENCIES?: Currency[];
       /** Decimal digits for fractional currency display */
@@ -562,7 +562,7 @@ declare global {
       /** Items in the grid */
       items: VaultGridItem[];
       /** Whether the grid has been modified */
-      gridData?: Array<Array<string | null>>;
+      gridData?: (string | null)[][];
     }
 
     /**
@@ -715,9 +715,7 @@ declare global {
        * Sets the currencies used in this system
        */
       static setCurrencies(
-        inCurrencies: Array<
-          Currency & { primary: boolean; exchangeRate: number }
-        >
+        inCurrencies: (Currency & { primary: boolean; exchangeRate: number })[]
       ): Promise<void>;
 
       /**
@@ -813,9 +811,7 @@ declare global {
         /** Item pile flag data */
         itemPileFlags?: Partial<PileDefaults>;
         /** Items to add to the pile */
-        items?: Array<
-          DocumentOrData<FoundryTypes.For<"Item">> | ItemTransferData
-        >;
+        items?: (DocumentOrData<FoundryTypes.For<"Item">> | ItemTransferData)[];
         /** Whether to create a new actor */
         createActor?: boolean;
         /** Actor UUID/ID/name to use */
@@ -830,7 +826,7 @@ declare global {
       static turnTokensIntoItemPiles(
         targets:
           | FoundryTypes.For<"Token" | "TokenDocument">
-          | Array<FoundryTypes.For<"Token" | "TokenDocument">>,
+          | FoundryTypes.For<"Token" | "TokenDocument">[],
         options?: {
           /** Item pile settings to apply */
           pileSettings?: Partial<PileDefaults>;
@@ -849,7 +845,7 @@ declare global {
       static revertTokensFromItemPiles(
         targets:
           | FoundryTypes.For<"Token" | "TokenDocument">
-          | Array<FoundryTypes.For<"Token" | "TokenDocument">>,
+          | FoundryTypes.For<"Token" | "TokenDocument">[],
         options?: {
           /** Token settings to update */
           tokenSettings?:
@@ -1036,7 +1032,7 @@ declare global {
           /** Targets to receive the split contents */
           targets?:
             | FoundryTypes.For<"TokenDocument" | "Actor">
-            | Array<FoundryTypes.For<"TokenDocument" | "Actor">>;
+            | FoundryTypes.For<"TokenDocument" | "Actor">[];
           /** Actor that triggered the split */
           instigator?: FoundryTypes.For<"TokenDocument" | "Actor">;
         }
@@ -1087,7 +1083,7 @@ declare global {
        */
       static addItems(
         target: FoundryTypes.For<"Actor" | "TokenDocument" | "Token">,
-        items: Array<ItemTransferData | FoundryTypes.For<"Item">>,
+        items: (ItemTransferData | FoundryTypes.For<"Item">)[],
         options?: {
           /** Remove existing items before adding */
           removeExistingActorItems?: boolean;
@@ -1103,7 +1099,7 @@ declare global {
        */
       static removeItems(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
-        items: Array<ItemReference | FoundryTypes.For<"Item"> | string>,
+        items: (ItemReference | FoundryTypes.For<"Item"> | string)[],
         options?: {
           /** Skip vault logging */
           skipVaultLogging?: boolean;
@@ -1118,7 +1114,7 @@ declare global {
       static transferItems(
         source: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
-        items: Array<ItemReference | FoundryTypes.For<"Item"> | string>,
+        items: (ItemReference | FoundryTypes.For<"Item"> | string)[],
         options?: {
           /** Skip vault logging */
           skipVaultLogging?: boolean;
@@ -1241,7 +1237,7 @@ declare global {
        */
       static combineItemPiles(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
-        sources: Array<FoundryTypes.For<"Actor" | "Token" | "TokenDocument">>,
+        sources: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">[],
         options?: {
           /** Item type filters */
           itemFilters?: ItemFilter[];
@@ -1269,7 +1265,9 @@ declare global {
       /**
        * Converts a currency string to currency data
        */
-      static getCurrenciesFromString(currencies: string): CurrencyData[];
+      static getCurrenciesFromString(
+        currencies: string
+      ): CurrencyWithQuantity[];
 
       /**
        * Calculates currency modifications
@@ -1461,7 +1459,7 @@ declare global {
         options?: {
           /** Users to render for */
           userIds?:
-            | Array<string | FoundryTypes.For<"User">>
+            | (string | FoundryTypes.For<"User">)[]
             | string
             | FoundryTypes.For<"User">
             | null;
@@ -1480,7 +1478,7 @@ declare global {
         options?: {
           /** Users to close for */
           userIds?:
-            | Array<string | FoundryTypes.For<"User">>
+            | (string | FoundryTypes.For<"User">)[]
             | string
             | FoundryTypes.For<"User">
             | null;
