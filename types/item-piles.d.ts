@@ -586,14 +586,14 @@ declare global {
     }
 
     export declare class Transaction {
-      document: document;
+      document: FoundryTypes.For<"Actor">;
       documentFlags: unknown;
       itemsToCreate: FoundryTypes.For<"Item">[];
       itemUpdates: {};
       itemsToUpdate: FoundryTypes.For<"Item">[];
       itemsToDelete: FoundryTypes.For<"Item">[];
-      itemsToForceDelete: Set<unknown>;
-      itemsToNotDelete: Set<unknown>;
+      itemsToForceDelete: Set<string>;
+      itemsToNotDelete: Set<string>;
       documentChanges: {};
       attributeDeltas: Map<string, number>;
       attributeTypeMap: Map<string, unknown>;
