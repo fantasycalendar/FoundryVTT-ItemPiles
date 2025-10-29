@@ -588,10 +588,10 @@ declare global {
     export declare class Transaction {
       document: document;
       documentFlags: unknown;
-      itemsToCreate: Item[];
+      itemsToCreate: FoundryTypes.For<"Item">[];
       itemUpdates: {};
-      itemsToUpdate: Item[];
-      itemsToDelete: Item[];
+      itemsToUpdate: FoundryTypes.For<"Item">[];
+      itemsToDelete: FoundryTypes.For<"Item">[];
       itemsToForceDelete: Set<unknown>;
       itemsToNotDelete: Set<unknown>;
       documentChanges: {};
@@ -601,10 +601,10 @@ declare global {
       itemTypeMap: Map<string, unknown>;
       itemFlagMap: Map<string, unknown>;
       preCommitted: boolean;
-      constructor(document: foundry.documents.Actor);
+      constructor(document: FoundryTypes.For<"Actor">);
 
       appendItemChanges(
-        items: Iterable<Item>,
+        items: Iterable<FoundryTypes.For<"Item">>,
         options: {
           set?: boolean;
           remove?: boolean;
@@ -624,7 +624,7 @@ declare global {
       ): Promise<void>;
 
       appendEmbeddedChanges(
-        item: Item,
+        item: FoundryTypes.For<"Item">,
         attributes: AttributeParam,
         options: {
           set?: boolean;
@@ -636,9 +636,9 @@ declare global {
 
       prepare(): {
         documentChanges: Record<string, number>;
-        itemsToCreate: Item[];
-        itemsToUpdate: Item[];
-        itemsToDelete: Item[];
+        itemsToCreate: FoundryTypes.For<"Item">[];
+        itemsToUpdate: FoundryTypes.For<"Item">[];
+        itemsToDelete: FoundryTypes.For<"Item">[];
         itemDeltas: [string, number][];
         attributeDeltas: [string, number][];
       };
