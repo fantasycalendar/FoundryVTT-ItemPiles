@@ -650,6 +650,272 @@ declare global {
     }
 
     /**
+     * API method option types namespace
+     */
+    export namespace API {
+      export interface CreateItemPileOptions {
+        /** Position to create the pile at */
+        position?: { x: number; y: number };
+        /** Scene ID to create the pile on */
+        sceneId?: string;
+        /** Token data overrides */
+        tokenOverrides?: Partial<
+          DocumentOrData<FoundryTypes.For<"TokenDocument">>
+        >;
+        /** Actor data overrides */
+        actorOverrides?: Partial<DocumentOrData<FoundryTypes.For<"Actor">>>;
+        /** Item pile flag data */
+        itemPileFlags?: Partial<PileDefaults>;
+        /** Items to add to the pile */
+        items?: (DocumentOrData<FoundryTypes.For<"Item">> | ItemTransferData)[];
+        /** Whether to create a new actor */
+        createActor?: boolean;
+        /** Actor UUID/ID/name to use */
+        actor?: string;
+        /** Folders to create the actor in */
+        folders?: string[] | string;
+      }
+
+      export interface TurnTokensIntoItemPilesOptions {
+        /** Item pile settings to apply */
+        pileSettings?: Partial<PileDefaults>;
+        /** Token settings to update */
+        tokenSettings?:
+          | Partial<DocumentOrData<FoundryTypes.For<"TokenDocument">>>
+          | ((
+              token: FoundryTypes.For<"TokenDocument">
+            ) => Partial<DocumentOrData<FoundryTypes.For<"TokenDocument">>>);
+      }
+
+      export interface RevertTokensFromItemPilesOptions {
+        /** Token settings to update */
+        tokenSettings?:
+          | Partial<DocumentOrData<FoundryTypes.For<"TokenDocument">>>
+          | ((
+              token: FoundryTypes.For<"TokenDocument">
+            ) => Partial<DocumentOrData<FoundryTypes.For<"TokenDocument">>>);
+      }
+
+      export interface UpdateItemPileOptions {
+        /** Interacting token that triggered this update */
+        interactingToken?: FoundryTypes.For<"Token" | "TokenDocument">;
+        /** Token settings to update */
+        tokenSettings?: Partial<
+          DocumentOrData<FoundryTypes.For<"TokenDocument">>
+        >;
+      }
+
+      export interface SplitItemPileContentsOptions {
+        /** Targets to receive the split contents */
+        targets?:
+          | FoundryTypes.For<"TokenDocument" | "Actor">
+          | FoundryTypes.For<"TokenDocument" | "Actor">[];
+        /** Actor that triggered the split */
+        instigator?: FoundryTypes.For<"TokenDocument" | "Actor">;
+      }
+
+      export interface GetMerchantPriceModifiersOptions {
+        /** Actor whose modifiers to check */
+        actor?: FoundryTypes.For<"Actor"> | string;
+        /** Only consider actor's modifiers */
+        absolute?: boolean;
+      }
+
+      export interface RefreshMerchantInventoryOptions {
+        /** Whether to clear existing inventory */
+        removeExistingActorItems?: boolean;
+      }
+
+      export interface AddItemsOptions {
+        /** Remove existing items before adding */
+        removeExistingActorItems?: boolean;
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface RemoveItemsOptions {
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface TransferItemsOptions {
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface TransferAllItemsOptions {
+        /** Item type filters */
+        itemFilters?: ItemFilter[];
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface SetAttributesOptions {
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface AddAttributesOptions {
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface RemoveAttributesOptions {
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface TransferAttributesOptions {
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface TransferAllAttributesOptions {
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface TransferEverythingOptions {
+        /** Item type filters */
+        itemFilters?: ItemFilter[];
+        /** Skip vault logging */
+        skipVaultLogging?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface CombineItemPilesOptions {
+        /** Item type filters */
+        itemFilters?: ItemFilter[];
+        /** Item pile flags to set on target */
+        targetItemPileFlags?: Partial<PileDefaults>;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface GetPaymentDataOptions {
+        /** Quantity to buy */
+        quantity?: number;
+        /** Target actor for payment */
+        target?:
+          | FoundryTypes.For<"Actor" | "Token" | "TokenDocument">
+          | string;
+      }
+
+      export interface UpdateCurrenciesOptions {
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface AddCurrenciesOptions {
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface RemoveCurrenciesOptions {
+        /** Allow change to be given */
+        change?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface TransferCurrenciesOptions {
+        /** Allow change to be given */
+        change?: boolean;
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface TransferAllCurrenciesOptions {
+        /** Interaction ID */
+        interactionId?: string;
+      }
+
+      export interface RollItemTableOptions {
+        /** Number of times to roll */
+        timesToRoll?: string | number;
+        /** Reset table before rolling */
+        resetTable?: boolean;
+        /** Normalize table before rolling */
+        normalizeTable?: boolean;
+        /** Display results in chat */
+        displayChat?: boolean;
+        /** Roll data to inject */
+        rollData?: FoundryTypes.For<"RollData">;
+        /** Target actor to add items to */
+        targetActor?: FoundryTypes.For<"Actor"> | string;
+        /** Remove existing items from target */
+        removeExistingActorItems?: boolean;
+        /** Custom category for items */
+        customCategory?: boolean | string;
+      }
+
+      export interface FindSimilarItemOptions {
+        /** Whether to check similarity based on stacking rules */
+        requireSameStack?: boolean;
+      }
+
+      export interface GetActorCurrenciesOptions {
+        /** Get all currencies regardless of quantity */
+        getAll?: boolean;
+        /** Include secondary currencies */
+        secondary?: boolean;
+      }
+
+      export interface RenderItemPileInterfaceOptions {
+        /** Users to render for */
+        userIds?:
+          | (string | FoundryTypes.For<"User">)[]
+          | string
+          | FoundryTypes.For<"User">
+          | null;
+        /** Actor viewing the interface */
+        inspectingTarget?: FoundryTypes.For<"Actor" | "TokenDocument"> | null;
+        /** Use assigned character */
+        useDefaultCharacter?: boolean;
+      }
+
+      export interface UnrenderItemPileInterfaceOptions {
+        /** Users to close for */
+        userIds?:
+          | (string | FoundryTypes.For<"User">)[]
+          | string
+          | FoundryTypes.For<"User">
+          | null;
+      }
+
+      export interface GetPricesForItemOptions {
+        /** Selling actor */
+        seller?: FoundryTypes.For<"Actor">;
+        /** Buying actor */
+        buyer?: FoundryTypes.For<"Actor">;
+        /** Quantity to buy */
+        quantity?: number;
+      }
+
+      export interface TradeItemsOptions {
+        /** Interaction ID */
+        interactionId?: string;
+      }
+    }
+
+    /**
      * Item Piles API
      */
     export class API {
@@ -797,28 +1063,9 @@ declare global {
       /**
        * Creates an item pile token at a location and/or an item pile actor
        */
-      static createItemPile(options?: {
-        /** Position to create the pile at */
-        position?: { x: number; y: number };
-        /** Scene ID to create the pile on */
-        sceneId?: string;
-        /** Token data overrides */
-        tokenOverrides?: Partial<
-          DocumentOrData<FoundryTypes.For<"TokenDocument">>
-        >;
-        /** Actor data overrides */
-        actorOverrides?: Partial<DocumentOrData<FoundryTypes.For<"Actor">>>;
-        /** Item pile flag data */
-        itemPileFlags?: Partial<PileDefaults>;
-        /** Items to add to the pile */
-        items?: (DocumentOrData<FoundryTypes.For<"Item">> | ItemTransferData)[];
-        /** Whether to create a new actor */
-        createActor?: boolean;
-        /** Actor UUID/ID/name to use */
-        actor?: string;
-        /** Folders to create the actor in */
-        folders?: string[] | string;
-      }): Promise<CreateItemPileResult>;
+      static createItemPile(
+        options?: API.CreateItemPileOptions
+      ): Promise<CreateItemPileResult>;
 
       /**
        * Turns tokens and actors into item piles
@@ -827,16 +1074,7 @@ declare global {
         targets:
           | FoundryTypes.For<"Token" | "TokenDocument">
           | FoundryTypes.For<"Token" | "TokenDocument">[],
-        options?: {
-          /** Item pile settings to apply */
-          pileSettings?: Partial<PileDefaults>;
-          /** Token settings to update */
-          tokenSettings?:
-            | Partial<DocumentOrData<FoundryTypes.For<"TokenDocument">>>
-            | ((
-                token: FoundryTypes.For<"TokenDocument">
-              ) => Partial<DocumentOrData<FoundryTypes.For<"TokenDocument">>>);
-        }
+        options?: API.TurnTokensIntoItemPilesOptions
       ): Promise<string[]>;
 
       /**
@@ -846,14 +1084,7 @@ declare global {
         targets:
           | FoundryTypes.For<"Token" | "TokenDocument">
           | FoundryTypes.For<"Token" | "TokenDocument">[],
-        options?: {
-          /** Token settings to update */
-          tokenSettings?:
-            | Partial<DocumentOrData<FoundryTypes.For<"TokenDocument">>>
-            | ((
-                token: FoundryTypes.For<"TokenDocument">
-              ) => Partial<DocumentOrData<FoundryTypes.For<"TokenDocument">>>);
-        }
+        options?: API.RevertTokensFromItemPilesOptions
       ): Promise<string[]>;
 
       /**
@@ -1005,15 +1236,7 @@ declare global {
       static updateItemPile(
         target: FoundryTypes.For<"Actor" | "TokenDocument">,
         newData: Partial<PileDefaults>,
-        options?: {
-          /** Interacting token that triggered this update */
-          interactingToken?: FoundryTypes.For<"Token" | "TokenDocument">;
-
-          /** Token settings to update */
-          tokenSettings?: Partial<
-            DocumentOrData<FoundryTypes.For<"TokenDocument">>
-          >;
-        }
+        options?: API.UpdateItemPileOptions
       ): Promise<FoundryTypes.For<"Actor" | "TokenDocument">>;
 
       /**
@@ -1028,14 +1251,7 @@ declare global {
        */
       static splitItemPileContents(
         target: FoundryTypes.For<"Token" | "TokenDocument" | "Actor">,
-        options?: {
-          /** Targets to receive the split contents */
-          targets?:
-            | FoundryTypes.For<"TokenDocument" | "Actor">
-            | FoundryTypes.For<"TokenDocument" | "Actor">[];
-          /** Actor that triggered the split */
-          instigator?: FoundryTypes.For<"TokenDocument" | "Actor">;
-        }
+        options?: API.SplitItemPileContentsOptions
       ): Promise<SplitPileResult | false>;
 
       /* ================================================
@@ -1047,12 +1263,7 @@ declare global {
        */
       static getMerchantPriceModifiers(
         target: FoundryTypes.For<"Actor" | "TokenDocument">,
-        options?: {
-          /** Actor whose modifiers to check */
-          actor?: FoundryTypes.For<"Actor"> | string;
-          /** Only consider actor's modifiers */
-          absolute?: boolean;
-        }
+        options?: API.GetMerchantPriceModifiersOptions
       ): MerchantPriceModifiers;
 
       /**
@@ -1068,10 +1279,7 @@ declare global {
        */
       static refreshMerchantInventory(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
-        options?: {
-          /** Whether to clear existing inventory */
-          removeExistingActorItems?: boolean;
-        }
+        options?: API.RefreshMerchantInventoryOptions
       ): Promise<ItemAndQuantity[]>;
 
       /* ================================================
@@ -1084,14 +1292,7 @@ declare global {
       static addItems(
         target: FoundryTypes.For<"Actor" | "TokenDocument" | "Token">,
         items: (ItemTransferData | FoundryTypes.For<"Item">)[],
-        options?: {
-          /** Remove existing items before adding */
-          removeExistingActorItems?: boolean;
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.AddItemsOptions
       ): Promise<ItemAndQuantity[]>;
 
       /**
@@ -1100,12 +1301,7 @@ declare global {
       static removeItems(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         items: (ItemReference | FoundryTypes.For<"Item"> | string)[],
-        options?: {
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.RemoveItemsOptions
       ): Promise<ItemRemovalResult[]>;
 
       /**
@@ -1115,12 +1311,7 @@ declare global {
         source: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         items: (ItemReference | FoundryTypes.For<"Item"> | string)[],
-        options?: {
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.TransferItemsOptions
       ): Promise<ItemAndQuantity[]>;
 
       /**
@@ -1129,14 +1320,7 @@ declare global {
       static transferAllItems(
         source: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
-        options?: {
-          /** Item type filters */
-          itemFilters?: ItemFilter[];
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.TransferAllItemsOptions
       ): Promise<FoundryTypes.For<"Item">[]>;
 
       /* ================================================
@@ -1149,10 +1333,7 @@ declare global {
       static setAttributes(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         attributes: Record<string, number>,
-        options?: {
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.SetAttributesOptions
       ): Promise<Record<string, number>>;
 
       /**
@@ -1161,12 +1342,7 @@ declare global {
       static addAttributes(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         attributes: Record<string, number>,
-        options?: {
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.AddAttributesOptions
       ): Promise<Record<string, number>>;
 
       /**
@@ -1175,12 +1351,7 @@ declare global {
       static removeAttributes(
         target: FoundryTypes.For<"Token" | "TokenDocument">,
         attributes: string[] | Record<string, number>,
-        options?: {
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.RemoveAttributesOptions
       ): Promise<Record<string, number>>;
 
       /**
@@ -1190,12 +1361,7 @@ declare global {
         source: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         attributes: string[] | Record<string, number>,
-        options?: {
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.TransferAttributesOptions
       ): Promise<Record<string, number>>;
 
       /**
@@ -1204,12 +1370,7 @@ declare global {
       static transferAllAttributes(
         source: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
-        options?: {
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.TransferAllAttributesOptions
       ): Promise<Record<string, number>>;
 
       /* ================================================
@@ -1222,14 +1383,7 @@ declare global {
       static transferEverything(
         source: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
-        options?: {
-          /** Item type filters */
-          itemFilters?: ItemFilter[];
-          /** Skip vault logging */
-          skipVaultLogging?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.TransferEverythingOptions
       ): Promise<TransferSummary>;
 
       /**
@@ -1238,14 +1392,7 @@ declare global {
       static combineItemPiles(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         sources: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">[],
-        options?: {
-          /** Item type filters */
-          itemFilters?: ItemFilter[];
-          /** Item pile flags to set on target */
-          targetItemPileFlags?: Partial<PileDefaults>;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.CombineItemPilesOptions
       ): Promise<TransferSummary>;
 
       /* ================================================
@@ -1283,14 +1430,7 @@ declare global {
        */
       static getPaymentData(
         price: string | number,
-        options?: {
-          /** Quantity to buy */
-          quantity?: number;
-          /** Target actor for payment */
-          target?:
-            | FoundryTypes.For<"Actor" | "Token" | "TokenDocument">
-            | string;
-        }
+        options?: API.GetPaymentDataOptions
       ): PaymentData;
 
       /**
@@ -1306,10 +1446,7 @@ declare global {
       static updateCurrencies(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         currencies: string,
-        options?: {
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.UpdateCurrenciesOptions
       ): Promise<CurrencyOperationResult>;
 
       /**
@@ -1318,10 +1455,7 @@ declare global {
       static addCurrencies(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         currencies: string,
-        options?: {
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.AddCurrenciesOptions
       ): Promise<CurrencyOperationResult>;
 
       /**
@@ -1330,12 +1464,7 @@ declare global {
       static removeCurrencies(
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         currencies: string,
-        options?: {
-          /** Allow change to be given */
-          change?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.RemoveCurrenciesOptions
       ): Promise<CurrencyOperationResult>;
 
       /**
@@ -1345,12 +1474,7 @@ declare global {
         source: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         currencies: string,
-        options?: {
-          /** Allow change to be given */
-          change?: boolean;
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.TransferCurrenciesOptions
       ): Promise<CurrencyOperationResult>;
 
       /**
@@ -1359,10 +1483,7 @@ declare global {
       static transferAllCurrencies(
         source: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         target: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
-        options?: {
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.TransferAllCurrenciesOptions
       ): Promise<CurrencyOperationResult>;
 
       /* ================================================
@@ -1374,24 +1495,7 @@ declare global {
        */
       static rollItemTable(
         table: string | FoundryTypes.For<"RollTable">,
-        options?: {
-          /** Number of times to roll */
-          timesToRoll?: string | number;
-          /** Reset table before rolling */
-          resetTable?: boolean;
-          /** Normalize table before rolling */
-          normalizeTable?: boolean;
-          /** Display results in chat */
-          displayChat?: boolean;
-          /** Roll data to inject */
-          rollData?: FoundryTypes.For<"RollData">;
-          /** Target actor to add items to */
-          targetActor?: FoundryTypes.For<"Actor"> | string;
-          /** Remove existing items from target */
-          removeExistingActorItems?: boolean;
-          /** Custom category for items */
-          customCategory?: boolean | string;
-        }
+        options?: API.RollItemTableOptions
       ): Promise<ItemAndQuantity[]>;
 
       /* ================================================
@@ -1414,10 +1518,7 @@ declare global {
       static findSimilarItem(
         itemsToSearch: FoundryTypes.For<"Item">[],
         itemToFind: FoundryTypes.For<"Item">,
-        options?: {
-          /** Whether to check similarity based on stacking rules */
-          requireSameStack?: boolean;
-        }
+        options?: API.FindSimilarItemOptions
       ): FoundryTypes.For<"Item"> | undefined;
 
       /**
@@ -1425,12 +1526,7 @@ declare global {
        */
       static getActorCurrencies(
         target: FoundryTypes.For<"Actor" | "TokenDocument" | "Token">,
-        options?: {
-          /** Get all currencies regardless of quantity */
-          getAll?: boolean;
-          /** Include secondary currencies */
-          secondary?: boolean;
-        }
+        options?: API.GetActorCurrenciesOptions
       ): CurrencyWithQuantity[];
 
       /**
@@ -1456,18 +1552,7 @@ declare global {
        */
       static renderItemPileInterface(
         target: FoundryTypes.For<"Actor" | "TokenDocument">,
-        options?: {
-          /** Users to render for */
-          userIds?:
-            | (string | FoundryTypes.For<"User">)[]
-            | string
-            | FoundryTypes.For<"User">
-            | null;
-          /** Actor viewing the interface */
-          inspectingTarget?: FoundryTypes.For<"Actor" | "TokenDocument"> | null;
-          /** Use assigned character */
-          useDefaultCharacter?: boolean;
-        }
+        options?: API.RenderItemPileInterfaceOptions
       ): Promise<void>;
 
       /**
@@ -1475,14 +1560,7 @@ declare global {
        */
       static unrenderItemPileInterface(
         target: FoundryTypes.For<"Actor" | "TokenDocument">,
-        options?: {
-          /** Users to close for */
-          userIds?:
-            | (string | FoundryTypes.For<"User">)[]
-            | string
-            | FoundryTypes.For<"User">
-            | null;
-        }
+        options?: API.UnrenderItemPileInterfaceOptions
       ): Promise<void>;
 
       /**
@@ -1495,14 +1573,7 @@ declare global {
        */
       static getPricesForItem(
         item: FoundryTypes.For<"Item">,
-        options?: {
-          /** Selling actor */
-          seller?: FoundryTypes.For<"Actor">;
-          /** Buying actor */
-          buyer?: FoundryTypes.For<"Actor">;
-          /** Quantity to buy */
-          quantity?: number;
-        }
+        options?: API.GetPricesForItemOptions
       ): ItemPriceOptions[];
 
       /**
@@ -1512,10 +1583,7 @@ declare global {
         seller: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         buyer: FoundryTypes.For<"Actor" | "Token" | "TokenDocument">,
         items: TradeItemSpec[],
-        options?: {
-          /** Interaction ID */
-          interactionId?: string;
-        }
+        options?: API.TradeItemsOptions
       ): Promise<CurrencyOperationResult>;
 
       /**
