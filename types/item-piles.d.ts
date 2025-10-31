@@ -813,9 +813,7 @@ declare global {
         /** Quantity to buy */
         quantity?: number;
         /** Target actor for payment */
-        target?:
-          | FoundryTypes.For<"Actor" | "Token" | "TokenDocument">
-          | string;
+        target?: FoundryTypes.For<"Actor" | "Token" | "TokenDocument"> | string;
       }
 
       export interface UpdateCurrenciesOptions {
@@ -867,8 +865,8 @@ declare global {
       }
 
       export interface FindSimilarItemOptions {
-        /** Whether to check similarity based on stacking rules */
-        requireSameStack?: boolean;
+        /** Return one */
+        returnOne?: boolean;
       }
 
       export interface GetActorCurrenciesOptions {
