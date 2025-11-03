@@ -1514,8 +1514,8 @@ declare global {
        * Finds a similar item in a list
        */
       static findSimilarItem(
-        itemsToSearch: FoundryTypes.For<"Item">[],
-        itemToFind: FoundryTypes.For<"Item">,
+        itemsToSearch: (FoundryTypes.For<"Item"> | ItemAndQuantity)[],
+        itemToFind: FoundryTypes.For<"Item"> | ItemAndQuantity,
         options?: API.FindSimilarItemOptions
       ): FoundryTypes.For<"Item"> | undefined;
 
