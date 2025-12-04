@@ -418,6 +418,7 @@ class API {
 	 *   PILE_DEFAULTS: Object,
 	 *   TOKEN_FLAG_DEFAULTS: Object,
 	 *   ITEM_TRANSFORMER: undefined/Function,
+	 *   PREVIEW_ITEM_TRANSFORMER: undefined/Function,
 	 *   ITEM_COST_TRANSFORMER: undefined/Function,
 	 *   PRICE_MODIFIER_TRANSFORMER: undefined/Function,
 	 *   SYSTEM_HOOKS: undefined/Function,
@@ -497,6 +498,15 @@ class API {
 			}
 			if (typeof data['ITEM_TRANSFORMER']({}) !== "object") {
 				throw Helpers.custom_error("addSystemIntegration | data.ITEM_TRANSFORMER's return value must be of type object");
+			}
+		}
+
+		if (data['PREVIEW_ITEM_TRANSFORMER']) {
+			if (!Helpers.isFunction(data['PREVIEW_ITEM_TRANSFORMER'])) {
+				throw Helpers.custom_error("addSystemIntegration | data.PREVIEW_ITEM_TRANSFORMER must be of type function");
+			}
+			if (typeof data['PREVIEW_ITEM_TRANSFORMER']({}) !== "object") {
+				throw Helpers.custom_error("addSystemIntegration | data.PREVIEW_ITEM_TRANSFORMER's return value must be of type object");
 			}
 		}
 
