@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.28
+
+- Fixed `PREVIEW_ITEM_TRANSFORMER` not being accepted by `game.itempiles.api.addSystemIntegration`
+
 ## Version 3.2.27
 
 - Fixed item quantity numbers in Custom System Builder
