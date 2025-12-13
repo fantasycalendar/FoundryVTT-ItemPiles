@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.29
+
+- Fixed minimizing Item Piles' app windows not working
+
 ## Version 3.2.28
 
 - Fixed `PREVIEW_ITEM_TRANSFORMER` not being accepted by `game.itempiles.api.addSystemIntegration` (thank you mechamaya on github!)

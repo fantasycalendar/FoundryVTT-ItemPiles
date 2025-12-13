@@ -54,6 +54,8 @@ Hooks.once("init", async () => {
 	window.ItemPiles = Helpers.deprecate({ API }, "API", "window.ItemPiles.API has been deprecated, please use game.itempiles.API instead")
 
 	if (CONSTANTS.IS_V13) {
+		window.MIN_WINDOW_WIDTH = 200;
+		window.MIN_WINDOW_HEIGHT = 50;
 		Object.defineProperty(SvelteApplication, 'defaultOptions', {
 			get: () => {
 				return foundry.utils.mergeObject(Application.defaultOptions, {
