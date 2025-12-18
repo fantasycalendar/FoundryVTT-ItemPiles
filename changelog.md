@@ -1,5 +1,10 @@
 # Item Piles Changelog
 
+## Version 3.2.30
+
+- Updated Brazilian & Czech localization (Thank you Kharmans & user on weblate)
+- Fixed error retrieving item from vault in PF1e
+
 ## Version 3.2.29
 
 - Fixed minimizing Item Piles' app windows not working
