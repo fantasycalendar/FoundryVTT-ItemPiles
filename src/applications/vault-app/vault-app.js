@@ -41,7 +41,7 @@ export default class VaultApp extends SvelteApplication {
 	}
 
 	onDropData(data) {
-		return this.store.onDropData(data);
+		return this.store.onDrop(data);
 	}
 
 	/** @inheritdoc */

@@ -376,7 +376,7 @@ class API {
 		if (typeof inDefaults !== "object") {
 			throw Helpers.custom_error("setPileDefaults | inDefaults must be of type object");
 		}
-		const validKeys = new Set(Object.keys(CONSTANTS.PILE_DEFAULTS));
+		const validKeys = new Set(Object.keys(PileUtilities.getPileDefaults()));
 		for (const key of Object.keys(inDefaults)) {
 			if (!validKeys.has(key)) {
 				throw Helpers.custom_error(`setPileDefaults | ${key} is not a valid pile setting`);
@@ -418,6 +418,7 @@ class API {
 	 *   PILE_DEFAULTS: Object,
 	 *   TOKEN_FLAG_DEFAULTS: Object,
 	 *   ITEM_TRANSFORMER: undefined/Function,
+	 *   PREVIEW_ITEM_TRANSFORMER: undefined/Function,
 	 *   ITEM_COST_TRANSFORMER: undefined/Function,
 	 *   PRICE_MODIFIER_TRANSFORMER: undefined/Function,
 	 *   SYSTEM_HOOKS: undefined/Function,
@@ -497,6 +498,15 @@ class API {
 			}
 			if (typeof data['ITEM_TRANSFORMER']({}) !== "object") {
 				throw Helpers.custom_error("addSystemIntegration | data.ITEM_TRANSFORMER's return value must be of type object");
+			}
+		}
+
+		if (data['PREVIEW_ITEM_TRANSFORMER']) {
+			if (!Helpers.isFunction(data['PREVIEW_ITEM_TRANSFORMER'])) {
+				throw Helpers.custom_error("addSystemIntegration | data.PREVIEW_ITEM_TRANSFORMER must be of type function");
+			}
+			if (typeof data['PREVIEW_ITEM_TRANSFORMER']({}) !== "object") {
+				throw Helpers.custom_error("addSystemIntegration | data.PREVIEW_ITEM_TRANSFORMER's return value must be of type object");
 			}
 		}
 
@@ -1911,7 +1921,7 @@ class API {
 	}
 
 	/**
-	 * Return all th registered currencies abbreviations
+	 * Return all the registered currencies abbreviations
 	 * @returns {Array<string>}                                 An array of string containing the abbreviation for each currency registered
 	 */
 	static getCurrenciesAbbreviations() {
@@ -2067,7 +2077,7 @@ class API {
 	 * @deprecated
 	 */
 	static getPaymentDataFromString(...args) {
-		Helpers.custom_warning(`game.itempiles.API.getPaymentDataFromString has been deprecated in favor of game.itempiles.API.getPaymentData`, false);
+		Helpers.custom_warning(`game.itempiles.API.getPaymentDataFromString has been deprecated in favor of game.itempiles.API.getPaymentData`, true);
 		return this.getPaymentData(...args);
 	}
 

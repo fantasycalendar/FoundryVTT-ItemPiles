@@ -9,6 +9,7 @@ import { InterfaceTracker } from "../socket.js";
 import { PileAttribute, PileItem } from "./pile-item.js";
 import DropCurrencyDialog from "../applications/dialogs/drop-currency-dialog/drop-currency-dialog.js";
 import { SYSTEMS } from "../systems.js";
+import PrivateAPI from "../API/private-api.js";
 
 const __STORES__ = new Map();
 
@@ -103,6 +104,110 @@ export default class ItemPileStore {
 				store[event](...args);
 			}
 		}
+	}
+
+	async onDropFolder(data) {
+
+		let droppedFolder = await fromUuid(data.uuid);
+		if (!droppedFolder) return;
+		let itemsToAdd = [];
+		let currenciesToAdd = [];
+
+		const folders = [droppedFolder].concat(droppedFolder.getSubfolders(true));
+
+		for (const folder of folders) {
+			switch (folder.type) {
+				case "Item":
+					let itemResults = [];
+					for (let item of folder.contents) {
+						let result = await fromUuid(item.uuid);
+						itemResults.push(result)
+					}
+					itemsToAdd = itemResults.deepFlatten();
+					break;
+				case "RollTable":
+					let results = await this.onDropRollTables(folder.contents);
+					itemsToAdd = results.map(result => result.items).deepFlatten();
+					currenciesToAdd = results.map(result => result.currencies).join(" ");
+					break;
+				default:
+					Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.DroppedFolderNotSupported", { type: folder.type }), true)
+					return;
+			}
+		}
+		if (itemsToAdd.length > 0) {
+			await game.itempiles.API.addItems(this.actor, itemsToAdd);
+		}
+		if (currenciesToAdd.length > 0) {
+			await game.itempiles.API.addCurrencies(this.actor, PileUtilities.getStringFromCurrencies(currenciesToAdd))
+		}
+	}
+
+	async onDropRollTables(tables) {
+		let rollTableResults = {
+			items: [],
+			currencies: []
+		};
+		for (let rollTable of tables) {
+			let result = await PileUtilities.rollTable({ tableUuid: rollTable.uuid });
+			rollTableResults.items = rollTableResults.items.concat(result.items);
+			rollTableResults.currencies = rollTableResults.currencies.concat(result.currencies);
+		}
+		return rollTableResults;
+	}
+
+	async onDrop(data) {
+
+		if (data.type === "Folder" && game.user.isGM) {
+			return this.onDropFolder(data);
+		}
+
+		if (data.type === "RollTable" && game.user.isGM) {
+			let results = await this.onDropRollTables([data]);
+			if (results.items.length > 0) {
+				await game.itempiles.API.addItems(this.actor, results.items);
+			}
+			if (results.currencies.length > 0) {
+				await game.itempiles.API.addCurrencies(this.actor, PileUtilities.getStringFromCurrencies(results.currencies))
+			}
+			return;
+		}
+
+		if (data.type === "Actor" && game.user.isGM) {
+			const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
+			return store.updateRecipient(newRecipient)
+		}
+
+		if (data.type !== "Item") {
+			Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.DroppedIsNotItem", { type: data.type }), true)
+			return false;
+		}
+
+		const item = await Item.implementation.fromDropData(data);
+		const itemData = item.toObject();
+
+		if (!itemData) {
+			console.error(data);
+			throw Helpers.custom_error("Something went wrong when dropping this item!")
+		}
+
+		if (!PileUtilities.isItemValidBasedOnProperties(this.actor, itemData) && !game.user.isGM) {
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.ItemPileInvalidItemDropped"), true)
+			return false;
+		}
+
+		const source = Utilities.getSourceActorFromDropData(data);
+
+		if (PileUtilities.isItemPileMerchant(this.actor) && !(game.user.isGM || this.actor.isOwner)) {
+			return;
+		}
+		return PrivateAPI._dropItem({
+			source: source,
+			target: this.actor,
+			itemData: {
+				item: itemData, quantity: 1, uuid: data.uuid
+			}
+		});
 	}
 
 	setupStores() {

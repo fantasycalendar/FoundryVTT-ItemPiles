@@ -165,7 +165,7 @@ export function getItemTypesThatCanStack() {
 		if (game.system.id === "custom-system-builder") {
 			const quantityAttribute = game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE.split(".").pop();
 			const itemTemplates = game.items
-				.filter(_i => _i?.templateSystem?.isTemplate && _i?.templateSystem?.getKeys)
+				.filter(_i => (_i?.isTemplateItem() || _i?.templateSystem?.isTemplate) && _i?.templateSystem?.getKeys)
 				.filter(_i => _i.templateSystem.getKeys().has(quantityAttribute));
 			for (const item of itemTemplates) {
 				itemTypesWithQuantities.add(item.name);

@@ -788,7 +788,7 @@
       "NoGMsConnectedAction": "警告 - 因为没有 GM 在线，无法执行 \"{action}\"。",
       "VaultFull": "这个物品不能放入这个金库中！",
       "VaultItemNotExpander": "物品不是金库扩容",
-      "VaultInvalidItemDropped": "你不能将这种类型的物品丢入这个金库！",
+      "ItemPileInvalidItemDropped": "你不能将这种类型的物品丢入这个金库！",
       "TransactionNoGMConnected": "没有 GM 连接 - 当前交易已被取消，没有添加、移除或转移任何东西",
       "DroppedIsNotItem": "你不能将 \"{type}\" 类型的文档丢入这个物品堆中！",
       "VaultSameItemOrigin": "你不能将源自金库的物品丢入金库！",

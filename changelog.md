@@ -1,5 +1,45 @@
 # Item Piles Changelog
 
+## Version 3.2.29
+
+- Fixed minimizing Item Piles' app windows not working
+
+## Version 3.2.28
+
+- Fixed `PREVIEW_ITEM_TRANSFORMER` not being accepted by `game.itempiles.api.addSystemIntegration` (thank you mechamaya on github!)
+
+## Version 3.2.27
+
+- Fixed item quantity numbers in Custom System Builder
+- Fixed `game.itempiles.API.rollItemTable` not working, and now supports text-type entries that contain currency text, like `10gp` or `1d6sp`
+
+## Version 3.2.26
+
+- Fixed not being able to drop items into merchants
+- Fixed not being able to see the "buy items" tab in merchants when they had no items for sale
+
+## Version 3.2.25
+
+- Added support for a `condition` property in merchant columns - the merchant column editor does not support it yet, but it will come in a future update
+- Minor fix to systems using string-based prices on items
+- Minor fix to dropping items on merchants for GMs
+
+## Version 3.2.24
+
+- Added feature allowing folders of items to be dropped onto item piles to fill item pile with all items contained in folder
+- Added feature allowing rolltables and folders of rolltables to dropped onto item piles - each rolltable will be rolled once, and the result will be added to the item pile
+- Added support for rolltables containing text entries like:
+  - `3gp` - 3 GP will be added to item pile
+  - `1d6gp` - 1-6 GP will be added to the item pile
+  - `2d6gp 50sp` - 2-12 GP and 50 SP will be added to the item pile
+- Fixed support for rounding up when the primary currency was that the lowest exchange rate of all currencies
+- Fixed currency editor sorting currencies by exchange rate on keydown, rather than on change
+- Upgraded `API#getPaymentDataFromString` to a loud deprecation
+
+## Version 3.2.23
+
+- Fixed critical error with non-item-based currencies
+
 ## Version 3.2.22
 
 - Fixed issue with interacting with the token HUD of Item Pile tokens that had negative elevation would double its negative elevation

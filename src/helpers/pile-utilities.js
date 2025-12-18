@@ -15,7 +15,10 @@ import * as CompendiumUtilities from "./compendium-utilities.js";
 
 export function getPileDefaults() {
 	return foundry.utils.mergeObject(
-		foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+		foundry.utils.mergeObject(
+			foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS),
+			foundry.utils.deepClone(SYSTEMS.DATA.PILE_DEFAULTS)
+		),
 		foundry.utils.deepClone(Helpers.getSetting(SETTINGS.PILE_DEFAULTS) ?? {})
 	);
 }
@@ -24,7 +27,7 @@ export function getPileActorDefaults(itemPileFlags = {}) {
 	const defaultItemPileId = Helpers.getSetting(SETTINGS.DEFAULT_ITEM_PILE_ACTOR_ID);
 	const defaultItemPileActor = game.actors.get(defaultItemPileId);
 
-	let pileDataDefaults = foundry.utils.deepClone(CONSTANTS.PILE_DEFAULTS);
+	let pileDataDefaults = getPileDefaults();
 	if (foundry.utils.isEmpty(itemPileFlags) && defaultItemPileActor) {
 		const defaultItemPileSettings = getActorFlagData(defaultItemPileActor);
 		itemPileFlags = foundry.utils.mergeObject(pileDataDefaults, defaultItemPileSettings);
@@ -313,10 +316,10 @@ export function getActorCurrencies(target, {
 	cachedActorCurrencies.set(actorUuid, currencies);
 
 	currencies = currencies.map(currency => {
-		if (currency.item) {
-			currency.quantity = currency.type === "attribute"
-				? Utilities.sanitizeNumber(foundry.utils.getProperty(actor, currency.path))
-				: Utilities.getItemQuantity(currency.item);
+		if (currency.type === "attribute") {
+			currency.quantity = Utilities.sanitizeNumber(foundry.utils.getProperty(actor, currency.path))
+		} else if (currency.item) {
+			currency.quantity = Utilities.getItemQuantity(currency.item);
 		}
 		return currency;
 	});
@@ -913,17 +916,18 @@ export function getMerchantModifiersForActor(merchant, {
 function getSmallestExchangeRate(currencies) {
 	const primaryCurrencies = currencies.filter(currency => !currency.secondary);
 	const smallestPrimaryCurrencyExchangeRate = Math.min(...primaryCurrencies.map(currency => currency.exchangeRate));
-	return primaryCurrencies.length > 1 && smallestPrimaryCurrencyExchangeRate < 1
-		? smallestPrimaryCurrencyExchangeRate
-		: (Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001);
+	const allCommonExchangeRate = new Set(primaryCurrencies.map(currency => currency.exchangeRate));
+	return (primaryCurrencies.length === 1 && smallestPrimaryCurrencyExchangeRate > 1) || (allCommonExchangeRate.size === 1 && smallestPrimaryCurrencyExchangeRate === 1)
+		? Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, 0.00001)
+		: smallestPrimaryCurrencyExchangeRate;
 }
 
 function getDecimalDifferenceBetweenExchangeRates(currencies) {
 
 	const primaryCurrencies = currencies.filter(currency => !currency.secondary);
 
-	const decimals = Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS) ?? 0.00001;
-	const defaultDecimals = decimals.toString().split(".")[1].length;
+	const decimals = Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, 0.00001);
+	const defaultDecimals = decimals.toString().split(".")?.[1]?.length ?? 0;
 
 	if (primaryCurrencies.length === 1) {
 		return defaultDecimals;
@@ -932,7 +936,7 @@ function getDecimalDifferenceBetweenExchangeRates(currencies) {
 	const exchangeRates = primaryCurrencies.map(curr => curr.exchangeRate);
 
 	const uniqueExchangeRates = new Set(exchangeRates);
-	if (uniqueExchangeRates.length === primaryCurrencies.length) {
+	if (uniqueExchangeRates.size === primaryCurrencies.length) {
 		return defaultDecimals;
 	}
 
@@ -1064,9 +1068,9 @@ export function getStringFromCurrencies(currencies) {
 	let allAbbreviationsArray = getCurrenciesAbbreviations();
 
 	let priceString = currencies
-		.filter(price => price.cost)
+		.filter(price => price.cost || price.quantity)
 		.map(price => {
-			let cost = price.cost;
+			let cost = price.cost || price.quantity;
 			let abbreviation = price.abbreviation;
 			if (!Helpers.isRealNumber(cost) || !abbreviation) {
 				Helpers.custom_error(`getStringFromCurrencies | The currency element is not valid with cost '${cost}' and abbreviation '${abbreviation}'`, true);
@@ -1084,9 +1088,9 @@ export function getStringFromCurrencies(currencies) {
 				abbreviation = abbreviation.replaceAll("%", "")
 			}
 			if (abbreviation.includes("{#}")) {
-				return abbreviation.replace("{#}", price.cost)
+				return abbreviation.replace("{#}", cost)
 			} else {
-				return price.cost + abbreviation;
+				return cost + abbreviation;
 			}
 		}).join(" ");
 
@@ -1101,7 +1105,7 @@ export function getPriceFromString(str, currencyList = false) {
 		currencyList = getCurrencyList()
 	}
 
-	let currencies = foundry.utils.duplicate(currencyList)
+	const currencies = foundry.utils.deepClone(currencyList)
 		.map(currency => {
 			currency.quantity = 0
 			currency.identifier = currency.abbreviation.toLowerCase().replace("{#}", "").trim()
@@ -1113,52 +1117,34 @@ export function getPriceFromString(str, currencyList = false) {
 	const splitBy = new RegExp("(.*?) *(" + sortedCurrencies.join("|") + ")", "g");
 
 	const parts = [...str.split(",").join("").split(" ").join("").trim().toLowerCase().matchAll(splitBy)];
-	const identifierFilter = [];
+
 	let overallCost = 0;
+	let currenciesToReturn = [];
 	for (const part of parts) {
 		for (const currency of currencies) {
 
-			if (part[2]) {
-				identifierFilter.push(part[2]?.toLowerCase());
-			}
+			if (part[2] !== currency.identifier || !currency.exchangeRate) continue;
 
-			if (part[2] !== currency.identifier) continue;
-
-			try {
+			let lowerCasePart = part[1].toLowerCase();
+			if (lowerCasePart.startsWith("d") || lowerCasePart.match(/\d*d\d+/g)) {
+				let diceParts = lowerCasePart.split("d");
+				let diceQuantity = parseInt(diceParts[0]) || 1;
+				let diceSize = parseInt(diceParts[1]);
+				for (let i = 0; i < diceQuantity; i++) {
+					let num = Math.ceil(Math.random() * diceSize);
+					currency.quantity += num;
+					overallCost += num * currency.exchangeRate;
+				}
+			} else {
 				const roll = new Roll(part[1]).evaluateSync()
 				currency.quantity = roll.total;
-				if (roll.total !== Number(part[1])) {
-					currency.roll = roll;
-				}
-				if (currency.exchangeRate) {
-					overallCost += roll.total * currency.exchangeRate;
-				}
-			} catch (err) {
-
+				overallCost += roll.total * currency.exchangeRate;
 			}
+			currenciesToReturn.push(currency);
 		}
 	}
 
-	// Maybe there is a better method for this ?
-	currencies = currencies.filter(currency => identifierFilter.includes(currency.identifier?.toLowerCase()));
-
-	if (!currencies.some(currency => Helpers.isRealNumber(currency.quantity) && currency.quantity >= 0)) {
-		try {
-			const roll = new Roll(str).evaluateSync();
-			if (roll.total) {
-				const primaryCurrency = currencies.find(currency => currency.primary);
-				primaryCurrency.quantity = roll.total;
-				if (roll.total !== Number(str)) {
-					primaryCurrency.roll = roll;
-				}
-				overallCost = roll.total;
-			}
-		} catch (err) {
-
-		}
-	}
-
-	return { currencies, overallCost };
+	return { currencies: currenciesToReturn, overallCost };
 }
 
 export function getCostOfItem(item, defaultCurrencies = false) {
@@ -2332,11 +2318,11 @@ export function clearActorLog(actor) {
  * @param displayChat
  * @param rollData
  * @param customCategory
- * @returns {Promise<[object]>}
+ * @returns {Promise<[object{ items: [], currencies: [] }]>}
  */
 export async function rollTable({
 	tableUuid,
-	formula = "1",
+	formula = false,
 	resetTable = true,
 	normalize = false,
 	displayChat = false,
@@ -2345,6 +2331,7 @@ export async function rollTable({
 } = {}) {
 
 	const rolledItems = [];
+	let currencies = [];
 
 	const table = await fromUuid(tableUuid);
 
@@ -2362,6 +2349,8 @@ export async function rollTable({
 			await table.normalize();
 		}
 	}
+
+	formula = formula || (table?.formula ?? "1");
 
 	const roll = await new Roll(formula.toString(), rollData).evaluate({ allowInteractive: false });
 	if (roll.total <= 0) {
@@ -2409,12 +2398,17 @@ export async function rollTable({
 
 		if (item instanceof RollTable) {
 			const newResults = await rollTable({ tableUuid: item.uuid, resetTable, normalize, displayChat });
-			rolledItems.push(...newResults)
+			rolledItems.push(...newResults.items)
 		} else if (item instanceof Item) {
 			const quantity = Math.max(Utilities.getItemQuantity(item) * rolledQuantity, 1);
 			rolledItems.push({
 				...rollData, item, quantity
 			});
+		} else {
+			let nameCurrencies = getPriceFromString(rollData.name);
+			if (nameCurrencies.overallCost) {
+				currencies = nameCurrencies.currencies;
+			}
 		}
 
 	}
@@ -2447,7 +2441,7 @@ export async function rollTable({
 		}
 	})
 
-	return items;
+	return { items, currencies };
 
 }
 
@@ -2520,9 +2514,11 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 				continue;
 			}
 
-			tableItems = await rollTable({
+			const result = await rollTable({
 				tableUuid: table.uuid, formula: roll.total, customCategory: customCategory
 			})
+
+			tableItems = result.items;
 
 			if (table?.customCategory) {
 				tableItems = tableItems.map(item => {
@@ -2607,15 +2603,21 @@ async function getItem(rollData) {
 		rollData.documentCollection = uuid.split(".").slice(1, 3).join(".");
 		rollData.documentId = uuid.split(".")[4];
 		rollData.documentUuid = uuid;
-	} else if (rollData.documentUuid) {
-		item = await fromUuid(rollData.documentUuid);
-	} else if (rollData.documentCollection === "Item") {
-		item = game.items.get(rollData.documentId);
-	} else {
-		const compendium = game.packs.get(rollData.documentCollection);
-		if (compendium) {
-			item = await compendium.getDocument(rollData.documentId);
+		return item;
+	}
+
+	if (CONSTANTS.IS_V13 && rollData.documentUuid) {
+		return await fromUuid(rollData.documentUuid);
+	} else if (!CONSTANTS.IS_V13) {
+		if (rollData.documentCollection === "Item") {
+			return game.items.get(rollData.documentId);
+		} else {
+			const compendium = game.packs.get(rollData.documentCollection);
+			if (compendium) {
+				return await compendium.getDocument(rollData.documentId);
+			}
 		}
 	}
-	return item;
+
+	return false;
 }

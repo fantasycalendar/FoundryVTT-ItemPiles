@@ -21,8 +21,6 @@ export class VaultStore extends ItemPileStore {
 		this.gridData = writable({});
 		this.gridItems = writable([]);
 		this.validGridItems = writable([]);
-		this.canDepositCurrency = writable(false);
-		this.canWithdrawCurrency = writable(false);
 		this.logSearch = writable("");
 		this.vaultLog = writable([]);
 		this.visibleLogItems = writable(18);
@@ -338,7 +336,7 @@ export class VaultStore extends ItemPileStore {
 		}, 10);
 	}
 
-	async onDropData(data, event, isExpander) {
+	async onDrop(data) {
 
 		let validPosition = get(this.dragPosition);
 		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, flipped: false, active: false });
@@ -366,7 +364,7 @@ export class VaultStore extends ItemPileStore {
 		}
 
 		if (!isItemValidBasedOnProperties(this.actor, itemData) && !game.user.isGM) {
-			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultInvalidItemDropped"), true)
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.ItemPileInvalidItemDropped"), true)
 			return false;
 		}
 
@@ -385,7 +383,7 @@ export class VaultStore extends ItemPileStore {
 
 		const vaultExpander = foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".vaultExpander");
 
-		if (isExpander && !vaultExpander) {
+		if (data.isExpander && !vaultExpander) {
 			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.VaultItemNotExpander"), true)
 			return false;
 		}

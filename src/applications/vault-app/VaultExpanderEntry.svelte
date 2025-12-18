@@ -25,7 +25,7 @@
 		<div class="item-piles-name-container">
 			<p>{$name}</p>
 			{#if !$editQuantities && item.canStack}
-				<span class="item-piles-small-text">(x{$quantity})</span>
+				<span class="item-piles-small-text" style="flex: 1 0 50%;">(x{$quantity})</span>
 			{/if}
 			<span class="item-piles-small-text">
         {($itemFlagData.addsCols ? localize("ITEM-PILES.Vault.ExpandsCols", { cols: $itemFlagData.addsCols }) : "")

@@ -45,7 +45,7 @@
 
 	async function updateSettings() {
 
-		let defaults = foundry.utils.duplicate(CONSTANTS.PILE_DEFAULTS);
+		let defaults = foundry.utils.duplicate(PileUtilities.getPileDefaults());
 
 		const types = [
 			"closedImage",

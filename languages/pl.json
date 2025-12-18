@@ -39,7 +39,7 @@
       "VaultItemNotExpander": "Ten przedmiot nie jest rozszerzeniem skarbca",
       "NoGMsConnected": "UWAGA - Brak podłączonych GMów - Item Piles wymaga GMa, aby gracze mogli korzystać z większości funkcji modułu.",
       "CantSortVault": "Nie udało się posortować elementów - albo jest ich po prostu za dużo, albo coś poszło nie tak",
-      "VaultInvalidItemDropped": "Nie można wrzucać tego typu przedmiotów do tego skarbca!",
+      "ItemPileInvalidItemDropped": "Nie można wrzucać tego typu przedmiotów do tego skarbca!",
       "VaultNoGmItemSidebar": "Tylko GM może upuszczać przedmioty z paska bocznego!",
       "TransactionNoGMConnected": "Żaden GM nie jest połączony - bieżąca transakcja została anulowana, nic nie zostało dodane, usunięte ani przeniesione",
       "DroppedIsNotItem": "Nie można wrzucać dokumentów typu \"{type}\" do tego stosu przedmiotów!",
