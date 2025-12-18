@@ -24,7 +24,7 @@
       "GiveItemAccepted": "{user_name} přijal tvoji nabídku.",
       "ShownToPlayers": "Ukázat {actor_name} hráčům",
       "CreatedJournal": "Vytvořen Item Piles log trezoru.",
-      "SystemSupportFound": "Systémová podpora nalezena! Použití výchozího nastavení systému na Kupu položek...",
+      "SystemSupportFound": "Systémová podpora nalezena! Použití výchozího nastavení systému na Kupu položek",
       "ItemTransferred": "{target_actor_name} obdržel {item_name} od {source_actor_name}."
     },
     "Errors": {
@@ -55,7 +55,8 @@
       "DroppedIsNotItem": "Nemůžete vložit dokument typu \"{type}\" do této kupy položek!",
       "VaultNoGmItemSidebar": "Pouze PJ může vložit předmět z postranního panelu!",
       "NoResponseFromGMTimeout": "VAROVÁNÍ - PJ \"{user_name}\" nereagoval na poslední žádost - prosím počkejte {time} sekund než uděláte další žádost v Item Piles.",
-      "TransactionNoGMConnected": "Žádný PJ není připojen - současná transakce byla stornována, nic nebylo přidáno, odstraněno nebo převedeno."
+      "TransactionNoGMConnected": "Žádný PJ není připojen - současná transakce byla stornována, nic nebylo přidáno, odstraněno nebo převedeno.",
+      "LogEmpty": "Log pro \"{actor_name}\" je prázdný a nemá co exportovat"
     },
     "Inspect": {
       "Title": "Průzkum obsahu kupy",
@@ -182,7 +183,7 @@
       "AddItem": "Přidat",
       "Service": "Služba",
       "TableTimesToRoll": "Kolikrát házet na tabulku:",
-      "LogSearch": "Hledání v protokolu:",
+      "LogSearch": "Prohledej protokol:",
       "LogSetQuantity": "{instigator} nastavil <strong>{item}</strong> <span>quantity</span> na {quantity}",
       "LogSetHidden": "{instigator} nastavil <strong>{item}</strong> na <span>Skrytý</span",
       "Log": "Záznam o činnosti",
@@ -194,7 +195,12 @@
       "LogSetNotForSale": "{instigator} nastavil <strong>{item}</strong> <span>Ne k prodeji</span",
       "LogSetVisible": "{instigator} nastavil <strong>{item}</strong> na <span>Viditelný</span",
       "LogTransaction": "{instigator} {action} {quantity}{item} za {price}",
-      "SortBy": "Třízeno podle:"
+      "SortBy": "Třízeno podle:",
+      "LogFreeTransaction": "{instigator} {action} {quantity}{item} zdarma",
+      "SetNotForSale": "Nastavit není k prodeji",
+      "SetForSale": "Nastavit k prodeji",
+      "SetHidden": "Skrýt",
+      "SetVisible": "Ukázat"
     },
     "Items": "Položky",
     "Settings": {
@@ -420,7 +426,12 @@
           "HideTokenWhenClosedExplanation": "Když je toto povoleno, token(y) tohoto obchodníka bude skryt, když je zavřeno.",
           "OnlyAcceptCustomPricesExplanation": "Když je povoleno, všechny předměty prodané tomuto obchodníkovi musí použít smluvní cenu pro daný předmět (existuje-li), a nikoliv běžné měny. Pokud předmět nemá smluvní cenu, nemůže být prodán.",
           "HideTokenWhenClosed": "Skrýt token při zavření",
-          "OnlyAcceptCustomPrices": "Akceptovat pouze smluvní ceny"
+          "OnlyAcceptCustomPrices": "Akceptovat pouze smluvní ceny",
+          "ExportMerchantLog": "Exportovat logy obchodníka",
+          "ExportMerchantLogExplanation": "Toto exportuje a stáhne textový soubor s logy, řazený od nejstarší po nejnovější informaci.",
+          "AddOverheadCostOption": "Přidat režijní náklad",
+          "OverheadCostOptions": "Možnost režijního nákladu",
+          "OverheadCostOptionsExplanation": "Zde můžeš konfigurovat režijní náklad, který je vždy přidán k ceně předmětů když je obchodník prodá. Toto je ovlivněno cenovými modifikátory."
         },
         "Vault": {
           "CanStackItemsExplanation": "Když je toto povoleno, položky přidané do trezoru se budou slučovat s podobnými předměty. Toto může být také řízeno po položkách v jejich konfiguraci.",
@@ -450,7 +461,7 @@
           "LoggingFormatActor": "Zobraz pouze jméno postavy"
         },
         "Configure": "Kupa položek",
-        "Update": "Aktualizace",
+        "Update": "Nastavení Aktualizace",
         "Main": {
           "Title": "Hlavní nastavení",
           "EnabledPile": "Povoleno",
@@ -606,7 +617,7 @@
         "Title": "Editovat měny",
         "Content": "Jako GM můžete aktualizovat měny v této kupě položek:",
         "Secondary": "Sekundární měny:",
-        "NoCurrency": "{actor_name} nemá žádnou platnou měnu...",
+        "NoCurrency": "{actor_name} nemá žádnou platnou měnu",
         "Submit": "Potvrdit"
       },
       "DropCurrencies": {
@@ -734,7 +745,10 @@
           "AddSellOption": "Přidat prodejní možnost",
           "PurchaseOptionsAsSellOption": "Nákupní možnosti jako Prodejní možnosti",
           "PurchaseOptionsAsSellOptionExplanation": "Když je toto povoleno, nákupní možnosti níže mohou být použity při prodeji předmětu zpět obchodníkovi. Jako výchozí můžou být použity pouze prodejní možnosti níže.",
-          "SellOptionsExplanation": "Zde můžete konfigurovat alternativní cesty k prodeji tohoto předmětu. Každá skupina reprezentuje odlišnou cestu jíž postava může prodat tento předmět obchodníkům."
+          "SellOptionsExplanation": "Zde můžete konfigurovat alternativní cesty k prodeji tohoto předmětu. Každá skupina reprezentuje odlišnou cestu jíž postava může prodat tento předmět obchodníkům.",
+          "AddOverheadCostOption": "Přidat režijní náklady",
+          "OverheadCostOptions": "Možnosti režijních nákladů",
+          "OverheadCostOptionsExplanation": "Zde můžeš konfigurovat režijní náklady, které jsou vždy přidány k ceně tohoto předmětu když jej obchodník prodá. Toto je ovlivněno modifikátory ceny."
         },
         "VaultTab": {
           "VaultExpander": "Rozšiřovač trezoru",
@@ -852,7 +866,7 @@
       },
       "NoSystemFound": {
         "Title": "Systém nerozpoznán",
-        "Content": "Tento systém není aktuálně plně podporován. To znamená že model neví jak nejlépe zpracovat položky systému, ale stále může fungovat v omezeném rozsahu. <br><br>Nastavení modulu si můžete nakonfigurovat sami, ale vyžaduje to trochu technických znalostí.<br><br>Pokud máte nějaké otázky, vyhledejte <strong>Wasp#2005</strong> na discordu Foundry."
+        "Content": "<p><strong>Tento systém není podporován.</strong></p><p> To znamená že modul neví jak nejlépe zpracovat položky systému, ale stále může fungovat v omezeném rozsahu. </p><p>Nastavení modulu si můžete nakonfigurovat sami, ale vyžaduje to trochu technických znalostí.</p><p>Pokud máte nějaké otázky, udělejte screenshot dialogu, který se otevře poté, co toto uzavřete a zeptejte se na kanálu podporu vašeho systému na discordu Foundry.</p>"
       },
       "NewSystemVersion": {
         "Title": "Nová verze systému",
@@ -953,6 +967,9 @@
     },
     "PlayerList": {
       "TradeButton": "Obchod"
+    },
+    "Hints": {
+      "CtrlClear": "Control+klik pro vyčištění"
     }
   }
 }
