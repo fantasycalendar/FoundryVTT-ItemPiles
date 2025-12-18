@@ -241,7 +241,7 @@
 
 		const hitApps = Object.values(ui.windows)
 			.sort((a, b) => b.position.zIndex - a.position.zIndex)
-			.filter(app => isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect()));
+			.filter(app => app?.element?.[0] && isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect()));
 
 		let dropData = {
 			type: "Item",
