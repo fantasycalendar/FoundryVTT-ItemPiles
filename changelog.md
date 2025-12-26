@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.31
+
+- Fixed dragging and stacking items in D&D 5e 5.x.x not working properly
+
 ## Version 3.2.30
 
 - Updated Brazilian & Czech localization (Thank you Kharmans & user on weblate)

@@ -239,9 +239,19 @@
 
 		if (!outOfBounds) return;
 
-		const hitApps = Object.values(ui.windows)
+		let windows = Object.values(ui.windows);
+		let applications = Array.from(foundry?.applications?.instances.values());
+
+		const hitApps = windows.concat(applications)
+			.filter(app => {
+				if(!app.element) return false;
+				if(app instanceof foundry?.applications?.api?.ApplicationV2){
+					return isCoordinateWithinPosition(x, y, app.element.getBoundingClientRect())
+				}
+				if(!app?.element?.[0]) return false;
+				return isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect())
+			})
 			.sort((a, b) => b.position.zIndex - a.position.zIndex)
-			.filter(app => app?.element?.[0] && isCoordinateWithinPosition(x, y, app.element[0].getBoundingClientRect()));
 
 		let dropData = {
 			type: "Item",
