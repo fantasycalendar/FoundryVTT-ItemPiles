@@ -77,7 +77,7 @@ jobs:
       - name: Send package to foundry
         if: "!github.event.release.prerelease"
         run: |
-          HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST 'https://api.foundryvtt.com/_api/packages/release_version/' \
+          HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST 'https://foundryvtt.com/_api/packages/release_version/' \
           --header 'Authorization: ${{ secrets.PACKAGE_TOKEN }}' \
           --header 'Content-Type: application/json' \
           --data '{
