@@ -10,6 +10,7 @@ export const SYSTEMS = {
 		ITEM_CLASS_EQUIPMENT_TYPE: "",
 		ITEM_QUANTITY_ATTRIBUTE: "",
 		ITEM_PRICE_ATTRIBUTE: "",
+		ITEM_PREVIEW_PERMISSION_LEVEL: 1,
 		QUANTITY_FOR_PRICE_ATTRIBUTE: "flags.item-piles.system.quantityForPrice",
 		ITEM_FILTERS: [],
 		ITEM_SIMILARITIES: ["name", "type"],

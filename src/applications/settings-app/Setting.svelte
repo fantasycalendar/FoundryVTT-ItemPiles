@@ -30,9 +30,9 @@
 
 			<div class="choice-container">
 				<select name={key} bind:value={data.value} disabled={disabled}>
-					{#each Object.entries(data.choices) as [key, choice], index (index)}
+					{#each Object.entries(data.choices) as [key, choice]}
 						{#if data.type === Number}
-							<option value="{index}">{localize(choice)}</option>
+							<option value="{Number(key)}">{localize(choice)}</option>
 						{:else}
 							<option value="{key}">{localize(choice)}</option>
 						{/if}

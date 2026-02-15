@@ -40,6 +40,7 @@ const SETTINGS = {
 	ITEM_CLASS_EQUIPMENT_TYPE: "itemClassEquipmentType",
 	ITEM_QUANTITY_ATTRIBUTE: "itemQuantityAttribute",
 	ITEM_PRICE_ATTRIBUTE: "itemPriceAttribute",
+	ITEM_PREVIEW_PERMISSION_LEVEL: "itemPreviewPermissionLevel",
 	QUANTITY_FOR_PRICE_ATTRIBUTE: "quantityForPriceAttribute",
 	ITEM_SIMILARITIES: "itemSimilarities",
 	UNSTACKABLE_ITEM_TYPES: "unstackableItemTypes",
@@ -268,6 +269,21 @@ const SETTINGS = {
 			type: String
 		},
 
+		[SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL]: {
+			name: "ITEM-PILES.Settings.PreviewLevel.Title",
+			hint: "ITEM-PILES.Settings.PreviewLevel.Hint",
+			scope: "world",
+			config: false,
+			system: true,
+			default: SYSTEMS.DATA.ITEM_PREVIEW_PERMISSION_LEVEL,
+			choices: {
+				1: "OWNERSHIP.LIMITED",
+				2: "OWNERSHIP.OBSERVER",
+				3: "OWNERSHIP.OWNER",
+			},
+			type: Number
+		},
+
 		[SETTINGS.QUANTITY_FOR_PRICE_ATTRIBUTE]: {
 			name: "ITEM-PILES.Settings.QuantityForPrice.Title",
 			hint: "ITEM-PILES.Settings.QuantityForPrice.Hint",
@@ -344,12 +360,12 @@ const SETTINGS = {
 			scope: "world",
 			config: false,
 			default: 1,
-			choices: [
-				"ITEM-PILES.Settings.OutputToChat.Off",
-				"ITEM-PILES.Settings.OutputToChat.Public",
-				"ITEM-PILES.Settings.OutputToChat.SelfGM",
-				"ITEM-PILES.Settings.OutputToChat.Blind",
-			],
+			choices: {
+				0: "ITEM-PILES.Settings.OutputToChat.Off",
+				1: "ITEM-PILES.Settings.OutputToChat.Public",
+				2: "ITEM-PILES.Settings.OutputToChat.SelfGM",
+				3: "ITEM-PILES.Settings.OutputToChat.Blind",
+			},
 			type: Number
 		},
 

@@ -411,6 +411,7 @@ class API {
 	 *   ITEM_CLASS_EQUIPMENT_TYPE: string,
 	 *   ITEM_QUANTITY_ATTRIBUTE: string,
 	 *   ITEM_PRICE_ATTRIBUTE: string,
+	 *   ITEM_PREVIEW_PERMISSION_LEVEL: number,
 	 *   QUANTITY_FOR_PRICE_ATTRIBUTE: string,
 	 *   ITEM_FILTERS: Array<{path: string, filters: string}>,
 	 *   ITEM_SIMILARITIES: Array<string>,
@@ -513,6 +514,15 @@ class API {
 		if (data['ITEM_COST_TRANSFORMER']) {
 			if (!Helpers.isFunction(data['ITEM_COST_TRANSFORMER'])) {
 				throw Helpers.custom_error("addSystemIntegration | data.ITEM_COST_TRANSFORMER must be of type function");
+			}
+		}
+
+		if (data['ITEM_PREVIEW_PERMISSION_LEVEL'] !== undefined) {
+			if (typeof data['ITEM_PREVIEW_PERMISSION_LEVEL'] !== "number") {
+				throw Helpers.custom_error("addSystemIntegration | data.ITEM_PREVIEW_PERMISSION_LEVEL must be of type number");
+			}
+			if (data['ITEM_PREVIEW_PERMISSION_LEVEL'] < 0 || data['ITEM_PREVIEW_PERMISSION_LEVEL'] > 3) {
+				throw Helpers.custom_error("addSystemIntegration | data.ITEM_PREVIEW_PERMISSION_LEVEL must be between 0 and 3 - see CONST.DOCUMENT_OWNERSHIP_LEVELS");
 			}
 		}
 

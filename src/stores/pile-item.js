@@ -7,6 +7,8 @@ import CONSTANTS from "../constants/constants.js";
 import { Plugins } from "../plugins/main.js";
 import { SYSTEMS } from "../systems.js";
 import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
+import * as Helpers from "../helpers/helpers.js";
+import SETTINGS from "../constants/settings.js";
 
 class PileBaseItem {
 
@@ -239,11 +241,11 @@ export class PileItem extends PileBaseItem {
 				return;
 			}
 		}
-		if (game.user.isGM || this.item.ownership[game.user.id] === 3) {
+		if (game.user.isGM || this.item.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
 			return this.item.sheet.render(true);
 		}
 		const itemData = this.item.toObject();
-		itemData.ownership[game.user.id] = 1;
+		itemData.ownership[game.user.id] = Helpers.getSetting(SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL);
 		const newItem = new Item.implementation(itemData);
 		newItem.document = newItem;
 		const cls = newItem._getSheetClass();
