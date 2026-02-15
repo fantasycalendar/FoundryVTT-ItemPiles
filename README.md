@@ -16,7 +16,7 @@ Other works by us:
 
 Like what we've done? Support us on Patreon!
 
-<a href="https://www.patreon.com/bePatron?u=67477974" data-patreon-widget-type="become-patron-button">Become a member!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+[![Support us on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dfantasycomputerworks%26type%3Dpatrons&style=for-the-badge)](https://patreon.com/fantasycomputerworks)
 
 ---
 
