@@ -6,4 +6,4 @@ module.js
 module.js.map
 style.css
 *.iml
-./tools
+tools/*
