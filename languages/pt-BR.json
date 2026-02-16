@@ -854,6 +854,10 @@
         "Title": "Quantidade de item para atributo de preço",
         "Hint": "Aqui você pode configurar qual é o caminho do atributo para a quantidade de itens que você recebe pelo preço. Por exemplo, no sistema PF2e, há uma propriedade \"por\" nos itens, que determina a quantidade de itens que você obtém pelo preço do item, que é armazenado no atributo \"item.system.price.per\" do item, então você colocaria \"system.price.per\" nesta configuração."
       },
+      "PreviewLevel": {
+        "Title": "Nível de Propriedade da Janela de Visualização do Item",
+        "Hint": "Esta configuração define o nível de propriedade da janela do item que é exibida quando os jogadores clicam em itens em pilhas de itens. Em alguns sistemas, a descrição só fica visível quando o nível está definido como \"Observador\", enquanto \"Limitado\" funciona bem na maioria dos sistemas."
+      },
       "Currencies": {
         "Title": "Moedas",
         "Label": "Configurar Moedas",
