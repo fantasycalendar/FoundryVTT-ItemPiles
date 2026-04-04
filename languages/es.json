@@ -3,17 +3,22 @@
     "Currency": "Moneda",
     "ContextMenu": {
       "ShowToPlayers": "Mostrar a los Jugadores",
-      "RequestTrade": "Solicitud de comercio"
+      "RequestTrade": "Solicitud de comercio",
+      "GiveToCharacter": "Dar a Personaje"
     },
     "HeaderButtons": {
-      "ShowToPlayers": "Mostrar a los Jugadores"
+      "ShowToPlayers": "Mostrar a los Jugadores",
+      "Configure": "Configurar"
     },
     "Notifications": {
       "ItemTransferred": "{item_name} de {source_actor_name} se entregó a {target_actor_name}.",
       "GiveItemAccepted": "{user_name} aceptó tu oferta.",
       "ShownToPlayers": "Mostrando {actor_name} a los jugadores",
       "UpdateMerchantSuccess": "Mercader actualizado con éxtito.",
-      "UpdateItemPileSuccess": "Item Pile actualizado exitosamente."
+      "UpdateItemPileSuccess": "Item Pile actualizado exitosamente.",
+      "CreatedJournal": "Se ha creado el diario Registro de Bóveda de Pilas de Objeto.",
+      "SystemSupportFound": "!Soporte de sistema encontrado! Aplicando configuraciones por defecto del sistema a Pilas de Objeto",
+      "ItemAdded": "{item_name} fue agregado a {target_actor_name}."
     },
     "Errors": {
       "DisallowedItemTrade": "No puedes intercambiar objetos de \"{tipo}\"",
@@ -22,12 +27,30 @@
       "PileLocked": "El botín está bloqueado y no se puede abrir; no puedes añadir objetos.",
       "DropNoToken": "No tienes ningún token en esta escena, por lo que no puedes soltar objetos.",
       "DisallowedItemDrop": "No puedes soltar objetos de \"{tipo}\"",
-      "PileTooFar": "Estás demasiado lejos como para interactuar con el botín."
+      "PileTooFar": "Estás demasiado lejos como para interactuar con el botín.",
+      "NoVaultAccess": "Usted no tiene permiso para ver esta bóveda.",
+      "NoTokenFound": "No se ha encontrado una ficha o personaje que lo represente.",
+      "NoVaultAccessActor": "{actor_name} no tiene permiso para ver esta bóveda.",
+      "ItemNoQuantity": "¡{item_name} tiene cantidad 0, entonces no puede transferir este objeto!"
     },
     "Warnings": {
       "GiveItemDeclined": "{user_name} rechaza tu oferta.",
       "NoPlayersActive": "No hay ningún jugador activo para hacer esto",
-      "GiveItemNoGM": "No hay DM activo para darte este objeto."
+      "GiveItemNoGM": "No hay DM activo para darte este objeto.",
+      "DroppedFolderNotSupported": "¡No puede soltar carpetas conteniendo tipo «{type}» en esta pila!",
+      "NoGMsConnectedAction": "ADVERTENCIA - No se pudo ejecutar «{action}» porque no hay GMs activos.",
+      "NoGMsConnected": "ADVERTENCIA - No hay GMs conectados - Pilas de Objeto necesita que un GM esté conectado para que los jugadores puedan utilizar la mayoría de las funciones del módulo.",
+      "VaultItemNotExpander": "Ese objeto no expande bóvedas",
+      "DroppedIsNotItem": "¡No puede soltar documentos de tipo «{type}» en esta pila!",
+      "VaultSameItemOrigin": "¡No puede soltar objetos que se originen de la bóveda dentro de esa bóveda!",
+      "LogEmpty": "El registro de «{actor_name}» está vacío y no tiene nada para exportar",
+      "ItemPileInvalidItemDropped": "¡No puede soltar este tipo de objeto en esta pila!",
+      "NoResponseFromGM": "ADVERTENCIA - El GM «{user_name}» no respondió a la solicitud - Pilas de Objeto necesita que un GM esté conectado y responda para que los jugadores puedan utilizar la mayoría de las funciones del módulo.",
+      "TransactionNoGMConnected": "No hay un GM conectado - la transacción actual fue cancelada, nada fue agregado, eliminado o transferido",
+      "VaultFull": "¡Este objeto no cabe en esta bóveda!",
+      "NoResponseFromGMTimeout": "ADVERTENCIA - El GM «{user_name}» no respondió a la última solicitud - por favor espere {time} segundos antes de hacer otra solicitud de Pilas de Objeto.",
+      "CantSortVault": "No se organizaron objetos - puede que hayan muchos objetos o algo salió mal",
+      "VaultNoGmItemSidebar": "¡Solo GMs pueden soltar objetos de la barra lateral!"
     },
     "Inspect": {
       "Title": "Examinando Contenido del Botín",
@@ -45,7 +68,9 @@
       "Owner": "Como propietario del Botín, puedes modificar su contenido.",
       "NoShareLeft": "No queda nada...",
       "OpenSheet": "Abrir Hoja",
-      "SplitItems": "Dividir los objetos en {num_players} partes"
+      "SplitItems": "Dividir los objetos en {num_players} partes",
+      "Change": "Cambiar",
+      "SplitNoPlayers": "No se encontraron personajes entre los cuales dividir los contenidos."
     },
     "Trade": {
       "Title": "Item Piles: Comercio",
@@ -138,7 +163,30 @@
       "ItemFree": "Gratis",
       "NoMatchFound": "Nada concuerda con tu búsqueda",
       "BuyServices": "Servicios de Compra",
-      "Service": "Servicio"
+      "Service": "Servicio",
+      "SetNotForSale": "El grupo no está a la venta",
+      "ToolTipRemoveTable": "Borrar Tabla",
+      "LogBought": "comprado",
+      "TooltipConfigureTable": "Configurar Tabla",
+      "LogSold": "vendido",
+      "SetForSale": "Grupo a la venta",
+      "SetHidden": "Esconder",
+      "TableAddAllItems": "Agregar todos los objetos:",
+      "SetVisible": "Mostrar",
+      "ClearAllServices": "Borrar Todos los Servicios del Actor",
+      "AddTable": "Agregar Tabla",
+      "RollAllTables": "Lanzar Todas las Tablas",
+      "Log": "Registro de Actividad",
+      "LogSearch": "Registro de búsqueda:",
+      "TooltipRollTable": "Lanzar Tabla",
+      "CurrentServices": "Servicios actuales",
+      "ToolTipRemoveAllRolledItems": "Borrar Todos los Objetos Lanzados",
+      "ShoppingAs": "Comprando como {actorName}",
+      "TableCustomCategory": "Agregar objetos a categoría personalizada:",
+      "RollableTables": "Tablas Lanzables",
+      "TableTimesToRoll": "Cantidad de veces para lanzar la tabla:",
+      "LogSetQuantity": "{instigator} escogió {quantity} como la cantidad de {item}",
+      "SortBy": "Organizar como:"
     },
     "Dialogs": {
       "TypeWarning": {
@@ -189,10 +237,46 @@
         "Header": "Item Piles: Recibiendo Objeto",
         "Ignore": "Ignorar Usuario",
         "ContentOne": "{source_actor_name} quiere dar \"{item_name}\" a {target_actor_name}, ¿aceptas?",
-        "ContentMany": "{source_actor_name} quiere dar \"{item_name}\" ({quantity}) a {target_actor_name}, ¿aceptas?"
+        "ContentMany": "{source_actor_name} quiere dar \"{item_name}\" ({quantity}) a {target_actor_name}, ¿aceptas?",
+        "Content": "{source_actor_name} quiere darle un objeto a {target_actor_name}, ¿aceptar?"
       },
       "TextEditor": {
         "Title": "Editor de Texto"
+      },
+      "CantRemoveVaultExpander": {
+        "Content": "No puede remover este expansor, los objetos de la bóveda no cabrían sin él. ¡Retire {num_items} objetos antes de borrar este expansor!",
+        "Title": "No es Posible Remover Expansor"
+      },
+      "GiveItems": {
+        "SelectPlaceholder": "Escoja un personaje para enviarle el objeto",
+        "Title": "Entregando Objetos",
+        "Submit": "Enviar",
+        "Secret": "Entregar sin que nadie sepa (excepto GMs)",
+        "ContentMultipleQuantity": "Usted tiene {quantity} de este objeto, ¿cuantos quiere regalar?",
+        "Header": "Entregando Objeto: {item_name}"
+      },
+      "ClearAllServices": {
+        "Title": "Borrar Todos los Servicios del Actor",
+        "Content": "Se borrarán todos los servicios del mercader, ¿Está seguro de que quiere hacer esto?"
+      },
+      "UserSelect": {
+        "Title": "Seleccionar Usuarios",
+        "Content": "¿A cuáles usuarios quiere mostrarles?"
+      },
+      "ClearVaultLog": {
+        "Content": "¿Está usted seguro de que quiere borrar el registro de la bóveda de «{actor_name}»?",
+        "Title": "¿Borrar el Registro de Bóveda?"
+      },
+      "ClearMerchantLog": {
+        "Content": "¿Está usted seguro de que quiere borrar el registro del mercader «{actor_name}»?",
+        "Title": "¿Borrar el Registro del Mercader?"
+      },
+      "RemoveMerchantTable": {
+        "Title": "Borrar Tabla de Mercader",
+        "Content": "¿Está seguro de que quiere borrar la tabla «{table_name}» de este mercader? Esta acción no se puede deshacer."
+      },
+      "SortMergeVaultItems": {
+        "Title": "¿Organizar y Unir Objetos Similares?"
       }
     },
     "Applications": {
@@ -570,6 +654,44 @@
       }
     },
     "Items": "Objetos",
-    "Currencies": "Monedas"
+    "Currencies": "Monedas",
+    "PlayerList": {
+      "TradeButton": "Comerciar"
+    },
+    "Types": {
+      "container": "Contenedor",
+      "pile": "Pila de Objeto",
+      "merchant": "Mercader",
+      "vault": "Bóveda"
+    },
+    "Vault": {
+      "LogTab": "Registros",
+      "SortItemsTooltip": "Organizar objetos - mantener presionado Ctrl para unir objetos similares",
+      "ExpandersTab": "Expansores",
+      "ViewingAs": "Viendo como {actor_name}",
+      "NeedsCapacity": "Esta bóveda tiene una capacidad total de {total_capacity}, pero no está disponible hasta que se agreguen expansores de bóveda",
+      "ExpandsCols": "{cols} columnas",
+      "CapacityLeft": "Esta bóveda tiene una capacidad de {capacidad}, con un total de {total_capacity}, arrastre y suelte expansores para aumentar la capacidad",
+      "CapacityFull": "Esta bóveda ha alcanzado su capacidad total de {total_capacity}",
+      "Withdraw": "Retirar",
+      "VaultTab": "Bóveda",
+      "ExpandsRows": "{rows} renglones",
+      "SortItems": "Organizar Objetos",
+      "Deposit": "Depositar",
+      "Deposited": "depositado",
+      "Withdrew": "retirado"
+    },
+    "General": {
+      "Primary": "Principal",
+      "Exchange": "Intercambio",
+      "Name": "Nombre",
+      "Cost": "Precio",
+      "Data": "Datos",
+      "Short": "Corto",
+      "Icon": "Ícono"
+    },
+    "Hints": {
+      "CtrlClear": "Control + click para borrar"
+    }
   }
 }
