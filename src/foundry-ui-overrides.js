@@ -53,7 +53,7 @@ function hideTemporaryItems(sidebar) {
 
 function createTradeButton() {
 	const minimalUI = game.modules.get('minimal-ui')?.active;
-	const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "") + (CONSTANTS.IS_V13 ? " item-piles-v13" : "");
+	const classes = "item-piles-player-list-trade-button" + (minimalUI ? " item-piles-minimal-ui" : "") + ((CONSTANTS.IS_V13 || CONSTANTS.IS_V14) ? " item-piles-v13" : "");
 	const text = !minimalUI ? game.i18n.localize("ITEM-PILES.ContextMenu.RequestTrade") : "";
 	const button = $(`<button type="button" class="${classes}"><i class="fas fa-handshake"></i>${text}</button>`)
 	button.click(() => {
@@ -187,8 +187,8 @@ function renderPileHUD(app, html) {
 
 	const pileData = PileUtilities.getActorFlagData(document);
 
-	const htmlType = CONSTANTS.IS_V13 ? "button" : "div";
-	const offset = CONSTANTS.IS_V13 ? "85" : "130";
+	const htmlType = (CONSTANTS.IS_V13 || CONSTANTS.IS_V14) ? "button" : "div";
+	const offset = (CONSTANTS.IS_V13 || CONSTANTS.IS_V14) ? "85" : "130";
 
 	const container = $(`<div class="col right" style="right:-${offset}px;"></div>`);
 
