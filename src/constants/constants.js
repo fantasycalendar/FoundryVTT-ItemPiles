@@ -8,6 +8,7 @@ const CONSTANTS = {
 	MODULE_NAME: module_name,
 	PATH: module_path,
 	IS_V13: false,
+	IS_V14: false,
 
 	ACTOR_DELTA_PROPERTY: "delta",
 
