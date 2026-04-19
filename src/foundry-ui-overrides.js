@@ -294,7 +294,8 @@ class FastTooltipManager extends (foundry?.helpers?.interaction?.TooltipManager?
 	 * @param {PointerEvent} event    The initiating pointerenter event
 	 */
 	#onActivate(event) {
-		if (Tour.tourInProgress) return; // Don't activate tooltips during a tour
+		const TourCls = foundry?.nue?.Tour ?? Tour;
+		if (TourCls.tourInProgress) return; // Don't activate tooltips during a tour
 		const element = event.target;
 		if (!element.dataset.fastTooltip) {
 			// Check if the element has moved out from underneath the cursor and pointerenter has fired on a non-child of the
