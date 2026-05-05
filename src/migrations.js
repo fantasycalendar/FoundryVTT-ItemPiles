@@ -85,7 +85,7 @@ async function updateTokens(version, callback) {
 		const scene = game.scenes.get(sceneId)
 		const updates = tokens.map(token => ({
 			_id: token.id,
-			[CONSTANTS.FLAGS.PILE]: callback(getProperty(token, CONSTANTS.FLAGS.PILE)),
+			[CONSTANTS.FLAGS.PILE]: callback(foundry.utils.getProperty(token, CONSTANTS.FLAGS.PILE)),
 			[CONSTANTS.FLAGS.VERSION]: version,
 		}));
 		if (updates.length) {
