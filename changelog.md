@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.33
+
+- Fixed the Item Price Attribute setting being missing from the system settings tab
+
 ## Version 3.2.32
 
 - Added support for configuring the ownership level that item preview windows (opened when clicking the names of items in item piles) so that systems can better control what is and isn't shown to players

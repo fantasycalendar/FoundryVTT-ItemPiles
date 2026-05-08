@@ -207,6 +207,8 @@
 					         options={["None", ...Object.keys(getDocumentTemplates("Item"))]}/>
 					<Setting key={SETTINGS.ITEM_QUANTITY_ATTRIBUTE} itemAttribute
 					         bind:data="{settings[SETTINGS.ITEM_QUANTITY_ATTRIBUTE]}"/>
+					<Setting key={SETTINGS.ITEM_PRICE_ATTRIBUTE} itemAttribute
+					         bind:data="{settings[SETTINGS.ITEM_PRICE_ATTRIBUTE]}"/>
 					<Setting key={SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL}
 					         bind:data="{settings[SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>
