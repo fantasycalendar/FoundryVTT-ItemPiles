@@ -1,0 +1,81 @@
+name: Create Draft Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  create-release:
+    if: contains(github.event.head_commit.message, '--RELEASE')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version and body from changelog
+        id: changelog
+        run: |
+          VERSION=$(awk '/^## Version / { sub(/^## Version /, ""); print; exit }' changelog.md)
+
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not find a '## Version X.Y.Z' header in changelog.md"
+            exit 1
+          fi
+
+          BODY=$(awk '
+            /^## Version / {
+              if (seen) exit
+              seen = 1
+              next
+            }
+            seen { print }
+          ' changelog.md)
+
+          BODY=$(echo "$BODY" | sed -e '/./,$!d' | sed -e :a -e '/^$/{$d;N;ba' -e '}')
+
+          if [ -z "$BODY" ]; then
+            echo "::error::Extracted changelog body is empty for version $VERSION"
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          {
+            echo 'body<<CHANGELOG_EOF'
+            echo "$BODY"
+            echo 'CHANGELOG_EOF'
+          } >> $GITHUB_OUTPUT
+
+          echo "Version: $VERSION"
+          echo "Body length: $(echo -n "$BODY" | wc -c) characters"
+
+      - name: Check tag does not already exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.changelog.outputs.version }}"
+          if gh release view "$VERSION" --json tagName >/dev/null 2>&1; then
+            echo "::error::Release $VERSION already exists. Bump the version in changelog.md or delete the existing release."
+            exit 1
+          fi
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.changelog.outputs.version }}
+          RELEASE_BODY: ${{ steps.changelog.outputs.body }}
+          RELEASE_BRANCH: ${{ github.ref_name }}
+        run: |
+          printf '%s' "$RELEASE_BODY" > release-notes.md
+
+          gh release create "$RELEASE_VERSION" \
+            --draft \
+            --target "$RELEASE_BRANCH" \
+            --title "$RELEASE_VERSION" \
+            --notes-file release-notes.md
+
+          echo "Draft release created for version $RELEASE_VERSION"
+          echo "Review and publish at: https://github.com/${{ github.repository }}/releases"
