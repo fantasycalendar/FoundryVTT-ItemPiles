@@ -175,7 +175,7 @@ export default class ItemPileStore {
 
 		if (data.type === "Actor" && game.user.isGM) {
 			const newRecipient = data.uuid ? (await foundry.utils.fromUuid(data.uuid)) : game.actors.get(data.id);
-			return store.updateRecipient(newRecipient)
+			return this.updateRecipient(newRecipient);
 		}
 
 		if (data.type !== "Item") {
@@ -393,57 +393,71 @@ export default class ItemPileStore {
 		const allItems = get(this.allItems);
 		const allAttributes = get(this.attributes);
 		const pileData = get(this.pileData);
-		const recipientPileData = this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {}
+		const recipientPileData = this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {};
 		const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
 
-		const groupedItems = allItems
-			.map(item => {
-				item.subItems.set([]);
-				return item;
-			})
-			.reduce((acc, item) => {
-				const containerID = get(item.containerID);
-				if (containerID) {
-					const container = allItems.find(pileItem => containerID.includes(pileItem.id));
-					if (container) {
-						container.subItems.update(subItems => {
-							subItems.push(item);
-							return subItems;
-						});
-						return acc;
-					}
-				}
-				acc.push(item);
-				return acc;
-			}, []);
+		const itemById = new Map(allItems.filter(item => item.id).map(item => [item.id, item]));
+		const subItemsByContainer = new Map();
 
-		const groupedAttributes = allAttributes
-			.reduce((acc, item) => {
-				const containerID = get(item.containerID);
-				if (containerID) {
-					const container = allItems.find(pileItem => pileItem.id === containerID)
-					if (container) {
-						container.subItems.update(subItems => {
-							subItems.push(item);
-							subItems.sort((a, b) => {
-								if (a?.attribute?.exchangeRate && b?.attribute?.exchangeRate) {
-									return (b?.attribute?.exchangeRate ?? 0) - (a?.attribute?.exchangeRate ?? 0);
-								}
-								return (get(b.name) > get(a.name) ? -1 : 1);
-							})
-							return subItems;
-						});
-						return acc;
-					}
+		const getContainer = (containerID) => {
+			if (!containerID) return false;
+			if (Array.isArray(containerID)) {
+				return containerID.map(id => itemById.get(id)).find(Boolean);
+			}
+			const directContainer = itemById.get(containerID);
+			if (directContainer) return directContainer;
+			if (typeof containerID === "string") {
+				return allItems.find(pileItem => pileItem.id && containerID.includes(pileItem.id));
+			}
+			return false;
+		};
+
+		const addSubItem = (container, item) => {
+			const subItems = subItemsByContainer.get(container) ?? [];
+			subItems.push(item);
+			subItemsByContainer.set(container, subItems);
+		};
+
+		const groupedItems = [];
+		for (const item of allItems) {
+			const container = getContainer(get(item.containerID));
+			if (container) {
+				addSubItem(container, item);
+				continue;
+			}
+			groupedItems.push(item);
+		}
+
+		const groupedAttributes = [];
+		for (const item of allAttributes) {
+			const container = getContainer(get(item.containerID));
+			if (container) {
+				addSubItem(container, item);
+				continue;
+			}
+			groupedAttributes.push(item);
+		}
+
+		for (const item of allItems) {
+			const subItems = subItemsByContainer.get(item) ?? [];
+			subItems.sort((a, b) => {
+				if (a?.attribute?.exchangeRate && b?.attribute?.exchangeRate) {
+					return (b?.attribute?.exchangeRate ?? 0) - (a?.attribute?.exchangeRate ?? 0);
 				}
-				acc.push(item);
-				return acc;
-			}, []);
+				return get(a.name).localeCompare(get(b.name));
+			});
+			item.subItems.set(subItems);
+		}
+
+		if (get(this.search)) {
+			[...allItems, ...allAttributes].forEach(entry => entry.filter());
+		}
 
 		const visibleItems = groupedItems
 			.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData))
 			.filter(entry => !get(entry.filtered))
 			.sort((a, b) => this.itemSortFunction(a, b));
+
 		const itemCurrencies = groupedItems.filter(entry => entry.isCurrency && !entry.isSecondaryCurrency);
 		const secondaryItemCurrencies = groupedItems.filter(entry => entry.isSecondaryCurrency);
 
@@ -451,13 +465,16 @@ export default class ItemPileStore {
 		this.visibleItems.set(visibleItems);
 		this.items.set(visibleItems);
 
-		const currencies = groupedAttributes.filter(entry => !entry.isSecondaryCurrency).concat(itemCurrencies);
-		const secondaryCurrencies = groupedAttributes.filter(entry => entry.isSecondaryCurrency).concat(secondaryItemCurrencies);
+		const allCurrencies = [
+			...groupedAttributes.filter(entry => !entry.isSecondaryCurrency),
+			...itemCurrencies,
+			...groupedAttributes.filter(entry => entry.isSecondaryCurrency),
+			...secondaryItemCurrencies
+		];
 
-		this.numCurrencies.set(currencies.concat(secondaryCurrencies).filter(entry => get(entry.quantity) > 0).length);
-
-		this.currencies.set(currencies.concat(secondaryCurrencies).filter(entry => !get(entry.filtered)));
-		this.allCurrencies.set(currencies.concat(secondaryCurrencies));
+		this.numCurrencies.set(allCurrencies.filter(entry => get(entry.quantity) > 0).length);
+		this.currencies.set(allCurrencies.filter(entry => !get(entry.filtered)));
+		this.allCurrencies.set(allCurrencies);
 
 		this.itemCategories.set(Object.values(allItems.reduce((acc, item) => {
 			const category = get(item.category);
@@ -465,7 +482,7 @@ export default class ItemPileStore {
 				acc[category.type] = { ...category };
 			}
 			return acc;
-		}, {})).sort((a, b) => a.label < b.label ? -1 : 1));
+		}, {})).sort((a, b) => a.label.localeCompare(b.label)));
 
 		const itemsPerCategory = visibleItems
 			.reduce((acc, item) => {
@@ -480,10 +497,10 @@ export default class ItemPileStore {
 				}
 				acc[category.type].items.push(item);
 				return acc;
-			}, {})
+			}, {});
 
 		Object.values(itemsPerCategory).forEach(category => category.items.sort((a, b) => {
-			return a.item.name < b.item.name ? -1 : 1;
+			return a.item.name.localeCompare(b.item.name);
 		}));
 
 		this.itemsPerCategory.set(itemsPerCategory);
@@ -494,7 +511,7 @@ export default class ItemPileStore {
 				label: category.label,
 				type: category.type
 			}
-		}).sort((a, b) => a.label < b.label ? -1 : 1));
+		}).sort((a, b) => a.label.localeCompare(b.label)));
 	}
 
 	createItem(item) {
