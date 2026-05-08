@@ -157,7 +157,7 @@ function insertItemHeaderButtons(itemSheet, buttons) {
 		if (game.modules.get("item-linking")?.active && !event.ctrlKey) {
 			const linkedItemUuid = foundry.utils.getProperty(obj, "flags.item-linking.baseItem") ?? false;
 			if (linkedItemUuid) {
-				obj = await fromUuid(linkedItemUuid);
+				obj = await foundry.utils.fromUuid(linkedItemUuid);
 				return ItemEditor.show(obj, {
 					extraTitle: " - Compendium"
 				});

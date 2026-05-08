@@ -342,7 +342,7 @@ export class VaultStore extends ItemPileStore {
 		this.dragPosition.set({ x: 0, y: 0, w: 1, h: 1, flipped: false, active: false });
 
 		if (data.type === "Actor" && game.user.isGM) {
-			const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
+			const newRecipient = data.uuid ? (await foundry.utils.fromUuid(data.uuid)) : game.actors.get(data.id);
 			this.refreshAppSize();
 			this.updateRecipient(newRecipient);
 			this.refreshFreeSpaces();
@@ -368,7 +368,7 @@ export class VaultStore extends ItemPileStore {
 			return false;
 		}
 
-		const source = (data.uuid ? fromUuidSync(data.uuid) : false)?.parent ?? false;
+		const source = (data.uuid ? foundry.utils.fromUuidSync(data.uuid) : false)?.parent ?? false;
 		const target = this.actor;
 
 		if (source === target) {

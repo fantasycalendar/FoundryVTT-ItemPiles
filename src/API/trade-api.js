@@ -431,7 +431,7 @@ export default class TradeAPI {
 		for (const entry of updates.add.items) {
 			let item = updates.targetActor.items.get(entry.id);
 			if (!item) {
-				item = await fromUuid(entry.uuid);
+				item = await foundry.utils.fromUuid(entry.uuid);
 				if (!item) continue;
 			}
 			const itemData = item.toObject();

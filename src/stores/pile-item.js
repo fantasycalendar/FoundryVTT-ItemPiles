@@ -241,16 +241,13 @@ export class PileItem extends PileBaseItem {
 				return;
 			}
 		}
-		if (game.user.isGM || this.item.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
+		if (this.item.isOwner) {
 			return this.item.sheet.render(true);
 		}
 		const itemData = this.item.toObject();
 		itemData.ownership[game.user.id] = Helpers.getSetting(SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL);
 		const newItem = new Item.implementation(itemData);
-		newItem.document = newItem;
-		const cls = newItem._getSheetClass();
-		const sheet = new cls(newItem, { editable: false });
-		return sheet?._render ? sheet._render(true) : sheet.render(true);
+		return newItem.sheet.render(true, { editable: false });
 	}
 
 	rendered(element) {

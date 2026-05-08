@@ -19,20 +19,13 @@
 				return;
 			}
 		}
-		if (game.user.isGM || item.ownership[game.user.id] === 3) {
+		if (item.isOwner) {
 			return item.sheet.render(true);
 		}
 		const itemData = item.toObject();
-		itemData.ownership[game.user.id] = 1;
+		itemData.ownership[game.user.id] = CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED;
 		const newItem = new Item.implementation(itemData);
-		const cls = newItem._getSheetClass();
-		newItem.document = newItem;
-		const sheet = new cls(newItem, { editable: false });
-		if (sheet?._render) {
-			sheet._render(true);
-		} else {
-			sheet.render(true)
-		}
+		return newItem.sheet.render(true, { editable: false });
 	}
 
 	function onKeyDown(e) {

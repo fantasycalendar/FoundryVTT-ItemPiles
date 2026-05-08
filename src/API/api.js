@@ -753,7 +753,7 @@ class API {
 			if (typeof actor !== "string") {
 				throw Helpers.custom_error(`createItemPile | actor must be of type string`);
 			}
-			let pileActor = await fromUuid(actor);
+			let pileActor = await foundry.utils.fromUuid(actor);
 			if (!pileActor) {
 				pileActor = game.actors.getName(actor);
 			}
@@ -1271,7 +1271,7 @@ class API {
 				throw Helpers.custom_error(`getMerchantPriceModifiers | actor must be of type Actor or string (UUID)`);
 			}
 			if (typeof actor === "string") {
-				actor = fromUuidSync(actor) || false;
+				actor = foundry.utils.fromUuidSync(actor) || false;
 			}
 		}
 
@@ -2303,7 +2303,7 @@ class API {
 
 		let rollTable = table;
 		if (typeof table === "string") {
-			let potentialTable = await fromUuid(table);
+			let potentialTable = await foundry.utils.fromUuid(table);
 			if (!potentialTable) {
 				potentialTable = game.tables.get(table)
 			}

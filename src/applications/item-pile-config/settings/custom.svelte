@@ -26,7 +26,7 @@
 
 	async function previewDocument(key) {
 		if (!pileData[key].uuid) return;
-		const doc = fromUuidSync(pileData[key].uuid);
+		const doc = foundry.utils.fromUuidSync(pileData[key].uuid);
 		if (!doc) return;
 		doc.sheet.render(true);
 	}

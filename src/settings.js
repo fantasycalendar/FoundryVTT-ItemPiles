@@ -46,7 +46,7 @@ export async function patchCurrencySettings() {
 	const currencies = Helpers.getSetting(SETTINGS.CURRENCIES);
 	for (let currency of currencies) {
 		if (currency.type !== "item" || !currency.data.uuid || currency.data.item) continue;
-		const item = await fromUuid(currency.data.uuid);
+		const item = await foundry.utils.fromUuid(currency.data.uuid);
 		if (!item) continue;
 		currency.data.item = item.toObject();
 	}
