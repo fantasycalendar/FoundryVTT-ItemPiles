@@ -35,7 +35,7 @@
 	async function dropData(data) {
 
 		if (data.type === "Actor") {
-			const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
+			const newRecipient = data.uuid ? (await foundry.utils.fromUuid(data.uuid)) : game.actors.get(data.id);
 			this.updateRecipient(newRecipient);
 			if (recipientStore) {
 				return recipientStore.updateSource(newRecipient);

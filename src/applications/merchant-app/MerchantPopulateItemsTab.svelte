@@ -112,7 +112,7 @@
 
 	async function evaluateTable(table, keepRolledItems) {
 
-		const rollableTable = await fromUuid(table.uuid);
+		const rollableTable = await foundry.utils.fromUuid(table.uuid);
 		if (!rollableTable) return;
 
 		if (!keepRolledItems) {
