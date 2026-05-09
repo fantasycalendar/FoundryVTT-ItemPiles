@@ -76,7 +76,7 @@ export class PileItem extends PileBaseItem {
 		super.setupStores();
 		this.item = item;
 		this.itemDocument = new TJSDocument(this.item);
-		this.canStack = PileUtilities.canItemStack(this.item, this.actor);
+		this.canStack = PileUtilities.canItemStack(this.item, this.store.actor);
 		this.presentFromTheStart.set(Utilities.getItemQuantity(this.item) > 0 || !this.canStack);
 		this.quantity.set(this.canStack ? Utilities.getItemQuantity(this.item) : 1);
 		this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -241,16 +241,32 @@ export class PileItem extends PileBaseItem {
 				return;
 			}
 		}
-		if (game.user.isGM || this.item.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
+		if (this.item.isOwner) {
 			return this.item.sheet.render(true);
 		}
 		const itemData = this.item.toObject();
+		itemData.ownership ??= {};
 		itemData.ownership[game.user.id] = Helpers.getSetting(SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL);
-		const newItem = new Item.implementation(itemData);
+		const newItem = new Item.implementation(itemData, { parent: this.item.parent });
 		newItem.document = newItem;
-		const cls = newItem._getSheetClass();
-		const sheet = new cls(newItem, { editable: false });
-		return sheet?._render ? sheet._render(true) : sheet.render(true);
+		const sheetOptions = {
+			editable: false,
+			// Some system sheets submit forms on close by default. Item pile previews are
+			// synthetic read-only documents, so submitting can fail for non-owner users
+			// and prevent the preview window from closing.
+			submitOnClose: false,
+			submitOnChange: false
+		};
+		const ItemSheetClass = newItem._getSheetClass?.();
+		if (ItemSheetClass) {
+			const sheet = new ItemSheetClass(newItem, sheetOptions);
+			return sheet?._render ? sheet._render(true) : sheet.render(true);
+		}
+		const sheet = newItem.sheet;
+		if (sheet?.options) {
+			sheet.options = foundry.utils.mergeObject(sheet.options, sheetOptions);
+		}
+		return sheet.render(true);
 	}
 
 	rendered(element) {
@@ -338,7 +354,7 @@ export class PileAttribute extends PileBaseItem {
 			this.filtered.set(true);
 		} else if (search) {
 			const nameIsInSearchQuery = name.toLowerCase().includes(search.toLowerCase());
-			const subItemNamesMatchQuery = get(this.subItems).some(item => get(item.filtered));
+			const subItemNamesMatchQuery = get(this.subItems).some(item => !get(item.filtered));
 			this.filtered.set(!(nameIsInSearchQuery || subItemNamesMatchQuery));
 		} else {
 			this.filtered.set(!presentFromTheStart && quantity === 0);

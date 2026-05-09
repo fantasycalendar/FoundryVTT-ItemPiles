@@ -44,12 +44,16 @@
 
 </script>
 
+<!-- Only cancel dragstart events that originate on the drop zone itself.
+	Draggable slotted children, such as item pile inventory rows, need their
+	bubbling dragstart event to remain uncancelled so Foundry can start the
+	item drag operation. -->
 <div
 	class={$$props.class}
 	on:dragenter={enter}
 	on:dragleave={leave}
 	on:dragover={overCallback}
-	on:dragstart|preventDefault
+	on:dragstart|self|preventDefault
 	on:drop|preventDefault={dropData}
 	style={$$props.style}
 >
