@@ -174,8 +174,11 @@ export default class ItemPileStore {
 		}
 
 		if (data.type === "Actor" && game.user.isGM) {
-			const newRecipient = data.uuid ? (await foundry.utils.fromUuid(data.uuid)) : game.actors.get(data.id);
-			return store.updateRecipient(newRecipient)
+			const newRecipient = data.uuid
+				? await foundry.utils.fromUuid(data.uuid)
+				: game.actors.get(data.id);
+			if (!newRecipient) return;
+			return this.updateRecipient(newRecipient);
 		}
 
 		if (data.type !== "Item") {

@@ -546,3 +546,32 @@ export function ensureValidIds(actor, itemsToCreate) {
 export function isRealNumber(inNumber) {
 	return !isNaN(inNumber) && typeof inNumber === "number" && isFinite(inNumber);
 }
+
+/**
+ * Render an item's sheet in read-only mode for users that don't own the item.
+ *
+ * Item Piles synthesizes a temporary Item document with elevated ownership for
+ * the viewing user, then opens its sheet. The synthetic document is detached
+ * from any compendium/world store, so anything that triggers a write (sheet
+ * close handlers that submit forms, change handlers, etc) must be suppressed.
+ *
+ * @param {Item} sourceItem               The real item being previewed.
+ * @param {number} ownershipLevel         Ownership level granted to the current user (defaults to LIMITED).
+ * @returns {Application|ApplicationV2|undefined}  The rendered sheet, or undefined if the original item was already owned.
+ */
+export function renderReadOnlyItemPreview(sourceItem, ownershipLevel = CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED) {
+	if (!sourceItem) return;
+	if (sourceItem.isOwner) {
+		return sourceItem.sheet.render(true);
+	}
+	const itemData = sourceItem.toObject();
+	itemData.ownership = { ...(itemData.ownership ?? {}), [game.user.id]: ownershipLevel };
+	const previewItem = new Item.implementation(itemData, { parent: sourceItem.parent ?? undefined });
+	const sheet = previewItem.sheet;
+	if (sheet?.options) {
+		sheet.options.editable = false;
+		sheet.options.submitOnChange = false;
+		sheet.options.submitOnClose = false;
+	}
+	return sheet.render(true, { editable: false });
+}

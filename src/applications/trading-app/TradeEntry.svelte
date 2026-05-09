@@ -1,6 +1,7 @@
 <script>
 
 	import * as Helpers from "../../helpers/helpers.js";
+	import * as Utilities from "../../helpers/utilities.js";
 	import SETTINGS from "../../constants/settings.js";
 	import { SYSTEMS } from "../../systems.js";
 
@@ -14,25 +15,8 @@
 		if (!canPreview || !data.id) return;
 		const item = store.leftTraderActor.items.get(data.id) ?? store.rightTraderActor.items.get(data.id);
 		if (!item) return;
-		if (SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER) {
-			if (!SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER(item)) {
-				return;
-			}
-		}
-		if (game.user.isGM || item.ownership[game.user.id] === 3) {
-			return item.sheet.render(true);
-		}
-		const itemData = item.toObject();
-		itemData.ownership[game.user.id] = 1;
-		const newItem = new Item.implementation(itemData);
-		const cls = newItem._getSheetClass();
-		newItem.document = newItem;
-		const sheet = new cls(newItem, { editable: false });
-		if (sheet?._render) {
-			sheet._render(true);
-		} else {
-			sheet.render(true)
-		}
+		if (SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER && !SYSTEMS.DATA.PREVIEW_ITEM_TRANSFORMER(item)) return;
+		return Utilities.renderReadOnlyItemPreview(item);
 	}
 
 	function onKeyDown(e) {
