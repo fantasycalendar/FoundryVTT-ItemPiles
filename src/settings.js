@@ -75,7 +75,8 @@ export async function checkSystem() {
 
 		let settingsValid = true;
 		for (const [name, data] of Object.entries(SETTINGS.GET_DEFAULT())) {
-			settingsValid = settingsValid && Helpers.getSetting(name).length !== (new data.type).length
+			if (data.type !== Array && data.type !== String) continue;
+			settingsValid = settingsValid && Helpers.getSetting(name).length !== (new data.type).length;
 		}
 
 		if (settingsValid) return;

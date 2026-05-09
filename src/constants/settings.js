@@ -191,7 +191,7 @@ const SETTINGS = {
 			config: false,
 			default: SYSTEMS.DATA.CSS_VARIABLES,
 			mergedDefaults: SETTINGS.DEFAULT_CSS_VARIABLES,
-			onchange: (data) => {
+			customOnChange: (data) => {
 				applySystemSpecificStyles(data);
 			},
 			type: Object

@@ -354,9 +354,9 @@ export async function openEditor(key, data = false) {
 		data = getSetting(key);
 	}
 
-	const result = await editor.show(data, { ...setting.applicationOptions, onchange: setting.onchange } ?? {});
+	const result = await editor.show(data, { ...setting.applicationOptions, customOnChange: setting.customOnChange } ?? {});
 
-	if (setting.onchange && result) setting.onchange(result);
+	if (setting.customOnChange && result) setting.customOnChange(result);
 
 	return result;
 

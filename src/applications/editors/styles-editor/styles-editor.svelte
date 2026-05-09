@@ -38,8 +38,8 @@
 			.filter(entry => entry[0].length && entry[1].length)
 		);
 		styleValues.set(data);
-		if (options.onchange) {
-			options.onchange(data);
+		if (options.customOnChange) {
+			options.customOnChange(data);
 		}
 	}
 
