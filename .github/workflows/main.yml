@@ -68,14 +68,18 @@ jobs:
           body: ${{ github.event.release.body }}
 
       - name: Get Compatibility
-        if: "!github.event.release.prerelease"
+        if: "!github.event.release.prerelease && env.PACKAGE_TOKEN != ''"
+        env:
+          PACKAGE_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
         run: |
           echo 'COMPATIBILITY<<EOF' >> $GITHUB_ENV
           cat module.json | jq .compatibility >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
       - name: Send package to foundry
-        if: "!github.event.release.prerelease"
+        if: "!github.event.release.prerelease && env.PACKAGE_TOKEN != ''"
+        env:
+          PACKAGE_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
         run: |
           HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" -X POST 'https://foundryvtt.com/_api/packages/release_version/' \
           --header 'Authorization: ${{ secrets.PACKAGE_TOKEN }}' \
@@ -106,7 +110,7 @@ jobs:
           fi
 
       - name: FC Discord notification
-        if: "!github.event.release.prerelease"
+        if: "!github.event.release.prerelease && env.DISCORD_WEBHOOK != ''"
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           DISCORD_USERNAME: ${{env.package_name}} Version ${{github.event.release.tag_name}}
@@ -115,7 +119,7 @@ jobs:
           args: "${{github.event.release.body}}"
 
       - name: JB2A Discord notification
-        if: "!github.event.release.prerelease"
+        if: "!github.event.release.prerelease && env.DISCORD_WEBHOOK != ''"
         env:
           DISCORD_WEBHOOK: ${{ secrets.JB2A_WEBHOOK_URL }}
           DISCORD_USERNAME: ${{env.package_name}} Version ${{github.event.release.tag_name}}
@@ -138,16 +142,20 @@ jobs:
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}
 
-      #update next branch
+      #update next branch (only if it exists on the repo)
       - name: Prepare repository
         if: "github.event.release.prerelease"
         run: |
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY"
+          if ! git ls-remote --exit-code --heads origin next >/dev/null 2>&1; then
+            echo "No 'next' branch on this repository — skipping prerelease manifest update."
+            exit 0
+          fi
           git config --global user.name '${{github.actor}}'
           git config --global user.email '${{github.actor}}@users.noreply.github.com'
           git add module.json
           git stash
           git clean -f
-          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY"
           git fetch origin "next"
           git switch -c "next" "origin/next"
           git checkout stash module.json
