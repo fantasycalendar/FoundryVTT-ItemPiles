@@ -69,7 +69,7 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create release
+      - name: Create draft release
         if: steps.check_release.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -80,9 +80,10 @@ jobs:
           printf '%s' "$RELEASE_BODY" > release-notes.md
 
           gh release create "$RELEASE_VERSION" \
+            --draft \
             --target "$RELEASE_BRANCH" \
             --title "$RELEASE_VERSION" \
             --notes-file release-notes.md
 
-          echo "Release published for version $RELEASE_VERSION"
-          echo "View at: https://github.com/${{ github.repository }}/releases/tag/$RELEASE_VERSION"
+          echo "Draft release created for version $RELEASE_VERSION"
+          echo "Review and publish at: https://github.com/${{ github.repository }}/releases"
