@@ -1156,8 +1156,9 @@ export default class PrivateAPI {
 
 		foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity ?? 1);
 		const containerItems = [itemData.item];
-		const item = foundry.utils.fromUuidSync(itemData.uuid);
-		const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
+		// Quick Insert and similar modules can provide serialized item data without a synchronously resolvable UUID.
+		const item = foundry.utils.fromUuidSync(itemData.uuid) ?? itemData.item;
+		const handler = item ? Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type) : false;
 		if (handler) handler({ item, items: containerItems });
 		const items = containerItems.map(item => ({
 			item,
