@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.2.34
+
+- Fixed Version to work with FOundry V14
+
 ## Version 3.2.33
 
 - Fixed the Item Price Attribute setting being missing from the system settings tab
