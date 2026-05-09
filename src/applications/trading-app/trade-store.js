@@ -39,7 +39,7 @@ export default class TradeStore {
 
 		const leftTrader = {
 			user: game.users.get(tradeData.leftTraderData.user),
-			actor: fromUuidSync(tradeData.leftTraderData.actor),
+			actor: foundry.utils.fromUuidSync(tradeData.leftTraderData.actor),
 			items: tradeData.leftTraderData.items,
 			currencies: tradeData.leftTraderData.currencies,
 			itemCurrencies: tradeData.leftTraderData.itemCurrencies,
@@ -48,7 +48,7 @@ export default class TradeStore {
 
 		const rightTrader = {
 			user: game.users.get(tradeData.rightTraderData.user),
-			actor: fromUuidSync(tradeData.rightTraderData.actor),
+			actor: foundry.utils.fromUuidSync(tradeData.rightTraderData.actor),
 			items: tradeData.rightTraderData.items,
 			currencies: tradeData.rightTraderData.currencies,
 			itemCurrencies: tradeData.rightTraderData.itemCurrencies,

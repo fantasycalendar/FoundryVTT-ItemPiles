@@ -72,21 +72,27 @@ export class SettingsApp extends SvelteApplication {
 	}
 }
 
-export class SettingsShim extends FormApplication {
+export class SettingsShim extends foundry.applications.api.ApplicationV2 {
 
-	/**
-	 * @inheritDoc
-	 */
-	constructor() {
-		super({});
+	static DEFAULT_OPTIONS = {
+		id: "item-piles-settings-shim",
+		window: { title: "Item Piles Settings" }
+	};
+
+	async _prepareContext() {
+		return {};
+	}
+
+	async _renderHTML() {
+		return "";
+	}
+
+	_replaceHTML() {
+	}
+
+	async render(options, _options) {
 		SettingsApp.show();
-	}
-
-	async _updateObject(event, formData) {
-	}
-
-	render() {
-		this.close();
+		return this;
 	}
 
 }

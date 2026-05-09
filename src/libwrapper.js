@@ -14,14 +14,12 @@ export function registerLibwrappers() {
 		return wrapped(...args);
 	}, "MIXED");
 
-	const overrideMethod = CONSTANTS.IS_V13
-		? `foundry.applications.sidebar.DocumentDirectory.prototype._onClickEntry`
-		: `DocumentDirectory.prototype._onClickEntryName`;
+	const overrideMethod = `foundry.applications.sidebar.DocumentDirectory.prototype._onClickEntry`;
 
 	libWrapper.register(CONSTANTS.MODULE_NAME, overrideMethod, function (wrapped, ...args) {
 		const event = args[0];
 		event.preventDefault();
-		if (!(this instanceof Compendium)) {
+		if (!(this instanceof foundry.applications.sidebar.apps.Compendium)) {
 			const documentId = event.currentTarget?.parentElement?.dataset?.documentId
 				?? event.target?.parentElement?.dataset?.documentId
 				?? event.target?.parentElement?.dataset?.entryId;
@@ -53,9 +51,12 @@ export function registerLibwrappers() {
 		)
 	}, []).flat();
 
+	const ApplicationV1 = foundry.appv1?.api?.Application ?? globalThis.Application;
+	const RENDER_STATE_NONE = ApplicationV1?.RENDER_STATES?.NONE ?? 0;
+
 	const sheetOverrideMethod = function (wrapped, forced, options, ...args) {
 		const renderItemPileInterface = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_SHEET, this.document, forced, options) === false;
-		if (this.state > Application.RENDER_STATES.NONE) {
+		if (this.state > RENDER_STATE_NONE) {
 			if (renderItemPileInterface) {
 				wrapped(forced, options, ...args)
 			} else {
@@ -68,15 +69,17 @@ export function registerLibwrappers() {
 
 	for (const override of sheetOverrides) {
 		try {
+			const prototype = override.split('.').slice(0, -1).reduce((obj, key) => obj?.[key], globalThis);
+			const isAppV2 = prototype?.constructor?.RENDER_STATES === undefined
+				&& typeof prototype?._renderHTML === "function";
+			if (isAppV2) continue;
 			libWrapper.register(CONSTANTS.MODULE_NAME, override, sheetOverrideMethod, "MIXED");
 		} catch (err) {
 			Helpers.custom_warning(`Could not override "${override}" due to error:\n${err}`)
 		}
 	}
 
-	const dragDrop = CONSTANTS.IS_V13
-		? "foundry.applications.ux.DragDrop.implementation"
-		: "DragDrop.prototype.callback";
+	const dragDrop = "foundry.applications.ux.DragDrop.implementation.prototype.callback";
 
 	libWrapper.register(CONSTANTS.MODULE_NAME, dragDrop, function (wrapped, event, type) {
 		const result = wrapped(event, type)

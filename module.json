@@ -5,9 +5,9 @@
   "version": "100.0.0",
   "library": "false",
   "compatibility": {
-    "minimum": "12",
-    "verified": "13",
-    "maximum": "13"
+    "minimum": "13",
+    "verified": "14",
+    "maximum": "14"
   },
   "authors": [
     {

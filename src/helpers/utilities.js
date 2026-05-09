@@ -8,7 +8,7 @@ export function getActor(target) {
 	if (target instanceof Actor) return target;
 	let targetDoc = target;
 	if (stringIsUuid(target)) {
-		targetDoc = fromUuidSync(target);
+		targetDoc = foundry.utils.fromUuidSync(target);
 		if (!targetDoc && deletedActorCache.has(target)) {
 			return deletedActorCache.get(target);
 		}
@@ -23,14 +23,14 @@ export function getActor(target) {
  * @returns {PlaceableObject|foundry.abstract.Document}
  */
 export function getToken(documentUuid) {
-	let doc = fromUuidSync(documentUuid);
+	let doc = foundry.utils.fromUuidSync(documentUuid);
 	doc = doc?.token ?? doc;
 	return doc instanceof TokenDocument ? doc?.object ?? doc : doc;
 }
 
 export function getDocument(target) {
 	if (stringIsUuid(target)) {
-		target = fromUuidSync(target);
+		target = foundry.utils.fromUuidSync(target);
 	}
 	return target?.document ?? target;
 }
@@ -426,7 +426,7 @@ export async function createFoldersFromNames(folders, type = "Actor") {
 
 export function getSourceActorFromDropData(dropData) {
 	if (dropData.uuid) {
-		const doc = fromUuidSync(dropData.uuid);
+		const doc = foundry.utils.fromUuidSync(dropData.uuid);
 		if (doc instanceof Actor) {
 			return doc;
 		} else if (doc instanceof TokenDocument) {
@@ -438,7 +438,7 @@ export function getSourceActorFromDropData(dropData) {
 	} else if (dropData.tokenId) {
 		if (dropData.sceneId) {
 			const uuid = `Scene.${dropData.sceneId}.Token.${dropData.tokenId}`;
-			return fromUuidSync(uuid)?.actor;
+			return foundry.utils.fromUuidSync(uuid)?.actor;
 		}
 		return canvas.tokens.get(dropData.tokenId).actor;
 	} else if (dropData.actorId) {

@@ -95,11 +95,7 @@ export function debug(msg, args = "") {
 
 export function custom_notify(message) {
 	message = `Item Piles | ${message}`;
-	if (CONSTANTS.IS_V13) {
-		ui.notifications.notify(message, "info", { console: false });
-	} else {
-		ui.notifications.notify(message, { console: false });
-	}
+	ui.notifications.notify(message, "info", { console: false });
 	console.log(message.replace("<br>", "\n"));
 }
 
@@ -164,7 +160,9 @@ export function clamp(num, min, max) {
 }
 
 export function getActiveApps(id, single = false) {
-	const apps = Object.values(ui.windows).filter(app => app.id.startsWith(id) && app._state > Application.RENDER_STATES.CLOSED);
+	const ApplicationV1 = foundry.appv1?.api?.Application ?? globalThis.Application;
+	const closedState = ApplicationV1?.RENDER_STATES?.CLOSED ?? -1;
+	const apps = Object.values(ui.windows).filter(app => app.id.startsWith(id) && app._state > closedState);
 	if (single) {
 		return apps?.[0] ?? false;
 	}
@@ -180,12 +178,14 @@ export function getActiveApps(id, single = false) {
  */
 export async function getFiles(inFile, { applyWildCard = false, softFail = false } = {}) {
 
+	const FilePickerImpl = foundry.applications.apps.FilePicker.implementation;
+
 	let source = 'data';
 	const browseOptions = { wildcard: applyWildCard };
 
 	if (/\.s3\./.test(inFile)) {
 		source = 's3'
-		const { bucket, keyPrefix } = FilePicker.parseS3URL(inFile);
+		const { bucket, keyPrefix } = FilePickerImpl.parseS3URL(inFile);
 		if (bucket) {
 			browseOptions.bucket = bucket;
 			inFile = keyPrefix;
@@ -193,7 +193,7 @@ export async function getFiles(inFile, { applyWildCard = false, softFail = false
 	}
 
 	try {
-		return (await FilePicker.browse(source, inFile, browseOptions)).files;
+		return (await FilePickerImpl.browse(source, inFile, browseOptions)).files;
 	} catch (err) {
 		if (softFail) return false;
 		throw custom_error(`Could not get files! | ${err}`);

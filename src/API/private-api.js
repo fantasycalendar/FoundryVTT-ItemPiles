@@ -1156,7 +1156,7 @@ export default class PrivateAPI {
 
 		foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity ?? 1);
 		const containerItems = [itemData.item];
-		const item = fromUuidSync(itemData.uuid);
+		const item = foundry.utils.fromUuidSync(itemData.uuid);
 		const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
 		if (handler) handler({ item, items: containerItems });
 		const items = containerItems.map(item => ({
@@ -1180,7 +1180,7 @@ export default class PrivateAPI {
 				});
 				targetUuid = await this._createItemPile({
 					sceneId, position, items: itemsDropped, tokenOverrides: {
-						elevation: elevation || fromUuidSync(sourceUuid)?.elevation || 0
+						elevation: elevation || foundry.utils.fromUuidSync(sourceUuid)?.elevation || 0
 					}, checkContainers: false
 				})
 			}
@@ -1316,7 +1316,7 @@ export default class PrivateAPI {
 
 		} else {
 
-			pileActor = await fromUuid(actor);
+			pileActor = await foundry.utils.fromUuid(actor);
 
 			if (!pileActor) {
 				throw Helpers.custom_error("Could not find actor with UUID " + actor);
@@ -1438,7 +1438,7 @@ export default class PrivateAPI {
 
 		for (const targetUuid of targetUuids) {
 
-			const target = fromUuidSync(targetUuid);
+			const target = foundry.utils.fromUuidSync(targetUuid);
 
 			let targetItemPileSettings = PileUtilities.getActorFlagData(target);
 
@@ -1516,7 +1516,7 @@ export default class PrivateAPI {
 
 		for (const targetUuid of targetUuids) {
 
-			let target = fromUuidSync(targetUuid);
+			let target = foundry.utils.fromUuidSync(targetUuid);
 
 			let specificPileSettings = PileUtilities.getActorFlagData(target);
 			specificPileSettings.enabled = false;
@@ -1614,7 +1614,7 @@ export default class PrivateAPI {
 
 		const target = Utilities.getToken(targetUuid);
 
-		const interactingToken = interactingTokenUuid ? fromUuidSync(interactingTokenUuid) : false;
+		const interactingToken = interactingTokenUuid ? foundry.utils.fromUuidSync(interactingTokenUuid) : false;
 
 		if (foundry.utils.isEmpty(diffData)) return false;
 
@@ -1723,17 +1723,17 @@ export default class PrivateAPI {
 		}
 		// Reformat macro data to contain useful information
 		if (macroData.source) {
-			macroData.source = fromUuidSync(macroData.source);
+			macroData.source = foundry.utils.fromUuidSync(macroData.source);
 		}
 
 		if (Array.isArray(macroData.target)) {
 
-			macroData.target = macroData.target.map(target => fromUuidSync(target));
+			macroData.target = macroData.target.map(target => foundry.utils.fromUuidSync(target));
 
 		} else {
 
 			if (macroData.target) {
-				macroData.target = fromUuidSync(macroData.target);
+				macroData.target = foundry.utils.fromUuidSync(macroData.target);
 			}
 
 			const sourceActor = macroData.source instanceof TokenDocument ? macroData.source.actor : macroData.source;
@@ -2351,7 +2351,7 @@ export default class PrivateAPI {
 		if (useDefaultCharacter) {
 			inspectingTarget = Utilities.getUserCharacter();
 		} else {
-			inspectingTarget = inspectingTargetUuid ? fromUuidSync(inspectingTargetUuid) : false;
+			inspectingTarget = inspectingTargetUuid ? foundry.utils.fromUuidSync(inspectingTargetUuid) : false;
 		}
 
 		const hookResult = Hooks.call(CONSTANTS.HOOKS.PRE_RENDER_INTERFACE, target, inspectingTarget)
