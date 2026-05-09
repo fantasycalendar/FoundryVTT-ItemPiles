@@ -76,7 +76,7 @@ export class PileItem extends PileBaseItem {
 		super.setupStores();
 		this.item = item;
 		this.itemDocument = new TJSDocument(this.item);
-		this.canStack = PileUtilities.canItemStack(this.item, this.actor);
+		this.canStack = PileUtilities.canItemStack(this.item, this.store.actor);
 		this.presentFromTheStart.set(Utilities.getItemQuantity(this.item) > 0 || !this.canStack);
 		this.quantity.set(this.canStack ? Utilities.getItemQuantity(this.item) : 1);
 		this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -335,7 +335,7 @@ export class PileAttribute extends PileBaseItem {
 			this.filtered.set(true);
 		} else if (search) {
 			const nameIsInSearchQuery = name.toLowerCase().includes(search.toLowerCase());
-			const subItemNamesMatchQuery = get(this.subItems).some(item => get(item.filtered));
+			const subItemNamesMatchQuery = get(this.subItems).some(item => !get(item.filtered));
 			this.filtered.set(!(nameIsInSearchQuery || subItemNamesMatchQuery));
 		} else {
 			this.filtered.set(!presentFromTheStart && quantity === 0);
