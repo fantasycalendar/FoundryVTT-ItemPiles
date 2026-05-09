@@ -35,6 +35,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "test": "node --import ./tests/register-loader.mjs --test tests/*.test.mjs"
   }
 }
