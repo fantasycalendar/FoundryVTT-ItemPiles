@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 function deepClone(value) {
-	return value === undefined ? undefined : structuredClone(value);
+	if (value === undefined || value === null || typeof value !== 'object') return value;
+	if (Array.isArray(value)) return value.map(deepClone);
+	return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, deepClone(entry)]));
 }
 
 function getProperty(source, path) {
@@ -107,9 +109,13 @@ function installFoundryMocks() {
 
 installFoundryMocks();
 
-const [{ getPriceData }, { PileItem }] = await Promise.all([
+const [{ getPriceData }, { PileItem }, { default: PrivateAPI }, { default: ItemPileSocket }, { SYSTEMS }, { default: dnd5e }] = await Promise.all([
 	import('../src/helpers/pile-utilities.js'),
-	import('../src/stores/pile-item.js')
+	import('../src/stores/pile-item.js'),
+	import('../src/API/private-api.js'),
+	import('../src/socket.js'),
+	import('../src/systems.js'),
+	import('../systems/dnd5e-4.0.0.js')
 ]);
 
 test('selling an item uses the matching merchant inventory item sell price modifier', () => {
@@ -294,4 +300,77 @@ test('non-owner item preview sheets disable close-time submission', async () => 
 	assert.equal(constructedSheet.options.editable, false);
 	assert.equal(constructedSheet.options.submitOnClose, false);
 	assert.equal(constructedSheet.options.submitOnChange, false);
+});
+
+
+test('dropping a D&D5e container from Quick Insert creates a pile when serialized contents are not iterable', async () => {
+	const originalSystemId = game.system.id;
+	const originalSystemVersion = game.system.version;
+	const originalCurrentSystem = SYSTEMS._currentSystem;
+	const originalSupportedDnd5e = SYSTEMS.SUPPORTED_SYSTEMS.dnd5e;
+	const originalFromUuidSync = foundry.utils.fromUuidSync;
+	const originalCreateItemPile = PrivateAPI._createItemPile;
+	const originalSocket = ItemPileSocket.socket;
+	const originalItem = globalThis.Item;
+
+	let createdPileArgs;
+	let hookArgs;
+	const containerFromQuickInsert = {
+		_id: 'quick-insert-chest',
+		uuid: 'Compendium.dnd5e.items.quick-insert-chest',
+		name: 'Chest',
+		type: 'container',
+		system: {
+			quantity: { value: 1 },
+			// Quick Insert / compendium drops can expose the D&D5e container contents
+			// as serialized source data instead of the iterable collection available on
+			// live item documents. This used to throw before the pile was created.
+			contents: {}
+		}
+	};
+
+	try {
+		globalThis.Item = class Item {};
+		game.system.id = 'dnd5e';
+		game.system.version = '5.2.5';
+		SYSTEMS._currentSystem = false;
+		SYSTEMS.SUPPORTED_SYSTEMS.dnd5e = { latest: dnd5e };
+		foundry.utils.fromUuidSync = uuid => uuid === containerFromQuickInsert.uuid ? containerFromQuickInsert : undefined;
+		PrivateAPI._createItemPile = async (args) => {
+			createdPileArgs = args;
+			return 'Scene.test.Token.created-pile';
+		};
+		ItemPileSocket.socket = {
+			executeForEveryone(...args) {
+				hookArgs = args;
+			}
+		};
+
+		const result = await PrivateAPI._dropItems({
+			userId: 'test-user',
+			sceneId: 'test-scene',
+			position: { x: 1200, y: 900 },
+			itemData: {
+				uuid: containerFromQuickInsert.uuid,
+				quantity: 1,
+				item: deepClone(containerFromQuickInsert)
+			}
+		});
+
+		assert.equal(result.targetUuid, 'Scene.test.Token.created-pile');
+		assert.deepEqual(result.position, { x: 1200, y: 900 });
+		assert.equal(createdPileArgs.items.length, 1);
+		assert.equal(createdPileArgs.items[0]._id, 'quick-insert-chest');
+		assert.deepEqual(createdPileArgs.items[0].system.contents, {});
+		assert.equal(hookArgs[0], ItemPileSocket.HANDLERS.CALL_HOOK);
+	} finally {
+		game.system.id = originalSystemId;
+		game.system.version = originalSystemVersion;
+		SYSTEMS._currentSystem = originalCurrentSystem;
+		SYSTEMS.SUPPORTED_SYSTEMS.dnd5e = originalSupportedDnd5e;
+		foundry.utils.fromUuidSync = originalFromUuidSync;
+		PrivateAPI._createItemPile = originalCreateItemPile;
+		ItemPileSocket.socket = originalSocket;
+		globalThis.Item = originalItem;
+	}
 });

@@ -67,10 +67,13 @@ export default {
 		"container": {
 			[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY]: true,
 			[CONSTANTS.ITEM_TYPE_METHODS.CONTENTS]: ({ item }) => {
-				return item.system.contents;
+				// Quick Insert may provide serialized containers whose contents are plain objects instead of iterable document collections.
+				const contents = item.system.contents;
+				return contents?.[Symbol.iterator] ? contents : [];
 			},
 			[CONSTANTS.ITEM_TYPE_METHODS.TRANSFER]: ({ item, items }) => {
-				for (const containedItem of item.system.contents) {
+				const contents = item.system.contents?.[Symbol.iterator] ? item.system.contents : [];
+				for (const containedItem of contents) {
 					items.push(containedItem.toObject());
 				}
 			}
