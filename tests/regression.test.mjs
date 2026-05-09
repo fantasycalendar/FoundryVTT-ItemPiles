@@ -223,5 +223,75 @@ test('non-owner item previews instantiate a read-only sheet from the item sheet 
 	assert.equal(constructedItem.document, constructedItem);
 	assert.equal(constructedItem.data.ownership['test-user'], 1);
 	assert.equal(constructedSheet.item, constructedItem);
-	assert.deepEqual(constructedSheet.options, { editable: false });
+	assert.deepEqual(constructedSheet.options, {
+		editable: false,
+		submitOnClose: false,
+		submitOnChange: false
+	});
+});
+
+
+test('non-owner item preview sheets disable close-time submission', async () => {
+	let constructedSheet;
+
+	class TestItem {
+		constructor(data, options) {
+			this.data = data;
+			this.options = options;
+			this.parent = options.parent;
+		}
+
+		_getSheetClass() {
+			return class TestSheet {
+				constructor(item, options) {
+					this.item = item;
+					this.options = options;
+					constructedSheet = this;
+				}
+
+				_render() {
+					return this;
+				}
+
+				close() {
+					// This mirrors systems like Custom System Builder whose sheets submit on
+					// close by default. A read-only preview must opt out, otherwise the
+					// synthetic non-owner item attempts a forbidden update and remains open.
+					if (this.options.submitOnClose !== false) {
+						throw new Error('read-only item preview attempted to submit on close');
+					}
+					return 'closed';
+				}
+			};
+		}
+	}
+	globalThis.Item = { implementation: TestItem };
+
+	const originalItem = {
+		isOwner: false,
+		parent: { id: 'csb-pile-parent' },
+		toObject: () => ({
+			_id: 'csb-preview-item',
+			name: 'CSB Preview Item',
+			type: 'equippableItem'
+		})
+	};
+	const context = {
+		item: originalItem,
+		store: {
+			pileData: {
+				subscribe(callback) {
+					callback({ canInspectItems: true });
+					return () => undefined;
+				}
+			}
+		}
+	};
+
+	await PileItem.prototype.preview.call(context);
+
+	assert.equal(constructedSheet.close(), 'closed');
+	assert.equal(constructedSheet.options.editable, false);
+	assert.equal(constructedSheet.options.submitOnClose, false);
+	assert.equal(constructedSheet.options.submitOnChange, false);
 });
