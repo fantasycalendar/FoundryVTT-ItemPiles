@@ -1,5 +1,16 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+
+test('drop zones do not cancel dragstart events from slotted item rows', async () => {
+	const dropZoneSource = await readFile(new URL('../src/applications/components/DropZone.svelte', import.meta.url), 'utf8');
+
+	// Item pile inventory rows are draggable children inside DropZone. The bug in
+	// issue #795 was caused by DropZone preventing every bubbling dragstart event,
+	// which left the row highlighted but cancelled Foundry's item drag operation.
+	assert.match(dropZoneSource, /on:dragstart\|self\|preventDefault/);
+	assert.doesNotMatch(dropZoneSource, /on:dragstart\|preventDefault(?:\s|$)/);
+});
 
 function deepClone(value) {
 	if (value === undefined || value === null || typeof value !== 'object') return value;
