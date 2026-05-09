@@ -24,7 +24,10 @@ jobs:
       - name: Extract version and body from changelog
         id: changelog
         run: |
-          VERSION=$(awk '/^## Version / { sub(/^## Version /, ""); print; exit }' changelog.md)
+          # Normalize CRLF -> LF so awk doesn't carry \r into the version/body.
+          tr -d '\r' < changelog.md > changelog.lf.md
+
+          VERSION=$(awk '/^## Version / { sub(/^## Version /, ""); print; exit }' changelog.lf.md)
 
           if [ -z "$VERSION" ]; then
             echo "::error::Could not find a '## Version X.Y.Z' header in changelog.md"
@@ -38,7 +41,7 @@ jobs:
               next
             }
             seen { print }
-          ' changelog.md)
+          ' changelog.lf.md)
 
           BODY=$(echo "$BODY" | sed -e '/./,$!d' | sed -e :a -e '/^$/{$d;N;ba' -e '}')
 
