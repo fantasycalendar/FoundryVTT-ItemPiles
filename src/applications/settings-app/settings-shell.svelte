@@ -61,7 +61,7 @@
 		const currencies = settings[SETTINGS.CURRENCIES].value.concat(settings[SETTINGS.SECONDARY_CURRENCIES].value)
 		for (const currency of currencies) {
 			if (!currency.data?.uuid) continue;
-			const actualItem = await fromUuid(currency.data?.uuid);
+			const actualItem = await foundry.utils.fromUuid(currency.data?.uuid);
 			try {
 				await actualItem.update({
 					name: currency.name,

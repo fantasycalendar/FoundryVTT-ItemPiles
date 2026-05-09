@@ -25,7 +25,6 @@ import { SvelteApplication } from "#runtime/svelte/application";
 import { TJSPosition } from "#runtime/svelte/store/position";
 
 Hooks.once("init", async () => {
-	CONSTANTS.IS_V13 = foundry.utils.isNewerVersion(game.version, 13);
 	Object.freeze(CONSTANTS);
 
 	//CONFIG.debug.hooks = true;
@@ -53,36 +52,35 @@ Hooks.once("init", async () => {
 
 	window.ItemPiles = Helpers.deprecate({ API }, "API", "window.ItemPiles.API has been deprecated, please use game.itempiles.API instead")
 
-	if (CONSTANTS.IS_V13) {
-		window.MIN_WINDOW_WIDTH = 200;
-		window.MIN_WINDOW_HEIGHT = 50;
-		Object.defineProperty(SvelteApplication, 'defaultOptions', {
-			get: () => {
-				return foundry.utils.mergeObject(Application.defaultOptions, {
-					// Copied directly from TRL except for minWidth and minHeight
-					defaultCloseAnimation: true,
-					draggable: true,
-					focusAuto: true,
-					focusKeep: false,
-					focusSource: void 0,
-					focusTrap: true,
-					headerButtonNoClose: false,
-					headerButtonNoLabel: false,
-					headerIcon: void 0,
-					headerNoTitleMinimized: false,
-					minHeight: 50, // MIN_WINDOW_HEIGHT
-					minWidth: 200, // MIN_WINDOW_WIDTH
-					positionable: true,
-					positionInitial: TJSPosition.Initial.browserCentered,
-					positionOrtho: true,
-					positionValidator: TJSPosition.Validators.transformWindow,
-					sessionStorage: void 0,
-					svelte: void 0,
-					transformOrigin: "top left"
-				}, { inPlace: false });
-			}
-		});
-	}
+	window.MIN_WINDOW_WIDTH = 200;
+	window.MIN_WINDOW_HEIGHT = 50;
+	const ApplicationV1 = foundry.appv1?.api?.Application ?? globalThis.Application;
+	Object.defineProperty(SvelteApplication, 'defaultOptions', {
+		get: () => {
+			return foundry.utils.mergeObject(ApplicationV1.defaultOptions, {
+				// TRL defaults reproduced verbatim with overridden minWidth/minHeight.
+				defaultCloseAnimation: true,
+				draggable: true,
+				focusAuto: true,
+				focusKeep: false,
+				focusSource: void 0,
+				focusTrap: true,
+				headerButtonNoClose: false,
+				headerButtonNoLabel: false,
+				headerIcon: void 0,
+				headerNoTitleMinimized: false,
+				minHeight: 50, // MIN_WINDOW_HEIGHT
+				minWidth: 200, // MIN_WINDOW_WIDTH
+				positionable: true,
+				positionInitial: TJSPosition.Initial.browserCentered,
+				positionOrtho: true,
+				positionValidator: TJSPosition.Validators.transformWindow,
+				sessionStorage: void 0,
+				svelte: void 0,
+				transformOrigin: "top left"
+			}, { inPlace: false });
+		}
+	});
 });
 
 Hooks.once("ready", () => {

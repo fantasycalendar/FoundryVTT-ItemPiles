@@ -15,7 +15,8 @@
 			return;
 		}
 		if (!filePicker) {
-			filePicker = new FilePicker({
+			const FilePickerImpl = foundry.applications.apps.FilePicker.implementation;
+			filePicker = new FilePickerImpl({
 				type: type,
 				current: value,
 				callback: path => {

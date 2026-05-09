@@ -14,7 +14,7 @@
 	export let elementRoot;
 
 	const priceModifiers = writable(data.map(data => {
-		data.actor = globalThis.fromUuidSync(data.actorUuid);
+		data.actor = foundry.utils.fromUuidSync(data.actorUuid);
 		if (!data.actor) return false;
 		return data;
 	}).filter(Boolean));

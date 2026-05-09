@@ -26,7 +26,7 @@
 	let images = [];
 
 	async function loadImages() {
-		const data = await FilePicker.browse("public", "icons/weapons/swords/*.webp", { wildcard: true });
+		const data = await foundry.applications.apps.FilePicker.implementation.browse("public", "icons/weapons/swords/*.webp", { wildcard: true });
 		images = data.files;
 	}
 

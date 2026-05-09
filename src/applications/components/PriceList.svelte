@@ -128,7 +128,7 @@
 
 	async function editItem(index) {
 		const data = prices[index].data;
-		let item = await fromUuid(data.uuid);
+		let item = await foundry.utils.fromUuid(data.uuid);
 		item.sheet.render(true);
 	}
 

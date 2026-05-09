@@ -108,7 +108,7 @@ export default class ItemPileStore {
 
 	async onDropFolder(data) {
 
-		let droppedFolder = await fromUuid(data.uuid);
+		let droppedFolder = await foundry.utils.fromUuid(data.uuid);
 		if (!droppedFolder) return;
 		let itemsToAdd = [];
 		let currenciesToAdd = [];
@@ -120,7 +120,7 @@ export default class ItemPileStore {
 				case "Item":
 					let itemResults = [];
 					for (let item of folder.contents) {
-						let result = await fromUuid(item.uuid);
+						let result = await foundry.utils.fromUuid(item.uuid);
 						itemResults.push(result)
 					}
 					itemsToAdd = itemResults.deepFlatten();
@@ -174,8 +174,11 @@ export default class ItemPileStore {
 		}
 
 		if (data.type === "Actor" && game.user.isGM) {
-			const newRecipient = data.uuid ? (await fromUuid(data.uuid)) : game.actors.get(data.id);
-			return store.updateRecipient(newRecipient)
+			const newRecipient = data.uuid
+				? await foundry.utils.fromUuid(data.uuid)
+				: game.actors.get(data.id);
+			if (!newRecipient) return;
+			return this.updateRecipient(newRecipient);
 		}
 
 		if (data.type !== "Item") {

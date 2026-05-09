@@ -276,7 +276,7 @@ async function callHook(hook, ...args) {
 	const newArgs = [];
 	for (let arg of args) {
 		if (stringIsUuid(arg)) {
-			const testArg = fromUuidSync(arg);
+			const testArg = foundry.utils.fromUuidSync(arg);
 			if (testArg) {
 				arg = testArg;
 			}

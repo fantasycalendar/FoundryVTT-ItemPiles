@@ -108,7 +108,7 @@ export default class CurrencyStore {
 		const data = currencies[index].data;
 		let item;
 		if (data.uuid) {
-			item = await fromUuid(data.uuid);
+			item = await foundry.utils.fromUuid(data.uuid);
 		} else {
 			let itemData = data.item;
 			if (itemData._id) delete itemData._id;

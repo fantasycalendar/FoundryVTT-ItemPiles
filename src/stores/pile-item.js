@@ -22,6 +22,11 @@ class PileBaseItem {
 		this.setup(data);
 	}
 
+	/** The pile's actor that owns this entry. */
+	get actor() {
+		return this.store.actor;
+	}
+
 	setupStores() {
 		this.category = writable({ service: false, type: "", label: "" });
 		this.quantity = writable(1);
@@ -236,21 +241,9 @@ export class PileItem extends PileBaseItem {
 	preview() {
 		const pileData = get(this.store.pileData);
 		if (!pileData.canInspectItems && !game.user.isGM) return;
-		if (SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER) {
-			if (!SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER(this.item)) {
-				return;
-			}
-		}
-		if (game.user.isGM || this.item.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
-			return this.item.sheet.render(true);
-		}
-		const itemData = this.item.toObject();
-		itemData.ownership[game.user.id] = Helpers.getSetting(SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL);
-		const newItem = new Item.implementation(itemData);
-		newItem.document = newItem;
-		const cls = newItem._getSheetClass();
-		const sheet = new cls(newItem, { editable: false });
-		return sheet?._render ? sheet._render(true) : sheet.render(true);
+		if (SYSTEMS.DATA?.PREVIEW_ITEM_TRANSFORMER && !SYSTEMS.DATA.PREVIEW_ITEM_TRANSFORMER(this.item)) return;
+		const ownership = Helpers.getSetting(SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL);
+		return Utilities.renderReadOnlyItemPreview(this.item, ownership);
 	}
 
 	rendered(element) {
@@ -336,13 +329,15 @@ export class PileAttribute extends PileBaseItem {
 		const quantity = get(this.quantity);
 		if (quantity === 0 && !presentFromTheStart) {
 			this.filtered.set(true);
-		} else if (search) {
-			const nameIsInSearchQuery = name.toLowerCase().includes(search.toLowerCase());
-			const subItemNamesMatchQuery = get(this.subItems).some(item => get(item.filtered));
-			this.filtered.set(!(nameIsInSearchQuery || subItemNamesMatchQuery));
-		} else {
-			this.filtered.set(!presentFromTheStart && quantity === 0);
+			return;
 		}
+		if (!search) {
+			this.filtered.set(!presentFromTheStart && quantity === 0);
+			return;
+		}
+		const nameMatches = name.toLowerCase().includes(search.toLowerCase());
+		const hasVisibleSubItem = get(this.subItems).some(item => get(item.filtered) === false);
+		this.filtered.set(!nameMatches && !hasVisibleSubItem);
 	}
 
 	take() {

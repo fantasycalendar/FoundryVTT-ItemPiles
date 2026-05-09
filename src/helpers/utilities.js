@@ -8,7 +8,7 @@ export function getActor(target) {
 	if (target instanceof Actor) return target;
 	let targetDoc = target;
 	if (stringIsUuid(target)) {
-		targetDoc = fromUuidSync(target);
+		targetDoc = foundry.utils.fromUuidSync(target);
 		if (!targetDoc && deletedActorCache.has(target)) {
 			return deletedActorCache.get(target);
 		}
@@ -23,14 +23,14 @@ export function getActor(target) {
  * @returns {PlaceableObject|foundry.abstract.Document}
  */
 export function getToken(documentUuid) {
-	let doc = fromUuidSync(documentUuid);
+	let doc = foundry.utils.fromUuidSync(documentUuid);
 	doc = doc?.token ?? doc;
 	return doc instanceof TokenDocument ? doc?.object ?? doc : doc;
 }
 
 export function getDocument(target) {
 	if (stringIsUuid(target)) {
-		target = fromUuidSync(target);
+		target = foundry.utils.fromUuidSync(target);
 	}
 	return target?.document ?? target;
 }
@@ -426,7 +426,7 @@ export async function createFoldersFromNames(folders, type = "Actor") {
 
 export function getSourceActorFromDropData(dropData) {
 	if (dropData.uuid) {
-		const doc = fromUuidSync(dropData.uuid);
+		const doc = foundry.utils.fromUuidSync(dropData.uuid);
 		if (doc instanceof Actor) {
 			return doc;
 		} else if (doc instanceof TokenDocument) {
@@ -438,7 +438,7 @@ export function getSourceActorFromDropData(dropData) {
 	} else if (dropData.tokenId) {
 		if (dropData.sceneId) {
 			const uuid = `Scene.${dropData.sceneId}.Token.${dropData.tokenId}`;
-			return fromUuidSync(uuid)?.actor;
+			return foundry.utils.fromUuidSync(uuid)?.actor;
 		}
 		return canvas.tokens.get(dropData.tokenId).actor;
 	} else if (dropData.actorId) {
@@ -545,4 +545,33 @@ export function ensureValidIds(actor, itemsToCreate) {
 
 export function isRealNumber(inNumber) {
 	return !isNaN(inNumber) && typeof inNumber === "number" && isFinite(inNumber);
+}
+
+/**
+ * Render an item's sheet in read-only mode for users that don't own the item.
+ *
+ * Item Piles synthesizes a temporary Item document with elevated ownership for
+ * the viewing user, then opens its sheet. The synthetic document is detached
+ * from any compendium/world store, so anything that triggers a write (sheet
+ * close handlers that submit forms, change handlers, etc) must be suppressed.
+ *
+ * @param {Item} sourceItem               The real item being previewed.
+ * @param {number} ownershipLevel         Ownership level granted to the current user (defaults to LIMITED).
+ * @returns {Application|ApplicationV2|undefined}  The rendered sheet, or undefined if the original item was already owned.
+ */
+export function renderReadOnlyItemPreview(sourceItem, ownershipLevel = CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED) {
+	if (!sourceItem) return;
+	if (sourceItem.isOwner) {
+		return sourceItem.sheet.render(true);
+	}
+	const itemData = sourceItem.toObject();
+	itemData.ownership = { ...(itemData.ownership ?? {}), [game.user.id]: ownershipLevel };
+	const previewItem = new Item.implementation(itemData, { parent: sourceItem.parent ?? undefined });
+	const sheet = previewItem.sheet;
+	if (sheet?.options) {
+		sheet.options.editable = false;
+		sheet.options.submitOnChange = false;
+		sheet.options.submitOnClose = false;
+	}
+	return sheet.render(true, { editable: false });
 }
