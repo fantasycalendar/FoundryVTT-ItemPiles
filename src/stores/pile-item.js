@@ -245,8 +245,15 @@ export class PileItem extends PileBaseItem {
 			return this.item.sheet.render(true);
 		}
 		const itemData = this.item.toObject();
+		itemData.ownership ??= {};
 		itemData.ownership[game.user.id] = Helpers.getSetting(SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL);
-		const newItem = new Item.implementation(itemData);
+		const newItem = new Item.implementation(itemData, { parent: this.item.parent });
+		newItem.document = newItem;
+		const ItemSheetClass = newItem._getSheetClass?.();
+		if (ItemSheetClass) {
+			const sheet = new ItemSheetClass(newItem, { editable: false });
+			return sheet?._render ? sheet._render(true) : sheet.render(true);
+		}
 		return newItem.sheet.render(true, { editable: false });
 	}
 

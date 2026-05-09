@@ -1293,8 +1293,15 @@ export function getPriceData({
 
 	} else if (buyerFlagData) {
 
+		const soldItemFlagData = foundry.utils.deepClone(itemFlagData);
+		const merchantItem = buyer?.items ? Utilities.findSimilarItem(buyer.items, item) : false;
+		if (merchantItem) {
+			const merchantItemFlagData = getItemFlagData(merchantItem);
+			soldItemFlagData.sellPriceModifier = merchantItemFlagData.sellPriceModifier ?? 1.0;
+		}
+
 		modifier = getMerchantModifiersForActor(buyer, {
-			item, actor: seller, pileFlagData: buyerFlagData, itemFlagData
+			item, actor: seller, pileFlagData: buyerFlagData, itemFlagData: soldItemFlagData
 		}).sellPriceModifier;
 
 	}
