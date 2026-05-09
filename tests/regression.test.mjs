@@ -51,13 +51,14 @@ function installFoundryMocks() {
 			isEmpty: object => !object || Object.keys(object).length === 0,
 			debounce: fn => fn,
 			fromUuidSync: () => undefined,
-			randomID: () => 'test-id'
+			randomID: () => 'test-id',
+			isNewerVersion: () => false
 		}
 	};
 
 	globalThis.game = {
 		system: { id: 'test-system', version: '1.0.0' },
-		user: { id: 'test-user', isGM: false },
+		user: { id: 'test-user', name: 'Test User', isGM: false },
 		users: [],
 		actors: [],
 		scenes: [],
@@ -104,16 +105,20 @@ function installFoundryMocks() {
 	globalThis.Item = class Item {};
 	globalThis.FormApplication = class FormApplication {};
 	globalThis.Application = class Application {};
-	globalThis.CONST = { DOCUMENT_OWNERSHIP_LEVELS: { OWNER: 3 } };
+	globalThis.CONST = {
+		DOCUMENT_OWNERSHIP_LEVELS: { OWNER: 3 },
+		CHAT_MESSAGE_STYLES: { OTHER: 'OTHER' }
+	};
 }
 
 installFoundryMocks();
 
-const [{ getPriceData }, { PileItem }, { default: PrivateAPI }, { default: ItemPileSocket }, { SYSTEMS }, { default: dnd5e }] = await Promise.all([
+const [{ getPriceData }, { PileItem }, { default: PrivateAPI }, { default: ItemPileSocket }, { default: ChatAPI }, { SYSTEMS }, { default: dnd5e }] = await Promise.all([
 	import('../src/helpers/pile-utilities.js'),
 	import('../src/stores/pile-item.js'),
 	import('../src/API/private-api.js'),
 	import('../src/socket.js'),
+	import('../src/API/chat-api.js'),
 	import('../src/systems.js'),
 	import('../systems/dnd5e-4.0.0.js')
 ]);
@@ -372,5 +377,135 @@ test('dropping a D&D5e container from Quick Insert creates a pile when serialize
 		PrivateAPI._createItemPile = originalCreateItemPile;
 		ItemPileSocket.socket = originalSocket;
 		globalThis.Item = originalItem;
+	}
+});
+
+
+test('restricted pickup output does not update a previously public chat card', async () => {
+	const originalSettingsGet = game.settings.get;
+	const originalUsers = game.users;
+	const originalMessages = game.messages;
+	const originalFromUuidSync = foundry.utils.fromUuidSync;
+	const originalRenderTemplate = globalThis.renderTemplate;
+	const originalChatMessage = globalThis.ChatMessage;
+	const originalItem = globalThis.Item;
+
+	const sourceActor = { uuid: 'Actor.pile', name: 'Loot Pile' };
+	const targetActor = { uuid: 'Actor.looter', name: 'Looter' };
+	let outputMode = 2;
+	let createdMessages = [];
+	let publicMessageUpdate;
+
+	const users = [
+		{ id: 'gm-user', name: 'Gamemaster', isGM: true },
+		{ id: 'looting-user', name: 'Looter User', isGM: false },
+		{ id: 'bystander-user', name: 'Bystander User', isGM: false }
+	];
+	users.get = id => users.find(user => user.id === id);
+
+	try {
+		game.settings.get = (_namespace, key) => {
+			if (key === 'outputToChat') return outputMode;
+			if (key === 'itemPreviewPermissionLevel') return 1;
+			return undefined;
+		};
+		game.users = users;
+		game.user = { id: 'gm-user', name: 'Gamemaster', isGM: true };
+		foundry.utils.fromUuidSync = uuid => ({
+			[sourceActor.uuid]: sourceActor,
+			[targetActor.uuid]: targetActor
+		}[uuid]);
+		globalThis.renderTemplate = async (_template, data) => JSON.stringify(data);
+		globalThis.Item = class Item {};
+		globalThis.ChatMessage = {
+			getSpeaker: ({ alias }) => ({ alias }),
+			create: async (chatData) => {
+				createdMessages.push(chatData);
+				return chatData;
+			}
+		};
+
+		const existingPublicMessage = {
+			id: 'public-message',
+			timestamp: Date.now(),
+			whisper: [],
+			flags: {
+				'item-piles': {
+					data: {
+						version: 'test',
+						source: sourceActor.uuid,
+						target: targetActor.uuid,
+						interactionId: 'same-pickup',
+						items: [{ name: 'Old Coin', img: 'coin.png', quantity: 1 }],
+						currencies: []
+					}
+				}
+			},
+			update(update) {
+				publicMessageUpdate = update;
+				return update;
+			}
+		};
+		game.messages = [existingPublicMessage];
+
+		await ChatAPI._outputPickupToChat(
+			sourceActor.uuid,
+			targetActor.uuid,
+			[{ name: 'Secret Gem', img: 'gem.png', quantity: 1 }],
+			[],
+			'looting-user',
+			'same-pickup'
+		);
+
+		assert.equal(publicMessageUpdate, undefined);
+		assert.equal(createdMessages.length, 1);
+		assert.deepEqual(createdMessages[0].whisper, ['gm-user', 'looting-user']);
+		assert.equal(createdMessages[0]['flags.item-piles.data'].interactionId, 'same-pickup');
+		assert.deepEqual(createdMessages[0]['flags.item-piles.data'].items, [{
+			name: 'Secret Gem',
+			img: 'gem.png',
+			quantity: 1
+		}]);
+
+		outputMode = 3;
+		createdMessages = [];
+		publicMessageUpdate = undefined;
+
+		await ChatAPI._outputPickupToChat(
+			sourceActor.uuid,
+			targetActor.uuid,
+			[{ name: 'Secret Gem', img: 'gem.png', quantity: 1 }],
+			[],
+			'looting-user',
+			'same-pickup'
+		);
+
+		assert.equal(publicMessageUpdate, undefined);
+		assert.equal(createdMessages.length, 1);
+		assert.deepEqual(createdMessages[0].whisper, ['gm-user']);
+
+		outputMode = 0;
+		createdMessages = [];
+		publicMessageUpdate = undefined;
+
+		await ChatAPI._outputPickupToChat(
+			sourceActor.uuid,
+			targetActor.uuid,
+			[{ name: 'Secret Gem', img: 'gem.png', quantity: 1 }],
+			[],
+			'looting-user',
+			'same-pickup'
+		);
+
+		assert.equal(publicMessageUpdate, undefined);
+		assert.equal(createdMessages.length, 0);
+	} finally {
+		game.settings.get = originalSettingsGet;
+		game.users = originalUsers;
+		game.messages = originalMessages;
+		foundry.utils.fromUuidSync = originalFromUuidSync;
+		globalThis.renderTemplate = originalRenderTemplate;
+		globalThis.Item = originalItem;
+		globalThis.ChatMessage = originalChatMessage;
 	}
 });

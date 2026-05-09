@@ -265,6 +265,8 @@ export default class ChatAPI {
 	 */
 	static async _outputPickupToChat(sourceUuid, targetUuid, items, currencies, userId, interactionId) {
 
+		if (!this._getOutputToChatMode()) return;
+
 		const sourceActor = Utilities.getActor(sourceUuid);
 		const targetActor = Utilities.getActor(targetUuid);
 
@@ -276,7 +278,7 @@ export default class ChatAPI {
 
 		for (const message of messages) {
 			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
-			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
+			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId && this._messageMatchesOutputVisibility(message, userId)) {
 				return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
 			}
 		}
@@ -353,6 +355,8 @@ export default class ChatAPI {
 	}
 
 	static async _outputSplitToChat(sourceUuid, pileDeltas, actorDeltas, userId) {
+
+		if (!this._getOutputToChatMode()) return;
 
 		const sourceActor = Utilities.getActor(sourceUuid);
 
@@ -446,6 +450,8 @@ export default class ChatAPI {
 
 	static async _outputMerchantTradeToChat(sourceUuid, targetUuid, priceInformation, userId, interactionId) {
 
+		if (!this._getOutputToChatMode()) return;
+
 		const sourceActor = Utilities.getActor(sourceUuid);
 		const targetActor = Utilities.getActor(targetUuid);
 
@@ -459,7 +465,7 @@ export default class ChatAPI {
 
 		for (const message of messages) {
 			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
-			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
+			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId && this._messageMatchesOutputVisibility(message, userId)) {
 				return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
 			}
 		}
@@ -632,21 +638,50 @@ export default class ChatAPI {
 
 	}
 
+	static _getOutputToChatMode() {
+		return Number(Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) || 0;
+	}
+
+	static _getOutputWhisperRecipients(userId, mode = this._getOutputToChatMode()) {
+		if (mode < 2) return [];
+
+		const recipients = Array.from(game.users)
+			.filter(user => user.isGM)
+			.map(user => user.id);
+
+		if (mode === 2) {
+			recipients.push(userId);
+		}
+
+		return Array.from(new Set(recipients));
+	}
+
+	static _messageMatchesOutputVisibility(message, userId) {
+		const mode = this._getOutputToChatMode();
+		if (!mode) return false;
+
+		const expectedWhisper = this._getOutputWhisperRecipients(userId, mode);
+		const messageWhisper = Array.from(new Set(message.whisper ?? []));
+
+		// Existing chat cards are updated in-place to merge repeated pickups / purchases.
+		// Only merge with cards that already have the same visibility as the current
+		// setting; otherwise a newly-private pickup could be appended to an old public
+		// card and remain visible in other players' chat logs.
+		if (expectedWhisper.length !== messageWhisper.length) return false;
+
+		return expectedWhisper.every(recipientId => messageWhisper.includes(recipientId));
+	}
+
 	static _createNewChatMessage(userId, chatData) {
 
-		if (!chatData.whisper) {
+		const mode = this._getOutputToChatMode();
+		if (!mode && !chatData.whisper?.length) return;
 
-			const mode = Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT);
-
-			if (mode > 1) {
-				chatData.whisper = Array.from(game.users)
-					.filter(user => user.isGM)
-					.map(user => user.id);
-				if (mode === 2) {
-					chatData.whisper.push(userId);
-				}
+		if (!chatData.whisper?.length) {
+			const whisper = this._getOutputWhisperRecipients(userId, mode);
+			if (whisper.length) {
+				chatData.whisper = whisper;
 			}
-
 		}
 
 		if (chatData?.whisper?.length) {
