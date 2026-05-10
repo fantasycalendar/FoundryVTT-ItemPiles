@@ -1,5 +1,6 @@
 import SETTINGS from "../constants/settings.js";
 import { getSetting } from "./helpers.js";
+import { findSimilarItem } from "./utilities.js";
 
 const PACK_ID = `world.item-piles-item-backup-do-not-delete`;
 
@@ -72,13 +73,10 @@ export async function findOrCreateItemInCompendium(itemData) {
 	if (!compendiumItem) {
 		compendiumItem = (await addItemsToCompendium([itemData]))[0];
 	}
-	COMPENDIUM_CACHE[compendiumItem.uuid] = itemData;
+	COMPENDIUM_CACHE[compendiumItem.uuid] = compendiumItem.toObject();
 	return compendiumItem;
 }
 
 export function findSimilarItemInCompendiumSync(itemToFind) {
-	return Object.values(COMPENDIUM_CACHE).find(compendiumItem => {
-		return compendiumItem.name === itemToFind.name
-			&& compendiumItem.type === itemToFind.type;
-	}) ?? false;
+	return findSimilarItem(Object.values(COMPENDIUM_CACHE), itemToFind) ?? false;
 }

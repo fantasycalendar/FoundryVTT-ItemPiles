@@ -286,7 +286,7 @@ export function getActorCurrencies(target, {
 	forActor = false, currencyList = false, getAll = false, secondary = true
 } = {}) {
 	const actor = Utilities.getActor(target);
-	const actorUuid = Utilities.getUuid(actor.uuid)
+	const actorUuid = Utilities.getUuid(actor);
 	const actorItems = actor
 		? Array.from(actor.items)
 		: [];
@@ -566,9 +566,9 @@ export function isItemCurrency(item, { target = false, actorCurrencies = false }
 	return !!Utilities.findSimilarItem(currencies, item);
 }
 
-export function getItemCurrencyData(item, { target = false, actorCurrencies = false }) {
+export function getItemCurrencyData(item, { target = false, actorCurrencies = false } = {}) {
 	return (actorCurrencies || getActorCurrencies(item?.parent || false, {
-		forActor: target, getAll: true, combine: true
+		forActor: target, getAll: true
 	}))
 		.filter(currency => currency.type === "item")
 		.find(currency => {
@@ -2129,8 +2129,8 @@ export function canItemFitInVault(item, vaultActor, {
 			}
 		}
 	}
-	const vaultGridData = gridData ?? getVaultGridData(vaultActor);
-	return getNewItemsVaultPosition(item, vaultGridData, { position, items });
+	const vaultGridData = gridData ?? getVaultGridData(vaultActor, { items });
+	return getNewItemsVaultPosition(item, vaultGridData, { position });
 }
 
 export function getNewItemsVaultPosition(item, gridData, { position = null } = {}) {

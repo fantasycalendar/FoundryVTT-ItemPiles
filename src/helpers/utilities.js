@@ -451,7 +451,6 @@ export function getSourceActorFromDropData(dropData) {
 
 export function deleteProperty(object, key) {
 	if (!key || !object) return false;
-	if (key in object) return true;
 	let target = object;
 	const keys = key.split('.');
 	for (let index = 0; index < keys.length; index++) {

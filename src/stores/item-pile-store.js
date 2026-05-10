@@ -620,7 +620,7 @@ export default class ItemPileStore {
 		const result = await DropCurrencyDialog.show(source, target, {
 			localization: !target ? "EditCurrencies" : false,
 			unlimitedCurrencies: !target && game.user.isGM,
-			existingCurrencies: PileUtilities.getActorCurrencies(source, { combine: true }),
+			existingCurrencies: PileUtilities.getActorCurrencies(source),
 			getUpdates: !target
 		});
 		return this._addCurrency(result, source, target);
