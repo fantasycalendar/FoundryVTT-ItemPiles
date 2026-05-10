@@ -278,7 +278,7 @@ export default class ChatAPI {
 
 		for (const message of messages) {
 			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
-			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
+			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId && this._messageMatchesOutputVisibility(message, userId)) {
 				return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
 			}
 		}
@@ -461,7 +461,7 @@ export default class ChatAPI {
 
 		for (const message of messages) {
 			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
-			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
+			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId && this._messageMatchesOutputVisibility(message, userId)) {
 				return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
 			}
 		}
@@ -657,13 +657,16 @@ export default class ChatAPI {
 	 * Whether an existing chat card's whisper set matches what we'd compute for
 	 * the current user under the current OUTPUT_TO_CHAT mode. Used to decide
 	 * whether to merge a new pickup/purchase into the existing card or post a
-	 * fresh one. Merging a private update into a public card would leak.
+	 * fresh one. Merging a private update into a public card would leak, and
+	 * when chat output is "Off" we must not touch any card at all.
 	 *
 	 * @param {ChatMessage} message
 	 * @param {string} userId
 	 * @returns {boolean}
 	 */
 	static _messageMatchesOutputVisibility(message, userId) {
+		const mode = Number(Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) || 0;
+		if (!mode) return false;
 		const expected = this._getOutputWhisperRecipients(userId);
 		const actual = Array.from(new Set(message.whisper ?? []));
 		if (expected.length !== actual.length) return false;
@@ -672,19 +675,15 @@ export default class ChatAPI {
 
 	static _createNewChatMessage(userId, chatData) {
 
-		if (!chatData.whisper) {
+		const mode = Number(Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) || 0;
 
-			const mode = Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT);
+		// Mode 0 means "Off". Suppress unless the caller pre-built a whisper
+		// list (e.g. trade-completion paths that target specific traders).
+		if (!mode && !chatData.whisper?.length) return;
 
-			if (mode > 1) {
-				chatData.whisper = Array.from(game.users)
-					.filter(user => user.isGM)
-					.map(user => user.id);
-				if (mode === 2) {
-					chatData.whisper.push(userId);
-				}
-			}
-
+		if (!chatData.whisper?.length) {
+			const whisper = this._getOutputWhisperRecipients(userId);
+			if (whisper.length) chatData.whisper = whisper;
 		}
 
 		if (chatData?.whisper?.length) {
