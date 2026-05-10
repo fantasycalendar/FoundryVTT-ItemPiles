@@ -265,7 +265,7 @@ class API {
 	 */
 	static setCurrencyDecimalDigits(inDecimalDigits) {
 		if (typeof inDecimalDigits !== "number") {
-			throw Helpers.custom_error("setCurrencyDecimalDigits | inDecimalDigits must be of type string");
+			throw Helpers.custom_error("setCurrencyDecimalDigits | inDecimalDigits must be of type number");
 		}
 		return Helpers.setSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, inDecimalDigits);
 	}
@@ -672,9 +672,11 @@ class API {
 	}
 
 	/**
-	 * Gets all the system item types, including custom item piles item categories
+	 * Gets the primary currency descriptor for the system (or the actor-specific
+	 * primary currency if an actor is provided).
 	 *
-	 * @returns {Array<{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchange: number}>}
+	 * @param {Actor|boolean} [actor=false] Optional actor to resolve the primary currency for.
+	 * @returns {{primary: boolean, name: string, data: Object, img: string, abbreviation: string, exchangeRate: number}|undefined}
 	 */
 	static getPrimaryCurrency(actor = false) {
 		if (actor && actor instanceof Actor) {
@@ -775,11 +777,11 @@ class API {
 		}
 
 		if (typeof actorOverrides !== "object") {
-			throw Helpers.custom_error(`createItemPile | tokenOverrides must be of type object`);
+			throw Helpers.custom_error(`createItemPile | actorOverrides must be of type object`);
 		}
 
 		if (typeof itemPileFlags !== "object") {
-			throw Helpers.custom_error(`createItemPile | tokenOverrides must be of type object`);
+			throw Helpers.custom_error(`createItemPile | itemPileFlags must be of type object`);
 		}
 
 		if (items) {
@@ -870,7 +872,7 @@ class API {
 		if (hookResult === false) return false;
 		if (wasClosed && pileData.openSound) {
 			let sound = pileData.openSound;
-			if (pileData.openSound.includes("*")) {
+			if (pileData.openSound.includes("*") && pileData.openSounds?.length) {
 				sound = Helpers.random_array_element(pileData.openSounds)
 			}
 			AudioHelper.play({ src: sound }, true)
@@ -900,7 +902,7 @@ class API {
 
 		if (wasOpen && pileData.closeSound) {
 			let sound = pileData.closeSound;
-			if (pileData.closeSound.includes("*")) {
+			if (pileData.closeSound.includes("*") && pileData.closeSounds?.length) {
 				sound = Helpers.random_array_element(pileData.closeSounds)
 			}
 			AudioHelper.play({ src: sound }, true)
@@ -954,7 +956,7 @@ class API {
 		if (hookResult === false) return false;
 		if (!wasClosed && pileData.closeSound) {
 			let sound = pileData.closeSound;
-			if (pileData.closeSound.includes("*")) {
+			if (pileData.closeSound.includes("*") && pileData.closeSounds?.length) {
 				sound = Helpers.random_array_element(pileData.closeSounds)
 			}
 			AudioHelper.play({ src: sound }, true)
@@ -1017,7 +1019,7 @@ class API {
 
 		if (pileData.lockedSound) {
 			let sound = pileData.lockedSound;
-			if (pileData.lockedSound.includes("*")) {
+			if (pileData.lockedSound.includes("*") && pileData.lockedSounds?.length) {
 				sound = Helpers.random_array_element(pileData.lockedSounds)
 			}
 			AudioHelper.play({ src: sound }, true);
@@ -1529,7 +1531,7 @@ class API {
 
 			return {
 				id: item._id,
-				quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(itemData), 0),
+				quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(item), 0),
 				flags: foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM)
 			}
 		});
@@ -1665,7 +1667,7 @@ class API {
 
 		Object.entries(attributes).forEach(entry => {
 			const [attribute, quantity] = entry;
-			if (!Helpers.isRealNumber(quantity) && quantity > 0) {
+			if (!Helpers.isRealNumber(quantity) || quantity <= 0) {
 				throw Helpers.custom_error(`addAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
 			}
 		});
@@ -1713,7 +1715,7 @@ class API {
 				if (!foundry.utils.hasProperty(targetActor, attribute)) {
 					throw Helpers.custom_error(`removeAttributes | Could not find attribute ${attribute} on target's actor with UUID "${targetUuid}"`);
 				}
-				if (!Helpers.isRealNumber(quantity) && quantity > 0) {
+				if (!Helpers.isRealNumber(quantity) || quantity <= 0) {
 					throw Helpers.custom_error(`removeAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
 				}
 			});
@@ -1768,7 +1770,7 @@ class API {
 				if (!foundry.utils.hasProperty(sourceActor, attribute)) {
 					throw Helpers.custom_error(`transferAttributes | Could not find attribute ${attribute} on source's actor with UUID "${targetUuid}"`);
 				}
-				if (!Helpers.isRealNumber(quantity) && quantity > 0) {
+				if (!Helpers.isRealNumber(quantity) || quantity <= 0) {
 					throw Helpers.custom_error(`transferAttributes | Attribute "${attribute}" must be of type number and greater than 0`);
 				}
 			});
@@ -1962,7 +1964,7 @@ class API {
 		}
 		currencies.forEach(currency => {
 			if (typeof currency !== "object") {
-				throw Helpers.custom_error("setCurrencies | each entry in inCurrencies must be of type object");
+				throw Helpers.custom_error("getStringFromCurrencies | each entry in currencies must be of type object");
 			}
 			if (typeof currency.cost !== "number") {
 				throw Helpers.custom_error("getStringFromCurrencies | currency.cost must be of type number");
@@ -2313,10 +2315,10 @@ class API {
 			if (!potentialTable) {
 				throw Helpers.custom_error(`rollItemTable | could not find table with string "${table}"`);
 			}
-			if (resetTable && table.startsWith("Compendium")) {
+			rollTable = potentialTable;
+			if (resetTable && rollTable.uuid?.startsWith("Compendium.")) {
 				resetTable = false;
 			}
-			rollTable = potentialTable;
 		}
 
 		if (!(rollTable instanceof RollTable)) {
@@ -2651,7 +2653,7 @@ class API {
 		}
 
 		const buyerActor = Utilities.getActor(buyer);
-		const buyerUuid = Utilities.getUuid(buyer);
+		const buyerUuid = Utilities.getUuid(buyerActor);
 		if (!buyerUuid) {
 			throw Helpers.custom_error(`tradeItems | Could not determine the UUID of the buyer, please provide a valid actor or token`, true);
 		}
