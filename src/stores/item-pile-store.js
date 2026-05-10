@@ -28,12 +28,11 @@ export default class ItemPileStore {
 
 		this.recipient = recipient ? Utilities.getActor(recipient) : false;
 		this.recipientDocument = recipient ? new TJSDocument(this.recipient) : new TJSDocument();
-		this.recipientPileData = writable(recipientPileData);
 
 		this.pileData = writable({});
 		this.shareData = writable({});
 
-		this.recipientPileData = writable({})
+		this.recipientPileData = writable(recipientPileData || {});
 		this.recipientShareData = writable({});
 
 		this.deleted = writable(false);
@@ -361,15 +360,19 @@ export default class ItemPileStore {
 	updateUnlinkedToken() {
 		this.pileData.set(PileUtilities.getActorFlagData(this.actor));
 		this.shareData.set(SharingUtilities.getItemPileSharingData(this.actor));
+		this.allItems.set([]);
+		this.attributes.set([]);
+		this.populateItems();
 		this.refreshItems();
 	}
 
 	updateSource(newSource) {
+		this.unsubscribe();
+		__STORES__.delete(this.uuid);
 		this.uuid = Utilities.getUuid(newSource);
 		this.actor = Utilities.getActor(newSource);
 		this.document.set(this.actor);
 		__STORES__.set(this.uuid, this);
-		this.unsubscribe();
 		this.setupStores();
 		this.setupSubscriptions();
 	}
