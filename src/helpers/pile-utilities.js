@@ -477,7 +477,7 @@ function doesPropertyMatch(propertyValue, filterValue) {
 	if (Array.isArray(propertyValue)) {
 		return propertyValue.some(value => doesPropertyMatch(value, filterValue));
 	}
-	if (Utilities.isRealNumber(propertyValue) && Utilities.isRealNumber(Number(filterValue))) {
+	if (Helpers.isRealNumber(propertyValue) && Helpers.isRealNumber(Number(filterValue))) {
 		return Math.abs(propertyValue - Number(filterValue)) < Number.EPSILON;
 	}
 	return propertyValue === filterValue;
@@ -1304,7 +1304,7 @@ export function getPriceData({
 	const defaultCurrencies = currencies.filter(currency => !currency.secondary);
 
 	let overheadCost = [];
-	if (sellerFlagData.overheadCost?.length) {
+	if (sellerFlagData?.overheadCost?.length) {
 		overheadCost = overheadCost.concat(getItemFlagPriceData(sellerFlagData.overheadCost, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
@@ -1312,7 +1312,7 @@ export function getPriceData({
 		overheadCost = overheadCost.concat(getItemFlagPriceData(itemFlagData.overheadCost, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
-	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice));
+	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData?.onlyAcceptBasePrice));
 	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0 || itemFlagData.sellPrices.filter(priceGroup => priceGroup.length).length > 0 || overheadCost.length > 0;
 
 	// In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
@@ -1430,11 +1430,11 @@ export function getPriceData({
 
 	}
 
-	if (itemFlagData.prices.length && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice))) {
+	if (itemFlagData.prices.length && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData?.onlyAcceptBasePrice))) {
 		priceData = priceData.concat(getItemFlagPriceData(itemFlagData.prices, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
-	if (itemFlagData.sellPrices.length && merchant === buyer && !buyerFlagData.onlyAcceptBasePrice) {
+	if (itemFlagData.sellPrices.length && merchant === buyer && !buyerFlagData?.onlyAcceptBasePrice) {
 		priceData = priceData.concat(getItemFlagPriceData(itemFlagData.sellPrices, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
@@ -1524,7 +1524,7 @@ export function getPriceData({
 				if (price.percent) {
 					const percent = Math.min(1, price.baseCost / 100);
 					const percentQuantity = Math.max(0, Math.floor(attributeQuantity * percent));
-					price.maxQuantity = Math.floor(attributeQuantity / percentQuantity);
+					price.maxQuantity = percentQuantity > 0 ? Math.floor(attributeQuantity / percentQuantity) : 0;
 					price.baseCost = !buyer
 						? price.baseCost
 						: percentQuantity;
@@ -1535,7 +1535,7 @@ export function getPriceData({
 						? price.quantity
 						: percentQuantity;
 				} else {
-					price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
+					price.maxQuantity = price.baseCost > 0 ? Math.floor(attributeQuantity / price.baseCost) : Infinity;
 				}
 
 				priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
@@ -1558,7 +1558,7 @@ export function getPriceData({
 				if (price.percent) {
 					const percent = Math.min(1, price.baseCost / 100);
 					const percentQuantity = Math.max(0, Math.floor(itemQuantity * percent));
-					price.maxQuantity = Math.floor(itemQuantity / percentQuantity);
+					price.maxQuantity = percentQuantity > 0 ? Math.floor(itemQuantity / percentQuantity) : 0;
 					price.baseCost = !buyer
 						? price.baseCost
 						: percentQuantity;
@@ -1569,7 +1569,7 @@ export function getPriceData({
 						? price.quantity
 						: percentQuantity;
 				} else {
-					price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
+					price.maxQuantity = price.baseCost > 0 ? Math.floor(itemQuantity / price.baseCost) : Infinity;
 				}
 
 				priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity);
@@ -1629,12 +1629,10 @@ export function getPaymentData({
 		})
 		.reduce((priceData, priceGroup) => {
 
-			priceData.reasons = [];
-
 			if (!priceGroup.maxQuantity && (buyer || seller) && priceData.canBuy) {
 				priceData.canBuy = false;
 				const reason = (buyer === merchant ? "TheyCantAfford" : "YouCantAfford");
-				priceData.reason.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
+				priceData.reasons.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
 			}
 
 			const primaryPrices = priceGroup.prices.filter(price => !price.secondary && price.cost);
@@ -1715,7 +1713,7 @@ export function getPaymentData({
 			return priceData;
 
 		}, {
-			totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [], reason: [],
+			totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [], reasons: [],
 
 			buyerReceive: [], buyerChange: [], sellerReceive: []
 		});
@@ -1875,9 +1873,9 @@ export function getPaymentData({
 			const currency = currencies.find(currency => {
 				return change.id === currency.id || (change.name === currency.name && change.img === currency.img && change.type === currency.type);
 			});
-			return acc + currency.quantity >= change.quantity
+			return acc + (currency.quantity >= change.quantity
 				? 0
-				: (change.quantity - currency.quantity) * change.exchangeRate;
+				: (change.quantity - currency.quantity) * change.exchangeRate);
 		}, 0);
 
 		// If the seller needs give the buyer some change, we'll modify the payment they'll get to cover for it
@@ -1891,8 +1889,12 @@ export function getPaymentData({
 			} else {
 				// Otherwise, we'll use the biggest currency we can find to cover for it
 				const biggestCurrency = paymentData.sellerReceive.find(price => price.quantity && (price.quantity * price.exchangeRate) > changeNeeded);
-				biggestCurrency.quantity--;
-				changeNeeded -= 1 * biggestCurrency.exchangeRate;
+				if (biggestCurrency) {
+					biggestCurrency.quantity--;
+					changeNeeded -= 1 * biggestCurrency.exchangeRate;
+				} else {
+					console.warn("ItemPiles | getPaymentData: unable to make change, no currency in sellerReceive covers the required amount");
+				}
 			}
 
 			changeNeeded = Math.abs(changeNeeded);

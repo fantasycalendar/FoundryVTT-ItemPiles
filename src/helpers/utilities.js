@@ -47,9 +47,10 @@ export function getUuid(target) {
 
 export function sanitizeNumber(quantity) {
 	if (typeof quantity === "string") {
-		quantity = quantity.replaceAll(/[^\d.]+/g, "") ?? 0;
+		quantity = quantity.replaceAll(/[^\d.]+/g, "");
 	}
-	return Number(quantity) ?? 0;
+	const n = Number(quantity);
+	return Number.isFinite(n) ? n : 0;
 }
 
 /**
@@ -543,9 +544,7 @@ export function ensureValidIds(actor, itemsToCreate) {
 
 }
 
-export function isRealNumber(inNumber) {
-	return !isNaN(inNumber) && typeof inNumber === "number" && isFinite(inNumber);
-}
+
 
 /**
  * Render an item's sheet in read-only mode for users that don't own the item.

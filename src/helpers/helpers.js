@@ -151,7 +151,7 @@ export function isGMConnected() {
 }
 
 export function roundToDecimals(num, decimals) {
-	if (!decimals) return Math.floor(num);
+	if (decimals === undefined || decimals === null) decimals = 0;
 	return Number(Math.round(num + 'e' + decimals) + 'e-' + decimals);
 }
 
