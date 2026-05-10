@@ -305,11 +305,11 @@ export function getActorCurrencies(target, {
 		const itemData = CompendiumUtilities.getItemFromCache(currency.data.uuid) || currency.data.item || false;
 		if (!itemData) return false;
 		const item = Utilities.findSimilarItem(actorItems, itemData);
-		// If the item exists on the actor, use the item's ID, so that we can match it against the actual item on the actor
-		currency.data.item = itemData;
-		currency.data.item._id = item?.id ?? itemData._id;
+		const clonedItemData = foundry.utils.deepClone(itemData);
+		clonedItemData._id = item?.id ?? itemData._id;
+		const clonedData = { ...currency.data, item: clonedItemData };
 		return {
-			...currency, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
+			...currency, data: clonedData, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
 		}
 	})).filter(Boolean);
 
@@ -360,11 +360,11 @@ export function getCurrenciesInItem(targetItem, {
 		const itemData = CompendiumUtilities.getItemFromCache(currency.data.uuid) || currency.data.item || false;
 		if (!itemData) return false;
 		const item = Utilities.findSimilarItem(subItems, itemData);
-		// If the item exists on the actor, use the item's ID, so that we can match it against the actual item on the actor
-		currency.data.item = itemData;
-		currency.data.item._id = item?.id ?? itemData._id;
+		const clonedItemData = foundry.utils.deepClone(itemData);
+		clonedItemData._id = item?.id ?? itemData._id;
+		const clonedData = { ...currency.data, item: clonedItemData };
 		return {
-			...currency, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
+			...currency, data: clonedData, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
 		}
 	})).filter(Boolean);
 
@@ -405,11 +405,10 @@ export function getCurrencyList(target = false, pileData = false) {
 		pileData = getActorFlagData(targetActor, { data: pileData });
 	}
 
-	const primaryCurrencies = (pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES);
-	const secondaryCurrencies = (pileData?.overrideSecondaryCurrencies || game.itempiles.API.SECONDARY_CURRENCIES).map(currency => {
-		currency.secondary = true;
-		return currency;
-	});
+	const primaryCurrencies = (pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES).map(c => foundry.utils.deepClone(c));
+	const secondaryCurrencies = (pileData?.overrideSecondaryCurrencies || game.itempiles.API.SECONDARY_CURRENCIES).map(currency => ({
+		...foundry.utils.deepClone(currency), secondary: true
+	}));
 
 	const currencies = primaryCurrencies.concat(secondaryCurrencies);
 

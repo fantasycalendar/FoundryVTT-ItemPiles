@@ -145,7 +145,9 @@ export default class Transaction {
 			attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
 		}
 		this.documentChanges = attributes.reduce((acc, attribute) => {
-			const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
+			const incomingQuantity = set
+				? attribute.quantity
+				: Math.abs(attribute.quantity) * (remove ? -1 : 1);
 			acc[attribute.path] = acc[attribute.path] ?? Number(foundry.utils.getProperty(this.document, attribute.path) ?? 0);
 			if (set) {
 				if (!onlyDelta) {
@@ -172,7 +174,9 @@ export default class Transaction {
 		}
 
 		this.itemUpdates = attributes.reduce((acc, attribute) => {
-			const incomingQuantity = Math.abs(attribute.quantity) * (remove ? -1 : 1);
+			const incomingQuantity = set
+				? attribute.quantity
+				: Math.abs(attribute.quantity) * (remove ? -1 : 1);
 
 			acc[item.id] = {
 				[attribute.path]: acc[item.id]?.[attribute.path] ?? Number(foundry.utils.getProperty(item, attribute.path) ?? 0)
