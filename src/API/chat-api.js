@@ -31,11 +31,13 @@ export default class ChatAPI {
 
 	static _preCreateChatMessage(chatMessage) {
 
-		if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING)) return;
-
 		const content = chatMessage.content.toLowerCase();
 
 		if (!(content.startsWith("!itempiles") || content.startsWith("!ip"))) return;
+
+		// Suppress the chat command itself even when trading is disabled, so the
+		// user doesn't see their `!ip ...` echoed as a regular message.
+		if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING)) return false;
 
 		const args = content.split(" ").slice(1);
 
@@ -77,7 +79,7 @@ export default class ChatAPI {
 			const update = this._replaceChatContent(message);
 			const tradeId = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
 			const tradeUsers = foundry.utils.getProperty(message, CONSTANTS.FLAGS.TRADE_USERS);
-			const bothUsersActive = tradeUsers.filter(userId => game.users.get(userId).active).length === tradeUsers.length;
+			const bothUsersActive = tradeUsers.filter(userId => game.users.get(userId)?.active).length === tradeUsers.length;
 			if (!bothUsersActive) {
 				updates.push(update);
 			} else {
@@ -421,7 +423,7 @@ export default class ChatAPI {
 		}
 		party_2_data.got_nothing = !party_2_data.items.length && !party_2_data.currencies.length;
 
-		if (party_1.got_nothing && party_2.got_nothing) return;
+		if (party_1_data.got_nothing && party_2_data.got_nothing) return;
 
 		const enableCollapse = (party_1_data.items.length + party_1_data.currencies.length + party_2_data.items.length + party_2_data.currencies.length) > 6;
 
