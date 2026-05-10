@@ -1,5 +1,6 @@
 <script>
 
+	import { onDestroy } from "svelte";
 	import { fade } from 'svelte/transition';
 	import { localize } from "#runtime/util/i18n";
 	import DropZone from "../components/DropZone.svelte";
@@ -63,31 +64,37 @@
 
 	}
 
+	const tradeSubscriptions = [];
+
 	if (store.isUserParticipant) {
-		const itemsUpdatedDebounce = debounce(async (items) => {
+		const itemsUpdatedDebounce = foundry.utils.debounce(async (items) => {
 			await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEMS, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
 			return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEMS, store.publicTradeId, game.user.id, items);
 		}, 20)
-		leftItems.subscribe(itemsUpdatedDebounce)
+		tradeSubscriptions.push(leftItems.subscribe(itemsUpdatedDebounce));
 
-		const itemCurrenciesUpdatedDebounce = debounce(async (items) => {
+		const itemCurrenciesUpdatedDebounce = foundry.utils.debounce(async (items) => {
 			await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_ITEM_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, items);
 			return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_ITEM_CURRENCIES, store.publicTradeId, game.user.id, items);
 		}, 20)
-		leftItemCurrencies.subscribe(itemCurrenciesUpdatedDebounce)
+		tradeSubscriptions.push(leftItemCurrencies.subscribe(itemCurrenciesUpdatedDebounce));
 
-		const attributesUpdatedDebounce = debounce(async (attributes) => {
+		const attributesUpdatedDebounce = foundry.utils.debounce(async (attributes) => {
 			await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_UPDATE_CURRENCIES, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, attributes);
 			return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_UPDATE_CURRENCIES, store.publicTradeId, game.user.id, attributes);
 		}, 40)
-		leftCurrencies.subscribe(attributesUpdatedDebounce)
+		tradeSubscriptions.push(leftCurrencies.subscribe(attributesUpdatedDebounce));
 
-		const acceptedDebounce = debounce(async (acceptedState) => {
+		const acceptedDebounce = foundry.utils.debounce(async (acceptedState) => {
 			await ItemPileSocket.executeForUsers(ItemPileSocket.HANDLERS.PRIVATE_TRADE_STATE, [store.leftTraderUser.id, store.rightTraderUser.id], store.privateTradeId, game.user.id, acceptedState);
 			return executeSocketAction(ItemPileSocket.HANDLERS.PUBLIC_TRADE_STATE, store.publicTradeId, game.user.id, acceptedState);
 		}, 10)
-		leftTraderAccepted.subscribe(acceptedDebounce)
+		tradeSubscriptions.push(leftTraderAccepted.subscribe(acceptedDebounce));
 	}
+
+	onDestroy(() => {
+		tradeSubscriptions.forEach(unsub => unsub());
+	});
 
 	async function executeSocketAction(socketHandler, ...args) {
 		if (store.isPrivate) {
@@ -226,8 +233,8 @@
 
 					{#if store.isUserParticipant}
 
-						<button type="button" style="flex:0 1 auto; margin-top: 0.25rem;"
-						        on:click={() => { store.toggleAccepted(store.leftTraderUser.id) }}>
+					<button type="button" style="flex:0 1 auto; margin-top: 0.25rem;"
+					        on:click={() => { store.toggleAccepted() }}>
 							{#if $leftTraderAccepted}
 								<i class="fas fa-times"></i>
 								{localize("Cancel")}
