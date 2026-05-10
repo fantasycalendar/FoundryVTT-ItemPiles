@@ -1937,13 +1937,13 @@ export function isMerchantClosed(merchant, { pileData = false } = {}) {
 	const openTimes = pileData.openTimes.open;
 	const closeTimes = pileData.openTimes.close;
 
-	const openingTime = Number(openTimes.hour.toString() + "." + openTimes.minute.toString());
-	const closingTime = Number(closeTimes.hour.toString() + "." + closeTimes.minute.toString());
-	const currentTime = Number(timestamp.hour.toString() + "." + timestamp.minute.toString());
+	const openingTime = openTimes.hour * 60 + openTimes.minute;
+	const closingTime = closeTimes.hour * 60 + closeTimes.minute;
+	const currentTime = timestamp.hour * 60 + timestamp.minute;
 
 	let isClosed = openingTime > closingTime
-		? !(currentTime >= openingTime || currentTime <= closingTime)  // Is the store open over midnight?
-		: !(currentTime >= openingTime && currentTime <= closingTime); // or is the store open during normal daylight hours?
+		? !(currentTime >= openingTime || currentTime <= closingTime)
+		: !(currentTime >= openingTime && currentTime <= closingTime);
 
 	const currentWeekday = window.SimpleCalendar.api.getCurrentWeekday();
 

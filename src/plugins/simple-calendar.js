@@ -18,7 +18,7 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 			weekday: window.SimpleCalendar.api.getCurrentWeekday(),
 			timestamp: window.SimpleCalendar.api.dateToTimestamp({})
 		}
-		previousState.time = Number(previousState.dateTime.hour.toString() + "." + previousState.dateTime.minute.toString());
+		previousState.time = previousState.dateTime.hour * 60 + previousState.dateTime.minute;
 
 		Hooks.on("updateWorldTime", async () => {
 			ItemPileStore.notifyAllOfChanges("updateOpenCloseStatus");
@@ -60,7 +60,7 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 			weekday: window.SimpleCalendar.api.getCurrentWeekday(),
 			timestamp: window.SimpleCalendar.api.dateToTimestamp({})
 		}
-		newState.time = Number(newState.dateTime.hour.toString() + "." + newState.dateTime.minute.toString());
+		newState.time = newState.dateTime.hour * 60 + newState.dateTime.minute;
 
 		const prevMinute = Math.floor(previousState.timestamp / 60);
 		const newMinute = Math.floor(newState.timestamp / 60);
@@ -248,8 +248,8 @@ function merchantRefreshFilter(flags, newState, previousState, categories) {
 	const closeHour = openTimesEnabled ? closeTimes.hour : 0;
 	const closeMinute = openTimesEnabled ? closeTimes.minute : 0;
 
-	const openingTime = Number(openHour.toString() + "." + openMinute.toString());
-	const closingTime = Number(closeHour.toString() + "." + closeMinute.toString());
+	const openingTime = openHour * 60 + openMinute;
+	const closingTime = closeHour * 60 + closeMinute;
 
 	const wasOpen = openingTime > closingTime
 		? (previousState.time >= openingTime || previousState.time <= closingTime)
