@@ -566,10 +566,15 @@ export function renderReadOnlyItemPreview(sourceItem, ownershipLevel = CONST.DOC
 	itemData.ownership = { ...(itemData.ownership ?? {}), [game.user.id]: ownershipLevel };
 	const previewItem = new Item.implementation(itemData, { parent: sourceItem.parent ?? undefined });
 	const sheet = previewItem.sheet;
-	if (sheet?.options) {
+	const ApplicationV2 = foundry.applications?.api?.ApplicationV2;
+	const isV2 = !!ApplicationV2 && sheet instanceof ApplicationV2;
+	// AppV2 derives editability from document ownership, so the ownership downgrade above
+	// already makes the sheet read-only. AppV1 still needs the option toggles, and on AppV1
+	// some systems freeze the options object, so guard against non-extensible options.
+	if (!isV2 && sheet?.options && Object.isExtensible(sheet.options)) {
 		sheet.options.editable = false;
 		sheet.options.submitOnChange = false;
 		sheet.options.submitOnClose = false;
 	}
-	return sheet.render(true, { editable: false });
+	return isV2 ? sheet.render({ force: true }) : sheet.render(true, { editable: false });
 }

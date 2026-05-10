@@ -4,6 +4,7 @@
 
 - Added `combineItemPiles` and `preCombineItemPiles` hooks fired when piles are combined; the existing `transferEverything` and `preTransferEverything` hooks continue to fire for back-compat
 - Fixed merchants buying items back at the seller's per-item sell-price modifier; the merchant's own per-item modifier now wins when a matching item is in the merchant's inventory
+- Fixed players being unable to preview items in piles or merchants on Foundry V14 / D&D 5e 5.x due to ApplicationV2 sheets rejecting the read-only option mutation
 
 ## Version 3.3.0
 
