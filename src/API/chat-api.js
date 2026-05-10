@@ -634,6 +634,42 @@ export default class ChatAPI {
 
 	}
 
+	/**
+	 * Build the whisper recipient list for the current OUTPUT_TO_CHAT mode.
+	 * @param {string} userId - the user whose action triggered the message
+	 * @returns {string[]} - empty array means "public message"
+	 */
+	static _getOutputWhisperRecipients(userId) {
+		const mode = Number(Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) || 0;
+		if (mode < 2) return [];
+
+		const recipients = Array.from(game.users)
+			.filter(user => user.isGM)
+			.map(user => user.id);
+
+		// Mode 2 ("SelfGM") includes the triggering user; mode 3 ("Blind") is GM-only.
+		if (mode === 2) recipients.push(userId);
+
+		return Array.from(new Set(recipients));
+	}
+
+	/**
+	 * Whether an existing chat card's whisper set matches what we'd compute for
+	 * the current user under the current OUTPUT_TO_CHAT mode. Used to decide
+	 * whether to merge a new pickup/purchase into the existing card or post a
+	 * fresh one. Merging a private update into a public card would leak.
+	 *
+	 * @param {ChatMessage} message
+	 * @param {string} userId
+	 * @returns {boolean}
+	 */
+	static _messageMatchesOutputVisibility(message, userId) {
+		const expected = this._getOutputWhisperRecipients(userId);
+		const actual = Array.from(new Set(message.whisper ?? []));
+		if (expected.length !== actual.length) return false;
+		return expected.every(recipient => actual.includes(recipient));
+	}
+
 	static _createNewChatMessage(userId, chatData) {
 
 		if (!chatData.whisper) {
