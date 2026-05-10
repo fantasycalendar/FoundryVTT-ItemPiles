@@ -3,6 +3,7 @@
 ## Version 3.3.1
 
 - Added `combineItemPiles` and `preCombineItemPiles` hooks fired when piles are combined; the existing `transferEverything` and `preTransferEverything` hooks continue to fire for back-compat
+- Fixed merchants buying items back at the seller's per-item sell-price modifier; the merchant's own per-item modifier now wins when a matching item is in the merchant's inventory
 
 ## Version 3.3.0
 
