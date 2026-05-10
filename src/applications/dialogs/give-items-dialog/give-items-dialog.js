@@ -47,7 +47,7 @@ export default class GiveItems extends TJSDialog {
 			for (let app of apps) {
 				app.render(false, { focus: true });
 			}
-			return;
+			return null;
 		}
 		return new Promise((resolve) => {
 			options.resolve = resolve;
