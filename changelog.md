@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.3.1
+
+- Added `combineItemPiles` and `preCombineItemPiles` hooks fired when piles are combined; the existing `transferEverything` and `preTransferEverything` hooks continue to fire for back-compat
+
 ## Version 3.3.0
 
 - Added support for Foundry V14, and dropped support for Foundry V12
