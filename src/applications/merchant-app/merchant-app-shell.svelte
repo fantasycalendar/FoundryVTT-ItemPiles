@@ -36,7 +36,7 @@
 
 		if (data.type === "Actor") {
 			const newRecipient = data.uuid ? (await foundry.utils.fromUuid(data.uuid)) : game.actors.get(data.id);
-			this.updateRecipient(newRecipient);
+			store.updateRecipient(newRecipient);
 			if (recipientStore) {
 				return recipientStore.updateSource(newRecipient);
 			}
@@ -83,8 +83,9 @@
 				hidden: !merchant.isOwner || !$pileData.logMerchantActivity
 			},
 		];
-		if (tabs.find(tab => tab.value === $activeTab).hidden) {
-			$activeTab = tabs.find(tab => !tab.hidden).value;
+		if (tabs.find(tab => tab.value === $activeTab)?.hidden ?? true) {
+			const fallback = tabs.find(tab => !tab.hidden);
+			if (fallback) $activeTab = fallback.value;
 		}
 	}
 
