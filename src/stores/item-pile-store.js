@@ -113,7 +113,7 @@ export default class ItemPileStore {
 
 	static notifyChanges(event, actor, ...args) {
 		const store = this.getStore(actor);
-		if (store) {
+		if (store && store[event]) {
 			store[event](...args);
 		}
 	}

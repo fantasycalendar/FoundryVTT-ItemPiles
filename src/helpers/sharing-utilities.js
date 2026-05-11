@@ -312,7 +312,7 @@ export function getItemSharesLeftForActor(pile, item, recipient, {
 	shareData = null
 } = {}) {
 
-	if (item instanceof String) {
+	if (typeof item === "string") {
 		item = pile.items.get(item);
 	}
 	let previouslyTaken = 0;
