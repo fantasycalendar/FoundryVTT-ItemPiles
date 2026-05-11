@@ -1,5 +1,5 @@
 <script>
-	import { getContext } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import { localize } from '#runtime/util/i18n';
 	import * as Helpers from "../../helpers/helpers.js";
 	import * as PileUtilities from "../../helpers/pile-utilities.js";
@@ -21,6 +21,8 @@
 	export let elementRoot;
 
 	let store = ItemPriceStore.make(item);
+
+	onDestroy(() => store.destroy());
 
 	let currentCustomCategories = writable(Array.from(new Set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES))));
 

@@ -588,7 +588,7 @@ export default class ItemPileStore {
 		await this.actor.deleteEmbeddedDocuments("Item", itemsToDelete);
 		if (pileSharingData?.items) {
 			pileSharingData.items = pileSharingData.items.map(item => {
-				const sharingItem = itemsToUpdate.find(item => item._id === item.id);
+				const sharingItem = itemsToUpdate.find(update => update._id === item.id);
 				if (sharingItem) {
 					item.actors = item.actors.map(actor => {
 						actor.quantity = Math.max(0, Math.min(actor.quantity, sharingItem.quantity));

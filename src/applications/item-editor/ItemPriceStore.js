@@ -4,8 +4,6 @@ import CONSTANTS from "../../constants/constants.js";
 import * as PileUtilities from "../../helpers/pile-utilities.js";
 import { getItemCost } from "../../helpers/utilities.js";
 
-const existingStores = new Map();
-
 export default class ItemPriceStore {
 
 	constructor(item) {
@@ -38,7 +36,7 @@ export default class ItemPriceStore {
 
 		this.data = writable(data);
 
-		this.itemDoc.subscribe((item, changes) => {
+		this._docUnsubscribe = this.itemDoc.subscribe((item, changes) => {
 			const { data } = changes;
 			if (foundry.utils.hasProperty(data, CONSTANTS.FLAGS.ITEM)) {
 				const newData = foundry.utils.getProperty(data, CONSTANTS.FLAGS.ITEM);
@@ -55,10 +53,12 @@ export default class ItemPriceStore {
 	}
 
 	static make(item) {
-		if (existingStores.has(item.id)) {
-			return existingStores.get(item.id);
-		}
 		return new this(item);
+	}
+
+	destroy() {
+		this._docUnsubscribe?.();
+		this._docUnsubscribe = null;
 	}
 
 	addPurchaseGroup() {
