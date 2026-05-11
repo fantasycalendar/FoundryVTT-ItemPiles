@@ -1530,7 +1530,7 @@ export function getPriceData({
 				if (price.percent) {
 					const percent = Math.min(1, price.baseCost / 100);
 					const percentQuantity = Math.max(0, Math.floor(attributeQuantity * percent));
-					price.maxQuantity = percentQuantity > 0 ? Math.floor(attributeQuantity / percentQuantity) : Infinity;
+					price.maxQuantity = percentQuantity > 0 ? Math.floor(attributeQuantity / percentQuantity) : 0;
 					price.baseCost = !buyer
 						? price.baseCost
 						: percentQuantity;
@@ -1564,7 +1564,7 @@ export function getPriceData({
 				if (price.percent) {
 					const percent = Math.min(1, price.baseCost / 100);
 					const percentQuantity = Math.max(0, Math.floor(itemQuantity * percent));
-					price.maxQuantity = percentQuantity > 0 ? Math.floor(itemQuantity / percentQuantity) : Infinity;
+					price.maxQuantity = percentQuantity > 0 ? Math.floor(itemQuantity / percentQuantity) : 0;
 					price.baseCost = !buyer
 						? price.baseCost
 						: percentQuantity;
