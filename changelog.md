@@ -2,9 +2,19 @@
 
 ## Version 3.3.1
 
-- Fixed players being unable to preview items in piles or merchants on Foundry V14 / D&D 5e 5.x due to ApplicationV2 sheets rejecting the read-only option changes
-- Added `combineItemPiles` and `preCombineItemPiles` hooks fired when piles are combined; the existing `transferEverything` and `preTransferEverything` hooks continue to fire for back-compat
-- Fixed merchants buying items back at the seller's per-item sell-price modifier; the merchant's own per-item modifier now wins when a matching item is in the merchant's inventory
+- Fixed players being unable to preview items in piles or merchants on Foundry V14
+- Added `combineItemPiles` and `preCombineItemPiles` hooks fired when piles are combined
+- Fixed merchants buying items back at the seller's per-item sell-price modifier; the merchant's own per-item modifier is now used when a matching item is in the merchant's inventory
+- Fixed piles with stacking disabled still merging items on older worlds
+- Fixed item pile token creation throwing an error when its container images were not configured
+- Fixed dragging an item from a token that had been removed from the canvas throwing an error
+- Fixed worlds failing to load when a currency referenced a deleted compendium item
+- Fixed tooltips on item pile HUD buttons appearing instantly instead of after the usual hover delay
+- Fixed removing a missing item-type price modifier from a merchant deleting an unrelated modifier instead
+- Fixed transfers involving multiple currencies inside the same container item losing all but the last currency change
+- Fixed the Spectate Trade button on chat trade cards not working on Foundry V13+
+- Fixed private trade completion messages only being whispered to one party, leaving the other trader and any other GMs in the dark
+- Fixed players getting no feedback when dropping items onto a merchant they don't own
 
 ## Version 3.3.0
 
