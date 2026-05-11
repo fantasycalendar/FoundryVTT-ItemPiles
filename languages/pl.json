@@ -698,7 +698,7 @@
       "DropCurrencies": {
         "Title": "Porzuć waluty",
         "Content": "Do tych pozycji możesz dodać następujące waluty:",
-        "NoCurrency": "{aktor_name} nie ma ważnych walut...",
+        "NoCurrency": "{actor_name} nie ma ważnych walut...",
         "Submit": "Dodaj"
       },
       "Settings": {
@@ -944,7 +944,7 @@
       "SpectateDisabled": "Transakcja zakończona",
       "TradeSpectate": "Obserwuj transakcję",
       "PrivateTrade": "Handel prywatny",
-      "Pickup": "{nazwa} odebrał następujące przedmioty:",
+      "Pickup": "{name} odebrał następujące przedmioty:",
       "TradeStartedButton": "Kliknij przycisk poniżej, aby zobaczyć:",
       "GaveItems": "{source} przekazało kilka przedmiotów do {target}:",
       "TradeStarted": "{party_1} i {party_2} rozpoczęli handel.",
