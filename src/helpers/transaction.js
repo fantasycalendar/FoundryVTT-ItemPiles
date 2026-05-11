@@ -179,6 +179,7 @@ export default class Transaction {
 				: Math.abs(attribute.quantity) * (remove ? -1 : 1);
 
 			acc[item.id] = {
+				...(acc[item.id] ?? {}),
 				[attribute.path]: acc[item.id]?.[attribute.path] ?? Number(foundry.utils.getProperty(item, attribute.path) ?? 0)
 			};
 

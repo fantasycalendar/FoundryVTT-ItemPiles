@@ -280,7 +280,9 @@ export default class MerchantStore extends ItemPileStore {
 		const pileData = get(this.pileData);
 		const priceMods = pileData.itemTypePriceModifiers;
 		const typeEntry = priceMods.find(entry => entry.type === type);
-		priceMods.splice(priceMods.indexOf(typeEntry), 1);
+		if (typeEntry) {
+			priceMods.splice(priceMods.indexOf(typeEntry), 1);
+		}
 		this.pileData.set(pileData);
 	}
 
