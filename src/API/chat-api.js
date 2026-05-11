@@ -12,6 +12,7 @@ export default class ChatAPI {
 
 		Helpers.hooks.on("preCreateChatMessage", this._preCreateChatMessage.bind(this));
 		Helpers.hooks.on("renderChatMessage", this._renderChatMessage.bind(this));
+		Helpers.hooks.on("renderChatMessageHTML", this._renderChatMessage.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.ITEM.TRANSFER, this._outputTransferItem.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER, this._outputTransferCurrency.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.TRANSFER_EVERYTHING, this._outputTransferEverything.bind(this));
@@ -441,7 +442,13 @@ export default class ChatAPI {
 			content: chatCardHtml,
 			flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
-			whisper: isPrivate ? [party_2.user] : []
+			whisper: isPrivate
+				? Array.from(new Set([
+					party_1.user,
+					party_2.user,
+					...Array.from(game.users).filter(u => u.isGM).map(u => u.id)
+				]))
+				: []
 		});
 
 	}
