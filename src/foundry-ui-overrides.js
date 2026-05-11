@@ -306,7 +306,7 @@ class FastTooltipManager extends (foundry?.helpers?.interaction?.TooltipManager?
 		this.#pending = element;
 		this.#activationTimeout = window.setTimeout(() => {
 			this.activate(element);
-		}, Number(element?.dataset?.tooltipActivationSpeed) ?? this.constructor.TOOLTIP_ACTIVATION_MS);
+		}, Number(element?.dataset?.tooltipActivationSpeed) || this.constructor.TOOLTIP_ACTIVATION_MS);
 	}
 
 	activate(element, { text, direction, cssClass } = {}) {
@@ -357,7 +357,7 @@ class FastTooltipManager extends (foundry?.helpers?.interaction?.TooltipManager?
 		window.clearTimeout(this.#deactivationTimeout);
 		this.#deactivationTimeout = window.setTimeout(() => {
 			if (!this.#pending) this.deactivate();
-		}, Number(this.element?.dataset?.tooltipDeactivationSpeed) ?? this.constructor.TOOLTIP_DEACTIVATION_MS);
+		}, Number(this.element?.dataset?.tooltipDeactivationSpeed) || this.constructor.TOOLTIP_DEACTIVATION_MS);
 	}
 
 	/* -------------------------------------------- */
