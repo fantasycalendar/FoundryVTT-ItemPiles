@@ -87,7 +87,7 @@ export function canItemStack(item, targetActor) {
 	}
 	if (isItemCurrency(itemData)) return true;
 	if (typeof actorFlagData.canStackItems === "boolean") {
-		actorFlagData.canStackItems = "yes";
+		actorFlagData.canStackItems = actorFlagData.canStackItems ? "yes" : "no";
 	}
 	if (!Utilities.isItemStackable(itemData)) return false;
 	if (actorFlagData.canStackItems.includes("always")) {

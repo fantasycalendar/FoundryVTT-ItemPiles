@@ -310,7 +310,7 @@ export default class Transaction {
 		return {
 			attributeDeltas: this.attributeDeltas, itemDeltas: this.itemDeltas.concat(itemsCreated.map(item => {
 				return {
-					item, quantity: PileUtilities.canItemStack(item) ? Utilities.getItemQuantity(item) : 1
+					item, quantity: PileUtilities.canItemStack(item, this.document) ? Utilities.getItemQuantity(item) : 1
 				}
 			}))
 		}
