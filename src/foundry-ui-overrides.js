@@ -44,7 +44,7 @@ function hideTemporaryItems(sidebar, html) {
 			if (element.parent().children().length === 1) {
 				return element.parent().empty();
 			}
-			element.find(`.directory-item[data-document-id="${item.id}"]`).remove();
+			element.remove();
 		});
 }
 
