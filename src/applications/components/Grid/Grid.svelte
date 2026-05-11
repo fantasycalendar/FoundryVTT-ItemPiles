@@ -6,7 +6,7 @@
 	import { calcPosition } from './grid-utils.js';
 	import GridItem from './GridItem.svelte';
 
-	export let gridContainer = HTMLDivElement;
+	export let gridContainer = null;
 	export let items = [];
 	export let dropGhost = false;
 	export let options = {
@@ -129,7 +129,7 @@
 			{#each Array(options.rows) as _, rowIndex (rowIndex)}
 				{#each Array(options.cols) as _, colIndex (colIndex)}
 					<div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
-					     style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}">
+					     style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}px">
 						<!--{colIndex} {rowIndex}-->
 					</div>
 				{/each}

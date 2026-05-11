@@ -20,7 +20,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	let itemRef = HTMLElement;
+	let itemRef = null;
 	let dragged = false;
 	const transformStore = item.transform;
 	const previewTransform = item.ghostTransform;
@@ -149,13 +149,14 @@
 
 			const unsnappedData = calcPosition(data, options);
 
-			const { left, top, outOfBounds } = constrainToContainer(
+			const { left, top, outOfBounds: innerOutOfBounds } = constrainToContainer(
 				pageX - pointerOffset.left,
 				pageY - pointerOffset.top,
 				unsnappedData.width,
 				unsnappedData.height
 			);
 
+			outOfBounds = innerOutOfBounds;
 			activeStore.set(!outOfBounds);
 
 			dispatch("itemmove", {
@@ -332,7 +333,6 @@
 	}
 
 	$: itemClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
-	$: collisionClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
 
 	function keydown(event) {
 		if (!active || !dragged || (item.item.w === item.item.h)) return;
@@ -380,7 +380,7 @@
 </div>
 
 {#if active}
-	<div style={ghostStyle} class={collisionClass}></div>
+	<div style={ghostStyle} class={itemClass}></div>
 
 	{#if collisions.length}
 		<div style={style} class={itemClass}></div>
