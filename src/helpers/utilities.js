@@ -441,7 +441,7 @@ export function getSourceActorFromDropData(dropData) {
 			const uuid = `Scene.${dropData.sceneId}.Token.${dropData.tokenId}`;
 			return foundry.utils.fromUuidSync(uuid)?.actor;
 		}
-		return canvas.tokens.get(dropData.tokenId).actor;
+		return canvas.tokens.get(dropData.tokenId)?.actor;
 	} else if (dropData.actorId) {
 		return game.actors.get(dropData.actorId);
 	}

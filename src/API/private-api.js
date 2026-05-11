@@ -123,19 +123,19 @@ export default class PrivateAPI {
 		if (!doc.isLinked) {
 			Utilities.deleteProperty(docData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.SHARING);
 		}
-		if (itemPileConfig.closedImage.includes("*")) {
+		if (itemPileConfig.closedImage?.includes("*")) {
 			itemPileConfig.closedImage = Helpers.random_array_element(itemPileConfig.closedImages);
 			itemPileConfig.closedImages = [];
 		}
-		if (itemPileConfig.emptyImage.includes("*")) {
+		if (itemPileConfig.emptyImage?.includes("*")) {
 			itemPileConfig.emptyImage = Helpers.random_array_element(itemPileConfig.emptyImages);
 			itemPileConfig.emptyImages = [];
 		}
-		if (itemPileConfig.openedImage.includes("*")) {
+		if (itemPileConfig.openedImage?.includes("*")) {
 			itemPileConfig.openedImage = Helpers.random_array_element(itemPileConfig.openedImages);
 			itemPileConfig.openedImages = [];
 		}
-		if (itemPileConfig.lockedImage.includes("*")) {
+		if (itemPileConfig.lockedImage?.includes("*")) {
 			itemPileConfig.lockedImage = Helpers.random_array_element(itemPileConfig.lockedImages);
 			itemPileConfig.lockedImages = [];
 		}

@@ -34,7 +34,8 @@ async function updateCache() {
 	for (const currency of currencies.concat(secondaryCurrencies)) {
 		if (currency.type !== "item") continue;
 		if (currency.data.uuid) {
-			COMPENDIUM_CACHE[currency.data?.uuid] = (await foundry.utils.fromUuid(currency.data.uuid)).toObject();
+			const item = await foundry.utils.fromUuid(currency.data.uuid);
+			if (item) COMPENDIUM_CACHE[currency.data.uuid] = item.toObject();
 		} else if (currency.data.item) {
 			const item = await findOrCreateItemInCompendium(currency.data.item)
 			COMPENDIUM_CACHE[item.uuid] = item.toObject();
