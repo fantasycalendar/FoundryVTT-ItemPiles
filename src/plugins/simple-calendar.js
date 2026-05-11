@@ -97,8 +97,9 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 						timestampData.year = newState.dateTime.year;
 						timestampData.month = newState.dateTime.month;
 						timestampData.day = newState.dateTime.day;
-						const weekInSeconds = SimpleCalendar.api.timestampPlusInterval(0, { day: 1 }) * weekdayCountDifference;
-						const timestamp = window.SimpleCalendar.api.dateToTimestamp(timestampData) - weekInSeconds;
+						const secondsPerDay = SimpleCalendar.api.timestampPlusInterval(0, { day: 1 });
+						const offsetInSeconds = secondsPerDay * weekdayCountDifference;
+						const timestamp = window.SimpleCalendar.api.dateToTimestamp(timestampData) - offsetInSeconds;
 						timestampData.day = window.SimpleCalendar.api.timestampToDate(timestamp).day;
 						break;
 
@@ -148,17 +149,18 @@ export default class SimpleCalendarPlugin extends BasePlugin {
 				return acc;
 			}, {});
 
-		this.validTokensOnScenes.filter((token) => {
-			const pileData = PileUtilities.getActorFlagData(token);
-			return pileData.hideTokenWhenClosed;
-		}).forEach(([sceneId, token]) => {
-			if (validTokensOnScenes[sceneId].length) {
-				if (!validTokensOnScenes[sceneId].find(t => t === token)) return;
-				validTokensOnScenes[sceneId].push(token)
-			} else {
-				validTokensOnScenes[sceneId] = [token]
+		for (const [sceneId, tokens] of this.validTokensOnScenes) {
+			for (const token of tokens) {
+				const pileData = PileUtilities.getActorFlagData(token);
+				if (!pileData.hideTokenWhenClosed) continue;
+				if (!validTokensOnScenes[sceneId]) {
+					validTokensOnScenes[sceneId] = [token];
+					continue;
+				}
+				if (validTokensOnScenes[sceneId].includes(token)) continue;
+				validTokensOnScenes[sceneId].push(token);
 			}
-		});
+		}
 
 		for (const [sceneId, tokens] of Object.entries(validTokensOnScenes)) {
 			const scene = game.scenes.get(sceneId);
