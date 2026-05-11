@@ -146,7 +146,7 @@ Hooks.once(CONSTANTS.HOOKS.READY, async () => {
 });
 
 Hooks.on(CONSTANTS.HOOKS.RESET_SETTINGS, async () => {
-	for (let setting of game.settings.storage.get("world").filter(setting => setting.key.includes('item-piles'))) {
+	for (let setting of game.settings.storage.get("world").filter(setting => setting.key.startsWith(`${CONSTANTS.MODULE_NAME}.`))) {
 		await setting.delete();
 	}
 	checkSystem();
