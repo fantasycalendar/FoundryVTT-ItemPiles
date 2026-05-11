@@ -13,6 +13,27 @@ import PrivateAPI from "../API/private-api.js";
 
 const __STORES__ = new Map();
 
+function resolveContainer(containerID, itemById) {
+	if (!containerID) return null;
+	return itemById.get(containerID) ?? null;
+}
+
+function pushSubItem(subItemsByContainer, container, item) {
+	const existing = subItemsByContainer.get(container);
+	if (existing) {
+		existing.push(item);
+		return;
+	}
+	subItemsByContainer.set(container, [item]);
+}
+
+function compareSubItems(a, b) {
+	if (a?.attribute?.exchangeRate && b?.attribute?.exchangeRate) {
+		return b.attribute.exchangeRate - a.attribute.exchangeRate;
+	}
+	return get(a.name).localeCompare(get(b.name));
+}
+
 export default class ItemPileStore {
 
 	constructor(application, source, recipient = false, { recipientPileData = false } = {}) {
@@ -399,57 +420,57 @@ export default class ItemPileStore {
 		const allItems = get(this.allItems);
 		const allAttributes = get(this.attributes);
 		const pileData = get(this.pileData);
-		const recipientPileData = this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {}
+		const recipientPileData = this.recipient ? PileUtilities.getActorFlagData(this.recipient) : {};
 		const actorIsMerchant = PileUtilities.isItemPileMerchant(this.actor, pileData);
 
-		const groupedItems = allItems
-			.map(item => {
-				item.subItems.set([]);
-				return item;
-			})
-			.reduce((acc, item) => {
-				const containerID = get(item.containerID);
-				if (containerID) {
-					const container = allItems.find(pileItem => containerID.includes(pileItem.id));
-					if (container) {
-						container.subItems.update(subItems => {
-							subItems.push(item);
-							return subItems;
-						});
-						return acc;
-					}
-				}
-				acc.push(item);
-				return acc;
-			}, []);
+		const itemById = new Map();
+		for (const item of allItems) {
+			if (item.id) itemById.set(item.id, item);
+		}
 
-		const groupedAttributes = allAttributes
-			.reduce((acc, item) => {
-				const containerID = get(item.containerID);
-				if (containerID) {
-					const container = allItems.find(pileItem => pileItem.id === containerID)
-					if (container) {
-						container.subItems.update(subItems => {
-							subItems.push(item);
-							subItems.sort((a, b) => {
-								if (a?.attribute?.exchangeRate && b?.attribute?.exchangeRate) {
-									return (b?.attribute?.exchangeRate ?? 0) - (a?.attribute?.exchangeRate ?? 0);
-								}
-								return (get(b.name) > get(a.name) ? -1 : 1);
-							})
-							return subItems;
-						});
-						return acc;
-					}
-				}
-				acc.push(item);
-				return acc;
-			}, []);
+		const subItemsByContainer = new Map();
+		const groupedItems = [];
+
+		for (const item of allItems) {
+			const container = resolveContainer(get(item.containerID), itemById);
+			if (container) {
+				pushSubItem(subItemsByContainer, container, item);
+				continue;
+			}
+			groupedItems.push(item);
+		}
+
+		const groupedAttributes = [];
+
+		for (const attribute of allAttributes) {
+			const container = resolveContainer(get(attribute.containerID), itemById);
+			if (container) {
+				pushSubItem(subItemsByContainer, container, attribute);
+				continue;
+			}
+			groupedAttributes.push(attribute);
+		}
+
+		for (const item of allItems) {
+			const subItems = subItemsByContainer.get(item);
+			if (subItems) {
+				subItems.sort(compareSubItems);
+				item.subItems.set(subItems);
+			} else {
+				item.subItems.set([]);
+			}
+		}
+
+		if (get(this.search)) {
+			for (const entry of allItems) entry.filter();
+			for (const entry of allAttributes) entry.filter();
+		}
 
 		const visibleItems = groupedItems
 			.filter(entry => this.visibleItemFilterFunction(entry, actorIsMerchant, pileData, recipientPileData))
 			.filter(entry => !get(entry.filtered))
 			.sort((a, b) => this.itemSortFunction(a, b));
+
 		const itemCurrencies = groupedItems.filter(entry => entry.isCurrency && !entry.isSecondaryCurrency);
 		const secondaryItemCurrencies = groupedItems.filter(entry => entry.isSecondaryCurrency);
 
@@ -457,50 +478,51 @@ export default class ItemPileStore {
 		this.visibleItems.set(visibleItems);
 		this.items.set(visibleItems);
 
-		const currencies = groupedAttributes.filter(entry => !entry.isSecondaryCurrency).concat(itemCurrencies);
-		const secondaryCurrencies = groupedAttributes.filter(entry => entry.isSecondaryCurrency).concat(secondaryItemCurrencies);
+		const allCurrencies = [
+			...groupedAttributes.filter(entry => !entry.isSecondaryCurrency),
+			...itemCurrencies,
+			...groupedAttributes.filter(entry => entry.isSecondaryCurrency),
+			...secondaryItemCurrencies
+		];
 
-		this.numCurrencies.set(currencies.concat(secondaryCurrencies).filter(entry => get(entry.quantity) > 0).length);
+		this.numCurrencies.set(allCurrencies.filter(entry => get(entry.quantity) > 0).length);
+		this.currencies.set(allCurrencies.filter(entry => !get(entry.filtered)));
+		this.allCurrencies.set(allCurrencies);
 
-		this.currencies.set(currencies.concat(secondaryCurrencies).filter(entry => !get(entry.filtered)));
-		this.allCurrencies.set(currencies.concat(secondaryCurrencies));
-
-		this.itemCategories.set(Object.values(allItems.reduce((acc, item) => {
+		const categoryIndex = {};
+		for (const item of allItems) {
 			const category = get(item.category);
-			if (!acc[category.type]) {
-				acc[category.type] = { ...category };
+			if (!categoryIndex[category.type]) {
+				categoryIndex[category.type] = { ...category };
 			}
-			return acc;
-		}, {})).sort((a, b) => a.label < b.label ? -1 : 1));
+		}
+		this.itemCategories.set(Object.values(categoryIndex).sort((a, b) => a.label.localeCompare(b.label)));
 
-		const itemsPerCategory = visibleItems
-			.reduce((acc, item) => {
-				const category = get(item.category);
-				if (!acc[category.type]) {
-					acc[category.type] = {
-						service: category.service,
-						type: category.type,
-						label: category.label,
-						items: []
-					};
-				}
-				acc[category.type].items.push(item);
-				return acc;
-			}, {})
+		const itemsPerCategory = {};
+		for (const item of visibleItems) {
+			const category = get(item.category);
+			if (!itemsPerCategory[category.type]) {
+				itemsPerCategory[category.type] = {
+					service: category.service,
+					type: category.type,
+					label: category.label,
+					items: []
+				};
+			}
+			itemsPerCategory[category.type].items.push(item);
+		}
 
-		Object.values(itemsPerCategory).forEach(category => category.items.sort((a, b) => {
-			return a.item.name < b.item.name ? -1 : 1;
-		}));
+		for (const category of Object.values(itemsPerCategory)) {
+			category.items.sort((a, b) => a.item.name.localeCompare(b.item.name));
+		}
 
 		this.itemsPerCategory.set(itemsPerCategory);
 
-		this.categories.set(Object.values(itemsPerCategory).map(category => {
-			return {
-				service: category.service,
-				label: category.label,
-				type: category.type
-			}
-		}).sort((a, b) => a.label < b.label ? -1 : 1));
+		this.categories.set(Object.values(itemsPerCategory).map(category => ({
+			service: category.service,
+			label: category.label,
+			type: category.type
+		})).sort((a, b) => a.label.localeCompare(b.label)));
 	}
 
 	createItem(item) {
