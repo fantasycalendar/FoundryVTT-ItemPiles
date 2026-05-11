@@ -1919,7 +1919,10 @@ export default class PrivateAPI {
 		const targetActor = Utilities.getActor(dropData.target);
 		if (sourceActor && targetActor && sourceActor === targetActor) return;
 
-		if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target) && !dropData.target.isOwner) return;
+		if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target) && !dropData.target.isOwner) {
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoMerchantOwnership"), true);
+			return;
+		}
 
 		const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
 		if (!validItem) return;

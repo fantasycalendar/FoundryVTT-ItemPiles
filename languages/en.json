@@ -64,6 +64,7 @@
       "ItemPileInvalidItemDropped": "You cannot drop this type of item into this item pile!",
       "VaultSameItemOrigin": "You can't drop items into the vault that originate from the vault!",
       "VaultNoGmItemSidebar": "Only GMs can drop items from the sidebar!",
+      "NoMerchantOwnership": "You need to own this merchant's actor to drop items onto it - ask your GM to grant you ownership.",
       "LogEmpty": "The log for \"{actor_name}\" is empty and has nothing to export"
     },
     "Inspect": {

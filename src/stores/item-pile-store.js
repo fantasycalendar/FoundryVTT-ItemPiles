@@ -222,6 +222,7 @@ export default class ItemPileStore {
 		const source = Utilities.getSourceActorFromDropData(data);
 
 		if (PileUtilities.isItemPileMerchant(this.actor) && !(game.user.isGM || this.actor.isOwner)) {
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoMerchantOwnership"), true);
 			return;
 		}
 		return PrivateAPI._dropItem({
