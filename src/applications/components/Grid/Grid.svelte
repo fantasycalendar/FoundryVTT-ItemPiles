@@ -1,7 +1,6 @@
 <script>
 
 	import { createEventDispatcher } from 'svelte';
-	import { writable } from 'svelte/store';
 	import { styleFromObject } from '../../../helpers/helpers';
 	import { calcPosition } from './grid-utils.js';
 	import GridItem from './GridItem.svelte';
@@ -27,9 +26,6 @@
 		highlightClass: "",
 		highlightItems: false
 	}
-
-	let containerHeight = writable(0);
-	let containerWidth = writable(0);
 
 	const dispatch = createEventDispatcher();
 
@@ -69,15 +65,11 @@
 		dispatch('itemflipped', { ...event.detail });
 	}
 
-	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
-	$: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
-
 	$: containerStyle = styleFromObject({
-		"width": $containerWidth + "px",
-		"height": $containerHeight + "px",
+		"width": (options.cols * (options.gridSize + options.gap) + options.gap) + "px",
+		"height": (options.rows * (options.gridSize + options.gap) + options.gap) + "px",
 	});
 
-	let backgroundGridStyle = "";
 	$: backgroundGridStyle = styleFromObject({
 		"grid-template-columns": `repeat(${options.cols}, ${options.gridSize + options.gap / 2}px)`,
 		"grid-template-rows": `repeat(${options.rows}, ${options.gridSize + options.gap / 2}px)`,
