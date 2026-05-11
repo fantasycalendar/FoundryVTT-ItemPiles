@@ -257,7 +257,7 @@ export function getItemPileTokens(filter = false) {
 	const mappedValidTokens = Object.fromEntries(validTokensOnScenes);
 
 	const invalidTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [scene, tokens.filter(token => {
-		if (mappedValidTokens[scene.id] && mappedValidTokens[scene.id].includes(token)) return false;
+		if (mappedValidTokens[scene] && mappedValidTokens[scene].includes(token)) return false;
 		try {
 			if (filter) filter(token);
 		} catch (err) {
