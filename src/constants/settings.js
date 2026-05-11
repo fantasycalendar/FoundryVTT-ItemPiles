@@ -446,7 +446,6 @@ const SETTINGS = {
 
 		[SETTINGS.HIDE_TOKEN_BORDER]: {
 			name: "ITEM-PILES.Settings.HideTokenBorder.Title",
-			label: "ITEM-PILES.Settings.HideTokenBorder.Label",
 			hint: "ITEM-PILES.Settings.HideTokenBorder.Hint",
 			scope: "world",
 			config: false,
