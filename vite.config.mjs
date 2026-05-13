@@ -35,7 +35,7 @@ export default ({ mode }) => {
 	/** @type {import('vite').UserConfig} */
 	return {
 		root: 'src/',                    // Source location / esbuild root.
-		base: `/${s_PACKAGE_ID}/dist`,   // Base module path that 29999 / served dev directory.
+		base: `/${s_PACKAGE_ID}/dist`,   // Base path under which Foundry serves this module on the dev port (29999).
 		publicDir: false,                // No public resources to copy.
 		cacheDir: '../.vite-cache',      // Relative from root directory.
 
@@ -66,7 +66,7 @@ export default ({ mode }) => {
 			open: '/game',
 			proxy: {
 				// Serves static files from main Foundry server.
-				[`^(/${s_PACKAGE_ID}/(assets|lang|packs|dist/${moduleJSON.id}.css))`]: 'http://localhost:30000',
+				[`^(/${s_PACKAGE_ID}/(assets|languages|packs|dist/${moduleJSON.id}.css))`]: 'http://localhost:30000',
 
 				// All other paths besides package ID path are served from main Foundry server.
 				[`^(?!/${s_PACKAGE_ID}/)`]: 'http://localhost:30000',
@@ -86,7 +86,7 @@ export default ({ mode }) => {
 			outDir: '../dist',
 			emptyOutDir: false,
 			sourcemap: s_SOURCEMAPS,
-			brotliSize: true,
+			reportCompressedSize: true,
 			minify: s_COMPRESS ? 'terser' : false,
 			target: ['es2022'],
 			terserOptions: s_COMPRESS ? { ...terserConfig(), ecma: 2022 } : void 0,

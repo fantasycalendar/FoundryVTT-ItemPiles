@@ -125,7 +125,7 @@
 						       bind:value={attribute.currentQuantity}/>
 						<input class="item-piles-range-input" style="flex: 2; margin-left:1rem;" type="number"
 						       bind:value={attribute.currentQuantity}
-						       on:click={() => {
+						       on:change={() => {
                         attribute.currentQuantity = Math.max(0, Math.min(attribute.quantity, attribute.currentQuantity));
                    }}/>
 						<div style="flex:0 1 50px; margin: 0 5px;">/ {abbreviateNumbers(attribute.quantity)}</div>
@@ -150,7 +150,7 @@
 						       bind:value={item.currentQuantity}/>
 						<input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
 						       bind:value={item.currentQuantity}
-						       on:click={() => {
+						       on:change={() => {
                         item.currentQuantity = Math.max(0, Math.min(item.quantity, item.currentQuantity));
                    }}/>
 						<div style="flex:0 1 50px; margin: 0 5px;">/ {abbreviateNumbers(item.quantity)}</div>
@@ -179,7 +179,7 @@
 							       bind:value={attribute.currentQuantity}/>
 							<input class="item-piles-range-input" style="flex: 2; margin-left:1rem;" type="number"
 							       bind:value={attribute.currentQuantity}
-							       on:click={() => {
+							       on:change={() => {
 													attribute.currentQuantity = Math.max(0, Math.min(attribute.quantity, attribute.currentQuantity));
 										 }}/>
 							<div style="flex:0 1 50px; margin: 0 5px;">/ {abbreviateNumbers(attribute.quantity)}</div>
@@ -204,7 +204,7 @@
 							       bind:value={item.currentQuantity}/>
 							<input class="item-piles-range-input" style="flex: 1.5; margin-left:1rem;" type="number"
 							       bind:value={item.currentQuantity}
-							       on:click={() => {
+							       on:change={() => {
 													item.currentQuantity = Math.max(0, Math.min(item.quantity, item.currentQuantity));
 										 }}/>
 							<div style="flex:0 1 50px; margin: 0 5px;">/ {abbreviateNumbers(item.quantity)}</div>

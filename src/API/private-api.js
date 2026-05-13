@@ -16,8 +16,6 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import ReceiveItemsShell from "../applications/dialogs/receive-items-dialog/receive-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 import { hotkeyActionState } from "../hotkeys.js";
-import { ensureValidIds } from "../helpers/utilities.js";
-import { getPileActorDefaults } from "../helpers/pile-utilities.js";
 
 const preloadedFiles = new Set();
 
@@ -125,19 +123,19 @@ export default class PrivateAPI {
 		if (!doc.isLinked) {
 			Utilities.deleteProperty(docData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.SHARING);
 		}
-		if (itemPileConfig.closedImage.includes("*")) {
+		if (itemPileConfig.closedImage?.includes("*")) {
 			itemPileConfig.closedImage = Helpers.random_array_element(itemPileConfig.closedImages);
 			itemPileConfig.closedImages = [];
 		}
-		if (itemPileConfig.emptyImage.includes("*")) {
+		if (itemPileConfig.emptyImage?.includes("*")) {
 			itemPileConfig.emptyImage = Helpers.random_array_element(itemPileConfig.emptyImages);
 			itemPileConfig.emptyImages = [];
 		}
-		if (itemPileConfig.openedImage.includes("*")) {
+		if (itemPileConfig.openedImage?.includes("*")) {
 			itemPileConfig.openedImage = Helpers.random_array_element(itemPileConfig.openedImages);
 			itemPileConfig.openedImages = [];
 		}
-		if (itemPileConfig.lockedImage.includes("*")) {
+		if (itemPileConfig.lockedImage?.includes("*")) {
 			itemPileConfig.lockedImage = Helpers.random_array_element(itemPileConfig.lockedImages);
 			itemPileConfig.lockedImages = [];
 		}
@@ -401,7 +399,7 @@ export default class PrivateAPI {
 		const shouldBeDeleted = PileUtilities.shouldItemPileBeDeleted(itemPileUuid);
 		if (shouldBeDeleted) {
 			await this._deleteItemPile(itemPileUuid);
-		} else if (!skipVaultLogging && (PileUtilities.isItemPileVault(itemPile) || PileUtilities.isItemPileVault(targetActor))) {
+		} else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
 			const pileActor = sourceIsItemPile ? sourceActor : targetActor;
 			const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
 			await PileUtilities.updateVaultLog(pileActor, {
@@ -656,11 +654,11 @@ export default class PrivateAPI {
 				});
 			}
 		} else if (!skipVaultLogging && (PileUtilities.isItemPileVault(sourceActor) || PileUtilities.isItemPileVault(targetActor))) {
-			const sourceIsItemPile = PileUtilities.isItemPileVault(sourceActor);
-			const pileActor = sourceIsItemPile ? sourceActor : targetActor;
-			const actorToLog = sourceIsItemPile ? targetActor : sourceActor;
+			const sourceIsVault = PileUtilities.isItemPileVault(sourceActor);
+			const pileActor = sourceIsVault ? sourceActor : targetActor;
+			const actorToLog = sourceIsVault ? targetActor : sourceActor;
 			await PileUtilities.updateVaultLog(pileActor, {
-				userId, actor: actorToLog, items: itemDeltas, attributes: attributeDeltas, withdrawal: sourceIsItemPile
+				userId, actor: actorToLog, items: itemDeltas, attributes: attributeDeltas, withdrawal: sourceIsVault
 			});
 		}
 
@@ -909,6 +907,9 @@ export default class PrivateAPI {
 		const sourceDocument = Utilities.getDocument(sourceUuid);
 		const targetDocument = Utilities.getDocument(targetUuid);
 
+		const sourceActor = Utilities.getActor(sourceUuid);
+		const targetActor = Utilities.getActor(targetUuid);
+
 		const sourceAttributes = PileUtilities.getActorCurrencies(sourceDocument).filter(entry => entry.type === "attribute");
 		const attributesToTransfer = sourceAttributes.filter(attribute => {
 			return foundry.utils.hasProperty(targetActor, attribute.data.path);
@@ -940,9 +941,6 @@ export default class PrivateAPI {
 		};
 		await this._executeItemPileMacro(sourceUuid, macroData);
 		await this._executeItemPileMacro(targetUuid, macroData);
-
-		const sourceActor = Utilities.getActor(sourceUuid);
-		const targetActor = Utilities.getActor(targetUuid);
 
 		const sourceIsItemPile = PileUtilities.isValidItemPile(sourceActor);
 
@@ -1063,6 +1061,10 @@ export default class PrivateAPI {
 		const targetUpdates = targetTransaction.prepare();
 		const sourceUpdates = sourceTransactions.map(data => data.updates)
 
+		const combineHookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_COMBINE_ITEM_PILES, sourceActors, sourceUpdates, targetActor, targetUpdates, interactionId);
+		if (combineHookResult === false) return false;
+		// Legacy alias kept for back-compat; listeners that need to distinguish
+		// combine from transfer-everything should subscribe to PRE_COMBINE_ITEM_PILES.
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PRE_TRANSFER_EVERYTHING, sourceActors, sourceUpdates, targetActor, targetUpdates, interactionId);
 		if (hookResult === false) return false;
 
@@ -1074,6 +1076,7 @@ export default class PrivateAPI {
 			await PileUtilities.updateItemPileData(targetActor, flags);
 		}
 
+		await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.COMBINE_ITEM_PILES, sourceUuids, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 		await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.TRANSFER_EVERYTHING, sourceUuids, targetUuid, itemDeltas, attributeDeltas, userId, interactionId);
 
 		const macroData = {
@@ -1156,8 +1159,8 @@ export default class PrivateAPI {
 
 		foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity ?? 1);
 		const containerItems = [itemData.item];
-		const item = foundry.utils.fromUuidSync(itemData.uuid);
-		const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
+		const item = foundry.utils.fromUuidSync(itemData.uuid) ?? itemData.item;
+		const handler = item ? Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type) : false;
 		if (handler) handler({ item, items: containerItems });
 		const items = containerItems.map(item => ({
 			item,
@@ -1416,7 +1419,7 @@ export default class PrivateAPI {
 
 		} else if (pileActor.prototypeToken.actorLink) {
 
-			if (items.length && !pileActor.prototypeToken.actorLink) {
+			if (items.length) {
 				await Helpers.hooks.runWithout(async () => {
 					const newItems = Utilities.ensureValidIds(pileActor, items);
 					await pileActor.createEmbeddedDocuments("Item", newItems, { keepId: true, keepEmbeddedIds: true });
@@ -1701,7 +1704,7 @@ export default class PrivateAPI {
 					Helpers.debug(`Preloaded image: ${filePath}`);
 				} else if (isSound) {
 					Helpers.debug(`Preloaded sound: ${filePath}`);
-					await AudioHelper.preloadSound(filePath);
+					await foundry.audio.AudioHelper.preloadSound(filePath);
 				}
 				resolve();
 			});
@@ -1916,7 +1919,10 @@ export default class PrivateAPI {
 		const targetActor = Utilities.getActor(dropData.target);
 		if (sourceActor && targetActor && sourceActor === targetActor) return;
 
-		if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target) && !dropData.target.isOwner) return;
+		if (dropData.target && PileUtilities.isItemPileMerchant(dropData.target) && !dropData.target.isOwner) {
+			Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Warnings.NoMerchantOwnership"), true);
+			return;
+		}
 
 		const validItem = await PileUtilities.checkItemType(dropData.target, dropData.itemData.item);
 		if (!validItem) return;

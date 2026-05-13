@@ -142,12 +142,12 @@ async function updateItems(version, callback) {
 	});
 
 	if (actorItemUpdates.length) {
-		Helpers.debug(`Item Piles | Migrating ${actorItemUpdates.length} item pile actors' items to version ${version}...`)
+		Helpers.debug(`Item Piles | Migrating ${actorItemUpdates.length} item pile actors' items to version ${version}...`);
+		await Actor.updateDocuments(actorItemUpdates.map(data => data.update));
 	}
 
-	await Actor.updateDocuments(actorItemUpdates.map(data => data.update))
-
 	for (const { actor, items } of actorItemUpdates) {
+		if (!items?.length) continue;
 		await actor.updateEmbeddedDocuments("Item", items);
 	}
 
@@ -181,8 +181,9 @@ async function updateItems(version, callback) {
 
 		await scene.updateEmbeddedDocuments("Token", updates.map(data => data.update), { animate: false });
 
-		for (const { token, itemUpdates } of updates) {
-			await token.actor.updateEmbeddedDocuments("Item", itemUpdates);
+		for (const { token, items } of updates) {
+			if (!items?.length) continue;
+			await token.actor.updateEmbeddedDocuments("Item", items);
 		}
 
 	}
@@ -288,8 +289,8 @@ const migrations = {
 			for (const priceGroup of flagData?.prices ?? []) {
 				for (const price of priceGroup) {
 					if (price.type !== "item" || !price.data.item) continue;
-					const compendiumItemUuid = (await recursivelyAddItemsToCompendium(price.data.item).uuid);
-					price.data = { uuid: compendiumItemUuid };
+					const compendiumItem = await recursivelyAddItemsToCompendium(price.data.item);
+					price.data = { uuid: compendiumItem.uuid };
 				}
 			}
 			foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM, PileUtilities.cleanItemFlagData(flagData, { addRemoveFlag: true }));

@@ -19,16 +19,23 @@ export default class Editor extends SvelteApplication {
 			width: 400,
 			height: "auto",
 			classes: ["item-piles-app"],
-			close: () => this.options.resolve(null),
 			svelte: {
 				target: document.body,
 			}
 		})
 	}
 
+	async close(options = {}) {
+		this.options.resolve?.(null);
+		return super.close(options);
+	}
+
 	static async show(data, options = {}, dialogOptions = {}) {
 		const app = options?.id ? getActiveApps(options?.id, true) : false;
-		if (app) return app.render(false, { focus: true });
+		if (app) {
+			app.render(false, { focus: true });
+			return null;
+		}
 		return new Promise(resolve => {
 			options.resolve = resolve;
 			return new this(data, options, dialogOptions).render(true, { focus: true });

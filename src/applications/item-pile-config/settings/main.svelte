@@ -19,19 +19,38 @@
 	let hasOverrideSecondaryCurrencies = writable(typeof pileData?.overrideSecondaryCurrencies === "object");
 	let hasOverrideItemFilters = writable(typeof pileData?.overrideItemFilters === "object");
 
+	let savedOverrideCurrencies = pileData?.overrideCurrencies || null;
+	let savedOverrideSecondaryCurrencies = pileData?.overrideSecondaryCurrencies || null;
+	let savedOverrideItemFilters = pileData?.overrideItemFilters || null;
+
 	$: {
 		if (!$hasOverrideCurrencies) {
+			if (pileData.overrideCurrencies && pileData.overrideCurrencies !== false) {
+				savedOverrideCurrencies = pileData.overrideCurrencies;
+			}
 			pileData.overrideCurrencies = false;
+		} else if (pileData.overrideCurrencies === false && savedOverrideCurrencies) {
+			pileData.overrideCurrencies = savedOverrideCurrencies;
 		}
 	}
 	$: {
 		if (!$hasOverrideSecondaryCurrencies) {
+			if (pileData.overrideSecondaryCurrencies && pileData.overrideSecondaryCurrencies !== false) {
+				savedOverrideSecondaryCurrencies = pileData.overrideSecondaryCurrencies;
+			}
 			pileData.overrideSecondaryCurrencies = false;
+		} else if (pileData.overrideSecondaryCurrencies === false && savedOverrideSecondaryCurrencies) {
+			pileData.overrideSecondaryCurrencies = savedOverrideSecondaryCurrencies;
 		}
 	}
 	$: {
 		if (!$hasOverrideItemFilters) {
+			if (pileData.overrideItemFilters && pileData.overrideItemFilters !== false) {
+				savedOverrideItemFilters = pileData.overrideItemFilters;
+			}
 			pileData.overrideItemFilters = false;
+		} else if (pileData.overrideItemFilters === false && savedOverrideItemFilters) {
+			pileData.overrideItemFilters = savedOverrideItemFilters;
 		}
 	}
 

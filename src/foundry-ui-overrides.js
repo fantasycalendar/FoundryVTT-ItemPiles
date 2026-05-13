@@ -12,6 +12,8 @@ export let fastToolTip = null;
 export default function registerUIOverrides() {
 	Hooks.on("renderPlayers", addTradeButton);
 	Hooks.on("getActorContextOptions", insertActorContextMenuItems);
+	Hooks.on("getActorSheetHeaderButtons", insertActorHeaderButtons);
+	Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
 	Hooks.on("getHeaderControlsApplicationV2", insertHeaderButtons);
 	Hooks.on("renderItemDirectory", hideTemporaryItems);
 	Hooks.on("renderTokenHUD", renderPileHUD);
@@ -44,7 +46,7 @@ function hideTemporaryItems(sidebar, html) {
 			if (element.parent().children().length === 1) {
 				return element.parent().empty();
 			}
-			element.find(`.directory-item[data-document-id="${item.id}"]`).remove();
+			element.remove();
 		});
 }
 
@@ -306,7 +308,7 @@ class FastTooltipManager extends (foundry?.helpers?.interaction?.TooltipManager?
 		this.#pending = element;
 		this.#activationTimeout = window.setTimeout(() => {
 			this.activate(element);
-		}, Number(element?.dataset?.tooltipActivationSpeed) ?? this.constructor.TOOLTIP_ACTIVATION_MS);
+		}, Number(element?.dataset?.tooltipActivationSpeed) || this.constructor.TOOLTIP_ACTIVATION_MS);
 	}
 
 	activate(element, { text, direction, cssClass } = {}) {
@@ -357,7 +359,7 @@ class FastTooltipManager extends (foundry?.helpers?.interaction?.TooltipManager?
 		window.clearTimeout(this.#deactivationTimeout);
 		this.#deactivationTimeout = window.setTimeout(() => {
 			if (!this.#pending) this.deactivate();
-		}, Number(this.element?.dataset?.tooltipDeactivationSpeed) ?? this.constructor.TOOLTIP_DEACTIVATION_MS);
+		}, Number(this.element?.dataset?.tooltipDeactivationSpeed) || this.constructor.TOOLTIP_DEACTIVATION_MS);
 	}
 
 	/* -------------------------------------------- */

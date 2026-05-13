@@ -87,7 +87,7 @@ export function canItemStack(item, targetActor) {
 	}
 	if (isItemCurrency(itemData)) return true;
 	if (typeof actorFlagData.canStackItems === "boolean") {
-		actorFlagData.canStackItems = "yes";
+		actorFlagData.canStackItems = actorFlagData.canStackItems ? "yes" : "no";
 	}
 	if (!Utilities.isItemStackable(itemData)) return false;
 	if (actorFlagData.canStackItems.includes("always")) {
@@ -257,7 +257,7 @@ export function getItemPileTokens(filter = false) {
 	const mappedValidTokens = Object.fromEntries(validTokensOnScenes);
 
 	const invalidTokensOnScenes = allTokensOnScenes.map(([scene, tokens]) => [scene, tokens.filter(token => {
-		if (mappedValidTokens[scene.id] && mappedValidTokens[scene.id].includes(token)) return false;
+		if (mappedValidTokens[scene] && mappedValidTokens[scene].includes(token)) return false;
 		try {
 			if (filter) filter(token);
 		} catch (err) {
@@ -286,7 +286,7 @@ export function getActorCurrencies(target, {
 	forActor = false, currencyList = false, getAll = false, secondary = true
 } = {}) {
 	const actor = Utilities.getActor(target);
-	const actorUuid = Utilities.getUuid(actor.uuid)
+	const actorUuid = Utilities.getUuid(actor);
 	const actorItems = actor
 		? Array.from(actor.items)
 		: [];
@@ -305,11 +305,11 @@ export function getActorCurrencies(target, {
 		const itemData = CompendiumUtilities.getItemFromCache(currency.data.uuid) || currency.data.item || false;
 		if (!itemData) return false;
 		const item = Utilities.findSimilarItem(actorItems, itemData);
-		// If the item exists on the actor, use the item's ID, so that we can match it against the actual item on the actor
-		currency.data.item = itemData;
-		currency.data.item._id = item?.id ?? itemData._id;
+		const clonedItemData = foundry.utils.deepClone(itemData);
+		clonedItemData._id = item?.id ?? itemData._id;
+		const clonedData = { ...currency.data, item: clonedItemData };
 		return {
-			...currency, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
+			...currency, data: clonedData, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
 		}
 	})).filter(Boolean);
 
@@ -360,11 +360,11 @@ export function getCurrenciesInItem(targetItem, {
 		const itemData = CompendiumUtilities.getItemFromCache(currency.data.uuid) || currency.data.item || false;
 		if (!itemData) return false;
 		const item = Utilities.findSimilarItem(subItems, itemData);
-		// If the item exists on the actor, use the item's ID, so that we can match it against the actual item on the actor
-		currency.data.item = itemData;
-		currency.data.item._id = item?.id ?? itemData._id;
+		const clonedItemData = foundry.utils.deepClone(itemData);
+		clonedItemData._id = item?.id ?? itemData._id;
+		const clonedData = { ...currency.data, item: clonedItemData };
 		return {
-			...currency, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
+			...currency, data: clonedData, quantity: 0, id: item?.id ?? item?._id ?? itemData._id ?? null, item, index
 		}
 	})).filter(Boolean);
 
@@ -405,11 +405,10 @@ export function getCurrencyList(target = false, pileData = false) {
 		pileData = getActorFlagData(targetActor, { data: pileData });
 	}
 
-	const primaryCurrencies = (pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES);
-	const secondaryCurrencies = (pileData?.overrideSecondaryCurrencies || game.itempiles.API.SECONDARY_CURRENCIES).map(currency => {
-		currency.secondary = true;
-		return currency;
-	});
+	const primaryCurrencies = (pileData?.overrideCurrencies || game.itempiles.API.CURRENCIES).map(c => foundry.utils.deepClone(c));
+	const secondaryCurrencies = (pileData?.overrideSecondaryCurrencies || game.itempiles.API.SECONDARY_CURRENCIES).map(currency => ({
+		...foundry.utils.deepClone(currency), secondary: true
+	}));
 
 	const currencies = primaryCurrencies.concat(secondaryCurrencies);
 
@@ -477,7 +476,7 @@ function doesPropertyMatch(propertyValue, filterValue) {
 	if (Array.isArray(propertyValue)) {
 		return propertyValue.some(value => doesPropertyMatch(value, filterValue));
 	}
-	if (Utilities.isRealNumber(propertyValue) && Utilities.isRealNumber(Number(filterValue))) {
+	if (Helpers.isRealNumber(propertyValue) && Helpers.isRealNumber(Number(filterValue))) {
 		return Math.abs(propertyValue - Number(filterValue)) < Number.EPSILON;
 	}
 	return propertyValue === filterValue;
@@ -567,9 +566,9 @@ export function isItemCurrency(item, { target = false, actorCurrencies = false }
 	return !!Utilities.findSimilarItem(currencies, item);
 }
 
-export function getItemCurrencyData(item, { target = false, actorCurrencies = false }) {
+export function getItemCurrencyData(item, { target = false, actorCurrencies = false } = {}) {
 	return (actorCurrencies || getActorCurrencies(item?.parent || false, {
-		forActor: target, getAll: true, combine: true
+		forActor: target, getAll: true
 	}))
 		.filter(currency => currency.type === "item")
 		.find(currency => {
@@ -1293,8 +1292,15 @@ export function getPriceData({
 
 	} else if (buyerFlagData) {
 
+		const soldItemFlagData = foundry.utils.deepClone(itemFlagData);
+		const merchantItem = buyer?.items ? Utilities.findSimilarItem(buyer.items, item) : false;
+		if (merchantItem) {
+			const merchantItemFlagData = getItemFlagData(merchantItem);
+			soldItemFlagData.sellPriceModifier = merchantItemFlagData.sellPriceModifier ?? 1.0;
+		}
+
 		modifier = getMerchantModifiersForActor(buyer, {
-			item, actor: seller, pileFlagData: buyerFlagData, itemFlagData
+			item, actor: seller, pileFlagData: buyerFlagData, itemFlagData: soldItemFlagData
 		}).sellPriceModifier;
 
 	}
@@ -1304,7 +1310,7 @@ export function getPriceData({
 	const defaultCurrencies = currencies.filter(currency => !currency.secondary);
 
 	let overheadCost = [];
-	if (sellerFlagData.overheadCost?.length) {
+	if (sellerFlagData?.overheadCost?.length) {
 		overheadCost = overheadCost.concat(getItemFlagPriceData(sellerFlagData.overheadCost, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
@@ -1312,7 +1318,7 @@ export function getPriceData({
 		overheadCost = overheadCost.concat(getItemFlagPriceData(itemFlagData.overheadCost, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
-	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice));
+	const disableNormalCost = itemFlagData.disableNormalCost && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData?.onlyAcceptBasePrice));
 	const hasOtherPrices = secondaryPrices?.length > 0 || itemFlagData.prices.filter(priceGroup => priceGroup.length).length > 0 || itemFlagData.sellPrices.filter(priceGroup => priceGroup.length).length > 0 || overheadCost.length > 0;
 
 	// In order to easily calculate an item's total worth, we can use the smallest exchange rate and convert all prices
@@ -1430,11 +1436,11 @@ export function getPriceData({
 
 	}
 
-	if (itemFlagData.prices.length && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData.onlyAcceptBasePrice))) {
+	if (itemFlagData.prices.length && (merchant === seller || (itemFlagData.purchaseOptionsAsSellOption && !buyerFlagData?.onlyAcceptBasePrice))) {
 		priceData = priceData.concat(getItemFlagPriceData(itemFlagData.prices, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
-	if (itemFlagData.sellPrices.length && merchant === buyer && !buyerFlagData.onlyAcceptBasePrice) {
+	if (itemFlagData.sellPrices.length && merchant === buyer && !buyerFlagData?.onlyAcceptBasePrice) {
 		priceData = priceData.concat(getItemFlagPriceData(itemFlagData.sellPrices, quantity, modifier, defaultCurrencies, currencyList));
 	}
 
@@ -1524,7 +1530,7 @@ export function getPriceData({
 				if (price.percent) {
 					const percent = Math.min(1, price.baseCost / 100);
 					const percentQuantity = Math.max(0, Math.floor(attributeQuantity * percent));
-					price.maxQuantity = Math.floor(attributeQuantity / percentQuantity);
+					price.maxQuantity = percentQuantity > 0 ? Math.floor(attributeQuantity / percentQuantity) : 0;
 					price.baseCost = !buyer
 						? price.baseCost
 						: percentQuantity;
@@ -1535,7 +1541,7 @@ export function getPriceData({
 						? price.quantity
 						: percentQuantity;
 				} else {
-					price.maxQuantity = Math.floor(attributeQuantity / price.baseCost);
+					price.maxQuantity = price.baseCost > 0 ? Math.floor(attributeQuantity / price.baseCost) : Infinity;
 				}
 
 				priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
@@ -1558,7 +1564,7 @@ export function getPriceData({
 				if (price.percent) {
 					const percent = Math.min(1, price.baseCost / 100);
 					const percentQuantity = Math.max(0, Math.floor(itemQuantity * percent));
-					price.maxQuantity = Math.floor(itemQuantity / percentQuantity);
+					price.maxQuantity = percentQuantity > 0 ? Math.floor(itemQuantity / percentQuantity) : 0;
 					price.baseCost = !buyer
 						? price.baseCost
 						: percentQuantity;
@@ -1569,7 +1575,7 @@ export function getPriceData({
 						? price.quantity
 						: percentQuantity;
 				} else {
-					price.maxQuantity = Math.floor(itemQuantity / price.baseCost);
+					price.maxQuantity = price.baseCost > 0 ? Math.floor(itemQuantity / price.baseCost) : Infinity;
 				}
 
 				priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity);
@@ -1629,12 +1635,10 @@ export function getPaymentData({
 		})
 		.reduce((priceData, priceGroup) => {
 
-			priceData.reasons = [];
-
 			if (!priceGroup.maxQuantity && (buyer || seller) && priceData.canBuy) {
 				priceData.canBuy = false;
 				const reason = (buyer === merchant ? "TheyCantAfford" : "YouCantAfford");
-				priceData.reason.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
+				priceData.reasons.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
 			}
 
 			const primaryPrices = priceGroup.prices.filter(price => !price.secondary && price.cost);
@@ -1715,7 +1719,7 @@ export function getPaymentData({
 			return priceData;
 
 		}, {
-			totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [], reason: [],
+			totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [], reasons: [],
 
 			buyerReceive: [], buyerChange: [], sellerReceive: []
 		});
@@ -1875,9 +1879,9 @@ export function getPaymentData({
 			const currency = currencies.find(currency => {
 				return change.id === currency.id || (change.name === currency.name && change.img === currency.img && change.type === currency.type);
 			});
-			return acc + currency.quantity >= change.quantity
+			return acc + (currency.quantity >= change.quantity
 				? 0
-				: (change.quantity - currency.quantity) * change.exchangeRate;
+				: (change.quantity - currency.quantity) * change.exchangeRate);
 		}, 0);
 
 		// If the seller needs give the buyer some change, we'll modify the payment they'll get to cover for it
@@ -1891,8 +1895,12 @@ export function getPaymentData({
 			} else {
 				// Otherwise, we'll use the biggest currency we can find to cover for it
 				const biggestCurrency = paymentData.sellerReceive.find(price => price.quantity && (price.quantity * price.exchangeRate) > changeNeeded);
-				biggestCurrency.quantity--;
-				changeNeeded -= 1 * biggestCurrency.exchangeRate;
+				if (biggestCurrency) {
+					biggestCurrency.quantity--;
+					changeNeeded -= 1 * biggestCurrency.exchangeRate;
+				} else {
+					console.warn("ItemPiles | getPaymentData: unable to make change, no currency in sellerReceive covers the required amount");
+				}
 			}
 
 			changeNeeded = Math.abs(changeNeeded);
@@ -1935,13 +1943,13 @@ export function isMerchantClosed(merchant, { pileData = false } = {}) {
 	const openTimes = pileData.openTimes.open;
 	const closeTimes = pileData.openTimes.close;
 
-	const openingTime = Number(openTimes.hour.toString() + "." + openTimes.minute.toString());
-	const closingTime = Number(closeTimes.hour.toString() + "." + closeTimes.minute.toString());
-	const currentTime = Number(timestamp.hour.toString() + "." + timestamp.minute.toString());
+	const openingTime = openTimes.hour * 60 + openTimes.minute;
+	const closingTime = closeTimes.hour * 60 + closeTimes.minute;
+	const currentTime = timestamp.hour * 60 + timestamp.minute;
 
 	let isClosed = openingTime > closingTime
-		? !(currentTime >= openingTime || currentTime <= closingTime)  // Is the store open over midnight?
-		: !(currentTime >= openingTime && currentTime <= closingTime); // or is the store open during normal daylight hours?
+		? !(currentTime >= openingTime || currentTime <= closingTime)
+		: !(currentTime >= openingTime && currentTime <= closingTime);
 
 	const currentWeekday = window.SimpleCalendar.api.getCurrentWeekday();
 
@@ -2128,8 +2136,8 @@ export function canItemFitInVault(item, vaultActor, {
 			}
 		}
 	}
-	const vaultGridData = gridData ?? getVaultGridData(vaultActor);
-	return getNewItemsVaultPosition(item, vaultGridData, { position, items });
+	const vaultGridData = gridData ?? getVaultGridData(vaultActor, { items });
+	return getNewItemsVaultPosition(item, vaultGridData, { position });
 }
 
 export function getNewItemsVaultPosition(item, gridData, { position = null } = {}) {

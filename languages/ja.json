@@ -74,7 +74,7 @@
       },
       "AddCurrency": {
         "Title": "金額を追加",
-        "Content": "{trading_actor_name}との取引に通貨を追加",
+        "Content": "{trader_actor_name}との取引に通貨を追加",
         "Label": "金額を更新"
       },
       "GMAddCurrency": "通貨を追加（GMモード）",
@@ -895,7 +895,7 @@
         "Content": "このスタックされたアイテムを分割しますか？",
         "Submit": "スタックを分割",
         "Header": "{item_name}のスタックを分割しています",
-        "ContentMultipleQuantity": "{item_name}は{quantity}個あります。新しいスタックに何個入れますか？"
+        "ContentMultipleQuantity": "このアイテムは{quantity}個あります。新しいスタックに何個入れますか？"
       },
       "ItemTypePriceModifiersEditor": {
         "ItemType": "アイテムタイプ",

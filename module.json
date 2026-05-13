@@ -3,7 +3,7 @@
   "title": "Item Piles",
   "description": "This module adds the ability for items to be dropped onto the ground, and then picked up.",
   "version": "100.0.0",
-  "library": "false",
+  "library": false,
   "compatibility": {
     "minimum": "13",
     "verified": "14",
@@ -30,18 +30,23 @@
     },
     {
       "lang": "de",
-      "name": "English",
+      "name": "Deutsch",
       "path": "languages/de.json"
     },
     {
       "lang": "fr",
-      "name": "French",
+      "name": "Français",
       "path": "languages/fr.json"
     },
     {
       "lang": "ja",
       "name": "日本語",
       "path": "languages/ja.json"
+    },
+    {
+      "lang": "ko",
+      "name": "한국어",
+      "path": "languages/ko.json"
     },
     {
       "lang": "pt-BR",
@@ -59,7 +64,7 @@
       "path": "languages/es.json"
     },
     {
-      "lang": "cn",
+      "lang": "zh-Hans",
       "name": "中文（简体）",
       "path": "languages/zh_Hans.json"
     },

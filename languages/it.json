@@ -379,7 +379,7 @@
         "Title": "Avviso Tipo Oggetto",
         "SellContent": "Stai tentando di vendere un articolo del tipo (\"{type}\") che normalmente il commerciante non accetta. Sei sicuro di volerlo fare?",
         "DropContent": "Stai rilasciando un elemento di un tipo (\"{type}\") che normalmente non è consentito rilasciare. Sei sicuro di volerlo fare?",
-        "TradeContent": "Stai tentando di scambiare un oggetto di un tipo (\"{tipo}\") che normalmente non può essere scambiato. Sei sicuro di volerlo fare?"
+        "TradeContent": "Stai tentando di scambiare un oggetto di un tipo (\"{type}\") che normalmente non può essere scambiato. Sei sicuro di volerlo fare?"
       },
       "NewSystemVersion": {
         "Confirm": "Aggiorna Impostazioni",
@@ -442,7 +442,7 @@
         "Title": "Dona Oggetto",
         "Header": "Stai donando: {item_name}",
         "Content": "Vuoi dare questo oggetto a \"{target_name}\"?",
-        "ContentMultipleQuantity": "Hai {quantità} di questo articolo, quanti ne vuoi regalare?",
+        "ContentMultipleQuantity": "Hai {quantity} di questo articolo, quanti ne vuoi regalare?",
         "Submit": "Dai",
         "ContentInfiniteQuantity": "Quanti ne vuoi dare a \"{target_name}\"?"
       },
@@ -654,7 +654,7 @@
       },
       "DropItem": {
         "Header": "Stai lasciando: {item_name}",
-        "ContentMultipleQuantity": "Hai {quantità} di questo articolo, quanti ne vuoi rilasciare?",
+        "ContentMultipleQuantity": "Hai {quantity} di questo articolo, quanti ne vuoi rilasciare?",
         "Submit": "Aggiungi alla pila",
         "SubmitNoTarget": "Crea nuova pila",
         "ContentInfiniteQuantity": "Quanti ne vuoi lasciare?",
@@ -667,7 +667,7 @@
         "Header": "Stai depositando: {item_name}",
         "Content": "Vuoi depositare questo oggetto in \"{target_name}\"?",
         "ContentInfiniteQuantity": "Quanti ne vuoi depositare?",
-        "ContentMultipleQuantity": "Hai {quantità} di questo articolo, quanti vuoi depositare?"
+        "ContentMultipleQuantity": "Hai {quantity} di questo articolo, quanti vuoi depositare?"
       },
       "WithdrawItem": {
         "Header": "Stai ritirando: {item_name}",
@@ -677,7 +677,7 @@
         "Submit": "Ritira"
       },
       "SplitItem": {
-        "ContentMultipleQuantity": "Ce ne sono {quantità} di questo articolo, quanti ne vuoi nel nuovo stack?",
+        "ContentMultipleQuantity": "Ce ne sono {quantity} di questo articolo, quanti ne vuoi nel nuovo stack?",
         "Header": "Stai dividendo una pila di {item_name}",
         "Content": "Vuoi dividere questo elemento in pila?",
         "Submit": "Dividi Pila",

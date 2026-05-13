@@ -49,7 +49,7 @@
 	on:dragenter={enter}
 	on:dragleave={leave}
 	on:dragover={overCallback}
-	on:dragstart|preventDefault
+	on:dragstart|self|preventDefault
 	on:drop|preventDefault={dropData}
 	style={$$props.style}
 >

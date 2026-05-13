@@ -450,7 +450,7 @@ export class VaultStore extends ItemPileStore {
 
 		for (const gridItem of gridItems) {
 			const update = updates.find(item => item._id === gridItem.id);
-			if (!gridItem) continue;
+			if (!update) continue;
 			const flagData = PileUtilities.getItemFlagData(update);
 			gridItem.transform.update(val => {
 				val.x = flagData.x;

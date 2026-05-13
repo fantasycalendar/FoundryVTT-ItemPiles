@@ -8,7 +8,7 @@ export const Plugins = {
 		data: null,
 		class: SimpleCalendarPlugin,
 		minVersion: "2.0.0",
-		invalidVersion: "v1.3.75"
+		invalidVersion: "1.3.75"
 	},
 	"levels-3d-preview": {
 		on: "init",

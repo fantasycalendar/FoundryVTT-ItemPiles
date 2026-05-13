@@ -166,7 +166,7 @@ export default class TradeStore {
 				item.newQuantity = item.quantity;
 				item.maxQuantity = maxQuantity;
 			} else {
-				items.splice(items.indexOf(item));
+				items.splice(items.indexOf(item), 1);
 			}
 		} else if (!item && quantity) {
 			items.push({

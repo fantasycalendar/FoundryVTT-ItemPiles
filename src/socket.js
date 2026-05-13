@@ -103,7 +103,7 @@ export default class ItemPileSocket {
 			Helpers.hooks.run = toggle;
 		},
 
-		[this.HANDLERS.DROP_ITEMS]: (args) => PrivateAPI._dropItems(args),
+		[this.HANDLERS.DROP_ITEMS]: (...args) => PrivateAPI._dropItems(...args),
 		[this.HANDLERS.GIVE_ITEMS]: (...args) => PrivateAPI._giveItems(...args),
 		[this.HANDLERS.GIVE_ITEMS_RESPONSE]: (...args) => PrivateAPI._giveItemsResponse(...args),
 		[this.HANDLERS.ADD_ITEMS]: (...args) => PrivateAPI._addItems(...args),

@@ -1,5 +1,6 @@
 import SETTINGS from "../constants/settings.js";
 import { getSetting } from "./helpers.js";
+import { findSimilarItem } from "./utilities.js";
 
 const PACK_ID = `world.item-piles-item-backup-do-not-delete`;
 
@@ -33,7 +34,8 @@ async function updateCache() {
 	for (const currency of currencies.concat(secondaryCurrencies)) {
 		if (currency.type !== "item") continue;
 		if (currency.data.uuid) {
-			COMPENDIUM_CACHE[currency.data?.uuid] = (await foundry.utils.fromUuid(currency.data.uuid)).toObject();
+			const item = await foundry.utils.fromUuid(currency.data.uuid);
+			if (item) COMPENDIUM_CACHE[currency.data.uuid] = item.toObject();
 		} else if (currency.data.item) {
 			const item = await findOrCreateItemInCompendium(currency.data.item)
 			COMPENDIUM_CACHE[item.uuid] = item.toObject();
@@ -72,13 +74,10 @@ export async function findOrCreateItemInCompendium(itemData) {
 	if (!compendiumItem) {
 		compendiumItem = (await addItemsToCompendium([itemData]))[0];
 	}
-	COMPENDIUM_CACHE[compendiumItem.uuid] = itemData;
+	COMPENDIUM_CACHE[compendiumItem.uuid] = compendiumItem.toObject();
 	return compendiumItem;
 }
 
 export function findSimilarItemInCompendiumSync(itemToFind) {
-	return Object.values(COMPENDIUM_CACHE).find(compendiumItem => {
-		return compendiumItem.name === itemToFind.name
-			&& compendiumItem.type === itemToFind.type;
-	}) ?? false;
+	return findSimilarItem(Object.values(COMPENDIUM_CACHE), itemToFind) ?? false;
 }

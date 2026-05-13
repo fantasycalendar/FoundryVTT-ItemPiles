@@ -43,61 +43,64 @@
 
 	$: pileData.enabled = $pileEnabled;
 
+	let isSubmitting = false;
+
 	async function updateSettings() {
 
-		let defaults = foundry.utils.duplicate(PileUtilities.getPileDefaults());
+		if (isSubmitting) return;
+		isSubmitting = true;
 
-		const types = [
-			"closedImage",
-			"emptyImage",
-			"openedImage",
-			"lockedImage",
-			"closeSound",
-			"openSound",
-			"lockedSound",
-			"unlockedSound",
-		];
+		try {
 
-		for (let type of types) {
-			if (pileData[type].includes("*")) {
-				pileData[type + "s"] = await Helpers.getFiles(pileData[type], { applyWildCard: true, softFail: true });
-				pileData[type + "s"] = pileData[type + "s"] || [];
+			let defaults = foundry.utils.duplicate(PileUtilities.getPileDefaults());
+
+			const types = [
+				"closedImage",
+				"emptyImage",
+				"openedImage",
+				"lockedImage",
+				"closeSound",
+				"openSound",
+				"lockedSound",
+				"unlockedSound",
+			];
+
+			for (let type of types) {
+				if (pileData[type].includes("*")) {
+					pileData[type + "s"] = await Helpers.getFiles(pileData[type], { applyWildCard: true, softFail: true });
+					pileData[type + "s"] = pileData[type + "s"] || [];
+				}
 			}
-		}
 
-		const data = foundry.utils.mergeObject(defaults, pileData);
+			const data = foundry.utils.mergeObject(defaults, pileData);
 
-		data.deleteWhenEmpty = {
-			"default": "default",
-			"true": true,
-			"false": false
-		}[data.deleteWhenEmpty];
+			data.deleteWhenEmpty = {
+				"default": "default",
+				"true": true,
+				"false": false
+			}[data.deleteWhenEmpty];
 
-		const currentData = PileUtilities.getActorFlagData(pileActor);
-		const diff = Object.keys(foundry.utils.diffObject(currentData, foundry.utils.deepClone(data)));
+			const currentData = PileUtilities.getActorFlagData(pileActor);
+			const diff = Object.keys(foundry.utils.diffObject(currentData, foundry.utils.deepClone(data)));
 
-		game.itempiles.API.updateItemPile(pileActor, data).then(async () => {
+			await game.itempiles.API.updateItemPile(pileActor, data);
+
 			if (diff.includes("enabled") || diff.includes("type")) {
 				const promises = [];
 				let apps = [];
 				switch (currentData.type) {
-					case CONSTANTS.PILE_TYPES.MERCHANT:
-						if (MerchantApp.getActiveApp(pileActor)) {
-							promises.push(MerchantApp.getActiveApp(pileActor).close());
-						}
-						if (MerchantApp.getActiveApp(pileActor)) {
-							promises.push(MerchantApp.getActiveApp(pileActor).close());
-						}
+					case CONSTANTS.PILE_TYPES.MERCHANT: {
+						const merchantApp = MerchantApp.getActiveApp(pileActor);
+						if (merchantApp) promises.push(merchantApp.close());
 						break;
+					}
 
 					case CONSTANTS.PILE_TYPES.VAULT:
-						apps = VaultApp.getActiveApps(pileActor)
-							.concat(VaultApp.getActiveApps(pileActor));
+						apps = VaultApp.getActiveApps(pileActor);
 						break;
 
 					default:
-						apps = ItemPileInventoryApp.getActiveApps(pileActor)
-							.concat(ItemPileInventoryApp.getActiveApps(pileActor));
+						apps = ItemPileInventoryApp.getActiveApps(pileActor);
 						break;
 				}
 
@@ -116,9 +119,12 @@
 					pileActor.sheet.render(true, { bypassItemPiles: true });
 				}
 			}
-		});
 
-		application.close();
+			application.close();
+
+		} finally {
+			isSubmitting = false;
+		}
 
 	}
 
@@ -152,7 +158,7 @@
 <ApplicationShell bind:elementRoot>
 
 	<form autocomplete=off bind:this={form} class="item-piles-config-container"
-	      on:submit|once|preventDefault={updateSettings}>
+	      on:submit|preventDefault={updateSettings}>
 
 		<Tabs bind:activeTab bind:tabs/>
 
@@ -228,7 +234,7 @@
 		</section>
 
 		<footer>
-			<button on:click|once={requestSubmit} type="button">
+			<button on:click={requestSubmit} type="button" disabled={isSubmitting}>
 				<i class="far fa-save"></i>
 				{localize("ITEM-PILES.Applications.ItemPileConfig.Update")}
 			</button>

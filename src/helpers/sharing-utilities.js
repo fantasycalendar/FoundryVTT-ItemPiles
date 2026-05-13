@@ -194,8 +194,8 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
 
 	const pileCurrencies = PileUtilities.getActorCurrencies(itemPile, { getAll: true });
 
-	const filteredItems = items.filter(item => !pileCurrencies.some(currency => item.id !== currency.id));
-	const currencies = items.filter(item => !pileCurrencies.some(currency => item.id === currency.id));
+	const filteredItems = items.filter(item => !pileCurrencies.some(currency => currency.id === item.id));
+	const currencies = items.filter(item => pileCurrencies.some(currency => currency.id === item.id));
 
 	let pileSharingData = {};
 	if (!sharingData && ((pileData.shareItemsEnabled && filteredItems.length) || (pileData.shareCurrenciesEnabled && (attributes.length || currencies.length)))) {
@@ -290,17 +290,18 @@ export function addToItemPileSharingData(itemPile, actorUuid, {
 
 export function removeFromItemPileSharingData(itemPile, actorUuid, { items = [], attributes = [] } = {}) {
 
-	items = items.map(item => {
-		Utilities.setItemQuantity(item, Utilities.getItemQuantity(item) * -1)
-		return item;
+	const negatedItems = items.map(item => {
+		const clone = foundry.utils.deepClone(item);
+		Utilities.setItemQuantity(clone, Utilities.getItemQuantity(item) * -1);
+		return clone;
 	});
 
-	attributes = attributes.map(attribute => {
-		attribute.quantity = attribute.quantity * -1;
-		return attribute;
-	});
+	const negatedAttributes = attributes.map(attribute => ({
+		...attribute,
+		quantity: attribute.quantity * -1
+	}));
 
-	return addToItemPileSharingData(itemPile, actorUuid, { items, attributes });
+	return addToItemPileSharingData(itemPile, actorUuid, { items: negatedItems, attributes: negatedAttributes });
 
 }
 
@@ -311,7 +312,7 @@ export function getItemSharesLeftForActor(pile, item, recipient, {
 	shareData = null
 } = {}) {
 
-	if (item instanceof String) {
+	if (typeof item === "string") {
 		item = pile.items.get(item);
 	}
 	let previouslyTaken = 0;

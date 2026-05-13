@@ -118,8 +118,11 @@ export default class TradeAPI {
 					return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.SameActor"), true);
 				}
 
-				// If they declined, show warning
-				if (!data || !data.fullPrivateTradeId.includes(privateTradeId)) {
+				// If they declined, show warning. The responder echoes back the full
+				// concatenated id (privateTradeId + their suffix), so a startsWith check
+				// pins it to exactly our request rather than any string that happens
+				// to contain the prefix.
+				if (!data || typeof data.fullPrivateTradeId !== "string" || !data.fullPrivateTradeId.startsWith(privateTradeId)) {
 					return Helpers.custom_warning(game.i18n.localize("ITEM-PILES.Trade.Declined"), true);
 				}
 
@@ -141,7 +144,7 @@ export default class TradeAPI {
 
 				ongoingTrades.set(data.fullPublicTradeId, { app, store });
 
-				actorSheet.byassItemPiles = true;
+				actorSheet.bypassItemPiles = true;
 				actor.sheet.render(true, actorSheet);
 
 				if (isPrivate) {
@@ -189,7 +192,7 @@ export default class TradeAPI {
 
 		// If muted, add user to blacklist locally
 		if (result === "mute") {
-			mutedUsers.push(tradingUserId);
+			mutedUsers.add(tradingUserId);
 			return false;
 		}
 
@@ -212,7 +215,7 @@ export default class TradeAPI {
 
 		ongoingTrades.set(fullPublicTradeId, { app, store });
 
-		actorSheet.byassItemPiles = true;
+		actorSheet.bypassItemPiles = true;
 		actor.sheet.render(true, actorSheet);
 
 		return {
@@ -454,7 +457,8 @@ export default class TradeAPI {
 		await transaction.commit();
 
 		if (trade.store.isPrivate) {
-			Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data[0], data[1], tradeId);
+			const data = trade.store.export();
+			Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data.leftTraderData, data.rightTraderData, tradeId);
 			trade.app.close({ callback: true });
 			ongoingTrades.delete(tradeId);
 		} else if (userId === game.user.id) {

@@ -1,7 +1,7 @@
 <script>
 
 	import { localize } from '#runtime/util/i18n';
-	import { getContext } from "svelte";
+	import { getContext, onDestroy } from "svelte";
 	import { tweened } from 'svelte/motion';
 	import { linear } from 'svelte/easing';
 	import * as Helpers from "../../helpers/helpers.js";
@@ -78,6 +78,12 @@
 		done = true;
 		application.close();
 	}
+
+	onDestroy(() => {
+		clearTimeout(timeout);
+		clearInterval(connection);
+		done = true;
+	});
 
 </script>
 

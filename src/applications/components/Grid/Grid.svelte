@@ -1,12 +1,11 @@
 <script>
 
 	import { createEventDispatcher } from 'svelte';
-	import { writable } from 'svelte/store';
 	import { styleFromObject } from '../../../helpers/helpers';
 	import { calcPosition } from './grid-utils.js';
 	import GridItem from './GridItem.svelte';
 
-	export let gridContainer = HTMLDivElement;
+	export let gridContainer = null;
 	export let items = [];
 	export let dropGhost = false;
 	export let options = {
@@ -27,9 +26,6 @@
 		highlightClass: "",
 		highlightItems: false
 	}
-
-	let containerHeight = writable(0);
-	let containerWidth = writable(0);
 
 	const dispatch = createEventDispatcher();
 
@@ -69,15 +65,11 @@
 		dispatch('itemflipped', { ...event.detail });
 	}
 
-	$: $containerWidth = options.cols * (options.gridSize + options.gap) + options.gap;
-	$: $containerHeight = options.rows * (options.gridSize + options.gap) + options.gap;
-
 	$: containerStyle = styleFromObject({
-		"width": $containerWidth + "px",
-		"height": $containerHeight + "px",
+		"width": (options.cols * (options.gridSize + options.gap) + options.gap) + "px",
+		"height": (options.rows * (options.gridSize + options.gap) + options.gap) + "px",
 	});
 
-	let backgroundGridStyle = "";
 	$: backgroundGridStyle = styleFromObject({
 		"grid-template-columns": `repeat(${options.cols}, ${options.gridSize + options.gap / 2}px)`,
 		"grid-template-rows": `repeat(${options.rows}, ${options.gridSize + options.gap / 2}px)`,
@@ -129,7 +121,7 @@
 			{#each Array(options.rows) as _, rowIndex (rowIndex)}
 				{#each Array(options.cols) as _, colIndex (colIndex)}
 					<div class:grid-disabled={colIndex >= options.enabledCols || rowIndex >= options.enabledRows}
-					     style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}">
+					     style="width: {options.gridSize + (options.gap/2)}px; height: {options.gridSize + (options.gap/2)}px">
 						<!--{colIndex} {rowIndex}-->
 					</div>
 				{/each}

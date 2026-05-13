@@ -259,6 +259,8 @@ CONSTANTS.HOOKS = {
 	DROP_DOCUMENT: module`onDropDocument`,
 	PRE_TRANSFER_EVERYTHING: module`preTransferEverything`,
 	TRANSFER_EVERYTHING: module`transferEverything`,
+	PRE_COMBINE_ITEM_PILES: module`preCombineItemPiles`,
+	COMBINE_ITEM_PILES: module`combineItemPiles`,
 	PRE_RENDER_SHEET: module`preRenderActorSheet`,
 	PRE_RENDER_INTERFACE: module`preRenderInterface`,
 	PRE_OPEN_INTERFACE: module`preOpenInterface`,

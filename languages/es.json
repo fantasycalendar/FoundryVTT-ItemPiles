@@ -16,12 +16,12 @@
       "UpdateItemPileSuccess": "Item Pile actualizado exitosamente."
     },
     "Errors": {
-      "DisallowedItemTrade": "No puedes intercambiar objetos de \"{tipo}\"",
+      "DisallowedItemTrade": "No puedes intercambiar objetos de \"{type}\"",
       "DisallowedItemSell": "Este comerciante no acepta artículos de \"{type}\"",
       "NoSourceDrop": "No puedes soltar objetos del inventario a menos que seas un DM.",
       "PileLocked": "El botín está bloqueado y no se puede abrir; no puedes añadir objetos.",
       "DropNoToken": "No tienes ningún token en esta escena, por lo que no puedes soltar objetos.",
-      "DisallowedItemDrop": "No puedes soltar objetos de \"{tipo}\"",
+      "DisallowedItemDrop": "No puedes soltar objetos de \"{type}\"",
       "PileTooFar": "Estás demasiado lejos como para interactuar con el botín."
     },
     "Warnings": {
@@ -125,7 +125,7 @@
       "CurrentItems": "Objetos actuales",
       "NoRollTables": "No hay tabla de tiradas, crea una para comenzar",
       "ClickRoll": "Haz clic en tirar para empezar",
-      "RolledTimes": "Se ha tirado {rollos} veces",
+      "RolledTimes": "Se ha tirado {rolls} veces",
       "KeepRolled": "Mantener tirada",
       "AddAll": "Agregar todos los artículos",
       "AddItem": "Añadir",
@@ -142,10 +142,10 @@
     },
     "Dialogs": {
       "TypeWarning": {
-        "SellContent": "Estás intentando vender un artículo del tipo (\"{tipo}\") y el comerciante normalmente no lo aceptaría. ¿Seguro que quieres hacer esto?",
+        "SellContent": "Estás intentando vender un artículo del tipo (\"{type}\") y el comerciante normalmente no lo aceptaría. ¿Seguro que quieres hacer esto?",
         "Title": "Advertencia de Tipo Objeto",
-        "DropContent": "Estás soltando un objeto que es del tipo (\"{tipo}\") y normalmente no se permite. ¿Seguro que quieres hacer esto?",
-        "TradeContent": "Estás intentando comerciar con un artículo que es del tipo (\"{tipo}\") y normalmente no se permite. ¿Seguro que quieres hacer esto?"
+        "DropContent": "Estás soltando un objeto que es del tipo (\"{type}\") y normalmente no se permite. ¿Seguro que quieres hacer esto?",
+        "TradeContent": "Estás intentando comerciar con un artículo que es del tipo (\"{type}\") y normalmente no se permite. ¿Seguro que quieres hacer esto?"
       },
       "ResetSettings": {
         "Title": "Restablecer la Configuración del Módulo Item Piles",

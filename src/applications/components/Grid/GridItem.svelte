@@ -20,7 +20,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	let itemRef = HTMLElement;
+	let itemRef = null;
 	let dragged = false;
 	const transformStore = item.transform;
 	const previewTransform = item.ghostTransform;
@@ -29,21 +29,22 @@
 	$: active = $activeStore;
 	$: transform = $transformStore;
 	$: gridTransform = calcPosition($transformStore, options);
-	$: ghostGridTransform = calcPosition({
-		...snapOnMove($previewTransform.left, $previewTransform.top, $previewTransform, options, false),
-		w: $previewTransform.w,
-		h: $previewTransform.h,
-	}, options);
+
+	$: classes = [
+		options.hoverClass,
+		(options.highlightItems && item.highlight) ? options.highlightClass : "",
+		(options.highlightItems && !item.highlight) ? options.dimClass : ""
+	].filter(Boolean).join(" ");
+
+	$: ghostGridTransform = (dragged || active)
+		? calcPosition({
+			...snapOnMove($previewTransform.left, $previewTransform.top, $previewTransform, options, false),
+			w: $previewTransform.w,
+			h: $previewTransform.h,
+		}, options)
+		: gridTransform;
 	$: {
 		if (!$activeStore) collisions = [];
-	}
-
-	let classes = "";
-	$: {
-		classes = "";
-		classes += " " + options.hoverClass;
-		classes += (options.highlightItems && item.highlight ? " " + options.highlightClass : "")
-		classes += (options.highlightItems && !item.highlight ? " " + options.dimClass : "")
 	}
 
 	$: style = styleFromObject({
@@ -69,6 +70,8 @@
 	let validPlacement = false;
 	let collisions = [];
 	let pointerOffset = { left: 0, top: 0 };
+	let dragContainerBounds = { width: 0, height: 0 };
+	let activeOtherIds = new Set();
 
 	function doubleClick(event) {
 		if (event.button !== 0) return;
@@ -123,11 +126,16 @@
 			internalTop: event.offsetY
 		};
 
+		if (!gridContainer) return;
+		const rect = gridContainer.getBoundingClientRect();
+		dragContainerBounds = { width: rect.width, height: rect.height };
+
+		activeOtherIds.clear();
+
 		$previewTransform = $transformStore;
 
-		// Setup events for when item is moved and dropped
-		window.addEventListener('pointermove', move, { passive: false });
-		window.addEventListener('pointerup', moveEnd, { passive: false });
+		window.addEventListener('pointermove', move, { passive: true });
+		window.addEventListener('pointerup', moveEnd, { passive: true });
 		window.addEventListener('touchmove', move, { passive: false });
 		window.addEventListener('touchend', moveEnd, { passive: false });
 
@@ -144,18 +152,20 @@
 		const { pageX, pageY } = (event.type === "touchmove" ? event.changedTouches[0] : event);
 
 		let outOfBounds = false;
+		let newPreview = null;
 
 		previewTransform.update(data => {
 
 			const unsnappedData = calcPosition(data, options);
 
-			const { left, top, outOfBounds } = constrainToContainer(
+			const { left, top, outOfBounds: innerOutOfBounds } = constrainToContainer(
 				pageX - pointerOffset.left,
 				pageY - pointerOffset.top,
 				unsnappedData.width,
 				unsnappedData.height
 			);
 
+			outOfBounds = innerOutOfBounds;
 			activeStore.set(!outOfBounds);
 
 			dispatch("itemmove", {
@@ -163,31 +173,41 @@
 				y: pageY - pointerOffset.internalTop
 			});
 
-			return {
+			newPreview = {
 				...data,
 				...snapOnMove(left, top, unsnappedData, options),
 				left,
 				top
 			};
+			return newPreview;
 		});
 
-		collisions = getCollisions({ id: item.id, transform: previewTransform }, items);
+		collisions = getCollisions({ id: item.id, transform: newPreview }, items);
 		if (!splitting) {
 			validPlacement = !outOfBounds && isPlacementValid({
 				id: item.id,
 				item: item,
-				transform: previewTransform
+				transform: newPreview
 			}, collisions, items, options);
+
+			const newActiveIds = new Set();
+			for (const c of collisions) newActiveIds.add(c.id);
+
 			for (const otherItem of items) {
 				if (otherItem.id === item.id) continue;
-				const isActive = collisions.indexOf(otherItem) > -1;
-				otherItem.active.set(isActive);
+				const wasActive = activeOtherIds.has(otherItem.id);
+				const isActive = newActiveIds.has(otherItem.id);
+				if (isActive !== wasActive) {
+					otherItem.active.set(isActive);
+				}
 				if (isActive) {
+					const otherTransform = get(otherItem.transform);
 					otherItem.ghostTransform.update(() => {
-						return calcPosition(swapItemTransform(transform, get(previewTransform), get(otherItem.transform)), options);
+						return calcPosition(swapItemTransform(transform, newPreview, otherTransform), options);
 					});
 				}
 			}
+			activeOtherIds = newActiveIds;
 		} else {
 			activeStore.set(!collisions.length);
 		}
@@ -195,30 +215,25 @@
 
 	function constrainToContainer(left, top, width, height) {
 
-		const parentRect = gridContainer.getBoundingClientRect();
-		const relativeRect = {
-			left: (parentRect.left - parentRect.x),
-			top: (parentRect.top - parentRect.y),
-			right: (parentRect.right - parentRect.x),
-			bottom: (parentRect.bottom - parentRect.y),
-		}
+		const right = dragContainerBounds.width;
+		const bottom = dragContainerBounds.height;
 
-		const outOfBounds = (left < relativeRect.left && left < (relativeRect.left - width / 2))
-			|| (top < relativeRect.top && top < (relativeRect.top - height / 2))
-			|| ((left + width) > relativeRect.right && (left + width) > (relativeRect.right + width / 2))
-			|| ((top + height) > relativeRect.bottom && (top + height) > (relativeRect.bottom + height / 2));
+		const outOfBounds = (left < 0 && left < (-width / 2))
+			|| (top < 0 && top < (-height / 2))
+			|| ((left + width) > right && (left + width) > (right + width / 2))
+			|| ((top + height) > bottom && (top + height) > (bottom + height / 2));
 
-		if (left < relativeRect.left) {
-			left = relativeRect.left;
+		if (left < 0) {
+			left = 0;
 		}
-		if (top < relativeRect.top) {
-			top = relativeRect.top;
+		if (top < 0) {
+			top = 0;
 		}
-		if ((left + width) > relativeRect.right) {
-			left = relativeRect.right - width;
+		if ((left + width) > right) {
+			left = right - width;
 		}
-		if ((top + height) > relativeRect.bottom) {
-			top = relativeRect.bottom - height;
+		if ((top + height) > bottom) {
+			top = bottom - height;
 		}
 
 		return { left, top, outOfBounds };
@@ -257,8 +272,11 @@
 		if (!active) return;
 
 		for (const otherItem of items) {
-			otherItem.active.set(false);
+			if (activeOtherIds.has(otherItem.id)) {
+				otherItem.active.set(false);
+			}
 		}
+		activeOtherIds.clear();
 
 		if (splitting) {
 			splitting = false;
@@ -332,7 +350,6 @@
 	}
 
 	$: itemClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
-	$: collisionClass = collisions.length ? (validPlacement ? options.collisionClass : options.invalidCollisionClass) : options.previewClass
 
 	function keydown(event) {
 		if (!active || !dragged || (item.item.w === item.item.h)) return;
@@ -380,7 +397,7 @@
 </div>
 
 {#if active}
-	<div style={ghostStyle} class={collisionClass}></div>
+	<div style={ghostStyle} class={itemClass}></div>
 
 	{#if collisions.length}
 		<div style={style} class={itemClass}></div>

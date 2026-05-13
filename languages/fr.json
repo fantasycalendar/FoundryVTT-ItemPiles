@@ -455,7 +455,7 @@
       "TooltipConfigureTable": "Configurer une table",
       "TooltipRollTable": "Lancer une table",
       "ToolTipRemoveAllRolledItems": "Retirer tous les objets tirés",
-      "ShoppingAs": "Shopping en tant que {nom de l'acteur}",
+      "ShoppingAs": "Shopping en tant que {actorName}",
       "TableCustomCategory": "Ajouter des articles à une catégorie personnalisée :",
       "TableAddAllItems": "Ajouter tous les articles :",
       "TableTimesToRoll": "Temps de roulement sur la table :",
@@ -964,7 +964,7 @@
         "Path": "Chemin de l'attribut",
         "AddNew": "Ajouter un nouveau filtre",
         "Title": "Item Piles - Éditeur de propriétés d'éléments requis",
-        "TitleActor": "Item Piles - Éditeur de propriétés d'objet requis : {actor-name}",
+        "TitleActor": "Item Piles - Éditeur de propriétés d'objet requis : {actor_name}",
         "Explanation": "Vous pouvez définir ici plusieurs types de propriétés d'objets requis que les articles transférés vers cette pile d'articles doivent posséder. Sur la base du chemin d'attribut donné, la pile d'objets pourra trouver le \"type\" d'un objet et, sur la base des conditions, elle empêchera le transfert d'articles qui ne correspondent pas à ces propriétés vers cette pile d'objets."
       }
     },

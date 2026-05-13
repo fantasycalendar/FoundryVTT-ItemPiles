@@ -1,9 +1,13 @@
 import { clamp } from "../../../helpers/helpers.js";
 import { get } from "svelte/store";
 
+function resolveTransform(t) {
+	return t?.subscribe ? get(t) : t;
+}
+
 export function isItemColliding(item, otherItem) {
-	const transform = item.transform?.subscribe ? get(item.transform) : item.transform;
-	const otherTransform = otherItem.transform?.subscribe ? get(otherItem.transform) : otherItem.transform;
+	const transform = resolveTransform(item.transform);
+	const otherTransform = resolveTransform(otherItem.transform);
 	return (
 		item.id !== otherItem.id &&
 		transform.x + (transform.w - 1) >= otherTransform.x &&
@@ -14,8 +18,10 @@ export function isItemColliding(item, otherItem) {
 }
 
 export function getCollisions(originalItem, items) {
+	const movingTransform = resolveTransform(originalItem.transform);
+	const moving = { id: originalItem.id, transform: movingTransform };
 	return items.filter((item) => {
-		return isItemColliding(originalItem, item)
+		return isItemColliding(moving, item)
 	});
 }
 
@@ -100,13 +106,8 @@ export function swapItemTransform(originalTransform, finalTransform, transform) 
 export function isPlacementValid(item, collisions, items, options) {
 	if (!collisions.length) return true;
 
-	const finalTransform = foundry.utils.deepClone(get(item.transform));
-	const origItemTransform = foundry.utils.deepClone(get(item.item.transform));
-
-	const newItemPlacement = {
-		id: item.id,
-		transform: finalTransform
-	};
+	const finalTransform = resolveTransform(item.transform);
+	const origItemTransform = resolveTransform(item.item.transform);
 
 	const itemWithinBounds = (finalTransform.x + (finalTransform.w - 1)) < options.enabledCols
 		&& (finalTransform.y + (finalTransform.h - 1)) < options.enabledRows
@@ -116,10 +117,9 @@ export function isPlacementValid(item, collisions, items, options) {
 	if (!itemWithinBounds) return false;
 
 	const assumedCollisionMovement = collisions.map(collision => {
-		const collisionTransform = foundry.utils.deepClone(get(collision.transform));
 		return {
 			id: collision.id,
-			transform: swapItemTransform(origItemTransform, finalTransform, collisionTransform)
+			transform: swapItemTransform(origItemTransform, finalTransform, resolveTransform(collision.transform))
 		};
 	});
 
@@ -131,11 +131,17 @@ export function isPlacementValid(item, collisions, items, options) {
 			&& (entry.transform.y) >= 0
 	})) return false;
 
-	const itemsSansCollisions = items.filter(i => {
-		return i.id !== item.id && !assumedCollisionMovement.some(coll => coll.id === i.id);
-	}).concat([newItemPlacement])
+	const excludedIds = new Set([item.id]);
+	for (const coll of assumedCollisionMovement) excludedIds.add(coll.id);
 
-	return assumedCollisionMovement.every(movedBox => {
-		return !getCollisions(movedBox, itemsSansCollisions).length;
-	});
+	const newItemPlacement = { id: item.id, transform: finalTransform };
+
+	for (const movedBox of assumedCollisionMovement) {
+		for (const candidate of items) {
+			if (excludedIds.has(candidate.id)) continue;
+			if (isItemColliding(movedBox, candidate)) return false;
+		}
+		if (isItemColliding(movedBox, newItemPlacement)) return false;
+	}
+	return true;
 }

@@ -12,6 +12,7 @@ export default class ChatAPI {
 
 		Helpers.hooks.on("preCreateChatMessage", this._preCreateChatMessage.bind(this));
 		Helpers.hooks.on("renderChatMessage", this._renderChatMessage.bind(this));
+		Helpers.hooks.on("renderChatMessageHTML", this._renderChatMessage.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.ITEM.TRANSFER, this._outputTransferItem.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.ATTRIBUTE.TRANSFER, this._outputTransferCurrency.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.TRANSFER_EVERYTHING, this._outputTransferEverything.bind(this));
@@ -31,11 +32,13 @@ export default class ChatAPI {
 
 	static _preCreateChatMessage(chatMessage) {
 
-		if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING)) return;
-
 		const content = chatMessage.content.toLowerCase();
 
 		if (!(content.startsWith("!itempiles") || content.startsWith("!ip"))) return;
+
+		// Suppress the chat command itself even when trading is disabled, so the
+		// user doesn't see their `!ip ...` echoed as a regular message.
+		if (!Helpers.getSetting(SETTINGS.ENABLE_TRADING)) return false;
 
 		const args = content.split(" ").slice(1);
 
@@ -77,7 +80,7 @@ export default class ChatAPI {
 			const update = this._replaceChatContent(message);
 			const tradeId = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PUBLIC_TRADE_ID);
 			const tradeUsers = foundry.utils.getProperty(message, CONSTANTS.FLAGS.TRADE_USERS);
-			const bothUsersActive = tradeUsers.filter(userId => game.users.get(userId).active).length === tradeUsers.length;
+			const bothUsersActive = tradeUsers.filter(userId => game.users.get(userId)?.active).length === tradeUsers.length;
 			if (!bothUsersActive) {
 				updates.push(update);
 			} else {
@@ -276,7 +279,7 @@ export default class ChatAPI {
 
 		for (const message of messages) {
 			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
-			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
+			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId && this._messageMatchesOutputVisibility(message, userId)) {
 				return this._updateExistingPickupMessage(message, sourceActor, targetActor, items, currencies, interactionId)
 			}
 		}
@@ -421,7 +424,7 @@ export default class ChatAPI {
 		}
 		party_2_data.got_nothing = !party_2_data.items.length && !party_2_data.currencies.length;
 
-		if (party_1.got_nothing && party_2.got_nothing) return;
+		if (party_1_data.got_nothing && party_2_data.got_nothing) return;
 
 		const enableCollapse = (party_1_data.items.length + party_1_data.currencies.length + party_2_data.items.length + party_2_data.currencies.length) > 6;
 
@@ -439,7 +442,13 @@ export default class ChatAPI {
 			content: chatCardHtml,
 			flavor: "Item Piles" + (isPrivate ? ": " + game.i18n.localize("ITEM-PILES.Chat.PrivateTrade") : ""),
 			speaker: ChatMessage.getSpeaker({ alias: game.user.name }),
-			whisper: isPrivate ? [party_2.user] : []
+			whisper: isPrivate
+				? Array.from(new Set([
+					party_1.user,
+					party_2.user,
+					...Array.from(game.users).filter(u => u.isGM).map(u => u.id)
+				]))
+				: []
 		});
 
 	}
@@ -459,7 +468,7 @@ export default class ChatAPI {
 
 		for (const message of messages) {
 			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
-			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId) {
+			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId && this._messageMatchesOutputVisibility(message, userId)) {
 				return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
 			}
 		}
@@ -632,21 +641,56 @@ export default class ChatAPI {
 
 	}
 
+	/**
+	 * Build the whisper recipient list for the current OUTPUT_TO_CHAT mode.
+	 * @param {string} userId - the user whose action triggered the message
+	 * @returns {string[]} - empty array means "public message"
+	 */
+	static _getOutputWhisperRecipients(userId) {
+		const mode = Number(Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) || 0;
+		if (mode < 2) return [];
+
+		const recipients = Array.from(game.users)
+			.filter(user => user.isGM)
+			.map(user => user.id);
+
+		// Mode 2 ("SelfGM") includes the triggering user; mode 3 ("Blind") is GM-only.
+		if (mode === 2) recipients.push(userId);
+
+		return Array.from(new Set(recipients));
+	}
+
+	/**
+	 * Whether an existing chat card's whisper set matches what we'd compute for
+	 * the current user under the current OUTPUT_TO_CHAT mode. Used to decide
+	 * whether to merge a new pickup/purchase into the existing card or post a
+	 * fresh one. Merging a private update into a public card would leak, and
+	 * when chat output is "Off" we must not touch any card at all.
+	 *
+	 * @param {ChatMessage} message
+	 * @param {string} userId
+	 * @returns {boolean}
+	 */
+	static _messageMatchesOutputVisibility(message, userId) {
+		const mode = Number(Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) || 0;
+		if (!mode) return false;
+		const expected = this._getOutputWhisperRecipients(userId);
+		const actual = Array.from(new Set(message.whisper ?? []));
+		if (expected.length !== actual.length) return false;
+		return expected.every(recipient => actual.includes(recipient));
+	}
+
 	static _createNewChatMessage(userId, chatData) {
 
-		if (!chatData.whisper) {
+		const mode = Number(Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) || 0;
 
-			const mode = Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT);
+		// Mode 0 means "Off". Suppress unless the caller pre-built a whisper
+		// list (e.g. trade-completion paths that target specific traders).
+		if (!mode && !chatData.whisper?.length) return;
 
-			if (mode > 1) {
-				chatData.whisper = Array.from(game.users)
-					.filter(user => user.isGM)
-					.map(user => user.id);
-				if (mode === 2) {
-					chatData.whisper.push(userId);
-				}
-			}
-
+		if (!chatData.whisper?.length) {
+			const whisper = this._getOutputWhisperRecipients(userId);
+			if (whisper.length) chatData.whisper = whisper;
 		}
 
 		if (chatData?.whisper?.length) {

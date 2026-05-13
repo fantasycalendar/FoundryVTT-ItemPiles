@@ -47,9 +47,10 @@ export function getUuid(target) {
 
 export function sanitizeNumber(quantity) {
 	if (typeof quantity === "string") {
-		quantity = quantity.replaceAll(/[^\d.]+/g, "") ?? 0;
+		quantity = quantity.replaceAll(/[^\d.]+/g, "");
 	}
-	return Number(quantity) ?? 0;
+	const n = Number(quantity);
+	return Number.isFinite(n) ? n : 0;
 }
 
 /**
@@ -440,7 +441,7 @@ export function getSourceActorFromDropData(dropData) {
 			const uuid = `Scene.${dropData.sceneId}.Token.${dropData.tokenId}`;
 			return foundry.utils.fromUuidSync(uuid)?.actor;
 		}
-		return canvas.tokens.get(dropData.tokenId).actor;
+		return canvas.tokens.get(dropData.tokenId)?.actor;
 	} else if (dropData.actorId) {
 		return game.actors.get(dropData.actorId);
 	}
@@ -450,7 +451,6 @@ export function getSourceActorFromDropData(dropData) {
 
 export function deleteProperty(object, key) {
 	if (!key || !object) return false;
-	if (key in object) return true;
 	let target = object;
 	const keys = key.split('.');
 	for (let index = 0; index < keys.length; index++) {
@@ -543,9 +543,7 @@ export function ensureValidIds(actor, itemsToCreate) {
 
 }
 
-export function isRealNumber(inNumber) {
-	return !isNaN(inNumber) && typeof inNumber === "number" && isFinite(inNumber);
-}
+
 
 /**
  * Render an item's sheet in read-only mode for users that don't own the item.
@@ -568,10 +566,15 @@ export function renderReadOnlyItemPreview(sourceItem, ownershipLevel = CONST.DOC
 	itemData.ownership = { ...(itemData.ownership ?? {}), [game.user.id]: ownershipLevel };
 	const previewItem = new Item.implementation(itemData, { parent: sourceItem.parent ?? undefined });
 	const sheet = previewItem.sheet;
-	if (sheet?.options) {
+	const ApplicationV2 = foundry.applications?.api?.ApplicationV2;
+	const isV2 = !!ApplicationV2 && sheet instanceof ApplicationV2;
+	// AppV2 derives editability from document ownership, so the ownership downgrade above
+	// already makes the sheet read-only. AppV1 still needs the option toggles, and on AppV1
+	// some systems freeze the options object, so guard against non-extensible options.
+	if (!isV2 && sheet?.options && Object.isExtensible(sheet.options)) {
 		sheet.options.editable = false;
 		sheet.options.submitOnChange = false;
 		sheet.options.submitOnClose = false;
 	}
-	return sheet.render(true, { editable: false });
+	return isV2 ? sheet.render({ force: true }) : sheet.render(true, { editable: false });
 }

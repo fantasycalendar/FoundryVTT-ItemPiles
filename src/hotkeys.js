@@ -23,14 +23,14 @@ export const hotkeyActionState = {
 	},
 
 	get forceDropItem() {
-		return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
-			return game.keyboard.downKeys.has(key);
+		return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(keybind => {
+			return game.keyboard.downKeys.has(keybind?.key);
 		});
 	},
 
 	get forceDropOneItem() {
-		return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP).some(key => {
-			return game.keyboard.downKeys.has(key);
+		return game.keybindings.get(CONSTANTS.MODULE_NAME, HOTKEYS.DROP_ONE).some(keybind => {
+			return game.keyboard.downKeys.has(keybind?.key);
 		});
 	},
 
