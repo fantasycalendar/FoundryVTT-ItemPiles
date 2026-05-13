@@ -15,6 +15,9 @@
 - Fixed the Spectate Trade button on chat trade cards not working on Foundry V13+
 - Fixed private trade completion messages only being whispered to one party, leaving the other trader and any other GMs in the dark
 - Fixed players getting no feedback when dropping items onto a merchant they don't own
+- Fixed the Configure button missing from actor and item sheets on systems that still use Foundry's older sheet style (such as PF2e and some D&D 5e sheets)
+- Fixed the arrow icon missing from collapsible sections on Foundry V13+
+- Fixed pile and container sounds failing to play on Foundry V14
 
 ## Version 3.3.0
 
