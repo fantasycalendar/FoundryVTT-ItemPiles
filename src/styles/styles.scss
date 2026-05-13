@@ -736,26 +736,12 @@
   }
 
   & > summary {
-    display: block;
     font-weight: 900;
-
-    &::before {
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
-      content: "\f054";
-      margin-right: 0.5rem;
-    }
+    cursor: pointer;
   }
 
   &[open] > summary {
     margin-bottom: 0.5rem;
-
-    &::before {
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
-      content: "\f078";
-      margin-right: 0.275rem;
-    }
   }
 }
 
