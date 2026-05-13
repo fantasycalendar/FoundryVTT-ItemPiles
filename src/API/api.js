@@ -875,7 +875,7 @@ class API {
 			if (pileData.openSound.includes("*") && pileData.openSounds?.length) {
 				sound = Helpers.random_array_element(pileData.openSounds)
 			}
-			AudioHelper.play({ src: sound }, true)
+			foundry.audio.AudioHelper.play({ src: sound }, true)
 		}
 		return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
 	}
@@ -905,7 +905,7 @@ class API {
 			if (pileData.closeSound.includes("*") && pileData.closeSounds?.length) {
 				sound = Helpers.random_array_element(pileData.closeSounds)
 			}
-			AudioHelper.play({ src: sound }, true)
+			foundry.audio.AudioHelper.play({ src: sound }, true)
 		}
 
 		return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
@@ -959,7 +959,7 @@ class API {
 			if (pileData.closeSound.includes("*") && pileData.closeSounds?.length) {
 				sound = Helpers.random_array_element(pileData.closeSounds)
 			}
-			AudioHelper.play({ src: sound }, true)
+			foundry.audio.AudioHelper.play({ src: sound }, true)
 		}
 		return this.updateItemPile(targetActor, pileData, { interactingToken: interactingTokenDocument });
 	}
@@ -1022,7 +1022,7 @@ class API {
 			if (pileData.lockedSound.includes("*") && pileData.lockedSounds?.length) {
 				sound = Helpers.random_array_element(pileData.lockedSounds)
 			}
-			AudioHelper.play({ src: sound }, true);
+			foundry.audio.AudioHelper.play({ src: sound }, true);
 		}
 
 		return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.PILE.RATTLE, Utilities.getUuid(targetActor), pileData, Utilities.getUuid(interactingTokenDocument));

@@ -1704,7 +1704,7 @@ export default class PrivateAPI {
 					Helpers.debug(`Preloaded image: ${filePath}`);
 				} else if (isSound) {
 					Helpers.debug(`Preloaded sound: ${filePath}`);
-					await AudioHelper.preloadSound(filePath);
+					await foundry.audio.AudioHelper.preloadSound(filePath);
 				}
 				resolve();
 			});
