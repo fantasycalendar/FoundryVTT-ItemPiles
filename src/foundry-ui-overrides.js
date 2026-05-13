@@ -12,6 +12,8 @@ export let fastToolTip = null;
 export default function registerUIOverrides() {
 	Hooks.on("renderPlayers", addTradeButton);
 	Hooks.on("getActorContextOptions", insertActorContextMenuItems);
+	Hooks.on("getActorSheetHeaderButtons", insertActorHeaderButtons);
+	Hooks.on("getItemSheetHeaderButtons", insertItemHeaderButtons);
 	Hooks.on("getHeaderControlsApplicationV2", insertHeaderButtons);
 	Hooks.on("renderItemDirectory", hideTemporaryItems);
 	Hooks.on("renderTokenHUD", renderPileHUD);
