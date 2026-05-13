@@ -126,6 +126,7 @@
 			internalTop: event.offsetY
 		};
 
+		if (!gridContainer) return;
 		const rect = gridContainer.getBoundingClientRect();
 		dragContainerBounds = { width: rect.width, height: rect.height };
 
