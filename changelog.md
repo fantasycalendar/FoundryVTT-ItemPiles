@@ -18,6 +18,7 @@
 - Fixed the Configure button missing from actor and item sheets on systems that still use Foundry's older sheet style (such as PF2e and some D&D 5e sheets)
 - Fixed the arrow icon missing from collapsible sections on Foundry V13+
 - Fixed pile and container sounds failing to play on Foundry V14
+- Fixed Item Piles chat messages not appearing on Foundry V14 (thank you mechamaya on github!)
 
 ## Version 3.3.0
 
