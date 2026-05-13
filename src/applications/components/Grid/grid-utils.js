@@ -6,7 +6,7 @@ function resolveTransform(t) {
 }
 
 export function isItemColliding(item, otherItem) {
-	const transform = item.transform;
+	const transform = resolveTransform(item.transform);
 	const otherTransform = resolveTransform(otherItem.transform);
 	return (
 		item.id !== otherItem.id &&
