@@ -64,6 +64,7 @@
       "ItemPileInvalidItemDropped": "Você não pode soltar este tipo de item nesta pilha de itens!",
       "VaultSameItemOrigin": "Você não pode soltar itens no cofre que se originam do próprio cofre!",
       "VaultNoGmItemSidebar": "Apenas Mestres podem soltar itens da barra lateral!",
+      "NoMerchantOwnership": "Você precisa ser o dono deste ator de mercador para soltar itens nele. Peça ao seu Mestre para lhe conceder a propriedade.",
       "LogEmpty": "O log para \"{actor_name}\" está vazio e não tem nada para exportar"
     },
     "Inspect": {
