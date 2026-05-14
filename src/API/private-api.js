@@ -155,6 +155,9 @@ export default class PrivateAPI {
 		Utilities.deleteProperty(docData, CONSTANTS.FLAGS.PILE);
 		foundry.utils.setProperty(docData, CONSTANTS.FLAGS.PILE, cleanItemPileConfig);
 		if (!doc.isLinked) {
+			if (!docData[CONSTANTS.ACTOR_DELTA_PROPERTY]) {
+				docData[CONSTANTS.ACTOR_DELTA_PROPERTY] = {};
+			}
 			Utilities.deleteProperty(docData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE);
 			foundry.utils.setProperty(docData, CONSTANTS.ACTOR_DELTA_PROPERTY + "." + CONSTANTS.FLAGS.PILE, cleanItemPileConfig);
 		}
