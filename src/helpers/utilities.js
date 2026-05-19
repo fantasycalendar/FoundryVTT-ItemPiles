@@ -337,8 +337,52 @@ export function distance_between(a, b) {
 	return new Ray(a, b).distance;
 }
 
+function getTokenElevation(tokenLike) {
+	const doc = tokenLike?.document ?? tokenLike;
+	const elevation = doc?.elevation ?? tokenLike?.elevation ?? 0;
+	return Number.isFinite(elevation) ? elevation : 0;
+}
+
+function getTokenHeight(tokenLike) {
+	const doc = tokenLike?.document ?? tokenLike;
+	const gridDistance = canvas.scene?.grid?.distance ?? 5;
+
+	//if wall height module is enabled, get token height. Else return whatever the grid distance is or 5. 
+	//opportunity to implement something for levels v14 in the future here as a fallback for when wall-height is not enabled.
+	const height = Number(
+		doc?.flags?.["wall-height"]?.tokenHeight
+	);
+
+	//
+	if (Number.isFinite(height) && height > 0) {
+		return height;
+	}
+
+	return gridDistance;
+}
+
+function getVerticalGapFromSourceToTarget(sourceToken, targetToken) {
+	const sourceBottom = getTokenElevation(sourceToken);
+	const sourceTop = sourceBottom + getTokenHeight(sourceToken);
+
+	const targetBottom = getTokenElevation(targetToken);
+	const targetTop = targetBottom + getTokenHeight(targetToken);
+
+	if (targetBottom > sourceTop) return targetBottom - sourceTop;
+	if (targetTop < sourceBottom) return sourceBottom - targetTop;
+
+	return 0;
+}
+
 export function grids_between_tokens(a, b) {
-	return Math.floor(distance_between_rect(a, b) / canvas.grid.size) + 1
+	const xyDistancePixels = distance_between_rect(a, b);
+	const xyDistanceGrids = xyDistancePixels / canvas.grid.size;
+
+	const gridDistance = canvas.scene?.grid?.distance || 5;
+	const verticalGap = getVerticalGapFromSourceToTarget(a, b);
+	const zDistanceGrids = verticalGap / gridDistance;
+
+	return Math.floor(Math.hypot(xyDistanceGrids, zDistanceGrids)) + 1;
 }
 
 export function tokens_close_enough(a, b, maxDistance) {

@@ -1939,7 +1939,7 @@ export default class PrivateAPI {
 
 				if (sourceToken) {
 
-					const distance = Math.floor(Utilities.distance_between_rect(sourceToken, dropData.target.object) / canvas.grid.size) + 1
+					const distance = Utilities.grids_between_tokens(sourceToken, dropData.target.object)
 
 					const pileData = PileUtilities.getActorFlagData(dropData.target);
 
