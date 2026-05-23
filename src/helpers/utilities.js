@@ -145,9 +145,24 @@ export function refreshItemTypesThatCanStack() {
 
 
 export function getDocumentTemplates(templateType) {
+	const legacyModel = game.model?.[templateType] ?? {};
+	const dataModelEntries = Object.entries(CONFIG[templateType]?.dataModels ?? {})
+		.map(([k, v]) => {
+			// Pass an empty source object so DataField `initial` callbacks that read
+			// from the parent source (e.g. PF2e ArmySystemData's `(d) => ... d.details?.level?.value`)
+			// receive an object rather than undefined. The try/catch is a defensive backstop
+			// for systems whose schemas still throw - that type drops out of the dropdown
+			// rather than crashing the entire SettingsApp render.
+			try {
+				return [k, v.schema.getInitialValue({})];
+			} catch (err) {
+				Helpers.debug(`Item Piles | getDocumentTemplates: failed to compute initial value for ${templateType}.${k}`, err);
+				return [k, {}];
+			}
+		});
 	return foundry.utils.mergeObject(
-		game.model[templateType],
-		Object.fromEntries(Object.entries(CONFIG[templateType]?.dataModels ?? {}).map(([k, v]) => [k, v.schema.getInitialValue()])),
+		legacyModel,
+		Object.fromEntries(dataModelEntries),
 		{ inplace: false },
 	);
 }
