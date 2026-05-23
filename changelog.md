@@ -6,6 +6,7 @@
 - Fixed the custom item category editor being openable multiple times simultaneously, which could cause categories to be lost
 - Fixed a null-reference error when dismissing the custom item category editor without saving
 - Fixed a console error on every chat message in Foundry V14 caused by the trade spectate hook receiving a plain HTML element instead of a jQuery object
+- Fixed players being unable to preview merchant items on Foundry V14 systems using ApplicationV2 sheets (e.g. D&D 5e)
 
 ## Version 3.3.1
 

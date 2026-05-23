@@ -564,9 +564,11 @@ export function ensureValidIds(actor, itemsToCreate) {
  * Render an item's sheet in read-only mode for users that don't own the item.
  *
  * Item Piles synthesizes a temporary Item document with elevated ownership for
- * the viewing user, then opens its sheet. The synthetic document is detached
- * from any compendium/world store, so anything that triggers a write (sheet
- * close handlers that submit forms, change handlers, etc) must be suppressed.
+ * the viewing user, then opens its sheet. The synthetic document is constructed
+ * without a parent so that ApplicationV2's permission check reads from the item's
+ * own ownership field rather than delegating to the parent actor (which the
+ * viewing user does not own). AppV1 sheets are additionally hardened against
+ * submitting changes on close.
  *
  * @param {Item} sourceItem               The real item being previewed.
  * @param {number} ownershipLevel         Ownership level granted to the current user (defaults to LIMITED).
@@ -579,11 +581,11 @@ export function renderReadOnlyItemPreview(sourceItem, ownershipLevel = CONST.DOC
 	}
 	const itemData = sourceItem.toObject();
 	itemData.ownership = { ...(itemData.ownership ?? {}), [game.user.id]: ownershipLevel };
-	const previewItem = new Item.implementation(itemData, { parent: sourceItem.parent ?? undefined });
+	const previewItem = new Item.implementation(itemData);
 	const sheet = previewItem.sheet;
 	const ApplicationV2 = foundry.applications?.api?.ApplicationV2;
 	const isV2 = !!ApplicationV2 && sheet instanceof ApplicationV2;
-	// AppV2 derives editability from document ownership, so the ownership downgrade above
+	// AppV2 derives editability from document ownership, so the ownership grant above
 	// already makes the sheet read-only. AppV1 still needs the option toggles, and on AppV1
 	// some systems freeze the options object, so guard against non-extensible options.
 	if (!isV2 && sheet?.options && Object.isExtensible(sheet.options)) {
