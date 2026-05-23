@@ -567,8 +567,11 @@ export function ensureValidIds(actor, itemsToCreate) {
  * the viewing user, then opens its sheet. The synthetic document is constructed
  * without a parent so that ApplicationV2's permission check reads from the item's
  * own ownership field rather than delegating to the parent actor (which the
- * viewing user does not own). AppV1 sheets are additionally hardened against
- * submitting changes on close.
+ * viewing user does not own).
+ *
+ * The synthetic document is also detached from any compendium/world store, so
+ * anything that triggers a write (sheet close handlers that submit forms, change
+ * handlers, etc) must be suppressed - hence the AppV1 option toggles below.
  *
  * @param {Item} sourceItem               The real item being previewed.
  * @param {number} ownershipLevel         Ownership level granted to the current user (defaults to LIMITED).
