@@ -2,7 +2,7 @@
 
 ## Version 3.3.2
 
-- Fixed the Settings app crashing on systems whose DataModel schemas throw during initialisation (e.g. PF2e)
+- Fixed (temporarily) the Settings app crashing on systems whose DataModel schemas throw during initialisation (e.g. PF2e)
 - Fixed the custom item category editor being openable multiple times simultaneously, which could cause categories to be lost
 - Fixed a null-reference error when dismissing the custom item category editor without saving
 - Fixed a console error on every chat message in Foundry V14 caused by the trade spectate hook receiving a plain HTML element instead of a jQuery object
