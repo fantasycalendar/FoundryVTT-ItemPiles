@@ -354,7 +354,11 @@ export async function openEditor(key, data = false) {
 		data = getSetting(key);
 	}
 
-	const result = await editor.show(data, { ...setting.applicationOptions, customOnChange: setting.customOnChange } ?? {});
+	const result = await editor.show(data, {
+		id: `item-piles-editor-${key}`,
+		...setting.applicationOptions,
+		customOnChange: setting.customOnChange
+	} ?? {});
 
 	if (setting.customOnChange && result) setting.customOnChange(result);
 

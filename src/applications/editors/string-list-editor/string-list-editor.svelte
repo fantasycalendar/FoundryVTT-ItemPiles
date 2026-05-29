@@ -26,10 +26,7 @@
 	}
 
 	function remove(index) {
-		stringListStore.update(val => {
-			val.splice(index, 1);
-			return val;
-		})
+		stringListStore.update(val => val.filter((_, i) => i !== index));
 	}
 
 	async function updateSettings() {

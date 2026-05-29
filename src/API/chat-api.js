@@ -53,7 +53,7 @@ export default class ChatAPI {
 	}
 
 	static _renderChatMessage(app, html) {
-		html.find(".item-piles-specate-trade").click(function () {
+		$(html).find(".item-piles-specate-trade").click(function () {
 			game.itempiles.API.spectateTrade($(this).data());
 		});
 	}

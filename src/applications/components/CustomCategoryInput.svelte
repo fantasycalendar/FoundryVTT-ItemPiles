@@ -10,6 +10,7 @@
 
 	async function showCustomItemCategoryEditor() {
 		openEditor(SETTINGS.CUSTOM_ITEM_CATEGORIES).then((result) => {
+			if (!Array.isArray(result)) return;
 			Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, Array.from(new Set(result)));
 			currentCustomCategories.set(Helpers.getSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES));
 		})

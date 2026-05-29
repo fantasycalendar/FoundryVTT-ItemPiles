@@ -145,9 +145,24 @@ export function refreshItemTypesThatCanStack() {
 
 
 export function getDocumentTemplates(templateType) {
+	const legacyModel = game.model?.[templateType] ?? {};
+	const dataModelEntries = Object.entries(CONFIG[templateType]?.dataModels ?? {})
+		.map(([k, v]) => {
+			// Pass an empty source object so DataField `initial` callbacks that read
+			// from the parent source (e.g. PF2e ArmySystemData's `(d) => ... d.details?.level?.value`)
+			// receive an object rather than undefined. The try/catch is a defensive backstop
+			// for systems whose schemas still throw - that type drops out of the dropdown
+			// rather than crashing the entire SettingsApp render.
+			try {
+				return [k, v.schema.getInitialValue({})];
+			} catch (err) {
+				Helpers.debug(`Item Piles | getDocumentTemplates: failed to compute initial value for ${templateType}.${k}`, err);
+				return [k, {}];
+			}
+		});
 	return foundry.utils.mergeObject(
-		game.model[templateType],
-		Object.fromEntries(Object.entries(CONFIG[templateType]?.dataModels ?? {}).map(([k, v]) => [k, v.schema.getInitialValue()])),
+		legacyModel,
+		Object.fromEntries(dataModelEntries),
 		{ inplace: false },
 	);
 }
@@ -549,9 +564,14 @@ export function ensureValidIds(actor, itemsToCreate) {
  * Render an item's sheet in read-only mode for users that don't own the item.
  *
  * Item Piles synthesizes a temporary Item document with elevated ownership for
- * the viewing user, then opens its sheet. The synthetic document is detached
- * from any compendium/world store, so anything that triggers a write (sheet
- * close handlers that submit forms, change handlers, etc) must be suppressed.
+ * the viewing user, then opens its sheet. The synthetic document is constructed
+ * without a parent so that ApplicationV2's permission check reads from the item's
+ * own ownership field rather than delegating to the parent actor (which the
+ * viewing user does not own).
+ *
+ * The synthetic document is also detached from any compendium/world store, so
+ * anything that triggers a write (sheet close handlers that submit forms, change
+ * handlers, etc) must be suppressed - hence the AppV1 option toggles below.
  *
  * @param {Item} sourceItem               The real item being previewed.
  * @param {number} ownershipLevel         Ownership level granted to the current user (defaults to LIMITED).
@@ -564,11 +584,11 @@ export function renderReadOnlyItemPreview(sourceItem, ownershipLevel = CONST.DOC
 	}
 	const itemData = sourceItem.toObject();
 	itemData.ownership = { ...(itemData.ownership ?? {}), [game.user.id]: ownershipLevel };
-	const previewItem = new Item.implementation(itemData, { parent: sourceItem.parent ?? undefined });
+	const previewItem = new Item.implementation(itemData);
 	const sheet = previewItem.sheet;
 	const ApplicationV2 = foundry.applications?.api?.ApplicationV2;
 	const isV2 = !!ApplicationV2 && sheet instanceof ApplicationV2;
-	// AppV2 derives editability from document ownership, so the ownership downgrade above
+	// AppV2 derives editability from document ownership, so the ownership grant above
 	// already makes the sheet read-only. AppV1 still needs the option toggles, and on AppV1
 	// some systems freeze the options object, so guard against non-extensible options.
 	if (!isV2 && sheet?.options && Object.isExtensible(sheet.options)) {
