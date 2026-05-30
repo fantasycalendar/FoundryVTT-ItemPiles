@@ -2,6 +2,8 @@
 
 	import ItemTypePriceModifiersEditor
 		from "../../editors/item-type-price-modifiers-editor/item-type-price-modifiers-editor.js";
+	import ItemPriceModifiersEditor
+		from "../../editors/item-price-modifiers-editor/item-price-modifiers-editor.js";
 	import PriceModifiersEditor from "../../editors/price-modifiers-editor/price-modifiers-editor.js";
 	import FilePicker from "../../components/FilePicker.svelte";
 	import SliderInput from "../../components/SliderInput.svelte";
@@ -74,6 +76,22 @@
 					delete modifier['actor'];
 				}
 			})
+		});
+	}
+
+	async function showItemPriceModifiers() {
+		const data = pileData.itemPriceModifiers || [];
+		return ItemPriceModifiersEditor.show(
+			data,
+			{ id: `item-price-modifier-item-pile-config-${pileActor.id}` },
+			{ title: localize("ITEM-PILES.Applications.ItemPriceModifiersEditor.TitleActor", { actor_name: pileActor.name }), }
+		).then((result) => {
+			pileData.itemPriceModifiers = result || [];
+			pileData.itemPriceModifiers.forEach(modifier => {
+				if (modifier.item) {
+					delete modifier["item"];
+				}
+			});
 		});
 	}
 
@@ -260,6 +278,18 @@
 		</label>
 		<button on:click={() => { showItemTypePriceModifiers() }} type="button">
 			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureItemTypePriceModifiers")}
+		</button>
+	</div>
+</div>
+
+<div class="form-group">
+	<div class="item-piles-flexcol">
+		<label>
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemPriceModifiers")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ItemPriceModifiersExplanation")}</p>
+		</label>
+		<button on:click={() => { showItemPriceModifiers() }} type="button">
+			{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.ConfigureItemPriceModifiers")}
 		</button>
 	</div>
 </div>

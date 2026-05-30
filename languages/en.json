@@ -574,10 +574,18 @@
         "ItemType": "Item Type",
         "Override": "Override"
       },
+      "ItemPriceModifiersEditor": {
+        "Title": "Item Price Modifiers Editor",
+        "TitleActor": "Item Price Modifiers Editor: {actor_name}",
+        "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific items. The \"Override\" setting means that it overrides the merchant's normal price modifiers, including item-type specific price modifiers.",
+        "DragDrop": "Drag and drop an item to add it to the list",
+        "Item": "Item",
+        "Override": "Override"
+      },
       "PriceModifiersEditor": {
         "Title": "Item Piles Price Modifiers Editor",
         "TitleActor": "Item Piles Price Modifiers Editor: {actor_name}",
-        "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors. The \"Override\" setting means that it overrides the merchant's normal price modifiers, including item-type specific price modifiers.",
+        "Explanation": "Here you can define the price and sell price modifiers for this merchant relating to specific actors. The \"Override\" setting means that it overrides the merchant's normal price modifiers, including item-type and item specific price modifiers.",
         "DragDrop": "Drag and drop an actor to add it to the list",
         "Actor": "Actor",
         "Override": "Override"
@@ -717,12 +725,15 @@
           "RefreshItemsHolidays": "Refresh Items Holidays (Simple Calendar)",
           "RefreshItemsHolidaysExplanation": "When the calendar passes notes with the given note category, the merchant's inventory will be refreshed. This happens on the note's time, or at midnight if it is a note that is set to all day.",
           "PriceModifierTitle": "Buy and Sell Price Modifiers",
-          "PriceModifierExplanation": "This configures the modifiers for the cost of every item in the shop. You can also configure modifiers per item type, and even for specific characters (such as silver-tongued bards). You are not limited to 200%, type into the field to go even higher.",
+          "PriceModifierExplanation": "This configures the modifiers for the cost of every item in the shop. You can also configure modifiers per item type, per specific item, and even for specific characters (such as silver-tongued bards). You are not limited to 200%, type into the field to go even higher.",
           "BuyPriceModifier": "Buy Price Modifier (%)",
           "SellPriceModifier": "Sell Price Modifier (%)",
           "ItemTypeModifier": "Item Type Price Modifiers",
           "ItemTypeModifiersExplanation": "In this dialog you can configure price modifiers for individual item types.",
           "ConfigureItemTypePriceModifiers": "Configure Item Type Price Modifiers",
+          "ItemPriceModifiers": "Item Price Modifiers",
+          "ItemPriceModifiersExplanation": "In this dialog you can configure price modifiers for specific items.",
+          "ConfigureItemPriceModifiers": "Configure Item Price Modifiers",
           "ActorPriceModifiers": "Per-Actor Override Price Modifiers",
           "ActorPriceModifiersExplanation": "Here you can configure if certain specific actors should have different price modifiers than the price modifiers above.",
           "ConfigureActorPriceModifiers": "Configure Actor Price Modifiers",
