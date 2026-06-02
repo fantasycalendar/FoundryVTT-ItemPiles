@@ -1,5 +1,5 @@
 <script>
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { localize } from '#runtime/util/i18n';
 	import SliderInput from "../../components/SliderInput.svelte";
 	import { ApplicationShell } from "#runtime/svelte/component/application";
@@ -14,9 +14,9 @@
 	export let data = [];
 	export let elementRoot;
 
-	function getStoredItem(priceData) {
+	async function getStoredItem(priceData) {
 		if (priceData.uuid) {
-			const uuidItem = foundry.utils.fromUuidSync(priceData.uuid);
+			const uuidItem = await foundry.utils.fromUuid(priceData.uuid);
 			if (uuidItem) {
 				return uuidItem;
 			}
@@ -30,10 +30,10 @@
 		return new Item.implementation(foundry.utils.deepClone(itemData));
 	}
 
-	function hydrateModifier(priceData) {
-		const item = getStoredItem(priceData);
+	async function hydrateModifier(priceData) {
+		const item = await getStoredItem(priceData);
 
-		if (!item) {
+		if (!item?.toObject) {
 			return false;
 		}
 
@@ -47,7 +47,11 @@
 		};
 	}
 
-	const itemPriceModifiers = writable(data.map(hydrateModifier).filter(Boolean));
+	const itemPriceModifiers = writable([]);
+
+	onMount(async () => {
+		itemPriceModifiers.set((await Promise.all(data.map(hydrateModifier))).filter(Boolean));
+	});
 
 	function remove(index) {
 		itemPriceModifiers.update(val => {
@@ -94,7 +98,7 @@
 		itemPriceModifiers.update(val => {
 
 			const existingIndex = val.findIndex(existingPriceData => {
-				return Utilities.areItemsSimilar(existingPriceData.itemData, itemData);
+				return existingPriceData.itemData && !Utilities.areItemsDifferent(existingPriceData.itemData, itemData);
 			});
 
 			if (existingIndex !== -1) {

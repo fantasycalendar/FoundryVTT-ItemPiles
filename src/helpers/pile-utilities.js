@@ -891,7 +891,7 @@ export function getMerchantModifiersForActor(merchant, {
 				?? (priceData.uuid
 					? CompendiumUtilities.getItemFromCache(priceData.uuid) ?? foundry.utils.fromUuidSync(priceData.uuid)?.toObject()
 					: false);
-			return Utilities.areItemsSimilar(storedItem, item);
+			return storedItem && !Utilities.areItemsDifferent(storedItem, item);
 		});
 		if (itemPriceModifier) {
 			buyPriceModifier = itemPriceModifier.override

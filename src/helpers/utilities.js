@@ -116,37 +116,6 @@ export function findSimilarItem(items, findItem, {
 
 }
 
-export function areItemsSimilar(itemA, itemB) {
-
-	let itemAData = itemA instanceof Item ? itemA.toObject() : itemA;
-	itemAData = itemAData?.item ?? itemAData;
-
-	let itemBData = itemB instanceof Item ? itemB.toObject() : itemB;
-	itemBData = itemBData?.item ?? itemBData;
-
-	if (!itemAData || !itemBData) {
-		return false;
-	}
-
-	const itemAId = itemA instanceof Item ? itemA.id : itemA?.item?._id ?? itemAData?._id ?? itemA?.id;
-	const itemBId = itemB instanceof Item ? itemB.id : itemB?.item?._id ?? itemBData?._id ?? itemB?.id;
-
-	if (itemAId && itemBId && itemAId === itemBId) {
-		return true;
-	}
-
-	const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
-
-	if (!itemSimilarities.length || !itemSimilarities.some(path => {
-		return foundry.utils.hasProperty(itemAData, path) || foundry.utils.hasProperty(itemBData, path);
-	})) {
-		return false;
-	}
-
-	return !areItemsDifferent(itemAData, itemBData);
-
-}
-
 export function areItemsDifferent(itemA, itemB) {
 	const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 	for (const path of itemSimilarities) {
