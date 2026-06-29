@@ -205,7 +205,7 @@ const CONSTANTS = {
 			enabled: false,
 			status: "open",
 			/*
-			auto = rely on simple calendar
+			auto = rely on the active world calendar (game.time.calendar)
 			open = always open
 			closed = always closed
 			 */
@@ -276,6 +276,10 @@ CONSTANTS.HOOKS = {
 	RENDER_VAULT_GRID_ITEM: module`renderVaultGridItem`,
 	HOVER_VAULT_GRID_ITEM: module`mouseHoverVaultGridItem`,
 	LEAVE_VAULT_GRID_ITEM: module`mouseLeaveVaultGridItem`,
+	MERCHANT: {
+		GET_HOLIDAYS: module`getHolidays`,
+		GET_ACTIVE_HOLIDAYS: module`getActiveHolidays`
+	},
 	PILE: {
 		PRE_CREATE: module`preCreateItemPile`,
 		CREATE: module`createItemPile`,
