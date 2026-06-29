@@ -9,6 +9,7 @@ import {
 	cachedRequiredPropertiesList
 } from "./caches.js";
 import { hotkeyActionState } from "../hotkeys.js";
+import { getCalendarState, getHolidaysOnDay } from "./calendar.js";
 import * as Utilities from "./utilities.js"
 import * as Helpers from "./helpers.js";
 import * as CompendiumUtilities from "./compendium-utilities.js";
@@ -1938,28 +1939,25 @@ export function isMerchantClosed(merchant, { pileData = false } = {}) {
 
 	if (!pileData) pileData = getActorFlagData(merchant);
 
-	const timestamp = window.SimpleCalendar.api.timestampToDate(window.SimpleCalendar.api.timestamp());
+	const state = getCalendarState();
+	if (!state) return false;
 
 	const openTimes = pileData.openTimes.open;
 	const closeTimes = pileData.openTimes.close;
 
 	const openingTime = openTimes.hour * 60 + openTimes.minute;
 	const closingTime = closeTimes.hour * 60 + closeTimes.minute;
-	const currentTime = timestamp.hour * 60 + timestamp.minute;
+	const currentTime = state.time;
 
 	let isClosed = openingTime > closingTime
 		? !(currentTime >= openingTime || currentTime <= closingTime)
 		: !(currentTime >= openingTime && currentTime <= closingTime);
 
-	const currentWeekday = window.SimpleCalendar.api.getCurrentWeekday();
+	isClosed = isClosed || (pileData.closedDays ?? []).includes(state.weekday);
 
-	isClosed = isClosed || (pileData.closedDays ?? []).includes(currentWeekday.name);
+	const holidays = getHolidaysOnDay(state);
 
-	const currentDate = window.SimpleCalendar.api.currentDateTime();
-	const notes = window.SimpleCalendar.api.getNotesForDay(currentDate.year, currentDate.month, currentDate.day);
-	const categories = new Set(notes.map(note => foundry.utils.getProperty(note, "flags.foundryvtt-simple-calendar.noteData.categories") ?? []).deepFlatten());
-
-	return isClosed || categories.intersection(new Set(pileData.closedHolidays ?? [])).size > 0;
+	return isClosed || holidays.intersection(new Set(pileData.closedHolidays ?? [])).size > 0;
 
 }
 

@@ -5,6 +5,7 @@ import * as PileUtilities from "../helpers/pile-utilities.js";
 import CONSTANTS from "../constants/constants.js";
 import * as Helpers from "../helpers/helpers.js";
 import { isResponsibleGM } from "../helpers/helpers.js";
+import { calendarAvailable } from "../helpers/calendar.js";
 import TradeMerchantItemDialog from "../applications/dialogs/trade-merchant-item-dialog/trade-merchant-item-dialog.js";
 import * as Utilities from "../helpers/utilities.js";
 import ItemPileStore from "./item-pile-store.js";
@@ -302,7 +303,7 @@ export default class MerchantStore extends ItemPileStore {
 	async updateOpenCloseStatus() {
 		const pileData = get(this.pileData);
 		if (pileData.openTimes.status === "auto") {
-			if (game.modules.get('foundryvtt-simple-calendar')?.active && pileData.openTimes.enabled) {
+			if (calendarAvailable() && pileData.openTimes.enabled) {
 				const isClosed = PileUtilities.isMerchantClosed(this.actor, { pileData });
 				this.closed.set(isClosed);
 			} else if (isResponsibleGM()) {
