@@ -16,6 +16,7 @@ import runMigrations from "./migrations.js"
 import ItemPileConfig from "./applications/item-pile-config/item-pile-config.js";
 import ItemEditor from "./applications/item-editor/item-editor.js";
 import { setupPlugins } from "./plugins/main.js";
+import { setupCalendar } from "./plugins/calendar.js";
 import { setupCaches } from "./helpers/caches.js";
 import { initializeCompendiumCache } from "./helpers/compendium-utilities.js";
 import { SYSTEMS } from "./systems.js";
@@ -115,6 +116,7 @@ Hooks.once("ready", () => {
 		registerHotkeysPost();
 		initializeCompendiumCache();
 		setupPlugins("ready");
+		setupCalendar();
 
 		ChatAPI.disablePastTradingButtons();
 
