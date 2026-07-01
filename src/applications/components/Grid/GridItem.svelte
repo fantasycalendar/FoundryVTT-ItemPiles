@@ -271,6 +271,8 @@
 
 		if (!active) return;
 
+		activeStore.set(false);
+
 		for (const otherItem of items) {
 			if (activeOtherIds.has(otherItem.id)) {
 				otherItem.active.set(false);
