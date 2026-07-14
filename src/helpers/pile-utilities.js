@@ -867,14 +867,22 @@ export function getMerchantModifiersForActor(merchant, {
 		buyPriceModifier *= itemFlagData.buyPriceModifier ?? 1.0;
 		sellPriceModifier *= itemFlagData.sellPriceModifier ?? 1.0;
 
+		const itemCustomCategory = typeof itemFlagData?.customCategory === "string"
+			? itemFlagData.customCategory.trim().toLowerCase()
+			: "";
 		const itemTypePriceModifier = itemTypePriceModifiers
 			.sort((a, b) => a.type === "custom" && b.type !== "custom"
 				? -1
 				: 0)
 			.find(priceData => {
-				return priceData.type === "custom"
-					? priceData.category.toLowerCase() === itemFlagData.customCategory.toLowerCase()
-					: priceData.type === item.type;
+				if (priceData.type === "custom") {
+					if (!itemCustomCategory) return false;
+					const priceCategory = typeof priceData.category === "string"
+						? priceData.category.trim().toLowerCase()
+						: "";
+					return priceCategory && priceCategory === itemCustomCategory;
+				}
+				return priceData.type === item.type;
 			});
 		if (itemTypePriceModifier) {
 			buyPriceModifier = itemTypePriceModifier.override
@@ -1721,7 +1729,7 @@ export function getPaymentData({
 		}, {
 			totalCurrencyCost: 0, canBuy: true, primary: false, finalPrices: [], otherPrices: [], reasons: [],
 
-			buyerReceive: [], buyerChange: [], sellerReceive: []
+			buyerReceive: [], buyerChange: [], sellerReceive: [], sellerChangeGiven: []
 		});
 
 	if (!paymentData.canBuy) {
@@ -1913,6 +1921,16 @@ export function getPaymentData({
 				currency.quantity += numCurrency;
 			}
 		}
+
+		paymentData.sellerChangeGiven = paymentData.buyerChange.map(change => {
+			const currency = currencies.find(currency => {
+				return change.id === currency.id || (change.name === currency.name && change.img === currency.img && change.type === currency.type);
+			});
+			return {
+				...change,
+				quantity: Math.min(change.quantity, currency?.quantity ?? 0)
+			};
+		});
 	}
 
 	paymentData.finalPrices = paymentData.finalPrices.concat(paymentData.otherPrices);
@@ -2338,6 +2356,10 @@ export async function rollTable({
 	customCategory = false
 } = {}) {
 
+	customCategory = typeof customCategory === "string" && customCategory.trim()
+		? customCategory.trim()
+		: false;
+
 	const rolledItems = [];
 	let currencies = [];
 
@@ -2477,7 +2499,10 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 		}
 
 		let tableItems = [];
-		const customCategory = table?.customCategory ?? false;
+		const rawCustomCategory = table?.customCategory;
+		const customCategory = typeof rawCustomCategory === "string" && rawCustomCategory.trim()
+			? rawCustomCategory.trim()
+			: false;
 
 		if (table.addAll) {
 
@@ -2528,9 +2553,9 @@ export async function rollMerchantTables({ tableData = false, actor = false } = 
 
 			tableItems = result.items;
 
-			if (table?.customCategory) {
+			if (customCategory) {
 				tableItems = tableItems.map(item => {
-					foundry.utils.setProperty(item, "customCategory", table?.customCategory)
+					foundry.utils.setProperty(item, "customCategory", customCategory)
 					return item;
 				});
 			}

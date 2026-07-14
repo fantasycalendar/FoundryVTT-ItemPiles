@@ -27,7 +27,7 @@
 				open: false,
 				timesToRoll: t.timesToRoll ?? "1d4",
 				items: t.items ?? {},
-				customCategory: t.customCategory ?? "",
+				customCategory: typeof t.customCategory === "string" ? t.customCategory : "",
 			};
 		}));
 
@@ -53,7 +53,11 @@
 		pileData.tablesForPopulate = popTables
 			.filter((t) => actualTables[t.uuid])
 			.map((t) => ({
-				uuid: t.uuid, addAll: t.addAll, items: t.items, timesToRoll: t.timesToRoll, customCategory: t.customCategory
+				uuid: t.uuid,
+				addAll: t.addAll,
+				items: t.items,
+				timesToRoll: t.timesToRoll,
+				customCategory: typeof t.customCategory === "string" ? t.customCategory : ""
 			}));
 		PileUtilities.updateItemPileData(store.actor, pileData);
 	}, 200);

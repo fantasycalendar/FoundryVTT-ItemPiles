@@ -1,5 +1,11 @@
 # Item Piles Changelog
 
+## Version 3.3.3
+
+- Fixed merchants not subtracting currency from their inventory when giving change for overpayments
+  - For example, buyer pays 1 gold for a 2 copper item and receives 9 silver and 8 copper as change, but the merchant's silver and copper were never deducted
+- Fixed merchants failing to open with a `customCategory.toLowerCase is not a function` error when an item's custom category flag held a non-string value
+
 ## Version 3.3.2
 
 - Fixed (temporarily) the Settings app crashing on systems whose DataModel schemas throw during initialisation (e.g. PF2e)

@@ -178,9 +178,12 @@ export class PileItem extends PileBaseItem {
 		const itemFlagData = get(this.itemFlagData);
 		this.category.update(cat => {
 			cat.service = itemFlagData?.isService;
-			if (itemFlagData.customCategory) {
-				cat.type = itemFlagData.customCategory.toLowerCase();
-				cat.label = itemFlagData.customCategory;
+			const customCategory = typeof itemFlagData?.customCategory === "string"
+				? itemFlagData.customCategory.trim()
+				: "";
+			if (customCategory) {
+				cat.type = customCategory.toLowerCase();
+				cat.label = customCategory;
 			} else if (cat.service && pileData.enabled && pileData.type === CONSTANTS.PILE_TYPES.MERCHANT) {
 				cat.type = "item-piles-service";
 				cat.label = "ITEM-PILES.Merchant.Service";

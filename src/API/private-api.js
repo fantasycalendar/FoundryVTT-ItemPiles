@@ -2432,6 +2432,21 @@ export default class PrivateAPI {
 			}
 		}
 
+		if (!sellerInfiniteCurrencies) {
+			for (const change of itemPrices.sellerChangeGiven) {
+				if (!change.quantity) continue;
+				if (change.type === "attribute") {
+					await sellerTransaction.appendDocumentChanges([{
+						path: change.data.path, quantity: change.quantity
+					}], { remove: true, type: "currency" });
+				} else {
+					await sellerTransaction.appendItemChanges([{
+						item: change.data.item, quantity: change.quantity
+					}], { remove: true, type: "currency", keepIfZero: sellerKeepZeroQuantity });
+				}
+			}
+		}
+
 		for (const entry of itemPrices.buyerReceive) {
 			if (!entry.quantity) {
 				continue;

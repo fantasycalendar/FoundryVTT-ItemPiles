@@ -18,7 +18,9 @@
 	const columns = store.itemColumns;
 
 	$: colSpan = $editPrices ? $columns.length + 1 : 1;
-	$: type = category.type === "custom" ? category.label.toLowerCase() : category.type;
+	$: type = category.type === "custom" && typeof category.label === "string"
+		? category.label.toLowerCase()
+		: category.type;
 
 </script>
 
