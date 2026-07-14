@@ -334,7 +334,15 @@ class FastTooltipManager extends (foundry?.helpers?.interaction?.TooltipManager?
 		this._setAnchor(direction);
 	}
 
-	/* -------------------------------------------- */
+	deactivate() {
+		this.#active = false;
+		this.tooltip.classList.remove("active");
+		this.tooltip.innerHTML = "";
+		if (this.element) {
+			this.element.removeAttribute("aria-describedby");
+			this.element = null;
+		}
+	}
 
 	/**
 	 * Handle hover events which deactivate a tooltipped element.
