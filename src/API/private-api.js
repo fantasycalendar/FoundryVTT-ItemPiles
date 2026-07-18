@@ -148,8 +148,7 @@ export default class PrivateAPI {
 		const pileData = { data: itemPileConfig, items: targetItems, currencies: targetCurrencies };
 		const scale = PileUtilities.getItemPileTokenScale(doc, pileData);
 		foundry.utils.setProperty(docData, "texture.src", PileUtilities.getItemPileTokenImage(doc, pileData));
-		foundry.utils.setProperty(docData, "texture.scaleX", scale);
-		foundry.utils.setProperty(docData, "texture.scaleY", scale);
+		foundry.utils.mergeObject(docData, PileUtilities.getItemPileTokenScaleUpdate(doc, scale));
 		foundry.utils.setProperty(docData, "name", PileUtilities.getItemPileName(doc, pileData));
 		const cleanItemPileConfig = PileUtilities.cleanFlagData(itemPileConfig);
 		Utilities.deleteProperty(docData, CONSTANTS.FLAGS.PILE);
@@ -1380,10 +1379,9 @@ export default class PrivateAPI {
 
 				overrideData = foundry.utils.mergeObject(overrideData, {
 					"texture.src": PileUtilities.getItemPileTokenImage(pileActor, data, overrideImage),
-					"texture.scaleX": scale,
-					"texture.scaleY": scale,
 					"name": PileUtilities.getItemPileName(pileActor, data, overrideData?.name)
 				});
+				foundry.utils.mergeObject(overrideData, PileUtilities.getItemPileTokenScaleUpdate(pileActor, scale));
 
 			}
 
@@ -1475,10 +1473,9 @@ export default class PrivateAPI {
 
 			specificTokenSettings = foundry.utils.mergeObject(specificTokenSettings, {
 				"texture.src": PileUtilities.getItemPileTokenImage(target, data, overrideImage),
-				"texture.scaleX": scale,
-				"texture.scaleY": scale,
 				"name": PileUtilities.getItemPileName(target, data, specificTokenSettings?.name)
 			});
+			foundry.utils.mergeObject(specificTokenSettings, PileUtilities.getItemPileTokenScaleUpdate(target, scale));
 
 			const sceneId = targetUuid.split('.')[1];
 			const tokenId = targetUuid.split('.')[3];

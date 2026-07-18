@@ -43,8 +43,8 @@
 
 <style>
     .merchant-bottom-row {
-        flex: 0 1 auto;
+        flex: 0 0 auto;
         align-items: center;
-        height: 31px;
+        min-height: 31px;
     }
 </style>

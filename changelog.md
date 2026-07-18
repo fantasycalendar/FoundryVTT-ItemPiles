@@ -1,5 +1,13 @@
 # Item Piles Changelog
 
+## Version 3.3.4
+
+- Fixed item being locked with a highlight when moving or clicking inside a recipient/container (thank you sambarilov on Github!)
+- Fixed item piles sometimes not being able to be opened due to leftover flags spamming errors in the console
+- Fixed merchants failing to open when an item's stored prices were not in the expected format
+- Fixed converting Small creature tokens into item piles shrinking them
+- Fixed merchant currencies being cut off when they wrapped onto a second line
+
 ## Version 3.3.3
 
 - Fixed merchants not subtracting currency from their inventory when giving change for overpayments

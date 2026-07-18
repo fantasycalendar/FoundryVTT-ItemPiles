@@ -39,10 +39,32 @@ export function getPileActorDefaults(itemPileFlags = {}) {
 function getFlagData(inDocument, flag, defaults, existing = false) {
 	const defaultFlags = foundry.utils.deepClone(defaults);
 	let flags = foundry.utils.deepClone(existing || (foundry.utils.getProperty(inDocument, flag) ?? {}));
+	flags = stripDeletionKeys(flags);
 	if (flag === CONSTANTS.FLAGS.PILE) {
 		flags = migrateFlagData(inDocument, flags);
 	}
 	return foundry.utils.mergeObject(defaultFlags, flags);
+}
+
+/**
+ * Removes forced-deletion keys (prefixed with "-=") from an object.
+ *
+ * Cleaning routines write keys like "-=vaultExpander" to strip stale flags during document updates.
+ * When such a key survives into stored flag data, foundry.utils.mergeObject treats it as legacy
+ * deletion syntax and logs a compatibility warning for every key on every read. Dropping the keys
+ * here keeps reads free of that warning while the deletion still applies on the next write.
+ *
+ * @param {Object} data
+ * @returns {Object}
+ */
+function stripDeletionKeys(data) {
+	if (!data || typeof data !== "object") return data;
+	for (const key of Object.keys(data)) {
+		if (key.startsWith("-=")) {
+			delete data[key];
+		}
+	}
+	return data;
 }
 
 export function migrateFlagData(document, data = false) {
@@ -107,12 +129,22 @@ export function canItemStack(item, targetActor) {
  * @returns {Object<CONSTANTS.ITEM_DEFAULTS>}
  */
 export function getItemFlagData(item, { data = false, useDefaults = true } = {}) {
-	return getFlagData(
+	const flagData = getFlagData(
 		Utilities.getDocument(item),
 		CONSTANTS.FLAGS.ITEM,
 		{ ...(useDefaults ? CONSTANTS.ITEM_DEFAULTS : {}) },
 		data
 	);
+	if (useDefaults) {
+		// Corrupt or legacy worlds can store these price fields as something other than an array,
+		// which breaks the .filter/.length calls in getPriceData and prevents merchants from opening.
+		for (const key of ["prices", "sellPrices", "overheadCost"]) {
+			if (!Array.isArray(flagData[key])) {
+				flagData[key] = [];
+			}
+		}
+	}
+	return flagData;
 }
 
 /**
@@ -664,6 +696,30 @@ export function getItemPileTokenScale(target, {
 
 }
 
+/**
+ * Builds the texture scale portion of a token/prototype-token update.
+ *
+ * The scale is only included when it differs from the document's current scale. Some systems (e.g.
+ * dnd5e) re-apply a creature-size scale factor whenever texture.scaleX is written, so writing back an
+ * unchanged value compounds the factor (0.8 -> 0.64 for Small creatures). Omitting the keys when the
+ * scale is unchanged leaves the existing scale untouched.
+ *
+ * @param {Actor|TokenDocument} target
+ * @param {Number} scale
+ * @returns {Object}
+ */
+export function getItemPileTokenScaleUpdate(target, scale) {
+	const pileDocument = Utilities.getDocument(target);
+	const currentScale = pileDocument instanceof TokenDocument
+		? pileDocument.texture.scaleX
+		: pileDocument.prototypeToken.texture.scaleX;
+	if (scale === currentScale) return {};
+	return {
+		"texture.scaleX": scale,
+		"texture.scaleY": scale,
+	};
+}
+
 export function getItemPileName(target, { data = false, items = false, currencies = false } = {}, overrideName = null) {
 
 	const pileDocument = Utilities.getDocument(target);
@@ -749,10 +805,9 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 		const scale = getItemPileTokenScale(tokenDocument, pileData, overrideScale);
 		const newTokenData = foundry.utils.mergeObject(tokenData, {
 			"texture.src": getItemPileTokenImage(tokenDocument, pileData, overrideImage),
-			"texture.scaleX": scale,
-			"texture.scaleY": scale,
 			"name": getItemPileName(tokenDocument, pileData, tokenData?.name),
 		});
+		foundry.utils.mergeObject(newTokenData, getItemPileTokenScaleUpdate(tokenDocument, scale));
 		const data = {
 			"_id": tokenDocument.id,
 			[CONSTANTS.FLAGS.PILE]: cleanedFlagData,

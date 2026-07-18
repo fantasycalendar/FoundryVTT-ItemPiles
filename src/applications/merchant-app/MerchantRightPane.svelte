@@ -4,7 +4,6 @@
 	import MerchantPopulateItemsTab from "./MerchantPopulateItemsTab.svelte";
 	import { localize } from "#runtime/util/i18n";
 	import MerchantFooter from "./MerchantFooter.svelte";
-	import { writable } from "svelte/store";
 	import MerchantActivityLog from "./MerchantActivityLog.svelte";
 
 	export let store;
@@ -15,14 +14,11 @@
 
 	let closed = store.closed;
 
-	const currencies = recipientStore?.allCurrencies || writable([]);
-
 </script>
 
 <div class="merchant-right-pane item-piles-flexcol">
 
-	<div class="merchant-tabbed-center"
-	     style="flex: 1; max-height: calc(100% - {recipientStore && $currencies.length ? '34px' : '0px'})">
+	<div class="merchant-tabbed-center">
 
 		{#if $closed && !store.userHasAuthority}
 			<div style="display: grid; place-items: center; height:100%;">
@@ -58,7 +54,8 @@
 
   .merchant-tabbed-center {
     overflow: hidden;
-    flex: 1 0 auto;
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
   }
