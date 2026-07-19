@@ -233,7 +233,9 @@
           "OpenStatusOpen": "营业中",
           "OpenStatusClosed": "关闭",
           "ItemTypeModifier": "物品类型价格调整器",
+          "ItemPriceModifiers": "物品价格调整器",
           "ActorPriceModifiers": "特定角色覆盖价格调整器",
+          "ConfigureItemPriceModifiers": "配置物品价格调整器",
           "ConfigureActorPriceModifiers": "配置角色价格调整器",
           "EnabledExplanation": "玩家不能从商人那里拿起物品，而必须购买它们",
           "HideNewItemsExplanation": "启用后，任何卖给这个商人的物品将被隐藏。",
@@ -245,10 +247,11 @@
           "RefreshItemsHolidaysExplanation": "当日历经过给定笔记类别的笔记时，商人的库存将被刷新。这发生在笔记的时间，或者如果它是全天笔记，则在午夜发生。",
           "RefreshItemsDaysExplanation": "当日历超过选中的日子时，商人的库存将被刷新。这发生在商人的开放时间，或者如果没有开/关时间，则在午夜发生。",
           "PriceModifierTitle": "购买和销售价格调整器",
-          "PriceModifierExplanation": "配置商店中每个物品成本的调整器。你也可以为个别物品类型配置调整器，甚至为特定角色（如银舌吟游诗人）。你不仅限于200%，输入字段中的值甚至可以更高。",
+          "PriceModifierExplanation": "配置商店中每个物品成本的调整器。你也可以为个别物品类型、具体物品，甚至特定角色（如银舌吟游诗人）配置调整器。你不仅限于200%，输入字段中的值甚至可以更高。",
           "BuyPriceModifier": "购买价格调整器（%）",
           "SellPriceModifier": "销售价格调整器（%）",
           "ItemTypeModifiersExplanation": "在这个对话框中，你可以配置个别物品类型的价格调整器。",
+          "ItemPriceModifiersExplanation": "在这个对话框中，你可以为具体物品配置价格调整器。",
           "ActorPriceModifiersExplanation": "在这里，你可以配置是否某些特定角色应该有不同于上述价格调整器的不同价格调整器。",
           "MerchantColumns": "商人列",
           "MerchantColumnsExplanation": "在这里，你可以配置这个商人的系统特定列，显示在其商人UI中，如物品的稀有度。",
@@ -471,12 +474,20 @@
         "Explanation": "在这里，你可以为这个商人定义特定物品类型的价格和销售价格调整器。\"覆盖\" 设置意味着它覆盖了商人的正常价格调整器。",
         "Override": "覆盖"
       },
+      "ItemPriceModifiersEditor": {
+        "Title": "物品价格调整编辑器",
+        "TitleActor": "物品价格调整编辑器：{actor_name}",
+        "DragDrop": "拖放一个物品以将其添加到列表中",
+        "Item": "物品",
+        "Explanation": "在这里，你可以为这个商人定义与特定物品相关的购买和销售价格调整器。\"覆盖\" 设置意味着它会覆盖商人的常规价格调整器，包括按物品类型配置的价格调整器。",
+        "Override": "覆盖"
+      },
       "PriceModifiersEditor": {
         "Title": "物品堆价格调整编辑器",
         "TitleActor": "物品堆价格调整编辑器：{actor_name}",
         "DragDrop": "拖放一个角色以将其添加到列表中",
         "Actor": "角色",
-        "Explanation": "在这里，你可以为这个商人定义与特定角色相关的价格和销售价格调整器。\"覆盖\" 设置意味着它覆盖了商人的正常价格调整器，包括特定物品类型的价格调整器。",
+        "Explanation": "在这里，你可以为这个商人定义与特定角色相关的价格和销售价格调整器。\"覆盖\" 设置意味着它覆盖了商人的正常价格调整器，包括按物品类型和按具体物品配置的价格调整器。",
         "Override": "覆盖"
       },
       "SplitItem": {

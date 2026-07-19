@@ -911,7 +911,7 @@ export function getMerchantModifiersForActor(merchant, {
 } = {}) {
 
 	let {
-		buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, actorPriceModifiers
+		buyPriceModifier, sellPriceModifier, itemTypePriceModifiers, itemPriceModifiers, actorPriceModifiers
 	} = getActorFlagData(merchant, { data: pileFlagData });
 
 	if (item) {
@@ -947,6 +947,23 @@ export function getMerchantModifiersForActor(merchant, {
 				? itemTypePriceModifier.sellPriceModifier ?? sellPriceModifier
 				: sellPriceModifier * itemTypePriceModifier.sellPriceModifier;
 		}
+
+		const itemPriceModifier = itemPriceModifiers.find(priceData => {
+			const storedItem = priceData.itemData
+				?? priceData.item
+				?? (priceData.uuid
+					? CompendiumUtilities.getItemFromCache(priceData.uuid) ?? foundry.utils.fromUuidSync(priceData.uuid)?.toObject()
+					: false);
+			return storedItem && !Utilities.areItemsDifferent(storedItem, item);
+		});
+		if (itemPriceModifier) {
+			buyPriceModifier = itemPriceModifier.override
+				? itemPriceModifier.buyPriceModifier ?? buyPriceModifier
+				: buyPriceModifier * itemPriceModifier.buyPriceModifier;
+			sellPriceModifier = itemPriceModifier.override
+				? itemPriceModifier.sellPriceModifier ?? sellPriceModifier
+				: sellPriceModifier * itemPriceModifier.sellPriceModifier;
+		}
 	}
 
 	if (actor && actorPriceModifiers) {
@@ -963,7 +980,7 @@ export function getMerchantModifiersForActor(merchant, {
 
 	if (SYSTEMS.DATA.PRICE_MODIFIER_TRANSFORMER && !absolute) {
 		const modifiers = SYSTEMS.DATA.PRICE_MODIFIER_TRANSFORMER({
-			buyPriceModifier, sellPriceModifier, merchant, item, actor, actorPriceModifiers
+			buyPriceModifier, sellPriceModifier, merchant, item, actor, itemPriceModifiers, actorPriceModifiers
 		});
 		buyPriceModifier = modifiers.buyPriceModifier;
 		sellPriceModifier = modifiers.sellPriceModifier;

@@ -197,6 +197,7 @@ const CONSTANTS = {
 		buyPriceModifier: 1,
 		sellPriceModifier: 0.5,
 		itemTypePriceModifiers: [],
+		itemPriceModifiers: [],
 		actorPriceModifiers: [],
 		tablesForPopulate: [],
 		merchantColumns: [],
