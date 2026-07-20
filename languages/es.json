@@ -421,7 +421,7 @@
           "OpenStatus": "Estado Abierto",
           "OpenStatusExplanation": "Esto configura el estado actual del estado abierto del mercader. Si el Horario de Apertura (a continuación) está habilitado y el módulo Calendario simple está habilitado, puede configurarlo para que sea automático.",
           "OpenStatusClosed": "Cerrado",
-          "OpenStatusAuto": "Automático (Simple Calendar)",
+          "OpenStatusAuto": "Automático",
           "PriceModifierTitle": "Modificadores de Precio de Compra y Venta",
           "BuyPriceModifier": "Modificador de Precio de Compra (%)",
           "SellPriceModifier": "Modificador de Precio de Venta (%)",

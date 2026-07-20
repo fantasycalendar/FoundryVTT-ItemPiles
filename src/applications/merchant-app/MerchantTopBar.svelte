@@ -1,6 +1,7 @@
 <script>
 
 	import { localize } from "#runtime/util/i18n";
+	import { calendarAvailable } from "../../helpers/calendar.js";
 
 	export let store;
 
@@ -10,7 +11,7 @@
 
 	let openTimeText = "";
 
-	const aboutTimeEnabled = game.modules.get('foundryvtt-simple-calendar')?.active || false;
+	const calendarActive = calendarAvailable();
 
 	$: open = $pileDataStore.openTimes.enabled ? $pileDataStore.openTimes?.open : false;
 	$: close = $pileDataStore.openTimes.enabled ? $pileDataStore.openTimes?.close : false;
@@ -34,7 +35,7 @@
       </span>
 			<span style="font-style: italic;">
         {#if store.userHasAuthority}
-          {#if aboutTimeEnabled && $pileDataStore.openTimes.status !== "auto"}
+          {#if calendarActive && $pileDataStore.openTimes.status !== "auto"}
           <a class="item-piles-right-divider" on:click={() => { store.setOpenStatus("auto"); }}>
             <i class="fas fa-clock"></i>
 	          {localize(`ITEM-PILES.Merchant.OpenCloseAuto`)}

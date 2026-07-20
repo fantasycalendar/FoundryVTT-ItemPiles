@@ -1,15 +1,7 @@
-import SimpleCalendarPlugin from "./simple-calendar.js";
 import Levels3dPreview from "./levels-3d-preview.js";
 import RarityColors from "./rarity-colors.js";
 
 export const Plugins = {
-	"foundryvtt-simple-calendar": {
-		on: "ready",
-		data: null,
-		class: SimpleCalendarPlugin,
-		minVersion: "2.0.0",
-		invalidVersion: "1.3.75"
-	},
 	"levels-3d-preview": {
 		on: "init",
 		data: null,
