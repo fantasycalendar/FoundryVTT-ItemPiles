@@ -13,6 +13,9 @@
     "#runtime/*": "@typhonjs-fvtt/runtime/*",
     "#standard/*": "@typhonjs-fvtt/standard/*"
   },
+  "exports": {
+    ".": {"types": "./types/item-piles.d.ts"}
+  },
   "dependencies": {
     "@typhonjs-fvtt/runtime": "^0.2.0",
     "@typhonjs-fvtt/standard": "^0.2.0",
