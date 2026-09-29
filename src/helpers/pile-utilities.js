@@ -1022,13 +1022,25 @@ export function getPriceArray(totalCost, currencies) {
 	const allCommonExchangeRate = new Set(primaryCurrencies.map(currency => currency.exchangeRate));
 
 	if (primaryCurrencies.length === 1 || allCommonExchangeRate.size === 1) {
+
+		// In the case of more than one primary currency with equal exchange rates, they are added with a cost of 0,
+		// but getPaymentData can only pay with currencies in this list, so they must be included so they can be
+		// used as a fallback for the buyer to use when they don't have enough of the primary currency
+		const otherCurrencies = primaryCurrencies.filter(currency => currency !== primaryCurrency);
+
 		return [{
 			...primaryCurrency,
 			cost: totalCost,
 			baseCost: totalCost,
 			maxCurrencyCost: totalCost,
 			string: primaryCurrency.abbreviation.replace('{#}', totalCost)
-		}]
+		}, ...otherCurrencies.map(currency => ({
+			...currency,
+			cost: 0,
+			baseCost: 0,
+			maxCurrencyCost: Math.ceil(totalCost / currency.exchangeRate),
+			string: currency.abbreviation.replace('{#}', 0)
+		}))]
 	}
 
 	const smallestExchangeRate = getSmallestExchangeRate(currencies);
@@ -1650,6 +1662,18 @@ export function getPriceData({
 	return priceData;
 }
 
+// When a purchase can't go ahead, show the full price without taking any of the buyer's currency
+function getUnpaidPaymentData(paymentData) {
+	paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost)
+		.filter(currency => !currency.secondary)
+		.concat(paymentData.otherPrices);
+
+	return {
+		...paymentData,
+		sellerReceive: paymentData.finalPrices,
+	};
+}
+
 export function getPaymentData({
 	purchaseData = [],
 	seller = false,
@@ -1788,15 +1812,7 @@ export function getPaymentData({
 		});
 
 	if (!paymentData.canBuy) {
-
-		paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost)
-			.filter(currency => !currency.secondary)
-			.concat(paymentData.otherPrices);
-
-		return {
-			...paymentData,
-			sellerReceive: paymentData.finalPrices,
-		};
+		return getUnpaidPaymentData(paymentData);
 	}
 
 	if (paymentData.totalCurrencyCost && !seller && !buyer) {
@@ -1869,7 +1885,11 @@ export function getPaymentData({
 		// we can start using the larger currencies, such as platinum in D&D 5e
 		if (currencies.length > 1) {
 
-			while (priceLeft > 0) {
+			// Keep going until the price is covered, or a whole pass finds nothing more to spend
+			let spentCurrency = true;
+			while (priceLeft > 0 && spentCurrency) {
+
+				spentCurrency = false;
 
 				// We then need to loop through each price, and check if we have any more left over
 				for (const buyerPrice of paymentData.finalPrices) {
@@ -1881,6 +1901,7 @@ export function getPaymentData({
 					// Otherwise, add enough to cover the remaining cost
 					const newQuantity = Math.ceil(Math.min(buyerCurrencyQuantity, priceLeft / buyerPrice.exchangeRate));
 					buyerPrice.quantity += newQuantity;
+					spentCurrency = true;
 					priceLeft = Helpers.roundToDecimals(priceLeft - (newQuantity * buyerPrice.exchangeRate), decimals);
 
 					if (priceLeft <= 0) break;
@@ -1892,6 +1913,14 @@ export function getPaymentData({
 				} else {
 					break;
 				}
+			}
+
+			// The buyer ran out of currency before covering the price
+			if (priceLeft > 0) {
+				const reason = (buyer === merchant ? "TheyCantAfford" : "YouCantAfford");
+				paymentData.canBuy = false;
+				paymentData.reasons.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
+				return getUnpaidPaymentData(paymentData);
 			}
 
 			paymentData.finalPrices = paymentData.finalPrices.sort((a, b) => b.exchangeRate - a.exchangeRate);
