@@ -1122,9 +1122,7 @@ export default class PrivateAPI {
 		documentChanges = {}, itemsToUpdate = [], itemsToDelete = [], itemsToCreate = []
 	} = {}) {
 		const targetDocument = Utilities.getDocument(documentUuid);
-		if (!foundry.utils.isEmpty(documentChanges)) {
-			await targetDocument.update(documentChanges);
-		}
+		await PileUtilities.updateDocumentAttributes(targetDocument, documentChanges);
 		const createdItems = itemsToCreate.length
 			? await targetDocument.createEmbeddedDocuments("Item", itemsToCreate, {
 				keepId: true,

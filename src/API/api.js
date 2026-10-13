@@ -421,6 +421,7 @@ class API {
 	 *   ITEM_TRANSFORMER: undefined/Function,
 	 *   PREVIEW_ITEM_TRANSFORMER: undefined/Function,
 	 *   ITEM_COST_TRANSFORMER: undefined/Function,
+	 *   ATTRIBUTE_UPDATE_HANDLER: undefined/Function,
 	 *   PRICE_MODIFIER_TRANSFORMER: undefined/Function,
 	 *   SYSTEM_HOOKS: undefined/Function,
 	 *   SHEET_OVERRIDES: undefined/Function,
@@ -514,6 +515,12 @@ class API {
 		if (data['ITEM_COST_TRANSFORMER']) {
 			if (!Helpers.isFunction(data['ITEM_COST_TRANSFORMER'])) {
 				throw Helpers.custom_error("addSystemIntegration | data.ITEM_COST_TRANSFORMER must be of type function");
+			}
+		}
+
+		if (data['ATTRIBUTE_UPDATE_HANDLER']) {
+			if (!Helpers.isFunction(data['ATTRIBUTE_UPDATE_HANDLER'])) {
+				throw Helpers.custom_error("addSystemIntegration | data.ATTRIBUTE_UPDATE_HANDLER must be of type function");
 			}
 		}
 

@@ -594,7 +594,7 @@ export default class ItemPileStore {
 
 		const pileSharingData = SharingUtilities.getItemPileSharingData(this.actor);
 
-		await this.actor.update(attributesToUpdate);
+		await PileUtilities.updateDocumentAttributes(this.actor, attributesToUpdate);
 		if (pileSharingData?.currencies) {
 			pileSharingData.currencies = pileSharingData.currencies.map(currency => {
 				if (attributesToUpdate[currency.path] !== undefined) {

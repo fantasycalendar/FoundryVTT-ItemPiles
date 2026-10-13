@@ -276,6 +276,7 @@ export class PileAttribute extends PileBaseItem {
 		this.abbreviation = writable(this.attribute.abbreviation);
 		this.identifier = foundry.utils.randomID();
 		const startingQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(this.parent, this.path) ?? 0);
+		this.documentQuantity = startingQuantity;
 		this.presentFromTheStart.set(startingQuantity > 0);
 		this.quantity.set(startingQuantity);
 		this.currentQuantity.set(Math.min(get(this.currentQuantity), get(this.quantityLeft), get(this.quantity)));
@@ -298,13 +299,15 @@ export class PileAttribute extends PileBaseItem {
 		});
 
 		this.subscribeTo(this.parentDoc, (doc, update) => {
-			if (update.action.includes("delete")) return;
-			const updateData = update.data?.[0] ?? {};
+			if (update.action === "delete") return;
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);
 			this.img.set(this.attribute.img);
-			if (foundry.utils.hasProperty(updateData, this.path)) {
-				const newQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(updateData, this.path) ?? 0);
+			// Read the value from the document rather than the update data, as attributes can be derived from embedded
+			// items, in which case the attribute's path doesn't normally get included in the document update
+			const newQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(this.parent, this.path) ?? 0);
+			if (newQuantity !== this.documentQuantity) {
+				this.documentQuantity = newQuantity;
 				this.quantity.set(newQuantity);
 				if (!this.toShare) {
 					this.quantityLeft.set(newQuantity);

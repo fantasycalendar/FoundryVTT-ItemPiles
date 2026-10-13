@@ -367,6 +367,26 @@ export function getActorCurrencies(target, {
 	return currencies;
 }
 
+/**
+ * Applies attribute changes to a document.
+ *
+ * If ATTRIBUTE_UPDATE_HANDLER is defined for the system, it will be called first with a copy of the
+ * changes, to allow the system to handle any changes that can't be applied through a regular document
+ * update. It returns the changes that are left, which are then applied through a regular document update.
+ *
+ * @param {Actor|Item} document
+ * @param {Object} changes
+ * @returns {Promise}
+ */
+export async function updateDocumentAttributes(document, changes) {
+	if (foundry.utils.isEmpty(changes)) return;
+	if (SYSTEMS.DATA.ATTRIBUTE_UPDATE_HANDLER) {
+		changes = await SYSTEMS.DATA.ATTRIBUTE_UPDATE_HANDLER(document, foundry.utils.deepClone(changes)) ?? changes;
+		if (foundry.utils.isEmpty(changes)) return;
+	}
+	return document.update(changes);
+}
+
 export function getCurrenciesInItem(targetItem, {
 	forActor = false, currencyList = false, getAll = false, secondary = true
 } = {}) {
