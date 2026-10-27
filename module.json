@@ -87,6 +87,21 @@
       "lang": "zh-Hant",
       "name": "漢語（正體字）",
       "path": "languages/zh_Hant.json"
+    },
+    {
+      "lang": "sv",
+      "name": "Svenska",
+      "path": "languages/sv.json"
+    },
+    {
+      "lang": "cn",
+      "name": "中文（简体）",
+      "path": "languages/zh_Hans.json"
+    },
+    {
+      "lang": "zh-tw",
+      "name": "漢語（正體字）",
+      "path": "languages/zh_Hant.json"
     }
   ],
   "relationships": {
