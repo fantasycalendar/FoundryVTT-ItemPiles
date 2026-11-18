@@ -46,7 +46,7 @@ export function registerLibwrappers() {
 			sheets.filter(sheet => {
 				return !acc.some(override => override.includes(`["${sheet}"]`));
 			}).map(sheet => {
-				return `CONFIG.Actor.sheetClasses.${str}.["${sheet}"].cls.prototype.render`;
+				return `CONFIG.Actor.sheetClasses["${str}"]["${sheet}"].cls.prototype.render`;
 			})
 		)
 	}, []).flat();
