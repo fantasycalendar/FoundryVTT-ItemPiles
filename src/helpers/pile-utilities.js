@@ -776,8 +776,7 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 	if (!target) return;
 
 	const flagData = getActorFlagData(target, { data: foundry.utils.deepClone(newFlags) });
-	if (!tokenData) tokenData = {};
-	tokenData = foundry.utils.mergeObject(tokenData, {});
+	tokenData = foundry.utils.deepClone(tokenData || {});
 
 	let documentActor = Utilities.getActor(target);
 	const documentTokens = documentActor.getActiveTokens();
@@ -797,24 +796,39 @@ export async function updateItemPileData(target, newFlags, tokenData) {
 
 	const sceneUpdates = documentTokens.reduce((acc, token) => {
 		const tokenDocument = token.document;
+		// Unlinked tokens reached through their base actor have their own contents, so their appearance is computed
+		// from those; they also keep their own pile settings unless new settings are being applied explicitly.
+		const viaBaseActor = !tokenDocument.actorLink && !documentActor.isToken;
+		const keepOwnFlags = viaBaseActor && !newFlags;
+		const tokenFlagData = keepOwnFlags ? getActorFlagData(tokenDocument) : flagData;
+		if (keepOwnFlags && !isValidItemPile(tokenDocument, tokenFlagData)) return acc;
+		const tokenPileData = viaBaseActor
+			? {
+				data: tokenFlagData,
+				items: getActorItems(tokenDocument.actor, { itemFilters: tokenFlagData.overrideItemFilters }),
+				currencies: getActorCurrencies(tokenDocument.actor, {
+					currencyList: (tokenFlagData.overrideCurrencies || []).concat(tokenFlagData.overrideSecondaryCurrencies || [])
+				})
+			}
+			: pileData;
 		const overrideImage = foundry.utils.getProperty(tokenData, "texture.src")
 			?? foundry.utils.getProperty(tokenData, "img");
 		const overrideScale = foundry.utils.getProperty(tokenData, "texture.scaleX")
 			?? foundry.utils.getProperty(tokenData, "texture.scaleY")
 			?? foundry.utils.getProperty(tokenData, "scale");
-		const scale = getItemPileTokenScale(tokenDocument, pileData, overrideScale);
-		const newTokenData = foundry.utils.mergeObject(tokenData, {
-			"texture.src": getItemPileTokenImage(tokenDocument, pileData, overrideImage),
-			"name": getItemPileName(tokenDocument, pileData, tokenData?.name),
+		const scale = getItemPileTokenScale(tokenDocument, tokenPileData, overrideScale);
+		const newTokenData = foundry.utils.mergeObject(foundry.utils.deepClone(tokenData), {
+			"texture.src": getItemPileTokenImage(tokenDocument, tokenPileData, overrideImage),
+			"name": getItemPileName(tokenDocument, tokenPileData, tokenData?.name),
 		});
 		foundry.utils.mergeObject(newTokenData, getItemPileTokenScaleUpdate(tokenDocument, scale));
 		const data = {
 			"_id": tokenDocument.id,
-			[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
 			[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
 			...newTokenData
 		};
-		if (!tokenDocument.actorLink) {
+		if (!keepOwnFlags) data[CONSTANTS.FLAGS.PILE] = cleanedFlagData;
+		if (!tokenDocument.actorLink && !keepOwnFlags) {
 			data[CONSTANTS.ACTOR_DELTA_PROPERTY] = {
 				[CONSTANTS.FLAGS.PILE]: cleanedFlagData,
 				[CONSTANTS.FLAGS.VERSION]: Helpers.getModuleVersion(),
