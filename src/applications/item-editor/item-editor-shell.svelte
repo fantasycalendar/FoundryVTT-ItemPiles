@@ -39,7 +39,8 @@
 
 	async function updateSettings() {
 		const flagData = store.export();
-		if (flagData.flags.customCategory) {
+		// The list of known categories is a world setting, which only GMs can write.
+		if (flagData.flags.customCategory && game.user.isGM) {
 			let customCategories = get(currentCustomCategories);
 			customCategories.push(flagData.flags.customCategory)
 			await Helpers.setSetting(SETTINGS.CUSTOM_ITEM_CATEGORIES, Array.from(new Set(customCategories)));

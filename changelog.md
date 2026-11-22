@@ -19,6 +19,7 @@
 - Fixed dropping a folder of roll tables onto an item pile failing, and dropping a folder of items only adding the items of its last subfolder
 - Fixed buying several items from a merchant at once freezing the GM's game when the buyer could not afford them all together
 - Fixed setting an actor's currencies adding to item-based currencies instead of setting them to the given amount
+- Fixed players being unable to save their items in the item editor when the item had a custom category
 
 ## Version 3.3.4
 
