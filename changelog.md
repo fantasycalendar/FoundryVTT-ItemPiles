@@ -22,6 +22,7 @@
 - Fixed players being unable to save their items in the item editor when the item had a custom category
 - Fixed saving a merchant's settings without Simple Calendar active clearing its closed days and holidays
 - Fixed vault item styles configured in the module settings having no effect
+- Fixed players being able to add items to item piles out of thin air by dragging them in from the sidebar or chat
 
 ## Version 3.3.4
 

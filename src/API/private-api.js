@@ -1164,6 +1164,9 @@ export default class PrivateAPI {
 		userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false, elevation = false, level = undefined
 	} = {}) {
 
+		// Items without a source actor are created from nothing, which only GMs may do.
+		if (!sourceUuid && !game.users.get(userId)?.isGM) return false;
+
 		let itemsDropped;
 		const levelOverride = level ? { level } : {};
 
