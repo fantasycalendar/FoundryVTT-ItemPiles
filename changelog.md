@@ -6,6 +6,7 @@
 - Fixed items not being added when creating an item pile on the canvas from an actor whose token is linked
 - Fixed vaults accepting more items than they can hold when items were added without the vault being opened, such as by macros or other modules
 - Fixed every other row in Item Piles chat messages being almost unreadable with the dark interface theme
+- Fixed a deprecation warning filling the console whenever the mouse moved over the interface
 
 ## Version 3.3.4
 
