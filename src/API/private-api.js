@@ -451,8 +451,8 @@ export default class PrivateAPI {
 		});
 
 		if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
-			await PileUtilities.updateVaultLog(targetActor, {
-				userId, items: itemDeltas, attributes: attributeDeltas, withdrawal: false
+			await PileUtilities.updateVaultLogFromDeltas(targetActor, {
+				userId, items: itemDeltas, attributes: attributeDeltas
 			});
 		}
 
@@ -733,7 +733,7 @@ export default class PrivateAPI {
 
 	}
 
-	static async _setAttributes(targetUuid, attributes, userId, { interactionId = false } = {}) {
+	static async _setAttributes(targetUuid, attributes, userId, { skipVaultLogging = false, interactionId = false } = {}) {
 
 		const targetDocument = Utilities.getDocument(targetUuid);
 
@@ -755,6 +755,11 @@ export default class PrivateAPI {
 			userId: userId,
 			interactionId: interactionId
 		});
+
+		const targetActor = Utilities.getActor(targetUuid);
+		if (!skipVaultLogging && PileUtilities.isItemPileVault(targetActor)) {
+			await PileUtilities.updateVaultLogFromDeltas(targetActor, { userId, attributes: attributeDeltas });
+		}
 
 		return attributeDeltas;
 

@@ -1621,12 +1621,13 @@ class API {
 	 * @param {Actor/Token/TokenDocument} target                  The target whose attribute will have their quantity set
 	 * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to set
 	 * @param {object} options                                    Options to pass to the function
+	 * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
 	 * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
 	 *
-	 * @returns {Promise<object>}                                 An array containing a key value pair of the attribute path and the quantity of that attribute that was set
+	 * @returns {Promise<object>}                                 An object with each attribute path and how much its quantity changed
 	 *
 	 */
-	static setAttributes(target, attributes, { interactionId = false } = {}) {
+	static setAttributes(target, attributes, { skipVaultLogging = false, interactionId = false } = {}) {
 
 		const targetUuid = Utilities.getUuid(target);
 		if (!targetUuid) throw Helpers.custom_error(`setAttributes | Could not determine the UUID, please provide a valid target`);
@@ -1643,7 +1644,7 @@ class API {
 		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SET_ATTRIBUTES, targetUuid, attributes, game.user.id, {
-			interactionId
+			skipVaultLogging, interactionId
 		});
 
 	}

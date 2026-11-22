@@ -2405,6 +2405,28 @@ export async function updateVaultLog(itemPile, {
 	});
 }
 
+/**
+ * Logs signed deltas to a vault: increases as deposits and decreases as withdrawals.
+ *
+ * @param {Actor} itemPile
+ * @param {Object} options
+ * @param {string} options.userId
+ * @param {Array<{item: Object, quantity: number}>} [options.items]
+ * @param {Object<string, number>} [options.attributes]  Attribute path to signed delta
+ */
+export async function updateVaultLogFromDeltas(itemPile, { userId, items = [], attributes = {} } = {}) {
+	for (const withdrawal of [false, true]) {
+		const matches = (quantity) => withdrawal ? quantity < 0 : quantity > 0;
+		const loggedItems = items.filter(entry => matches(entry.quantity))
+			.map(entry => ({ ...entry, quantity: Math.abs(entry.quantity) }));
+		const loggedAttributes = Object.fromEntries(Object.entries(attributes)
+			.filter(([, quantity]) => matches(quantity))
+			.map(([path, quantity]) => [path, Math.abs(quantity)]));
+		if (!loggedItems.length && foundry.utils.isEmpty(loggedAttributes)) continue;
+		await updateVaultLog(itemPile, { userId, items: loggedItems, attributes: loggedAttributes, withdrawal });
+	}
+}
+
 export function getActorLog(actor) {
 	return foundry.utils.getProperty(Utilities.getActor(actor), CONSTANTS.FLAGS.LOG) || [];
 }

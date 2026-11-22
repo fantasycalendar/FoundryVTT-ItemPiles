@@ -149,10 +149,11 @@ export default class Transaction {
 				: Math.abs(attribute.quantity) * (remove ? -1 : 1);
 			acc[attribute.path] = acc[attribute.path] ?? Number(foundry.utils.getProperty(this.document, attribute.path) ?? 0);
 			if (set) {
+				const previousQuantity = acc[attribute.path];
 				if (!onlyDelta) {
 					acc[attribute.path] = incomingQuantity
 				}
-				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : acc[attribute.path]) + incomingQuantity);
+				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.get(attribute.path) ?? 0) + (incomingQuantity - previousQuantity));
 			} else {
 				if (!onlyDelta) {
 					acc[attribute.path] += incomingQuantity
@@ -183,13 +184,11 @@ export default class Transaction {
 			};
 
 			if (set) {
+				const previousQuantity = Utilities.sanitizeNumber(acc[item.id][attribute.path]);
 				if (!onlyDelta) {
 					acc[item.id][attribute.path] = incomingQuantity;
 				}
-				this.attributeDeltas.set(attribute.path, this.attributeDeltas.has(attribute.path)
-					? this.attributeDeltas.get(attribute.path)
-					: Utilities.sanitizeNumber(foundry.utils.getProperty(acc[item.id], attribute.path)) + incomingQuantity
-				);
+				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.get(attribute.path) ?? 0) + (incomingQuantity - previousQuantity));
 			} else {
 				if (!onlyDelta) {
 					acc[item.id][attribute.path] = acc[item.id][attribute.path] + incomingQuantity;

@@ -11,6 +11,8 @@
 - Removed the Delete when empty option from merchants, vaults and other pile types that are never deleted when emptied
 - Added a Token button to item pile, merchant and vault windows opened from the canvas, letting GMs configure that placed token directly
 - Fixed tall merchant images pushing the description and settings tabs out of view
+- Fixed vault logs missing currency changes made by GMs, and currency decreases being logged as deposits
+- setAttributes and updateCurrencies hooks and macros now receive how much each value changed instead of an incorrect amount
 
 ## Version 3.3.4
 
