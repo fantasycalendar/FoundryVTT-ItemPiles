@@ -119,8 +119,9 @@ export function findSimilarItem(items, findItem, {
 export function areItemsDifferent(itemA, itemB) {
 	const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 	for (const path of itemSimilarities) {
-		if (foundry.utils.getProperty(itemA, path) !== foundry.utils.getProperty(itemB, path)
-			|| (!foundry.utils.hasProperty(itemA, path) ^ !foundry.utils.hasProperty(itemB, path))) {
+		// A missing value and null are equivalent: stored documents fill schema defaults (e.g. system.container: null)
+		// that partial item data, such as data passed to the API from macros, omits.
+		if ((foundry.utils.getProperty(itemA, path) ?? null) !== (foundry.utils.getProperty(itemB, path) ?? null)) {
 			return true;
 		}
 	}

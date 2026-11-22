@@ -1,5 +1,9 @@
 # Item Piles Changelog
 
+## Version 3.3.5
+
+- Fixed items added by macros and other modules not stacking with matching items the actor already had
+
 ## Version 3.3.4
 
 - Fixed item being locked with a highlight when moving or clicking inside a recipient/container (thank you sambarilov on Github!)
