@@ -1347,6 +1347,14 @@ export default class PrivateAPI {
 			return item.item ?? item;
 		}) : [];
 
+		const addItemsToLinkedActor = async () => {
+			if (!items.length || !pileActor.prototypeToken.actorLink) return;
+			await Helpers.hooks.runWithout(async () => {
+				const newItems = Utilities.ensureValidIds(pileActor, items);
+				await pileActor.createEmbeddedDocuments("Item", newItems, { keepId: true, keepEmbeddedIds: true });
+			});
+		};
+
 		if (position && sceneId) {
 
 			let pileData = PileUtilities.getActorFlagData(pileActor);
@@ -1388,6 +1396,8 @@ export default class PrivateAPI {
 			const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.PILE.PRE_CREATE, overrideData, items);
 			if (hookResult === false) return false;
 
+			await addItemsToLinkedActor();
+
 			const tokenData = (await pileActor.getTokenDocument(overrideData)).toObject();
 
 			const cleanItemPileConfig = PileUtilities.cleanFlagData(pileData);
@@ -1418,14 +1428,9 @@ export default class PrivateAPI {
 
 			returns["tokenUuid"] = Utilities.getUuid(tokenDocument);
 
-		} else if (pileActor.prototypeToken.actorLink) {
+		} else {
 
-			if (items.length) {
-				await Helpers.hooks.runWithout(async () => {
-					const newItems = Utilities.ensureValidIds(pileActor, items);
-					await pileActor.createEmbeddedDocuments("Item", newItems, { keepId: true, keepEmbeddedIds: true });
-				});
-			}
+			await addItemsToLinkedActor();
 
 		}
 

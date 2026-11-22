@@ -3,6 +3,7 @@
 ## Version 3.3.5
 
 - Fixed items added by macros and other modules not stacking with matching items the actor already had
+- Fixed items not being added when creating an item pile on the canvas from an actor whose token is linked
 
 ## Version 3.3.4
 
