@@ -12,6 +12,7 @@ import * as PileUtilities from "../helpers/pile-utilities.js";
 import * as helpers from "../helpers/helpers.js";
 import * as Helpers from "../helpers/helpers.js";
 import { SYSTEMS } from "../systems.js";
+import SETTINGS from "../constants/settings.js";
 import { isItemValidBasedOnProperties } from "../helpers/pile-utilities.js";
 
 export class VaultStore extends ItemPileStore {
@@ -501,11 +502,15 @@ export class VaultItem extends PileItem {
 			if (rarityColor) {
 				this.style.set({ "box-shadow": `inset 0px 0px 7px 0px ${rarityColor}` });
 			} else {
-				this.style.set(SYSTEMS.DATA?.VAULT_STYLES ? SYSTEMS.DATA?.VAULT_STYLES.filter(style => {
+				// The setting holds the GM's rules. Worlds where it was never seeded store an empty list, so those
+				// fall back to the system integration's defaults.
+				const configuredStyles = Helpers.getSetting(SETTINGS.VAULT_STYLES);
+				const vaultStyles = configuredStyles?.length ? configuredStyles : (SYSTEMS.DATA?.VAULT_STYLES ?? []);
+				this.style.set(vaultStyles.filter(style => {
 					return foundry.utils.getProperty(this.item, style.path) === style.value;
 				}).reduce((acc, style) => {
 					return foundry.utils.mergeObject(acc, style.styling);
-				}, {}) : {});
+				}, {}));
 			}
 		});
 		this.subscribeTo(this.itemFlagData, (data) => {
