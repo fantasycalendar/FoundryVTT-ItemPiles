@@ -10,6 +10,7 @@
 - Fixed removing and transferring items reporting wrong quantities or not working in systems such as WFRP4e, which broke Clear All Actor Items on merchants
 - Removed the Delete when empty option from merchants, vaults and other pile types that are never deleted when emptied
 - Added a Token button to item pile, merchant and vault windows opened from the canvas, letting GMs configure that placed token directly
+- Fixed tall merchant images pushing the description and settings tabs out of view
 
 ## Version 3.3.4
 

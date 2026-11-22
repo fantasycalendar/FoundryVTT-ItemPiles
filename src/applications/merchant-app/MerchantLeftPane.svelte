@@ -48,7 +48,7 @@
 
 <div class="merchant-left-pane item-piles-flexcol">
 
-	<div class="item-piles-bottom-divider">
+	<div class="item-piles-bottom-divider merchant-img-container">
 		<div class="merchant-img">
 			<img src="{ $merchantImg }">
 		</div>
@@ -148,16 +148,32 @@
 
     section {
       padding: 0.25rem;
+      flex: 1 1 0;
+      min-height: 0;
+    }
+
+    // Tall portraits shrink to at most half the pane so the tabs and description keep their space.
+    .merchant-img-container {
+      display: flex;
+      flex-direction: column;
+      flex: 0 1 auto;
+      min-height: 0;
+      max-height: 50%;
     }
 
     .merchant-img {
       position: relative;
+      display: flex;
+      flex-direction: column;
       flex: 0 1 auto;
+      min-height: 0;
       border-radius: 5px;
 
       img {
         width: 100%;
         height: auto;
+        min-height: 0;
+        object-fit: contain;
         border: 0;
         border-radius: 3px;
         z-index: 1;
