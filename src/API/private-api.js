@@ -2434,6 +2434,8 @@ export default class PrivateAPI {
 			}), seller: sellingActor, buyer: buyingActor
 		});
 
+		if (!itemPrices.canBuy) return false;
+
 		const preCalcHookResult = Helpers.hooks.call(CONSTANTS.HOOKS.ITEM.PRE_CALC_TRADE, sellingActor, buyingActor, itemPrices, userId, interactionId);
 		if (preCalcHookResult === false) return false;
 

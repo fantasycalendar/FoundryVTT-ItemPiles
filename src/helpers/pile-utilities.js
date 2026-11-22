@@ -1801,6 +1801,18 @@ export function getPaymentData({
 			buyerReceive: [], buyerChange: [], sellerReceive: [], sellerChangeGiven: []
 		});
 
+	// Each item was checked on its own above; several affordable items can still cost more than the buyer has.
+	if (paymentData.canBuy && buyer && !buyerInfiniteCurrencies && paymentData.totalCurrencyCost > 0) {
+		const buyerWealth = Helpers.roundToDecimals(recipientCurrencies
+			.filter(currency => !currency.secondary)
+			.reduce((total, currency) => total + (Number(currency.quantity) || 0) * currency.exchangeRate, 0), decimals);
+		if (buyerWealth < paymentData.totalCurrencyCost) {
+			paymentData.canBuy = false;
+			const reason = (buyer === merchant ? "TheyCantAfford" : "YouCantAfford");
+			paymentData.reasons.push([`ITEM-PILES.Applications.TradeMerchantItem.${reason}`]);
+		}
+	}
+
 	if (!paymentData.canBuy) {
 
 		paymentData.finalPrices = getPriceArray(paymentData.totalCurrencyCost)
