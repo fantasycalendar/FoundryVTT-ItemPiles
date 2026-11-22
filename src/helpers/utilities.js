@@ -510,6 +510,22 @@ export function ensureValidIds(actor, itemsToCreate) {
 		return (hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, b.type) - hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, a.type));
 	});
 
+	// New ids are assigned up front so that items inside nested containers can point at their container's new id,
+	// even when that container is itself contained and therefore has no entry of its own in the map below.
+	const newIds = new Map();
+	const newIdsByOldId = new Map();
+	for (const item of sortedItems) {
+		const newId = createUniqueId(actor);
+		newIds.set(item, newId);
+		if (item._id) newIdsByOldId.set(item._id, newId);
+	}
+
+	const idGeneratorHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR);
+	const getNewContainerId = (containerId) => {
+		const newContainerId = newIdsByOldId.get(containerId);
+		return idGeneratorHandler ? idGeneratorHandler({ actor, containerId: newContainerId }) : newContainerId;
+	};
+
 	let itemsInContainers = sortedItems.reduce((acc, item) => {
 		const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
 
@@ -521,14 +537,9 @@ export function ensureValidIds(actor, itemsToCreate) {
 			const containerId = idRetrieverHandler ? idRetrieverHandler({ item }) : foundry.utils.getProperty(item, path);
 			if (acc[containerId]) {
 				acc[containerId].items.push(item);
-
-				const idGeneratorHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR);
-				const newContainerId = idGeneratorHandler
-					? idGeneratorHandler({ actor, containerId: acc[containerId].item._id })
-					: acc[containerId].item._id;
-				foundry.utils.setProperty(item, path, newContainerId);
+				foundry.utils.setProperty(item, path, getNewContainerId(containerId));
 			} else {
-				foundry.utils.setProperty(item, path, "");
+				foundry.utils.setProperty(item, path, newIdsByOldId.has(containerId) ? getNewContainerId(containerId) : "");
 				acc[item._id] = {
 					item,
 					items: []
@@ -542,7 +553,7 @@ export function ensureValidIds(actor, itemsToCreate) {
 			}
 		}
 
-		item._id = createUniqueId(actor);
+		item._id = newIds.get(item);
 
 		return acc;
 	}, {});
