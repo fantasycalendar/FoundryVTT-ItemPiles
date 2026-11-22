@@ -1154,15 +1154,17 @@ export default class PrivateAPI {
 	 * @param {String/Boolean} [targetUuid=false]
 	 * @param {Object/Boolean} [position=false]
 	 * @param {Number/Boolean} [elevation=false]
+	 * @param {String} [level]               The scene level (Foundry v14+) to create a new pile on
 	 * @param {Object} [itemData=false]
 	 *
 	 * @returns {sourceUuid: string/boolean, targetUuid: string/boolean, position: object/boolean, itemsDropped: array }
 	 */
 	static async _dropItems({
-		userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false, elevation = false
+		userId, sceneId, sourceUuid = false, targetUuid = false, itemData = false, position = false, elevation = false, level = undefined
 	} = {}) {
 
 		let itemsDropped;
+		const levelOverride = level ? { level } : {};
 
 		foundry.utils.setProperty(itemData.item, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE, itemData?.quantity ?? 1);
 		const containerItems = [itemData.item];
@@ -1190,7 +1192,8 @@ export default class PrivateAPI {
 				});
 				targetUuid = await this._createItemPile({
 					sceneId, position, items: itemsDropped, tokenOverrides: {
-						elevation: elevation || foundry.utils.fromUuidSync(sourceUuid)?.elevation || 0
+						elevation: elevation || foundry.utils.fromUuidSync(sourceUuid)?.elevation || 0,
+						...levelOverride
 					}, checkContainers: false
 				})
 			}
@@ -1206,7 +1209,7 @@ export default class PrivateAPI {
 					sceneId,
 					position,
 					items: items.map(data => data.item),
-					tokenOverrides: { elevation: elevation || 0 }
+					tokenOverrides: { elevation: elevation || 0, ...levelOverride }
 				});
 			}
 
@@ -1813,10 +1816,18 @@ export default class PrivateAPI {
 			throw Helpers.custom_error("Something went wrong when dropping this item!")
 		}
 
+		// Only the dropping client knows which scene level (v14+) it is viewing.
+		const level = canvas.level ?? null;
+		const levelBottom = level?.elevation?.bottom;
 		const dropData = {
-			source: false, target: data?.target ?? false, elevation: data?.elevation, itemData: {
+			source: false,
+			target: data?.target ?? false,
+			elevation: data?.elevation ?? (Number.isFinite(levelBottom) ? levelBottom : undefined),
+			level: level?.id,
+			itemData: {
 				item: itemData, quantity: 1, uuid: data?.uuid
-			}, position: false
+			},
+			position: false
 		};
 
 		dropData.source = Utilities.getSourceActorFromDropData(data);
@@ -2001,6 +2012,7 @@ export default class PrivateAPI {
 			targetUuid: Utilities.getUuid(dropData.target),
 			position: dropData.position,
 			elevation: dropData.elevation,
+			level: dropData.level,
 			itemData: dropData.itemData
 		});
 

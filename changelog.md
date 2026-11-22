@@ -13,6 +13,7 @@
 - Fixed tall merchant images pushing the description and settings tabs out of view
 - Fixed vault logs missing currency changes made by GMs, and currency decreases being logged as deposits
 - setAttributes and updateCurrencies hooks and macros now receive how much each value changed instead of an incorrect amount
+- Fixed item piles created by dropping items on the canvas appearing on the ground level instead of the level being viewed
 
 ## Version 3.3.4
 
