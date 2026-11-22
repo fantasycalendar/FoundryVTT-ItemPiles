@@ -82,7 +82,8 @@ export default class Transaction {
 
 				if (itemQuantity > 1 || canItemStack) {
 
-					const newQuantity = itemQuantity + incomingQuantity;
+					const newQuantity = set ? incomingQuantity : itemQuantity + incomingQuantity;
+					const quantityDelta = newQuantity - itemQuantity;
 
 					const existingItemUpdate = remove
 						? this.itemsToUpdate.find(item => item._id === itemId)
@@ -102,7 +103,7 @@ export default class Transaction {
 						this.itemsToUpdate.push(update);
 					}
 
-					this.itemDeltas.set(documentExistingItem.id, (this.itemDeltas.has(documentExistingItem.id) ? this.itemDeltas.get(documentExistingItem.id) : 0) + incomingQuantity);
+					this.itemDeltas.set(documentExistingItem.id, (this.itemDeltas.has(documentExistingItem.id) ? this.itemDeltas.get(documentExistingItem.id) : 0) + quantityDelta);
 
 				} else if (remove) {
 

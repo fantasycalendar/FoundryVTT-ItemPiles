@@ -18,6 +18,7 @@
 - Fixed selling items to merchants not posting a chat message, and merchant chat messages going missing when the GM was slow to respond or several purchases happened at once
 - Fixed dropping a folder of roll tables onto an item pile failing, and dropping a folder of items only adding the items of its last subfolder
 - Fixed buying several items from a merchant at once freezing the GM's game when the buyer could not afford them all together
+- Fixed setting an actor's currencies adding to item-based currencies instead of setting them to the given amount
 
 ## Version 3.3.4
 
