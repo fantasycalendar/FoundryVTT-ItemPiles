@@ -2273,6 +2273,44 @@ export function getNewItemsVaultPosition(item, gridData, { position = null } = {
 
 }
 
+/**
+ * Gives each item about to be created in a vault a free grid cell, honouring a requested position when it is free.
+ * Storing the cell lets later capacity checks see which cells are taken, whichever path added the item.
+ *
+ * @param {Actor} vaultActor
+ * @param {Array<Object>} itemsToCreate  Item data, updated in place
+ * @returns {Array<Object>}
+ */
+export function assignVaultPositions(vaultActor, itemsToCreate) {
+	if (!isItemPileVault(vaultActor) || !itemsToCreate.length) return itemsToCreate;
+	const vaultFlags = getActorFlagData(vaultActor);
+	const gridData = getVaultGridData(vaultActor);
+	for (const itemData of itemsToCreate) {
+		const flagData = getItemFlagData(itemData);
+		if (flagData.vaultExpander && vaultFlags.vaultExpansion) continue;
+		const requested = Helpers.isRealNumber(flagData.x) && Helpers.isRealNumber(flagData.y)
+			? { x: flagData.x, y: flagData.y, flipped: flagData.flipped }
+			: null;
+		const position = getNewItemsVaultPosition(itemData, gridData, { position: requested });
+		if (!position) continue;
+		const flipped = position.flipped ?? flagData.flipped ?? false;
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x", position.x);
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y", position.y);
+		foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM + ".flipped", flipped);
+		const { width, height } = getVaultItemDimensions(itemData, { ...flagData, flipped });
+		for (let w = 0; w < width; w++) {
+			const x = Math.min(position.x + w, gridData.enabledCols - 1);
+			for (let h = 0; h < height; h++) {
+				const y = Math.min(position.y + h, gridData.enabledRows - 1);
+				gridData.grid[x][y] = itemData.name;
+				const index = gridData.freeCells.findIndex(cell => cell.x === x && cell.y === y);
+				if (index > -1) gridData.freeCells.splice(index, 1);
+			}
+		}
+	}
+	return itemsToCreate;
+}
+
 export function getVaultAccess(vaultActor, { flagData = false, hasRecipient = false } = {}) {
 
 	const vaultFlags = getActorFlagData(vaultActor, { data: flagData });

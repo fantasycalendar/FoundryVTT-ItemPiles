@@ -227,6 +227,7 @@ export default class Transaction {
 		});
 
 		this.itemsToCreate = Utilities.ensureValidIds(this.document, this.itemsToCreate);
+		this.itemsToCreate = PileUtilities.assignVaultPositions(this.document, this.itemsToCreate);
 
 		this.itemsToDelete = this.itemsToUpdate.filter(item => {
 			return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
