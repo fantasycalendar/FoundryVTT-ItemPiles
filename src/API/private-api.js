@@ -291,7 +291,7 @@ export default class PrivateAPI {
 				const item = sourceActor.items.get(itemData._id ?? itemData.id);
 				const handler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type);
 				if (!handler) continue;
-				handler({ item, items: newItems });
+				await handler({ item, items: newItems });
 			}
 			newItems.forEach(newItem => {
 				if (items.some(item => (item?.id ?? item?.item?._id) === newItem._id)) return;
@@ -1163,7 +1163,7 @@ export default class PrivateAPI {
 		const containerItems = [itemData.item];
 		const item = foundry.utils.fromUuidSync(itemData.uuid) ?? itemData.item;
 		const handler = item ? Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, item.type) : false;
-		if (handler) handler({ item, items: containerItems });
+		if (handler) await handler({ item, items: containerItems });
 		const items = containerItems.map(item => ({
 			item,
 			flags: undefined,
