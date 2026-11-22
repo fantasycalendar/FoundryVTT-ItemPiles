@@ -16,6 +16,7 @@ import CustomDialog from "../applications/components/CustomDialog.svelte";
 import ReceiveItemsShell from "../applications/dialogs/receive-items-dialog/receive-items-shell.svelte";
 import BankVaultApp from "../applications/vault-app/vault-app.js";
 import { hotkeyActionState } from "../hotkeys.js";
+import ChatAPI from "./chat-api.js";
 
 const preloadedFiles = new Set();
 
@@ -2602,6 +2603,14 @@ export default class PrivateAPI {
 					seller: sellingActor, buyer: buyingActor, item: entry.item, quantity: entry.quantity, userId
 				});
 			}
+		}
+
+		// Posted here on the GM as part of the trade, so the card exists even if the trading client stopped waiting on
+		// a slow GM. The chat card code edits its input, so it gets its own copy.
+		if (sellerIsMerchant || buyerIsMerchant) {
+			await ChatAPI._outputMerchantTrade(sellerUuid, buyerUuid, JSON.parse(JSON.stringify(itemPrices)), userId, interactionId, {
+				sellerIsMerchant
+			});
 		}
 
 		await ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.CALL_HOOK, CONSTANTS.HOOKS.ITEM.TRADE, sellerUuid, buyerUuid, itemPrices, userId, interactionId);

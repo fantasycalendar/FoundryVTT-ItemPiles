@@ -19,7 +19,6 @@ export default class ChatAPI {
 		Helpers.hooks.on(CONSTANTS.HOOKS.PILE.SPLIT_INVENTORY, this._outputSplitItemPileInventory.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.TRADE.STARTED, this._outputTradeStarted.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.TRADE.COMPLETE, this._outputTradeComplete.bind(this));
-		Helpers.hooks.on(CONSTANTS.HOOKS.ITEM.TRADE, this._outputMerchantTradeComplete.bind(this));
 		Helpers.hooks.on(CONSTANTS.HOOKS.ITEM.GIVE, this._outputGiveItem.bind(this));
 
 		$(document).on("click", ".item-piles-chat-card .item-piles-collapsible", async function () {
@@ -199,11 +198,31 @@ export default class ChatAPI {
 		return this._outputTradeCompleteToChat(instigator, party_1, party_2, publicTradeId, isPrivate);
 	}
 
-	static async _outputMerchantTradeComplete(source, target, priceInformation, userId, interactionId) {
-		if (!Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
-		if (!PileUtilities.isItemPileMerchant(source)) return;
-		if (!interactionId || game.user.id !== userId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
-		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.MERCHANT_TRADE_CHAT_MESSAGE, source.uuid, target.uuid, priceInformation, userId, interactionId);
+	static _chatWriteQueues = new Map();
+
+	/**
+	 * Runs chat card writes that share a key one after another, so concurrent updates to the same card each see
+	 * the previous one's result.
+	 */
+	static _queueChatWrite(key, write) {
+		const previous = this._chatWriteQueues.get(key) ?? Promise.resolve();
+		const next = previous.then(write, write);
+		const settled = next.catch(() => {});
+		this._chatWriteQueues.set(key, settled);
+		settled.then(() => {
+			if (this._chatWriteQueues.get(key) === settled) this._chatWriteQueues.delete(key);
+		});
+		return next;
+	}
+
+	/**
+	 * Called on the GM by PrivateAPI._tradeItems once a trade with a merchant completes.
+	 */
+	static async _outputMerchantTrade(sellerUuid, buyerUuid, priceInformation, userId, interactionId, { sellerIsMerchant = true } = {}) {
+		if (!interactionId || !Helpers.getSetting(SETTINGS.OUTPUT_TO_CHAT)) return;
+		const merchantUuid = sellerIsMerchant ? sellerUuid : buyerUuid;
+		const actorUuid = sellerIsMerchant ? buyerUuid : sellerUuid;
+		return this._outputMerchantTradeToChat(merchantUuid, actorUuid, priceInformation, userId, interactionId, { sold: !sellerIsMerchant });
 	}
 
 	/**
@@ -453,7 +472,20 @@ export default class ChatAPI {
 
 	}
 
-	static async _outputMerchantTradeToChat(sourceUuid, targetUuid, priceInformation, userId, interactionId) {
+	static _outputMerchantTradeToChat(sourceUuid, targetUuid, priceInformation, userId, interactionId, { sold = false } = {}) {
+		return this._queueChatWrite(`merchant|${sourceUuid}|${targetUuid}`, () => {
+			return this._writeMerchantTradeToChat(sourceUuid, targetUuid, priceInformation, userId, interactionId, { sold });
+		});
+	}
+
+	static _merchantTradeMessage(sold, actorName, merchantName) {
+		return game.i18n.format(sold ? "ITEM-PILES.Chat.MerchantSold" : "ITEM-PILES.Chat.MerchantTraded", {
+			name: actorName,
+			merchant: merchantName
+		});
+	}
+
+	static async _writeMerchantTradeToChat(sourceUuid, targetUuid, priceInformation, userId, interactionId, { sold = false } = {}) {
 
 		const sourceActor = Utilities.getActor(sourceUuid);
 		const targetActor = Utilities.getActor(targetUuid);
@@ -468,7 +500,7 @@ export default class ChatAPI {
 
 		for (const message of messages) {
 			const flags = foundry.utils.getProperty(message, CONSTANTS.FLAGS.PILE);
-			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId && this._messageMatchesOutputVisibility(message, userId)) {
+			if (flags && flags.version && !foundry.utils.isNewerVersion(Helpers.getModuleVersion(), flags.version) && flags.source === sourceUuid && flags.target === targetUuid && flags.interactionId === interactionId && !!flags.sold === sold && this._messageMatchesOutputVisibility(message, userId)) {
 				return this._updateExistingMerchantMessage(message, sourceActor, targetActor, priceInformation, interactionId)
 			}
 		}
@@ -476,10 +508,7 @@ export default class ChatAPI {
 		const pileData = PileUtilities.getActorFlagData(sourceActor);
 
 		const chatCardHtml = await foundry.applications.handlebars.renderTemplate(CONSTANTS.PATH + "templates/chat/merchant-traded.html", {
-			message: game.i18n.format("ITEM-PILES.Chat.MerchantTraded", {
-				name: targetActor.name,
-				merchant: sourceActor.name
-			}),
+			message: this._merchantTradeMessage(sold, targetActor.name, sourceActor.name),
 			merchant: {
 				name: sourceActor.name,
 				img: pileData.merchantImage || sourceActor.img
@@ -499,7 +528,8 @@ export default class ChatAPI {
 				source: sourceUuid,
 				target: targetUuid,
 				priceInformation: [priceInformation],
-				interactionId: interactionId
+				interactionId: interactionId,
+				sold
 			}
 		});
 
@@ -621,10 +651,7 @@ export default class ChatAPI {
 		const pileData = PileUtilities.getActorFlagData(sourceActor);
 
 		const chatCardHtml = await foundry.applications.handlebars.renderTemplate(CONSTANTS.PATH + "templates/chat/merchant-traded.html", {
-			message: game.i18n.format("ITEM-PILES.Chat.MerchantTraded", {
-				name: targetActor.name,
-				merchant: sourceActor.name
-			}),
+			message: this._merchantTradeMessage(!!flags.sold, targetActor.name, sourceActor.name),
 			merchant: {
 				name: sourceActor.name,
 				img: pileData.merchantImage || sourceActor.img

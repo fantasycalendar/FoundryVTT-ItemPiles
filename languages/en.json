@@ -810,6 +810,7 @@
       "PrivateTrade": "Private Trade",
       "ExpandTrade": "View full trade details",
       "MerchantTraded": "{name} bought the following things from {merchant}:",
+      "MerchantSold": "{name} sold the following things to {merchant}:",
       "GaveItems": "{source} gave some items to {target}:"
     },
     "VaultLog": {
