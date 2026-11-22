@@ -1472,7 +1472,7 @@ class API {
 			}
 
 			return {
-				_id: item._id, quantity: itemData?.quantity ?? Utilities.getItemQuantity(item)
+				_id: item._id, quantity: Utilities.getRequestedQuantity(itemData, item)
 			}
 		});
 
@@ -1531,7 +1531,7 @@ class API {
 
 			return {
 				id: item._id,
-				quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(item), 0),
+				quantity: Math.max(Utilities.getRequestedQuantity(itemData, item), 0),
 				flags: foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM)
 			}
 		});

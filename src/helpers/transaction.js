@@ -40,9 +40,8 @@ export default class Transaction {
 			if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
 				itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
 			}
-			const incomingQuantity = set
-				? Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData))
-				: Math.abs(data.quantity ?? Utilities.getItemQuantity(itemData)) * (remove ? -1 : 1);
+			const requestedQuantity = Math.abs(Utilities.getRequestedQuantity(data, itemData));
+			const incomingQuantity = set ? requestedQuantity : requestedQuantity * (remove ? -1 : 1);
 
 			let itemId = itemData._id ?? itemData.id;
 			let documentHasItem = false;

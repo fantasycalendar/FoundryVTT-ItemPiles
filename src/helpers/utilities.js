@@ -233,6 +233,20 @@ export function getItemQuantity(item) {
 
 
 /**
+ * Returns the quantity requested by an entry passed to item operations. A `quantity` key is honoured on plain request
+ * objects such as `{ _id, quantity }`; documents use the configured quantity attribute, because some systems give
+ * their Item class a `quantity` getter with a different shape (WFRP4e returns `{ value }`).
+ *
+ * @param {Object|Item} entry
+ * @param {Object|Item} item  The item data to read the quantity from when the entry has no explicit quantity
+ * @returns {Number}
+ */
+export function getRequestedQuantity(entry, item = entry) {
+	const explicitQuantity = entry instanceof foundry.abstract.Document ? undefined : entry?.quantity;
+	return sanitizeNumber(explicitQuantity ?? getItemQuantity(item));
+}
+
+/**
  * Returns whether an item has the quantity property
  *
  * @param {Item/Object} item
