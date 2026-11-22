@@ -2513,7 +2513,7 @@ export async function rollTable({
 
 	const roll = await new Roll(formula.toString(), rollData).evaluate({ allowInteractive: false });
 	if (roll.total <= 0) {
-		return [];
+		return { items: [], currencies: [] };
 	}
 
 	let results = [];

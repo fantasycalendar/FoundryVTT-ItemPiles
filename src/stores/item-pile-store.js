@@ -143,12 +143,12 @@ export default class ItemPileStore {
 						let result = await foundry.utils.fromUuid(item.uuid);
 						itemResults.push(result)
 					}
-					itemsToAdd = itemResults.deepFlatten();
+					itemsToAdd = itemsToAdd.concat(itemResults.deepFlatten());
 					break;
 				case "RollTable":
 					let results = await this.onDropRollTables(folder.contents);
-					itemsToAdd = results.map(result => result.items).deepFlatten();
-					currenciesToAdd = results.map(result => result.currencies).join(" ");
+					itemsToAdd = itemsToAdd.concat(results.items);
+					currenciesToAdd = currenciesToAdd.concat(results.currencies);
 					break;
 				default:
 					Helpers.custom_warning(game.i18n.format("ITEM-PILES.Warnings.DroppedFolderNotSupported", { type: folder.type }), true)

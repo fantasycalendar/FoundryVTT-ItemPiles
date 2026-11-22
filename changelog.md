@@ -16,6 +16,7 @@
 - Fixed item piles created by dropping items on the canvas appearing on the ground level instead of the level being viewed
 - Fixed item piles dropped from the same actor sometimes all changing to look like one of them, and containers reverting to regular piles
 - Fixed selling items to merchants not posting a chat message, and merchant chat messages going missing when the GM was slow to respond or several purchases happened at once
+- Fixed dropping a folder of roll tables onto an item pile failing, and dropping a folder of items only adding the items of its last subfolder
 
 ## Version 3.3.4
 
