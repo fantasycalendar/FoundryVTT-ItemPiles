@@ -8,6 +8,7 @@
 - Fixed every other row in Item Piles chat messages being almost unreadable with the dark interface theme
 - Fixed a deprecation warning filling the console whenever the mouse moved over the interface
 - Fixed removing and transferring items reporting wrong quantities or not working in systems such as WFRP4e, which broke Clear All Actor Items on merchants
+- Removed the Delete when empty option from merchants, vaults and other pile types that are never deleted when emptied
 
 ## Version 3.3.4
 
