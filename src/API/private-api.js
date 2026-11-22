@@ -2376,15 +2376,20 @@ export default class PrivateAPI {
 		});
 		if (result === false) return;
 
+		const targetDocument = Utilities.getDocument(targetUuid);
+		const tokenUuid = targetDocument instanceof TokenDocument
+			? targetDocument.uuid
+			: (target?.token?.uuid ?? null);
+
 		if (PileUtilities.isItemPileVault(target)) {
-			return BankVaultApp.show(target, inspectingTarget)
+			return BankVaultApp.show(target, inspectingTarget, { tokenUuid })
 		}
 
 		if (PileUtilities.isItemPileMerchant(target)) {
-			return MerchantApp.show(target, inspectingTarget)
+			return MerchantApp.show(target, inspectingTarget, { tokenUuid })
 		}
 
-		return ItemPileInventoryApp.show(target, inspectingTarget, { remote });
+		return ItemPileInventoryApp.show(target, inspectingTarget, { remote, tokenUuid });
 
 	}
 

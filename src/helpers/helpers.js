@@ -159,6 +159,23 @@ export function clamp(num, min, max) {
 	return Math.max(Math.min(num, max), min);
 }
 
+/**
+ * Header button for item pile interfaces opened from a placed token, giving GMs that token's configuration.
+ *
+ * @param {string|null} tokenUuid
+ * @returns {Array<Object>} The button, or nothing for non-GMs and interfaces opened from an actor
+ */
+export function getConfigureTokenHeaderButtons(tokenUuid) {
+	if (!game.user.isGM || !tokenUuid) return [];
+	// Same label and icon as Foundry's own actor sheet control for the placed token's configuration.
+	return [{
+		label: !getSetting(SETTINGS.HIDE_ACTOR_HEADER_TEXT) ? "DOCUMENT.Token" : "",
+		class: "item-piles-configure-token",
+		icon: "fa-regular fa-circle-user",
+		onclick: () => foundry.utils.fromUuidSync(tokenUuid)?.sheet?.render(true)
+	}];
+}
+
 export function getActiveApps(id, single = false) {
 	const ApplicationV1 = foundry.appv1?.api?.Application ?? globalThis.Application;
 	const closedState = ApplicationV1?.RENDER_STATES?.CLOSED ?? -1;

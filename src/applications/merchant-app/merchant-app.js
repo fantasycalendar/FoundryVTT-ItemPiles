@@ -26,6 +26,7 @@ export default class MerchantApp extends SvelteApplication {
 		}, dialogData);
 		this.merchant = merchant;
 		this.recipient = recipient;
+		this.tokenUuid = options.tokenUuid ?? merchant?.token?.uuid ?? null;
 		Helpers.hooks.callAll(CONSTANTS.HOOKS.OPEN_INTERFACE, this, merchant, recipient, options, dialogData);
 	}
 
@@ -106,7 +107,8 @@ export default class MerchantApp extends SvelteApplication {
 					onclick: () => {
 						ItemPileConfig.show(this.merchant);
 					}
-				}
+				},
+				...Helpers.getConfigureTokenHeaderButtons(this.tokenUuid)
 			);
 		}
 		return newButtons.concat(buttons);
