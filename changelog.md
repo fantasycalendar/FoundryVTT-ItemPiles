@@ -28,6 +28,7 @@
 - Fixed transferring a secondary currency moving the main currency instead
 - Fixed secondary currencies counting towards whether characters could afford items priced in the main currency
 - Fixed merchant items priced in some item-based secondary currencies always being shown as unaffordable
+- The preAddAttributes, preSetAttributes, preRemoveAttributes, preTransferAttributes, preTransferAllAttributes, preUpdateCurrencies, preAddCurrencies and preRemoveCurrencies hooks now receive the actor's pending changes, and preRemoveCurrencies also receives the items about to be deleted
 
 ## Version 3.3.4
 
