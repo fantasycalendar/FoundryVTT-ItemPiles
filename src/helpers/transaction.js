@@ -105,9 +105,9 @@ export default class Transaction {
 		return this.items.get(item.id);
 	}
 
-	addItemCreation(itemData, { type = "item" } = {}) {
+	addItemCreation(itemData, { type = "item", holderType = null } = {}) {
 		const key = foundry.utils.randomID();
-		const change = createItemChange({ key, source: itemData, isNew: true, quantity: 0, type });
+		const change = createItemChange({ key, source: itemData, isNew: true, quantity: 0, type, holderType });
 		this.items.set(key, change);
 		return change;
 	}
@@ -143,7 +143,7 @@ export default class Transaction {
 				|| Utilities.findSimilarItem(this.document.items, itemData);
 		}
 		if (existingItem) return { existingItem };
-		const creations = Array.from(this.items.values()).filter(change => change.isNew);
+		const creations = Array.from(this.items.values()).filter(change => change.isNew && !change.holderType);
 		const pending = Utilities.findSimilarItem(creations.map(change => change.source), itemData);
 		if (pending && PileUtilities.canItemStack(itemData, this.document)) {
 			return { pendingCreation: creations.find(change => change.source === pending) };
@@ -272,7 +272,8 @@ export default class Transaction {
 		};
 	}
 
-	// The document's own storage is spent before any holder.
+	// The document's own storage is spent before any holder. Exclusive currencies are never read from or written to the
+	// document itself, and an exclusive shortfall throws before anything is written.
 	async appendCurrencyChanges(entries, {
 		set = false, remove = false, onlyDelta = false, keepIfZero = false, holders = true, excludeHolders = []
 	} = {}) {
@@ -303,42 +304,87 @@ export default class Transaction {
 	appendAttributeCurrencyChange(entry, { set, remove, onlyDelta, holders, excludeHolders }) {
 		const path = entry.data?.path ?? entry.path;
 		if (!path) return;
+		const exclusive = PileUtilities.getExclusiveCurrencyPaths().has(path);
+
+		let quantity = Math.abs(Utilities.sanitizeNumber(entry.quantity));
+		let isRemoval = remove;
 
 		if (set) {
 			const target = Utilities.sanitizeNumber(entry.quantity);
-			const record = this.getAttributeValueRecord(path);
-			const deltaBefore = record.delta;
-			applyValueChange(record, target, { set: true, onlyDelta });
-			this.addCurrencyDelta(path, record.delta - deltaBefore, { own: true });
-			return;
+			if (!exclusive) {
+				const record = this.getAttributeValueRecord(path);
+				const deltaBefore = record.delta;
+				applyValueChange(record, target, { set: true, onlyDelta });
+				this.addCurrencyDelta(path, record.delta - deltaBefore, { own: true });
+				return;
+			}
+			const held = this.getHeldAmount(entry, path);
+			const difference = Helpers.roundToDecimals(target - held, PileUtilities.getCurrencyDecimals());
+			quantity = Math.abs(difference);
+			isRemoval = difference < 0;
 		}
 
-		const quantity = Math.abs(Utilities.sanitizeNumber(entry.quantity));
 		if (!quantity) return;
 
 		if (onlyDelta) {
-			this.addCurrencyDelta(path, remove ? -quantity : quantity, { own: true });
-			applyValueChange(this.getAttributeValueRecord(path), quantity, { remove, onlyDelta: true });
-		} else if (remove) {
-			this.removeAttributeCurrency(entry, path, quantity, { holders, excludeHolders });
+			this.addCurrencyDelta(path, isRemoval ? -quantity : quantity, { own: !exclusive });
+			if (!exclusive) {
+				applyValueChange(this.getAttributeValueRecord(path), quantity, { remove: isRemoval, onlyDelta: true });
+			}
+		} else if (isRemoval) {
+			this.removeAttributeCurrency(entry, path, quantity, { exclusive, holders, excludeHolders });
 		} else {
-			this.receiveAttributeCurrency(path, quantity);
+			this.receiveAttributeCurrency(path, quantity, { excludeHolders });
 		}
 	}
 
-	removeAttributeCurrency(entry, path, quantity, { holders, excludeHolders }) {
+	getHeldAmount(entry, path) {
+		const heldAmounts = PileUtilities.getCurrencySources(this.document, entry)
+			.map(source => this.getCurrencySourceAccess(source).read());
+		const pendingAmounts = this.getPendingHolderCreations(path)
+			.map(change => this.getFieldValueRecord(change, path).value);
+		return heldAmounts.concat(pendingAmounts).reduce((total, amount) => total + amount, 0);
+	}
+
+	removeAttributeCurrency(entry, path, quantity, { exclusive, holders, excludeHolders }) {
 		this.addCurrencyDelta(path, -quantity);
 		const sources = PileUtilities.getCurrencySources(this.document, entry, { holders, excludeHolders });
 		const access = sources.map(source => this.getCurrencySourceAccess(source));
 		const shortfall = PileUtilities.takeFromSources(access, quantity);
 		if (shortfall <= 0) return;
+		if (exclusive) {
+			const message = `${this.document.name} does not hold enough "${path}" to remove ${quantity}`;
+			throw Helpers.custom_error(`Transaction | ${message}`);
+		}
 		applyValueChange(this.getAttributeValueRecord(path), shortfall, { remove: true });
 		this.addOwnCurrencyDelta(path, -shortfall);
 	}
 
-	receiveAttributeCurrency(path, quantity) {
-		this.addCurrencyDelta(path, quantity, { own: true });
-		applyValueChange(this.getAttributeValueRecord(path), quantity);
+	receiveAttributeCurrency(path, quantity, { excludeHolders }) {
+		this.addCurrencyDelta(path, quantity);
+		const receiver = PileUtilities.getCurrencyReceiver(this.document, path, { excludeHolders });
+		if (!receiver) {
+			const message = `${this.document.name} has no currency holder that can receive "${path}"`;
+			throw Helpers.custom_error(`Transaction | ${message}`);
+		}
+		if (receiver.kind === "attribute") {
+			applyValueChange(this.getAttributeValueRecord(path), quantity);
+			this.addOwnCurrencyDelta(path, quantity);
+		} else if (receiver.kind === "holder") {
+			const access = this.getCurrencySourceAccess(receiver);
+			access.write(access.read() + quantity);
+		} else {
+			const pending = this.getPendingHolderCreations(path)
+				.find(change => change.holderType.id === receiver.holderType.id);
+			const pendingCreation = pending ?? this.addItemCreation(null, { type: "holder", holderType: receiver.holderType });
+			applyValueChange(this.getFieldValueRecord(pendingCreation, path), quantity);
+		}
+	}
+
+	getPendingHolderCreations(path) {
+		return Array.from(this.items.values()).filter(change => {
+			return change.isNew && change.holderType && PileUtilities.getHolderCurrencyEntry(change.holderType, path);
+		});
 	}
 
 	async appendDeltas(source) {
@@ -366,6 +412,13 @@ export default class Transaction {
 	}
 
 	shouldItemBeDeleted(change) {
+		if (change.holderType?.deleteWhenEmpty && change.fields.size) {
+			const amounts = {
+				...PileUtilities.getHolderAmounts(change.source, change.holderType),
+				...getFieldValues(change)
+			};
+			if (Object.values(amounts).every(amount => amount <= 0)) return true;
+		}
 		if (change.holderType || change.keepIfZero) return false;
 		return change.hasQuantityChange && change.quantity.value <= 0;
 	}
@@ -387,7 +440,7 @@ export default class Transaction {
 	prepare() {
 		if (this.payload) return this.payload;
 		const { documentChanges, attributeDeltas } = this.prepareDocumentChanges();
-		const { itemsToCreate, itemsToUpdate, itemsToDelete, itemDeltas } = this.prepareItemChanges();
+		const { itemsToCreate, itemsToUpdate, itemsToDelete, itemDeltas, holderCreations } = this.prepareItemChanges();
 		this.payload = {
 			documentChanges,
 			itemsToCreate,
@@ -397,6 +450,7 @@ export default class Transaction {
 			itemDeltas,
 			currencyDeltas: Object.fromEntries(Array.from(this.currencyDeltas).filter(([_, quantity]) => quantity))
 		};
+		this.holderCreations = holderCreations;
 		return this.payload;
 	}
 
@@ -425,12 +479,15 @@ export default class Transaction {
 		const fieldUpdates = [];
 		const itemDeltas = [];
 		let itemsToCreate = [];
+		const holderCreations = new Set();
 
 		for (const change of this.items.values()) {
 
 			if (change.isNew) {
 				const itemData = this.getCreationData(change);
-				if (itemData) itemsToCreate.push(itemData);
+				if (!itemData) continue;
+				if (change.holderType) holderCreations.add(itemData);
+				itemsToCreate.push(itemData);
 				continue;
 			}
 
@@ -445,7 +502,7 @@ export default class Transaction {
 				}
 			}
 
-			if (change.quantity.delta) {
+			if (change.quantity.delta && change.type !== "holder") {
 				const item = setReportedItemFlagData(change.source.toObject(), change.itemFlagData ?? {});
 				Utilities.setItemQuantity(item, change.quantity.delta, true);
 				itemDeltas.push({ item, quantity: change.quantity.delta, type: change.type });
@@ -464,10 +521,15 @@ export default class Transaction {
 		itemsToCreate = Utilities.ensureValidIds(this.document, itemsToCreate);
 		itemsToCreate = PileUtilities.assignVaultPositions(this.document, itemsToCreate);
 
-		return { itemsToCreate, itemsToUpdate, itemsToDelete, itemDeltas };
+		return { itemsToCreate, itemsToUpdate, itemsToDelete, itemDeltas, holderCreations };
 	}
 
 	getCreationData(change) {
+		if (change.holderType) {
+			const itemData = change.holderType.create({ amounts: getFieldValues(change), actor: this.document });
+			itemData._id ??= foundry.utils.randomID();
+			return itemData;
+		}
 		const itemData = Utilities.setItemQuantity(foundry.utils.deepClone(change.source), change.quantity.value);
 		const keep = change.quantity.value > 0
 			|| change.type === "currency"
@@ -503,11 +565,15 @@ export default class Transaction {
 			? await PrivateAPI._commitDocumentChanges(documentUuid, changes)
 			: await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_DOCUMENT_CHANGES, documentUuid, changes);
 
+		const holderIds = new Set(Array.from(this.holderCreations).map(itemData => itemData._id));
+
 		const changedItemDeltas = payload.itemDeltas.map(delta => ({ ...delta, item: foundry.utils.deepClone(delta.item) }));
-		const createdItemDeltas = itemsCreated.map(item => {
-			const quantity = PileUtilities.canItemStack(item, this.document) ? Utilities.getItemQuantity(item) : 1;
-			return { item, quantity };
-		});
+		const createdItemDeltas = itemsCreated
+			.filter(item => !holderIds.has(item._id))
+			.map(item => {
+				const quantity = PileUtilities.canItemStack(item, this.document) ? Utilities.getItemQuantity(item) : 1;
+				return { item, quantity };
+			});
 
 		return {
 			attributeDeltas: { ...payload.attributeDeltas },

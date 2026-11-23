@@ -349,7 +349,7 @@ export function getAttributeSharesLeftForActor(pile, path, recipient, {
 
 	let previouslyTaken = 0;
 	let recipientUuid = Utilities.getUuid(recipient);
-	let currentQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(pile, path) ?? 0);
+	let currentQuantity = PileUtilities.getAttributeCurrencyQuantity(pile, path);
 
 	if (getAll && SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
 		const items = PileUtilities.getActorItems(pile);

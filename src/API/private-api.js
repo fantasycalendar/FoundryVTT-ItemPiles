@@ -633,10 +633,10 @@ export default class PrivateAPI {
 		const targetActor = Utilities.getActor(targetUuid);
 
 		const currencyList = PileUtilities.getCurrencyList();
-		const sourceCurrencyList = PileUtilities.getActorCurrencies(sourceActor, { currencyList });
+		const sourceCurrencyList = PileUtilities.getActorCurrencies(sourceActor, { currencyList, includeHolders: "hidden" });
 
 		const sourceTransaction = new Transaction(sourceActor);
-		await sourceTransaction.appendCurrencyChanges(sourceCurrencyList, { remove: true });
+		await sourceTransaction.appendCurrencyChanges(sourceCurrencyList, { remove: true, holders: "hidden" });
 		const sourceUpdates = sourceTransaction.prepare();
 
 		const targetTransaction = new Transaction(targetActor);
@@ -918,7 +918,7 @@ export default class PrivateAPI {
 
 		const itemsToTransfer = PileUtilities.getActorItems(sourceActor, { itemFilters }).map(item => item.toObject());
 
-		const sourceCurrencies = PileUtilities.getActorCurrencies(sourceActor);
+		const sourceCurrencies = PileUtilities.getActorCurrencies(sourceActor, { includeHolders: "hidden" });
 
 		const itemCurrenciesToTransfer = sourceCurrencies
 			.filter(currency => currency.type === "item")
@@ -931,7 +931,7 @@ export default class PrivateAPI {
 		await sourceTransaction.appendItemChanges(itemCurrenciesToTransfer, {
 			remove: true, type: "currency"
 		});
-		await sourceTransaction.appendCurrencyChanges(attributesToTransfer, { remove: true });
+		await sourceTransaction.appendCurrencyChanges(attributesToTransfer, { remove: true, holders: "hidden" });
 		const sourceUpdates = sourceTransaction.prepare();
 
 		const targetTransaction = new Transaction(targetActor);
@@ -986,7 +986,7 @@ export default class PrivateAPI {
 			const itemsToTransfer = PileUtilities.getActorItems(sourceActor, { itemFilters })
 				.map(item => item.toObject());
 
-			const sourceCurrencies = PileUtilities.getActorCurrencies(sourceActor);
+			const sourceCurrencies = PileUtilities.getActorCurrencies(sourceActor, { includeHolders: "hidden" });
 
 			const itemCurrenciesToTransfer = sourceCurrencies
 				.filter(currency => currency.type === "item")
@@ -999,7 +999,7 @@ export default class PrivateAPI {
 			await sourceTransaction.appendItemChanges(itemCurrenciesToTransfer, {
 				remove: true, type: "currency"
 			});
-			await sourceTransaction.appendCurrencyChanges(attributesToTransfer, { remove: true });
+			await sourceTransaction.appendCurrencyChanges(attributesToTransfer, { remove: true, holders: "hidden" });
 			const sourceUpdates = sourceTransaction.prepare();
 
 			await targetTransaction.appendDeltas(sourceTransaction);
@@ -2185,7 +2185,7 @@ export default class PrivateAPI {
 		const itemPileActor = Utilities.getActor(itemPileUuid);
 
 		const items = PileUtilities.getActorItems(itemPileActor);
-		const currencies = PileUtilities.getActorCurrencies(itemPileActor);
+		const currencies = PileUtilities.getActorCurrencies(itemPileActor, { includeHolders: "hidden" });
 
 		const pileData = PileUtilities.getActorFlagData(itemPileActor);
 		const shareData = SharingUtilities.getItemPileSharingData(itemPileActor);
@@ -2219,7 +2219,7 @@ export default class PrivateAPI {
 				...attribute, quantity: Math.floor(attribute.quantity / numPlayers) * numPlayers
 			}
 		});
-		await tempPileTransaction.appendCurrencyChanges(attributes, { remove: true });
+		await tempPileTransaction.appendCurrencyChanges(attributes, { remove: true, holders: "hidden" });
 
 		if (SYSTEMS.DATA.ITEM_TYPE_HANDLERS) {
 			for (const item of items) {

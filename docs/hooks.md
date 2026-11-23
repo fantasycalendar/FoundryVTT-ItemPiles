@@ -1029,8 +1029,8 @@ Called before currencies are updated to an actor. Not called in the case of a tr
 |------------------------|---------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 | target                 | <code>Actor/TokenDocument/UUID</code> | The target that will have currencies added to it                                                                           |
 | actorUpdates           | <code>object</code>                   | The changes that will be written to the target, where the keys are the attribute paths and the values are their new values |
-| itemsToCreate          | <code>array</code>                    | An array of objects each containing the item id and the quantity that was added                                            |
-| itemQuantitiesToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                          |
+| itemsToCreate          | <code>array</code>                    | An array of the item data that will be created, which may include new currency holders (such as credsticks)                |
+| itemQuantitiesToUpdate | <code>array</code>                    | An array of the item updates that will be made, which may include currency holders and currency stored inside containers   |
 | interactionId          | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                  |
 
 If the hook returns `false`, the action is interrupted.
@@ -1059,8 +1059,8 @@ Called before currencies are added to an actor. Not called in the case of a tran
 |------------------------|---------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 | target                 | <code>Actor/TokenDocument/UUID</code> | The target that will have currencies added to it                                                                           |
 | actorUpdates           | <code>object</code>                   | The changes that will be written to the target, where the keys are the attribute paths and the values are their new values |
-| itemsToCreate          | <code>array</code>                    | An array of objects each containing the item id and the quantity that was added                                            |
-| itemQuantitiesToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                          |
+| itemsToCreate          | <code>array</code>                    | An array of the item data that will be created, which may include new currency holders (such as credsticks)                |
+| itemQuantitiesToUpdate | <code>array</code>                    | An array of the item updates that will be made, which may include currency holders and currency stored inside containers   |
 | interactionId          | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                  |
 
 If the hook returns `false`, the action is interrupted.
@@ -1085,13 +1085,13 @@ Called after currencies were added to the target. Not called in the case of a tr
 
 Called before currencies were removed from the target. Not called in the case of a transfer.
 
-| Param                  | Type                                  | Description                                                                                                                |
-|------------------------|---------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| target                 | <code>Actor/TokenDocument/UUID</code> | The target that will have its currencies removed                                                                           |
-| actorUpdates           | <code>object</code>                   | The changes that will be written to the target, where the keys are the attribute paths and the values are their new values |
-| itemQuantitiesToUpdate | <code>array</code>                    | An array of objects each containing the item id and the quantity that was updated                                          |
-| interactionId          | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                  |
-| itemsToDelete          | <code>array</code>                    | An array of the IDs of the items that will be deleted                                                                      |
+| Param                  | Type                                  | Description                                                                                                                           |
+|------------------------|---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| target                 | <code>Actor/TokenDocument/UUID</code> | The target that will have its currencies removed                                                                                      |
+| actorUpdates           | <code>object</code>                   | The changes that will be written to the target, where the keys are the attribute paths and the values are their new values            |
+| itemQuantitiesToUpdate | <code>array</code>                    | An array of the item updates that will be made, which may include currency holders and currency stored inside containers              |
+| interactionId          | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                             |
+| itemsToDelete          | <code>array</code>                    | An array of the IDs of the items that will be deleted, such as emptied currency holders and emptied currency stacks inside containers |
 
 If the hook returns `false`, the action is interrupted.
 

@@ -30,6 +30,7 @@ export const SYSTEMS = {
         CSS_VARIABLES: [],
         SOFT_MIGRATIONS: {},
         ITEM_TYPE_HANDLERS: {},
+        CURRENCY_HOLDERS: [],
     },
 
     get HAS_SYSTEM_SUPPORT() {

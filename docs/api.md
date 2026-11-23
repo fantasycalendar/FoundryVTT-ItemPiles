@@ -344,7 +344,50 @@ A combination of all the methods above, but this integrates a system's specific 
 | data.CURRENCIES                    | `Array<{ primary: boolean, type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }>, exchangeRate: number }>` | The array of currencies for this system, each entry is an object containing data for each currency                                                                                                                                                                                                                                                                                                                                                                                                |
 | data.SECONDARY_CURRENCIES          | `Array<{ type: string ["attribute"/"item"], img: string, abbreviation: string, data: Object<{ path: string } / { uuid: string } / { item: object }> }>`                                         | The array of secondary currencies for this system                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | data.CURRENCY_DECIMAL_DIGITS       | `undefined/number`                                                                                                                                                                              | How many decimals should be shown for fractional amounts of currency (only works when only 1 currency is configured)                                                                                                                                                                                                                                                                                                                                                                              |
+| data.CURRENCY_HOLDERS              | `undefined/Array<Object>`                                                                                                                                                                       | Optional item types that hold currency, such as credsticks; see [Currency holders](#currency-holders) below                                                                                                                                                                                                                                                                                                                                                                                       |
 | version                            | `string`                                                                                                                                                                                        | Which game system version this configuration should be applied to  - default `latest`, but should ideally be the system version it is compatible with.                                                                                                                                                                                                                                                                                                                                            |
+
+---
+
+#### Currency holders
+
+`CURRENCY_HOLDERS` lets a system declare items that hold currency, such as credsticks. Item Piles counts what they hold as the owner's money: it is included in what the owner can afford, and spent after the owner's own currency. Containers whose item type has a `HAS_CURRENCY` item type handler are always treated as holders of the system's attribute currencies, unless the "Spend currency in containers" setting is off.
+
+| Key                    | Type                              | Description                                                                                                                                           |
+|------------------------|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| id                     | `string`                          | A unique identifier for this kind of holder                                                                                                           |
+| filter                 | `Function/Array<{path, filters}>` | `({ item }) => boolean`, or filters in the same format as `ITEM_FILTERS`, all of which must match                                                     |
+| currencies             | `Object`                          | Keyed by the `data.path` of an attribute currency; each value has a `path` on the item, or both `get({ item })` and `set({ item, value })` functions  |
+| currencies.*.exclusive | `undefined/boolean`               | The currency only ever exists on holders: the actor's own value for it is ignored and never written                                                   |
+| receive                | `undefined/Array<string>`         | Currency paths whose income goes to the first holder of this kind; one is created with `create` if the actor has none                                 |
+| create                 | `undefined/Function`              | `({ amounts, actor }) => itemData`, required with `receive`; returns the data of a new holder already holding `amounts`                               |
+| deleteWhenEmpty        | `undefined/boolean`               | Whether a holder is deleted once everything it holds is spent                                                                                         |
+| hidden                 | `undefined/boolean`               | Whether holders are treated as money rather than goods: they are left out of item lists, never stack, and transfer-all and splitting move their value |
+| priority               | `undefined/number`                | Holders with a lower priority are spent first; holders with the same priority are spent in sheet order                                                |
+
+```js
+CURRENCY_HOLDERS: [{
+	id: "credstick",
+	filter: ({ item }) => item.type === "treasure" && item.system.category === "credstick",
+	currencies: {
+		"system.currency.credits": {
+			get: ({ item }) => item._source.system.price.value.credits ?? 0,
+			set: ({ value }) => ({ "system.price.value": _replace({ credits: value }) }),
+			exclusive: true
+		}
+	},
+	receive: ["system.currency.credits"],
+	create: ({ amounts }) => ({
+		name: "Credstick",
+		type: "treasure",
+		system: { category: "credstick", price: { value: { credits: amounts["system.currency.credits"] ?? 0 } } }
+	}),
+	deleteWhenEmpty: true,
+	hidden: true
+}]
+```
+
+`_replace` replaces the whole price object instead of merging into it. It requires Foundry v14; on v13, use the key `"system.price.==value"` instead.
 
 ---
 
