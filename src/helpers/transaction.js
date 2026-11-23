@@ -26,7 +26,7 @@ function applyValueChange(record, quantity, { set = false, remove = false, onlyD
 	}
 }
 
-function createItemChange({ key, source, isNew, quantity, type = null }) {
+function createItemChange({ key, source, isNew, quantity, type = null, holderType = null }) {
 	return {
 		key,
 		source,
@@ -37,7 +37,8 @@ function createItemChange({ key, source, isNew, quantity, type = null }) {
 		type,
 		keepIfZero: false,
 		notForSaleIfZero: false,
-		hasQuantityChange: false
+		hasQuantityChange: false,
+		holderType
 	};
 }
 
@@ -113,7 +114,12 @@ export default class Transaction {
 
 	getFieldValueRecord(change, path) {
 		if (!change.fields.has(path)) {
-			const original = change.isNew ? 0 : foundry.utils.getProperty(change.source, path);
+			let original = 0;
+			if (!change.isNew) {
+				original = change.holderType
+					? PileUtilities.getHolderAmount(change.source, change.holderType, path)
+					: foundry.utils.getProperty(change.source, path);
+			}
 			change.fields.set(path, createValueRecord(original));
 		}
 		return change.fields.get(path);
@@ -232,14 +238,39 @@ export default class Transaction {
 		this.ownCurrencyDeltas.set(path, Helpers.roundToDecimals(delta, PileUtilities.getCurrencyDecimals()));
 	}
 
-	async appendCurrencyChanges(entries, { set = false, remove = false, onlyDelta = false, keepIfZero = false } = {}) {
+	getCurrencySourceAccess(source) {
+		if (source.kind === "attribute") {
+			const record = this.getAttributeValueRecord(source.path);
+			return {
+				read: () => record.value,
+				write: (amount) => {
+					const deltaBefore = record.delta;
+					applyValueChange(record, amount, { set: true });
+					this.addOwnCurrencyDelta(source.path, record.delta - deltaBefore);
+				}
+			};
+		}
+		const change = this.getItemChange(source.item);
+		change.holderType ??= source.holderType;
+		change.type ??= "holder";
+		const record = this.getFieldValueRecord(change, source.path);
+		return {
+			read: () => record.value,
+			write: (amount) => applyValueChange(record, amount, { set: true })
+		};
+	}
+
+	// The document's own storage is spent before any holder.
+	async appendCurrencyChanges(entries, {
+		set = false, remove = false, onlyDelta = false, keepIfZero = false, holders = true, excludeHolders = []
+	} = {}) {
 		this.payload = null;
 		for (const entry of entries) {
 			if (!entry.quantity && !set) continue;
 			if (entry.type === "item") {
 				await this.appendItemCurrencyChange(entry, { set, remove, onlyDelta, keepIfZero });
 			} else {
-				this.appendAttributeCurrencyChange(entry, { set, remove, onlyDelta });
+				this.appendAttributeCurrencyChange(entry, { set, remove, onlyDelta, holders, excludeHolders });
 			}
 		}
 	}
@@ -251,7 +282,7 @@ export default class Transaction {
 		});
 	}
 
-	appendAttributeCurrencyChange(entry, { set, remove, onlyDelta }) {
+	appendAttributeCurrencyChange(entry, { set, remove, onlyDelta, holders, excludeHolders }) {
 		const path = entry.data?.path ?? entry.path;
 		if (!path) return;
 
@@ -267,8 +298,29 @@ export default class Transaction {
 		const quantity = Math.abs(Utilities.sanitizeNumber(entry.quantity));
 		if (!quantity) return;
 
-		this.addCurrencyDelta(path, remove ? -quantity : quantity, { own: true });
-		applyValueChange(this.getAttributeValueRecord(path), quantity, { remove, onlyDelta });
+		if (onlyDelta) {
+			this.addCurrencyDelta(path, remove ? -quantity : quantity, { own: true });
+			applyValueChange(this.getAttributeValueRecord(path), quantity, { remove, onlyDelta: true });
+		} else if (remove) {
+			this.removeAttributeCurrency(entry, path, quantity, { holders, excludeHolders });
+		} else {
+			this.receiveAttributeCurrency(path, quantity);
+		}
+	}
+
+	removeAttributeCurrency(entry, path, quantity, { holders, excludeHolders }) {
+		this.addCurrencyDelta(path, -quantity);
+		const sources = PileUtilities.getCurrencySources(this.document, entry, { holders, excludeHolders });
+		const access = sources.map(source => this.getCurrencySourceAccess(source));
+		const shortfall = PileUtilities.takeFromSources(access, quantity);
+		if (shortfall <= 0) return;
+		applyValueChange(this.getAttributeValueRecord(path), shortfall, { remove: true });
+		this.addOwnCurrencyDelta(path, -shortfall);
+	}
+
+	receiveAttributeCurrency(path, quantity) {
+		this.addCurrencyDelta(path, quantity, { own: true });
+		applyValueChange(this.getAttributeValueRecord(path), quantity);
 	}
 
 	async appendDeltas(source) {
@@ -296,8 +348,22 @@ export default class Transaction {
 	}
 
 	shouldItemBeDeleted(change) {
-		if (change.keepIfZero) return false;
+		if (change.holderType || change.keepIfZero) return false;
 		return change.hasQuantityChange && change.quantity.value <= 0;
+	}
+
+	getItemFieldUpdates(change) {
+		let updates = {};
+		for (const [path, record] of change.fields) {
+			if (change.holderType && record.value === record.original) continue;
+			const entry = change.holderType ? PileUtilities.getHolderCurrencyEntry(change.holderType, path) : { path };
+			if (Helpers.isFunction(entry?.set)) {
+				updates = foundry.utils.mergeObject(updates, entry.set({ item: change.source, value: record.value }));
+			} else if (entry) {
+				updates[entry.path] = record.value;
+			}
+		}
+		return updates;
 	}
 
 	prepare() {
@@ -355,7 +421,7 @@ export default class Transaction {
 			} else {
 				const update = this.getItemUpdate(change);
 				if (update) itemsToUpdate.push(update);
-				const updates = getFieldValues(change);
+				const updates = this.getItemFieldUpdates(change);
 				if (!foundry.utils.isEmpty(updates)) {
 					fieldUpdates.push({ _id: change.key, ...updates });
 				}

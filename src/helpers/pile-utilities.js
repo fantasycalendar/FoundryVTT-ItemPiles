@@ -315,7 +315,7 @@ export function getActorItems(target, { itemFilters = false, getItemCurrencies =
 
 // Lots happening here, but in essence, it gets the actor's currencies, and creates an array of them
 export function getActorCurrencies(target, {
-	forActor = false, currencyList = false, getAll = false, secondary = true
+	forActor = false, currencyList = false, getAll = false, secondary = true, includeHolders = false, excludeHolders = []
 } = {}) {
 	const actor = Utilities.getActor(target);
 	const actorUuid = Utilities.getUuid(actor);
@@ -355,6 +355,8 @@ export function getActorCurrencies(target, {
 		}
 		return currency;
 	});
+
+	currencies = addHeldCurrencies(actor, currencies, { includeHolders, excludeHolders });
 
 	if (!getAll) {
 		currencies = currencies.filter(currency => currency.quantity > 0);
@@ -429,6 +431,161 @@ export function getActorPrimaryCurrency(target) {
 export function getCurrencyDecimals() {
 	const step = Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, 0.00001);
 	return step.toString().split(".")?.[1]?.length ?? 0;
+}
+
+/**
+ * The kinds of items that can hold currencies: every item type with a HAS_CURRENCY handler (containers), which hold the
+ * same attribute paths as actors. They are left out when the spendFromContainers setting is off.
+ */
+export function getHolderTypes() {
+	if (!Helpers.getSetting(SETTINGS.SPEND_FROM_CONTAINERS)) return [];
+	return Object.entries(SYSTEMS.DATA.ITEM_TYPE_HANDLERS ?? {})
+		.filter(([itemType, handlers]) => itemType !== "GLOBAL" && handlers?.[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY])
+		.map(([itemType]) => ({
+			id: `container.${itemType}`,
+			container: true,
+			priority: 0,
+			matches: ({ item }) => item.type === itemType
+		}));
+}
+
+export function getHolderCurrencyEntry(holderType, path) {
+	if (holderType.container) return { path };
+	return holderType.currencies?.[path] ?? null;
+}
+
+export function getHolderAmount(item, holderType, path) {
+	const entry = getHolderCurrencyEntry(holderType, path);
+	if (!entry) return 0;
+	const value = Helpers.isFunction(entry.get)
+		? entry.get({ item })
+		: foundry.utils.getProperty(item, entry.path);
+	return Helpers.roundToDecimals(Utilities.sanitizeNumber(value), getCurrencyDecimals());
+}
+
+/**
+ * The amounts a holder item holds, keyed by currency path.
+ */
+export function getHolderAmounts(item, holderType, { currencyList = false } = {}) {
+	let paths = Object.keys(holderType.currencies ?? {});
+	if (holderType.container) {
+		paths = (currencyList || getCurrencyList(item.parent))
+			.filter(currency => currency.type === "attribute")
+			.map(currency => currency.data.path);
+	}
+	return Object.fromEntries(paths.map(path => [path, getHolderAmount(item, holderType, path)]));
+}
+
+/**
+ * The actor's items in sheet order, with the items inside a container directly after it (depth-first).
+ * Items in `exclude`, and everything inside them, are left out.
+ */
+function getItemsInSheetOrder(actor, exclude = new Set()) {
+	const items = Array.from(actor.items);
+	const containedPath = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
+	const bySort = (a, b) => ((a.sort ?? 0) - (b.sort ?? 0)) || (items.indexOf(a) - items.indexOf(b));
+	const children = new Map();
+	const roots = [];
+	for (const item of items) {
+		const containerId = containedPath ? foundry.utils.getProperty(item, containedPath) : false;
+		if (containerId && actor.items.has(containerId)) {
+			if (!children.has(containerId)) children.set(containerId, []);
+			children.get(containerId).push(item);
+		} else {
+			roots.push(item);
+		}
+	}
+	const ordered = [];
+	const visit = (list) => {
+		for (const item of list.sort(bySort)) {
+			if (exclude.has(item.id)) continue;
+			ordered.push(item);
+			visit(children.get(item.id) ?? []);
+		}
+	};
+	visit(roots);
+	return ordered;
+}
+
+/**
+ * The target's currency holders in sheet order. Item piles (including merchants and vaults) have none: their
+ * containers are goods.
+ *
+ * @param target
+ * @param {object} options
+ * @param {Array<string>} [options.exclude]   Item ids that are never holders, along with everything inside them
+ * @returns {Array<{ item: Item, holderType: object }>}
+ */
+export function getCurrencyHolders(target, { exclude = [] } = {}) {
+	const actor = Utilities.getActor(target);
+	if (!actor?.items || isValidItemPile(actor)) return [];
+	const holderTypes = getHolderTypes();
+	if (!holderTypes.length) return [];
+	const holders = [];
+	for (const item of getItemsInSheetOrder(actor, new Set(exclude))) {
+		const holderType = holderTypes.find(holderType => holderType.matches({ item }));
+		if (holderType) holders.push({ item, holderType });
+	}
+	return holders;
+}
+
+/**
+ * Takes up to `quantity` from each source in order and returns what could not be covered.
+ * Sources are `{ read(), write(amount) }`; empty or negative sources are skipped without being written.
+ */
+export function takeFromSources(sources, quantity) {
+	let remaining = Helpers.roundToDecimals(quantity, getCurrencyDecimals());
+	for (const source of sources) {
+		if (remaining <= 0) break;
+		const available = source.read();
+		if (available <= 0) continue;
+		const taken = Math.min(available, remaining);
+		source.write(Helpers.roundToDecimals(available - taken, getCurrencyDecimals()));
+		remaining = Helpers.roundToDecimals(remaining - taken, getCurrencyDecimals());
+	}
+	return Math.max(0, remaining);
+}
+
+/**
+ * Where an attribute currency can be spent from on the target, in spending order:
+ * - `{ kind: "attribute", path }`: the target's own attribute
+ * - `{ kind: "holder", item, holderType, path }`: an amount held by a currency holder
+ *
+ * @param target
+ * @param currency                            A currency entry ({ type, data })
+ * @param {object} options
+ * @param {boolean} [options.holders]         Whether to include currency holders
+ * @param {Array<string>} [options.excludeHolders]
+ */
+export function getCurrencySources(target, currency, { holders = true, excludeHolders = [] } = {}) {
+	const actor = Utilities.getActor(target);
+	if (!actor) return [];
+	const path = currency.data?.path ?? currency.path;
+	const sources = [{ kind: "attribute", path }];
+	if (!holders) return sources;
+	for (const { item, holderType } of getCurrencyHolders(actor, { exclude: excludeHolders })) {
+		if (!getHolderCurrencyEntry(holderType, path)) continue;
+		sources.push({ kind: "holder", item, holderType, path });
+	}
+	return sources;
+}
+
+/**
+ * When `includeHolders` is set, adds holder amounts to attribute currencies.
+ * Returns new currency objects for anything it changes, so the cached entries keep the actor's own quantities.
+ */
+function addHeldCurrencies(actor, currencies, { includeHolders = false, excludeHolders = [] } = {}) {
+	if (!includeHolders) return currencies;
+	const holders = getCurrencyHolders(actor, { exclude: excludeHolders });
+	if (!holders.length) return currencies;
+	return currencies.map(currency => {
+		if (currency.type !== "attribute") return currency;
+		let quantity = currency.quantity;
+		for (const { item, holderType } of holders) {
+			quantity += getHolderAmount(item, holderType, currency.path);
+		}
+		return { ...currency, quantity: Helpers.roundToDecimals(quantity, getCurrencyDecimals()) };
+	});
 }
 
 export function getCurrencyList(target = false, pileData = false) {
@@ -1573,7 +1730,7 @@ export function getPriceData({
 	const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 	const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
 
-	const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
+	const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true, includeHolders: true });
 	const totalCurrencies = recipientCurrencies
 		.filter(currency => !currency.secondary && currency.exchangeRate !== undefined)
 		.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
@@ -1700,10 +1857,13 @@ export function getPaymentData({
 		? seller
 		: buyer;
 	const currencyList = getCurrencyList(merchant);
-	const currencies = getActorCurrencies(merchant, { currencyList, getAll: true });
+	const tradedItemIds = purchaseData.map(data => data.item?.id).filter(Boolean);
+	const currencies = getActorCurrencies(merchant, {
+		currencyList, getAll: true, includeHolders: true, excludeHolders: tradedItemIds
+	});
 	const decimals = getDecimalDifferenceBetweenExchangeRates(currencies);
 
-	const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
+	const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true, includeHolders: true });
 
 	const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 

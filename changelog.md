@@ -33,6 +33,7 @@
 - Fixed merchants that keep sold-out items selling items that cannot stack over and over instead of showing them as sold out
 - Fixed sold-out merchant items staying unavailable after a restock refilled them
 - Fixed item pile and merchant windows showing the currency in a container as the actor's own currency after the container's currency changed
+- Added spending currency stored in characters' containers: coins in bags and pouches now count towards what characters can afford, and are spent once their own coins run out. This is on by default, and GMs can turn it off with the new "Spend currency in containers" setting
 - Fixed removing or paying with a secondary currency also taking the same amount of the main currency
 - Fixed transferring a secondary currency moving the main currency instead
 - Fixed secondary currencies counting towards whether characters could afford items priced in the main currency

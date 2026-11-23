@@ -960,6 +960,10 @@
         "Title": "Auto-delete empty piles",
         "Hint": "This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles."
       },
+      "SpendFromContainers": {
+        "Title": "Spend currency in containers",
+        "Hint": "When enabled, currency stored in a character's containers (such as coins in a backpack) counts towards what they can afford, and is spent once the character's own currency runs out. Item piles and merchants never spend from their containers."
+      },
       "PreloadFiles": {
         "Title": "Preload Files",
         "Hint": "Causes files (images and audio) of piles to be preloaded, resulting in a seamless experience."

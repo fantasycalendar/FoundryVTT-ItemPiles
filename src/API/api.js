@@ -2436,11 +2436,14 @@ class API {
 	 * @param {Actor/TokenDocument/Token} target      The target to get the currencies from
 	 * @param {object} [options]                      Object containing optional parameters
 	 * @param {Boolean} [options.getAll]              Whether to get all the currencies, regardless of quantity
+	 * @param {Boolean} [options.secondary]           Whether to include secondary currencies
+	 * @param {Boolean} [options.includeHolders]      Whether to add the currencies held by the target's currency holders
+	 *                                                (such as coins in containers) to each currency's quantity
 	 *
 	 * @returns {Array<object>}                       An array of objects containing the data about each currency
 	 */
-	static getActorCurrencies(target, { getAll = false, secondary = true } = {}) {
-		return PileUtilities.getActorCurrencies(target, { getAll, secondary });
+	static getActorCurrencies(target, { getAll = false, secondary = true, includeHolders = false } = {}) {
+		return PileUtilities.getActorCurrencies(target, { getAll, secondary, includeHolders });
 	}
 
 	static updateTokenHud() {

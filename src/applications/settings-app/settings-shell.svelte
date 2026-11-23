@@ -175,6 +175,7 @@
 					<Setting key={SETTINGS.INSPECT_ITEMS_IN_TRADE} bind:data="{settings[SETTINGS.INSPECT_ITEMS_IN_TRADE]}"/>
 					<Setting key={SETTINGS.OUTPUT_TO_CHAT} bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
 					<Setting key={SETTINGS.DELETE_EMPTY_PILES} bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
+					<Setting key={SETTINGS.SPEND_FROM_CONTAINERS} bind:data="{settings[SETTINGS.SPEND_FROM_CONTAINERS]}"/>
 					<Setting key={SETTINGS.POPULATION_TABLES_FOLDER} bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
 					<Setting key={SETTINGS.HIDE_TOKEN_BORDER} bind:data="{settings[SETTINGS.HIDE_TOKEN_BORDER]}"/>
 					<SettingButton key={SETTINGS.PRICE_PRESETS} bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>

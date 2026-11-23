@@ -19,6 +19,7 @@ const SETTINGS = {
 	ENABLE_GIVING_ITEMS: "enableGivingItems",
 	SHOW_TRADE_BUTTON: "showTradeButton",
 	DELETE_EMPTY_PILES: "deleteEmptyPiles",
+	SPEND_FROM_CONTAINERS: "spendFromContainers",
 	INSPECT_ITEMS_IN_TRADE: "inspectItemsInTrade",
 	POPULATION_TABLES_FOLDER: "populationTablesFolder",
 	PRICE_PRESETS: "pricePresets",
@@ -393,6 +394,15 @@ const SETTINGS = {
 			scope: "world",
 			config: false,
 			default: false,
+			type: Boolean
+		},
+
+		[SETTINGS.SPEND_FROM_CONTAINERS]: {
+			name: "ITEM-PILES.Settings.SpendFromContainers.Title",
+			hint: "ITEM-PILES.Settings.SpendFromContainers.Hint",
+			scope: "world",
+			config: false,
+			default: true,
 			type: Boolean
 		},
 

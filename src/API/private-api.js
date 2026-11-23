@@ -2390,11 +2390,12 @@ export default class PrivateAPI {
 		const sellerInfiniteQuantity = sellerIsMerchant && sellerFlagData.infiniteQuantity;
 		const sellerInfiniteCurrencies = sellerIsMerchant && sellerFlagData.infiniteCurrencies;
 		const sellerKeepZeroQuantity = sellerIsMerchant && sellerFlagData.keepZeroQuantity;
+		const tradedItemIds = items.map(data => data.id).filter(Boolean);
 
 		for (const payment of itemPrices.sellerReceive) {
 			if (!payment.quantity) continue;
 			if (payment.type === "attribute") {
-				await sellerTransaction.appendCurrencyChanges([payment]);
+				await sellerTransaction.appendCurrencyChanges([payment], { excludeHolders: tradedItemIds });
 			} else {
 				await sellerTransaction.appendItemChanges([{
 					item: payment.data.item, quantity: payment.quantity
@@ -2406,7 +2407,7 @@ export default class PrivateAPI {
 			for (const change of itemPrices.sellerChangeGiven) {
 				if (!change.quantity) continue;
 				if (change.type === "attribute") {
-					await sellerTransaction.appendCurrencyChanges([change], { remove: true });
+					await sellerTransaction.appendCurrencyChanges([change], { remove: true, excludeHolders: tradedItemIds });
 				} else {
 					await sellerTransaction.appendItemChanges([{
 						item: change.data.item, quantity: change.quantity

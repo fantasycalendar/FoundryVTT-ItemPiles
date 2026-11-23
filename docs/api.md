@@ -987,7 +987,7 @@ Transfers all items and attributes between the source and the target.
 
 Updates currencies to the target. It differs from the add and remove operations in that it "sets" the currency of the target with the passed value. This is useful in cases where you want to pre-fill something with a specific amount of currency.
 
-**Returns**: `Promise<object>` - An object containing the items and attributes added to the target
+**Returns**: `Promise<object>` - An object containing the items and attributes added to the target, and `currencyDeltas`, the change to each attribute currency including currency on currency holders
 
 | Param                   | Type                             | Default | Description                                    |
 |-------------------------|----------------------------------|---------|------------------------------------------------|
@@ -1021,7 +1021,7 @@ game.itempiles.API.updateCurrencies(actor, "1d4gp 1d3sp")
 
 Adds currencies to the target
 
-**Returns**: `Promise<object>` - An object containing the items and attributes added to the target
+**Returns**: `Promise<object>` - An object containing the items and attributes added to the target, and `currencyDeltas`, the change to each attribute currency including currency on currency holders
 
 | Param                   | Type                             | Default | Description                                    |
 |-------------------------|----------------------------------|---------|------------------------------------------------|
@@ -1055,7 +1055,7 @@ game.itempiles.API.addCurrencies(tokenOrActor, "1d4gp");
 
 Removes currencies from the target
 
-**Returns**: `Promise<array>` - An object containing the items and attributes removed from the target
+**Returns**: `Promise<array>` - An object containing the items and attributes removed from the target, and `currencyDeltas`, the change to each attribute currency including currency on currency holders
 
 | Param                   | Type                             | Default | Description                                       |
 |-------------------------|----------------------------------|---------|---------------------------------------------------|
@@ -1090,7 +1090,7 @@ game.itempiles.API.removeCurrencies(tokenOrActor, "1d4gp");
 
 Transfers currencies between the source and the target.
 
-**Returns**: `Promise<object>` - An object containing the items and attributes transferred to the target
+**Returns**: `Promise<object>` - An object containing the items and attributes transferred to the target, and `currencyDeltas`, the change to each attribute currency including currency on currency holders
 
 | Param                   | Type                        | Default | Description                                         |
 |-------------------------|-----------------------------|---------|-----------------------------------------------------|
@@ -1109,7 +1109,7 @@ Transfers currencies between the source and the target.
 
 Transfers all currencies between the source and the target.
 
-**Returns**: `Promise<object>` - An object containing all items and attributes transferred to the target
+**Returns**: `Promise<object>` - An object containing all items and attributes transferred to the target, and `currencyDeltas`, the change to each attribute currency including currency on currency holders
 
 | Param                   | Type                        | Default | Description                               |
 |-------------------------|-----------------------------|---------|-------------------------------------------|
@@ -1248,6 +1248,8 @@ Turns a string of currencies into an object containing payment data, and the cha
 | target           | `string/Actor/TokenDocument/Token` |         | The target to get the currencies from                     |
 | options          | `object`                           |         | Options to pass to the function                           |
 | [options.getAll] | `boolean`                          | `false` | Whether to get all the currencies, regardless of quantity |
+| [options.secondary] | `boolean`                          | `true`  | Whether to include secondary currencies                   |
+| [options.includeHolders] | `boolean`                          | `false` | Whether to add what the target's currency holders hold (such as coins in its containers) to each currency's quantity |
 
 ---
 
