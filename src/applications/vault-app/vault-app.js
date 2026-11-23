@@ -35,6 +35,7 @@ export default class VaultApp extends SvelteApplication {
 
 		this.actor = actor;
 		this.recipient = recipient;
+		this.tokenUuid = options.tokenUuid ?? actor?.token?.uuid ?? null;
 
 		Helpers.hooks.callAll(CONSTANTS.HOOKS.OPEN_INTERFACE, this, actor, recipient, options, dialogData);
 
@@ -140,6 +141,7 @@ export default class VaultApp extends SvelteApplication {
 						ItemPileConfig.show(this.actor);
 					}
 				},
+				...Helpers.getConfigureTokenHeaderButtons(this.tokenUuid),
 			].concat(buttons);
 		}
 		return buttons

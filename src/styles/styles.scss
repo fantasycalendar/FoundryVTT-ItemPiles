@@ -833,7 +833,7 @@
     align-items: center;
 
     &:nth-child(odd) {
-      background-color: var(--item-piles-text-light-highlight);
+      background-color: var(--item-piles-chat-row-odd, var(--item-piles-text-light-highlight));
     }
 
     img {
@@ -858,6 +858,11 @@
       padding-right: 2px;
     }
   }
+}
+
+// The default stripe is a light cream suited to dark text; dark themes render light text, so they get a subtle light tint.
+.theme-dark .item-piles-chat-card {
+  --item-piles-chat-row-odd: rgba(255, 255, 255, 0.08);
 }
 
 /* ---------------------- TRADING UI ---------------------- */

@@ -30,25 +30,33 @@
 		return weekday;
 	});
 
-	pileData.closedDays = pileData.closedDays.filter(closedWeekday => {
-		return weekdays.some(weekday => weekday.name === closedWeekday);
-	});
+	// Entries are pruned against the calendar's own weekdays and note categories, which exist only while
+	// Simple Calendar is active; otherwise the stored values are kept as they are.
+	if (simpleCalendarActive) {
+		pileData.closedDays = pileData.closedDays.filter(closedWeekday => {
+			return weekdays.some(weekday => weekday.name === closedWeekday);
+		});
+	}
 
 	const holidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
 		return { name: holiday.name, selected: pileData.closedHolidays.includes(holiday.name) };
 	});
 
-	pileData.closedHolidays = pileData.closedHolidays.filter(closedHoliday => {
-		return holidays.some(holiday => holiday.name === closedHoliday);
-	});
+	if (simpleCalendarActive) {
+		pileData.closedHolidays = pileData.closedHolidays.filter(closedHoliday => {
+			return holidays.some(holiday => holiday.name === closedHoliday);
+		});
+	}
 
 	const refreshItemsHolidays = (simpleCalendarActive ? window.SimpleCalendar.api.getCurrentCalendar().noteCategories : []).map(holiday => {
 		return { name: holiday.name, selected: pileData.refreshItemsHolidays.includes(holiday.name) };
 	});
 
-	pileData.refreshItemsHolidays = pileData.refreshItemsHolidays.filter(refreshItemsHoliday => {
-		return refreshItemsHolidays.some(holiday => holiday.name === refreshItemsHoliday);
-	});
+	if (simpleCalendarActive) {
+		pileData.refreshItemsHolidays = pileData.refreshItemsHolidays.filter(refreshItemsHoliday => {
+			return refreshItemsHolidays.some(holiday => holiday.name === refreshItemsHoliday);
+		});
+	}
 
 	async function showItemTypePriceModifiers() {
 		const data = pileData.itemTypePriceModifiers || [];

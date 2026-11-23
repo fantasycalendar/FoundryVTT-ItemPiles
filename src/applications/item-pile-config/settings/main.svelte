@@ -6,6 +6,7 @@
 	import { localize } from "#runtime/util/i18n";
 	import * as Helpers from "../../../helpers/helpers.js";
 	import SETTINGS from "../../../constants/settings.js";
+	import CONSTANTS from "../../../constants/constants.js";
 	import TextEditorDialog from "../../dialogs/text-editor-dialog/text-editor-dialog.js";
 	import { writable } from "svelte/store";
 
@@ -14,6 +15,9 @@
 	export let pileEnabled;
 
 	const deleteWhenEmptySetting = localize(Helpers.getSetting(SETTINGS.DELETE_EMPTY_PILES) ? "Yes" : "No");
+
+	// Only lootable piles are deleted once emptied (see PileUtilities.shouldItemPileBeDeleted).
+	$: canDeleteWhenEmpty = pileData.type === CONSTANTS.PILE_TYPES.PILE || pileData.type === CONSTANTS.PILE_TYPES.CONTAINER;
 
 	let hasOverrideCurrencies = writable(typeof pileData?.overrideCurrencies === "object");
 	let hasOverrideSecondaryCurrencies = writable(typeof pileData?.overrideSecondaryCurrencies === "object");
@@ -162,20 +166,22 @@
 	<MacroSelector bind:macro={pileData.macro}/>
 </div>
 
-<div class="form-group">
-	<label style="flex:4;">
-		<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmpty")}</span>
-		<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyExplanation")}</p>
-	</label>
-	<select bind:value={pileData.deleteWhenEmpty} style="flex:4;">
-		<option
-			value="default">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyDefault")}
-			({localize(deleteWhenEmptySetting)})
-		</option>
-		<option value={true}>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyYes")}</option>
-		<option value={false}>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyNo")}</option>
-	</select>
-</div>
+{#if canDeleteWhenEmpty}
+	<div class="form-group">
+		<label style="flex:4;">
+			<span>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmpty")}</span>
+			<p>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyExplanation")}</p>
+		</label>
+		<select bind:value={pileData.deleteWhenEmpty} style="flex:4;">
+			<option
+				value="default">{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyDefault")}
+				({localize(deleteWhenEmptySetting)})
+			</option>
+			<option value={true}>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyYes")}</option>
+			<option value={false}>{localize("ITEM-PILES.Applications.ItemPileConfig.Main.DeleteWhenEmptyNo")}</option>
+		</select>
+	</div>
+{/if}
 
 <div class="form-group">
 	<label>

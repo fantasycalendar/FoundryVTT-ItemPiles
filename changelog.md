@@ -1,5 +1,47 @@
 # Item Piles Changelog
 
+## Version 3.3.5
+
+- Fixed items added by macros and other modules not stacking with matching items the actor already had
+- Fixed items not being added when creating an item pile on the canvas from an actor whose token is linked
+- Fixed vaults accepting more items than they can hold when items were added without the vault being opened, such as by macros or other modules
+- Fixed every other row in Item Piles chat messages being almost unreadable with the dark interface theme
+- Fixed a deprecation warning filling the console whenever the mouse moved over the interface
+- Fixed removing and transferring items reporting wrong quantities or not working in systems such as WFRP4e, which broke Clear All Actor Items on merchants
+- Removed the Delete when empty option from merchants, vaults and other pile types that are never deleted when emptied
+- Added a Token button to item pile, merchant and vault windows opened from the canvas, letting GMs configure that placed token directly
+- Fixed tall merchant images pushing the description and settings tabs out of view
+- Fixed vault logs missing currency changes made by GMs, and currency decreases being logged as deposits
+- setAttributes and updateCurrencies hooks and macros now receive how much each value changed instead of an incorrect amount
+- Fixed item piles created by dropping items on the canvas appearing on the ground level instead of the level being viewed
+- Fixed item piles dropped from the same actor sometimes all changing to look like one of them, and containers reverting to regular piles
+- Fixed selling items to merchants not posting a chat message, and merchant chat messages going missing when the GM was slow to respond or several purchases happened at once
+- Fixed dropping a folder of roll tables onto an item pile failing, and dropping a folder of items only adding the items of its last subfolder
+- Fixed buying several items from a merchant at once freezing the GM's game when the buyer could not afford them all together
+- Fixed setting an actor's currencies adding to item-based currencies instead of setting them to the given amount
+- Fixed players being unable to save their items in the item editor when the item had a custom category
+- Fixed saving a merchant's settings without Simple Calendar active clearing its closed days and holidays
+- Fixed vault item styles configured in the module settings having no effect
+- Fixed players being able to add items to item piles out of thin air by dragging them in from the sidebar or chat
+- Fixed merchant restocks and roll table results set to replace existing items keeping the old stock and adding the new items on top of it
+- Fixed coins being lost in player trades when both players offered the same item-based currency
+- Fixed merchants restocked by Simple Calendar losing the custom categories set on their roll table items
+- Fixed merchants with infinite currencies losing their item-based currencies when buying from players
+- Fixed merchants with infinite currencies sometimes ending up with an item-based currency at a negative quantity
+- Fixed splitting an item pile with a single character removing items that cannot stack without giving them to the character
+- Fixed merchants that keep sold-out items deleting some of them when several sold out at once
+- Fixed merchants that keep sold-out items selling items that cannot stack over and over instead of showing them as sold out
+- Fixed sold-out merchant items staying unavailable after a restock refilled them
+- Fixed item pile and merchant windows showing the currency in a container as the actor's own currency after the container's currency changed
+- Added currency holders: coin pouches, backpacks, credsticks and other items with money. GMs set them up with the new Currency Holders setting in the System tab, and system compatibility modules can set them up for you. Money on these items counts as the character's own when buying, selling, trading, looting and depositing into vaults, and is spent after the character's own money. Currency items stored inside them, such as gems in a pouch, can count too. Selling, giving, dropping or depositing an item with money shows how much it has first
+- Merchant windows now show the buyer's money including money on items such as backpacks or credsticks, and hovering over a currency shows which items it's on
+- Depositing, withdrawing, dropping and trading can now use money on items, and move exactly the coins you chose
+- Fixed removing or paying with a secondary currency also taking the same amount of the main currency
+- Fixed transferring a secondary currency moving the main currency instead
+- Fixed secondary currencies counting towards whether characters could afford items priced in the main currency
+- Fixed merchant items priced in some item-based secondary currencies always being shown as unaffordable
+- The preAddAttributes, preSetAttributes, preRemoveAttributes, preTransferAttributes, preTransferAllAttributes, preUpdateCurrencies, preAddCurrencies and preRemoveCurrencies hooks now receive the actor's pending changes, and preRemoveCurrencies also receives the items about to be deleted
+
 ## Version 3.3.4
 
 - Fixed item being locked with a highlight when moving or clicking inside a recipient/container (thank you sambarilov on Github!)

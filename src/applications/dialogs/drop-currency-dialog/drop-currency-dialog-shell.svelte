@@ -15,16 +15,23 @@
 
 	const targetCurrencyData = PileUtilities.getCurrencyList(targetActor);
 
+	const includeHolders = !!targetActor;
+
 	const currencies = PileUtilities.getActorCurrencies(sourceActor, {
 		currencyList: targetCurrencyData.currencies,
-		getAll: settings?.unlimitedCurrencies
+		getAll: settings?.unlimitedCurrencies,
+		includeHolders
 	});
 
 	const existingCurrencies = settings.existingCurrencies ?? PileUtilities.getActorCurrencies(sourceActor, {
-		currencyList: targetCurrencyData.currencies
+		currencyList: targetCurrencyData.currencies,
+		includeHolders
 	});
 
-	let attributes = currencies.filter(entry => entry.type === "attribute")
+	// Editing sets the pile's own values, and exclusive currencies have none: they only exist on currency holders.
+	const exclusivePaths = settings?.getUpdates ? PileUtilities.getExclusiveCurrencyPaths() : new Set();
+
+	let attributes = currencies.filter(entry => entry.type === "attribute" && !exclusivePaths.has(entry.path))
 		.map(currency => {
 			currency.currentQuantity = 0;
 			return currency;

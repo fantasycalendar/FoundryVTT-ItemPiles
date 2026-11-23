@@ -120,8 +120,6 @@ Hooks.once("ready", () => {
 
 		Hooks.callAll(CONSTANTS.HOOKS.READY);
 
-		registerSystemLibwrappers();
-
 		displayChatMessage();
 
 	}, 100);
@@ -130,6 +128,9 @@ Hooks.once("ready", () => {
 
 Hooks.once(CONSTANTS.HOOKS.READY, async () => {
 	setTimeout(async () => {
+		// Deferred so that integrations which await between addSystemIntegration calls have finished registering.
+		registerSystemLibwrappers();
+
 		if (game.user.isGM) {
 			await checkSystem();
 			await patchCurrencySettings();

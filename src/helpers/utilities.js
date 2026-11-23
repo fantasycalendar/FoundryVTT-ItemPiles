@@ -119,8 +119,9 @@ export function findSimilarItem(items, findItem, {
 export function areItemsDifferent(itemA, itemB) {
 	const itemSimilarities = game.itempiles.API.ITEM_SIMILARITIES;
 	for (const path of itemSimilarities) {
-		if (foundry.utils.getProperty(itemA, path) !== foundry.utils.getProperty(itemB, path)
-			|| (!foundry.utils.hasProperty(itemA, path) ^ !foundry.utils.hasProperty(itemB, path))) {
+		// A missing value and null are equivalent: stored documents fill schema defaults (e.g. system.container: null)
+		// that partial item data, such as data passed to the API from macros, omits.
+		if ((foundry.utils.getProperty(itemA, path) ?? null) !== (foundry.utils.getProperty(itemB, path) ?? null)) {
 			return true;
 		}
 	}
@@ -230,6 +231,20 @@ export function getItemQuantity(item) {
 	return sanitizeNumber(foundry.utils.getProperty(itemData, game.itempiles.API.ITEM_QUANTITY_ATTRIBUTE));
 }
 
+
+/**
+ * Returns the quantity requested by an entry passed to item operations. A `quantity` key is honoured on plain request
+ * objects such as `{ _id, quantity }`; documents use the configured quantity attribute, because some systems give
+ * their Item class a `quantity` getter with a different shape (WFRP4e returns `{ value }`).
+ *
+ * @param {Object|Item} entry
+ * @param {Object|Item} item  The item data to read the quantity from when the entry has no explicit quantity
+ * @returns {Number}
+ */
+export function getRequestedQuantity(entry, item = entry) {
+	const explicitQuantity = entry instanceof foundry.abstract.Document ? undefined : entry?.quantity;
+	return sanitizeNumber(explicitQuantity ?? getItemQuantity(item));
+}
 
 /**
  * Returns whether an item has the quantity property
@@ -482,6 +497,21 @@ export function deleteProperty(object, key) {
 	return true;
 }
 
+export function setForcedDeletion(object, key) {
+	const ForcedDeletion = foundry.data.operators?.ForcedDeletion;
+	if (ForcedDeletion) {
+		object[key] = new ForcedDeletion();
+	} else {
+		object[`-=${key}`] = null;
+	}
+	return object;
+}
+
+export function isForcedDeletion(key, value) {
+	const ForcedDeletion = foundry.data.operators?.ForcedDeletion;
+	return key.startsWith("-=") || Boolean(ForcedDeletion && value instanceof ForcedDeletion);
+}
+
 
 export function hasItemTypeHandler(handler, itemType = "GLOBAL") {
 	return !!SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];
@@ -510,6 +540,22 @@ export function ensureValidIds(actor, itemsToCreate) {
 		return (hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, b.type) - hasItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTENTS, a.type));
 	});
 
+	// New ids are assigned up front so that items inside nested containers can point at their container's new id,
+	// even when that container is itself contained and therefore has no entry of its own in the map below.
+	const newIds = new Map();
+	const newIdsByOldId = new Map();
+	for (const item of sortedItems) {
+		const newId = createUniqueId(actor);
+		newIds.set(item, newId);
+		if (item._id) newIdsByOldId.set(item._id, newId);
+	}
+
+	const idGeneratorHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR);
+	const getNewContainerId = (containerId) => {
+		const newContainerId = newIdsByOldId.get(containerId);
+		return idGeneratorHandler ? idGeneratorHandler({ actor, containerId: newContainerId }) : newContainerId;
+	};
+
 	let itemsInContainers = sortedItems.reduce((acc, item) => {
 		const handler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED);
 
@@ -521,14 +567,9 @@ export function ensureValidIds(actor, itemsToCreate) {
 			const containerId = idRetrieverHandler ? idRetrieverHandler({ item }) : foundry.utils.getProperty(item, path);
 			if (acc[containerId]) {
 				acc[containerId].items.push(item);
-
-				const idGeneratorHandler = getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.CONTAINER_ID_GENERATOR);
-				const newContainerId = idGeneratorHandler
-					? idGeneratorHandler({ actor, containerId: acc[containerId].item._id })
-					: acc[containerId].item._id;
-				foundry.utils.setProperty(item, path, newContainerId);
+				foundry.utils.setProperty(item, path, getNewContainerId(containerId));
 			} else {
-				foundry.utils.setProperty(item, path, "");
+				foundry.utils.setProperty(item, path, newIdsByOldId.has(containerId) ? getNewContainerId(containerId) : "");
 				acc[item._id] = {
 					item,
 					items: []
@@ -542,7 +583,7 @@ export function ensureValidIds(actor, itemsToCreate) {
 			}
 		}
 
-		item._id = createUniqueId(actor);
+		item._id = newIds.get(item);
 
 		return acc;
 	}, {});

@@ -213,6 +213,7 @@
 					         bind:data="{settings[SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>
 					<SettingButton key={SETTINGS.SECONDARY_CURRENCIES} bind:data="{settings[SETTINGS.SECONDARY_CURRENCIES]}"/>
+					<SettingButton key={SETTINGS.CURRENCY_HOLDERS} bind:data="{settings[SETTINGS.CURRENCY_HOLDERS]}"/>
 					<Setting key={SETTINGS.CURRENCY_DECIMAL_DIGITS} bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
 					         disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
 					<SettingButton key={SETTINGS.ITEM_FILTERS} bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>

@@ -137,6 +137,15 @@ class API {
 	}
 
 	/**
+	 * The kinds of items that hold currencies, such as credsticks or coin pouches
+	 *
+	 * @returns {Array<object>}
+	 */
+	static get CURRENCY_HOLDERS() {
+		return Helpers.getSetting(SETTINGS.CURRENCY_HOLDERS);
+	}
+
+	/**
 	 * The attributes for detecting item similarities
 	 *
 	 * @returns {Array<string>}
@@ -328,6 +337,20 @@ class API {
 			}
 		});
 		return Helpers.setSetting(SETTINGS.ITEM_FILTERS, inFilters);
+	}
+
+	/**
+	 * Sets the kinds of items that hold currencies, such as credsticks or coin pouches
+	 *
+	 * @param {Array<object>} inHolderTypes   Holder types in the CURRENCY_HOLDERS format (see docs/api.md)
+	 * @returns {Promise}
+	 */
+	static async setCurrencyHolders(inHolderTypes) {
+		const errors = PileUtilities.validateCurrencyHolders(inHolderTypes);
+		if (errors.length) {
+			throw Helpers.custom_error(`setCurrencyHolders | ${errors[0]}`);
+		}
+		return Helpers.setSetting(SETTINGS.CURRENCY_HOLDERS, inHolderTypes);
 	}
 
 	/**
@@ -661,6 +684,13 @@ class API {
 
 		if (data["CURRENCY_DECIMAL_DIGITS"] && typeof data['CURRENCY_DECIMAL_DIGITS'] !== "number") {
 			throw Helpers.custom_error("addSystemIntegration | data.CURRENCY_DECIMAL_DIGITS must be of type number");
+		}
+
+		if (data['CURRENCY_HOLDERS'] !== undefined && data['CURRENCY_HOLDERS'] !== null) {
+			const holderErrors = PileUtilities.validateCurrencyHolders(data['CURRENCY_HOLDERS']);
+			if (holderErrors.length) {
+				throw Helpers.custom_error(`addSystemIntegration | ${holderErrors[0]}`);
+			}
 		}
 
 		data['INTEGRATION'] = true;
@@ -1472,7 +1502,7 @@ class API {
 			}
 
 			return {
-				_id: item._id, quantity: itemData?.quantity ?? Utilities.getItemQuantity(item)
+				_id: item._id, quantity: Utilities.getRequestedQuantity(itemData, item)
 			}
 		});
 
@@ -1531,7 +1561,7 @@ class API {
 
 			return {
 				id: item._id,
-				quantity: Math.max(itemData?.quantity ?? Utilities.getItemQuantity(item), 0),
+				quantity: Math.max(Utilities.getRequestedQuantity(itemData, item), 0),
 				flags: foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM)
 			}
 		});
@@ -1621,12 +1651,13 @@ class API {
 	 * @param {Actor/Token/TokenDocument} target                  The target whose attribute will have their quantity set
 	 * @param {object} attributes                                 An object with each key being an attribute path, and its value being the quantity to set
 	 * @param {object} options                                    Options to pass to the function
+	 * @param {boolean} [options.skipVaultLogging=false]          Whether to skip logging this action to the target actor if it is a vault
 	 * @param {string/boolean} [options.interactionId=false]      The interaction ID of this action
 	 *
-	 * @returns {Promise<object>}                                 An array containing a key value pair of the attribute path and the quantity of that attribute that was set
+	 * @returns {Promise<object>}                                 An object with each attribute path and how much its quantity changed
 	 *
 	 */
-	static setAttributes(target, attributes, { interactionId = false } = {}) {
+	static setAttributes(target, attributes, { skipVaultLogging = false, interactionId = false } = {}) {
 
 		const targetUuid = Utilities.getUuid(target);
 		if (!targetUuid) throw Helpers.custom_error(`setAttributes | Could not determine the UUID, please provide a valid target`);
@@ -1643,7 +1674,7 @@ class API {
 		}
 
 		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.SET_ATTRIBUTES, targetUuid, attributes, game.user.id, {
-			interactionId
+			skipVaultLogging, interactionId
 		});
 
 	}
@@ -2210,11 +2241,13 @@ class API {
 	 * @param {string} currencies                               A string of currencies to transfer (eg, "5gp 25sp")
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {boolean} [options.change=true]                   Whether the source actor can get change back
+	 * @param {boolean} [options.exact=false]                   Whether to move exactly the given amount of each currency,
+	 *                                                          without paying with other currencies or giving change
 	 * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
 	 *
 	 * @returns {Promise<object>}                               An object containing the items and attributes transferred to the target
 	 */
-	static transferCurrencies(source, target, currencies, { change = true, interactionId = false } = {}) {
+	static transferCurrencies(source, target, currencies, { change = true, exact = false, interactionId = false } = {}) {
 
 		const sourceActor = Utilities.getActor(source);
 		const sourceUuid = Utilities.getUuid(sourceActor);
@@ -2238,19 +2271,27 @@ class API {
 			throw Helpers.custom_error(`transferCurrencies | price must be of type string`);
 		}
 
-		const paymentData = PileUtilities.getPaymentData({
-			purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: sourceActor
+		if (exact) {
+			if (!PileUtilities.canAffordExactCurrencies(sourceActor, currencies)) {
+				throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} does not have "${currencies}" to transfer`);
+			}
+		} else {
+			const paymentData = PileUtilities.getPaymentData({
+				purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: sourceActor
+			});
+
+			if (!paymentData.canBuy) {
+				throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}"`);
+			}
+
+			if (!change && paymentData.buyerChange.length) {
+				throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}" without receiving change!`);
+			}
+		}
+
+		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_CURRENCIES, sourceUuid, targetUuid, currencies, game.user.id, {
+			exact, interactionId
 		});
-
-		if (!paymentData.canBuy) {
-			throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}"`);
-		}
-
-		if (!change && paymentData.buyerChange.length) {
-			throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}" without receiving change!`);
-		}
-
-		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_CURRENCIES, sourceUuid, targetUuid, currencies, game.user.id, { interactionId });
 
 	}
 
@@ -2435,11 +2476,14 @@ class API {
 	 * @param {Actor/TokenDocument/Token} target      The target to get the currencies from
 	 * @param {object} [options]                      Object containing optional parameters
 	 * @param {Boolean} [options.getAll]              Whether to get all the currencies, regardless of quantity
+	 * @param {Boolean} [options.secondary]           Whether to include secondary currencies
+	 * @param {Boolean} [options.includeHolders]      Whether to add the currencies held by the target's currency holders
+	 *                                                (such as coins in containers) to each currency's quantity
 	 *
 	 * @returns {Array<object>}                       An array of objects containing the data about each currency
 	 */
-	static getActorCurrencies(target, { getAll = false, secondary = true } = {}) {
-		return PileUtilities.getActorCurrencies(target, { getAll, secondary });
+	static getActorCurrencies(target, { getAll = false, secondary = true, includeHolders = false } = {}) {
+		return PileUtilities.getActorCurrencies(target, { getAll, secondary, includeHolders });
 	}
 
 	static updateTokenHud() {

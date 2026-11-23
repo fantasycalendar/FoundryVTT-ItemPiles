@@ -280,6 +280,21 @@
         "Title": "Clear All Actor Services",
         "Content": "This will clear all of the merchant's services, are you sure you want to do this?"
       },
+      "ItemHoldsMoney": {
+        "GiveTitle": "Give Item",
+        "DropTitle": "Drop Item",
+        "DepositTitle": "Deposit Item",
+        "GiveQuestion": "Give {item_name} to {target_name}?",
+        "DropQuestion": "Drop {item_name}?",
+        "DepositQuestion": "Deposit {item_name} in {target_name}?",
+        "Holds": "It has {money}.",
+        "ItemHolds": "{item_name} has {money}.",
+        "RowHolds": "Has {money}.",
+        "Give": "Give",
+        "Drop": "Drop",
+        "Deposit": "Deposit",
+        "Keep": "Keep"
+      },
       "GiveItemUserNotActive": {
         "Title": "Giving Item",
         "Content": "\"{actor_name}\" is owned by the player \"{user_name}\" but they are not active, so you cannot give them this item."
@@ -521,6 +536,43 @@
           "PriceModifierTitle": "Buy and Sell Price Modifiers",
           "PriceModifierExplanation": "This configures the modifiers for the cost this item when bought and sold. This multiplies the base price of the item before any other price modifiers. If the sell price modifier of the merchant is 50%, the sell price modifier of the item would have to be 200% in order to nullify the merchant modifier."
         }
+      },
+      "CurrencyHoldersEditor": {
+        "Title": "Item Piles Currency Holders Editor",
+        "Explanation": "Coin pouches, backpacks, credsticks and other items with money. Money on them counts as the character's own, and is spent after it. Amounts are edited on the items.",
+        "Name": "Name (for example \"Credstick\")",
+                "WhichItems": "Which items",
+        "WhichItemsHint": "An item matches when its value at each property path is one of the listed values.",
+        "Currencies": "Currencies",
+        "Currency": "Currency",
+        "Path": "Path",
+        "PathHint": "Where the item stores this currency, as a property path on the item, for example system.currency.gp.",
+        "Exclusive": "Exclusive",
+        "ExclusiveHint": "The character never has this currency itself, only on items of this kind, like credits on credsticks.",
+        "Receives": "Receives",
+        "ReceivesHint": "Money the character gains goes onto their first item of this kind, or onto a new one made from the item to create.",
+        "ItemToCreate": "Item to create",
+        "ItemToCreateHint": "New items of this kind are copies of this one.",
+        "DropItem": "Drop an item here",
+        "OnlyItems": "Only items can be dropped here.",
+        "DeleteWhenSpent": "Delete the item when it's spent to zero",
+        "HideInItemLists": "Hide in item lists",
+        "HideInItemListsHint": "Item Piles windows don't list these items. The money on them is shown with the currencies.",
+        "NotMoneyOnItemPiles": "Not money on item piles",
+        "NotMoneyOnItemPilesHint": "On item piles and merchants, the money in these items isn't the pile's.",
+        "CountItemsInside": "Also count currency items stored inside",
+        "CountItemsInsideHint": "Currency items stored inside these items, such as gems, count too.",
+        "SpendingOrder": "Spending order",
+        "SpendingOrderHint": "Lower numbers are spent first. Items with the same number are spent in sheet order.",
+        "AddKind": "Add a kind of item",
+        "NoKinds": "No currency holders yet.",
+        "ErrorNoFilter": "Add at least one row under Which items.",
+        "ErrorFilterIncomplete": "Every row under Which items needs a property path and at least one value.",
+        "ErrorNoCurrency": "Add at least one currency.",
+        "ErrorNoCurrencyChosen": "Choose a currency in every currency row.",
+        "ErrorCurrencyPath": "{currency} needs the property path where the item stores it.",
+        "ErrorDuplicateCurrency": "{currency} is listed more than once.",
+        "ErrorMissingItem": "Drop an item to create, or untick Receives."
       },
       "FilterEditor": {
         "Title": "Item Piles Filters Editor",
@@ -810,6 +862,7 @@
       "PrivateTrade": "Private Trade",
       "ExpandTrade": "View full trade details",
       "MerchantTraded": "{name} bought the following things from {merchant}:",
+      "MerchantSold": "{name} sold the following things to {merchant}:",
       "GaveItems": "{source} gave some items to {target}:"
     },
     "VaultLog": {
@@ -868,6 +921,11 @@
         "Title": "Secondary Currencies",
         "Label": "Configure Secondary Currencies",
         "Hint": "This setting define secondary currencies, similar to but separate from regular currencies. These cannot have exchange rates or be split into other custom currencies."
+      },
+      "CurrencyHolders": {
+        "Title": "Currency Holders",
+        "Label": "Configure Currency Holders",
+        "Hint": "Coin pouches, backpacks, credsticks and other items with money. Their money counts as their owner's when buying, selling, trading, looting and depositing."
       },
       "CurrencyDecimalDigits": {
         "Title": "Currency Decimal Digits",

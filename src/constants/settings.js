@@ -1,6 +1,8 @@
 import { SYSTEMS } from "../systems.js";
 import { refreshItemTypesThatCanStack } from "../helpers/utilities.js";
 import { applySystemSpecificStyles } from "../settings.js";
+import { clearHolderTypeCache } from "../helpers/pile-utilities.js";
+import { cachedActorCurrencies, cachedCurrencyList } from "../helpers/caches.js";
 
 const SETTINGS = {
 
@@ -32,6 +34,7 @@ const SETTINGS = {
 	// System Settings
 	CURRENCIES: "currencies",
 	SECONDARY_CURRENCIES: "secondaryCurrencies",
+	CURRENCY_HOLDERS: "currencyHolders",
 	CURRENCY_DECIMAL_DIGITS: "currencyDecimalDigits",
 	ITEM_FILTERS: "itemFilters",
 	ACTOR_CLASS_TYPE: "actorClassType",
@@ -128,6 +131,24 @@ const SETTINGS = {
 			min: 0,
 			max: 1,
 			type: Number
+		},
+
+		[SETTINGS.CURRENCY_HOLDERS]: {
+			name: "ITEM-PILES.Settings.CurrencyHolders.Title",
+			label: "ITEM-PILES.Settings.CurrencyHolders.Label",
+			hint: "ITEM-PILES.Settings.CurrencyHolders.Hint",
+			icon: "fas fa-wallet",
+			application: "currency-holders",
+			scope: "world",
+			config: false,
+			system: true,
+			default: SYSTEMS.DATA.CURRENCY_HOLDERS,
+			onChange: () => {
+				clearHolderTypeCache();
+				cachedActorCurrencies.clear();
+				cachedCurrencyList.clear();
+			},
+			type: Array
 		},
 
 		[SETTINGS.ITEM_FILTERS]: {

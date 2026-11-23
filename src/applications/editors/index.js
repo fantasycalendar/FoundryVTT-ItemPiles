@@ -6,6 +6,7 @@ import PricePresetEditor from "./price-preset-editor/price-preset-editor.js";
 import UnstackableItemTypesEditor from "./unstackable-item-types-editor/unstackable-item-types-editor.js";
 import VaultStylesEditor from "./vault-styles-editor/vault-styles-editor.js";
 import StylesEditor from "./styles-editor/styles-editor.js";
+import CurrencyHoldersEditor from "./currency-holders-editor/currency-holders-editor.js";
 
 export default {
 	"currencies": CurrenciesEditor,
@@ -17,5 +18,6 @@ export default {
 	"vault-styles": VaultStylesEditor,
 	"price-modifiers": PriceModifiersEditor,
 	"unstackable-item-types": UnstackableItemTypesEditor,
-	"price-presets": PricePresetEditor
+	"price-presets": PricePresetEditor,
+	"currency-holders": CurrencyHoldersEditor
 }

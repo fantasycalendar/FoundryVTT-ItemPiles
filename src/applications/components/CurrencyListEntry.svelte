@@ -9,6 +9,7 @@
 	let img = currency.img;
 	let abbreviation = currency.abbreviation;
 	let quantity = currency.quantity;
+	let tooltip = currency.tooltip ?? name;
 
 	let text = "";
 	$: {
@@ -26,7 +27,7 @@
 
 </script>
 
-<div class="item-piles-flexrow{options.reverse ? '-reverse' : ''} item-piles-item-row" data-fast-tooltip={$name}
+<div class="item-piles-flexrow{options.reverse ? '-reverse' : ''} item-piles-item-row" data-fast-tooltip={$tooltip}
      data-fast-tooltip-activation-speed="0" data-fast-tooltip-deactivation-speed="0" style="flex:0 1 auto;">
 
 	{#if $img}

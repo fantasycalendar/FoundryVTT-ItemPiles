@@ -121,10 +121,11 @@
 
 		currenciesToAdd.items.forEach(item => {
 			const itemData = store.leftTraderActor.items.get(item.item._id).toObject();
-			store.addItem(itemData, { quantity: item.quantity, currency: true })
+			const quantity = asGM ? item.quantity : Math.min(item.quantity, Utilities.getItemQuantity(itemData));
+			store.addItem(itemData, { quantity, currency: true })
 		});
 
-		const currencies = PileUtilities.getActorCurrencies(store.leftTraderActor, { getAll: asGM })
+		const currencies = PileUtilities.getActorCurrencies(store.leftTraderActor, { getAll: asGM, includeHolders: true })
 			.filter(currency => currency.type === "attribute");
 
 		Object.entries(currenciesToAdd.attributes).forEach(([path, quantity]) => {
