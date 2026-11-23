@@ -6,6 +6,8 @@ import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
 
+const ITEM_FLAGS_KEY = CONSTANTS.FLAGS.ITEM.replace(/^flags\./, "");
+
 // value === original + written. delta - written is the delta-only part, reported but never written.
 function createValueRecord(original) {
 	const value = Utilities.sanitizeNumber(original);
@@ -31,6 +33,7 @@ function createItemChange({ key, source, isNew, quantity, type = null }) {
 		isNew,
 		quantity: createValueRecord(quantity),
 		fields: new Map(),
+		itemFlagData: null,
 		type,
 		keepIfZero: false,
 		notForSaleIfZero: false,
@@ -49,16 +52,17 @@ function cleanAttributes(attributes) {
 }
 
 // Written item data stores only non-default item-piles flags; reported itemDeltas carry the full set.
-function setCleanItemFlagData(itemData) {
-	const flagData = PileUtilities.getItemFlagData(itemData);
+function setCleanItemFlagData(itemData, extraFlagData = {}) {
+	const existingFlagData = PileUtilities.getItemFlagData(itemData);
+	const flagData = foundry.utils.mergeObject(existingFlagData, extraFlagData, { inplace: false });
 	Utilities.deleteProperty(itemData, CONSTANTS.FLAGS.ITEM);
 	const cleanFlagData = removeOverheadCost(PileUtilities.cleanItemFlagData(flagData));
 	foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM, cleanFlagData);
 	return itemData;
 }
 
-function setReportedItemFlagData(itemData) {
-	const flagData = PileUtilities.getItemFlagData(itemData);
+function setReportedItemFlagData(itemData, extraFlagData = {}) {
+	const flagData = foundry.utils.mergeObject(PileUtilities.getItemFlagData(itemData), extraFlagData);
 	Utilities.deleteProperty(itemData, CONSTANTS.FLAGS.ITEM);
 	foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM, removeOverheadCost(flagData));
 	return itemData;
@@ -154,6 +158,7 @@ export default class Transaction {
 				itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
 			}
 			const quantity = Math.abs(Utilities.getRequestedQuantity(data, itemData));
+			const entryFlagData = foundry.utils.getProperty(data.flags ?? {}, ITEM_FLAGS_KEY);
 
 			const { existingItem, pendingCreation } = this.findTargetForItem(itemData, { remove, type: entryType });
 
@@ -180,6 +185,16 @@ export default class Transaction {
 			}
 			change.hasQuantityChange = true;
 			applyValueChange(change.quantity, quantity, { set, remove, onlyDelta });
+
+			let flagData = null;
+			if (entryFlagData && change.isNew) {
+				flagData = entryFlagData;
+			} else if (entryFlagData?.customCategory !== undefined) {
+				flagData = { customCategory: entryFlagData.customCategory };
+			}
+			if (flagData) {
+				change.itemFlagData = foundry.utils.mergeObject(change.itemFlagData ?? {}, flagData, { inplace: false });
+			}
 		}
 	}
 
@@ -268,7 +283,7 @@ export default class Transaction {
 			}
 
 			if (change.quantity.delta) {
-				const item = setReportedItemFlagData(change.source.toObject());
+				const item = setReportedItemFlagData(change.source.toObject(), change.itemFlagData ?? {});
 				Utilities.setItemQuantity(item, change.quantity.delta, true);
 				itemDeltas.push({ item, quantity: change.quantity.delta, type: change.type });
 			}
@@ -294,15 +309,18 @@ export default class Transaction {
 		const keep = change.quantity.value > 0
 			|| change.type === "currency"
 			|| !PileUtilities.canItemStack(itemData, this.document);
-		return keep ? setCleanItemFlagData(itemData) : null;
+		return keep ? setCleanItemFlagData(itemData, change.itemFlagData ?? {}) : null;
 	}
 
 	getItemUpdate(change) {
 		const quantityChanged = change.quantity.value !== Utilities.getItemQuantity(change.source);
-		if (!quantityChanged) return null;
+		if (!quantityChanged && !change.itemFlagData) return null;
 		const update = Utilities.setItemQuantity(change.source.toObject(), change.quantity.value);
 		if (change.notForSaleIfZero) {
 			foundry.utils.setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", change.quantity.value === 0);
+		}
+		for (const [key, value] of Object.entries(change.itemFlagData ?? {})) {
+			foundry.utils.setProperty(update, `${CONSTANTS.FLAGS.ITEM}.${key}`, value);
 		}
 		return update;
 	}

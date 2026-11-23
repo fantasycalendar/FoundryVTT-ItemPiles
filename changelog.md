@@ -25,6 +25,7 @@
 - Fixed players being able to add items to item piles out of thin air by dragging them in from the sidebar or chat
 - Fixed merchant restocks and roll table results set to replace existing items keeping the old stock and adding the new items on top of it
 - Fixed coins being lost in player trades when both players offered the same item-based currency
+- Fixed merchants restocked by Simple Calendar losing the custom categories set on their roll table items
 - Fixed merchants with infinite currencies losing their item-based currencies when buying from players
 - Fixed merchants with infinite currencies sometimes ending up with an item-based currency at a negative quantity
 - Fixed splitting an item pile with a single character removing items that cannot stack without giving them to the character
