@@ -84,6 +84,8 @@ export default class Transaction {
 		this.attributes = new Map();
 		this.embeddedDeltas = new Map();
 		this.items = new Map();
+		this.currencyDeltas = new Map();
+		this.ownCurrencyDeltas = new Map();
 		this.payload = null;
 	}
 
@@ -217,6 +219,82 @@ export default class Transaction {
 		}
 	}
 
+	addCurrencyDelta(path, quantity, { own = false } = {}) {
+		const delta = (this.currencyDeltas.get(path) ?? 0) + quantity;
+		this.currencyDeltas.set(path, Helpers.roundToDecimals(delta, PileUtilities.getCurrencyDecimals()));
+		if (own) this.addOwnCurrencyDelta(path, quantity);
+	}
+
+	// ownCurrencyDeltas[path] is the part of attributes[path].delta made by currency changes, all of which is also in
+	// currencyDeltas. appendDeltas relies on this to move each amount exactly once.
+	addOwnCurrencyDelta(path, quantity) {
+		const delta = (this.ownCurrencyDeltas.get(path) ?? 0) + quantity;
+		this.ownCurrencyDeltas.set(path, Helpers.roundToDecimals(delta, PileUtilities.getCurrencyDecimals()));
+	}
+
+	async appendCurrencyChanges(entries, { set = false, remove = false, onlyDelta = false, keepIfZero = false } = {}) {
+		this.payload = null;
+		for (const entry of entries) {
+			if (!entry.quantity && !set) continue;
+			if (entry.type === "item") {
+				await this.appendItemCurrencyChange(entry, { set, remove, onlyDelta, keepIfZero });
+			} else {
+				this.appendAttributeCurrencyChange(entry, { set, remove, onlyDelta });
+			}
+		}
+	}
+
+	async appendItemCurrencyChange(entry, { set, remove, onlyDelta, keepIfZero }) {
+		const itemData = entry.data?.item ?? entry.item;
+		await this.appendItemChanges([{ item: itemData, quantity: entry.quantity }], {
+			set, remove, type: "currency", keepIfZero, onlyDelta
+		});
+	}
+
+	appendAttributeCurrencyChange(entry, { set, remove, onlyDelta }) {
+		const path = entry.data?.path ?? entry.path;
+		if (!path) return;
+
+		if (set) {
+			const target = Utilities.sanitizeNumber(entry.quantity);
+			const record = this.getAttributeValueRecord(path);
+			const deltaBefore = record.delta;
+			applyValueChange(record, target, { set: true, onlyDelta });
+			this.addCurrencyDelta(path, record.delta - deltaBefore, { own: true });
+			return;
+		}
+
+		const quantity = Math.abs(Utilities.sanitizeNumber(entry.quantity));
+		if (!quantity) return;
+
+		this.addCurrencyDelta(path, remove ? -quantity : quantity, { own: true });
+		applyValueChange(this.getAttributeValueRecord(path), quantity, { remove, onlyDelta });
+	}
+
+	async appendDeltas(source) {
+		const { itemDeltas } = source.prepare();
+		await this.appendItemChanges(itemDeltas);
+		const currencyEntries = Array.from(source.currencyDeltas)
+			.filter(([_, quantity]) => quantity)
+			.map(([path, quantity]) => ({ type: "attribute", data: { path }, quantity: Math.abs(quantity) }));
+		await this.appendCurrencyChanges(currencyEntries);
+		await this.appendDocumentChanges(source.getAttributeDeltasOutsideCurrencies());
+	}
+
+	getAttributeDeltasOutsideCurrencies() {
+		const deltas = {};
+		for (const [path, record] of this.attributes) {
+			const delta = record.delta - (this.ownCurrencyDeltas.get(path) ?? 0);
+			if (delta) deltas[path] = Helpers.roundToDecimals(delta, PileUtilities.getCurrencyDecimals());
+		}
+		for (const [path, delta] of this.embeddedDeltas) {
+			if (!delta) continue;
+			const total = (deltas[path] ?? 0) + delta;
+			deltas[path] = Helpers.roundToDecimals(total, PileUtilities.getCurrencyDecimals());
+		}
+		return deltas;
+	}
+
 	shouldItemBeDeleted(change) {
 		if (change.keepIfZero) return false;
 		return change.hasQuantityChange && change.quantity.value <= 0;
@@ -232,7 +310,8 @@ export default class Transaction {
 			itemsToUpdate,
 			itemsToDelete,
 			attributeDeltas,
-			itemDeltas
+			itemDeltas,
+			currencyDeltas: Object.fromEntries(Array.from(this.currencyDeltas).filter(([_, quantity]) => quantity))
 		};
 		return this.payload;
 	}
@@ -348,6 +427,7 @@ export default class Transaction {
 
 		return {
 			attributeDeltas: { ...payload.attributeDeltas },
+			currencyDeltas: { ...payload.currencyDeltas },
 			itemDeltas: changedItemDeltas.concat(createdItemDeltas)
 		};
 	}
