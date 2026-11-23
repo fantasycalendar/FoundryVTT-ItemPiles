@@ -250,13 +250,25 @@ export default class Transaction {
 				}
 			};
 		}
+		if (source.kind === "holder") {
+			const change = this.getItemChange(source.item);
+			change.holderType ??= source.holderType;
+			change.type ??= "holder";
+			const record = this.getFieldValueRecord(change, source.path);
+			return {
+				read: () => record.value,
+				write: (amount) => applyValueChange(record, amount, { set: true })
+			};
+		}
 		const change = this.getItemChange(source.item);
-		change.holderType ??= source.holderType;
-		change.type ??= "holder";
-		const record = this.getFieldValueRecord(change, source.path);
+		change.type ??= source.own ? "currency" : "item";
+		if (source.own) change.keepIfZero = true;
 		return {
-			read: () => record.value,
-			write: (amount) => applyValueChange(record, amount, { set: true })
+			read: () => change.quantity.value,
+			write: (amount) => {
+				change.hasQuantityChange = true;
+				applyValueChange(change.quantity, amount, { set: true });
+			}
 		};
 	}
 
@@ -268,18 +280,24 @@ export default class Transaction {
 		for (const entry of entries) {
 			if (!entry.quantity && !set) continue;
 			if (entry.type === "item") {
-				await this.appendItemCurrencyChange(entry, { set, remove, onlyDelta, keepIfZero });
+				await this.appendItemCurrencyChange(entry, { set, remove, onlyDelta, keepIfZero, holders, excludeHolders });
 			} else {
 				this.appendAttributeCurrencyChange(entry, { set, remove, onlyDelta, holders, excludeHolders });
 			}
 		}
 	}
 
-	async appendItemCurrencyChange(entry, { set, remove, onlyDelta, keepIfZero }) {
-		const itemData = entry.data?.item ?? entry.item;
-		await this.appendItemChanges([{ item: itemData, quantity: entry.quantity }], {
-			set, remove, type: "currency", keepIfZero, onlyDelta
-		});
+	async appendItemCurrencyChange(entry, { set, remove, onlyDelta, keepIfZero, holders, excludeHolders }) {
+		if (!remove || set || onlyDelta) {
+			const itemData = entry.data?.item ?? entry.item;
+			await this.appendItemChanges([{ item: itemData, quantity: entry.quantity }], {
+				set, remove, type: "currency", keepIfZero, onlyDelta
+			});
+			return;
+		}
+		const sources = PileUtilities.getCurrencySources(this.document, entry, { holders, excludeHolders });
+		const access = sources.map(source => this.getCurrencySourceAccess(source));
+		PileUtilities.takeFromSources(access, Math.abs(entry.quantity));
 	}
 
 	appendAttributeCurrencyChange(entry, { set, remove, onlyDelta, holders, excludeHolders }) {

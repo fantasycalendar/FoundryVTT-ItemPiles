@@ -530,6 +530,30 @@ export function getCurrencyHolders(target, { exclude = [] } = {}) {
 }
 
 /**
+ * Stacks of an item currency stored inside the given container holders, in holder order.
+ * A stored stack differs from the currency's item data only by its container, so it is matched as if it were in that
+ * container.
+ */
+export function getContainedCurrencyStacks(target, currency, holders) {
+	const actor = Utilities.getActor(target);
+	const containedPath = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
+	const itemData = currency?.data?.item;
+	if (!actor?.items || !containedPath || !itemData) return [];
+	const stacks = [];
+	for (const { item: holder, holderType } of holders) {
+		if (!holderType.container) continue;
+		const contents = actor.items.filter(item => foundry.utils.getProperty(item, containedPath) === holder.id);
+		if (!contents.length) continue;
+		const probe = foundry.utils.deepClone(itemData);
+		delete probe._id;
+		foundry.utils.setProperty(probe, containedPath, holder.id);
+		const stack = Utilities.findSimilarItem(contents, probe);
+		if (stack) stacks.push(stack);
+	}
+	return stacks;
+}
+
+/**
  * Takes up to `quantity` from each source in order and returns what could not be covered.
  * Sources are `{ read(), write(amount) }`; empty or negative sources are skipped without being written.
  */
@@ -547,9 +571,11 @@ export function takeFromSources(sources, quantity) {
 }
 
 /**
- * Where an attribute currency can be spent from on the target, in spending order:
+ * Where a currency can be spent from on the target, in spending order:
  * - `{ kind: "attribute", path }`: the target's own attribute
  * - `{ kind: "holder", item, holderType, path }`: an amount held by a currency holder
+ * - `{ kind: "stack", item, own }`: a stack of an item currency, the target's own top-level stack or one inside a
+ *   container holder
  *
  * @param target
  * @param currency                            A currency entry ({ type, data })
@@ -560,6 +586,21 @@ export function takeFromSources(sources, quantity) {
 export function getCurrencySources(target, currency, { holders = true, excludeHolders = [] } = {}) {
 	const actor = Utilities.getActor(target);
 	if (!actor) return [];
+
+	if (currency.type === "item") {
+		const itemData = currency.data?.item ?? currency.item;
+		if (!itemData) return [];
+		const containedPath = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
+		const topLevelItems = actor.items.filter(item => !containedPath || !foundry.utils.getProperty(item, containedPath));
+		const ownStack = topLevelItems.find(item => item.id === itemData._id)
+			?? Utilities.findSimilarItem(topLevelItems, itemData);
+		const sources = ownStack ? [{ kind: "stack", item: ownStack, own: true }] : [];
+		if (!holders) return sources;
+		const containerHolders = getCurrencyHolders(actor, { exclude: excludeHolders });
+		const containedStacks = getContainedCurrencyStacks(actor, { data: { item: itemData } }, containerHolders);
+		return sources.concat(containedStacks.map(item => ({ kind: "stack", item, own: false })));
+	}
+
 	const path = currency.data?.path ?? currency.path;
 	const sources = [{ kind: "attribute", path }];
 	if (!holders) return sources;
@@ -571,14 +612,21 @@ export function getCurrencySources(target, currency, { holders = true, excludeHo
 }
 
 /**
- * When `includeHolders` is set, adds holder amounts to attribute currencies.
- * Returns new currency objects for anything it changes, so the cached entries keep the actor's own quantities.
+ * When `includeHolders` is set, adds holder amounts to attribute currencies, and stacks inside containers to item
+ * currencies. Returns new currency objects for anything it changes, so the cached entries keep the actor's own
+ * quantities.
  */
 function addHeldCurrencies(actor, currencies, { includeHolders = false, excludeHolders = [] } = {}) {
 	if (!includeHolders) return currencies;
 	const holders = getCurrencyHolders(actor, { exclude: excludeHolders });
 	if (!holders.length) return currencies;
 	return currencies.map(currency => {
+		if (currency.type === "item") {
+			const stacks = getContainedCurrencyStacks(actor, currency, holders);
+			if (!stacks.length) return currency;
+			const quantity = stacks.reduce((total, stack) => total + Utilities.getItemQuantity(stack), currency.quantity);
+			return { ...currency, quantity };
+		}
 		if (currency.type !== "attribute") return currency;
 		let quantity = currency.quantity;
 		for (const { item, holderType } of holders) {
