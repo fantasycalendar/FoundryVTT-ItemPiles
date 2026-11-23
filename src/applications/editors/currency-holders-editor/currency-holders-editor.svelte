@@ -14,7 +14,7 @@
 	export let data;
 	export let elementRoot;
 
-	const L = (key) => localize(`ITEM-PILES.Applications.CurrencyHoldersEditor.${key}`);
+	const L = (key, data) => localize(`ITEM-PILES.Applications.CurrencyHoldersEditor.${key}`, data);
 	const OPTIONS = ["deleteWhenEmpty", "hidden", "ignoreInItemPiles", "includeContents"];
 
 	const currencyChoices = getSetting(SETTINGS.CURRENCIES).concat(getSetting(SETTINGS.SECONDARY_CURRENCIES))
@@ -62,6 +62,7 @@
 	}
 
 	let holderTypes = foundry.utils.deepClone(data || getSetting(SETTINGS.CURRENCY_HOLDERS) || []).map(toForm);
+	let cardErrors = {};
 	let errors = [];
 
 	function addHolderType() {
@@ -102,7 +103,7 @@
 
 	async function dropItem(holderType, dropData) {
 		if (dropData?.type !== "Item") {
-			Helpers.custom_warning(L("DropItem"), true);
+			Helpers.custom_warning(L("OnlyItems"), true);
 			return;
 		}
 		const item = await foundry.utils.fromUuid(dropData.uuid);
@@ -120,7 +121,41 @@
 		holderTypes = holderTypes;
 	}
 
+	// Messages for GMs about each card, keyed by holder type id; validateCurrencyHolders in save() checks the data that
+	// is stored.
+	function getFormErrors(forms) {
+		const messages = {};
+		for (const form of forms) {
+			const cardMessages = [];
+			if (!form.filter.length) {
+				cardMessages.push(L("ErrorNoFilter"));
+			} else if (form.filter.some(entry => !entry.path.trim() || !String(entry.filters).trim())) {
+				cardMessages.push(L("ErrorFilterIncomplete"));
+			}
+			if (!form.currencies.length) cardMessages.push(L("ErrorNoCurrency"));
+			const seen = new Set();
+			for (const row of form.currencies) {
+				if (!row.currency) {
+					cardMessages.push(L("ErrorNoCurrencyChosen"));
+					continue;
+				}
+				const currency = choicesFor(row).find(choice => choice.path === row.currency)?.name ?? row.currency;
+				if (seen.has(row.currency)) cardMessages.push(L("ErrorDuplicateCurrency", { currency }));
+				seen.add(row.currency);
+				if (!row.path.trim()) cardMessages.push(L("ErrorCurrencyPath", { currency }));
+			}
+			if (form.currencies.some(row => row.receive) && !form.createItem) {
+				cardMessages.push(L("ErrorMissingItem"));
+			}
+			if (cardMessages.length) messages[form.id] = [...new Set(cardMessages)];
+		}
+		return messages;
+	}
+
 	function save() {
+		cardErrors = getFormErrors(holderTypes);
+		errors = [];
+		if (Object.keys(cardErrors).length) return;
 		const result = holderTypes.map(fromForm);
 		errors = validateCurrencyHolders(result);
 		if (errors.length) return;
@@ -147,7 +182,7 @@
 					</button>
 				</div>
 
-				<h4 data-tooltip={L("MatchingItemsHint")}>{L("MatchingItems")}</h4>
+				<h4 data-tooltip={L("WhichItemsHint")}>{L("WhichItems")}</h4>
 				<table>
 					<tr>
 						<th>{localize("ITEM-PILES.Applications.FilterEditor.Path")}</th>
@@ -173,9 +208,9 @@
 				<table>
 					<tr>
 						<th>{L("Currency")}</th>
-						<th>{L("ItemPath")}</th>
-						<th class="custom-check" data-tooltip={L("OnlyOnHoldersHint")}>{L("OnlyOnHolders")}</th>
-						<th class="custom-check" data-tooltip={L("ReceivesIncomeHint")}>{L("ReceivesIncome")}</th>
+						<th data-tooltip={L("PathHint")}>{L("Path")}</th>
+						<th class="custom-check" data-tooltip={L("ExclusiveHint")}>{L("Exclusive")}</th>
+						<th class="custom-check" data-tooltip={L("ReceivesHint")}>{L("Receives")}</th>
 						<th class="custom-small">
 							<a class="item-piles-clickable" data-action="add-currency" on:click={() => addCurrency(holderType)}>
 								<i class="fas fa-plus"></i>
@@ -201,7 +236,7 @@
 					{/each}
 				</table>
 
-				<h4 data-tooltip={L("NewHolderItemHint")}>{L("NewHolderItem")}</h4>
+				<h4 data-tooltip={L("ItemToCreateHint")}>{L("ItemToCreate")}</h4>
 				<DropZone class="item-piles-holder-item" callback={(dropData) => dropItem(holderType, dropData)}>
 					{#if holderType.createItem}
 						<div class="item-piles-flexrow item-piles-holder-item-row">
@@ -216,20 +251,29 @@
 
 				<div class="item-piles-holder-options">
 					<label><input type="checkbox" name="deleteWhenEmpty" bind:checked={holderType.deleteWhenEmpty}/>
-						{L("DeleteWhenEmpty")}</label>
-					<label data-tooltip={L("TreatAsMoneyHint")}><input type="checkbox" name="hidden" bind:checked={holderType.hidden}/>
-						{L("TreatAsMoney")}</label>
-					<label data-tooltip={L("IgnoreInItemPilesHint")}>
+						{L("DeleteWhenSpent")}</label>
+					<label data-tooltip={L("HideInItemListsHint")}><input type="checkbox" name="hidden" bind:checked={holderType.hidden}/>
+						{L("HideInItemLists")}</label>
+					<label data-tooltip={L("NotMoneyOnItemPilesHint")}>
 						<input type="checkbox" name="ignoreInItemPiles" bind:checked={holderType.ignoreInItemPiles}/>
-						{L("IgnoreInItemPiles")}</label>
-					<label><input type="checkbox" name="includeContents" bind:checked={holderType.includeContents}/>
-						{L("IncludeContents")}</label>
-					<label data-tooltip={L("PriorityHint")}>{L("Priority")}
+						{L("NotMoneyOnItemPiles")}</label>
+					<label data-tooltip={L("CountItemsInsideHint")}>
+						<input type="checkbox" name="includeContents" bind:checked={holderType.includeContents}/>
+						{L("CountItemsInside")}</label>
+					<label data-tooltip={L("SpendingOrderHint")}>{L("SpendingOrder")}
 						<input type="number" name="priority" bind:value={holderType.priority}/></label>
 				</div>
+
+				{#if cardErrors[holderType.id]}
+					<ul class="item-piles-holder-errors">
+						{#each cardErrors[holderType.id] as error}
+							<li>{error}</li>
+						{/each}
+					</ul>
+				{/if}
 			</fieldset>
 		{:else}
-			<p class="item-piles-holder-none">{L("NoHolderTypes")}</p>
+			<p class="item-piles-holder-none">{L("NoKinds")}</p>
 		{/each}
 
 		{#if errors.length}
@@ -242,7 +286,7 @@
 
 		<footer>
 			<button type="button" data-action="add-holder" on:click={addHolderType}>
-				<i class="fas fa-plus"></i> {L("AddHolderType")}
+				<i class="fas fa-plus"></i> {L("AddKind")}
 			</button>
 			<button type="button" data-action="save" on:click={save}>
 				<i class="far fa-save"></i> {localize("Save")}

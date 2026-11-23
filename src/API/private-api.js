@@ -1846,6 +1846,53 @@ export default class PrivateAPI {
 
 	}
 
+	/**
+	 * Asks the user to confirm moving an item that holds money away from a character. Resolves to whether to go ahead.
+	 *
+	 * @param {Actor} sourceActor
+	 * @param {object} itemData
+	 * @param {string} action           "Give", "Drop" or "Deposit"
+	 * @param {Actor} [targetActor]
+	 * @returns {Promise<boolean>}
+	 */
+	static async _confirmMoneyInItem(sourceActor, itemData, action, targetActor = null) {
+		if (!sourceActor || PileUtilities.isValidItemPile(sourceActor)) return true;
+		const item = sourceActor.items.get(itemData?._id) ?? itemData;
+		const money = PileUtilities.describeMoneyHeldByItem(item, sourceActor);
+		if (!money) return true;
+		const key = "ITEM-PILES.Dialogs.ItemHoldsMoney";
+		const confirmed = await TJSDialog.confirm({
+			title: game.i18n.localize(`${key}.${action}Title`),
+			content: {
+				class: CustomDialog,
+				props: {
+					header: game.i18n.format(`${key}.${action}Question`, {
+						item_name: item.name, target_name: targetActor?.name ?? ""
+					}),
+					content: `<span class="item-piles-holds-money-confirm">${foundry.utils.escapeHTML(game.i18n.format(`${key}.Holds`, { money }))}</span>`
+				}
+			},
+			buttons: {
+				yes: {
+					icon: '<i class="fas fa-check"></i>',
+					label: game.i18n.localize(`${key}.${action}`)
+				},
+				no: {
+					icon: '<i class="fas fa-times"></i>',
+					label: game.i18n.localize(`${key}.Keep`)
+				}
+			},
+			modal: true,
+			draggable: false,
+			rejectClose: false,
+			defaultYes: false,
+			options: {
+				height: "auto"
+			}
+		});
+		return !!confirmed;
+	}
+
 	static async _depositWithdrawItem(dropData, sourceIsVault = false, targetIsVault = true) {
 
 		const sourceActor = Utilities.getActor(dropData.source);
@@ -1873,6 +1920,9 @@ export default class PrivateAPI {
 				return;
 			}
 		}
+
+		if (!sourceIsVault && !(await this._confirmMoneyInItem(sourceActor, dropData.itemData.item, "Deposit", targetActor))) return;
+
 		Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);
 
 		let flagData = PileUtilities.getItemFlagData(dropData.itemData.item);
@@ -1957,6 +2007,8 @@ export default class PrivateAPI {
 
 			}
 		}
+
+		if (!(await this._confirmMoneyInItem(sourceActor, dropData.itemData.item, "Drop", targetActor))) return;
 
 		Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);
 
@@ -2046,6 +2098,8 @@ export default class PrivateAPI {
 
 			Utilities.setItemQuantity(dropData.itemData.item, dropData.itemData.quantity);
 			foundry.utils.setProperty(dropData.itemData, "quantity", dropData.itemData.quantity);
+
+			if (!(await this._confirmMoneyInItem(sourceActor, dropData.itemData.item, "Give", targetActor))) return;
 
 			if (Hooks.call(CONSTANTS.HOOKS.ITEM.PRE_GIVE, sourceActor, targetActor, dropData.itemData, user.id) === false) {
 				return;

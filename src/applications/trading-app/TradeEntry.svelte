@@ -1,7 +1,9 @@
 <script>
 
+	import { localize } from '#runtime/util/i18n';
 	import * as Helpers from "../../helpers/helpers.js";
 	import * as Utilities from "../../helpers/utilities.js";
+	import * as PileUtilities from "../../helpers/pile-utilities.js";
 	import SETTINGS from "../../constants/settings.js";
 	import { SYSTEMS } from "../../systems.js";
 
@@ -10,6 +12,11 @@
 	export let editable = true;
 
 	const canPreview = data.id && (Helpers.getSetting(SETTINGS.INSPECT_ITEMS_IN_TRADE) || editable)
+
+	const ownerActor = [store.leftTraderActor, store.rightTraderActor].find(actor => actor?.items.has(data.id));
+	const heldMoney = data.currency ? "" : PileUtilities.describeMoneyHeldByItem(
+		ownerActor?.items.get(data.id) ?? data.data, ownerActor
+	);
 
 	function previewItem() {
 		if (!canPreview || !data.id) return;
@@ -57,6 +64,10 @@
 	<div class="item-piles-name item-piles-text">
 		<div class="item-piles-name-container">
 			<p class:item-piles-clickable-link="{canPreview}" on:click={previewItem}>{data.name}</p>
+			{#if heldMoney}
+				<i class="fas fa-coins item-piles-holds-money" style="margin-left: 0.25rem;"
+				   data-tooltip={localize("ITEM-PILES.Dialogs.ItemHoldsMoney.RowHolds", { money: heldMoney })}></i>
+			{/if}
 		</div>
 	</div>
 

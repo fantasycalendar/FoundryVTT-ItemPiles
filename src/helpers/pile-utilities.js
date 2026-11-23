@@ -727,6 +727,58 @@ export function getContainedCurrencyStacks(target, currency, holders) {
 }
 
 /**
+ * The money an item holds: the amounts on it and on any holders stored inside it, and currency items stored inside
+ * holders whose type has `includeContents`. `item` may be item data being moved, with `actor` holding what is stored
+ * inside it.
+ *
+ * @returns {Array<{ name: string, img: string, abbreviation: string, quantity: number }>}   In currency list order
+ */
+export function getMoneyHeldByItem(item, actor = item?.parent) {
+	const holderTypes = getHolderTypes();
+	if (!item || !holderTypes.length) return [];
+	const containedPath = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
+	const currencies = getCurrencyList(actor || false);
+	const totals = new Map();
+	const add = (currency, quantity) => {
+		if (quantity > 0) totals.set(currency, (totals.get(currency) ?? 0) + quantity);
+	};
+	const visit = (holderItem) => {
+		const id = holderItem.id ?? holderItem._id;
+		const holderType = holderTypes.find(type => type.matches({ item: holderItem }));
+		if (holderType) {
+			for (const currency of currencies) {
+				if (currency.type === "attribute") {
+					add(currency, getHolderAmount(holderItem, holderType, currency.data.path));
+				} else if (holderType.includeContents && actor && id) {
+					for (const stack of getContainedCurrencyStacks(actor, currency, [{ item: { id }, holderType }])) {
+						add(currency, Utilities.getItemQuantity(stack));
+					}
+				}
+			}
+		}
+		if (!actor?.items || !containedPath || !id) return;
+		for (const child of actor.items) {
+			if (foundry.utils.getProperty(child, containedPath) === id) visit(child);
+		}
+	};
+	visit(item);
+	return currencies.filter(currency => totals.has(currency)).map(currency => ({
+		name: currency.name,
+		img: currency.img,
+		abbreviation: currency.abbreviation,
+		quantity: Helpers.roundToDecimals(totals.get(currency), getCurrencyDecimals())
+	}));
+}
+
+/**
+ * The money an item holds as one line of text, such as "10GP and 5SP"; empty when it holds none.
+ */
+export function describeMoneyHeldByItem(item, actor = item?.parent) {
+	const amounts = getMoneyHeldByItem(item, actor).map(entry => entry.abbreviation.replace("{#}", entry.quantity));
+	return amounts.length ? new Intl.ListFormat(game.i18n.lang, { type: "conjunction" }).format(amounts) : "";
+}
+
+/**
  * Takes up to `quantity` from each source in order and returns what could not be covered.
  * Sources are `{ read(), write(amount) }`; empty or negative sources are skipped without being written.
  */

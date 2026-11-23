@@ -33,9 +33,9 @@
 - Fixed merchants that keep sold-out items selling items that cannot stack over and over instead of showing them as sold out
 - Fixed sold-out merchant items staying unavailable after a restock refilled them
 - Fixed item pile and merchant windows showing the currency in a container as the actor's own currency after the container's currency changed
-- Added currency holders: items that hold currency, such as containers with coins, coin pouches or credsticks. GMs configure them in the new Currency Holders system setting, and system modules can provide them. What holders hold counts as their owner's money when buying, selling, trading, looting and depositing into vaults, and is spent once the owner's own currency runs out. Holders can also count coin items stored inside them
-- Merchant windows now show the buyer's currency including what their currency holders hold, and hovering over a currency shows where it is held
-- Depositing, withdrawing, dropping and trading currency can now use currency on currency holders, and move exactly the coins chosen without making change
+- Added currency holders: coin pouches, backpacks, credsticks and other items with money. GMs set them up with the new Currency Holders setting in the System tab, and system compatibility modules can set them up for you. Money on these items counts as the character's own when buying, selling, trading, looting and depositing into vaults, and is spent after the character's own money. Currency items stored inside them, such as gems in a pouch, can count too. Selling, giving, dropping or depositing an item with money shows how much it has first
+- Merchant windows now show the buyer's money including money on items such as backpacks or credsticks, and hovering over a currency shows which items it's on
+- Depositing, withdrawing, dropping and trading can now use money on items, and move exactly the coins you chose
 - Fixed removing or paying with a secondary currency also taking the same amount of the main currency
 - Fixed transferring a secondary currency moving the main currency instead
 - Fixed secondary currencies counting towards whether characters could afford items priced in the main currency

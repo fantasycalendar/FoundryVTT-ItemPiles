@@ -58,6 +58,8 @@
 	$: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxSellerItemQuantity);
 	$: itemName = localize($itemNameStore) + ($itemQuantityForPriceStore > 1 ? ` (${$itemQuantityForPriceStore})` : "");
 
+	const heldMoney = settings?.selling ? PileUtilities.describeMoneyHeldByItem(item.item, seller) : "";
+
 	let submitted = false;
 	async function submit() {
 		if(submitted) return;
@@ -125,6 +127,13 @@
 				{/if}
 			</div>
 		</div>
+
+		{#if heldMoney}
+			<p class="item-piles-holds-money item-piles-text-center" style="margin: 0 0 0.5rem;">
+				<i class="fas fa-exclamation-triangle"></i>
+				{localize("ITEM-PILES.Dialogs.ItemHoldsMoney.ItemHolds", { item_name: localize($itemNameStore), money: heldMoney })}
+			</p>
+		{/if}
 
 		<div class="item-piles-bottom-divider" style="display: grid; grid-template-columns: auto auto;">
 
