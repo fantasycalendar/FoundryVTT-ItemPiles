@@ -150,14 +150,15 @@ If the hook returns `false`, the action is interrupted.
 
 Called after all items and attributes have been transferred from the source to the target.
 
-| Param           | Type                             | Description                                                                                                                   |
-|-----------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| source          | <code>Actor/TokenDocument</code> | The source that had all of its content transferred                                                                            |
-| target          | <code>Actor/TokenDocument</code> | The target that received all of the content                                                                                   |
-| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                               |
-| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed on the target |
-| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                 |
-| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                     |
+| Param           | Type                             | Description                                                                                                                                        |
+|-----------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| source          | <code>Actor/TokenDocument</code> | The source that had all of its content transferred                                                                                                 |
+| target          | <code>Actor/TokenDocument</code> | The target that received all of the content                                                                                                        |
+| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                                                    |
+| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed on the target                      |
+| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                                      |
+| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                                          |
+| currencyDeltas  | <code>object</code>              | An object, where the keys are the currency paths and the values the amount that changed, including currency on currency holders such as credsticks |
 
 ---
 
@@ -1041,13 +1042,14 @@ If the hook returns `false`, the action is interrupted.
 
 Called after currencies were updated to the target. Not called in the case of a transfer.
 
-| Param           | Type                                  | Description                                                                                                     |
-|-----------------|---------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were added to                                                                       |
-| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                               |
-| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
-| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                   |
-| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                       |
+| Param           | Type                                  | Description                                                                                                                                        |
+|-----------------|---------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were added to                                                                                                          |
+| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                                                                  |
+| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed                                    |
+| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                                                      |
+| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                                          |
+| currencyDeltas  | <code>object</code>                   | An object, where the keys are the currency paths and the values the amount that changed, including currency on currency holders such as credsticks |
 
 ---
 
@@ -1071,13 +1073,14 @@ If the hook returns `false`, the action is interrupted.
 
 Called after currencies were added to the target. Not called in the case of a transfer.
 
-| Param           | Type                                  | Description                                                                                                     |
-|-----------------|---------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were added to                                                                       |
-| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                               |
-| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
-| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                   |
-| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                       |
+| Param           | Type                                  | Description                                                                                                                                        |
+|-----------------|---------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were added to                                                                                                          |
+| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                                                                  |
+| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed                                    |
+| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                                                      |
+| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                                          |
+| currencyDeltas  | <code>object</code>                   | An object, where the keys are the currency paths and the values the amount that changed, including currency on currency holders such as credsticks |
 
 ---
 
@@ -1101,13 +1104,14 @@ If the hook returns `false`, the action is interrupted.
 
 Called after currencies was removed from the target. Not called in the case of a transfer.
 
-| Param           | Type                                  | Description                                                                                                     |
-|-----------------|---------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were removed from                                                                   |
-| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                               |
-| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed |
-| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                   |
-| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                       |
+| Param           | Type                                  | Description                                                                                                                                        |
+|-----------------|---------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| target          | <code>Actor/TokenDocument/UUID</code> | The target whose currencies were removed from                                                                                                      |
+| itemDeltas      | <code>array</code>                    | An array of objects each containing the item id and the quantity that was changed                                                                  |
+| attributeDeltas | <code>object</code>                   | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed                                    |
+| userId          | <code>string</code>                   | The ID of the user that initiated this action                                                                                                      |
+| interactionId   | <code>string/boolean</code>           | The ID of this interaction, to identify ongoing transfers                                                                                          |
+| currencyDeltas  | <code>object</code>                   | An object, where the keys are the currency paths and the values the amount that changed, including currency on currency holders such as credsticks |
 
 ---
 
@@ -1131,14 +1135,15 @@ If the hook returns `false`, the action is interrupted.
 
 Called after currencies have been transferred from the source to the target.
 
-| Param           | Type                             | Description                                                                                                                   |
-|-----------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| source          | <code>Actor/TokenDocument</code> | The source that transferred currencies                                                                                        |
-| target          | <code>Actor/TokenDocument</code> | The target that received the currencies                                                                                       |
-| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                               |
-| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed on the target |
-| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                 |
-| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                     |
+| Param           | Type                             | Description                                                                                                                                        |
+|-----------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| source          | <code>Actor/TokenDocument</code> | The source that transferred currencies                                                                                                             |
+| target          | <code>Actor/TokenDocument</code> | The target that received the currencies                                                                                                            |
+| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                                                    |
+| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed on the target                      |
+| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                                      |
+| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                                          |
+| currencyDeltas  | <code>object</code>              | An object, where the keys are the currency paths and the values the amount that changed, including currency on currency holders such as credsticks |
 
 ---
 
@@ -1162,14 +1167,15 @@ If the hook returns `false`, the action is interrupted.
 
 Called after all the source's currencies were transferred from the source to the target.
 
-| Param           | Type                             | Description                                                                                                                   |
-|-----------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| source          | <code>Actor/TokenDocument</code> | The source that transferred all of its currencies                                                                             |
-| target          | <code>Actor/TokenDocument</code> | The target that received all of the currencies                                                                                |
-| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                               |
-| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed on the target |
-| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                 |
-| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                     |
+| Param           | Type                             | Description                                                                                                                                        |
+|-----------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| source          | <code>Actor/TokenDocument</code> | The source that transferred all of its currencies                                                                                                  |
+| target          | <code>Actor/TokenDocument</code> | The target that received all of the currencies                                                                                                     |
+| itemDeltas      | <code>array</code>               | An array of objects each containing the item id and the quantity that was changed on the target                                                    |
+| attributeDeltas | <code>object</code>              | An object, where the keys are the attribute that was updated, and the value being the quantity that was changed on the target                      |
+| userId          | <code>string</code>              | The ID of the user that initiated this action                                                                                                      |
+| interactionId   | <code>string/boolean</code>      | The ID of this interaction, to identify ongoing transfers                                                                                          |
+| currencyDeltas  | <code>object</code>              | An object, where the keys are the currency paths and the values the amount that changed, including currency on currency holders such as credsticks |
 
 ---
 

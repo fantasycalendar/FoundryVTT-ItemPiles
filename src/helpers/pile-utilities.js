@@ -2704,8 +2704,10 @@ export function getVaultAccess(vaultActor, { flagData = false, hasRecipient = fa
 }
 
 export async function updateVaultLog(itemPile, {
-	actor = false, userId = false, items = [], attributes = [], withdrawal = true, vaultLogData = {},
+	actor = false, userId = false, items = [], attributes = {}, currencyDeltas = {}, withdrawal = true, vaultLogData = {},
 } = {}) {
+
+	attributes = { ...attributes, ...currencyDeltas };
 
 	const formattedItems = [];
 	const formattedCurrencies = [];
@@ -2779,7 +2781,8 @@ export async function updateVaultLog(itemPile, {
  * @param {Array<{item: Object, quantity: number}>} [options.items]
  * @param {Object<string, number>} [options.attributes]  Attribute path to signed delta
  */
-export async function updateVaultLogFromDeltas(itemPile, { userId, items = [], attributes = {} } = {}) {
+export async function updateVaultLogFromDeltas(itemPile, { userId, items = [], attributes = {}, currencyDeltas = {} } = {}) {
+	attributes = { ...attributes, ...currencyDeltas };
 	for (const withdrawal of [false, true]) {
 		const matches = (quantity) => withdrawal ? quantity < 0 : quantity > 0;
 		const loggedItems = items.filter(entry => matches(entry.quantity))
