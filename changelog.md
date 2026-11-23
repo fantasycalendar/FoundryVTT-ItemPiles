@@ -24,6 +24,10 @@
 - Fixed vault item styles configured in the module settings having no effect
 - Fixed players being able to add items to item piles out of thin air by dragging them in from the sidebar or chat
 - Fixed item pile and merchant windows showing the currency in a container as the actor's own currency after the container's currency changed
+- Fixed removing or paying with a secondary currency also taking the same amount of the main currency
+- Fixed transferring a secondary currency moving the main currency instead
+- Fixed secondary currencies counting towards whether characters could afford items priced in the main currency
+- Fixed merchant items priced in some item-based secondary currencies always being shown as unaffordable
 
 ## Version 3.3.4
 

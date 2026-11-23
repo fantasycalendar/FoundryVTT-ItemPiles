@@ -1199,7 +1199,7 @@ export function getPriceFromString(str, currencyList = false) {
 	for (const part of parts) {
 		for (const currency of currencies) {
 
-			if (part[2] !== currency.identifier || !currency.exchangeRate) continue;
+			if (part[2] !== currency.identifier || (!currency.secondary && !currency.exchangeRate)) continue;
 
 			let lowerCasePart = part[1].toLowerCase();
 			if (lowerCasePart.startsWith("d") || lowerCasePart.match(/\d*d\d+/g)) {
@@ -1209,12 +1209,12 @@ export function getPriceFromString(str, currencyList = false) {
 				for (let i = 0; i < diceQuantity; i++) {
 					let num = Math.ceil(Math.random() * diceSize);
 					currency.quantity += num;
-					overallCost += num * currency.exchangeRate;
+					if (!currency.secondary) overallCost += num * currency.exchangeRate;
 				}
 			} else {
 				const roll = new Roll(part[1]).evaluateSync()
 				currency.quantity = roll.total;
-				overallCost += roll.total * currency.exchangeRate;
+				if (!currency.secondary) overallCost += roll.total * currency.exchangeRate;
 			}
 			currenciesToReturn.push(currency);
 		}
@@ -1569,9 +1569,9 @@ export function getPriceData({
 	const buyerInfiniteCurrencies = buyerFlagData?.infiniteCurrencies;
 	const buyerInfiniteQuantity = buyerFlagData?.infiniteQuantity;
 
-	const recipientCurrencies = getActorCurrencies(buyer, { currencyList });
+	const recipientCurrencies = getActorCurrencies(buyer, { currencyList, getAll: true });
 	const totalCurrencies = recipientCurrencies
-		.filter(currency => currency.exchangeRate !== undefined)
+		.filter(currency => !currency.secondary && currency.exchangeRate !== undefined)
 		.map(currency => currency.quantity * currency.exchangeRate).reduce((acc, num) => acc + num, 0);
 
 	// For each price group, check for properties and items and make sure that the actor can afford it
@@ -1601,7 +1601,12 @@ export function getPriceData({
 			}
 
 			if (price.type === "attribute") {
-				const attributeQuantity = Utilities.sanitizeNumber(foundry.utils.getProperty(buyer, price.data.path));
+				const heldCurrency = recipientCurrencies.find(currency => {
+					return currency.type === "attribute" && currency.path === price.data.path;
+				});
+				const attributeQuantity = heldCurrency
+					? heldCurrency.quantity
+					: Utilities.sanitizeNumber(foundry.utils.getProperty(buyer, price.data.path));
 				price.buyerQuantity = attributeQuantity;
 
 				if (price.percent) {
@@ -1624,13 +1629,18 @@ export function getPriceData({
 				priceGroup.maxQuantity = Math.min(priceGroup.maxQuantity, price.maxQuantity)
 
 			} else {
-				const priceItem = CompendiumUtilities.getItemFromCache(price.data.uuid);
-				const foundItem = priceItem
-					? Utilities.findSimilarItem(buyer.items, priceItem)
-					: false;
-				const itemQuantity = foundItem
-					? Utilities.getItemQuantity(foundItem)
-					: 0;
+				const priceItem = price.data.item ?? CompendiumUtilities.getItemFromCache(price.data.uuid);
+				const heldCurrency = priceItem && recipientCurrencies.find(currency => {
+					if (currency.type !== "item" || !currency.data?.item) return false;
+					return !Utilities.areItemsDifferent(currency.data.item, priceItem);
+				});
+				let itemQuantity = 0;
+				if (heldCurrency) {
+					itemQuantity = heldCurrency.quantity;
+				} else if (priceItem) {
+					const foundItem = Utilities.findSimilarItem(buyer.items, priceItem);
+					itemQuantity = foundItem ? Utilities.getItemQuantity(foundItem) : 0;
+				}
 				price.buyerQuantity = itemQuantity;
 				if (!itemQuantity) {
 					priceGroup.maxQuantity = 0;
@@ -2577,7 +2587,7 @@ export async function rollTable({
 			});
 		} else {
 			let nameCurrencies = getPriceFromString(rollData.name);
-			if (nameCurrencies.overallCost) {
+			if (nameCurrencies.currencies.some(currency => currency.quantity)) {
 				currencies = nameCurrencies.currencies;
 			}
 		}
