@@ -47,20 +47,20 @@ function getFlagData(inDocument, flag, defaults, existing = false) {
 }
 
 /**
- * Removes forced-deletion keys (prefixed with "-=") from an object.
+ * Removes forced deletions (see Utilities.setForcedDeletion) from flag data that is being read.
  *
- * Cleaning routines write keys like "-=vaultExpander" to strip stale flags during document updates.
- * When such a key survives into stored flag data, foundry.utils.mergeObject treats it as legacy
- * deletion syntax and logs a compatibility warning for every key on every read. Dropping the keys
- * here keeps reads free of that warning while the deletion still applies on the next write.
+ * Cleaning routines mark stale flags for deletion during document updates. When such a marker survives into flag data
+ * that is read back, foundry.utils.mergeObject treats a "-=" key as legacy deletion syntax and logs a compatibility
+ * warning on every read. Dropping the markers here keeps reads free of that warning while the deletion still applies
+ * on the next write.
  *
  * @param {Object} data
  * @returns {Object}
  */
 function stripDeletionKeys(data) {
 	if (!data || typeof data !== "object") return data;
-	for (const key of Object.keys(data)) {
-		if (key.startsWith("-=")) {
+	for (const [key, value] of Object.entries(data)) {
+		if (Utilities.isForcedDeletion(key, value)) {
 			delete data[key];
 		}
 	}
@@ -877,7 +877,7 @@ export function cleanFlagData(flagData, { addRemoveFlag = false, existingData = 
 			if (!baseKeys.has(key)) {
 				delete flagData[key];
 				if (addRemoveFlag && (!existingDataKeys || existingDataKeys.has(key))) {
-					flagData["-=" + key] = null;
+					Utilities.setForcedDeletion(flagData, key);
 				}
 			}
 		}
@@ -885,7 +885,7 @@ export function cleanFlagData(flagData, { addRemoveFlag = false, existingData = 
 	for (const key of toRemove) {
 		delete flagData[key];
 		if (addRemoveFlag && (!existingDataKeys || existingDataKeys.has(key))) {
-			flagData["-=" + key] = null;
+			Utilities.setForcedDeletion(flagData, key);
 		}
 	}
 	return flagData;
@@ -899,7 +899,7 @@ export function cleanItemFlagData(flagData, { addRemoveFlag = false, existingDat
 	for (const key of toRemove) {
 		delete flagData[key];
 		if (addRemoveFlag && (!existingDataKeys || existingDataKeys.has(key))) {
-			flagData["-=" + key] = null;
+			Utilities.setForcedDeletion(flagData, key);
 		}
 	}
 	return flagData;

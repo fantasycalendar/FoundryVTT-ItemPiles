@@ -497,6 +497,21 @@ export function deleteProperty(object, key) {
 	return true;
 }
 
+export function setForcedDeletion(object, key) {
+	const ForcedDeletion = foundry.data.operators?.ForcedDeletion;
+	if (ForcedDeletion) {
+		object[key] = new ForcedDeletion();
+	} else {
+		object[`-=${key}`] = null;
+	}
+	return object;
+}
+
+export function isForcedDeletion(key, value) {
+	const ForcedDeletion = foundry.data.operators?.ForcedDeletion;
+	return key.startsWith("-=") || Boolean(ForcedDeletion && value instanceof ForcedDeletion);
+}
+
 
 export function hasItemTypeHandler(handler, itemType = "GLOBAL") {
 	return !!SYSTEMS.DATA.ITEM_TYPE_HANDLERS?.[itemType]?.[handler];

@@ -219,7 +219,7 @@ export default class Transaction {
 			const cleanFlagData = PileUtilities.cleanItemFlagData(flagData);
 			if (foundry.utils.hasProperty(cleanFlagData, "overheadCost")) {
 				delete cleanFlagData["overheadCost"];
-				cleanFlagData["-=overheadCost"] = null;
+				Utilities.setForcedDeletion(cleanFlagData, "overheadCost");
 			}
 			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, cleanFlagData);
 			return item;
@@ -247,7 +247,7 @@ export default class Transaction {
 			const mergedFlagData = foundry.utils.mergeObject(existingFlagData, cleanFlagData);
 			if (foundry.utils.hasProperty(mergedFlagData, "overheadCost")) {
 				delete mergedFlagData["overheadCost"];
-				mergedFlagData["-=overheadCost"] = null;
+				Utilities.setForcedDeletion(mergedFlagData, "overheadCost");
 			}
 			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, mergedFlagData);
 			const type = this.itemTypeMap.get(id);
