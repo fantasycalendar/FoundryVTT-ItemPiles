@@ -430,6 +430,23 @@ export default class TradeAPI {
 		if (trade.store.privateTradeId !== privateId) return;
 		const updates = trade.store.getTradeData();
 
+		await this._applyTradeData(updates);
+
+		if (trade.store.isPrivate) {
+			const data = trade.store.export();
+			Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data.leftTraderData, data.rightTraderData, tradeId);
+			trade.app.close({ callback: true });
+			ongoingTrades.delete(tradeId);
+		} else if (userId === game.user.id) {
+			if (Helpers.isGMConnected()) {
+				await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
+			}
+			return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_COMPLETED, tradeId, updates);
+		}
+	}
+
+	static async _applyTradeData(updates) {
+
 		const itemsToAdd = [];
 		for (const entry of updates.add.items) {
 			let item = updates.targetActor.items.get(entry.id);
@@ -449,24 +466,16 @@ export default class TradeAPI {
 			itemsToRemove.push(Utilities.setItemQuantity(itemData, entry.quantity, true));
 		}
 
+		const toCurrencyEntries = (attributes) => attributes.map(attribute => ({
+			type: "attribute", data: { path: attribute.path }, quantity: attribute.quantity
+		}));
+
 		const transaction = new Transaction(updates.sourceActor);
 		await transaction.appendItemChanges(itemsToAdd);
 		await transaction.appendItemChanges(itemsToRemove, { remove: true });
-		await transaction.appendDocumentChanges(updates.add.attributes);
-		await transaction.appendDocumentChanges(updates.remove.attributes, { remove: true });
-		await transaction.commit();
-
-		if (trade.store.isPrivate) {
-			const data = trade.store.export();
-			Hooks.callAll(CONSTANTS.HOOKS.TRADE.COMPLETE, trade.store.instigator, data.leftTraderData, data.rightTraderData, tradeId);
-			trade.app.close({ callback: true });
-			ongoingTrades.delete(tradeId);
-		} else if (userId === game.user.id) {
-			if (Helpers.isGMConnected()) {
-				await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.DISABLE_CHAT_TRADE_BUTTON, tradeId);
-			}
-			return ItemPileSocket.executeForEveryone(ItemPileSocket.HANDLERS.TRADE_COMPLETED, tradeId, updates);
-		}
+		await transaction.appendCurrencyChanges(toCurrencyEntries(updates.add.attributes));
+		await transaction.appendCurrencyChanges(toCurrencyEntries(updates.remove.attributes), { remove: true });
+		return transaction.commit();
 	}
 
 	static async _tradeCompleted(tradeId) {

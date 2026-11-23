@@ -15,13 +15,17 @@
 
 	const targetCurrencyData = PileUtilities.getCurrencyList(targetActor);
 
+	const includeHolders = !!targetActor;
+
 	const currencies = PileUtilities.getActorCurrencies(sourceActor, {
 		currencyList: targetCurrencyData.currencies,
-		getAll: settings?.unlimitedCurrencies
+		getAll: settings?.unlimitedCurrencies,
+		includeHolders
 	});
 
 	const existingCurrencies = settings.existingCurrencies ?? PileUtilities.getActorCurrencies(sourceActor, {
-		currencyList: targetCurrencyData.currencies
+		currencyList: targetCurrencyData.currencies,
+		includeHolders
 	});
 
 	let attributes = currencies.filter(entry => entry.type === "attribute")

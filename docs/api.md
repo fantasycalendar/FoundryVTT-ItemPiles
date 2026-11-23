@@ -1142,6 +1142,7 @@ Transfers currencies between the source and the target.
 | currencies              | `string`                    |         | A string of currencies to transfer (eg, "5gp 25sp") |
 | options                 | `object`                    |         | Options to pass to the function                     |
 | [options.change]        | `boolean`                   | `true`  | Whether the actor can get change back               |
+| [options.exact]         | `boolean`                   | `false` | Whether to move exactly the given amount of each currency, without paying with other currencies or giving change |
 | [options.interactionId] | `string/boolean`            | `false` | The interaction ID of this action                   |
 
 ---

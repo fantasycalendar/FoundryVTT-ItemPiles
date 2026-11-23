@@ -2259,11 +2259,13 @@ class API {
 	 * @param {string} currencies                               A string of currencies to transfer (eg, "5gp 25sp")
 	 * @param {object} options                                  Options to pass to the function
 	 * @param {boolean} [options.change=true]                   Whether the source actor can get change back
+	 * @param {boolean} [options.exact=false]                   Whether to move exactly the given amount of each currency,
+	 *                                                          without paying with other currencies or giving change
 	 * @param {string/boolean} [options.interactionId=false]    The ID of this interaction
 	 *
 	 * @returns {Promise<object>}                               An object containing the items and attributes transferred to the target
 	 */
-	static transferCurrencies(source, target, currencies, { change = true, interactionId = false } = {}) {
+	static transferCurrencies(source, target, currencies, { change = true, exact = false, interactionId = false } = {}) {
 
 		const sourceActor = Utilities.getActor(source);
 		const sourceUuid = Utilities.getUuid(sourceActor);
@@ -2287,19 +2289,27 @@ class API {
 			throw Helpers.custom_error(`transferCurrencies | price must be of type string`);
 		}
 
-		const paymentData = PileUtilities.getPaymentData({
-			purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: sourceActor
+		if (exact) {
+			if (!PileUtilities.canAffordExactCurrencies(sourceActor, currencies)) {
+				throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} does not have "${currencies}" to transfer`);
+			}
+		} else {
+			const paymentData = PileUtilities.getPaymentData({
+				purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: sourceActor
+			});
+
+			if (!paymentData.canBuy) {
+				throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}"`);
+			}
+
+			if (!change && paymentData.buyerChange.length) {
+				throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}" without receiving change!`);
+			}
+		}
+
+		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_CURRENCIES, sourceUuid, targetUuid, currencies, game.user.id, {
+			exact, interactionId
 		});
-
-		if (!paymentData.canBuy) {
-			throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}"`);
-		}
-
-		if (!change && paymentData.buyerChange.length) {
-			throw Helpers.custom_error(`transferCurrencies | ${sourceActor.name} cannot afford to transfer "${currencies}" without receiving change!`);
-		}
-
-		return ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.TRANSFER_CURRENCIES, sourceUuid, targetUuid, currencies, game.user.id, { interactionId });
 
 	}
 

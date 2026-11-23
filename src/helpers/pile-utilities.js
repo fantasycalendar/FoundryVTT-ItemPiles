@@ -725,6 +725,64 @@ export function getCurrencyReceiver(target, path, { excludeHolders = [] } = {}) 
 	return exclusive ? null : { kind: "attribute", path };
 }
 
+export function getHeldCurrencyBreakdown(target) {
+	const actor = Utilities.getActor(target);
+	const ownCurrencies = getActorCurrencies(actor, { getAll: true });
+	const holders = getCurrencyHolders(actor);
+	const containedPath = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
+	return getActorCurrencies(actor, { getAll: true, includeHolders: true }).map(currency => {
+		const sources = [];
+		const ownQuantity = ownCurrencies.find(ownCurrency => ownCurrency.index === currency.index)?.quantity ?? 0;
+		if (ownQuantity) sources.push({ name: actor.name, quantity: ownQuantity });
+		if (currency.type === "attribute") {
+			for (const { item, holderType } of holders) {
+				const quantity = getHolderAmount(item, holderType, currency.path);
+				if (quantity) sources.push({ name: item.name, quantity });
+			}
+		} else {
+			for (const stack of getContainedCurrencyStacks(actor, currency, holders)) {
+				const container = actor.items.get(foundry.utils.getProperty(stack, containedPath));
+				sources.push({ name: container?.name ?? stack.name, quantity: Utilities.getItemQuantity(stack) });
+			}
+		}
+		return { ...currency, sources };
+	});
+}
+
+export function getStringFromCurrencyAmounts(target, { attributes = {}, items = [] } = {}) {
+	const actor = Utilities.getActor(target);
+	const currencies = getActorCurrencies(actor, { getAll: true });
+	const amounts = [];
+	for (const [path, quantity] of Object.entries(attributes)) {
+		const currency = currencies.find(currency => currency.type === "attribute" && currency.path === path);
+		if (currency && quantity > 0) amounts.push({ abbreviation: currency.abbreviation, quantity });
+	}
+	for (const entry of items) {
+		const itemData = entry.item ?? actor.items.get(entry._id);
+		const currency = currencies.find(currency => {
+			if (currency.type !== "item") return false;
+			if (currency.id === entry._id) return true;
+			return currency.data?.item && itemData && !Utilities.areItemsDifferent(currency.data.item, itemData);
+		});
+		if (currency && entry.quantity > 0) amounts.push({ abbreviation: currency.abbreviation, quantity: entry.quantity });
+	}
+	return getStringFromCurrencies(amounts);
+}
+
+export function canAffordExactCurrencies(target, currencies) {
+	const heldCurrencies = getActorCurrencies(target, { getAll: true, includeHolders: true });
+	return getPriceFromString(currencies).currencies
+		.filter(currency => currency.quantity > 0)
+		.every(currency => {
+			const held = heldCurrencies.find(heldCurrency => {
+				if (heldCurrency.type !== currency.type) return false;
+				if (currency.type === "attribute") return heldCurrency.path === currency.data.path;
+				return heldCurrency.data?.item && !Utilities.areItemsDifferent(heldCurrency.data.item, currency.data.item);
+			});
+			return (held?.quantity ?? 0) >= currency.quantity;
+		});
+}
+
 /**
  * Applies exclusive currencies and, when `includeHolders` is set, adds holder amounts to attribute currencies.
  * Returns new currency objects for anything it changes, so the cached entries keep the actor's own quantities.

@@ -677,11 +677,11 @@ export default class ItemPileStore {
 
 		} else {
 
-			if (!foundry.utils.isEmpty(currencies.attributes)) {
-				await game.itempiles.API.transferAttributes(source, target, currencies.attributes, { interactionId: this.interactionId })
-			}
-			if (currencies.items.length) {
-				await game.itempiles.API.transferItems(source, target, currencies.items, { interactionId: this.interactionId })
+			const currencyString = PileUtilities.getStringFromCurrencyAmounts(source, currencies);
+			if (currencyString) {
+				await game.itempiles.API.transferCurrencies(source, target, currencyString, {
+					exact: true, interactionId: this.interactionId
+				});
 			}
 		}
 

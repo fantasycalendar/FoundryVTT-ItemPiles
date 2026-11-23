@@ -553,29 +553,34 @@ export default class PrivateAPI {
 	}
 
 	static async _transferCurrencies(sourceUuid, targetUuid, currencies, userId, {
-		skipVaultLogging = false, interactionId = false
+		skipVaultLogging = false, exact = false, interactionId = false
 	} = {}) {
 
 		const sourceActor = Utilities.getActor(sourceUuid);
 		const targetActor = Utilities.getActor(targetUuid);
 
 		const priceData = PileUtilities.getPriceFromString(currencies);
-		const secondaryPrices = priceData.currencies.filter(currency => currency.secondary && currency.quantity);
-		const overallCost = priceData.overallCost;
 
-		const paymentData = PileUtilities.getPaymentData({
-			purchaseData: [{ cost: overallCost, quantity: 1, secondaryPrices }], buyer: sourceActor
-		});
+		let payments = priceData.currencies.filter(currency => currency.quantity > 0);
+		let change = [];
+		let received = payments;
+		if (!exact) {
+			const secondaryPrices = priceData.currencies.filter(currency => currency.secondary && currency.quantity);
+			const paymentData = PileUtilities.getPaymentData({
+				purchaseData: [{ cost: priceData.overallCost, quantity: 1, secondaryPrices }], buyer: sourceActor
+			});
+			payments = paymentData.finalPrices.filter(currency => currency.quantity);
+			change = paymentData.buyerChange.filter(currency => currency.quantity);
+			received = paymentData.sellerReceive.filter(currency => currency.quantity);
+		}
 
 		const sourceTransaction = new Transaction(sourceActor);
-		const payments = paymentData.finalPrices.filter(currency => currency.quantity);
-		const change = paymentData.buyerChange.filter(currency => currency.quantity);
 		await sourceTransaction.appendCurrencyChanges(payments, { remove: true });
 		await sourceTransaction.appendCurrencyChanges(change);
 		const sourceUpdates = sourceTransaction.prepare();
 
 		const targetTransaction = new Transaction(targetActor);
-		await targetTransaction.appendCurrencyChanges(paymentData.sellerReceive.filter(currency => currency.quantity));
+		await targetTransaction.appendCurrencyChanges(received);
 		const targetUpdates = targetTransaction.prepare();
 
 		const hookResult = Helpers.hooks.call(CONSTANTS.HOOKS.CURRENCY.PRE_TRANSFER, sourceActor, sourceUpdates, targetActor, targetUpdates, interactionId);

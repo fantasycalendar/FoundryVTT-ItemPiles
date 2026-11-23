@@ -35,6 +35,8 @@
 - Fixed item pile and merchant windows showing the currency in a container as the actor's own currency after the container's currency changed
 - Added spending currency stored in characters' containers: coins in bags and pouches now count towards what characters can afford, and are spent once their own coins run out. This is on by default, and GMs can turn it off with the new "Spend currency in containers" setting
 - Fixed coin items stored in containers not counting towards what characters can afford
+- Merchant windows now show the buyer's currency including what is stored in containers, and hovering over a currency shows where it is held
+- Depositing, withdrawing, dropping and trading currency can now use currency stored in containers, and move exactly the coins chosen without making change
 - Added support for systems to declare items that hold currency, such as credsticks, which count as their owner's money when buying, selling, trading, looting and depositing into vaults
 - Fixed removing or paying with a secondary currency also taking the same amount of the main currency
 - Fixed transferring a secondary currency moving the main currency instead
