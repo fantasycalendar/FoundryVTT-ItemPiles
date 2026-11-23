@@ -10,6 +10,12 @@ import * as CompendiumUtilities from "../helpers/compendium-utilities.js";
 import * as Helpers from "../helpers/helpers.js";
 import SETTINGS from "../constants/settings.js";
 
+function isEmbeddedUpdate(doc, update) {
+	const action = (update.action ?? "").replace(".", "").toLowerCase();
+	return Object.values(doc?.constructor?.metadata?.embedded ?? {})
+		.some(collection => action === `update${collection.toLowerCase()}`);
+}
+
 class PileBaseItem {
 
 	constructor(store, data, isCurrency = false, isSecondaryCurrency = false, parent = false) {
@@ -298,7 +304,7 @@ export class PileAttribute extends PileBaseItem {
 		});
 
 		this.subscribeTo(this.parentDoc, (doc, update) => {
-			if (update.action.includes("delete")) return;
+			if (update.action.includes("delete") || isEmbeddedUpdate(doc, update)) return;
 			const updateData = update.data?.[0] ?? {};
 			this.path = this.attribute.path;
 			this.name.set(this.attribute.name);

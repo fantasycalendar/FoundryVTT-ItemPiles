@@ -23,6 +23,7 @@
 - Fixed saving a merchant's settings without Simple Calendar active clearing its closed days and holidays
 - Fixed vault item styles configured in the module settings having no effect
 - Fixed players being able to add items to item piles out of thin air by dragging them in from the sidebar or chat
+- Fixed item pile and merchant windows showing the currency in a container as the actor's own currency after the container's currency changed
 
 ## Version 3.3.4
 
