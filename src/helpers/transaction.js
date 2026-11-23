@@ -424,15 +424,11 @@ export default class Transaction {
 	}
 
 	getItemFieldUpdates(change) {
-		let updates = {};
+		const updates = {};
 		for (const [path, record] of change.fields) {
 			if (change.holderType && record.value === record.original) continue;
 			const entry = change.holderType ? PileUtilities.getHolderCurrencyEntry(change.holderType, path) : { path };
-			if (Helpers.isFunction(entry?.set)) {
-				updates = foundry.utils.mergeObject(updates, entry.set({ item: change.source, value: record.value }));
-			} else if (entry) {
-				updates[entry.path] = record.value;
-			}
+			if (entry) updates[entry.path] = record.value;
 		}
 		return updates;
 	}
@@ -526,7 +522,7 @@ export default class Transaction {
 
 	getCreationData(change) {
 		if (change.holderType) {
-			const itemData = change.holderType.create({ amounts: getFieldValues(change), actor: this.document });
+			const itemData = PileUtilities.createHolderItem(change.holderType, getFieldValues(change));
 			itemData._id ??= foundry.utils.randomID();
 			return itemData;
 		}

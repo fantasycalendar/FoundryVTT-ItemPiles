@@ -137,6 +137,15 @@ class API {
 	}
 
 	/**
+	 * The kinds of items that hold currencies, such as credsticks or coin pouches
+	 *
+	 * @returns {Array<object>}
+	 */
+	static get CURRENCY_HOLDERS() {
+		return Helpers.getSetting(SETTINGS.CURRENCY_HOLDERS);
+	}
+
+	/**
 	 * The attributes for detecting item similarities
 	 *
 	 * @returns {Array<string>}
@@ -328,6 +337,20 @@ class API {
 			}
 		});
 		return Helpers.setSetting(SETTINGS.ITEM_FILTERS, inFilters);
+	}
+
+	/**
+	 * Sets the kinds of items that hold currencies, such as credsticks or coin pouches
+	 *
+	 * @param {Array<object>} inHolderTypes   Holder types in the CURRENCY_HOLDERS format (see docs/api.md)
+	 * @returns {Promise}
+	 */
+	static async setCurrencyHolders(inHolderTypes) {
+		const errors = PileUtilities.validateCurrencyHolders(inHolderTypes);
+		if (errors.length) {
+			throw Helpers.custom_error(`setCurrencyHolders | ${errors[0]}`);
+		}
+		return Helpers.setSetting(SETTINGS.CURRENCY_HOLDERS, inHolderTypes);
 	}
 
 	/**
@@ -663,53 +686,12 @@ class API {
 			throw Helpers.custom_error("addSystemIntegration | data.CURRENCY_DECIMAL_DIGITS must be of type number");
 		}
 
-		if (data['CURRENCY_HOLDERS'] && !Array.isArray(data['CURRENCY_HOLDERS'])) {
-			throw Helpers.custom_error("addSystemIntegration | data.CURRENCY_HOLDERS must be an array");
+		if (data['CURRENCY_HOLDERS'] !== undefined && data['CURRENCY_HOLDERS'] !== null) {
+			const holderErrors = PileUtilities.validateCurrencyHolders(data['CURRENCY_HOLDERS']);
+			if (holderErrors.length) {
+				throw Helpers.custom_error(`addSystemIntegration | ${holderErrors[0]}`);
+			}
 		}
-		(data['CURRENCY_HOLDERS'] ?? []).forEach((holder, index) => {
-			const prefix = `addSystemIntegration | CURRENCY_HOLDERS.${index}`;
-			if (typeof holder !== "object" || holder === null) {
-				throw Helpers.custom_error(`${prefix} must be of type object`);
-			}
-			if (typeof holder.id !== "string" || !holder.id) {
-				throw Helpers.custom_error(`${prefix}.id must be a non-empty string`);
-			}
-			if (Array.isArray(holder.filter)) {
-				holder.filter.forEach(filter => {
-					if (typeof filter?.path !== "string" || (typeof filter?.filters !== "string" && !Array.isArray(filter?.filters))) {
-						throw Helpers.custom_error(`${prefix}.filter entries must have a "path" string and a "filters" string or array`);
-					}
-				});
-			} else if (!Helpers.isFunction(holder.filter)) {
-				throw Helpers.custom_error(`${prefix}.filter must be a function or an array of { path, filters }`);
-			}
-			if (typeof holder.currencies !== "object" || holder.currencies === null || !Object.keys(holder.currencies).length) {
-				throw Helpers.custom_error(`${prefix}.currencies must be an object keyed by currency paths`);
-			}
-			for (const [path, entry] of Object.entries(holder.currencies)) {
-				const hasPath = typeof entry?.path === "string";
-				const hasAccessors = Helpers.isFunction(entry?.get) && Helpers.isFunction(entry?.set);
-				if (!hasPath && !hasAccessors) {
-					throw Helpers.custom_error(`${prefix}.currencies["${path}"] must have a "path" string, or both "get" and "set" functions`);
-				}
-			}
-			if (holder.receive !== undefined) {
-				if (!Array.isArray(holder.receive)) {
-					throw Helpers.custom_error(`${prefix}.receive must be an array of currency paths`);
-				}
-				for (const path of holder.receive) {
-					if (!holder.currencies[path]) {
-						throw Helpers.custom_error(`${prefix}.receive contains "${path}", which is not one of its currencies`);
-					}
-				}
-				if (holder.receive.length && !Helpers.isFunction(holder.create)) {
-					throw Helpers.custom_error(`${prefix}.create must be a function when "receive" is set`);
-				}
-			}
-			if (holder.priority !== undefined && typeof holder.priority !== "number") {
-				throw Helpers.custom_error(`${prefix}.priority must be of type number`);
-			}
-		});
 
 		data['INTEGRATION'] = true;
 

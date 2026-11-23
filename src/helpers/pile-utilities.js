@@ -437,8 +437,91 @@ export function getCurrencyDecimals() {
 	return step.toString().split(".")?.[1]?.length ?? 0;
 }
 
+const HOLDER_OPTIONS = ["deleteWhenEmpty", "hidden", "ignoreInItemPiles", "includeContents"];
+
+function containsFunction(value) {
+	if (Helpers.isFunction(value)) return true;
+	if (typeof value !== "object" || value === null) return false;
+	return Object.values(value).some(containsFunction);
+}
+
+/**
+ * Problems with a list of currency holder types, as messages naming the entry. Holder types are plain data so that
+ * they can be stored in the Currency Holders setting and edited by GMs.
+ */
+export function validateCurrencyHolders(holderTypes) {
+	if (!Array.isArray(holderTypes)) return ["CURRENCY_HOLDERS must be an array"];
+	const errors = [];
+	const ids = new Set();
+	holderTypes.forEach((holderType, index) => {
+		const prefix = `CURRENCY_HOLDERS.${index}`;
+		if (typeof holderType !== "object" || holderType === null || Array.isArray(holderType)) {
+			errors.push(`${prefix} must be an object`);
+			return;
+		}
+		if (typeof holderType.id !== "string" || !holderType.id) {
+			errors.push(`${prefix}.id must be a non-empty string`);
+		} else if (ids.has(holderType.id)) {
+			errors.push(`${prefix}.id "${holderType.id}" is used by another holder type`);
+		}
+		ids.add(holderType.id);
+		if (holderType.name !== undefined && typeof holderType.name !== "string") {
+			errors.push(`${prefix}.name must be a string`);
+		}
+		const filter = holderType.filter;
+		if (!Array.isArray(filter) || !filter.length) {
+			errors.push(`${prefix}.filter must be data: a non-empty array of { path, filters }, all of which an item must match`);
+		} else if (filter.some(entry => {
+			return typeof entry?.path !== "string" || !entry.path.trim()
+				|| (typeof entry?.filters !== "string" && !Array.isArray(entry?.filters));
+		})) {
+			errors.push(`${prefix}.filter entries must have a "path" string and a "filters" string or array`);
+		}
+		const currencies = holderType.currencies;
+		if (typeof currencies !== "object" || currencies === null || !Object.keys(currencies).length) {
+			errors.push(`${prefix}.currencies must be an object keyed by currency paths`);
+		} else {
+			for (const [path, entry] of Object.entries(currencies)) {
+				if (typeof entry?.path !== "string" || !entry.path.trim()) {
+					errors.push(`${prefix}.currencies["${path}"].path must be the path on the item that stores the amount`);
+				}
+				if (entry?.exclusive !== undefined && typeof entry.exclusive !== "boolean") {
+					errors.push(`${prefix}.currencies["${path}"].exclusive must be a boolean`);
+				}
+			}
+		}
+		if (holderType.receive !== undefined) {
+			if (!Array.isArray(holderType.receive)) {
+				errors.push(`${prefix}.receive must be an array of currency paths`);
+			} else {
+				for (const path of holderType.receive) {
+					if (!currencies?.[path]) errors.push(`${prefix}.receive contains "${path}", which is not one of its currencies`);
+				}
+				if (holderType.receive.length && holderType.createItem === undefined) {
+					errors.push(`${prefix}.createItem is required when "receive" is set: it is the item a new holder is made from`);
+				}
+			}
+		}
+		const createItem = holderType.createItem;
+		if (createItem !== undefined && (typeof createItem !== "object" || createItem === null || Array.isArray(createItem))) {
+			errors.push(`${prefix}.createItem must be item data`);
+		}
+		for (const option of HOLDER_OPTIONS) {
+			if (holderType[option] !== undefined && typeof holderType[option] !== "boolean") {
+				errors.push(`${prefix}.${option} must be a boolean`);
+			}
+		}
+		if (holderType.priority !== undefined && typeof holderType.priority !== "number") {
+			errors.push(`${prefix}.priority must be a number`);
+		}
+		if (containsFunction({ ...holderType, filter: undefined })) {
+			errors.push(`${prefix} contains a function; holder types are data (item filters, paths and a new holder item) so that GMs can edit them in the Currency Holders setting`);
+		}
+	});
+	return errors;
+}
+
 function getHolderFilter(holderType) {
-	if (Helpers.isFunction(holderType.filter)) return holderType.filter;
 	const filters = cleanItemFilters(holderType.filter);
 	return ({ item }) => filters.every(filter => {
 		const value = foundry.utils.getProperty(item, filter.path);
@@ -462,46 +545,44 @@ function reportUnknownHolderCurrencies(holderType) {
 	}
 }
 
+let cachedHolderTypes = null;
+
+export function clearHolderTypeCache() {
+	cachedHolderTypes = null;
+}
+
 /**
- * The kinds of items that can hold currencies: the system's declared CURRENCY_HOLDERS, plus every item type with a
- * HAS_CURRENCY handler (containers), which hold the same attribute paths as actors. Container types are left out when
- * the spendFromContainers setting is off.
+ * The kinds of items that hold currencies, from the Currency Holders setting. A system integration's CURRENCY_HOLDERS
+ * are that setting's default. Entries that fail validation are skipped.
  */
 export function getHolderTypes() {
-	const declared = (SYSTEMS.DATA.CURRENCY_HOLDERS ?? []).map(holderType => {
-		reportUnknownHolderCurrencies(holderType);
-		return {
-			...holderType,
-			declared: true,
-			priority: holderType.priority ?? 0,
-			matches: getHolderFilter(holderType)
-		};
-	});
-	if (!Helpers.getSetting(SETTINGS.SPEND_FROM_CONTAINERS)) return declared;
-	const containers = Object.entries(SYSTEMS.DATA.ITEM_TYPE_HANDLERS ?? {})
-		.filter(([itemType, handlers]) => itemType !== "GLOBAL" && handlers?.[CONSTANTS.ITEM_TYPE_METHODS.HAS_CURRENCY])
-		.map(([itemType]) => ({
-			id: `container.${itemType}`,
-			container: true,
-			priority: 0,
-			matches: ({ item }) => item.type === itemType
-		}));
-	return declared.concat(containers);
+	if (cachedHolderTypes) return cachedHolderTypes;
+	const stored = Helpers.getSetting(SETTINGS.CURRENCY_HOLDERS);
+	const holderTypes = Array.isArray(stored) ? stored : [];
+	cachedHolderTypes = holderTypes
+		.filter(holderType => {
+			const errors = validateCurrencyHolders([holderType]);
+			if (errors.length) Helpers.debug(`Skipping currency holder type "${holderType?.id}": ${errors.join("; ")}`);
+			return !errors.length;
+		})
+		.map(holderType => {
+			reportUnknownHolderCurrencies(holderType);
+			return { ...holderType, priority: holderType.priority ?? 0, matches: getHolderFilter(holderType) };
+		});
+	return cachedHolderTypes;
 }
 
 /**
- * Whether the item is a declared currency holder with `hidden: true`. Such items are money, not goods: they are left
- * out of item lists, and each one keeps its own amounts, so they never stack.
+ * Whether the item is a currency holder with `hidden: true`. Such items are money, not goods: they are left out of
+ * item lists, and each one keeps its own amounts, so they never stack.
  */
 export function isHiddenCurrencyHolder(item) {
-	if (!item || !SYSTEMS.DATA.CURRENCY_HOLDERS?.length) return false;
-	return getHolderTypes().some(holderType => {
-		return holderType.declared && holderType.hidden && holderType.matches({ item });
-	});
+	if (!item) return false;
+	return getHolderTypes().some(holderType => holderType.hidden && holderType.matches({ item }));
 }
 
 /**
- * The quantity of an attribute currency on the target, including declared hidden holders.
+ * The quantity of an attribute currency on the target, including hidden holders.
  */
 export function getAttributeCurrencyQuantity(target, path) {
 	const actor = Utilities.getActor(target);
@@ -514,10 +595,10 @@ export function getAttributeCurrencyQuantity(target, path) {
 }
 
 /**
- * Attribute currency paths that only ever live on declared holders; the actor's own value at such a path is ignored.
+ * Attribute currency paths that only ever live on holders; the actor's own value at such a path is ignored.
  */
 export function getExclusiveCurrencyPaths() {
-	return new Set((SYSTEMS.DATA.CURRENCY_HOLDERS ?? []).flatMap(holderType => {
+	return new Set(getHolderTypes().flatMap(holderType => {
 		return Object.entries(holderType.currencies ?? {})
 			.filter(([_, entry]) => entry?.exclusive)
 			.map(([path]) => path);
@@ -525,30 +606,40 @@ export function getExclusiveCurrencyPaths() {
 }
 
 export function getHolderCurrencyEntry(holderType, path) {
-	if (holderType.container) return { path };
 	return holderType.currencies?.[path] ?? null;
 }
 
+/**
+ * The amount of a currency a holder holds, read from the item's stored data, which is where it is written. Systems
+ * may prepare that value under another name: SF2e stores credits at system.price.value.sp and prepares them as
+ * system.price.value.credits.
+ */
 export function getHolderAmount(item, holderType, path) {
 	const entry = getHolderCurrencyEntry(holderType, path);
 	if (!entry) return 0;
-	const value = Helpers.isFunction(entry.get)
-		? entry.get({ item })
-		: foundry.utils.getProperty(item, entry.path);
+	const value = foundry.utils.getProperty(item?._source ?? item, entry.path);
 	return Helpers.roundToDecimals(Utilities.sanitizeNumber(value), getCurrencyDecimals());
 }
 
 /**
  * The amounts a holder item holds, keyed by currency path.
  */
-export function getHolderAmounts(item, holderType, { currencyList = false } = {}) {
-	let paths = Object.keys(holderType.currencies ?? {});
-	if (holderType.container) {
-		paths = (currencyList || getCurrencyList(item.parent))
-			.filter(currency => currency.type === "attribute")
-			.map(currency => currency.data.path);
-	}
+export function getHolderAmounts(item, holderType) {
+	const paths = Object.keys(holderType.currencies ?? {});
 	return Object.fromEntries(paths.map(path => [path, getHolderAmount(item, holderType, path)]));
+}
+
+/**
+ * The data of a new holder: a copy of the holder type's createItem holding `amounts`, keyed by currency path.
+ */
+export function createHolderItem(holderType, amounts = {}) {
+	const itemData = foundry.utils.deepClone(holderType.createItem ?? {});
+	delete itemData._id;
+	for (const [path, amount] of Object.entries(amounts)) {
+		const entry = getHolderCurrencyEntry(holderType, path);
+		if (entry) foundry.utils.setProperty(itemData, entry.path, amount);
+	}
+	return itemData;
 }
 
 /**
@@ -583,13 +674,13 @@ function getItemsInSheetOrder(actor, exclude = new Set()) {
 }
 
 /**
- * The target's currency holders in spending order: declared priority first, then sheet order.
- * Item piles (including merchants and vaults) only use declared holders; their containers are goods.
+ * The target's currency holders in spending order: priority first, then sheet order.
+ * On item piles (including merchants and vaults), holder types with `ignoreInItemPiles` are goods.
  *
  * @param target
  * @param {object} options
  * @param {Array<string>} [options.exclude]   Item ids that are never holders, along with everything inside them
- * @param {boolean} [options.hiddenOnly]      Only include declared holders with `hidden: true`
+ * @param {boolean} [options.hiddenOnly]      Only include holders with `hidden: true`
  * @returns {Array<{ item: Item, holderType: object }>}
  */
 export function getCurrencyHolders(target, { exclude = [], hiddenOnly = false } = {}) {
@@ -597,10 +688,10 @@ export function getCurrencyHolders(target, { exclude = [], hiddenOnly = false } 
 	if (!actor?.items) return [];
 	let holderTypes = getHolderTypes();
 	if (isValidItemPile(actor)) {
-		holderTypes = holderTypes.filter(holderType => holderType.declared);
+		holderTypes = holderTypes.filter(holderType => !holderType.ignoreInItemPiles);
 	}
 	if (hiddenOnly) {
-		holderTypes = holderTypes.filter(holderType => holderType.declared && holderType.hidden);
+		holderTypes = holderTypes.filter(holderType => holderType.hidden);
 	}
 	if (!holderTypes.length) return [];
 	const holders = [];
@@ -612,7 +703,7 @@ export function getCurrencyHolders(target, { exclude = [], hiddenOnly = false } 
 }
 
 /**
- * Stacks of an item currency stored inside the given container holders, in holder order.
+ * Stacks of an item currency stored inside the given holders whose type has `includeContents`, in holder order.
  * A stored stack differs from the currency's item data only by its container, so it is matched as if it were in that
  * container.
  */
@@ -623,7 +714,7 @@ export function getContainedCurrencyStacks(target, currency, holders) {
 	if (!actor?.items || !containedPath || !itemData) return [];
 	const stacks = [];
 	for (const { item: holder, holderType } of holders) {
-		if (!holderType.container) continue;
+		if (!holderType.includeContents) continue;
 		const contents = actor.items.filter(item => foundry.utils.getProperty(item, containedPath) === holder.id);
 		if (!contents.length) continue;
 		const probe = foundry.utils.deepClone(itemData);
@@ -657,13 +748,13 @@ export function takeFromSources(sources, quantity) {
  * - `{ kind: "attribute", path }`: the target's own attribute (left out for exclusive currencies)
  * - `{ kind: "holder", item, holderType, path }`: an amount held by a currency holder
  * - `{ kind: "stack", item, own }`: a stack of an item currency, the target's own top-level stack or one inside a
- *   container holder
+ *   holder whose type has `includeContents`
  *
  * @param target
  * @param currency                            A currency entry ({ type, data })
  * @param {object} options
- * @param {boolean|string} [options.holders]  true for all holders, "hidden" for declared hidden holders only, false for
- *                                            none; exclusive currencies always use their declared holders
+ * @param {boolean|string} [options.holders]  true for all holders, "hidden" for hidden holders only, false for
+ *                                            none; exclusive currencies always use their holders
  * @param {Array<string>} [options.excludeHolders]
  */
 export function getCurrencySources(target, currency, { holders = true, excludeHolders = [] } = {}) {
@@ -690,7 +781,6 @@ export function getCurrencySources(target, currency, { holders = true, excludeHo
 	if (!holders && !exclusive) return sources;
 	const hiddenOnly = holders === "hidden" && !exclusive;
 	for (const { item, holderType } of getCurrencyHolders(actor, { exclude: excludeHolders, hiddenOnly })) {
-		if (exclusive && !holderType.declared) continue;
 		if (!getHolderCurrencyEntry(holderType, path)) continue;
 		sources.push({ kind: "holder", item, holderType, path });
 	}
@@ -700,21 +790,21 @@ export function getCurrencySources(target, currency, { holders = true, excludeHo
 /**
  * Where received attribute currency goes on the target:
  * - `{ kind: "holder", item, holderType, path }`: the first holder whose type receives the currency, or for exclusive
- *   currencies the first declared holder that holds it
+ *   currencies the first holder that holds it
  * - `{ kind: "create", holderType, path }`: no such holder exists, so one is created
  * - `{ kind: "attribute", path }`: the target's own attribute
  * - `null`: an exclusive currency that no holder type can take
  */
 export function getCurrencyReceiver(target, path, { excludeHolders = [] } = {}) {
 	const actor = Utilities.getActor(target);
-	const declaredTypes = getHolderTypes().filter(holderType => holderType.declared);
+	const holderTypes = getHolderTypes();
 	const exclusive = getExclusiveCurrencyPaths().has(path);
-	const receiverType = declaredTypes.find(holderType => holderType.receive?.includes(path));
+	const receiverType = holderTypes.find(holderType => holderType.receive?.includes(path));
 	let candidateTypes = [];
 	if (receiverType) {
 		candidateTypes = [receiverType];
 	} else if (exclusive) {
-		candidateTypes = declaredTypes.filter(holderType => getHolderCurrencyEntry(holderType, path));
+		candidateTypes = holderTypes.filter(holderType => getHolderCurrencyEntry(holderType, path));
 	}
 	if (candidateTypes.length) {
 		const holder = getCurrencyHolders(actor, { exclude: excludeHolders })
@@ -786,7 +876,7 @@ export function canAffordExactCurrencies(target, currencies) {
 /**
  * Applies exclusive currencies and, when `includeHolders` is set, adds holder amounts to attribute currencies.
  * Returns new currency objects for anything it changes, so the cached entries keep the actor's own quantities.
- * `includeHolders: "hidden"` only adds declared hidden holders, for operations where visible holders travel as items.
+ * `includeHolders: "hidden"` only adds hidden holders, for operations where visible holders travel as items.
  */
 function addHeldCurrencies(actor, currencies, { includeHolders = false, excludeHolders = [] } = {}) {
 	const exclusivePaths = getExclusiveCurrencyPaths();

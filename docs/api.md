@@ -8,6 +8,7 @@
   * [ITEM_PRICE_ATTRIBUTE](#ITEM_PRICE_ATTRIBUTE)
   * [ITEM_QUANTITY_ATTRIBUTE](#ITEM_QUANTITY_ATTRIBUTE)
   * [ITEM_FILTERS](#ITEM_FILTERS)
+  * [CURRENCY_HOLDERS](#CURRENCY_HOLDERS)
   * [ITEM_SIMILARITIES](#ITEM_SIMILARITIES)
   * [UNSTACKABLE_ITEM_TYPES](#UNSTACKABLE_ITEM_TYPES)
   * [PILE_DEFAULTS](#PILE_DEFAULTS)
@@ -19,6 +20,7 @@
   * [setItemQuantityAttribute](#setItemQuantityAttribute)
   * [setItemPriceAttribute](#setItemPriceAttribute)
   * [setItemFilters](#setItemFilters)
+  * [setCurrencyHolders](#setCurrencyHolders)
   * [setItemSimilarities](#setItemSimilarities)
   * [setUnstackableItemTypes](#setUnstackableItemTypes)
   * [setPileDefaults](#setPileDefaults)
@@ -150,6 +152,14 @@ The filters for item types eligible for interaction within this system
 
 ---
 
+### CURRENCY_HOLDERS
+
+`game.itempiles.API.CURRENCY_HOLDERS` ⇒ `Array<Object>`
+
+The kinds of items that hold currency, such as coin pouches or credsticks; see [Currency holders](#currency-holders)
+
+---
+
 ### ITEM_SIMILARITIES
 
 `game.itempiles.API.ITEM_SIMILARITIES` ⇒ `Array<string>`
@@ -267,6 +277,18 @@ Sets the items filters for interaction within this system
 
 ---
 
+### setCurrencyHolders
+
+`game.itempiles.API.setCurrencyHolders(inHolderTypes)` ⇒ `Promise`
+
+Sets the kinds of items that hold currency. The list is validated first; see [Currency holders](#currency-holders)
+
+| Param         | Type            |
+|---------------|-----------------|
+| inHolderTypes | `Array<Object>` |
+
+---
+
 ### setItemSimilarities
 
 `game.itempiles.API.setItemSimilarities(inPaths)` ⇒ `Promise`
@@ -351,43 +373,59 @@ A combination of all the methods above, but this integrates a system's specific 
 
 #### Currency holders
 
-`CURRENCY_HOLDERS` lets a system declare items that hold currency, such as credsticks. Item Piles counts what they hold as the owner's money: it is included in what the owner can afford, and spent after the owner's own currency. Containers whose item type has a `HAS_CURRENCY` item type handler are always treated as holders of the system's attribute currencies, unless the "Spend currency in containers" setting is off.
+Currency holders are items that hold currency, such as coin pouches, containers with coins, or credsticks. What they hold counts as their owner's money: it is included in what the owner can afford, and spent after the owner's own currency, in priority and then sheet order.
 
-| Key                    | Type                              | Description                                                                                                                                           |
-|------------------------|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| id                     | `string`                          | A unique identifier for this kind of holder                                                                                                           |
-| filter                 | `Function/Array<{path, filters}>` | `({ item }) => boolean`, or filters in the same format as `ITEM_FILTERS`, all of which must match                                                     |
-| currencies             | `Object`                          | Keyed by the `data.path` of an attribute currency; each value has a `path` on the item, or both `get({ item })` and `set({ item, value })` functions  |
-| currencies.*.exclusive | `undefined/boolean`               | The currency only ever exists on holders: the actor's own value for it is ignored and never written                                                   |
-| receive                | `undefined/Array<string>`         | Currency paths whose income goes to the first holder of this kind; one is created with `create` if the actor has none                                 |
-| create                 | `undefined/Function`              | `({ amounts, actor }) => itemData`, required with `receive`; returns the data of a new holder already holding `amounts`                               |
-| deleteWhenEmpty        | `undefined/boolean`               | Whether a holder is deleted once everything it holds is spent                                                                                         |
-| hidden                 | `undefined/boolean`               | Whether holders are treated as money rather than goods: they are left out of item lists, never stack, and transfer-all and splitting move their value |
-| priority               | `undefined/number`                | Holders with a lower priority are spent first; holders with the same priority are spent in sheet order                                                |
+Holder types are plain data. GMs configure them in the module's System settings (Currency Holders), and `CURRENCY_HOLDERS` in a system integration is that setting's default, the same as `ITEM_FILTERS`. Amounts are read from and written to the item's stored data (its `_source`), so `path` must be the stored field, even where the system prepares the value under another name.
+
+| Key                    | Type                                | Description                                                                                                                                                             |
+|------------------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| id                     | `string`                            | A unique identifier for this kind of holder                                                                                                                             |
+| name                   | `undefined/string`                  | A label for this kind of holder, shown in the Currency Holders editor                                                                                                   |
+| filter                 | `Array<{path, filters}>`            | Filters in the same format as `ITEM_FILTERS`, all of which an item must match to be a holder                                                                            |
+| currencies             | `Object<{ path, exclusive }>`       | Keyed by the `data.path` of an attribute currency; `path` is where the item stores the amount                                                                          |
+| currencies.*.exclusive | `undefined/boolean`                 | The currency only ever exists on holders: the actor's own value for it is ignored and never written, so the currency's `data.path` only needs to be an unused path      |
+| receive                | `undefined/Array<string>`           | Currency paths whose income goes to the first holder of this kind; a new one is made from `createItem` if the actor has none                                           |
+| createItem             | `undefined/Object`                  | Item data for new holders, required with `receive`; a new holder is a copy of it, with each received amount written at its currency's `path`                           |
+| deleteWhenEmpty        | `undefined/boolean`                 | Whether a holder is deleted once spending empties it                                                                                                                    |
+| hidden                 | `undefined/boolean`                 | Whether holders are treated as money rather than goods: they are left out of Item Piles item lists, never stack, and transfer-all and splitting move their value        |
+| ignoreInItemPiles      | `undefined/boolean`                 | Whether these items are goods on item piles, merchants and vaults, so that what they hold is not the pile's money (for example containers for sale)                     |
+| includeContents        | `undefined/boolean`                 | Whether coin items stored inside a holder count too; needs the system's `IS_CONTAINED_PATH` item type handler                                                           |
+| priority               | `undefined/number`                  | Holders with a lower priority are spent first; holders with the same priority are spent in sheet order                                                                  |
+
+Containers in D&D 5e:
+
+```js
+CURRENCY_HOLDERS: [{
+	id: "containers",
+	name: "Containers",
+	filter: [{ path: "type", filters: "container" }],
+	currencies: {
+		"system.currency.pp": { path: "system.currency.pp" },
+		"system.currency.gp": { path: "system.currency.gp" },
+		"system.currency.ep": { path: "system.currency.ep" },
+		"system.currency.sp": { path: "system.currency.sp" },
+		"system.currency.cp": { path: "system.currency.cp" }
+	},
+	ignoreInItemPiles: true,
+	includeContents: true
+}]
+```
+
+Credsticks in Starfinder 2e, which store credits at `system.price.value.sp` and prepare them as `system.price.value.credits`. Credits only exist on credsticks, so the Credits currency's own path (here `flags.item-piles.credits`) is never read or written:
 
 ```js
 CURRENCY_HOLDERS: [{
 	id: "credstick",
-	filter: ({ item }) => item.type === "treasure" && item.system.category === "credstick",
+	name: "Credstick",
+	filter: [{ path: "type", filters: "treasure" }, { path: "system.category", filters: "credstick" }],
 	currencies: {
-		"system.currency.credits": {
-			get: ({ item }) => item._source.system.price.value.credits ?? 0,
-			set: ({ value }) => ({ "system.price.value": _replace({ credits: value }) }),
-			exclusive: true
-		}
+		"flags.item-piles.credits": { path: "system.price.value.sp", exclusive: true }
 	},
-	receive: ["system.currency.credits"],
-	create: ({ amounts }) => ({
-		name: "Credstick",
-		type: "treasure",
-		system: { category: "credstick", price: { value: { credits: amounts["system.currency.credits"] ?? 0 } } }
-	}),
-	deleteWhenEmpty: true,
+	receive: ["flags.item-piles.credits"],
+	createItem: { name: "Credstick", type: "treasure", system: { category: "credstick", quantity: 1, price: { value: {} } } },
 	hidden: true
 }]
 ```
-
-`_replace` replaces the whole price object instead of merging into it. It requires Foundry v14; on v13, use the key `"system.price.==value"` instead.
 
 ---
 

@@ -522,6 +522,33 @@
           "PriceModifierExplanation": "This configures the modifiers for the cost this item when bought and sold. This multiplies the base price of the item before any other price modifiers. If the sell price modifier of the merchant is 50%, the sell price modifier of the item would have to be 200% in order to nullify the merchant modifier."
         }
       },
+      "CurrencyHoldersEditor": {
+        "Title": "Item Piles Currency Holders Editor",
+        "Explanation": "Each holder type describes which items hold currency and where on the item each currency is stored. What holders hold counts as their owner's money, and is spent after the owner's own currency, in sheet order. Amounts are edited on the items themselves.",
+        "Name": "Name",
+        "MatchingItems": "Matching items",
+        "MatchingItemsHint": "An item is a holder when it matches all of these: the property at the path must equal one of the comma-separated values.",
+        "Currencies": "Currencies",
+        "Currency": "Currency",
+        "ItemPath": "Path on the item",
+        "OnlyOnHolders": "Only on holders",
+        "OnlyOnHoldersHint": "The currency only exists on holders: the owner's own value at the currency's path is ignored and never written, so any unused path will do when configuring the currency.",
+        "ReceivesIncome": "Receives income",
+        "ReceivesIncomeHint": "Currency the owner receives goes to their first holder of this type, or to a new one made from the new holder item.",
+        "NewHolderItem": "New holder item",
+        "NewHolderItemHint": "Drop an item here. New holders are copies of it, holding the amount received.",
+        "DropItem": "Drop an item here",
+        "DeleteWhenEmpty": "Delete when emptied by spending",
+        "TreatAsMoney": "Treat as money",
+        "TreatAsMoneyHint": "Holders are left out of item lists in Item Piles windows, never stack, and their value is moved when taking everything or splitting.",
+        "IgnoreInItemPiles": "Goods on item piles",
+        "IgnoreInItemPilesHint": "On item piles, merchants and vaults these items are goods for sale or loot, so what they hold is not the pile's money.",
+        "IncludeContents": "Count coin items stored inside",
+        "Priority": "Priority",
+        "PriorityHint": "Holders with a lower priority are spent first.",
+        "AddHolderType": "Add holder type",
+        "NoHolderTypes": "No holder types are configured."
+      },
       "FilterEditor": {
         "Title": "Item Piles Filters Editor",
         "TitleActor": "Item Piles Filters Editor: {actor_name}",
@@ -870,6 +897,11 @@
         "Label": "Configure Secondary Currencies",
         "Hint": "This setting define secondary currencies, similar to but separate from regular currencies. These cannot have exchange rates or be split into other custom currencies."
       },
+      "CurrencyHolders": {
+        "Title": "Currency Holders",
+        "Label": "Configure Currency Holders",
+        "Hint": "Items that hold currency, such as coin pouches, containers with coins or credsticks. What they hold counts as their owner's money when buying, selling, trading, looting and depositing."
+      },
       "CurrencyDecimalDigits": {
         "Title": "Currency Decimal Digits",
         "Hint": "This setting defines the lowest decimal digit your currencies round to. For example in a modern setting with modern currencies, '0.01' allows for two decimal digits. This is not used if you have more than one currency."
@@ -959,10 +991,6 @@
       "DeleteEmptyPiles": {
         "Title": "Auto-delete empty piles",
         "Hint": "This causes item piles to delete themselves once they run out of items. This can be overridden on individual item piles."
-      },
-      "SpendFromContainers": {
-        "Title": "Spend currency in containers",
-        "Hint": "When enabled, currency stored in a character's containers (such as coins in a backpack) counts towards what they can afford, and is spent once the character's own currency runs out. Item piles and merchants never spend from their containers."
       },
       "PreloadFiles": {
         "Title": "Preload Files",

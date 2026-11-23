@@ -175,7 +175,6 @@
 					<Setting key={SETTINGS.INSPECT_ITEMS_IN_TRADE} bind:data="{settings[SETTINGS.INSPECT_ITEMS_IN_TRADE]}"/>
 					<Setting key={SETTINGS.OUTPUT_TO_CHAT} bind:data="{settings[SETTINGS.OUTPUT_TO_CHAT]}"/>
 					<Setting key={SETTINGS.DELETE_EMPTY_PILES} bind:data="{settings[SETTINGS.DELETE_EMPTY_PILES]}"/>
-					<Setting key={SETTINGS.SPEND_FROM_CONTAINERS} bind:data="{settings[SETTINGS.SPEND_FROM_CONTAINERS]}"/>
 					<Setting key={SETTINGS.POPULATION_TABLES_FOLDER} bind:data="{settings[SETTINGS.POPULATION_TABLES_FOLDER]}"/>
 					<Setting key={SETTINGS.HIDE_TOKEN_BORDER} bind:data="{settings[SETTINGS.HIDE_TOKEN_BORDER]}"/>
 					<SettingButton key={SETTINGS.PRICE_PRESETS} bind:data="{settings[SETTINGS.PRICE_PRESETS]}"/>
@@ -214,6 +213,7 @@
 					         bind:data="{settings[SETTINGS.ITEM_PREVIEW_PERMISSION_LEVEL]}"/>
 					<SettingButton key={SETTINGS.CURRENCIES} bind:data="{settings[SETTINGS.CURRENCIES]}"/>
 					<SettingButton key={SETTINGS.SECONDARY_CURRENCIES} bind:data="{settings[SETTINGS.SECONDARY_CURRENCIES]}"/>
+					<SettingButton key={SETTINGS.CURRENCY_HOLDERS} bind:data="{settings[SETTINGS.CURRENCY_HOLDERS]}"/>
 					<Setting key={SETTINGS.CURRENCY_DECIMAL_DIGITS} bind:data="{settings[SETTINGS.CURRENCY_DECIMAL_DIGITS]}"
 					         disabled="{settings[SETTINGS.CURRENCIES].value.length !== 1}"/>
 					<SettingButton key={SETTINGS.ITEM_FILTERS} bind:data="{settings[SETTINGS.ITEM_FILTERS]}"/>

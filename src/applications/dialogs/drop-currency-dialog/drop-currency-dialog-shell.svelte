@@ -28,7 +28,10 @@
 		includeHolders
 	});
 
-	let attributes = currencies.filter(entry => entry.type === "attribute")
+	// Editing sets the pile's own values, and exclusive currencies have none: they only exist on currency holders.
+	const exclusivePaths = settings?.getUpdates ? PileUtilities.getExclusiveCurrencyPaths() : new Set();
+
+	let attributes = currencies.filter(entry => entry.type === "attribute" && !exclusivePaths.has(entry.path))
 		.map(currency => {
 			currency.currentQuantity = 0;
 			return currency;
