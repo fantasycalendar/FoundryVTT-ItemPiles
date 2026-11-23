@@ -2444,7 +2444,7 @@ export default class PrivateAPI {
 		if (preCalcHookResult === false) return false;
 
 		const sellerTransaction = new Transaction(sellingActor);
-		const sellerFlagData = PileUtilities.getActorFlagData(sellerTransaction);
+		const sellerFlagData = PileUtilities.getActorFlagData(sellingActor);
 		const sellerIsMerchant = PileUtilities.isItemPileMerchant(sellingActor, sellerFlagData);
 		const sellerInfiniteQuantity = sellerIsMerchant && sellerFlagData.infiniteQuantity;
 		const sellerInfiniteCurrencies = sellerIsMerchant && sellerFlagData.infiniteCurrencies;
@@ -2495,13 +2495,14 @@ export default class PrivateAPI {
 					"default": sellerFlagData?.infiniteQuantity ?? false, "yes": true, "no": false
 				}[itemFlagData.infiniteQuantity ?? "default"];
 				if (sellerIsMerchant && itemInfiniteQuantity) continue;
+				// Items with infinite quantity were skipped above, so only infinite currencies leave the stock untouched.
 				await sellerTransaction.appendItemChanges([{
 					item: entry.item, quantity: entry.quantity
 				}], {
 					remove: true,
 					type: entry.isCurrency ? "currency" : entry.type,
 					keepIfZero: itemFlagData.isService || sellerKeepZeroQuantity || itemFlagData.keepZeroQuantity,
-					onlyDelta
+					onlyDelta: sellerInfiniteCurrencies && entry.isCurrency
 				});
 			}
 		}

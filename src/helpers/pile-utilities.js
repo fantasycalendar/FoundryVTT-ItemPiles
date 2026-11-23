@@ -426,6 +426,11 @@ export function getActorPrimaryCurrency(target) {
 	return getActorCurrencies(actor, { getAll: true }).find(currency => currency.primary);
 }
 
+export function getCurrencyDecimals() {
+	const step = Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, 0.00001);
+	return step.toString().split(".")?.[1]?.length ?? 0;
+}
+
 export function getCurrencyList(target = false, pileData = false) {
 	let targetUuid = false;
 	if (target) {
@@ -1002,8 +1007,7 @@ function getDecimalDifferenceBetweenExchangeRates(currencies) {
 
 	const primaryCurrencies = currencies.filter(currency => !currency.secondary);
 
-	const decimals = Helpers.getSetting(SETTINGS.CURRENCY_DECIMAL_DIGITS, 0.00001);
-	const defaultDecimals = decimals.toString().split(".")?.[1]?.length ?? 0;
+	const defaultDecimals = getCurrencyDecimals();
 
 	if (primaryCurrencies.length === 1) {
 		return defaultDecimals;

@@ -23,6 +23,14 @@
 - Fixed saving a merchant's settings without Simple Calendar active clearing its closed days and holidays
 - Fixed vault item styles configured in the module settings having no effect
 - Fixed players being able to add items to item piles out of thin air by dragging them in from the sidebar or chat
+- Fixed merchant restocks and roll table results set to replace existing items keeping the old stock and adding the new items on top of it
+- Fixed coins being lost in player trades when both players offered the same item-based currency
+- Fixed merchants with infinite currencies losing their item-based currencies when buying from players
+- Fixed merchants with infinite currencies sometimes ending up with an item-based currency at a negative quantity
+- Fixed splitting an item pile with a single character removing items that cannot stack without giving them to the character
+- Fixed merchants that keep sold-out items deleting some of them when several sold out at once
+- Fixed merchants that keep sold-out items selling items that cannot stack over and over instead of showing them as sold out
+- Fixed sold-out merchant items staying unavailable after a restock refilled them
 - Fixed item pile and merchant windows showing the currency in a container as the actor's own currency after the container's currency changed
 - Fixed removing or paying with a secondary currency also taking the same amount of the main currency
 - Fixed transferring a secondary currency moving the main currency instead

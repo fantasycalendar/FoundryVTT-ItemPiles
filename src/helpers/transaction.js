@@ -1,319 +1,336 @@
 import * as Utilities from "./utilities.js";
 import * as PileUtilities from "./pile-utilities.js";
+import * as Helpers from "./helpers.js";
 import ItemPileSocket from "../socket.js";
 import PrivateAPI from "../API/private-api.js";
 import { SYSTEMS } from "../systems.js";
 import CONSTANTS from "../constants/constants.js";
 
+// value === original + written. delta - written is the delta-only part, reported but never written.
+function createValueRecord(original) {
+	const value = Utilities.sanitizeNumber(original);
+	return { original: value, value, delta: 0, written: 0 };
+}
+
+function applyValueChange(record, quantity, { set = false, remove = false, onlyDelta = false } = {}) {
+	const current = record.value + (onlyDelta ? record.delta - record.written : 0);
+	const next = set
+		? Utilities.sanitizeNumber(quantity)
+		: current + Math.abs(Utilities.sanitizeNumber(quantity)) * (remove ? -1 : 1);
+	record.delta = Helpers.roundToDecimals(record.delta + next - current, PileUtilities.getCurrencyDecimals());
+	if (!onlyDelta) {
+		record.value = Helpers.roundToDecimals(next, PileUtilities.getCurrencyDecimals());
+		record.written = record.delta;
+	}
+}
+
+function createItemChange({ key, source, isNew, quantity, type = null }) {
+	return {
+		key,
+		source,
+		isNew,
+		quantity: createValueRecord(quantity),
+		fields: new Map(),
+		type,
+		keepIfZero: false,
+		notForSaleIfZero: false,
+		hasQuantityChange: false
+	};
+}
+
+function getFieldValues(change) {
+	return Object.fromEntries(Array.from(change.fields).map(([path, record]) => [path, record.value]));
+}
+
+function cleanAttributes(attributes) {
+	return Array.isArray(attributes)
+		? attributes
+		: Object.entries(attributes).map(([path, quantity]) => ({ path, quantity }));
+}
+
+// Written item data stores only non-default item-piles flags; reported itemDeltas carry the full set.
+function setCleanItemFlagData(itemData) {
+	const flagData = PileUtilities.getItemFlagData(itemData);
+	Utilities.deleteProperty(itemData, CONSTANTS.FLAGS.ITEM);
+	const cleanFlagData = removeOverheadCost(PileUtilities.cleanItemFlagData(flagData));
+	foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM, cleanFlagData);
+	return itemData;
+}
+
+function setReportedItemFlagData(itemData) {
+	const flagData = PileUtilities.getItemFlagData(itemData);
+	Utilities.deleteProperty(itemData, CONSTANTS.FLAGS.ITEM);
+	foundry.utils.setProperty(itemData, CONSTANTS.FLAGS.ITEM, removeOverheadCost(flagData));
+	return itemData;
+}
+
+function removeOverheadCost(flagData) {
+	if (!foundry.utils.hasProperty(flagData, "overheadCost")) return flagData;
+	delete flagData.overheadCost;
+	return Utilities.setForcedDeletion(flagData, "overheadCost");
+}
+
+// Each pending number lives in exactly one record. commit() writes the very payload object prepare() returned, so
+// edits made to it by pre-hook listeners are committed.
 export default class Transaction {
 
 	constructor(document) {
 		this.document = document;
-		this.documentFlags = PileUtilities.getActorFlagData(this.document);
-		this.itemsToCreate = [];
-		this.itemUpdates = {};
-		this.itemsToUpdate = [];
-		this.itemsToDelete = [];
-		this.itemsToForceDelete = new Set();
-		this.itemsToNotDelete = new Set();
-		this.documentChanges = {};
-		this.attributeDeltas = new Map();
-		this.attributeTypeMap = new Map();
-		this.itemDeltas = new Map();
-		this.itemTypeMap = new Map();
-		this.itemFlagMap = new Map();
-		this.preCommitted = false;
+		this.pileData = PileUtilities.getActorFlagData(this.document);
+		this.attributes = new Map();
+		this.embeddedDeltas = new Map();
+		this.items = new Map();
+		this.payload = null;
+	}
+
+	getAttributeValueRecord(path) {
+		if (!this.attributes.has(path)) {
+			this.attributes.set(path, createValueRecord(foundry.utils.getProperty(this.document, path)));
+		}
+		return this.attributes.get(path);
+	}
+
+	getItemChange(item) {
+		if (!this.items.has(item.id)) {
+			const quantity = Utilities.getItemQuantity(item);
+			this.items.set(item.id, createItemChange({ key: item.id, source: item, isNew: false, quantity }));
+		}
+		return this.items.get(item.id);
+	}
+
+	addItemCreation(itemData, { type = "item" } = {}) {
+		const key = foundry.utils.randomID();
+		const change = createItemChange({ key, source: itemData, isNew: true, quantity: 0, type });
+		this.items.set(key, change);
+		return change;
+	}
+
+	getFieldValueRecord(change, path) {
+		if (!change.fields.has(path)) {
+			const original = change.isNew ? 0 : foundry.utils.getProperty(change.source, path);
+			change.fields.set(path, createValueRecord(original));
+		}
+		return change.fields.get(path);
+	}
+
+	findTargetForItem(itemData, { remove = false, type = "item" } = {}) {
+		const isVault = PileUtilities.isItemPileVault(this.document, this.pileData);
+		let existingItem = false;
+		// A positioned vault item only stacks onto an item it collides with; it never falls back to id or similarity
+		// matching.
+		if (isVault && type !== "currency" && !remove) {
+			const unpositioned = foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x") === undefined
+				&& foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y") === undefined;
+			const similarItems = Utilities.findSimilarItem(this.document.items, itemData, { returnOne: false });
+			existingItem = similarItems.find(item => {
+				const fits = unpositioned || PileUtilities.areItemsColliding(item, itemData);
+				return fits && PileUtilities.canItemStack(item, this.document);
+			});
+		} else {
+			existingItem = this.document.items.get(itemData._id ?? itemData.id)
+				|| Utilities.findSimilarItem(this.document.items, itemData);
+		}
+		if (existingItem) return { existingItem };
+		const creations = Array.from(this.items.values()).filter(change => change.isNew);
+		const pending = Utilities.findSimilarItem(creations.map(change => change.source), itemData);
+		if (pending && PileUtilities.canItemStack(itemData, this.document)) {
+			return { pendingCreation: creations.find(change => change.source === pending) };
+		}
+		return {};
 	}
 
 	async appendItemChanges(items, {
-		set = false, remove = false, type = "item", keepIfZero = false
+		set = false, remove = false, type = null, keepIfZero = false, onlyDelta = false
 	} = {}) {
+		this.payload = null;
 
-		for (let data of items) {
+		for (const data of items) {
 
-			let item = data.item ?? data;
+			const item = data.item ?? data;
+			const entryType = type ?? (PileUtilities.isItemCurrency(item) ? "currency" : "item");
 
-			type = PileUtilities.isItemCurrency(item) ? "currency" : type;
-
-			let flags = data.flags ?? false;
 			let itemData = item instanceof Item ? item.toObject() : foundry.utils.deepClone(item);
 			if (SYSTEMS.DATA.ITEM_TRANSFORMER && !remove) {
 				itemData = await SYSTEMS.DATA.ITEM_TRANSFORMER(itemData);
 			}
-			const requestedQuantity = Math.abs(Utilities.getRequestedQuantity(data, itemData));
-			const incomingQuantity = set ? requestedQuantity : requestedQuantity * (remove ? -1 : 1);
+			const quantity = Math.abs(Utilities.getRequestedQuantity(data, itemData));
 
-			let itemId = itemData._id ?? itemData.id;
-			let documentHasItem = false;
-			let documentExistingItem = false;
-			if (this.documentFlags.type === CONSTANTS.PILE_TYPES.VAULT && type !== "currency" && !remove) {
-				const documentExistingItems = Utilities.findSimilarItem(this.document.items, itemData, {
-					returnOne: false
-				});
-				documentExistingItem = documentExistingItems.find(item => {
-					return PileUtilities.canItemStack(item, this.document) && (
-						(
-							foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".x") === undefined
-							&&
-							foundry.utils.getProperty(itemData, CONSTANTS.FLAGS.ITEM + ".y") === undefined
-						)
-						||
-						PileUtilities.areItemsColliding(item, itemData)
-					)
-				});
-			} else {
-				documentHasItem = this.document.items.get(itemId);
-				documentExistingItem = documentHasItem || Utilities.findSimilarItem(this.document.items, itemData);
+			const { existingItem, pendingCreation } = this.findTargetForItem(itemData, { remove, type: entryType });
+
+			let change;
+			if (existingItem) {
+				const stacks = Utilities.getItemQuantity(existingItem) > 1
+					|| PileUtilities.canItemStack(existingItem, this.document);
+				change = (stacks || remove) ? this.getItemChange(existingItem) : null;
+			} else if (pendingCreation) {
+				change = pendingCreation;
 			}
 
-			const canItemStack = PileUtilities.canItemStack(documentExistingItem || itemData, this.document);
-
-			if (remove && (keepIfZero || type === "currency")) {
-				this.itemsToNotDelete.add(item.id);
+			if (!change) {
+				// Removals never create items.
+				if (remove) continue;
+				if (!itemData._id) itemData._id = foundry.utils.randomID();
+				change = this.addItemCreation(itemData, { type: entryType });
 			}
 
-			if (flags) {
-				this.itemFlagMap.set(itemId, flags);
+			change.type ??= entryType;
+			if (remove && (keepIfZero || entryType === "currency")) {
+				change.keepIfZero = true;
+				change.notForSaleIfZero ||= keepIfZero && entryType !== "currency";
 			}
-
-			if (documentExistingItem) {
-
-				const itemQuantity = Utilities.getItemQuantity(documentExistingItem);
-
-				if (itemQuantity > 1 || canItemStack) {
-
-					const newQuantity = set ? incomingQuantity : itemQuantity + incomingQuantity;
-					const quantityDelta = newQuantity - itemQuantity;
-
-					const existingItemUpdate = remove
-						? this.itemsToUpdate.find(item => item._id === itemId)
-						: Utilities.findSimilarItem(this.itemsToUpdate, itemData);
-
-					if (existingItemUpdate) {
-						Utilities.setItemQuantity(existingItemUpdate, newQuantity);
-						if (keepIfZero && type !== "currency") {
-							foundry.utils.setProperty(existingItemUpdate, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
-						}
-					} else {
-						const update = Utilities.setItemQuantity(documentExistingItem.toObject(), newQuantity);
-						if (keepIfZero && type !== "currency") {
-							foundry.utils.setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", newQuantity === 0);
-						}
-						this.itemTypeMap.set(documentExistingItem.id, type)
-						this.itemsToUpdate.push(update);
-					}
-
-					this.itemDeltas.set(documentExistingItem.id, (this.itemDeltas.has(documentExistingItem.id) ? this.itemDeltas.get(documentExistingItem.id) : 0) + quantityDelta);
-
-				} else if (remove) {
-
-					this.itemsToForceDelete.add(documentExistingItem.id);
-					this.itemDeltas.set(documentExistingItem.id, (this.itemDeltas.has(documentExistingItem.id) ? this.itemDeltas.get(documentExistingItem.id) : 0) + incomingQuantity);
-
-				} else {
-
-					if (!itemData._id) {
-						itemData._id = foundry.utils.randomID();
-					}
-					Utilities.setItemQuantity(itemData, incomingQuantity);
-					this.itemsToCreate.push(itemData);
-					this.itemTypeMap.set(itemData._id, type)
-
-				}
-
-			} else {
-				const existingItemCreation = Utilities.findSimilarItem(this.itemsToCreate, itemData);
-				if (existingItemCreation && canItemStack) {
-					const newQuantity = Utilities.getItemQuantity(existingItemCreation) + incomingQuantity;
-					Utilities.setItemQuantity(existingItemCreation, newQuantity);
-				} else {
-					if (!itemData._id) {
-						itemData._id = foundry.utils.randomID();
-					}
-					Utilities.setItemQuantity(itemData, incomingQuantity);
-					this.itemsToCreate.push(itemData);
-					this.itemTypeMap.set(itemData._id, type)
-				}
-			}
+			change.hasQuantityChange = true;
+			applyValueChange(change.quantity, quantity, { set, remove, onlyDelta });
 		}
 	}
 
-	async appendDocumentChanges(attributes, {
-		set = false, remove = false, type = "attribute", onlyDelta = false
-	} = {}) {
-		if (!Array.isArray(attributes)) {
-			attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
+	async appendDocumentChanges(attributes, { set = false, remove = false, onlyDelta = false } = {}) {
+		this.payload = null;
+		for (const { path, quantity } of cleanAttributes(attributes)) {
+			applyValueChange(this.getAttributeValueRecord(path), quantity, { set, remove, onlyDelta });
 		}
-		this.documentChanges = attributes.reduce((acc, attribute) => {
-			const incomingQuantity = set
-				? attribute.quantity
-				: Math.abs(attribute.quantity) * (remove ? -1 : 1);
-			acc[attribute.path] = acc[attribute.path] ?? Number(foundry.utils.getProperty(this.document, attribute.path) ?? 0);
-			if (set) {
-				const previousQuantity = acc[attribute.path];
-				if (!onlyDelta) {
-					acc[attribute.path] = incomingQuantity
-				}
-				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.get(attribute.path) ?? 0) + (incomingQuantity - previousQuantity));
-			} else {
-				if (!onlyDelta) {
-					acc[attribute.path] += incomingQuantity
-				}
-				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity);
-			}
-			this.attributeTypeMap.set(attribute.path, type)
-			return acc;
-		}, this.documentChanges);
 	}
 
-	async appendEmbeddedChanges(item, attributes, {
-		set = false, remove = false, type = "attribute", onlyDelta = false
-	} = {}) {
-
-		if (!Array.isArray(attributes)) {
-			attributes = Object.entries(attributes).map(entry => ({ path: entry[0], quantity: entry[1] }));
+	async appendEmbeddedChanges(item, attributes, { set = false, remove = false, onlyDelta = false } = {}) {
+		this.payload = null;
+		const change = this.getItemChange(item);
+		for (const { path, quantity } of cleanAttributes(attributes)) {
+			const record = this.getFieldValueRecord(change, path);
+			const deltaBefore = record.delta;
+			applyValueChange(record, quantity, { set, remove, onlyDelta });
+			const delta = (this.embeddedDeltas.get(path) ?? 0) + record.delta - deltaBefore;
+			this.embeddedDeltas.set(path, Helpers.roundToDecimals(delta, PileUtilities.getCurrencyDecimals()));
 		}
+	}
 
-		this.itemUpdates = attributes.reduce((acc, attribute) => {
-			const incomingQuantity = set
-				? attribute.quantity
-				: Math.abs(attribute.quantity) * (remove ? -1 : 1);
-
-			acc[item.id] = {
-				...(acc[item.id] ?? {}),
-				[attribute.path]: acc[item.id]?.[attribute.path] ?? Number(foundry.utils.getProperty(item, attribute.path) ?? 0)
-			};
-
-			if (set) {
-				const previousQuantity = Utilities.sanitizeNumber(acc[item.id][attribute.path]);
-				if (!onlyDelta) {
-					acc[item.id][attribute.path] = incomingQuantity;
-				}
-				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.get(attribute.path) ?? 0) + (incomingQuantity - previousQuantity));
-			} else {
-				if (!onlyDelta) {
-					acc[item.id][attribute.path] = acc[item.id][attribute.path] + incomingQuantity;
-				}
-				this.attributeDeltas.set(attribute.path, (this.attributeDeltas.has(attribute.path) ? this.attributeDeltas.get(attribute.path) : 0) + incomingQuantity);
-			}
-
-			return acc;
-		}, this.itemUpdates);
-
+	shouldItemBeDeleted(change) {
+		if (change.keepIfZero) return false;
+		return change.hasQuantityChange && change.quantity.value <= 0;
 	}
 
 	prepare() {
+		if (this.payload) return this.payload;
+		const { documentChanges, attributeDeltas } = this.prepareDocumentChanges();
+		const { itemsToCreate, itemsToUpdate, itemsToDelete, itemDeltas } = this.prepareItemChanges();
+		this.payload = {
+			documentChanges,
+			itemsToCreate,
+			itemsToUpdate,
+			itemsToDelete,
+			attributeDeltas,
+			itemDeltas
+		};
+		return this.payload;
+	}
 
-		this.documentChanges = Object.fromEntries(Object.entries(this.documentChanges).filter(entry => {
-			if (this.attributeDeltas.get(entry[0]) === 0) {
-				this.attributeDeltas.delete(entry[0]);
+	prepareDocumentChanges() {
+		const documentChanges = {};
+		const attributeDeltas = {};
+		for (const [path, record] of this.attributes) {
+			if (Number(foundry.utils.getProperty(this.document, path)) !== record.value) {
+				documentChanges[path] = record.value;
 			}
-			return Number(foundry.utils.getProperty(this.document, entry[0])) !== entry[1];
-		}))
-
-		this.itemsToCreate = this.itemsToCreate.filter(item => {
-			return !PileUtilities.canItemStack(item, this.document) || Utilities.getItemQuantity(item) > 0 || this.itemTypeMap.get(item._id) === "currency"
-		}).map(item => {
-			const flagData = PileUtilities.getItemFlagData(item);
-			Utilities.deleteProperty(item, CONSTANTS.FLAGS.ITEM);
-			const cleanFlagData = PileUtilities.cleanItemFlagData(flagData);
-			if (foundry.utils.hasProperty(cleanFlagData, "overheadCost")) {
-				delete cleanFlagData["overheadCost"];
-				Utilities.setForcedDeletion(cleanFlagData, "overheadCost");
-			}
-			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, cleanFlagData);
-			return item;
-		});
-
-		this.itemsToCreate = Utilities.ensureValidIds(this.document, this.itemsToCreate);
-		this.itemsToCreate = PileUtilities.assignVaultPositions(this.document, this.itemsToCreate);
-
-		this.itemsToDelete = this.itemsToUpdate.filter(item => {
-			return Utilities.getItemQuantity(item) <= 0 && this.itemTypeMap.get(item._id) !== "currency";
-		}).map(item => item._id).concat(Array.from(this.itemsToForceDelete));
-
-		for (const itemId of this.itemsToDelete) {
-			if (this.itemsToNotDelete.has(itemId)) {
-				this.itemsToDelete.splice(this.itemsToDelete.indexOf(itemId), 1);
-			}
+			attributeDeltas[path] = record.delta;
 		}
+		for (const [path, delta] of this.embeddedDeltas) {
+			const total = (attributeDeltas[path] ?? 0) + delta;
+			attributeDeltas[path] = Helpers.roundToDecimals(total, PileUtilities.getCurrencyDecimals());
+		}
+		for (const path of this.attributes.keys()) {
+			if (attributeDeltas[path] === 0) delete attributeDeltas[path];
+		}
+		return { documentChanges, attributeDeltas };
+	}
 
-		this.itemDeltas = Array.from(this.itemDeltas).map(([id, quantity]) => {
-			const item = this.document.items.get(id).toObject();
-			const existingFlagData = PileUtilities.getItemFlagData(item);
-			const newFlagData = this.itemFlagMap.get(id) ?? {};
-			Utilities.deleteProperty(item, CONSTANTS.FLAGS.ITEM);
-			const cleanFlagData = PileUtilities.cleanItemFlagData(newFlagData);
-			const mergedFlagData = foundry.utils.mergeObject(existingFlagData, cleanFlagData);
-			if (foundry.utils.hasProperty(mergedFlagData, "overheadCost")) {
-				delete mergedFlagData["overheadCost"];
-				Utilities.setForcedDeletion(mergedFlagData, "overheadCost");
+	prepareItemChanges() {
+		const itemsToDelete = [];
+		const itemsToUpdate = [];
+		const fieldUpdates = [];
+		const itemDeltas = [];
+		let itemsToCreate = [];
+
+		for (const change of this.items.values()) {
+
+			if (change.isNew) {
+				const itemData = this.getCreationData(change);
+				if (itemData) itemsToCreate.push(itemData);
+				continue;
 			}
-			foundry.utils.setProperty(item, CONSTANTS.FLAGS.ITEM, mergedFlagData);
-			const type = this.itemTypeMap.get(id);
-			Utilities.setItemQuantity(item, quantity, true);
-			return { item, quantity, type };
-		}).filter(delta => delta.quantity);
 
-		this.itemsToUpdate = this.itemsToUpdate
-			.filter(item => Utilities.getItemQuantity(item) > 0 || this.itemsToNotDelete.has(item._id) || this.itemTypeMap.get(item._id) === "currency")
-			.filter(itemData => {
-				const item = this.document.items.get(itemData._id)
-				return Utilities.getItemQuantity(item) !== Utilities.getItemQuantity(itemData);
-			});
-
-		Object.entries(this.itemUpdates).forEach(([id, update]) => {
-			update["_id"] = id;
-			const existingUpdateIndex = this.itemsToUpdate.findIndex(existingUpdate => existingUpdate["_id"] === update["_id"]);
-			if (existingUpdateIndex > -1) {
-				this.itemsToUpdate[existingUpdateIndex] = foundry.utils.mergeObject(this.itemsToUpdate[existingUpdateIndex], update);
+			if (this.shouldItemBeDeleted(change)) {
+				itemsToDelete.push(change.key);
 			} else {
-				this.itemsToUpdate.push(update);
+				const update = this.getItemUpdate(change);
+				if (update) itemsToUpdate.push(update);
+				const updates = getFieldValues(change);
+				if (!foundry.utils.isEmpty(updates)) {
+					fieldUpdates.push({ _id: change.key, ...updates });
+				}
 			}
-		});
 
-		this.attributeDeltas = Object.fromEntries(this.attributeDeltas);
-		this.preCommitted = true;
-		return {
-			documentChanges: this.documentChanges,
-			itemsToCreate: this.itemsToCreate,
-			itemsToDelete: this.itemsToDelete,
-			itemsToUpdate: this.itemsToUpdate,
-			attributeDeltas: this.attributeDeltas,
-			itemDeltas: this.itemDeltas
+			if (change.quantity.delta) {
+				const item = setReportedItemFlagData(change.source.toObject());
+				Utilities.setItemQuantity(item, change.quantity.delta, true);
+				itemDeltas.push({ item, quantity: change.quantity.delta, type: change.type });
+			}
 		}
+
+		for (const update of fieldUpdates) {
+			const index = itemsToUpdate.findIndex(existingUpdate => existingUpdate._id === update._id);
+			if (index > -1) {
+				itemsToUpdate[index] = foundry.utils.mergeObject(itemsToUpdate[index], update);
+			} else {
+				itemsToUpdate.push(update);
+			}
+		}
+
+		itemsToCreate = Utilities.ensureValidIds(this.document, itemsToCreate);
+		itemsToCreate = PileUtilities.assignVaultPositions(this.document, itemsToCreate);
+
+		return { itemsToCreate, itemsToUpdate, itemsToDelete, itemDeltas };
+	}
+
+	getCreationData(change) {
+		const itemData = Utilities.setItemQuantity(foundry.utils.deepClone(change.source), change.quantity.value);
+		const keep = change.quantity.value > 0
+			|| change.type === "currency"
+			|| !PileUtilities.canItemStack(itemData, this.document);
+		return keep ? setCleanItemFlagData(itemData) : null;
+	}
+
+	getItemUpdate(change) {
+		const quantityChanged = change.quantity.value !== Utilities.getItemQuantity(change.source);
+		if (!quantityChanged) return null;
+		const update = Utilities.setItemQuantity(change.source.toObject(), change.quantity.value);
+		if (change.notForSaleIfZero) {
+			foundry.utils.setProperty(update, CONSTANTS.FLAGS.ITEM + ".notForSale", change.quantity.value === 0);
+		}
+		return update;
 	}
 
 	async commit() {
 
-		if (!this.preCommitted) {
-			this.prepare();
-		}
+		const payload = this.prepare();
+		const changes = {
+			documentChanges: payload.documentChanges,
+			itemsToUpdate: payload.itemsToUpdate,
+			itemsToDelete: payload.itemsToDelete,
+			itemsToCreate: payload.itemsToCreate
+		};
 
-		let itemsCreated;
 		const documentUuid = Utilities.getUuid(this.document);
-		if (this.document.isOwner) {
-			itemsCreated = await PrivateAPI._commitDocumentChanges(documentUuid, {
-				documentChanges: this.documentChanges,
-				itemsToUpdate: this.itemsToUpdate,
-				itemsToDelete: this.itemsToDelete,
-				itemsToCreate: this.itemsToCreate
-			})
-		} else {
-			itemsCreated = await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_DOCUMENT_CHANGES, documentUuid, {
-				documentChanges: this.documentChanges,
-				itemsToUpdate: this.itemsToUpdate,
-				itemsToDelete: this.itemsToDelete,
-				itemsToCreate: this.itemsToCreate
-			});
-		}
+		const itemsCreated = this.document.isOwner
+			? await PrivateAPI._commitDocumentChanges(documentUuid, changes)
+			: await ItemPileSocket.executeAsGM(ItemPileSocket.HANDLERS.COMMIT_DOCUMENT_CHANGES, documentUuid, changes);
+
+		const changedItemDeltas = payload.itemDeltas.map(delta => ({ ...delta, item: foundry.utils.deepClone(delta.item) }));
+		const createdItemDeltas = itemsCreated.map(item => {
+			const quantity = PileUtilities.canItemStack(item, this.document) ? Utilities.getItemQuantity(item) : 1;
+			return { item, quantity };
+		});
 
 		return {
-			attributeDeltas: this.attributeDeltas, itemDeltas: this.itemDeltas.concat(itemsCreated.map(item => {
-				return {
-					item, quantity: PileUtilities.canItemStack(item, this.document) ? Utilities.getItemQuantity(item) : 1
-				}
-			}))
-		}
+			attributeDeltas: { ...payload.attributeDeltas },
+			itemDeltas: changedItemDeltas.concat(createdItemDeltas)
+		};
 	}
 }
