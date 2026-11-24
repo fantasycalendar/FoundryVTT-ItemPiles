@@ -2297,6 +2297,7 @@ export function getPaymentData({
 			if (priceGroup.item) {
 
 				let items = [{ item: priceGroup.item, contained: false }];
+				const containedPath = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.IS_CONTAINED_PATH);
 				const itemTypeHandler = Utilities.getItemTypeHandler(CONSTANTS.ITEM_TYPE_METHODS.TRANSFER, priceGroup.item.type);
 				if (itemTypeHandler) {
 					const containedItems = [];
@@ -2321,13 +2322,17 @@ export function getPaymentData({
 						}]);
 					}
 
+                    const containerId = (containedPath && foundry.utils.getProperty(itemData.item, containedPath)) || null;
+
 					priceData.buyerReceive.push({
 						type: "item",
 						name: itemData.item.name,
 						img: itemData.item.img,
-						quantity: requiredQuantity,
+						quantity: itemData.contained ? itemQuantity : requiredQuantity,
 						item: itemData.item,
-						contained: itemData.contained
+						contained: itemData.contained,
+						id: itemData.item.id ?? itemData.item._id ?? null,
+						containerId: containerId
 					});
 				}
 			}

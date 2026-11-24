@@ -5,6 +5,7 @@
 	import { get } from "svelte/store";
 	import * as PileUtilities from "../../../helpers/pile-utilities.js";
 	import PriceSelector from "../../components/PriceSelector.svelte";
+	import ReceiveTree from "./ReceiveTree.svelte";
 
 	const { application } = getContext('#external');
 
@@ -57,6 +58,29 @@
 	$: maxItemQuantity = $prices[$selectedPriceGroup]?.maxQuantity ?? Infinity;
 	$: maxItemPurchaseQuantity = Math.min(maxItemQuantity, maxSellerItemQuantity);
 	$: itemName = localize($itemNameStore) + ($itemQuantityForPriceStore > 1 ? ` (${$itemQuantityForPriceStore})` : "");
+
+	function toReceiveTree(entries) {
+		const ids = new Set(entries.map(entry => entry.id).filter(Boolean));
+		const children = new Map();
+		const roots = [];
+		for (const entry of entries) {
+			if (entry.containerId && entry.containerId !== entry.id && ids.has(entry.containerId)) {
+				if (!children.has(entry.containerId)) children.set(entry.containerId, []);
+				children.get(entry.containerId).push(entry);
+			} else {
+				roots.push(entry);
+			}
+		}
+		const visited = new Set();
+		const toNode = (entry) => {
+			visited.add(entry);
+			const contents = (entry.id ? children.get(entry.id) ?? [] : []).filter(child => !visited.has(child));
+			return { entry, children: contents.map(toNode) };
+		};
+		return roots.map(toNode);
+	}
+
+	$: receiveTree = toReceiveTree(paymentData.buyerReceive ?? []);
 
 	const heldMoney = settings?.selling ? PileUtilities.describeMoneyHeldByItem(item.item, seller) : "";
 
@@ -135,13 +159,13 @@
 			</p>
 		{/if}
 
-		<div class="item-piles-bottom-divider" style="display: grid; grid-template-columns: auto auto;">
+		<div class="item-piles-bottom-divider" style="display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 1rem;">
 
 			<strong class="item-piles-bottom-divider" style="margin-bottom:0.25rem; padding-bottom:0.25rem;">
 				{localize("ITEM-PILES.Applications.TradeMerchantItem." + (settings.selling ? "YouReceive" : "YouPay"))}:
 			</strong>
 
-			<strong class="item-piles-bottom-divider item-piles-text-right"
+			<strong class="item-piles-bottom-divider"
 			        style="margin-bottom:0.25rem; padding-bottom:0.25rem;">
 				{localize("ITEM-PILES.Applications.TradeMerchantItem." + (settings.selling ? "TheyReceive" : "YouReceive"))}:
 			</strong>
@@ -159,26 +183,19 @@
 				{/each}
 			</div>
 
-			<div style="display:flex; flex-direction: column; align-items: flex-end;">
-				{#each paymentData.buyerReceive as price}
-					<div style="display:flex; align-items: center;">
-						<span>{price.quantity > 1 ? price.quantity + " " : ""}{price.name}</span>
-						<div class="item-piles-img-container" style="margin-left: 0.25rem;">
-							<img class="item-piles-img" src={price.img}/>
-						</div>
-					</div>
-				{/each}
+			<div style="display:flex; flex-direction: column; align-items: flex-start; min-width: 0;">
+				<ReceiveTree nodes={receiveTree}/>
 				{#if paymentData.buyerChange.length}
-          <span class="item-piles-small-text item-piles-text-right" style="margin-right: 0.25rem; margin-top: 0.5rem;">
+          <span class="item-piles-small-text" style="margin-top: 0.5rem;">
             {localize("ITEM-PILES.Applications.TradeMerchantItem.Change")}:
           </span>
 					{#each paymentData.buyerChange as change}
 						{#if change.quantity}
 							<div style="display:flex; align-items: center;">
-								<span>{change.quantity} {localize(change.name)}</span>
-								<div class="item-piles-img-container" style="margin-left: 0.25rem;">
+								<div class="item-piles-img-container" style="margin-right: 0.25rem;">
 									<img class="item-piles-img" src={change.img}/>
 								</div>
+								<span>{change.quantity} {localize(change.name)}</span>
 							</div>
 						{/if}
 					{/each}
