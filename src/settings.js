@@ -53,17 +53,18 @@ export async function patchCurrencySettings() {
 	return Helpers.setSetting(SETTINGS.CURRENCIES, currencies);
 }
 
+const cssVariableSheet = new CSSStyleSheet();
+
 export function applySystemSpecificStyles(data = false) {
-	const defaultCssVariables = foundry.utils.deepClone(SETTINGS.DEFAULT_CSS_VARIABLES);
 	const cssVariables = data || Helpers.getSetting(SETTINGS.CSS_VARIABLES);
-	const mergedCssVariables = foundry.utils.mergeObject(defaultCssVariables, cssVariables)
-	const root = document.documentElement;
-	for (const [style, val] of Object.entries(mergedCssVariables)) {
-		if (!val) {
-			root.style.removeProperty(`--item-piles-${style}`)
-		} else {
-			root.style.setProperty(`--item-piles-${style}`, val);
-		}
+	cssVariableSheet.replaceSync(":root, .theme-light, .theme-dark {}");
+	const rule = cssVariableSheet.cssRules[0].style;
+	for (const [style, val] of Object.entries(cssVariables ?? {})) {
+		if (!val || val === SETTINGS.DEFAULT_CSS_VARIABLES[style]) continue;
+		rule.setProperty(`--item-piles-${style}`, val);
+	}
+	if (!document.adoptedStyleSheets.includes(cssVariableSheet)) {
+		document.adoptedStyleSheets = [...document.adoptedStyleSheets, cssVariableSheet];
 	}
 }
 

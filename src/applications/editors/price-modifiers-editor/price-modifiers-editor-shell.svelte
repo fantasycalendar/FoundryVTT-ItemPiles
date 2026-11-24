@@ -151,7 +151,7 @@
     padding: 1rem;
     margin: 0.25rem;
     border-radius: 10px;
-    border: 2px dashed gray;
+    border: 2px dashed var(--item-piles-divider);
   }
 
   table {

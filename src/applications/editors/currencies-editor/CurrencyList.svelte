@@ -101,7 +101,7 @@
       grid-column: 1/-1;
       font-size: 1.5rem;
       border-radius: 5px;
-      border: 2px dashed rgba(0, 0, 0, 0.35);
+      border: 2px dashed var(--item-piles-divider);
     }
   }
 
@@ -121,7 +121,7 @@
     left: 0;
     border-radius: 5px;
     box-shadow: inset 0 0 15px 5px rgb(0, 0, 0, 0.5);
-    background-color: rgba(255, 255, 255, 0.75);
+    background-color: var(--item-piles-drop-overlay);
     z-index: 100000;
     display: flex;
     justify-content: center;

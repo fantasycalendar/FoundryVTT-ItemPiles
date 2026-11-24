@@ -69,7 +69,7 @@
 <style lang="scss">
 
   .setting:not(:last-child) {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--item-piles-divider);
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
   }

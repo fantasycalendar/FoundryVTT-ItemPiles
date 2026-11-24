@@ -154,7 +154,7 @@
       height: 1.5rem;
       margin-top: 10px;
       margin-bottom: 5px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--item-piles-divider-faint);
       padding: 0 5px;
       display: flex;
       align-items: center;

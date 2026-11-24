@@ -86,7 +86,7 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    border: 1px solid black;
+    border: 1px solid var(--item-piles-image-border);
 
     .grid-item-image {
       position: absolute;

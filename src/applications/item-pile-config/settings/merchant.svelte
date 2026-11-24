@@ -421,7 +421,7 @@
 
 	<div class="form-group item-piles-top-divider">
 		<label>
-			<p style="color: #c02609;">
+			<p style="color: var(--item-piles-warning);">
 				{localize("ITEM-PILES.Applications.ItemPileConfig.Merchant.RefreshItemsWarning")}
 			</p>
 		</label>

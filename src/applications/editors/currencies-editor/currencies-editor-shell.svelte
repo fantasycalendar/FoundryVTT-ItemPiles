@@ -70,7 +70,7 @@
   }
 
   footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.5);
+    border-top: 1px solid var(--item-piles-divider-strong);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
     display: flex;

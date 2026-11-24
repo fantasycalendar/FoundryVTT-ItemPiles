@@ -140,7 +140,7 @@
     flex: 0 1 35%;
     padding-right: 0.25rem;
     margin-right: 0.25rem;
-    border-right: 1px solid rgba(0, 0, 0, 0.5);
+    border-right: 1px solid var(--item-piles-divider-strong);
     max-height: 100%;
     max-width: 300px;
     min-width: 250px;

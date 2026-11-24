@@ -101,7 +101,7 @@
     min-height: 150px;
     padding: 0.5rem;
     text-align: center;
-    border: 1px solid gray;
+    border: 1px solid var(--item-piles-divider);
     border-radius: 5px;
 
     img {

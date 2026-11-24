@@ -88,7 +88,7 @@
 
     .buy-button {
       padding-left: 0.25rem;
-      border-left: 1px solid rgba(0, 0, 0, 0.5)
+      border-left: 1px solid var(--item-piles-divider-strong)
     }
   }
 

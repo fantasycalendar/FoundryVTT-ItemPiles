@@ -42,6 +42,6 @@
     flex: 0;
     margin: 2px 0.25rem 2px 0;
     min-width: 1px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--item-piles-divider-strong);
   }
 </style>

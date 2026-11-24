@@ -51,8 +51,8 @@
           top: 0;
           width: 0.6rem;
           height: 14px;
-          border-left: 1px solid rgba(0, 0, 0, 0.4);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+          border-left: 1px solid var(--item-piles-divider);
+          border-bottom: 1px solid var(--item-piles-divider);
         }
 
         &:not(:last-child)::after {
@@ -61,7 +61,7 @@
           left: 0;
           top: 0;
           bottom: 0;
-          border-left: 1px solid rgba(0, 0, 0, 0.4);
+          border-left: 1px solid var(--item-piles-divider);
         }
       }
     }

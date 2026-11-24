@@ -87,7 +87,7 @@
   .drop-item {
     display: flex;
     align-items: center;
-    border: 1px solid rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--item-piles-divider);
     border-radius: 5px;
     padding: 0.25rem;
     font-size: 0.75rem;
@@ -100,7 +100,7 @@
     .drop-document-custom-image {
       max-width: 35px;
       min-width: 35px;
-      border: 1px solid rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--item-piles-divider);
       border-radius: 5px;
       margin-right: 0.5rem;
     }

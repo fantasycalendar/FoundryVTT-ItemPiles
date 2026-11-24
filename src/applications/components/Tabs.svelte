@@ -18,7 +18,7 @@
 <nav class="tabs" data-group="primary" style={$$props.style}>
 	{#each tabs.filter(tab => !tab.hidden) as tab, index (tab.value)}
 		{#if separateElements && index > 0}
-			<div style="border-right: 1px solid rgba(0,0,0,0.5); margin: 0 10px;"></div>
+			<div style="border-right: 1px solid var(--item-piles-divider-strong); margin: 0 10px;"></div>
 		{/if}
 		<div on:click={() => { clicked(tab) }}
 		     class="item item-piles-flexrow item-piles-clickable-link"
@@ -38,7 +38,7 @@
 <style lang="scss">
 
   .tabs {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--item-piles-divider);
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
   }
@@ -54,7 +54,7 @@
 
       &.underscore {
         text-shadow: none;
-        border-bottom: 2px solid rgba(125, 0, 0, 0.5);
+        border-bottom: 2px solid var(--item-piles-tab-active);
       }
     }
   }

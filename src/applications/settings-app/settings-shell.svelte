@@ -309,7 +309,7 @@
   }
 
   footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.25);
+    border-top: 1px solid var(--item-piles-divider);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
   }

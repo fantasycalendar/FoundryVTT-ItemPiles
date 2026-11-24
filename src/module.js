@@ -81,6 +81,16 @@ Hooks.once("init", async () => {
 			}, { inPlace: false });
 		}
 	});
+
+	// TODO: Remove this patch when upgrading to TRL 0.3, which strips these classes in the SvelteApp constructor.
+	const injectHTML = SvelteApplication.prototype._injectHTML;
+	SvelteApplication.prototype._injectHTML = function (...args) {
+		this.options.classes = [
+			...this.options.classes.filter(cls => cls !== "themed" && !cls.startsWith("theme-") && cls !== "item-piles-window"),
+			"item-piles-window"
+		];
+		return injectHTML.apply(this, args);
+	};
 });
 
 Hooks.once("ready", () => {

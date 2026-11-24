@@ -70,7 +70,7 @@
       .item-piles-right-divider {
         margin-right: 0.25rem;
         padding-right: 0.5rem;
-        border-right: 1px solid rgba(0, 0, 0, 0.5);
+        border-right: 1px solid var(--item-piles-divider-strong);
       }
     }
 

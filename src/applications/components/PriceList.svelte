@@ -267,17 +267,17 @@
   }
 
   .item-piles-sortable-list-entry {
-    border: 1px solid rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--item-piles-divider-faint);
     border-radius: 4px;
   }
 
   .item-piles-even-color {
     &:nth-child(even) {
-      background-color: #e5e5d6;
+      background-color: var(--item-piles-price-row-even);
     }
 
     &:nth-child(odd) {
-      background-color: #f8f8e7;
+      background-color: var(--item-piles-price-row-odd);
     }
   }
 
@@ -297,7 +297,7 @@
     left: 0;
     border-radius: 5px;
     box-shadow: inset 0 0 15px 5px rgb(0, 0, 0, 0.5);
-    background-color: rgba(255, 255, 255, 0.75);
+    background-color: var(--item-piles-drop-overlay);
     z-index: 100000;
     display: flex;
     justify-content: center;

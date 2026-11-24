@@ -72,9 +72,9 @@
     position: relative;
     --tjs-label-justify-content: flex-start;
     --tjs-label-overflow: visible;
-    --tjs-menu-primary-color: black;
-    --tjs-menu-color: black;
-    --tjs-menu-border: 1px solid #444;
+    --tjs-menu-primary-color: var(--item-piles-text);
+    --tjs-menu-color: var(--item-piles-text);
+    --tjs-menu-border: 1px solid var(--item-piles-divider-strong);
     --tjs-menu-box-shadow: 0 6px 9px -1px rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
@@ -108,12 +108,12 @@
 
     .multiple-prices::after {
       border-width: 0.3rem;
-      border-right-color: #3ead2c;
+      border-right-color: var(--item-piles-success);
       transform: rotate(45deg);
     }
 
     .cant-afford-multiple-prices::after {
-      border-right-color: #cf5234;
+      border-right-color: var(--item-piles-danger);
     }
 
   }

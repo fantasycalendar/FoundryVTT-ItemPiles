@@ -314,7 +314,7 @@
 
   .col:not(:last-child) {
     padding-right: 10px;
-    border-right: 1px solid rgba(0, 0, 0, 0.35);
+    border-right: 1px solid var(--item-piles-divider);
   }
 
   .row {
@@ -344,7 +344,7 @@
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    background: #435068;
+    background: var(--item-piles-spinner);
     animation-timing-function: cubic-bezier(0, 1, 1, 0);
   }
 

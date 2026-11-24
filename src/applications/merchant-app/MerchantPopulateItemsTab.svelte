@@ -299,7 +299,7 @@
 					<button
 						slot="right"
 						class="item-piles-rolled-item-button"
-						style="color:red;"
+						style="color: var(--item-piles-danger);"
 						on:click={() => removeAddedItem(item)}
 						data-fast-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
 					>
@@ -330,7 +330,7 @@
 					<button
 						slot="right"
 						class="item-piles-rolled-item-button"
-						style="color:red;"
+						style="color: var(--item-piles-danger);"
 						on:click={() => removeAddedItem(item)}
 						data-fast-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
 					>
@@ -369,7 +369,7 @@
 					        on:click={() => { removeTable(table.uuid) }}
 					        data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveTable")}
 					>
-						<i class="fas fa-trash" style="color:#de0e0e;"></i>
+						<i class="fas fa-trash" style="color: var(--item-piles-danger);"></i>
 					</button>
 					<button class="item-piles-rolled-item-button"
 					        on:click={() => { table.open = !table.open; }}
@@ -500,7 +500,7 @@
 				</button>
 
 				<button class="item-piles-button"
-				        style="color:red; max-width:30px;"
+				        style="color: var(--item-piles-danger); max-width:30px;"
 				        on:click={() => { $itemsRolled = []; }}
 				        data-fast-tooltip={localize("ITEM-PILES.Merchant.ToolTipRemoveAllRolledItems")}>
 					<i class="fas fa-trash"/>
@@ -536,7 +536,7 @@
 							<small style="white-space: nowrap;">{item.price}</small>
 							<i
 								class="fas fa-times"
-								style="color: #555; font-size: 0.75rem; opacity: 0.75;"
+								style="color: var(--item-piles-text-muted); font-size: 0.75rem;"
 							/>
 						{/if}
 						<div class="item-piles-quantity-input-container">
@@ -551,7 +551,7 @@
 
 					<button
 						class="item-piles-rolled-item-button"
-						style="color:red;"
+						style="color: var(--item-piles-danger);"
 						on:click={() => removeItem(item)}
 						data-fast-tooltip={localize("ITEM-PILES.Merchant.RemoveItem")}
 					>

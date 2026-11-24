@@ -156,10 +156,10 @@
 
     > div {
       border-radius: 0.25rem;
-      border: 1px solid rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--item-piles-divider);
 
       &.grid-disabled {
-        background-color: rgba(0, 0, 0, 0.25);
+        background-color: var(--item-piles-grid-disabled);
       }
     }
   }

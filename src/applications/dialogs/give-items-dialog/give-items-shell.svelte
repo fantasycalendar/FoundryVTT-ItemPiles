@@ -78,7 +78,7 @@
 
 	<div class="form-group">
 		<Select
-			--background="rgba(0, 0, 0, 0.05)"
+			--background="var(--item-piles-input-background)"
 			--border-radius="5px"
 			--font-family="inherit"
 			--font-size="0.833rem"
@@ -86,7 +86,7 @@
 			--group-title-font-size="0.833rem"
 			--group-title-font-weight="bold"
 			--height="calc(var(--form-field-height) + 1px)"
-			--input-color="black"
+			--input-color="var(--item-piles-input-text-color)"
 			--item-padding="0.25rem"
 			--margin="0.25rem 0"
 			--padding="0 8px"

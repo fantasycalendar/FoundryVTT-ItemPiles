@@ -2,6 +2,7 @@
 
 ## Version 3.3.5
 
+- Added support for Foundry's light or dark color scheme
 - Fixed items added by macros and other modules not stacking with matching items the actor already had
 - Fixed items not being added when creating an item pile on the canvas from an actor whose token is linked
 - Fixed vaults accepting more items than they can hold when items were added without the vault being opened, such as by macros or other modules

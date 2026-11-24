@@ -336,7 +336,7 @@
   }
 
   :global(.item-piles-holder-item) {
-    border: 1px dashed rgba(0, 0, 0, 0.35);
+    border: 1px dashed var(--item-piles-divider);
     border-radius: 4px;
     padding: 0.25rem;
     min-height: 2rem;
@@ -376,7 +376,7 @@
   }
 
   .item-piles-holder-errors {
-    color: #d93131;
+    color: var(--item-piles-danger);
   }
 
 </style>

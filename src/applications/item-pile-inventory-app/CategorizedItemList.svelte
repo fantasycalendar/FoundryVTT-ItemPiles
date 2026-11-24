@@ -35,7 +35,7 @@
 <style lang="scss">
 
   .item-group-type {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--item-piles-divider-faint);
     margin: 0.5rem 0 0.25rem 0;
     padding-right: 10px;
     height: 1.5rem;

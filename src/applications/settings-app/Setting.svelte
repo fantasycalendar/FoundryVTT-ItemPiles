@@ -84,7 +84,7 @@
 
   .item-pile-setting:not(:last-child) {
 
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--item-piles-divider);
     margin-bottom: 0.4rem;
     padding-bottom: 0.4rem;
 
@@ -104,7 +104,7 @@
     }
 
     .invalid {
-      border: 2px solid #d93131;
+      border: 2px solid var(--item-piles-danger);
     }
 
     label {

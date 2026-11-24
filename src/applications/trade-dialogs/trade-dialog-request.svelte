@@ -155,7 +155,7 @@
 
   .item-piles-progress {
     width: calc(100% - 4px);
-    background: #e1e4e8;
+    background: var(--item-piles-progress-track);
     border-radius: 3px;
     overflow: hidden;
     margin: 0.25rem 2px 0 2px;
@@ -169,7 +169,7 @@
     .progress-bar {
       display: block;
       height: 100%;
-      background-color: rgba(255, 20, 20, 0.65);
+      background-color: var(--item-piles-danger);
     }
   }
 

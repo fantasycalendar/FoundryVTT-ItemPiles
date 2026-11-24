@@ -86,7 +86,7 @@
 
       overflow: hidden;
       border-radius: 4px;
-      border: 1px solid black;
+      border: 1px solid var(--item-piles-image-border);
       align-self: center;
     }
 
